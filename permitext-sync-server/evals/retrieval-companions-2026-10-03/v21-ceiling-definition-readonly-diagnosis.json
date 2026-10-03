@@ -1,0 +1,422 @@
+{
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "readOnly": true,
+  "providerCalls": 0,
+  "sourceEdited": false,
+  "sourceHashes": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-evidence-assembly.mjs",
+      "sha256": "4b89e959376318697f44a788ce26cd97cabd306cf49f452b62efff4a4176dbf8",
+      "matchesFrozenCommit": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-definition-excerpts.mjs",
+      "sha256": "22590aca7e9ebd8cba25807da3f8aba3d8fd6675af9ad2d313b7083ee9d39486",
+      "matchesFrozenCommit": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/evidence-discovery.mjs",
+      "sha256": "bac74ea1dac41ee65c2e5168a3f32feacff7096d7840b3ffdb066e461572c873",
+      "matchesFrozenCommit": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-rule-packets.mjs",
+      "sha256": "d8eb40961ae75d7c0b31695c60f07067c8cbd583f79c76eb10a33d371bddd149",
+      "matchesFrozenCommit": true
+    }
+  ],
+  "actualEvidence": {
+    "firstTurnBC202Present": false,
+    "secondTurnBC202Present": true,
+    "bothTurnsControllingCeilingParentAndChildPresent": true,
+    "safeLogLimit": "Logs expose source references/counts and issue types, not actual202 text/labels, candidate ranks, source roles or private drafts. Presence202 does not prove presence of either material definition.",
+    "visibleFirstAnswer": "Delivered first response explicitly makes the7ft6in result conditional on occupiable-vs-habitable status and says needed code definitions were not included.",
+    "issueTypes": [
+      "fact_evidence_confusion"
+    ],
+    "logs": [
+      {
+        "turn": "01",
+        "path": "/tmp/permitext-production-v21-repeat-ceiling-01.jsonl",
+        "sha256": "9b45ddd53888e539c1424deb77555ae343c90323bfd4af1438c7e9de973c7f9b",
+        "safeEventShapes": [
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_conversation_message",
+            "keys": [
+              "event",
+              "user",
+              "mode",
+              "model",
+              "answerReasoningEffort",
+              "verificationReasoningEffort",
+              "requestedModel",
+              "routingMode",
+              "answerTier",
+              "routingReasons",
+              "evidenceAnalysisModel",
+              "verificationModel",
+              "escalated",
+              "escalationStages",
+              "verificationAttemptCount",
+              "verificationIssueTypes",
+              "webSupport",
+              "modelUsage",
+              "estimatedCostUSD",
+              "pricingVersion",
+              "conversation",
+              "evidenceSections",
+              "evidencePassages",
+              "totalTokens"
+            ]
+          },
+          {
+            "event": "research_operation_accounting",
+            "keys": [
+              "event",
+              "operationID",
+              "status",
+              "charged",
+              "failureCode",
+              "providerRequestCount",
+              "pendingProviderRequestCount",
+              "embeddingProviderRequestCount",
+              "embeddingPendingProviderRequestCount",
+              "embeddingInputTokens",
+              "semanticSearch",
+              "estimatedProviderCostUSD",
+              "conservativeProviderCostUSD",
+              "durationMilliseconds",
+              "preparationMilliseconds",
+              "retrievalMilliseconds",
+              "projectLinked",
+              "projectFactCount",
+              "establishedConversationFactCount",
+              "evidenceReferences",
+              "evidenceCharacterCount",
+              "verificationIssueTypes"
+            ]
+          },
+          {
+            "event": "dynamic_route_observation",
+            "keys": [
+              "event",
+              "severity",
+              "route",
+              "method",
+              "statusCode",
+              "durationMilliseconds",
+              "requestID",
+              "releaseID",
+              "gitCommit",
+              "deploymentHost",
+              "environment",
+              "observedAt"
+            ]
+          }
+        ],
+        "deliveredDefinitionTextOrLabelsPresent": false
+      },
+      {
+        "turn": "02",
+        "path": "/tmp/permitext-production-v21-repeat-ceiling-02.jsonl",
+        "sha256": "ddf12706503d8dfef570df491609e02bacbd37c11982ef95f2bc5d936145018c",
+        "safeEventShapes": [
+          {
+            "event": "permitext.sync",
+            "keys": [
+              "event",
+              "mode",
+              "principal",
+              "changed",
+              "mutationCount",
+              "excludedMutationKinds",
+              "durationMs",
+              "observedAt"
+            ]
+          },
+          {
+            "event": "permitext.sync",
+            "keys": [
+              "event",
+              "mode",
+              "principal",
+              "changed",
+              "mutationCount",
+              "excludedMutationKinds",
+              "durationMs",
+              "observedAt"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_conversation_message",
+            "keys": [
+              "event",
+              "user",
+              "mode",
+              "model",
+              "answerReasoningEffort",
+              "verificationReasoningEffort",
+              "requestedModel",
+              "routingMode",
+              "answerTier",
+              "routingReasons",
+              "evidenceAnalysisModel",
+              "verificationModel",
+              "escalated",
+              "escalationStages",
+              "verificationAttemptCount",
+              "verificationIssueTypes",
+              "webSupport",
+              "modelUsage",
+              "estimatedCostUSD",
+              "pricingVersion",
+              "conversation",
+              "evidenceSections",
+              "evidencePassages",
+              "totalTokens"
+            ]
+          },
+          {
+            "event": "research_operation_accounting",
+            "keys": [
+              "event",
+              "operationID",
+              "status",
+              "charged",
+              "failureCode",
+              "providerRequestCount",
+              "pendingProviderRequestCount",
+              "embeddingProviderRequestCount",
+              "embeddingPendingProviderRequestCount",
+              "embeddingInputTokens",
+              "semanticSearch",
+              "estimatedProviderCostUSD",
+              "conservativeProviderCostUSD",
+              "durationMilliseconds",
+              "preparationMilliseconds",
+              "retrievalMilliseconds",
+              "projectLinked",
+              "projectFactCount",
+              "establishedConversationFactCount",
+              "evidenceReferences",
+              "evidenceCharacterCount",
+              "verificationIssueTypes"
+            ]
+          },
+          {
+            "event": "dynamic_route_observation",
+            "keys": [
+              "event",
+              "severity",
+              "route",
+              "method",
+              "statusCode",
+              "durationMilliseconds",
+              "requestID",
+              "releaseID",
+              "gitCommit",
+              "deploymentHost",
+              "environment",
+              "observedAt"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          },
+          {
+            "event": "research_provider_phase",
+            "keys": [
+              "event",
+              "stage",
+              "outcome",
+              "durationMilliseconds",
+              "providerAttempts",
+              "attemptTimings"
+            ]
+          }
+        ],
+        "deliveredDefinitionTextOrLabelsPresent": false
+      }
+    ],
+    "visibleSecondTurnCapture": [
+      {
+        "id": "repeat-ceiling-02",
+        "question": "For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?",
+        "capturedAt": "2026-10-03T18:52:03.185Z",
+        "visibleText": "RESEARCH\n\nHistory\n\u22ef\n\nFor this project, how low can we make the ceilings in the retail sales area and the community-facility offices?\n\nResearch complete\n01:04\n\nThe supported minimum is 7 feet 6 inches if the retail sales area and community-facility offices are occupiable rather than habitable spaces; habitable rooms and spaces require 8 feet. The code definitions needed to resolve that distinction for these uses are not included, so I cannot yet give an unconditional project minimum. Measure from the finished floor to the finished underside of the ceiling or ceiling beams. (2022 NYC BC \u00a7 1208.2)\n\nFor a furred ceiling in a nonhabitable room, the required minimum must be maintained over at least two-thirds of the room\u2019s area; the remaining portion may be lower, but never below 7 feet. The exception preserves the \u00a7 1208.2 minimum for habitable rooms and spaces\u2014this is not permission to lower their ceilings to 7 feet. (BC \u00a7 1208.2.1)\n\nA separate exception permits 7-foot ceilings above and below a mezzanine, other than in habitable spaces; no mezzanine arrangement has been established for these areas. (BC \u00a7 1208.2, Exception 4)\n\nFor the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?\n\nResearch complete\n01:05\n\nYes, conditionally: if the ductwork enclosure is a furred ceiling and the retail sales area is a nonhabitable occupiable space, your layout satisfies this ceiling-height rule. The required 7-foot-6-inch height would remain over 75% of the room\u2019s area\u2014more than the required two-thirds\u2014and the lowered quarter would meet the 7-foot absolute minimum for a furred ceiling. (2022 NYC BC \u00a7\u00a7 1208.2, 1208.2.1)\n\nMeasure both heights from the finished floor to the finished underside of the ceiling or ceiling beams. If the space is habitable, the furred-ceiling exception preserves the 8-foot minimum, so neither proposed height satisfies that requirement. The available code text does not include the definitions needed to resolve that classification for the retail sales area. (BC \u00a7\u00a7 1208.2, 1208.2.1)\n\nSend"
+      }
+    ],
+    "visibleCapturePath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v21-visible-answers.json",
+    "visibleCaptureSHA256": "d9ca24352b4404e5006bc3c6952cc89804e7694af3cd921bc93b9d21fc5a9e42"
+  },
+  "canonical": {
+    "definitionSource": {
+      "sectionID": "113",
+      "codePrefix": "BC",
+      "sectionNumber": "202",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "jurisdiction": "New York City",
+      "sourceHash": "567225158f146bceb3d361d3644d5f639598a599c06e2a8e2be5eeaaa09c14b3",
+      "characters": 236422
+    },
+    "completeRequestedEntries": {
+      "schemaVersion": 1,
+      "version": "20260930-complete-definition-dependencies-v4",
+      "sourceMode": "canonical_enacted_definition_entries",
+      "sectionID": "113",
+      "codePrefix": "BC",
+      "sectionNumber": "202",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "labels": [
+        "HABITABLE SPACE",
+        "OCCUPIABLE SPACE"
+      ],
+      "passages": [
+        "HABITABLE SPACE. All rooms and spaces within a dwelling unit in Group R or I-1, including bedrooms, living rooms, studies, recreation rooms, kitchens, dining rooms and other similar spaces.\nException: The following spaces within a dwelling unit shall not be considered habitable space:\n1. A dining space 55 square feet (5.1 m\n\n2\n\n) or less located off a living room, foyer or kitchen;\n2. A kitchenette;\n3. A bathroom or toilet room;\n4. A laundry room; and\n5. A corridor, passageway, or private hall; and a foyer used as an entrance hall in a dwelling unit: not exceeding 10 percent of the total floor area of the dwelling unit; or not exceeding 20 percent of the floor area of the dwelling unit where every habitable room is at least 20 percent larger than the required minimum room sizes established by the New York City Housing Maintenance Code .",
+        "OCCUPIABLE SPACE . A room or enclosed space , other than a habitable space , designed for human occupancy or use in which individuals may remain for a period of time for rest , amusement , treatment , education , dining , shopping , employment , labor or other similar purposes ."
+      ],
+      "text": "HABITABLE SPACE. All rooms and spaces within a dwelling unit in Group R or I-1, including bedrooms, living rooms, studies, recreation rooms, kitchens, dining rooms and other similar spaces.\nException: The following spaces within a dwelling unit shall not be considered habitable space:\n1. A dining space 55 square feet (5.1 m\n\n2\n\n) or less located off a living room, foyer or kitchen;\n2. A kitchenette;\n3. A bathroom or toilet room;\n4. A laundry room; and\n5. A corridor, passageway, or private hall; and a foyer used as an entrance hall in a dwelling unit: not exceeding 10 percent of the total floor area of the dwelling unit; or not exceeding 20 percent of the floor area of the dwelling unit where every habitable room is at least 20 percent larger than the required minimum room sizes established by the New York City Housing Maintenance Code .\n\nOCCUPIABLE SPACE . A room or enclosed space , other than a habitable space , designed for human occupancy or use in which individuals may remain for a period of time for rest , amusement , treatment , education , dining , shopping , employment , labor or other similar purposes .",
+      "canonicalSectionCharacterCount": 236422,
+      "excerptCharacterCount": 1129,
+      "canonicalContextComplete": false,
+      "completeDefinitionEntries": true
+    },
+    "characters": 1129
+  },
+  "confirmedGenericFailurePaths": [
+    {
+      "stage": "candidate_nomination",
+      "source": "research-evidence-assembly.mjs definitionCandidates optional loop",
+      "behavior": "Only candidates plus supplementalDefinitionCandidates are examined; definition priority metadata is mandatory. Merely delivering a rule using a defined term does not nominate its authorized same-authority definition source.",
+      "productionConfidence": "Explains possible first-turn absence; actual candidate availability/definitions quota not logged, so cannot isolate nomination versus quota."
+    },
+    {
+      "stage": "definition_entry_selection",
+      "source": "definitionSelectionContext + targetedDefinitionExcerpt/entryScore",
+      "behavior": "Selection text contains retrieval query +first4000chars of every canonical expansion source, truncated at32000. Every exact matched label receives +100 plus8 perlabelterm; compound labels in unrelated sources can outrank responsive rule classifications. Only8 entries andexisting2500chars are kept in supplemental stage.",
+      "offlineProof": "Controlled canonical observed-source-order contexts contain both habitable andoccupiable terms yet select8 unrelated labels, omitting both complete entries. Controlled assembly with authorizedBC202 supplemental candidate also omits both in eachturn."
+    }
+  ],
+  "boundedCounterfactual": {
+    "currentQueryPlusResponsiveCeilingPacket": "Both complete definitions selected when selection context uses only query +responsive1208.2/.1 canonical text. Probe output1872chars firstturn/1786secondturn. Exact requested two-definition set1129chars.",
+    "limits": "No cap increase needed: fits existing2500 supplemental definition allowance andmaximum2definition sources.",
+    "notProof": "Counterfactual/probes are not actual provider inputs or a production fix; no new correctness grade asserted."
+  },
+  "proposedGenericRemedy": {
+    "candidate": "Nominate at most an existing same-authority/version/jurisdiction authorized definitions candidate from complete responsive operative-rule terminology, within existingdefinition source/read/text limits, rather than depending entirely on global semantic shortlist.",
+    "selection": "Prioritize current question +the relevant complete operative packet for exact complete definition-label selection; do not rank its required classifications against all unrelated canonical source prefixes/project facets. Preserve full definition entries/exceptions andexisting pin/edition/budget guards.",
+    "alreadySupplied": "If an existing chapter definitions excerpt does not contain the needed complete labels, its mere section identity should not mark those definitions supplied; replace/extend only complete entries within the same limits.",
+    "avoid": "No ceiling/use legal outcome mapping, no classification inferred from source title, no global full202 delivery or additional calls/caps."
+  },
+  "meaningfulLaterContracts": [
+    "Synthetic operative rule names two defined classifications while unrelated long source paragraphs name many higher-word-count definitions; both complete operative definitions survive existing8-entry/2500-char budget.",
+    "Same-topic followup delivers parent rule plus an already listed definitions excerpt missing operative labels; exact complete missing entries recovered atomically, not chapter identity assumedcomplete.",
+    "Wrong authority/edition/jurisdiction, strict selection, no responsive term match, ambiguous definition labels, duplicate entries or over-budget complete definitions are not expanded.",
+    "Complete exception/list content stays attached to its definition; unused parent labels do not become independent applicability conclusions."
+  ],
+  "replay": {
+    "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v21-ceiling-definition-readonly-replay.json",
+    "sha256": "f29616b68ae6262d357269ca6cced20dab88c47e7b425be05571a08159eb1c35",
+    "limits": "Observed accounting order is not the captured ranked discovery input; canonical whole source/header reconstruction and visible33-field strings omit hidden qualifiers. The BC202 supplemental candidate is deliberately introduced as a controlled availability test, not evidence of actual nomination. Second-turn verified history uses canonical identities/whole-source supporting text rather than uncaptured exact cited slices or stored topic. No paid semantic ranking or writer replay performed."
+  }
+}

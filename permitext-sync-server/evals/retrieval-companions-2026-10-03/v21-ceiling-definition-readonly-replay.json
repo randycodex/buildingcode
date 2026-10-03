@@ -1,0 +1,932 @@
+{
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "assemblyVersion": "20261003-continuing-canonical-packets-v65",
+  "providerCalls": 0,
+  "scope": "Read-only frozen source diagnosis; no browser/model/provider/state changes. Existing accounting does not retain delivered source excerpt text, definition labels, evidence flags or stored citation order. Full raw provider drafts not read.",
+  "canonical": {
+    "sectionID": "113",
+    "codePrefix": "BC",
+    "sectionNumber": "202",
+    "corpusID": "nyc-2022-construction-codes",
+    "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+    "codeEdition": "2022 New York City Construction Codes",
+    "jurisdiction": "New York City",
+    "sourceHash": "567225158f146bceb3d361d3644d5f639598a599c06e2a8e2be5eeaaa09c14b3",
+    "characters": 236422,
+    "requiredDefinitions": {
+      "schemaVersion": 1,
+      "version": "20260930-complete-definition-dependencies-v4",
+      "sourceMode": "canonical_enacted_definition_entries",
+      "sectionID": "113",
+      "codePrefix": "BC",
+      "sectionNumber": "202",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "labels": [
+        "HABITABLE SPACE",
+        "OCCUPIABLE SPACE"
+      ],
+      "passages": [
+        "HABITABLE SPACE. All rooms and spaces within a dwelling unit in Group R or I-1, including bedrooms, living rooms, studies, recreation rooms, kitchens, dining rooms and other similar spaces.\nException: The following spaces within a dwelling unit shall not be considered habitable space:\n1. A dining space 55 square feet (5.1 m\n\n2\n\n) or less located off a living room, foyer or kitchen;\n2. A kitchenette;\n3. A bathroom or toilet room;\n4. A laundry room; and\n5. A corridor, passageway, or private hall; and a foyer used as an entrance hall in a dwelling unit: not exceeding 10 percent of the total floor area of the dwelling unit; or not exceeding 20 percent of the floor area of the dwelling unit where every habitable room is at least 20 percent larger than the required minimum room sizes established by the New York City Housing Maintenance Code .",
+        "OCCUPIABLE SPACE . A room or enclosed space , other than a habitable space , designed for human occupancy or use in which individuals may remain for a period of time for rest , amusement , treatment , education , dining , shopping , employment , labor or other similar purposes ."
+      ],
+      "text": "HABITABLE SPACE. All rooms and spaces within a dwelling unit in Group R or I-1, including bedrooms, living rooms, studies, recreation rooms, kitchens, dining rooms and other similar spaces.\nException: The following spaces within a dwelling unit shall not be considered habitable space:\n1. A dining space 55 square feet (5.1 m\n\n2\n\n) or less located off a living room, foyer or kitchen;\n2. A kitchenette;\n3. A bathroom or toilet room;\n4. A laundry room; and\n5. A corridor, passageway, or private hall; and a foyer used as an entrance hall in a dwelling unit: not exceeding 10 percent of the total floor area of the dwelling unit; or not exceeding 20 percent of the floor area of the dwelling unit where every habitable room is at least 20 percent larger than the required minimum room sizes established by the New York City Housing Maintenance Code .\n\nOCCUPIABLE SPACE . A room or enclosed space , other than a habitable space , designed for human occupancy or use in which individuals may remain for a period of time for rest , amusement , treatment , education , dining , shopping , employment , labor or other similar purposes .",
+      "canonicalSectionCharacterCount": 236422,
+      "excerptCharacterCount": 1129,
+      "canonicalContextComplete": false,
+      "completeDefinitionEntries": true
+    }
+  },
+  "cases": [
+    {
+      "turn": "01",
+      "question": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+      "actual": {
+        "references": [
+          "ZR 12-10",
+          "BC 1004.1.3",
+          "BC 1208.2.1",
+          "ZR APPENDIX E",
+          "BC 506.2.2",
+          "ZR 33-123",
+          "BC 903.2.11.10",
+          "MC 403.3.1.1",
+          "ZR 35-33",
+          "ZR 78-352",
+          "BC 1208.2",
+          "BC 1004.3",
+          "MC 403.2.1",
+          "MC 403.1",
+          "BC 402.8.2",
+          "BC 303.7",
+          "BC 102.1",
+          "MC 102.1",
+          "ZR 27-111"
+        ],
+        "characters": 37521,
+        "verificationIssueTypes": [
+          "fact_evidence_confusion"
+        ]
+      },
+      "query": {
+        "question": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+        "sourceQuery": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+        "semanticQuery": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?\nProject search context (supplied facts, not applicability): Occupancy: Proposed mixed-use: residential, retail and community facility; formal groups TBD; Additional Project facts (user wording; not independently verified): The user describes the project as a proposed new building in schematic design with ground-floor retail and community-facility space.; Residential Units: 0; Building Class: I5; Land Use Code: 08",
+        "dependentMeasurementSubject": null,
+        "resolvedSubjectContext": "",
+        "inheritedAuthorityReferences": [],
+        "activeRulePacketReferences": [],
+        "retrievalQuery": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?\nProject facts: Occupancy: Proposed mixed-use: residential, retail and community facility; formal groups TBD; Additional Project facts (user wording; not independently verified): The user describes the project as a proposed new building in schematic design with ground-floor retail and community-facility space.; Residential Units: 0; Building Class: I5; Land Use Code: 08",
+        "previousTopicApplied": false,
+        "projectFactsApplied": true,
+        "contextDependentFollowUp": false,
+        "relevanceComparison": false,
+        "conversationTopic": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+        "immediateContext": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+        "topicDecision": {
+          "version": "20261003-bounded-causal-equipment-continuity-v11",
+          "decision": "topic_switch",
+          "question": {
+            "text": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+            "source": "current_question",
+            "codeReferences": []
+          },
+          "rootTopic": {
+            "text": "",
+            "source": "none",
+            "codeReferences": []
+          },
+          "currentTopic": {
+            "text": "",
+            "source": "none",
+            "codeReferences": []
+          },
+          "nextRootTopic": {
+            "text": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+            "source": "current_question",
+            "codeReferences": []
+          },
+          "nextCurrentTopic": {
+            "text": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+            "source": "current_question",
+            "codeReferences": []
+          },
+          "contextPolicy": {
+            "includeRootTopic": false,
+            "includeCurrentTopic": false,
+            "replaceRootTopic": true
+          },
+          "signals": {
+            "returnToOriginal": false,
+            "correction": false,
+            "relevanceComparison": false,
+            "explicitSwitch": false,
+            "projectSubjectContinuation": false,
+            "hypotheticalContinuation": false,
+            "formatTransformation": false,
+            "contextualContinuation": true,
+            "citedSubjectContinuation": false,
+            "causalSubjectContinuation": false,
+            "definiteSubjectContinuation": false,
+            "relatedReference": false,
+            "disjointExplicitReference": false,
+            "selfContained": false,
+            "rootTokenOverlap": 0,
+            "currentTokenOverlap": 0
+          }
+        }
+      },
+      "probes": [
+        {
+          "name": "currentQuestion",
+          "contextCharacters": 111,
+          "containsHabitableTerms": false,
+          "containsOccupiableTerms": false,
+          "labels": [],
+          "characters": 0,
+          "requiredEntriesIncluded": [
+            {
+              "label": "HABITABLE SPACE",
+              "complete": false
+            },
+            {
+              "label": "OCCUPIABLE SPACE",
+              "complete": false
+            }
+          ],
+          "text": null
+        },
+        {
+          "name": "queryAndResponsiveCeilingRules",
+          "contextCharacters": 2191,
+          "containsHabitableTerms": true,
+          "containsOccupiableTerms": true,
+          "labels": [
+            "DWELLING",
+            "FACILITY",
+            "HABITABLE SPACE",
+            "KITCHEN",
+            "KITCHENETTE",
+            "MEZZANINE",
+            "OCCUPIABLE SPACE",
+            "STORAGE ROOM"
+          ],
+          "characters": 1872,
+          "requiredEntriesIncluded": [
+            {
+              "label": "HABITABLE SPACE",
+              "complete": true
+            },
+            {
+              "label": "OCCUPIABLE SPACE",
+              "complete": true
+            }
+          ],
+          "text": "DWELLING. A building or structure that is occupied in whole or in part as the home, residence or sleeping place of one or more families.\n\nFACILITY . All or any portion of buildings , structure , site improvements , elements and pedestrian or vehicular routes located on a site .\n\nHABITABLE SPACE. All rooms and spaces within a dwelling unit in Group R or I-1, including bedrooms, living rooms, studies, recreation rooms, kitchens, dining rooms and other similar spaces.\nException: The following spaces within a dwelling unit shall not be considered habitable space:\n1. A dining space 55 square feet (5.1 m\n\n2\n\n) or less located off a living room, foyer or kitchen;\n2. A kitchenette;\n3. A bathroom or toilet room;\n4. A laundry room; and\n5. A corridor, passageway, or private hall; and a foyer used as an entrance hall in a dwelling unit: not exceeding 10 percent of the total floor area of the dwelling unit; or not exceeding 20 percent of the floor area of the dwelling unit where every habitable room is at least 20 percent larger than the required minimum room sizes established by the New York City Housing Maintenance Code .\n\nKITCHEN. A room with 80 square feet (7.4 m\n\n2\n\n) or more of floor area that is intended, arranged, designed or used for cooking or warming of food.\n\nKITCHENETTE. A space with less than 80 square feet (7.4 m\n\n2\n\n) of floor area that is intended, arranged, designed or used for cooking or warming of food.\n\nMEZZANINE. An intermediate level or levels between the floor and ceiling of any story in accordance with Section 505 .\n\nOCCUPIABLE SPACE . A room or enclosed space , other than a habitable space , designed for human occupancy or use in which individuals may remain for a period of time for rest , amusement , treatment , education , dining , shopping , employment , labor or other similar purposes .\n\nSTORAGE ROOM . See Section 427 . 4 ."
+        },
+        {
+          "name": "observedCanonicalSourceOrder",
+          "contextCharacters": 32000,
+          "containsHabitableTerms": true,
+          "containsOccupiableTerms": true,
+          "labels": [
+            "CELL",
+            "COMMERCIAL COOKING SYSTEM",
+            "COVERED MALL BUILDING",
+            "HAZARDOUS PRODUCTION MATERIAL (HPM)",
+            "LABORATORY UNIT",
+            "LIQUID STORAGE ROOM",
+            "STORAGE ROOM",
+            "STORY ABOVE GRADE PLANE"
+          ],
+          "characters": 2487,
+          "requiredEntriesIncluded": [
+            {
+              "label": "HABITABLE SPACE",
+              "complete": false
+            },
+            {
+              "label": "OCCUPIABLE SPACE",
+              "complete": false
+            }
+          ],
+          "text": "CELL. See Section 408.1.1.\n\nCOMMERCIAL COOKING SYSTEM. A system consisting of commercial cooking equipment, exhaust hood, filters, exhaust duct system, fire suppression system and other related appurtenances designed to capture grease-laden cooking vapors and exhaust them safely to the outdoors.\n\nCOVERED MALL BUILDING\n. A single building enclosing a number of tenants and occupants such as retail stores , drinking and dining establishments , entertainment and amusement facilities , passenger transportation terminals , offices , and other similar uses wherein two or more tenants have a main entrance into one or more malls . For the purpose of this chapter , anchor buildings shall not be considered as part of the covered mall building . The term \" Covered Mall Building \" shall include open mall buildings as defined below .\nMall . A roofed or covered common pedestrian area within a covered mall building that serves as access for two or more tenants and not to exceed three levels that are open to each other . The term \" mall \" shall include open malls as defined below .\nOpen mall . An unroofed common pedestrian way serving a number of tenants not exceeding three levels . Circulation at levels above grade shall be permitted to include open exterior balconies leading to exits discharging at grade .\nOpen mall building . Several structures housing a number of tenants , such as retail stores , drinking and dining establishments , entertainment and amusement facilities , offices and other similar uses , wherein two or more tenants have a main entrance into one or more open malls . For the purposes of Chapter 4 , anchor buildings are not considered as part of the open mall building .\n\nHAZARDOUS PRODUCTION MATERIAL (HPM). A solid, liquid or gas associated with semiconductor manufacturing that has a degree-of-hazard rating in health, flammability or instability of Class 3 or 4 as defined in NFPA 704 and that is used directly in research, laboratory or production processes that have as their end product materials that are not hazardous.\n\nLABORATORY UNIT. See Section 427.4.\n\nLIQUID STORAGE ROOM. A room classified as Group H-3 occupancy used for the storage of flammable or combustible liquids in an unopened condition.\n\nSTORAGE ROOM . See Section 427 . 4 .\n\nSTORY ABOVE GRADE PLANE . Any story having its finished floor surface entirely above grade plane , except that a basement shall also be considered a story above grade plane ( see \" Story \" and \" Basement \")."
+        }
+      ],
+      "reconstruction": {
+        "references": [
+          "ZR 12-10",
+          "BC 1004.1.3",
+          "BC 1208.2.1",
+          "ZR APPENDIX E",
+          "BC 506.2.2",
+          "ZR 33-123",
+          "BC 903.2.11.10",
+          "MC 403.3.1.1",
+          "ZR 35-33",
+          "ZR 78-352",
+          "BC 1208.2",
+          "BC 1004.3",
+          "MC 403.2.1",
+          "MC 403.1",
+          "BC 402.8.2",
+          "BC 303.7",
+          "BC 102.1",
+          "MC 102.1",
+          "BC 202"
+        ],
+        "usage": {
+          "pinnedCount": 0,
+          "pinnedCharacterCount": 0,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 0,
+          "pinnedSelectionTruncatedCount": 0,
+          "pinnedSelectionExcerptedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 48000,
+          "supplementalCharacterCount": 41332,
+          "candidateCount": 10,
+          "discoveredCount": 10,
+          "targetedDefinitionCount": 2,
+          "crossReferenceCount": 6,
+          "topicDependencyCount": 0,
+          "interpretationContextCount": 2,
+          "characterCount": 41332,
+          "resolverFailureCount": 2,
+          "nonMaterialCandidateCount": 0
+        },
+        "definitionCandidatePriority": {
+          "version": "20261001-historical-reference-scope-v7",
+          "primaryFunction": "exception",
+          "functions": [
+            "exception",
+            "calculation_table",
+            "definition"
+          ],
+          "materialityRank": 6,
+          "evidenceRole": "supporting",
+          "controllingRoot": null,
+          "controllingTopicRoutes": [],
+          "topicRoutes": [],
+          "topicRouteRelationship": "unrestricted",
+          "pinnedScopeActive": false,
+          "hierarchyDepth": null,
+          "descendantClaimCoverage": true,
+          "claimCoverageRequired": false,
+          "claimCoverageReason": null,
+          "reasons": [
+            "exception or permitted reduction",
+            "calculation or table provision",
+            "definition provision"
+          ]
+        },
+        "definitionSource": {
+          "text": "COMMERCIAL COOKING SYSTEM. A system consisting of commercial cooking equipment, exhaust hood, filters, exhaust duct system, fire suppression system and other related appurtenances designed to capture grease-laden cooking vapors and exhaust them safely to the outdoors.\n\nFIRE PROTECTION SYSTEM. Approved devices, equipment and systems or combinations of systems used to detect a fire, activate an alarm, extinguish or control a fire, control or manage smoke and products of a fire or any combination thereof.\n\nHAZARDOUS PRODUCTION MATERIAL (HPM). A solid, liquid or gas associated with semiconductor manufacturing that has a degree-of-hazard rating in health, flammability or instability of Class 3 or 4 as defined in NFPA 704 and that is used directly in research, laboratory or production processes that have as their end product materials that are not hazardous.\n\nINTERIOR SURFACES. Surfaces other than weather-exposed surfaces.\n\nLABORATORY UNIT. See Section 427.4.\n\nLIQUID STORAGE ROOM. A room classified as Group H-3 occupancy used for the storage of flammable or combustible liquids in an unopened condition.\n\nSTORAGE ROOM . See Section 427 . 4 .\n\nSTORY ABOVE GRADE PLANE . Any story having its finished floor surface entirely above grade plane , except that a basement shall also be considered a story above grade plane ( see \" Story \" and \" Basement \").",
+          "characters": 1360,
+          "labels": [
+            "COMMERCIAL COOKING SYSTEM",
+            "FIRE PROTECTION SYSTEM",
+            "HAZARDOUS PRODUCTION MATERIAL (HPM)",
+            "INTERIOR SURFACES",
+            "LABORATORY UNIT",
+            "LIQUID STORAGE ROOM",
+            "STORAGE ROOM",
+            "STORY ABOVE GRADE PLANE"
+          ],
+          "canonicalContextComplete": false,
+          "truncated": false,
+          "indexedPassage": null,
+          "sourceHash": "5173ff48534e8ac69cecc45fffa9f693ffc7f095389995fcba9116b112bf580c",
+          "requiredEntriesIncluded": [
+            {
+              "label": "HABITABLE SPACE",
+              "complete": false
+            },
+            {
+              "label": "OCCUPIABLE SPACE",
+              "complete": false
+            }
+          ]
+        },
+        "reads": [
+          {
+            "reference": "ZR 12-10",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 1004.1.3",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 1208.2.1",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 1208.2",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "ZR APPENDIX E",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 506.2.2",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR 33-123",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 903.2.11.10",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 903.2",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "MC 403.3.1.1",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR 35-33",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR 78-352",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 1004.1.3",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 903.2.11.10",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "MC 403.3.1.1",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 1004.3",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 1004.3",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "MC 403.2.1",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "MC 403.1",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "MC 403.2.1",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "MC 403.1",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 402.8.2",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 303.7",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 102.1",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "MC 102.1",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 202",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR 12-10"
+          },
+          {
+            "reference": "BC 1208.2.1"
+          },
+          {
+            "reference": "BC 1208.2"
+          },
+          {
+            "reference": "BC 1004.1.3"
+          },
+          {
+            "reference": "ZR 74-943"
+          },
+          {
+            "reference": "ZR APPENDIX E"
+          },
+          {
+            "reference": "ZR 62-57"
+          },
+          {
+            "reference": "BC 505.2.1"
+          },
+          {
+            "reference": "ZR 23-22"
+          },
+          {
+            "reference": "ZR 25-023"
+          },
+          {
+            "reference": "BC 1004.3"
+          },
+          {
+            "reference": "ZR 27-10"
+          },
+          {
+            "reference": "BC 402.8.2"
+          },
+          {
+            "reference": "BC 303.7"
+          },
+          {
+            "reference": "ZR 74-944"
+          },
+          {
+            "reference": "ZR 74-945"
+          },
+          {
+            "reference": "BC 102.1"
+          },
+          {
+            "reference": "BC 202"
+          }
+        ],
+        "limitations": [
+          {
+            "kind": "canonical-section-unavailable",
+            "count": 2,
+            "text": "2 enacted sections were not available from the canonical resolver."
+          },
+          {
+            "kind": "evidence-character-limit",
+            "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+          },
+          {
+            "kind": "targeted-definition-excerpt",
+            "count": 2,
+            "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+          },
+          {
+            "kind": "cross-reference-limit",
+            "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+          }
+        ]
+      }
+    },
+    {
+      "turn": "02",
+      "question": "For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?",
+      "actual": {
+        "references": [
+          "ZR 12-10",
+          "BC 1208.2.1",
+          "BC 1208.2",
+          "BC 1004.1.3",
+          "ZR 74-943",
+          "ZR APPENDIX E",
+          "ZR 62-57",
+          "BC 505.2.1",
+          "ZR 23-22",
+          "ZR 25-023",
+          "BC 1004.3",
+          "ZR 27-10",
+          "BC 402.8.2",
+          "BC 303.7",
+          "ZR 74-944",
+          "ZR 74-945",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "characters": 28735,
+        "verificationIssueTypes": [
+          "fact_evidence_confusion"
+        ]
+      },
+      "query": {
+        "question": "For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?",
+        "sourceQuery": "Follow-up: For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?\nPrevious topic: For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?\nPreviously discussed provisions: BC § 1208.2, BC § 1208.2.1",
+        "semanticQuery": "make ceilings retail sales community facility offices: For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?\nSubject context: Minimum ceiling heights.; Furred ceiling.\nProject search context (supplied facts, not applicability): Lower Density Growth Management Area: Not within a mapped lower-density growth management area; Tax Lot Area: 13,663 sq ft; MIH Area / Applicable Option(s): Not within a mapped Mandatory Inclusionary Housing area; Affordable Housing Zoning Status: Not within a mapped Inclusionary Housing designated area; Waterfront Status / Waterfront Access Plan: Not within a mapped waterfront area or Waterfront Access Plan",
+        "dependentMeasurementSubject": {
+          "text": "make ceilings retail sales community facility offices",
+          "terms": [
+            "make",
+            "ceilings",
+            "retail",
+            "sales",
+            "community",
+            "facility",
+            "offices"
+          ],
+          "source": "active_user_topic"
+        },
+        "resolvedSubjectContext": "Minimum ceiling heights.; Furred ceiling.",
+        "inheritedAuthorityReferences": [
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "1208.2",
+            "sectionID": "3021",
+            "reference": "BC § 1208.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "corpusID": "nyc-2022-construction-codes",
+            "applicabilityStatus": "current-enacted-edition"
+          },
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "1208.2.1",
+            "sectionID": "3022",
+            "reference": "BC § 1208.2.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "corpusID": "nyc-2022-construction-codes",
+            "applicabilityStatus": "current-enacted-edition"
+          }
+        ],
+        "activeRulePacketReferences": [
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "1208.2",
+            "sectionID": "3021",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "corpusID": "nyc-2022-construction-codes",
+            "applicabilityStatus": "current-enacted-edition"
+          },
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "1208.2.1",
+            "sectionID": "3022",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "corpusID": "nyc-2022-construction-codes",
+            "applicabilityStatus": "current-enacted-edition"
+          }
+        ],
+        "retrievalQuery": "Follow-up: For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?\nPrevious topic: For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?\nPreviously discussed provisions: BC § 1208.2, BC § 1208.2.1\nProject facts: Lower Density Growth Management Area: Not within a mapped lower-density growth management area; Tax Lot Area: 13,663 sq ft; MIH Area / Applicable Option(s): Not within a mapped Mandatory Inclusionary Housing area; Affordable Housing Zoning Status: Not within a mapped Inclusionary Housing designated area; Waterfront Status / Waterfront Access Plan: Not within a mapped waterfront area or Waterfront Access Plan",
+        "previousTopicApplied": true,
+        "projectFactsApplied": true,
+        "contextDependentFollowUp": true,
+        "relevanceComparison": false,
+        "conversationTopic": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+        "immediateContext": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+        "topicDecision": {
+          "version": "20261003-bounded-causal-equipment-continuity-v11",
+          "decision": "continuation",
+          "question": {
+            "text": "For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?",
+            "source": "current_question",
+            "codeReferences": []
+          },
+          "rootTopic": {
+            "text": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+            "source": "explicit_root",
+            "codeReferences": []
+          },
+          "currentTopic": {
+            "text": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+            "source": "explicit_current",
+            "codeReferences": []
+          },
+          "nextRootTopic": {
+            "text": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+            "source": "explicit_root",
+            "codeReferences": []
+          },
+          "nextCurrentTopic": {
+            "text": "For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?",
+            "source": "current_question",
+            "codeReferences": []
+          },
+          "contextPolicy": {
+            "includeRootTopic": true,
+            "includeCurrentTopic": true,
+            "replaceRootTopic": false
+          },
+          "signals": {
+            "returnToOriginal": false,
+            "correction": false,
+            "relevanceComparison": false,
+            "explicitSwitch": false,
+            "projectSubjectContinuation": false,
+            "hypotheticalContinuation": false,
+            "formatTransformation": false,
+            "contextualContinuation": true,
+            "citedSubjectContinuation": false,
+            "causalSubjectContinuation": false,
+            "definiteSubjectContinuation": true,
+            "relatedReference": false,
+            "disjointExplicitReference": false,
+            "selfContained": false,
+            "rootTokenOverlap": 0.4,
+            "currentTokenOverlap": 0.4
+          }
+        }
+      },
+      "probes": [
+        {
+          "name": "currentQuestion",
+          "contextCharacters": 135,
+          "containsHabitableTerms": false,
+          "containsOccupiableTerms": false,
+          "labels": [],
+          "characters": 0,
+          "requiredEntriesIncluded": [
+            {
+              "label": "HABITABLE SPACE",
+              "complete": false
+            },
+            {
+              "label": "OCCUPIABLE SPACE",
+              "complete": false
+            }
+          ],
+          "text": null
+        },
+        {
+          "name": "queryAndResponsiveCeilingRules",
+          "contextCharacters": 2469,
+          "containsHabitableTerms": true,
+          "containsOccupiableTerms": true,
+          "labels": [
+            "DWELLING",
+            "HABITABLE SPACE",
+            "KITCHEN",
+            "KITCHENETTE",
+            "LOT",
+            "MEZZANINE",
+            "OCCUPIABLE SPACE",
+            "STORAGE ROOM"
+          ],
+          "characters": 1786,
+          "requiredEntriesIncluded": [
+            {
+              "label": "HABITABLE SPACE",
+              "complete": true
+            },
+            {
+              "label": "OCCUPIABLE SPACE",
+              "complete": true
+            }
+          ],
+          "text": "DWELLING. A building or structure that is occupied in whole or in part as the home, residence or sleeping place of one or more families.\n\nHABITABLE SPACE. All rooms and spaces within a dwelling unit in Group R or I-1, including bedrooms, living rooms, studies, recreation rooms, kitchens, dining rooms and other similar spaces.\nException: The following spaces within a dwelling unit shall not be considered habitable space:\n1. A dining space 55 square feet (5.1 m\n\n2\n\n) or less located off a living room, foyer or kitchen;\n2. A kitchenette;\n3. A bathroom or toilet room;\n4. A laundry room; and\n5. A corridor, passageway, or private hall; and a foyer used as an entrance hall in a dwelling unit: not exceeding 10 percent of the total floor area of the dwelling unit; or not exceeding 20 percent of the floor area of the dwelling unit where every habitable room is at least 20 percent larger than the required minimum room sizes established by the New York City Housing Maintenance Code .\n\nKITCHEN. A room with 80 square feet (7.4 m\n\n2\n\n) or more of floor area that is intended, arranged, designed or used for cooking or warming of food.\n\nKITCHENETTE. A space with less than 80 square feet (7.4 m\n\n2\n\n) of floor area that is intended, arranged, designed or used for cooking or warming of food.\n\nLOT. A portion or parcel of land considered as a unit.\n\nMEZZANINE. An intermediate level or levels between the floor and ceiling of any story in accordance with Section 505 .\n\nOCCUPIABLE SPACE . A room or enclosed space , other than a habitable space , designed for human occupancy or use in which individuals may remain for a period of time for rest , amusement , treatment , education , dining , shopping , employment , labor or other similar purposes .\n\nSTORAGE ROOM . See Section 427 . 4 ."
+        },
+        {
+          "name": "observedCanonicalSourceOrder",
+          "contextCharacters": 31157,
+          "containsHabitableTerms": true,
+          "containsOccupiableTerms": true,
+          "labels": [
+            "CURB LEVEL",
+            "HEIGHT, BUILDING",
+            "LOT LINE",
+            "OCCUPANT LOAD",
+            "OTHER STRUCTURES",
+            "STORAGE ROOM",
+            "STREET LINE",
+            "WHEELCHAIR SPACE"
+          ],
+          "characters": 656,
+          "requiredEntriesIncluded": [
+            {
+              "label": "HABITABLE SPACE",
+              "complete": false
+            },
+            {
+              "label": "OCCUPIABLE SPACE",
+              "complete": false
+            }
+          ],
+          "text": "CURB LEVEL . As defined in the New York City Zoning Resolution .\n\nHEIGHT, BUILDING. The vertical distance from the grade plane to the average height of the highest roof surfaces.\n\nLOT LINE. A line dividing one lot from another, or from a street or any public place.\n\nOCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed .\n\nOTHER STRUCTURES . Structures , other than buildings , for which loads are specified in Chapter 16 .\n\nSTORAGE ROOM . See Section 427 . 4 .\n\nSTREET LINE . A lot line separating a street from other land .\n\nWHEELCHAIR SPACE . A space for a single wheelchair and its occupant ."
+        }
+      ],
+      "reconstruction": {
+        "references": [
+          "ZR 12-10",
+          "BC 1208.2.1",
+          "BC 1208.2",
+          "BC 1004.1.3",
+          "ZR 74-943",
+          "ZR APPENDIX E",
+          "ZR 62-57",
+          "BC 505.2.1",
+          "ZR 23-22",
+          "ZR 25-023",
+          "BC 1004.3",
+          "ZR 27-10",
+          "BC 402.8.2",
+          "BC 303.7",
+          "ZR 74-944",
+          "ZR 74-945",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "usage": {
+          "pinnedCount": 0,
+          "pinnedCharacterCount": 0,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 0,
+          "pinnedSelectionTruncatedCount": 0,
+          "pinnedSelectionExcerptedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 48000,
+          "supplementalCharacterCount": 42522,
+          "candidateCount": 10,
+          "discoveredCount": 10,
+          "targetedDefinitionCount": 2,
+          "crossReferenceCount": 6,
+          "topicDependencyCount": 0,
+          "interpretationContextCount": 1,
+          "characterCount": 42522,
+          "resolverFailureCount": 1,
+          "nonMaterialCandidateCount": 0
+        },
+        "definitionCandidatePriority": {
+          "version": "20261001-historical-reference-scope-v7",
+          "primaryFunction": "exception",
+          "functions": [
+            "exception",
+            "calculation_table",
+            "definition"
+          ],
+          "materialityRank": 6,
+          "evidenceRole": "supporting",
+          "controllingRoot": null,
+          "controllingTopicRoutes": [],
+          "topicRoutes": [],
+          "topicRouteRelationship": "unrestricted",
+          "pinnedScopeActive": false,
+          "hierarchyDepth": null,
+          "descendantClaimCoverage": true,
+          "claimCoverageRequired": false,
+          "claimCoverageReason": null,
+          "reasons": [
+            "exception or permitted reduction",
+            "calculation or table provision",
+            "definition provision"
+          ]
+        },
+        "definitionSource": {
+          "text": "DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling.\n\nHEIGHT, BUILDING. The vertical distance from the grade plane to the average height of the highest roof surfaces.\n\nOCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed .\n\nOTHER STRUCTURES . Structures , other than buildings , for which loads are specified in Chapter 16 .\n\nPARKING GARAGE. A structure or portion of a structure, other than a private garage or carport, used for the parking or storage of motor vehicles.\n\nSTORAGE ROOM . See Section 427 . 4 .\n\nSTREET LINE . A lot line separating a street from other land .\n\nWHEELCHAIR SPACE . A space for a single wheelchair and its occupant .",
+          "characters": 821,
+          "labels": [
+            "DWELLING UNIT",
+            "HEIGHT, BUILDING",
+            "OCCUPANT LOAD",
+            "OTHER STRUCTURES",
+            "PARKING GARAGE",
+            "STORAGE ROOM",
+            "STREET LINE",
+            "WHEELCHAIR SPACE"
+          ],
+          "canonicalContextComplete": false,
+          "truncated": false,
+          "indexedPassage": null,
+          "sourceHash": "70d5d964e746a49774f662891c13c6d5e656d0a80f2389826c7762f18fdb67c1",
+          "requiredEntriesIncluded": [
+            {
+              "label": "HABITABLE SPACE",
+              "complete": false
+            },
+            {
+              "label": "OCCUPIABLE SPACE",
+              "complete": false
+            }
+          ]
+        },
+        "reads": [
+          {
+            "reference": "ZR 12-10",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 1208.2.1",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 1208.2",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 1004.1.3",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR 74-943",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR APPENDIX E",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR 62-57",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 505.2.1",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR 23-22",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "ZR 25-023",
+            "origin": "permitext_discovered"
+          },
+          {
+            "reference": "BC 1004.1.3",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "ZR 12-10",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 1004.3",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 1004.3",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "ZR 27-10",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 402.8.2",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 303.7",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 402.8.2",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 303.7",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "ZR 74-944",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "ZR 74-945",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 102.1",
+            "origin": "permitext_cross_reference"
+          },
+          {
+            "reference": "BC 202",
+            "origin": "permitext_discovered"
+          }
+        ],
+        "limitations": [
+          {
+            "kind": "canonical-section-unavailable",
+            "count": 1,
+            "text": "1 enacted section was not available from the canonical resolver."
+          },
+          {
+            "kind": "evidence-character-limit",
+            "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+          },
+          {
+            "kind": "targeted-definition-excerpt",
+            "count": 2,
+            "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+          },
+          {
+            "kind": "cross-reference-limit",
+            "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+          }
+        ]
+      }
+    }
+  ],
+  "reconstructionLimitations": "Observed accounting order is not the captured ranked discovery input; canonical whole source/header reconstruction and visible33-field strings omit hidden qualifiers. The BC202 supplemental candidate is deliberately introduced as a controlled availability test, not evidence of actual nomination. Second-turn verified history uses canonical identities/whole-source supporting text rather than uncaptured exact cited slices or stored topic. No paid semantic ranking or writer replay performed."
+}

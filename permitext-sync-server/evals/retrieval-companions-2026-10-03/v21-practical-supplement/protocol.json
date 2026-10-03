@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "cohort": "v21-practical-supplement",
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "conversationCount": 4,
+  "turnCount": 8,
+  "action": "Parent-run production acceptance after deployed v21identity is verified. Four fresh project-linked Research conversations, two exact question strings each. Preserve existing saved1070Southern structured facts. Do not inject keys, source IDs, code sections, expected answers or model overrides into user payloads.",
+  "freeze": "These questions, keys and full source packets are sealed before any generation on this supplement. Candidate source is already frozen9166992c557a8b6f95eadf9a6e01dd531c5796d9. No tuning or implementation changes during this cohort; successor code receives a new record.",
+  "grading": "Independently grade delivered visible answers after captured pairs against the unchanged keys and full canonical sources. Preserve wrong-topic, wrong-code, partial/withheld, missing-fact, numeric, table, edition, citation and unrelated-extra errors, not merely provider/verifier status. Use only supplied/current conversation facts.",
+  "leakageBoundary": "Root may read questions-only.json upon readiness. Root must not read reviewer-key.json or source-packets.json before all new captures. Independent reviewer opens only corresponding captured pair keys. User-visible question strings contain no code-reference or answer seeding.",
+  "limitations": "Assistant-authored small practical sample with prior corpus exposure disclosed. Not statistical evidence,95%accuracy or source-disjoint blind validation. No API/provider calls, browser actions, saved-project edits or application source changes during authoring."
+}

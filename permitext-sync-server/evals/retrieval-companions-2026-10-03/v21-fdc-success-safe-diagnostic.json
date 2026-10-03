@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "sealed": true,
+  "createdAt": "2026-10-03T19:21:14.750536+00:00",
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "caseID": "repeat-fdc-02",
+  "originalCaseID": "practical-04-02",
+  "logPath": "/tmp/permitext-production-v21-repeat-fdc-02.jsonl",
+  "logSHA256": "276ace210a456531d586c698ca65a4c18f474f4ce910e7114d6400c2b07b490f",
+  "accountingPath": "/tmp/permitext-production-v21-repeat-fdc-02.accounting.json",
+  "accountingSHA256": "7d3c84ce2ec18e4e149df9e7fe77794d6dbd187bf5ddb602f6ce1642540e98cc",
+  "method": "Only known structured log event fields, typed phase outcomes, escalation enums and accounting counts were read for causal diagnosis. Duplicate nested events were deduplicated; no raw provider draft, source prose or binding flags were inferred.",
+  "observations": {
+    "terminalStatus": "completed",
+    "charged": true,
+    "failureCode": null,
+    "providerRequestCount": 4,
+    "pendingProviderRequestCount": 0,
+    "embeddingProviderRequestCount": 1,
+    "verificationAttemptCount": 2,
+    "verificationIssueTypes": [
+      "zoning_unbound_conclusion"
+    ],
+    "verificationModel": "gpt-6.1-sol",
+    "escalated": true,
+    "escalationStages": [
+      {
+        "stage": "answer_verification_revision",
+        "fromModel": "gpt-6-luna",
+        "toModel": "gpt-6.1-sol",
+        "reasonCode": "RESEARCH_VERIFICATION_REVISION",
+        "issueTypes": [
+          "zoning_unbound_conclusion"
+        ]
+      }
+    ],
+    "uniqueVisibleProviderPhaseEvents": [
+      {
+        "stage": "permitext_research_verification",
+        "outcome": "completed",
+        "durationMilliseconds": 3252,
+        "providerAttempts": 1
+      },
+      {
+        "stage": "permitext_code_interpretation",
+        "outcome": "completed",
+        "durationMilliseconds": 3064,
+        "providerAttempts": 1
+      },
+      {
+        "stage": "permitext_code_interpretation",
+        "outcome": "completed",
+        "durationMilliseconds": 9679,
+        "providerAttempts": 1
+      }
+    ],
+    "governingReferencesListed": [
+      "BC 912.4.2",
+      "FC 912"
+    ],
+    "hasStandaloneScopeDiagnosticInAvailableStructuredEvents": false
+  },
+  "supportedConclusion": "The successful delivery followed a bounded answer-verification revision explicitly triggered by zoning_unbound_conclusion. It was not an initial draft that simply bypassed the gate: two verification attempts and the recorded answer_verification_revision escalation establish a repair path. The final delivered answer independently satisfies the unchanged canonical key.",
+  "unknowns": [
+    "Whether the final successful gate used the new non-Zoning technical scope exemption, different narrative wording, different source bindings/roles, or another repaired scope is unknown. No private draft or scopeDecision/binding record was supplied.",
+    "Current accounting/log field absence does not prove the exemption was not invoked or that its diagnostic was never persisted in another operation view.",
+    "Listed governing references do not prove complete writer excerpts or inherited-reference eligibility. The final operative answer was judged separately against complete canonical sources."
+  ],
+  "staticPointers": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/app.mjs",
+      "line": 21069,
+      "reason": "The general-answer branch recomputes deterministic quality/source gates before delivery; failure records issues and proceeds only to the bounded next attempt."
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/app.mjs",
+      "line": 21090,
+      "reason": "Failed deterministic answer-quality attempts record model and available safe zoning attempt diagnostics."
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/app.mjs",
+      "line": 9918,
+      "reason": "The existing diagnostic helper exposes a zoningSafety diagnostic only when evaluateZoningResearchSafety returned one."
+    }
+  ],
+  "reviewerActions": {
+    "providerCalls": 0,
+    "browserActions": 0,
+    "sourceEdits": 0
+  },
+  "scope": "Qualified attribution only; no claim that the v21 scope exemption alone fixed this actual production failure."
+}

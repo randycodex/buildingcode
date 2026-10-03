@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "cohort": "v21-practical-supplement",
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "auditedAt": "2026-10-03T18:48:50.144290+00:00",
+  "sourceCount": 25,
+  "resolver": "allSectionCatalogByID + researchBodyForCatalogSection with exact current corpus/codeVersion/prefix identity validation",
+  "providersInvoked": 0,
+  "browserInteractions": 0,
+  "applicationSourceEdits": 0,
+  "reviews": [
+    {
+      "pair": "v21-practical-01",
+      "review": "Complete708.1through708.1.12andthetwo708.1.10children reviewed, including all cleanout-size, direction-flow and fixture-pipe exceptions. Asked access/clearance thresholds are based on piping served, not the capped cleanout size. Below-grade/floor/vehicular conditions stay distinct from behind-wall retail piping.",
+      "tables": "No operative table is needed for asked access/clearance. Referenced Table702.4fitting standards are not independently reconstructed or used to approve products."
+    },
+    {
+      "pair": "v21-practical-02",
+      "review": "Complete603.6parent and603.6.1/.2/.3reviewed. All5connector items preserved. Length, rated-wall condition, absolute floor prohibition and manufacturer-appliance clearance remain independently scoped. Airduct versus airconnector distinction is essential.",
+      "tables": "No operative table. UL181product-test standard not independently reconstructed; question is resolved by the enacted length/floor restrictions."
+    },
+    {
+      "pair": "v21-practical-03",
+      "review": "Fullcurrent-consolidatedFC906reviewed, including mounting gross-weight bands, bottom clearance, bracket/cabinet/wheeled-unit distinctions, conspicuous/unobstructed placement and all approval/staff-access exceptions. The directly enacted906.9height rules have no stated exceptions.",
+      "tables": "FullFC906body/HTML retained with906.1and906.3.1/.2tables and notes, includingNFPA10definitions and sprinkler qualifications. These tables concern hazard selection/distribution, not gross-weight mounting height; no hazard classification is invented."
+    },
+    {
+      "pair": "v21-practical-04",
+      "review": "Full1010.1scope,1010.1.1parent,1010.1.1.1width including all7exceptions,1010.1.1.2projection limits, and1005.3.2capacity plus actual smoke-protected assembly exceptions reviewed. Common retail egress is kept distinct from internal private dwelling doors.",
+      "tables": "No operative table is necessary for the requested32inch/one-leaf baseline.1005.3.2references assembly tables only in conditional exceptions not established for retail. ICCA117.1maneuvering-clearance certification is not inferred from this narrow width answer."
+    }
+  ],
+  "unresolvedAmbiguities": [],
+  "sourceFiles": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 7.html",
+      "sha256": "b8667ab777f7c9ec5584e75d4513026d649e9d5f9e8e64d6590b8cafb35b157b",
+      "bytes": 399419
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 6.html",
+      "sha256": "42e85c923a0a99c78726c2aebf70929d2b7e3037e369653fcfd4e0e0c5c554c9",
+      "bytes": 250687
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004761.json",
+      "sha256": "4f5124bc69f2ba6ef1b55098c6db34c9817198320ed3e6cff37b8e9785c91c53",
+      "bytes": 42431
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/10.html",
+      "sha256": "bcd0144f59fce3902beff150683b665769367cfcc81e27a2555c6b615333e23f",
+      "bytes": 975397
+    }
+  ],
+  "sourceBodyHashes": [
+    {
+      "packetID": "PC 708.1",
+      "sectionID": "12400",
+      "bodySHA256": "b843cea854011d1a4c78a29bf71ea362348f948f117a5b9fcc20ee95c0690d84",
+      "textSHA256": "6fab30931a010043096909a0f005522041de72c1a0674d185fa0e77d623c650d"
+    },
+    {
+      "packetID": "PC 708.1.1",
+      "sectionID": "12401",
+      "bodySHA256": "4c317fdea160e5d30ac04cd697b6d37f945e5c8b849f797bce19b1d69620dba1",
+      "textSHA256": "4999638f0aa03a1a08bf0b7fe95fa95ab5840f814bf1c4384c6347de797c31c0"
+    },
+    {
+      "packetID": "PC 708.1.2",
+      "sectionID": "12402",
+      "bodySHA256": "9e581ceae3be68f1d4b9db549f52f819d5eedc7f539bf8f6451e88cd98558585",
+      "textSHA256": "6c25e4261f0a15e3e15129248766243747ca236a32657cadd523c24313103227"
+    },
+    {
+      "packetID": "PC 708.1.3",
+      "sectionID": "12403",
+      "bodySHA256": "02e26d16589e89f04fe701c36f4425e66838da2814ad5d58d7f4730670fa3239",
+      "textSHA256": "a60cbbbbe45c2e89e8100b1c0191d0f3e7165070f440d0eecf934d421b09dc80"
+    },
+    {
+      "packetID": "PC 708.1.4",
+      "sectionID": "12404",
+      "bodySHA256": "319d5b970310c95b3fb7b23db29cfe3d9d4e75e6013fe3939e43c797b09f4ca6",
+      "textSHA256": "5a3a65acdcc4c183d1d19d43051b3b0649f94c9a6bcbbf29bdc73003e572a6ce"
+    },
+    {
+      "packetID": "PC 708.1.5",
+      "sectionID": "12405",
+      "bodySHA256": "2ad38745e849cdb6b08e2c8996d47eb5befb4696783496b4856cb17c3a806db6",
+      "textSHA256": "68f138ca18604a1d2666a492fb5bc2a0f8537bd4edcb7c7aacb313ef62aba134"
+    },
+    {
+      "packetID": "PC 708.1.6",
+      "sectionID": "12406",
+      "bodySHA256": "730d8c9d605b9dee6dbc8b8bbab8a91289730e08c7cfc27f2933b8e025a0720e",
+      "textSHA256": "bad8bf3c8c4fd54c16ad82f1089810df19f003a5b746e3a57bdad14bebbcbfad"
+    },
+    {
+      "packetID": "PC 708.1.7",
+      "sectionID": "12407",
+      "bodySHA256": "eacedbe89108fcd8367e9a9be70700a6b626000f8c2787d14ad41c1a5be771b7",
+      "textSHA256": "0b23d2dc53ecfa4c964cb508d4f6fdb0f9e6c5e75d1cb91ce4000689237b00bb"
+    },
+    {
+      "packetID": "PC 708.1.8",
+      "sectionID": "12408",
+      "bodySHA256": "d5117cc6aa09f256e6e9381f62cfe343de91e090bea07eac499d53c864561d7c",
+      "textSHA256": "220b7eac557fca3e2099ebeb5ba952a678b4ba9e1514f8af681a8f77da980f8f"
+    },
+    {
+      "packetID": "PC 708.1.9",
+      "sectionID": "12409",
+      "bodySHA256": "c729ecd411ba93c49f80560834ca00d873071e53c901f916f70ffae18719d8f6",
+      "textSHA256": "88fee8084e84aa1056d48678628777f130afdf53d93d70d9dba4a3d6bb32cfa7"
+    },
+    {
+      "packetID": "PC 708.1.10",
+      "sectionID": "12410",
+      "bodySHA256": "703e1ada31cfed2df74dcb9de42f37f9155dc2a6a0fd2100e7e74a4471934962",
+      "textSHA256": "0840820743199b8b4cafd0af16d2f183a6f735915315cf75ffe80e8e89a56de6"
+    },
+    {
+      "packetID": "PC 708.1.10.1",
+      "sectionID": "12411",
+      "bodySHA256": "ae0696a5785ae6511296bc3c30ced39027d21cce8da88fb9dc744fa9bed1cdf9",
+      "textSHA256": "211bca98b03e55197dbd535309ea62b6d25ab70a4301b10da269da6b942b689c"
+    },
+    {
+      "packetID": "PC 708.1.10.2",
+      "sectionID": "12412",
+      "bodySHA256": "1621c0408c37d72dd5593656cb95f4cfa3e83bb948086065ed5350aca550491b",
+      "textSHA256": "1759cfac0afcac3f63bb92cf9c41c0b3c38c550126ad2c37c3686094597fd162"
+    },
+    {
+      "packetID": "PC 708.1.11",
+      "sectionID": "12413",
+      "bodySHA256": "aef0125023af6d496c57d72c3f545412f71edab2afdc75408f6b09b0cb03277e",
+      "textSHA256": "8985d95a6b005588214825e570033e156b4af5bae5fce7aa10288fe6bdac6afa"
+    },
+    {
+      "packetID": "PC 708.1.12",
+      "sectionID": "12414",
+      "bodySHA256": "b0ce00d42ac7adbdcfad088b8db0783392d0b66af750bba2aafbd94a5524a0a3",
+      "textSHA256": "591fed31b8587d073866b490d530ad544a3161bba713eb533c9e819019f49edb"
+    },
+    {
+      "packetID": "MC 603.6",
+      "sectionID": "10784",
+      "bodySHA256": "3b41c41386cb5041266cf4ca4864c1361f43e3873ef75f78ff794ac7eab99c14",
+      "textSHA256": "7148699ae6e79d989fa5a9ffc0e6d3cfc60f6a068b94015b1523718d9e2e7d95"
+    },
+    {
+      "packetID": "MC 603.6.1",
+      "sectionID": "10785",
+      "bodySHA256": "ebc27360c6b1278e668f4e7fcc213206515a9eadc79fc6e0d954409ca9e88e76",
+      "textSHA256": "cb91bb9efa240eb898fcb6023864a5b68a7081a61258f117bfdae1d2d86aff7f"
+    },
+    {
+      "packetID": "MC 603.6.2",
+      "sectionID": "10788",
+      "bodySHA256": "227a085d7a6b12d7b6025e85a0b3a158b8fce767338d5f8f901424006f9c9782",
+      "textSHA256": "7af814b81a762585968058a2383a728281580d5f71368d916299d8b99e6ff917"
+    },
+    {
+      "packetID": "MC 603.6.3",
+      "sectionID": "10789",
+      "bodySHA256": "77f2b8e4ce1c88aa9439c55c369acad4b6094a9506c88db7605ae00c6bf94586",
+      "textSHA256": "ecff642a08aebd79596710f32f09c6b569f81f8b6a5b68d383a6341c7fb999cc"
+    },
+    {
+      "packetID": "FC 906",
+      "sectionID": "31004761",
+      "bodySHA256": "9d7a27e27310fe7f2443d39b9ac448155c3dadeb7c8145bb256b991880162902",
+      "textSHA256": "e08d8237f9f1d0ff11fc030b2e182f9a8eb30f31a3d504f338058f4c8a933cf0"
+    },
+    {
+      "packetID": "BC 1010.1",
+      "sectionID": "2244",
+      "bodySHA256": "6b2aa51bfefabbfab5a296a0d6c07a52079983a446dba442cacd43632f235b39",
+      "textSHA256": "2e6a241a6fe803a9c6b9c217477f1830814d052d83f6db86f3b1350ccb1c3260"
+    },
+    {
+      "packetID": "BC 1010.1.1",
+      "sectionID": "2245",
+      "bodySHA256": "c890321a8054a829a543b8ccfd0fa2d6aefeb6c04c217035cac3b07a60d69d7a",
+      "textSHA256": "6cc9c157e129c33667b5c4555ccd659292cb5858f16269a5fd65acf1f1129d87"
+    },
+    {
+      "packetID": "BC 1010.1.1.1",
+      "sectionID": "2246",
+      "bodySHA256": "90beda6cb01f3d315b9cb60744c6b700b73428a52db79ab9e24eabbbf3907dd1",
+      "textSHA256": "d3e3108d44c3a59b7b7abc5ad421a97fd1c80198d9f423755571a2093bd3aadd"
+    },
+    {
+      "packetID": "BC 1010.1.1.2",
+      "sectionID": "2247",
+      "bodySHA256": "0e64056cf390be46a25b026c92f0ffb22a402ca6d4ba542e94fee05192c2764f",
+      "textSHA256": "9feba5a97ca201335534d251867a9f8afac43a7d52d6d5d5ba50b33a50ef6b88"
+    },
+    {
+      "packetID": "BC 1005.3.2",
+      "sectionID": "2163",
+      "bodySHA256": "59f571d37b6f5ef1864ab4961e30ab98ab7065c4f15d5c7bbc596dcceb244b8d",
+      "textSHA256": "ae4d6b7a72685e68d729ea6f6e18d85972492ebe5a42078ebebbdb230d4029f3"
+    }
+  ],
+  "sourceAuthority": "Assistant review of full canonical enacted library text; source metadata does not establish project applicability. Current construction library includes consolidated amendments where present; FireCode is the current2022consolidation, not a newly invented2026FireCode edition.",
+  "overlap": {
+    "v20PracticalExactPacketOverlap": [],
+    "v20QuestionTopicsRepeated": false,
+    "olderCorpusExposure": "Prior source exposure is substantial. The new subjects differ from all16v20captured questions but are not claimed reference-disjoint from every prior campaign, source inspection or general architectural practice.",
+    "statisticalOrBlindClaim": false
+  },
+  "bodyAndTablePreservation": "All canonical bodies and original block HTML/plainText/metadata retained without excerpt clipping; complete table cells/notes remain in source packets. Adjacent structural heading text is not treated as an additional operative condition."
+}

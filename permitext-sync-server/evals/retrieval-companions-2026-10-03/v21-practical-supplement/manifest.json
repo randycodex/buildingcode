@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "cohort": "v21-practical-supplement",
+  "frozenAt": "2026-10-03T18:48:50.149727+00:00",
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "conversationCount": 4,
+  "turnCount": 8,
+  "sourceCount": 25,
+  "files": {
+    "questions-only.json": {
+      "sha256": "bdc0f03bfea3ba4b0f20b8d33cc35e0deca76eb3ddd5b64fc07029865b5e7b47",
+      "bytes": 2402
+    },
+    "reviewer-key.json": {
+      "sha256": "6a6cbcdde4cfe4f0311351e03e4a150dcb01de51aaced2c6ac4e0ec5ba54e451",
+      "bytes": 14330
+    },
+    "source-packets.json": {
+      "sha256": "97daf59035481535c40333f1b3b8582c1a4e0be840436cbed7c7a71d34127bdd",
+      "bytes": 161307
+    },
+    "source-audit.json": {
+      "sha256": "a8ed08b8519fd5e24ae1b583ea2c8566ae5e5a8fa0ac8eeaf06284a7e506f47a",
+      "bytes": 11302
+    },
+    "protocol.json": {
+      "sha256": "05264f03db009234d6ef94f83c9c3fc797fd50cbb8c93a1cad084fbc621de8e7",
+      "bytes": 1717
+    }
+  },
+  "priorSourceExposureDisclosed": true,
+  "statisticalClaim": false,
+  "paidProviderCalls": 0
+}

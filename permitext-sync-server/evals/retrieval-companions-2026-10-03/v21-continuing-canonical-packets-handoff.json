@@ -1,0 +1,287 @@
+{
+  "scope": "Authorized generic v21 source repair only. No providers/browser/deployment/commit; v20 artifacts not modified. Root owns app/safety integration.",
+  "versions": {
+    "discovery": "20261003-continuing-canonical-packets-v53",
+    "assembly": "20261003-continuing-canonical-packets-v65",
+    "packets": "20261003-continuing-canonical-packets-v6"
+  },
+  "files": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/evidence-discovery.mjs",
+      "sha256": "bac74ea1dac41ee65c2e5168a3f32feacff7096d7840b3ffdb066e461572c873"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-evidence-assembly.mjs",
+      "sha256": "4b89e959376318697f44a788ce26cd97cabd306cf49f452b62efff4a4176dbf8"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-retrieval-query-context.mjs",
+      "sha256": "237ca33f66cf97700199d1d9657571ab9a6057d6810a7f5fa15fb310a278da7b"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-rule-packets.mjs",
+      "sha256": "d8eb40961ae75d7c0b31695c60f07067c8cbd583f79c76eb10a33d371bddd149"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/tests/research-continuing-canonical-packets-contract.mjs",
+      "sha256": "06aab34ff26acf1dfa2c35c2e787a89eb49144ef74092e23cfe0b0f3538bbf06"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/tests/research-semantic-query-context-contract.mjs",
+      "sha256": "b7aacfc582aa65003b378ef933a6b38cdf0b7c7f825786d8d8466761af94c445"
+    }
+  ],
+  "changes": [
+    "Rejected checked-title subject extraction falls back to bounded continuing human subject words (16words/140chars), with no prior measurements, assistant conclusions or operative source clauses. Existing topic/family/edition/correction guards remain.",
+    "Exact checked canonical identity can nominate a responsive complete child index record when no root entry exists; authorized index membership and fresh canonical hash/offset/full-source admission remain mandatory.",
+    "A responsive full canonical child can reserve its literal same-authority structural ancestor qualification without requiring the ancestor to repeat two detail words. Max2 dependencies/max4 reads and all source/count/text/pin guards remain."
+  ],
+  "contracts": [
+    {
+      "file": "tests/research-continuing-canonical-packets-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-current-detail-packet-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-canonical-method-dependencies-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-rule-packets-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-evidence-assembly-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-indexed-reference-dependency-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-source-edition-integrity-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-technical-source-boundaries-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-semantic-query-context-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-dependent-measurement-subject-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    }
+  ],
+  "existingAssertionRationale": "Ambiguous checked headings formerly required an empty semantic continuation. The new intended behavior retains sanitary drain from the human topic only; exact assertion now verifies absence of old dimensions/properties and remains bounded. No frozen evaluation keys changed.",
+  "ceilReplay": {
+    "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v21-ceiling-canonical-ancestor-replay.json",
+    "assertions": {
+      "completeAncestorDelivered": true,
+      "exactCanonicalText": true,
+      "sourceHash": "afb1928daaafb1fee57d58d5ee12516c152f0f30dd0613542c12b2b5858e274e",
+      "canonicalSourceHash": "afb1928daaafb1fee57d58d5ee12516c152f0f30dd0613542c12b2b5858e274e",
+      "readCount": 1,
+      "bounded": true
+    },
+    "characterCount": 39972,
+    "crossReferences": 6,
+    "limits": "48k ordinary construction total/six references, unchanged",
+    "limitations": "Actual ranked candidates, chosen indexed slices and project codeVersion were not captured. This uses observed first10 accounting refs as candidate order and visible33-field snapshot as grouped fact strings, no semantic calls; actual hidden source/status qualifiers and project codeVersion are unknown; it proves canonical dependency/filter behavior, not exact hosted ranking."
+  },
+  "propaneReplay": {
+    "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v21-propane-continuing-canonical-replay.json",
+    "variants": [
+      {
+        "priorCitationOrder": [
+          "FC 6105",
+          "FC 6109"
+        ],
+        "semanticQuery": "They would be in a locked cage behind the retail space, not inside the apartments. Does that avoid the residential restriction?\nSubject context: caf\u00e9 tenant propane cylinders\nProject search context (supplied facts, not applicability): Occupancy: Proposed mixed-use: residential, retail and community facility; formal groups TBD; Additional Project facts (user wording; not independently verified): The user describes the project as a proposed new building in schematic design with ground-floor retail and community-facility space.; Residential Units: 0; Additional Project facts (user wording; not independently verified): Existing-property records shown in Structured facts (1 story, 22,438 sq ft, 0 residential units, 1966, class I5) describe the existing property, not the proposed building.; Building Class: I5",
+        "activeGuardNomination": {
+          "checkedChildEligible": true,
+          "singleProtectedSlot": true,
+          "controlledCandidateLimit": 2,
+          "delivered": true,
+          "complete": true,
+          "exactCanonical": true,
+          "sourceHash": "ceaecb5a6c7834ffd587239a35b8b5cdb23f6f268b015f7b301b8a400e375fa5",
+          "canonicalSourceHash": "ceaecb5a6c7834ffd587239a35b8b5cdb23f6f268b015f7b301b8a400e375fa5",
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 10621,
+            "candidateCount": 2,
+            "discoveredCount": 2,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 1,
+            "topicDependencyCount": 0,
+            "interpretationContextCount": 0,
+            "characterCount": 10621,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "refs": [
+            "FC 505",
+            "FC 6105",
+            "FC 1024"
+          ]
+        }
+      },
+      {
+        "priorCitationOrder": [
+          "FC 6109",
+          "FC 6105"
+        ],
+        "semanticQuery": "They would be in a locked cage behind the retail space, not inside the apartments. Does that avoid the residential restriction?\nSubject context: caf\u00e9 tenant propane cylinders\nProject search context (supplied facts, not applicability): Occupancy: Proposed mixed-use: residential, retail and community facility; formal groups TBD; Additional Project facts (user wording; not independently verified): The user describes the project as a proposed new building in schematic design with ground-floor retail and community-facility space.; Residential Units: 0; Additional Project facts (user wording; not independently verified): Existing-property records shown in Structured facts (1 story, 22,438 sq ft, 0 residential units, 1966, class I5) describe the existing property, not the proposed building.; Building Class: I5",
+        "activeGuardNomination": {
+          "checkedChildEligible": true,
+          "singleProtectedSlot": true,
+          "controlledCandidateLimit": 2,
+          "delivered": false,
+          "exactCanonical": false,
+          "sourceHash": null,
+          "canonicalSourceHash": "ceaecb5a6c7834ffd587239a35b8b5cdb23f6f268b015f7b301b8a400e375fa5",
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 17173,
+            "candidateCount": 2,
+            "discoveredCount": 2,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 1,
+            "topicDependencyCount": 0,
+            "interpretationContextCount": 0,
+            "characterCount": 17173,
+            "resolverFailureCount": 2,
+            "nonMaterialCandidateCount": 0
+          },
+          "refs": [
+            "FC 505",
+            "FC 6109",
+            "FC 1024"
+          ]
+        }
+      },
+      {
+        "priorCitationOrder": [
+          "FC 6105"
+        ],
+        "semanticQuery": "They would be in a locked cage behind the retail space, not inside the apartments. Does that avoid the residential restriction?\nSubject context: caf\u00e9 tenant propane cylinders\nProject search context (supplied facts, not applicability): Occupancy: Proposed mixed-use: residential, retail and community facility; formal groups TBD; Additional Project facts (user wording; not independently verified): The user describes the project as a proposed new building in schematic design with ground-floor retail and community-facility space.; Residential Units: 0; Additional Project facts (user wording; not independently verified): Existing-property records shown in Structured facts (1 story, 22,438 sq ft, 0 residential units, 1966, class I5) describe the existing property, not the proposed building.; Building Class: I5",
+        "activeGuardNomination": {
+          "checkedChildEligible": true,
+          "singleProtectedSlot": true,
+          "controlledCandidateLimit": 2,
+          "delivered": true,
+          "complete": true,
+          "exactCanonical": true,
+          "sourceHash": "ceaecb5a6c7834ffd587239a35b8b5cdb23f6f268b015f7b301b8a400e375fa5",
+          "canonicalSourceHash": "ceaecb5a6c7834ffd587239a35b8b5cdb23f6f268b015f7b301b8a400e375fa5",
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 10621,
+            "candidateCount": 2,
+            "discoveredCount": 2,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 1,
+            "topicDependencyCount": 0,
+            "interpretationContextCount": 0,
+            "characterCount": 10621,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "refs": [
+            "FC 505",
+            "FC 6105",
+            "FC 1024"
+          ]
+        }
+      },
+      {
+        "priorCitationOrder": [
+          "FC 6109"
+        ],
+        "semanticQuery": "They would be in a locked cage behind the retail space, not inside the apartments. Does that avoid the residential restriction?\nSubject context: caf\u00e9 tenant propane cylinders\nProject search context (supplied facts, not applicability): Occupancy: Proposed mixed-use: residential, retail and community facility; formal groups TBD; Additional Project facts (user wording; not independently verified): The user describes the project as a proposed new building in schematic design with ground-floor retail and community-facility space.; Residential Units: 0; Additional Project facts (user wording; not independently verified): Existing-property records shown in Structured facts (1 story, 22,438 sq ft, 0 residential units, 1966, class I5) describe the existing property, not the proposed building.; Building Class: I5",
+        "activeGuardNomination": {
+          "checkedChildEligible": false,
+          "singleProtectedSlot": true,
+          "controlledCandidateLimit": 2,
+          "delivered": false,
+          "exactCanonical": false,
+          "sourceHash": null,
+          "canonicalSourceHash": "ceaecb5a6c7834ffd587239a35b8b5cdb23f6f268b015f7b301b8a400e375fa5",
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 17173,
+            "candidateCount": 2,
+            "discoveredCount": 2,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 1,
+            "topicDependencyCount": 0,
+            "interpretationContextCount": 0,
+            "characterCount": 17173,
+            "resolverFailureCount": 2,
+            "nonMaterialCandidateCount": 0
+          },
+          "refs": [
+            "FC 505",
+            "FC 6109",
+            "FC 1024"
+          ]
+        }
+      }
+    ],
+    "limitations": "Actual stored topicContext, verified citation order/supporting slices, semantic query vector/hits and ranked candidates were not captured. Variants reconstruct checked FC6105/6109 identity/title with canonical text and vary citation order; this is not a faithful stored message export. Controlled three-section canonical index with mocked observed FC505 semantic lead demonstrates structural guard/active-slot eligibility and exact assembly only, not actual global semantic ranking. Hidden project qualifiers/codeVersion unknown; visible33 fields projected into grouped fact strings. One existing protected active-source slot retains prior-identity order: in the deliberately cramped limit2 variant, FC6109-first keeps6109, even though the FC6105 child is eligible. This is a residual controlled limitation, not a claim about actual hosted citation order or semantic rerank."
+  },
+  "residuals": [
+    "One existing active-source protected slot retains checked identity order. Deliberately cramped limit2/FC505-leading control with FC6109 first retains6109 although6105 child is eligible; no claim that all unknown hosted citation orders are solved. Semantic subject retention can now improve actual semantic retrieval, but no provider ranking/answer verification was run.",
+    "Actual stored checked citation order/source slices/topic metadata/semantic vectors were not captured. Replays use observed accounting source order and canonical resolution plus visible33 fields with reconstructed qualifiers; no new production accuracy claimed.",
+    "Ancestor nomination intentionally requires a full canonical responsive child and literal qualification link. Fragment-only children, unrelated links, wrong identities and sources exceeding remaining/per-source caps stay omitted.",
+    "Bounded human fallback is soft search intent only; writer/verifier still receive full original human context/facts."
+  ],
+  "fdcReadOnly": {
+    "artifact": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v20-fdc-deterministic-scope-audit.json",
+    "conclusion": "Confirmed generic counterexample: a benign zoning evidence limitation activates zoning risk on an otherwise eligible technically-bound conclusion when incidentalZR exists. Actual private draft/bindings/plan unknown; no safety patch by this agent. C owns safety boundary."
+  }
+}

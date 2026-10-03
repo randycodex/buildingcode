@@ -1,0 +1,72 @@
+{
+  "createdAt": "2026-10-03T19:36:23.909795+00:00",
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "deploymentID": "dpl_HqJQd49vsS5g5Lfj8t97V9qLChyb",
+  "productionWebsiteTest": true,
+  "sourceFrozenThroughoutSample": true,
+  "modelsOrServiceSettingsChangedDuringSample": false,
+  "plannedTurns": 16,
+  "capturedTurns": 16,
+  "uiRetryUsed": false,
+  "sourceAndEvidenceConstraintsPreserved": true,
+  "cohorts": [
+    {
+      "cohort": "repeated_regressions",
+      "file": "v21-repeated-independent-review.json",
+      "sha256": "98451d441411dd3341c24c9ccbeaf3d9c51c2721aede645c521c48efdfa124c2",
+      "turns": 8,
+      "totals": {
+        "correct": 4,
+        "minor_issue": 3,
+        "materially_wrong": 0,
+        "withheld": 1,
+        "appropriate_clarification": 0,
+        "fixture_ambiguous": 0
+      },
+      "strictCorrectTurns": 4
+    },
+    {
+      "cohort": "new_practical_questions",
+      "file": "v21-fresh-independent-review.json",
+      "sha256": "86d5aeae4495e47746078d3be4963f8cde3ddd25911b2b19fc4a23450e53d049",
+      "turns": 8,
+      "totals": {
+        "correct": 5,
+        "minor_issue": 2,
+        "materially_wrong": 0,
+        "withheld": 1,
+        "appropriate_clarification": 0,
+        "fixture_ambiguous": 0
+      },
+      "strictCorrectTurns": 5
+    }
+  ],
+  "strictCorrectTurns": 9,
+  "strictCorrectDenominator": 16,
+  "totals": {
+    "correct": 9,
+    "minor_issue": 5,
+    "materially_wrong": 0,
+    "withheld": 2,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0
+  },
+  "betaAcceptancePassed": false,
+  "productionReliabilityEstablished": false,
+  "statisticalProductAccuracyClaim": false,
+  "estimatedProviderCostUSD": 1.269207,
+  "providerRequestCount": 64,
+  "medianDurationSeconds": 42.907,
+  "allTurnsProjectLinked": true,
+  "projectFactCountPerTurn": 33,
+  "pendingProviderRequestCount": 0,
+  "failedOperations": [],
+  "screenshot": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v21-fdc-full.jpg",
+  "limitations": [
+    "Small assistant-authored repeated and practical cohorts are diagnostic coverage, not a statistical product-accuracy estimate.",
+    "Reviewers checked full canonical sources; ChatGPT was not ground truth in this round.",
+    "Safe hosted logs omit actual excerpt text and private binding flags; section reference presence does not prove complete delivery.",
+    "Five known broader contract failures remain disclosed separately in validation-v21.json.",
+    "v21 FDC success followed bounded verification repair; the final scope mechanism remains unknown."
+  ]
+}

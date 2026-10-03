@@ -1,0 +1,902 @@
+{
+  "sealed": true,
+  "schemaVersion": 1,
+  "cohort": "v21-known-repeated-eight",
+  "reviewer": "Independent assistant source review of actual browser-delivered text; no verifier-pass shortcut or private draft credit",
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "deploymentID": "dpl_HqJQd49vsS5g5Lfj8t97V9qLChyb",
+  "capturePath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v21-visible-answers.json",
+  "captureSHA256AtReview": "b51db2d331b3770004515fb479cfb0fcff6a42231169331d202fa7ed077dfffb",
+  "captureRowsAtReview": 14,
+  "createdAt": "2026-10-03T19:19:18.146079+00:00",
+  "reviewedTurns": 8,
+  "reviewScope": "Exactly8knownrepeatedv20rows(ceiling2,propane2,publiclavatory2,FDC2),samequestionstringsandsaved33projectfacts. NEWv21practicalsupplementisaseparatecohortandnotgradedhere.",
+  "frozenPriorArtifactHashes": {
+    "reviewer-key.json": "500e46167b0d7099faf7148014279e0fddd87baf14531d47ef19a1e7299372ea",
+    "source-packets.json": "8f9110b620995830916faea0eaf886c6175ca92bc013a6d76cbbdbd3950d33e9",
+    "v20-practical-supplement/reviewer-key.json": "d7bdae70c3fe9c433125a834cd70797834288fae849353303b3b6c2f95b11f3e",
+    "v20-practical-supplement/source-packets.json": "4df795ddd3e6aa90ebb16070597590d80c74ff3085bdc5d46779bfd632343a9f",
+    "v20-independent-review-regression-eight-sealed.json": "694010c1c64f10244aa634040d9292fca239d0b7472ff03cb61a9dff254e1f3e",
+    "v20-practical-independent-review.json": "f14c4dbf5792a73809648a9ac93c914637b0b79c751d986a0121ac154df4a1ae"
+  },
+  "verifiedCanonicalSources": [
+    {
+      "reference": "BC 1208.2",
+      "sectionID": 3021,
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/12.html",
+      "sourceSHA256": "a71385f66d2008c0d5dced2c7b45ef6c042f32e3831cd45760e91929c973c5a2",
+      "excerptSHA256": "71b96d728cede25628daea803e2e0bcee33791f2e13f1a9a8b03b29cee787cca"
+    },
+    {
+      "reference": "BC 1208.2.1",
+      "sectionID": 3022,
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/12.html",
+      "sourceSHA256": "a71385f66d2008c0d5dced2c7b45ef6c042f32e3831cd45760e91929c973c5a2",
+      "excerptSHA256": "acbcf6d5a9c180a549d3a76c0756cf46ebdd4784c20e5853d0c3cc3791864da6"
+    },
+    {
+      "reference": "FC 6105",
+      "sectionID": 31005025,
+      "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+      "corpusID": "nyc-2022-fire-code",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31005025.json",
+      "sourceSHA256": "229fbf153865e4f45ffa3e7f04fb893afddabadf95999f927ecd1cd1629e0a51",
+      "excerptSHA256": "8b3abeb9838e405095ea7700fd2dd5b9bd278918ed86d1bdde8cad0c1dbde9d2"
+    },
+    {
+      "packetID": "PC 416.5",
+      "sectionID": "11981",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 4.html",
+        "sha256": "e24b3242e8e14af6fe95a8876bd57fe6500a3f8d04f0ecf85f183c7cc19d66cc",
+        "bytes": 333438
+      },
+      "bodySHA256": "0017436add39f1b24007eda8405df0fa4235889c30ac9631d43bc3fd2a1181dd",
+      "textSHA256": "14bd161a6eebe90b337bceafa9cf0ebb3231d6a367646c801fb02fbad6fab309"
+    },
+    {
+      "packetID": "PC 607.1.1",
+      "sectionID": "12210",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
+        "sha256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
+        "bytes": 402348
+      },
+      "bodySHA256": "36343e6932939c241a66cd51001beeefddb1718c6f1456874c20b5b943ab2b20",
+      "textSHA256": "99c75d1a52ab87c671c1e420739fd0465e336abc3539098c94f29272088fefbc"
+    },
+    {
+      "packetID": "PC 607.1.2",
+      "sectionID": "12211",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
+        "sha256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
+        "bytes": 402348
+      },
+      "bodySHA256": "242713d0bc2fbeb16e6b0fa31e56645738a29ba58de5de54809c11da75c3a815",
+      "textSHA256": "0e55ce6a74bb72d032cca724790f4393b81db33954560eb49de1340786f21c6f"
+    },
+    {
+      "packetID": "FC 912",
+      "sectionID": "31004767",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-fire-code",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+        "applicabilityStatus": "current-consolidation"
+      },
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004767.json",
+        "sha256": "e75c075822dd34e92d8a4aaf7852aec1d5302cf6956050c513b28a47bed866c3",
+        "bytes": 16198
+      },
+      "bodySHA256": "f4200bc4f0becc303e055c8e523472259a26d9838927ef82ed47a5ba88f38be2",
+      "textSHA256": "6ecc8d414f319ec530edf1a5f5d3939d79df79a40fd86cb0432e597f5b81ce2d"
+    },
+    {
+      "packetID": "BC 912.4",
+      "sectionID": "2044",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/9.html",
+        "sha256": "88d0b3180d4e535df4013fa144cd5c4e41ab24d025c66a91c3cbe70f35b0e1ff",
+        "bytes": 836918
+      },
+      "bodySHA256": "0ea2b1fe2fddc626878d54c07ae8e035cd949b4edfa461a5e1142b84adc15d57",
+      "textSHA256": "29d6233582776fc000f4ed725efd0fe87d04eccef2ed7117a1d366336dfffcd1"
+    },
+    {
+      "packetID": "BC 912.4.2",
+      "sectionID": "2046",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/9.html",
+        "sha256": "88d0b3180d4e535df4013fa144cd5c4e41ab24d025c66a91c3cbe70f35b0e1ff",
+        "bytes": 836918
+      },
+      "bodySHA256": "5da5fb145c5fff7e1e922edeae35814953372c67f85f7362921f005575e83795",
+      "textSHA256": "91ac9d8a468bc0c7e47653ceea1c8c1f0321515d7e9e98f328ae99a8eb3427ef"
+    },
+    {
+      "reference": "BC 202",
+      "sectionID": 113,
+      "sourcePath": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/2.html",
+      "sourceSHA256": "4a0755055c2bc5bec21d0e8403d2bde5bd31aacfe993df9f4f85296d2f23559c",
+      "bodySHA256": "1a5ed283271d846d2fa14acb9516432720e03247f6ca85e5ce23367eec9f8728",
+      "textSHA256": "c17226eda52646349494317cf439cb00ea15041c04f7a5c59ef2da53929103f9",
+      "scope": "Additional full canonical source review for definitions and optional/table claims; frozen rubric unchanged."
+    },
+    {
+      "reference": "PC 604.4",
+      "sectionID": 12122,
+      "sourcePath": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
+      "sourceSHA256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
+      "bodySHA256": "8632537bafb330c52fe46f717a205b3fbf7e34abc131145d915cd54066d1e668",
+      "textSHA256": "42148cf60caaf48ba62c0f7b019e6efbc12f03b70ebf29bc3323650068b1214b",
+      "scope": "Additional full canonical source review for definitions and optional/table claims; frozen rubric unchanged."
+    },
+    {
+      "reference": "FC 6109",
+      "sectionID": 31005029,
+      "sourcePath": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31005029.json",
+      "sourceSHA256": "2b2ad4db1f53d5ff496fb6683b611ddc7e4722031eab5ab6d062e2fda1977145",
+      "bodySHA256": "66c089c01e405f8077bb9bc68fd95e0bcdc58fe431b09cf9ec2217e40c42ec11",
+      "textSHA256": "8ff2863f01f67fbcfd867835977b3c698ea8ddc13eaa36a10a6ae80dd1cff812",
+      "scope": "Additional full canonical source review for definitions and optional/table claims; frozen rubric unchanged."
+    }
+  ],
+  "rows": [
+    {
+      "id": "repeat-ceiling-01",
+      "originalCaseID": "regression-01-01",
+      "originalKeyID": "natural-01-1",
+      "grade": "minor_issue",
+      "question": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+      "deliveredAnswerText": "The supported minimum is 7 feet 6 inches if the retail sales area and community-facility offices are occupiable rather than habitable spaces; habitable rooms and spaces require 8 feet. The code definitions needed to resolve that distinction for these uses are not included, so I cannot yet give an unconditional project minimum. Measure from the finished floor to the finished underside of the ceiling or ceiling beams. (2022 NYC BC \u00a7 1208.2)\n\nFor a furred ceiling in a nonhabitable room, the required minimum must be maintained over at least two-thirds of the room\u2019s area; the remaining portion may be lower, but never below 7 feet. The exception preserves the \u00a7 1208.2 minimum for habitable rooms and spaces\u2014this is not permission to lower their ceilings to 7 feet. (BC \u00a7 1208.2.1)\n\nA separate exception permits 7-foot ceilings above and below a mezzanine, other than in habitable spaces; no mezzanine arrangement has been established for these areas. (BC \u00a7 1208.2, Exception 4)",
+      "deliveredAnswerSHA256": "6c64ddfd395aeb049164af31acc520c03d1695853ae6c8c1844961903b0df912",
+      "visibleCaptureTextSHA256": "4a851f67031d03ee6ff11af211ab7bc2108d9fffd3d658cda7e50c3fa7aa548f",
+      "capturedAt": "2026-10-03T18:49:55.584Z",
+      "displayedDuration": "01:04",
+      "strictCompleteCorrect": false,
+      "askedOperativeConclusionDelivered": true,
+      "substantiveAnswerDelivered": true,
+      "operativeConclusionReview": "The answer now supplies the relevant 7 ft 6 in occupiable-space minimum and finished-floor datum, whereas v20 omitted the governing baseline entirely. The separate 8 ft habitable branch, furred-ceiling two-thirds/7 ft lower limit, and nonhabitable mezzanine exception are correctly scoped. It nevertheless leaves the named retail sales and office uses unnecessarily unclassified and says an unconditional project minimum cannot be given. Current BC 202 defines habitable spaces as dwelling-unit rooms in R/I-1 and includes shopping/employment in occupiable spaces. This is a useful conditional baseline with a minor classification gap, rather than a strict correct answer.",
+      "sourceClauseReasons": [
+        {
+          "reference": "BC 1208.2",
+          "reason": "Occupiable minimum 7 ft 6 in; habitable minimum 8 ft; finished-floor-to-underside datum. Exception 4 permits 7 ft only for nonhabitable spaces above/below a mezzanine."
+        },
+        {
+          "reference": "BC 1208.2.1",
+          "reason": "Furred ceilings retain the applicable minimum over two-thirds of the area, never below 7 ft; the habitable-space minimum remains."
+        },
+        {
+          "reference": "BC 202",
+          "reason": "Habitable space is within an R/I-1 dwelling unit. Occupiable space includes shopping/employment. Definitions independently reviewed, not assumed present in the actual writer packet."
+        }
+      ],
+      "usefulness": "useful_but_unnecessarily_conditional",
+      "failureStage": "classification/definition_retrieval_or_delivery_gap; exact writer cause unknown",
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "BC 1208.2"
+        ],
+        "accountingEvidenceReferences": [
+          "ZR 12-10",
+          "BC 1004.1.3",
+          "BC 1208.2.1",
+          "ZR APPENDIX E",
+          "BC 506.2.2",
+          "ZR 33-123",
+          "BC 903.2.11.10",
+          "MC 403.3.1.1",
+          "ZR 35-33",
+          "ZR 78-352",
+          "BC 1208.2",
+          "BC 1004.3",
+          "MC 403.2.1",
+          "MC 403.1",
+          "BC 402.8.2",
+          "BC 303.7",
+          "BC 102.1",
+          "MC 102.1",
+          "ZR 27-111"
+        ],
+        "neededReferencesListed": {
+          "BC 1208.2": true
+        },
+        "actualWriterExcerptCompleteness": "Unknown: complete writer packets are not in capture/accounting. Canonical clauses were independently reviewed; listed reference presence is not complete supplied text proof."
+      },
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-repeat-ceiling-01.accounting.json",
+        "sha256": "8f2f564d3ea608ac8123ae7b38a272538268bec0c2596bd26bdc9915eaca1938",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.188118,
+        "durationMilliseconds": 64885,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "verificationIssueTypes": [
+          "fact_evidence_confusion"
+        ]
+      },
+      "comparison": {
+        "v20grade": "withheld",
+        "v20deliveredAnswerSHA256": "5d1dbc106e885d54e48d9a2986c47c990da28e5bcbb6ff4c31168961434b9046",
+        "v21grade": "minor_issue"
+      },
+      "materialErrorAbsenceScope": "No material false operative conclusion identified in this reviewed delivered text and canonical scope; not an absence claim about unseen drafts, other runs or the wider code library."
+    },
+    {
+      "id": "repeat-ceiling-02",
+      "originalCaseID": "regression-01-02",
+      "originalKeyID": "natural-01-2",
+      "grade": "minor_issue",
+      "question": "For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?",
+      "deliveredAnswerText": "Yes, conditionally: if the ductwork enclosure is a furred ceiling and the retail sales area is a nonhabitable occupiable space, your layout satisfies this ceiling-height rule. The required 7-foot-6-inch height would remain over 75% of the room\u2019s area\u2014more than the required two-thirds\u2014and the lowered quarter would meet the 7-foot absolute minimum for a furred ceiling. (2022 NYC BC \u00a7\u00a7 1208.2, 1208.2.1)\n\nMeasure both heights from the finished floor to the finished underside of the ceiling or ceiling beams. If the space is habitable, the furred-ceiling exception preserves the 8-foot minimum, so neither proposed height satisfies that requirement. The available code text does not include the definitions needed to resolve that classification for the retail sales area. (BC \u00a7\u00a7 1208.2, 1208.2.1)",
+      "deliveredAnswerSHA256": "48b430553b6f8b4244e4e62a5c70c4dfe304e5ab45521e8fd714fc67849db658",
+      "visibleCaptureTextSHA256": "d0b6819e92a12eb2f01e13955a45cbe3773011e162ae1a16e1fb92adb46f87c3",
+      "capturedAt": "2026-10-03T18:52:03.185Z",
+      "displayedDuration": "01:05",
+      "strictCompleteCorrect": false,
+      "askedOperativeConclusionDelivered": true,
+      "substantiveAnswerDelivered": true,
+      "operativeConclusionReview": "The conditional dimensional comparison is correct: 75% at 7 ft 6 in exceeds two-thirds, and the lowered 25% at 7 ft meets the furred-ceiling lower bound. The finished-floor datum and separate habitable 8 ft restriction are retained. As in v20, retail classification remains unnecessarily unresolved. The answer does not claim whole-building approval.",
+      "sourceClauseReasons": [
+        {
+          "reference": "BC 1208.2",
+          "reason": "Relevant occupiable 7 ft 6 in baseline, separate habitable 8 ft minimum, and measurement datum."
+        },
+        {
+          "reference": "BC 1208.2.1",
+          "reason": "75% is at least two-thirds; a lowered quarter at 7 ft meets the nonhabitable furred-ceiling limit."
+        },
+        {
+          "reference": "BC 202",
+          "reason": "The named retail sales use is an occupiable shopping space. Exact definition entries actually supplied remain unknown despite a listed BC 202 reference."
+        }
+      ],
+      "usefulness": "useful_correct_dimensional_answer_overqualified",
+      "failureStage": "unnecessary_classification_boundary; actual writer definition coverage unknown",
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "BC 1208.2",
+          "BC 1208.2.1"
+        ],
+        "accountingEvidenceReferences": [
+          "ZR 12-10",
+          "BC 1208.2.1",
+          "BC 1208.2",
+          "BC 1004.1.3",
+          "ZR 74-943",
+          "ZR APPENDIX E",
+          "ZR 62-57",
+          "BC 505.2.1",
+          "ZR 23-22",
+          "ZR 25-023",
+          "BC 1004.3",
+          "ZR 27-10",
+          "BC 402.8.2",
+          "BC 303.7",
+          "ZR 74-944",
+          "ZR 74-945",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "neededReferencesListed": {
+          "BC 1208.2": true,
+          "BC 1208.2.1": true
+        },
+        "actualWriterExcerptCompleteness": "Unknown: complete writer packets are not in capture/accounting. Canonical clauses were independently reviewed; listed reference presence is not complete supplied text proof."
+      },
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-repeat-ceiling-02.accounting.json",
+        "sha256": "88ca47fa16a3e99a6bb9ec0abfeaeb591cc719bfcf67c517698a8c88293b859d",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.150185,
+        "durationMilliseconds": 65621,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "verificationIssueTypes": [
+          "fact_evidence_confusion"
+        ]
+      },
+      "comparison": {
+        "v20grade": "minor_issue",
+        "v20deliveredAnswerSHA256": "ba590f8b27790d8d0a644d947dd035c458002dd27913807069340ca2600b3008",
+        "v21grade": "minor_issue"
+      },
+      "materialErrorAbsenceScope": "No material false operative conclusion identified in this reviewed delivered text and canonical scope; not an absence claim about unseen drafts, other runs or the wider code library."
+    },
+    {
+      "id": "repeat-propane-01",
+      "originalCaseID": "regression-05-01",
+      "originalKeyID": "natural-05-1",
+      "grade": "correct",
+      "question": "Could a caf\u00e9 tenant keep propane cylinders outside this building? What fire-safety restrictions should we check before drawing a storage cage?",
+      "deliveredAnswerText": "Possibly, but for your proposed mixed-use building with residential use, outdoor caf\u00e9 cylinders larger than 16.4 ounces require commissioner authorization\u2014even outside on the lot\u2014and the storage facility itself must be approved. A cage does not by itself establish permission. The residential-lot restriction applies to any lot containing a building used for residential occupancy; containers over 16.4 ounces also cannot be brought into a nonresidential building without authorization. (FC \u00a7\u00a7 6105.3(3), (5), (6), 6109.1)\n\nBefore drawing the cage, check:\n\nCylinder and total limits: No individual LPG container may have a capacity greater than 100 pounds. Outdoor storage is limited to 400 pounds of LPG total. These are separate limits, not alternatives. (FC \u00a7\u00a7 6105.3(1), 6109.12)\nBasic location: Storage must be at or above grade, not on a roof, and at least 20 feet from building openings, 20 feet from motor-vehicle fuel dispensers, and 10 feet from combustible material. Do not store or leave cylinders unattended near exit-access doors, exits, stairs, exit-discharge areas or other means of egress. (FC \u00a7\u00a7 6109.4, 6109.6, 6109.12)\nAdditional exposure setbacks: For storage over 100 pounds through 400 pounds, Table 6109.12 requires, among other applicable exposures, 25 feet from subway openings and Group A occupancies/public gathering places, 10 feet from combustible-construction buildings, public sidewalks, parked vehicles, streets, private roads and lot lines, and 5 feet from air-compressor intakes or HVAC inlets. Other nearby hazardous-material storage must be checked against its specific table row. Only entries marked with footnote a qualify for reduction to 5 feet: a protective structure rated at least 2 hours must interrupt the line of sight, stand at least 5 feet from the exposure, and allow natural ventilation preventing hazardous gas accumulation. An ordinary cage is not that protective structure. (FC Table 6109.12 and note a)\nFailure hazards: Do not locate storage where failure of structures or containment systems would expose the LPG to electric power lines or piping containing flammable/combustible liquids, flammable gases or oxidizing materials. (FC \u00a7 6109.12.1)\nEnclosure and cylinder protection: Provide a suitable enclosure or other protection against tampering; minimize physical damage and excessive temperature rise, and provide vehicular protection as required by the commissioner. Stored outlet valves must be closed, with screw-on caps or collars securely installed whether cylinders are full, partly full or empty. Cylinders over 1 pound must be positioned with the pressure-relief valve communicating directly with the vapor space. (FC \u00a7\u00a7 6109.2, 6109.3, 6109.8, 6109.13)\nElectrical equipment: Except as otherwise provided in NFPA 58, equipment within 3 feet in any direction must meet Electrical Code Class I, Division 2 wiring requirements, unless separated by a wall or solid partition without openings. (FC \u00a7 6109.14)\nStorage versus connected use: If cylinders supply a stationary LPG installation, access to public-utility piped natural gas prohibits that installation unless authorized by the commissioner. Equipment must be approved for LPG. (FC \u00a7\u00a7 6105.1, 6105.3(10))\n\nThe cylinder capacities, total quantity, intended connection to caf\u00e9 equipment, measured site clearances and commissioner authorization remain unresolved. A permit is required above the quantities referenced in FC \u00a7 105.6, but that provision is not available here, so the permit threshold cannot yet be determined. The NFPA 58 electrical exception also cannot be evaluated from the available text.\n\nWhat cylinder size and maximum number of cylinders does the caf\u00e9 propose to keep outside?",
+      "deliveredAnswerSHA256": "c7c3fde6c19388c0983d531777e83a28e55191b4756bd7ff2a7016c2158e4491",
+      "visibleCaptureTextSHA256": "0999f9f4dc9966d297b0032c8de86aac16b15fcb318948e68340b08866c66852",
+      "capturedAt": "2026-10-03T18:55:25.441Z",
+      "displayedDuration": "02:06",
+      "strictCompleteCorrect": true,
+      "askedOperativeConclusionDelivered": true,
+      "substantiveAnswerDelivered": true,
+      "operativeConclusionReview": "Correctly leads with Commissioner authorization for containers over 16.4 ounces on any lot containing residential occupancy, plus storage-facility approval. A cage alone is not permission. The broad outdoor-storage baseline and added claims were checked against complete FC 6105/6109, including actual table bands and notes. Needed cylinder quantity/authorization facts are requested after a useful baseline. The permit quantity threshold is explicitly unresolved rather than invented; this disclosed auxiliary limit does not replace the answered residential-lot rule.",
+      "sourceClauseReasons": [
+        {
+          "reference": "FC 6105.3(3), (5), (6)",
+          "reason": "Storage-facility approval; residential-lot and nonresidential-building restrictions over 16.4 ounces, with Commissioner authorization where specified."
+        },
+        {
+          "reference": "FC 6105.3(1), (10); 6105.1",
+          "reason": "100 lb individual capacity cap; approved LPG equipment; stationary installation where piped natural gas is available prohibited unless authorized."
+        },
+        {
+          "reference": "FC 6109.12 and Table 6109.12",
+          "reason": "400 lb outdoor cap at/above grade; 20 ft from openings/fuel dispensers and 10 ft from combustibles. The table band over 100 through 400 lb has the stated exposure distances. Only marked rows permit the qualified two-hour protective-structure reduction to 5 ft, with exposure separation and natural ventilation."
+        },
+        {
+          "reference": "FC 6109.2, .3, .4, .6, .8, .12.1, .13, .14",
+          "reason": "Exposure, tampering, temperature and vehicle protection; over-1-lb relief-valve vapor orientation; closed valves/caps/collars; egress/roof restrictions; proximity hazards; and qualified electrical Class I/Division 2 conditions are accurately stated."
+        }
+      ],
+      "usefulness": "useful_broad_baseline_with_genuinely_needed_design_question",
+      "failureStage": null,
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "FC 6105",
+          "FC 6109"
+        ],
+        "accountingEvidenceReferences": [
+          "FC 6109",
+          "BC 1905.6.3.3",
+          "FC 5503",
+          "FC 3306",
+          "FC 608",
+          "FC 5803",
+          "FC 105",
+          "FC 6105",
+          "FC 5504",
+          "FC 307",
+          "FC 403",
+          "BC 102.1",
+          "FC 202"
+        ],
+        "neededReferencesListed": {
+          "FC 6105": true,
+          "FC 6109": true
+        },
+        "actualWriterExcerptCompleteness": "Unknown: complete writer packets are not in capture/accounting. Canonical clauses were independently reviewed; listed reference presence is not complete supplied text proof."
+      },
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-repeat-propane-01.accounting.json",
+        "sha256": "bba3ebabb0087c091a908612ff3b0ee164a890455180f31ce175d538a0f55a5c",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "providerRequestCount": 6,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.194907,
+        "durationMilliseconds": 127078,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "verificationIssueTypes": [
+          "missed_material_conclusion",
+          "misstated_provision",
+          "repeated_established_fact"
+        ]
+      },
+      "comparison": {
+        "v20grade": "correct",
+        "v20deliveredAnswerSHA256": "8004dd14964efcd9360ceb0be726e9c054eddaabed33e6666166d2b8f8aa9323",
+        "v21grade": "correct"
+      },
+      "materialErrorAbsenceScope": "No material false operative conclusion identified in this reviewed delivered text and canonical scope; not an absence claim about unseen drafts, other runs or the wider code library."
+    },
+    {
+      "id": "repeat-propane-02",
+      "originalCaseID": "regression-05-02",
+      "originalKeyID": "natural-05-2",
+      "grade": "correct",
+      "question": "They would be in a locked cage behind the retail space, not inside the apartments. Does that avoid the residential restriction?",
+      "deliveredAnswerText": "No. A locked cage behind the retail space is still on the lot. FC 6105.3(5) prohibits LPG containers over 16.4 ounces on any lot containing a building used for residential occupancy, unless the Commissioner authorizes them; locating them outside the apartments\u2014or behind the retail tenant\u2014does not avoid that restriction. The cage/storage facility also requires approval under FC 6105.3(3). (FC \u00a7 6105.3(3), (5))",
+      "deliveredAnswerSHA256": "2ab825bf82fdeb2a4b5aa5c5bbfc1ba03c8b9e7a6be20cc6a097b371c19f788e",
+      "visibleCaptureTextSHA256": "adf50b03c88728f45552f45163452e98bfa954d9543d90049ce15db9eaef9f72",
+      "capturedAt": "2026-10-03T18:57:29.009Z",
+      "displayedDuration": "00:44",
+      "strictCompleteCorrect": true,
+      "askedOperativeConclusionDelivered": true,
+      "substantiveAnswerDelivered": true,
+      "operativeConclusionReview": "The direct No preserves the mixed residential-lot subject. An outdoor locked cage behind retail does not avoid FC 6105.3(5); the answer retains the over-16.4-ounce threshold and Commissioner authorization, and correctly adds independent facility approval. It does not prohibit every container size or derive permission from the lock.",
+      "sourceClauseReasons": [
+        {
+          "reference": "FC 6105.3(5)",
+          "reason": "The restriction covers any lot containing a residential building, not only apartment interiors."
+        },
+        {
+          "reference": "FC 6105.3(3)",
+          "reason": "Storage-facility approval is independent of cage location."
+        }
+      ],
+      "usefulness": "direct_scoped_answer_with_continuity",
+      "failureStage": null,
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "FC 6105"
+        ],
+        "accountingEvidenceReferences": [
+          "ZR 15-023",
+          "FC 6105",
+          "ZR APPENDIX E",
+          "ZR 74-171",
+          "ZR 37-624",
+          "ZR 37-73",
+          "ZR 35-24",
+          "ZR 73-452",
+          "ZR 32-171",
+          "BC 304.1",
+          "ZR 32-41",
+          "ZR 74-901",
+          "ZR 37-78",
+          "ZR 37-625",
+          "ZR 91-832",
+          "ZR 91-837",
+          "BC 102.1",
+          "ZR 12-10"
+        ],
+        "neededReferencesListed": {
+          "FC 6105": true
+        },
+        "actualWriterExcerptCompleteness": "Unknown: complete writer packets are not in capture/accounting. Canonical clauses were independently reviewed; listed reference presence is not complete supplied text proof."
+      },
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-repeat-propane-02.accounting.json",
+        "sha256": "07079b4b42bb221c86c6d2bf7db265b20029f9ce526f91899871f50db9c19f6f",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.013646,
+        "durationMilliseconds": 45105,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "verificationIssueTypes": []
+      },
+      "comparison": {
+        "v20grade": "withheld",
+        "v20deliveredAnswerSHA256": "390d1aef5ea59c275bb06a9c89f0556ef3fdf305fdb47da4daedfabbe0197eff",
+        "v21grade": "correct"
+      },
+      "materialErrorAbsenceScope": "No material false operative conclusion identified in this reviewed delivered text and canonical scope; not an absence claim about unseen drafts, other runs or the wider code library."
+    },
+    {
+      "id": "repeat-lavatory-01",
+      "originalCaseID": "practical-01-01",
+      "originalKeyID": "practical-01-01",
+      "grade": "withheld",
+      "question": "What do we need to prevent scalding at the lavatory in the ground-floor public restroom?",
+      "deliveredAnswerText": "The supplied code text does not establish what temperature limit or protective device is required to prevent scalding at this lavatory. It specifies maximum flow rates for public lavatories\u20140.25 gallon per metering cycle for metering faucets, or 0.5 gpm at 60 psi for other faucets\u2014but those are flow limits, not scald-prevention requirements (PC \u00a7 604.4, Table 604.4).",
+      "deliveredAnswerSHA256": "50b5cc837f6504553dbcfa8c63a3d8dfe8a8992cd3e5cd48854d2fdb37eebc57",
+      "visibleCaptureTextSHA256": "2d2267dba7586081d41df8f5032a28d2c6d428ce4e9d24acb404c8393deddcfa",
+      "capturedAt": "2026-10-03T19:00:14.336Z",
+      "displayedDuration": "00:32",
+      "strictCompleteCorrect": false,
+      "askedOperativeConclusionDelivered": false,
+      "substantiveAnswerDelivered": true,
+      "operativeConclusionReview": "The requested scald-prevention baseline is explicitly not delivered: an approved ASSE 1070 tempered-water device, maximum 110 F, and the regulated point-of-use-heater exception are omitted. The accurately quoted public-lavatory flow/consumption limits do not answer the temperature-safety question. This is a packet-limited partial nonanswer, not an assertion that enacted law has no anti-scald provision. Research complete status does not make it a successful answer.",
+      "sourceClauseReasons": [
+        {
+          "reference": "PC 416.5",
+          "reason": "Public customer/patron/visitor hand-washing requires tempered delivery through an approved ASSE 1070 device; regulated point-of-use-heater exception."
+        },
+        {
+          "reference": "PC 607.1.2",
+          "reason": "Tempered-water device and maximum 110 F delivery; separate shower protection is retained."
+        },
+        {
+          "reference": "PC 604.4 and Table 604.4",
+          "reason": "Public-lavatory consumption limits of 0.25 gallon per metering cycle and 0.5 gpm at 60 psi are accurate, but concern flow rather than temperature protection."
+        }
+      ],
+      "usefulness": "no_requested_safety_baseline",
+      "failureStage": "ordinary_language_decisive_source_retrieval_gap",
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "PC 416.5",
+          "PC 607.1.2"
+        ],
+        "accountingEvidenceReferences": [
+          "PC 405.3.2",
+          "PC 405.3.4",
+          "PC 604.4",
+          "BC 1109.2.3",
+          "PC 107.5",
+          "PC 410.4",
+          "BC 1109.2.1.2",
+          "PC 420.5",
+          "PC 201.4",
+          "BC 1109.2.1",
+          "PC 102.1",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "neededReferencesListed": {
+          "PC 416.5": false,
+          "PC 607.1.2": false
+        },
+        "actualWriterExcerptCompleteness": "Unknown: complete writer packets are not in capture/accounting. Canonical clauses were independently reviewed; listed reference presence is not complete supplied text proof."
+      },
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-repeat-lavatory-01.accounting.json",
+        "sha256": "6ff64d9669705932024a2c0fa5aabd542156faea2d4e873770b258aa08641ed4",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.009552,
+        "durationMilliseconds": 32260,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "verificationIssueTypes": []
+      },
+      "comparison": {
+        "v20grade": "withheld",
+        "v20deliveredAnswerSHA256": "66be2f0c1a1694ac3a7f7103d5b6fcae11eb29e48e888de658ed714fae8ae2b1",
+        "v21grade": "withheld"
+      },
+      "materialErrorAbsenceScope": "No material false operative conclusion identified in this reviewed delivered text and canonical scope; not an absence claim about unseen drafts, other runs or the wider code library."
+    },
+    {
+      "id": "repeat-lavatory-02",
+      "originalCaseID": "practical-01-02",
+      "originalKeyID": "practical-01-02",
+      "grade": "minor_issue",
+      "question": "The central water heater would be set to 110\u00b0F. Can we rely on its thermostat and leave out the temperature-limiting device at the lavatory?",
+      "deliveredAnswerText": "No\u2014if this restroom is provided for customers, patrons and visitors, the central heater\u2019s 110\u00b0F thermostat setting cannot replace the required temperature-limiting device. The 2022 NYC Plumbing Code prohibits using a water-heater thermostat as the means of complying with maximum fixture delivery temperatures (PC \u00a7 607.1.1). For lavatories in those public toilet facilities, tempered water must be delivered through an approved device conforming to ASSE 1070. The exception covers point-of-use heaters with outlet temperature regulated to provide tempered water, not the proposed central heater (PC \u00a7 416.5).\n\nThe remaining applicability question is who the public restroom serves; \u201cpublic restroom\u201d alone does not establish the specific users named in \u00a7 416.5.\n\nWill this restroom serve customers, patrons or visitors?",
+      "deliveredAnswerSHA256": "e6e48e9ef07653e004f1e45d4ec4f31f31063d7d8bdbcef51a049b801a5cd151",
+      "visibleCaptureTextSHA256": "8d21ce6c586dae702f7d9c77b03a9b5118b8a6d1bd79d6f32f128039e14dd4db",
+      "capturedAt": "2026-10-03T19:02:19.278Z",
+      "displayedDuration": "00:55",
+      "strictCompleteCorrect": false,
+      "askedOperativeConclusionDelivered": true,
+      "substantiveAnswerDelivered": true,
+      "operativeConclusionReview": "The thermostat-only proposal is correctly rejected under PC 607.1.1, and the ASSE 1070 public-lavatory requirement and regulated point-of-use exception are accurately distinguished from the central heater. However, the answer adds an unnecessary applicability intake asking whether the already described public retail restroom serves customers, patrons or visitors. The frozen key needs no extra premise to reject the thermostat-only proposal. This weakens a previously correct direct answer without granting a materially false legal permission.",
+      "sourceClauseReasons": [
+        {
+          "reference": "PC 607.1.1",
+          "reason": "A water-heater thermostat cannot serve as the code-required fixture temperature-limiting means."
+        },
+        {
+          "reference": "PC 416.5",
+          "reason": "Public hand-washing ASSE 1070 tempered-water protection; the point-of-use exception does not describe the proposed central heater."
+        }
+      ],
+      "usefulness": "correct_core_answer_redundant_intake",
+      "failureStage": "unnecessary_missing_fact_question_and_conditional_lead",
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "PC 607.1.1",
+          "PC 416.5"
+        ],
+        "accountingEvidenceReferences": [
+          "PC 607.1.1",
+          "PC 607.1.2",
+          "PC 604.4",
+          "PC 408.3",
+          "PC 501.6",
+          "PC 416.5",
+          "PC 424.5",
+          "PC 607.2",
+          "PC 1501.3",
+          "PC 607.2.2",
+          "PC 608.1",
+          "PC 702.1",
+          "PC 702.2",
+          "PC 702.3",
+          "PC 702.4",
+          "PC 1102.4",
+          "PC 102.1"
+        ],
+        "neededReferencesListed": {
+          "PC 607.1.1": true,
+          "PC 416.5": true
+        },
+        "actualWriterExcerptCompleteness": "Unknown: complete writer packets are not in capture/accounting. Canonical clauses were independently reviewed; listed reference presence is not complete supplied text proof."
+      },
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-repeat-lavatory-02.accounting.json",
+        "sha256": "bcb9d6e2fce1e3cfb7da579f2f25b8dcfb90dadf8c841483e1d16bb160a0ee85",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.142317,
+        "durationMilliseconds": 55780,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "verificationIssueTypes": [
+          "overstated_compliance"
+        ]
+      },
+      "comparison": {
+        "v20grade": "correct",
+        "v20deliveredAnswerSHA256": "716dd4a0121f3075765d7c361f6dda6b03f482ccf13c0cb2095a87980618dd48",
+        "v21grade": "minor_issue"
+      },
+      "materialErrorAbsenceScope": "No material false operative conclusion identified in this reviewed delivered text and canonical scope; not an absence claim about unseen drafts, other runs or the wider code library."
+    },
+    {
+      "id": "repeat-fdc-01",
+      "originalCaseID": "practical-04-01",
+      "originalKeyID": "practical-04-01",
+      "grade": "correct",
+      "question": "For the fire department connection on the street wall, what clear space do we need to leave around it?",
+      "deliveredAnswerText": "Leave and maintain a clear working space at least 36 inches wide, 36 inches deep, and 78 inches high in front of and to the sides of the wall-mounted Fire Department connection (NYC Building Code \u00a7 912.4.2). The Fire Commissioner may require or approve otherwise; immediate access must also remain unobstructed (NYC Fire Code \u00a7\u00a7 912.3, 912.3.2).",
+      "deliveredAnswerSHA256": "fa663fb0b9891d9f3d8325e1903fcfd49a3e9ad403168aa711b1477043e604f9",
+      "visibleCaptureTextSHA256": "6a4eb3493af20a08fbd2e32382dcb50cf26d07aaab3f50e4201d82ec8397909f",
+      "capturedAt": "2026-10-03T19:04:31.822Z",
+      "displayedDuration": "00:34",
+      "strictCompleteCorrect": true,
+      "askedOperativeConclusionDelivered": true,
+      "substantiveAnswerDelivered": true,
+      "operativeConclusionReview": "The answer supplies the correct 36 in wide, 36 in deep, 78 in high working-space baseline in front of/to the sides of the wall-mounted FDC, maintained. It preserves the Fire Commissioner exception and separate immediate unobstructed access. This includes the companion access clause omitted in v20.",
+      "sourceClauseReasons": [
+        {
+          "reference": "BC 912.4.2",
+          "reason": "Wall-mounted front/side working space of at least 36 by 36 by 78 in, provided and maintained unless otherwise required or approved by the Fire Commissioner."
+        },
+        {
+          "reference": "FC 912.3 and .3.2",
+          "reason": "Immediate unobstructed access is required separately from the working-space dimensions and visibility."
+        }
+      ],
+      "usefulness": "complete_compact_baseline",
+      "failureStage": null,
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "BC 912.4.2",
+          "FC 912"
+        ],
+        "accountingEvidenceReferences": [
+          "ZR 12-10",
+          "BC 912.4.2",
+          "BC 912.4.1",
+          "FC 912",
+          "BC 912.2.1.6",
+          "BC 912.2.1.1",
+          "ZR 124-31",
+          "BC 102.1"
+        ],
+        "neededReferencesListed": {
+          "BC 912.4.2": true,
+          "FC 912": true
+        },
+        "actualWriterExcerptCompleteness": "Unknown: complete writer packets are not in capture/accounting. Canonical clauses were independently reviewed; listed reference presence is not complete supplied text proof."
+      },
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-repeat-fdc-01.accounting.json",
+        "sha256": "2910469bb3b16922f00f9fd490f0d99388d773abfc18671b26ce5082447aab3c",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.008179,
+        "durationMilliseconds": 34427,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "verificationIssueTypes": []
+      },
+      "comparison": {
+        "v20grade": "minor_issue",
+        "v20deliveredAnswerSHA256": "e2b7bbb834d1cbae433829e1a176cebbf102a62a5ac6326aa6323aae348515b2",
+        "v21grade": "correct"
+      },
+      "materialErrorAbsenceScope": "No material false operative conclusion identified in this reviewed delivered text and canonical scope; not an absence claim about unseen drafts, other runs or the wider code library."
+    },
+    {
+      "id": "repeat-fdc-02",
+      "originalCaseID": "practical-04-02",
+      "originalKeyID": "practical-04-02",
+      "grade": "correct",
+      "question": "Could a planter leave only 24 inches in front of it if the hose couplings are still visible?",
+      "deliveredAnswerText": "No\u2014unless the Fire Commissioner requires or approves a different clearance. For the wall-mounted fire department connection discussed, the required working space is at least 36 inches wide, 36 inches deep and 78 inches high, maintained in front of and to the sides (2022 NYC Building Code \u00a7 912.4.2). A planter leaving only 24 inches of depth falls 12 inches short; visible hose couplings do not substitute for working clearance.\n\nImmediate access must also remain unobstructed, and the Fire Code independently requires the same working-space dimensions, subject to its stated exception for otherwise required or approved space (2022 NYC Fire Code, current consolidated text, \u00a7\u00a7 912.3 and 912.3.2).",
+      "deliveredAnswerSHA256": "4bd74a382e78234f1a9ff0f8e4cba4e595212688edbbc6de108b81d351a9134a",
+      "visibleCaptureTextSHA256": "6dde07616896f53866dc524bfdea89b5bbb3df1b1e093d76915889df5b1aa48e",
+      "capturedAt": "2026-10-03T19:06:01.419Z",
+      "displayedDuration": "00:41",
+      "strictCompleteCorrect": true,
+      "askedOperativeConclusionDelivered": true,
+      "substantiveAnswerDelivered": true,
+      "operativeConclusionReview": "The direct No is correctly qualified by an unestablished Fire Commissioner alternate: 24 in front depth is 12 in short of the required 36 in. Coupling visibility does not replace working clearance. The wall-mounted front/side context and independent immediate unobstructed access are retained; no fence exception or whole-project approval is invented.",
+      "sourceClauseReasons": [
+        {
+          "reference": "BC 912.4.2",
+          "reason": "36 in front depth is required; 24 in is 12 in short, absent an established required/approved alternate."
+        },
+        {
+          "reference": "FC 912.3 and .3.2",
+          "reason": "Immediate unobstructed access and clear working space are separate requirements; visibility is not a substitute."
+        }
+      ],
+      "usefulness": "direct_scoped_answer_after_bounded_repair",
+      "failureStage": null,
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "BC 912.4.2",
+          "FC 912"
+        ],
+        "accountingEvidenceReferences": [
+          "BC 912.4.2",
+          "FC 912",
+          "BC 1020.2",
+          "BC Q105.1",
+          "ZR APPENDIX E",
+          "FC 504",
+          "BC 905.7",
+          "BC 905.4",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "neededReferencesListed": {
+          "BC 912.4.2": true,
+          "FC 912": true
+        },
+        "actualWriterExcerptCompleteness": "Unknown: complete writer packets are not in capture/accounting. Canonical clauses were independently reviewed; listed reference presence is not complete supplied text proof."
+      },
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-repeat-fdc-02.accounting.json",
+        "sha256": "7d3c84ce2ec18e4e149df9e7fe77794d6dbd187bf5ddb602f6ce1642540e98cc",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "providerRequestCount": 4,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.110693,
+        "durationMilliseconds": 41663,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "verificationIssueTypes": [
+          "zoning_unbound_conclusion"
+        ]
+      },
+      "comparison": {
+        "v20grade": "withheld",
+        "v20deliveredAnswerSHA256": "6c6df8e253dbbf6e3569ce0954a087444001d6d0590a5e76b0b7b2c0ddff196e",
+        "v21grade": "correct"
+      },
+      "materialErrorAbsenceScope": "No material false operative conclusion identified in this reviewed delivered text and canonical scope; not an absence claim about unseen drafts, other runs or the wider code library."
+    }
+  ],
+  "totals": {
+    "correct": 4,
+    "minor_issue": 3,
+    "materially_wrong": 0,
+    "withheld": 1,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0
+  },
+  "strictCorrectTurns": 4,
+  "strictCorrectDenominator": 8,
+  "comparisonSameEightV20Rows": {
+    "totals": {
+      "correct": 2,
+      "minor_issue": 2,
+      "materially_wrong": 0,
+      "withheld": 4,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 0
+    },
+    "strictCorrectTurns": 2,
+    "strictCorrectDenominator": 8,
+    "changes": [
+      {
+        "id": "repeat-ceiling-01",
+        "originalCaseID": "regression-01-01",
+        "v20grade": "withheld",
+        "v20deliveredAnswerSHA256": "5d1dbc106e885d54e48d9a2986c47c990da28e5bcbb6ff4c31168961434b9046",
+        "v21grade": "minor_issue"
+      },
+      {
+        "id": "repeat-propane-02",
+        "originalCaseID": "regression-05-02",
+        "v20grade": "withheld",
+        "v20deliveredAnswerSHA256": "390d1aef5ea59c275bb06a9c89f0556ef3fdf305fdb47da4daedfabbe0197eff",
+        "v21grade": "correct"
+      },
+      {
+        "id": "repeat-lavatory-02",
+        "originalCaseID": "practical-01-02",
+        "v20grade": "correct",
+        "v20deliveredAnswerSHA256": "716dd4a0121f3075765d7c361f6dda6b03f482ccf13c0cb2095a87980618dd48",
+        "v21grade": "minor_issue"
+      },
+      {
+        "id": "repeat-fdc-01",
+        "originalCaseID": "practical-04-01",
+        "v20grade": "minor_issue",
+        "v20deliveredAnswerSHA256": "e2b7bbb834d1cbae433829e1a176cebbf102a62a5ac6326aa6323aae348515b2",
+        "v21grade": "correct"
+      },
+      {
+        "id": "repeat-fdc-02",
+        "originalCaseID": "practical-04-02",
+        "v20grade": "withheld",
+        "v20deliveredAnswerSHA256": "6c6df8e253dbbf6e3569ce0954a087444001d6d0590a5e76b0b7b2c0ddff196e",
+        "v21grade": "correct"
+      }
+    ]
+  },
+  "gradingReconciliation": "The first ceiling answer now delivers a conditional 7 ft 6 in baseline, so it is minor rather than the prior withheld answer that omitted the governing minima entirely. No rubric change or private-answer credit. Initial lavatory still withholds the temperature/device baseline. Its follow-up is minor for a new unnecessary known-use clarification; the No and exception remain correct.",
+  "financialObservationsSeparateFromGrades": {
+    "estimatedProviderCostUSD": 0.8175970000000001,
+    "providerRequestCount": 34,
+    "unsettledProviderRequests": 0,
+    "medianDisplayedSeconds": 49.5
+  },
+  "failureTaxonomy": {
+    "requested_safety_baseline_missing": 1,
+    "unnecessary_use_classification_or_missing_fact_question": 3,
+    "delivered_materially_wrong": 0,
+    "infrastructure_transport_failure_observed": 0
+  },
+  "limitations": [
+    "Small repeated sample selected from known defects; author/reviewer prior exposure is disclosed. Not blind/source-disjoint/statistical accuracy or95%validation.",
+    "Frozen prior keys unchanged; full current canonical clauses/definitions/table bands and footnotes reviewed. Actual writer packets/role bindings not supplied, so exact source-clipping or scope-selection causes remain unknown.",
+    "Success after bounded revision does not prove the new scope exemption was the cause; safe FDCdiagnostic recorded separately. Source code remained frozen throughout these repeated captures.",
+    "No model/provider calls, browser interaction, code changes, saved-project mutations or rubric repairs by reviewer. Originalv20capturesandgrades remain immutable.",
+    "NEW8questionsmustremainseparatefromthisrepeateddenominator. Correctcorewithminorqualificationisnotcountedasstrictcorrect."
+  ]
+}

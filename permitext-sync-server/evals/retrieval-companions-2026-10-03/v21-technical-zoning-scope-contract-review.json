@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-03T18:32:33.208723+00:00",
+  "phase": "v21 local technical-binding scope patch; not deployment evidence",
+  "productionBaselineCommit": "862571620678b02b27163d991e30879cff98a289",
+  "currentParentCommit": "cbf2cf3afece4bcd9344df89a7dc03bf93fa08ab",
+  "ownedFiles": [
+    {
+      "path": "permitext-sync-server/research-zoning-safety.mjs",
+      "sha256": "832c6757ff40defce5ab943128d3715cd9de76cbedb5a2178349607ed0af307f"
+    },
+    {
+      "path": "permitext-sync-server/tests/research-zoning-technical-boundary-scope-contract.mjs",
+      "sha256": "978ea3f088b4ec131684cff82842b49d3f9cb279bd9230a4b0c11ad8fc30fc92"
+    }
+  ],
+  "change": "Recognized non-operative zoning assessment limitations no longer convert eligible complete technical bindings into a Zoning answer; affirmative/mixed/legal determinations, ZR selections, reference-only/contextual/incomplete bindings remain guarded.",
+  "completenessBoundary": "canonicalContextComplete:false alone does not reject an atomic complete technical child. Explicit textComplete:false, completenessReview.textComplete:false and truncation still reject. Technical enclosing applicability and exception verification remains independent.",
+  "passingCommands": [
+    "node --check permitext-sync-server/research-zoning-safety.mjs",
+    "git diff --check",
+    "node permitext-sync-server/tests/research-zoning-technical-boundary-scope-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-active-scope-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-safety-contract.mjs",
+    "node permitext-sync-server/tests/research-section-reference-quality-contract.mjs",
+    "node permitext-sync-server/tests/research-section-reference-http-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-mapped-review-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-selected-sources-contract.mjs",
+    "node permitext-sync-server/tests/research-evidence-boundary-fallback-contract.mjs",
+    "node permitext-sync-server/tests/research-scope-diagnostic-privacy-contract.mjs",
+    "node permitext-sync-server/tests/research-economics-contract.mjs"
+  ],
+  "existingBaselineFailures": [
+    {
+      "test": "research-zoning-mapped-review-http-contract.mjs",
+      "line": 133,
+      "assertion": "missing_review",
+      "actual": [
+        "permitext_code_interpretation",
+        "permitext_research_verification",
+        "permitext_code_interpretation",
+        "permitext_research_verification"
+      ],
+      "expected": [
+        "permitext_code_interpretation",
+        "permitext_research_verification",
+        "permitext_research_targeted_revision",
+        "permitext_research_verification"
+      ],
+      "currentResult": "failed",
+      "frozenV20Result": "failed identically",
+      "baselineLog": "/tmp/permitext-v20-mapped-scope-baseline.log"
+    },
+    {
+      "test": "research-selected-passage-http.mjs",
+      "line": 92,
+      "assertion": "Unavailable outside sources must remain disclosed even when no lookup was requested.",
+      "actual": {
+        "outsideCurrentLibrary": [],
+        "webSupportRequested": false,
+        "webSupportReasons": [
+          "selected_evidence_boundary"
+        ],
+        "codeVersion": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1"
+      },
+      "currentResult": "failed",
+      "frozenV20Result": "failed identically",
+      "baselineLog": "/tmp/permitext-v20-selected-scope-baseline.log"
+    }
+  ],
+  "baselineMethod": {
+    "source": "git archive 862571620678b02b27163d991e30879cff98a289 permitext-sync-server",
+    "directory": "/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-scope-v20-baseline-dcrhm295",
+    "canonicalResourceTree": "read-only symlink to clean release resources; git diff baseline-to-HEAD and dirty status show no CodeContent changes"
+  },
+  "providerCalls": 0,
+  "browserActions": 0,
+  "sourceFixtureEdits": 0,
+  "committedByThisAgent": false,
+  "productionFDCAttribution": "Actual zoning_unbound_conclusion and governing BC912.4.2 presence were observed. This generic flaw is independently reproduced, but no raw production draft/bindings were available, so it is not established as the actual production trigger.",
+  "preservedEvaluationArtifacts": "Frozen v20 original captures, keys and grade outcomes remain unchanged."
+}

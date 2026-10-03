@@ -1,0 +1,184 @@
+{
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "createdAt": "2026-10-03T18:39:19.360370+00:00",
+  "sourceCommittedAndPushed": true,
+  "offlineChecksPassed": true,
+  "finalCombinedRootContracts": [
+    "research-continuing-canonical-packets-contract.mjs",
+    "research-semantic-query-context-contract.mjs",
+    "research-source-edition-integrity-contract.mjs",
+    "research-corpus-registry-contract.mjs",
+    "research-historical-topic-routing-contract.mjs",
+    "research-zoning-technical-boundary-scope-contract.mjs",
+    "research-zoning-active-scope-contract.mjs",
+    "research-zoning-safety-contract.mjs",
+    "research-section-reference-http-contract.mjs",
+    "research-evidence-boundary-fallback-contract.mjs",
+    "research-scope-diagnostic-privacy-contract.mjs",
+    "research-economics-contract.mjs"
+  ],
+  "otherRootContractsPassed": [
+    "research-interpretation-context-contract.mjs",
+    "research-verifier-envelope-repair-contract.mjs",
+    "research-model-routing-contract.mjs",
+    "research-complex-verification-contract.mjs"
+  ],
+  "agentRetrievalContracts": [
+    {
+      "file": "tests/research-continuing-canonical-packets-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-current-detail-packet-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-canonical-method-dependencies-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-rule-packets-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-evidence-assembly-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-indexed-reference-dependency-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-source-edition-integrity-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-technical-source-boundaries-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-semantic-query-context-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    },
+    {
+      "file": "tests/research-dependent-measurement-subject-contract.mjs",
+      "pass": true,
+      "providerCalls": 0
+    }
+  ],
+  "agentScopeContracts": [
+    "node --check permitext-sync-server/research-zoning-safety.mjs",
+    "git diff --check",
+    "node permitext-sync-server/tests/research-zoning-technical-boundary-scope-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-active-scope-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-safety-contract.mjs",
+    "node permitext-sync-server/tests/research-section-reference-quality-contract.mjs",
+    "node permitext-sync-server/tests/research-section-reference-http-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-mapped-review-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-selected-sources-contract.mjs",
+    "node permitext-sync-server/tests/research-evidence-boundary-fallback-contract.mjs",
+    "node permitext-sync-server/tests/research-scope-diagnostic-privacy-contract.mjs",
+    "node permitext-sync-server/tests/research-economics-contract.mjs"
+  ],
+  "preexistingFailedChecks": [
+    {
+      "test": "research-cross-code-continuity-contract.mjs",
+      "failure": "MC403.3.1.1 source absent for private bathroom airflow ordinary-language question at line27",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    },
+    {
+      "test": "research-decision-fact-contract.mjs",
+      "failure": "Retained September draft references an unknown sourceID in supportedPoints/1, declared sectionID12088; fails before verifier dispatch",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    },
+    {
+      "test": "research-decision-fact-repair-http-contract.mjs",
+      "failure": "Recorded mock draft/source-binding expectation fails during first verifier call; phases stop after initial writer and verifier rather than expected4",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    },
+    {
+      "test": "research-zoning-mapped-review-http-contract.mjs",
+      "line": 133,
+      "assertion": "missing_review",
+      "actual": [
+        "permitext_code_interpretation",
+        "permitext_research_verification",
+        "permitext_code_interpretation",
+        "permitext_research_verification"
+      ],
+      "expected": [
+        "permitext_code_interpretation",
+        "permitext_research_verification",
+        "permitext_research_targeted_revision",
+        "permitext_research_verification"
+      ],
+      "currentResult": "failed",
+      "frozenV20Result": "failed identically",
+      "baselineLog": "/tmp/permitext-v20-mapped-scope-baseline.log"
+    },
+    {
+      "test": "research-selected-passage-http.mjs",
+      "line": 92,
+      "assertion": "Unavailable outside sources must remain disclosed even when no lookup was requested.",
+      "actual": {
+        "outsideCurrentLibrary": [],
+        "webSupportRequested": false,
+        "webSupportReasons": [
+          "selected_evidence_boundary"
+        ],
+        "codeVersion": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1"
+      },
+      "currentResult": "failed",
+      "frozenV20Result": "failed identically",
+      "baselineLog": "/tmp/permitext-v20-selected-scope-baseline.log"
+    }
+  ],
+  "paidProviderCallsDuringAuthoring": 0,
+  "sourceLimitsChanged": false,
+  "modelsOrServiceSettingsChanged": false,
+  "productionDeploymentVerified": true,
+  "productionAnswerAcceptancePassed": false,
+  "productionAnswerAcceptanceStatus": "not_run",
+  "residuals": [
+    "One existing active-source protected slot retains checked identity order. Deliberately cramped limit2/FC505-leading control with FC6109 first retains6109 although6105 child is eligible; no claim that all unknown hosted citation orders are solved. Semantic subject retention can now improve actual semantic retrieval, but no provider ranking/answer verification was run.",
+    "Actual stored checked citation order/source slices/topic metadata/semantic vectors were not captured. Replays use observed accounting source order and canonical resolution plus visible33 fields with reconstructed qualifiers; no new production accuracy claimed.",
+    "Ancestor nomination intentionally requires a full canonical responsive child and literal qualification link. Fragment-only children, unrelated links, wrong identities and sources exceeding remaining/per-source caps stay omitted.",
+    "Bounded human fallback is soft search intent only; writer/verifier still receive full original human context/facts.",
+    "Actual zoning_unbound_conclusion and governing BC912.4.2 presence were observed. This generic flaw is independently reproduced, but no raw production draft/bindings were available, so it is not established as the actual production trigger."
+  ],
+  "writerChange": "General focus and user-facing language instructions; live effect untested.",
+  "safeDiagnostics": "Enum/count allowlist for actual future scope cause; no question, answer, source prose or project facts.",
+  "productionDeploymentID": "dpl_HqJQd49vsS5g5Lfj8t97V9qLChyb",
+  "productionVerifiedAt": "2026-10-03T18:47:40.341024+00:00",
+  "productionAcceptanceStatus": "failed",
+  "productionAcceptancePassed": false,
+  "capturedProductionTurns": 16,
+  "productionReviewTotals": {
+    "correct": 9,
+    "minor_issue": 5,
+    "materially_wrong": 0,
+    "withheld": 2,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0
+  },
+  "productionStrictCorrectTurns": 9,
+  "productionProviderRequestsPending": 0
+}

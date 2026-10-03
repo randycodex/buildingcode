@@ -1,0 +1,91 @@
+{
+  "verifiedAt": "2026-10-03T18:47:40.341024+00:00",
+  "gitCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "deploymentID": "dpl_HqJQd49vsS5g5Lfj8t97V9qLChyb",
+  "deploymentHost": "permitext-sync-3vojln0l7-randycodexs-projects-b72fc111.vercel.app",
+  "protected": {
+    "release": {
+      "release": {
+        "releaseID": "9166992c557a",
+        "gitCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+        "environment": "production",
+        "deploymentHost": "permitext-sync-3vojln0l7-randycodexs-projects-b72fc111.vercel.app",
+        "buildTimestamp": "2026-10-03T18:39:45.103Z"
+      }
+    },
+    "health": {
+      "ok": true,
+      "storage": "postgres",
+      "schema": "normalized-v4",
+      "rateLimit": "postgres",
+      "commercialReadiness": {
+        "configured": true,
+        "authentication": {
+          "configured": true,
+          "livePublishableKey": true,
+          "verificationMode": "networkless",
+          "authorizedPartyCount": 2
+        }
+      },
+      "operations": {
+        "releaseIdentityConfigured": true,
+        "structuredRuntimeLogs": true,
+        "clientErrorReporting": true,
+        "slowRequestThresholdMilliseconds": 2000,
+        "externalAlertsConfigured": true,
+        "monitoringProvider": "vercel-observability-daily-review"
+      },
+      "release": {
+        "releaseID": "9166992c557a",
+        "gitCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+        "environment": "production",
+        "deploymentHost": "permitext-sync-3vojln0l7-randycodexs-projects-b72fc111.vercel.app",
+        "buildTimestamp": "2026-10-03T18:39:45.103Z"
+      }
+    },
+    "privateVectorHTTPStatus": 404
+  },
+  "public": {
+    "release": {
+      "release": {
+        "releaseID": "9166992c557a",
+        "gitCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+        "environment": "production",
+        "deploymentHost": "permitext-sync-3vojln0l7-randycodexs-projects-b72fc111.vercel.app",
+        "buildTimestamp": "2026-10-03T18:39:45.103Z"
+      }
+    },
+    "health": {
+      "ok": true,
+      "storage": "postgres",
+      "schema": "normalized-v4",
+      "rateLimit": "postgres",
+      "commercialReadiness": {
+        "configured": true,
+        "authentication": {
+          "configured": true,
+          "livePublishableKey": true,
+          "verificationMode": "networkless",
+          "authorizedPartyCount": 2
+        }
+      },
+      "operations": {
+        "releaseIdentityConfigured": true,
+        "structuredRuntimeLogs": true,
+        "clientErrorReporting": true,
+        "slowRequestThresholdMilliseconds": 2000,
+        "externalAlertsConfigured": true,
+        "monitoringProvider": "vercel-observability-daily-review"
+      },
+      "release": {
+        "releaseID": "9166992c557a",
+        "gitCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+        "environment": "production",
+        "deploymentHost": "permitext-sync-3vojln0l7-randycodexs-projects-b72fc111.vercel.app",
+        "buildTimestamp": "2026-10-03T18:39:45.103Z"
+      }
+    },
+    "servedClientSHA256": "9ccc7e92c1ed4e259fe83cbb0343ed456469a12d600621725cb1d5e751545b49"
+  },
+  "answerAcceptance": "not_run"
+}

@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "cohort": "v21-practical-supplement",
+  "reviewerOnly": true,
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "entries": [
+    {
+      "id": "v21-practical-01-01",
+      "family": "PC",
+      "expectedResolution": "useful_scoped_baseline",
+      "requiredPackets": [
+        "PC 708.1.9",
+        "PC 708.1.10"
+      ],
+      "supportingPackets": [
+        "PC 708.1",
+        "PC 708.1.10.1"
+      ],
+      "decisiveChecks": [
+        "4-inch piping falls in the 6-inch-and-smaller class: clearance is at least18inches from and perpendicular to the face of the cleanout opening to any obstruction, under708.1.9.",
+        "Required cleanouts need access. For concealed piping,708.1.10 requires extension through and termination flush with the finished wall/floor/ground surface, or extension outside the building; simply leaving the plug buried behind permanent finishes is insufficient.",
+        "For a finished-wall opening, the face must be within1.5inches of the finished wall surface. A direction to terminate flush satisfies that limit; do not claim any arbitrary wall recess is allowed.",
+        "If discussing a trim cover/access door, it must be designed for that purpose and approved. Mortar, plaster or other permanent material cannot cover the cleanout plug, under708.1.10.1."
+      ],
+      "necessaryUnknownFacts": [],
+      "optionalUnknownFacts": [
+        "Actual pipe route/turns, fittings and whether this is a stack affect other cleanout placement/design rules, but do not prevent giving the requested access and working-clearance baseline."
+      ],
+      "forbiddenClaims": [
+        "12inches is adequate for the4-inch drain.",
+        "A permanently buried removable plug is accessible solely because it can eventually be uncovered.",
+        "The18inch clearance is measured parallel to the wall or from the cabinet face instead of perpendicular from the cleanout face."
+      ],
+      "rubricNuance": "For strict correct, cover access and the18inch working clearance. Failure to explain access at all is a material requested-baseline omission. Omission of the1.5inch limit can be minor when an otherwise correct flush-to-finish detail is stated. The question does not ask for approval of the entire drainage design."
+    },
+    {
+      "id": "v21-practical-01-02",
+      "family": "PC",
+      "expectedResolution": "direct_no",
+      "requiredPackets": [
+        "PC 708.1.9"
+      ],
+      "supportingPackets": [
+        "PC 708.1.10",
+        "PC 708.1.5"
+      ],
+      "decisiveChecks": [
+        "Apply the changed8-inch drain fact, replacing the first-turn4-inch premise.",
+        "8-inch-and-larger piping requires at least36inches perpendicular clearance from the opening face to an obstruction.18inches is insufficient; another18inches is needed for this specific clearance.",
+        "The clearance class is the piping served, not an assumption that the cleanout opening is only4inches.708.1.5 permits the size cap for larger piping but does not waive708.1.9clearance."
+      ],
+      "necessaryUnknownFacts": [],
+      "optionalUnknownFacts": [],
+      "forbiddenClaims": [
+        "Retain18inches because the old4-inch premise still applies.",
+        "Use the4-inch cleanout-size cap to reduce the8-inch drain clearance to18inches.",
+        "Visible/removable plug or cabinet access waives the dimensional clearance."
+      ],
+      "rubricNuance": "A short No+36inch rule and changed-size explanation is sufficient; a catalogue of unrelated fitting standards is unnecessary."
+    },
+    {
+      "id": "v21-practical-02-01",
+      "family": "MC",
+      "expectedResolution": "direct_no",
+      "requiredPackets": [
+        "MC 603.6.2"
+      ],
+      "supportingPackets": [
+        "MC 603.6",
+        "MC 603.6.1",
+        "MC 603.6.3"
+      ],
+      "decisiveChecks": [
+        "The question specifies an air connector.603.6.2item3 limits air-connector runs to14feet, so16feet exceeds that limit by2feet.",
+        "Distinguish limited-use air connectors from flexible air ducts;603.6.1 permits rigid/flexible air ducts and does not itself impose this connector14foot limit.",
+        "If describing a permissible connector alternative, qualification remains Class0/1 approval underUL181, temperature not above250\u00b0F, no penetration of walls/partitions/shafts rated1hour or more, no passing through floors, other applicable duct provisions, and manufacturer-specified appliance clearance. These conditions do not excuse the excessive16foot run."
+      ],
+      "necessaryUnknownFacts": [],
+      "optionalUnknownFacts": [
+        "A different listed product classified as an air duct rather than air connector requires its own product/system check; no unspecified product substitution makes this16foot connector allowed."
+      ],
+      "forbiddenClaims": [
+        "All flexible air ducts are universally limited to14feet.",
+        "A16foot connector is permitted solely because the diffuser is in retail or because the manufacturer allows it.",
+        "UL181listing alone waives the length limit."
+      ],
+      "rubricNuance": "No+14foot connector limit is sufficient for the actual question. Do not require every installation detail before delivering that decisive failure. Any added broader installation approval must satisfy all material conditions."
+    },
+    {
+      "id": "v21-practical-02-02",
+      "family": "MC",
+      "expectedResolution": "direct_no",
+      "requiredPackets": [
+        "MC 603.6.2"
+      ],
+      "supportingPackets": [
+        "MC 603.6"
+      ],
+      "decisiveChecks": [
+        "Retain the prior air-connector product subject, with the length changed to12feet.",
+        "12feet meets the14foot length limit, but603.6.2item5 separately prohibits air connectors passing through floors.",
+        "The floor prohibition is not limited to a rated floor. The1hour qualifier in item4 concerns rated walls/partitions/shafts and must not be transferred to item5.",
+        "A shorter connector does not receive full approval or overcome the floor prohibition."
+      ],
+      "necessaryUnknownFacts": [],
+      "optionalUnknownFacts": [],
+      "forbiddenClaims": [
+        "Yes solely because12feet is below14feet.",
+        "A floor crossing is permitted if the floor is unrated, less than1hour, sleeved or firestopped.",
+        "An unrelated egress-floor or condensate-pipe rule answers the connector question."
+      ],
+      "rubricNuance": "A direct No explaining the independent floor constraint is a complete resolution. Do not require floor rating to answer."
+    },
+    {
+      "id": "v21-practical-03-01",
+      "family": "FC",
+      "expectedResolution": "useful_scoped_baseline",
+      "requiredPackets": [
+        "FC 906"
+      ],
+      "supportingPackets": [],
+      "decisiveChecks": [
+        "Fully charged25pounds is the stated gross weight and is not more than40pounds.906.9.1 requires the extinguisher top not more than5feet above the floor.",
+        "906.9.3 independently requires at least4inches between the floor and the bottom of an installed hand-held extinguisher.",
+        "Use top-of-extinguisher for the5foot limit, not handle/label/centerline. The bottom clearance is a separate simultaneous constraint.",
+        "If mounting method/access is added,906.7requires supplied securely anchored hangers/brackets for hand-held units not housed in cabinets, and906.5/.6 require conspicuous/readily accessible and unobstructed/unobscured placement; these do not change the height dimensions."
+      ],
+      "necessaryUnknownFacts": [],
+      "optionalUnknownFacts": [
+        "Actual extinguisher height is needed to draw the simultaneous upper/lower limits; it is not needed to state both limits. Type/rating/hazard review is separate from the asked mounting dimensions."
+      ],
+      "forbiddenClaims": [
+        "5feet is measured to handle or centerline.",
+        "A4inch bottom gap replaces the top height cap.",
+        "25pounds refers only to extinguishing-agent content when the question expressly states fully charged weight."
+      ],
+      "rubricNuance": "Both requested dimensions are necessary. NFPA10selection/servicing and fire-hazard classification are not reasons to withhold the directly enacted mounting baseline."
+    },
+    {
+      "id": "v21-practical-03-02",
+      "family": "FC",
+      "expectedResolution": "direct_no",
+      "requiredPackets": [
+        "FC 906"
+      ],
+      "supportingPackets": [],
+      "decisiveChecks": [
+        "Replace25pound first-turn weight with55pounds fully charged, retaining hand-held extinguisher subject.",
+        "Gross weight over40pounds invokes906.9.2: top not more than3.5feet(42inches) above the floor.",
+        "5feet is1.5feet(18inches) too high. At least4inches below the bottom remains independently required by906.9.3.",
+        "Do not treat the larger hand-held unit as a wheeled extinguisher under906.10."
+      ],
+      "necessaryUnknownFacts": [],
+      "optionalUnknownFacts": [],
+      "forbiddenClaims": [
+        "The5foot limit still applies because the earlier extinguisher weighed25pounds.",
+        "A listed bracket or unobstructed placement waives the3.5foot cap.",
+        "The floor gap needs to be3.5feet."
+      ],
+      "rubricNuance": "No+3.5foot top cap is sufficient. The existing bottom-clearance condition should not be contradicted; repeating it is useful but not required to reject the proposed5foot top."
+    },
+    {
+      "id": "v21-practical-04-01",
+      "family": "BC",
+      "expectedResolution": "useful_scoped_baseline",
+      "requiredPackets": [
+        "BC 1010.1.1.1"
+      ],
+      "supportingPackets": [
+        "BC 1010.1",
+        "BC 1010.1.1",
+        "BC 1010.1.1.2",
+        "BC 1005.3.2"
+      ],
+      "decisiveChecks": [
+        "For the described new swinging retail egress door, state the minimum clear opening of32inches, subject also to sufficient capacity for the occupant load served.",
+        "Clear width is measured between the face of the door and the stop with the door open90degrees; a nominal leaf width is not automatically that clear opening.",
+        "Where minimum32inches applies and two leaves have no mullion, one leaf must itself provide32inches clear.",
+        "No listed width exception is established for this retail/common-lobby exit: internal nonaccessible dwelling/sleeping-unit doors, non-egressR2/R3doors, storage-closet/I3/revolving/freezer/R1shower alternatives are not imported merely because the project also has dwellings.",
+        "If quantitative occupant-capacity arithmetic is added,1005.3.2generally uses0.2inch per occupant for components other than stairs, with its actual smoke-protected assembly exceptions; none is established here."
+      ],
+      "necessaryUnknownFacts": [
+        "Occupant load served is needed to decide whether final required capacity exceeds the32inch baseline, but is not needed to explain that baseline or measurement."
+      ],
+      "optionalUnknownFacts": [
+        "Detailed hardware/projections and accessibility maneuvering clearance remain separate design checks."
+      ],
+      "forbiddenClaims": [
+        "A nominal32inch door leaf necessarily gives32inches clear.",
+        "32inches automatically approves the door for any occupant load.",
+        "The project being residential invokes a private dwelling-door exception for the common retail exit."
+      ],
+      "rubricNuance": "32inch minimum, clear-width measurement and occupant-capacity qualification provide a useful answer; the double-leaf condition becomes decisive in the follow-up. A targeted occupant-load question is permissible after explaining the baseline. Missing the occupant load must not replace the baseline with a nonanswer."
+    },
+    {
+      "id": "v21-practical-04-02",
+      "family": "BC",
+      "expectedResolution": "direct_no",
+      "requiredPackets": [
+        "BC 1010.1.1.1"
+      ],
+      "supportingPackets": [
+        "BC 1010.1.1"
+      ],
+      "decisiveChecks": [
+        "Retain the retail/common-lobby egress-door subject. The question specifies no center post, i.e. a double-leaf opening without a mullion.",
+        "One leaf must itself provide at least32inches clear under1010.1.1.1.17inches through each leaf fails.",
+        "34inches with both leaves open does not satisfy the independent one-leaf requirement.",
+        "Missing occupant load does not prevent rejecting the17inch leaf even though it is still needed for final total egress capacity."
+      ],
+      "necessaryUnknownFacts": [],
+      "optionalUnknownFacts": [],
+      "forbiddenClaims": [
+        "Yes because the combined34inch opening exceeds32inches.",
+        "One17inch leaf is enough because the other opens at the same time.",
+        "Ask for occupant load instead of answering the already decisive leaf-width failure."
+      ],
+      "rubricNuance": "A direct No and the one32inch-leaf rule is sufficient; do not assume this also establishes every accessibility, swing, fire-rating or occupant-capacity requirement."
+    }
+  ],
+  "authorship": "Assistant-authored practical questions and assistant canonical-source reviewer keys. The author has substantial prior exposure to the Permitext corpus and earlier tests. This is not a truly blind/source-disjoint benchmark or independent licensed-professional adjudication.",
+  "priorSourceExposureDisclosed": true,
+  "statisticalClaim": false,
+  "grading": "Judge only actual delivered text within its conversation. Correct requires the requested operative baseline/conclusion and material qualifications with usable current canonical support; verifier pass is not ground truth. Preserve minor omissions, material errors, withheld/partial answers, appropriate clarifications and infrastructure failures separately. Audit substantive optional additions for errors even if the main narrow answer is correct.",
+  "labels": [
+    "correct",
+    "minor_issue",
+    "materially_wrong",
+    "withheld",
+    "appropriate_clarification",
+    "fixture_ambiguous"
+  ],
+  "unchargedRecoveryIsNotSuccess": true,
+  "storedProjectBoundary": "Keep saved project facts unchanged. Proposed retail design facts here belong to their conversation. Existing inventory measurements do not overwrite the stated proposed drain/product/unit/door design."
+}

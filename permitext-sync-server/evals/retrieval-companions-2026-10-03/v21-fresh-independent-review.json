@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 1,
+  "sealed": true,
+  "cohort": "v21-new-practical-eight",
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "deploymentID": "dpl_HqJQd49vsS5g5Lfj8t97V9qLChyb",
+  "createdAt": "2026-10-03T19:31:58.315254+00:00",
+  "reviewScope": "Exactly the eight fresh-* delivered rows in the fixed production capture. The eight known repeat-* rows remain a separate sealed cohort and are not rescored here.",
+  "reviewer": "Independent assistant canonical-source review of actual delivered browser text; no private draft credit or verifier-pass shortcut.",
+  "capturePath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v21-visible-answers.json",
+  "captureSHA256AtReview": "c5a64192ddf1f88f311160d9aa83e954cf8b456bc600e2e253686e8a2264be01",
+  "captureRowsAtReview": 16,
+  "manifestPath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v21-practical-supplement/manifest.json",
+  "manifestSHA256": "489a05c3026e135b8f9efadf95d9268fd3362223c4efc327f288e42dce13eb84",
+  "frozenArtifactHashes": {
+    "questions-only.json": "bdc0f03bfea3ba4b0f20b8d33cc35e0deca76eb3ddd5b64fc07029865b5e7b47",
+    "reviewer-key.json": "6a6cbcdde4cfe4f0311351e03e4a150dcb01de51aaced2c6ac4e0ec5ba54e451",
+    "source-packets.json": "97daf59035481535c40333f1b3b8582c1a4e0be840436cbed7c7a71d34127bdd",
+    "source-audit.json": "a8ed08b8519fd5e24ae1b583ea2c8566ae5e5a8fa0ac8eeaf06284a7e506f47a",
+    "protocol.json": "05264f03db009234d6ef94f83c9c3fc797fd50cbb8c93a1cad084fbc621de8e7"
+  },
+  "sourceAudit": {
+    "allFrozenFileHashesVerified": true,
+    "allTwentyFiveBodyHashesVerified": true,
+    "allTwentyFiveOperativeTextHashesVerified": true,
+    "allPhysicalSourceHashesVerified": true,
+    "exactQuestionMatches": 8,
+    "candidateHEADVerified": true,
+    "additionalDeliveredCitationAuditPath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v21-fresh-extra-citation-source-audit.json",
+    "additionalDeliveredCitationAuditSHA256": "4be578c464930f84c41a57df8402e1a76e77a4ee1120a7ff00cf331da38f588b",
+    "additionalCitations": [
+      "BC 717.7",
+      "BC 1010.1.4.2"
+    ],
+    "sourceMetadataDoesNotEstablishProjectApplicability": true
+  },
+  "counts": {
+    "correct": 5,
+    "minor_issue": 2,
+    "materially_wrong": 0,
+    "withheld": 1,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0
+  },
+  "strictCompleteCorrect": {
+    "numerator": 5,
+    "denominator": 8,
+    "description": "Strict complete-correct count for this small authored practical sample only; no general accuracy estimate."
+  },
+  "familyOutcomes": {
+    "PC": {
+      "correct": 2
+    },
+    "MC": {
+      "correct": 2
+    },
+    "FC": {
+      "withheld": 1,
+      "correct": 1
+    },
+    "BC": {
+      "minor_issue": 2
+    }
+  },
+  "cases": [
+    {
+      "id": "fresh-cleanout-01",
+      "originalCaseID": "v21-practical-01-01",
+      "family": "PC",
+      "question": "What access and clearance do we need for the cleanout on the 4-inch retail drain behind the finished wall?",
+      "exactQuestionMatch": true,
+      "capturedAt": "2026-10-03T19:09:28.213Z",
+      "visibleTextSHA256": "6886033f8e4f6fca5e43a601937915ce1b3b78a1b56cf5ebe26afd9a91354386",
+      "deliveredAnswer": "Provide access through the finished wall, with the cleanout opening’s face no more than 1½ inches from the finished wall surface. For the 4-inch pipe, keep at least 18 inches of clear space perpendicular outward from the opening’s face to any obstruction. (2022 NYC Plumbing Code §§ 708.1.10, 708.1.9.)",
+      "deliveredAnswerSHA256": "71de3e485fe7e7e5b5e5e812168995de97be294a02d648c1a64e489781fb58a7",
+      "displayedDuration": "00:30",
+      "displayedSeconds": 30,
+      "grade": "correct",
+      "reason": "Gives through-wall access, the finished-wall face limit of 1.5 inches and the 18-inch clearance measured perpendicular from the opening face. This resolves both requested access and working-clearance requirements for the stated 4-inch pipe.",
+      "sourceChecks": [
+        {
+          "claim": "4-inch pipe requires at least 18 inches perpendicular clearance to an obstruction.",
+          "reference": "PC 708.1.9",
+          "outcome": "supported"
+        },
+        {
+          "claim": "Provide access through the finished wall and locate the face within 1.5 inches of the wall surface.",
+          "reference": "PC 708.1.10",
+          "outcome": "supported_scoped_baseline"
+        }
+      ],
+      "decisiveTextCoverage": "complete_requested_baseline",
+      "usefulness": "Useful direct design baseline. It does not purport to approve the entire drainage installation.",
+      "failureStage": "none",
+      "presentationNotes": [],
+      "evidenceDiagnosis": null,
+      "requiredKeyPackets": [
+        "PC 708.1.9",
+        "PC 708.1.10"
+      ],
+      "reviewedSourceReferences": [
+        "PC 708.1.9",
+        "PC 708.1.10"
+      ],
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-fresh-cleanout-01.accounting.json",
+        "sha256": "c27e1b86e28e5583cbb5ae218124931b63f7d9ecaf12767b52bccc603287d5d0",
+        "status": "completed",
+        "failureCode": null,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.015241,
+        "durationMilliseconds": 30680,
+        "verificationIssueTypes": [],
+        "evidenceReferences": [
+          "PC 708.1.10",
+          "PC 708.1.9",
+          "BC 722.6.2",
+          "PC 903.5.2",
+          "PC 502.5",
+          "PC 703.5",
+          "BC 1107.2.2.7.2",
+          "BC 1107.2.2.7.2.2",
+          "BC G102.1",
+          "BC 1109.2.1.6",
+          "BC 1107.2.2.7.2.1",
+          "BC 1107.2.2.7.2.3",
+          "BC 1107.2.2.5",
+          "BC 2308.4.2.1",
+          "PC 102.1",
+          "BC 102.1",
+          "BC 202"
+        ]
+      }
+    },
+    {
+      "id": "fresh-cleanout-02",
+      "originalCaseID": "v21-practical-01-02",
+      "family": "PC",
+      "question": "The drain is now 8 inches, and the cabinet leaves 18 inches in front of the cleanout opening. Is that enough?",
+      "exactQuestionMatch": true,
+      "capturedAt": "2026-10-03T19:11:03.586Z",
+      "visibleTextSHA256": "849fb42ee7611f4c17bab84e7639371b6bba1875a01f896729ec0fb496b82de1",
+      "deliveredAnswer": "No. For 8-inch piping, the required clearance is at least 36 inches, measured perpendicular from the cleanout opening’s face to an obstruction; 18 inches is short by 18 inches (2022 NYC Plumbing Code § 708.1.9).",
+      "deliveredAnswerSHA256": "e8a7a10bcf477a0bb668cc54a85303e9cd44992e765a3fdcec9a3a7658568c9d",
+      "displayedDuration": "00:30",
+      "displayedSeconds": 30,
+      "grade": "correct",
+      "reason": "Applies the corrected 8-inch piping size, gives 36 inches of required perpendicular clearance and correctly identifies the 18-inch shortfall. It does not confuse the cleanout-opening size cap with the piping-served clearance class.",
+      "sourceChecks": [
+        {
+          "claim": "8-inch piping requires at least 36 inches; available 18 inches is short by 18 inches.",
+          "reference": "PC 708.1.9",
+          "outcome": "supported"
+        }
+      ],
+      "decisiveTextCoverage": "complete_requested_conclusion",
+      "usefulness": "Direct No with the needed dimension and correction.",
+      "failureStage": "none",
+      "presentationNotes": [],
+      "evidenceDiagnosis": null,
+      "requiredKeyPackets": [
+        "PC 708.1.9"
+      ],
+      "reviewedSourceReferences": [
+        "PC 708.1.9"
+      ],
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-fresh-cleanout-02.accounting.json",
+        "sha256": "cb1b2f73eb80fbcd0f667373ddd817a69f927230c39598af8b77bca4aeea0f7d",
+        "status": "completed",
+        "failureCode": null,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.008913,
+        "durationMilliseconds": 30141,
+        "verificationIssueTypes": [],
+        "evidenceReferences": [
+          "PC 708.1.10",
+          "PC 708.1.9",
+          "BC 2113.18",
+          "PC 703.5",
+          "PC 708.1.5",
+          "MC 506.3.9",
+          "PC 405.2",
+          "PC 708.1",
+          "MC 801.13",
+          "PC 502.5",
+          "MC 506.3.8.1",
+          "PC 708.1.1",
+          "PC 708.1.2",
+          "PC 708.1.3",
+          "PC 708.1.4",
+          "PC 708.1.6",
+          "BC 102.1",
+          "PC 102.1",
+          "BC 202"
+        ]
+      }
+    },
+    {
+      "id": "fresh-flexible-01",
+      "originalCaseID": "v21-practical-02-01",
+      "family": "MC",
+      "question": "The retail layout needs a 16-foot run from the main supply duct to a diffuser. Can we use a flexible air connector for that?",
+      "exactQuestionMatch": true,
+      "capturedAt": "2026-10-03T19:12:41.814Z",
+      "visibleTextSHA256": "6a4791e013dec29a8408ec8f2141e26e6e9cb28736d840e0d57143de928539d9",
+      "deliveredAnswer": "No. A flexible air connector run may not exceed 14 feet, so the proposed 16-foot run is 2 feet over the limit (MC § 603.6.2). It also must not pass through a floor or a rated wall, partition, or shaft required to have at least a 1-hour fire-resistance rating.",
+      "deliveredAnswerSHA256": "79a976c9dd9975e038f44901d07bd1dd5c17b2a2575a239242be71fe9eb4cbcb",
+      "displayedDuration": "00:32",
+      "displayedSeconds": 32,
+      "grade": "correct",
+      "reason": "Correctly treats the product as an air connector, states its 14-foot maximum and rejects the proposed 16-foot run. The added MC rated-wall/partition/shaft and floor prohibitions are accurate and do not offer installation approval.",
+      "sourceChecks": [
+        {
+          "claim": "Air connector maximum is 14 feet; 16 feet exceeds it by 2 feet.",
+          "reference": "MC 603.6.2, item 3",
+          "outcome": "supported"
+        },
+        {
+          "claim": "No floors or wall/partition/shaft assemblies required to be rated at least one hour.",
+          "reference": "MC 603.6.2, items 4 and 5",
+          "outcome": "supported"
+        }
+      ],
+      "decisiveTextCoverage": "complete_requested_conclusion",
+      "usefulness": "Direct length rejection. Other listing and installation conditions are not prerequisites for this No.",
+      "failureStage": "none",
+      "presentationNotes": [],
+      "evidenceDiagnosis": null,
+      "requiredKeyPackets": [
+        "MC 603.6.2"
+      ],
+      "reviewedSourceReferences": [
+        "MC 603.6.2"
+      ],
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-fresh-flexible-01.accounting.json",
+        "sha256": "58d18f5a00788c01655444c8432b5bdc86ba93e506fa776cf7ac7757b3d05297",
+        "status": "completed",
+        "failureCode": null,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.007648,
+        "durationMilliseconds": 32847,
+        "verificationIssueTypes": [],
+        "evidenceReferences": [
+          "MC 607.7",
+          "MC 603.6.2",
+          "MC 603.6.3",
+          "BC 717.7",
+          "BC 409.3.1",
+          "MC 609.1",
+          "MC 603.6.1",
+          "FGC 308.4.5",
+          "FGC 611.4",
+          "FGC 308.3.4",
+          "MC 102.1",
+          "BC 102.1",
+          "BC 202"
+        ]
+      }
+    },
+    {
+      "id": "fresh-flexible-02",
+      "originalCaseID": "v21-practical-02-02",
+      "family": "MC",
+      "question": "We shortened it to 12 feet. Can it pass through the floor to serve the room above?",
+      "exactQuestionMatch": true,
+      "capturedAt": "2026-10-03T19:14:07.353Z",
+      "visibleTextSHA256": "ad603a44ba48916ae389a9d0060e91491efb4337f5478876d5cf3b4c971fabb2",
+      "deliveredAnswer": "No. A 12-foot air connector is within the 14-foot maximum, but flexible air connectors shall not pass through a floor; shortening the run does not change that prohibition (2022 NYC MC § 603.6.2; BC § 717.7).",
+      "deliveredAnswerSHA256": "e3d96e4ffc3cc07bef482bb3bb8d0c506588bdf8c41a8ebfc3caf86387df8ba1",
+      "displayedDuration": "00:30",
+      "displayedSeconds": 30,
+      "grade": "correct",
+      "reason": "Retains the air-connector subject and corrected 12-foot length. It correctly separates the satisfied length limit from the independent floor-crossing prohibition. The added BC citation independently supports the floor prohibition.",
+      "sourceChecks": [
+        {
+          "claim": "12 feet meets the 14-foot length limit but cannot pass through a floor.",
+          "reference": "MC 603.6.2, items 3 and 5",
+          "outcome": "supported"
+        },
+        {
+          "claim": "Flexible air connectors shall not pass through any wall, floor or ceiling.",
+          "reference": "BC 717.7",
+          "outcome": "relevant_additional_support"
+        }
+      ],
+      "decisiveTextCoverage": "complete_requested_conclusion",
+      "usefulness": "Direct No; it does not incorrectly ask for the floor rating.",
+      "failureStage": "none",
+      "presentationNotes": [],
+      "evidenceDiagnosis": null,
+      "requiredKeyPackets": [
+        "MC 603.6.2"
+      ],
+      "reviewedSourceReferences": [
+        "MC 603.6.2",
+        "BC 717.7"
+      ],
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-fresh-flexible-02.accounting.json",
+        "sha256": "acfbc9a080dbfcaaa7168ecfe52ec4cd0389d9c55b7be07573e9334e3494c9d2",
+        "status": "completed",
+        "failureCode": null,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.011076,
+        "durationMilliseconds": 30481,
+        "verificationIssueTypes": [],
+        "evidenceReferences": [
+          "FGC 503.10.13",
+          "BC 717.5",
+          "MC 603.6.2",
+          "BC 717.7",
+          "MC 306.4",
+          "BC 1016.2",
+          "BC 1205.2.7.2",
+          "BC 1003.3.1",
+          "ZR 23-232",
+          "BC 717.1.2.1",
+          "BC 717.5.3",
+          "BC 717.5.4",
+          "BC 717.5.5",
+          "BC 717.5.6",
+          "BC 717.5.7",
+          "BC 1205.2.2",
+          "FGC 102.1",
+          "BC 102.1",
+          "BC 202",
+          "ZR 12-10"
+        ]
+      }
+    },
+    {
+      "id": "fresh-extinguisher-01",
+      "originalCaseID": "v21-practical-03-01",
+      "family": "FC",
+      "question": "How high can we hang a portable fire extinguisher in the retail space if it weighs 25 pounds fully charged, and do we need a gap beneath it?",
+      "exactQuestionMatch": true,
+      "capturedAt": "2026-10-03T19:16:49.848Z",
+      "visibleTextSHA256": "4428ec46c8a0d108afedafe7ce16508d1e6f432198fcb23fa62e68f2c0c8a20a",
+      "deliveredAnswer": "Hang the 25-pound fully charged extinguisher with its top no more than 5 feet above the floor. It falls within the gross-weight category of 40 pounds or less. (FC § 906.9.1)\n\nThe gap beneath it cannot be determined from the available text. FC § 906.9 requires installation to comply with §§ 906.9.1 through 906.9.3, but § 906.9.3 is missing. That subsection is needed to resolve the bottom-clearance question; the height rule alone does not establish that no gap is required.",
+      "deliveredAnswerSHA256": "9420d94cf63ea7884367099df1335ba8ce0f073037242006dab83d9185f5464e",
+      "displayedDuration": "00:44",
+      "displayedSeconds": 44,
+      "grade": "withheld",
+      "reason": "The top-height baseline is correct, but the requested bottom gap is explicitly left unanswered. The frozen full FC 906 text contains 906.9.3, which requires at least 4 inches under a hand-held unit. This is a withheld/partial requested baseline, not a correct answer merely because the top dimension is useful.",
+      "sourceChecks": [
+        {
+          "claim": "25-pound fully charged unit is in the not-over-40-pound category; its top must not exceed 5 feet.",
+          "reference": "FC 906.9.1",
+          "outcome": "supported"
+        },
+        {
+          "claim": "Bottom clearance cannot be resolved because 906.9.3 is missing from available text.",
+          "reference": "FC 906.9.3",
+          "outcome": "asked_requirement_withheld; canonical requirement exists"
+        }
+      ],
+      "decisiveTextCoverage": "partial_requested_baseline",
+      "usefulness": "Useful top-height instruction only. The user must still obtain the asked bottom dimension.",
+      "failureStage": "unresolved_operative_evidence_delivery; precise retrieval_vs_assembly_vs_writer_stage_unknown",
+      "presentationNotes": [
+        "The interface says Research complete although one of the two requested dimensions remains unanswered."
+      ],
+      "evidenceDiagnosis": "FC 906 is in accounting evidenceReferences, but that proves reference presence only. The delivered answer explicitly reports the child as unavailable. Without an actual writer excerpt, omission from the packet versus missed text by the model cannot be established.",
+      "requiredKeyPackets": [
+        "FC 906"
+      ],
+      "reviewedSourceReferences": [
+        "FC 906"
+      ],
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-fresh-extinguisher-01.accounting.json",
+        "sha256": "964c4f10b742db71c9860eefc0597e8ffd6ab7dd9c4ed8c9243fba6bb04b21ea",
+        "status": "completed",
+        "failureCode": null,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.124524,
+        "durationMilliseconds": 44151,
+        "verificationIssueTypes": [
+          "missed_material_conclusion"
+        ],
+        "evidenceReferences": [
+          "FC 906",
+          "FC 3315",
+          "FC 3206",
+          "FC 2404",
+          "FC 315",
+          "FC 5106",
+          "FC 5704",
+          "FC 901",
+          "FC 5703",
+          "FC 903",
+          "FC 202"
+        ]
+      }
+    },
+    {
+      "id": "fresh-extinguisher-02",
+      "originalCaseID": "v21-practical-03-02",
+      "family": "FC",
+      "question": "We changed to a larger hand-held unit that weighs 55 pounds fully charged. Can we keep its top at 5 feet above the floor?",
+      "exactQuestionMatch": true,
+      "capturedAt": "2026-10-03T19:18:22.329Z",
+      "visibleTextSHA256": "fbd2b65c267014542f10cf237d69e1afbab2d3bf6f5de5346f798c17de244514",
+      "deliveredAnswer": "No. Because the fully charged hand-held extinguisher weighs 55 pounds—more than 40 pounds—its top may be no more than 3.5 feet above the floor, not 5 feet (2022 NYC Fire Code § 906.9.2).",
+      "deliveredAnswerSHA256": "d40f9826732f00c1cdee8af02ad5c65f5a1a08a53d448c14bf2ea7bd2ada3d78",
+      "displayedDuration": "00:29",
+      "displayedSeconds": 29,
+      "grade": "correct",
+      "reason": "Uses the changed 55-pound hand-held gross weight, invokes the over-40-pound category and correctly rejects a 5-foot top in favor of the 3.5-foot cap. Repeating the independent 4-inch bottom gap is not required for this narrow No, and the answer does not contradict it.",
+      "sourceChecks": [
+        {
+          "claim": "55 pounds exceeds 40; top maximum is 3.5 feet, so 5 feet is not permitted.",
+          "reference": "FC 906.9.2",
+          "outcome": "supported"
+        }
+      ],
+      "decisiveTextCoverage": "complete_requested_conclusion",
+      "usefulness": "Direct answer to the changed weight and proposed top height.",
+      "failureStage": "none",
+      "presentationNotes": [],
+      "evidenceDiagnosis": null,
+      "requiredKeyPackets": [
+        "FC 906"
+      ],
+      "reviewedSourceReferences": [
+        "FC 906"
+      ],
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-fresh-extinguisher-02.accounting.json",
+        "sha256": "feceeb0fa9a6d76a7fd49f07681e3ba6b0f1503d1d616415af44bc6269148258",
+        "status": "completed",
+        "failureCode": null,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.013965,
+        "durationMilliseconds": 30104,
+        "verificationIssueTypes": [],
+        "evidenceReferences": [
+          "FC 906",
+          "FC 3315",
+          "BC 1607.1",
+          "FC 5705",
+          "BC K101.1",
+          "FC 3504",
+          "FC 5003",
+          "FC 5601",
+          "FC 3206",
+          "FC 2404",
+          "BC 1607.7",
+          "BC 1607.8",
+          "BC 1607.6",
+          "BC 1607.9",
+          "BC 1607.13.3",
+          "BC 1607.11.1.2",
+          "BC 102.1",
+          "FC 202",
+          "BC 202"
+        ]
+      }
+    },
+    {
+      "id": "fresh-door-01",
+      "originalCaseID": "v21-practical-04-01",
+      "family": "BC",
+      "question": "How wide does the swinging exit door from the ground-floor retail space to the common lobby need to be?",
+      "exactQuestionMatch": true,
+      "capturedAt": "2026-10-03T19:21:23.374Z",
+      "visibleTextSHA256": "5c9583409972f195209497d4223aedc7d7420eb815d4136391b497f1a5470400",
+      "deliveredAnswer": "For a single-leaf swinging exit door from the retail space to the common lobby, use 32 inches minimum clear opening, not merely a 32-inch nominal door size. BC § 1010.1.4.2 expressly identifies the “minimum 32-inch (812.8 mm) single-leaf requirement of Section 1010.1.1.”\n\nThat establishes the baseline, not the final capacity-based width. The full door-size and egress-capacity provisions are unavailable here, and the occupant load served by this door is unknown, so I cannot determine whether a greater width is required or confirm the complete measurement conditions.",
+      "deliveredAnswerSHA256": "b258024cdb2296159cdba3595cd281002c83311949303ce3eb687c505727b346",
+      "displayedDuration": "01:09",
+      "displayedSeconds": 69,
+      "grade": "minor_issue",
+      "reason": "Gives the correct 32-inch clear-opening baseline and correctly reserves any greater occupant-capacity width. It omits the face-to-stop measurement with the door open 90 degrees, and relies on an indirect cross-reference in a power-operated-door clause instead of the governing width clause. The baseline is still substantively supported, so this is a minor incomplete-detail/citation-quality issue rather than a withheld answer.",
+      "sourceChecks": [
+        {
+          "claim": "At least 32 inches clear, rather than a nominal 32-inch leaf.",
+          "reference": "BC 1010.1.1.1; indirect reference also appears in BC 1010.1.4.2, Exception 3",
+          "outcome": "correct_baseline; indirect_citation"
+        },
+        {
+          "claim": "Larger capacity-based width cannot be established without the served occupant load.",
+          "reference": "BC 1010.1.1.1",
+          "outcome": "supported_necessary_unknown_for_final_capacity"
+        },
+        {
+          "claim": "Clear width is measured face-to-stop with the door at 90 degrees.",
+          "reference": "BC 1010.1.1.1",
+          "outcome": "omitted_requested_measurement_detail"
+        }
+      ],
+      "decisiveTextCoverage": "partial_detail_after_useful_baseline",
+      "usefulness": "The minimum width is usable, but its measurement method still needs explanation. The missing occupant load legitimately prevents final capacity approval, not the minimum baseline.",
+      "failureStage": "observed_direct_governing_reference_retrieval_gap",
+      "presentationNotes": [
+        "Unnecessary single-leaf assumption in the first sentence; the question did not identify the leaf arrangement."
+      ],
+      "evidenceDiagnosis": "Accounting does not list BC 1010.1.1.1 or BC 1005.3.2 and the delivered answer states that the full sizing/capacity provisions are unavailable. This supports a direct-source retrieval/delivery gap. Exact ranking or clipping cause is not established from accounting alone.",
+      "requiredKeyPackets": [
+        "BC 1010.1.1.1"
+      ],
+      "reviewedSourceReferences": [
+        "BC 1010.1.1.1",
+        "BC 1010.1.4.2"
+      ],
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-fresh-door-01.accounting.json",
+        "sha256": "72e9d4e1be34a45eb939c4818ce0cb95e953714ef070250fd1ace86049fe12b7",
+        "status": "completed",
+        "failureCode": null,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.147662,
+        "durationMilliseconds": 69855,
+        "verificationIssueTypes": [
+          "missed_material_conclusion",
+          "incorrect_citation"
+        ],
+        "evidenceReferences": [
+          "BC 1016.2",
+          "BC 1010.1.2.1",
+          "BC 716.5.1",
+          "BC 1010.1.2.2",
+          "BC 1109.2.1.6",
+          "BC 1029.4",
+          "BC 1006.3.2",
+          "BC 1029.19.4",
+          "BC 1019.3",
+          "BC 903.2.11.10",
+          "BC 1010.1.4.1",
+          "BC 1010.1.4.3",
+          "BC 1010.1.4.2",
+          "BC 1006.2.1",
+          "BC 903.2",
+          "BC 1509.2",
+          "BC 102.1",
+          "BC 202"
+        ]
+      }
+    },
+    {
+      "id": "fresh-door-02",
+      "originalCaseID": "v21-practical-04-02",
+      "family": "BC",
+      "question": "We proposed two leaves without a center post. They give 34 inches clear when both are open, but only 17 inches through either leaf alone. Does that work?",
+      "exactQuestionMatch": true,
+      "capturedAt": "2026-10-03T19:23:40.452Z",
+      "visibleTextSHA256": "98293650a5b0fb29e2b3d1bee6fd5c51c90a8330bed73eedc98b777cf6fbdc24",
+      "deliveredAnswer": "No—not for an ordinary pair of swinging exit doors. For two leaves without a mullion (center post), the 2022 NYC Building Code requires one leaf to provide at least 32 inches clear. Each of your leaves provides only 17 inches, so the 34-inch combined opening does not satisfy that requirement (BC § 1010.1.1.1).\n\nThe power-operated-door provision has a limited exception for a biparting door in emergency-breakout mode: the two leaves meeting in the center must provide at least 32 inches clear when broken out. That exception is not established merely by opening both swinging leaves; you have not identified this as a power-operated emergency-breakout assembly (BC § 1010.1.4.2, Exception 3).\n\nIs this an ordinary swinging pair or a power-operated biparting assembly designed for emergency breakout?",
+      "deliveredAnswerSHA256": "347ad79a1561906d2926b72c318447a280000d73a1c1d313822537e7007cbd3c",
+      "displayedDuration": "00:50",
+      "displayedSeconds": 50,
+      "grade": "minor_issue",
+      "reason": "Correctly rejects the ordinary swinging pair: one leaf must itself provide at least 32 inches clear and neither 17-inch leaf does so. The narrowly described power-operated biparting emergency-breakout exception is genuine and accurately scoped. The closing question unnecessarily reopens the already stated swinging-door premise; the core No is correct.",
+      "sourceChecks": [
+        {
+          "claim": "An ordinary two-leaf opening without a mullion needs one 32-inch-clear leaf; two 17-inch leaves do not qualify merely because the combined width is 34 inches.",
+          "reference": "BC 1010.1.1.1",
+          "outcome": "supported"
+        },
+        {
+          "claim": "In power-operated biparting emergency-breakout mode, the two center leaves can satisfy the 32-inch clear opening when broken out.",
+          "reference": "BC 1010.1.4.2, Exception 3",
+          "outcome": "supported_narrow_exception; not_full_installation_approval"
+        },
+        {
+          "claim": "Ask whether this is an ordinary pair or a power-operated emergency-breakout assembly.",
+          "reference": "Frozen conversation premise: swinging retail exit door",
+          "outcome": "unnecessary_conditional_intake_after_correct_No"
+        }
+      ],
+      "decisiveTextCoverage": "complete_requested_conclusion",
+      "usefulness": "The rejection is decisive and useful. The final question adds avoidable uncertainty to a stated premise.",
+      "failureStage": "model_overqualification_after_correct_rule_application",
+      "presentationNotes": [
+        "Optional alternative and redundant follow-up make the clear No feel less settled."
+      ],
+      "evidenceDiagnosis": null,
+      "requiredKeyPackets": [
+        "BC 1010.1.1.1"
+      ],
+      "reviewedSourceReferences": [
+        "BC 1010.1.1.1",
+        "BC 1010.1.4.2"
+      ],
+      "accounting": {
+        "path": "/tmp/permitext-production-v21-fresh-door-02.accounting.json",
+        "sha256": "fa14be27d9bab9c20f5205caa204f750819f3313c23b7e127d019c793643c2ef",
+        "status": "completed",
+        "failureCode": null,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "estimatedProviderCostUSD": 0.122581,
+        "durationMilliseconds": 50684,
+        "verificationIssueTypes": [
+          "misstated_provision"
+        ],
+        "evidenceReferences": [
+          "BC 1010.1.4.2",
+          "BC 1010.1.4.3",
+          "BC 1010.1.1.1",
+          "BC 1010.1.1.2",
+          "BC 1029.8.1",
+          "BC 507.2.1",
+          "BC 1005.7.1",
+          "BC 1203.5.1.1.2",
+          "BC 1018.3",
+          "BC 406.5.2",
+          "BC 1010.1.10",
+          "BC 1010.1.4.1",
+          "BC 507.3",
+          "BC 716.5.9.3",
+          "BC 1010.1.3",
+          "BC 1010.1.1",
+          "BC 102.1",
+          "BC 202"
+        ]
+      }
+    }
+  ],
+  "sharedFailureFindings": [
+    {
+      "category": "requested_baseline_not_completed",
+      "cases": [
+        "fresh-extinguisher-01"
+      ],
+      "finding": "The delivered answer fails to give the independently required 4-inch bottom clearance although the full canonical FC 906 contains it. Its correct top-height answer is preserved as partial usefulness.",
+      "known": "Actual delivered omission; accounting includes the FC 906 reference.",
+      "unknown": "Whether 906.9.3 was clipped/absent in the actual writer packet or present but missed. Source-reference presence cannot decide this."
+    },
+    {
+      "category": "direct_governing_source_gap",
+      "cases": [
+        "fresh-door-01"
+      ],
+      "finding": "The answer gives a usable 32-inch baseline via an indirect power-operated-door cross-reference but does not supply the ordinary clear-width measurement method.",
+      "known": "Direct governing BC 1010.1.1.1 is absent from the accounting reference list and the displayed answer reports the full sizing provisions unavailable. It is retrieved/cited in the follow-up.",
+      "unknown": "Exact discovery ranking, assembly clipping and writer packet completeness."
+    },
+    {
+      "category": "unnecessary_conditional_followup",
+      "cases": [
+        "fresh-door-02"
+      ],
+      "finding": "A correct decisive No is followed by an unnecessary ordinary-versus-power-operated question despite the retained swinging-door premise.",
+      "known": "Actual final wording and prior question strings.",
+      "unknown": "No inference about private drafts or a provider reasoning trace."
+    }
+  ],
+  "positiveBoundaryChecks": [
+    "Corrected drain size changes the clearance class from 18 to 36 inches.",
+    "Corrected connector length does not waive the independent floor prohibition.",
+    "Changed fully charged extinguisher weight changes the top-height category.",
+    "Combined two-leaf width does not replace the independent one-leaf clear-width requirement."
+  ],
+  "financialSummarySeparateFromCorrectness": {
+    "estimatedProviderCostUSD": 0.45161,
+    "providerRequestCount": 30,
+    "pendingProviderRequestCount": 0,
+    "medianDisplayedSeconds": 31.0,
+    "medianAccountingDurationSeconds": 31.7635,
+    "allProjectLinked": true,
+    "allProjectFactCount": 33,
+    "note": "All eight accounting operations completed; a completed/charged operation or Research complete label does not make a partial answer correct."
+  },
+  "limitations": [
+    "Assistant-authored practical questions and source keys, with substantial prior corpus/test exposure. This is not a truly blind or source-disjoint benchmark.",
+    "Root did not read the fresh reviewer keys before all eight fresh captures were completed, as reported in the handoff. The author and grader are the same assistant subagent; no independent licensed-professional adjudication is claimed.",
+    "Four related pairs share family/topic conditions. Turns are correlated and the sample is small; this supports defect detection, not a population-level or 95-percent accuracy claim.",
+    "Grades use the unchanged rubric, full canonical enacted clauses/exceptions and actual visible text. Accounting reference lists do not establish complete actual writer excerpts.",
+    "Questions and saved 33 project facts were unchanged. Design corrections belong to their conversations and do not alter the saved project inventory.",
+    "No provider calls, browser interaction, source edits, repaired responses, fixture changes, commits or deployment actions were performed during this review."
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "sealed": true,
+  "createdAt": "2026-10-03T18:13:59.795502+00:00",
+  "candidateCommit": "862571620678b02b27163d991e30879cff98a289",
+  "scope": "Read-only current/frozen predicate audit after independent grades sealed. No candidate edits, provider requests, browser operation or private draft inspection.",
+  "actualObserved": {
+    "questionID": "practical-04-02",
+    "grade": "withheld",
+    "accountingPath": "/tmp/permitext-production-v20-practical-04-02.accounting.json",
+    "accountingSHA256": "dfcc7993dd4584a858b95a44cbd7db52dc7356eb57075df1bef9c3546d130796",
+    "status": "completed",
+    "charged": false,
+    "failureCode": "RESEARCH_VERIFICATION_FAILED",
+    "providerRequestCount": 3,
+    "pendingProviderRequestCount": 0,
+    "hasBC91242Listed": true,
+    "hasIncidentalZRListed": true,
+    "verificationIssueTypes": [
+      "zoning_unbound_conclusion"
+    ],
+    "safeStructuralTelemetryPath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v20-practical04-02-safe-structural-telemetry.json",
+    "safeStructuralTelemetrySHA256": "8de1fd6bf7d0fcbe97717226a06e4fe1d66af6904475734d4db91e580dccfc88",
+    "deduplicatedAttempts": 2,
+    "attemptModel": "permitext-deterministic-answer-quality-gate",
+    "attemptPasses": [
+      false,
+      false
+    ],
+    "noProviderVerificationPhaseObserved": true
+  },
+  "codeIdentity": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-zoning-safety.mjs",
+      "sha256": "fb37710a83502b3c578782157bc14727499b564823ec5fc9a5304b8f4bf4553f",
+      "workingBytesMatchFrozenV20": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/app.mjs",
+      "sha256": "5cf83bd7833595e97bd6443b95b16e4976f348b8c4d9b921774283884a9e94ca",
+      "workingBytesMatchFrozenV20": true
+    }
+  ],
+  "concreteCodePointers": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-zoning-safety.mjs",
+      "line": 157,
+      "finding": "answerText aggregates answerText/conclusion/explanation/supported-point headings and explanations plus evidenceLimitations into one narrative."
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-zoning-safety.mjs",
+      "line": 219,
+      "finding": "nonZoningAnswerScope rejects the entire Construction/Fire scope if any non-null questionPlan, explicit zoning cue in current question OR aggregated narrative, or broad categorical project-approval expression occurs."
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-zoning-safety.mjs",
+      "line": 227,
+      "finding": "The actual binding exemption requires every bound evidence source to be eligible Construction/Fire authority; contextual/irrelevant roles, contextualReference, referenceOnly and section_reference records deny it."
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-zoning-safety.mjs",
+      "line": 297,
+      "finding": "Generic pronouns such as this/it count as project heads. Regulatory predicates include compliant/allowed/prohibited and broad is...required/subject-to forms."
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-zoning-safety.mjs",
+      "line": 1284,
+      "finding": "Any discovered ZR source opens zoning riskProfile unless nonZoningAnswerScope succeeds; presence is broader than an active zoning conclusion."
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-zoning-safety.mjs",
+      "line": 1594,
+      "finding": "When zoning profile is active, any generic categoricalProjectConclusion in aggregated narrative with no cited ZR source raises zoning_unbound_conclusion, even if that conclusion is bound to a technical BC rule."
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/app.mjs",
+      "line": 21049,
+      "finding": "General answer branch evaluates zoning safety before ordinary provider verification; rejection triggers bounded revision/deterministic recheck. Observed two deterministic failures are consistent with this path but do not reveal exact rejected private narrative."
+    }
+  ],
+  "genericReadOnlyReproduction": {
+    "actualProductionDraftUsed": false,
+    "syntheticAuditPath": "/tmp/permitext-v20-fdc-zoning-scope-synthetic-audit.json",
+    "syntheticAuditSHA256": "a7c6ac2c22ef96d06e28d0d31a59c845f730d08b8ceb058bc73ae93cf330db1e",
+    "method": "Import pure evaluateZoningResearchSafety. Use complete frozen BC912.4.2 body with eligible governing B1 binding, one synthetic unrelated ZR record, and a narrowly scoped technical front-clearance conclusion. Toggle one scope feature per case; no providers or implementation fixtures modified.",
+    "cases": [
+      {
+        "id": "eligible_bound_technical_claim",
+        "pass": true,
+        "applies": false,
+        "issueTypes": []
+      },
+      {
+        "id": "innocuous_zoning_limitation",
+        "pass": false,
+        "applies": true,
+        "issueTypes": [
+          "zoning_unbound_conclusion"
+        ]
+      },
+      {
+        "id": "BC_contextual_reference",
+        "pass": false,
+        "applies": true,
+        "issueTypes": [
+          "zoning_unbound_conclusion"
+        ]
+      },
+      {
+        "id": "BC_reference_only",
+        "pass": false,
+        "applies": true,
+        "issueTypes": [
+          "zoning_unbound_conclusion"
+        ]
+      },
+      {
+        "id": "BC_section_reference_mode",
+        "pass": false,
+        "applies": true,
+        "issueTypes": [
+          "zoning_unbound_conclusion"
+        ]
+      },
+      {
+        "id": "categorical_project_approval",
+        "pass": false,
+        "applies": true,
+        "issueTypes": [
+          "zoning_unbound_conclusion"
+        ]
+      },
+      {
+        "id": "non_null_question_plan",
+        "pass": false,
+        "applies": true,
+        "issueTypes": [
+          "zoning_unbound_conclusion"
+        ]
+      }
+    ],
+    "confirmedDefect": "Adding only a harmless negative zoning evidence limitation to an otherwise eligible BC-bound technical conclusion changes applies:false/pass to applies:true/zoning_unbound_conclusion. The limiter is treated as an active zoning cue and generic this...not compliant technical language as a Zoning conclusion.",
+    "intentionalGuardCases": "Reference-only/contextual source flags and broad whole-project approval also block exemption. Their production values are unknown and they must not be blanket-disabled."
+  },
+  "actualCauseConfidence": {
+    "verified": "Deterministic gate rejected twice with zoning_unbound_conclusion; BC912.4.2 and unrelated ZR reference listed; no provider verification phase observed. Correct governing canonical text exists.",
+    "conditional": "The benign zoning-limitation branch is a confirmed generic counterexample and plausible cause, not a proven explanation of this production draft. Non-null zoning plan, unsupported categorical project approval, bound source roles or reference-only flags can lead to the same issue.",
+    "unknown": [
+      "Actual rejected draft narrative and supported-point text",
+      "Actual citation and supported-point source-ID bindings",
+      "Actual evidence roles/contextualReference/referenceOnly/selectionMode flags",
+      "Actual questionPlan at quality gate",
+      "Complete actual writer excerpt at the moment of rejection"
+    ]
+  },
+  "boundedGeneralNextStep": {
+    "principle": "Evaluate active legal claims and their eligible authoritative bindings, rather than automatically broadening a BC/FC technical conclusion into zoning based on all narrative fields or unrelated retrieved sources.",
+    "safeBoundary": "A negative evidence-limitations statement about unreviewed zoning should not itself create an operative zoning conclusion. Allow narrow construction/fire conclusions only with actual eligible complete canonical supporting bindings; still evaluate independent zoning clauses and categorical whole-project approval. Do not ignore invalid/ref-only bindings or grant approval because a BC citation exists.",
+    "preserve": [
+      "Selected-source boundaries and eligibility/completeness checks",
+      "Independent affirmative zoning/use/map/bulk/parking applicability guards",
+      "Commissioner and CPC authorization differences",
+      "Global project compliance approval review",
+      "Normal semantic verification after deterministic gates"
+    ]
+  },
+  "diagnosticOnlyIfActualBranchUnavailable": {
+    "proposal": "Add typed structural scope-rejection enumeration to existing attempt diagnostics, no private prose/envelope.",
+    "possibleFields": [
+      "questionPlanPresent",
+      "explicitZoningQuestion",
+      "explicitZoningNarrative",
+      "zoningCueOnlyInEvidenceLimitations",
+      "categoricalGlobalProjectApproval",
+      "boundEvidenceCount",
+      "eligibleTechnicalBindingCount",
+      "rejectionFlagsCounts.contextualRole",
+      "rejectionFlagsCounts.contextualReference",
+      "rejectionFlagsCounts.referenceOnly",
+      "rejectionFlagsCounts.sectionReference"
+    ],
+    "notImplemented": true
+  },
+  "gradeArtifacts": {
+    "practical8": {
+      "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v20-practical-independent-review.json",
+      "sha256": "f14c4dbf5792a73809648a9ac93c914637b0b79c751d986a0121ac154df4a1ae"
+    },
+    "regression8": {
+      "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v20-independent-review-regression-eight-sealed.json",
+      "sha256": "694010c1c64f10244aa634040d9292fca239d0b7472ff03cb61a9dff254e1f3e"
+    },
+    "cohortSummary": {
+      "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v20-cohort-summary.json",
+      "sha256": "852f9caae781dd4c24794a3adc5762b9e61666bcb5f42c2266c7e2127e68087d"
+    }
+  },
+  "limitations": [
+    "Safe telemetry only; no raw private provider payload/draft or issue-detail prose inspected. Read-only synthetic predicate exercise establishes generic branch behavior, not the unknown production narrative. All candidate outcomes retain their original independent labels; no unseen valid draft credited."
+  ]
+}

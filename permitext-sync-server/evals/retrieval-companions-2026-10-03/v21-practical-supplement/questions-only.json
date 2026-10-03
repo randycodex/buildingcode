@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "cohort": "v21-practical-supplement",
+  "conversationCount": 4,
+  "turnCount": 8,
+  "delivery": "Create a fresh Research conversation within the existing 1070 Southern project for each pair. Send only each question string, in order, and retain the actual delivered first answer for its follow-up. Do not send reviewer metadata, source packets, expected answers, section references or a scenario preamble. Keep the existing saved project facts unchanged.",
+  "conversations": [
+    {
+      "id": "v21-practical-01",
+      "turns": [
+        {
+          "id": "v21-practical-01-01",
+          "question": "What access and clearance do we need for the cleanout on the 4-inch retail drain behind the finished wall?"
+        },
+        {
+          "id": "v21-practical-01-02",
+          "question": "The drain is now 8 inches, and the cabinet leaves 18 inches in front of the cleanout opening. Is that enough?"
+        }
+      ]
+    },
+    {
+      "id": "v21-practical-02",
+      "turns": [
+        {
+          "id": "v21-practical-02-01",
+          "question": "The retail layout needs a 16-foot run from the main supply duct to a diffuser. Can we use a flexible air connector for that?"
+        },
+        {
+          "id": "v21-practical-02-02",
+          "question": "We shortened it to 12 feet. Can it pass through the floor to serve the room above?"
+        }
+      ]
+    },
+    {
+      "id": "v21-practical-03",
+      "turns": [
+        {
+          "id": "v21-practical-03-01",
+          "question": "How high can we hang a portable fire extinguisher in the retail space if it weighs 25 pounds fully charged, and do we need a gap beneath it?"
+        },
+        {
+          "id": "v21-practical-03-02",
+          "question": "We changed to a larger hand-held unit that weighs 55 pounds fully charged. Can we keep its top at 5 feet above the floor?"
+        }
+      ]
+    },
+    {
+      "id": "v21-practical-04",
+      "turns": [
+        {
+          "id": "v21-practical-04-01",
+          "question": "How wide does the swinging exit door from the ground-floor retail space to the common lobby need to be?"
+        },
+        {
+          "id": "v21-practical-04-02",
+          "question": "We proposed two leaves without a center post. They give 34 inches clear when both are open, but only 17 inches through either leaf alone. Does that work?"
+        }
+      ]
+    }
+  ]
+}

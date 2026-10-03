@@ -1,0 +1,325 @@
+{
+  "readOnly": true,
+  "candidateCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "providerCalls": 0,
+  "sourceEdits": false,
+  "sourceHashes": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/evidence-discovery.mjs",
+      "sha256": "bac74ea1dac41ee65c2e5168a3f32feacff7096d7840b3ffdb066e461572c873",
+      "matchesFrozenCommit": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-evidence-assembly.mjs",
+      "sha256": "4b89e959376318697f44a788ce26cd97cabd306cf49f452b62efff4a4176dbf8",
+      "matchesFrozenCommit": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-definition-excerpts.mjs",
+      "sha256": "22590aca7e9ebd8cba25807da3f8aba3d8fd6675af9ad2d313b7083ee9d39486",
+      "matchesFrozenCommit": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-evidence-priority.mjs",
+      "sha256": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+      "matchesFrozenCommit": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-question-subject.mjs",
+      "sha256": "040106696bc42e6adb0bb40ced76a87ec69a2292b108629acbdf623398755cf2",
+      "matchesFrozenCommit": true
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-corpus-registry.mjs",
+      "sha256": "ea49bf73d634ad28142d508f47e24177578b2a77018b89a676e43b3cc25019ff",
+      "matchesFrozenCommit": true
+    }
+  ],
+  "actual": {
+    "references": [
+      "PC 405.3.2",
+      "PC 405.3.4",
+      "PC 604.4",
+      "BC 1109.2.3",
+      "PC 107.5",
+      "PC 410.4",
+      "BC 1109.2.1.2",
+      "PC 420.5",
+      "PC 201.4",
+      "BC 1109.2.1",
+      "PC 102.1",
+      "BC 102.1",
+      "BC 202"
+    ],
+    "characters": 20754,
+    "semanticSearch": {
+      "status": "complete",
+      "enabled": true,
+      "fallbackReason": null,
+      "queryCached": false,
+      "hitCount": 100,
+      "coveredPassages": 52946,
+      "totalPassages": 52946
+    },
+    "verificationIssueTypes": []
+  },
+  "actualLogEvidence": {
+    "path": "/tmp/permitext-production-v21-repeat-lavatory-01.jsonl",
+    "sha256": "dbdcfb198661a926221ab53f1ddf13b5f4779c0c530481e53109bffc939147e4",
+    "safeEventShapes": [
+      {
+        "event": "research_provider_phase",
+        "keys": [
+          "event",
+          "stage",
+          "outcome",
+          "durationMilliseconds",
+          "providerAttempts",
+          "attemptTimings"
+        ]
+      },
+      {
+        "event": "research_provider_phase",
+        "keys": [
+          "event",
+          "stage",
+          "outcome",
+          "durationMilliseconds",
+          "providerAttempts",
+          "attemptTimings"
+        ]
+      },
+      {
+        "event": "research_conversation_message",
+        "keys": [
+          "event",
+          "user",
+          "mode",
+          "model",
+          "answerReasoningEffort",
+          "verificationReasoningEffort",
+          "requestedModel",
+          "routingMode",
+          "answerTier",
+          "routingReasons",
+          "evidenceAnalysisModel",
+          "verificationModel",
+          "escalated",
+          "escalationStages",
+          "verificationAttemptCount",
+          "verificationIssueTypes",
+          "webSupport",
+          "modelUsage",
+          "estimatedCostUSD",
+          "pricingVersion",
+          "conversation",
+          "evidenceSections",
+          "evidencePassages",
+          "totalTokens"
+        ]
+      },
+      {
+        "event": "research_operation_accounting",
+        "keys": [
+          "event",
+          "operationID",
+          "status",
+          "charged",
+          "failureCode",
+          "providerRequestCount",
+          "pendingProviderRequestCount",
+          "embeddingProviderRequestCount",
+          "embeddingPendingProviderRequestCount",
+          "embeddingInputTokens",
+          "semanticSearch",
+          "estimatedProviderCostUSD",
+          "conservativeProviderCostUSD",
+          "durationMilliseconds",
+          "preparationMilliseconds",
+          "retrievalMilliseconds",
+          "projectLinked",
+          "projectFactCount",
+          "establishedConversationFactCount",
+          "evidenceReferences",
+          "evidenceCharacterCount",
+          "verificationIssueTypes"
+        ]
+      },
+      {
+        "event": "dynamic_route_observation",
+        "keys": [
+          "event",
+          "severity",
+          "route",
+          "method",
+          "statusCode",
+          "durationMilliseconds",
+          "requestID",
+          "releaseID",
+          "gitCommit",
+          "deploymentHost",
+          "environment",
+          "observedAt"
+        ]
+      },
+      {
+        "event": "research_provider_phase",
+        "keys": [
+          "event",
+          "stage",
+          "outcome",
+          "durationMilliseconds",
+          "providerAttempts",
+          "attemptTimings"
+        ]
+      }
+    ],
+    "deliveredSourceTextOrDefinitionLabelsCaptured": false,
+    "visibleAnswer": "Completed answer states no temperature/protective-device rule available and provides unrelated public-lavatory flow limits instead. No private drafts or hidden binding flags inspected."
+  },
+  "routing": {
+    "softIntent": {
+      "version": "20261003-shared-current-question-subject-v1",
+      "codePrefixes": [
+        "PC"
+      ],
+      "roomDimensions": false,
+      "buildingArea": false
+    },
+    "corpusPlan": [
+      {
+        "id": "nyc-2022-construction-codes",
+        "role": "requested",
+        "reason": "construction-code cue"
+      },
+      {
+        "id": "nyc-2022-fire-code",
+        "role": "recall_only",
+        "reason": "authorized current-library recall; applicability unresolved"
+      },
+      {
+        "id": "nyc-zoning-resolution",
+        "role": "recall_only",
+        "reason": "authorized current-library recall; applicability unresolved"
+      }
+    ],
+    "finding": "CorrectPC subject andConstruction requested; FC/ZRrecall only. Governing text is within authorized current corpus; not a routing exclusion or outdated-only library."
+  },
+  "canonical": [
+    {
+      "sectionID": "11981",
+      "codePrefix": "PC",
+      "sectionNumber": "416.5",
+      "title": "416.5 Tempered water for public hand-washing facilities.",
+      "text": "416.5 416.5 Tempered water for public hand-washing facilities. Tempered water shall be delivered from lavatories and group wash fixtures located in public toilet facilities provided for customers, patrons and visitors. Tempered water shall be delivered through an approved water-temperature limiting device that conforms to ASSE 1070. Exception: Where point of use heaters are installed, outlet water temperature shall be regulated to provide tempered water. Section PC 417: Showers",
+      "characters": 482,
+      "sourceHash": "830bafd6207c978a48e99b8653bb86f43ab3c209f6df932129a5ae4a05a64ae0",
+      "authority": {
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City"
+      },
+      "crossReferences": [
+        {
+          "sectionID": "",
+          "codePrefix": "PC",
+          "sectionNumber": "417",
+          "referenceKind": "section"
+        }
+      ],
+      "currentQueryRank": 5,
+      "neutralTemperatureQueryRank": 11
+    },
+    {
+      "sectionID": "12210",
+      "codePrefix": "PC",
+      "sectionNumber": "607.1.1",
+      "title": "607.1.1 Temperature limiting means.",
+      "text": "607.1.1 607.1.1 Temperature limiting means. A thermostat control for a water heater shall not serve as the temperature limiting means for the purposes of complying with the requirements of this code for maximum allowable hot or tempered water delivery temperature at fixtures.",
+      "characters": 276,
+      "sourceHash": "1e66a3d6ff7b8b20209ed28c3a224b310859cbcf3096c14e867226e5a5194d54",
+      "authority": {
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City"
+      },
+      "crossReferences": [],
+      "currentQueryRank": null,
+      "neutralTemperatureQueryRank": 19
+    }
+  ],
+  "operativeTerminology": {
+    "separatePC202Exists": false,
+    "definitionSourceReference": "PC 201.4",
+    "definitionSourceCharacters": 38264,
+    "temperedMentions": [
+      "in, chamber or tank containing an artificial body of water for swimming, diving or recreational bathing having a depth of 3 feet (915 mm) or more at any point. TEMPERED WATER. Water having a temperature range between 85\u00b0F (29\u00b0C) and 110\u00b0F (43\u00b0C). THIRD-PARTY CERTIFICATION AGENCY. An approved agency operating a product or material certification system that incorporates initial product testing, assessment and surveillance of a manufacturer's quality control system. THIRD-PARTY CERTIFIED. Certification obtained by the manufacturer indicating that the function and performance characteristics of a product or"
+    ],
+    "temperedDefinition": null,
+    "metadataOnlyCounterfactual": {
+      "schemaVersion": 1,
+      "version": "20260930-complete-definition-dependencies-v4",
+      "sourceMode": "canonical_enacted_definition_entries",
+      "sectionID": "11811",
+      "codePrefix": "PC",
+      "sectionNumber": "201.4",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "labels": [
+        "TEMPERED WATER"
+      ],
+      "passages": [
+        "TEMPERED WATER. Water having a temperature range between 85\u00b0F (29\u00b0C) and 110\u00b0F (43\u00b0C)."
+      ],
+      "text": "TEMPERED WATER. Water having a temperature range between 85\u00b0F (29\u00b0C) and 110\u00b0F (43\u00b0C).",
+      "canonicalSectionCharacterCount": 38264,
+      "excerptCharacterCount": 86,
+      "canonicalContextComplete": false,
+      "completeDefinitionEntries": true
+    },
+    "selectedFromComplete4165": [],
+    "selectedText": null
+  },
+  "findings": [
+    {
+      "stage": "ordinary_goal_retrieval",
+      "confirmed": "Plain PC-only current-question BM25 finds 416.5 at rank 5, score 8.34, while a public-lavatory placement rule scores 14.20. Frozen discovery expansions and ranking in the same PC-only corpus place 416.5 at candidate 12; the existing assembler admits at most 10 discovered sources. Its raw relative strength is 0.587, below the existing 0.7 reservation threshold.",
+      "limits": "Actual global semantic ranks and slices were not captured. This confirms a generic scoring failure path, rather than the exact production fusion decision. Do not lower global thresholds based on this case."
+    },
+    {
+      "stage": "requested_property_words",
+      "confirmed": "The existing water-temperature concept expansion requires the literal word temperature. This scalding request instead triggers broad lavatory, fixture, toilet, water and closet expansion, favoring arrangement and flow candidates.",
+      "genericMeaning": "Equipment and setting words outrank the requested prevention property. Retrieval must preserve the requested function or goal as well as the subject; search similarity does not establish legal applicability."
+    },
+    {
+      "stage": "canonical_reference_packet",
+      "confirmed": "None of the observed full canonical sources links directly to 416.5 or 607.1.1. Controlled nomination of 416.5 delivers its complete 482-character body within existing limits. It has no literal 607.1.1 link, so ordinary cross-reference recovery does not recover that independent rule.",
+      "limits": "A bounded canonical-reference expansion cannot discover an unlinked responsive neighbor from unrelated primary rules. Neither the 482-character rule nor the 276-character neighboring rule requires higher text caps."
+    },
+    {
+      "stage": "embedded_definition_recognition",
+      "confirmed": "The PC catalog has no separate 202 record. Its General Definitions chapter is embedded in PC 201.4 (Terms not defined), a 38,264-character canonical source. The complete 86-character TEMPERED WATER entry occurs at offset 31,675. Both definition detectors reject the carrier because its number/title do not identify a definitions section and it lacks the expected following-terms-shall-have-meanings predicate. A read-only metadata counterfactual changing only the diagnostic copy of its title enables exact complete-entry extraction.",
+      "limits": "Production listing PC 201.4 does not prove delivery of the tempered-water definition; the actual indexed excerpt is unknown. This classifier probe is not a source patch, citation approval or full-chapter delivery."
+    }
+  ],
+  "boundedGeneralRepairProposal": [
+    "Improve current-intent decomposition and ranking to distinguish the requested regulatory property or function from equipment and setting. Nominate candidates from the existing authorized pool; use no legal reference or answer lookup, and require exact source review after nomination.",
+    "For a supplied responsive operative rule, prioritize its same-authority definition labels and literal dependencies over incidental context. Recognize embedded definitions only through exact structural chapter headings and complete entry boundaries. Preserve physical source identity, source hash, offsets and the published subreference distinction.",
+    "A listed definitions carrier does not establish delivery of each complete label. Do not invent a 607.1.1 link. Related unlinked rules need genuine authorized semantic or lexical candidate support and must fit existing caps."
+  ],
+  "meaningfulLaterContracts": [
+    "Vary ordinary prevent/avoid goals across fixtures and equipment; equipment word overlap must not turn them into placement or flow questions.",
+    "A canonical chapter heading and complete definition entries embedded in a prior catalog record qualify only with exact structural markers and boundaries; an uppercase prose mention alone does not.",
+    "Responsive operative terminology selects complete definitions ahead of unrelated project inventory; wrong editions, jurisdictions and strict pins remain excluded.",
+    "Complete current rules and independent responsive candidates stay within existing source/count/text limits; unrelated or over-budget complete candidates remain omitted atomically."
+  ],
+  "replay": {
+    "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v21-lavatory-readonly-replay.json",
+    "sha256": "af078f62cf50bc5e4a2b2f3a8904208761bd61faad21a37b754e1488ed0f0d08",
+    "limitations": "Actual global semantic vector/hits, chosen indexed slices, ranked candidates, evidence-role flags, project hidden qualifiers/metadata and writer request were not captured. PC-only lexical probes are not actual global hosted rankings. Observed accounting first10 are reconstructed full canonical candidates. Controlled416.5 nomination tests bounded complete-packet recovery only, not actual retrieval or answer accuracy; no question-specific implementation or provider calls."
+  },
+  "noAccuracyClaim": "Source availability, eligibility and bounded delivery only. No provider/writer/semantic-query replay, productionfix ornewgrade claimed."
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "9166992c557a8b6f95eadf9a6e01dd531c5796d9",
+  "sourceFreezeSHA256": "b046f84ceed7ca81a1149cf3e3985705e555fe06923c9bb9800eb0d2626591e4",
+  "questionsOnlySHA256": "bdc0f03bfea3ba4b0f20b8d33cc35e0deca76eb3ddd5b64fc07029865b5e7b47",
+  "questionsOnlyPath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v21-practical-supplement/questions-only.json",
+  "questionCount": 8,
+  "authorship": "assistant-authored diagnostic supplement with prior corpus exposure; not a random statistical sample",
+  "sourceBeforeAuthoringFrozen": true,
+  "reviewerKeySeenBeforeFreshCaptures": false,
+  "recordedAt": "2026-10-03T18:50:53.395246+00:00"
+}
