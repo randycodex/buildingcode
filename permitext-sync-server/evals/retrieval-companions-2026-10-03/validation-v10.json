@@ -1,0 +1,23 @@
+{
+  "candidate": "v10",
+  "completedAt": "2026-10-03T08:41:51.653334+00:00",
+  "providerCalls": 0,
+  "checks": [
+    {
+      "test": "research-claim-scope-contract.mjs",
+      "outcome": "passed",
+      "scope": "actual writer/verifier220 envelopes plus guidance source relationships; no generated answers"
+    },
+    {
+      "test": "research-revision-verification-http-contract.mjs",
+      "outcome": "passed",
+      "scope": "provider doubles: reject unsafe reviewed revision; persist accepted reviewed revision"
+    },
+    {
+      "test": "research-targeted-revision-bindings-contract.mjs",
+      "outcome": "passed",
+      "scope": "preserve mandatory/shared authoritative bindings through citation cleanup"
+    }
+  ],
+  "productionAcceptance": "pending"
+}

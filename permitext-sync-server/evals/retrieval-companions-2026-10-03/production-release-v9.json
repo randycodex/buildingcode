@@ -1,0 +1,16 @@
+{
+  "candidate": "v9",
+  "commit": "354ad3999a3171cf75daf1c8a50158fe38c8b6e9",
+  "deploymentID": "dpl_381B66Mmai3kpTCx512XZFaU319N",
+  "deploymentHost": "permitext-sync-di1nkzioa-randycodexs-projects-b72fc111.vercel.app",
+  "productionURL": "https://permitext.com",
+  "ready": true,
+  "identityVerified": true,
+  "healthVerified": true,
+  "privateVectorRouteHTTPStatus": 404,
+  "clientAssetVersion": "20261003-research-answer-status-v630",
+  "flagsPersistedInProjectEnvironment": false,
+  "answerAcceptance": "failed targeted mechanical repeat: two correct, one withheld; twelve remaining planned diagnostic turns not run",
+  "allOperationsSettled": true,
+  "estimatedProviderCostUSD": 0.052169999999999994
+}

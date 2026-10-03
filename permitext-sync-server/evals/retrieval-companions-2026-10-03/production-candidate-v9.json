@@ -1,0 +1,142 @@
+{
+  "candidateCommit": "354ad3999a3171cf75daf1c8a50158fe38c8b6e9",
+  "productionDeploymentID": "dpl_381B66Mmai3kpTCx512XZFaU319N",
+  "captureSource": "Authenticated production browser visible text",
+  "turnCount": 3,
+  "answers": [
+    {
+      "id": "production-v9-mc-1",
+      "question": "Is the primary condensate drain steep enough for the saved cooling-unit example, or does its fall need to change?",
+      "submittedAt": "2026-10-03T08:31:18.262Z",
+      "observedAt": "2026-10-03T08:32:23.705Z",
+      "visibleAnswer": "Research complete\n00:40\n\nNo\u2014the fall needs to increase. The 2022 NYC Plumbing Code requires at least 1/8 inch of vertical fall per 12 inches of horizontal run (PC \u00a7 314.2.1). Over 8 feet (96 inches), the minimum fall is (96 \u00f7 12) \u00d7 1/8 = 1 inch. The saved 1/2-inch fall is 1/2 inch short."
+    },
+    {
+      "id": "production-v9-mc-2",
+      "question": "Since a blocked drain could damage the ceiling and there is no floor drain, what overflow protection can we use? Do we have to add a separate overflow pipe?",
+      "submittedAt": "2026-10-03T08:32:42.190Z",
+      "observedAt": "2026-10-03T08:34:46.672Z",
+      "visibleAnswer": "Research incomplete\n00:51\n\nResearch could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation."
+    },
+    {
+      "id": "production-v9-mc-3",
+      "question": "Correction: the primary drain has one inch of total fall over the same eight-foot run. Is the slope now enough, and do we still need the overflow protection?",
+      "submittedAt": "2026-10-03T08:35:04.387Z",
+      "observedAt": "2026-10-03T08:37:17.602Z",
+      "visibleAnswer": "Research complete\n00:32\n\nYes\u2014the corrected fall meets the minimum: 1 inch over 8 feet (96 inches) is exactly 1/8 inch per 12 inches. But overflow protection is still required in the stated hypothetical: because a blocked primary drain could damage building components and there is no suitably sized, located floor drain, PC \u00a7 314.2.3 requires one of its listed auxiliary protection methods. A separate overflow line is only one option; the code also allows the specified auxiliary-pan or water-level shutoff methods."
+    }
+  ],
+  "accounting": [
+    {
+      "id": "production-v9-mc-1",
+      "operationID": "910e5c2d-6688-4707-81e4-c21ff6c587ee",
+      "status": "completed",
+      "failureCode": null,
+      "estimatedProviderCostUSD": 0.018272,
+      "providerRequestCount": 5,
+      "pendingProviderRequestCount": 0,
+      "embeddingProviderRequestCount": 1,
+      "projectLinked": true,
+      "projectFactCount": 33,
+      "durationMilliseconds": 40651,
+      "evidenceReferences": [
+        "PC 314.2.1",
+        "PC 314.2.3",
+        "PC 314.2",
+        "PC 1104.4",
+        "PC 314.2.2",
+        "MC 307.2.1",
+        "MC 307.2",
+        "MC 307.2.3",
+        "FGC 307.1",
+        "PC 314.2.5",
+        "PC 314.2.4",
+        "MC 307.2.2",
+        "MC 307.2.4",
+        "MC 307.2.5",
+        "MC 307.2.6",
+        "PC 102.1",
+        "MC 102.1"
+      ]
+    },
+    {
+      "id": "production-v9-mc-2",
+      "operationID": "b87c7f6f-7532-4ca8-8d11-65b434db4c3d",
+      "status": "completed",
+      "failureCode": "RESEARCH_VERIFICATION_FAILED",
+      "estimatedProviderCostUSD": 0.024756,
+      "providerRequestCount": 5,
+      "pendingProviderRequestCount": 0,
+      "embeddingProviderRequestCount": 1,
+      "projectLinked": true,
+      "projectFactCount": 33,
+      "durationMilliseconds": 51547,
+      "evidenceReferences": [
+        "PC 1301.9.6",
+        "PC 1301.9.9",
+        "BC 721.1",
+        "PC 314.2.3",
+        "PC 1108.1",
+        "PC 1101.5.2.1",
+        "PC 1403.2.3",
+        "BC 1503.4.1",
+        "PC 405.7.1",
+        "MC 1305.3.8",
+        "PC 606.5.4",
+        "PC 606.5.7",
+        "PC 314.2.1",
+        "BC 1405.10",
+        "BC 1405.6",
+        "BC 705.5",
+        "PC 102.1",
+        "BC 102.1",
+        "BC 202"
+      ]
+    },
+    {
+      "id": "production-v9-mc-3",
+      "operationID": "b5757faf-7343-4266-a0fe-16d8628da1f0",
+      "status": "completed",
+      "failureCode": null,
+      "estimatedProviderCostUSD": 0.009142,
+      "providerRequestCount": 3,
+      "pendingProviderRequestCount": 0,
+      "embeddingProviderRequestCount": 1,
+      "projectLinked": true,
+      "projectFactCount": 33,
+      "durationMilliseconds": 32473,
+      "evidenceReferences": [
+        "PC 1108.1",
+        "PC 1108.3",
+        "PC 704.1",
+        "PC 1301.9.6",
+        "PC 1101.5.2.1",
+        "PC 710.1",
+        "PC 1403.2.3",
+        "PC 421.3",
+        "PC 314.2.3",
+        "PC 606.5.4",
+        "PC 314.2.1",
+        "PC 1101.7",
+        "PC 102.1"
+      ]
+    }
+  ],
+  "estimatedProviderCostUSD": 0.052169999999999994,
+  "allOperationsSettled": true,
+  "reviewStatus": "sealed independent assistant source review",
+  "acceptance": "failed targeted mechanical repeat: two correct, one withheld; twelve remaining planned diagnostic turns not run",
+  "captureSHA256": "99fbb3a462be8db0e0fdf6fbcb3827c864f083e5dce7a493e7e6a3f74527326d",
+  "reviewArtifactSHA256": "941fb48810178f2de6b02efdae4a33981dd9d1052c79e29c6128dc5a4f3fe122",
+  "grades": {
+    "correct": 2,
+    "materially_wrong": 0,
+    "withheld": 1
+  },
+  "reviewCaveat": "Correct slope follow-up should repeat PC314.2.1 beside the slope calculation; prior-turn citation retained.",
+  "limitations": [
+    "Known correlated diagnostic conversation; not full15 result or population accuracy.",
+    "Private writer drafts unavailable; review feedback is fallible and not legal authority.",
+    "Token/accounting estimate, not invoice/wallet."
+  ]
+}
