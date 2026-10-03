@@ -1,0 +1,15 @@
+{
+  "candidate": "v7",
+  "commit": "55dc3c891f393f1b08bb48d91499dc3b4d55a728",
+  "deploymentID": "dpl_4YGcSJav8LpQBauNN17ZM9Tvym8x",
+  "deploymentHost": "permitext-sync-96xkr2ly3-randycodexs-projects-b72fc111.vercel.app",
+  "productionURL": "https://permitext.com",
+  "ready": true,
+  "identityVerified": true,
+  "healthVerified": true,
+  "privateVectorRouteHTTPStatus": 404,
+  "paidProductionTurns": 0,
+  "answerAcceptance": "not run; preflight UI failed because browser reused immutable old asset version",
+  "uiFinding": "After reload, reopened v6 headroom verification recovery still displayed Research complete; live network asset contained the new classifier but the HTML requested its old immutable URL. v8 bumps aligned client/shell versions.",
+  "flagsPersistedInProjectEnvironment": false
+}
