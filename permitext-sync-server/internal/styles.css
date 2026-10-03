@@ -147,3 +147,32 @@ textarea, input, select { width: 100%; padding: 10px; border: 1px solid #3a3a3a;
 
 .feedback-case label.feedback-source-choice { display: inline-flex; align-items: center; gap: 8px; }
 .feedback-case .feedback-source-choice input { width: auto; }
+
+/* Keep the review queue and evidence independently accessible on desktop. */
+.case-workspace { height: calc(100dvh - 355px); min-height: 480px; }
+.case-sidebar { display: flex; flex-direction: column; min-height: 0; padding: 14px; }
+.case-controls { display: grid; gap: 10px; }
+.case-controls h2 { font-size: 16px; margin: 0; }
+.case-controls p { margin: 0 0 10px; }
+.case-results { overflow-y: auto; min-height: 0; scrollbar-gutter: stable; }
+.case-results button { display: grid; gap: 7px; padding: 10px 12px; cursor: pointer; }
+.case-results .badge { justify-self: start; margin: 0; padding: 2px 7px; }
+.case-detail { overflow-y: auto; min-height: 0; scrollbar-gutter: stable; }
+.case-detail .review-form { position: sticky; bottom: -18px; padding: 14px 0; background: #131313; border-top: 1px solid #474747; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #f4a340; outline-offset: 3px; }
+@media (max-width: 800px) {
+  .case-workspace { height: auto; min-height: 0; }
+  .case-results { max-height: 300px; }
+  .case-detail { overflow: visible; }
+  .case-detail .review-form { position: static; }
+}
+
+@media (min-width: 801px) {
+  .case-detail { overflow: hidden; }
+  .case-detail > .card { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; padding-bottom: 0; }
+  .case-content { overflow-y: auto; min-height: 0; padding-right: 10px; scrollbar-gutter: stable; }
+  .case-detail .review-form { position: static; margin-top: 12px; gap: 6px; }
+  .case-detail .review-form h3 { margin: 0; font-size: 15px; }
+  .case-detail .review-form textarea { min-height: 54px; height: 54px; }
+  .case-detail .review-form .meta { margin: 0; font-size: 12px; }
+}
