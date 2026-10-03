@@ -231,6 +231,44 @@ assert.equal(deduplicatedQuery.semanticQuery, `${followQuestion}\nSubject contex
 assert.deepEqual(deduplicatedQuery.inheritedAuthorityReferences.map(reference => reference.sectionNumber), ["999.1", "999.2", "999.3"],
   "Title deduplication does not remove distinct source identity hints.");
 assert.deepEqual(repeatedTitles, repeatedSnapshot, "Search title normalization never modifies checked history.");
+const pipeRoot = "For a fictional new sanitary drain in NYC, a two-inch horizontal pipe runs 20 feet and drops two inches uniformly. Is that enough fall?";
+const pipeCorrection = "Correction: it is a four-inch pipe, and it drops three inches over that same 20-foot run. Does that satisfy the minimum slope?";
+const pipeQuestion = "On that same drain, can we reduce from four inches to three inches farther downstream because there is less room? This is the main horizontal line, not a toilet outlet connection.";
+const pipeHistory = [{ role: "user", question: pipeRoot }, { role: "user", question: pipeCorrection }, {
+  role: "assistant", answer: { mode: "answer", verification: { pass: true }, supportedPoints: [{ sourceIDs: ["checked-pipe"] }], citations: [
+    { ...citation, codePrefix: "PC", title: "999.1 Slope of horizontal drainage piping.", codeEdition: "2022 NYC Plumbing Code", codeVersion: "fixture-pc-2022" },
+    { ...citation, codePrefix: "PC", sectionID: "fixture-pipe-2", sectionNumber: "999.2", title: "999.2 Slope of horizontal drainage piping.", codeEdition: "2022 NYC Plumbing Code", codeVersion: "fixture-pc-2022" }
+  ] }
+}];
+const pipeSnapshot = structuredClone(pipeHistory);
+const pipeFollow = researchEvidenceRetrievalQuery({ question: pipeQuestion, previousMessages: pipeHistory });
+assert.equal(pipeFollow.semanticQuery, `${pipeQuestion}\nSubject context: horizontal drainage piping`,
+  "A new equipment detail retains the subject without repeating the old slope property or measurements.");
+assert.doesNotMatch(pipeFollow.semanticQuery, /Subject context:.*(?:Slope|20|two-inch|Correction|fall)/);
+assert.equal(pipeFollow.inheritedAuthorityReferences.length, 2, "Changing the requested property does not discard authority identities.");
+const samePropertyQuestion = "For that same horizontal drainage pipe, what minimum slope is required for its corrected diameter?";
+assert.equal(researchEvidenceRetrievalQuery({ question: samePropertyQuestion, previousMessages: pipeHistory }).semanticQuery,
+  `${samePropertyQuestion}\nSubject context: Slope of horizontal drainage piping.`,
+  "A current request for the same property retains the complete checked title.");
+for (const ambiguousTitle of ["Slope of drainage piping of equipment.", "Requirements of horizontal drainage piping.", "Height of 36-inch supports.", "Slope of ventilation ducting."]) {
+  const history = structuredClone(pipeHistory);
+  history.at(-1).answer.citations = [{ ...history.at(-1).answer.citations[0], title: ambiguousTitle }];
+  assert.equal(researchEvidenceRetrievalQuery({ question: pipeQuestion, previousMessages: history }).semanticQuery, pipeQuestion,
+    "Ambiguous or unrelated property headings are omitted without restoring a long old measured topic.");
+}
+for (const switchedQuestion of [
+  "New topic: how should this outdoor gas line be buried?",
+  "Actually under the Fuel Gas Code, how should this gas line be buried?",
+  "Do the same diameter check under the 2014 NYC Plumbing Code instead. What arrangement is permitted?"
+]) assert.doesNotMatch(researchEvidenceRetrievalQuery({ question: switchedQuestion, previousMessages: pipeHistory }).semanticQuery,
+  /Subject context:.*(?:Slope of horizontal drainage piping|2022|999\.1)/,
+  "Property extraction cannot bypass an explicit topic, code or edition boundary.");
+assert.deepEqual(pipeHistory, pipeSnapshot);
+const compressorProperty = structuredClone(detailedTitle);
+compressorProperty.at(-1).answer.citations[0].title = "999.1 Capacity of industrial air compressors.";
+assert.equal(researchEvidenceRetrievalQuery({ question: followQuestion, previousMessages: compressorProperty }).semanticQuery,
+  `${followQuestion}\nSubject context: industrial air compressors`,
+  "The same grammatical property gate retains non-plumbing equipment without importing its old capacity property.");
 for (const question of ["New topic: what is the plumbing vent arrangement?", "Under PC 888.1, how is the vent arrangement measured?", "Actually, under the Plumbing Code, how should this fixture be vented?"]) {
   const switched = researchEvidenceRetrievalQuery({ question, previousMessages: messages });
   assert.doesNotMatch(switched.semanticQuery, /industrial air compressor|General Requirements|Mechanical Code|2014/, question);

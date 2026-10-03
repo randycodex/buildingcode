@@ -21098,8 +21098,14 @@ function researchProgressElapsed(startedAt, endedAt = Date.now()) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
+function researchAnswerHasVerificationRecovery(answer) {
+  return answer?.mode === "clarification" && answer.model === "permitext-conversation-clarification" &&
+    answer.verification?.status === "clarification" && answer.verification.pass === false &&
+    ["verification_source", "verification_context", "verification_format", "verification_incomplete"].includes(answer.verification.reason);
+}
+
 function researchProgressStatusLabel(progress) {
-  if (progress.status === "completed") return "Research complete";
+  if (progress.status === "completed") return progress.answerIncomplete ? "Research incomplete" : "Research complete";
   if (progress.errorCode === "RESEARCH_ZONING_SOURCE_UNAVAILABLE") return "Zoning Research unavailable";
   const active = researchProgressStages.find((stage) =>
     ["active", "retrying"].includes(progress.stages.get(stage.id))
@@ -21218,6 +21224,7 @@ function researchProgressFromSavedMessage(message) {
   return {
     id: `saved-${message.id}`,
     status: "completed",
+    answerIncomplete: researchAnswerHasVerificationRecovery(message.answer),
     startedAt: Date.parse(value.startedAt) || Date.parse(message.createdAt) || Date.now(),
     endedAt: Date.parse(value.completedAt) || Date.parse(message.createdAt) || Date.now(),
     stages: new Map(value.stages.map((stage) => [stage.id, stage.state]))
@@ -21346,6 +21353,10 @@ async function runResearchProgressSession(
       const conflict = researchProgressConversationConflict(view, result.conversation);
       if (conflict) throw conflict;
       progress.status = "completed";
+      const completedMessage = result.conversation?.messages?.findLast(message =>
+        message.role === "assistant" && message.requestID === progress.id
+      );
+      progress.answerIncomplete = completedMessage ? researchAnswerHasVerificationRecovery(completedMessage.answer) : false;
       progress.endedAt = Date.now();
       clearInterval(progress.timer);
       activeResearchProgress.delete(progress.conversationID);

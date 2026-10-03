@@ -25,7 +25,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-complete-table-context-v58";
+export const researchEvidenceAssemblyVersion = "20261003-action-subject-query-context-v59";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -343,6 +343,7 @@ export function researchEvidenceRetrievalQuery({
     question: normalizedQuestion,
     sourceQuery,
     semanticQuery,
+    resolvedSubjectContext: contextDependentFollowUp && checkedPriorSources.length ? semanticContext : "",
     inheritedAuthorityReferences,
     retrievalQuery: retrievalQuery.trim(),
     previousTopicApplied,
@@ -1037,6 +1038,7 @@ export async function assembleResearchEvidence({
         retrievalContext: {
           sourceQuery: query.sourceQuery,
           semanticQuery: query.semanticQuery,
+          resolvedSubjectContext: query.resolvedSubjectContext,
           currentQuestion: query.question,
           inheritedAuthorityReferences: query.inheritedAuthorityReferences,
           conversationTopic: query.conversationTopic,

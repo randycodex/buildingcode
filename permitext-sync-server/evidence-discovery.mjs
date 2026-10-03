@@ -3,7 +3,7 @@ import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-current-lexical-reservation-v48";
+export const evidenceDiscoveryVersion = "20261003-action-subject-reservation-v49";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1634,7 +1634,7 @@ function currentDetailIndexedPrimary(primary, pool, currentQuestion) {
   return stronger[0]?.passage || primary;
 }
 
-function mergedIndexedPassages(primary, lexical, semantic, currentScores, currentQuestion) {
+function mergedIndexedPassages(primary, lexical, semantic, currentScores, currentQuestion, preservePrimary = false) {
   const pool = new Map();
   for (const [method, hit] of [["lexical", lexical], ["semantic", semantic]]) {
     for (const [rank, passage] of (hit?.passages || (hit ? [hit] : [])).entries()) {
@@ -1650,7 +1650,7 @@ function mergedIndexedPassages(primary, lexical, semantic, currentScores, curren
   // It must not replace a complete, more specific literal child already in the
   // same authorized pool with a generic sibling merely because that sibling
   // repeats the containing chapter title or unrelated project context.
-  const selected = semantic && !primary.exactReference
+  const selected = semantic && !primary.exactReference && !preservePrimary
     ? currentDetailIndexedPrimary(primary, merged, currentQuestion) : primary;
   const companion = completeSibling(selected, merged);
   return { ...selected, passages: merged, ...(companion ? { companion } : {}) };
@@ -1681,6 +1681,63 @@ function strongCurrentLexicalReservation({ currentHits, detailed, selected, curr
     Number(preferredPrefixes.has(right.item.section.codePrefix)) - Number(preferredPrefixes.has(left.item.section.codePrefix)) ||
     left.rank - right.rank);
   return eligible[0] || null;
+}
+
+function retrievalWordForms(word) {
+  const forms = singularForms(word);
+  if (/^[a-z]{4,}$/.test(word) && /(?:ing|ed)$/.test(word)) {
+    const stem = word.replace(/(?:ing|ed)$/, "");
+    if (stem.length >= 3) {
+      forms.add(stem); forms.add(`${stem}e`);
+      if (/([b-df-hj-np-tv-z])\1$/.test(stem)) forms.add(stem.slice(0, -1));
+    }
+  }
+  return forms;
+}
+
+function currentActionSubjectProbe(currentQuestion, resolvedSubject) {
+  // Only a clear modal/action question supplies an action. An excluded example
+  // or the previous answer cannot supply it. Generic conversational verbs do
+  // not nominate a rule merely because its equipment name overlaps.
+  const action = String(currentQuestion).match(/\b(?:can|may|could|should|must|will|would)\s+(?:(?:we|i|you|they|it)\s+)?(?:(?:now|still|instead|also)\s+)?(?:not\s+)?([a-z]{3,})\b/i)?.[1]?.toLowerCase();
+  const genericActions = new Set(["be", "have", "has", "do", "does", "use", "make", "get", "need", "know", "help", "explain", "check", "verify", "continue", "solve", "satisfy", "comply", "apply", "meet", "provide", "tell", "ask", "see", "consider"]);
+  if (!action || stopWords.has(action) || genericActions.has(action)) return null;
+  const subject = String(resolvedSubject || "").trim().replace(/[.]$/, "");
+  // The helper has already resolved topic/family/edition changes. Ambiguous
+  // multiple subjects or sentence-shaped fallback context gets no probe.
+  if (!subject || subject.length > 140 || /[;?!:=\d]/.test(subject) ||
+      /^(?:not|no|is|are|was|were|can|may|must|would|should|what|which|how|it|this|these|those)\b/i.test(subject)) return null;
+  const words = rawTokens(subject).filter(word => word.length > 2 && /[a-z]/i.test(word) &&
+    !stopWords.has(word) && !genericPassageHeadingWords.has(word) &&
+    !["system", "systems", "equipment", "building", "project", "existing", "proposed", "subject", "context"].includes(word));
+  if (!words.length || words.length > 8) return null;
+  // The noun phrase's final two substantive words identify the equipment;
+  // leading modifiers from the previous heading must not overwhelm its new
+  // action. Morphological variants still count as one subject word each.
+  const subjectWords = words.slice(-2);
+  if (subjectWords.some(word => retrievalWordForms(word).has(action))) return null;
+  return { action, subjectWords, query: [action, ...subjectWords].join(" ") };
+}
+
+function completeActionSubjectHit(hit, probe) {
+  if (!hit?.scopeComplete || !completeIndexedScope(hit) ||
+      (hit.completeSubsectionText && hit.completeSubsectionText !== hit.text)) return false;
+  if ([...new Set([...(hit.contextTexts || []), hit.text])].join("\n\n").length > 12000) return false;
+  const words = new Set(rawTokens(hit.text).flatMap(word => [...retrievalWordForms(word)]));
+  return [...retrievalWordForms(probe.action)].some(word => words.has(word)) &&
+    probe.subjectWords.every(subject => [...retrievalWordForms(subject)].some(word => words.has(word)));
+}
+
+function strongActionSubjectReservation({ probeHits, detailed, selected, currentQuestion, contextQuestion, preferredPrefixes }) {
+  const protectedIDs = new Set(selected.filter((item, index) => index === 0 || item.directReference ||
+    item.completeSiblingCompanionOf || item.useSelectedPassageOnly).map(item => comparableSectionID(item.section.id)));
+  return probeHits.map(hit => ({ hit, item: detailed.find(item => comparableSectionID(item.section.id) === comparableSectionID(hit.sectionID)) }))
+    .filter(({ item, hit }) => item && !protectedIDs.has(comparableSectionID(hit.sectionID)) &&
+      !item.useSelectedPassageOnly && !item.contextualReference && !item.inheritedReference &&
+      zoningScopeRankingFactor(item.section, contextQuestion, currentQuestion) >= 1)
+    .sort((left, right) => Number(preferredPrefixes.has(right.item.section.codePrefix)) -
+      Number(preferredPrefixes.has(left.item.section.codePrefix)) || left.hit.probeRank - right.hit.probeRank)
+    .map(({ hit, item }) => ({ hit, item, rank: hit.probeRank, strength: hit.probeStrength, actionSubject: true }))[0] || null;
 }
 
 export async function discoverRelevantEvidence({
@@ -1776,6 +1833,19 @@ export async function discoverRelevantEvidence({
     .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean) : [];
   const currentPassageScores = new Map(currentPassageHits.flatMap(hit =>
     (hit.passages || [hit]).map(passage => [passageIdentity(passage), passage.score])));
+  const actionSubjectProbe = passageIndex && retrievalContext?.contextDependentFollowUp
+    ? currentActionSubjectProbe(currentQuestion, retrievalContext.resolvedSubjectContext) : null;
+  const actionSubjectHits = actionSubjectProbe ? searchResearchPassages(passageIndex, actionSubjectProbe.query,
+    { queryWeights: new Map(rawTokens(actionSubjectProbe.query).map(word => [word, 1])),
+      explicitReferenceQuery: "", limit: 100, passagesPerSection: 8 })
+    .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean) : [];
+  const actionSubjectRecallHits = actionSubjectHits.flatMap((hit, rank) => {
+    const complete = (hit.passages || [hit]).find(passage => completeActionSubjectHit(passage, actionSubjectProbe) &&
+      passage.score >= (actionSubjectHits[0]?.score || Infinity) * 0.7);
+    return complete ? [{ ...complete, passages: hit.passages, probeRank: rank + 1,
+      probeStrength: complete.score / actionSubjectHits[0].score }] : [];
+  }).sort((left, right) => Number(disciplinePrefixes.has(right.codePrefix)) -
+    Number(disciplinePrefixes.has(left.codePrefix)) || left.probeRank - right.probeRank).slice(0, 5);
   const passageHitsByID = new Map(lexicalHitsByID);
   const semanticResult = passageIndex && semanticSearch
     ? await semanticSearch.search(passageIndex, retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }) : null;
@@ -1800,11 +1870,11 @@ export async function discoverRelevantEvidence({
   // this nomination does not by itself admit a source to the final shortlist.
   const currentLexicalRecallHits = currentPassageHits.slice(0, 5).filter(hit =>
     completeIndexedScope(hit) && hit.score >= (currentPassageHits[0]?.score || Infinity) * 0.7);
-  for (const hit of currentLexicalRecallHits) {
+  for (const hit of [...currentLexicalRecallHits, ...actionSubjectRecallHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (!passageHitsByID.has(id)) passageHitsByID.set(id, hit);
     if (semanticHits.length && !fusedScores.has(id)) {
-      fusedScores.set(id, 4000 / (61 + currentPassageHits.indexOf(hit)));
+      fusedScores.set(id, 4000 / (61 + (hit.probeRank ? hit.probeRank - 1 : currentPassageHits.indexOf(hit))));
     }
   }
   const scores = new Map();
@@ -1904,7 +1974,7 @@ export async function discoverRelevantEvidence({
   exactReferenceIDs.forEach((id) => scores.set(id, (scores.get(id) || 0) + 100));
   routesByID.forEach(({ score }, id) => scores.set(id, (scores.get(id) || 0) + score));
   headingScores.forEach((score, id) => scores.set(id, (scores.get(id) || 0) + score));
-  [...passageHits, ...semanticHits, ...currentLexicalRecallHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
+  [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
     Math.max(scores.get(comparableSectionID(hit.sectionID)) || 0, hit.score * 3)));
 
   const preliminary = Array.from(scores, ([id, score]) => ({ id, score }))
@@ -1914,7 +1984,7 @@ export async function discoverRelevantEvidence({
   // term definitions even when a broad topic route fills the lexical shortlist.
   // Their complete text is never admitted automatically by this reservation.
   const preliminaryIDs = new Set(preliminary.map((entry) => entry.id));
-  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits]) {
+  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (catalogByID.has(id) && !preliminaryIDs.has(id)) {
       preliminary.push({ id, score: scores.get(id) || 0 });
@@ -2095,18 +2165,21 @@ export async function discoverRelevantEvidence({
   // source, while retaining the semantic lead, direct references and complete
   // sibling. This adds recall, never a determination of legal applicability.
   if (semanticHits.length && candidateLimit > 1 && !lead?.useSelectedPassageOnly) {
-    const reservation = strongCurrentLexicalReservation({ currentHits: currentPassageHits, detailed,
-      selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes });
+    const reservation = strongActionSubjectReservation({ probeHits: actionSubjectRecallHits, detailed,
+      selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes }) ||
+      strongCurrentLexicalReservation({ currentHits: currentPassageHits, detailed,
+        selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes });
     const replaceIndex = selectedCandidates.findLastIndex(item => item !== lead &&
       !item.directReference && !item.completeSiblingCompanionOf && !item.useSelectedPassageOnly);
     if (reservation && replaceIndex >= 0) {
       const id = comparableSectionID(reservation.hit.sectionID);
       reservation.item.indexedPassage = mergedIndexedPassages(reservation.hit, reservation.hit,
-        semanticHitsByID.get(id), currentPassageScores, currentQuestion);
+        semanticHitsByID.get(id), currentPassageScores, currentQuestion, reservation.actionSubject === true);
       reservation.item.passage = { text: reservation.item.indexedPassage.text,
         score: reservation.hit.score, blockID: reservation.item.indexedPassage.blockID };
       reservation.item.currentQuestionLexicalReservation = { rank: reservation.rank,
-        strength: Math.round(reservation.strength * 1000) / 1000 };
+        strength: Math.round(reservation.strength * 1000) / 1000,
+        ...(reservation.actionSubject ? { kind: "current_action_resolved_subject" } : {}) };
       const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference || item.completeSiblingCompanionOf);
       selectedCandidates = [...protectedItems, reservation.item, ...selectedCandidates.filter(item =>
         !protectedItems.includes(item) && item !== reservation.item)].slice(0, candidateLimit);

@@ -1,0 +1,30 @@
+{
+  "candidate": "v6",
+  "commit": "4d821677201e848a19df27e0691306511c259929",
+  "deploymentID": "dpl_DeRJNaG3C6mHsnzMRf5ZVk18UXZ7",
+  "deploymentHost": "permitext-sync-dcpgxo27g-randycodexs-projects-b72fc111.vercel.app",
+  "productionURL": "https://permitext.com",
+  "ready": true,
+  "identityVerified": true,
+  "healthVerified": true,
+  "privateVectorRouteHTTPStatus": 404,
+  "models": {
+    "writer": "gpt-6-luna",
+    "writerEffort": "low",
+    "verifier": "gpt-6-luna",
+    "verifierEffort": "medium",
+    "serviceTier": "priority"
+  },
+  "flags": {
+    "PERMITEXT_RESEARCH_PASSAGE_SEARCH": "1",
+    "PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL": "1",
+    "PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING": "1",
+    "PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES": "1",
+    "PERMITEXT_RESEARCH_SEMANTIC_SEARCH": "1"
+  },
+  "flagsPersistedInProjectEnvironment": false,
+  "answerAcceptance": "failed; 7 correct, 1 wrong, 1 withheld in nine targeted turns",
+  "verifiedAt": "2026-10-03T06:55:00.001548+00:00",
+  "estimatedProviderCostUSD": 0.128725,
+  "allOperationsSettled": true
+}

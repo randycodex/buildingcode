@@ -382,6 +382,27 @@ export function semanticResearchScenarioText(value) {
 function sourceSubject(value) {
   return text(value).replace(/^(?:SECTION\s+)?(?:(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*)?\d+(?:[-.]\d+)*\s*[:.]?\s*/i, "");
 }
+function subjectTermStem(value) {
+  const stem = value.replace(/ies$/, "y").replace(/(?:ing|age|s)$/, "").replace(/e$/, "");
+  return stem.length >= 3 ? stem : value;
+}
+function currentDetailSourceSubject(title, question, topics) {
+  // A heading can name the equipment while also naming the previous question's
+  // property. Keep that property only when the current question requests it.
+  // Extract only this unambiguous grammatical shape; never rebuild an old user
+  // scenario, measurements or an operative rule as subject context.
+  if (!/\bof\b/i.test(title)) return title;
+  const parts = title.replace(/\.$/, "").match(/^([^.!?:;]+)\s+of\s+([^.!?:;]+)$/i);
+  if (!parts || /\bof\b/i.test(parts[1]) || /\bof\b|\d/i.test(parts[2])) return "";
+  const property = [...terms(parts[1])].filter(term => !genericSubjectWords.has(term));
+  const subject = text(parts[2]);
+  const subjectTerms = [...terms(subject)].filter(term => !genericSubjectWords.has(term));
+  if (!property.length || !subjectTerms.length || parts[1].split(" ").length > 5 || subject.split(" ").length > 10) return "";
+  const activeTerms = new Set([...terms([question, ...topics].join(" "))].map(subjectTermStem));
+  if (!activeTerms.has(subjectTermStem(subjectTerms.at(-1)))) return "";
+  const currentTerms = new Set([...terms(question)].map(subjectTermStem));
+  return property.some(term => currentTerms.has(subjectTermStem(term))) ? title : subject;
+}
 function userSubject(value) {
   // User questions provide subject context, never source authority. Remove
   // old references, editions and measurements so they cannot answer the new
@@ -443,7 +464,11 @@ export function semanticResearchSubjectContext({ question, contextualTopics = []
   const titles = sources.map(source => sourceSubject(source.title)).filter(title =>
     [...terms(title)].some(term => !genericSubjectWords.has(term)))
     .filter((title, index, all) => all.findIndex(candidate => candidate.toLowerCase() === title.toLowerCase()) === index);
-  if (!returnToOriginal && !changedEdition && !correctedTopic && substantiveTerms.length >= 6 && titles.length) return titles.join("; ").slice(0, 140);
+  if (!returnToOriginal && !changedEdition && !correctedTopic && substantiveTerms.length >= 6 && titles.length) {
+    const subjects = titles.map(title => currentDetailSourceSubject(title, question, topics)).filter(Boolean)
+      .filter((subject, index, all) => all.findIndex(candidate => candidate.toLowerCase() === subject.toLowerCase()) === index);
+    return subjects.join("; ").slice(0, 140);
+  }
   // Generic section titles cannot supply a subject. Fall back only to active
   // user topics, never assistant text or the prior source's operative clauses.
   const chosen = returnToOriginal ? topics[0] : correctedTopic || topics.find(value => userSubject(value).length >= 12) || topics.at(-1);
