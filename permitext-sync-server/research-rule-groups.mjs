@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { researchCurrentRuleDetailScore } from './research-rule-packets.mjs';
 import { researchPassagesForSection } from './research-passage-index.mjs';
 
-export const researchRuleGroupVersion = '20261003-bounded-canonical-rule-groups-v1';
+export const researchRuleGroupVersion = '20261003-bounded-canonical-rule-groups-v2';
 const fields = ['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'];
 const identity = value => String(value?.sectionID || value?.id || '');
 const compact = value => String(value || '').replace(/\s+/g, ' ').trim();
@@ -44,6 +44,37 @@ export function nearestCompleteIndexedRuleGroup(canonical, primary, alternatives
     [...new Set([...(parent.contextTexts || []), parent.completeSubsectionText || parent.text].map(compact))]
       .join('\n\n').length <= maximumCharacters)
     .sort((left, right) => right.subsectionNumber.split('.').length - left.subsectionNumber.split('.').length)[0] || null;
+}
+
+// Search's small alternative pools are not a completeness inventory. A selected
+// responsive child can locate its nearest fitting parent in the same authorized
+// index, using the body discovery already read. This adds no source/read or legal
+// applicability claim; assembly still freshly binds the returned exact record.
+export function nominateNearestCompleteIndexedRuleGroup(candidate, index, question, { maximumCharacters = 12000 } = {}) {
+  const anchor = candidate?.section || candidate;
+  const primary = candidate?.indexedPassage;
+  const body = candidate?.body || anchor?.body;
+  const cap = Math.min(12000, Number(maximumCharacters));
+  if (!Number.isFinite(cap) || cap <= 0 || !index?.passagesByID?.get || !index?.sections?.get || !Array.isArray(index.passages) ||
+      !body?.blocks || candidate.useSelectedPassageOnly || candidate.signals?.useSelectedPassageOnly ||
+      candidate.contextualReference || candidate.contextualAuthorityReference || candidate.inheritedReference || candidate.inheritedAuthorityReference ||
+      anchor?.truncated || anchor?.researchClaimEligible === false || !primary?.id ||
+      researchCurrentRuleDetailScore(primary, question) < 2) return null;
+  const sectionID = String(candidate?.section ? identity(anchor) : candidate?.sectionID || '');
+  const registered = index.sections.get(sectionID);
+  const indexed = index.passagesByID.get(primary.id);
+  if (!registered || identity(registered) !== sectionID || !sameAuthority(anchor, registered) ||
+      !indexed || indexed.sectionID !== sectionID ||
+      ['text', 'subsectionNumber', 'sourceTextHash', 'scopeComplete'].some(key => primary[key] !== indexed[key]) ||
+      ['blockID', 'start', 'end'].some(key => primary.sourceOffsets?.[key] !== indexed.sourceOffsets?.[key]) ||
+      (primary.completeSubsectionText && primary.completeSubsectionText !== indexed.completeSubsectionText) ||
+      fields.some(key => (primary[key] && primary[key] !== registered[key]) ||
+        (indexed[key] && indexed[key] !== registered[key]))) return null;
+  const canonical = { ...registered, body, text: body.blocks.map(block => String(block.plainText || '')).join('\n\n') };
+  const parents = index.passages.filter(parent => parent.sectionID === sectionID &&
+    parent.kind === 'numbered_subsection' && index.passagesByID.get(parent.id) === parent &&
+    fields.every(key => !parent[key] || parent[key] === registered[key]));
+  return nearestCompleteIndexedRuleGroup(canonical, indexed, parents, cap, question);
 }
 
 export function canonicalRuleDelegatesToChildren(parent) {

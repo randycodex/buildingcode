@@ -5,9 +5,10 @@ import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 import { researchCurrentRuleDetailScore, researchCheckedRuleIndexPassage } from "./research-rule-packets.mjs";
 import { researchEmbeddedDefinitionCarrier } from "./research-definition-excerpts.mjs";
-import { nominateDelegatedRuleGroups } from "./research-rule-groups.mjs";
+import { nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
+import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-bounded-canonical-rule-groups-v55";
+export const evidenceDiscoveryVersion = "20261003-current-family-full-index-recall-v56";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -29,7 +30,7 @@ const conceptExpansions = [
     terms: ["slope", "sloping", "drainage", "piping", "horizontal"]
   },
   {
-    pattern: /\b(?:water|lavator\w*|shower\w*)\b[\s\S]*\btemperature\b|\btemperature\b[\s\S]*\b(?:water|lavator\w*|shower\w*)\b/i,
+    pattern: /\b(?:water|lavator\w*|shower\w*|faucet\w*|sink\w*)\b[\s\S]*\b(?:temperature|scald\w*)\b|\b(?:temperature|scald\w*)\b[\s\S]*\b(?:water|lavator\w*|shower\w*|faucet\w*|sink\w*)\b/i,
     terms: ["tempered", "thermostatic", "temperature"]
   },
   {
@@ -1858,16 +1859,18 @@ export async function discoverRelevantEvidence({
   const currentPassageScores = new Map(currentPassageHits.flatMap(hit =>
     (hit.passages || [hit]).map(passage => [passageIdentity(passage), passage.score])));
   // Keep a small literal foreground independently of expanded synonyms and
-  // mixed project context. It can reorder existing authorized candidates only;
-  // it cannot nominate new sources or replace a protected reference/companion.
+  // mixed project context. Filter its family shortlist before the cap; ordinary
+  // semantic/lexical recall remains cross-code. At most three complete sources
+  // can enter the existing shortlist, preserving every protected slot.
   const foregroundWords = rawTokens(currentQuestion).filter(word => word.length > 2 && /[a-z]/i.test(word) &&
     !stopWords.has(word) && !rankingBoilerplate.has(word) && !genericPassageHeadingWords.has(word) &&
     !["need", "needed", "project", "fictional", "scenario", "ground", "floor", "make"].includes(word));
   const foregroundWeights = new Map(foregroundWords.flatMap(word => [...singularForms(word)].map(form => [form, 1])));
+  const foregroundOverlapMinimum = Math.max(2, Math.ceil(new Set(foregroundWords).size / 4));
   const foregroundPrefixes = explicitDisciplinePrefixes.size ? explicitDisciplinePrefixes : disciplinePrefixes;
-  const foregroundHits = passageIndex && foregroundWeights.size >= 2
+  const foregroundHits = passageIndex && foregroundWeights.size >= 2 && foregroundPrefixes.size
     ? searchResearchPassages(passageIndex, currentQuestion, { queryWeights: foregroundWeights,
-      explicitReferenceQuery: currentQuestion, limit: 100, passagesPerSection: 8 })
+      explicitReferenceQuery: currentQuestion, limit: 5, passagesPerSection: 8, codePrefixes: foregroundPrefixes })
       .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID))
       .filter(hit => hit && foregroundPrefixes.has(hit.codePrefix)) : [];
   const activePacketHits = passageIndex && retrievalContext?.contextDependentFollowUp && !relevanceComparison
@@ -1934,11 +1937,13 @@ export async function discoverRelevantEvidence({
   // this nomination does not by itself admit a source to the final shortlist.
   const currentLexicalRecallHits = currentPassageHits.slice(0, 5).filter(hit =>
     completeIndexedScope(hit) && hit.score >= (currentPassageHits[0]?.score || Infinity) * 0.7);
-  for (const hit of [...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits]) {
+  const foregroundRecallHits = foregroundHits.filter(hit => completeIndexedScope(hit));
+  for (const hit of [...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits, ...foregroundRecallHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (!passageHitsByID.has(id)) passageHitsByID.set(id, hit);
     if (semanticHits.length && !fusedScores.has(id)) {
-      fusedScores.set(id, 4000 / (61 + (hit.probeRank ? hit.probeRank - 1 : currentPassageHits.indexOf(hit))));
+      const rank = hit.probeRank ? hit.probeRank - 1 : Math.max(0, currentPassageHits.indexOf(hit));
+      fusedScores.set(id, 4000 / (61 + rank));
     }
   }
   const scores = new Map();
@@ -2038,7 +2043,7 @@ export async function discoverRelevantEvidence({
   exactReferenceIDs.forEach((id) => scores.set(id, (scores.get(id) || 0) + 100));
   routesByID.forEach(({ score }, id) => scores.set(id, (scores.get(id) || 0) + score));
   headingScores.forEach((score, id) => scores.set(id, (scores.get(id) || 0) + score));
-  [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
+  [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits, ...foregroundRecallHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
     Math.max(scores.get(comparableSectionID(hit.sectionID)) || 0, hit.score * 3)));
 
   const preliminary = Array.from(scores, ([id, score]) => ({ id, score }))
@@ -2048,7 +2053,7 @@ export async function discoverRelevantEvidence({
   // term definitions even when a broad topic route fills the lexical shortlist.
   // Their complete text is never admitted automatically by this reservation.
   const preliminaryIDs = new Set(preliminary.map((entry) => entry.id));
-  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits]) {
+  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits, ...foregroundRecallHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (catalogByID.has(id) && !preliminaryIDs.has(id)) {
       preliminary.push({ id, score: scores.get(id) || 0 });
@@ -2294,14 +2299,18 @@ export async function discoverRelevantEvidence({
     const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference ||
       item.completeSiblingCompanionOf || item.currentQuestionLexicalReservation || item.useSelectedPassageOnly);
     const foreground = foregroundHits.slice(0, 5).flatMap((hit, rank) => {
-      const item = selectedCandidates.find(value => comparableSectionID(value.section.id) === comparableSectionID(hit.sectionID));
+      const item = detailed.find(value => comparableSectionID(value.section.id) === comparableSectionID(hit.sectionID));
       const words = new Set(rawTokens(hit.text).flatMap(word => [...singularForms(word)]));
-      const overlap = foregroundWords.filter(word => [...singularForms(word)].some(form => words.has(form))).length;
+      const overlap = [...new Set(foregroundWords)].filter(word => [...singularForms(word)].some(form => words.has(form))).length;
       if (!item || protectedItems.includes(item) || item.definitionCarrier || !foregroundPrefixes.has(item.section.codePrefix) ||
           item.contextualReference || item.inheritedReference || item.useSelectedPassageOnly ||
-          !completeIndexedScope(hit) || !completeIndexedScope(item.indexedPassage) || overlap < 2 ||
+          !completeIndexedScope(hit) || !completeIndexedScope(item.indexedPassage) || overlap < foregroundOverlapMinimum ||
           zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) < 1) return [];
       item.currentQuestionForeground = { rank: rank + 1, source: "literal_current_question" };
+      // Preserve the exact scope that qualified, not a semantic sibling.
+      item.indexedPassage = mergedIndexedPassages(hit, hit, semanticHitsByID.get(comparableSectionID(hit.sectionID)),
+        currentPassageScores, currentQuestion, true);
+      item.passage = { text: item.indexedPassage.text, score: hit.score, blockID: item.indexedPassage.blockID };
       return [item];
     }).slice(0, 3);
     selectedCandidates = [...protectedItems, ...foreground, ...selectedCandidates.filter(item =>
@@ -2325,6 +2334,13 @@ export async function discoverRelevantEvidence({
   // them for the chosen candidates, keeping all existing source-review checks.
   for (const [index, item] of [...selectedCandidates, ...supplementalDefinitions].entries()) {
     const { body, passage, section } = item;
+    // An enclosing rule can fall outside both ranked alternative pools. Obtain
+    // at most its nearest responsive complete scope from this same authorized
+    // index and already-read body; assembly must freshly bind and budget it.
+    const enclosingRule = item.indexedPassage && !item.useSelectedPassageOnly
+      ? nominateNearestCompleteIndexedRuleGroup(item, passageIndex, currentQuestion, { maximumCharacters: 12000 }) : null;
+    const indexedAlternatives = [...new Map([enclosingRule, ...(item.indexedPassage?.passages || [])]
+      .filter(Boolean).map(value => [passageIdentity(value), value])).values()].slice(0, 6);
     const richSources = structuredRichSources(body);
     item.sourceReviewRequirements = sourceReviewRequirements(body, passage, richSources);
     item.visualSources = [];
@@ -2385,7 +2401,7 @@ export async function discoverRelevantEvidence({
         completeSubsectionText: item.indexedPassage.completeSubsectionText,
         scopeComplete: item.indexedPassage.scopeComplete, sourceOffsets: item.indexedPassage.sourceOffsets,
         sourceTextHash: item.indexedPassage.sourceTextHash,
-        alternatives: (item.indexedPassage.passages || []).slice(0, 6).map(passage => ({
+        alternatives: indexedAlternatives.map(passage => ({
           id: passage.id, subsectionNumber: passage.subsectionNumber, text: passage.text,
           contextTexts: passage.contextTexts, completeSubsectionText: passage.completeSubsectionText,
           sourceOffsets: passage.sourceOffsets, sourceTextHash: passage.sourceTextHash,
@@ -2509,6 +2525,7 @@ export async function discoverRelevantEvidence({
     candidateState: "unreviewed",
     candidates: candidates.slice(0, candidateLimit),
     supplementalDefinitionCandidates: candidates.slice(candidateLimit),
+    chapterScopeCandidates: nominateResearchChapterScopeCandidates(candidates.slice(0, candidateLimit), sections, passageIndex),
     delegatingRuleGroups: nominateDelegatedRuleGroups(selectedCandidates.filter(item =>
       !explicitDisciplinePrefixes.size || explicitDisciplinePrefixes.has(item.section.codePrefix)), sections, passageIndex,
       currentQuestion, codeReferences),
