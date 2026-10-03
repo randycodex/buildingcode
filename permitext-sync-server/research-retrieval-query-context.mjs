@@ -70,7 +70,8 @@ function factPayload(value) {
     if (retained.length) payload += ` [${retained.join("; ")}]`;
   }
   const assertion = payload.split(/\s+\[/)[0];
-  const labeledFacets = match ? facetNames(match[1]) : [];
+  const labeledFacets = match ? facetNames(match[1]).filter(name => name !== "use" ||
+    !/\b(?:zoning districts?|commercial overlays?|special purpose|special districts?)\b/i.test(match[1])) : [];
   return { full, payload, assertion, label: match ? text(match[1]) : "", custom: /^(?:Unknown:\s*)?Custom Fact\s*—/i.test(main),
     value: match ? assertion.slice(assertion.indexOf(":") + 1).trim() : "",
     facets: labeledFacets.length ? labeledFacets : facetNames(assertion),
@@ -197,9 +198,97 @@ export function activeResearchRetrievalFacts({ question, contextualTopics = [], 
   }).map(fact => fact.full);
 }
 
-export function semanticResearchProjectFacts({ question, contextualTopics = [], projectFacts = [], maximumCharacters = 640 } = {}) {
+const contextBoilerplate = new Set([
+  "for", "from", "are", "has", "not", "only", "use", "using", "please", "cite", "governing", "section", "nyc",
+  "saved", "context", "scenario", "test", "research", "fictional", "hypothetical", "proposed", "enough", "dimensions", "access",
+  "keep", "same", "such", "much", "leave", "still", "explain", "answer", "question", "asks", "ask", "check"
+]);
+function contextTerms(value) { return new Set([...terms(value)].filter(term => !contextBoilerplate.has(term))); }
+function hypotheticalScopeRequested(value) {
+  return /\b(?:fictional|hypothetical|test|sample|example)\b[^.!?]{0,70}\b(?:scenario|premises|conditions|case|example)\b|\b(?:scenario|premises|conditions|case)\b[^.!?]{0,70}\b(?:fictional|hypothetical|test|sample|example)\b|\bsaved\b[^.!?]{0,60}\bexample\b/i.test(value);
+}
+function actualScopeRequested(value) {
+  return projectApplication(value) || /\b(?:actual|real|existing)\s+(?:project|building|property|conditions)\b/i.test(value) &&
+    !hypotheticalScopeRequested(value);
+}
+function contextScopeIntroduction(value) {
+  if (/^(?:fictional|hypothetical|(?:research )?test (?:scenario|case)|(?:for )?(?:the )?(?:alternative|sample|example) (?:scenario|case)|suppose|assume|assuming|what if)\b/i.test(value)) return "hypothetical";
+  if (/^(?:existing[- ]property records?|actual (?:project|building)|real project|(?:sourced|public) project background|proposed (?:project|building))\b/i.test(value)) return "project";
+  return null;
+}
+function contextualFactStatements(fact) {
+  // Structured fields remain atomic: slicing them could detach an exception or
+  // a label from its value. Long descriptions may contain several separate
+  // subjects and explicitly named scopes. Select whole statements, carrying
+  // the scope introduction verbatim instead of promoting a test to a fact.
+  const prefix = fact.payload.match(/^Additional Project facts\s*\([^)]*\):\s*/i)?.[0] || "";
+  const description = prefix ? fact.payload.slice(prefix.length) : fact.payload;
+  if (fact.label || fact.payload.length <= 640) return [{ ...fact, scope: contextScopeIntroduction(description) }];
+  const rawSentences = description.split(/(?<=[.!?])\s+(?=[A-Z0-9“‘"'])/).map(text).filter(Boolean);
+  if (rawSentences.length < 2) return [{ ...fact, scope: contextScopeIntroduction(description) }];
+  const sentences = [];
+  for (const sentence of rawSentences) {
+    // These describe how to use the saved scenarios, not an equipment/site
+    // condition. Their scope instruction is preserved by the named envelope;
+    // the complete original wording remains available to generation.
+    if (/^(?:Use these (?:fictional|hypothetical|test|example) (?:premises|assumptions)|Keep (?:real|actual) project facts|Any corrected test value)\b/i.test(sentence)) continue;
+    // Conditions, exceptions, pronouns and attribution belong to the preceding
+    // assertion. Never cut a negative qualification off a selected assertion.
+    if (sentences.length && /^(?:source\s*:|(?:except|unless|however|but|only|provided|otherwise|if|when|this|these|those|it|they|that|no|none|keep|use)\b)/i.test(sentence)) {
+      sentences[sentences.length - 1] += ` ${sentence}`;
+    } else sentences.push(sentence);
+  }
+  let scope = null;
+  let anchor = "";
+  return sentences.map(sentence => {
+    // Further "assume" statements in an explicit scenario inherit its named
+    // scope; they do not replace it with an unrelated quantified condition.
+    const introduced = scope === "hypothetical" && /^(?:assume|assuming|suppose)\b/i.test(sentence)
+      ? null : contextScopeIntroduction(sentence);
+    const header = introduced && sentence.match(/^([^:]{1,300}:)\s*(?=(?:assume|suppose|assuming|consider)\b)/i)?.[1];
+    if (introduced) { scope = introduced; anchor = header || sentence; }
+    const assertion = header ? sentence.slice(header.length).trim() : sentence;
+    const scoped = anchor && assertion !== anchor ? `${anchor} ${assertion}` : assertion;
+    return { ...fact, payload: `${prefix}${scoped}`, assertion, facets: facetNames(assertion), scope,
+      scopeAnchor: anchor, scopeIntroduction: Boolean(introduced), descriptionStatement: true };
+  });
+}
+
+function shadowedDescriptionStatements(facts, topics) {
+  const shadowed = new Set();
+  const measurementWords = value => fieldWords(value).map(word =>
+    ({ wide: "width", widened: "width", narrow: "width", narrowed: "width", high: "height", deep: "depth", long: "length" })[word] || word);
+  const heads = new Set([...measurementHeads, "clearance"]);
+  for (const topic of topics) {
+    const scenario = /\b(?:what if|suppose|supposing|assume|assuming|hypothetically|hypothetical|fictional|instead|rather than)\b/i.test(topic);
+    for (const clause of topic.split(/[;!?]|\.(?=\s|$)|\s+(?:and|but|while)\s+/i).map(text).filter(Boolean)) {
+      const descriptiveChange = scenario && (/\b(?:we|I|the|this|it)\b[\s\S]*\b(?:widened|narrowed|raised|lowered|revised|correct(?:ed)?|keep)\b/i.test(clause) ||
+        /^keep\s+(?:the|our|this)\b/i.test(clause)) &&
+        !/^(?:is|are|can|could|would|should|does|do|what|which|how|why|whether)\b/i.test(clause);
+      if ((!suppliedFieldClause(clause, scenario) && !descriptiveChange) || !suppliedQuantity.test(clause)) continue;
+      const words = new Set(measurementWords(clause));
+      const attributes = [...words].filter(word => heads.has(word));
+      if (!attributes.length) continue;
+      const candidates = facts.filter(fact => fact.descriptionStatement && suppliedQuantity.test(fact.assertion)).flatMap(fact => {
+        const factWords = measurementWords(fact.assertion);
+        if (!attributes.some(word => factWords.includes(word)) || conflictingFieldQualifier(factWords, words)) return [];
+        const identity = factWords.filter(word => words.has(word) && !valueBoilerplate.has(word) && !heads.has(word));
+        if (!identity.length) return [];
+        return [{ fact, score: new Set(identity).size }];
+      });
+      const best = Math.max(0, ...candidates.map(candidate => candidate.score));
+      const matches = candidates.filter(candidate => candidate.score === best);
+      if (matches.length === 1) shadowed.add(matches[0].fact);
+    }
+  }
+  return shadowed;
+}
+
+export function relevantResearchRetrievalFactContext({ question, contextualTopics = [], projectFacts = [],
+  maximumCharacters = 640, queryMode = "semantic" } = {}) {
   const subject = currentTopics(question, contextualTopics).join(" ");
-  const questionTerms = terms(subject);
+  const currentTerms = contextTerms(question);
+  const questionTerms = currentTerms.size >= 3 ? currentTerms : contextTerms(subject);
   const relevant = new Set();
   const zoning = /\b(?:zoning|district|FAR|floor area ratio|parking|setback|yards?|lot coverage|lot|permitted use|use permitted|development rights?|frontage|transparency|streetscape|street[- ]wall|glazing)\b/i.test(subject);
   if (zoning) for (const name of ["district", "use", "work", "lot"]) relevant.add(name);
@@ -210,27 +299,65 @@ export function semanticResearchProjectFacts({ question, contextualTopics = [], 
   if (/\b(?:area|FAR|coverage|square feet|sq\s*ft)\b/i.test(subject)) relevant.add("area");
   if (/\b(?:flood|waterfront|sidewalk|grade|elevation)\b/i.test(subject)) relevant.add("flood");
   if (/\b(?:construction type|fire[- ]rat(?:ing|ed)|fire[- ]resistan)\b/i.test(subject)) relevant.add("protection");
-  const ranked = activeResearchRetrievalFacts({ question, contextualTopics, projectFacts }).map(factPayload)
-    .filter(fact => !fact.unknown)
+  const originalFacts = (Array.isArray(projectFacts) ? projectFacts : []).map(factPayload);
+  const activeFields = activeResearchRetrievalFacts({ question, contextualTopics,
+    projectFacts: originalFacts.filter(fact => fact.label).map(fact => fact.full) }).map(factPayload);
+  const topics = currentTopics(question, contextualTopics);
+  const applicationIndex = topics.findIndex(projectApplication);
+  const overrideTopics = applicationIndex < 0 ? topics : topics.slice(0, applicationIndex + 1);
+  const overridden = new Set(overrideTopics.flatMap(value => [...overrideFacets(value)]));
+  const descriptions = originalFacts.filter(fact => !fact.label && !fact.unknown &&
+    !/\brejected; excluded from active Research\b/i.test(fact.full)).flatMap(contextualFactStatements);
+  const shadows = shadowedDescriptionStatements(descriptions, overrideTopics);
+  const statementFacts = [...activeFields.filter(fact => !fact.unknown).flatMap(contextualFactStatements),
+    ...descriptions.filter(fact => !shadows.has(fact) && !fact.facets.some(name => overridden.has(name)))];
+  // An explicitly requested saved hypothetical must not silently use actual
+  // inventory from the same description. A clear actual return drops the test.
+  const latestScope = currentTopics(question, contextualTopics).find(value => hypotheticalScopeRequested(value) || actualScopeRequested(value));
+  const hypothetical = latestScope && hypotheticalScopeRequested(latestScope) && statementFacts.some(fact => fact.scope === "hypothetical");
+  const scopeAnchors = [...new Set(statementFacts.filter(fact => fact.scope === "hypothetical").map(fact => fact.scopeAnchor || fact.assertion))];
+  const namedScopes = scopeAnchors.filter(anchor => {
+    const name = anchor.match(/\b(?:scenario|case)\s+([A-Za-z0-9-]+)\s*[:—-]/i)?.[1];
+    return name && new RegExp(`\\b(?:scenario|case)\\s+${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(subject);
+  });
+  const selectedScope = scopeAnchors.length > 1 ? namedScopes.length === 1 ? namedScopes[0] : null : scopeAnchors[0];
+  const ranked = statementFacts.filter(fact => hypothetical ? fact.scope === "hypothetical" &&
+      (scopeAnchors.length <= 1 || (fact.scopeAnchor || fact.assertion) === selectedScope) : fact.scope !== "hypothetical")
     .map((fact, index) => {
-      const overlap = [...terms(fact.assertion)].filter(term => questionTerms.has(term)).length;
+      const overlap = [...contextTerms(fact.assertion)].filter(term => questionTerms.has(term)).length;
       const facetMatches = fact.facets.filter(name => relevant.has(name)).length;
-      return { ...fact, index, score: facetMatches * 10 + overlap };
-    }).filter(fact => fact.score > 0 && !/\b(?:address|borough|BBL|ZIP code|community district|zoning map)\s*:/i.test(fact.payload))
+      const lexicalIdentity = queryMode === "lexical" && zoning && /\b(?:address|borough|BBL|ZIP code|community district|zoning map)\s*:/i.test(fact.payload);
+      // A description's broad use/fire facet alone cannot nominate unrelated
+      // prose. Within a requested scope, the first statement carries premises
+      // (and remains attached to every selected subordinate statement).
+      const substantive = overlap > 0 || hypothetical && fact.scopeIntroduction;
+      return { ...fact, index, score: fact.descriptionStatement && !substantive ? 0 : facetMatches * 10 + overlap * 4 + (lexicalIdentity ? 1 : 0) };
+    }).filter(fact => fact.score > 0 && (queryMode === "lexical" && zoning ||
+      !/\b(?:address|borough|BBL|ZIP code|community district|zoning map)\s*:/i.test(fact.payload)))
     .sort((left, right) => right.score - left.score || left.index - right.index);
   const selected = [];
   let used = 0;
-  const budget = Math.max(0, Math.min(640, Math.floor(Number(maximumCharacters) || 0)));
+  const budget = Math.max(0, Math.min(4_000, Math.floor(Number(maximumCharacters) || 0)));
   for (const fact of ranked) {
-    const cost = fact.payload.length + (selected.length ? 2 : 0);
-    // Include whole statements, including their negation and scope. A long
-    // fact that does not fit remains available to generation, not sliced here.
-    if (used + cost > budget) continue;
-    selected.push(fact.payload);
-    used += cost;
+    // Scope introductions may be shared by two selected complete sentences.
+    // Deduplicate the introduction without removing it from the final context.
+    let payload = fact.payload;
+    if (fact.scopeAnchor && selected.some(value => value.includes(fact.scopeAnchor))) {
+      const prefix = fact.payload.match(/^Additional Project facts\s*\([^)]*\):\s*/i)?.[0] || "";
+      payload = `${prefix}${fact.assertion}`;
+    }
+    const statementCost = payload.length + (selected.length ? 2 : 0);
+    if (used + statementCost > budget) continue;
+    selected.push(payload);
+    used += statementCost;
     if (selected.length === 5) break;
   }
   return selected.join("; ");
+}
+
+export function semanticResearchProjectFacts(options = {}) {
+  return relevantResearchRetrievalFactContext({ ...options, queryMode: "semantic",
+    maximumCharacters: Math.max(0, Math.min(640, Math.floor(Number(options.maximumCharacters ?? 640) || 0))) });
 }
 
 export function semanticResearchScenarioText(value) {

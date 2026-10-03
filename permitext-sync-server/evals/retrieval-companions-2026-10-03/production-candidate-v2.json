@@ -1,0 +1,68 @@
+{
+  "observedAt": "2026-10-03T04:48:30Z",
+  "surface": "Authenticated production in-app browser",
+  "url": "https://permitext.com/workspace#cq/project/web-project-mufm8lot",
+  "gitCommit": "a7601bbd692cd02bf9f8de1f5290289fc0e76d5b",
+  "deploymentID": "dpl_8x5As9RCkTx8vz7myFk92fK4dtrN",
+  "case": {
+    "id": "hosted-candidate-v2-rooftop-1",
+    "question": "For the fictional Research test scenario saved in this project's context, is the proposed rooftop clear path wide enough for firefighter access? Please use the saved dimensions and cite the governing NYC Fire Code section.",
+    "displayedSeconds": 57,
+    "answer": "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+    "outcome": "withheld; failed hosted acceptance"
+  },
+  "runtimeOperation": {
+    "event": "research_operation_accounting",
+    "operationID": "81e6b8e2-677e-4386-b17d-5d555acbbbd8",
+    "status": "completed",
+    "charged": false,
+    "failureCode": "RESEARCH_VERIFICATION_FAILED",
+    "providerRequestCount": 6,
+    "pendingProviderRequestCount": 0,
+    "embeddingProviderRequestCount": 2,
+    "embeddingPendingProviderRequestCount": 0,
+    "embeddingInputTokens": 171,
+    "semanticSearch": {
+      "status": "complete",
+      "enabled": true,
+      "fallbackReason": null,
+      "queryCached": false,
+      "hitCount": 100,
+      "coveredPassages": 52946,
+      "totalPassages": 52946
+    },
+    "estimatedProviderCostUSD": 0.027499,
+    "conservativeProviderCostUSD": 0.054938,
+    "durationMilliseconds": 58076,
+    "preparationMilliseconds": 61,
+    "retrievalMilliseconds": 25498,
+    "projectLinked": true,
+    "projectFactCount": 33,
+    "establishedConversationFactCount": 0,
+    "evidenceReferences": [
+      "ZR 12-10",
+      "FC 504",
+      "FC 414",
+      "ZR 35-812",
+      "BC 705.12.1.1",
+      "FC 404",
+      "BC 705.12.2",
+      "ZR 62-931",
+      "FC 105",
+      "ZR 74-943",
+      "FC 502",
+      "ZR 23-732",
+      "ZR 74-944",
+      "ZR 74-945",
+      "ZR 74-946",
+      "BC 102.1"
+    ],
+    "evidenceCharacterCount": 35236,
+    "verificationIssueTypes": [
+      "incorrect_citation"
+    ],
+    "requestTimestamp": 1791002846547,
+    "deploymentID": "dpl_8x5As9RCkTx8vz7myFk92fK4dtrN"
+  },
+  "diagnosis": "Exact offline replay reproduced two embeddings and 171 input tokens. The semantic query skipped the long saved context, supplied unrelated occupancy/overlay/waterfront facts, and FC 504.1 replaced a pool of more relevant rooftop children. The cited packet lacked the decisive rooftop width rule. No incorrect numerical answer was delivered; verification blocked the draft."
+}

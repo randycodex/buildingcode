@@ -3,7 +3,7 @@ import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-complete-sibling-discovery-v46";
+export const evidenceDiscoveryVersion = "20261003-current-detail-child-discovery-v47";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1576,7 +1576,8 @@ function authorizedIndexedHit(hit, passageIndex, catalogByID) {
     // from its authorized catalog instead of changing prepared embedding input.
     // A supplied conflicting jurisdiction is rejected, never overwritten.
     if (section.jurisdiction && passage.jurisdiction && passage.jurisdiction !== section.jurisdiction) return null;
-    return { ...passage, jurisdiction: section.jurisdiction || passage.jurisdiction || null };
+    return { ...passage, passageTitle: canonical.passageTitle,
+      jurisdiction: section.jurisdiction || passage.jurisdiction || null };
   };
   const primary = bind(hit);
   return primary ? { ...primary, passages: (hit.passages || [hit]).map(bind).filter(Boolean) } : null;
@@ -1600,7 +1601,40 @@ function completeSibling(primary, pool, preferSemantic = false) {
       (left.lexicalRank ?? Infinity) - (right.lexicalRank ?? Infinity) || left.id.localeCompare(right.id))[0] || null;
 }
 
-function mergedIndexedPassages(primary, lexical, semantic, currentScores) {
+const genericPassageHeadingWords = new Set([
+  "general", "requirements", "requirement", "provisions", "provision", "minimum", "maximum",
+  "reserved", "definitions", "definition", "scope", "section", "code", "access"
+]);
+
+function indexedHeadingDetail(passage, questionTerms) {
+  // The containing chapter title is shared by unrelated children. Only the
+  // canonical child's own heading can protect literal current-question detail.
+  const heading = String(passage.passageTitle || "").replace(/^\s*(?:[A-Z]+\s+)?\d+(?:[-.]\d+)*\s*[:.]?\s*/, "");
+  const terms = [...new Set(rawTokens(heading).filter(term => term.length > 2 &&
+    /[a-z]/i.test(term) && !stopWords.has(term) && !genericPassageHeadingWords.has(term)))];
+  const matched = terms.filter(term => [...singularForms(term)].some(form => questionTerms.has(form))).length;
+  return { matched, coverage: matched / Math.max(1, terms.length) };
+}
+
+function currentDetailIndexedPrimary(primary, pool, currentQuestion) {
+  const questionTerms = new Set(rawTokens(currentQuestion).flatMap(term => [...singularForms(term)]));
+  const primaryDetail = indexedHeadingDetail(primary, questionTerms);
+  const stronger = pool.map(passage => ({ passage, detail: indexedHeadingDetail(passage, questionTerms) }))
+    .filter(({ passage, detail }) => passageIdentity(passage) !== passageIdentity(primary) &&
+      sameSiblingAuthority(primary, passage) && completeIndexedScope(passage) &&
+      passage.currentQuestionScore > 0 && detail.matched >= 2 &&
+      (detail.matched > primaryDetail.matched ||
+        (detail.matched === primaryDetail.matched && detail.coverage > primaryDetail.coverage)))
+    .sort((left, right) => right.detail.matched - left.detail.matched ||
+      right.detail.coverage - left.detail.coverage ||
+      right.passage.currentQuestionScore - left.passage.currentQuestionScore ||
+      (left.passage.semanticRank ?? Infinity) - (right.passage.semanticRank ?? Infinity) ||
+      (left.passage.lexicalRank ?? Infinity) - (right.passage.lexicalRank ?? Infinity) ||
+      left.passage.id.localeCompare(right.passage.id));
+  return stronger[0]?.passage || primary;
+}
+
+function mergedIndexedPassages(primary, lexical, semantic, currentScores, currentQuestion) {
   const pool = new Map();
   for (const [method, hit] of [["lexical", lexical], ["semantic", semantic]]) {
     for (const [rank, passage] of (hit?.passages || (hit ? [hit] : [])).entries()) {
@@ -1612,8 +1646,14 @@ function mergedIndexedPassages(primary, lexical, semantic, currentScores) {
     }
   }
   const merged = [...pool.values()];
-  const companion = completeSibling(primary, merged);
-  return { ...primary, passages: merged, ...(companion ? { companion } : {}) };
+  // Meaning search supplies recall when a user does not use the code's words.
+  // It must not replace a complete, more specific literal child already in the
+  // same authorized pool with a generic sibling merely because that sibling
+  // repeats the containing chapter title or unrelated project context.
+  const selected = semantic && !primary.exactReference
+    ? currentDetailIndexedPrimary(primary, merged, currentQuestion) : primary;
+  const companion = completeSibling(selected, merged);
+  return { ...selected, passages: merged, ...(companion ? { companion } : {}) };
 }
 
 export async function discoverRelevantEvidence({
@@ -1725,7 +1765,7 @@ export async function discoverRelevantEvidence({
   const semanticHitsByID = new Map(semanticHits.map(hit => [comparableSectionID(hit.sectionID), hit]));
   for (const [id, primary] of passageHitsByID) {
     passageHitsByID.set(id, mergedIndexedPassages(primary, lexicalHitsByID.get(id),
-      semanticHitsByID.get(id), currentPassageScores));
+      semanticHitsByID.get(id), currentPassageScores, currentQuestion));
   }
   const scores = new Map();
   const matchedTermsByID = new Map();

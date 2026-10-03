@@ -1,0 +1,1 @@
+Candidate v3 was frozen before the exact cached-query replay completed and was never deployed. The replay exposed a short-follow-up heading-selection regression and missing same-chapter referenced scope. The source was corrected afterward; a new v4 freeze will govern the next release. Preserve v3 as an unshipped checkpoint, not an acceptance result.

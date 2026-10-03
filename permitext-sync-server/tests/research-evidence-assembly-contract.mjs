@@ -473,11 +473,8 @@ const zoningFactAfterBuildingFacts = researchEvidenceRetrievalQuery({
 assert.equal(zoningFactAfterBuildingFacts.projectFactsApplied, true);
 assert.match(zoningFactAfterBuildingFacts.retrievalQuery, /Zoning District\(s\): R7A/);
 assert.match(zoningFactAfterBuildingFacts.retrievalQuery, /Zoning Map: 3b/);
-assert(
-  zoningFactAfterBuildingFacts.retrievalQuery.indexOf("Zoning District(s): R7A") <
-    zoningFactAfterBuildingFacts.retrievalQuery.indexOf("Building detail 1"),
-  "Question-relevant Zoning facts must be inserted before unrelated building facts can consume the retrieval limit."
-);
+assert.doesNotMatch(zoningFactAfterBuildingFacts.retrievalQuery, /Building detail \d/,
+  "Unrelated inventory must not consume the query budget or dilute a zoning search.");
 
 assert.equal(researchEvidenceAssemblyLimits.maximumCandidates, 12);
 assert.equal(researchEvidenceAssemblyLimits.maximumDiscovered, 10);

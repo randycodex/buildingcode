@@ -21,11 +21,11 @@ import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import {
-  activeResearchRetrievalFacts, semanticResearchProjectFacts,
+  semanticResearchProjectFacts, relevantResearchRetrievalFactContext,
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-complete-sibling-context-v55";
+export const researchEvidenceAssemblyVersion = "20261003-bound-subsection-dependencies-v57";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -204,43 +204,6 @@ function previousConversationTopic(messages) {
   return "";
 }
 
-function projectFactsForRetrieval(question, projectFacts) {
-  const values = (Array.isArray(projectFacts) ? projectFacts : []).map(fact => compactText(fact));
-  if (!/\b(?:transparency|streetscape|street[- ]wall|storefront glazing)\b/i.test(question)) return values;
-  // The complete, attributed facts still go to generation and verification.
-  // A query needs only the facts relevant to this topic: unrelated inventory
-  // fields must not act as explicit requests for their named code provisions.
-  return values.filter(fact => /\b(?:address|borough|BBL|block|tax lots?|zoning districts?|commercial overlays?|special purpose|zoning map|lot width|project (?:scope|phase)|work type|scope of work|new building|development|enlargement|alteration|change of use|proposed|frontage|ground[- ]floor|retail|community facility|residential|flood|sidewalk|grade)\b/i.test(
-    fact.split(/Original user\/source wording:/i)[0]
-  ));
-}
-
-function prioritizedProjectFacts(question, projectFacts) {
-  const values = (Array.isArray(projectFacts) ? projectFacts : [])
-    .map((fact) => compactText(fact))
-    .filter(Boolean);
-  const normalizedQuestion = compactText(question).toLowerCase();
-  const questionTerms = new Set(
-    normalizedQuestion.match(/[a-z0-9][a-z0-9-]{2,}/g) || []
-  );
-  const zoningQuestion = /\b(?:zoning|district|far|floor area ratio|parking|setback|yard|lot coverage|permitted use|use permitted|development rights?)\b/i.test(normalizedQuestion);
-  const constructionQuestion = /\b(?:building code|construction|occupancy|egress|travel distance|plumbing|fixture|sprinkler|fire code)\b/i.test(normalizedQuestion);
-  return values
-    .map((text, index) => {
-      const normalizedFact = text.toLowerCase();
-      let score = 0;
-      if (zoningQuestion && /^zoning fact\s+—/i.test(text)) score += 1_000;
-      if (constructionQuestion && /^building\s*\/\s*code fact\s+—/i.test(text)) score += 1_000;
-      for (const term of questionTerms) {
-        if (normalizedFact.includes(term)) score += 10;
-      }
-      if (/\b(?:address|borough|bbl|block|tax lot|community district)\b/i.test(text)) score += 2;
-      return { text, index, score };
-    })
-    .sort((left, right) => right.score - left.score || left.index - right.index)
-    .map(({ text }) => text);
-}
-
 // An explicit request to discuss the rule independently of the saved project
 // persists only through the topics the conversation resolver actually retains.
 function excludesSavedProjectFacts(question, contextualTopics) {
@@ -313,10 +276,6 @@ export function researchEvidenceRetrievalQuery({
   ) {
     contextualTopics.push({ label: "Previous topic", text: immediateTopic });
   }
-  const activeProjectFacts = activeResearchRetrievalFacts({ question: normalizedQuestion, contextualTopics, projectFacts });
-  const factContext = prioritizedProjectFacts(normalizedQuestion, projectFactsForRetrieval(
-    `${normalizedQuestion} ${contextualTopics.map(context => context.text).join(" ")}`, activeProjectFacts))
-    .slice(0, 30).join("; ").slice(0, 4_000);
   if (contextualTopics.length) {
     const followUpPrefix = "Follow-up: ";
     let contextualQuery = `${followUpPrefix}${normalizedQuestion}`;
@@ -368,11 +327,15 @@ export function researchEvidenceRetrievalQuery({
       maximumCharacters: maximumQueryCharacters - semanticQuery.length - semanticFactPrefix.length });
   if (semanticFactContext) semanticQuery += `${semanticFactPrefix}${semanticFactContext}`;
   let projectFactsApplied = false;
-  if (factContext && !excludesSavedProjectFacts(normalizedQuestion, contextualTopics)) {
+  if (!excludesSavedProjectFacts(normalizedQuestion, contextualTopics)) {
     const factsPrefix = "\nProject facts: ";
     const availableFactCharacters = maximumQueryCharacters - retrievalQuery.length - factsPrefix.length;
-    if (availableFactCharacters > 0) {
-      retrievalQuery += `${factsPrefix}${factContext.slice(0, availableFactCharacters)}`;
+    const factContext = relevantResearchRetrievalFactContext({ question: normalizedQuestion,
+      contextualTopics, projectFacts, maximumCharacters: availableFactCharacters, queryMode: "lexical" });
+    if (factContext) {
+      // The selector returns complete assertions with their original scope.
+      // Never cut a negation, scenario qualifier or measurement mid-statement.
+      retrievalQuery += `${factsPrefix}${factContext}`;
       projectFactsApplied = true;
     }
   }
@@ -890,6 +853,67 @@ function canonicalIndexedPassage(value, candidate, allowance, question = "") {
         selected = combined;
         companions.push({ id: companion.id, subsectionNumber: companion.subsectionNumber,
           sourceTextHash: companion.sourceTextHash, sourceOffsets: companion.sourceOffsets, completeSubsection: true });
+      }
+    }
+    // Embedded chapters can resolve a direct child reference back to the same
+    // catalog section, which the outer cross-reference queue has already seen.
+    // Retain one responsive, complete referenced child from the existing bound
+    // pool. This is source context, not a finding that the child governs.
+    if (selected !== fullText && candidate?.signals?.useSelectedPassageOnly !== true) {
+      const referenced = new Set(extractResearchCodeReferences(selected)
+        .filter(reference => reference.referenceKind === "section" &&
+          (!reference.codePrefix || reference.codePrefix === candidate.codePrefix))
+        .map(reference => reference.sectionNumber));
+      const bound = entry => valid(entry) &&
+        String(entry.sectionID) === String(candidate.sectionID || candidate.id) &&
+        ["codePrefix", "corpusID", "codeVersion", "codeEdition"].every(key =>
+          entry[key] && entry[key] === candidate[key] && (!value[key] || entry[key] === value[key])) &&
+        // Index v2 omits jurisdiction. An absent label inherits the registered
+        // catalog identity; a conflicting supplied jurisdiction is rejected.
+        Boolean(candidate.jurisdiction && (!value.jurisdiction || candidate.jurisdiction === value.jurisdiction) &&
+          (!entry.jurisdiction || entry.jurisdiction === candidate.jurisdiction));
+      const delivered = new Set([item.id, ...companions.map(entry => entry.id)]);
+      const genericDetailWords = new Set([...questionSpecificIgnoredTerms, "section", "code", "general",
+        "access", "requirements", "requirement", "provisions", "provision", "minimum", "maximum"]);
+      const detailWords = text => new Set((String(text).toLowerCase().match(/[a-z]{3,}/g) || [])
+        .filter(word => !genericDetailWords.has(word)).flatMap(word => [word,
+          ...(word.endsWith("s") && !word.endsWith("ss") ? [word.slice(0, -1)] : []),
+          ...(word.length > 5 && word.endsWith("ing") ? [word.slice(0, -3), `${word.slice(0, -3)}e`] : [])]));
+      const currentDetailWords = detailWords(question);
+      const matchDetail = text => {
+        const words = detailWords(text);
+        return [...currentDetailWords].filter(word => words.has(word)).length;
+      };
+      const sourcePool = [...(passage.alternatives || []), ...(passage.sameSectionReferences || []),
+        ...(item.sameSectionReferences || []),
+        ...(companions.some(entry => entry.id === passage.companion?.id)
+          ? passage.companion.sameSectionReferences || [] : [])];
+      const dependencies = [...new Map(sourcePool
+        .filter(entry => !delivered.has(entry.id) && referenced.has(entry.subsectionNumber) && bound(entry) &&
+          (entry.scopeComplete === true || entry.completeSubsectionText))
+        .map(entry => [entry.id, entry])).values()]
+        .map(entry => ({ entry, slices: [...(entry.contextTexts || []), entry.completeSubsectionText || entry.text]
+          .map(compactText).filter(Boolean) }))
+        .filter(dependency => dependency.slices.length && dependency.slices.every(text =>
+          containmentText.includes(text.replace(/\s+/g, " "))))
+        .map(dependency => ({ ...dependency,
+          // A referenced child's exact source heading owns its detail. Repeated
+          // parent context cannot outrank a pipe/valve/etc. named by the user.
+          headingMatches: matchDetail(String(dependency.entry.text).split(/\r?\n/, 1)[0]),
+          ownMatches: matchDetail(dependency.entry.text),
+          matches: terms.filter(term => dependency.slices.join(" ").toLowerCase().includes(term)).length }))
+        .filter(dependency => dependency.matches > 0 || dependency.ownMatches > 0)
+        .sort((left, right) => right.headingMatches - left.headingMatches ||
+          right.ownMatches - left.ownMatches || right.matches - left.matches ||
+          left.entry.subsectionNumber.localeCompare(right.entry.subsectionNumber, undefined, { numeric: true }));
+      for (const dependency of dependencies) {
+        const combined = [selected, ...dependency.slices.filter(text => !selected.includes(text))].join("\n\n");
+        if (combined.length > allowance) continue;
+        selected = combined;
+        companions.push({ id: dependency.entry.id, subsectionNumber: dependency.entry.subsectionNumber,
+          sourceTextHash: dependency.entry.sourceTextHash, sourceOffsets: dependency.entry.sourceOffsets,
+          relationship: "same_section_reference", completeSubsection: true });
+        break;
       }
     }
     return { text: selected, id: item.id, subsectionNumber: item.subsectionNumber,

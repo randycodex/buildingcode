@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { researchEvidenceRetrievalQuery, researchEvidenceStrategyForTurn } from "../research-evidence-assembly.mjs";
 import { projectFactProjection } from "../project-fact-projection.mjs";
-import { activeResearchRetrievalFacts, semanticResearchProjectFacts } from "../research-retrieval-query-context.mjs";
+import { activeResearchRetrievalFacts, semanticResearchProjectFacts, relevantResearchRetrievalFactContext } from "../research-retrieval-query-context.mjs";
 
 globalThis.fetch = () => { throw new Error("Network/provider calls forbidden in semantic-query context contract."); };
 const facts = projectFactProjection({ structuredFacts: [
@@ -260,3 +260,129 @@ assert.equal(researchEvidenceStrategyForTurn({ question: selectedQuestion, pinne
   "question_explicitly_bounded_to_selected_evidence");
 assert.deepEqual(facts, snapshot, "Query projection must not change stored facts.");
 console.log("Semantic-query context passed: bounded relevant facts, labeled custom corrections/counts, separate field subjects, qualifiers, active hypotheses and actual resets, inventory scope, generic-title subject recovery, explicit topic/family/edition precedence and no prior answer reuse; no API calls.");
+
+// Regression input is the 33 visible production fields, projected with explicit
+// reconstructed metadata. This proves query selection, not hidden account state
+// or correctness of a legal answer. The fictional values are test assumptions.
+const visibleProductionFacts = [
+  "Building / Code Fact — Occupancy: Proposed mixed-use: residential, retail and community facility; formal groups TBD (user-stated; not independently verified; preserve the stated negation, scope and uncertainty).",
+  "Building / Code Fact — Stories Above Grade: 1 (sourced data; verify current official records; existing-property record; does not describe the proposed building or work).",
+  "Building / Code Fact — Project Status: Schematic design (user-described) (user-stated; not independently verified).",
+  "Building / Code Fact — Work / Filing Type: Proposed new building / development (user-described); filing basis unconfirmed (user-stated; not independently verified; preserve the stated negation, scope and uncertainty).",
+  "Building / Code Fact — Building Area: 22,438 sq ft (sourced data; verify current official records; existing-property record; does not describe the proposed building or work).",
+  "Building / Code Fact — Number of Buildings: 1 (sourced data; verify current official records; existing-property record; does not describe the proposed building or work).",
+  "Building / Code Fact — Residential Units: 0 (sourced data; verify current official records; existing-property record; does not describe the proposed building or work).",
+  "Building / Code Fact — Total Units: 1 (sourced data; verify current official records; existing-property record; does not describe the proposed building or work).",
+  "Building / Code Fact — Year Built: 1966 (sourced data; verify current official records; existing-property record; does not describe the proposed building or work).",
+  "Building / Code Fact — Building Class: I5 (sourced data; verify current official records; existing-property record; does not describe the proposed building or work).",
+  "Zoning Fact — Address: 1070 SOUTHERN BOULEVARD, Bronx, NY 10459 (sourced data; verify current official records).",
+  "Zoning Fact — BBL: 2027440001 (sourced data; verify current official records).",
+  "Zoning Fact — Borough: Bronx (sourced data; verify current official records).",
+  "Zoning Fact — Block: 2744 (sourced data; verify current official records).",
+  "Zoning Fact — Tax Lot(s): 1 (sourced data; verify current official records).",
+  "Zoning Fact — ZIP Code: 10459 (sourced data; verify current official records).",
+  "Zoning Fact — Tax Lot Area: 13,663 sq ft (sourced data; verify current official records; mapped tax-lot record; zoning-lot composition and street-frontage applicability are not established).",
+  "Zoning Fact — Land Use Code: 08 (sourced data; verify current official records; existing-property record; does not describe the proposed building or work).",
+  "Zoning Fact — Zoning District(s): R7-1 (sourced data; verify current official records).",
+  "Zoning Fact — Commercial Overlay(s): C2-4 (sourced data; verify current official records).",
+  "Zoning Fact — Special Purpose District / Subdistrict / Subarea: None mapped (sourced data; verify current official records).",
+  "Zoning Fact — Zoning Map: 6c (sourced data; verify current official records).",
+  "Zoning Fact — Community District: Bronx 2 (sourced data; verify current official records).",
+  "Zoning Fact — Lot Width: 188.5 ft (sourced data; verify current official records; mapped tax-lot record; zoning-lot composition and street-frontage applicability are not established).",
+  "Zoning Fact — Lot Depth: 122.33 ft (sourced data; verify current official records; mapped tax-lot record; zoning-lot composition and street-frontage applicability are not established).",
+  "Zoning Fact — MIH Area / Applicable Option(s): Not within a mapped Mandatory Inclusionary Housing area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty).",
+  "Zoning Fact — Affordable Housing Zoning Status: Not within a mapped Inclusionary Housing designated area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty).",
+  "Zoning Fact — Transit Zone: Within a mapped Appendix I transit zone (sourced data; verify current official records).",
+  "Zoning Fact — Waterfront Status / Waterfront Access Plan: Not within a mapped waterfront area or Waterfront Access Plan (sourced data; verify current official records; preserve the stated negation, scope and uncertainty).",
+  "Zoning Fact — Lower Density Growth Management Area: Not within a mapped lower-density growth management area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty).",
+  "Zoning Fact — FRESH Program Area: Within a mapped FRESH program area (sourced data; verify current official records).",
+  "Zoning Fact — Appendix J Designated M District: Not within a mapped Appendix J designated M district (sourced data; verify current official records; preserve the stated negation, scope and uncertainty).",
+  "Additional Project facts (user wording; not independently verified): 1070 Southern Boulevard, Bronx, NY 10459 (BBL 2027440001). The user describes the project as a proposed new building in schematic design with ground-floor retail and community-facility space. Sourced project background, checked October 3, 2026: Comunilife's development portfolio describes a planned mixed-use project of approximately 135,000 sq ft with 127 homes, including 75 supportive homes, retail and a Bronx administrative hub; it lists construction starting in June 2028. Source: https://comunilife.org/portfolio/ . This is a public development description, not an approved filing or confirmed design program; gross building area is not established zoning floor area. Existing-property records shown in Structured facts (1 story, 22,438 sq ft, 0 residential units, 1966, class I5) describe the existing property, not the proposed building. Mapped tax-lot zoning is R7-1 with C2-4 overlay; zoning-lot composition, frontage classifications and filing/vesting basis remain unresolved. FICTIONAL RESEARCH TEST SCENARIO — authorized by the user solely to exercise Research, not real project conditions: assume an 8-story, 85-foot-high proposed building with a flat roof (0-degree slope), Type IA construction and full NFPA 13 sprinkler protection. Assume 4,000 sq ft of ground-floor retail and 2,000 sq ft of community-service space; formal occupancy/use classifications require analysis. The roof has a bulkhead door, a proposed 5-foot-wide clear path and 9 feet of vertical clearance. A condensate-producing cooling coil has an 8-foot primary drain run with a half-inch fall; blockage could damage the ceiling below, and there is no suitably sized and located floor drain. Use these fictional premises when a question asks about the Research test scenario. Keep real project facts, public proposals and test assumptions distinct. Any corrected test value applies to that conversation's hypothetical scenario and does not establish actual project conditions."
+];
+const visibleQuestions = [
+  "For the fictional Research test scenario saved in this project's context, is the proposed rooftop clear path wide enough for firefighter access? Please use the saved dimensions and cite the governing NYC Fire Code section.",
+  "In this fictional scenario, we widened the path to 6 feet, but a pipe crosses above it with only 8 feet of vertical clearance. Does that solve the firefighter-access issue?",
+  "Suppose we correct the overhead clearance to 9 feet and keep the path 6 feet wide. How much clear area must we leave at the rooftop bulkhead door?",
+  "If this same fictional flat-roof building were revised from 85 feet to 110 feet high, would that rooftop-access provision still cover it? Please distinguish the limit of that provision from whether other access requirements could apply.",
+  "For the fictional Research test scenario saved in this project's context, is the cooling-coil drain slope adequate, and what overflow protection is required?"
+];
+const visibleSnapshot = structuredClone(visibleProductionFacts);
+const scopedFirst = semanticResearchProjectFacts({ question: visibleQuestions[0], projectFacts: visibleProductionFacts });
+assert.match(scopedFirst, /85-foot-high/);
+assert.match(scopedFirst, /flat roof \(0-degree slope\)/);
+assert.match(scopedFirst, /5-foot-wide clear path and 9 feet of vertical clearance/);
+assert.match(scopedFirst, /FICTIONAL RESEARCH TEST SCENARIO/);
+assert.match(scopedFirst, /not real project conditions/);
+assert.match(scopedFirst, /user wording; not independently verified/);
+assert.doesNotMatch(scopedFirst, /C2-4|R7-1|Waterfront|4,000|condensate/);
+assert(scopedFirst.length <= 640);
+const scopedSecond = semanticResearchProjectFacts({ question: visibleQuestions[1],
+  contextualTopics: [{ text: visibleQuestions[0] }], projectFacts: visibleProductionFacts });
+assert.doesNotMatch(scopedSecond, /5-foot-wide|9 feet of vertical/);
+assert.match(scopedSecond, /85-foot-high.*flat roof/);
+const scopedThird = semanticResearchProjectFacts({ question: visibleQuestions[2],
+  contextualTopics: [{ text: visibleQuestions[0] }, { text: visibleQuestions[1] }], projectFacts: visibleProductionFacts });
+assert.doesNotMatch(scopedThird, /5-foot-wide|9 feet of vertical/);
+assert.match(scopedThird, /85-foot-high/);
+assert.doesNotMatch(scopedThird, /condensate|4,000/);
+const scopedFourth = semanticResearchProjectFacts({ question: visibleQuestions[3],
+  contextualTopics: [{ text: visibleQuestions[0] }, { text: visibleQuestions[2] }], projectFacts: visibleProductionFacts });
+assert.doesNotMatch(scopedFourth, /85-foot-high|5-foot-wide/,
+  "A corrected compound condition is omitted whole; no fictional updated statement is invented.");
+const drainExampleQuestion = "Is the primary condensate drain steep enough for the saved cooling-unit example, or does its fall need to change?";
+const scopedDrain = semanticResearchProjectFacts({ question: drainExampleQuestion, projectFacts: visibleProductionFacts });
+assert.match(scopedDrain, /8-foot primary drain run with a half-inch fall/);
+assert.match(scopedDrain, /no suitably sized and located floor drain/);
+assert.match(scopedDrain, /not real project conditions/);
+assert.doesNotMatch(scopedDrain, /clear path|85-foot-high|C2-4|Waterfront/);
+for (const question of ["For our proposed building, is its clear path wide enough for firefighter access?",
+  "Back to the actual project: what rooftop access should be checked?", "What is the real building height?"]) {
+  const actualContext = semanticResearchProjectFacts({ question, projectFacts: visibleProductionFacts });
+  assert.doesNotMatch(actualContext, /FICTIONAL|85-foot-high|5-foot-wide|9 feet of vertical|half-inch fall/,
+    "Actual/default project questions must not inherit the test's design conditions.");
+}
+const longRealContext = "Additional Project facts (user wording; not independently verified): " +
+  "Public project background describes a proposal awaiting design confirmation. ".repeat(12) +
+  "The primary equipment drain has a 12-foot run with a quarter-inch fall. " +
+  "This is only the primary drain; no secondary drain has been proposed, and the floor drain is not nearby.";
+const realDrain = relevantResearchRetrievalFactContext({ question: "Is the primary equipment drain fall adequate?",
+  projectFacts: [longRealContext], maximumCharacters: 400 });
+assert.match(realDrain, /12-foot run with a quarter-inch fall/);
+assert.match(realDrain, /only the primary drain; no secondary drain/);
+assert.match(realDrain, /floor drain is not nearby/);
+assert.match(realDrain, /not independently verified/);
+assert.equal(relevantResearchRetrievalFactContext({ question: "Is the primary equipment drain fall adequate?",
+  projectFacts: [longRealContext], maximumCharacters: 80 }), "", "Never clip the appended restriction or negative assertion to fit.");
+const longHypotheticalContext = "Additional Project facts (user wording; not independently verified): " +
+  "Existing property records describe an unrelated one-story industrial building. ".repeat(12) +
+  "HYPOTHETICAL MECHANICAL TEST SCENARIO — supplied for research, not actual project conditions: assume a new cooling system above an occupied room. " +
+  "The primary drain has a 12-foot run with a quarter-inch fall. " +
+  "The cooling coil is over a finished ceiling, and no nearby floor drain is available.";
+const mechanicalQuestion = "For the hypothetical mechanical test scenario, is the primary drain fall adequate?";
+const mechanicalContext = semanticResearchProjectFacts({ question: mechanicalQuestion, projectFacts: [longHypotheticalContext] });
+assert.match(mechanicalContext, /quarter-inch fall/);
+assert.match(mechanicalContext, /HYPOTHETICAL MECHANICAL TEST SCENARIO/);
+assert.match(mechanicalContext, /not actual project conditions/);
+assert.doesNotMatch(mechanicalContext, /one-story industrial/);
+const changedMechanical = semanticResearchProjectFacts({ question: "Correction: in this hypothetical scenario, the primary drain fall is now one inch over the 12 feet. What should we check?",
+  contextualTopics: [{ text: mechanicalQuestion }], projectFacts: [longHypotheticalContext] });
+assert.doesNotMatch(changedMechanical, /quarter-inch fall/);
+const qualifiers = relevantResearchRetrievalFactContext({ question: "For the hypothetical mechanical test scenario, where is the cooling coil?",
+  projectFacts: [longHypotheticalContext], maximumCharacters: 640 });
+assert.match(qualifiers, /finished ceiling, and no nearby floor drain is available/);
+assert.doesNotMatch(semanticResearchProjectFacts({ question: "Where is the actual project's cooling coil?", projectFacts: [longHypotheticalContext] }), /finished ceiling|quarter-inch fall/);
+const ambiguousScopes = "Additional Project facts (user wording; not independently verified): " + "Background does not confirm a design program. ".repeat(18) +
+  "FICTIONAL TEST SCENARIO Alpha: assume a proposed ventilation system. The exhaust duct has a 20-foot run. " +
+  "FICTIONAL TEST SCENARIO Beta: assume another proposed ventilation system. The exhaust duct has a 30-foot run.";
+assert.equal(semanticResearchProjectFacts({ question: "For the fictional test scenario, what is the exhaust duct length?", projectFacts: [ambiguousScopes] }), "",
+  "Two equally named saved scopes cannot be silently resolved to one scenario or mixed.");
+const namedAlpha = semanticResearchProjectFacts({ question: "For fictional test scenario Alpha, what is the exhaust duct length?", projectFacts: [ambiguousScopes] });
+assert.match(namedAlpha, /Alpha.*20-foot/);
+assert.doesNotMatch(namedAlpha, /Beta|30-foot/);
+const lexicalContext = relevantResearchRetrievalFactContext({ question: visibleQuestions[0], projectFacts: visibleProductionFacts,
+  maximumCharacters: 1700, queryMode: "lexical" });
+assert.match(lexicalContext, /85-foot-high.*flat roof|flat roof[\s\S]*85-foot-high/);
+assert.match(lexicalContext, /5-foot-wide clear path/);
+assert.doesNotMatch(lexicalContext, /C2-4|R7-1|Waterfront|condensate/);
+assert.deepEqual(visibleProductionFacts, visibleSnapshot, "Search-only statement selection never modifies original project facts.");
+console.log("Long saved-context query selection passed: production33-field scope, current measured corrections, actual reset, ordinary saved-example language, non-roof scope/provenance and complete negation, ambiguous named scenarios; no provider calls.");

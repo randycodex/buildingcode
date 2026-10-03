@@ -27,12 +27,22 @@ Reviews: `regression-review-b-v1.json`, `regression-review-c-v1.json`. A separat
 - Hosted query embeddings acquire a durable turn reservation before provider dispatch, share generation spending limits, preserve unknown-outcome reserves, avoid duplicate charges and record free/failed operation expense.
 - A server-only 53,110,832-byte vector artifact is bound to its checksum, model, dimensions, text version and current corpus fingerprint. Offline validation proves all 50,294 input hashes and seven authorized source combinations match. Missing, stale or corrupt assets safely fall back before embedding spending.
 
-Focused HTTP/provider-double contracts, source-boundary contracts, prepared-asset validation and client builds passed. The known pre-existing native disclosure contract failure is separate from this web release. Actual new hosted bundle size, deployment SHA, hybrid diagnostics, post-deployment conversations and persistence remain release acceptance gates.
+Focused HTTP/provider-double contracts, source-boundary contracts, prepared-asset validation and client builds passed. The known pre-existing native disclosure contract failure is separate from this web release. The hosted v2 deployment passed release identity, readiness and asset gates. Its Lambda bundle is 415.05 MB; the private vector route returns HTTP 404. Authenticated answer acceptance remains open.
 
 ## Spend at this checkpoint
 
-Local campaign provider estimates plus the four authenticated production baseline operations total **$1.78365956** against the user-authorized **$13.97** cap. No unknown or pending outcomes remain. Production operations are recorded as aggregate hosted-operation entries, distinct from individual local provider requests. These are token/accounting estimates, not a billing invoice or wallet balance.
+Local campaign provider estimates plus the four authenticated production baseline operations total **$1.81117432** against the user-authorized **$13.97** cap. No unknown or pending outcomes remain. Production operations are recorded as aggregate hosted-operation entries, distinct from individual local provider requests. These are token/accounting estimates, not a billing invoice or wallet balance.
 
 ## Hosted candidate results
 
-Pending deployment and authenticated browser verification. Do not treat the candidate as live based on the local tests above.
+Candidate v2 (`a7601bbd692cd02bf9f8de1f5290289fc0e76d5b`) was deployed and promoted to permitext.com. The first ordinary saved-context rooftop question **failed answer acceptance**: the website displayed a verification recovery message after 57 seconds. Runtime telemetry proves semantic search was active with all 52,946 current passages covered, 100 hits and two query embeddings; its six provider requests cost an estimated $0.027499. The operation was not charged as a completed Research answer.
+
+An exact offline replay reproduced the hosted retrieval and 171 embedding tokens. The long project description was omitted from the semantic query, while unrelated occupancy, commercial-overlay and waterfront facts entered it. The lexical query cut off before the saved roof dimensions. A semantic frontage child then displaced more relevant rooftop children already present in the lexical/semantic candidate pool. This is a retrieval/context failure, not evidence that the model cannot reason about the dimension. A scope-preserving context and hybrid-selection correction is in progress. See `production-candidate-v2.json`; v2 is not an accepted production fix.
+
+The existing model configuration remains Luna 6 low for writing and Luna 6 medium for verification, with the hosted priority service tier. No model change was made in this release.
+
+## Follow-up correction before the next release
+
+The next candidate selects complete scoped statements from long saved descriptions for both lexical and semantic queries. Current corrections remove superseded condition sentences from search while the original full context remains available to writing and verification. A literal child-heading guard prevents a generic semantic child from displacing a more specific current-question child. A bounded same-chapter dependency can add one complete already-bound referenced subsection when it fits the existing per-source allowance; strict selected-only requests do not expand. No verification rule or model configuration is relaxed.
+
+A cached five-query replay caught additional missing scope before deployment. The v3 freeze is preserved as an unshipped checkpoint; final release verification is pending.
