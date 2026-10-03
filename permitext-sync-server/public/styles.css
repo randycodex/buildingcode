@@ -17773,3 +17773,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 
 .reader-open-code-menu { scrollbar-width: none; }
 .reader-open-code-menu::-webkit-scrollbar { display: none; }
+
+.reader-panel > .pane-collapsed-tab,
+.reader-panel > .pane-collapsed-tab:hover {
+  color: var(--code-accent);
+}
