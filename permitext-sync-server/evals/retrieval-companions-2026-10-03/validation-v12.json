@@ -1,0 +1,20 @@
+{
+  "candidate": "v12",
+  "providerCalls": 0,
+  "modelsEvidenceAndSemanticGatesUnchanged": true,
+  "passedChecks": [
+    "research-exception-recipient-scope-contract (24 exact writer/revision/reviewer envelopes)",
+    "research-claim-scope-contract (220 envelopes plusguidance)",
+    "research-targeted-revision-bindings-contract",
+    "research-revision-verification-http-contract (mocked rejected/accepted revision persistence)",
+    "research-conversation-presentation-contract",
+    "node syntax research-claim-scope",
+    "git diff --check"
+  ],
+  "existingUnrelatedFailure": {
+    "test": "research-zoning-verification-instructions-contract",
+    "line": 41,
+    "reason": "Historical writer14kcharacterlimit alreadyexceeded: withnew678charaddition15320; baseline14642. Reviewer13885under14k. Limitnotchanged."
+  },
+  "liveAnswerAcceptance": "pending"
+}
