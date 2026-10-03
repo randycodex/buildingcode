@@ -23780,6 +23780,72 @@ async function renderResearchConversation(conversationID, options = {}) {
   return panel;
 }
 
+function selectedReaderResearchPassages() {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || !selection.rangeCount) return null;
+  const range = selection.getRangeAt(0);
+  const startElement = range.startContainer.nodeType === Node.ELEMENT_NODE
+    ? range.startContainer : range.startContainer.parentElement;
+  const panel = startElement?.closest(".reader-panel");
+  if (!panel || !panel.contains(range.endContainer) || !readerPrivateContentAllowed(panel)) return null;
+  const passages = [];
+  panel.querySelectorAll("[data-research-section-id]").forEach((element) => {
+    if (!range.intersectsNode(element)) return;
+    // Nested selectable wrappers represent the same source; keep the outer one.
+    if (element.parentElement.closest("[data-research-section-id]")) return;
+    const clipped = document.createRange();
+    clipped.selectNodeContents(element);
+    if (range.compareBoundaryPoints(Range.START_TO_START, clipped) > 0) {
+      clipped.setStart(range.startContainer, range.startOffset);
+    }
+    if (range.compareBoundaryPoints(Range.END_TO_END, clipped) < 0) {
+      clipped.setEnd(range.endContainer, range.endOffset);
+    }
+    const selectedText = researchSelectionTextFromRange("", clipped);
+    if (selectedText) passages.push({
+      sectionID: element.dataset.researchSectionId,
+      selectedText,
+      savedItemID: element.dataset.researchSavedItemId || ""
+    });
+  });
+  if (!passages.length) return null;
+  return { passages, originSurface: "reader", originPaneID: panel.dataset.paneId || "",
+    projectID: researchCreationProjectID(selectedOpenProjectID() || panel.dataset.projectId) };
+}
+
+const readerSelectionResearchAction = document.createElement("button");
+readerSelectionResearchAction.type = "button";
+readerSelectionResearchAction.className = "reader-selection-research-action";
+readerSelectionResearchAction.textContent = "Research selected text";
+readerSelectionResearchAction.hidden = true;
+document.body.append(readerSelectionResearchAction);
+let selectedReaderResearchIntent = null;
+readerSelectionResearchAction.addEventListener("pointerdown", (event) => event.preventDefault());
+readerSelectionResearchAction.addEventListener("click", async () => {
+  const intent = selectedReaderResearchIntent;
+  if (!intent || readerSelectionResearchAction.disabled) return;
+  readerSelectionResearchAction.disabled = true;
+  try {
+    await startNewResearchFromSelection(intent);
+    readerSelectionResearchAction.hidden = true;
+  } catch (error) {
+    await showWebNotice("Research not started", error.message);
+  } finally {
+    readerSelectionResearchAction.disabled = false;
+  }
+});
+document.addEventListener("selectionchange", () => {
+  if (document.activeElement === readerSelectionResearchAction) return;
+  selectedReaderResearchIntent = selectedReaderResearchPassages();
+  readerSelectionResearchAction.hidden = !selectedReaderResearchIntent;
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    readerSelectionResearchAction.hidden = true;
+    selectedReaderResearchIntent = null;
+  }
+});
+
 function researchSelectionTextFromRange(selection, range) {
   const fragment = range.cloneContents();
   const container = document.createElement("div");
