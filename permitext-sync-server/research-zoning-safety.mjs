@@ -3,7 +3,7 @@ import { unresolvedZoningFARSelectionPattern, unresolvedZoningPropertyDeterminat
 import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20261003-active-claim-safety-scope-v27";
+  "20261003-technical-binding-scope-v28";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -216,22 +216,88 @@ function explicitZoningSubject(value) {
     /\b(?:R\d{1,2}[A-Z]?|C\d-\d{1,2}[A-Z]?|M\d-\d)\b/i.test(value);
 }
 
-function nonZoningAnswerScope({ question, evidence, answer, questionPlan }) {
-  if (questionPlan || explicitZoningSubject(compactText(question)) ||
-    explicitZoningSubject(answerText(answer)) ||
-    /\b(?:project|property|site|parcel|proposal|owner|applicant)\b[^.!?]{0,100}\b(?:approved|permitted|authorized|compliant|lawful|may proceed|can proceed)\b/i.test(answerText(answer))) return false;
+function ancillaryZoningAssessmentBoundary(value) {
+  // This is an epistemic boundary, not a negative legal determination. Do not
+  // remove it from answerText: mapped, historical and table audits still need
+  // the full narrative. Unrecognized or mixed wording remains operative here.
+  const clauses = compactText(value).split(/[.!?;]+\s*/).filter(Boolean);
+  if (!clauses.length) return false;
+  const subject = String.raw`(?:the\s+)?zoning(?:\s+resolution)?(?:\s+(?:applicability|compliance|requirements?|rules?|conclusions?))?`;
+  const assessment = String.raw`(?:this|the|our|that)\s+(?:(?:technical|code|construction|fire)\s+)?(?:answer|analysis|review|assessment|discussion)`;
+  const status = String.raw`(?:(?:is|are|was|were)\s+not\s+(?:determined|established|verified|reviewed|assessed|evaluated|resolved)|(?:has|have|had)\s+not\s+been\s+(?:determined|established|verified|reviewed|assessed|evaluated|resolved))`;
+  const boundary = new RegExp(
+    String.raw`^(?:${subject}\s+${status}(?:\s+(?:by|in|within|from)\s+${assessment})?|${assessment}\s+(?:does\s+not|did\s+not|cannot)\s+(?:determine|establish|verify|review|assess|evaluate|resolve|address)\s+${subject})$`,
+    "i"
+  );
+  return clauses.every((clause) => boundary.test(clause));
+}
+
+function zoningAnswerScopeDecision({ question, evidence, answer, questionPlan }) {
+  const limitations = Array.isArray(answer?.evidenceLimitations) ? answer.evidenceLimitations : [];
+  const ancillary = limitations.filter(ancillaryZoningAssessmentBoundary);
+  const operativeLimitations = limitations.filter((limitation) =>
+    !ancillaryZoningAssessmentBoundary(limitation));
+  const operativeNarrative = answerText({ ...answer, evidenceLimitations: [] });
+  const categoricalApproval = /\b(?:project|property|site|parcel|proposal|owner|applicant)\b[^.!?]{0,100}\b(?:approved|permitted|authorized|compliant|lawful|may proceed|can proceed)\b/i.test(answerText(answer));
   const bound = new Set(boundSourceIDs(answer));
   const boundEvidence = (Array.isArray(evidence) ? evidence : [])
     .filter((source) => bound.has(compactText(source?.sourceID)));
+  const found = new Set(boundEvidence.map((source) => compactText(source?.sourceID)));
+  const bindingRejections = {
+    nonTechnical: 0, emptyText: 0, contextualRole: 0, contextualReference: 0,
+    referenceOnly: 0, sectionReference: 0, incomplete: 0
+  };
+  let eligibleTechnicalSourceCount = 0;
+  for (const source of boundEvidence) {
+    const flags = {
+      nonTechnical: !/^(?:AC|BC|FC|FGC|MC|PC)$/i.test(compactText(source?.codePrefix)) ||
+        compactText(source?.corpusID) === zoningCorpusID,
+      emptyText: !compactText(source?.text),
+      contextualRole: ["contextual", "irrelevant"].includes(source?.evidencePriority?.evidenceRole || source?.evidenceRole),
+      contextualReference: source?.signals?.contextualReference === true,
+      referenceOnly: source?.referenceOnly === true,
+      sectionReference: source?.selectionMode === "section_reference",
+      // A complete atomic child may omit the rest of its canonical parent.
+      // That does not change its authority family; substantive source-scope
+      // verification separately checks enclosing conditions and exceptions.
+      incomplete: source?.textComplete === false ||
+        source?.sourceCompletenessReview?.textComplete === false || source?.truncated === true
+    };
+    for (const [key, rejected] of Object.entries(flags)) if (rejected) bindingRejections[key] += 1;
+    if (!Object.values(flags).some(Boolean)) eligibleTechnicalSourceCount += 1;
+  }
+  const pinnedZoningSourceCount = zoningEvidence(evidence)
+    .filter((source) => source?.origin === "user_pinned").length;
+  const missingBindingCount = [...bound].filter((sourceID) => !found.has(sourceID)).length;
+  const reasonCodes = [
+    questionPlan ? "zoning_plan" : null,
+    explicitZoningSubject(compactText(question)) ? "zoning_question" : null,
+    explicitZoningSubject(operativeNarrative) ? "zoning_operative_answer" : null,
+    operativeLimitations.some(explicitZoningSubject) ? "operative_zoning_limitation" : null,
+    categoricalApproval ? "categorical_project_approval" : null,
+    pinnedZoningSourceCount ? "selected_zoning_source" : null,
+    !boundEvidence.length ? "no_bound_source" : null,
+    missingBindingCount ? "missing_bound_source" : null,
+    eligibleTechnicalSourceCount !== boundEvidence.length ? "ineligible_technical_binding" : null
+  ].filter(Boolean);
   // An actual Construction/Fire Code binding establishes which kind of rule
   // this answer uses. Merely discovering a Zoning passage does not turn that
-  // rule into a Zoning conclusion. Mixed answers remain subject to review.
-  return boundEvidence.length > 0 && boundEvidence.every((source) =>
-    /^(?:AC|BC|FC|FGC|MC|PC)$/i.test(compactText(source?.codePrefix)) &&
-    compactText(source?.corpusID) !== zoningCorpusID &&
-    !["contextual", "irrelevant"].includes(source?.evidencePriority?.evidenceRole || source?.evidenceRole) &&
-    source?.signals?.contextualReference !== true && source?.referenceOnly !== true &&
-    source?.selectionMode !== "section_reference");
+  // rule into a Zoning conclusion. A negative assessment boundary is not a
+  // Zoning claim; selected Zoning material and mixed/legal approvals still are.
+  return {
+    schemaVersion: 1,
+    kind: "zoning_answer_scope",
+    nonZoningExemption: reasonCodes.length === 0,
+    reasonCodes: reasonCodes.length ? reasonCodes : ["eligible_technical_bindings"],
+    boundReferenceCount: bound.size,
+    boundSourceCount: boundEvidence.length,
+    eligibleTechnicalSourceCount,
+    missingBindingCount,
+    pinnedZoningSourceCount,
+    ancillaryBoundaryCount: ancillary.length,
+    operativeZoningLimitationCount: operativeLimitations.filter(explicitZoningSubject).length,
+    bindingRejections
+  };
 }
 
 function sourceHasStructuredTable(source) {
@@ -1281,9 +1347,11 @@ function riskProfile({
   questionPlan = null
 } = {}) {
   const sources = zoningEvidence(evidence);
-  if (!sources.length || nonZoningAnswerScope({ question, evidence, answer, questionPlan })) {
+  const scopeDecision = zoningAnswerScopeDecision({ question, evidence, answer, questionPlan });
+  if (!sources.length || scopeDecision.nonZoningExemption) {
     return {
       applies: false,
+      scopeDecision,
       categories: [],
       zoningSourceIDs: [],
       missingMappedLocation: false,
@@ -1402,6 +1470,7 @@ function riskProfile({
   ];
   return {
     applies: true,
+    scopeDecision,
     categories: unique(categories),
     zoningSourceIDs: unique(sources.map((source) => source?.sourceID)),
     missingMappedLocation,
@@ -1522,6 +1591,7 @@ export function evaluateZoningResearchSafety({
       safetyVersion: zoningResearchSafetyVersion,
       pass: true,
       applies: false,
+      scopeDecision: profile.scopeDecision,
       categories: [],
       issues: []
     };
@@ -1932,9 +2002,12 @@ export function evaluateZoningResearchSafety({
     applies: true,
     categories: profile.categories,
     zoningSourceIDs: profile.zoningSourceIDs,
+    scopeDecision: profile.scopeDecision,
     ...(issues.some((issue) => issue.type === "zoning_missing_mapped_location")
-      ? { attemptDiagnostic: mappedLocationDiagnostic }
-      : {}),
+      ? { attemptDiagnostic: { ...mappedLocationDiagnostic, scopeDecision: profile.scopeDecision } }
+      : issues.some((issue) => issue.type === "zoning_unbound_conclusion")
+        ? { attemptDiagnostic: profile.scopeDecision }
+        : {}),
     issues
   };
 }

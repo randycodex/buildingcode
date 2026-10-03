@@ -17,6 +17,19 @@ const zoningDiagnosticFieldKinds = new Set([
   "supported_point_heading",
   "supported_point_explanation"
 ]);
+const zoningScopeReasonCodes = new Set([
+  "zoning_plan", "zoning_question", "zoning_operative_answer", "operative_zoning_limitation",
+  "categorical_project_approval", "selected_zoning_source", "no_bound_source",
+  "missing_bound_source", "ineligible_technical_binding", "eligible_technical_bindings"
+]);
+const zoningScopeCountFields = [
+  "boundReferenceCount", "boundSourceCount", "eligibleTechnicalSourceCount", "missingBindingCount",
+  "pinnedZoningSourceCount", "ancillaryBoundaryCount", "operativeZoningLimitationCount"
+];
+const zoningScopeRejectionFields = [
+  "nonTechnical", "emptyText", "contextualRole", "contextualReference",
+  "referenceOnly", "sectionReference", "incomplete"
+];
 
 function nonnegativeNumber(value, fallback = 0) {
   const number = Number(value);
@@ -88,7 +101,12 @@ function normalizedStructuredAttemptFailureStages(value) {
 export function createResearchVerificationAttemptDiagnostics(value) {
   return (Array.isArray(value) ? value : []).slice(0, 2).flatMap((attempt, index) => {
     const zoning = attempt?.zoningSafety;
+    if (zoning?.kind === "zoning_answer_scope") {
+      const scope = normalizedZoningScopeDiagnostic(zoning);
+      return scope ? [{ attempt: index + 1, zoningSafety: scope }] : [];
+    }
     if (zoning?.kind !== "zoning_mapped_location") return [];
+    const scopeDecision = normalizedZoningScopeDiagnostic(zoning.scopeDecision);
     const triggeringClauses = (Array.isArray(zoning.triggeringClauses)
       ? zoning.triggeringClauses
       : []).slice(0, 24).flatMap((clause) => {
@@ -114,10 +132,28 @@ export function createResearchVerificationAttemptDiagnostics(value) {
         sourceBoundaryQuestion: zoning.sourceBoundaryQuestion === true,
         citedAppendixJ: zoning.citedAppendixJ === true,
         mappedLocationBoundaryPresent: zoning.mappedLocationBoundaryPresent === true,
-        triggeringClauses
+        triggeringClauses,
+        ...(scopeDecision ? { scopeDecision } : {})
       }
     }];
   });
+}
+
+function normalizedZoningScopeDiagnostic(value) {
+  if (value?.kind !== "zoning_answer_scope") return null;
+  const reasonCodes = [...new Set((Array.isArray(value.reasonCodes) ? value.reasonCodes : [])
+    .map(reason => allowlistedValue(reason, zoningScopeReasonCodes)).filter(Boolean))].slice(0, 10);
+  if (!reasonCodes.length) return null;
+  const boundedCounts = (fields, values) => Object.fromEntries(fields.map(field =>
+    [field, Math.min(1_000, nonnegativeInteger(values?.[field]))]));
+  return {
+    schemaVersion: 1,
+    kind: "zoning_answer_scope",
+    nonZoningExemption: value.nonZoningExemption === true,
+    reasonCodes,
+    ...boundedCounts(zoningScopeCountFields, value),
+    bindingRejections: boundedCounts(zoningScopeRejectionFields, value.bindingRejections)
+  };
 }
 
 export function createResearchStructuredAttemptDiagnostics({

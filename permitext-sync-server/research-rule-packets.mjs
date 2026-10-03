@@ -1,7 +1,7 @@
 // A completeness audit describes what was supplied, never which law applies.
 // Recovery uses canonical references and retrieved terminology; model text is
 // never treated as evidence.
-export const researchRulePacketVersion = "20261003-current-detail-canonical-packets-v4";
+export const researchRulePacketVersion = "20261003-continuing-canonical-packets-v6";
 
 const detailStopWords = new Set(('a an and are as at be been before between building buildings by can code codes could do does each existing feet fictional for from have how if in into is it its later may measure measured minimum maximum new not now of on one only or our project proposed question scenario section shall should same some supplied than that the their these this those to under use used using was we were what when where whether which will with without would').split(' '));
 const detailForms = word => {
@@ -22,6 +22,76 @@ export function researchCurrentRuleDetailScore(source, question) {
   const words = new Set((String(source?.text || source?.selectedText || source?.canonicalText || '')
     .toLowerCase().match(/[a-z]{3,}/g) || []).flatMap(word => [...detailForms(word)]));
   return terms.filter(word => [...detailForms(word)].some(form => words.has(form))).length;
+}
+
+// A complete canonical alternatives list can name a method differently from
+// the user's ordinary wording. These exact links nominate dependencies only;
+// they never establish which alternative is applicable or approved.
+export function researchAlternativeMethodReferences(source, references = []) {
+  const text = String(source?.text || '');
+  const introduction = /\b(?:one|any) of (?:the )?following (?:methods?|means|options?|alternatives?)\s*:/i.exec(text);
+  if (!introduction) return [];
+  const tail = text.slice(introduction.index + introduction[0].length);
+  const markers = [...tail.matchAll(/(?:^|\s)([1-9]\d*)[.)]\s+/g)];
+  const items = [];
+  for (const marker of markers) {
+    if (Number(marker[1]) !== items.length + 1) break;
+    items.push(marker);
+  }
+  if (items.length < 2) return [];
+  const itemTexts = items.map((marker, index) => tail.slice(marker.index + marker[0].length,
+    items[index + 1]?.index ?? tail.length).split(/\.(?=\s+[A-Z]|$)/, 1)[0]);
+  const literalReference = reference => {
+    if (reference.codePrefix !== source.codePrefix || reference.referenceKind === 'table') return false;
+    const number = String(reference.sectionNumber || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const prefix = String(source.codePrefix || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return number && itemTexts.some(item => new RegExp(`\\b(?:Sections?\\s+|${prefix}\\s+(?:Sections?\\s+)?)${number}(?=$|[\\s,.;:)])`, 'i').test(item));
+  };
+  const linked = [...new Map(references.filter(literalReference)
+    .map(reference => [reference.sectionNumber, reference])).values()];
+  return linked.length >= 2 ? linked : [];
+}
+
+// An operative qualification can refer upward to the enclosing numbered rule
+// without repeating the user's detail words. Only an actual literal ancestor
+// link qualifies; unrelated siblings and reference metadata alone do not.
+export function researchAncestorQualificationReferences(source, references = []) {
+  const number = String(source?.sectionNumber || '');
+  if (!/^\d+(?:\.\d+)+$/.test(number)) return [];
+  const clauses = String(source?.text || '').split(/(?<=[.!?])\s+(?=[A-Z])/);
+  return references.filter(reference => {
+    if (reference.codePrefix !== source.codePrefix || reference.referenceKind === 'table' ||
+        !/^\d+(?:\.\d+)*$/.test(String(reference.sectionNumber || '')) ||
+        !number.startsWith(reference.sectionNumber + '.')) return false;
+    const target = reference.sectionNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const prefix = String(source.codePrefix).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const literal = new RegExp(`\\b(?:Sections?\\s+|${prefix}\\s+(?:Sections?\\s+)?)${target}(?=$|[\\s,.;:)])`, 'i');
+    return clauses.some(clause => literal.test(clause) &&
+      /\b(?:exceptions?|subject to|in accordance with|(?:established|required|specified|provided|permitted|allowed|regulated|governed|limited) (?:in|by|under))\b/i.test(clause));
+  });
+}
+
+// The same checked catalog identity can be represented only by child passages
+// in the index. A responsive child nominates the whole canonical packet; its
+// text never stands in for that whole source, which the assembler must resolve
+// freshly, bind by hash/offsets and include atomically within the existing cap.
+export function researchCheckedRuleIndexPassage(passages, reference, registeredSection, question, maximumCharacters = 12000) {
+  const fields = ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'];
+  if (!registeredSection?.jurisdiction || !fields.every(key => reference?.[key] &&
+      registeredSection[key] === reference[key]) ||
+      (reference.jurisdiction && reference.jurisdiction !== registeredSection.jurisdiction)) return null;
+  const matching = (passages || []).filter(passage => fields.every(key => passage[key] === reference[key]) &&
+    (!reference.sectionID || String(passage.sectionID) === String(reference.sectionID)) &&
+    String(passage.sectionID) === String(registeredSection.sectionID || registeredSection.id) &&
+    (!passage.jurisdiction || passage.jurisdiction === registeredSection.jurisdiction));
+  const roots = matching.filter(passage => passage.subsectionNumber === passage.sectionNumber);
+  const pool = roots.length ? roots : matching.filter(passage =>
+    String(passage.subsectionNumber).startsWith(passage.sectionNumber + '.'));
+  return pool.filter(passage => passage.text && passage.sourceTextHash && passage.sourceOffsets &&
+    (passage.scopeComplete === true || passage.completeSubsectionText) &&
+    [...new Set([...(passage.contextTexts || []), passage.completeSubsectionText || passage.text])].join('\n\n').length <= maximumCharacters &&
+    researchCurrentRuleDetailScore(passage, question) >= 2)
+    .sort((left, right) => researchCurrentRuleDetailScore(right, question) - researchCurrentRuleDetailScore(left, question))[0] || null;
 }
 
 const contextText = value => typeof value === "string" || typeof value === "number"

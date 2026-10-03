@@ -8,12 +8,13 @@ import {
   researchQuestionReturnsToOriginalTopic,
   extractResearchCodeReferences
 } from "./research-conversation-topic.mjs";
-import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
+import { targetedDefinitionExcerpt, researchEmbeddedDefinitionCarrier } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { orderedResearchTopicDependencies, researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import {
   researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery, researchCurrentRuleDetailScore,
+  researchAlternativeMethodReferences, researchAncestorQualificationReferences,
   sameRuleIdentity as sameRuleIdentityForPacket,
   researchCanonicalApplicabilityContext
 } from "./research-rule-packets.mjs";
@@ -21,13 +22,15 @@ import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, z
 import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
+import { researchQuestionSubject } from "./research-question-subject.mjs";
+import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage } from "./research-rule-groups.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import {
   semanticResearchProjectFacts, relevantResearchRetrievalFactContext,
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-current-detail-canonical-packets-v63";
+export const researchEvidenceAssemblyVersion = "20261003-bounded-canonical-rule-groups-v67";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -676,8 +679,8 @@ function canonicalAncestorReferences(source, maximum = maximumPinnedAncestorCont
   return references;
 }
 
-function targetedDefinitionValue(value, context, maximumCharacters) {
-  const excerpt = targetedDefinitionExcerpt(value, context, { maximumCharacters });
+function targetedDefinitionValue(value, context, maximumCharacters, options = {}) {
+  const excerpt = targetedDefinitionExcerpt(value, context, { ...options, maximumCharacters });
   if (!excerpt) return { value, excerpt: null };
   const { text, ...metadata } = excerpt;
   return {
@@ -762,22 +765,32 @@ function questionSpecificBlockValue(value, question, maximumCharacters) {
   };
 }
 
-function definitionSelectionContext(query, values = []) {
-  return [
-    compactText(query),
-    // A section reference supplies no passage. Feeding the first 4,000
-    // characters of its entire definitions section into ranking makes those
-    // unrelated opening entries outrank the user's question.
-    ...values.map((value) => value?.selectionMode === "section_reference"
-      ? "" : canonicalText(value).slice(0, 4_000))
-  ].filter(Boolean).join("\n").slice(0, 32_000);
+function definitionSelectionContext(query, values = [], definitionSource = null) {
+  const sameAuthority = value => !definitionSource ||
+    ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"].every(key =>
+      !definitionSource[key] || value[key] === definitionSource[key]);
+  const operative = values.filter(value => value?.selectionMode !== "section_reference" &&
+    sameAuthority(value) && !isDefinitionCandidate(value) && !researchEmbeddedDefinitionCarrier(value) &&
+    !/\bdefinitions?\b/i.test(value?.title || "") && String(value?.sectionNumber) !== "202");
+  const detailQuery = String(query || "").replace(/\b([a-z]{3,})y\b/gi, "$& $1ies");
+  const headingQuery = detailQuery.replace(/\b(?:area|areas|space|spaces|building|buildings|other|general|minimum|maximum|required|requirement|requirements|provision|provisions|code|section)\b/gi, " ");
+  const responsive = operative.filter(value => researchCurrentRuleDetailScore(value, detailQuery) >= 2 &&
+    researchCurrentRuleDetailScore({ text: value.title || "" }, headingQuery) >= 1);
+  // A supplied enclosing qualification may contain a defined term that the
+  // more responsive child does not repeat. Keep that exact structural parent,
+  // but never the unrelated opening text of every retrieved section.
+  const relevant = operative.filter(value => responsive.includes(value) || responsive.some(child =>
+    child.codePrefix === value.codePrefix && String(child.sectionNumber).startsWith(`${value.sectionNumber}.`)));
+  return [compactText(query), ...relevant.map(value => canonicalText(value).slice(0, 4_000))]
+    .filter(Boolean).join("\n").slice(0, 32_000);
 }
 
 function isDefinitionCandidate(value) {
   const functions = Array.isArray(value?.evidencePriority?.functions)
     ? value.evidencePriority.functions
     : [];
-  return value?.evidencePriority?.primaryFunction === "definition" || functions.includes("definition");
+  return value?.evidencePriority?.primaryFunction === "definition" || functions.includes("definition") ||
+    Boolean(value?.signals?.canonicalEmbeddedDefinitions);
 }
 
 function sourceRecord(value, {
@@ -797,11 +810,16 @@ function sourceRecord(value, {
 }) {
   const rawText = canonicalText(value);
   const text = rawText.slice(0, Math.max(0, characterAllowance)).trimEnd();
+  const embeddedDefinition = targetedDefinition?.embeddedDefinitionSection;
+  const sourceRelationship = embeddedDefinition
+    ? `${relationship}. Definition heading in this canonical source: ${embeddedDefinition.heading}. ` +
+      `The registered carrier ${value.codePrefix} ${value.sectionNumber} is not the definition's published section number.`
+    : relationship;
   return attachStructuredTable({
     sourceID,
     origin,
     sourceType: "enacted_text",
-    relationship,
+    relationship: sourceRelationship,
     authorityClass: "enacted",
     retrievalReason: compactText(retrievalReason || relationship),
     retrievalRank: retrievalRank !== null && retrievalRank !== "" && Number.isFinite(Number(retrievalRank))
@@ -862,7 +880,10 @@ function canonicalIndexedPassage(value, candidate, allowance, question = "") {
     .map(item => ({ item, matches: terms.filter(term => compactText(item.text).toLowerCase().includes(term)).length }))
     .filter(entry => entry.matches >= 2)
     .sort((left, right) => right.matches - left.matches);
-  for (const item of [passage, ...alternatives.map(entry => entry.item)]) {
+  const group = candidate?.signals?.useSelectedPassageOnly === true ? null : nearestCompleteIndexedRuleGroup(value,
+    passage, [...(passage.alternatives || []), ...(passage.sameSectionReferences || [])], allowance, question);
+  for (const item of [...new Map([group, passage, ...alternatives.map(entry => entry.item)]
+    .filter(Boolean).map(item => [item.id, item])).values()]) {
     const slices = [...(item.contextTexts || []), item.completeSubsectionText || item.text]
       .map(compactText).filter(Boolean);
     if (!slices.length || slices.some(text => !containmentText.includes(text.replace(/\s+/g, " ")))) continue;
@@ -959,6 +980,8 @@ function canonicalIndexedPassage(value, candidate, allowance, question = "") {
     }
     return { text: selected, id: item.id, subsectionNumber: item.subsectionNumber,
       sourceTextHash: item.sourceTextHash, sourceOffsets: item.sourceOffsets,
+      ...(item === group ? { completeScopeOffsets: { ...item.sourceOffsets,
+        end: item.sourceOffsets.start + (item.completeSubsectionText || item.text).length } } : {}),
       ...(companions.length ? { companions } : {}),
       completeSection: selected === fullText, completeSubsection: Boolean(item.completeSubsectionText || item.scopeComplete) };
   }
@@ -1409,14 +1432,62 @@ export async function assembleResearchEvidence({
         !['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(key => canonical[key]) ||
         /\bdefinitions?\b/i.test(canonical.title || '') ||
         researchCurrentRuleDetailScore({ text: record.text }, query.question) < 1) return;
-    const references = normalizedCrossReferences(canonical).filter(reference => reference.codePrefix === canonical.codePrefix &&
+    const reserveDelegatedChild = async (parent, parentRecord) => {
+      if (!parentRecord.canonicalContextComplete || parentRecord.truncated) return;
+      const group = (discovery?.delegatingRuleGroups || []).find(group =>
+        group.parent.sectionID === parent.sectionID);
+      const children = freshDelegatedRuleChildren(parent, group, query.question, limits.maximumCharactersPerSource);
+      for (const child of children) {
+        if (reservedPacketDependencies.size >= Math.min(2, limits.maximumCrossReferences) || packetDependencyReads >= 4) break;
+        const reference = { ...child, referenceKind: 'section', referencePurpose: 'registered_delegated_rule_child' };
+        const key = packetDependencyKey(reference);
+        if (attemptedPacketDependencies.has(key) || suppliedRuleReference(sources, reference)) continue;
+        attemptedPacketDependencies.add(key);
+        packetDependencyReads += 1;
+        let resolved;
+        try {
+          resolved = await canonicalSection(async request => {
+            const value = await resolveSection(request);
+            if (!value || value.sectionID !== child.sectionID || value.sectionNumber !== child.sectionNumber ||
+                !['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(field =>
+                  value[field] === parent[field]) || !boundCanonicalRulePassage(value, child.boundChildPassage, true))
+              throw new Error('Delegated child source mismatch');
+            return value;
+          }, reference, sourceOrigins.crossReference);
+        } catch { resolverFailureCount += 1; continue; }
+        const allowance = Math.min(limits.maximumCharactersPerSource, supplementalCharacterCeiling - characterCount -
+          reservedTopicCharacters() - reservedPacketCharacters());
+        if (allowance < 1 || canonicalText(resolved).length > allowance) continue;
+        const dependencyRecord = sourceRecord(resolved, { origin: sourceOrigins.crossReference,
+          sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, 'delegated-child'),
+          characterAllowance: allowance, canonicalResolved: true, retrievalDepth: 1, retrievedAt,
+          relationship: 'Complete registered child of a supplied canonical rule that delegates to this section' });
+        if (!dependencyRecord.text || dependencyRecord.truncated || !suppliedRuleReference([dependencyRecord], reference)) continue;
+        dependencyRecord.delegatedRuleParent = { sectionID: parent.sectionID, sectionNumber: parent.sectionNumber,
+          sourceTextHash: group.parentPassage.sourceTextHash };
+        reservedPacketDependencies.set(key, { reference, resolved, record: dependencyRecord });
+        record.currentRulePacketAnchor = true;
+        break;
+      }
+    };
+    await reserveDelegatedChild(canonical, record);
+    const canonicalReferences = normalizedCrossReferences(canonical);
+    const alternatives = researchCurrentRuleDetailScore({ text: record.text }, query.question) >= 2
+      ? new Set(researchAlternativeMethodReferences({ ...canonical, text: record.text }, canonicalReferences)
+        .map(reference => reference.sectionNumber)) : new Set();
+    const ancestors = record.canonicalContextComplete && researchCurrentRuleDetailScore({ text: record.text }, query.question) >= 2
+      ? new Set(researchAncestorQualificationReferences({ ...canonical, text: record.text }, canonicalReferences)
+        .map(reference => reference.sectionNumber)) : new Set();
+    const references = canonicalReferences.filter(reference => reference.codePrefix === canonical.codePrefix &&
       (!sameRuleIdentityForPacket(canonical, reference) || reference.referenceKind === 'table') &&
       (reference.referenceKind === 'table' || String(reference.sectionNumber).split('.')[0] ===
-        String(canonical.sectionNumber).split('.')[0]) &&
-      !candidates.some(candidate => candidate.codePrefix === reference.codePrefix &&
-        candidate.sectionNumber === reference.sectionNumber && candidate.corpusID === canonical.corpusID &&
-        candidate.codeVersion === canonical.codeVersion && candidate.codeEdition === canonical.codeEdition))
-      .sort((left, right) => Number(right.referenceKind === 'table') - Number(left.referenceKind === 'table'));
+        String(canonical.sectionNumber).split('.')[0]))
+      .sort((left, right) => Number(right.referenceKind === 'table') - Number(left.referenceKind === 'table') ||
+        Number((discovery?.delegatingRuleGroups || []).some(group => group.parent.sectionNumber === right.sectionNumber &&
+          group.parent.codePrefix === right.codePrefix)) - Number((discovery?.delegatingRuleGroups || []).some(group =>
+          group.parent.sectionNumber === left.sectionNumber && group.parent.codePrefix === left.codePrefix)) ||
+        Number(ancestors.has(right.sectionNumber)) - Number(ancestors.has(left.sectionNumber)) ||
+        Number(alternatives.has(right.sectionNumber)) - Number(alternatives.has(left.sectionNumber)));
     for (const rawReference of references) {
       if (reservedPacketDependencies.size >= Math.min(2, limits.maximumCrossReferences) || packetDependencyReads >= 4) break;
       const reference = { ...rawReference, corpusID: canonical.corpusID, codeVersion: canonical.codeVersion,
@@ -1437,14 +1508,19 @@ export async function assembleResearchEvidence({
       } catch { resolverFailureCount += 1; continue; }
       const remaining = supplementalCharacterCeiling - characterCount - reservedTopicCharacters() - reservedPacketCharacters();
       const allowance = Math.min(limits.maximumCharactersPerSource, remaining);
+      const delegatedGroup = (discovery?.delegatingRuleGroups || []).find(group => group.parent.sectionID === resolved.sectionID);
+      const hasBoundResponsiveChild = freshDelegatedRuleChildren(resolved, delegatedGroup,
+        query.question, limits.maximumCharactersPerSource).length > 0;
       if (allowance < 1 || canonicalText(resolved).length > allowance ||
-          researchCurrentRuleDetailScore(resolved, query.question) < 2) continue;
+          (researchCurrentRuleDetailScore(resolved, query.question) < 2 &&
+            !alternatives.has(reference.sectionNumber) && !ancestors.has(reference.sectionNumber) && !hasBoundResponsiveChild)) continue;
       const dependencyRecord = sourceRecord(resolved, { origin: sourceOrigins.crossReference,
         sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, 'current-packet'),
         characterAllowance: allowance, canonicalResolved: true, retrievalDepth: 1, retrievedAt });
       if (!dependencyRecord.text || dependencyRecord.truncated || !suppliedRuleReference([dependencyRecord], reference)) continue;
       reservedPacketDependencies.set(key, { reference, resolved, record: dependencyRecord });
       record.currentRulePacketAnchor = true;
+      await reserveDelegatedChild(resolved, dependencyRecord);
     }
   };
 
@@ -1470,11 +1546,19 @@ export async function assembleResearchEvidence({
   }
   for (const [index, candidate] of candidates.entries()) {
     if (discoveredCount >= limits.maximumDiscovered) break;
+    // Unrequested dictionaries are selected after the responsive rules, using
+    // their terminology and the existing two-definition allowance. An indexed
+    // opening dictionary fragment must not preempt that later complete entry.
+    if (isDefinitionCandidate(candidate) && !candidate.evidencePriority?.claimCoverageRequired &&
+        !candidate.signals?.useSelectedPassageOnly && !currentReferences.some(reference =>
+          reference.codePrefix === candidate.codePrefix && reference.sectionNumber === candidate.sectionNumber)) continue;
     const identity = sectionIdentity(candidate);
     if (!identity || includedSectionIdentities.has(identity)) continue;
     const ownReservation = reservedTopicDependencies.get(dependencyKey(candidate));
     const ownPacketReservation = [...reservedPacketDependencies.values()].find(entry =>
-      entry.resolved.sectionID === candidate.sectionID);
+      entry.resolved.sectionID === candidate.sectionID &&
+      ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction']
+        .every(key => !candidate[key] || candidate[key] === entry.resolved[key]));
     const reservedCharacters = (candidate.evidencePriority?.claimCoverageRequired === true ? 0
       : reservedTopicCharacters() - (ownReservation
         ? Math.max(0, ownReservation.textLength - (existingTopicDependency(candidate)?.text.length || 0)) : 0)) +
@@ -1484,7 +1568,8 @@ export async function assembleResearchEvidence({
     if (remainingCharacters < 1) continue;
     let resolved;
     try {
-      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered, {
+      resolved = await canonicalSection(ownPacketReservation ? async () => ownPacketReservation.resolved : resolveSection,
+        candidate, sourceOrigins.discovered, {
         includeAmendmentHistory: asksForZoningAmendmentHistoryEvents(query.question)
       });
     } catch {
@@ -1537,7 +1622,7 @@ export async function assembleResearchEvidence({
       : targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
           resolved,
-          definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+          definitionSelectionContext(query.question, canonicalForExpansion, resolved),
           allowance
         )
       : { value: resolved, excerpt: null };
@@ -1792,7 +1877,7 @@ export async function assembleResearchEvidence({
     }
   }
   const crossReferencePriority = (reference) => {
-    if (reference?.referencePurpose === 'current_detail_packet_dependency') return 5;
+    if (['current_detail_packet_dependency', 'registered_delegated_rule_child'].includes(reference?.referencePurpose)) return 5;
     if (reference?.referencePurpose === "canonical_ancestor_scope") return 4;
     if (String(reference?.referenceKind || "").toLowerCase() === "table") return 3;
     if (reference?.sameSectionFamily === true) return 2;
@@ -1830,12 +1915,15 @@ export async function assembleResearchEvidence({
     const targeted = targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
           resolved,
-          definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+          definitionSelectionContext(query.question, canonicalForExpansion, resolved),
           allowance
         )
       : { value: resolved, excerpt: null };
     const ancestorScope = reference.referencePurpose === "canonical_ancestor_scope";
-    const relationship = ancestorScope
+    const delegatedChild = reference.referencePurpose === 'registered_delegated_rule_child';
+    const relationship = delegatedChild
+      ? 'Complete registered child of a supplied canonical rule that delegates to this section; not a complete child-group claim'
+      : ancestorScope
       ? `Governing ancestor scope for pinned ${reference.codePrefix || resolved.codePrefix} ${reference.sectionNumber || resolved.sectionNumber}`
       : `Direct enacted-text cross-reference from this answer's primary evidence`;
     const record = sourceRecord(targeted.value, {
@@ -2039,10 +2127,12 @@ export async function assembleResearchEvidence({
 
   // Optional definitions fill the remaining space; an oversized definitions
   // section must not displace the complete closing conditions of a short rule.
+  const definitionPrefixes = new Set([...currentReferences.map(reference => reference.codePrefix),
+    ...researchQuestionSubject(query.question).codePrefixes]);
   const definitionCandidates = dependencyPlan?.corpusPrefix === "ZR" && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
     Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
     { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
-  )];
+  )].sort((left, right) => Number(definitionPrefixes.has(right.codePrefix)) - Number(definitionPrefixes.has(left.codePrefix)));
   for (const [index, candidate] of definitionCandidates.entries()) {
     if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
     if (!isDefinitionCandidate(candidate)) continue;
@@ -2057,13 +2147,16 @@ export async function assembleResearchEvidence({
       resolverFailureCount += 1;
       continue;
     }
+    if (["sectionID", "codePrefix", "sectionNumber", "corpusID", "codeVersion", "codeEdition", "jurisdiction"]
+      .some(key => candidate[key] && candidate[key] !== resolved[key])) continue;
     const identity = sectionIdentity(resolved);
     if (!identity || includedSectionIdentities.has(identity)) continue;
     const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters, 2_500);
     const targeted = targetedDefinitionValue(
       resolved,
-      definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
-      allowance
+      definitionSelectionContext(query.question, canonicalForExpansion, resolved),
+      allowance,
+      { allowShortSection: true }
     );
     if (!targeted.excerpt) continue;
     const record = sourceRecord(targeted.value, {

@@ -1,10 +1,13 @@
+import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
-import { researchCurrentRuleDetailScore } from "./research-rule-packets.mjs";
+import { researchCurrentRuleDetailScore, researchCheckedRuleIndexPassage } from "./research-rule-packets.mjs";
+import { researchEmbeddedDefinitionCarrier } from "./research-definition-excerpts.mjs";
+import { nominateDelegatedRuleGroups } from "./research-rule-groups.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-current-detail-canonical-packets-v51";
+export const evidenceDiscoveryVersion = "20261003-bounded-canonical-rule-groups-v55";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -980,10 +983,8 @@ function questionDisciplinePrefixes(question) {
   // A soft ranking signal, never a corpus exclusion or a substitute for a
   // section reference. Cross-code requirements can still be selected.
   const prefixes = explicitQuestionDisciplinePrefixes(question);
-  if (/\b(?:fuel[- ]gas|natural[- ]gas|gas[- ]fired|gas[-\s]+(?:piping|pipes?|lines?|systems?|appliances?|connectors?|connections?))\b/i.test(question)) prefixes.add("FGC");
-  if (/\b(?:ventilat\w*|exhaust|ducts?|air[- ]condition\w*|makeup[- ]air|mechanical\s+(?:code|system)|combustion\s+air)\b/i.test(question)) prefixes.add("MC");
-  if (/\b(?:plumbing|sanitary|drain(?:age|s)?|sewer|trap(?:s|ping)?|lavator\w*|toilet|shower|water[- ]heater|drinking[- ]fountain)\b/i.test(question)) prefixes.add("PC");
-  if (/\b(?:permit|DOB\s+inspection|certificate\s+of\s+occupancy|stop[- ]work\s+order|permit\s+application)\b/i.test(question)) prefixes.add("AC");
+  for (const prefix of researchQuestionSubject(question).codePrefixes) prefixes.add(prefix);
+  if (/\bpermit\b/i.test(question)) prefixes.add("AC");
   return prefixes;
 }
 
@@ -1856,17 +1857,27 @@ export async function discoverRelevantEvidence({
     .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean) : [];
   const currentPassageScores = new Map(currentPassageHits.flatMap(hit =>
     (hit.passages || [hit]).map(passage => [passageIdentity(passage), passage.score])));
+  // Keep a small literal foreground independently of expanded synonyms and
+  // mixed project context. It can reorder existing authorized candidates only;
+  // it cannot nominate new sources or replace a protected reference/companion.
+  const foregroundWords = rawTokens(currentQuestion).filter(word => word.length > 2 && /[a-z]/i.test(word) &&
+    !stopWords.has(word) && !rankingBoilerplate.has(word) && !genericPassageHeadingWords.has(word) &&
+    !["need", "needed", "project", "fictional", "scenario", "ground", "floor", "make"].includes(word));
+  const foregroundWeights = new Map(foregroundWords.flatMap(word => [...singularForms(word)].map(form => [form, 1])));
+  const foregroundPrefixes = explicitDisciplinePrefixes.size ? explicitDisciplinePrefixes : disciplinePrefixes;
+  const foregroundHits = passageIndex && foregroundWeights.size >= 2
+    ? searchResearchPassages(passageIndex, currentQuestion, { queryWeights: foregroundWeights,
+      explicitReferenceQuery: currentQuestion, limit: 100, passagesPerSection: 8 })
+      .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID))
+      .filter(hit => hit && foregroundPrefixes.has(hit.codePrefix)) : [];
   const activePacketHits = passageIndex && retrievalContext?.contextDependentFollowUp && !relevanceComparison
     ? (retrievalContext.activeRulePacketReferences || []).slice(0, 3).flatMap(reference => {
       if (!['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => reference[key]) ||
           (explicitDisciplinePrefixes.size && !explicitDisciplinePrefixes.has(reference.codePrefix))) return [];
-      const entry = passageIndex.passages.find(passage =>
-        ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => passage[key] === reference[key]) &&
-        (!reference.sectionID || comparableSectionID(passage.sectionID) === comparableSectionID(reference.sectionID)) &&
-        (!reference.jurisdiction || !passage.jurisdiction || passage.jurisdiction === reference.jurisdiction) &&
-        passage.subsectionNumber === passage.sectionNumber &&
-        [...new Set([...(passage.contextTexts || []), passage.text])].join('\n\n').length <= 12000 &&
-        researchCurrentRuleDetailScore(passage, currentQuestion) >= 2);
+      const registered = reference.sectionID ? catalogByID.get(comparableSectionID(reference.sectionID)) :
+        sections.find(section => ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition']
+          .every(key => section[key] === reference[key]));
+      const entry = researchCheckedRuleIndexPassage(passageIndex.passages, reference, registered, currentQuestion);
       const hit = entry && authorizedIndexedHit({ ...entry, score: currentPassageScores.get(passageIdentity(entry)) || 1 }, passageIndex, catalogByID);
       return hit ? [hit] : [];
     }) : [];
@@ -2163,6 +2174,7 @@ export async function discoverRelevantEvidence({
       useSelectedPassageOnly: routeMatch?.useSelectedPassageOnly === true,
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
+      definitionCarrier: researchEmbeddedDefinitionCarrier({ ...section, body }),
     });
   }
 
@@ -2278,6 +2290,23 @@ export async function discoverRelevantEvidence({
         !protectedItems.includes(item) && item !== reservation.item)].slice(0, candidateLimit);
     }
   }
+  if (candidateLimit > 1 && !lead?.useSelectedPassageOnly && foregroundPrefixes.size) {
+    const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference ||
+      item.completeSiblingCompanionOf || item.currentQuestionLexicalReservation || item.useSelectedPassageOnly);
+    const foreground = foregroundHits.slice(0, 5).flatMap((hit, rank) => {
+      const item = selectedCandidates.find(value => comparableSectionID(value.section.id) === comparableSectionID(hit.sectionID));
+      const words = new Set(rawTokens(hit.text).flatMap(word => [...singularForms(word)]));
+      const overlap = foregroundWords.filter(word => [...singularForms(word)].some(form => words.has(form))).length;
+      if (!item || protectedItems.includes(item) || item.definitionCarrier || !foregroundPrefixes.has(item.section.codePrefix) ||
+          item.contextualReference || item.inheritedReference || item.useSelectedPassageOnly ||
+          !completeIndexedScope(hit) || !completeIndexedScope(item.indexedPassage) || overlap < 2 ||
+          zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) < 1) return [];
+      item.currentQuestionForeground = { rank: rank + 1, source: "literal_current_question" };
+      return [item];
+    }).slice(0, 3);
+    selectedCandidates = [...protectedItems, ...foreground, ...selectedCandidates.filter(item =>
+      !protectedItems.includes(item) && !foreground.includes(item))].slice(0, candidateLimit);
+  }
   const selectedIDs = new Set(selectedCandidates.map((item) => item.section.id));
   const selectedPrefixCounts = new Map();
   for (const item of selectedCandidates) {
@@ -2285,8 +2314,9 @@ export async function discoverRelevantEvidence({
   }
   const supplementalDefinitions = detailed.filter((item) => !selectedIDs.has(item.section.id) &&
     selectedPrefixCounts.has(item.section.codePrefix) &&
-    (String(item.section.sectionNumber) === "202" || /\bdefinitions?\b/i.test(item.section.title || "")))
+    (String(item.section.sectionNumber) === "202" || /\bdefinitions?\b/i.test(item.section.title || "") || item.definitionCarrier))
     .sort((left, right) =>
+      Number(foregroundPrefixes.has(right.section.codePrefix)) - Number(foregroundPrefixes.has(left.section.codePrefix)) ||
       selectedPrefixCounts.get(right.section.codePrefix) - selectedPrefixCounts.get(left.section.codePrefix) ||
       Number(String(right.section.sectionNumber) === "202") - Number(String(left.section.sectionNumber) === "202") ||
       right.score - left.score)
@@ -2396,6 +2426,8 @@ export async function discoverRelevantEvidence({
         matchedTerms: item.matchedTerms.slice(0, 12),
         ...(item.completeSiblingCompanionOf ? { completeSiblingCompanionOf: item.completeSiblingCompanionOf } : {}),
         ...(item.currentQuestionLexicalReservation ? { currentQuestionLexicalReservation: item.currentQuestionLexicalReservation } : {}),
+        ...(item.currentQuestionForeground ? { currentQuestionForeground: item.currentQuestionForeground } : {}),
+        ...(item.definitionCarrier ? { canonicalEmbeddedDefinitions: item.definitionCarrier } : {}),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
         rootClaimCoverage: item.rootClaimCoverage,
@@ -2477,6 +2509,9 @@ export async function discoverRelevantEvidence({
     candidateState: "unreviewed",
     candidates: candidates.slice(0, candidateLimit),
     supplementalDefinitionCandidates: candidates.slice(candidateLimit),
+    delegatingRuleGroups: nominateDelegatedRuleGroups(selectedCandidates.filter(item =>
+      !explicitDisciplinePrefixes.size || explicitDisciplinePrefixes.has(item.section.codePrefix)), sections, passageIndex,
+      currentQuestion, codeReferences),
     coverageLimitations,
     outsideCurrentLibrary,
     searchedSectionCount: sections.length

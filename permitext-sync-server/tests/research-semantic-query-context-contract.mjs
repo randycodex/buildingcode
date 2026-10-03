@@ -253,8 +253,9 @@ assert.equal(researchEvidenceRetrievalQuery({ question: samePropertyQuestion, pr
 for (const ambiguousTitle of ["Slope of drainage piping of equipment.", "Requirements of horizontal drainage piping.", "Height of 36-inch supports.", "Slope of ventilation ducting."]) {
   const history = structuredClone(pipeHistory);
   history.at(-1).answer.citations = [{ ...history.at(-1).answer.citations[0], title: ambiguousTitle }];
-  assert.equal(researchEvidenceRetrievalQuery({ question: pipeQuestion, previousMessages: history }).semanticQuery, pipeQuestion,
-    "Ambiguous or unrelated property headings are omitted without restoring a long old measured topic.");
+  assert.equal(researchEvidenceRetrievalQuery({ question: pipeQuestion, previousMessages: history }).semanticQuery,
+    `${pipeQuestion}\nSubject context: sanitary drain`,
+    "Ambiguous headings fall back to compact human subject words, without restoring old measurements or factual clauses.");
 }
 for (const switchedQuestion of [
   "New topic: how should this outdoor gas line be buried?",

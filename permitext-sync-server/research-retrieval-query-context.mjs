@@ -1,3 +1,4 @@
+import { researchQuestionSubject, researchFloorAreaRatioRequested } from "./research-question-subject.mjs";
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
 // These are search facets, not legal categories or applicability decisions.
@@ -297,16 +298,18 @@ function shadowedDescriptionStatements(facts, topics) {
 export function relevantResearchRetrievalFactContext({ question, contextualTopics = [], projectFacts = [],
   maximumCharacters = 640, queryMode = "semantic" } = {}) {
   const subject = currentTopics(question, contextualTopics).join(" ");
+  const intent = researchQuestionSubject(subject);
   const currentTerms = contextTerms(question);
   const questionTerms = currentTerms.size >= 3 ? currentTerms : contextTerms(subject);
   const relevant = new Set();
-  const zoning = /\b(?:zoning|district|FAR|floor area ratio|parking|setback|yards?|lot coverage|lot|permitted use|use permitted|development rights?|frontage|transparency|streetscape|street[- ]wall|glazing)\b/i.test(subject);
+  const zoning = /\b(?:zoning|district|floor area ratio|parking|setback|yards?|lot coverage|lot|permitted use|use permitted|development rights?|frontage|transparency|streetscape|street[- ]wall|glazing)\b/i.test(subject) || researchFloorAreaRatioRequested(subject);
+  if (intent.roomDimensions) relevant.add("use");
   if (zoning) for (const name of ["district", "use", "work", "lot"]) relevant.add(name);
   if (/\b(?:occupancy|occupant load|egress|stairs?|exit|travel distance|accessible|fire|sprinkler|ventilation|plumbing fixtures?|water closets?)\b/i.test(subject)) relevant.add("use");
   if (/\b(?:new|development|enlargement|alteration|existing|change of use|construction)\b/i.test(subject)) relevant.add("work");
-  if (/\b(?:sprinkler|fire|storage|egress|travel distance|height|area)\b/i.test(subject)) relevant.add("sprinklers");
+  if ((!intent.roomDimensions || /\b(?:sprinkler|fire|storage|egress|travel distance)\b/i.test(subject)) && /\b(?:sprinkler|fire|storage|egress|travel distance|height|area)\b/i.test(subject)) relevant.add("sprinklers");
   if (/\b(?:height|stories|storeys|high[- ]rise|floors?|vertical|elevator)\b/i.test(subject.replace(/\bfloor\s+drains?\b/gi, "drain"))) relevant.add("height");
-  if (/\b(?:area|FAR|coverage|square feet|sq\s*ft)\b/i.test(subject)) relevant.add("area");
+  if ((!intent.roomDimensions || intent.buildingArea) && /\b(?:area|FAR|coverage|square feet|sq\s*ft)\b/i.test(subject)) relevant.add("area");
   if (/\b(?:flood|waterfront|sidewalk|grade|elevation)\b/i.test(subject)) relevant.add("flood");
   if (/\b(?:construction type|fire[- ]rat(?:ing|ed)|fire[- ]resistan)\b/i.test(subject)) relevant.add("protection");
   const originalFacts = (Array.isArray(projectFacts) ? projectFacts : []).map(factPayload);
@@ -336,6 +339,11 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
     .map((fact, index) => {
       const buildingDimensionField = /^(?:Stories Above Grade|Levels Below Grade|Building Height)$/i.test(fact.label);
       if (buildingDimensionField && !buildingScaleDimensionsRequested(subject)) return { ...fact, index, score: 0 };
+      // A room ceiling question must not acquire a gross-building-area search
+      // subject merely because it names the retail sales area. Full project facts
+      // remain available to the writer/reviewer; this only filters search hints.
+      if (intent.roomDimensions && !intent.buildingArea && fact.facets.includes("area") &&
+          !researchQuestionSubject(fact.assertion).roomDimensions) return { ...fact, index, score: 0 };
       const overlap = [...contextTerms(fact.assertion)].filter(term => questionTerms.has(term)).length;
       const facetMatches = fact.facets.filter(name => relevant.has(name)).length;
       const lexicalIdentity = queryMode === "lexical" && zoning && /\b(?:address|borough|BBL|ZIP code|community district|zoning map)\s*:/i.test(fact.payload);
@@ -415,6 +423,18 @@ function userSubject(value) {
     .replace(/\b(?:Under|NYC|New York City|Building Code|Construction Code|Mechanical Code|Plumbing Code|Fire Code|Fuel Gas Code|Zoning Resolution)\b/gi, " ")
     .replace(/\s+/g, " ").trim().slice(0, 360);
 }
+function boundedHumanSubject(value) {
+  // A rejected checked heading cannot justify replaying a prior scenario.
+  // Retain only compact words from the human question's opening subject,
+  // excluding measurements, modal instructions and old factual clauses.
+  const omitted = new Set([...valueBoilerplate, ...contextBoilerplate, ...genericSubjectWords,
+    "can", "may", "might", "will", "shall", "need", "needs", "new", "we", "our", "my", "beside", "outside"]);
+  const openings = text(value).split(/[.!?](?:\s|$)/).flatMap(clause => clause.split(/,\s*/));
+  const candidates = openings.map(opening => (userSubject(opening).match(/\p{L}[\p{L}-]*/gu) || [])
+    .flatMap(word => word.split("-")).filter(word => word.length > 2 && !omitted.has(word.toLowerCase())));
+  return (candidates.find(words => words.length >= 2) || candidates.find(words => words.length) || [])
+    .slice(0, 16).join(" ").slice(0, 140);
+}
 function requestedFamilies(value) {
   const families = new Set((text(value).match(/\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\b/gi) || []).map(value => value.toUpperCase()));
   for (const [family, name] of [["BC", "building"], ["EBC", "existing building"], ["FC", "fire"], ["FGC", "fuel gas"], ["MC", "mechanical"], ["PC", "plumbing"]]) {
@@ -467,7 +487,8 @@ export function semanticResearchSubjectContext({ question, contextualTopics = []
   if (!returnToOriginal && !changedEdition && !correctedTopic && substantiveTerms.length >= 6 && titles.length) {
     const subjects = titles.map(title => currentDetailSourceSubject(title, question, topics)).filter(Boolean)
       .filter((subject, index, all) => all.findIndex(candidate => candidate.toLowerCase() === subject.toLowerCase()) === index);
-    return subjects.join("; ").slice(0, 140);
+    if (subjects.length) return subjects.join("; ").slice(0, 140);
+    return boundedHumanSubject(topics[0] || "");
   }
   // Generic section titles cannot supply a subject. Fall back only to active
   // user topics, never assistant text or the prior source's operative clauses.

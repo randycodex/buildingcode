@@ -1,4 +1,6 @@
-export const researchDefinitionExcerptVersion = "20260930-complete-definition-dependencies-v4";
+import { createHash } from "node:crypto";
+
+export const researchDefinitionExcerptVersion = "20261003-operative-definition-context-v5";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -186,12 +188,71 @@ function definitionEntries(section) {
   return richEntries.length ? richEntries : definitionEntriesFromText(section);
 }
 
+// Some canonical catalog records carry the next chapter in the same source
+// block. Recognize the enacted heading, not a guessed catalog title/number.
+// The registered carrier remains the citation identity throughout extraction.
+export function researchEmbeddedDefinitionCarrier(section) {
+  if (section?.truncated === true) return null;
+  const prefix = compactText(section?.codePrefix).toUpperCase();
+  if (!/^[A-Z]+$/.test(prefix)) return null;
+  const blocks = section?.body?.blocks || section?.blocks || [];
+  for (const [blockIndex, block] of blocks.entries()) {
+    const headings = [...String(block?.html || "").matchAll(/<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/gi)];
+    for (const [headingIndex, heading] of headings.entries()) {
+      const headingText = plainTextFromHTML(heading[1]);
+      const match = headingText.match(/^Section\s+([A-Z]+)\s+(\d+(?:\.\d+)*):\s+(?:General\s+)?Definitions?\s*$/i);
+      if (!match || match[1].toUpperCase() !== prefix) continue;
+      const plain = String(block.plainText || "");
+      const location = exactWhitespaceLocation(plain, headingText);
+      if (!location) continue;
+      const nextSection = headings.slice(headingIndex + 1).map(item => plainTextFromHTML(item[1]))
+        .find(text => /^Section\s+[A-Z]+\s+\d+(?:\.\d+)*:/i.test(text));
+      const nextLocation = nextSection && exactWhitespaceLocation(plain.slice(location.end), nextSection);
+      const rangeEnd = nextLocation ? location.end + nextLocation.start : plain.length;
+      const entries = definitionEntries(section).filter(entry =>
+        exactWhitespaceLocation(plain.slice(location.end, rangeEnd), entry.text));
+      if (new Set(entries.map(entry => entry.label)).size < 2) continue;
+      return { codePrefix: prefix, sectionNumber: match[2], heading: headingText,
+        carrierSectionID: compactText(section?.sectionID || section?.id),
+        carrierSectionNumber: compactText(section?.sectionNumber),
+        sourceTextHash: createHash("sha256").update(plain).digest("hex"),
+        definitionRange: { start: location.end, end: rangeEnd },
+        sourceOffsets: { blockIndex, blockID: String(block.id || ""), ...location } };
+    }
+  }
+  return null;
+}
+
+function exactWhitespaceLocation(source, excerpt) {
+  const words = compactText(excerpt).split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  const pattern = words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("\\s+");
+  const match = new RegExp(pattern).exec(source);
+  return match ? { start: match.index, end: match.index + match[0].length } : null;
+}
+
+function definitionBindings(section, selected, carrier) {
+  if (!carrier) return {};
+  const blocks = section?.body?.blocks || section?.blocks || [];
+  const block = blocks[carrier.sourceOffsets.blockIndex];
+  const plain = String(block?.plainText || "");
+  const entries = selected.map(entry => {
+    const location = exactWhitespaceLocation(plain, entry.text);
+    return location && location.start >= carrier.definitionRange.start && location.end <= carrier.definitionRange.end ? { label: entry.label,
+      sourceTextHash: carrier.sourceTextHash,
+      sourceOffsets: { blockIndex: carrier.sourceOffsets.blockIndex, blockID: String(block.id || ""), ...location }
+    } : null;
+  });
+  return entries.every(Boolean) ? { embeddedDefinitionSection: carrier, canonicalEntryBindings: entries } : null;
+}
+
 function isDefinitionSection(section, text) {
   const sectionNumber = compactText(section?.sectionNumber).toUpperCase();
   const title = compactText(section?.title);
   return sectionNumber === "202" ||
     /\bdefinitions?\b/i.test(title) ||
-    /\bthe following (?:terms )?shall.*\bmeanings?\b/i.test(text.slice(0, 2_000));
+    /\bthe following (?:terms )?shall.*\bmeanings?\b/i.test(text.slice(0, 2_000)) ||
+    Boolean(researchEmbeddedDefinitionCarrier(section));
 }
 
 function entryScore(entry, queryTerms, normalizedQuery) {
@@ -286,13 +347,14 @@ function boundedRequiredTermEntry(entry, maximumCharacters) {
 }
 
 export function targetedDefinitionExcerpt(section, query, options = {}) {
+  if (section?.truncated === true) return null;
   const canonicalText = compactText(section?.canonicalText || section?.text ||
     ((Array.isArray(section?.body?.blocks) ? section.body.blocks : section?.blocks) || [])
       .map((block) => compactText(block?.plainText))
       .filter(Boolean)
       .join("\n\n"));
   if (
-    (canonicalText.length < researchDefinitionExcerptLimits.minimumSectionCharacters &&
+    (options.allowShortSection !== true && canonicalText.length < researchDefinitionExcerptLimits.minimumSectionCharacters &&
       !(zoningHousingDefinitionEntries(section).length && canonicalText.length > (options.maximumCharacters || researchDefinitionExcerptLimits.maximumCharacters))) ||
     !isDefinitionSection(section, canonicalText)
   ) return null;
@@ -315,7 +377,8 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     researchDefinitionExcerptLimits.maximumCharacters,
     researchDefinitionExcerptLimits.maximumCharacters
   );
-  const entries = definitionEntries(section);
+  const carrier = researchEmbeddedDefinitionCarrier(section);
+  const entries = definitionEntries(section).filter(entry => !carrier || definitionBindings(section, [entry], carrier));
   // A dependency packet requests exact, complete definition entries. Do not
   // fall back to an incidental mention of the term or clip its conditions to
   // fit: the caller must retain an explicit evidence gap when it cannot fit.
@@ -324,8 +387,10 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     const selected = labels.map(label => entries.filter(entry => comparableText(entry.label) === label));
     if (selected.some(matches => matches.length !== 1) || labels.length > maximumDefinitions) return null;
     const complete = selected.map(matches => matches[0]).sort((left, right) => left.order - right.order);
-    const text = complete.map(entry => entry.text).join("\n\n");
+    const text = [carrier?.heading, ...complete.map(entry => entry.text)].filter(Boolean).join("\n\n");
     if (text.length > maximumCharacters) return null;
+    const bindings = definitionBindings(section, complete, carrier);
+    if (!bindings) return null;
     return {
       schemaVersion: 1, version: researchDefinitionExcerptVersion,
       sourceMode: "canonical_enacted_definition_entries",
@@ -334,7 +399,7 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
       codeVersion: compactText(section?.codeVersion), jurisdiction: compactText(section?.jurisdiction),
       labels: complete.map(entry => entry.label), passages: complete.map(entry => entry.text), text,
       canonicalSectionCharacterCount: canonicalText.length, excerptCharacterCount: text.length,
-      canonicalContextComplete: false, completeDefinitionEntries: true
+      canonicalContextComplete: false, completeDefinitionEntries: true, ...bindings
     };
   }
   const dependencies = options.requiredTextTerms?.length ? [] : zoningDefinitionDependencies(section, query);
@@ -355,7 +420,7 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
       left.order - right.order
     );
   const selected = [];
-  let characterCount = 0;
+  let characterCount = carrier ? carrier.heading.length + 2 : 0;
   const candidates = requiredEntries
     ? ranked.slice(0, maximumDefinitions).sort((left, right) => left.text.length - right.text.length)
     : ranked;
@@ -377,7 +442,9 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
   if (!selected.length) return null;
   if (requiredEntries && selected.length !== candidates.length) return null;
   selected.sort((left, right) => left.order - right.order);
-  const text = selected.map((entry) => entry.text).join("\n\n");
+  const text = [carrier?.heading, ...selected.map((entry) => entry.text)].filter(Boolean).join("\n\n");
+  const bindings = definitionBindings(section, selected, carrier);
+  if (!bindings) return null;
   return {
     schemaVersion: 1,
     version: researchDefinitionExcerptVersion,
@@ -393,6 +460,7 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     text,
     canonicalSectionCharacterCount: canonicalText.length,
     excerptCharacterCount: text.length,
-    canonicalContextComplete: false
+    canonicalContextComplete: false,
+    ...bindings
   };
 }
