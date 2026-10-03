@@ -1,7 +1,7 @@
 import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
 import { researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 
-export const researchCorpusRegistryVersion = "20261003-requested-versus-recall-corpus-v17";
+export const researchCorpusRegistryVersion = "20261003-requested-versus-recall-corpus-v18";
 const currentLibraryRecallReason = "authorized current-library recall; applicability unresolved";
 
 const constructionCodeVersion =
@@ -14,6 +14,7 @@ const zoningCodeVersion =
   "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 
 const constructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b|\b(?:means\s+of\s+egress|occupancy|travel\s+distance|fixture\s+count|construction\s+type)\b/i;
+const explicitConstructionAuthorityCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b/i;
 const fireCue = /\bextinguishers?\b|\bfire[- ]lanes?\b|\bfire[- ]apparatus\s+access\b|\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
 const zoningCuePattern = /\b(?:transparency|streetscape|street[- ]wall|primary frontage|storefront glazing)\b|\b(?:does|can|would|will)\s+zoning\b|\bzoning\s+(?:allow\w*|permit\w*|prohibit\w*|restrict\w*)\b|\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability|transitions?|amendments?|history|rules?|requirements?|regulations?|provisions?)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
 const projectDependentZoningCuePattern = /\b(?:parking|floor\s+area|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
@@ -21,7 +22,8 @@ const projectDependentZoningCuePattern = /\b(?:parking|floor\s+area|permitted\s+
 // Preserve lowercase FAR when its surrounding words establish ratio intent.
 const floorAreaRatioCue = value => /\bFAR\b/.test(value) ||
   /\b(?:permitted|maximum|allowable|calculate)\s+far\b|\bfar\s*(?:of|=|\d)/i.test(value);
-const zoningCue = { test: value => zoningCuePattern.test(value) || floorAreaRatioCue(value) };
+const independentlyNamedZoningCue = /\b(?:and|plus|as\s+well\s+as|under)\s+(?:the\s+)?zoning\b|\bzoning\s+(?:and|plus|as\s+well\s+as)\b/i;
+const zoningCue = { test: value => zoningCuePattern.test(value) || independentlyNamedZoningCue.test(value) || floorAreaRatioCue(value) };
 const projectDependentZoningCue = { test: value => projectDependentZoningCuePattern.test(value) || floorAreaRatioCue(value) };
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\b/i;
 const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas|Administrative)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b|\b(?:BC|AC|PC|MC|FGC)14\b|\b2014\s+code\b|\b(?:BC|AC|PC|MC|FGC|Building\s+Code|Construction\s+Codes?)\s*2014\b/i;
@@ -201,10 +203,13 @@ export function routeResearchCorpora({
   const projectHasZoningContext = (Array.isArray(projectFacts) ? projectFacts : [])
     .some((fact) => /^(?:Zoning Fact|NYC Planning Fact)\s+—\s+(?:Zoning District|Zoning Map|BBL|Block|Tax Lot)/i.test(compactText(fact)));
   // Project inventory supplies context, not an independent zoning request.
-  // Fire protection also uses floor area and parking terminology; retain its
-  // own corpus/budget unless the user independently names a zoning issue.
+  // Technical code questions also use floor area, yards and parking terms,
+  // including exclusions in a scenario. Their presence is not an independent
+  // zoning request. Explicit zoning cues below still permit mixed questions,
+  // and authorized current-library recall remains available in either case.
   const projectZoningRequested = projectHasZoningContext &&
-    projectDependentZoningCue.test(currentQuestion) && !fireCue.test(currentQuestion);
+    projectDependentZoningCue.test(currentQuestion) &&
+    !explicitConstructionAuthorityCue.test(currentQuestion) && !fireCue.test(currentQuestion);
   const currentHasCorpusCue = [
     constructionCue,
     fireCue,
