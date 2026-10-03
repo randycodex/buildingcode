@@ -23832,6 +23832,9 @@ function positionReaderSelectionResearchAction() {
     readerSelectionResearchAction.hidden = true;
     return;
   }
+  readerSelectionResearchAction.style.setProperty(
+    "--selection-code-accent", getComputedStyle(panel).getPropertyValue("--code-accent").trim()
+  );
   const bounds = panel.getBoundingClientRect();
   const left = Math.max(0, bounds.left);
   const right = Math.min(window.innerWidth, bounds.right);

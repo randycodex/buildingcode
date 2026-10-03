@@ -17685,10 +17685,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   padding: 0 16px;
   white-space: nowrap;
   transition: none;
-  border: 1px solid var(--accent, #ffb65c);
+  border: 1px solid var(--selection-code-accent, var(--code-accent));
   border-radius: 12px;
   background: #191919;
-  color: #ffb65c;
+  color: var(--selection-code-accent, var(--code-accent));
   box-shadow: 0 4px 24px #0008;
   font-family: inherit;
   font-size: 14px;
