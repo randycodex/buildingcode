@@ -1,0 +1,34 @@
+{
+  "configuration": {
+    "PERMITEXT_RESEARCH_ROUTING_MODE": "hybrid",
+    "PERMITEXT_RESEARCH_ROUTING_POLICY": "review_first",
+    "PERMITEXT_RESEARCH_MODEL": "gpt-6-luna",
+    "PERMITEXT_RESEARCH_FAST_MODEL": "gpt-6-luna",
+    "PERMITEXT_RESEARCH_ACCURATE_MODEL": "gpt-6.1-sol",
+    "PERMITEXT_RESEARCH_COMPLEX_VERIFICATION": "1",
+    "PERMITEXT_RESEARCH_ACCURATE_SERVICE_TIER": "default",
+    "PERMITEXT_RESEARCH_REASONING_EFFORT": "low",
+    "PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT": "medium",
+    "PERMITEXT_RESEARCH_SERVICE_TIER": "priority",
+    "PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS": "2",
+    "PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS": "0.10",
+    "PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS": "10",
+    "PERMITEXT_RESEARCH_PRICING_VERSION": "official-model-docs-2026-10-03",
+    "PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS": "0.10",
+    "PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS": "0.01",
+    "PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS": "0.50",
+    "PERMITEXT_RESEARCH_FAST_PRICING_VERSION": "official-model-docs-2026-10-03",
+    "PERMITEXT_RESEARCH_MAX_REQUEST_USD": "1.00"
+  },
+  "officialSources": [
+    "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "https://developers.openai.com/api/docs/models/gpt-6-luna"
+  ],
+  "pricesAreStandardPerMillionTokens": true,
+  "tierMultiplier": "Luna priority2x; Sol standard default1x",
+  "existingDailyAndMonthlyCapsUnchanged": true,
+  "mandatoryFinalReviewAndAttemptLimitsUnchanged": true,
+  "productionAnswersPending": true,
+  "capRationale": "v17 blocked before full accurate revision; real18source/33fact unpaid envelope reconstruction (not exact hosted prior draft) has four unsettled phase ceilings around$0.95 and actual-first-two plus remaining conservative ceilings around$0.67\u20130.74. Exact rejected-call diagnostic added. Daily/monthly caps unchanged.",
+  "preflightSHA256": "0223c50f65eeae97806063ee9333e151789db26b2215c626f711a706f5b80063"
+}

@@ -273,7 +273,7 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
   const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
   const nextReservedUSD = Number((context.reservedUSD + maximumRequestUSD).toFixed(6));
   if (nextReservedUSD > context.maximumRequestUSD) {
-    throw spendCapError("Research stopped before another provider call could exceed the cumulative per-turn spending limit.");
+    throw spendCapError(`Research stopped before another provider call could exceed the cumulative per-turn spending limit. Reserved upper bound: $${context.reservedUSD.toFixed(6)}; next request upper bound: $${maximumRequestUSD.toFixed(6)}; turn limit: $${context.maximumRequestUSD.toFixed(6)}.`);
   }
   context.reservedUSD = nextReservedUSD;
   context.providerRequestCount += 1;

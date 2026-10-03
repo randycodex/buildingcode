@@ -323,6 +323,7 @@ import { materializeGuidanceSourceResolutions, validateGuidanceSourceResolutions
 import { repairGuidanceDeclaredActions } from "./research-guidance-action-repairs.mjs";
 import { bindResearchNarrativeSources } from "./research-narrative-source-bindings.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
+import { researchFailedHumanMeasurementTopicContext } from "./research-measurement-subject.mjs";
 import { refreshZoningContextEvidence, zoningContextExcerptPrompt } from "./research-zoning-context-excerpts.mjs";
 import { isZoningConditionalExplanation, planZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
 import {
@@ -19618,12 +19619,13 @@ async function handleResearchConversationMessage(request, response) {
   if (!conversation) return;
   const originalConversation = structuredClone(conversation);
   const activeMessages = activeResearchMessages(conversation);
-  const topicContext = activeResearchTopicContext(conversation);
+  let topicContext = activeResearchTopicContext(conversation);
   const question = normalizedResearchText(context.body.question, 2_000);
   if (question.length < 3) {
     sendError(response, 400, "Enter a research question.");
     return;
   }
+  topicContext = researchFailedHumanMeasurementTopicContext({ conversation, question, topicContext });
   if (conversation.projectContextReviewRequired) {
     sendJSON(response, 409, {
       error: "Review the user-provided Project context before generating another answer.",
@@ -19880,7 +19882,7 @@ async function handleResearchConversationMessage(request, response) {
     const corpusPlan = await researchCorpusPlanForTurn({
       question,
       messages: activeMessages,
-      topicContext: conversation.topicContext,
+      topicContext,
       projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
       projectFacts: combinedProjectFacts,
       pinnedEvidence
@@ -21581,7 +21583,7 @@ async function handleResearchConversationMessage(request, response) {
     }
     if (error.code === "RESEARCH_SPEND_CAP") {
       progressResponse.failActive("failed");
-      progressResponse.error(503, "Research is temporarily unavailable. Your question is still here.", {
+      progressResponse.error(503, "Research stopped at a spending limit before another model call. Your question and earlier messages are saved. You can ask a narrower question here.", {
         code: "RESEARCH_SPEND_CAP"
       });
       return;

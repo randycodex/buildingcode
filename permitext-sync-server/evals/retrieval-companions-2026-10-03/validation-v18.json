@@ -1,0 +1,18 @@
+{
+  "candidate": "v18",
+  "providerCalls": 0,
+  "passedChecks": [
+    "failed-human-measurement-subject: current revision human subject only, no failed facts/assistant citations, reset/edition/newtopic negative checks",
+    "dependent-measurement-subject",
+    "failed-question-history: mocked HTTP failure/recovery without providers",
+    "complex-verification",
+    "claim-scope:220 request envelopes",
+    "cost-guardrail",
+    "hosted-semantic-spend",
+    "syntax/diff check"
+  ],
+  "requestCapUSD": 1.0,
+  "dailyAndMonthlyCapsUnchanged": true,
+  "attemptAndFinalReviewLimitsUnchanged": true,
+  "liveAcceptance": "pending"
+}

@@ -26,7 +26,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-dependent-measurement-subject-v61";
+export const researchEvidenceAssemblyVersion = "20261003-failed-human-measurement-subject-v62";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -295,9 +295,10 @@ export function researchEvidenceRetrievalQuery({
       previousTopicApplied = true;
     }
   }
-  const checkedPriorSources = contextDependentFollowUp
+  const recoveredFailedHumanSubject = topicContext?.failedHumanSubjectRecovery?.source === "failed_human_question";
+  const checkedPriorSources = contextDependentFollowUp && !recoveredFailedHumanSubject
     ? researchPriorAnswerSources(previousMessages) : [];
-  const inheritedAuthorityReferences = contextDependentFollowUp &&
+  const inheritedAuthorityReferences = contextDependentFollowUp && !recoveredFailedHumanSubject &&
       !extractResearchCodeReferences(normalizedQuestion).length &&
       !/\b\d{1,3}-\d{2,4}\b/.test(normalizedQuestion)
     ? researchQueryInheritedReferences(normalizedQuestion,
