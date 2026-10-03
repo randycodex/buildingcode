@@ -14,6 +14,7 @@ import { orderedResearchTopicDependencies, researchTopicDependencyPlan, sameTopi
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import {
   researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery, researchCurrentRuleDetailScore,
+  researchAlternativeMethodReferences,
   sameRuleIdentity as sameRuleIdentityForPacket,
   researchCanonicalApplicabilityContext
 } from "./research-rule-packets.mjs";
@@ -27,7 +28,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-current-detail-canonical-packets-v63";
+export const researchEvidenceAssemblyVersion = "20261003-canonical-method-dependencies-v64";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1409,14 +1410,16 @@ export async function assembleResearchEvidence({
         !['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(key => canonical[key]) ||
         /\bdefinitions?\b/i.test(canonical.title || '') ||
         researchCurrentRuleDetailScore({ text: record.text }, query.question) < 1) return;
-    const references = normalizedCrossReferences(canonical).filter(reference => reference.codePrefix === canonical.codePrefix &&
+    const canonicalReferences = normalizedCrossReferences(canonical);
+    const alternatives = researchCurrentRuleDetailScore({ text: record.text }, query.question) >= 2
+      ? new Set(researchAlternativeMethodReferences({ ...canonical, text: record.text }, canonicalReferences)
+        .map(reference => reference.sectionNumber)) : new Set();
+    const references = canonicalReferences.filter(reference => reference.codePrefix === canonical.codePrefix &&
       (!sameRuleIdentityForPacket(canonical, reference) || reference.referenceKind === 'table') &&
       (reference.referenceKind === 'table' || String(reference.sectionNumber).split('.')[0] ===
-        String(canonical.sectionNumber).split('.')[0]) &&
-      !candidates.some(candidate => candidate.codePrefix === reference.codePrefix &&
-        candidate.sectionNumber === reference.sectionNumber && candidate.corpusID === canonical.corpusID &&
-        candidate.codeVersion === canonical.codeVersion && candidate.codeEdition === canonical.codeEdition))
-      .sort((left, right) => Number(right.referenceKind === 'table') - Number(left.referenceKind === 'table'));
+        String(canonical.sectionNumber).split('.')[0]))
+      .sort((left, right) => Number(right.referenceKind === 'table') - Number(left.referenceKind === 'table') ||
+        Number(alternatives.has(right.sectionNumber)) - Number(alternatives.has(left.sectionNumber)));
     for (const rawReference of references) {
       if (reservedPacketDependencies.size >= Math.min(2, limits.maximumCrossReferences) || packetDependencyReads >= 4) break;
       const reference = { ...rawReference, corpusID: canonical.corpusID, codeVersion: canonical.codeVersion,
@@ -1438,7 +1441,7 @@ export async function assembleResearchEvidence({
       const remaining = supplementalCharacterCeiling - characterCount - reservedTopicCharacters() - reservedPacketCharacters();
       const allowance = Math.min(limits.maximumCharactersPerSource, remaining);
       if (allowance < 1 || canonicalText(resolved).length > allowance ||
-          researchCurrentRuleDetailScore(resolved, query.question) < 2) continue;
+          (researchCurrentRuleDetailScore(resolved, query.question) < 2 && !alternatives.has(reference.sectionNumber))) continue;
       const dependencyRecord = sourceRecord(resolved, { origin: sourceOrigins.crossReference,
         sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, 'current-packet'),
         characterAllowance: allowance, canonicalResolved: true, retrievalDepth: 1, retrievedAt });
@@ -1474,7 +1477,9 @@ export async function assembleResearchEvidence({
     if (!identity || includedSectionIdentities.has(identity)) continue;
     const ownReservation = reservedTopicDependencies.get(dependencyKey(candidate));
     const ownPacketReservation = [...reservedPacketDependencies.values()].find(entry =>
-      entry.resolved.sectionID === candidate.sectionID);
+      entry.resolved.sectionID === candidate.sectionID &&
+      ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction']
+        .every(key => !candidate[key] || candidate[key] === entry.resolved[key]));
     const reservedCharacters = (candidate.evidencePriority?.claimCoverageRequired === true ? 0
       : reservedTopicCharacters() - (ownReservation
         ? Math.max(0, ownReservation.textLength - (existingTopicDependency(candidate)?.text.length || 0)) : 0)) +
@@ -1484,7 +1489,8 @@ export async function assembleResearchEvidence({
     if (remainingCharacters < 1) continue;
     let resolved;
     try {
-      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered, {
+      resolved = await canonicalSection(ownPacketReservation ? async () => ownPacketReservation.resolved : resolveSection,
+        candidate, sourceOrigins.discovered, {
         includeAmendmentHistory: asksForZoningAmendmentHistoryEvents(query.question)
       });
     } catch {

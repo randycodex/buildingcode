@@ -1,7 +1,7 @@
 // A completeness audit describes what was supplied, never which law applies.
 // Recovery uses canonical references and retrieved terminology; model text is
 // never treated as evidence.
-export const researchRulePacketVersion = "20261003-current-detail-canonical-packets-v4";
+export const researchRulePacketVersion = "20261003-canonical-method-dependencies-v5";
 
 const detailStopWords = new Set(('a an and are as at be been before between building buildings by can code codes could do does each existing feet fictional for from have how if in into is it its later may measure measured minimum maximum new not now of on one only or our project proposed question scenario section shall should same some supplied than that the their these this those to under use used using was we were what when where whether which will with without would').split(' '));
 const detailForms = word => {
@@ -22,6 +22,34 @@ export function researchCurrentRuleDetailScore(source, question) {
   const words = new Set((String(source?.text || source?.selectedText || source?.canonicalText || '')
     .toLowerCase().match(/[a-z]{3,}/g) || []).flatMap(word => [...detailForms(word)]));
   return terms.filter(word => [...detailForms(word)].some(form => words.has(form))).length;
+}
+
+// A complete canonical alternatives list can name a method differently from
+// the user's ordinary wording. These exact links nominate dependencies only;
+// they never establish which alternative is applicable or approved.
+export function researchAlternativeMethodReferences(source, references = []) {
+  const text = String(source?.text || '');
+  const introduction = /\b(?:one|any) of (?:the )?following (?:methods?|means|options?|alternatives?)\s*:/i.exec(text);
+  if (!introduction) return [];
+  const tail = text.slice(introduction.index + introduction[0].length);
+  const markers = [...tail.matchAll(/(?:^|\s)([1-9]\d*)[.)]\s+/g)];
+  const items = [];
+  for (const marker of markers) {
+    if (Number(marker[1]) !== items.length + 1) break;
+    items.push(marker);
+  }
+  if (items.length < 2) return [];
+  const itemTexts = items.map((marker, index) => tail.slice(marker.index + marker[0].length,
+    items[index + 1]?.index ?? tail.length).split(/\.(?=\s+[A-Z]|$)/, 1)[0]);
+  const literalReference = reference => {
+    if (reference.codePrefix !== source.codePrefix || reference.referenceKind === 'table') return false;
+    const number = String(reference.sectionNumber || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const prefix = String(source.codePrefix || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return number && itemTexts.some(item => new RegExp(`\\b(?:Sections?\\s+|${prefix}\\s+(?:Sections?\\s+)?)${number}(?=$|[\\s,.;:)])`, 'i').test(item));
+  };
+  const linked = [...new Map(references.filter(literalReference)
+    .map(reference => [reference.sectionNumber, reference])).values()];
+  return linked.length >= 2 ? linked : [];
 }
 
 const contextText = value => typeof value === "string" || typeof value === "number"
