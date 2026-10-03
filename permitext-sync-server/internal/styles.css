@@ -181,3 +181,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .case-timeline { padding: 10px 12px; margin: 12px 0; border: 1px solid #303030; border-radius: 9px; }
 .case-timeline p { margin: 0 0 5px; font-size: 13px; }
 .case-timeline p:last-child { margin-bottom: 0; }
+
+.tabs { gap: 24px; flex-wrap: wrap; align-items: stretch; }
+.console-nav-group { display: flex; flex-direction: column; gap: 8px; }
+.console-nav-group > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.console-nav-label { padding-left: 13px; color: #aaa69f; font-size: 11px; letter-spacing: .04em; }
+@media (max-width: 800px) { .tabs { gap: 16px; } }

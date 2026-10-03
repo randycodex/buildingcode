@@ -7,7 +7,7 @@ let data = null;
 let selectedCaseID = "";
 let caseQuery = "";
 let caseStatus = "all";
-let activeTab = "cases";
+let activeTab = "feedback";
 const renderedTabs = new Set();
 let refreshCaseQueue = null;
 let selectedRetrievalCaseID = "";
@@ -64,12 +64,12 @@ function renderSummary() {
   ).length;
   summaryElement.replaceChildren();
   [
+    ["Open feedback", openFeedback],
     ["Research cases", data.dataset.cases.length],
     ["Research approved", approved],
     ["Retrieval approved", `${retrievalApproved}/${data.retrievalDataset.cases.length}`],
     ["Zoning approved", `${zoningApproved}/${data.zoningDataset.cases.length}`],
     ["Saved runs", data.runs.length],
-    ["Open feedback", openFeedback],
     ["Month spend", `$${Number(data.researchSpend?.totals?.estimatedCostUSD || 0).toFixed(4)}`]
   ].forEach(([label, value]) => {
     const card = element("article");

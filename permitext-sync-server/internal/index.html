@@ -19,19 +19,35 @@
       <p id="status" class="status">Loading private console data…</p>
       <section id="summary" class="summary" hidden></section>
       <nav class="tabs" aria-label="Console sections" hidden>
-        <button type="button" data-tab="cases" aria-pressed="true">Research cases</button>
-        <button type="button" data-tab="retrieval" aria-pressed="false">Retrieval cases</button>
-        <button type="button" data-tab="zoning" aria-pressed="false">Zoning cases</button>
-        <button type="button" data-tab="runs" aria-pressed="false">Runs and comparison</button>
-        <button type="button" data-tab="feedback" aria-pressed="false">Feedback candidates</button>
-        <button type="button" data-tab="spend" aria-pressed="false">Research spend</button>
-        <button type="button" data-tab="lifetime-grants" aria-pressed="false">Lifetime grants</button>
+        <div class="console-nav-group" role="group" aria-label="Incoming reports">
+          <span class="console-nav-label">1 · Review feedback</span>
+          <div><button type="button" data-tab="feedback" aria-pressed="true">Feedback candidates</button></div>
+        </div>
+        <div class="console-nav-group" role="group" aria-label="Quality testing">
+          <span class="console-nav-label">2 · Define test cases</span>
+          <div>
+            <button type="button" data-tab="cases" aria-pressed="false">Research cases</button>
+            <button type="button" data-tab="retrieval" aria-pressed="false">Retrieval cases</button>
+            <button type="button" data-tab="zoning" aria-pressed="false">Zoning cases</button>
+          </div>
+        </div>
+        <div class="console-nav-group" role="group" aria-label="Evaluation results">
+          <span class="console-nav-label">3 · Check results</span>
+          <div><button type="button" data-tab="runs" aria-pressed="false">Runs and comparison</button></div>
+        </div>
+        <div class="console-nav-group" role="group" aria-label="Operations">
+          <span class="console-nav-label">Operations</span>
+          <div>
+            <button type="button" data-tab="spend" aria-pressed="false">Research spend</button>
+            <button type="button" data-tab="lifetime-grants" aria-pressed="false">Lifetime grants</button>
+          </div>
+        </div>
       </nav>
-      <section id="cases" class="tab-panel"></section>
+      <section id="cases" class="tab-panel" hidden></section>
       <section id="retrieval" class="tab-panel" hidden></section>
       <section id="zoning" class="tab-panel" hidden></section>
       <section id="runs" class="tab-panel" hidden></section>
-      <section id="feedback" class="tab-panel" hidden></section>
+      <section id="feedback" class="tab-panel"></section>
       <section id="spend" class="tab-panel" hidden></section>
       <section id="lifetime-grants" class="tab-panel" hidden></section>
     </main>
