@@ -69,3 +69,10 @@ All nine operations settled, linked to the project with 33 facts; estimated prov
 ## Production client-cache preflight, candidate v7
 
 Candidate v7 deployed with the correct source identity, healthy backend and private-vector HTTP404. Before paid answer testing, reopening the saved v6 headroom failure still displayed “Research complete.” The HTML retained an immutable old client URL, while a fresh network read contained the new classifier. Candidate v8 preserves the same server retrieval and prompts but advances the matched HTML/module/offline shell asset versions. No paid v7 turns were dispatched; live status verification is required after v8 reload.
+
+
+## Full fifteen-turn production repeat, candidate v8
+
+The updated client loaded on production and labeled the retained v6 failure and new live verification recovery “Research incomplete.” The matched client/offline shell generations passed cache contracts. All fifteen unchanged questions then completed on production: independent source review graded **14 correct, zero materially wrong, one withheld**. The previous downstream-reduction and rooftop-headroom errors recovered, as did initial burial-depth retrieval. The withheld condensate-options answer is retained; its review feedback escalated an overview into installation specifications and included an unsupported transfer of a drain requirement between alternatives. Those private review findings do not establish that the unavailable draft was otherwise correct. The apartment living-room answer had a correct threshold/shortfall but an unnecessary conditional opening.
+
+All operations settled and linked to the active project with 33 facts. Estimated provider cost was **$0.256737**. See `production-candidate-v8.json`. This is improvement on a known fifteen-turn diagnostic set, not proof of95-percent general accuracy. Candidate v9 refines the existing shared writer/reviewer scope contract for qualified method-category overviews versus installation approvals, preserves result-changing conditions, and requires omissions to match the exact alternative. Its production answers remain pending.

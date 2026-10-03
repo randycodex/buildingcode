@@ -1,0 +1,18 @@
+{
+  "candidate": "v8",
+  "commit": "0a156ad7bce621aabad5fc2ace9741d4b699d921",
+  "deploymentID": "dpl_3ZH17D51tidqvocPpp1EJgyMBG9S",
+  "deploymentHost": "permitext-sync-qt8tydxs1-randycodexs-projects-b72fc111.vercel.app",
+  "productionURL": "https://permitext.com",
+  "ready": true,
+  "identityVerified": true,
+  "healthVerified": true,
+  "privateVectorRouteHTTPStatus": 404,
+  "clientAssetVersion": "20261003-research-answer-status-v630",
+  "reopenedIncompleteLabelVerified": true,
+  "liveIncompleteLabelVerified": true,
+  "flagsPersistedInProjectEnvironment": false,
+  "answerAcceptance": "failed; delivered mechanical overview withheld, prior critical roof/PC failures recovered",
+  "allOperationsSettled": true,
+  "estimatedProviderCostUSD": 0.256737
+}
