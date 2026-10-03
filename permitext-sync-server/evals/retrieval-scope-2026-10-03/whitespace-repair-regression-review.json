@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-03T02:41:09.092368+00:00",
+  "reviewer": "Root assistant source review; not professional adjudication",
+  "classification": "Known regressions only, not fresh validation; original50-turn score unchanged.",
+  "sourceChange": "Normalize only canonical whitespace containment comparisons. Retain sourceblockhashes, rawoffsets, exact indexed text, atomiccontext, strictselection andeditionboundaries. Shortenassemblyversionlabelto20261003-whitespace-containment-v53afterlivepersistencecheckcaughtthe256charactercompositelimit.",
+  "tests": [
+    "research-multiline-indexed-passage-containment-contract.mjs",
+    "research-indexed-passage-assembly-contract.mjs",
+    "research-cross-reference-completeness-contract.mjs",
+    "research-fast-conversation-http-contract.mjs"
+  ],
+  "runs": [
+    {
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v1",
+      "archiveDirectory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-whitespace-repair-live-20261003-v1",
+      "resultsSHA256": "3ec5daf4b0213ee0e26cd7ee64e8f8d757fb8558da258adf6b850d0eeaa32e21",
+      "sourceHashes": {
+        "app.mjs": "8ad233d4599d062288a15b4987f2f689c6c9fe70a08f33f2c56c6e1dcc9a5725",
+        "research-rule-packets.mjs": "e82eacb6d3319b335b1631c8f5564cac4b727c55402f4db411de6675fe546fc4",
+        "research-evidence-assembly.mjs": "90a18aa51d0325738d2bd19ec08b7b492cc896051f20a2725adfa918d5c09f01",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+        "evidence-discovery.mjs": "608edc738b146d38591d097874b93b1bcfcb2bf96ab2a10581fc7342b1e88624",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "79931aa591e5ae72ead2fcbce10b1f86f35d93b6966ccee1bb9716daa1bc5382",
+        "research-corpus-registry.mjs": "7c916830bc6f4bd4386d277733d2a105ced3d82666383969edc3431a9bb18970",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "c1cd6acb85b03211f62189d68e2d23231cb5bb828cb9f7e88563e8746a3607fa",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "research-config.mjs": "acfe048896d8e39476ff25a9acce18b65e41679e32e58076739be0ec946dabe3",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "5a85f06f21f9a9387804d5ee28b49431e0bd50b5c1801c1cea1aa170c959c198",
+        "research-passage-index.mjs": "6c6e1e278de1bb25ac8924c1fbb943cd334bd6fede201d39198d7c7df73d6732",
+        "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012"
+      },
+      "providerStatuses": {
+        "settled": 5
+      },
+      "estimatedCostUSD": 0.01023606,
+      "cases": [
+        {
+          "id": "scope-hold-21-tank-fill-1",
+          "httpStatus": 500,
+          "label": "integration_failure",
+          "answerText": null,
+          "answerTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 33.070974625000005,
+          "sourceReview": "The provider drafts were verified but saving failed because the composed research-system-version label exceeded256characters. This is an integration failure, not a passing answer.",
+          "selectedTextHashes": []
+        }
+      ]
+    },
+    {
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "archiveDirectory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-whitespace-repair-live-20261003-v2",
+      "resultsSHA256": "dc4619201e96e13482143a8baf1505d8d2387666181541050f4190410288589c",
+      "sourceHashes": {
+        "app.mjs": "8ad233d4599d062288a15b4987f2f689c6c9fe70a08f33f2c56c6e1dcc9a5725",
+        "research-rule-packets.mjs": "e82eacb6d3319b335b1631c8f5564cac4b727c55402f4db411de6675fe546fc4",
+        "research-evidence-assembly.mjs": "95959bdecd930737c3942c4f7899939423405ea90fa8099cf8871e5777c90dda",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+        "evidence-discovery.mjs": "608edc738b146d38591d097874b93b1bcfcb2bf96ab2a10581fc7342b1e88624",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "79931aa591e5ae72ead2fcbce10b1f86f35d93b6966ccee1bb9716daa1bc5382",
+        "research-corpus-registry.mjs": "7c916830bc6f4bd4386d277733d2a105ced3d82666383969edc3431a9bb18970",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "c1cd6acb85b03211f62189d68e2d23231cb5bb828cb9f7e88563e8746a3607fa",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "research-config.mjs": "acfe048896d8e39476ff25a9acce18b65e41679e32e58076739be0ec946dabe3",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "5a85f06f21f9a9387804d5ee28b49431e0bd50b5c1801c1cea1aa170c959c198",
+        "research-passage-index.mjs": "6c6e1e278de1bb25ac8924c1fbb943cd334bd6fede201d39198d7c7df73d6732",
+        "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012"
+      },
+      "providerStatuses": {
+        "settled": 8
+      },
+      "estimatedCostUSD": 0.010976935000000002,
+      "cases": [
+        {
+          "id": "scope-hold-21-tank-fill-1",
+          "httpStatus": 200,
+          "label": "correct",
+          "answerText": "**No.** Under the supplied current-consolidated NYC Fire Code text, an aboveground tank storing combustible liquid may not be filled above 95% of capacity, and filling requires an approved overfill-prevention system that automatically shuts off flow at 95%. For a 1,000-gallon tank, that limit is 950 gallons; an operator watching the gauge does not meet the stated automatic-shutoff requirement. (FC \u00a7 5704.2.9.4)\n\nThe supplied facts identify the solvent as combustible, so this rule applies.",
+          "answerTextSHA256": "ec055a2ec03a2a752c94bd21db47a3521e177fdd3aaa6e04b3842a360e6b8f51",
+          "seconds": 22.427332333,
+          "sourceReview": "Correct aboveground combustible-liquid95percent fill ceiling and separate automaticshutoff requirement; facts supplied, full5704.2.9.4 in actualboundevidence.",
+          "selectedTextHashes": [
+            "1f3197de84626aaf8142a2db87c7fa54c4ff38d6346efac76d21e9483cb34ede"
+          ]
+        },
+        {
+          "id": "scope-hold-21-tank-fill-2",
+          "httpStatus": 200,
+          "label": "correct",
+          "answerText": "**No.** Stopping at 950 gallons meets the 95% fill ceiling for a 1,000-gallon tank, but it does not replace the separate requirement for an approved system that automatically shuts off liquid flow at 95%. An operator alone is not enough. (FC \u00a7 5704.2.9.4)",
+          "answerTextSHA256": "92bdaf3dfdaae7fdd1d3aafdfaa11a17bb2ac5d958bcaa349cd21930a8aefe39",
+          "seconds": 7.7259930840000015,
+          "sourceReview": "Correct aboveground combustible-liquid95percent fill ceiling and separate automaticshutoff requirement; facts supplied, full5704.2.9.4 in actualboundevidence.",
+          "selectedTextHashes": [
+            "1f3197de84626aaf8142a2db87c7fa54c4ff38d6346efac76d21e9483cb34ede"
+          ]
+        }
+      ]
+    }
+  ],
+  "finalKnownReplay": {
+    "correct": 2,
+    "turns": 2,
+    "productionAccepted": false
+  },
+  "budget": {
+    "capUSD": 13.97,
+    "totalActualUSD": 1.3596619549999993,
+    "remainingUSD": 12.610338045,
+    "providerCalls": 1464,
+    "unsettledCalls": 0
+  },
+  "limitations": [
+    "No production push or deployment.",
+    "WarmlocalHTTP, nothostedperformance.",
+    "This doesnotresolve fire-watchinterpretation, missingfollow-upsource or mixed-usescope errors.",
+    "Two repeatedknownquestions cannotestablish productaccuracy."
+  ]
+}

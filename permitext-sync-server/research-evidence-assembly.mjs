@@ -20,7 +20,7 @@ import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, z
 import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-canonical-scope-complete-dependencies-v52";
+export const researchEvidenceAssemblyVersion = "20261003-whitespace-containment-v53";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -839,6 +839,11 @@ function canonicalIndexedPassage(value, candidate, allowance, question = "") {
   };
   if (!valid(passage)) return null;
   const fullText = compactText(canonicalText(value));
+  // Canonical resolvers can flatten paragraph breaks while indexed slices keep
+  // the raw block layout. Compare whitespace consistently; the block hash,
+  // offsets and exact indexed text above still bind the authoritative source.
+  // Keep the original slices below so emitted evidence is never rewritten.
+  const containmentText = fullText.replace(/\s+/g, " ");
   const terms = questionSpecificTerms(question);
   const alternatives = [...(passage.alternatives || []), ...(passage.sameSectionReferences || [])]
     .filter(item => item.id !== passage.id && valid(item))
@@ -848,7 +853,7 @@ function canonicalIndexedPassage(value, candidate, allowance, question = "") {
   for (const item of [passage, ...alternatives.map(entry => entry.item)]) {
     const slices = [...(item.contextTexts || []), item.completeSubsectionText || item.text]
       .map(compactText).filter(Boolean);
-    if (!slices.length || slices.some(text => !fullText.includes(text))) continue;
+    if (!slices.length || slices.some(text => !containmentText.includes(text.replace(/\s+/g, " ")))) continue;
     const selected = fullText.length <= allowance ? fullText : [...new Set(slices)].join("\n\n");
     // A complete alternative is preferable to an unrelated prefix when the
     // highest-ranked parent subtree cannot fit the bounded answer package.

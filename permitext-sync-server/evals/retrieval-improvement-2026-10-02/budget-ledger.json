@@ -81779,6 +81779,304 @@
         "total_tokens": 23745
       },
       "endedAt": "2026-10-03T02:26:01.736Z"
+    },
+    {
+      "id": "90cf5026-d373-4462-b84c-a6b98eac7b9a",
+      "case": "scope-hold-21-tank-fill-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018506400000000003,
+      "startedAt": "2026-10-03T02:35:12.013Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v1",
+      "costUSD": 6e-7,
+      "usage": {
+        "prompt_tokens": 30,
+        "total_tokens": 30
+      },
+      "endedAt": "2026-10-03T02:35:12.454Z"
+    },
+    {
+      "id": "92a3e261-d4e8-46a8-a3e6-ae7152d8e794",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0935924,
+      "startedAt": "2026-10-03T02:35:13.873Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v1",
+      "costUSD": 0.002735425,
+      "usage": {
+        "input_tokens": 19524,
+        "input_tokens_details": {
+          "cache_write_tokens": 19521,
+          "cached_tokens": 0
+        },
+        "output_tokens": 590,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20114
+      },
+      "endedAt": "2026-10-03T02:35:21.677Z"
+    },
+    {
+      "id": "a914117b-fced-4499-ad72-23d192c2241e",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07085925,
+      "startedAt": "2026-10-03T02:35:21.736Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v1",
+      "costUSD": 0.0025315550000000004,
+      "usage": {
+        "input_tokens": 20469,
+        "input_tokens_details": {
+          "cache_write_tokens": 15553,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1076,
+        "output_tokens_details": {
+          "reasoning_tokens": 816
+        },
+        "total_tokens": 21545
+      },
+      "endedAt": "2026-10-03T02:35:31.591Z"
+    },
+    {
+      "id": "3fecd62d-e040-4735-ab0d-0ded9fc0cb36",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.09158820000000001,
+      "startedAt": "2026-10-03T02:35:31.629Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v1",
+      "costUSD": 0.00267255,
+      "usage": {
+        "input_tokens": 19525,
+        "input_tokens_details": {
+          "cache_write_tokens": 19522,
+          "cached_tokens": 0
+        },
+        "output_tokens": 464,
+        "output_tokens_details": {
+          "reasoning_tokens": 156
+        },
+        "total_tokens": 19989
+      },
+      "endedAt": "2026-10-03T02:35:36.433Z"
+    },
+    {
+      "id": "1dc79b98-1eb0-44ce-b75c-9fa91ca2f1e4",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06751910000000001,
+      "startedAt": "2026-10-03T02:35:36.467Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v1",
+      "costUSD": 0.0022959300000000003,
+      "usage": {
+        "input_tokens": 19100,
+        "input_tokens_details": {
+          "cache_write_tokens": 14184,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 947,
+        "output_tokens_details": {
+          "reasoning_tokens": 903
+        },
+        "total_tokens": 20047
+      },
+      "endedAt": "2026-10-03T02:35:46.121Z"
+    },
+    {
+      "id": "218edadf-93d2-4b03-ac1b-9bc9812d8e81",
+      "case": "scope-hold-21-tank-fill-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018506400000000003,
+      "startedAt": "2026-10-03T02:38:51.315Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "costUSD": 6e-7,
+      "usage": {
+        "prompt_tokens": 30,
+        "total_tokens": 30
+      },
+      "endedAt": "2026-10-03T02:38:51.729Z"
+    },
+    {
+      "id": "931beed3-04fc-4c14-be6e-a662f300a26f",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0935924,
+      "startedAt": "2026-10-03T02:38:53.122Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "costUSD": 0.00044401,
+      "usage": {
+        "input_tokens": 19524,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 19521
+        },
+        "output_tokens": 497,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20021
+      },
+      "endedAt": "2026-10-03T02:38:59.582Z"
+    },
+    {
+      "id": "20e33fc2-ac63-44aa-9ee9-38366678953b",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06904315000000001,
+      "startedAt": "2026-10-03T02:38:59.626Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "costUSD": 0.0023320550000000004,
+      "usage": {
+        "input_tokens": 19713,
+        "input_tokens_details": {
+          "cache_write_tokens": 14797,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 866,
+        "output_tokens_details": {
+          "reasoning_tokens": 718
+        },
+        "total_tokens": 20579
+      },
+      "endedAt": "2026-10-03T02:39:08.929Z"
+    },
+    {
+      "id": "37854e0e-e1b4-4dcf-9dab-13bae2703b9b",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.08953340000000001,
+      "startedAt": "2026-10-03T02:39:08.966Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "costUSD": 0.0024025500000000003,
+      "usage": {
+        "input_tokens": 18693,
+        "input_tokens_details": {
+          "cache_write_tokens": 18690,
+          "cached_tokens": 0
+        },
+        "output_tokens": 132,
+        "output_tokens_details": {
+          "reasoning_tokens": 68
+        },
+        "total_tokens": 18825
+      },
+      "endedAt": "2026-10-03T02:39:11.515Z"
+    },
+    {
+      "id": "55364be7-30cc-41d7-983c-594ec4eff5b0",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0673365,
+      "startedAt": "2026-10-03T02:39:11.545Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "costUSD": 0.00192693,
+      "usage": {
+        "input_tokens": 19032,
+        "input_tokens_details": {
+          "cache_write_tokens": 14116,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 226,
+        "output_tokens_details": {
+          "reasoning_tokens": 182
+        },
+        "total_tokens": 19258
+      },
+      "endedAt": "2026-10-03T02:39:14.739Z"
+    },
+    {
+      "id": "c00450bc-afb9-4f6b-b401-443c3240c709",
+      "case": "scope-hold-21-tank-fill-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000185152,
+      "startedAt": "2026-10-03T02:39:15.014Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "costUSD": 5.6e-7,
+      "usage": {
+        "prompt_tokens": 28,
+        "total_tokens": 28
+      },
+      "endedAt": "2026-10-03T02:39:15.205Z"
+    },
+    {
+      "id": "8e8114c9-fbd6-403d-9fb1-a77b55dfa142",
+      "case": "scope-hold-21-tank-fill-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08712770000000002,
+      "startedAt": "2026-10-03T02:39:15.801Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "costUSD": 0.0022188000000000004,
+      "usage": {
+        "input_tokens": 16551,
+        "input_tokens_details": {
+          "cache_write_tokens": 16548,
+          "cached_tokens": 0
+        },
+        "output_tokens": 300,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 16851
+      },
+      "endedAt": "2026-10-03T02:39:18.841Z"
+    },
+    {
+      "id": "be4756dc-0304-4342-b258-bee61a68a87f",
+      "case": "scope-hold-21-tank-fill-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06226935000000001,
+      "startedAt": "2026-10-03T02:39:18.865Z",
+      "runDirectory": "/tmp/permitext-scope-whitespace-repair-live-20261003-v2",
+      "costUSD": 0.00165143,
+      "usage": {
+        "input_tokens": 16764,
+        "input_tokens_details": {
+          "cache_write_tokens": 11848,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 242,
+        "output_tokens_details": {
+          "reasoning_tokens": 198
+        },
+        "total_tokens": 17006
+      },
+      "endedAt": "2026-10-03T02:39:22.471Z"
     }
   ]
 }

@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-03T02:28:57.379Z",
+  "baseline": {
+    "commit": "e194524b2",
+    "candidate": "v52",
+    "candidateFreezePath": "evals/retrieval-scope-2026-10-03/candidate-freeze.json",
+    "candidateFreezeSHA256": "656d38fb0b5e00d254a3e3a256957d39a2e753cd2e0a2d8334fc1e40f07c73db",
+    "runPath": "/tmp/permitext-scope-heldout-live-20261003-v2/results.json",
+    "runVersion": "v2 only"
+  },
+  "scope": "Read-only diagnosis of three known failed cases. These cases are now development regressions; they cannot support a fresh heldout accuracy claim.",
+  "paidCalls": 0,
+  "fixtureChanges": false,
+  "caseEvidence": [
+    {
+      "id": "scope-hold-20-gas-cylinder-2",
+      "question": "If the chain instead secures it to a fixed structural bracket designed for this purpose, does that meet the permitted securing-method requirement?",
+      "answerMode": "clarification",
+      "writerRequests": [
+        {
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/8fef8d91-1eb9-41f4-92b8-d030ccc91ca6-request.json",
+          "sha256": "fdfa32c0800c17735035c5762b53a3d0dd62ca19854aa1009a1a0a3f35a0c2c3"
+        },
+        {
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/09d5c924-8416-4f6b-bd9f-2543b29ec1fa-request.json",
+          "sha256": "fcd4f80905f1101fcb2dab8574b8a228146cefebd6ed53b246dc0e2bbf580a93"
+        }
+      ]
+    },
+    {
+      "id": "scope-hold-21-tank-fill-1",
+      "question": "For this project, may the 1,000-gallon aboveground solvent storage tank be filled to 980 gallons if an operator watches the gauge?",
+      "answerMode": "openai",
+      "writerRequests": [
+        {
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/802abd22-d022-467c-ba25-14bb140690e3-request.json",
+          "sha256": "107a272ac53f4b7db28f39a72620ea59a08808be627b59837ce302cd9da103fd"
+        },
+        {
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/cc907fc2-e003-473c-9c1f-8a11b6529bcc-request.json",
+          "sha256": "51bbb8731763968332f6089a2e200e4870168b2d092b0943e1c2cda101cd9988"
+        }
+      ]
+    },
+    {
+      "id": "scope-hold-24-mixed-side-yard-1",
+      "question": "For this project, if we choose to leave an open area along the side lot line, may it be only 4 feet wide measured perpendicular to that line?",
+      "answerMode": "openai",
+      "writerRequests": [
+        {
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/5a0d56d4-9e35-4b8b-a2b4-e0ffac5acba1-request.json",
+          "sha256": "1053e5ed9861ae1437a73a926cf50073ec9cd9b45d01d79935c3f3523073f107"
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "kind": "follow_up_cited_source_loss",
+      "caseID": "scope-hold-20-gas-cylinder-2",
+      "observed": "Conversation topic classification is continuation and reconstructed lexical sourceQuery retains the root compressed-gas question plus FC5303. The captured semantic query is the bracket follow-up plus Subject context: General Requirements. The prior checked citation stores canonical parent5303 and generic title rather than the discussed subsection5303.3.3. All supplied enacted passages are structural-attachment/anchor rules from PC/MC/BC; FC5303 appears only in untrusted conversation history.",
+      "failureLocation": [
+        "research-evidence-assembly.mjs:researchEvidenceRetrievalQuery semanticContext/shortSubjects",
+        "research-conversation-continuity.mjs:researchPriorAnswerSources",
+        "evidence-discovery.mjs:discoverRelevantEvidence inherited reference scoring and final candidate selection"
+      ],
+      "genericProposal": "For a dependent continuation, retain a bounded canonical subject descriptor from the checked prior passage/subsection and root-topic nouns when its catalog title is generic. Reserve a small re-resolution opportunity for checked prior canonical identities; this is a retrieval hint, not a direct-reference legal boost or reuse of earlier conclusions. Explicit current references, topic switches, corrected edition and changed scope supersede the old hint.",
+      "contracts": [
+        "A prior monolithic source has generic parent title but an operative checked subsection; a pronoun follow-up changes an attachment method and retains the same source subject.",
+        "An explicit new code family or topic switch does not retain the prior source.",
+        "A corrected edition or district uses only authorized new source context.",
+        "A prior withheld/contextual-only answer supplies no governing citation hint."
+      ],
+      "ownership": "Continuity/query construction owner plus discovery ranking owner; no section-specific new route."
+    },
+    {
+      "kind": "complete_child_discarded_by_whitespace_mismatch",
+      "caseID": "scope-hold-21-tank-fill-1",
+      "observed": "Full authorized-index replay with the captured query vector reproduces the frozen index fingerprint and candidate rank5FC5704. Its primary indexed child is5704.2.9.4,546characters, with complete parent context totaling1696characters. Exact block hash and source offsets match canonical body. The actual writer instead receives a truncated4368-character unrelated subsection collection omitting that child and ending mid numbered list.",
+      "rootCause": "app.mjs researchEvidenceForSectionIDs collapses all whitespace to spaces in canonicalText. research-evidence-assembly.mjs compactText preserves newlines. canonicalIndexedPassage therefore rejects legitimate multiline child/context slices because fullText.includes(slice) compares different whitespace representations, despite exact source-body hash/offset validation succeeding.",
+      "failureLocation": [
+        "app.mjs:researchEvidenceForSectionIDs canonicalText serialization",
+        "research-evidence-assembly.mjs:canonicalIndexedPassage containment check",
+        "research-evidence-assembly.mjs:questionSpecificBlockValue fallback"
+      ],
+      "genericProposal": "Compare canonical containment using one whitespace-only representation on both sides while retaining exact raw block hash, integer source offsets and original passage-text equality. Emit the complete indexed child and its exact retained context atomically. Never fit by discarding exceptions or operative conditions. If complete context exceeds allowance, keep it unresolved. Avoid fallback to unrelated prefixes after a valid indexed child is available.",
+      "contracts": [
+        "Multiline single-block source plus a resolver that returns flattened canonicalText retains a complete decisive child and parent condition within budget.",
+        "Exact raw block hash/offset mismatch is rejected despite whitespace normalization.",
+        "Altered legal words or added nonexistent context are rejected.",
+        "A complete child larger than the allowance remains incomplete; no exception/condition is dropped.",
+        "User-pinned selection boundaries and earlier fail-closed oversized dependency contracts remain unchanged."
+      ],
+      "ownership": "Narrow whitespace fix delegated to passage_index; broader fallback/child selection remains assembly owner.",
+      "replayArtifact": "/tmp/permitext-tank-full-retrieval-replay-20261003.json",
+      "indexFingerprint": "30d003b0f0dcd7e7984be1898eb9523f0443e99e9f53c0ae5655b84df42b7ed2",
+      "primaryChildCharacters": 546,
+      "completeChildAndContextCharacters": 1696
+    },
+    {
+      "kind": "use_category_applicability_routing",
+      "caseID": "scope-hold-24-mixed-side-yard-1",
+      "observed": "Confirmed project facts say residences plus commercial use on a single zoning lot in C4. Writer evidence contains33-25 and no35-01/35-52 mixed-building scope/rule. Its answer applies the commercial/community-facility chapter8-foot-or5-foot-average8 framework rather than the mixed-building5-foot rule. The full wrong-category rule is complete, so this is not truncation.",
+      "failureLocation": [
+        "evidence-discovery.mjs:zoningScopeRankingFactor district-family-only prior",
+        "research-evidence-assembly.mjs:researchEvidenceRetrievalQuery semanticQuery omits relevant project use-category facts",
+        "research-rule-packets.mjs:researchCanonicalApplicabilityContext metadata/instruction without supplying enclosing operative scope"
+      ],
+      "genericProposal": "Carry a small relevant applicability-fact projection (district, explicit building-use category, work scope) into semantic retrieval. Use canonical chapter/category metadata to nominate the correct framework and retrieve its enacted applicability clause before applying a numerical rule. Rank parallel category frameworks as candidates; do not exclude legitimately cross-referenced chapters or infer legal applicability from a chapter title alone. Preserve explicit unknowns, negations and current corrections. No route keyed to this question or35-52.",
+      "contracts": [
+        "Two same-district chapter frameworks use nearly identical side-yard terminology; explicit mixed-use facts retrieve the mixed-building scope and child rule.",
+        "A pure commercial/community-facility scenario retains its own chapter.",
+        "Unknown building-use category yields conditional scope rather than fabricated selection.",
+        "A district/use correction supersedes saved facts within the hypothetical.",
+        "A genuine cross-reference to a parallel chapter remains available and does not become automatic applicability."
+      ],
+      "ownership": "Discovery applicability ranking and canonical-scope dependency owner; project-fact projection/query owner."
+    }
+  ],
+  "recommendedOrder": [
+    "Repair whitespace containment and prove exact-source safeguards first.",
+    "Improve checked-source subject continuity without restoring hidden exact-reference authority boosts.",
+    "Add category-aware applicability recall with source-backed scope dependencies.",
+    "Run these as known regressions, then validate on fresh disjoint operative scenarios after a new freeze."
+  ],
+  "limitations": [
+    "No new provider calls or source retuning was performed during diagnosis.",
+    "Observed repairs on these now-known cases cannot establish independent accuracy.",
+    "Generic proposals preserve authorized corpus/edition boundaries and are retrieval aids, not legal applicability findings."
+  ]
+}
