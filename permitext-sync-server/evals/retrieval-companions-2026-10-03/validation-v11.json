@@ -1,0 +1,25 @@
+{
+  "candidate": "v11",
+  "presentationOnly": true,
+  "providerCalls": 0,
+  "backendModelAndEvidenceUnchanged": true,
+  "passedChecks": [
+    "research-inline-alternatives-display-contract",
+    "research-answer-structure-contract",
+    "research-clarification-copy-contract",
+    "offline-shell-coherence",
+    "offline-asset-revision-contract",
+    "node syntax app/offline/service-worker",
+    "git diff --check"
+  ],
+  "existingUnrelatedFailure": {
+    "test": "research-list-summary-contract",
+    "line": 30,
+    "reason": "Requires historical backend evidenceLimitations minItems1 schema regex; untouched HEAD backend also fails the same assertion.",
+    "backendUnchangedByTask": true
+  },
+  "actualCapturedMC2WordsConditionsAndCitationsPreserved": true,
+  "storedAndCopyTextUnchanged": true,
+  "displayReplaySHA256": "2ff4d7edcd0b07c73ca94ff6d9e4fc157c4f7ac0bc63f69665f12e352cc85d28",
+  "renderedProductionAcceptance": "pending"
+}

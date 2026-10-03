@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261003-research-answer-status-v630";
+} from "./offline-storage.js?v=20261003-research-numbered-alternatives-v631";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261003-research-answer-status-v630";
+} from "./research-intent-state.js?v=20261003-research-numbered-alternatives-v631";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18579,8 +18579,53 @@ function researchAnswerTable(block) {
   return { header, rows };
 }
 
+function researchAnswerDisplayMarkdown(value) {
+  const text = String(value || "");
+  // Display only. Do not reinterpret quoted source text or code as prose lists.
+  if (/```|~~~/.test(text)) return text;
+  return text.split(/(\n\s*\n)/).map((block, index) => {
+    if (index % 2 || /^(?: {4}|\t)/.test(block) || /[\r\n`"“”‘|]/.test(block) || /(?:^|[\s:(])'[^']+'/.test(block) ||
+      /^\s*(?:#{1,6}\s|>|[-*+•]\s|\d+[.)]\s)/.test(block)) return block;
+    const markers = Array.from(block.matchAll(/\(([1-9]\d*)\)\s+/g));
+    if (markers.length < 2 || markers.length > 20 ||
+      markers.some((marker, ordinal) => Number(marker[1]) !== ordinal + 1) ||
+      !/:\s*$/.test(block.slice(0, markers[0].index))) return block;
+    const items = [];
+    let conjunction = "";
+    for (let ordinal = 0; ordinal < markers.length - 1; ordinal += 1) {
+      const start = markers[ordinal].index + markers[ordinal][0].length;
+      const next = markers[ordinal + 1].index;
+      const separator = block.slice(start, next).match(/;\s*(?:(and|or)\s+)?$/i);
+      if (!separator) return block;
+      items.push(conjunction + block.slice(start, next - separator[0].length + 1).trim());
+      conjunction = separator[1] ? `${separator[1]} ` : "";
+    }
+    let last = block.slice(markers.at(-1).index + markers.at(-1)[0].length).trim();
+    let suffix = "";
+    let depth = 0;
+    for (let cursor = 0; cursor < last.length; cursor += 1) {
+      if (last[cursor] === "(" || last[cursor] === "[") depth += 1;
+      if (last[cursor] === ")" || last[cursor] === "]") depth -= 1;
+      if (depth < 0) return block;
+      if (depth || !/[.!?]/.test(last[cursor]) ||
+        !/^\s+(?:[A-Z]|\d)/.test(last.slice(cursor + 1))) continue;
+      const remainder = last.slice(cursor + 1).trim();
+      // Only detach prose explicitly referring back to the numbered methods.
+      // A dependent qualification such as "It must..." remains ambiguous.
+      if (!/^For (?:methods?|options?|items?|alternatives?) \d+\b/.test(remainder)) return block;
+      suffix = remainder;
+      last = last.slice(0, cursor + 1);
+      break;
+    }
+    items.push(conjunction + last);
+    if (depth || items.some((item) => (item.match(/\b[A-Za-z]{3,}\b/g) || []).length < 2)) return block;
+    const introduction = block.slice(0, markers[0].index).trimEnd();
+    return `${introduction}\n\n${items.map((item, ordinal) => `${ordinal + 1}. ${item}`).join("\n")}${suffix ? `\n\n${suffix}` : ""}`;
+  }).join("");
+}
+
 function appendResearchAnswerNarrative(container, result) {
-  const text = researchAnswerNarrativeText(result);
+  const text = researchAnswerDisplayMarkdown(researchAnswerNarrativeText(result));
   if (!text) return;
   const narrative = document.createElement("div");
   narrative.className = "research-answer-narrative";
