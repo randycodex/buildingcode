@@ -295,6 +295,56 @@ assert.deepEqual(
   "A collateral Project zoning fact must not reroute a Construction Code question."
 );
 
+const contextualTechnicalQuestions = [
+  "Under the 2022 NYC Building Code, this building is not a parking garage. What exterior-opening limits apply?",
+  "Under the Mechanical Code, how much floor area is required for servicing the boiler?",
+  "Under PC 606.5, what pressure controls are required for equipment located in the yard?"
+];
+for (const question of contextualTechnicalQuestions) {
+  const routed = routeResearchCorpora({ question,
+    projectFacts: ["Zoning Fact — Zoning District(s): R7-1 (NYC Planning imported)"],
+    registry: createResearchCorpusRegistry({ zoningResearchEligibility: true }) });
+  assert.deepEqual(routed.selected.map(corpus => corpus.id), ["nyc-2022-construction-codes"],
+    `Incidental technical scenario terms must not consume the zoning evidence budget: ${question}`);
+}
+const independentlyMixedQuestion = routeResearchCorpora({
+  question: "Under the Building Code and ZR 36-521, compare the parking garage's requirements.",
+  projectFacts: ["Zoning Fact — Zoning District(s): R7-1 (NYC Planning imported)"],
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true }) });
+assert.deepEqual(independentlyMixedQuestion.selected.map(corpus => corpus.id),
+  ["nyc-2022-construction-codes", "nyc-zoning-resolution"],
+  "An independently named zoning request must survive the technical-context guard.");
+for (const question of [
+  "Under the Building Code and zoning, what floor area can we build?",
+  "Under zoning and the Mechanical Code, do yard setbacks control the outdoor equipment?"
+]) {
+  const mixed = routeResearchCorpora({ question,
+    projectFacts: ["Zoning Fact — Zoning District(s): R7-1 (NYC Planning imported)"],
+    registry: createResearchCorpusRegistry({ zoningResearchEligibility: true }) });
+  assert.deepEqual(mixed.selected.map(corpus => corpus.id),
+    ["nyc-2022-construction-codes", "nyc-zoning-resolution"]);
+}
+const sharedOccupancyTerm = routeResearchCorpora({
+  question: "What setback applies to this project's occupancy?",
+  projectFacts: ["Zoning Fact — Zoning District(s): R7-1 (NYC Planning imported)"],
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true }) });
+assert(sharedOccupancyTerm.selected.some(corpus => corpus.id === "nyc-zoning-resolution"),
+  "A generic occupancy term does not restrict the question to Construction Codes.");
+const previousRecallFlag = process.env.PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL;
+try {
+  process.env.PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL = "1";
+  const registry = createResearchCorpusRegistry({ zoningResearchEligibility: true });
+  const technical = routeResearchCorpora({ question: contextualTechnicalQuestions[0], registry,
+    projectFacts: ["Zoning Fact — Zoning District(s): R7-1 (NYC Planning imported)"] });
+  assert.equal(technical.selected.find(corpus => corpus.id === "nyc-zoning-resolution")?.retrievalRole, "recall_only",
+    "Authorized zoning recall remains searchable without selecting a zoning-only budget.");
+  const mixed = routeResearchCorpora({ question: "Under the Building Code and zoning, what floor area can we build?", registry });
+  assert.equal(mixed.selected.find(corpus => corpus.id === "nyc-zoning-resolution")?.retrievalRole, "requested");
+} finally {
+  if (previousRecallFlag === undefined) delete process.env.PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL;
+  else process.env.PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL = previousRecallFlag;
+}
+
 const buildingCodeOnlyBoundary = routeResearchCorpora({
   question: "A change between Group B and Group M follows a zoning Use Group renumbering. Based only on the selected Building Code passages, what accessibility consequence can be stated?",
   registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
