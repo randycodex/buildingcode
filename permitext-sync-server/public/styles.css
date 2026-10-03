@@ -17716,3 +17716,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   align-items: center;
   padding-block: 0;
 }
+
+.pane-header-drag-area [data-collapse-title-bound="true"] { cursor: pointer; }
+.pane-header-drag-area [data-collapse-title-bound="true"]:focus-visible {
+  outline: 2px solid var(--code-accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}

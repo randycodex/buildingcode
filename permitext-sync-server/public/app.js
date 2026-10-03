@@ -36923,7 +36923,7 @@ function bindPaneDragging(panes) {
     const header = pane.querySelector(":scope > header");
     if (header) {
       header.classList.add("pane-header-drag-area");
-      header.title = "Drag to move · Double-click to collapse";
+      header.title = "Drag to move · Click title to collapse";
     }
     pane.querySelectorAll(".pane-header-drag-area, .pane-collapsed-tab, :scope > .pane-drag-handle").forEach((handle) => {
       if (handle.dataset.dragBound === "true") return;
@@ -37788,13 +37788,27 @@ function preparePaneCollapse(panel) {
   header.setAttribute("aria-label", `${label} column header`);
   if (header.dataset.collapseBound !== "true") {
     header.dataset.collapseBound = "true";
-    header.addEventListener("dblclick", (event) => {
-      if (event.target.closest("button, a, input, select, textarea, summary, [contenteditable], [role='button'], .panel-kind, .panel-title, h2")) return;
-      event.preventDefault();
-      preparePaneCollapse(panel);
-      setPaneCollapsed(panel, true, { focus: true });
-    });
+
   }
+  header.querySelectorAll(".panel-kind, .panel-title, h2").forEach((titleNode) => {
+    if (titleNode.closest("button, a, summary") || titleNode.querySelector("button, a, input, select, textarea, summary, [contenteditable]")) return;
+    titleNode.tabIndex = 0;
+    titleNode.setAttribute("role", "button");
+    titleNode.setAttribute("aria-label", `Collapse ${label}`);
+    titleNode.setAttribute("aria-expanded", String(!paneIsCollapsed(panel.dataset.paneId)));
+    titleNode.title = `Collapse ${label}`;
+    if (titleNode.dataset.collapseTitleBound === "true") return;
+    titleNode.dataset.collapseTitleBound = "true";
+    const collapse = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setPaneCollapsed(panel, true, { focus: true });
+    };
+    titleNode.addEventListener("click", collapse);
+    titleNode.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") collapse(event);
+    });
+  });
   let rail = panel.querySelector(":scope > .pane-collapsed-tab");
   if (!rail) {
     rail = document.createElement("button");
