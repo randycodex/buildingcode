@@ -1,4 +1,4 @@
-export const researchEvidencePriorityVersion = "20261001-historical-reference-scope-v7";
+export const researchEvidencePriorityVersion = "20261003-embedded-definition-role-v8";
 
 export const researchEvidenceFunctions = Object.freeze({
   controllingRule: "controlling_rule",
@@ -123,7 +123,8 @@ function isCrossReference(value) {
 function isDefinition(value, text) {
   return descriptor(value).sectionNumber === "202" ||
     /\bdefinitions?\b/i.test(normalizedText(value?.title)) ||
-    /\bthe following (?:terms )?shall.*\bmeanings?\b/i.test(text);
+    /\bthe following (?:terms )?shall.*\bmeanings?\b/i.test(text) ||
+    Boolean(value?.signals?.canonicalEmbeddedDefinitions);
 }
 
 function isException(value, text) {

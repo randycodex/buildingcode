@@ -12233,7 +12233,9 @@ function selectedResearchEvidence(conversation, currentEvidence) {
 
 export function researchAssemblyCrossReferences(evidence, catalog) {
   const references = [];
-  for (const phrase of inlineCodeReferencePhrases(evidence.text || evidence.canonicalText || "")) {
+  for (const phrase of inlineCodeReferencePhrases(evidence.text || evidence.canonicalText || "", {
+    includeFireCode: true
+  })) {
     const codePrefix = String(phrase.codePrefix || evidence.codePrefix || "").toUpperCase();
     for (const reference of phrase.references || []) {
       const sectionNumber = String(reference.sectionNumber || "").replace(/\.$/, "").toUpperCase();
@@ -21832,7 +21834,10 @@ async function handleResearchConversationMessage(request, response) {
           establishedConversationFactCount: researchOperation.establishedConversationFactCount ?? null,
           evidenceReferences: researchOperation.evidenceReferences || [],
           evidenceCharacterCount: researchOperation.evidenceCharacterCount ?? null,
-          verificationIssueTypes: researchOperation.verificationIssueTypes || []
+          verificationIssueTypes: researchOperation.verificationIssueTypes || [],
+          verificationAttemptDiagnostics: createResearchVerificationAttemptDiagnostics(
+            researchOperation.verificationAttemptDiagnostics
+          )
         }));
       } catch {
         // Logging must not replace the original Research response.

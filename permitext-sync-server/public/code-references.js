@@ -7,6 +7,16 @@ const inlineDirectReferencePhrasePattern = new RegExp(
   String.raw`\b(BC|PC|MC|FGC|AC|ZR)\s+(?:(Table)\s+)?(${inlineReferenceNumberSource})((?:\s*(?:,\s*(?:(?:and|or)\s+)?|(?:and|or|through|to)\s+)${inlineReferenceNumberSource})*)`,
   "gi"
 );
+// Research also reads enacted Fire Code text. Keep that grammar opt-in so
+// browser links retain their existing supported destinations.
+const fireReferencePhrasePattern = new RegExp(
+  inlineReferencePhrasePattern.source.replace("BC|PC|MC|FGC|AC|ZR", "BC|PC|MC|FGC|AC|ZR|FC"),
+  inlineReferencePhrasePattern.flags
+);
+const fireDirectReferencePhrasePattern = new RegExp(
+  inlineDirectReferencePhrasePattern.source.replace("BC|PC|MC|FGC|AC|ZR", "BC|PC|MC|FGC|AC|ZR|FC"),
+  inlineDirectReferencePhrasePattern.flags
+);
 const inlineReferenceNumberPattern = new RegExp(inlineReferenceNumberSource, "gi");
 
 function normalizedAnchor(value) {
@@ -127,7 +137,7 @@ export function rewriteStructuredCodeLinks(html) {
   );
 }
 
-export function inlineCodeReferencePhrases(text) {
+export function inlineCodeReferencePhrases(text, { includeFireCode = false } = {}) {
   const source = String(text || "");
   const phrases = [];
   const addMatches = (pattern, { direct = false } = {}) => {
@@ -160,8 +170,9 @@ export function inlineCodeReferencePhrases(text) {
       });
     }
   };
-  addMatches(inlineReferencePhrasePattern);
-  addMatches(inlineDirectReferencePhrasePattern, { direct: true });
+  addMatches(includeFireCode === true ? fireReferencePhrasePattern : inlineReferencePhrasePattern);
+  addMatches(includeFireCode === true ? fireDirectReferencePhrasePattern : inlineDirectReferencePhrasePattern,
+    { direct: true });
 
   const seen = new Set();
   return phrases

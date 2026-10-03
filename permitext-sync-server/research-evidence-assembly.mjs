@@ -8,7 +8,7 @@ import {
   researchQuestionReturnsToOriginalTopic,
   extractResearchCodeReferences
 } from "./research-conversation-topic.mjs";
-import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
+import { targetedDefinitionExcerpt, researchEmbeddedDefinitionCarrier } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { orderedResearchTopicDependencies, researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
@@ -22,13 +22,14 @@ import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, z
 import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
+import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import {
   semanticResearchProjectFacts, relevantResearchRetrievalFactContext,
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-continuing-canonical-packets-v65";
+export const researchEvidenceAssemblyVersion = "20261003-operative-definition-context-v66";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -677,8 +678,8 @@ function canonicalAncestorReferences(source, maximum = maximumPinnedAncestorCont
   return references;
 }
 
-function targetedDefinitionValue(value, context, maximumCharacters) {
-  const excerpt = targetedDefinitionExcerpt(value, context, { maximumCharacters });
+function targetedDefinitionValue(value, context, maximumCharacters, options = {}) {
+  const excerpt = targetedDefinitionExcerpt(value, context, { ...options, maximumCharacters });
   if (!excerpt) return { value, excerpt: null };
   const { text, ...metadata } = excerpt;
   return {
@@ -763,22 +764,32 @@ function questionSpecificBlockValue(value, question, maximumCharacters) {
   };
 }
 
-function definitionSelectionContext(query, values = []) {
-  return [
-    compactText(query),
-    // A section reference supplies no passage. Feeding the first 4,000
-    // characters of its entire definitions section into ranking makes those
-    // unrelated opening entries outrank the user's question.
-    ...values.map((value) => value?.selectionMode === "section_reference"
-      ? "" : canonicalText(value).slice(0, 4_000))
-  ].filter(Boolean).join("\n").slice(0, 32_000);
+function definitionSelectionContext(query, values = [], definitionSource = null) {
+  const sameAuthority = value => !definitionSource ||
+    ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"].every(key =>
+      !definitionSource[key] || value[key] === definitionSource[key]);
+  const operative = values.filter(value => value?.selectionMode !== "section_reference" &&
+    sameAuthority(value) && !isDefinitionCandidate(value) && !researchEmbeddedDefinitionCarrier(value) &&
+    !/\bdefinitions?\b/i.test(value?.title || "") && String(value?.sectionNumber) !== "202");
+  const detailQuery = String(query || "").replace(/\b([a-z]{3,})y\b/gi, "$& $1ies");
+  const headingQuery = detailQuery.replace(/\b(?:area|areas|space|spaces|building|buildings|other|general|minimum|maximum|required|requirement|requirements|provision|provisions|code|section)\b/gi, " ");
+  const responsive = operative.filter(value => researchCurrentRuleDetailScore(value, detailQuery) >= 2 &&
+    researchCurrentRuleDetailScore({ text: value.title || "" }, headingQuery) >= 1);
+  // A supplied enclosing qualification may contain a defined term that the
+  // more responsive child does not repeat. Keep that exact structural parent,
+  // but never the unrelated opening text of every retrieved section.
+  const relevant = operative.filter(value => responsive.includes(value) || responsive.some(child =>
+    child.codePrefix === value.codePrefix && String(child.sectionNumber).startsWith(`${value.sectionNumber}.`)));
+  return [compactText(query), ...relevant.map(value => canonicalText(value).slice(0, 4_000))]
+    .filter(Boolean).join("\n").slice(0, 32_000);
 }
 
 function isDefinitionCandidate(value) {
   const functions = Array.isArray(value?.evidencePriority?.functions)
     ? value.evidencePriority.functions
     : [];
-  return value?.evidencePriority?.primaryFunction === "definition" || functions.includes("definition");
+  return value?.evidencePriority?.primaryFunction === "definition" || functions.includes("definition") ||
+    Boolean(value?.signals?.canonicalEmbeddedDefinitions);
 }
 
 function sourceRecord(value, {
@@ -798,11 +809,16 @@ function sourceRecord(value, {
 }) {
   const rawText = canonicalText(value);
   const text = rawText.slice(0, Math.max(0, characterAllowance)).trimEnd();
+  const embeddedDefinition = targetedDefinition?.embeddedDefinitionSection;
+  const sourceRelationship = embeddedDefinition
+    ? `${relationship}. Definition heading in this canonical source: ${embeddedDefinition.heading}. ` +
+      `The registered carrier ${value.codePrefix} ${value.sectionNumber} is not the definition's published section number.`
+    : relationship;
   return attachStructuredTable({
     sourceID,
     origin,
     sourceType: "enacted_text",
-    relationship,
+    relationship: sourceRelationship,
     authorityClass: "enacted",
     retrievalReason: compactText(retrievalReason || relationship),
     retrievalRank: retrievalRank !== null && retrievalRank !== "" && Number.isFinite(Number(retrievalRank))
@@ -1478,6 +1494,12 @@ export async function assembleResearchEvidence({
   }
   for (const [index, candidate] of candidates.entries()) {
     if (discoveredCount >= limits.maximumDiscovered) break;
+    // Unrequested dictionaries are selected after the responsive rules, using
+    // their terminology and the existing two-definition allowance. An indexed
+    // opening dictionary fragment must not preempt that later complete entry.
+    if (isDefinitionCandidate(candidate) && !candidate.evidencePriority?.claimCoverageRequired &&
+        !candidate.signals?.useSelectedPassageOnly && !currentReferences.some(reference =>
+          reference.codePrefix === candidate.codePrefix && reference.sectionNumber === candidate.sectionNumber)) continue;
     const identity = sectionIdentity(candidate);
     if (!identity || includedSectionIdentities.has(identity)) continue;
     const ownReservation = reservedTopicDependencies.get(dependencyKey(candidate));
@@ -1548,7 +1570,7 @@ export async function assembleResearchEvidence({
       : targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
           resolved,
-          definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+          definitionSelectionContext(query.question, canonicalForExpansion, resolved),
           allowance
         )
       : { value: resolved, excerpt: null };
@@ -1841,7 +1863,7 @@ export async function assembleResearchEvidence({
     const targeted = targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
           resolved,
-          definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+          definitionSelectionContext(query.question, canonicalForExpansion, resolved),
           allowance
         )
       : { value: resolved, excerpt: null };
@@ -2050,10 +2072,12 @@ export async function assembleResearchEvidence({
 
   // Optional definitions fill the remaining space; an oversized definitions
   // section must not displace the complete closing conditions of a short rule.
+  const definitionPrefixes = new Set([...currentReferences.map(reference => reference.codePrefix),
+    ...researchQuestionSubject(query.question).codePrefixes]);
   const definitionCandidates = dependencyPlan?.corpusPrefix === "ZR" && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
     Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
     { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
-  )];
+  )].sort((left, right) => Number(definitionPrefixes.has(right.codePrefix)) - Number(definitionPrefixes.has(left.codePrefix)));
   for (const [index, candidate] of definitionCandidates.entries()) {
     if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
     if (!isDefinitionCandidate(candidate)) continue;
@@ -2068,13 +2092,16 @@ export async function assembleResearchEvidence({
       resolverFailureCount += 1;
       continue;
     }
+    if (["sectionID", "codePrefix", "sectionNumber", "corpusID", "codeVersion", "codeEdition", "jurisdiction"]
+      .some(key => candidate[key] && candidate[key] !== resolved[key])) continue;
     const identity = sectionIdentity(resolved);
     if (!identity || includedSectionIdentities.has(identity)) continue;
     const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters, 2_500);
     const targeted = targetedDefinitionValue(
       resolved,
-      definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
-      allowance
+      definitionSelectionContext(query.question, canonicalForExpansion, resolved),
+      allowance,
+      { allowShortSection: true }
     );
     if (!targeted.excerpt) continue;
     const record = sourceRecord(targeted.value, {
