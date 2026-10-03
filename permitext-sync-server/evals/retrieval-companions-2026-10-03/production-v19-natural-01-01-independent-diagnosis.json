@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "reviewKind": "read-only independent production subject/retrieval diagnosis",
+  "candidateCommit": "8018ad11dbd939e1de50c873cad7ff2866cd3203",
+  "createdAt": "2026-10-03",
+  "capturedTurnID": "production-v19-natural-01-01",
+  "artifacts": {
+    "capturePath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v19-visible-answers.json",
+    "captureSHA256AtReview": "33f271705f1d30bcac5572f374ab79cb74127685f44fadeba61744a769738fdf",
+    "answerRowSHA256": "aaa79d24bd51aae607f167a2a1a1a00669b6ea89fa03136ad96ec7060dd96997",
+    "accountingPath": "/tmp/permitext-production-v19-natural-01-01.accounting.json",
+    "accountingSHA256": "95224eb4360a35dcaef0dcb6c6bb1a12c454231829229c77583cb23bf162bc77",
+    "frozenFixtureHashesVerified": {
+      "questions.json": true,
+      "reviewer-key.json": true,
+      "source-packets.json": true,
+      "project-context-snapshot.json": true,
+      "protocol.json": true
+    },
+    "canonicalSourceSHA256": "a71385f66d2008c0d5dced2c7b45ef6c042f32e3831cd45760e91929c973c5a2",
+    "canonicalExcerptSHA256": "71b96d728cede25628daea803e2e0bcee33791f2e13f1a9a8b03b29cee787cca"
+  },
+  "grade": {
+    "decision": "withheld",
+    "deliveredSubstantiveCodeAnswer": false,
+    "usefulness": "unsuccessful answer; clearer issue explanation/report recovery only",
+    "decisiveRuleCoverage": "absent from reported assembled authority packet",
+    "reason": "The visible result is Research incomplete. The reported source packet contains no BC provision, so it does not retrieve the available ordinary occupiable-space ceiling-height baseline. There is no final private-draft correctness credit.",
+    "expectedBaseline": "Sales areas and offices are occupiable spaces: minimum 7 feet 6 inches, measured finished floor to finished underside of ceiling or beams. Preserve separate 8-foot habitable and 7-foot specific room categories if discussed. Old one-story inventory is not proposed room design.",
+    "canonicalReference": "2022 BC 1208.2",
+    "sourceKeyCaveat": "For ordinary occupiable sales/office spaces; no blanket final occupancy or building approval. A genuinely activated special room or exception must be qualified, but those later branches do not justify withholding this baseline."
+  },
+  "observed": {
+    "sourceCounts": {
+      "BC": 0,
+      "PC": 0,
+      "MC": 0,
+      "FGC": 0,
+      "FC": 1,
+      "ZR": 15
+    },
+    "assembledReferences": [
+      "ZR 27-111",
+      "ZR 12-10",
+      "ZR 35-33",
+      "FC 703",
+      "ZR 35-34",
+      "ZR 35-32",
+      "ZR 27-14",
+      "ZR 27-16",
+      "ZR 78-352",
+      "ZR 35-812",
+      "ZR 27-10",
+      "ZR 37-73",
+      "ZR 74-761",
+      "ZR 23-22",
+      "ZR 27-00",
+      "ZR 23-50"
+    ],
+    "characters": 45569,
+    "semanticStatus": {
+      "status": "complete",
+      "enabled": true,
+      "fallbackReason": null,
+      "queryCached": false,
+      "hitCount": 100,
+      "coveredPassages": 52946,
+      "totalPassages": 52946
+    },
+    "providerRequestCount": 5,
+    "estimatedProviderCostUSD": 0.09002,
+    "failureCode": "RESEARCH_VERIFICATION_FAILED",
+    "verificationIssueTypes": [
+      "irrelevant_citation"
+    ],
+    "durationMilliseconds": 50973,
+    "factCount": 33
+  },
+  "findings": [
+    {
+      "stage": "corpus intent routing",
+      "certainty": "offline reproduced defect; actual production project.codeVersion not exposed by these captures",
+      "pointers": [
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/research-corpus-registry.mjs",
+          "line": 16
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/research-corpus-registry.mjs",
+          "line": 336
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+          "line": 12537
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+          "line": 19887
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+          "line": 19904
+        }
+      ],
+      "finding": "The ceiling question has no explicit code name, reference or recognized construction subject. With projectCodeVersion set to the ZR bundle, routeResearchCorpora marks ZR requested via Project configured code basis. With no configured version it marks Construction requested. Recall enabled preserves Construction as recall_only, but that does not prevent the ZR requested route from activating the zoning planner/selector.",
+      "offlineReproduction": {
+        "question": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+        "projectFacts": [
+          "Zoning Fact — Zoning District: R7-1"
+        ],
+        "nullVersionRequested": "nyc-2022-construction-codes",
+        "zoningVersionRequested": "nyc-zoning-resolution",
+        "recallEnabledOtherFamiliesRemain": "recall_only"
+      },
+      "limitation": "Cannot assert that production used the ZR fallback without the actual routed plan or saved project.codeVersion. Accounting alone does not include those fields."
+    },
+    {
+      "stage": "shared ordinary-language subject recognition",
+      "certainty": "confirmed implementation gap",
+      "pointers": [
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/evidence-discovery.mjs",
+          "line": 979
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/evidence-discovery.mjs",
+          "line": 1780
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/evidence-discovery.mjs",
+          "line": 2135
+        }
+      ],
+      "finding": "questionDisciplinePrefixes provides noun-based soft priors for FGC, MC, PC and AC but no BC subject prior for room/ceiling clear height. Thus the current interior-ceiling subject receives no corresponding Construction-family preference while retail/community-facility/office wording can match unrelated ZR use/bulk passages. Exact authority names are recognized, but the user should not need to name BC to obtain that preference."
+    },
+    {
+      "stage": "project-fact query dilution",
+      "certainty": "confirmed selector behavior with illustrative UI reconstruction; exact production qualified query not captured",
+      "pointers": [
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/research-retrieval-query-context.mjs",
+          "line": 309
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/research-retrieval-query-context.mjs",
+          "line": 342
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/research-evidence-assembly.mjs",
+          "line": 355
+        }
+      ],
+      "finding": "The generic word area in retail sales area activates the area facet. An unpaid query reconstruction appends the public gross-area/supportive-housing description, existing Building Area, Tax Lot Area and FRESH Program Area to the semantic query. Those facts do not determine interior minimum ceiling clear height. Appending their original qualifications avoids false project assertions, but still moves retrieval toward ZR FAR/program topics.",
+      "limitation": "Reconstruction used visible UI labels, not exact projectFactProjection/server qualification. It demonstrates a general facet/subject mismatch, not the literal production embedding request."
+    },
+    {
+      "stage": "writer/revision delivery",
+      "certainty": "confirmed deduplicated final-review log",
+      "pointers": [
+        {
+          "file": "/tmp/permitext-production-v19-natural-01-01.jsonl",
+          "event": "research_clarification_recovery"
+        }
+      ],
+      "finding": "Both verifier attempts correctly reject binding a packet-wide ceiling-height source-gap statement to ZR 35-33, a FAR provision. This is not evidence that the ceiling rule is unknowable or needs new project facts. It is a retrieval miss followed by irrelevant source binding that the bounded revision failed to remove. Disabling this verifier finding would produce a misleading citation without repairing the absent BC rule."
+    }
+  ],
+  "recommendedGeneralCorrection": [
+    "Compute a shared current-question subject/measurement-object intent before reading generic project labels or choosing a fallback corpus. Ordinary interior room clearance, whole-building bulk height, component clearances and floor-area calculations are different properties even when all discuss height/area.",
+    "Use that subject for a soft family preference and compatible edition selection. A project configured codeVersion may provide the edition of an appropriate family; it must not make an unrelated code book an independently requested legal framework. Keep explicitly named mixed-authority requests, exact references, approved pinned evidence, source-only boundaries and authorized current-library recall available.",
+    "Use the same subject/property intent to filter retrieval-only project facts: retail/office use may help room-rule interpretation, while tax-lot area, unrelated FRESH status, supportive unit count and existing gross building area should not dominate an interior-clear-height query. Preserve all original facts for the writer/reviewer and their scope; this is not data deletion.",
+    "Activate zoning-specific planning/selection only for an independently requested ZR subject or explicitly pinned/authorized ZR scope; recall_only or a project metadata fallback is not sufficient.",
+    "Add offline and real website acceptance cases using unnumbered room/ceiling questions, whole-building zoning-height contrasts, mixed named requests, historic edition selections, corrections and strict selected-source boundaries. Do not add a known numeric answer or BC1208-specific output script."
+  ],
+  "sourceFiles": [
+    {
+      "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/research-corpus-registry.mjs",
+      "deployedSHA256": "e21d7984e355b0f67087ca5ae2547ccba038ac5f7c01ecd0ac5b87dc4edc9575",
+      "workingSHA256": "e21d7984e355b0f67087ca5ae2547ccba038ac5f7c01ecd0ac5b87dc4edc9575",
+      "workingBytesMatchDeployed": true
+    },
+    {
+      "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/research-retrieval-query-context.mjs",
+      "deployedSHA256": "bf29407acda6c2b004e0e6e0c5fdbc6e1de0d61c231db7f225dacbe4aa8b4707",
+      "workingSHA256": "bf29407acda6c2b004e0e6e0c5fdbc6e1de0d61c231db7f225dacbe4aa8b4707",
+      "workingBytesMatchDeployed": true
+    },
+    {
+      "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/research-evidence-assembly.mjs",
+      "deployedSHA256": "284b722dc24d17ebda4f2a476c13452239dbf368690b201a9923eeb6e89d527a",
+      "workingSHA256": "284b722dc24d17ebda4f2a476c13452239dbf368690b201a9923eeb6e89d527a",
+      "workingBytesMatchDeployed": true
+    },
+    {
+      "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/evidence-discovery.mjs",
+      "deployedSHA256": "3b672262851c872f0ebb727d50d3d634915491c10bcdbac5312e4423f6be31e2",
+      "workingSHA256": "3b672262851c872f0ebb727d50d3d634915491c10bcdbac5312e4423f6be31e2",
+      "workingBytesMatchDeployed": true
+    },
+    {
+      "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+      "deployedSHA256": "606591bc0d78aa0a3c83e26f7070110990311c84fcdb4b26b5a38f51b293400c",
+      "workingSHA256": "031a7d1199f4a16e2c628fe7381b54e1e1a6473d8810f27c5bf20af144dbd89c",
+      "workingBytesMatchDeployed": false
+    }
+  ],
+  "limitations": [
+    "Assistant source review, not an independent professional code determination.",
+    "One captured natural turn only; no other unseen keys/outputs inspected for this diagnosis.",
+    "No application source changed, no provider calls, no browser interaction, no deployment.",
+    "Cannot assign the exact fraction of this miss caused by routing versus ranking without the production corpus plan/embedding candidate ranks."
+  ]
+}

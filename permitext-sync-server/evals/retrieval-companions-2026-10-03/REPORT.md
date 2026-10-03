@@ -2,6 +2,25 @@
 
 The production website is the acceptance surface. Local results are diagnostic and regression evidence, not proof that the hosted website is fixed.
 
+
+## Current acceptance checkpoint
+
+The goal is **100% complete, correct, source-supported answers**. The user's first-beta minimum is **95%** on a representative acceptance sample, not permission to ignore critical safety or applicability errors. These are measured release targets, not a guarantee that an open-ended research model can never err.
+
+All **36 actual production turns** are now captured and independently source-reviewed across 12 conversations and six code families on one unchanged release: `50a0295ecb332d24ba0b8bdcd2386908b5706046`, deployment `dpl_EGVuPUuZYy9iX1LqkCVkotntpzZ9`. Public release identity was verified before the first and after the last turn; all 147 frozen server source hashes match that commit. No fresh-result-driven retuning occurred within the cohort.
+
+Strict grades: **20 correct, 7 minor issues, 1 appropriate clarification, 1 materially wrong, 7 withheld**. Fully correct answers are **20/36 (55.56%)**; the one genuinely needed clarification is separately useful. Four withheld turns were verification nonanswers and three were partial answers missing decisive evidence. Zero observed transport failures does not mean zero answer failures. This cohort **fails beta acceptance**. UI-displayed median duration was 44 seconds and nearest-rank p90 101 seconds; these are not separately measured browser end-to-end times.
+
+The cohort's estimated provider expense was **$2.533475**. Campaign estimated settled expense is **$5.88131532 / $13.97**, leaving **$8.08868468** before the next operation. All 36 operations reconciled with no pending provider or embedding requests; each was linked to the active project and received 33 saved facts. These are token-based estimates, not an API wallet balance or invoice.
+
+Missing controlling tables and narrow dependencies explain several incomplete answers. A complete mechanical source was also misread by transferring a formula from an excluded exception into the applicable branch. Unnecessary edition uncertainty and retaining a derived path length after equipment removal caused smaller issues. The next repair addresses those shared causes, then requires its own website regression and a separately reported ordinary-language sample. Neither request-contract tests nor local retrieval replay establish production answer correctness.
+
+Sealed evidence: `production-v18-fresh-summary.json`, `production-v18-fresh-independent-aggregate-review.json`, and 24 per-conversation capture/review files. The material mechanical error and every withheld answer remain in the audit; no successful retest replaces the original grade.
+
+## Test realism limitation
+
+The mixed cohort first-turn prompts explicitly identify synthetic premises as separate from the real project and specify that corrections supersede earlier facts. This prevents invented evaluation dimensions from being presented as real project data, but also gives the model extra contextual guidance. On the user's October 3 question about this preamble, root acknowledged that these results alone cannot establish ordinary-language production performance. A separate natural-language acceptance sample must use short questions relying on saved project facts without the evaluation preamble. Do not pool that sample silently with this frozen cohort or describe this cohort as fully blind.
+
 ## Verified baseline
 
 At production commit `2c68a79e10910e8c038dd1a17926fa6c79cc9992`, an authenticated four-turn rooftop conversation recognized the saved fictional dimensions and subsequent corrections. All four turns withheld the requested conclusion because broad FC 504 excerpts omitted the decisive rooftop provisions. Displayed durations were 10, 15, 18 and 25 seconds. Private runtime accounting confirms project linkage and 33 supplied project facts. All four operations settled, with estimated combined provider cost $0.099500.
@@ -90,3 +109,10 @@ Candidate v10 limits supported points to the narrative's actual material claims 
 The v10 mechanical repeat delivered three independently correct answers, including the former withheld methods overview. The three gas and three drainage answers also passed independent canonical-source review; the remaining six diagnostic turns are still in progress. The unchanged model combination remains Luna low writing and medium verification. The five retrieval flags are now persisted in the production project environment so future builds retain the tested configuration.
 
 Candidate v11 changes only display formatting and aligned web cache versions. A conservative renderer converts unmistakable contiguous inline alternatives into numbered lines without rewriting stored/copied/exported text, words, conjunctions, conditions or citation order. Ambiguous prose, quotations, code, tables and reference-only lists remain unchanged. Focused renderer/source-preservation and offline-shell contracts passed; one historical list-summary contract fails identically on the unchanged backend and is recorded separately. Production rendering still requires confirmation.
+
+
+## Fresh ordinary-language production sample, candidate v19
+
+Exact v19 production commit `8018ad11dbd939e1de50c873cad7ff2866cd3203` passed identity/health/private-asset gates and authenticated saved recovery copy plus Report-form/cancel verification. Six new conversations and twelve exact question/follow-up turns were run unchanged on this deployment. Independent canonical-source review graded **5 correct, 3 minor, 4 withheld**; no delivered material error was established. This fails accuracy acceptance. All twelve operations settled, linked to the active project with 33 facts; total provider estimate **$1.076793**. No repeated failed question was used to replace a failure.
+
+Failures retain wrong-subject ceiling and propane follow-up packets, inconsistent verifier envelope and unresolved residential parking source support. Minor gaps include sink receptor baseline coverage, an unavailable-in-packet coating criterion that exists locally, and insufficient Outer Transit Zone tracing. Copy/UI success is separate from answer accuracy. The next candidate shares ordinary current-question subject hints across corpus routing, ranking and retrieval fact selection; bounded internal verifier-envelope correction and saved format recovery preserve all substantive checks and spending limits. Future live results remain required.

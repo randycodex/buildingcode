@@ -1,0 +1,62 @@
+{
+  "candidateVersion": "20261003-current-rule-packets-qualified-claims-recovery-report-v19",
+  "productionVerified": true,
+  "providerCalls": 0,
+  "coreSourceCommits": [
+    "42c18396a",
+    "4e958feed"
+  ],
+  "releaseCheckoutCoreCommits": [
+    "7477e711f",
+    "3cd301b9f"
+  ],
+  "passedRootContracts": [
+    "tests/research-corpus-registry-contract.mjs",
+    "tests/research-qualified-branch-scope-contract.mjs",
+    "tests/research-claim-scope-contract.mjs",
+    "tests/research-exception-recipient-scope-contract.mjs",
+    "tests/research-conversation-presentation-contract.mjs",
+    "tests/research-code-basis-contract.mjs",
+    "tests/research-historical-topic-routing-contract.mjs",
+    "tests/research-conversation-topic-contract.mjs",
+    "tests/research-failed-human-measurement-subject-contract.mjs",
+    "tests/research-current-detail-packet-contract.mjs"
+  ],
+  "passedAgentContracts": [
+    "tests/research-current-detail-packet-contract.mjs",
+    "tests/research-current-lexical-reservation-contract.mjs",
+    "tests/research-complete-sibling-contract.mjs",
+    "tests/research-indexed-reference-dependency-contract.mjs",
+    "tests/research-evidence-assembly-contract.mjs",
+    "tests/research-canonical-scope-ranking-contract.mjs",
+    "tests/research-zoning-use-scope-ranking-contract.mjs",
+    "tests/research-semantic-query-context-contract.mjs",
+    "tests/research-failed-human-measurement-subject-contract.mjs",
+    "tests/research-rule-packets-contract.mjs",
+    "tests/research-cross-reference-completeness-contract.mjs",
+    "tests/research-topic-dependency-budget-contract.mjs",
+    "tests/research-transparency-continuity-contract.mjs"
+  ],
+  "releaseCheckoutContentVerification": "npm run verify:deploy-content passed after npm ci --ignore-scripts",
+  "limits": "One checked complete active-rule source can exceed the ordinary per-source share within the unchanged total allowance. Strict pins, source counts, canonical identity/hash/offset checks, total budgets and $1 request cap remain.",
+  "limitsOfEvidence": "Deployment, served client identity, authenticated historical recovery display and Report form/cancel verified. Natural12 production sample graded5 correct,3 minor,4 withheld; accuracy acceptance failed. No claim of beta readiness.",
+  "updatedAt": "2026-10-03T16:41:15.897338+00:00",
+  "productionCandidateCommit": "8018ad11dbd939e1de50c873cad7ff2866cd3203",
+  "webRecoverySourceCommit": "4b0f607ea",
+  "releaseCheckoutRecoveryCommit": "9f505c734",
+  "passedWebRecoveryContracts": [
+    "tests/research-clarification-copy-contract.mjs",
+    "tests/research-verification-report-contract.mjs",
+    "tests/research-transparency-continuity-contract.mjs",
+    "tests/research-progress-answer-status-contract.mjs",
+    "tests/research-failure-explanation-contract.mjs",
+    "tests/web-research-recovery-contract.mjs",
+    "tests/offline-shell-coherence.mjs",
+    "tests/offline-asset-revision-contract.mjs"
+  ],
+  "recoveryPolicy": "Structured verification failures explain the reason and offer an explicit issue report; no blanket paid retry or guessed missing-project question. Historical canonical records remain valid without mutation. Genuine factual clarifications and transport retry are preserved.",
+  "productionDeploymentVerified": true,
+  "authenticatedRecoveryUIVerified": true,
+  "productionAnswerAcceptancePassed": false,
+  "naturalProductionSampleSummary": "production-v19-natural-summary.json"
+}

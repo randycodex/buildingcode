@@ -1,0 +1,643 @@
+{
+  "sealed": true,
+  "reviewer": "Independent assistant source review; not an official interpretation or a verifier pass proxy.",
+  "candidateCommit": "8018ad11dbd939e1de50c873cad7ff2866cd3203",
+  "deploymentID": "dpl_8psS5SQf9dWvfbLGhckLSwduaMkq",
+  "plannedSampleTurns": 12,
+  "capturePath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v19-visible-answers.json",
+  "frozenArtifactHashes": {
+    "questions.json": "6fea445e6504e0264cdda7ade958b9548258f4ee7857d75850e9fd2aa73eaaac",
+    "reviewer-key.json": "500e46167b0d7099faf7148014279e0fddd87baf14531d47ef19a1e7299372ea",
+    "source-packets.json": "8f9110b620995830916faea0eaf886c6175ca92bc013a6d76cbbdbd3950d33e9",
+    "project-context-snapshot.json": "37ac09a72876ae6833e19619480a9c12debde0c74242512a4f0a359724ff7316",
+    "protocol.json": "7f92cb2854c4234aae9c4b7d7f959dbd938261b17b1383db68a8e9c4abbd752a",
+    "frozen-manifest.json": "c2372eb27966d2ef9284c806e8670c010d363706bc9cfbf9adcfb58d687870dd"
+  },
+  "createdAt": "2026-10-03T16:34:09.573963+00:00",
+  "reviewedTurns": 12,
+  "reviewScope": "All12 actual captured rows, each corresponding reviewer key opened only after its visible capture was supplied; complete canonical source compared independently. Earlier first-five review remains immutable.",
+  "captureFileSHA256AtReview": "39a921861dc28674603a0a6b1a7c76d0388b5c4741617c450116343a763f6bdb",
+  "capturedSubsetSHA256": "8bd1aa298ad7eca3ffc78bb3012549a10f1a1edcce548a515d8af778cb3561d2",
+  "previousSealedReview": {
+    "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v19-first-five-independent-review.json",
+    "sha256": "003f5c2870aa65161ae9ae50855d749c83890778f54694ec27ee8f73728093e6"
+  },
+  "verifiedCanonicalSources": [
+    {
+      "reference": "BC 1208.2",
+      "sectionID": 3021,
+      "sectionNumber": "1208.2",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/12.html",
+      "sourceSHA256": "a71385f66d2008c0d5dced2c7b45ef6c042f32e3831cd45760e91929c973c5a2",
+      "excerptSHA256": "71b96d728cede25628daea803e2e0bcee33791f2e13f1a9a8b03b29cee787cca"
+    },
+    {
+      "reference": "BC 1208.2.1",
+      "sectionID": 3022,
+      "sectionNumber": "1208.2.1",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/12.html",
+      "sourceSHA256": "a71385f66d2008c0d5dced2c7b45ef6c042f32e3831cd45760e91929c973c5a2",
+      "excerptSHA256": "acbcf6d5a9c180a549d3a76c0756cf46ebdd4784c20e5853d0c3cc3791864da6"
+    },
+    {
+      "reference": "PC 802.1",
+      "sectionID": 12475,
+      "sectionNumber": "802.1",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 8.html",
+      "sourceSHA256": "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b",
+      "excerptSHA256": "6998f07141e7f04902bc9f2c6472cbe37de9262a73525fca09f19364ae51d109"
+    },
+    {
+      "reference": "PC 802.1.1",
+      "sectionID": 12476,
+      "sectionNumber": "802.1.1",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 8.html",
+      "sourceSHA256": "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b",
+      "excerptSHA256": "faca3f7d1ec091af4f0c1eba929b8a5a5bdc7ae2dd9e10605086c7cbb69d7d7a"
+    },
+    {
+      "reference": "PC 802.1.8",
+      "sectionID": 12483,
+      "sectionNumber": "802.1.8",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 8.html",
+      "sourceSHA256": "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b",
+      "excerptSHA256": "58359332c2d8239a79b51b1573e57f312ce9658bcd88d7c6bc224e15a68c8e48"
+    },
+    {
+      "reference": "PC 802.2",
+      "sectionID": 12484,
+      "sectionNumber": "802.2",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 8.html",
+      "sourceSHA256": "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b",
+      "excerptSHA256": "734bfeccbb28b6f892c58c389df6af63daa9b227bc8a78f6cdd12cebf33bbda8"
+    },
+    {
+      "reference": "MC 507.1",
+      "sectionID": 10658,
+      "sectionNumber": "507.1",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 5.html",
+      "sourceSHA256": "28f46999f485048d8c06e1410e4b00c9442f1fe90b8dc8643081434274579fbe",
+      "excerptSHA256": "bae5b7e2c311c0e05527144275757cd7b4bb4669bbf8c242c4c90cc57ad02eac"
+    },
+    {
+      "reference": "MC 507.2",
+      "sectionID": 10665,
+      "sectionNumber": "507.2",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 5.html",
+      "sourceSHA256": "28f46999f485048d8c06e1410e4b00c9442f1fe90b8dc8643081434274579fbe",
+      "excerptSHA256": "7210e463ec6f5b1f37d1b2b4496759a7f5313940583653354466ce5883332631"
+    },
+    {
+      "reference": "MC 507.3",
+      "sectionID": 10677,
+      "sectionNumber": "507.3",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 5.html",
+      "sourceSHA256": "28f46999f485048d8c06e1410e4b00c9442f1fe90b8dc8643081434274579fbe",
+      "excerptSHA256": "664595d9e58789fb3f2c1af7e2cddf5a46b350320fde440e50deef0e9c04c593"
+    },
+    {
+      "reference": "FGC 404.9",
+      "sectionID": 8239,
+      "sectionNumber": "404.9",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
+      "sourceSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2",
+      "excerptSHA256": "ef3637ae2b1958690f5abe2f296d18bf6cc454297b41596d7af3871fff3cbad4"
+    },
+    {
+      "reference": "FGC 404.11",
+      "sectionID": 8241,
+      "sectionNumber": "404.11",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
+      "sourceSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2",
+      "excerptSHA256": "2509bd314b0728571c57bb331730036ac77b78af72ac37289aca81922e009c62"
+    },
+    {
+      "reference": "FGC 404.11.2",
+      "sectionID": 8243,
+      "sectionNumber": "404.11.2",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
+      "sourceSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2",
+      "excerptSHA256": "2c04bae730788cc5f17ffc1fbae102dc233cb772e35e45ab7e6e6054822e49a6"
+    },
+    {
+      "reference": "FGC 404.11.5",
+      "sectionID": 8246,
+      "sectionNumber": "404.11.5",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
+      "sourceSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2",
+      "excerptSHA256": "62f59a7f1fe05c2a7d39ca0ed295d9cfb87252dd93bcbf12e60e31d7ed908416"
+    },
+    {
+      "reference": "FC 6105",
+      "sectionID": 31005025,
+      "sectionNumber": "6105",
+      "jurisdiction": "New York City",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "corpusID": "nyc-2022-fire-code",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31005025.json",
+      "sourceSHA256": "229fbf153865e4f45ffa3e7f04fb893afddabadf95999f927ecd1cd1629e0a51",
+      "excerptSHA256": "8b3abeb9838e405095ea7700fd2dd5b9bd278918ed86d1bdde8cad0c1dbde9d2"
+    },
+    {
+      "reference": "ZR 12-10",
+      "sectionID": 20018523,
+      "sectionNumber": "12-10",
+      "jurisdiction": "New York City",
+      "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+      "corpusID": "nyc-zoning-resolution",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20018523.json",
+      "sourceSHA256": "512a48be0b13e1dd775c98f8078b1714067698dbc15ce0d64aaf52122aaef911",
+      "excerptSHA256": "139ae75e520e0ef047c1c5bd3f713103cc7c52b53d052b0ce350a922d45b77b3"
+    },
+    {
+      "reference": "ZR 25-211",
+      "sectionID": 20017541,
+      "sectionNumber": "25-211",
+      "jurisdiction": "New York City",
+      "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+      "corpusID": "nyc-zoning-resolution",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20017541.json",
+      "sourceSHA256": "1a9708312a5206241c3bbcb6e781d46d555c202c3feb8d0208f1cebae916d818",
+      "excerptSHA256": "6143fbc265a283299febc007649cbcc6200b3e2f739a19457b666b70536bbf9b"
+    },
+    {
+      "reference": "ZR 25-221",
+      "sectionID": 20022798,
+      "sectionNumber": "25-221",
+      "jurisdiction": "New York City",
+      "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+      "corpusID": "nyc-zoning-resolution",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20022798.json",
+      "sourceSHA256": "71629bff88f3d1c62a77006caf608a6e7db8eed0592bda70463bc8cf37e17688",
+      "excerptSHA256": "bd3b887f5f68a3bb58dda4222d0d0925b7748bbfad7ae12a75aed21756c78082"
+    },
+    {
+      "reference": "ZR 25-222",
+      "sectionID": 20022799,
+      "sectionNumber": "25-222",
+      "jurisdiction": "New York City",
+      "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+      "corpusID": "nyc-zoning-resolution",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20022799.json",
+      "sourceSHA256": "c5f422776bb71ed9efb9e8950e0691fb4dfbf57917f88bf0f22fa44941e3c5cd",
+      "excerptSHA256": "7b53aeb3b03cf7a6a9183c99ed6e6c1c70ac16f9c6b819c1516c8dec4ed2e69c"
+    }
+  ],
+  "additionalCanonicalSourceChecks": [
+    {
+      "reference": "FC 6109 full storage section including Table6109.12 and note a",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31005029.json",
+      "sourceSHA256": "2b2ad4db1f53d5ff496fb6683b611ddc7e4722031eab5ab6d062e2fda1977145",
+      "textSHA256": "8ff2863f01f67fbcfd867835977b3c698ea8ddc13eaa36a10a6ae80dd1cff812"
+    },
+    {
+      "references": [
+        "FGC 404.3",
+        "FGC 401.5",
+        "FGC 404.11.6",
+        "FGC 406.4.1.2"
+      ],
+      "resolver": "constructionHTMLBodyForSection direct canonical HTML",
+      "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
+      "sourceSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2"
+    }
+  ],
+  "rows": [
+    {
+      "id": "production-v19-natural-01-01",
+      "question": "For this project, how low can we make the ceilings in the retail sales area and the community-facility offices?",
+      "capturedAt": "2026-10-03T15:52:49.202Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nFor this project, how low can we make the ceilings in the retail sales area and the community-facility offices?\n\nResearch incomplete\n00:50\n\nResearch couldn’t finish because its explanation and source references didn’t agree.\n\nYour question and conversation are saved. You don’t need to repeat the question.\n\nReport this issue\nSend",
+      "keyID": "natural-01-1",
+      "family": "BC",
+      "decision": "withheld",
+      "substantiveAccuracy": "not_assessable_no_delivered_code_answer",
+      "usefulness": "No useful ceiling-height baseline was delivered. The truthful failure explanation/report action is a recovery UX improvement, not an answer.",
+      "failureStage": "retrieval_and_citation_relevance",
+      "decisiveTextCoverage": {
+        "actualWriter": "BC 1208.2 absent from the accounting source list; 15 ZR sources and FC 703 were supplied. No exact full writer body was available for independent inspection.",
+        "delivered": "No operative BC conclusion."
+      },
+      "sourceChecks": [
+        {
+          "reference": "BC 1208.2",
+          "check": "Sales/office occupiable spaces have a 7-foot-6-inch baseline, measured finished floor to finished underside of ceiling/beams. No already-known project fact prevents giving that baseline."
+        }
+      ],
+      "projectContext": "Does not confuse existing inventory with proposed rooms, because no technical answer was delivered; this is not positive correctness credit.",
+      "presentationIssues": [
+        "Visible incomplete status and Report this issue are appropriate; user should not have to repeat the question."
+      ],
+      "diagnosisArtifact": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v19-natural-01-01-independent-diagnosis.json",
+      "visibleRowSHA256": "aaa79d24bd51aae607f167a2a1a1a00669b6ea89fa03136ad96ec7060dd96997",
+      "deliveredAnswerText": "Research couldn’t finish because its explanation and source references didn’t agree.\n\nYour question and conversation are saved. You don’t need to repeat the question.",
+      "deliveredAnswerSHA256": "02d926d9d73bada7ca72f424347e201b8be71b33d3bd6479bb46c7bab0e639ac",
+      "expectedKeyHash": "bfb578944f190334da84e50259ec7b4b64f40417b4297d7684de99391106722f"
+    },
+    {
+      "id": "production-v19-natural-01-02",
+      "question": "For the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?",
+      "capturedAt": "2026-10-03T16:06:20.734Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nFor this project, how low can we make the ceilings in the retail sales area and the community-facility offices?\n\nResearch incomplete\n00:50\n\nResearch couldn’t finish because its explanation and source references didn’t agree.\n\nYour question and conversation are saved. You don’t need to repeat the question.\n\nReport this issue\n\nFor the retail sales area, what if we lower just a quarter of the ceiling to 7 feet for ductwork and leave the rest at 7 feet 6 inches?\n\nResearch interrupted\n00:40\n\nPermitext could not read the result of its answer check, so no answer was saved. This is a processing error, not a problem with your question. Your question is saved; use Retry to try again.\n\nRetry\nSend",
+      "keyID": "natural-01-2",
+      "family": "BC",
+      "decision": "withheld",
+      "substantiveAccuracy": "not_assessable_no_delivered_code_answer",
+      "usefulness": "No answer to the stated area/height comparison. This is an internal verification-protocol failure, not a genuinely missing project fact.",
+      "failureStage": "verifier_envelope_cross_field_validation",
+      "decisiveTextCoverage": {
+        "actualWriter": "Accounting lists BC 1208.2 but not separate BC 1208.2.1. Actual full writer body unavailable; full child-clause coverage unknown. A reference alone does not prove operative text coverage.",
+        "delivered": "No operative conclusion."
+      },
+      "sourceChecks": [
+        {
+          "reference": "BC 1208.2",
+          "check": "Ordinary nonhabitable occupiable sales area baseline is 7 feet 6 inches."
+        },
+        {
+          "reference": "BC 1208.2.1",
+          "check": "Two-thirds minimum-height area and no furred ceiling below 7 feet: three-quarters at 7 feet 6 inches plus one-quarter at 7 feet meets this narrow rule; habitable-space exception does not change the stated sales-area result."
+        }
+      ],
+      "projectContext": "No numeric correction was applied in a delivered answer; no private draft is credited.",
+      "presentationIssues": [
+        "The processing-error explanation is truthful, but the blanket Retry action/copy is the separate existing error path and provides no evidence that resubmission resolves the protocol issue."
+      ],
+      "diagnosisArtifact": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v19-natural-01-02-independent-diagnosis.json",
+      "visibleRowSHA256": "52caa41e1ccef350d207dfe5069edff2d889119ef512268d5e904cc65a9d8eb5",
+      "deliveredAnswerText": "Permitext could not read the result of its answer check, so no answer was saved. This is a processing error, not a problem with your question. Your question is saved; use Retry to try again.",
+      "deliveredAnswerSHA256": "2188b91a6e691e007f0534d8eb7f2f52d0152bb89ccf6fc44babc67ddf678428",
+      "expectedKeyHash": "5f3b98e98fbdd4ffb0f0811f0ca8d8c54f316ca95dd267e9e18dc4f50a28aa49"
+    },
+    {
+      "id": "production-v19-natural-02-01",
+      "question": "If one of our retail spaces becomes a café, how should the kitchen sink drain? Can we connect it directly to the sewer pipe?",
+      "capturedAt": "2026-10-03T16:07:49.535Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nIf one of our retail spaces becomes a café, how should the kitchen sink drain? Can we connect it directly to the sewer pipe?\n\nResearch complete\n00:40\n\nGenerally, no: a café kitchen sink used for food preparation or handling must discharge indirectly through an air gap; if it is used to wash or rinse utensils, dishes, pots, pans, or service ware, it must discharge indirectly through an air gap or air break—not directly to the sewer drainage pipe (PC §§ 802.1.1, 802.1.8). The express direct-connection exception is for a hand sink. If it is a multiple-compartment sink, each well must discharge independently to a waste receptor (PC § 802.1.1).\n\nWill this sink be used for handwashing, food preparation, washing dishes or utensils, or more than one of these?\n\nSend",
+      "keyID": "natural-02-1",
+      "family": "PC",
+      "decision": "minor_issue",
+      "substantiveAccuracy": "core_direct_vs_indirect_answer_correct_but_baseline_incomplete",
+      "usefulness": "Useful function-based baseline before an appropriate sink-use question; missing the basic trapped/vented receptor arrangement for the broad how-should-it-drain question.",
+      "failureStage": "answer_completeness_and_scope_wording",
+      "decisiveTextCoverage": {
+        "actualWriter": "Not independently audited; grading visible claims against complete sealed canonical packets only.",
+        "delivered": "Correct PC 802.1.1 food-handling air gap and PC 802.1.8 utensil gap-or-break, plus hand-sink exception. PC 802.2 receptor trap/vent requirement not delivered."
+      },
+      "sourceChecks": [
+        {
+          "reference": "PC 802.1.1",
+          "check": "Food preparation/handling fixtures require indirect air gap. Independent multiple-compartment wells occur within this food-handling provision; final answer states that addition broadly rather than tying it back explicitly to food-handling scope."
+        },
+        {
+          "reference": "PC 802.1.8",
+          "check": "Non-dwelling food-utensil sink may use air gap OR air break; hand-sink direct-connection exception correctly distinguished."
+        },
+        {
+          "reference": "PC 802.2",
+          "check": "Indirect waste enters a waste receptor that is trapped and vented and connects to building drainage. This basic arrangement is omitted, without claiming complete installation approval."
+        }
+      ],
+      "projectContext": "Café is a hypothetical retail tenancy, not a known installed kitchen. Asking actual sink function is genuinely relevant.",
+      "presentationIssues": [
+        "Brief readable paragraph and one useful follow-up."
+      ],
+      "materiality": "No unsafe direct-connection permission or false gap-only conclusion. Minor completeness/scope wording issue; no known multiple-compartment arrangement was approved.",
+      "visibleRowSHA256": "4697ac212f2db342e18761ec766e53c51cecedfbebf5e0f7a1255b429276c7c9",
+      "deliveredAnswerText": "Generally, no: a café kitchen sink used for food preparation or handling must discharge indirectly through an air gap; if it is used to wash or rinse utensils, dishes, pots, pans, or service ware, it must discharge indirectly through an air gap or air break—not directly to the sewer drainage pipe (PC §§ 802.1.1, 802.1.8). The express direct-connection exception is for a hand sink. If it is a multiple-compartment sink, each well must discharge independently to a waste receptor (PC § 802.1.1).\n\nWill this sink be used for handwashing, food preparation, washing dishes or utensils, or more than one of these?",
+      "deliveredAnswerSHA256": "dfbebd1e813c0e85cda07e85f1cdc7ea1bcf0fd7b32c1844b7e02c4f559fe6de",
+      "expectedKeyHash": "1e14f1da273e859f412f03b2a8421c597bf8f24597717420b97e176c984f1afb"
+    },
+    {
+      "id": "production-v19-natural-02-02",
+      "question": "This sink would only be for washing pots and utensils, not preparing food. Does it still have to have an air gap?",
+      "capturedAt": "2026-10-03T16:09:30.886Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nIf one of our retail spaces becomes a café, how should the kitchen sink drain? Can we connect it directly to the sewer pipe?\n\nResearch complete\n00:40\n\nGenerally, no: a café kitchen sink used for food preparation or handling must discharge indirectly through an air gap; if it is used to wash or rinse utensils, dishes, pots, pans, or service ware, it must discharge indirectly through an air gap or air break—not directly to the sewer drainage pipe (PC §§ 802.1.1, 802.1.8). The express direct-connection exception is for a hand sink. If it is a multiple-compartment sink, each well must discharge independently to a waste receptor (PC § 802.1.1).\n\nWill this sink be used for handwashing, food preparation, washing dishes or utensils, or more than one of these?\n\nThis sink would only be for washing pots and utensils, not preparing food. Does it still have to have an air gap?\n\nResearch complete\n00:38\n\nIt still needs an indirect connection, but not necessarily an air gap: if this sink is outside a dwelling unit and washes pots or utensils used in preparing, serving, or eating food, it may discharge indirectly through either an air gap or an air break. Not using the sink to prepare food does not remove that requirement. (PC § 802.1.8)\n\nWill the pots and utensils washed in this sink be used to prepare, serve, or eat food? The cited rule applies to washing those food-related items, even if food is not prepared in the sink.\n\nSend",
+      "keyID": "natural-02-2",
+      "family": "PC",
+      "decision": "correct",
+      "substantiveAccuracy": "correct",
+      "usefulness": "Answers the correction directly: still indirect, air gap is not the only option. The added food-utensil question is redundant in the already established café kitchen context.",
+      "failureStage": null,
+      "decisiveTextCoverage": {
+        "actualWriter": "Not independently audited; visible answer compared with complete sealed canonical text.",
+        "delivered": "PC 802.1.8 indirect gap-or-break permission and recipient scope correctly stated."
+      },
+      "sourceChecks": [
+        {
+          "reference": "PC 802.1.8",
+          "check": "Non-dwelling sinks washing food-related pots/utensils must discharge indirectly through an air gap OR air break. Correctly stops imposing food-preparation air-gap-only rule after the user correction."
+        }
+      ],
+      "projectContext": "Retains the café retail context and applies only pots/utensils use; does not repeat independent-well requirement from food-handling subsection.",
+      "presentationIssues": [
+        "Redundant question about whether café pots/utensils relate to food; this does not withhold or materially change the already correct answer."
+      ],
+      "materiality": "Presentation/extra follow-up concern recorded separately from substantive correctness.",
+      "visibleRowSHA256": "55b7d328569e7d9b707e81f61211fc9500037de3a06d1329bcb7ba0d9a690c44",
+      "deliveredAnswerText": "It still needs an indirect connection, but not necessarily an air gap: if this sink is outside a dwelling unit and washes pots or utensils used in preparing, serving, or eating food, it may discharge indirectly through either an air gap or an air break. Not using the sink to prepare food does not remove that requirement. (PC § 802.1.8)\n\nWill the pots and utensils washed in this sink be used to prepare, serve, or eat food? The cited rule applies to washing those food-related items, even if food is not prepared in the sink.",
+      "deliveredAnswerSHA256": "f1c1b9d15317f5a16b0df2ab027a488715f3399c08dbfab47b335abca638aadf",
+      "expectedKeyHash": "6caa1c14e22422e5af7367ebabb7c13b4ef076a9a0beac349531c26b79e345b7"
+    },
+    {
+      "id": "production-v19-natural-03-01",
+      "question": "If a retail tenant adds a small café kitchen, what determines whether we need a grease hood?",
+      "capturedAt": "2026-10-03T16:10:59.699Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nIf a retail tenant adds a small café kitchen, what determines whether we need a grease hood?\n\nResearch complete\n00:37\n\nThe cooking appliances and what they emit—not the café’s size—determine whether a Type I grease hood is required. NYC requires a Type I hood where cooking produces grease or smoke, and over medium-, heavy-, or extra-heavy-duty appliances (MC § 507.2). A narrow exception applies to an electric appliance if an approved testing agency documents grease in its effluent at no more than 5 mg/m³ when tested at 500 cfm under UL 710B. Heat or moisture without grease or smoke may instead trigger Type II hood requirements, subject to the stated HVAC or separate-removal-system exception (MC § 507.3).\n\nTo determine the result for this café, identify the appliances and cooking methods, including whether any appliance is electric and has the required test documentation. What equipment and cooking methods are planned?\n\nWhat appliances and cooking methods are planned, and is any electric appliance supported by the specified UL 710B test documentation?\n\nSend",
+      "keyID": "natural-03-1",
+      "family": "MC",
+      "decision": "correct",
+      "substantiveAccuracy": "correct",
+      "usefulness": "Useful baseline explaining the actual grease-hood trigger and a narrow electric-appliance exception before asking relevant equipment details.",
+      "failureStage": null,
+      "decisiveTextCoverage": {
+        "actualWriter": "Not independently audited; visible answer compared with complete sealed canonical text.",
+        "delivered": "MC 507.2 core Type I trigger, medium/heavy/extra-heavy scope, and complete stated electric-test exception; MC 507.3 heat/moisture Type II condition with separate HVAC/removal-system exception."
+      },
+      "sourceChecks": [
+        {
+          "reference": "MC 507.2",
+          "check": "Grease/smoke and medium/heavy/extra-heavy trigger correctly stated; approved-agency documentation, electric-appliance recipient, <=5 mg/m³ at 500 cfm under UL 710B preserved."
+        },
+        {
+          "reference": "MC 507.3",
+          "check": "Heat/moisture without grease/smoke may require Type II, subject to HVAC/separate-removal design exception. Does not imply exception abolishes combustion/exhaust requirements or approve a complete installation."
+        },
+        {
+          "reference": "MC 507.1",
+          "check": "Overview does not claim complete system compliance. Unactivated general/shared-hood or listed-integral-downdraft conditions need not all be recited in this baseline question; appliance/process information requested."
+        }
+      ],
+      "projectContext": "Actual hypothetical café appliances and methods remain unknown; targeted question is useful. Does not decide from café size or unrelated saved building inventory.",
+      "presentationIssues": [
+        "Same equipment/test-documentation question appears twice in consecutive paragraphs. Substantive rules correct; duplicate rendering/assembly is a separate presentation issue."
+      ],
+      "materiality": "No substantive material defect established for this qualified overview.",
+      "visibleRowSHA256": "551e966a6829e3bdf520ccff501601b56fa737dd7c2558c6556eb1ed9f66b731",
+      "deliveredAnswerText": "The cooking appliances and what they emit—not the café’s size—determine whether a Type I grease hood is required. NYC requires a Type I hood where cooking produces grease or smoke, and over medium-, heavy-, or extra-heavy-duty appliances (MC § 507.2). A narrow exception applies to an electric appliance if an approved testing agency documents grease in its effluent at no more than 5 mg/m³ when tested at 500 cfm under UL 710B. Heat or moisture without grease or smoke may instead trigger Type II hood requirements, subject to the stated HVAC or separate-removal-system exception (MC § 507.3).\n\nTo determine the result for this café, identify the appliances and cooking methods, including whether any appliance is electric and has the required test documentation. What equipment and cooking methods are planned?\n\nWhat appliances and cooking methods are planned, and is any electric appliance supported by the specified UL 710B test documentation?",
+      "deliveredAnswerSHA256": "f7e9cd296b17d175680ffa19e9bc44017ab01d83f7660f549187729379bee11d",
+      "expectedKeyHash": "b9f54e8961c7b5ac4d7c681e1bc19bb334f6d828249c64ccb9cf172f3bb2be62"
+    },
+    {
+      "id": "production-v19-natural-03-02",
+      "question": "They would only warm pastries in an electric oven, with no frying. Can we skip the special hood just because it is electric?",
+      "capturedAt": "2026-10-03T16:12:59.938Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nIf a retail tenant adds a small café kitchen, what determines whether we need a grease hood?\n\nResearch complete\n00:37\n\nThe cooking appliances and what they emit—not the café’s size—determine whether a Type I grease hood is required. NYC requires a Type I hood where cooking produces grease or smoke, and over medium-, heavy-, or extra-heavy-duty appliances (MC § 507.2). A narrow exception applies to an electric appliance if an approved testing agency documents grease in its effluent at no more than 5 mg/m³ when tested at 500 cfm under UL 710B. Heat or moisture without grease or smoke may instead trigger Type II hood requirements, subject to the stated HVAC or separate-removal-system exception (MC § 507.3).\n\nTo determine the result for this café, identify the appliances and cooking methods, including whether any appliance is electric and has the required test documentation. What equipment and cooking methods are planned?\n\nWhat appliances and cooking methods are planned, and is any electric appliance supported by the specified UL 710B test documentation?\n\nThey would only warm pastries in an electric oven, with no frying. Can we skip the special hood just because it is electric?\n\nResearch complete\n01:06\n\nNo—not just because it is electric. Under the 2022 NYC Mechanical Code, a Type I grease hood is required where cooking produces grease or smoke, and over medium-, heavy-, and extra-heavy-duty cooking appliances. The electric-appliance exception applies only when an approved testing agency documents grease in the appliance’s effluent at 5 mg/m³ or less, tested at 500 cfm in accordance with UL 710B (MC § 507.2).\n\nIf the oven produces heat or moisture without grease or smoke, a Type II hood is required unless those loads are incorporated into the HVAC design or a separate removal system (MC § 507.3). Thus, avoiding a Type I hood would not automatically establish that no hood is needed.\n\nSend",
+      "keyID": "natural-03-2",
+      "family": "MC",
+      "decision": "correct",
+      "reason": "No automatic electric/no-frying waiver. Correct MC507.2 grease/smoke and duty-class triggers; the narrow exception retains electric appliance, approved-agency documentation, <=5 mg/m³, 500 cfm and UL710B. Correct MC507.3 independent TypeII heat/moisture condition and HVAC/separate-removal exception. Does not infer grease-free pastries or approve skipping every hood/exhaust requirement.",
+      "usefulness": "Useful direct No followed by the actual exception and independent exhaust scope.",
+      "failureStage": null,
+      "presentationIssues": [],
+      "sourceChecks": [
+        "MC 507.2",
+        "MC 507.3"
+      ],
+      "decisiveTextCoverage": "Visible conclusions compared with full canonical source. Actual complete writer packet not independently available; accounting references alone do not prove full body coverage.",
+      "visibleRowSHA256": "7a5c0b93858c0d62342122cdfdbcd295e283cbd9cedf7f2b6384e46077dd1ec9",
+      "deliveredAnswerText": "If the oven produces heat or moisture without grease or smoke, a Type II hood is required unless those loads are incorporated into the HVAC design or a separate removal system (MC § 507.3). Thus, avoiding a Type I hood would not automatically establish that no hood is needed.",
+      "deliveredAnswerSHA256": "d41dd2acef36af8fe75635ea44eca0f4a0d29db1dcd3e45b3853fc22841306c3",
+      "expectedKeyHash": "94a6bfde087e6f708dcf8e71d317403abb77ef999dd6e11772354c186376e3a1",
+      "accounting": null,
+      "accountingSHA256": null
+    },
+    {
+      "id": "production-v19-natural-04-01",
+      "question": "For a gas boiler in the proposed building, can we run steel gas piping outdoors along the rear wall? What protection should the detail show?",
+      "capturedAt": "2026-10-03T16:15:37.533Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nFor a gas boiler in the proposed building, can we run steel gas piping outdoors along the rear wall? What protection should the detail show?\n\nResearch complete\n01:11\n\nYes, conditionally: an exposed outdoor steel gas-piping run along the rear wall is permitted under the supplied 2022 NYC Fuel Gas Code provisions, provided it meets the outdoor installation and corrosion-protection requirements and does not interfere with normal operation of windows, doors or other exit openings (FGC §§ 404.9, 404.3).\n\nThe detail should show:\n\nElevation and exposure: piping at least 3½ inches above ground, not concealed (FGC § 404.9).\nCorrosion protection: exposed exterior steel protected by galvanizing, bonded coating complying with § 404.11.4, protective coating complying with § 404.11.5, or protective wrapping complying with § 404.11.6. Wrapping must be approved for the application and field-applied according to the manufacturer’s instructions. Protect susceptible metallic fittings and joints as well (FGC §§ 404.11, 404.11.2, 404.11.6). The supplied evidence does not include §§ 404.11.4–404.11.5, so it does not establish the specifications needed to approve either coating option.\nIdentification: yellow labels marked “Gas” in black, complying with ASME A13.1, at intervals no greater than 5 feet; where a gas test is required, label before testing. Marking is not required for pipe in the same room as the appliance served (FGC § 401.5).\nExterior-wall passage, if included: corrosion protection under § 404.11. If encased in a protective pipe sleeve, seal the annular space and provide at least one end with a vented outlet piped to a safe outdoor location. The terminal must be at least 18 inches above grade, not beneath a building opening or overhang, and installed to prevent water and insect entry (FGC § 404.9).\n\nA fire-rated rear wall does not, by itself, prohibit piping on its exterior face. Piping within a required fire-rated wall or assembly is prohibited; through-penetrations must comply with BC Chapter 7 (FGC § 404.3). The secure-support and physical-damage-protection clause in the supplied § 404.9 applies to piping installed above ground, outdoors, across roof surfaces; it is not a stated requirement for this wall-mounted route.\n\nSend",
+      "keyID": "natural-04-1",
+      "family": "FGC",
+      "decision": "correct",
+      "reason": "Outdoor exposed routing is conditionally permitted. FGC404.9 elevation/no-concealment and conditional sleeve/terminal rules match text; FGC404.11/.11.2 corrosion options match. Extra FGC401.5 label interval/color/testing timing and FGC404.3 exterior face versus in-wall/penetration distinction match full canonical text. The physical-damage/support sentence in404.9 is explicitly tied to outdoor roof routing; answer avoids transferring that clause to this wall detail. It does not assert all other support/protection obligations are absent.",
+      "usefulness": "Useful detail checklist, with a disclosed missing coating-specification dependency. Narrow baseline complete; does not approve the full route.",
+      "failureStage": null,
+      "presentationIssues": [
+        "The answer reports unavailable coating child text even though the enacted library contains it; retrieval completeness gap recorded separately from correct conditional baseline."
+      ],
+      "sourceChecks": [
+        "FGC 404.9",
+        "FGC 404.11",
+        "FGC 404.11.2",
+        "FGC 404.3",
+        "FGC 401.5",
+        "FGC 404.11.6"
+      ],
+      "decisiveTextCoverage": "Visible conclusions compared with full canonical source. Actual complete writer packet not independently available; accounting references alone do not prove full body coverage.",
+      "visibleRowSHA256": "ee6f16e8a67f79060e25cb01532113aa2417c04fc9d93d62ab950ac97b3249c8",
+      "deliveredAnswerText": "The detail should show:\n\nElevation and exposure: piping at least 3½ inches above ground, not concealed (FGC § 404.9).\nCorrosion protection: exposed exterior steel protected by galvanizing, bonded coating complying with § 404.11.4, protective coating complying with § 404.11.5, or protective wrapping complying with § 404.11.6. Wrapping must be approved for the application and field-applied according to the manufacturer’s instructions. Protect susceptible metallic fittings and joints as well (FGC §§ 404.11, 404.11.2, 404.11.6). The supplied evidence does not include §§ 404.11.4–404.11.5, so it does not establish the specifications needed to approve either coating option.\nIdentification: yellow labels marked “Gas” in black, complying with ASME A13.1, at intervals no greater than 5 feet; where a gas test is required, label before testing. Marking is not required for pipe in the same room as the appliance served (FGC § 401.5).\nExterior-wall passage, if included: corrosion protection under § 404.11. If encased in a protective pipe sleeve, seal the annular space and provide at least one end with a vented outlet piped to a safe outdoor location. The terminal must be at least 18 inches above grade, not beneath a building opening or overhang, and installed to prevent water and insect entry (FGC § 404.9).\n\nA fire-rated rear wall does not, by itself, prohibit piping on its exterior face. Piping within a required fire-rated wall or assembly is prohibited; through-penetrations must comply with BC Chapter 7 (FGC § 404.3). The secure-support and physical-damage-protection clause in the supplied § 404.9 applies to piping installed above ground, outdoors, across roof surfaces; it is not a stated requirement for this wall-mounted route.",
+      "deliveredAnswerSHA256": "c6637be4f5950dd623326bf7765dbabd9c5cf9bdf3cedb8801f8d825faca64e6",
+      "expectedKeyHash": "2510f62f609b7bc79aa15cd1cadf180100cee534545ec6ba9e3ac8c8a6e21395",
+      "accounting": null,
+      "accountingSHA256": null
+    },
+    {
+      "id": "production-v19-natural-04-02",
+      "question": "We were planning to paint the exposed black steel with ordinary exterior house paint. Is that enough?",
+      "capturedAt": "2026-10-03T16:17:51.422Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nFor a gas boiler in the proposed building, can we run steel gas piping outdoors along the rear wall? What protection should the detail show?\n\nResearch complete\n01:11\n\nYes, conditionally: an exposed outdoor steel gas-piping run along the rear wall is permitted under the supplied 2022 NYC Fuel Gas Code provisions, provided it meets the outdoor installation and corrosion-protection requirements and does not interfere with normal operation of windows, doors or other exit openings (FGC §§ 404.9, 404.3).\n\nThe detail should show:\n\nElevation and exposure: piping at least 3½ inches above ground, not concealed (FGC § 404.9).\nCorrosion protection: exposed exterior steel protected by galvanizing, bonded coating complying with § 404.11.4, protective coating complying with § 404.11.5, or protective wrapping complying with § 404.11.6. Wrapping must be approved for the application and field-applied according to the manufacturer’s instructions. Protect susceptible metallic fittings and joints as well (FGC §§ 404.11, 404.11.2, 404.11.6). The supplied evidence does not include §§ 404.11.4–404.11.5, so it does not establish the specifications needed to approve either coating option.\nIdentification: yellow labels marked “Gas” in black, complying with ASME A13.1, at intervals no greater than 5 feet; where a gas test is required, label before testing. Marking is not required for pipe in the same room as the appliance served (FGC § 401.5).\nExterior-wall passage, if included: corrosion protection under § 404.11. If encased in a protective pipe sleeve, seal the annular space and provide at least one end with a vented outlet piped to a safe outdoor location. The terminal must be at least 18 inches above grade, not beneath a building opening or overhang, and installed to prevent water and insect entry (FGC § 404.9).\n\nA fire-rated rear wall does not, by itself, prohibit piping on its exterior face. Piping within a required fire-rated wall or assembly is prohibited; through-penetrations must comply with BC Chapter 7 (FGC § 404.3). The secure-support and physical-damage-protection clause in the supplied § 404.9 applies to piping installed above ground, outdoors, across roof surfaces; it is not a stated requirement for this wall-mounted route.\n\nWe were planning to paint the exposed black steel with ordinary exterior house paint. Is that enough?\n\nResearch complete\n00:37\n\nNo—not on the information supplied. For exposed exterior ferrous metal, the 2022 NYC Fuel Gas Code requires corrosion protection by one of its listed methods, including a protective coating that complies with FGC § 404.11.5; it does not establish that ordinary exterior house paint meets that standard. The supplied § 404.11.5 text is unavailable, so whether a particular paint qualifies cannot be determined from this evidence. (FGC § 404.11.2)\n\nIf the field-applied paint is intended to protect gas piping against corrosion, the code also requires a test at not less than 1½ times the proposed maximum working pressure and not less than 3 psig; above 125 psig, pressure must not produce hoop stress greater than 50% of the pipe’s specified minimum yield strength. That testing rule does not itself establish that the paint is an acceptable protective coating. (FGC § 406.4.1.2)\n\nSend",
+      "keyID": "natural-04-2",
+      "family": "FGC",
+      "decision": "minor_issue",
+      "reason": "Core refusal to establish ordinary house paint as compliant is sound and avoids prohibiting all paint/field application. But the locally available FGC404.11.5 criterion (approved for application and factory/field applied per manufacturer instructions, with its explicit field-coating exception) is not supplied to the user. The exact primary coating rule is replaced by a legal-source gap. Extra FGC406.4.1.2 testing pressure/hoop-stress clause is accurately stated and explicitly not presented as coating approval.",
+      "usefulness": "Partly useful bounded answer; cannot tell the user the available approval/manufacturer criterion because retrieval omitted the direct child.",
+      "failureStage": "direct_dependency_retrieval",
+      "presentationIssues": [
+        "Collateral pressure-test paragraph is accurate but distracts from the unresolved primary coating criterion."
+      ],
+      "sourceChecks": [
+        "FGC 404.11",
+        "FGC 404.11.2",
+        "FGC 404.11.5",
+        "FGC 406.4.1.2"
+      ],
+      "decisiveTextCoverage": "Visible conclusions compared with full canonical source. Actual complete writer packet not independently available; accounting references alone do not prove full body coverage.",
+      "visibleRowSHA256": "d6672086be749c7667aa9a1cb6a827bc94e5ab4088d42076cc1a5a4f11184a24",
+      "deliveredAnswerText": "If the field-applied paint is intended to protect gas piping against corrosion, the code also requires a test at not less than 1½ times the proposed maximum working pressure and not less than 3 psig; above 125 psig, pressure must not produce hoop stress greater than 50% of the pipe’s specified minimum yield strength. That testing rule does not itself establish that the paint is an acceptable protective coating. (FGC § 406.4.1.2)",
+      "deliveredAnswerSHA256": "08dddef025a04fcecff0ba0843c6d8512d5727ba1fdd95caea3be1936b37f8b9",
+      "expectedKeyHash": "dd1102d363cd5c65e536ceadffd7fac8aa6eee7535dd35f793e43940ddf2ba8b",
+      "accounting": null,
+      "accountingSHA256": null
+    },
+    {
+      "id": "production-v19-natural-05-01",
+      "question": "Could a café tenant keep propane cylinders outside this building? What fire-safety restrictions should we check before drawing a storage cage?",
+      "capturedAt": "2026-10-03T16:20:55.302Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nCould a café tenant keep propane cylinders outside this building? What fire-safety restrictions should we check before drawing a storage cage?\n\nResearch complete\n01:38\n\nOnly conditionally—not simply by placing cylinders in an outdoor cage. For the proposed mixed-use building with residential space, LPG containers larger than 16.4 ounces are prohibited anywhere on the lot unless authorized by the commissioner. Outdoor LPG storage facilities must also be approved. Thus, a typical larger-cylinder café installation is not established as permissible without that authorization and storage approval. (2022 NYC Fire Code, current consolidated text, §§ 6105.3(3), (5), 6109.1.)\n\nBefore laying out the cage, check these restrictions:\n\nCylinder and total quantity limits: No individual LPG container may have capacity greater than 100 pounds. Outdoor storage is limited to 400 pounds of LPG. A permit is required when quantities exceed those in FC § 105.6; that threshold text was not supplied, so the permit trigger cannot yet be determined. Approval does not settle that separate permit question. (FC §§ 6105.3(1), (4), 6109.12.)\nBasic location: Storage must be at or above grade, not on a roof, and at least 20 feet from building openings, 20 feet from motor-vehicle fuel dispensers, and 10 feet from combustible material. These outdoor separation requirements include containers connected for use. (FC §§ 6109.6, 6109.12.)\nAdditional exposure distances: For storage of more than 100 pounds through 400 pounds, Table 6109.12 requires, where those exposures exist, 10 feet from combustible buildings or structures; 25 feet from subway openings and Group A occupancies/public gathering places; 5 feet from air-compressor intakes or HVAC inlets; and 10 feet from public sidewalks, parked vehicles, public streets, private roads and lot lines. Other table rows address nearby liquid, gas, oxygen and solid-material storage. Only distances marked with note “a”—including the public-street/private-road/lot-line row—may be reduced to 5 feet using a protective structure rated at least 2 hours that interrupts the container-to-exposure line of sight, stands at least 5 feet from the exposure, and allows natural ventilation to prevent hazardous gas accumulation. This is not a general reduction of the building-opening or other unmarked clearances. (FC Table 6109.12, note a.)\nEgress and failure hazards: Do not store or leave cylinders unattended near exit-access doors, exits, stairs, exit-discharge areas or other egress areas. Do not locate storage where failure of structures or containment systems could expose the LPG to electric power lines or piping carrying flammable/combustible liquids, flammable gases or oxidizing materials. (FC §§ 6109.4, 6109.12.1.)\nEnclosure and cylinder protection: Provide a suitable enclosure or other tamper protection, minimize physical damage and excessive temperature rise, and provide vehicular protection as required by the commissioner. Stored cylinders must have securely installed screw-on valve caps or collars and closed outlet valves, whether full, partially full or empty. Cylinders over 1 pound must be positioned with the relief valve communicating directly with the vapor space. (FC §§ 6109.2, 6109.3, 6109.8, 6109.13.)\nElectrical equipment: Except as otherwise provided in NFPA 58, electrical equipment within 3 feet in any direction must meet Class I, Division 2 wiring requirements unless separated from the area by a wall or solid partition without openings. The supplied packet does not include the NFPA 58 alternative. (FC § 6109.14.)\n\nIf these cylinders will supply a stationary café installation, access to utility piped natural gas prohibits that LPG installation unless the commissioner authorizes it; the appliance must also be approved for LPG. A storage cage alone does not establish permission to operate the café equipment. (FC §§ 6105.1, 6105.3(10).)\n\nThe layout remains conditional on the proposed cylinder capacities, total LPG quantity, measured exposure distances and commissioner authorization. What cylinder size and total LPG quantity does the café propose?\n\nSend",
+      "keyID": "natural-05-1",
+      "family": "FC",
+      "decision": "correct",
+      "reason": "Correctly leads with lot-wide residential LPG-container restriction above16.4ounces and commissioner authorization, FC6105.3(5); cage/retail location alone not permission. Full extra FC6109 clauses reviewed:400lb aggregate/100lb individual,20ft openings/dispensers/10ft combustible,>100through400 table, marked-only note-a wall relief with rating/distances/ventilation, egress/hazard/enclosure/valve/relief/electrical conditions are accurately scoped. FC6105.1 approved appliance and .3(10) utility-natural-gas restriction accurately distinguished.",
+      "usefulness": "Useful conditional baseline, though very long for initial question. Actual capacity/authorization and layout are legitimately unknown.",
+      "failureStage": null,
+      "presentationIssues": [
+        "Dense long checklist; substantial extra rules increase cost and reading burden.",
+        "Discloses permit-threshold source gap rather than inventing it; no full permit/installation approval claimed."
+      ],
+      "sourceChecks": [
+        "FC 6105",
+        "FC 6109"
+      ],
+      "decisiveTextCoverage": "Visible conclusions compared with full canonical source. Actual complete writer packet not independently available; accounting references alone do not prove full body coverage.",
+      "visibleRowSHA256": "741dd19019818b090d5ae782b77684ec9ea03b1a942b3c2641dc4a84e706f301",
+      "deliveredAnswerText": "Before laying out the cage, check these restrictions:\n\nCylinder and total quantity limits: No individual LPG container may have capacity greater than 100 pounds. Outdoor storage is limited to 400 pounds of LPG. A permit is required when quantities exceed those in FC § 105.6; that threshold text was not supplied, so the permit trigger cannot yet be determined. Approval does not settle that separate permit question. (FC §§ 6105.3(1), (4), 6109.12.)\nBasic location: Storage must be at or above grade, not on a roof, and at least 20 feet from building openings, 20 feet from motor-vehicle fuel dispensers, and 10 feet from combustible material. These outdoor separation requirements include containers connected for use. (FC §§ 6109.6, 6109.12.)\nAdditional exposure distances: For storage of more than 100 pounds through 400 pounds, Table 6109.12 requires, where those exposures exist, 10 feet from combustible buildings or structures; 25 feet from subway openings and Group A occupancies/public gathering places; 5 feet from air-compressor intakes or HVAC inlets; and 10 feet from public sidewalks, parked vehicles, public streets, private roads and lot lines. Other table rows address nearby liquid, gas, oxygen and solid-material storage. Only distances marked with note “a”—including the public-street/private-road/lot-line row—may be reduced to 5 feet using a protective structure rated at least 2 hours that interrupts the container-to-exposure line of sight, stands at least 5 feet from the exposure, and allows natural ventilation to prevent hazardous gas accumulation. This is not a general reduction of the building-opening or other unmarked clearances. (FC Table 6109.12, note a.)\nEgress and failure hazards: Do not store or leave cylinders unattended near exit-access doors, exits, stairs, exit-discharge areas or other egress areas. Do not locate storage where failure of structures or containment systems could expose the LPG to electric power lines or piping carrying flammable/combustible liquids, flammable gases or oxidizing materials. (FC §§ 6109.4, 6109.12.1.)\nEnclosure and cylinder protection: Provide a suitable enclosure or other tamper protection, minimize physical damage and excessive temperature rise, and provide vehicular protection as required by the commissioner. Stored cylinders must have securely installed screw-on valve caps or collars and closed outlet valves, whether full, partially full or empty. Cylinders over 1 pound must be positioned with the relief valve communicating directly with the vapor space. (FC §§ 6109.2, 6109.3, 6109.8, 6109.13.)\nElectrical equipment: Except as otherwise provided in NFPA 58, electrical equipment within 3 feet in any direction must meet Class I, Division 2 wiring requirements unless separated from the area by a wall or solid partition without openings. The supplied packet does not include the NFPA 58 alternative. (FC § 6109.14.)\n\nIf these cylinders will supply a stationary café installation, access to utility piped natural gas prohibits that LPG installation unless the commissioner authorizes it; the appliance must also be approved for LPG. A storage cage alone does not establish permission to operate the café equipment. (FC §§ 6105.1, 6105.3(10).)\n\nThe layout remains conditional on the proposed cylinder capacities, total LPG quantity, measured exposure distances and commissioner authorization. What cylinder size and total LPG quantity does the café propose?",
+      "deliveredAnswerSHA256": "94f02d2073f77c8677a643caa0fab92128201a2ba1faf15e3b3cce6bbc89e271",
+      "expectedKeyHash": "e541911d059c5474619ae28da55ceb0899ac607b6dc91c6072030752e148b21c",
+      "accounting": null,
+      "accountingSHA256": null
+    },
+    {
+      "id": "production-v19-natural-05-02",
+      "question": "They would be in a locked cage behind the retail space, not inside the apartments. Does that avoid the residential restriction?",
+      "capturedAt": "2026-10-03T16:22:21.127Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nCould a café tenant keep propane cylinders outside this building? What fire-safety restrictions should we check before drawing a storage cage?\n\nResearch complete\n01:38\n\nOnly conditionally—not simply by placing cylinders in an outdoor cage. For the proposed mixed-use building with residential space, LPG containers larger than 16.4 ounces are prohibited anywhere on the lot unless authorized by the commissioner. Outdoor LPG storage facilities must also be approved. Thus, a typical larger-cylinder café installation is not established as permissible without that authorization and storage approval. (2022 NYC Fire Code, current consolidated text, §§ 6105.3(3), (5), 6109.1.)\n\nBefore laying out the cage, check these restrictions:\n\nCylinder and total quantity limits: No individual LPG container may have capacity greater than 100 pounds. Outdoor storage is limited to 400 pounds of LPG. A permit is required when quantities exceed those in FC § 105.6; that threshold text was not supplied, so the permit trigger cannot yet be determined. Approval does not settle that separate permit question. (FC §§ 6105.3(1), (4), 6109.12.)\nBasic location: Storage must be at or above grade, not on a roof, and at least 20 feet from building openings, 20 feet from motor-vehicle fuel dispensers, and 10 feet from combustible material. These outdoor separation requirements include containers connected for use. (FC §§ 6109.6, 6109.12.)\nAdditional exposure distances: For storage of more than 100 pounds through 400 pounds, Table 6109.12 requires, where those exposures exist, 10 feet from combustible buildings or structures; 25 feet from subway openings and Group A occupancies/public gathering places; 5 feet from air-compressor intakes or HVAC inlets; and 10 feet from public sidewalks, parked vehicles, public streets, private roads and lot lines. Other table rows address nearby liquid, gas, oxygen and solid-material storage. Only distances marked with note “a”—including the public-street/private-road/lot-line row—may be reduced to 5 feet using a protective structure rated at least 2 hours that interrupts the container-to-exposure line of sight, stands at least 5 feet from the exposure, and allows natural ventilation to prevent hazardous gas accumulation. This is not a general reduction of the building-opening or other unmarked clearances. (FC Table 6109.12, note a.)\nEgress and failure hazards: Do not store or leave cylinders unattended near exit-access doors, exits, stairs, exit-discharge areas or other egress areas. Do not locate storage where failure of structures or containment systems could expose the LPG to electric power lines or piping carrying flammable/combustible liquids, flammable gases or oxidizing materials. (FC §§ 6109.4, 6109.12.1.)\nEnclosure and cylinder protection: Provide a suitable enclosure or other tamper protection, minimize physical damage and excessive temperature rise, and provide vehicular protection as required by the commissioner. Stored cylinders must have securely installed screw-on valve caps or collars and closed outlet valves, whether full, partially full or empty. Cylinders over 1 pound must be positioned with the relief valve communicating directly with the vapor space. (FC §§ 6109.2, 6109.3, 6109.8, 6109.13.)\nElectrical equipment: Except as otherwise provided in NFPA 58, electrical equipment within 3 feet in any direction must meet Class I, Division 2 wiring requirements unless separated from the area by a wall or solid partition without openings. The supplied packet does not include the NFPA 58 alternative. (FC § 6109.14.)\n\nIf these cylinders will supply a stationary café installation, access to utility piped natural gas prohibits that LPG installation unless the commissioner authorizes it; the appliance must also be approved for LPG. A storage cage alone does not establish permission to operate the café equipment. (FC §§ 6105.1, 6105.3(10).)\n\nThe layout remains conditional on the proposed cylinder capacities, total LPG quantity, measured exposure distances and commissioner authorization. What cylinder size and total LPG quantity does the café propose?\n\nThey would be in a locked cage behind the retail space, not inside the apartments. Does that avoid the residential restriction?\n\nResearch incomplete\n00:44\n\nResearch received an answer it couldn’t read.\n\nYour question and conversation are saved. You don’t need to repeat the question.\n\nReport this issue\nSend",
+      "keyID": "natural-05-2",
+      "family": "FC",
+      "decision": "withheld",
+      "reason": "No delivered code answer. FC6105.3(5) applies on any lot containing residential occupancy, not just apartment interiors; locked outdoor retail cage does not avoid that scope. Container capacity/authorization matter only for specific eligibility, not this location-scope comparison.",
+      "usefulness": "No useful answer to the direct follow-up. The visible processing failure is not a genuine missing-user-fact clarification.",
+      "failureStage": "retrieval_subject_loss_then_targeted_revision_mismatch",
+      "presentationIssues": [
+        "Current structured format-error copy/report action truthfully explains a processing failure but supplies no substantive result."
+      ],
+      "sourceChecks": [
+        "FC 6105"
+      ],
+      "decisiveTextCoverage": "Accounting contains19 refs:15 ZR,3 BC and FC505, no FC6105/FC6109. Wrong LPG subject packet verified. Prior citation roles, project codeVersion and exact qualified writer query not logged: inheritance/fallback branch conditional.",
+      "visibleRowSHA256": "604e08510d79a83fdf344cbcfad2a423ce43b3e7597e0d44edf526e53ee0336a",
+      "deliveredAnswerText": "Your question and conversation are saved. You don’t need to repeat the question.",
+      "deliveredAnswerSHA256": "828a571013b9ae159516864037952c89d611eb2cc020628cc640d9240d8f5cc7",
+      "expectedKeyHash": "a1465c28038d4c314c6ab90106c8881f7738086ead448bd6c07fe3a07a72f455",
+      "accounting": null,
+      "accountingSHA256": null
+    },
+    {
+      "id": "production-v19-natural-06-01",
+      "question": "For the new apartments in this project, do we have to provide parking? The project facts say we are in a transit zone.",
+      "capturedAt": "2026-10-03T16:25:46.772Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nFor the new apartments in this project, do we have to provide parking? The project facts say we are in a transit zone.\n\nResearch incomplete\n01:12\n\nResearch couldn’t finish because its explanation and source references didn’t agree.\n\nYour question and conversation are saved. You don’t need to repeat the question.\n\nReport this issue\nSend",
+      "keyID": "natural-06-1",
+      "family": "ZR",
+      "decision": "withheld",
+      "reason": "No delivered zoning answer. Supplied Bronx + AppendixI inclusion can be conditionally traced through complete ZR12-10 Inner/Outer text to Outer (without claiming fresh map verification), then25-221/.25-222 new-dwelling framework. Relevant operative table/definitions were not delivered.",
+      "usefulness": "No baseline branches or useful count/qualification question delivered; known transit fact alone not a complete answer.",
+      "failureStage": "operative_dependency_retrieval_and_citation_repair",
+      "presentationIssues": [
+        "Incomplete status correctly preserved; no private draft correctness credit."
+      ],
+      "sourceChecks": [
+        "ZR 12-10",
+        "ZR 25-221",
+        "ZR 25-222"
+      ],
+      "decisiveTextCoverage": "Accounting has25-21 heading,25-212 partial excerpt and12-10 reference, but no25-221/25-222 operative Outer framework. Reviewer log confirms no usable operative transit definitions in actual supplied excerpt; full12-10 name alone is not coverage.",
+      "visibleRowSHA256": "7a66160e04bae2406ade2e4ba27ac8dca2f8e52338c354a915a27c125e679d7f",
+      "deliveredAnswerText": "Your question and conversation are saved. You don’t need to repeat the question.",
+      "deliveredAnswerSHA256": "828a571013b9ae159516864037952c89d611eb2cc020628cc640d9240d8f5cc7",
+      "expectedKeyHash": "53a8ae6c42c48accce11a731903c72ff913d3a56a8e830a9c1e8c932834b06c1",
+      "accounting": null,
+      "accountingSHA256": null
+    },
+    {
+      "id": "production-v19-natural-06-02",
+      "question": "The old property record shows zero apartments. Can we use that to say no residential parking is needed for the new building?",
+      "capturedAt": "2026-10-03T16:28:35.770Z",
+      "visibleText": "RESEARCH\n\nHistory\n⋯\n\nFor the new apartments in this project, do we have to provide parking? The project facts say we are in a transit zone.\n\nResearch incomplete\n01:12\n\nResearch couldn’t finish because its explanation and source references didn’t agree.\n\nYour question and conversation are saved. You don’t need to repeat the question.\n\nReport this issue\n\nThe old property record shows zero apartments. Can we use that to say no residential parking is needed for the new building?\n\nResearch complete\n01:19\n\nNo. The old record’s zero apartments describes the existing property, not the proposed new building. It cannot establish that no residential parking is needed for the new apartments.\n\nIf the lot is within the Inner Transit Zone, no accessory off-street parking is required for the proposed new dwelling units under the rule for units created after December 5, 2024 (ZR § 25-211). “Created” means issuance of a temporary certificate of occupancy, or a final certificate if no temporary certificate was issued. That would be the basis for no required residential parking—not the old apartment count. Your supplied Appendix I transit-zone status does not establish Inner Transit Zone status from the text provided, so that geographic applicability remains unresolved.\n\nIs the lot mapped within the Inner Transit Zone specifically?\n\nSend",
+      "keyID": "natural-06-2",
+      "family": "ZR",
+      "decision": "minor_issue",
+      "reason": "Correct central No: existing zero-apartment inventory does not describe proposed new dwellings or establish parking exemption. Conditional Inner25-211 rule/date/created definition is legally accurate but supplies a geographically irrelevant alternative and asks for Inner status rather than using available Bronx+AppendixI facts and full Outer definitions. It does not affirmatively classify the site as Inner or grant a false project exemption; incomplete applicability trace is minor relative to the asked inventory inference.",
+      "usefulness": "Correct immediate inventory correction, but unnecessarily sends user back to a geographical fact that the available legal definitions can resolve conditionally.",
+      "failureStage": "retrieval_applicability_gap",
+      "presentationIssues": [
+        "Unnecessary Inner-zone follow-up; no proposed-count/qualifying-mix continuation."
+      ],
+      "sourceChecks": [
+        "ZR 12-10",
+        "ZR 25-211",
+        "ZR 25-221",
+        "ZR 25-222"
+      ],
+      "decisiveTextCoverage": "Visible conclusions compared with full canonical source. Actual complete writer packet not independently available; accounting references alone do not prove full body coverage.",
+      "visibleRowSHA256": "723a2bcd6009b3cda6c1af3e0b476450ccb7ced7a632784406fbb7b0ea8bf874",
+      "deliveredAnswerText": "If the lot is within the Inner Transit Zone, no accessory off-street parking is required for the proposed new dwelling units under the rule for units created after December 5, 2024 (ZR § 25-211). “Created” means issuance of a temporary certificate of occupancy, or a final certificate if no temporary certificate was issued. That would be the basis for no required residential parking—not the old apartment count. Your supplied Appendix I transit-zone status does not establish Inner Transit Zone status from the text provided, so that geographic applicability remains unresolved.\n\nIs the lot mapped within the Inner Transit Zone specifically?",
+      "deliveredAnswerSHA256": "bd534e2f3da34ce7b95ae6ac9910d9b4fbd3d6d2262cbe360026ed3db66370a9",
+      "expectedKeyHash": "14ca9392e48d6c4ac39f3c3fd4d3c2a2926d7c2aed75c110862b0d22033e2b28",
+      "accounting": null,
+      "accountingSHA256": null
+    }
+  ],
+  "totals": {
+    "withheld": 4,
+    "minor_issue": 3,
+    "correct": 5
+  },
+  "strictCorrectTurns": 5,
+  "strictCorrectDenominator": 12,
+  "limitations": [
+    "Small12-turn ordinary-language production sample from6 correlated project conversations, not a statistical general-accuracy estimate or95% claim.",
+    "Assistant source review is not official legal interpretation; fixtures are reviewer criteria, not ground truth by verifier pass.",
+    "Qualified initial overviews need not recite every unactivated installation provision; genuinely relevant unknown appliance/capacity/function details are allowed after useful baselines.",
+    "Actual writer body unavailable where explicitly noted; accounting reference presence is not decisive-text coverage. No credit for undelivered drafts.",
+    "Minor completeness/applicability gaps are not counted as fully correct. Duplicate/redundant questions are presentation issues separately recorded for otherwise correct operative answers.",
+    "No source/key edits, providers, browser actions, or deployment during grading. Original first-five review and production captures are preserved."
+  ]
+}

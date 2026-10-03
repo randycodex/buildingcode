@@ -1,0 +1,36 @@
+{
+  "verifiedAt": "2026-10-03T15:49:32.074717+00:00",
+  "gitCommit": "8018ad11dbd939e1de50c873cad7ff2866cd3203",
+  "deploymentID": "dpl_8psS5SQf9dWvfbLGhckLSwduaMkq",
+  "deploymentHost": "permitext-sync-jjdbyj1vq-randycodexs-projects-b72fc111.vercel.app",
+  "publicURL": "https://permitext.com",
+  "protectedReleaseIdentityPassed": true,
+  "protectedHealthPassed": true,
+  "storage": "postgres",
+  "privateVectorHTTP": 404,
+  "publicReleaseIdentityPassed": true,
+  "publicAppSHA256": "9ccc7e92c1ed4e259fe83cbb0343ed456469a12d600621725cb1d5e751545b49",
+  "publicAppMatchesFreeze": true,
+  "recoveryUI": {
+    "verifiedInAuthenticatedProduction": true,
+    "savedFailureDisplaysCurrentCopy": true,
+    "reportOpensExistingForm": true,
+    "sendFeedbackDisabledUntilExplicitChoice": true,
+    "cancelClosesForm": true,
+    "noResearchResubmission": true,
+    "storedRecordsUnchangedByProjection": true
+  },
+  "answerAcceptance": {
+    "status": "failed",
+    "capturedTurns": 12,
+    "grades": {
+      "correct": 5,
+      "minor": 3,
+      "withheld": 4
+    },
+    "summary": "production-v19-natural-summary.json",
+    "costUSD": 1.076793,
+    "limits": "independent assistant source review of practical ordinary-language sample; not population accuracy"
+  },
+  "deploymentNotes": "Production alias was unchanged while failed candidate builds remained unpromoted. The successful deployment inherits existing Production settings and supplies only release identity at build/runtime. Environment pulls contain sensitive placeholders and were not used for the successful deployment."
+}

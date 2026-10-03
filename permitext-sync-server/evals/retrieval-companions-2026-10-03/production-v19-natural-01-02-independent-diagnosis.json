@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "reviewKind": "read-only independent verifier protocol diagnosis",
+  "candidateCommit": "8018ad11dbd939e1de50c873cad7ff2866cd3203",
+  "capturedTurnID": "production-v19-natural-01-02",
+  "artifacts": {
+    "capturePath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v19-visible-answers.json",
+    "captureSHA256AtReview": "afe3d3874e138af87f2c357d5c0de2093c71a12cae8dc97efaea4ac01ca6ea0f",
+    "capturedRowSHA256": "52caa41e1ccef350d207dfe5069edff2d889119ef512268d5e904cc65a9d8eb5",
+    "accountingSHA256": "95fd74f345dc7e384880b91d87475c3f70a5baa24ba303c9029ae08d437e7570",
+    "logSHA256": "4dca30660a3ec7ba8ae597793fb17cf72ef401c311fe1d206bdd739f06347b58"
+  },
+  "deliveredGrade": {
+    "decision": "withheld",
+    "failureClass": "internal verifier protocol consistency failure",
+    "deliveredSubstantiveAnswer": false,
+    "visibleStatus": "Research interrupted",
+    "visibleRecovery": "Old generic processing/Retry path; no saved assistant answer.",
+    "noPrivateDraftCorrectnessCredit": true
+  },
+  "observed": {
+    "failureCode": "INVALID_RESEARCH_VERIFICATION",
+    "status": "failed",
+    "estimatedProviderCostUSD": 0.016739,
+    "providerRequestCount": 3,
+    "embeddingProviderRequestCount": 1,
+    "durationMilliseconds": 38662,
+    "evidenceReferences": [
+      "ZR 12-10",
+      "MC 403.3.1.1",
+      "BC 721.1",
+      "BC 1004.1.3",
+      "ZR 74-943",
+      "BC 1208.2",
+      "ZR APPENDIX E",
+      "ZR 23-22",
+      "ZR 62-57",
+      "ZR 42-315",
+      "BC 1004.3",
+      "ZR 27-10",
+      "MC 502.20",
+      "MC 502.6",
+      "BC 1405.10",
+      "BC 1405.6",
+      "MC 102.1",
+      "BC 102.1",
+      "BC 202"
+    ],
+    "evidenceCharacterCount": 47971,
+    "relevantReferenceIncluded": "BC 1208.2",
+    "furredCompanionReferenceListed": false,
+    "diagnosticEvents": [
+      {
+        "event": "research_provider_phase",
+        "stage": "permitext_code_interpretation",
+        "outcome": "completed",
+        "durationMilliseconds": 2479,
+        "providerAttempts": 1,
+        "attemptTimings": [
+          {
+            "attempt": 1,
+            "headersMilliseconds": 2381,
+            "bodyMilliseconds": 95,
+            "responseStatus": 200,
+            "bodyReadOutcome": "completed"
+          }
+        ]
+      },
+      {
+        "event": "research_provider_phase",
+        "stage": "permitext_research_verification",
+        "outcome": "completed",
+        "durationMilliseconds": 10790,
+        "providerAttempts": 1,
+        "attemptTimings": [
+          {
+            "attempt": 1,
+            "headersMilliseconds": 10724,
+            "bodyMilliseconds": 64,
+            "responseStatus": 200,
+            "bodyReadOutcome": "completed"
+          }
+        ]
+      },
+      {
+        "event": "research_conversation_failure",
+        "user": "3a86204924af8d9d",
+        "conversation": "0a7ad4e5ce7b046a",
+        "code": "INVALID_RESEARCH_VERIFICATION",
+        "failureStage": null,
+        "message": "The Research verifier returned inconsistent issues.",
+        "verificationAttempts": [],
+        "providerStatus": null,
+        "incompleteReason": null,
+        "providerUsage": null,
+        "bindingIssue": null,
+        "providerCause": null,
+        "providerRequestID": null,
+        "providerAttempts": null,
+        "webSupport": null
+      }
+    ]
+  },
+  "canonicalKey": {
+    "references": [
+      "BC 1208.2",
+      "BC 1208.2.1"
+    ],
+    "expectedDecisionAndMaterialChecks": "For the nonhabitable sales area and furred-ceiling proposal: at least two-thirds must retain 7 feet 6 inches and no furred ceiling may be below 7 feet. Three-quarters at 7 feet 6 inches and one-quarter at 7 feet meets those conditions. Do not extend this relief to habitable apartment rooms or claim whole-building approval.",
+    "canonicalExcerptHashes": {
+      "BC 1208.2": "71b96d728cede25628daea803e2e0bcee33791f2e13f1a9a8b03b29cee787cca",
+      "BC 1208.2.1": "acbcf6d5a9c180a549d3a76c0756cf46ebdd4784c20e5853d0c3cc3791864da6"
+    },
+    "coverageCaveat": "The packet now names BC1208.2, unlike the first turn, but the reported references do not name BC1208.2.1. Without the actual writer body, complete furred-ceiling operative coverage cannot be established from this accounting alone; parent presence is not automatically complete descendant coverage."
+  },
+  "sharedFailureChain": [
+    {
+      "finding": "The verifier transport completed in one provider attempt with HTTP200 and outcome completed. This was not a transport timeout or rejected request.",
+      "evidence": "research_provider_phase permitext_research_verification duration10790ms; body read completed."
+    },
+    {
+      "finding": "The exact exception text is The Research verifier returned inconsistent issues. JSON parsing and base pass:boolean/issues:array validation therefore succeeded, then a cross-field/content/range validator rejected the result.",
+      "pointer": {
+        "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+        "lineAtFrozenCandidate": 10866
+      }
+    },
+    {
+      "finding": "The validator checks failed verdict/advisory question conflicts, pass/issues consistency, allowed nonempty issues, optional field types/lengths, index uniqueness/range and authorization for missing-fact edits. Multiple distinct defects emit the same exception.",
+      "pointer": {
+        "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+        "lineAtFrozenCandidate": 10878
+      },
+      "actualViolatedInvariant": "UNKNOWN: neither parsed verifier result nor subtype is present in the supplied log.",
+      "offlineFrozenFunctionReproductions": [
+        "pass=true with an issue",
+        "pass=false without issues",
+        "pass=false with an advisory question",
+        "out-of-range optional missing-fact index when missingFactCount=0"
+      ],
+      "reproductionResult": "All four distinct synthetic violations throw the same INVALID_RESEARCH_VERIFICATION/inconsistent issues message; a valid failed verdict is accepted."
+    },
+    {
+      "finding": "openAIResearchVerification attaches status/usage only inside JSON parse catch. The result validator is called outside that catch, so its throw leaves failureStage/providerStatus/providerUsage unset and no typed validation reason is logged. Accounting still independently settles provider cost.",
+      "pointer": {
+        "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+        "lineAtFrozenCandidate": 11140
+      }
+    },
+    {
+      "finding": "The existing structured-output retry surrounds interpretation generation only. Verifier provider maximumAttempts retries provider failures, not a completed200 review rejected by this local validator. No current bounded verifier-envelope correction handles this shape.",
+      "pointer": {
+        "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+        "lineAtFrozenCandidate": 10760
+      }
+    },
+    {
+      "finding": "The route canonical clarification recovery recognizes RESEARCH_VERIFICATION_FAILED and selected draft/citation errors, but excludes INVALID_RESEARCH_VERIFICATION. It therefore persists a failed user question rather than a structured assistant recovery. The web historical-answer projection cannot apply to a record with no assistant answer.",
+      "pointer": {
+        "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+        "lineAtFrozenCandidate": 21481
+      }
+    },
+    {
+      "finding": "The ordinary failed progress renderer and saved failure record explicitly invite Retry for INVALID_RESEARCH_VERIFICATION, which explains the observed mismatch with turn1 Report this issue UX. That display is an outcome of the distinct backend failure shape, not evidence that repeating the same legal question is necessary.",
+      "pointers": [
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/app.mjs",
+          "lineAtFrozenCandidate": 19255
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/public/app.js",
+          "line": 21565
+        },
+        {
+          "file": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/public/app.js",
+          "line": 21281
+        }
+      ]
+    }
+  ],
+  "boundedGeneralRepairProposal": [
+    "Emit a typed verifier_validation substage and invariant code from the shared parser. Preserve only bounded diagnostic structure (verdict boolean, issue types/count, advisory question count, valid index range/count and field lengths) plus the candidate/evidence fingerprints; do not infer a legal mistake from malformed review metadata.",
+    "Express applicable shape constraints and valid optional indices in the supported strict schema where feasible, while retaining local cross-field validation as the final gate. Pass requires no substantive issues; failure requires at least one valid issue and no advisory acceptance questions. Optional edits must refer only to actual candidate entries and an authorized issue type.",
+    "Add at most one automatic verifier-envelope correction after a completed model review fails protocol validation, subject to existing shared provider-call/spend/time limits and cancellation/context identity gates. Reuse the same immutable proposed answer and evidence; provide the exact validator invariant plus original parsed verdict and ask for a coherent fresh review. It is a review correction, not legal answer regeneration or an extra retrieval run.",
+    "Run the identical parser, source-binding and mapped-scope checks on the corrected review. A valid failed review must enter the existing bounded answer revision/verification flow; it must never be converted to pass. A still-invalid review must remain a nonanswer. Do not drop issues, advisory fields, substantive qualifications or invalid indices simply to make the old verdict acceptable.",
+    "After bounded protocol recovery is exhausted, persist a truthful canonical system processing recovery with the question/history retained and no charge. Do not fabricate missing project facts or a source conclusion. Route it to an explanation/report action consistently; transport retry remains distinct. This backend handling follows the repair attempt rather than substituting a UI message for validation."
+  ],
+  "neededContracts": [
+    "valid verdict accepted unchanged; malformed review corrected once; malformed twice remains withheld",
+    "corrected failed substantive review enters the existing repair loop and still requires fresh pass",
+    "no source/hash/answer mutation between protocol attempts",
+    "failed review cannot authorize advisory follow-ups or optional missing-fact edits without valid binding",
+    "spend/timeout/cancellation/account/project context guards prevent the repair call",
+    "settled usage includes both failed and corrected reviews; no pending reservations",
+    "saved/reopened protocol recovery never claims Research complete and asks for no invented missing fact"
+  ],
+  "limitations": [
+    "Only captured natural01turn2 and its corresponding sealed keys/source packets were reviewed.",
+    "No raw parsed verifier body or full writer request was provided; the exact inconsistent field and decisive descendant coverage remain unknown.",
+    "No application edits, provider calls, deployment or browser interaction.",
+    "Assistant source review, not a professional code determination; no statistical accuracy claim."
+  ]
+}
