@@ -219,6 +219,18 @@ const detailedTitle = structuredClone(messages);
 detailedTitle.at(-1).answer.citations[0].title = "999.1 Industrial air compressors";
 assert.match(researchEvidenceRetrievalQuery({ question: followQuestion, previousMessages: detailedTitle }).semanticQuery,
   /Subject context: Industrial air compressors/);
+const repeatedTitles = structuredClone(detailedTitle);
+repeatedTitles.at(-1).answer.citations.push(
+  { ...citation, sectionID: "fixture-rule-2", sectionNumber: "999.2", title: "MC 999.2:  INDUSTRIAL   AIR COMPRESSORS" },
+  { ...citation, sectionID: "fixture-rule-3", sectionNumber: "999.3", title: "999.3 Compressor restraints" }
+);
+const repeatedSnapshot = structuredClone(repeatedTitles);
+const deduplicatedQuery = researchEvidenceRetrievalQuery({ question: followQuestion, previousMessages: repeatedTitles });
+assert.equal(deduplicatedQuery.semanticQuery, `${followQuestion}\nSubject context: Industrial air compressors; Compressor restraints`,
+  "Equivalent checked headings are normalized and included once; distinct subject titles retain their order.");
+assert.deepEqual(deduplicatedQuery.inheritedAuthorityReferences.map(reference => reference.sectionNumber), ["999.1", "999.2", "999.3"],
+  "Title deduplication does not remove distinct source identity hints.");
+assert.deepEqual(repeatedTitles, repeatedSnapshot, "Search title normalization never modifies checked history.");
 for (const question of ["New topic: what is the plumbing vent arrangement?", "Under PC 888.1, how is the vent arrangement measured?", "Actually, under the Plumbing Code, how should this fixture be vented?"]) {
   const switched = researchEvidenceRetrievalQuery({ question, previousMessages: messages });
   assert.doesNotMatch(switched.semanticQuery, /industrial air compressor|General Requirements|Mechanical Code|2014/, question);
@@ -386,3 +398,49 @@ assert.match(lexicalContext, /5-foot-wide clear path/);
 assert.doesNotMatch(lexicalContext, /C2-4|R7-1|Waterfront|condensate/);
 assert.deepEqual(visibleProductionFacts, visibleSnapshot, "Search-only statement selection never modifies original project facts.");
 console.log("Long saved-context query selection passed: production33-field scope, current measured corrections, actual reset, ordinary saved-example language, non-roof scope/provenance and complete negation, ambiguous named scenarios; no provider calls.");
+
+const componentDimensionFacts = projectFactProjection({ structuredFacts: [
+  { key: "stories-above-grade", label: "Stories Above Grade", value: "1", status: "sourced", source: "nyc-planning" },
+  { key: "levels-below-grade", label: "Levels Below Grade", value: "2", status: "sourced", source: "nyc-planning" },
+  { key: "building-height", label: "Building Height", value: "15 feet", status: "sourced", source: "nyc-planning" },
+  { key: "pipe-elevation", label: "Pipe elevation", value: "The outdoor pipe is 10 inches below grade, measured above the top of the pipe", status: "confirmed" },
+  { key: "primary-drain-fall", label: "Primary drain fall", value: "Half an inch over 8 feet", status: "confirmed" }
+] }).researchFacts;
+const componentSnapshot = structuredClone(componentDimensionFacts);
+for (const question of [
+  "Since a blocked drain could damage the ceiling and there is no floor drain, what overflow protection can we use? Do we have to add a separate overflow pipe?",
+  "An outdoor gas pipe has cover measured above the top of the pipe and is not underneath a building. How deep must it be buried?",
+  "What height or vertical clearance applies above this pipe?",
+  "How is the floor drain's elevation measured?"
+]) {
+  const context = relevantResearchRetrievalFactContext({ question, projectFacts: componentDimensionFacts, queryMode: "lexical", maximumCharacters: 1400 });
+  assert.doesNotMatch(context, /Stories Above Grade|Levels Below Grade|Building Height/,
+    "A component location or floor drain must not select the building's inventory dimensions.");
+}
+const pipeContext = semanticResearchProjectFacts({ question: "How is the outdoor pipe elevation measured above the top of the pipe?", projectFacts: componentDimensionFacts });
+assert.match(pipeContext, /outdoor pipe is 10 inches below grade/);
+assert.doesNotMatch(pipeContext, /Stories Above Grade|Levels Below Grade|Building Height/);
+for (const question of [
+  "How many stories are shown for the existing building?",
+  "What is the building height in the existing property record?",
+  "Which existing levels below grade are recorded?",
+  "For building rooftop access, what existing building height is supplied?"
+]) assert.match(semanticResearchProjectFacts({ question, projectFacts: componentDimensionFacts }), /Stories Above Grade|Levels Below Grade|Building Height/,
+  "Explicit building-scale questions retain supplied inventory with its provenance.");
+const isolatedFloorDrain = semanticResearchProjectFacts({ question: "Where is the floor drain located?", projectFacts: [
+  "Additional Project facts (user wording; not independently verified): The ground-floor retail frontage is part of a proposed mixed-use program.",
+  ...componentDimensionFacts
+] });
+assert.doesNotMatch(isolatedFloorDrain, /ground-floor retail|Stories Above Grade|Levels Below Grade|Building Height/,
+  "An equipment's floor qualifier cannot nominate the ground-floor use program.");
+assert.match(semanticResearchProjectFacts({ question: visibleQuestions[0], projectFacts: visibleProductionFacts }), /85-foot-high[\s\S]*flat roof/,
+  "Inventory narrowing does not remove the explicit scoped saved building/roof premises.");
+assert.deepEqual(componentDimensionFacts, componentSnapshot);
+console.log("Component-versus-building dimension facets passed: floor drain and pipe elevation exclude story/height inventory, while supplied component measurements and explicit building/roof dimensions remain; no provider calls.");
+const blockedDrainQuestion = "Since a blocked drain could damage the ceiling and there is no floor drain, what overflow protection can we use? Do we have to add a separate overflow pipe?";
+const blockedDrainContext = semanticResearchProjectFacts({ question: blockedDrainQuestion,
+  contextualTopics: [{ text: drainExampleQuestion }], projectFacts: visibleProductionFacts });
+assert.match(blockedDrainContext, /8-foot primary drain run with a half-inch fall/);
+assert.match(blockedDrainContext, /not real project conditions/);
+assert.doesNotMatch(blockedDrainContext, /Stories Above Grade|85-foot-high|flat roof|sprinkler protection/,
+  "Overflow protection is the saved equipment subject; generic 'protection' cannot nominate sprinkler/roof premises.");

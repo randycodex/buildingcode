@@ -244,3 +244,96 @@ const { researchEvidenceRetrievalQuery } = await import("../research-evidence-as
 const uncertaintyQuery = researchEvidenceRetrievalQuery({ question: "I'm not sure. What should I check first?", topicContext: { rootTopic: "Does my building need sprinklers?", currentTopic: "Does my building need sprinklers?" } });
 assert.match(uncertaintyQuery.retrievalQuery, /sprinklers/);
 assert.equal(uncertaintyQuery.previousTopicApplied, true);
+
+// A production follow-up restates a failure condition without naming the
+// equipment again. Read the actual canonical narrow provisions offline; prior
+// citations nominate fresh retrieval only and never carry an answer forward.
+globalThis.fetch = () => { throw new Error("Provider/network calls forbidden in causal-topic contract."); };
+const { createResearchCorpusRegistry, routeResearchCorpora } = await import("../research-corpus-registry.mjs");
+const { researchCorpusResources, researchBodyForCatalogSection } = await import("../app.mjs");
+const { semanticResearchProjectFacts } = await import("../research-retrieval-query-context.mjs");
+const causalRegistry = createResearchCorpusRegistry({ zoningResearchEligibility: true });
+const causalCorpus = causalRegistry.find(corpus => corpus.id === "nyc-2022-construction-codes");
+const causalResources = await researchCorpusResources({ selected: [causalCorpus] });
+const causalCitations = [];
+for (const [codePrefix, sectionNumber] of [["PC", "314.2.1"], ["MC", "307.2.1"], ["PC", "314.2.3"], ["MC", "307.2.3"]]) {
+  const section = causalResources.catalog.find(entry => entry.codePrefix === codePrefix && entry.sectionNumber === sectionNumber);
+  assert(section, "The prior citation must exist in the canonical corpus.");
+  const body = await researchBodyForCatalogSection(section);
+  causalCitations.push({ ...section, sectionID: section.id,
+    supportingPassages: [{ selectedText: body.blocks.map(block => block.plainText || "").filter(Boolean).join("\n") }] });
+}
+const causalRoot = "Is the primary condensate drain steep enough for the saved cooling-unit example, or does its fall need to change?";
+const causalQuestion = "Since a blocked drain could damage the ceiling and there is no floor drain, what overflow protection can we use? Do we have to add a separate overflow pipe?";
+const causalHistory = [{ role: "user", question: causalRoot }, { role: "assistant", answer: {
+  mode: "openai", verification: { pass: true }, supportedPoints: [{ sourceIDs: ["canonical-regression-source"] }], citations: causalCitations
+} }];
+const causalSnapshot = structuredClone(causalHistory);
+const causalDecision = decideResearchConversationTopic({ question: causalQuestion, previousMessages: causalHistory });
+assert.equal(causalDecision.decision, researchConversationTopicDecisions.continuation);
+assert.equal(causalDecision.signals.causalSubjectContinuation, true);
+assert.equal(causalDecision.signals.citedSubjectContinuation, false,
+  "The whole-question 40% threshold remains unchanged; this is a separate bounded causal signal.");
+assert(causalDecision.signals.rootTokenOverlap < 0.2);
+const causalProjectFacts = ["Additional Project facts (user wording; not independently verified): " +
+  "Public project background is unrelated to this equipment example. ".repeat(14) +
+  "FICTIONAL RESEARCH TEST SCENARIO — supplied only for research, not actual project conditions: assume a proposed cooling coil. " +
+  "A condensate-producing cooling coil has an 8-foot primary drain run with a half-inch fall; blockage could damage the ceiling below, and there is no suitably sized and located floor drain."];
+const causalQuery = researchEvidenceRetrievalQuery({ question: causalQuestion, previousMessages: causalHistory, projectFacts: causalProjectFacts });
+assert.equal(causalQuery.previousTopicApplied, true);
+assert.match(causalQuery.sourceQuery, /primary condensate drain/);
+assert.match(causalQuery.semanticQuery, /Condensate disposal/);
+assert.match(causalQuery.semanticQuery, /8-foot primary drain run with a half-inch fall/);
+assert.match(causalQuery.semanticQuery, /FICTIONAL RESEARCH TEST SCENARIO/);
+assert.match(causalQuery.semanticQuery, /not actual project conditions/);
+assert(causalQuery.inheritedAuthorityReferences.some(reference => reference.codePrefix === "PC" && reference.sectionNumber === "314.2.3"));
+const causalRoute = routeResearchCorpora({ question: causalQuestion, previousMessages: causalHistory,
+  projectFacts: causalProjectFacts, registry: causalRegistry });
+assert(causalRoute.selected.some(corpus => corpus.id === causalCorpus.id && /verified citation/.test(corpus.routeReason)),
+  "A continuing question preserves the checked source's code book while resolving text anew.");
+for (const question of [
+  "New topic: how do roof drains and emergency overflow scuppers work?",
+  "Separate question: how deep must an outdoor gas pipe be buried?",
+  "Since a blocked drain could damage the ceiling, under the 2014 NYC Mechanical Code what overflow protection can we use?",
+  "Since a blocked drain could damage the ceiling, under the Fuel Gas Code what overflow protection can we use?"
+]) {
+  const decision = decideResearchConversationTopic({ question, previousMessages: causalHistory });
+  assert.equal(decision.signals.causalSubjectContinuation, false, question);
+  assert.equal(decision.decision, researchConversationTopicDecisions.topicSwitch, question);
+  const query = researchEvidenceRetrievalQuery({ question, previousMessages: causalHistory, projectFacts: causalProjectFacts });
+  assert.deepEqual(query.inheritedAuthorityReferences, [], question);
+  assert.doesNotMatch(query.semanticQuery, /8-foot primary drain|Condensate disposal/, question);
+}
+for (const question of [
+  "Since a roof drain could damage the ceiling, what overflow protection can we use?",
+  "Since a water tank could damage the ceiling, what overflow protection can we use?",
+  "What overflow protection can we use?",
+  "Since the building could be damaged, what overflow protection can we use?"
+]) assert.equal(decideResearchConversationTopic({ question, previousMessages: causalHistory }).signals.causalSubjectContinuation, false,
+  "The causal rule cannot bridge generic property nouns or newly named equipment modifiers.");
+for (const mutate of [
+  answer => { answer.verification.pass = false; },
+  answer => { answer.supportedPoints = []; },
+  answer => { answer.mode = "evidence_boundary"; },
+  answer => { answer.citations = []; },
+  answer => { for (const citation of answer.citations) citation.evidenceRole = "contextual"; },
+  answer => { for (const citation of answer.citations) citation.sectionID = null; },
+  answer => { for (const citation of answer.citations) delete citation.corpusID; },
+  answer => { for (const citation of answer.citations) citation.codePrefix = "FAKE"; },
+  answer => { for (const citation of answer.citations) citation.sectionNumber = "forged section"; },
+  answer => { for (const citation of answer.citations) { citation.title = "Unrelated surface requirements";
+    citation.supportingPassages = [{ selectedText: "This purported citation contains no equipment detail or failure-protection requirement." }]; } }
+]) {
+  const altered = structuredClone(causalHistory);
+  mutate(altered.at(-1).answer);
+  assert.equal(decideResearchConversationTopic({ question: causalQuestion, previousMessages: altered }).signals.causalSubjectContinuation, false,
+    "Missing, unverified, contextual, malformed or unrelated purported citations cannot enable the new signal.");
+}
+assert.equal(decideResearchConversationTopic({ question: causalQuestion, previousMessages: [{ role: "user", question: causalRoot }] }).signals.causalSubjectContinuation, false);
+assert.equal(decideResearchConversationTopic({ question: "Because a blocked drain could damage the ceiling, what overflow protection can we use?", previousMessages: causalHistory }).signals.causalSubjectContinuation, true);
+assert.deepEqual(causalHistory, causalSnapshot, "Subject inheritance does not mutate or promote prior answer content.");
+// A pure topic planner trusts server-persisted verification metadata as a hint.
+// It cannot authenticate a fully fabricated canonical-looking answer packet.
+// The normal resolver must still fetch the real section, and verification must
+// establish every new answer independently of these topic decisions.
+console.log("Bounded causal-topic continuation passed: ordinary blocked-drain follow-up, canonical source/title hints, saved-example scope, explicit topic/family/edition boundaries, missing or malformed sources, and immutable history; no provider calls.");

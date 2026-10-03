@@ -1,6 +1,6 @@
 import { researchPriorAnswerSources } from "./research-conversation-continuity.mjs";
 
-export const researchConversationTopicVersion = "20261003-source-relevance-versus-physical-support-v10";
+export const researchConversationTopicVersion = "20261003-bounded-causal-equipment-continuity-v11";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -149,6 +149,21 @@ function subjectTokens(value) {
       ? token.slice(0, -1) : token));
 }
 
+function sourceMatchesNamedAuthority(question, source) {
+  const families = new Set((question.match(/\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\b/gi) || []).map(value => value.toUpperCase()));
+  const existingBuilding = /\bexisting\s+building\s+code\b/i.test(question);
+  if (existingBuilding) families.add("EBC");
+  if (/\bzoning\s+resolution\b/i.test(question)) families.add("ZR");
+  for (const [family, name] of [["AC", "administrative"], ["BC", "building"], ["MC", "mechanical"], ["PC", "plumbing"], ["FGC", "fuel gas"], ["FC", "fire"]]) {
+    if (family === "BC" && existingBuilding) continue;
+    if (new RegExp(`\\b${name}\\s+code\\b`, "i").test(question)) families.add(family);
+  }
+  if (families.size && !families.has(source.codePrefix)) return false;
+  const editions = [...question.matchAll(/\b((?:19|20)\d{2})\b[^.!?]{0,30}\b(?:edition|code)\b|\b(?:edition|code)\b[^.!?]{0,25}\b((?:19|20)\d{2})\b/gi)]
+    .map(match => match[1] || match[2]);
+  return !editions.length || editions.some(year => new RegExp(`\\b${year}\\b`).test(source.codeEdition || ""));
+}
+
 function citedSubjectContinuation(question, previousMessages) {
   const questionTokens = subjectTokens(question);
   if (questionTokens.size < 3) return false;
@@ -156,13 +171,62 @@ function citedSubjectContinuation(question, previousMessages) {
   // discussed, even when it shares few words with the earlier user question.
   // Require several substantive terms in one local passage; shared units,
   // generic requirement language or scattered terms in a chapter do not count.
-  return researchPriorAnswerSources(previousMessages).some(source => {
+  return researchPriorAnswerSources(previousMessages).filter(source => sourceMatchesNamedAuthority(question, source)).some(source => {
     const passages = [source.title, ...source.selectedText.split(/(?<=[.!?])\s+(?=[A-Z])/)]
       .filter(text => text && text.length <= 1_200);
     return passages.some(passage => {
       const passageTokens = subjectTokens(passage);
       const matches = [...questionTokens].filter(token => passageTokens.has(token)).length;
       return matches >= 3 && matches / questionTokens.size >= 0.4;
+    });
+  });
+}
+
+function causalSubjectContinuation(question, rootTopic, currentTopic, previousMessages) {
+  // A user may move from a component's dimensions to its failure protection
+  // without repeating its full name: "Since a blocked drain ...". Recognize
+  // this only within the latest checked subject, never as code applicability.
+  const opening = question.match(/^(?:since|because|given(?:\s+that)?|now\s+that)\s+([^,?!;]{1,400})/i)?.[1];
+  if (!opening || extractResearchCodeReferences(question).length) return false;
+  const answer = (Array.isArray(previousMessages) ? previousMessages : [])
+    .findLast(message => message?.role === "assistant")?.answer;
+  if (!Array.isArray(answer?.supportedPoints) || !answer.supportedPoints.length) return false;
+  const sources = researchPriorAnswerSources(previousMessages).filter(source =>
+    source.sectionID !== null && source.sectionID !== undefined &&
+    source.corpusID && source.codeVersion && source.codeEdition && source.title && source.selectedText &&
+    sourceMatchesNamedAuthority(question, source));
+  if (!sources.length) return false;
+
+  // Use the head of the opening causal subject. A newly introduced modifier
+  // ("a roof drain" after a different drain) is not an implicit same-object
+  // reference. Ordinary state adjectives ending in -ed do not name equipment.
+  const phrase = opening.match(/^(?:a|an|the|our|my|this|that|its)\s+([a-z][a-z-]*(?:\s+[a-z][a-z-]*){0,5})/i)?.[1];
+  if (!phrase) return false;
+  const words = [];
+  for (const word of phrase.toLowerCase().match(/[a-z][a-z-]*/g) || []) {
+    if (stopWords.has(word) || /^(?:will|shall|fail|fails|failed|leak|leaks|overflows?)$/.test(word)) break;
+    words.push(word);
+  }
+  const head = words.at(-1);
+  if (!head || /^(?:building|structure|project|property|system|equipment|unit|appliance)$/.test(head)) return false;
+  const priorSubjects = subjectTokens(`${rootTopic} ${currentTopic}`);
+  const [subject] = subjectTokens(head);
+  if (!subject || !priorSubjects.has(subject)) return false;
+  if (words.slice(0, -1).some(word => !/ed$/.test(word) &&
+    ![...subjectTokens(word)].every(token => priorSubjects.has(token)))) return false;
+
+  const questionTokens = subjectTokens(question);
+  if (questionTokens.size < 3) return false;
+  return sources.some(source => {
+    const titleTokens = subjectTokens(source.title);
+    const passages = source.selectedText.split(/(?<=[.!?])\s+(?=[A-Z])/)
+      .filter(value => value && value.length <= 1_200);
+    return passages.some(passage => {
+      const passageTokens = subjectTokens(passage);
+      if (!titleTokens.has(subject) && !passageTokens.has(subject)) return false;
+      // Absolute detail matches are sufficient only with the causal subject
+      // checks above. Keep the ordinary 40% citation threshold unchanged.
+      return [...questionTokens].filter(token => passageTokens.has(token)).length >= 3;
     });
   });
 }
@@ -241,6 +305,7 @@ function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
   const uncertaintyContinuation = /^(?:(?:i(?:['’]m| am)|we(?:['’]re| are)) (?:not sure|unsure)|(?:i|we) (?:do not|don['’]t) know|what should (?:i|we) check (?:first|next))\b/i.test(question);
   const explicitFollowUp = /^(?:then\b|and\b|yes\b|so\b|where should (?:I|we) measure\b|what is the governing\b)/i.test(question);
   const definiteSubject = definiteSubjectContinuation(question, rootTopic.text, currentTopic.text);
+  const causalSubject = !explicitSwitch && causalSubjectContinuation(question, rootTopic.text, currentTopic.text, previousMessages);
   const contextualContinuation =
     explicitFollowUp ||
     /^(?:why|how so|explain|tell me more|more details?|go on|what about)\b/i.test(question) ||
@@ -249,7 +314,8 @@ function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
     formatTransformation ||
     projectSubjectContinuation ||
     hypotheticalContinuation ||
-    definiteSubject;
+    definiteSubject ||
+    causalSubject;
   const questionReferences = extractResearchCodeReferences(question);
   const topicReferences = [...rootTopic.codeReferences, ...currentTopic.codeReferences];
   const relatedReference = referencesOverlap(questionReferences, topicReferences);
@@ -276,6 +342,7 @@ function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
     currentTokenOverlap,
     maximumTokenOverlap,
     citedSubjectContinuation: citedSubject,
+    causalSubjectContinuation: causalSubject,
     definiteSubjectContinuation: definiteSubject,
     questionReferences
   };
@@ -351,6 +418,7 @@ export function decideResearchConversationTopic({
       formatTransformation: signals.formatTransformation,
       contextualContinuation: signals.contextualContinuation,
       citedSubjectContinuation: signals.citedSubjectContinuation,
+      causalSubjectContinuation: signals.causalSubjectContinuation,
       definiteSubjectContinuation: signals.definiteSubjectContinuation,
       relatedReference: signals.relatedReference,
       disjointExplicitReference: signals.disjointExplicitReference,

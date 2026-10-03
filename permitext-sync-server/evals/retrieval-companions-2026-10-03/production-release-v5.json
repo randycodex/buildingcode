@@ -1,0 +1,32 @@
+{
+  "candidate": "v5",
+  "commit": "9c7a800bf58fa2994ed65e07bee24a92067a7ca5",
+  "deploymentID": "dpl_FimFVTUjwX6BaKXRShqRYakbQccA",
+  "deploymentHost": "permitext-sync-m17507pt7-randycodexs-projects-b72fc111.vercel.app",
+  "productionURL": "https://permitext.com",
+  "ready": true,
+  "identityVerified": true,
+  "healthVerified": true,
+  "privateVectorRouteHTTPStatus": 404,
+  "models": {
+    "writer": "gpt-6-luna",
+    "writerEffort": "low",
+    "verifier": "gpt-6-luna",
+    "verifierEffort": "medium",
+    "serviceTier": "priority"
+  },
+  "flags": {
+    "PERMITEXT_RESEARCH_PASSAGE_SEARCH": "1",
+    "PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL": "1",
+    "PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING": "1",
+    "PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES": "1",
+    "PERMITEXT_RESEARCH_SEMANTIC_SEARCH": "1"
+  },
+  "flagsPersistedInProjectEnvironment": false,
+  "answerAcceptance": "failed: retained rooftop and downstream drainage material errors, condensate and burial-rule withholding",
+  "verifiedAt": "2026-10-03T05:57:00.999750+00:00",
+  "turnCount": 15,
+  "estimatedProviderCostUSD": 0.239573,
+  "allOperationsSettled": true,
+  "acceptanceCompletedAt": "2026-10-03T06:44:00.864461+00:00"
+}

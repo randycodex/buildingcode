@@ -3,7 +3,7 @@ import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-current-detail-child-discovery-v47";
+export const evidenceDiscoveryVersion = "20261003-current-lexical-reservation-v48";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -979,7 +979,7 @@ function questionDisciplinePrefixes(question) {
   // A soft ranking signal, never a corpus exclusion or a substitute for a
   // section reference. Cross-code requirements can still be selected.
   const prefixes = explicitQuestionDisciplinePrefixes(question);
-  if (/\b(?:fuel[- ]gas|natural[- ]gas|gas[- ]fired|gas\s+(?:piping|pipes?|lines?|systems?|appliances?|connectors?|connections?))\b/i.test(question)) prefixes.add("FGC");
+  if (/\b(?:fuel[- ]gas|natural[- ]gas|gas[- ]fired|gas[-\s]+(?:piping|pipes?|lines?|systems?|appliances?|connectors?|connections?))\b/i.test(question)) prefixes.add("FGC");
   if (/\b(?:ventilat\w*|exhaust|ducts?|air[- ]condition\w*|makeup[- ]air|mechanical\s+(?:code|system)|combustion\s+air)\b/i.test(question)) prefixes.add("MC");
   if (/\b(?:plumbing|sanitary|drain(?:age|s)?|sewer|trap(?:s|ping)?|lavator\w*|toilet|shower|water[- ]heater|drinking[- ]fountain)\b/i.test(question)) prefixes.add("PC");
   if (/\b(?:permit|DOB\s+inspection|certificate\s+of\s+occupancy|stop[- ]work\s+order|permit\s+application)\b/i.test(question)) prefixes.add("AC");
@@ -1656,6 +1656,33 @@ function mergedIndexedPassages(primary, lexical, semantic, currentScores, curren
   return { ...selected, passages: merged, ...(companion ? { companion } : {}) };
 }
 
+function strongCurrentLexicalReservation({ currentHits, detailed, selected, currentQuestion, contextQuestion, preferredPrefixes }) {
+  const currentTerms = new Set(rawTokens(currentQuestion).flatMap(term => [...singularForms(term)])
+    .filter(term => term.length > 2 && /[a-z]/i.test(term) && !stopWords.has(term) &&
+      !genericPassageHeadingWords.has(term) && !["nyc", "new", "york", "city", "fictional", "scenario", "project"].includes(term)));
+  if (currentTerms.size < 2) return null;
+  const bestScore = currentHits[0]?.score;
+  if (!(bestScore > 0)) return null;
+  const protectedIDs = new Set(selected.filter((item, index) => index === 0 || item.directReference ||
+    item.completeSiblingCompanionOf || item.useSelectedPassageOnly).map(item => comparableSectionID(item.section.id)));
+  const eligible = currentHits.slice(0, 5).map((hit, rank) => {
+    const id = comparableSectionID(hit.sectionID);
+    const item = detailed.find(value => comparableSectionID(value.section.id) === id);
+    const strength = hit.score / bestScore;
+    const words = new Set(rawTokens(hit.text).flatMap(term => [...singularForms(term)]));
+    const subjectOverlap = [...currentTerms].filter(term => words.has(term)).length;
+    return { item, hit, rank: rank + 1, strength, subjectOverlap };
+  }).filter(({ item, hit, strength, subjectOverlap }) => item && !protectedIDs.has(comparableSectionID(hit.sectionID)) &&
+    !item.useSelectedPassageOnly && !item.contextualReference && !item.inheritedReference &&
+    completeIndexedScope(hit) && completeIndexedScope(item.indexedPassage) &&
+    zoningScopeRankingFactor(item.section, contextQuestion, currentQuestion) >= 1 &&
+    strength >= 0.7 && subjectOverlap >= 2);
+  eligible.sort((left, right) =>
+    Number(preferredPrefixes.has(right.item.section.codePrefix)) - Number(preferredPrefixes.has(left.item.section.codePrefix)) ||
+    left.rank - right.rank);
+  return eligible[0] || null;
+}
+
 export async function discoverRelevantEvidence({
   question,
   retrievalContext = null,
@@ -1745,7 +1772,8 @@ export async function discoverRelevantEvidence({
   // The companion decision uses the current question only. Reusing fused
   // inherited scores here would repeat the old topic instead of its new detail.
   const currentPassageHits = passageIndex ? searchResearchPassages(passageIndex, currentQuestion,
-    { queryWeights: questionTerms, explicitReferenceQuery: currentQuestion, limit: 100, passagesPerSection: 8 }) : [];
+    { queryWeights: questionTerms, explicitReferenceQuery: currentQuestion, limit: 100, passagesPerSection: 8 })
+    .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean) : [];
   const currentPassageScores = new Map(currentPassageHits.flatMap(hit =>
     (hit.passages || [hit]).map(passage => [passageIdentity(passage), passage.score])));
   const passageHitsByID = new Map(lexicalHitsByID);
@@ -1766,6 +1794,18 @@ export async function discoverRelevantEvidence({
   for (const [id, primary] of passageHitsByID) {
     passageHitsByID.set(id, mergedIndexedPassages(primary, lexicalHitsByID.get(id),
       semanticHitsByID.get(id), currentPassageScores, currentQuestion));
+  }
+  // Contextual words can evict a strong current-only hit from the first lexical
+  // hundred. Keep its authorized scope available for the bounded reservation;
+  // this nomination does not by itself admit a source to the final shortlist.
+  const currentLexicalRecallHits = currentPassageHits.slice(0, 5).filter(hit =>
+    completeIndexedScope(hit) && hit.score >= (currentPassageHits[0]?.score || Infinity) * 0.7);
+  for (const hit of currentLexicalRecallHits) {
+    const id = comparableSectionID(hit.sectionID);
+    if (!passageHitsByID.has(id)) passageHitsByID.set(id, hit);
+    if (semanticHits.length && !fusedScores.has(id)) {
+      fusedScores.set(id, 4000 / (61 + currentPassageHits.indexOf(hit)));
+    }
   }
   const scores = new Map();
   const matchedTermsByID = new Map();
@@ -1864,7 +1904,7 @@ export async function discoverRelevantEvidence({
   exactReferenceIDs.forEach((id) => scores.set(id, (scores.get(id) || 0) + 100));
   routesByID.forEach(({ score }, id) => scores.set(id, (scores.get(id) || 0) + score));
   headingScores.forEach((score, id) => scores.set(id, (scores.get(id) || 0) + score));
-  [...passageHits, ...semanticHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
+  [...passageHits, ...semanticHits, ...currentLexicalRecallHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
     Math.max(scores.get(comparableSectionID(hit.sectionID)) || 0, hit.score * 3)));
 
   const preliminary = Array.from(scores, ([id, score]) => ({ id, score }))
@@ -1874,7 +1914,7 @@ export async function discoverRelevantEvidence({
   // term definitions even when a broad topic route fills the lexical shortlist.
   // Their complete text is never admitted automatically by this reservation.
   const preliminaryIDs = new Set(preliminary.map((entry) => entry.id));
-  for (const hit of [...passageHits, ...semanticHits]) {
+  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (catalogByID.has(id) && !preliminaryIDs.has(id)) {
       preliminary.push({ id, score: scores.get(id) || 0 });
@@ -2050,6 +2090,28 @@ export async function discoverRelevantEvidence({
         item !== companionItem && !preceding.includes(item))].slice(0, candidateLimit);
     }
   }
+  // Meaning recall can crowd a short, strongly matching current-question rule
+  // out of the fixed shortlist. Reserve at most one already authorized lexical
+  // source, while retaining the semantic lead, direct references and complete
+  // sibling. This adds recall, never a determination of legal applicability.
+  if (semanticHits.length && candidateLimit > 1 && !lead?.useSelectedPassageOnly) {
+    const reservation = strongCurrentLexicalReservation({ currentHits: currentPassageHits, detailed,
+      selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes });
+    const replaceIndex = selectedCandidates.findLastIndex(item => item !== lead &&
+      !item.directReference && !item.completeSiblingCompanionOf && !item.useSelectedPassageOnly);
+    if (reservation && replaceIndex >= 0) {
+      const id = comparableSectionID(reservation.hit.sectionID);
+      reservation.item.indexedPassage = mergedIndexedPassages(reservation.hit, reservation.hit,
+        semanticHitsByID.get(id), currentPassageScores, currentQuestion);
+      reservation.item.passage = { text: reservation.item.indexedPassage.text,
+        score: reservation.hit.score, blockID: reservation.item.indexedPassage.blockID };
+      reservation.item.currentQuestionLexicalReservation = { rank: reservation.rank,
+        strength: Math.round(reservation.strength * 1000) / 1000 };
+      const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference || item.completeSiblingCompanionOf);
+      selectedCandidates = [...protectedItems, reservation.item, ...selectedCandidates.filter(item =>
+        !protectedItems.includes(item) && item !== reservation.item)].slice(0, candidateLimit);
+    }
+  }
   const selectedIDs = new Set(selectedCandidates.map((item) => item.section.id));
   const selectedPrefixCounts = new Map();
   for (const item of selectedCandidates) {
@@ -2167,6 +2229,7 @@ export async function discoverRelevantEvidence({
       signals: {
         matchedTerms: item.matchedTerms.slice(0, 12),
         ...(item.completeSiblingCompanionOf ? { completeSiblingCompanionOf: item.completeSiblingCompanionOf } : {}),
+        ...(item.currentQuestionLexicalReservation ? { currentQuestionLexicalReservation: item.currentQuestionLexicalReservation } : {}),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
         rootClaimCoverage: item.rootClaimCoverage,

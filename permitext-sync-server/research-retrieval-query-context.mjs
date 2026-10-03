@@ -201,9 +201,19 @@ export function activeResearchRetrievalFacts({ question, contextualTopics = [], 
 const contextBoilerplate = new Set([
   "for", "from", "are", "has", "not", "only", "use", "using", "please", "cite", "governing", "section", "nyc",
   "saved", "context", "scenario", "test", "research", "fictional", "hypothetical", "proposed", "enough", "dimensions", "access",
-  "keep", "same", "such", "much", "leave", "still", "explain", "answer", "question", "asks", "ask", "check"
+  "keep", "same", "such", "much", "leave", "still", "explain", "answer", "question", "asks", "ask", "check", "protection"
 ]);
-function contextTerms(value) { return new Set([...terms(value)].filter(term => !contextBoilerplate.has(term))); }
+function contextTerms(value) {
+  // A floor drain is a component; "floor" here is not a building-level fact.
+  const componentText = text(value).replace(/\bfloor\s+drains?\b/gi, "drain");
+  return new Set([...terms(componentText)].filter(term => !contextBoilerplate.has(term)));
+}
+function buildingScaleDimensionsRequested(value) {
+  const subject = text(value).replace(/\bfloor\s+drains?\b/gi, "drain");
+  return /\b(?:how many|number of)\s+(?:building\s+)?(?:stories|storeys|floors|levels)\b|\b(?:stories|storeys|levels)\s+(?:above|below)\s+(?:ground|grade)\b|\b(?:high[- ]rise|elevators?)\b/i.test(subject) ||
+    /\b(?:building|structure|project)(?:['’]s)?\b[^.!?]{0,35}\b(?:height|high|stories|storeys|floors|levels)\b|\b(?:height|stories|storeys|floors|levels)\b[^.!?]{0,35}\b(?:building|structure|project)\b/i.test(subject) ||
+    /\b(?:rooftop|roof)[- ](?:access|height|level|clear path|stairs?|exit|elevator)\b/i.test(subject);
+}
 function hypotheticalScopeRequested(value) {
   return /\b(?:fictional|hypothetical|test|sample|example)\b[^.!?]{0,70}\b(?:scenario|premises|conditions|case|example)\b|\b(?:scenario|premises|conditions|case)\b[^.!?]{0,70}\b(?:fictional|hypothetical|test|sample|example)\b|\bsaved\b[^.!?]{0,60}\bexample\b/i.test(value);
 }
@@ -295,7 +305,7 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
   if (/\b(?:occupancy|occupant load|egress|stairs?|exit|travel distance|accessible|fire|sprinkler|ventilation|plumbing fixtures?|water closets?)\b/i.test(subject)) relevant.add("use");
   if (/\b(?:new|development|enlargement|alteration|existing|change of use|construction)\b/i.test(subject)) relevant.add("work");
   if (/\b(?:sprinkler|fire|storage|egress|travel distance|height|area)\b/i.test(subject)) relevant.add("sprinklers");
-  if (/\b(?:height|stories|storeys|high[- ]rise|floors?|vertical|elevator)\b/i.test(subject)) relevant.add("height");
+  if (/\b(?:height|stories|storeys|high[- ]rise|floors?|vertical|elevator)\b/i.test(subject.replace(/\bfloor\s+drains?\b/gi, "drain"))) relevant.add("height");
   if (/\b(?:area|FAR|coverage|square feet|sq\s*ft)\b/i.test(subject)) relevant.add("area");
   if (/\b(?:flood|waterfront|sidewalk|grade|elevation)\b/i.test(subject)) relevant.add("flood");
   if (/\b(?:construction type|fire[- ]rat(?:ing|ed)|fire[- ]resistan)\b/i.test(subject)) relevant.add("protection");
@@ -324,6 +334,8 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
   const ranked = statementFacts.filter(fact => hypothetical ? fact.scope === "hypothetical" &&
       (scopeAnchors.length <= 1 || (fact.scopeAnchor || fact.assertion) === selectedScope) : fact.scope !== "hypothetical")
     .map((fact, index) => {
+      const buildingDimensionField = /^(?:Stories Above Grade|Levels Below Grade|Building Height)$/i.test(fact.label);
+      if (buildingDimensionField && !buildingScaleDimensionsRequested(subject)) return { ...fact, index, score: 0 };
       const overlap = [...contextTerms(fact.assertion)].filter(term => questionTerms.has(term)).length;
       const facetMatches = fact.facets.filter(name => relevant.has(name)).length;
       const lexicalIdentity = queryMode === "lexical" && zoning && /\b(?:address|borough|BBL|ZIP code|community district|zoning map)\s*:/i.test(fact.payload);
@@ -429,7 +441,8 @@ export function semanticResearchSubjectContext({ question, contextualTopics = []
     /^(?:actually|correction|to clarify|clarification|I meant)\b/i.test(value) &&
     [...overrideFacets(value)].some(name => ["use", "work", "district"].includes(name)));
   const titles = sources.map(source => sourceSubject(source.title)).filter(title =>
-    [...terms(title)].some(term => !genericSubjectWords.has(term)));
+    [...terms(title)].some(term => !genericSubjectWords.has(term)))
+    .filter((title, index, all) => all.findIndex(candidate => candidate.toLowerCase() === title.toLowerCase()) === index);
   if (!returnToOriginal && !changedEdition && !correctedTopic && substantiveTerms.length >= 6 && titles.length) return titles.join("; ").slice(0, 140);
   // Generic section titles cannot supply a subject. Fall back only to active
   // user topics, never assistant text or the prior source's operative clauses.
