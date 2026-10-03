@@ -81,7 +81,8 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/research-accuracy-holdout.mjs"]) {
   sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex");
 }
-for (const name of ["research-passage-index.mjs", "research-semantic-passages.mjs"]) {
+for (const name of ["research-passage-index.mjs", "research-semantic-passages.mjs",
+  "research-retrieval-query-context.mjs", "research-interpretation-context.mjs"]) {
   try { sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex"); }
   catch (error) { if (error.code !== "ENOENT") throw error; }
 }

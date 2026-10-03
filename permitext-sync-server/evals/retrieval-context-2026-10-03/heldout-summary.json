@@ -1,0 +1,670 @@
+{
+  "schemaVersion": 1,
+  "sealedAt": "2026-10-03T03:29:24.031Z",
+  "candidateVersion": "20261003-query-scope-context-v54",
+  "runSHA256": "f76a0049366f292f79039ebb822b60c19a2e975f4cf97f4707c2573a571cdd52",
+  "reviewHashes": {
+    "heldout-review-a.json": "1ef95cce698dacc999249d083f03f9b9703dcf24f721c87d45660eb764837c8a",
+    "heldout-review-b.json": "db545eed87d7dfb60f0c57f965111a49912dc679c25de2b8fc00dd0a32235003",
+    "heldout-review-c.json": "1553f48a43a8b905eb53a5a70b9eab2faff7267e01b63abc24be27ec8291c150"
+  },
+  "reviewAuthority": "Assistant source review; not professional adjudication or representative product accuracy",
+  "turnCount": 36,
+  "labels": {
+    "correct": 27,
+    "withheld": 7,
+    "appropriate_clarification": 1,
+    "materially_wrong": 1
+  },
+  "strictPass": 28,
+  "strictPassRate": 0.7777777777777778,
+  "fullyPassingFamilies": 7,
+  "familyCount": 12,
+  "byCodeFamily": {
+    "BC": {
+      "turnCount": 6,
+      "strictPass": 6,
+      "labels": {
+        "correct": 6
+      }
+    },
+    "PC": {
+      "turnCount": 6,
+      "strictPass": 6,
+      "labels": {
+        "correct": 6
+      }
+    },
+    "MC": {
+      "turnCount": 6,
+      "strictPass": 5,
+      "labels": {
+        "correct": 4,
+        "withheld": 1,
+        "appropriate_clarification": 1
+      }
+    },
+    "FGC": {
+      "turnCount": 6,
+      "strictPass": 5,
+      "labels": {
+        "correct": 5,
+        "withheld": 1
+      }
+    },
+    "FC": {
+      "turnCount": 6,
+      "strictPass": 4,
+      "labels": {
+        "withheld": 1,
+        "correct": 4,
+        "materially_wrong": 1
+      }
+    },
+    "ZR": {
+      "turnCount": 6,
+      "strictPass": 2,
+      "labels": {
+        "withheld": 4,
+        "correct": 2
+      }
+    }
+  },
+  "byTurnGroup": {
+    "initial": {
+      "turnCount": 12,
+      "labels": {
+        "correct": 9,
+        "appropriate_clarification": 1,
+        "withheld": 2
+      }
+    },
+    "followUps": {
+      "turnCount": 24,
+      "labels": {
+        "correct": 18,
+        "withheld": 5,
+        "materially_wrong": 1
+      }
+    }
+  },
+  "actualWriterDecisiveCoverage": {
+    "complete": 34,
+    "missing": 1,
+    "incomplete": 1
+  },
+  "localWarmTimingSeconds": {
+    "p50": 12.458187999999966,
+    "p90": 35.38599620899995,
+    "minimum": 6.930772000000005,
+    "maximum": 42.64184895799999,
+    "scope": "Full-turn local HTTP; fixture preflight warms corpus/query caches. Does not establish production/cold-start timing."
+  },
+  "provider": {
+    "callCount": 127,
+    "allSettled": true,
+    "estimatedCostUSD": 0.19519525499999998,
+    "invoiceVerified": false,
+    "models": [
+      "text-embedding-3-small",
+      "gpt-6-luna"
+    ]
+  },
+  "families": [
+    {
+      "familyID": "accessible-ramp",
+      "turnCount": 3,
+      "strictPass": 3,
+      "labels": {
+        "correct": 3
+      },
+      "fullyPassing": true
+    },
+    {
+      "familyID": "terrace-guard",
+      "turnCount": 3,
+      "strictPass": 3,
+      "labels": {
+        "correct": 3
+      },
+      "fullyPassing": true
+    },
+    {
+      "familyID": "shower-waterproofing",
+      "turnCount": 3,
+      "strictPass": 3,
+      "labels": {
+        "correct": 3
+      },
+      "fullyPassing": true
+    },
+    {
+      "familyID": "restaurant-grease",
+      "turnCount": 3,
+      "strictPass": 3,
+      "labels": {
+        "correct": 3
+      },
+      "fullyPassing": true
+    },
+    {
+      "familyID": "condensate-protection",
+      "turnCount": 3,
+      "strictPass": 2,
+      "labels": {
+        "correct": 2,
+        "withheld": 1
+      },
+      "fullyPassing": false
+    },
+    {
+      "familyID": "dryer-duct",
+      "turnCount": 3,
+      "strictPass": 3,
+      "labels": {
+        "appropriate_clarification": 1,
+        "correct": 2
+      },
+      "fullyPassing": true
+    },
+    {
+      "familyID": "gas-shutoff-access",
+      "turnCount": 3,
+      "strictPass": 2,
+      "labels": {
+        "correct": 2,
+        "withheld": 1
+      },
+      "fullyPassing": false
+    },
+    {
+      "familyID": "gas-restoration",
+      "turnCount": 3,
+      "strictPass": 3,
+      "labels": {
+        "correct": 3
+      },
+      "fullyPassing": true
+    },
+    {
+      "familyID": "rooftop-access",
+      "turnCount": 3,
+      "strictPass": 1,
+      "labels": {
+        "withheld": 1,
+        "correct": 1,
+        "materially_wrong": 1
+      },
+      "fullyPassing": false
+    },
+    {
+      "familyID": "emergency-light-tests",
+      "turnCount": 3,
+      "strictPass": 3,
+      "labels": {
+        "correct": 3
+      },
+      "fullyPassing": true
+    },
+    {
+      "familyID": "office-loading-table",
+      "turnCount": 3,
+      "strictPass": 0,
+      "labels": {
+        "withheld": 3
+      },
+      "fullyPassing": false
+    },
+    {
+      "familyID": "residential-parking-location",
+      "turnCount": 3,
+      "strictPass": 2,
+      "labels": {
+        "correct": 2,
+        "withheld": 1
+      },
+      "fullyPassing": false
+    }
+  ],
+  "cases": [
+    {
+      "id": "context-hold-01-accessible-ramp-1",
+      "familyID": "accessible-ramp",
+      "codeFamily": "BC",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "0f0fd73698de503c9412178ace0b70c89441fc07b54efc87144fbbb385e7417d",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-01-accessible-ramp-2",
+      "familyID": "accessible-ramp",
+      "codeFamily": "BC",
+      "turn": 2,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "4e0ec3179cd87336eb60f328f925c34655fb6dafe06f87e01fb7aec838b5c089",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-01-accessible-ramp-3",
+      "familyID": "accessible-ramp",
+      "codeFamily": "BC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "7855b35f160aec6a39aaae5ebcdd01d9dbdbba2c577e5956edd346095b195c21",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-02-terrace-guard-1",
+      "familyID": "terrace-guard",
+      "codeFamily": "BC",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "1b8af8156e64f9ab83a234cfd327a34831fa430b5c3f76d861a5aee55f99c027",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-02-terrace-guard-2",
+      "familyID": "terrace-guard",
+      "codeFamily": "BC",
+      "turn": 2,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "05eb8835183eb0a10fdb820a2b7b75b30bf4ea6b2594faa700fb8e48a1c97f82",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-02-terrace-guard-3",
+      "familyID": "terrace-guard",
+      "codeFamily": "BC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "35123079270b9052e55c14a216d21cbed2f6aa00222db7ad062f8bfbded07aa0",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-1",
+      "familyID": "shower-waterproofing",
+      "codeFamily": "PC",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "9db12dae805e580f0de4fb14a7316ae5fcbd7ce1fdeab00228cbf34d6026ca4a",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-2",
+      "familyID": "shower-waterproofing",
+      "codeFamily": "PC",
+      "turn": 2,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "f53237a1b37f433661c92d55aa9f53995c292627f077c77244c350324207a9eb",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-3",
+      "familyID": "shower-waterproofing",
+      "codeFamily": "PC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "a8e60a6d9f02bad0756ea3caa8891f2f1ec062d2064f61865c4c9a716276ad8d",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-1",
+      "familyID": "restaurant-grease",
+      "codeFamily": "PC",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "8af39fa6615a169bcaca12731aead6d5166c500654f1c8603bfc44be91fab481",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-2",
+      "familyID": "restaurant-grease",
+      "codeFamily": "PC",
+      "turn": 2,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "3c1610d254326d1aee96152474a3904254e2cf27c2b0aa616edb8cd6e239c5a5",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-3",
+      "familyID": "restaurant-grease",
+      "codeFamily": "PC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-a.json",
+      "answerTextSHA256": "430092fe95f9256857d0725889076f88a327f606d3cc8ce373e113d44ad574e5",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-05-condensate-protection-1",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "9542920fbcc73a996635aa23e21b60e66a5da02e256aff5264169cb8856a79a3",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-05-condensate-protection-2",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "turn": 2,
+      "label": "withheld",
+      "strictPass": false,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "failureStage": "verification_ancillary_summary_whole_answer_suppression"
+    },
+    {
+      "id": "context-hold-05-condensate-protection-3",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "f08f111b4fadcaac18e2fe3883607890e651712f7153f152a8659168e1c0fbdc",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-06-dryer-duct-1",
+      "familyID": "dryer-duct",
+      "codeFamily": "MC",
+      "turn": 1,
+      "label": "appropriate_clarification",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "c9233503303d09be8e4dea9a442c13b0d54ed2d8c687268e81363ebd7711c4f5",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-06-dryer-duct-2",
+      "familyID": "dryer-duct",
+      "codeFamily": "MC",
+      "turn": 2,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "35a1807d12b28f6a97da7b27dcf140ed6ff5f79550933b9d0fff525c4dc3fcf6",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-06-dryer-duct-3",
+      "familyID": "dryer-duct",
+      "codeFamily": "MC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "85a5073251598cdc5a8f96d1aa8cd24acb1127548f79681246b7181ce2dc75eb",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-1",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "ac016dabbd5ede9e398f7b96cee3023c75a006565f203ea0fce1ca99a26b33bf",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-2",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "turn": 2,
+      "label": "withheld",
+      "strictPass": false,
+      "actualWriterDecisiveTextCoverage": "missing",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "3246123c2af4e83fe905b1907fcba407d2a7c569ac0efc1067ed2be20c6a3e15",
+      "failureStage": "followup_governing_source_retrieval_gap"
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-3",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "6501c35ea9c33fb7f00ac9a5a59df307e5c84b2b9ce550b51ea22dbcfd91e070",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-08-gas-restoration-1",
+      "familyID": "gas-restoration",
+      "codeFamily": "FGC",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "ca65f3726a7af4bed7f56ff9c3b4bdca6aa47c49c30c2e381f93d9c6f601e029",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-08-gas-restoration-2",
+      "familyID": "gas-restoration",
+      "codeFamily": "FGC",
+      "turn": 2,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "d918272fbbe8e98fc30f5c5b09b3c34bcace0148ae2d7e0ce406af1e51e408a3",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-08-gas-restoration-3",
+      "familyID": "gas-restoration",
+      "codeFamily": "FGC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-b.json",
+      "answerTextSHA256": "fd1e13fc4fba03acc1c742629a1d2a8b1a2c6632ff869f56bcc1a1f3814da8b6",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-09-rooftop-access-1",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "turn": 1,
+      "label": "withheld",
+      "strictPass": false,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "failureStage": "deterministic_answer_gate_before_subjective_verifier"
+    },
+    {
+      "id": "context-hold-09-rooftop-access-2",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "turn": 2,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "8e7621ddb543285bb12f984f574dc821ef3292ba75c539b3f688a0d66f070da6",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-09-rooftop-access-3",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "turn": 3,
+      "label": "materially_wrong",
+      "strictPass": false,
+      "actualWriterDecisiveTextCoverage": "incomplete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "733246b29ad59ace69bb22bb906232d8a40c55869978d50aa41bd790ee3e95ae",
+      "failureStage": "retrieval_excerpt_missing_decisive_child_then_writer_false_absence_claim_and_verifier_acceptance"
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-1",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "4347e9fe7fd4ba26894c2ce68718edb68d15d9939b36134d4f5eb159c063e6d0",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-2",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "turn": 2,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "25eef5a88c756fcb1c2ee65980b06d42cf1ae80ea3d4ac5e012b202d8ee64aed",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-3",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "2d97b58fb37ddd69b8dfb1f384dd12fc8eaded3c72edf7382830a06eaec3480b",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-11-office-loading-table-1",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "turn": 1,
+      "label": "withheld",
+      "strictPass": false,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "failureStage": "deterministic_table_binding_gate"
+    },
+    {
+      "id": "context-hold-11-office-loading-table-2",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "turn": 2,
+      "label": "withheld",
+      "strictPass": false,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "failureStage": "deterministic_definition_condition_gate"
+    },
+    {
+      "id": "context-hold-11-office-loading-table-3",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "turn": 3,
+      "label": "withheld",
+      "strictPass": false,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "failureStage": "deterministic_table_binding_and_definition_condition_gates"
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-1",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "turn": 1,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "134cb99f43553e468918785d43e2c0ce2fb7042cef7517587f22293fd58bcdce",
+      "failureStage": null
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-2",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "turn": 2,
+      "label": "withheld",
+      "strictPass": false,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "04ac2cb886e67597ffbc1bdb3583cecae6c1ff813f696aeda8249ffb36b814db",
+      "failureStage": "writer_unnecessary_unsupported_definition_citation_then_incomplete_strict_removal"
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-3",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "turn": 3,
+      "label": "correct",
+      "strictPass": true,
+      "actualWriterDecisiveTextCoverage": "complete",
+      "reviewFile": "heldout-review-c.json",
+      "answerTextSHA256": "f64890e258f53ed9038d180e7c23b3adc09261a7f1fb0eac4b6b621f21bf2343",
+      "failureStage": null
+    }
+  ],
+  "limitations": [
+    "36 turns are12 correlated scenario conversations, not36 independent legal topics.",
+    "The dryer named-material key overstates an absolute ban; truthful conditional clarification is accepted and the key caveat is preserved, without editing frozen prompts/keys.",
+    "Two available decisive subsections did not reach actual writer packets; source identity presence alone is not text completeness.",
+    "This evaluation does not establish95-percent overall product accuracy, hosted readiness or model causality.",
+    "All original results remain unchanged. Cases are now known regressions after their review."
+  ]
+}

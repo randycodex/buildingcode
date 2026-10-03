@@ -82077,6 +82077,3683 @@
         "total_tokens": 17006
       },
       "endedAt": "2026-10-03T02:39:22.471Z"
+    },
+    {
+      "id": "b6b63906-dfc8-402c-b4b1-d46fe4133c98",
+      "case": "context-dev-01-door-landings-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018561400000000004,
+      "startedAt": "2026-10-03T03:01:15.271Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 6.800000000000001e-7,
+      "usage": {
+        "prompt_tokens": 34,
+        "total_tokens": 34
+      },
+      "endedAt": "2026-10-03T03:01:16.439Z"
+    },
+    {
+      "id": "7e7e4fde-5a24-46fc-b638-f325410437b9",
+      "case": "context-dev-02-bathtub-outlets-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018451400000000004,
+      "startedAt": "2026-10-03T03:01:16.998Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 4.8e-7,
+      "usage": {
+        "prompt_tokens": 24,
+        "total_tokens": 24
+      },
+      "endedAt": "2026-10-03T03:01:17.969Z"
+    },
+    {
+      "id": "b9bff809-1a79-4267-979e-6ccb349657e0",
+      "case": "context-dev-03-bathroom-oil-appliance-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018554800000000003,
+      "startedAt": "2026-10-03T03:01:18.355Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 6e-7,
+      "usage": {
+        "prompt_tokens": 30,
+        "total_tokens": 30
+      },
+      "endedAt": "2026-10-03T03:01:18.888Z"
+    },
+    {
+      "id": "dd26d98c-d67e-456a-9b3c-6d6d494e2c62",
+      "case": "context-dev-04-gas-meter-valve-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018447000000000003,
+      "startedAt": "2026-10-03T03:01:19.384Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 5e-7,
+      "usage": {
+        "prompt_tokens": 25,
+        "total_tokens": 25
+      },
+      "endedAt": "2026-10-03T03:01:19.944Z"
+    },
+    {
+      "id": "f370fb3d-31fc-4c4c-b90f-c3b85a685a90",
+      "case": "context-dev-05-sprinkler-visual-records-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018502000000000004,
+      "startedAt": "2026-10-03T03:01:20.408Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 5e-7,
+      "usage": {
+        "prompt_tokens": 25,
+        "total_tokens": 25
+      },
+      "endedAt": "2026-10-03T03:01:20.579Z"
+    },
+    {
+      "id": "48a31794-2b1e-46d1-a2cd-dbd93114f25c",
+      "case": "context-dev-05-sprinkler-visual-records-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018251200000000002,
+      "startedAt": "2026-10-03T03:01:21.615Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 1.6e-7,
+      "usage": {
+        "prompt_tokens": 8,
+        "total_tokens": 8
+      },
+      "endedAt": "2026-10-03T03:01:22.264Z"
+    },
+    {
+      "id": "206585ea-ade4-42fb-8f8b-52b256659015",
+      "case": "context-dev-01-door-landings-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08673170000000001,
+      "startedAt": "2026-10-03T03:01:23.259Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0022663,
+      "usage": {
+        "input_tokens": 17051,
+        "input_tokens_details": {
+          "cache_write_tokens": 17048,
+          "cached_tokens": 0
+        },
+        "output_tokens": 270,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17321
+      },
+      "endedAt": "2026-10-03T03:01:27.421Z"
+    },
+    {
+      "id": "2b10e4d8-b91c-4122-9929-72d0aadea30e",
+      "case": "context-dev-01-door-landings-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0579172,
+      "startedAt": "2026-10-03T03:01:27.474Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0031098000000000002,
+      "usage": {
+        "input_tokens": 15359,
+        "input_tokens_details": {
+          "cache_write_tokens": 15356,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2380,
+        "output_tokens_details": {
+          "reasoning_tokens": 2336
+        },
+        "total_tokens": 17739
+      },
+      "endedAt": "2026-10-03T03:01:49.639Z"
+    },
+    {
+      "id": "c02efb42-054a-48bd-b442-2173ce6fb7bd",
+      "case": "context-dev-01-door-landings-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018574600000000003,
+      "startedAt": "2026-10-03T03:01:49.832Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 6.4e-7,
+      "usage": {
+        "prompt_tokens": 32,
+        "total_tokens": 32
+      },
+      "endedAt": "2026-10-03T03:01:50.010Z"
+    },
+    {
+      "id": "ccbcddc5-f6a9-46b5-a25b-32eefcb859c7",
+      "case": "context-dev-01-door-landings-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08553545000000001,
+      "startedAt": "2026-10-03T03:01:50.537Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0022753,
+      "usage": {
+        "input_tokens": 16407,
+        "input_tokens_details": {
+          "cache_write_tokens": 16404,
+          "cached_tokens": 0
+        },
+        "output_tokens": 449,
+        "output_tokens_details": {
+          "reasoning_tokens": 168
+        },
+        "total_tokens": 16856
+      },
+      "endedAt": "2026-10-03T03:01:56.370Z"
+    },
+    {
+      "id": "7e0782bc-54a3-4e54-af7f-cbdad6c95ab6",
+      "case": "context-dev-01-door-landings-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.057600950000000005,
+      "startedAt": "2026-10-03T03:01:56.417Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.00259215,
+      "usage": {
+        "input_tokens": 15169,
+        "input_tokens_details": {
+          "cache_write_tokens": 10206,
+          "cached_tokens": 4960
+        },
+        "output_tokens": 2533,
+        "output_tokens_details": {
+          "reasoning_tokens": 2353
+        },
+        "total_tokens": 17702
+      },
+      "endedAt": "2026-10-03T03:02:17.714Z"
+    },
+    {
+      "id": "049f9677-a09e-45cd-b4a4-b3cfe9a53b6b",
+      "case": "context-dev-01-door-landings-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0888382,
+      "startedAt": "2026-10-03T03:02:17.751Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.00208652,
+      "usage": {
+        "input_tokens": 17739,
+        "input_tokens_details": {
+          "cache_write_tokens": 12964,
+          "cached_tokens": 4772
+        },
+        "output_tokens": 836,
+        "output_tokens_details": {
+          "reasoning_tokens": 200
+        },
+        "total_tokens": 18575
+      },
+      "endedAt": "2026-10-03T03:02:26.394Z"
+    },
+    {
+      "id": "08ed8cae-d190-473e-982c-525b73480068",
+      "case": "context-dev-01-door-landings-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.060547300000000005,
+      "startedAt": "2026-10-03T03:02:26.434Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0038664000000000003,
+      "usage": {
+        "input_tokens": 16463,
+        "input_tokens_details": {
+          "cache_write_tokens": 11500,
+          "cached_tokens": 4960
+        },
+        "output_tokens": 4758,
+        "output_tokens_details": {
+          "reasoning_tokens": 4660
+        },
+        "total_tokens": 21221
+      },
+      "endedAt": "2026-10-03T03:03:07.506Z"
+    },
+    {
+      "id": "d511cef4-6291-4aa9-9a56-c35259138ede",
+      "case": "context-dev-02-bathtub-outlets-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07360595000000002,
+      "startedAt": "2026-10-03T03:03:08.024Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0016259249999999999,
+      "usage": {
+        "input_tokens": 11372,
+        "input_tokens_details": {
+          "cache_write_tokens": 11369,
+          "cached_tokens": 0
+        },
+        "output_tokens": 409,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 11781
+      },
+      "endedAt": "2026-10-03T03:03:11.999Z"
+    },
+    {
+      "id": "ebdacba5-e49a-4997-a9f2-80cd0f8acb47",
+      "case": "context-dev-02-bathtub-outlets-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.04817395000000001,
+      "startedAt": "2026-10-03T03:03:12.036Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0011624299999999999,
+      "usage": {
+        "input_tokens": 11072,
+        "input_tokens_details": {
+          "cache_write_tokens": 6156,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 687,
+        "output_tokens_details": {
+          "reasoning_tokens": 563
+        },
+        "total_tokens": 11759
+      },
+      "endedAt": "2026-10-03T03:03:19.379Z"
+    },
+    {
+      "id": "8c0346a5-dce6-4899-ada3-7e7e5b08e54b",
+      "case": "context-dev-02-bathtub-outlets-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.0676533,
+      "startedAt": "2026-10-03T03:03:19.414Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.00129005,
+      "usage": {
+        "input_tokens": 9789,
+        "input_tokens_details": {
+          "cache_write_tokens": 9786,
+          "cached_tokens": 0
+        },
+        "output_tokens": 133,
+        "output_tokens_details": {
+          "reasoning_tokens": 81
+        },
+        "total_tokens": 9922
+      },
+      "endedAt": "2026-10-03T03:03:22.535Z"
+    },
+    {
+      "id": "d25b6f33-5202-4fa6-a3d8-b7a68fbe99f7",
+      "case": "context-dev-02-bathtub-outlets-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.04684845000000001,
+      "startedAt": "2026-10-03T03:03:22.570Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.00084843,
+      "usage": {
+        "input_tokens": 10544,
+        "input_tokens_details": {
+          "cache_write_tokens": 5628,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 191,
+        "output_tokens_details": {
+          "reasoning_tokens": 147
+        },
+        "total_tokens": 10735
+      },
+      "endedAt": "2026-10-03T03:03:25.838Z"
+    },
+    {
+      "id": "c6000824-3d45-49ef-8606-562ebd1d3821",
+      "case": "context-dev-02-bathtub-outlets-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018508600000000002,
+      "startedAt": "2026-10-03T03:03:26.014Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 6.2e-7,
+      "usage": {
+        "prompt_tokens": 31,
+        "total_tokens": 31
+      },
+      "endedAt": "2026-10-03T03:03:26.207Z"
+    },
+    {
+      "id": "24d3f256-a17c-4231-a4be-22354a9d64a5",
+      "case": "context-dev-02-bathtub-outlets-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08962085,
+      "startedAt": "2026-10-03T03:03:26.748Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0025573,
+      "usage": {
+        "input_tokens": 19447,
+        "input_tokens_details": {
+          "cache_write_tokens": 19444,
+          "cached_tokens": 0
+        },
+        "output_tokens": 253,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 19700
+      },
+      "endedAt": "2026-10-03T03:03:30.038Z"
+    },
+    {
+      "id": "39aa3587-820b-4475-a036-483c91c1037d",
+      "case": "context-dev-02-bathtub-outlets-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0542773,
+      "startedAt": "2026-10-03T03:03:30.076Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.00128718,
+      "usage": {
+        "input_tokens": 14206,
+        "input_tokens_details": {
+          "cache_write_tokens": 9290,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 153,
+        "output_tokens_details": {
+          "reasoning_tokens": 109
+        },
+        "total_tokens": 14359
+      },
+      "endedAt": "2026-10-03T03:03:32.215Z"
+    },
+    {
+      "id": "adfa0fce-5c44-401e-bb77-ba754c2a8be2",
+      "case": "context-dev-03-bathroom-oil-appliance-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1086448,
+      "startedAt": "2026-10-03T03:03:32.861Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0039788,
+      "usage": {
+        "input_tokens": 27907,
+        "input_tokens_details": {
+          "cache_write_tokens": 27904,
+          "cached_tokens": 0
+        },
+        "output_tokens": 981,
+        "output_tokens_details": {
+          "reasoning_tokens": 309
+        },
+        "total_tokens": 28888
+      },
+      "endedAt": "2026-10-03T03:03:41.807Z"
+    },
+    {
+      "id": "2c7481b5-f0d8-45c1-a3d1-e59c46aa7626",
+      "case": "context-dev-03-bathroom-oil-appliance-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06772645000000001,
+      "startedAt": "2026-10-03T03:03:41.826Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.00313093,
+      "usage": {
+        "input_tokens": 19076,
+        "input_tokens_details": {
+          "cache_write_tokens": 14160,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 2623,
+        "output_tokens_details": {
+          "reasoning_tokens": 2531
+        },
+        "total_tokens": 21699
+      },
+      "endedAt": "2026-10-03T03:04:06.877Z"
+    },
+    {
+      "id": "511bdf8a-ec7b-407c-81be-57845d9024b5",
+      "case": "context-dev-03-bathroom-oil-appliance-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000189332,
+      "startedAt": "2026-10-03T03:04:07.100Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0000012,
+      "usage": {
+        "prompt_tokens": 60,
+        "total_tokens": 60
+      },
+      "endedAt": "2026-10-03T03:04:07.341Z"
+    },
+    {
+      "id": "47ec858f-1f07-4fa4-8778-87dd055eaa85",
+      "case": "context-dev-03-bathroom-oil-appliance-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11632170000000001,
+      "startedAt": "2026-10-03T03:04:07.931Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0041404250000000005,
+      "usage": {
+        "input_tokens": 31256,
+        "input_tokens_details": {
+          "cache_write_tokens": 31253,
+          "cached_tokens": 0
+        },
+        "output_tokens": 467,
+        "output_tokens_details": {
+          "reasoning_tokens": 220
+        },
+        "total_tokens": 31723
+      },
+      "endedAt": "2026-10-03T03:04:13.492Z"
+    },
+    {
+      "id": "6caa8798-dcdb-4a42-aff2-cae4e75a52fd",
+      "case": "context-dev-03-bathroom-oil-appliance-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06869555000000001,
+      "startedAt": "2026-10-03T03:04:13.531Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0026835550000000002,
+      "usage": {
+        "input_tokens": 19753,
+        "input_tokens_details": {
+          "cache_write_tokens": 14837,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1559,
+        "output_tokens_details": {
+          "reasoning_tokens": 1414
+        },
+        "total_tokens": 21312
+      },
+      "endedAt": "2026-10-03T03:04:28.258Z"
+    },
+    {
+      "id": "be39d521-65fe-491c-aea2-88ae8faf911b",
+      "case": "context-dev-03-bathroom-oil-appliance-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1198868,
+      "startedAt": "2026-10-03T03:04:28.297Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0037466,
+      "usage": {
+        "input_tokens": 32489,
+        "input_tokens_details": {
+          "cache_write_tokens": 27756,
+          "cached_tokens": 4730
+        },
+        "output_tokens": 459,
+        "output_tokens_details": {
+          "reasoning_tokens": 158
+        },
+        "total_tokens": 32948
+      },
+      "endedAt": "2026-10-03T03:04:33.785Z"
+    },
+    {
+      "id": "b95a2f76-b725-4da3-a1da-5528a16f99e4",
+      "case": "context-dev-03-bathroom-oil-appliance-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06931595000000002,
+      "startedAt": "2026-10-03T03:04:33.824Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.00283918,
+      "usage": {
+        "input_tokens": 19966,
+        "input_tokens_details": {
+          "cache_write_tokens": 15050,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1817,
+        "output_tokens_details": {
+          "reasoning_tokens": 1750
+        },
+        "total_tokens": 21783
+      },
+      "endedAt": "2026-10-03T03:04:50.504Z"
+    },
+    {
+      "id": "3ef4f37d-9242-42fa-b4c1-a809cf71177e",
+      "case": "context-dev-04-gas-meter-valve-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07870225,
+      "startedAt": "2026-10-03T03:04:51.185Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.001812675,
+      "usage": {
+        "input_tokens": 13574,
+        "input_tokens_details": {
+          "cache_write_tokens": 13571,
+          "cached_tokens": 0
+        },
+        "output_tokens": 232,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 13806
+      },
+      "endedAt": "2026-10-03T03:04:53.751Z"
+    },
+    {
+      "id": "0b5f2e5c-b0ae-4dba-a047-cfe70bbc7440",
+      "case": "context-dev-04-gas-meter-valve-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05163015,
+      "startedAt": "2026-10-03T03:04:53.789Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0010919299999999999,
+      "usage": {
+        "input_tokens": 12668,
+        "input_tokens_details": {
+          "cache_write_tokens": 7752,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 147,
+        "output_tokens_details": {
+          "reasoning_tokens": 103
+        },
+        "total_tokens": 12815
+      },
+      "endedAt": "2026-10-03T03:04:55.838Z"
+    },
+    {
+      "id": "66cd66b2-d10b-47b1-a5a0-165d7b3a7dd0",
+      "case": "context-dev-04-gas-meter-valve-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000184866,
+      "startedAt": "2026-10-03T03:04:56.094Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 5.2e-7,
+      "usage": {
+        "prompt_tokens": 26,
+        "total_tokens": 26
+      },
+      "endedAt": "2026-10-03T03:04:56.308Z"
+    },
+    {
+      "id": "d114c1a8-f17b-4131-b8b5-f92c9f40a1c4",
+      "case": "context-dev-04-gas-meter-valve-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0845823,
+      "startedAt": "2026-10-03T03:04:56.934Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0021949250000000003,
+      "usage": {
+        "input_tokens": 15892,
+        "input_tokens_details": {
+          "cache_write_tokens": 15889,
+          "cached_tokens": 0
+        },
+        "output_tokens": 417,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 16309
+      },
+      "endedAt": "2026-10-03T03:05:00.576Z"
+    },
+    {
+      "id": "5aa87859-3517-4f18-9d30-c940a5125cc0",
+      "case": "context-dev-04-gas-meter-valve-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.059513300000000005,
+      "startedAt": "2026-10-03T03:05:00.616Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0015711800000000001,
+      "usage": {
+        "input_tokens": 15882,
+        "input_tokens_details": {
+          "cache_write_tokens": 10966,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 302,
+        "output_tokens_details": {
+          "reasoning_tokens": 258
+        },
+        "total_tokens": 16184
+      },
+      "endedAt": "2026-10-03T03:05:04.047Z"
+    },
+    {
+      "id": "a1d9fc1c-7fb8-40af-80f6-07c873d8eff7",
+      "case": "context-dev-05-sprinkler-visual-records-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09186540000000001,
+      "startedAt": "2026-10-03T03:05:05.806Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0025703,
+      "usage": {
+        "input_tokens": 18431,
+        "input_tokens_details": {
+          "cache_write_tokens": 18428,
+          "cached_tokens": 0
+        },
+        "output_tokens": 533,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18964
+      },
+      "endedAt": "2026-10-03T03:05:10.388Z"
+    },
+    {
+      "id": "9896e20c-459e-4b20-a452-4f1efe137a73",
+      "case": "context-dev-05-sprinkler-visual-records-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06973670000000001,
+      "startedAt": "2026-10-03T03:05:10.429Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.00257768,
+      "usage": {
+        "input_tokens": 19458,
+        "input_tokens_details": {
+          "cache_write_tokens": 14542,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1421,
+        "output_tokens_details": {
+          "reasoning_tokens": 1377
+        },
+        "total_tokens": 20879
+      },
+      "endedAt": "2026-10-03T03:05:23.373Z"
+    },
+    {
+      "id": "2f68c566-ab5c-4c3c-bf8d-8c63e9844bce",
+      "case": "context-dev-05-sprinkler-visual-records-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018499800000000002,
+      "startedAt": "2026-10-03T03:05:23.652Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 5e-7,
+      "usage": {
+        "prompt_tokens": 25,
+        "total_tokens": 25
+      },
+      "endedAt": "2026-10-03T03:05:23.800Z"
+    },
+    {
+      "id": "524b40ce-893b-4348-8eac-4483d9bbf1fd",
+      "case": "context-dev-05-sprinkler-visual-records-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09240330000000001,
+      "startedAt": "2026-10-03T03:05:24.235Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.0024290500000000003,
+      "usage": {
+        "input_tokens": 18497,
+        "input_tokens_details": {
+          "cache_write_tokens": 18494,
+          "cached_tokens": 0
+        },
+        "output_tokens": 234,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18731
+      },
+      "endedAt": "2026-10-03T03:05:27.173Z"
+    },
+    {
+      "id": "4b5b19f3-0f9d-498d-8de6-1503b80d95f9",
+      "case": "context-dev-05-sprinkler-visual-records-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0650661,
+      "startedAt": "2026-10-03T03:05:27.215Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+      "costUSD": 0.001721055,
+      "usage": {
+        "input_tokens": 17397,
+        "input_tokens_details": {
+          "cache_write_tokens": 12481,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 223,
+        "output_tokens_details": {
+          "reasoning_tokens": 179
+        },
+        "total_tokens": 17620
+      },
+      "endedAt": "2026-10-03T03:05:30.239Z"
+    },
+    {
+      "id": "cc3b94ae-ae74-4ede-bde4-3bb5b6676ec4",
+      "case": "context-hold-01-accessible-ramp-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019890200000000001,
+      "startedAt": "2026-10-03T03:06:29.129Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0000031,
+      "usage": {
+        "prompt_tokens": 155,
+        "total_tokens": 155
+      },
+      "endedAt": "2026-10-03T03:06:29.694Z"
+    },
+    {
+      "id": "7c7c2edf-c73c-49a9-978b-6b85e7d01740",
+      "case": "context-hold-02-terrace-guard-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000196174,
+      "startedAt": "2026-10-03T03:06:30.312Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000252,
+      "usage": {
+        "prompt_tokens": 126,
+        "total_tokens": 126
+      },
+      "endedAt": "2026-10-03T03:06:30.544Z"
+    },
+    {
+      "id": "cfc63ee0-bf10-430d-b47b-0a462acd609f",
+      "case": "context-hold-03-shower-waterproofing-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019698800000000002,
+      "startedAt": "2026-10-03T03:06:31.028Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000264,
+      "usage": {
+        "prompt_tokens": 132,
+        "total_tokens": 132
+      },
+      "endedAt": "2026-10-03T03:06:31.280Z"
+    },
+    {
+      "id": "cbf7b107-1beb-4423-ad9a-a27c3595f118",
+      "case": "context-hold-04-restaurant-grease-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019397400000000002,
+      "startedAt": "2026-10-03T03:06:31.839Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.000002,
+      "usage": {
+        "prompt_tokens": 100,
+        "total_tokens": 100
+      },
+      "endedAt": "2026-10-03T03:06:32.005Z"
+    },
+    {
+      "id": "744f9e57-f366-43f7-b26b-2708d03c276a",
+      "case": "context-hold-05-condensate-protection-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019525000000000003,
+      "startedAt": "2026-10-03T03:06:32.583Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000244,
+      "usage": {
+        "prompt_tokens": 122,
+        "total_tokens": 122
+      },
+      "endedAt": "2026-10-03T03:06:32.732Z"
+    },
+    {
+      "id": "77b9b218-b47b-40b1-a82f-6dc7e3933d11",
+      "case": "context-hold-06-dryer-duct-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019874800000000003,
+      "startedAt": "2026-10-03T03:06:33.193Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000284,
+      "usage": {
+        "prompt_tokens": 142,
+        "total_tokens": 142
+      },
+      "endedAt": "2026-10-03T03:06:33.423Z"
+    },
+    {
+      "id": "2bd66515-3cb9-43a9-8236-7e05353a0b67",
+      "case": "context-hold-07-gas-shutoff-access-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019698800000000002,
+      "startedAt": "2026-10-03T03:06:33.926Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000268,
+      "usage": {
+        "prompt_tokens": 134,
+        "total_tokens": 134
+      },
+      "endedAt": "2026-10-03T03:06:34.095Z"
+    },
+    {
+      "id": "89d51b21-dacc-42e4-a824-963f0eef3b85",
+      "case": "context-hold-08-gas-restoration-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019780200000000001,
+      "startedAt": "2026-10-03T03:06:34.515Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000274,
+      "usage": {
+        "prompt_tokens": 137,
+        "total_tokens": 137
+      },
+      "endedAt": "2026-10-03T03:06:34.693Z"
+    },
+    {
+      "id": "03318fe3-f11e-44a8-946a-7196753f4774",
+      "case": "context-hold-09-rooftop-access-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019507400000000002,
+      "startedAt": "2026-10-03T03:06:35.258Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0000021800000000000003,
+      "usage": {
+        "prompt_tokens": 109,
+        "total_tokens": 109
+      },
+      "endedAt": "2026-10-03T03:06:35.475Z"
+    },
+    {
+      "id": "600d47b6-b066-4dc9-8676-3df9f49fb42d",
+      "case": "context-hold-10-emergency-light-tests-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000196042,
+      "startedAt": "2026-10-03T03:06:36.029Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000234,
+      "usage": {
+        "prompt_tokens": 117,
+        "total_tokens": 117
+      },
+      "endedAt": "2026-10-03T03:06:36.219Z"
+    },
+    {
+      "id": "1f42a6bd-2c9e-4a2f-8ec5-fc5f71252e0a",
+      "case": "context-hold-11-office-loading-table-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000199452,
+      "startedAt": "2026-10-03T03:06:37.370Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000304,
+      "usage": {
+        "prompt_tokens": 152,
+        "total_tokens": 152
+      },
+      "endedAt": "2026-10-03T03:06:37.626Z"
+    },
+    {
+      "id": "0ac84bf7-4373-49ff-9d6c-25a7d1c8de03",
+      "case": "context-hold-12-residential-parking-location-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019894600000000003,
+      "startedAt": "2026-10-03T03:06:38.033Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000294,
+      "usage": {
+        "prompt_tokens": 147,
+        "total_tokens": 147
+      },
+      "endedAt": "2026-10-03T03:06:38.231Z"
+    },
+    {
+      "id": "81f080b9-aa91-475b-a90f-0caa50eb1bd3",
+      "case": "context-hold-01-accessible-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08046995000000001,
+      "startedAt": "2026-10-03T03:06:39.297Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00193655,
+      "usage": {
+        "input_tokens": 14269,
+        "input_tokens_details": {
+          "cache_write_tokens": 14266,
+          "cached_tokens": 0
+        },
+        "output_tokens": 306,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 14575
+      },
+      "endedAt": "2026-10-03T03:06:42.947Z"
+    },
+    {
+      "id": "ece37cbd-17c7-4e33-84ca-243344b5486d",
+      "case": "context-hold-01-accessible-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05307225000000001,
+      "startedAt": "2026-10-03T03:06:43.002Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00135843,
+      "usage": {
+        "input_tokens": 13304,
+        "input_tokens_details": {
+          "cache_write_tokens": 8388,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 521,
+        "output_tokens_details": {
+          "reasoning_tokens": 477
+        },
+        "total_tokens": 13825
+      },
+      "endedAt": "2026-10-03T03:06:48.788Z"
+    },
+    {
+      "id": "7edf657c-ea87-41f9-a198-ee9c3f3b6d6a",
+      "case": "context-hold-01-accessible-ramp-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019978200000000002,
+      "startedAt": "2026-10-03T03:06:49.000Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000336,
+      "usage": {
+        "prompt_tokens": 168,
+        "total_tokens": 168
+      },
+      "endedAt": "2026-10-03T03:06:49.247Z"
+    },
+    {
+      "id": "7cddffc6-405c-4f4f-b9e7-962543966ed4",
+      "case": "context-hold-01-accessible-ramp-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0815386,
+      "startedAt": "2026-10-03T03:06:49.830Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0019533,
+      "usage": {
+        "input_tokens": 14683,
+        "input_tokens_details": {
+          "cache_write_tokens": 14680,
+          "cached_tokens": 0
+        },
+        "output_tokens": 236,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 14919
+      },
+      "endedAt": "2026-10-03T03:06:53.148Z"
+    },
+    {
+      "id": "3e42d278-959f-430c-98b4-b2020c564d75",
+      "case": "context-hold-01-accessible-ramp-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05321855,
+      "startedAt": "2026-10-03T03:06:53.187Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0012981800000000001,
+      "usage": {
+        "input_tokens": 13338,
+        "input_tokens_details": {
+          "cache_write_tokens": 8422,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 392,
+        "output_tokens_details": {
+          "reasoning_tokens": 348
+        },
+        "total_tokens": 13730
+      },
+      "endedAt": "2026-10-03T03:06:57.147Z"
+    },
+    {
+      "id": "a4f6c734-2455-4662-ab4d-7eadcc8d0e10",
+      "case": "context-hold-01-accessible-ramp-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019982600000000003,
+      "startedAt": "2026-10-03T03:06:57.310Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0000033399999999999998,
+      "usage": {
+        "prompt_tokens": 167,
+        "total_tokens": 167
+      },
+      "endedAt": "2026-10-03T03:06:57.538Z"
+    },
+    {
+      "id": "7e636bac-26b8-4e61-97df-a175bca5803c",
+      "case": "context-hold-01-accessible-ramp-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07865055,
+      "startedAt": "2026-10-03T03:06:58.102Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001798675,
+      "usage": {
+        "input_tokens": 13382,
+        "input_tokens_details": {
+          "cache_write_tokens": 13379,
+          "cached_tokens": 0
+        },
+        "output_tokens": 252,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 13634
+      },
+      "endedAt": "2026-10-03T03:07:00.721Z"
+    },
+    {
+      "id": "db6ba419-fec9-4f8b-a1fc-5a43923c78d1",
+      "case": "context-hold-01-accessible-ramp-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.051208300000000005,
+      "startedAt": "2026-10-03T03:07:00.763Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0011695549999999999,
+      "usage": {
+        "input_tokens": 12477,
+        "input_tokens_details": {
+          "cache_write_tokens": 7561,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 350,
+        "output_tokens_details": {
+          "reasoning_tokens": 306
+        },
+        "total_tokens": 12827
+      },
+      "endedAt": "2026-10-03T03:07:04.860Z"
+    },
+    {
+      "id": "d6eb0ab6-95ca-42b5-825c-5ae52885f552",
+      "case": "context-hold-02-terrace-guard-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08436285,
+      "startedAt": "2026-10-03T03:07:05.661Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0021276750000000003,
+      "usage": {
+        "input_tokens": 15814,
+        "input_tokens_details": {
+          "cache_write_tokens": 15811,
+          "cached_tokens": 0
+        },
+        "output_tokens": 302,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 16116
+      },
+      "endedAt": "2026-10-03T03:07:09.314Z"
+    },
+    {
+      "id": "5b786c31-7de3-4f0e-9c6e-8a731606b001",
+      "case": "context-hold-02-terrace-guard-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0574486,
+      "startedAt": "2026-10-03T03:07:09.342Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0015026800000000002,
+      "usage": {
+        "input_tokens": 15018,
+        "input_tokens_details": {
+          "cache_write_tokens": 10102,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 381,
+        "output_tokens_details": {
+          "reasoning_tokens": 337
+        },
+        "total_tokens": 15399
+      },
+      "endedAt": "2026-10-03T03:07:13.748Z"
+    },
+    {
+      "id": "2d50dc24-800a-4404-b7f5-d74d585206e7",
+      "case": "context-hold-02-terrace-guard-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019989200000000002,
+      "startedAt": "2026-10-03T03:07:14.008Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000318,
+      "usage": {
+        "prompt_tokens": 159,
+        "total_tokens": 159
+      },
+      "endedAt": "2026-10-03T03:07:14.271Z"
+    },
+    {
+      "id": "a23e9797-54d5-4abb-9d79-b308791fa718",
+      "case": "context-hold-02-terrace-guard-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0871761,
+      "startedAt": "2026-10-03T03:07:14.920Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0022690500000000003,
+      "usage": {
+        "input_tokens": 17009,
+        "input_tokens_details": {
+          "cache_write_tokens": 17006,
+          "cached_tokens": 0
+        },
+        "output_tokens": 286,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17295
+      },
+      "endedAt": "2026-10-03T03:07:18.262Z"
+    },
+    {
+      "id": "8d942f59-eee4-4a31-87ba-a15d456ec6a4",
+      "case": "context-hold-02-terrace-guard-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.059155250000000006,
+      "startedAt": "2026-10-03T03:07:18.298Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001473305,
+      "usage": {
+        "input_tokens": 15763,
+        "input_tokens_details": {
+          "cache_write_tokens": 10847,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 136,
+        "output_tokens_details": {
+          "reasoning_tokens": 92
+        },
+        "total_tokens": 15899
+      },
+      "endedAt": "2026-10-03T03:07:20.674Z"
+    },
+    {
+      "id": "34252d05-254b-4504-9472-bb1cacf613dc",
+      "case": "context-hold-02-terrace-guard-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000193534,
+      "startedAt": "2026-10-03T03:07:20.916Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000212,
+      "usage": {
+        "prompt_tokens": 106,
+        "total_tokens": 106
+      },
+      "endedAt": "2026-10-03T03:07:21.122Z"
+    },
+    {
+      "id": "f4eb9ce1-edcb-4ed7-93ee-681a87a3967d",
+      "case": "context-hold-02-terrace-guard-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08990740000000001,
+      "startedAt": "2026-10-03T03:07:21.700Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0024023,
+      "usage": {
+        "input_tokens": 18023,
+        "input_tokens_details": {
+          "cache_write_tokens": 18020,
+          "cached_tokens": 0
+        },
+        "output_tokens": 299,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18322
+      },
+      "endedAt": "2026-10-03T03:07:24.914Z"
+    },
+    {
+      "id": "7f1570af-5da9-45f2-8101-2507b47fe489",
+      "case": "context-hold-02-terrace-guard-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.062140100000000004,
+      "startedAt": "2026-10-03T03:07:24.936Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0018368050000000002,
+      "usage": {
+        "input_tokens": 16847,
+        "input_tokens_details": {
+          "cache_write_tokens": 11931,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 592,
+        "output_tokens_details": {
+          "reasoning_tokens": 407
+        },
+        "total_tokens": 17439
+      },
+      "endedAt": "2026-10-03T03:07:32.730Z"
+    },
+    {
+      "id": "8c80a3bf-fb68-4f83-b25e-d69aded7cc2c",
+      "case": "context-hold-02-terrace-guard-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0935671,
+      "startedAt": "2026-10-03T03:07:32.753Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0020333,
+      "usage": {
+        "input_tokens": 19433,
+        "input_tokens_details": {
+          "cache_write_tokens": 14680,
+          "cached_tokens": 4750
+        },
+        "output_tokens": 301,
+        "output_tokens_details": {
+          "reasoning_tokens": 37
+        },
+        "total_tokens": 19734
+      },
+      "endedAt": "2026-10-03T03:07:36.340Z"
+    },
+    {
+      "id": "faa15de8-119c-4299-b7de-17b75ed869d7",
+      "case": "context-hold-02-terrace-guard-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.062442050000000006,
+      "startedAt": "2026-10-03T03:07:36.384Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0016635550000000002,
+      "usage": {
+        "input_tokens": 16969,
+        "input_tokens_details": {
+          "cache_write_tokens": 12053,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 215,
+        "output_tokens_details": {
+          "reasoning_tokens": 171
+        },
+        "total_tokens": 17184
+      },
+      "endedAt": "2026-10-03T03:07:38.901Z"
+    },
+    {
+      "id": "8b7b4f1c-05df-423b-b763-71d06616bf81",
+      "case": "context-hold-03-shower-waterproofing-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08668990000000001,
+      "startedAt": "2026-10-03T03:07:39.804Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0022418000000000004,
+      "usage": {
+        "input_tokens": 16423,
+        "input_tokens_details": {
+          "cache_write_tokens": 16420,
+          "cached_tokens": 0
+        },
+        "output_tokens": 378,
+        "output_tokens_details": {
+          "reasoning_tokens": 99
+        },
+        "total_tokens": 16801
+      },
+      "endedAt": "2026-10-03T03:07:44.015Z"
+    },
+    {
+      "id": "76abf133-6fee-4a03-9c04-6d1f2ba09a03",
+      "case": "context-hold-03-shower-waterproofing-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08992005,
+      "startedAt": "2026-10-03T03:07:44.215Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00185315,
+      "usage": {
+        "input_tokens": 17658,
+        "input_tokens_details": {
+          "cache_write_tokens": 12820,
+          "cached_tokens": 4835
+        },
+        "output_tokens": 404,
+        "output_tokens_details": {
+          "reasoning_tokens": 109
+        },
+        "total_tokens": 18062
+      },
+      "endedAt": "2026-10-03T03:07:48.690Z"
+    },
+    {
+      "id": "020ae66a-d916-474a-a30e-aa5776a0206f",
+      "case": "context-hold-03-shower-waterproofing-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.059733850000000005,
+      "startedAt": "2026-10-03T03:07:48.729Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0021413,
+      "usage": {
+        "input_tokens": 15579,
+        "input_tokens_details": {
+          "cache_write_tokens": 15576,
+          "cached_tokens": 0
+        },
+        "output_tokens": 388,
+        "output_tokens_details": {
+          "reasoning_tokens": 344
+        },
+        "total_tokens": 15967
+      },
+      "endedAt": "2026-10-03T03:07:53.359Z"
+    },
+    {
+      "id": "3fd91f49-b370-4a54-bc42-c873e551be5c",
+      "case": "context-hold-03-shower-waterproofing-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019874800000000003,
+      "startedAt": "2026-10-03T03:07:53.635Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000298,
+      "usage": {
+        "prompt_tokens": 149,
+        "total_tokens": 149
+      },
+      "endedAt": "2026-10-03T03:07:53.844Z"
+    },
+    {
+      "id": "23145fd9-9964-43df-8cd5-c280b51556b5",
+      "case": "context-hold-03-shower-waterproofing-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08567405,
+      "startedAt": "2026-10-03T03:07:54.395Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0022256750000000003,
+      "usage": {
+        "input_tokens": 16418,
+        "input_tokens_details": {
+          "cache_write_tokens": 16415,
+          "cached_tokens": 0
+        },
+        "output_tokens": 347,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 16765
+      },
+      "endedAt": "2026-10-03T03:07:58.038Z"
+    },
+    {
+      "id": "c3150240-babe-4fe5-aceb-5b7af84cb618",
+      "case": "context-hold-03-shower-waterproofing-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.057971100000000005,
+      "startedAt": "2026-10-03T03:07:58.079Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0016249300000000001,
+      "usage": {
+        "input_tokens": 15280,
+        "input_tokens_details": {
+          "cache_write_tokens": 10364,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 560,
+        "output_tokens_details": {
+          "reasoning_tokens": 422
+        },
+        "total_tokens": 15840
+      },
+      "endedAt": "2026-10-03T03:08:04.599Z"
+    },
+    {
+      "id": "327a8c45-a87d-482f-94b9-d60ad2755e46",
+      "case": "context-hold-03-shower-waterproofing-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08923805,
+      "startedAt": "2026-10-03T03:08:04.638Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00186834,
+      "usage": {
+        "input_tokens": 17805,
+        "input_tokens_details": {
+          "cache_write_tokens": 13048,
+          "cached_tokens": 4754
+        },
+        "output_tokens": 379,
+        "output_tokens_details": {
+          "reasoning_tokens": 48
+        },
+        "total_tokens": 18184
+      },
+      "endedAt": "2026-10-03T03:08:08.581Z"
+    },
+    {
+      "id": "4e0a6811-6d99-420f-a991-6617b8820c7a",
+      "case": "context-hold-03-shower-waterproofing-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.058148200000000004,
+      "startedAt": "2026-10-03T03:08:08.620Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00146193,
+      "usage": {
+        "input_tokens": 15348,
+        "input_tokens_details": {
+          "cache_write_tokens": 10432,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 217,
+        "output_tokens_details": {
+          "reasoning_tokens": 173
+        },
+        "total_tokens": 15565
+      },
+      "endedAt": "2026-10-03T03:08:11.393Z"
+    },
+    {
+      "id": "a1d572cf-51a1-4cc7-856e-11b37a096fce",
+      "case": "context-hold-03-shower-waterproofing-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019817600000000002,
+      "startedAt": "2026-10-03T03:08:11.704Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000278,
+      "usage": {
+        "prompt_tokens": 139,
+        "total_tokens": 139
+      },
+      "endedAt": "2026-10-03T03:08:11.924Z"
+    },
+    {
+      "id": "f05549a9-3952-4918-96fe-eb111ab7d394",
+      "case": "context-hold-03-shower-waterproofing-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08365225,
+      "startedAt": "2026-10-03T03:08:12.504Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002093175,
+      "usage": {
+        "input_tokens": 15386,
+        "input_tokens_details": {
+          "cache_write_tokens": 15383,
+          "cached_tokens": 0
+        },
+        "output_tokens": 340,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15726
+      },
+      "endedAt": "2026-10-03T03:08:15.872Z"
+    },
+    {
+      "id": "eae36f4d-422f-4cda-9aab-f4b78f1426dc",
+      "case": "context-hold-03-shower-waterproofing-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.057335300000000006,
+      "startedAt": "2026-10-03T03:08:15.890Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0014306800000000001,
+      "usage": {
+        "input_tokens": 14810,
+        "input_tokens_details": {
+          "cache_write_tokens": 9894,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 289,
+        "output_tokens_details": {
+          "reasoning_tokens": 245
+        },
+        "total_tokens": 15099
+      },
+      "endedAt": "2026-10-03T03:08:19.824Z"
+    },
+    {
+      "id": "ad8ed8e0-b4e5-43d3-9cf0-319d4872297f",
+      "case": "context-hold-04-restaurant-grease-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10737100000000001,
+      "startedAt": "2026-10-03T03:08:20.850Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.003923425,
+      "usage": {
+        "input_tokens": 28256,
+        "input_tokens_details": {
+          "cache_write_tokens": 28253,
+          "cached_tokens": 0
+        },
+        "output_tokens": 783,
+        "output_tokens_details": {
+          "reasoning_tokens": 152
+        },
+        "total_tokens": 29039
+      },
+      "endedAt": "2026-10-03T03:08:28.892Z"
+    },
+    {
+      "id": "84212985-09a4-409a-bae0-89b5e1976192",
+      "case": "context-hold-04-restaurant-grease-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06858225,
+      "startedAt": "2026-10-03T03:08:28.932Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0022371800000000005,
+      "usage": {
+        "input_tokens": 20274,
+        "input_tokens_details": {
+          "cache_write_tokens": 15358,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 536,
+        "output_tokens_details": {
+          "reasoning_tokens": 492
+        },
+        "total_tokens": 20810
+      },
+      "endedAt": "2026-10-03T03:08:35.101Z"
+    },
+    {
+      "id": "391a45da-e3cc-4673-bc7a-ffbafdbb3c61",
+      "case": "context-hold-04-restaurant-grease-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000196636,
+      "startedAt": "2026-10-03T03:08:35.436Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0000024,
+      "usage": {
+        "prompt_tokens": 120,
+        "total_tokens": 120
+      },
+      "endedAt": "2026-10-03T03:08:35.599Z"
+    },
+    {
+      "id": "cf128869-6dcf-4a3d-ba3d-81ece93dff05",
+      "case": "context-hold-04-restaurant-grease-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10608235,
+      "startedAt": "2026-10-03T03:08:36.132Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.003662425,
+      "usage": {
+        "input_tokens": 27776,
+        "input_tokens_details": {
+          "cache_write_tokens": 27773,
+          "cached_tokens": 0
+        },
+        "output_tokens": 381,
+        "output_tokens_details": {
+          "reasoning_tokens": 148
+        },
+        "total_tokens": 28157
+      },
+      "endedAt": "2026-10-03T03:08:41.095Z"
+    },
+    {
+      "id": "3c9ab7c7-0a86-4444-83b6-5655c631eb52",
+      "case": "context-hold-04-restaurant-grease-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06187775000000001,
+      "startedAt": "2026-10-03T03:08:41.135Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001890055,
+      "usage": {
+        "input_tokens": 17705,
+        "input_tokens_details": {
+          "cache_write_tokens": 12789,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 484,
+        "output_tokens_details": {
+          "reasoning_tokens": 440
+        },
+        "total_tokens": 18189
+      },
+      "endedAt": "2026-10-03T03:08:46.216Z"
+    },
+    {
+      "id": "ea028c18-2fed-411a-86c6-ff0f00cbe4e0",
+      "case": "context-hold-04-restaurant-grease-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019529400000000002,
+      "startedAt": "2026-10-03T03:08:46.593Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000216,
+      "usage": {
+        "prompt_tokens": 108,
+        "total_tokens": 108
+      },
+      "endedAt": "2026-10-03T03:08:46.883Z"
+    },
+    {
+      "id": "d7ff5aa4-697e-432d-80db-294e291a62c2",
+      "case": "context-hold-04-restaurant-grease-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10519465000000001,
+      "startedAt": "2026-10-03T03:08:47.514Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.003670425,
+      "usage": {
+        "input_tokens": 27548,
+        "input_tokens_details": {
+          "cache_write_tokens": 27545,
+          "cached_tokens": 0
+        },
+        "output_tokens": 454,
+        "output_tokens_details": {
+          "reasoning_tokens": 138
+        },
+        "total_tokens": 28002
+      },
+      "endedAt": "2026-10-03T03:08:52.149Z"
+    },
+    {
+      "id": "ac164790-b01b-47be-bcbd-1d8872c69833",
+      "case": "context-hold-04-restaurant-grease-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06125515,
+      "startedAt": "2026-10-03T03:08:52.192Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0017062750000000002,
+      "usage": {
+        "input_tokens": 17538,
+        "input_tokens_details": {
+          "cache_write_tokens": 12575,
+          "cached_tokens": 4960
+        },
+        "output_tokens": 169,
+        "output_tokens_details": {
+          "reasoning_tokens": 125
+        },
+        "total_tokens": 17707
+      },
+      "endedAt": "2026-10-03T03:08:54.535Z"
+    },
+    {
+      "id": "41019c90-497c-4e72-a5f5-91b32a52843b",
+      "case": "context-hold-05-condensate-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08272660000000001,
+      "startedAt": "2026-10-03T03:08:55.704Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002103175,
+      "usage": {
+        "input_tokens": 15726,
+        "input_tokens_details": {
+          "cache_write_tokens": 15723,
+          "cached_tokens": 0
+        },
+        "output_tokens": 275,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 16001
+      },
+      "endedAt": "2026-10-03T03:08:58.627Z"
+    },
+    {
+      "id": "cf857ba1-3215-4f9a-bd06-c8eb567e66d1",
+      "case": "context-hold-05-condensate-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.051216000000000005,
+      "startedAt": "2026-10-03T03:08:58.667Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0014734299999999997,
+      "usage": {
+        "input_tokens": 12564,
+        "input_tokens_details": {
+          "cache_write_tokens": 7648,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 936,
+        "output_tokens_details": {
+          "reasoning_tokens": 781
+        },
+        "total_tokens": 13500
+      },
+      "endedAt": "2026-10-03T03:09:07.451Z"
+    },
+    {
+      "id": "ec05eda0-1859-4be1-a34f-d272e0d1c6f1",
+      "case": "context-hold-05-condensate-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0856295,
+      "startedAt": "2026-10-03T03:09:07.493Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001840625,
+      "usage": {
+        "input_tokens": 16852,
+        "input_tokens_details": {
+          "cache_write_tokens": 12329,
+          "cached_tokens": 4520
+        },
+        "output_tokens": 508,
+        "output_tokens_details": {
+          "reasoning_tokens": 168
+        },
+        "total_tokens": 17360
+      },
+      "endedAt": "2026-10-03T03:09:12.203Z"
+    },
+    {
+      "id": "a2e34094-7ce4-4202-8bdb-71b5fa643773",
+      "case": "context-hold-05-condensate-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.051708800000000006,
+      "startedAt": "2026-10-03T03:09:12.243Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00123868,
+      "usage": {
+        "input_tokens": 12774,
+        "input_tokens_details": {
+          "cache_write_tokens": 7858,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 414,
+        "output_tokens_details": {
+          "reasoning_tokens": 370
+        },
+        "total_tokens": 13188
+      },
+      "endedAt": "2026-10-03T03:09:16.647Z"
+    },
+    {
+      "id": "8e08a14f-f47d-46f5-aa9f-e072f40165f0",
+      "case": "context-hold-05-condensate-protection-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019687800000000002,
+      "startedAt": "2026-10-03T03:09:17.032Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000268,
+      "usage": {
+        "prompt_tokens": 134,
+        "total_tokens": 134
+      },
+      "endedAt": "2026-10-03T03:09:17.235Z"
+    },
+    {
+      "id": "0b9d7834-bd28-410d-9b25-dc6d30218623",
+      "case": "context-hold-05-condensate-protection-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09180105000000001,
+      "startedAt": "2026-10-03T03:09:17.907Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0027463,
+      "usage": {
+        "input_tokens": 19479,
+        "input_tokens_details": {
+          "cache_write_tokens": 19476,
+          "cached_tokens": 0
+        },
+        "output_tokens": 623,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20102
+      },
+      "endedAt": "2026-10-03T03:09:23.481Z"
+    },
+    {
+      "id": "e1ece6d4-a217-4ee7-8357-07b22ef90bc8",
+      "case": "context-hold-05-condensate-protection-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0668316,
+      "startedAt": "2026-10-03T03:09:23.525Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0025179300000000003,
+      "usage": {
+        "input_tokens": 19376,
+        "input_tokens_details": {
+          "cache_write_tokens": 14460,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1322,
+        "output_tokens_details": {
+          "reasoning_tokens": 1191
+        },
+        "total_tokens": 20698
+      },
+      "endedAt": "2026-10-03T03:09:38.835Z"
+    },
+    {
+      "id": "e7ae2745-f416-4586-9c51-22bf65583a4c",
+      "case": "context-hold-05-condensate-protection-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09820525000000001,
+      "startedAt": "2026-10-03T03:09:38.888Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00255888,
+      "usage": {
+        "input_tokens": 21869,
+        "input_tokens_details": {
+          "cache_write_tokens": 17108,
+          "cached_tokens": 4758
+        },
+        "output_tokens": 745,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 22614
+      },
+      "endedAt": "2026-10-03T03:09:44.972Z"
+    },
+    {
+      "id": "750770b9-f184-4d8f-9612-ced21d0b964c",
+      "case": "context-hold-05-condensate-protection-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06737225,
+      "startedAt": "2026-10-03T03:09:45.020Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0025549300000000004,
+      "usage": {
+        "input_tokens": 19608,
+        "input_tokens_details": {
+          "cache_write_tokens": 14692,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1338,
+        "output_tokens_details": {
+          "reasoning_tokens": 1166
+        },
+        "total_tokens": 20946
+      },
+      "endedAt": "2026-10-03T03:09:59.179Z"
+    },
+    {
+      "id": "65487cd5-40c1-4c9c-9927-43784018719b",
+      "case": "context-hold-05-condensate-protection-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00020248800000000002,
+      "startedAt": "2026-10-03T03:09:59.667Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0000036000000000000003,
+      "usage": {
+        "prompt_tokens": 180,
+        "total_tokens": 180
+      },
+      "endedAt": "2026-10-03T03:09:59.847Z"
+    },
+    {
+      "id": "471e1ea4-3309-4373-878f-b68c9f2ac03f",
+      "case": "context-hold-05-condensate-protection-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0837925,
+      "startedAt": "2026-10-03T03:10:00.399Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0023373,
+      "usage": {
+        "input_tokens": 15315,
+        "input_tokens_details": {
+          "cache_write_tokens": 15312,
+          "cached_tokens": 0
+        },
+        "output_tokens": 846,
+        "output_tokens_details": {
+          "reasoning_tokens": 327
+        },
+        "total_tokens": 16161
+      },
+      "endedAt": "2026-10-03T03:10:08.850Z"
+    },
+    {
+      "id": "1f0c0014-1648-477b-ba7c-c7ed71656ef1",
+      "case": "context-hold-05-condensate-protection-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.057607000000000005,
+      "startedAt": "2026-10-03T03:10:08.892Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0015611800000000001,
+      "usage": {
+        "input_tokens": 14770,
+        "input_tokens_details": {
+          "cache_write_tokens": 9854,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 560,
+        "output_tokens_details": {
+          "reasoning_tokens": 516
+        },
+        "total_tokens": 15330
+      },
+      "endedAt": "2026-10-03T03:10:15.770Z"
+    },
+    {
+      "id": "19a5b4f6-4aa2-4c51-b5e9-81193c366848",
+      "case": "context-hold-06-dryer-duct-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07927590000000001,
+      "startedAt": "2026-10-03T03:10:17.063Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002054175,
+      "usage": {
+        "input_tokens": 13546,
+        "input_tokens_details": {
+          "cache_write_tokens": 13543,
+          "cached_tokens": 0
+        },
+        "output_tokens": 722,
+        "output_tokens_details": {
+          "reasoning_tokens": 242
+        },
+        "total_tokens": 14268
+      },
+      "endedAt": "2026-10-03T03:10:24.709Z"
+    },
+    {
+      "id": "d5b96417-6757-40a8-b44b-50db8bed14be",
+      "case": "context-hold-06-dryer-duct-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05304860000000001,
+      "startedAt": "2026-10-03T03:10:24.755Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001587805,
+      "usage": {
+        "input_tokens": 12939,
+        "input_tokens_details": {
+          "cache_write_tokens": 8023,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1071,
+        "output_tokens_details": {
+          "reasoning_tokens": 1004
+        },
+        "total_tokens": 14010
+      },
+      "endedAt": "2026-10-03T03:10:35.394Z"
+    },
+    {
+      "id": "0f1fa78d-ee8d-431e-8fae-43909c232783",
+      "case": "context-hold-06-dryer-duct-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019978200000000002,
+      "startedAt": "2026-10-03T03:10:35.833Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000306,
+      "usage": {
+        "prompt_tokens": 153,
+        "total_tokens": 153
+      },
+      "endedAt": "2026-10-03T03:10:36.008Z"
+    },
+    {
+      "id": "33e7ddd4-c26e-4b60-81f7-7c98016fa96d",
+      "case": "context-hold-06-dryer-duct-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0851125,
+      "startedAt": "2026-10-03T03:10:36.506Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00217605,
+      "usage": {
+        "input_tokens": 16349,
+        "input_tokens_details": {
+          "cache_write_tokens": 16346,
+          "cached_tokens": 0
+        },
+        "output_tokens": 265,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 16614
+      },
+      "endedAt": "2026-10-03T03:10:39.703Z"
+    },
+    {
+      "id": "c8f54678-b4a3-4fc7-9e7f-b7c202826496",
+      "case": "context-hold-06-dryer-duct-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.054320200000000006,
+      "startedAt": "2026-10-03T03:10:39.725Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001292055,
+      "usage": {
+        "input_tokens": 13709,
+        "input_tokens_details": {
+          "cache_write_tokens": 8793,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 287,
+        "output_tokens_details": {
+          "reasoning_tokens": 243
+        },
+        "total_tokens": 13996
+      },
+      "endedAt": "2026-10-03T03:10:43.257Z"
+    },
+    {
+      "id": "50d41e7f-74e2-40cf-8f39-57fb020c2734",
+      "case": "context-hold-06-dryer-duct-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00020000200000000001,
+      "startedAt": "2026-10-03T03:10:43.744Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000314,
+      "usage": {
+        "prompt_tokens": 157,
+        "total_tokens": 157
+      },
+      "endedAt": "2026-10-03T03:10:43.933Z"
+    },
+    {
+      "id": "f4943b88-6bc1-4af7-bf93-bb4823cf79bc",
+      "case": "context-hold-06-dryer-duct-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08060415000000001,
+      "startedAt": "2026-10-03T03:10:44.460Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00203705,
+      "usage": {
+        "input_tokens": 14261,
+        "input_tokens_details": {
+          "cache_write_tokens": 14258,
+          "cached_tokens": 0
+        },
+        "output_tokens": 509,
+        "output_tokens_details": {
+          "reasoning_tokens": 171
+        },
+        "total_tokens": 14770
+      },
+      "endedAt": "2026-10-03T03:10:49.965Z"
+    },
+    {
+      "id": "28be903a-d9c6-40ea-a040-e339b9fe20a5",
+      "case": "context-hold-06-dryer-duct-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.051210500000000006,
+      "startedAt": "2026-10-03T03:10:50.076Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0011661799999999997,
+      "usage": {
+        "input_tokens": 12310,
+        "input_tokens_details": {
+          "cache_write_tokens": 7394,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 385,
+        "output_tokens_details": {
+          "reasoning_tokens": 341
+        },
+        "total_tokens": 12695
+      },
+      "endedAt": "2026-10-03T03:10:54.733Z"
+    },
+    {
+      "id": "999f23b7-1a4b-4e57-882e-e0f9821272b6",
+      "case": "context-hold-07-gas-shutoff-access-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0769076,
+      "startedAt": "2026-10-03T03:10:56.048Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001731175,
+      "usage": {
+        "input_tokens": 12350,
+        "input_tokens_details": {
+          "cache_write_tokens": 12347,
+          "cached_tokens": 0
+        },
+        "output_tokens": 375,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12725
+      },
+      "endedAt": "2026-10-03T03:10:59.590Z"
+    },
+    {
+      "id": "82512f9a-d006-4e60-b1be-b7040d3974d3",
+      "case": "context-hold-07-gas-shutoff-access-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05279835000000001,
+      "startedAt": "2026-10-03T03:10:59.637Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00184818,
+      "usage": {
+        "input_tokens": 12794,
+        "input_tokens_details": {
+          "cache_write_tokens": 7878,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1628,
+        "output_tokens_details": {
+          "reasoning_tokens": 1435
+        },
+        "total_tokens": 14422
+      },
+      "endedAt": "2026-10-03T03:11:18.156Z"
+    },
+    {
+      "id": "71d581ff-3dad-415c-b40d-b00809be6d83",
+      "case": "context-hold-07-gas-shutoff-access-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.07123985000000001,
+      "startedAt": "2026-10-03T03:11:18.201Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0014383,
+      "usage": {
+        "input_tokens": 10867,
+        "input_tokens_details": {
+          "cache_write_tokens": 10864,
+          "cached_tokens": 0
+        },
+        "output_tokens": 160,
+        "output_tokens_details": {
+          "reasoning_tokens": 108
+        },
+        "total_tokens": 11027
+      },
+      "endedAt": "2026-10-03T03:11:20.708Z"
+    },
+    {
+      "id": "5518e4f4-c1a8-4510-ba52-9a3b6f360564",
+      "case": "context-hold-07-gas-shutoff-access-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05147945,
+      "startedAt": "2026-10-03T03:11:20.754Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0013916799999999997,
+      "usage": {
+        "input_tokens": 12262,
+        "input_tokens_details": {
+          "cache_write_tokens": 7346,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 848,
+        "output_tokens_details": {
+          "reasoning_tokens": 804
+        },
+        "total_tokens": 13110
+      },
+      "endedAt": "2026-10-03T03:11:30.527Z"
+    },
+    {
+      "id": "beb620af-e432-4b4a-b153-b922d036a56b",
+      "case": "context-hold-07-gas-shutoff-access-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019808800000000002,
+      "startedAt": "2026-10-03T03:11:31.009Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0000028999999999999998,
+      "usage": {
+        "prompt_tokens": 145,
+        "total_tokens": 145
+      },
+      "endedAt": "2026-10-03T03:11:31.336Z"
+    },
+    {
+      "id": "e78eee5c-0b41-4232-a715-0b4018f0e8c6",
+      "case": "context-hold-07-gas-shutoff-access-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0839608,
+      "startedAt": "2026-10-03T03:11:31.907Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00233905,
+      "usage": {
+        "input_tokens": 16485,
+        "input_tokens_details": {
+          "cache_write_tokens": 16482,
+          "cached_tokens": 0
+        },
+        "output_tokens": 557,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17042
+      },
+      "endedAt": "2026-10-03T03:11:37.171Z"
+    },
+    {
+      "id": "1680a0d8-18f5-4089-8e7f-204fa6ec1f8d",
+      "case": "context-hold-07-gas-shutoff-access-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05584535000000001,
+      "startedAt": "2026-10-03T03:11:37.216Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00199643,
+      "usage": {
+        "input_tokens": 14496,
+        "input_tokens_details": {
+          "cache_write_tokens": 9580,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1499,
+        "output_tokens_details": {
+          "reasoning_tokens": 1283
+        },
+        "total_tokens": 15995
+      },
+      "endedAt": "2026-10-03T03:11:55.646Z"
+    },
+    {
+      "id": "7cd909af-8476-49cf-a36b-d6b0bbbdb86e",
+      "case": "context-hold-07-gas-shutoff-access-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09044695000000001,
+      "startedAt": "2026-10-03T03:11:55.691Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002087205,
+      "usage": {
+        "input_tokens": 18956,
+        "input_tokens_details": {
+          "cache_write_tokens": 14425,
+          "cached_tokens": 4528
+        },
+        "output_tokens": 477,
+        "output_tokens_details": {
+          "reasoning_tokens": 170
+        },
+        "total_tokens": 19433
+      },
+      "endedAt": "2026-10-03T03:12:00.998Z"
+    },
+    {
+      "id": "27a72287-2434-4788-be41-5fc8163cf180",
+      "case": "context-hold-07-gas-shutoff-access-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05419645000000001,
+      "startedAt": "2026-10-03T03:12:01.040Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0014380550000000001,
+      "usage": {
+        "input_tokens": 13829,
+        "input_tokens_details": {
+          "cache_write_tokens": 8913,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 549,
+        "output_tokens_details": {
+          "reasoning_tokens": 505
+        },
+        "total_tokens": 14378
+      },
+      "endedAt": "2026-10-03T03:12:08.512Z"
+    },
+    {
+      "id": "98ddbb5b-921d-4622-b366-c4af73667e2b",
+      "case": "context-hold-07-gas-shutoff-access-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019894600000000003,
+      "startedAt": "2026-10-03T03:12:09.016Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.000003,
+      "usage": {
+        "prompt_tokens": 150,
+        "total_tokens": 150
+      },
+      "endedAt": "2026-10-03T03:12:09.287Z"
+    },
+    {
+      "id": "eb0a1933-b2ba-4fb1-844e-8e6dea49b417",
+      "case": "context-hold-07-gas-shutoff-access-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08170525,
+      "startedAt": "2026-10-03T03:12:09.865Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002067925,
+      "usage": {
+        "input_tokens": 14536,
+        "input_tokens_details": {
+          "cache_write_tokens": 14533,
+          "cached_tokens": 0
+        },
+        "output_tokens": 502,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15038
+      },
+      "endedAt": "2026-10-03T03:12:14.395Z"
+    },
+    {
+      "id": "4de1acfe-2a3c-44e1-87b1-d22f710e172b",
+      "case": "context-hold-07-gas-shutoff-access-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.055893750000000006,
+      "startedAt": "2026-10-03T03:12:14.441Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0014271800000000001,
+      "usage": {
+        "input_tokens": 14190,
+        "input_tokens_details": {
+          "cache_write_tokens": 9274,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 437,
+        "output_tokens_details": {
+          "reasoning_tokens": 393
+        },
+        "total_tokens": 14627
+      },
+      "endedAt": "2026-10-03T03:12:19.261Z"
+    },
+    {
+      "id": "57a71c10-c8de-4378-bb9f-ff61ada871c6",
+      "case": "context-hold-08-gas-restoration-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0781605,
+      "startedAt": "2026-10-03T03:12:20.813Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001798925,
+      "usage": {
+        "input_tokens": 12892,
+        "input_tokens_details": {
+          "cache_write_tokens": 12889,
+          "cached_tokens": 0
+        },
+        "output_tokens": 375,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 13267
+      },
+      "endedAt": "2026-10-03T03:12:24.609Z"
+    },
+    {
+      "id": "71982986-06ca-4f9d-a406-52534a376d5c",
+      "case": "context-hold-08-gas-restoration-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05371850000000001,
+      "startedAt": "2026-10-03T03:12:24.636Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0011878050000000001,
+      "usage": {
+        "input_tokens": 13075,
+        "input_tokens_details": {
+          "cache_write_tokens": 8159,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 237,
+        "output_tokens_details": {
+          "reasoning_tokens": 193
+        },
+        "total_tokens": 13312
+      },
+      "endedAt": "2026-10-03T03:12:28.257Z"
+    },
+    {
+      "id": "5f7ed5c2-1245-42c7-9c64-9070440e6a7c",
+      "case": "context-hold-08-gas-restoration-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019747200000000005,
+      "startedAt": "2026-10-03T03:12:28.761Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0000027600000000000003,
+      "usage": {
+        "prompt_tokens": 138,
+        "total_tokens": 138
+      },
+      "endedAt": "2026-10-03T03:12:28.979Z"
+    },
+    {
+      "id": "c86035dd-cf53-40e6-aeb5-7c94bbadf519",
+      "case": "context-hold-08-gas-restoration-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07672555,
+      "startedAt": "2026-10-03T03:12:29.514Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0017592999999999999,
+      "usage": {
+        "input_tokens": 12175,
+        "input_tokens_details": {
+          "cache_write_tokens": 12172,
+          "cached_tokens": 0
+        },
+        "output_tokens": 475,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12650
+      },
+      "endedAt": "2026-10-03T03:12:34.678Z"
+    },
+    {
+      "id": "87e075ad-75a8-4c5e-a9ec-9977338f2e78",
+      "case": "context-hold-08-gas-restoration-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05338465,
+      "startedAt": "2026-10-03T03:12:34.727Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0013385550000000002,
+      "usage": {
+        "input_tokens": 12905,
+        "input_tokens_details": {
+          "cache_write_tokens": 7989,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 581,
+        "output_tokens_details": {
+          "reasoning_tokens": 537
+        },
+        "total_tokens": 13486
+      },
+      "endedAt": "2026-10-03T03:12:42.395Z"
+    },
+    {
+      "id": "b658e7d6-4393-43eb-a062-67fe110765f9",
+      "case": "context-hold-08-gas-restoration-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000197736,
+      "startedAt": "2026-10-03T03:12:42.966Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000278,
+      "usage": {
+        "prompt_tokens": 139,
+        "total_tokens": 139
+      },
+      "endedAt": "2026-10-03T03:12:43.199Z"
+    },
+    {
+      "id": "e587532e-af77-4579-864b-e0a03a3faaf4",
+      "case": "context-hold-08-gas-restoration-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0810821,
+      "startedAt": "2026-10-03T03:12:43.830Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0020644250000000004,
+      "usage": {
+        "input_tokens": 14096,
+        "input_tokens_details": {
+          "cache_write_tokens": 14093,
+          "cached_tokens": 0
+        },
+        "output_tokens": 605,
+        "output_tokens_details": {
+          "reasoning_tokens": 188
+        },
+        "total_tokens": 14701
+      },
+      "endedAt": "2026-10-03T03:12:49.728Z"
+    },
+    {
+      "id": "6b6bce6d-b09a-409b-ba8a-bc128176077e",
+      "case": "context-hold-08-gas-restoration-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0554114,
+      "startedAt": "2026-10-03T03:12:49.778Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00219343,
+      "usage": {
+        "input_tokens": 13844,
+        "input_tokens_details": {
+          "cache_write_tokens": 8928,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 2056,
+        "output_tokens_details": {
+          "reasoning_tokens": 1900
+        },
+        "total_tokens": 15900
+      },
+      "endedAt": "2026-10-03T03:13:10.040Z"
+    },
+    {
+      "id": "ab703375-b996-4fff-963b-63938341a56f",
+      "case": "context-hold-08-gas-restoration-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.07550895,
+      "startedAt": "2026-10-03T03:13:10.086Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0016323,
+      "usage": {
+        "input_tokens": 12583,
+        "input_tokens_details": {
+          "cache_write_tokens": 12580,
+          "cached_tokens": 0
+        },
+        "output_tokens": 119,
+        "output_tokens_details": {
+          "reasoning_tokens": 69
+        },
+        "total_tokens": 12702
+      },
+      "endedAt": "2026-10-03T03:13:12.398Z"
+    },
+    {
+      "id": "46eb937f-3543-4497-b3b5-2a931801fa78",
+      "case": "context-hold-08-gas-restoration-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.055554400000000004,
+      "startedAt": "2026-10-03T03:13:12.420Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00157143,
+      "usage": {
+        "input_tokens": 13924,
+        "input_tokens_details": {
+          "cache_write_tokens": 9008,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 792,
+        "output_tokens_details": {
+          "reasoning_tokens": 748
+        },
+        "total_tokens": 14716
+      },
+      "endedAt": "2026-10-03T03:13:20.905Z"
+    },
+    {
+      "id": "d33cc80b-376f-400f-a2c2-3b6f918bd97c",
+      "case": "context-hold-09-rooftop-access-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08846365,
+      "startedAt": "2026-10-03T03:13:22.533Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002322925,
+      "usage": {
+        "input_tokens": 16548,
+        "input_tokens_details": {
+          "cache_write_tokens": 16545,
+          "cached_tokens": 0
+        },
+        "output_tokens": 509,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17057
+      },
+      "endedAt": "2026-10-03T03:13:27.690Z"
+    },
+    {
+      "id": "48f91ab7-e6b8-42ad-b18d-6737182ce2b9",
+      "case": "context-hold-09-rooftop-access-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09394770000000001,
+      "startedAt": "2026-10-03T03:13:27.911Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00206144,
+      "usage": {
+        "input_tokens": 18620,
+        "input_tokens_details": {
+          "cache_write_tokens": 13978,
+          "cached_tokens": 4639
+        },
+        "output_tokens": 535,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 19155
+      },
+      "endedAt": "2026-10-03T03:13:32.727Z"
+    },
+    {
+      "id": "b4174d8f-3a4c-4d6d-b36e-c453bd751a80",
+      "case": "context-hold-09-rooftop-access-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000199342,
+      "startedAt": "2026-10-03T03:13:33.370Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000302,
+      "usage": {
+        "prompt_tokens": 151,
+        "total_tokens": 151
+      },
+      "endedAt": "2026-10-03T03:13:33.617Z"
+    },
+    {
+      "id": "451daf13-46e3-4160-aec4-02dcc92b02a0",
+      "case": "context-hold-09-rooftop-access-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0974303,
+      "startedAt": "2026-10-03T03:13:34.218Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002731175,
+      "usage": {
+        "input_tokens": 20574,
+        "input_tokens_details": {
+          "cache_write_tokens": 20571,
+          "cached_tokens": 0
+        },
+        "output_tokens": 319,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20893
+      },
+      "endedAt": "2026-10-03T03:13:37.554Z"
+    },
+    {
+      "id": "470fd186-0d06-4e32-bd95-8cc5ff64a5b5",
+      "case": "context-hold-09-rooftop-access-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07086640000000001,
+      "startedAt": "2026-10-03T03:13:37.724Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0028658000000000004,
+      "usage": {
+        "input_tokens": 19843,
+        "input_tokens_details": {
+          "cache_write_tokens": 19840,
+          "cached_tokens": 0
+        },
+        "output_tokens": 771,
+        "output_tokens_details": {
+          "reasoning_tokens": 727
+        },
+        "total_tokens": 20614
+      },
+      "endedAt": "2026-10-03T03:13:46.662Z"
+    },
+    {
+      "id": "469c15c8-6e08-4ec4-ac76-ab2704ba12cc",
+      "case": "context-hold-09-rooftop-access-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000199342,
+      "startedAt": "2026-10-03T03:13:47.246Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000308,
+      "usage": {
+        "prompt_tokens": 154,
+        "total_tokens": 154
+      },
+      "endedAt": "2026-10-03T03:13:47.588Z"
+    },
+    {
+      "id": "062f66af-0baf-44c1-8a97-eca98553b046",
+      "case": "context-hold-09-rooftop-access-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10448900000000001,
+      "startedAt": "2026-10-03T03:13:48.325Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0029880500000000003,
+      "usage": {
+        "input_tokens": 22681,
+        "input_tokens_details": {
+          "cache_write_tokens": 22678,
+          "cached_tokens": 0
+        },
+        "output_tokens": 306,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 22987
+      },
+      "endedAt": "2026-10-03T03:13:51.565Z"
+    },
+    {
+      "id": "b3d03c4d-ff1e-4f9e-a72b-f0a0e9d2e9ca",
+      "case": "context-hold-09-rooftop-access-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07839370000000001,
+      "startedAt": "2026-10-03T03:13:51.843Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00248458,
+      "usage": {
+        "input_tokens": 22217,
+        "input_tokens_details": {
+          "cache_write_tokens": 17236,
+          "cached_tokens": 4978
+        },
+        "output_tokens": 560,
+        "output_tokens_details": {
+          "reasoning_tokens": 516
+        },
+        "total_tokens": 22777
+      },
+      "endedAt": "2026-10-03T03:13:57.632Z"
+    },
+    {
+      "id": "b8303eb2-264e-4b46-96de-57609da5d0cb",
+      "case": "context-hold-10-emergency-light-tests-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10365135,
+      "startedAt": "2026-10-03T03:13:59.889Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0034643,
+      "usage": {
+        "input_tokens": 25083,
+        "input_tokens_details": {
+          "cache_write_tokens": 25080,
+          "cached_tokens": 0
+        },
+        "output_tokens": 658,
+        "output_tokens_details": {
+          "reasoning_tokens": 229
+        },
+        "total_tokens": 25741
+      },
+      "endedAt": "2026-10-03T03:14:06.231Z"
+    },
+    {
+      "id": "05e61ca4-f019-4f40-87e9-1fbc1287a3ea",
+      "case": "context-hold-10-emergency-light-tests-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07252410000000001,
+      "startedAt": "2026-10-03T03:14:06.281Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002808055,
+      "usage": {
+        "input_tokens": 21261,
+        "input_tokens_details": {
+          "cache_write_tokens": 16345,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 1431,
+        "output_tokens_details": {
+          "reasoning_tokens": 1265
+        },
+        "total_tokens": 22692
+      },
+      "endedAt": "2026-10-03T03:14:22.764Z"
+    },
+    {
+      "id": "d08cae92-f785-4640-ac30-f88286f8bbcb",
+      "case": "context-hold-10-emergency-light-tests-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11264715000000002,
+      "startedAt": "2026-10-03T03:14:22.805Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0032774899999999997,
+      "usage": {
+        "input_tokens": 28473,
+        "input_tokens_details": {
+          "cache_write_tokens": 23926,
+          "cached_tokens": 4544
+        },
+        "output_tokens": 482,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 28955
+      },
+      "endedAt": "2026-10-03T03:14:26.893Z"
+    },
+    {
+      "id": "945f1a2d-dd02-4b4f-840f-af41253fadcc",
+      "case": "context-hold-10-emergency-light-tests-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07304,
+      "startedAt": "2026-10-03T03:14:26.945Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0023379299999999998,
+      "usage": {
+        "input_tokens": 21472,
+        "input_tokens_details": {
+          "cache_write_tokens": 16556,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 438,
+        "output_tokens_details": {
+          "reasoning_tokens": 394
+        },
+        "total_tokens": 21910
+      },
+      "endedAt": "2026-10-03T03:14:33.032Z"
+    },
+    {
+      "id": "716c6f08-0c2a-49a1-9ce1-f600ee2bbbcf",
+      "case": "context-hold-10-emergency-light-tests-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019210400000000004,
+      "startedAt": "2026-10-03T03:14:33.663Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0000017,
+      "usage": {
+        "prompt_tokens": 85,
+        "total_tokens": 85
+      },
+      "endedAt": "2026-10-03T03:14:33.874Z"
+    },
+    {
+      "id": "e010d7c4-f938-4826-b9e2-9ce724b83c77",
+      "case": "context-hold-10-emergency-light-tests-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09515550000000002,
+      "startedAt": "2026-10-03T03:14:35.087Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002641675,
+      "usage": {
+        "input_tokens": 19514,
+        "input_tokens_details": {
+          "cache_write_tokens": 19511,
+          "cached_tokens": 0
+        },
+        "output_tokens": 405,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 19919
+      },
+      "endedAt": "2026-10-03T03:14:38.918Z"
+    },
+    {
+      "id": "087b2aba-4be7-42e2-bf28-f9e61c181ae8",
+      "case": "context-hold-10-emergency-light-tests-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07388920000000002,
+      "startedAt": "2026-10-03T03:14:38.968Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002185305,
+      "usage": {
+        "input_tokens": 20927,
+        "input_tokens_details": {
+          "cache_write_tokens": 16011,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 269,
+        "output_tokens_details": {
+          "reasoning_tokens": 225
+        },
+        "total_tokens": 21196
+      },
+      "endedAt": "2026-10-03T03:14:42.547Z"
+    },
+    {
+      "id": "4296430e-52c6-404f-8bac-4713d8f0bd29",
+      "case": "context-hold-10-emergency-light-tests-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018761600000000001,
+      "startedAt": "2026-10-03T03:14:43.248Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 9.400000000000001e-7,
+      "usage": {
+        "prompt_tokens": 47,
+        "total_tokens": 47
+      },
+      "endedAt": "2026-10-03T03:14:43.468Z"
+    },
+    {
+      "id": "774c6fc1-20cf-48a0-b96b-b4040580d8da",
+      "case": "context-hold-10-emergency-light-tests-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1013936,
+      "startedAt": "2026-10-03T03:14:44.093Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0030973000000000003,
+      "usage": {
+        "input_tokens": 22763,
+        "input_tokens_details": {
+          "cache_write_tokens": 22760,
+          "cached_tokens": 0
+        },
+        "output_tokens": 504,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 23267
+      },
+      "endedAt": "2026-10-03T03:14:49.146Z"
+    },
+    {
+      "id": "f0b23f19-3ef7-4777-938b-02a25bfc36fa",
+      "case": "context-hold-10-emergency-light-tests-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0765523,
+      "startedAt": "2026-10-03T03:14:49.187Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0024765549999999996,
+      "usage": {
+        "input_tokens": 21865,
+        "input_tokens_details": {
+          "cache_write_tokens": 16949,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 617,
+        "output_tokens_details": {
+          "reasoning_tokens": 573
+        },
+        "total_tokens": 22482
+      },
+      "endedAt": "2026-10-03T03:14:55.910Z"
+    },
+    {
+      "id": "ff1a2d14-3036-4811-90c6-fb345c409d52",
+      "case": "context-hold-11-office-loading-table-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0988856,
+      "startedAt": "2026-10-03T03:14:57.677Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.002904425,
+      "usage": {
+        "input_tokens": 20840,
+        "input_tokens_details": {
+          "cache_write_tokens": 20837,
+          "cached_tokens": 0
+        },
+        "output_tokens": 599,
+        "output_tokens_details": {
+          "reasoning_tokens": 265
+        },
+        "total_tokens": 21439
+      },
+      "endedAt": "2026-10-03T03:15:02.979Z"
+    },
+    {
+      "id": "b1937d59-f038-4eb4-b1af-4ea4671cde60",
+      "case": "context-hold-11-office-loading-table-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1035078,
+      "startedAt": "2026-10-03T03:15:03.189Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0025335949999999996,
+      "usage": {
+        "input_tokens": 22878,
+        "input_tokens_details": {
+          "cache_write_tokens": 18083,
+          "cached_tokens": 4792
+        },
+        "output_tokens": 450,
+        "output_tokens_details": {
+          "reasoning_tokens": 118
+        },
+        "total_tokens": 23328
+      },
+      "endedAt": "2026-10-03T03:15:07.372Z"
+    },
+    {
+      "id": "682f09c5-b874-4949-8c18-63bf78c4758f",
+      "case": "context-hold-11-office-loading-table-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019791200000000004,
+      "startedAt": "2026-10-03T03:15:08.175Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000284,
+      "usage": {
+        "prompt_tokens": 142,
+        "total_tokens": 142
+      },
+      "endedAt": "2026-10-03T03:15:08.398Z"
+    },
+    {
+      "id": "72afccca-18cd-4bbf-a2d1-a0242bd477a9",
+      "case": "context-hold-11-office-loading-table-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.12827705000000003,
+      "startedAt": "2026-10-03T03:15:09.028Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.004905425000000001,
+      "usage": {
+        "input_tokens": 37472,
+        "input_tokens_details": {
+          "cache_write_tokens": 37469,
+          "cached_tokens": 0
+        },
+        "output_tokens": 443,
+        "output_tokens_details": {
+          "reasoning_tokens": 167
+        },
+        "total_tokens": 37915
+      },
+      "endedAt": "2026-10-03T03:15:12.910Z"
+    },
+    {
+      "id": "50337e6d-4ce3-4588-9945-174e401e51b5",
+      "case": "context-hold-11-office-loading-table-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1327106,
+      "startedAt": "2026-10-03T03:15:12.989Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00477126,
+      "usage": {
+        "input_tokens": 39428,
+        "input_tokens_details": {
+          "cache_write_tokens": 34654,
+          "cached_tokens": 4771
+        },
+        "output_tokens": 783,
+        "output_tokens_details": {
+          "reasoning_tokens": 219
+        },
+        "total_tokens": 40211
+      },
+      "endedAt": "2026-10-03T03:15:19.726Z"
+    },
+    {
+      "id": "1a65f3cc-a84b-4c9c-b492-1983adfb1d8d",
+      "case": "context-hold-11-office-loading-table-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00020121200000000004,
+      "startedAt": "2026-10-03T03:15:20.617Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000344,
+      "usage": {
+        "prompt_tokens": 172,
+        "total_tokens": 172
+      },
+      "endedAt": "2026-10-03T03:15:20.806Z"
+    },
+    {
+      "id": "37b34ac8-4041-4821-9dc9-9928b0bb48ec",
+      "case": "context-hold-11-office-loading-table-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10361285,
+      "startedAt": "2026-10-03T03:15:21.390Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0030010500000000003,
+      "usage": {
+        "input_tokens": 22693,
+        "input_tokens_details": {
+          "cache_write_tokens": 22690,
+          "cached_tokens": 0
+        },
+        "output_tokens": 329,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 23022
+      },
+      "endedAt": "2026-10-03T03:15:25.611Z"
+    },
+    {
+      "id": "8c9cc2fa-c638-46e8-a00d-044f113bf80a",
+      "case": "context-hold-11-office-loading-table-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10836485000000001,
+      "startedAt": "2026-10-03T03:15:25.708Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0029765349999999998,
+      "usage": {
+        "input_tokens": 24776,
+        "input_tokens_details": {
+          "cache_write_tokens": 19987,
+          "cached_tokens": 4786
+        },
+        "output_tokens": 860,
+        "output_tokens_details": {
+          "reasoning_tokens": 195
+        },
+        "total_tokens": 25636
+      },
+      "endedAt": "2026-10-03T03:15:36.003Z"
+    },
+    {
+      "id": "d5725336-c39e-4a2c-bac3-c58a85c982e0",
+      "case": "context-hold-12-residential-parking-location-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07641865,
+      "startedAt": "2026-10-03T03:15:37.850Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0017779249999999999,
+      "usage": {
+        "input_tokens": 12204,
+        "input_tokens_details": {
+          "cache_write_tokens": 12201,
+          "cached_tokens": 0
+        },
+        "output_tokens": 505,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12709
+      },
+      "endedAt": "2026-10-03T03:15:43.249Z"
+    },
+    {
+      "id": "5c1e4a3f-1e1f-4d04-8f30-34476050f98c",
+      "case": "context-hold-12-residential-parking-location-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0533599,
+      "startedAt": "2026-10-03T03:15:43.335Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0018236749999999999,
+      "usage": {
+        "input_tokens": 13474,
+        "input_tokens_details": {
+          "cache_write_tokens": 13471,
+          "cached_tokens": 0
+        },
+        "output_tokens": 279,
+        "output_tokens_details": {
+          "reasoning_tokens": 235
+        },
+        "total_tokens": 13753
+      },
+      "endedAt": "2026-10-03T03:15:46.959Z"
+    },
+    {
+      "id": "d9930fdb-2cad-4b7b-b8c1-d25e2d08a36f",
+      "case": "context-hold-12-residential-parking-location-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019987000000000002,
+      "startedAt": "2026-10-03T03:15:47.766Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000312,
+      "usage": {
+        "prompt_tokens": 156,
+        "total_tokens": 156
+      },
+      "endedAt": "2026-10-03T03:15:48.181Z"
+    },
+    {
+      "id": "80487e3e-16fd-4f8b-a468-3f3b37d8e7cf",
+      "case": "context-hold-12-residential-parking-location-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08026095000000001,
+      "startedAt": "2026-10-03T03:15:48.711Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.001920675,
+      "usage": {
+        "input_tokens": 13574,
+        "input_tokens_details": {
+          "cache_write_tokens": 13571,
+          "cached_tokens": 0
+        },
+        "output_tokens": 448,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 14022
+      },
+      "endedAt": "2026-10-03T03:15:54.097Z"
+    },
+    {
+      "id": "4d0cc237-cf85-44bf-bf6f-45a1cff5d093",
+      "case": "context-hold-12-residential-parking-location-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05644155,
+      "startedAt": "2026-10-03T03:15:54.205Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00199556,
+      "usage": {
+        "input_tokens": 14546,
+        "input_tokens_details": {
+          "cache_write_tokens": 12242,
+          "cached_tokens": 2301
+        },
+        "output_tokens": 884,
+        "output_tokens_details": {
+          "reasoning_tokens": 745
+        },
+        "total_tokens": 15430
+      },
+      "endedAt": "2026-10-03T03:16:03.751Z"
+    },
+    {
+      "id": "70d8301b-437f-4612-b1e1-2d727142970d",
+      "case": "context-hold-12-residential-parking-location-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.08342455,
+      "startedAt": "2026-10-03T03:16:03.804Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0019601749999999998,
+      "usage": {
+        "input_tokens": 15162,
+        "input_tokens_details": {
+          "cache_write_tokens": 15159,
+          "cached_tokens": 0
+        },
+        "output_tokens": 130,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15292
+      },
+      "endedAt": "2026-10-03T03:16:05.415Z"
+    },
+    {
+      "id": "785a41d6-19d7-416a-b80d-0f1544854fe9",
+      "case": "context-hold-12-residential-parking-location-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05423055,
+      "startedAt": "2026-10-03T03:16:05.488Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0016845599999999999,
+      "usage": {
+        "input_tokens": 13682,
+        "input_tokens_details": {
+          "cache_write_tokens": 11378,
+          "cached_tokens": 2301
+        },
+        "output_tokens": 478,
+        "output_tokens_details": {
+          "reasoning_tokens": 363
+        },
+        "total_tokens": 14160
+      },
+      "endedAt": "2026-10-03T03:16:11.896Z"
+    },
+    {
+      "id": "20664765-af6d-4a23-963c-19a76ae2b625",
+      "case": "context-hold-12-residential-parking-location-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000198836,
+      "startedAt": "2026-10-03T03:16:12.684Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.00000302,
+      "usage": {
+        "prompt_tokens": 151,
+        "total_tokens": 151
+      },
+      "endedAt": "2026-10-03T03:16:12.914Z"
+    },
+    {
+      "id": "ea647f1b-62c4-49e7-843b-fb35bd00f182",
+      "case": "context-hold-12-residential-parking-location-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08096,
+      "startedAt": "2026-10-03T03:16:13.433Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0019843,
+      "usage": {
+        "input_tokens": 13875,
+        "input_tokens_details": {
+          "cache_write_tokens": 13872,
+          "cached_tokens": 0
+        },
+        "output_tokens": 500,
+        "output_tokens_details": {
+          "reasoning_tokens": 191
+        },
+        "total_tokens": 14375
+      },
+      "endedAt": "2026-10-03T03:16:18.333Z"
+    },
+    {
+      "id": "bf10b8a5-c1ef-4bfb-955c-85c619170004",
+      "case": "context-hold-12-residential-parking-location-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05446100000000001,
+      "startedAt": "2026-10-03T03:16:18.425Z",
+      "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+      "costUSD": 0.0017034349999999999,
+      "usage": {
+        "input_tokens": 13809,
+        "input_tokens_details": {
+          "cache_write_tokens": 11505,
+          "cached_tokens": 2301
+        },
+        "output_tokens": 484,
+        "output_tokens_details": {
+          "reasoning_tokens": 440
+        },
+        "total_tokens": 14293
+      },
+      "endedAt": "2026-10-03T03:16:25.211Z"
     }
   ]
 }

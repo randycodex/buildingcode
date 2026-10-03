@@ -1,0 +1,9 @@
+{
+  "verifiedAt": "2026-10-03T03:24:06.977Z",
+  "candidateFreezeSHA256": "e1fddf6683cb9ccca43d2ae39e625a004e1f2f4b6b972e7381ef58d114e6978c",
+  "sourceFilesChecked": 137,
+  "fixtureFilesChecked": 7,
+  "mismatches": [],
+  "sourceEditsAfterFreeze": 0,
+  "scope": "Frozen pre-retuning candidate; file hashes do not alone grade delivered answers."
+}

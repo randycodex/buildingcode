@@ -1,0 +1,1390 @@
+{
+  "grading": "Source-linked keys reviewed and frozen before paid output. No product accuracy claim.",
+  "keys": [
+    {
+      "id": "context-dev-01-door-landings-1",
+      "split": "development",
+      "familyID": "door-landings",
+      "codeFamily": "BC",
+      "question": "Under the 2022 NYC building rules, an office door has a landing only 36 inches long in the direction of travel. Does that length meet the ordinary minimum?",
+      "expectedAnswer": "No. The ordinary door-landing length in the direction of travel is at least 44 inches. Width and door-swing conditions remain separate.",
+      "decisiveReferences": [
+        "BC 1010.1.6"
+      ],
+      "sourceReferences": [
+        "BC 1010.1.6"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1010.1.6": "d0a6ca6d5cc6b49451473f93aa86f70f5c7de162000e945286e821ff1c8d9bec"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-01-door-landings-2",
+      "split": "development",
+      "familyID": "door-landings",
+      "codeFamily": "BC",
+      "question": "Change the situation to a door wholly within an individual apartment. Is a 36-inch landing length allowed for that situation?",
+      "expectedAnswer": "Yes for this length condition. Within individual Group R-2 units the landing length need not exceed 36 inches. This does not waive width or door-swing requirements.",
+      "decisiveReferences": [
+        "BC 1010.1.6"
+      ],
+      "sourceReferences": [
+        "BC 1010.1.6"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1010.1.6": "d0a6ca6d5cc6b49451473f93aa86f70f5c7de162000e945286e821ff1c8d9bec"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-02-bathtub-outlets-1",
+      "split": "development",
+      "familyID": "bathtub-outlets",
+      "codeFamily": "PC",
+      "question": "For a new NYC bathtub, the waste outlet and overflow connect to 1-inch waste tubing. Is that size enough?",
+      "expectedAnswer": "No. Bathtub waste and overflow outlets must connect to tubing or piping at least 1.5 inches in diameter.",
+      "decisiveReferences": [
+        "PC 407.2"
+      ],
+      "sourceReferences": [
+        "PC 407.1",
+        "PC 407.2"
+      ],
+      "sourceExcerptHashes": {
+        "PC 407.1": "480c0c610ccdc857e77dbe66a4f309164b8efdfbb04247e7006baffca55f3b6e",
+        "PC 407.2": "3cd5c55aca833f292e49ee5c06fe842dd128f0c765e68333cdd60e22f2bfa4a3"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-02-bathtub-outlets-2",
+      "split": "development",
+      "familyID": "bathtub-outlets",
+      "codeFamily": "PC",
+      "question": "If we enlarge the tubing to 1.5 inches, can we leave out the overflow outlet?",
+      "expectedAnswer": "No. Both a waste outlet and an overflow outlet are required; the waste outlet also needs a watertight stopper.",
+      "decisiveReferences": [
+        "PC 407.2"
+      ],
+      "sourceReferences": [
+        "PC 407.1",
+        "PC 407.2"
+      ],
+      "sourceExcerptHashes": {
+        "PC 407.1": "480c0c610ccdc857e77dbe66a4f309164b8efdfbb04247e7006baffca55f3b6e",
+        "PC 407.2": "3cd5c55aca833f292e49ee5c06fe842dd128f0c765e68333cdd60e22f2bfa4a3"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-03-bathroom-oil-appliance-1",
+      "split": "development",
+      "familyID": "bathroom-oil-appliance",
+      "codeFamily": "MC",
+      "question": "Under the 2022 NYC mechanical rules, can an ordinary fuel-oil-fired appliance that takes combustion air from the bathroom be installed in that bathroom?",
+      "expectedAnswer": "No. Bathrooms are prohibited appliance locations unless an enumerated exception is met; the described ordinary bathroom-air appliance does not meet one.",
+      "decisiveReferences": [
+        "MC 303.3"
+      ],
+      "sourceReferences": [
+        "MC 303.1",
+        "MC 303.3"
+      ],
+      "sourceExcerptHashes": {
+        "MC 303.1": "967f2d87ff572bbe24dcdb6360e2c89e18411ebd26a8806498a11db39058e2d4",
+        "MC 303.3": "2e9c81d4881639c6f130a4c2781e28f65ff145e9f908cf2d1c1213d4cc8957f8"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-03-bathroom-oil-appliance-2",
+      "split": "development",
+      "familyID": "bathroom-oil-appliance",
+      "codeFamily": "MC",
+      "question": "Suppose it is instead a direct-vent appliance taking all combustion air directly outdoors, listed for the installation and installed according to the manufacturer. Does the bathroom location exception permit it?",
+      "expectedAnswer": "Yes under the stated direct-vent exception in a room not used for sleeping. All combustion air must come directly outdoors, and listing and manufacturer conditions must be met.",
+      "decisiveReferences": [
+        "MC 303.3"
+      ],
+      "sourceReferences": [
+        "MC 303.1",
+        "MC 303.3"
+      ],
+      "sourceExcerptHashes": {
+        "MC 303.1": "967f2d87ff572bbe24dcdb6360e2c89e18411ebd26a8806498a11db39058e2d4",
+        "MC 303.3": "2e9c81d4881639c6f130a4c2781e28f65ff145e9f908cf2d1c1213d4cc8957f8"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-04-gas-meter-valve-1",
+      "split": "development",
+      "familyID": "gas-meter-valve",
+      "codeFamily": "FGC",
+      "question": "For a new NYC natural-gas meter, may its shutoff valve be located only on the outlet side of the meter?",
+      "expectedAnswer": "No. Every meter must have a shutoff valve on the supply side.",
+      "decisiveReferences": [
+        "FGC 409.2"
+      ],
+      "sourceReferences": [
+        "FGC 409.1",
+        "FGC 409.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 409.1": "f38ce4be55a85544e7c06084ea8f611648c7e7011ac3b00712814a7a256923e9",
+        "FGC 409.2": "55796170e17c40981845905de07cd3eea7f7a4d77fd3ea44132463356da14efa"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-04-gas-meter-valve-2",
+      "split": "development",
+      "familyID": "gas-meter-valve",
+      "codeFamily": "FGC",
+      "question": "If we put the valve on the supply side, may we use any valve type without utility approval?",
+      "expectedAnswer": "No. Meter valves must be of a type approved by the utility company.",
+      "decisiveReferences": [
+        "FGC 409.2"
+      ],
+      "sourceReferences": [
+        "FGC 409.1",
+        "FGC 409.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 409.1": "f38ce4be55a85544e7c06084ea8f611648c7e7011ac3b00712814a7a256923e9",
+        "FGC 409.2": "55796170e17c40981845905de07cd3eea7f7a4d77fd3ea44132463356da14efa"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-05-sprinkler-visual-records-1",
+      "split": "development",
+      "familyID": "sprinkler-visual-records",
+      "codeFamily": "FC",
+      "question": "For a NYC office sprinkler system, is a visual inspection once every three months enough for the routine visual-inspection rule?",
+      "expectedAnswer": "No. A visual inspection must be completed monthly by the certificate of fitness holder in accordance with NFPA 25.",
+      "decisiveReferences": [
+        "FC 901.6.2.1"
+      ],
+      "sourceReferences": [
+        "FC 901.6",
+        "FC 901.6.2",
+        "FC 901.6.2.1"
+      ],
+      "sourceExcerptHashes": {
+        "FC 901.6": "3b274609af80ae6ad7a33552e0b5cac59e4067477b69fb0ef79464c7f1a6a40a",
+        "FC 901.6.2": "738366ca91a10506b541ee27bbc54d80cb563c4ba3129775b00c3270b3bebbbc",
+        "FC 901.6.2.1": "e5e42e19950e85d745f916906eb3e6ee73b4a34f218ffd3a6b51b71271f76160"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-dev-05-sprinkler-visual-records-2",
+      "split": "development",
+      "familyID": "sprinkler-visual-records",
+      "codeFamily": "FC",
+      "question": "When the monthly inspection finds a defect, does it have to appear on the inspection report?",
+      "expectedAnswer": "Yes. All defects or violations must be noted on the inspection report.",
+      "decisiveReferences": [
+        "FC 901.6.2.1"
+      ],
+      "sourceReferences": [
+        "FC 901.6",
+        "FC 901.6.2",
+        "FC 901.6.2.1"
+      ],
+      "sourceExcerptHashes": {
+        "FC 901.6": "3b274609af80ae6ad7a33552e0b5cac59e4067477b69fb0ef79464c7f1a6a40a",
+        "FC 901.6.2": "738366ca91a10506b541ee27bbc54d80cb563c4ba3129775b00c3270b3bebbbc",
+        "FC 901.6.2.1": "e5e42e19950e85d745f916906eb3e6ee73b4a34f218ffd3a6b51b71271f76160"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-01-accessible-ramp-1",
+      "split": "heldout",
+      "familyID": "accessible-ramp",
+      "codeFamily": "BC",
+      "question": "For this project, does the proposed 1-in-10 ramp slope meet the running-slope limit?",
+      "expectedAnswer": "No. A means-of-egress or accessible-route ramp has a running slope no steeper than 1 vertical in 12 horizontal.",
+      "decisiveReferences": [
+        "BC 1012.2"
+      ],
+      "sourceReferences": [
+        "BC 1012.1",
+        "BC 1012.2",
+        "BC 1012.4",
+        "BC 1012.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1012.1": "cf85915b0c5f7b04a9f2539cb85cbe212ea9c0f27f39f9a2d93614cb41fd48fa",
+        "BC 1012.2": "92a935f71c04a3fa7c32ec76980c1941a827ab7770eca0d6f31c2a3e6008e539",
+        "BC 1012.4": "d4aa536c0cd3cb23700142e0a74e9271ed43939a58c024457ec54a848e018403",
+        "BC 1012.3": "a1d23b0da3988b0ff0fc59bc63840556adf31b81d1bc79bdd0ef6ed7ac484209"
+      },
+      "projectFactsSHA256": "73cc6f7741826cc29a9f231cb50c3a901fa6eea2c4d4d0fd704d68186dfc4bbf",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-01-accessible-ramp-2",
+      "split": "heldout",
+      "familyID": "accessible-ramp",
+      "codeFamily": "BC",
+      "question": "We change the running slope to 1 in 12, but the ramp rises 32 inches in one run. Is one run allowed?",
+      "expectedAnswer": "No. A ramp run may rise no more than 30 inches; meeting running slope alone does not permit a 32-inch run.",
+      "decisiveReferences": [
+        "BC 1012.4"
+      ],
+      "sourceReferences": [
+        "BC 1012.1",
+        "BC 1012.2",
+        "BC 1012.4",
+        "BC 1012.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1012.1": "cf85915b0c5f7b04a9f2539cb85cbe212ea9c0f27f39f9a2d93614cb41fd48fa",
+        "BC 1012.2": "92a935f71c04a3fa7c32ec76980c1941a827ab7770eca0d6f31c2a3e6008e539",
+        "BC 1012.4": "d4aa536c0cd3cb23700142e0a74e9271ed43939a58c024457ec54a848e018403",
+        "BC 1012.3": "a1d23b0da3988b0ff0fc59bc63840556adf31b81d1bc79bdd0ef6ed7ac484209"
+      },
+      "projectFactsSHA256": "73cc6f7741826cc29a9f231cb50c3a901fa6eea2c4d4d0fd704d68186dfc4bbf",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-01-accessible-ramp-3",
+      "split": "heldout",
+      "familyID": "accessible-ramp",
+      "codeFamily": "BC",
+      "question": "We split the rise into two 16-inch runs. Can we use a 1-in-40 cross slope on the ramp surface?",
+      "expectedAnswer": "No. Cross slope may not be steeper than 1 in 48. The two 16-inch rises satisfy the rise limit but do not waive cross slope.",
+      "decisiveReferences": [
+        "BC 1012.3"
+      ],
+      "sourceReferences": [
+        "BC 1012.1",
+        "BC 1012.2",
+        "BC 1012.4",
+        "BC 1012.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1012.1": "cf85915b0c5f7b04a9f2539cb85cbe212ea9c0f27f39f9a2d93614cb41fd48fa",
+        "BC 1012.2": "92a935f71c04a3fa7c32ec76980c1941a827ab7770eca0d6f31c2a3e6008e539",
+        "BC 1012.4": "d4aa536c0cd3cb23700142e0a74e9271ed43939a58c024457ec54a848e018403",
+        "BC 1012.3": "a1d23b0da3988b0ff0fc59bc63840556adf31b81d1bc79bdd0ef6ed7ac484209"
+      },
+      "projectFactsSHA256": "73cc6f7741826cc29a9f231cb50c3a901fa6eea2c4d4d0fd704d68186dfc4bbf",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-02-terrace-guard-1",
+      "split": "heldout",
+      "familyID": "terrace-guard",
+      "codeFamily": "BC",
+      "question": "For this project, is a guard required along the open side of the terrace?",
+      "expectedAnswer": "Yes. The 31-inch drop within 36 inches of the open edge is more than 30 inches, triggering a guard under the stated ordinary open-sided terrace conditions.",
+      "decisiveReferences": [
+        "BC 1015.2"
+      ],
+      "sourceReferences": [
+        "BC 1015.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1015.2": "225a85956fd4380ed84d6119114e1f9e3a4df698fd669797a217ddb21ad07a43"
+      },
+      "projectFactsSHA256": "4bec4b7e4c410bfb143fef027398f4ddca1ff092c9ba8a876b325b7611cf383d",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-02-terrace-guard-2",
+      "split": "heldout",
+      "familyID": "terrace-guard",
+      "codeFamily": "BC",
+      "question": "Correction: the largest drop anywhere within 36 inches horizontally of the edge is exactly 30 inches. Does this drop-height rule still require a guard?",
+      "expectedAnswer": "No under this drop-height trigger. It says more than 30 inches; an exact 30-inch greatest drop within the stated horizontal zone does not satisfy that predicate. Do not claim immunity from another applicable roof/guard requirement.",
+      "decisiveReferences": [
+        "BC 1015.2"
+      ],
+      "sourceReferences": [
+        "BC 1015.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1015.2": "225a85956fd4380ed84d6119114e1f9e3a4df698fd669797a217ddb21ad07a43"
+      },
+      "projectFactsSHA256": "4bec4b7e4c410bfb143fef027398f4ddca1ff092c9ba8a876b325b7611cf383d",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-02-terrace-guard-3",
+      "split": "heldout",
+      "familyID": "terrace-guard",
+      "codeFamily": "BC",
+      "question": "Separate situation: does the same guard rule require a guard across the loading side of a loading dock with a 40-inch drop?",
+      "expectedAnswer": "No under this provision. The loading side of loading docks or piers is an express guard exception. Do not extend that exception to other sides or ordinary terraces.",
+      "decisiveReferences": [
+        "BC 1015.2"
+      ],
+      "sourceReferences": [
+        "BC 1015.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1015.2": "225a85956fd4380ed84d6119114e1f9e3a4df698fd669797a217ddb21ad07a43"
+      },
+      "projectFactsSHA256": "4bec4b7e4c410bfb143fef027398f4ddca1ff092c9ba8a876b325b7611cf383d",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-1",
+      "split": "heldout",
+      "familyID": "shower-waterproofing",
+      "codeFamily": "PC",
+      "question": "For this project, may the shower liner turn up only 1 inch above the finished threshold?",
+      "expectedAnswer": "No. The liner must turn up on all sides at least 2 inches above the finished threshold.",
+      "decisiveReferences": [
+        "PC 417.5.2"
+      ],
+      "sourceReferences": [
+        "PC 417.5",
+        "PC 417.5.2",
+        "PC 312.9"
+      ],
+      "sourceExcerptHashes": {
+        "PC 417.5": "6985d69476c01f47d8965ab2f9b452e395b55650b756466192790c6ce8f30bee",
+        "PC 417.5.2": "864ab3c3d06a0f0d587d689c25d67313b6eb59619b2b2eae94385181a315c114",
+        "PC 312.9": "44377fdf04d46c4a9927b7d3635f00b1e604bb33e99e8a65e591059da8674af3"
+      },
+      "projectFactsSHA256": "c16b7ee9289f4ae54a6e756c9514058db0a76eead66f3e776383baef690b09cc",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-2",
+      "split": "heldout",
+      "familyID": "shower-waterproofing",
+      "codeFamily": "PC",
+      "question": "We raise the liner to 2 inches above the threshold, but put fasteners through it only half an inch above the threshold. Is that allowed?",
+      "expectedAnswer": "No. The liner may not be nailed or perforated less than 1 inch above the finished threshold. Adequate turn-up height does not waive this condition.",
+      "decisiveReferences": [
+        "PC 417.5.2"
+      ],
+      "sourceReferences": [
+        "PC 417.5",
+        "PC 417.5.2",
+        "PC 312.9"
+      ],
+      "sourceExcerptHashes": {
+        "PC 417.5": "6985d69476c01f47d8965ab2f9b452e395b55650b756466192790c6ce8f30bee",
+        "PC 417.5.2": "864ab3c3d06a0f0d587d689c25d67313b6eb59619b2b2eae94385181a315c114",
+        "PC 312.9": "44377fdf04d46c4a9927b7d3635f00b1e604bb33e99e8a65e591059da8674af3"
+      },
+      "projectFactsSHA256": "c16b7ee9289f4ae54a6e756c9514058db0a76eead66f3e776383baef690b09cc",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-3",
+      "split": "heldout",
+      "familyID": "shower-waterproofing",
+      "codeFamily": "PC",
+      "question": "Before covering the completed liner, what water depth and minimum holding time are required for its leak test?",
+      "expectedAnswer": "Plug the shower drain watertight, use potable water at least 2 inches deep measured at the threshold, retain it for at least 15 minutes, and show no leakage. If there is no threshold at least 2 inches high, construct a temporary threshold for the test.",
+      "decisiveReferences": [
+        "PC 312.9"
+      ],
+      "sourceReferences": [
+        "PC 417.5",
+        "PC 417.5.2",
+        "PC 312.9"
+      ],
+      "sourceExcerptHashes": {
+        "PC 417.5": "6985d69476c01f47d8965ab2f9b452e395b55650b756466192790c6ce8f30bee",
+        "PC 417.5.2": "864ab3c3d06a0f0d587d689c25d67313b6eb59619b2b2eae94385181a315c114",
+        "PC 312.9": "44377fdf04d46c4a9927b7d3635f00b1e604bb33e99e8a65e591059da8674af3"
+      },
+      "projectFactsSHA256": "c16b7ee9289f4ae54a6e756c9514058db0a76eead66f3e776383baef690b09cc",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-1",
+      "split": "heldout",
+      "familyID": "restaurant-grease",
+      "codeFamily": "PC",
+      "question": "For this project, does the kitchen sink waste need a grease interceptor or automatic grease removal device?",
+      "expectedAnswer": "Yes. Food-preparation fixtures and equipment discharging fats, oils or grease must drain to a grease interceptor or automatic grease removal device in accordance with DEP requirements.",
+      "decisiveReferences": [
+        "PC 1003.3.1"
+      ],
+      "sourceReferences": [
+        "PC 1003.1",
+        "PC 1003.3",
+        "PC 1003.3.4",
+        "PC 1003.3.1",
+        "PC 1003.3.3"
+      ],
+      "sourceExcerptHashes": {
+        "PC 1003.1": "1ab207aa97e1d3f8ba7e60f88263b52443ac18451dfefb36eb75f718bd0ee065",
+        "PC 1003.3": "d7abdc72218d07d97d5d5bb07ecdaf2fbaa6fc03eabdc64ad517ccd87e2d3b96",
+        "PC 1003.3.4": "3cc72ce4ab9800f5b30b07ed50023482f62b3b89928e0510fd43ffbfcac4de57",
+        "PC 1003.3.1": "6883e741d93e2cc6096b5249d4a1f2c15270c03237c5787e4a052211fb0ffbb6",
+        "PC 1003.3.3": "d28d3f548537f67b824ab1df85e76cad443d8edb24e1f0bf26c310cf633e7b26"
+      },
+      "projectFactsSHA256": "e54ecc5b78e55546cbd575b457cf9adfc60d588f3cf7fa433b53b896039e5ba1",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-2",
+      "split": "heldout",
+      "familyID": "restaurant-grease",
+      "codeFamily": "PC",
+      "question": "Could we run the toilet waste through that same grease interceptor too?",
+      "expectedAnswer": "No. Grease interceptors or automatic grease removal devices may receive waste only from fixtures/equipment that allow fats, oils or grease to be discharged; ordinary toilet sanitary waste does not belong on that connection.",
+      "decisiveReferences": [
+        "PC 1003.3.1"
+      ],
+      "sourceReferences": [
+        "PC 1003.1",
+        "PC 1003.3",
+        "PC 1003.3.4",
+        "PC 1003.3.1",
+        "PC 1003.3.3"
+      ],
+      "sourceExcerptHashes": {
+        "PC 1003.1": "1ab207aa97e1d3f8ba7e60f88263b52443ac18451dfefb36eb75f718bd0ee065",
+        "PC 1003.3": "d7abdc72218d07d97d5d5bb07ecdaf2fbaa6fc03eabdc64ad517ccd87e2d3b96",
+        "PC 1003.3.4": "3cc72ce4ab9800f5b30b07ed50023482f62b3b89928e0510fd43ffbfcac4de57",
+        "PC 1003.3.1": "6883e741d93e2cc6096b5249d4a1f2c15270c03237c5787e4a052211fb0ffbb6",
+        "PC 1003.3.3": "d28d3f548537f67b824ab1df85e76cad443d8edb24e1f0bf26c310cf633e7b26"
+      },
+      "projectFactsSHA256": "e54ecc5b78e55546cbd575b457cf9adfc60d588f3cf7fa433b53b896039e5ba1",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-3",
+      "split": "heldout",
+      "familyID": "restaurant-grease",
+      "codeFamily": "PC",
+      "question": "Now consider an ordinary kitchen inside one private dwelling unit instead of this restaurant. Does the same grease-interceptor requirement apply?",
+      "expectedAnswer": "No under this ordinary grease-interceptor requirement. Individual dwelling units and private living quarters are expressly excepted; do not carry restaurant facts into the hypothetical dwelling.",
+      "decisiveReferences": [
+        "PC 1003.3.3"
+      ],
+      "sourceReferences": [
+        "PC 1003.1",
+        "PC 1003.3",
+        "PC 1003.3.4",
+        "PC 1003.3.1",
+        "PC 1003.3.3"
+      ],
+      "sourceExcerptHashes": {
+        "PC 1003.1": "1ab207aa97e1d3f8ba7e60f88263b52443ac18451dfefb36eb75f718bd0ee065",
+        "PC 1003.3": "d7abdc72218d07d97d5d5bb07ecdaf2fbaa6fc03eabdc64ad517ccd87e2d3b96",
+        "PC 1003.3.4": "3cc72ce4ab9800f5b30b07ed50023482f62b3b89928e0510fd43ffbfcac4de57",
+        "PC 1003.3.1": "6883e741d93e2cc6096b5249d4a1f2c15270c03237c5787e4a052211fb0ffbb6",
+        "PC 1003.3.3": "d28d3f548537f67b824ab1df85e76cad443d8edb24e1f0bf26c310cf633e7b26"
+      },
+      "projectFactsSHA256": "e54ecc5b78e55546cbd575b457cf9adfc60d588f3cf7fa433b53b896039e5ba1",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-05-condensate-protection-1",
+      "split": "heldout",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "question": "For this project, does a half-inch fall over an 8-foot condensate-drain run meet the minimum slope?",
+      "expectedAnswer": "No. The condensate piping minimum is 1/8 inch per foot, so an 8-foot horizontal run needs at least 1 inch fall in the direction of discharge.",
+      "decisiveReferences": [
+        "MC 307.2.1"
+      ],
+      "sourceReferences": [
+        "MC 307.2",
+        "MC 307.2.1",
+        "MC 307.2.3"
+      ],
+      "sourceExcerptHashes": {
+        "MC 307.2": "472182bb9aa466280b7f6015836968341ec96a0f75a6824b5f93fbb2a63736cb",
+        "MC 307.2.1": "7b240ce6606570311b961bbec0915105f1122f313ff532cb4f3248500200e0bf",
+        "MC 307.2.3": "b47495eb26c9888ead8d39f83edebf72de37790d0a0673a85546a3fc5124285b"
+      },
+      "projectFactsSHA256": "5bfa75e8f1a6ca31737a87d5698f3a7b7ecf48a80e498c8600994d432c29fa55",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-05-condensate-protection-2",
+      "split": "heldout",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "question": "We correct the drain slope. If the primary drain clogs, water could damage the ceiling below. Do we need an overflow-protection method?",
+      "expectedAnswer": "Yes. Where primary condensate overflow could damage building components, provide one of the listed auxiliary/secondary protection methods; the stated no-floor-drain facts exclude that exception.",
+      "decisiveReferences": [
+        "MC 307.2.3"
+      ],
+      "sourceReferences": [
+        "MC 307.2",
+        "MC 307.2.1",
+        "MC 307.2.3"
+      ],
+      "sourceExcerptHashes": {
+        "MC 307.2": "472182bb9aa466280b7f6015836968341ec96a0f75a6824b5f93fbb2a63736cb",
+        "MC 307.2.1": "7b240ce6606570311b961bbec0915105f1122f313ff532cb4f3248500200e0bf",
+        "MC 307.2.3": "b47495eb26c9888ead8d39f83edebf72de37790d0a0673a85546a3fc5124285b"
+      },
+      "projectFactsSHA256": "5bfa75e8f1a6ca31737a87d5698f3a7b7ecf48a80e498c8600994d432c29fa55",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-05-condensate-protection-3",
+      "split": "heldout",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "question": "Could a listed water-level detector that shuts off the cooling equipment before the auxiliary pan overflows satisfy an allowed method without a separate drain from that pan?",
+      "expectedAnswer": "Yes as an expressly allowed method, provided the auxiliary pan meets the specified dimensions/material/construction requirements and has a listed water-level device shutting equipment off before pan overflow. It does not waive the primary condensate drain.",
+      "decisiveReferences": [
+        "MC 307.2.3"
+      ],
+      "sourceReferences": [
+        "MC 307.2",
+        "MC 307.2.1",
+        "MC 307.2.3"
+      ],
+      "sourceExcerptHashes": {
+        "MC 307.2": "472182bb9aa466280b7f6015836968341ec96a0f75a6824b5f93fbb2a63736cb",
+        "MC 307.2.1": "7b240ce6606570311b961bbec0915105f1122f313ff532cb4f3248500200e0bf",
+        "MC 307.2.3": "b47495eb26c9888ead8d39f83edebf72de37790d0a0673a85546a3fc5124285b"
+      },
+      "projectFactsSHA256": "5bfa75e8f1a6ca31737a87d5698f3a7b7ecf48a80e498c8600994d432c29fa55",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-06-dryer-duct-1",
+      "split": "heldout",
+      "familyID": "dryer-duct",
+      "codeFamily": "MC",
+      "question": "For this project, can the permanent domestic dryer exhaust duct be ordinary flexible foil duct?",
+      "expectedAnswer": "No for the permanent exhaust duct. It must have a smooth interior finish and be metal at least 0.016 inch thick, normally 4 inches nominal diameter unless the manufacturer specifically requires larger. Do not confuse a permitted transition duct with the permanent exhaust duct.",
+      "decisiveReferences": [
+        "MC 504.8.1"
+      ],
+      "sourceReferences": [
+        "MC 504.8",
+        "MC 504.8.1",
+        "MC 504.8.2"
+      ],
+      "sourceExcerptHashes": {
+        "MC 504.8": "e09d0b029c00e0f7115c1e89e120d7a9d9ebb93a37d2fba9992ecf0880aa7529",
+        "MC 504.8.1": "6991802922f236231c2796e3060b0f95db4b77248918cb203f366e67f4cda022",
+        "MC 504.8.2": "df14d27c7f9be298e0782659822e1629d14247b5b19749f877100fac4e83cdff"
+      },
+      "projectFactsSHA256": "4de342a2fe108906529e0ba45e838ae6109c654bd3fd0dd9da258f3e0f02c5ab",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-06-dryer-duct-2",
+      "split": "heldout",
+      "familyID": "dryer-duct",
+      "codeFamily": "MC",
+      "question": "We replace it with compliant smooth metal duct. May the joint screws project a quarter inch into the duct?",
+      "expectedAnswer": "No. Screws or similar fasteners in a single-appliance duct may not protrude more than 1/8 inch inside.",
+      "decisiveReferences": [
+        "MC 504.8.2"
+      ],
+      "sourceReferences": [
+        "MC 504.8",
+        "MC 504.8.1",
+        "MC 504.8.2"
+      ],
+      "sourceExcerptHashes": {
+        "MC 504.8": "e09d0b029c00e0f7115c1e89e120d7a9d9ebb93a37d2fba9992ecf0880aa7529",
+        "MC 504.8.1": "6991802922f236231c2796e3060b0f95db4b77248918cb203f366e67f4cda022",
+        "MC 504.8.2": "df14d27c7f9be298e0782659822e1629d14247b5b19749f877100fac4e83cdff"
+      },
+      "projectFactsSHA256": "4de342a2fe108906529e0ba45e838ae6109c654bd3fd0dd9da258f3e0f02c5ab",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-06-dryer-duct-3",
+      "split": "heldout",
+      "familyID": "dryer-duct",
+      "codeFamily": "MC",
+      "question": "If we change to fasteners projecting no more than one-eighth inch, are duct supports spaced every 6 feet acceptable?",
+      "expectedAnswer": "No. The exhaust duct must be supported at 4-foot intervals and secured. Meeting the fastener projection condition does not waive support spacing.",
+      "decisiveReferences": [
+        "MC 504.8.2"
+      ],
+      "sourceReferences": [
+        "MC 504.8",
+        "MC 504.8.1",
+        "MC 504.8.2"
+      ],
+      "sourceExcerptHashes": {
+        "MC 504.8": "e09d0b029c00e0f7115c1e89e120d7a9d9ebb93a37d2fba9992ecf0880aa7529",
+        "MC 504.8.1": "6991802922f236231c2796e3060b0f95db4b77248918cb203f366e67f4cda022",
+        "MC 504.8.2": "df14d27c7f9be298e0782659822e1629d14247b5b19749f877100fac4e83cdff"
+      },
+      "projectFactsSHA256": "4de342a2fe108906529e0ba45e838ae6109c654bd3fd0dd9da258f3e0f02c5ab",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-1",
+      "split": "heldout",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "question": "For this project, may the appliance gas shutoff valve be concealed behind permanent drywall?",
+      "expectedAnswer": "No. Shutoff valves are prohibited in concealed locations and furnace plenums.",
+      "decisiveReferences": [
+        "FGC 409.1.2"
+      ],
+      "sourceReferences": [
+        "FGC 409.1",
+        "FGC 409.5",
+        "FGC 409.1.2",
+        "FGC 409.1.3",
+        "FGC 409.5.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 409.1": "f38ce4be55a85544e7c06084ea8f611648c7e7011ac3b00712814a7a256923e9",
+        "FGC 409.5": "f374b402602c7eeb5cd1036dbc012ac46e23bc8ac868817dee5af327a3b71c0d",
+        "FGC 409.1.2": "eb84ca77e9cfb0ff3a161e17c40e0a5150e1a38498ccefd9942c26f12a0aa507",
+        "FGC 409.1.3": "7ba1be127617c2cebcfe3bc46eb5a166ad73d37a0d7c6d36209d22e1a70bafb2",
+        "FGC 409.5.2": "49ba4650f515cbf46b46239f7078f58f616de77a673aa5bfe0a60f804b68b620"
+      },
+      "projectFactsSHA256": "530ec269d7fc7892d73ad87baa7b55fa7dbbf6556fad4dd0e119233ae11fdd2f",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-2",
+      "split": "heldout",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "question": "What if we put the valve in an open, reachable location but leave it where moving equipment can hit it?",
+      "expectedAnswer": "No. Shutoff valves must be accessible for operation and protected from damage. Accessibility alone does not meet the protection condition.",
+      "decisiveReferences": [
+        "FGC 409.1.3"
+      ],
+      "sourceReferences": [
+        "FGC 409.1",
+        "FGC 409.5",
+        "FGC 409.1.2",
+        "FGC 409.1.3",
+        "FGC 409.5.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 409.1": "f38ce4be55a85544e7c06084ea8f611648c7e7011ac3b00712814a7a256923e9",
+        "FGC 409.5": "f374b402602c7eeb5cd1036dbc012ac46e23bc8ac868817dee5af327a3b71c0d",
+        "FGC 409.1.2": "eb84ca77e9cfb0ff3a161e17c40e0a5150e1a38498ccefd9942c26f12a0aa507",
+        "FGC 409.1.3": "7ba1be127617c2cebcfe3bc46eb5a166ad73d37a0d7c6d36209d22e1a70bafb2",
+        "FGC 409.5.2": "49ba4650f515cbf46b46239f7078f58f616de77a673aa5bfe0a60f804b68b620"
+      },
+      "projectFactsSHA256": "530ec269d7fc7892d73ad87baa7b55fa7dbbf6556fad4dd0e119233ae11fdd2f",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-3",
+      "split": "heldout",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "question": "Separate hypothetical: for a vented decorative gas appliance, may its identified dedicated shutoff valve be in another area with ready access instead of right next to the appliance?",
+      "expectedAnswer": "Yes under the vented-decorative-appliance exception. It must have ready access, be permanently identified, serve no other appliance, and piping from it to within 6 feet of the appliance must meet the stated gas-piping requirements. This is not a general remote-valve allowance for cooking ranges.",
+      "decisiveReferences": [
+        "FGC 409.5.2"
+      ],
+      "sourceReferences": [
+        "FGC 409.1",
+        "FGC 409.5",
+        "FGC 409.1.2",
+        "FGC 409.1.3",
+        "FGC 409.5.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 409.1": "f38ce4be55a85544e7c06084ea8f611648c7e7011ac3b00712814a7a256923e9",
+        "FGC 409.5": "f374b402602c7eeb5cd1036dbc012ac46e23bc8ac868817dee5af327a3b71c0d",
+        "FGC 409.1.2": "eb84ca77e9cfb0ff3a161e17c40e0a5150e1a38498ccefd9942c26f12a0aa507",
+        "FGC 409.1.3": "7ba1be127617c2cebcfe3bc46eb5a166ad73d37a0d7c6d36209d22e1a70bafb2",
+        "FGC 409.5.2": "49ba4650f515cbf46b46239f7078f58f616de77a673aa5bfe0a60f804b68b620"
+      },
+      "projectFactsSHA256": "530ec269d7fc7892d73ad87baa7b55fa7dbbf6556fad4dd0e119233ae11fdd2f",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-08-gas-restoration-1",
+      "split": "heldout",
+      "familyID": "gas-restoration",
+      "codeFamily": "FGC",
+      "question": "For this project, after restoring gas service, does the earlier pressure test mean we can skip checking the piping for leakage immediately after gas is turned back on?",
+      "expectedAnswer": "No. Immediately after gas is turned on into a new system or initially restored after service interruption, check for abnormal conditions and leakage. An earlier pressure test is not that operating leakage check.",
+      "decisiveReferences": [
+        "FGC 406.6.3"
+      ],
+      "sourceReferences": [
+        "FGC 406.6",
+        "FGC 406.6.1",
+        "FGC 406.7.1.4",
+        "FGC 406.6.3",
+        "FGC 406.5.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 406.6": "79b5c0e615ab2a624384898fa871842a32f0b4ede64d3e9be4c126a0c18774bf",
+        "FGC 406.6.1": "ae30e4d3e42cec6f58719dacad61e4944b3248817cc06bfc5722f2ce7aacef79",
+        "FGC 406.7.1.4": "776ccaa63e2ab9b128d7cb60ace62ab401646e75c911c3b817405d7b38cd2b96",
+        "FGC 406.6.3": "eefcdb9241e7b6ab473bc6702f6139f5013ba2d27d320d7ee8220c1d6324aa35",
+        "FGC 406.5.2": "69c3ba096f185a4a4b7ef552aa3ff9d6b9564fd4c9dc60a8f1d8e1986851241c"
+      },
+      "projectFactsSHA256": "ee6360c71ff2272ab221c1d814c99c7d0b28c22b12518978ce17103b2b3f7487",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-08-gas-restoration-2",
+      "split": "heldout",
+      "familyID": "gas-restoration",
+      "codeFamily": "FGC",
+      "question": "During that check we find a leak. Can gas stay on while the necessary repair is being arranged?",
+      "expectedAnswer": "No. Where leakage is indicated or an abnormal condition presents a hazard, shut off gas until necessary repairs are made.",
+      "decisiveReferences": [
+        "FGC 406.6.3"
+      ],
+      "sourceReferences": [
+        "FGC 406.6",
+        "FGC 406.6.1",
+        "FGC 406.7.1.4",
+        "FGC 406.6.3",
+        "FGC 406.5.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 406.6": "79b5c0e615ab2a624384898fa871842a32f0b4ede64d3e9be4c126a0c18774bf",
+        "FGC 406.6.1": "ae30e4d3e42cec6f58719dacad61e4944b3248817cc06bfc5722f2ce7aacef79",
+        "FGC 406.7.1.4": "776ccaa63e2ab9b128d7cb60ace62ab401646e75c911c3b817405d7b38cd2b96",
+        "FGC 406.6.3": "eefcdb9241e7b6ab473bc6702f6139f5013ba2d27d320d7ee8220c1d6324aa35",
+        "FGC 406.5.2": "69c3ba096f185a4a4b7ef552aa3ff9d6b9564fd4c9dc60a8f1d8e1986851241c"
+      },
+      "projectFactsSHA256": "ee6360c71ff2272ab221c1d814c99c7d0b28c22b12518978ce17103b2b3f7487",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-08-gas-restoration-3",
+      "split": "heldout",
+      "familyID": "gas-restoration",
+      "codeFamily": "FGC",
+      "question": "After the repairs, what approved kinds of methods can be used for the required leakage check?",
+      "expectedAnswer": "Use a combustible-gas indicator meeting the stated instrument requirements or a noncorrosive leak-detection fluid. Repairs to the affected piping must also be retested; do not imply the leakage check replaces required pressure testing.",
+      "decisiveReferences": [
+        "FGC 406.6.3",
+        "FGC 406.5.2"
+      ],
+      "sourceReferences": [
+        "FGC 406.6",
+        "FGC 406.6.1",
+        "FGC 406.7.1.4",
+        "FGC 406.6.3",
+        "FGC 406.5.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 406.6": "79b5c0e615ab2a624384898fa871842a32f0b4ede64d3e9be4c126a0c18774bf",
+        "FGC 406.6.1": "ae30e4d3e42cec6f58719dacad61e4944b3248817cc06bfc5722f2ce7aacef79",
+        "FGC 406.7.1.4": "776ccaa63e2ab9b128d7cb60ace62ab401646e75c911c3b817405d7b38cd2b96",
+        "FGC 406.6.3": "eefcdb9241e7b6ab473bc6702f6139f5013ba2d27d320d7ee8220c1d6324aa35",
+        "FGC 406.5.2": "69c3ba096f185a4a4b7ef552aa3ff9d6b9564fd4c9dc60a8f1d8e1986851241c"
+      },
+      "projectFactsSHA256": "ee6360c71ff2272ab221c1d814c99c7d0b28c22b12518978ce17103b2b3f7487",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-09-rooftop-access-1",
+      "split": "heldout",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "For this project, is a 5-foot-wide rooftop clear path enough for firefighter access?",
+      "expectedAnswer": "No. The rooftop clear path must be at least 6 feet horizontally wide under the stated flat 60-foot-high building conditions.",
+      "decisiveReferences": [
+        "FC 504.4.4"
+      ],
+      "sourceReferences": [
+        "FC 504.4",
+        "FC 504.4.4",
+        "FC 504.4.6"
+      ],
+      "sourceExcerptHashes": {
+        "FC 504.4": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+        "FC 504.4.4": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+        "FC 504.4.6": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa"
+      },
+      "projectFactsSHA256": "d3fe832c9e15bf8a9b7a1242469945df260befef0add263657006856557a3888",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-09-rooftop-access-2",
+      "split": "heldout",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "We widen the clear path to 6 feet, but a fixed overhead structure leaves only 8 feet of vertical clearance. Does that meet the clear-path height?",
+      "expectedAnswer": "No. The rooftop clear path must have at least 9 feet of height as well as the 6-foot horizontal width.",
+      "decisiveReferences": [
+        "FC 504.4.4"
+      ],
+      "sourceReferences": [
+        "FC 504.4",
+        "FC 504.4.4",
+        "FC 504.4.6"
+      ],
+      "sourceExcerptHashes": {
+        "FC 504.4": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+        "FC 504.4.4": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+        "FC 504.4.6": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa"
+      },
+      "projectFactsSHA256": "d3fe832c9e15bf8a9b7a1242469945df260befef0add263657006856557a3888",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-09-rooftop-access-3",
+      "split": "heldout",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "The path is now clear to 9 feet. How much clear space must we keep around the bulkhead door that opens onto this rooftop?",
+      "expectedAnswer": "At least 6 feet clearance in all directions from the door opening, measured from the door hinge. This door clearance is separate from the clear path and perimeter landing requirements.",
+      "decisiveReferences": [
+        "FC 504.4.6"
+      ],
+      "sourceReferences": [
+        "FC 504.4",
+        "FC 504.4.4",
+        "FC 504.4.6"
+      ],
+      "sourceExcerptHashes": {
+        "FC 504.4": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+        "FC 504.4.4": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+        "FC 504.4.6": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa"
+      },
+      "projectFactsSHA256": "d3fe832c9e15bf8a9b7a1242469945df260befef0add263657006856557a3888",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-1",
+      "split": "heldout",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "question": "For this project, are 10-second monthly emergency-light activation tests long enough?",
+      "expectedAnswer": "No. Activation tests last at least 30 seconds and are conducted manually at least monthly unless the equipment has the specified automated features; a trained knowledgeable person conducts the manual test.",
+      "decisiveReferences": [
+        "FC 1027.9.1"
+      ],
+      "sourceReferences": [
+        "FC 1027.1",
+        "FC 1027.9",
+        "FC 604.5",
+        "FC 1027.9.1",
+        "FC 1027.9.2"
+      ],
+      "sourceExcerptHashes": {
+        "FC 1027.1": "ae42508fc33cc5966d4146ff8f61c705f6609c69fa011e72277be166517d6739",
+        "FC 1027.9": "823d212cfe952311bccb3b76d246c085d8acc171597cf7c17aa3ce3cc9c73899",
+        "FC 604.5": "6db9cc5a570ecb8fe6f525b90b5634a5008e85cbf131ef674eb2d37b53c1599d",
+        "FC 1027.9.1": "d3e65492c7883685a54e203c9f4c9288be793764bc350e55d3dd0d4caaff5b55",
+        "FC 1027.9.2": "5856f87d5b5431b37cb498f7a0c6671d937be2c60745e1a6cc172e59d505e2b3"
+      },
+      "projectFactsSHA256": "fd55ada1df2f8f40dfe41c8b1f907b096991a634877398de54e68805eeff21a9",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-2",
+      "split": "heldout",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "question": "We switch to equipment with automated self-testing and self-diagnostics. Can we skip the monthly visual inspection too?",
+      "expectedAnswer": "No. The automated-testing option still requires a visual inspection at least monthly for supervisory/trouble signals or other signs of malfunction.",
+      "decisiveReferences": [
+        "FC 1027.9.1"
+      ],
+      "sourceReferences": [
+        "FC 1027.1",
+        "FC 1027.9",
+        "FC 604.5",
+        "FC 1027.9.1",
+        "FC 1027.9.2"
+      ],
+      "sourceExcerptHashes": {
+        "FC 1027.1": "ae42508fc33cc5966d4146ff8f61c705f6609c69fa011e72277be166517d6739",
+        "FC 1027.9": "823d212cfe952311bccb3b76d246c085d8acc171597cf7c17aa3ce3cc9c73899",
+        "FC 604.5": "6db9cc5a570ecb8fe6f525b90b5634a5008e85cbf131ef674eb2d37b53c1599d",
+        "FC 1027.9.1": "d3e65492c7883685a54e203c9f4c9288be793764bc350e55d3dd0d4caaff5b55",
+        "FC 1027.9.2": "5856f87d5b5431b37cb498f7a0c6671d937be2c60745e1a6cc172e59d505e2b3"
+      },
+      "projectFactsSHA256": "fd55ada1df2f8f40dfe41c8b1f907b096991a634877398de54e68805eeff21a9",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-3",
+      "split": "heldout",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "question": "Apart from the monthly checks, what minimum duration and frequency apply to the battery-power test?",
+      "expectedAnswer": "Battery-powered emergency lighting is operated on battery power for at least 90 minutes, at least once a year, by a qualified person under the referenced qualification rules.",
+      "decisiveReferences": [
+        "FC 1027.9.2"
+      ],
+      "sourceReferences": [
+        "FC 1027.1",
+        "FC 1027.9",
+        "FC 604.5",
+        "FC 1027.9.1",
+        "FC 1027.9.2"
+      ],
+      "sourceExcerptHashes": {
+        "FC 1027.1": "ae42508fc33cc5966d4146ff8f61c705f6609c69fa011e72277be166517d6739",
+        "FC 1027.9": "823d212cfe952311bccb3b76d246c085d8acc171597cf7c17aa3ce3cc9c73899",
+        "FC 604.5": "6db9cc5a570ecb8fe6f525b90b5634a5008e85cbf131ef674eb2d37b53c1599d",
+        "FC 1027.9.1": "d3e65492c7883685a54e203c9f4c9288be793764bc350e55d3dd0d4caaff5b55",
+        "FC 1027.9.2": "5856f87d5b5431b37cb498f7a0c6671d937be2c60745e1a6cc172e59d505e2b3"
+      },
+      "projectFactsSHA256": "fd55ada1df2f8f40dfe41c8b1f907b096991a634877398de54e68805eeff21a9",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-11-office-loading-table-1",
+      "split": "heldout",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "For this project, how many accessory off-street loading berths does the ordinary zoning table require?",
+      "expectedAnswer": "One loading berth. In C4-4, LRC-C has none for the first 100,000 square feet and one for the next 200,000; the stated 120,000 square feet is in that tier.",
+      "decisiveReferences": [
+        "ZR 36-62"
+      ],
+      "sourceReferences": [
+        "ZR 36-61",
+        "ZR 36-62"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-61": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+        "ZR 36-62": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80"
+      },
+      "projectFactsSHA256": "99de5f4ea32eea8fa0f7e6173fc68793cda7ccd235e4cf06d9454ae1a569291f",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-11-office-loading-table-2",
+      "split": "heldout",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "Correction: the total office floor area is only 95,000 square feet. What does the same loading table require then?",
+      "expectedAnswer": "None under this ordinary table, because 95,000 square feet is within the first 100,000-square-foot tier for LRC-C in C4-4.",
+      "decisiveReferences": [
+        "ZR 36-62"
+      ],
+      "sourceReferences": [
+        "ZR 36-61",
+        "ZR 36-62"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-61": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+        "ZR 36-62": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80"
+      },
+      "projectFactsSHA256": "99de5f4ea32eea8fa0f7e6173fc68793cda7ccd235e4cf06d9454ae1a569291f",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-11-office-loading-table-3",
+      "split": "heldout",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "For a larger version with 350,000 square feet of office floor area in the same district, how many loading berths would the table require?",
+      "expectedAnswer": "Two loading berths: none for the first 100,000, one for the next 200,000, and one for the additional 50,000 within the next 300,000-square-foot increment.",
+      "decisiveReferences": [
+        "ZR 36-62"
+      ],
+      "sourceReferences": [
+        "ZR 36-61",
+        "ZR 36-62"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-61": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+        "ZR 36-62": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80"
+      },
+      "projectFactsSHA256": "99de5f4ea32eea8fa0f7e6173fc68793cda7ccd235e4cf06d9454ae1a569291f",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-1",
+      "split": "heldout",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "For this project, may accessory parking spaces sit between the street line and the apartment building street wall?",
+      "expectedAnswer": "No under the stated ordinary multiple-dwelling interior-lot facts. Spaces may be within the building or in open areas that are not between the street line and street wall and their prolongations.",
+      "decisiveReferences": [
+        "ZR 25-621"
+      ],
+      "sourceReferences": [
+        "ZR 25-621"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 25-621": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092"
+      },
+      "projectFactsSHA256": "16cee57ef0ae72419c97f7a5ade11bcd6577d764e76a1cc1cd95aa7a603ff4dd",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-2",
+      "split": "heldout",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "What if we relocate the spaces behind the street wall in an open side or rear area instead?",
+      "expectedAnswer": "Yes as to this location restriction if the area is not between the street line and street wall or their prolongations. Other parking, yard, access and curb-cut requirements still apply.",
+      "decisiveReferences": [
+        "ZR 25-621"
+      ],
+      "sourceReferences": [
+        "ZR 25-621"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 25-621": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092"
+      },
+      "projectFactsSHA256": "16cee57ef0ae72419c97f7a5ade11bcd6577d764e76a1cc1cd95aa7a603ff4dd",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-3",
+      "split": "heldout",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "Separate version: on a through lot with the same apartment use, does the no-parking-between-street-line-and-street-wall restriction have to apply along both street frontages?",
+      "expectedAnswer": "No. On through lots this limitation applies along only one street frontage; it does not disappear along both. Entire-block lots and large sites have separate exceptions not assumed here.",
+      "decisiveReferences": [
+        "ZR 25-621"
+      ],
+      "sourceReferences": [
+        "ZR 25-621"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 25-621": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092"
+      },
+      "projectFactsSHA256": "16cee57ef0ae72419c97f7a5ade11bcd6577d764e76a1cc1cd95aa7a603ff4dd",
+      "reviewCriteria": [
+        "Correct directly asked operative rule with applicable parent and stated facts.",
+        "Apply explicit corrections and hypotheticals to the requested scenario while preserving ordinary project facts outside that hypothetical.",
+        "Do not require unrelated whole-project approval to answer a narrow rule.",
+        "Keep measurement, exceptions and other conditions distinct.",
+        "An unnecessary nonanswer is withheld; model/verifier approval is not source correctness."
+      ],
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication."
+    }
+  ]
+}

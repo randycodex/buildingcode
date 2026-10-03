@@ -1,0 +1,45 @@
+{
+  "archivedAt": "2026-10-03T03:24:33.111Z",
+  "artifactRoot": "/Users/randy/.codex/artifacts/permitext-retrieval-context-2026-10-03",
+  "candidateSource": "/Users/randy/.codex/artifacts/permitext-retrieval-context-2026-10-03/candidate-source",
+  "rawRuns": [
+    {
+      "split": "development",
+      "path": "/Users/randy/.codex/artifacts/permitext-retrieval-context-2026-10-03/development-raw-v1",
+      "fileCount": 80,
+      "resultsSHA256": "c896b149f42e9b13f14aba314815859747415fa9ec3d487af968bfcccf745a55",
+      "caseCount": 10,
+      "providerCallCount": 37,
+      "settled": true,
+      "costUSD": 0.06146247,
+      "caseHTTPStatusCounts": {
+        "200": 10
+      }
+    },
+    {
+      "split": "heldout",
+      "path": "/Users/randy/.codex/artifacts/permitext-retrieval-context-2026-10-03/heldout-raw-v1",
+      "fileCount": 267,
+      "resultsSHA256": "f76a0049366f292f79039ebb822b60c19a2e975f4cf97f4707c2573a571cdd52",
+      "caseCount": 36,
+      "providerCallCount": 127,
+      "settled": true,
+      "costUSD": 0.19519525499999998,
+      "caseHTTPStatusCounts": {
+        "200": 36
+      }
+    }
+  ],
+  "campaignAccounting": {
+    "capUSD": 13.97,
+    "calls": 1628,
+    "settled": 1628,
+    "outstandingReservations": 0,
+    "estimatedTokenRateCostUSD": 1.6163196799999997,
+    "pricingSource": "Configured token rates in shared runner ledger, not provider invoice or wallet balance"
+  },
+  "limitations": [
+    "HTTP 200 and verifier pass are not accuracy labels.",
+    "Temporary isolated projects/stores; no production or normal research history writes."
+  ]
+}

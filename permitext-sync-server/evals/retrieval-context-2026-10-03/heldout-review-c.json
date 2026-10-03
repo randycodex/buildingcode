@@ -1,0 +1,3291 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-03T03:27:50.386Z",
+  "reviewAuthority": "Assistant source review; not licensed professional adjudication or independent expert sign-off.",
+  "cohort": "retrieval-context-2026-10-03",
+  "split": "heldout",
+  "reviewPart": "C",
+  "assignedConversationIDs": [
+    "context-hold-09-rooftop-access",
+    "context-hold-10-emergency-light-tests",
+    "context-hold-11-office-loading-table",
+    "context-hold-12-residential-parking-location"
+  ],
+  "runDirectory": "/tmp/permitext-retrieval-context-heldout-20261003-v1",
+  "runFinishedAt": "2026-10-03T03:16:25.710Z",
+  "runResultsSHA256": "f76a0049366f292f79039ebb822b60c19a2e975f4cf97f4707c2573a571cdd52",
+  "candidateFreezeSHA256": "e1fddf6683cb9ccca43d2ae39e625a004e1f2f4b6b972e7381ef58d114e6978c",
+  "candidateFrozenAt": "2026-10-03T03:05:43.444Z",
+  "candidateVersion": "20261003-query-scope-context-v54",
+  "baseCommit": "cb90fc092",
+  "noPaidCallsByReviewer": true,
+  "noCandidateSourceEdits": true,
+  "noKeyChanges": true,
+  "sourceAndFixtureIntegrity": {
+    "sourceHashCount": 137,
+    "sourceHashMismatches": [],
+    "runSourceHashMismatches": [],
+    "runFixtureHash": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+    "frozenHeldoutFixtureHash": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+    "fixtureChecks": {
+      "development.json": {
+        "expected": "5f7172e1f2d433352433a06cd29677238da52fff2272b0fa6cdf7f9e89f80292",
+        "actual": "5f7172e1f2d433352433a06cd29677238da52fff2272b0fa6cdf7f9e89f80292"
+      },
+      "heldout.json": {
+        "expected": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+        "actual": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95"
+      },
+      "source-keys.json": {
+        "expected": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb",
+        "actual": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb"
+      },
+      "source-packets.json": {
+        "expected": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213",
+        "actual": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213"
+      },
+      "source-audit.json": {
+        "expected": "80641cc9153e2bbc7517bbd36c8644b4e52f481f1eab09517191465c07d7fdd3",
+        "actual": "80641cc9153e2bbc7517bbd36c8644b4e52f481f1eab09517191465c07d7fdd3"
+      },
+      "protocol.json": {
+        "expected": "9eab840662f8c6e269ba2e6b7cce9a9edc59426721a7e33b896aa0be5811f57a",
+        "actual": "9eab840662f8c6e269ba2e6b7cce9a9edc59426721a7e33b896aa0be5811f57a"
+      },
+      "frozen-manifest.json": {
+        "expected": "1c6e3c2f30a48b8b28c50b6e343c8ff85b50682c3df4858adf299f21a20c0b16",
+        "actual": "1c6e3c2f30a48b8b28c50b6e343c8ff85b50682c3df4858adf299f21a20c0b16"
+      }
+    },
+    "assignedCanonicalPacketChecks": [
+      {
+        "reference": "FC 504.4",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004726.json"
+      },
+      {
+        "reference": "FC 504.4.4",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004726.json"
+      },
+      {
+        "reference": "FC 504.4.6",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004726.json"
+      },
+      {
+        "reference": "FC 1027.1",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "ae42508fc33cc5966d4146ff8f61c705f6609c69fa011e72277be166517d6739",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004796.json"
+      },
+      {
+        "reference": "FC 1027.9",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "823d212cfe952311bccb3b76d246c085d8acc171597cf7c17aa3ce3cc9c73899",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004796.json"
+      },
+      {
+        "reference": "FC 604.5",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "6db9cc5a570ecb8fe6f525b90b5634a5008e85cbf131ef674eb2d37b53c1599d",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004738.json"
+      },
+      {
+        "reference": "FC 1027.9.1",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "d3e65492c7883685a54e203c9f4c9288be793764bc350e55d3dd0d4caaff5b55",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004796.json"
+      },
+      {
+        "reference": "FC 1027.9.2",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "5856f87d5b5431b37cb498f7a0c6671d937be2c60745e1a6cc172e59d505e2b3",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004796.json"
+      },
+      {
+        "reference": "ZR 36-61",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20017973.json"
+      },
+      {
+        "reference": "ZR 36-62",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20017974.json"
+      },
+      {
+        "reference": "ZR 25-621",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20017588.json"
+      }
+    ]
+  },
+  "methodology": [
+    "Grade the delivered final answer, not HTTP 200, model mode, draft quality, retrieval expected-ID recall or verifier approval. Generic no-determination responses are withheld.",
+    "Read frozen assigned source keys and packets after freeze; compare with actual canonical parent/source text and writer ENACTED_TEXT clauses. References and expected answers remain review-only.",
+    "Check parent applicability, exclusions, measurements and explicit project corrections/hypotheticals. Treat confirmed synthetic facts as scenario premises, not independent parcel facts.",
+    "For loading, inspect original HTML row/column cells, rowspan/colspan, headings, footnotes and cumulative LRC-C bands; compare these with actual writer flat text and any structured grids.",
+    "Use raw writer/repair/verifier requests for failure attribution, never as correctness ground truth. Where final gate internals are not preserved, label their precise reason unknown.",
+    "Preserve original frozen-run results. No repairs, provider calls, source edits or key changes during this review."
+  ],
+  "totals": {
+    "turnCount": 12,
+    "labels": {
+      "correct": 6,
+      "minor_issue": 0,
+      "materially_wrong": 1,
+      "withheld": 5,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 0
+    },
+    "strictPass": 6,
+    "narrowOperativeConclusionsCorrect": 6,
+    "decisiveTextCoverage": {
+      "complete": 11,
+      "incomplete": 1
+    },
+    "structuredLoadingGridFidelity": {
+      "complete": 0,
+      "flattenedOnly": 3
+    },
+    "conversationFamilies": 4,
+    "strictPassingFamilies": 1,
+    "initialTurns": {
+      "correct": 2,
+      "minor_issue": 0,
+      "materially_wrong": 0,
+      "withheld": 2,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 0
+    },
+    "followUpTurns": {
+      "correct": 4,
+      "minor_issue": 0,
+      "materially_wrong": 1,
+      "withheld": 3,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 0
+    }
+  },
+  "families": [
+    {
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "turnCount": 3,
+      "labels": {
+        "correct": 1,
+        "minor_issue": 0,
+        "materially_wrong": 1,
+        "withheld": 1,
+        "appropriate_clarification": 0,
+        "fixture_ambiguous": 0
+      },
+      "strictPass": false
+    },
+    {
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "turnCount": 3,
+      "labels": {
+        "correct": 3,
+        "minor_issue": 0,
+        "materially_wrong": 0,
+        "withheld": 0,
+        "appropriate_clarification": 0,
+        "fixture_ambiguous": 0
+      },
+      "strictPass": true
+    },
+    {
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "turnCount": 3,
+      "labels": {
+        "correct": 0,
+        "minor_issue": 0,
+        "materially_wrong": 0,
+        "withheld": 3,
+        "appropriate_clarification": 0,
+        "fixture_ambiguous": 0
+      },
+      "strictPass": false
+    },
+    {
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "turnCount": 3,
+      "labels": {
+        "correct": 2,
+        "minor_issue": 0,
+        "materially_wrong": 0,
+        "withheld": 1,
+        "appropriate_clarification": 0,
+        "fixture_ambiguous": 0
+      },
+      "strictPass": false
+    }
+  ],
+  "cases": [
+    {
+      "id": "context-hold-09-rooftop-access-1",
+      "split": "heldout",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "For this project, is a 5-foot-wide rooftop clear path enough for firefighter access?",
+      "label": "withheld",
+      "strictPass": false,
+      "reasoning": "The delivered response provides no rule or project conclusion, although both writer drafts correctly answer no: the stated 5-foot width is below the 6-foot minimum. The actual writer evidence contains the controlling threshold and parent height/slope scope. This is an unnecessary nonanswer, not an appropriate request for missing facts.",
+      "failureStage": "deterministic_answer_gate_before_subjective_verifier",
+      "factReading": "Both drafts apply the supplied 60-foot flat-roof facts and the 5-foot proposal. No alternative/modification was stated; the narrow width answer did not require further project information.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "deliveredMode": "clarification",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FC 504.4.4"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "Parent scope: buildings 100 feet or less and slope exception greater than 20 degrees",
+            "presentInActualSourceIDs": [],
+            "presentInWriterRequestFiles": [
+              "d33cc80b-376f-400f-a2c2-3b6f918bd97c-request.json",
+              "48f91ab7-e6b8-42ad-b18d-6737182ce2b9-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004726-1",
+              "research-permitext_discovered-id:113-13"
+            ]
+          },
+          {
+            "clause": "Rooftop path minimum: 6 feet horizontal width and 9 feet height",
+            "presentInActualSourceIDs": [],
+            "presentInWriterRequestFiles": [
+              "d33cc80b-376f-400f-a2c2-3b6f918bd97c-request.json",
+              "48f91ab7-e6b8-42ad-b18d-6737182ce2b9-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004726-1",
+              "research-permitext_discovered-id:113-13"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FC 504.4": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+          "FC 504.4.4": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+          "FC 504.4.6": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "d3fe832c9e15bf8a9b7a1242469945df260befef0add263657006856557a3888",
+        "fixtureStructuredFactsSHA256": "8e15e9ebb611a46b24e61681def8fc2eb149af7129d80bdc8fa1cf2b42f8a087",
+        "projectInformationSHA256": "1e8414bce32f8bd7c11ba63ff49861d64f1a15fe99c13ed962c786c241fb66cb",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current enacted NYC Fire Code",
+            "status": "confirmed"
+          },
+          {
+            "key": "building-height",
+            "value": "60 feet",
+            "status": "confirmed"
+          },
+          {
+            "key": "roof-slope",
+            "value": "Flat roof, zero degrees",
+            "status": "confirmed"
+          },
+          {
+            "key": "clear-path-proposal",
+            "value": "5 feet horizontal width",
+            "status": "confirmed"
+          },
+          {
+            "key": "door",
+            "value": "Ordinary bulkhead door opening onto the roof",
+            "status": "confirmed"
+          },
+          {
+            "key": "approval-modifications",
+            "value": "No approved alternative or modification of rooftop access requirements",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Both drafts apply the supplied 60-foot flat-roof facts and the 5-foot proposal. No alternative/modification was stated; the narrow width answer did not require further project information."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": null,
+        "actualCitedSources": [],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "FC 504.4",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 504.4.4",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 504.4.6",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 0,
+        "materialContradictionFound": false,
+        "notes": "Delivered supportedPoints are empty; draft points were inspected for failure attribution only."
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "d33cc80b-376f-400f-a2c2-3b6f918bd97c-request.json",
+          "requestSHA256": "868be5f052d4fbc9757ea7492afdb561fdca7d0be78767222e4f2cafff7df986",
+          "responseFile": "d33cc80b-376f-400f-a2c2-3b6f918bd97c-response.json",
+          "responseSHA256": "f308197a3d2dd404a6a1108d44bea8f77385855b5b96e7d9c9f5c73f6ecf5cae",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "No. On the stated facts, the rooftop-access rule applies because the building is 60 feet tall and the flat roof does not exceed the slope exclusion. It requires a clear path at least 6 feet wide and 9 feet high, so a 5-foot-wide path is 1 foot too narrow (FC § 504.4, including § 504.4.4). No approved alternative or modification is stated. The supplied passage does not establish whether some other project-specific approval changes that result.",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": null
+        },
+        {
+          "file": "48f91ab7-e6b8-42ad-b18d-6737182ce2b9-request.json",
+          "requestSHA256": "214c5abd98e8125f1b11da17c53a7fa735c991ceb488a55a4a4ec3b3d41900a0",
+          "responseFile": "48f91ab7-e6b8-42ad-b18d-6737182ce2b9-response.json",
+          "responseSHA256": "caf9340ea2dc3a94ac9efa40cd3e57b946da7c0fa9f976e342ad44a8a670a0f6",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "No. Under the supplied current-consolidated NYC Fire Code text, the rooftop rule covers buildings 100 feet or less in height with roofs not exceeding a 20-degree slope; the stated 60-foot height and flat roof meet those conditions. The clear path must be at least 6 feet wide and 9 feet high, so a 5-foot path is 1 foot short. It must also provide the prescribed front-to-rear and side-to-side routes, with no more than 100 feet between paths, and afford reasonable access to rooftop features including bulkhead doors. (FC § 504.4, § 504.4.4.)",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": "1. zoning_unbound_conclusion: Bind every material Zoning conclusion to an exact supplied Zoning PASSAGE_ID; do not present an uncited parcel, use, bulk, parking, or applicability conclusion."
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "The bounded revision request records zoning_unbound_conclusion demanding exact Zoning PASSAGE_ID binding for an FC rooftop answer. No exact-question medium-effort verifier request exists. The final recorded reason is verification_incomplete; the post-revision deterministic finding itself is not retained in results and is unknown.",
+        "noMediumVerifierRequestFound": true,
+        "unrecordedFinalGateFinding": "unknown",
+        "records": []
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 11.373190708000038
+    },
+    {
+      "id": "context-hold-09-rooftop-access-2",
+      "split": "heldout",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "We widen the clear path to 6 feet, but a fixed overhead structure leaves only 8 feet of vertical clearance. Does that meet the clear-path height?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly distinguishes the independent width and height minima and rejects the stated 8-foot overhead clearance because 9 feet is required. The cited FC 504 packet actually contains 504.4 parent scope and 504.4.4.",
+      "failureStage": null,
+      "factReading": "Applies the corrected 6-foot width and the explicit 8-foot clearance; does not continue evaluating the superseded 5-foot proposal. The short scope qualification is legally supported and does not block the answer.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "No. For rooftops within the supplied rule’s scope—buildings 100 feet or less in height and not exceeding the stated roof-slope exception—the rooftop clear path must be at least 9 feet high. An 8-foot overhead clearance is 1 foot short, even if the path is widened to 6 feet; the width and height are separate minimums (FC § 504.4, including § 504.4.4).",
+      "answerTextSHA256": "8e7621ddb543285bb12f984f574dc821ef3292ba75c539b3f688a0d66f070da6",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FC 504.4.4"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "Parent rooftop scope retained",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004726-1",
+              "research-permitext_discovered-id:31004734-9"
+            ],
+            "presentInWriterRequestFiles": [
+              "451daf13-46e3-4160-aec4-02dcc92b02a0-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004726-1",
+              "research-permitext_discovered-id:31004734-9"
+            ]
+          },
+          {
+            "clause": "6-foot width plus independent 9-foot height minimum",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004726-1"
+            ],
+            "presentInWriterRequestFiles": [
+              "451daf13-46e3-4160-aec4-02dcc92b02a0-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004726-1"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FC 504.4": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+          "FC 504.4.4": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+          "FC 504.4.6": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "d3fe832c9e15bf8a9b7a1242469945df260befef0add263657006856557a3888",
+        "fixtureStructuredFactsSHA256": "8e15e9ebb611a46b24e61681def8fc2eb149af7129d80bdc8fa1cf2b42f8a087",
+        "projectInformationSHA256": "1e8414bce32f8bd7c11ba63ff49861d64f1a15fe99c13ed962c786c241fb66cb",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current enacted NYC Fire Code",
+            "status": "confirmed"
+          },
+          {
+            "key": "building-height",
+            "value": "60 feet",
+            "status": "confirmed"
+          },
+          {
+            "key": "roof-slope",
+            "value": "Flat roof, zero degrees",
+            "status": "confirmed"
+          },
+          {
+            "key": "clear-path-proposal",
+            "value": "5 feet horizontal width",
+            "status": "confirmed"
+          },
+          {
+            "key": "door",
+            "value": "Ordinary bulkhead door opening onto the roof",
+            "status": "confirmed"
+          },
+          {
+            "key": "approval-modifications",
+            "value": "No approved alternative or modification of rooftop access requirements",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Applies the corrected 6-foot width and the explicit 8-foot clearance; does not continue evaluating the superseded 5-foot proposal. The short scope qualification is legally supported and does not block the answer."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004726-1",
+            "sectionID": "31004726",
+            "reference": "FC 504",
+            "textSHA256": "4a6e36a103a311b54df022967d69eb558b983cc305048d560b23c6fbb11b6403",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "FC 504.4",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 504.4.4",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 504.4.6",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false,
+        "notes": null
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "451daf13-46e3-4160-aec4-02dcc92b02a0-request.json",
+          "requestSHA256": "5016e36f1560c779baceac1f1e1ba3ccff94a4c2c8c9f59a5a489ce3084592b2",
+          "responseFile": "451daf13-46e3-4160-aec4-02dcc92b02a0-response.json",
+          "responseSHA256": "e4348359a84b3e09ae3ecec75a54ad908f11c70b97109fce67f54f9f7bf056eb",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "No. For rooftops within the supplied rule’s scope—buildings 100 feet or less in height and not exceeding the stated roof-slope exception—the rooftop clear path must be at least 9 feet high. An 8-foot overhead clearance is 1 foot short, even if the path is widened to 6 feet; the width and height are separate minimums (FC § 504.4, including § 504.4.4).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": true,
+          "observedRevisionFeedback": null
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Delivered answer compared independently with actual source clauses and frozen canonical packets.",
+        "noMediumVerifierRequestFound": false,
+        "unrecordedFinalGateFinding": null,
+        "records": [
+          {
+            "file": "470fd186-0d06-4e32-bd95-8cc5ff64a5b5-request.json",
+            "requestSHA256": "7188b6379e6744867559ddacee5cd8bcf467f8997e10bf12915fe0871abc5bf6",
+            "responseFile": "470fd186-0d06-4e32-bd95-8cc5ff64a5b5-response.json",
+            "responseSHA256": "ceff0847b119db331fc506fa2647e6cee4e2ecb7380e8e85abea64c9645c8b90",
+            "recordedJudgment": {
+              "pass": true,
+              "issues": [],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          }
+        ]
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 13.87390741699998
+    },
+    {
+      "id": "context-hold-09-rooftop-access-3",
+      "split": "heldout",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "The path is now clear to 9 feet. How much clear space must we keep around the bulkhead door that opens onto this rooftop?",
+      "label": "materially_wrong",
+      "strictPass": false,
+      "reasoning": "The delivered categorical claim that no fixed bulkhead-door clearance is specified contradicts canonical FC 504.4.6, which requires 6 feet in all directions from the door opening, measured from the hinge. FC 504.4.4 reasonable-access language cannot establish absence of a distinct clearance rule.",
+      "failureStage": "retrieval_excerpt_missing_decisive_child_then_writer_false_absence_claim_and_verifier_acceptance",
+      "factReading": "The answer correctly uses the 60-foot flat-roof building and updated 6-by-9-foot clear path, but does not answer the distinct bulkhead-door clearance.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "**No fixed clearance distance is specified around the bulkhead door.** For the stated 60-foot, flat-roof building, the clear path must be at least 6 feet wide and 9 feet high, and it must afford “reasonable access” to bulkhead doors. The code does not define that phrase here as a particular number of feet around the door (FC § 504.4.4).",
+      "answerTextSHA256": "733246b29ad59ace69bb22bb906232d8a40c55869978d50aa41bd790ee3e95ae",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "incomplete",
+        "expectedReferences": [
+          "FC 504.4.6"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "Parent rooftop scope retained",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004726-1",
+              "research-permitext_discovered-id:31004734-2"
+            ],
+            "presentInWriterRequestFiles": [
+              "062f66af-0baf-44c1-8a97-eca98553b046-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004726-1",
+              "research-permitext_discovered-id:31004734-2"
+            ]
+          },
+          {
+            "clause": "504.4.6: 6 feet clearance in all directions at bulkhead door, measured from hinge",
+            "presentInActualSourceIDs": [],
+            "presentInWriterRequestFiles": [],
+            "presentInWriterSourceIDs": []
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FC 504.4": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+          "FC 504.4.4": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+          "FC 504.4.6": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "d3fe832c9e15bf8a9b7a1242469945df260befef0add263657006856557a3888",
+        "fixtureStructuredFactsSHA256": "8e15e9ebb611a46b24e61681def8fc2eb149af7129d80bdc8fa1cf2b42f8a087",
+        "projectInformationSHA256": "1e8414bce32f8bd7c11ba63ff49861d64f1a15fe99c13ed962c786c241fb66cb",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current enacted NYC Fire Code",
+            "status": "confirmed"
+          },
+          {
+            "key": "building-height",
+            "value": "60 feet",
+            "status": "confirmed"
+          },
+          {
+            "key": "roof-slope",
+            "value": "Flat roof, zero degrees",
+            "status": "confirmed"
+          },
+          {
+            "key": "clear-path-proposal",
+            "value": "5 feet horizontal width",
+            "status": "confirmed"
+          },
+          {
+            "key": "door",
+            "value": "Ordinary bulkhead door opening onto the roof",
+            "status": "confirmed"
+          },
+          {
+            "key": "approval-modifications",
+            "value": "No approved alternative or modification of rooftop access requirements",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "The answer correctly uses the 60-foot flat-roof building and updated 6-by-9-foot clear path, but does not answer the distinct bulkhead-door clearance."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004726-1",
+            "sectionID": "31004726",
+            "reference": "FC 504",
+            "textSHA256": "4a6e36a103a311b54df022967d69eb558b983cc305048d560b23c6fbb11b6403",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "FC 504.4",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 504.4.4",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 504.4.6",
+            "canonicalParentReference": "FC 504",
+            "sectionID": 31004726,
+            "id": 31004726,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "ec6dd033c935d25b6de2984410bdd0e8040c43e03dc012df432aeca39f24f303",
+            "actualResolverTextLength": 21284,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 504: Building and Rooftop Access",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": "A partial 504.4.4 excerpt cannot support a universal absence claim about required door clearance."
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": true,
+        "notes": null
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "062f66af-0baf-44c1-8a97-eca98553b046-request.json",
+          "requestSHA256": "aad900ee063bd3fb5abe15c1f82ccdbfa177d764582a2a2c1e0e963ee02bf8c6",
+          "responseFile": "062f66af-0baf-44c1-8a97-eca98553b046-response.json",
+          "responseSHA256": "25b02a8c44e08cd690b562234d0253abbb30b5193059f0c5efe9b83cb35e31a8",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "**No fixed clearance distance is specified around the bulkhead door.** For the stated 60-foot, flat-roof building, the clear path must be at least 6 feet wide and 9 feet high, and it must afford “reasonable access” to bulkhead doors. The code does not define that phrase here as a particular number of feet around the door (FC § 504.4.4).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": true,
+          "observedRevisionFeedback": null
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "The actual writer request 062f66af-0baf-44c1-8a97-eca98553b046 contains FC 504.4 plus 504.4.4, but omits the 504.4.6 text and its six-foot/in-all-directions/hinge clause. The parent sectionID is present; that is not decisive-text coverage. The medium verifier nevertheless returns pass=true. Both delivered prose and supportedPoints repeat the false absence claim.",
+        "noMediumVerifierRequestFound": false,
+        "unrecordedFinalGateFinding": null,
+        "records": [
+          {
+            "file": "b3d03c4d-ff1e-4f9e-a72b-f0a0e9d2e9ca-request.json",
+            "requestSHA256": "57be7c80df877880333ad0cb6e4daccfd39ebfd533971773c7a99d033266de91",
+            "responseFile": "b3d03c4d-ff1e-4f9e-a72b-f0a0e9d2e9ca-response.json",
+            "responseSHA256": "b33777824d5f06f879dfff228e7bf823a5254001adb0db4b86e3ccf059624537",
+            "recordedJudgment": {
+              "pass": true,
+              "issues": [],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          }
+        ]
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 11.012212499999965
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-1",
+      "split": "heldout",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "question": "For this project, are 10-second monthly emergency-light activation tests long enough?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly rejects 10-second monthly manual activation tests: FC 1027.9.1 requires at least 30 seconds. The automated option is correctly excluded under the initial equipment facts. The added annual 90-minute test is accurately qualified under FC 604.5.",
+      "failureStage": null,
+      "factReading": "Uses the confirmed initial manual/no-automated-feature premise. Does not ask the user to reconfirm an established equipment fact.",
+      "keyNotes": [
+        "The final answer omits the trained/knowledgeable tester wording for the manual test, but the directly asked duration conclusion is correct and it does not claim an unqualified person is allowed. The operative tester qualification is present in actual evidence."
+      ],
+      "answerText": "**No.** The monthly manual activation tests must last at least **30 seconds**, so the stated 10-second tests are 20 seconds too short. The automated-testing alternative does not apply because the supplied project facts say the equipment has no automated self-testing and self-diagnostic feature (FC § 1027.9.1).\n\nSeparately, battery-powered emergency lighting must receive a battery-power test of at least **90 minutes at least once a year**, conducted by a qualified person **in accordance with FC 604.5** (FC § 1027.9.2).",
+      "answerTextSHA256": "4347e9fe7fd4ba26894c2ce68718edb68d15d9939b36134d4f5eb159c063e6d0",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FC 1027.9.1"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "Trained knowledgeable tester and at least 30-second activation test",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004796-1"
+            ],
+            "presentInWriterRequestFiles": [
+              "b8303eb2-264e-4b46-96de-57609da5d0cb-request.json",
+              "d08cae92-f785-4640-ac30-f88286f8bbcb-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004796-1",
+              "research-permitext_discovered-id:31004681-14"
+            ]
+          },
+          {
+            "clause": "Manual monthly testing unless automated self-testing/self-diagnostic feature",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004796-1"
+            ],
+            "presentInWriterRequestFiles": [
+              "b8303eb2-264e-4b46-96de-57609da5d0cb-request.json",
+              "d08cae92-f785-4640-ac30-f88286f8bbcb-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004796-1",
+              "research-permitext_discovered-id:31004681-14"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FC 1027.1": "ae42508fc33cc5966d4146ff8f61c705f6609c69fa011e72277be166517d6739",
+          "FC 1027.9": "823d212cfe952311bccb3b76d246c085d8acc171597cf7c17aa3ce3cc9c73899",
+          "FC 604.5": "6db9cc5a570ecb8fe6f525b90b5634a5008e85cbf131ef674eb2d37b53c1599d",
+          "FC 1027.9.1": "d3e65492c7883685a54e203c9f4c9288be793764bc350e55d3dd0d4caaff5b55",
+          "FC 1027.9.2": "5856f87d5b5431b37cb498f7a0c6671d937be2c60745e1a6cc172e59d505e2b3"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "fd55ada1df2f8f40dfe41c8b1f907b096991a634877398de54e68805eeff21a9",
+        "fixtureStructuredFactsSHA256": "44b56ba0d99a7ba05ce324ebf53edface1189de866a6639ab90716bb1856c93d",
+        "projectInformationSHA256": "c92410043ec5d2f97655db25b133c0670fe1bcd0d0733c5bf24c26311c0070ac",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current enacted NYC Fire Code",
+            "status": "confirmed"
+          },
+          {
+            "key": "use",
+            "value": "Group B office",
+            "status": "confirmed"
+          },
+          {
+            "key": "equipment",
+            "value": "Battery-powered emergency lighting for the means of egress",
+            "status": "confirmed"
+          },
+          {
+            "key": "current-activation-testing",
+            "value": "Manual tests lasting 10 seconds once a month; no automated testing feature initially",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Uses the confirmed initial manual/no-automated-feature premise. Does not ask the user to reconfirm an established equipment fact."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004796-1",
+            "sectionID": "31004796",
+            "reference": "FC 1027",
+            "textSHA256": "1ff0ce5a1a477688ee2f47cb41811cb95538e9a0e9a0e079b501fd117e9f0b70",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "FC 1027.1",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 604.5",
+            "canonicalParentReference": "FC 604",
+            "sectionID": 31004738,
+            "id": 31004738,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+            "actualResolverTextLength": 3300,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 604: Emergency Power Systems",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9.1",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9.2",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 2,
+        "materialContradictionFound": false,
+        "notes": "Direct activation-duration conclusion and ancillary annual-test point are source-supported."
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "b8303eb2-264e-4b46-96de-57609da5d0cb-request.json",
+          "requestSHA256": "51905b18f71ca25e61e11689ae6861af1a31734a13a10168f63b684399e651ec",
+          "responseFile": "b8303eb2-264e-4b46-96de-57609da5d0cb-response.json",
+          "responseSHA256": "1f1d98137a789b9f47d44ea18447608eea8d302d8d59c2f78598ac71702ce20a",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "**No.** Under the supplied current-consolidated NYC Fire Code text, a manual monthly activation test must last at least **30 seconds**; the stated 10-second tests are 20 seconds short. The automated self-testing exception does not apply on the supplied fact that the equipment has no automated self-testing and self-diagnostic feature (FC § 1027.9.1). Separately, battery-powered emergency lighting must be tested on battery power for at least **90 minutes at least once a year** by a qualified person (FC § 1027.9.2).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": null
+        },
+        {
+          "file": "d08cae92-f785-4640-ac30-f88286f8bbcb-request.json",
+          "requestSHA256": "8d18289acac6de762a69a79878991ba87ee87b4b740a2a003427f508dfb180a5",
+          "responseFile": "d08cae92-f785-4640-ac30-f88286f8bbcb-response.json",
+          "responseSHA256": "e71d5a2f93a1cfcf82e5ef213fdf3670c2ab1c93cdd1646e74739e25289680ca",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "**No.** The monthly manual activation tests must last at least **30 seconds**, so the stated 10-second tests are 20 seconds too short. The automated-testing alternative does not apply because the supplied project facts say the equipment has no automated self-testing and self-diagnostic feature (FC § 1027.9.1).\n\nSeparately, battery-powered emergency lighting must receive a battery-power test of at least **90 minutes at least once a year**, conducted by a qualified person **in accordance with FC 604.5** (FC § 1027.9.2).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": true,
+          "observedRevisionFeedback": "1. missed_material_conclusion: The answer correctly concludes that 10-second monthly tests are too short: FC 1027.9.1 requires at least 30 seconds, and the supplied project fact says there is no automated self-testing feature. But the separate annual-test sentence omits the source’s qualification that the 90-minute battery-power test must be conducted “in accordance with FC 604.5” (FC 1027.9.2, in the cited FC 1027 passage). Remove that ancillary sentence or retain the cross-reference with an appropriately bounded explanation."
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Delivered answer compared independently with actual source clauses and frozen canonical packets.",
+        "noMediumVerifierRequestFound": false,
+        "unrecordedFinalGateFinding": null,
+        "records": [
+          {
+            "file": "05e61ca4-f019-4f40-87e9-1fbc1287a3ea-request.json",
+            "requestSHA256": "8acb4bd35f14141cb959c49e5320327abd7d869e027d64d420344fa09aa18b7c",
+            "responseFile": "05e61ca4-f019-4f40-87e9-1fbc1287a3ea-response.json",
+            "responseSHA256": "f099622b71e02f888d492003a65f52508f061aeb271a57dbd582ffd0ab00831d",
+            "recordedJudgment": {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "missed_material_conclusion",
+                  "detail": "The answer correctly concludes that 10-second monthly tests are too short: FC 1027.9.1 requires at least 30 seconds, and the supplied project fact says there is no automated self-testing feature. But the separate annual-test sentence omits the source’s qualification that the 90-minute battery-power test must be conducted “in accordance with FC 604.5” (FC 1027.9.2, in the cited FC 1027 passage). Remove that ancillary sentence or retain the cross-reference with an appropriately bounded explanation."
+                }
+              ],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          },
+          {
+            "file": "945f1a2d-dd02-4b4f-840f-af41253fadcc-request.json",
+            "requestSHA256": "5e5152eb04955390e5d25e3ed3f93808353529523820065ad43bcb1b9040f50b",
+            "responseFile": "945f1a2d-dd02-4b4f-840f-af41253fadcc-response.json",
+            "responseSHA256": "19a711c66f067df4ff4067a26c1cd0d1bc5c2a5f3b91c2a8bb0a62dd3f3c1123",
+            "recordedJudgment": {
+              "pass": true,
+              "issues": [],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          }
+        ]
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 34.84068687499995
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-2",
+      "split": "heldout",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "question": "We switch to equipment with automated self-testing and self-diagnostics. Can we skip the monthly visual inspection too?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly says automated self-testing does not eliminate monthly visual inspection, and identifies supervisory/trouble signals and other malfunction indicators. Annual testing remains a separate correctly stated obligation.",
+      "failureStage": null,
+      "factReading": "Uses the current hypothetical automated equipment even though original structured facts describe equipment without automation initially. The explicit follow-up change controls the requested scenario.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "**No.** If the equipment uses its automated self-testing and self-diagnostic feature instead of monthly manual testing, it still requires a visual inspection at least once a month. That inspection must check the display for a supervisory or trouble signal, or any other indication the equipment is not in good working order (2022 NYC Fire Code § 1027.9.1). The separate annual battery-power test of at least 90 minutes also remains required (FC § 1027.9.2).",
+      "answerTextSHA256": "25eef5a88c756fcb1c2ee65980b06d42cf1ae80ea3d4ac5e012b202d8ee64aed",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FC 1027.9.1"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "Automated option still requires monthly visual inspection",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004796-1"
+            ],
+            "presentInWriterRequestFiles": [
+              "e010d7c4-f938-4826-b9e2-9ce724b83c77-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004796-1"
+            ]
+          },
+          {
+            "clause": "Visual inspection checks supervisory/trouble signals or other malfunction",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004796-1"
+            ],
+            "presentInWriterRequestFiles": [
+              "e010d7c4-f938-4826-b9e2-9ce724b83c77-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004796-1"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FC 1027.1": "ae42508fc33cc5966d4146ff8f61c705f6609c69fa011e72277be166517d6739",
+          "FC 1027.9": "823d212cfe952311bccb3b76d246c085d8acc171597cf7c17aa3ce3cc9c73899",
+          "FC 604.5": "6db9cc5a570ecb8fe6f525b90b5634a5008e85cbf131ef674eb2d37b53c1599d",
+          "FC 1027.9.1": "d3e65492c7883685a54e203c9f4c9288be793764bc350e55d3dd0d4caaff5b55",
+          "FC 1027.9.2": "5856f87d5b5431b37cb498f7a0c6671d937be2c60745e1a6cc172e59d505e2b3"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "fd55ada1df2f8f40dfe41c8b1f907b096991a634877398de54e68805eeff21a9",
+        "fixtureStructuredFactsSHA256": "44b56ba0d99a7ba05ce324ebf53edface1189de866a6639ab90716bb1856c93d",
+        "projectInformationSHA256": "c92410043ec5d2f97655db25b133c0670fe1bcd0d0733c5bf24c26311c0070ac",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current enacted NYC Fire Code",
+            "status": "confirmed"
+          },
+          {
+            "key": "use",
+            "value": "Group B office",
+            "status": "confirmed"
+          },
+          {
+            "key": "equipment",
+            "value": "Battery-powered emergency lighting for the means of egress",
+            "status": "confirmed"
+          },
+          {
+            "key": "current-activation-testing",
+            "value": "Manual tests lasting 10 seconds once a month; no automated testing feature initially",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Uses the current hypothetical automated equipment even though original structured facts describe equipment without automation initially. The explicit follow-up change controls the requested scenario."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004796-1",
+            "sectionID": "31004796",
+            "reference": "FC 1027",
+            "textSHA256": "1ff0ce5a1a477688ee2f47cb41811cb95538e9a0e9a0e079b501fd117e9f0b70",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "FC 1027.1",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 604.5",
+            "canonicalParentReference": "FC 604",
+            "sectionID": 31004738,
+            "id": 31004738,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+            "actualResolverTextLength": 3300,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 604: Emergency Power Systems",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9.1",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9.2",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 2,
+        "materialContradictionFound": false,
+        "notes": null
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "e010d7c4-f938-4826-b9e2-9ce724b83c77-request.json",
+          "requestSHA256": "7f80d5d0d68f98f82fe4368eb25c89411d99513b0f015cb7fbd33da4e8e2f04e",
+          "responseFile": "e010d7c4-f938-4826-b9e2-9ce724b83c77-response.json",
+          "responseSHA256": "33f93a425415d8c7290f95bbb76b8df9169cf670a8fbc5377f1c24cb34526667",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "**No.** If the equipment uses its automated self-testing and self-diagnostic feature instead of monthly manual testing, it still requires a visual inspection at least once a month. That inspection must check the display for a supervisory or trouble signal, or any other indication the equipment is not in good working order (2022 NYC Fire Code § 1027.9.1). The separate annual battery-power test of at least 90 minutes also remains required (FC § 1027.9.2).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": true,
+          "observedRevisionFeedback": null
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Delivered answer compared independently with actual source clauses and frozen canonical packets.",
+        "noMediumVerifierRequestFound": false,
+        "unrecordedFinalGateFinding": null,
+        "records": [
+          {
+            "file": "087b2aba-4be7-42e2-bf28-f9e61c181ae8-request.json",
+            "requestSHA256": "f479735cdbbb95c65b7a98302d8bd355724ec52e967103d0e8468b6db9692cb8",
+            "responseFile": "087b2aba-4be7-42e2-bf28-f9e61c181ae8-response.json",
+            "responseSHA256": "f59ce5992610c9ec65e1bed38067c3be795d603d1e30679fd6e6ad457032bf93",
+            "recordedJudgment": {
+              "pass": true,
+              "issues": [],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          }
+        ]
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 9.576537249999994
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests-3",
+      "split": "heldout",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "question": "Apart from the monthly checks, what minimum duration and frequency apply to the battery-power test?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly states battery operation for at least 90 minutes at least once a year, by a qualified person under FC 604.5. The actual writer packet contains both 1027.9.2 and the operative supervision/qualification text of 604.5.",
+      "failureStage": null,
+      "factReading": "Preserves the equipment and NYC current Fire Code scenario and keeps annual battery testing distinct from monthly activation/visual checks.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "Under the supplied current-consolidated NYC Fire Code text, the battery-power test must operate the equipment on battery power for **at least 90 minutes**, and it must be conducted **at least once a year**. It is separate from the monthly activation checks. The test must be performed by a qualified person in accordance with FC 604.5; that section requires personal supervision by a knowledgeable, trained person with at least one listed qualification (FC §§ 1027.9.2, 604.5).",
+      "answerTextSHA256": "2d97b58fb37ddd69b8dfb1f384dd12fc8eaded3c72edf7382830a06eaec3480b",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FC 1027.9.2"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "Battery power for at least 90 minutes, at least annually, qualified person under FC 604.5",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004796-2"
+            ],
+            "presentInWriterRequestFiles": [
+              "774c6fc1-20cf-48a0-b96b-b4040580d8da-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004796-2"
+            ]
+          },
+          {
+            "clause": "FC 604.5 knowledge/training, personal supervision and listed qualifications",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004738-5"
+            ],
+            "presentInWriterRequestFiles": [
+              "774c6fc1-20cf-48a0-b96b-b4040580d8da-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:31004738-5"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FC 1027.1": "ae42508fc33cc5966d4146ff8f61c705f6609c69fa011e72277be166517d6739",
+          "FC 1027.9": "823d212cfe952311bccb3b76d246c085d8acc171597cf7c17aa3ce3cc9c73899",
+          "FC 604.5": "6db9cc5a570ecb8fe6f525b90b5634a5008e85cbf131ef674eb2d37b53c1599d",
+          "FC 1027.9.1": "d3e65492c7883685a54e203c9f4c9288be793764bc350e55d3dd0d4caaff5b55",
+          "FC 1027.9.2": "5856f87d5b5431b37cb498f7a0c6671d937be2c60745e1a6cc172e59d505e2b3"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "fd55ada1df2f8f40dfe41c8b1f907b096991a634877398de54e68805eeff21a9",
+        "fixtureStructuredFactsSHA256": "44b56ba0d99a7ba05ce324ebf53edface1189de866a6639ab90716bb1856c93d",
+        "projectInformationSHA256": "c92410043ec5d2f97655db25b133c0670fe1bcd0d0733c5bf24c26311c0070ac",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current enacted NYC Fire Code",
+            "status": "confirmed"
+          },
+          {
+            "key": "use",
+            "value": "Group B office",
+            "status": "confirmed"
+          },
+          {
+            "key": "equipment",
+            "value": "Battery-powered emergency lighting for the means of egress",
+            "status": "confirmed"
+          },
+          {
+            "key": "current-activation-testing",
+            "value": "Manual tests lasting 10 seconds once a month; no automated testing feature initially",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Preserves the equipment and NYC current Fire Code scenario and keeps annual battery testing distinct from monthly activation/visual checks."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004796-2",
+            "sectionID": "31004796",
+            "reference": "FC 1027",
+            "textSHA256": "1ff0ce5a1a477688ee2f47cb41811cb95538e9a0e9a0e079b501fd117e9f0b70",
+            "evidenceRole": "supporting"
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:31004738-5",
+            "sectionID": "31004738",
+            "reference": "FC 604",
+            "textSHA256": "ebffcb46eb2bf0a05ee204dfef42594b771adfe2ca7560b17758a250cf62f6f9",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "FC 1027.1",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 604.5",
+            "canonicalParentReference": "FC 604",
+            "sectionID": 31004738,
+            "id": 31004738,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+            "actualResolverTextLength": 3300,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 604: Emergency Power Systems",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9.1",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "FC 1027.9.2",
+            "canonicalParentReference": "FC 1027",
+            "sectionID": 31004796,
+            "id": 31004796,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "141be6109a9a332c4484245e73f09a77a59b06a5abfda7d38c6786201e3dc282",
+            "actualResolverTextLength": 10279,
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "title": "FC 1027: Maintenance of the Means of Egress",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 2,
+        "materialContradictionFound": false,
+        "notes": null
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "774c6fc1-20cf-48a0-b96b-b4040580d8da-request.json",
+          "requestSHA256": "ba5548d421208e8ee71d9dd75767c191a341c9f17f4a68ba94fd1bec87863949",
+          "responseFile": "774c6fc1-20cf-48a0-b96b-b4040580d8da-response.json",
+          "responseSHA256": "8f3e7640db29882d3c813decefa2a68309b8183638183f263f37cc6778f430f6",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "Under the supplied current-consolidated NYC Fire Code text, the battery-power test must operate the equipment on battery power for **at least 90 minutes**, and it must be conducted **at least once a year**. It is separate from the monthly activation checks. The test must be performed by a qualified person in accordance with FC 604.5; that section requires personal supervision by a knowledgeable, trained person with at least one listed qualification (FC §§ 1027.9.2, 604.5).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": true,
+          "observedRevisionFeedback": null
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Delivered answer compared independently with actual source clauses and frozen canonical packets.",
+        "noMediumVerifierRequestFound": false,
+        "unrecordedFinalGateFinding": null,
+        "records": [
+          {
+            "file": "f0b23f19-3ef7-4777-938b-02a25bfc36fa-request.json",
+            "requestSHA256": "fe08eb22f70e9cb5710aa6d0e6bf39a6af3af5121789e5887ce28aa409e2fd6e",
+            "responseFile": "f0b23f19-3ef7-4777-938b-02a25bfc36fa-response.json",
+            "responseSHA256": "83efcba6d39c7712c9d0490108f8c5400651cb475fe247f75b3e64e77e8a72dc",
+            "recordedJudgment": {
+              "pass": true,
+              "issues": [],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          }
+        ]
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 13.333013749999983
+    },
+    {
+      "id": "context-hold-11-office-loading-table-1",
+      "split": "heldout",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "For this project, how many accessory off-street loading berths does the ordinary zoning table require?",
+      "label": "withheld",
+      "strictPass": false,
+      "reasoning": "The delivered response withholds the requested ordinary table result. Both writer drafts correctly compute one berth for the stated new 120,000-square-foot C4-4 LRC-C office development. Canonical table cells independently establish that calculation; model/verifier booleans are not the basis of the grade.",
+      "failureStage": "deterministic_table_binding_gate",
+      "factReading": "Both drafts use the stated C4-4 district, explicit Use Group VII/LRC-C office classification, whole new development area and no loading relief. No missing fact is necessary to apply the requested ordinary table.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "deliveredMode": "clarification",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "ZR 36-62"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "36-62 development/enlargement applicability and use classification LRC-C/VII",
+            "presentInActualSourceIDs": [],
+            "presentInWriterRequestFiles": [
+              "ff1a2d14-3036-4811-90c6-fb345c409d52-request.json",
+              "b1937d59-f038-4eb4-b1af-4ea4671cde60-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:20017974-1",
+              "research-permitext_discovered-id:20018523-13"
+            ]
+          },
+          {
+            "clause": "C4-4 column label and LRC-C cumulative loading bands: first 100,000 none, next 200,000 one, each additional 300,000 one",
+            "presentInActualSourceIDs": [],
+            "presentInWriterRequestFiles": [
+              "ff1a2d14-3036-4811-90c6-fb345c409d52-request.json",
+              "b1937d59-f038-4eb4-b1af-4ea4671cde60-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:20017974-1",
+              "research-permitext_discovered-id:20018523-13"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "ZR 36-61": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+          "ZR 36-62": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "99de5f4ea32eea8fa0f7e6173fc68793cda7ccd235e4cf06d9454ae1a569291f",
+        "fixtureStructuredFactsSHA256": "7d1a5d465c29b258419b02fea8ab93ca4da62f871af91803765f51ba3569adf8",
+        "projectInformationSHA256": "121073e7cddbc78ab90704739ec802a5e821446a7aef31408cb5a5e7a1be6000",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current imported NYC Zoning Resolution",
+            "status": "confirmed"
+          },
+          {
+            "key": "zoning-district",
+            "value": "C4-4",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-work",
+            "value": "New development",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-use",
+            "value": "Only Use Group VII offices, within Loading Requirement Category C",
+            "status": "confirmed"
+          },
+          {
+            "key": "floor-area",
+            "value": "120,000 square feet for this development; no other use or enlargement portion",
+            "status": "confirmed"
+          },
+          {
+            "key": "modifications",
+            "value": "No special district modification, waiver, grandfathering or approved loading relief",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Both drafts use the stated C4-4 district, explicit Use Group VII/LRC-C office classification, whole new development area and no loading relief. No missing fact is necessary to apply the requested ordinary table."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": null,
+        "actualCitedSources": [],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "ZR 36-61",
+            "canonicalParentReference": "ZR 36-61",
+            "sectionID": 20017973,
+            "id": 20017973,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+            "actualResolverTextLength": 423,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Permitted Accessory Off-street Loading Berths",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "ZR 36-62",
+            "canonicalParentReference": "ZR 36-62",
+            "sectionID": 20017974,
+            "id": 20017974,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "872e1bd1c59da33fd61233fd2a415308b8e38e4a4045f3b82ccf981a6a4fe9e2",
+            "actualResolverTextLength": 3130,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Required Accessory Off-street Loading Berths",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 0,
+        "materialContradictionFound": false,
+        "notes": "Delivered supportedPoints are empty; draft points were inspected for failure attribution only."
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "ff1a2d14-3036-4811-90c6-fb345c409d52-request.json",
+          "requestSHA256": "27496a3c67a25871bac3892fd618fe36f371ba6b32459307a194b4aab4906872",
+          "responseFile": "ff1a2d14-3036-4811-90c6-fb345c409d52-response.json",
+          "responseSHA256": "bcaa3c6bf9acab3eba924bdb2995f55bd890910faebf23f98bf5273956c41769",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "**One required berth.** For the stated new development in C4-4, Use Group VII is LRC-C. The table provides no berth for the first 100,000 sq. ft., then one for the next 200,000 sq. ft.; at 120,000 sq. ft., the project falls in that next band, so the ordinary table requires one berth (ZR § 36-62). No loading relief is stated for this project.",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": null
+        },
+        {
+          "file": "b1937d59-f038-4eb4-b1af-4ea4671cde60-request.json",
+          "requestSHA256": "47fcb783d7da729af29dcb4199bceb0fd48bf103faf6e291c19aa44f7a6e3ba7",
+          "responseFile": "b1937d59-f038-4eb4-b1af-4ea4671cde60-response.json",
+          "responseSHA256": "a049bccd201f19c7d3cd9a09f18951cdf1e71c9fe867e6c7ae0784b3da635585",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "**One accessory off-street loading berth.** For the stated new 120,000-sq.-ft. development in C4-4, Use Group VII is LRC-C. The C4-4 table column requires none for the first 100,000 sq. ft. and one for the next 200,000 sq. ft.; 120,000 sq. ft. therefore falls in the one-berth band (ZR § 36-62).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": "1. zoning_table_binding: Bind the table-derived result to the exact structured-table PASSAGE_ID. Do not present a table row, category, symbol, or numeric limit as uncited prose."
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Revision feedback explicitly records zoning_table_binding demanding the exact structured-table PASSAGE_ID. The writer packet contains complete flattened 36-62 operative table text but no structured grid for 36-62. It contains an unrelated structured ZR 36-661 berth-dimension table. No exact-question medium verifier request exists. The final nonanswer reason is verification_incomplete; the exact final post-revision gate finding is not preserved and is unknown.",
+        "noMediumVerifierRequestFound": true,
+        "unrecordedFinalGateFinding": "unknown",
+        "records": []
+      },
+      "structuredTableReview": {
+        "canonicalTableGrids": [
+          {
+            "blockID": "zr-17974-block-008",
+            "htmlSHA256": "b3fc87e1dbe1aa385712fa35851ae607ec4e1088e3c72dcdac0496e49a79e477",
+            "rows": [
+              [
+                {
+                  "text": "Loading Requirement Category",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Use or Use Group",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – A",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Groups IX(A), IX(B) and X",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – B",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Group VI, except automotive equipment rental and leasing, automotive repair and maintenance, or gasoline stations; all uses listed under Use Group VIII",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – C",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Groups V and VII; court houses listed under Use Group IV(A)",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – D",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Hospitals and related facilities listed under Use Group III(B); prisons listed under Use Group IV(A)",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – E",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Funeral establishments listed under Use Group VI",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            ]
+          },
+          {
+            "blockID": "zr-17974-block-011",
+            "htmlSHA256": "2cbbcaafc537c2f946b337b8275432c6068429a48e102101319905b538772123",
+            "rows": [
+              [
+                {
+                  "text": "Loading Requirement Category",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Districts",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ],
+              [
+                {
+                  "text": "C1 2 C2 2 C3 C4-1 C4-2 C4-3 C8-1 C8-2 C7 outside the Greater Transit Zone",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "C1 3 C1-6 C1-7 C1-8 C1-9 C2 3 C2-6 C2-7 C2-8 C4-4 C4-5 C4-6 C4-7 C4-8 C4-9 C4-11 C4-12 C5 C6 C8-3 C8-4 C7 within the Greater Transit Zone",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-A",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 8,000 sq. ft.: None Next 17,000 sq. ft.: 1 Next 15,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Each additional 80,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 15,000 sq. ft.: None Next 25,000 sq. ft.: 1 Next 40,000 sq. ft.: 1 Each additional 80,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-B",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 8,000 sq. ft.: None Next 17,000 sq. ft.: 1 Next 15,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Next 40,000 sq. ft.: 1 Each additional 150,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 25,000 sq. ft.: None Next 15,000 sq. ft.: 1 Next 60,000 sq. ft.: 1 Each additional 150,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-C",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 25,000 sq. ft.: None Next 75,000 sq. ft.: 1 Next 200,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 100,000 sq. ft.: None Next 200,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-D 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 10,000 sq. ft.: None Next 290,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ],
+              [
+                {
+                  "text": "LRC E",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 10,000 sq. ft.: None Next 20,000 sq. ft.: 1 Any additional amount : 1",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ]
+            ]
+          }
+        ],
+        "selectedDistrict": "C4-4",
+        "selectedCategory": "LRC-C",
+        "useClassificationCell": "All uses listed under Use Groups V and VII; court houses listed under Use Group IV(A)",
+        "districtColumnIndex": 2,
+        "districtColumnCounting": "Zero-based among all three table columns (category=0, lower district group=1, C4-4 group=2).",
+        "operativeCell": "First 100,000 sq. ft.: None; Next 200,000 sq. ft.: 1; Each additional 300,000 sq. ft.: 1",
+        "cumulativeBands": [
+          {
+            "throughSquareFeet": 100000,
+            "totalBerths": 0
+          },
+          {
+            "throughSquareFeet": 300000,
+            "totalBerths": 1
+          },
+          {
+            "throughSquareFeet": 600000,
+            "totalBerths": 2
+          }
+        ],
+        "scenarioFloorArea": 120000,
+        "expectedBerths": 1,
+        "applicableFootnotes": "Hospital ambulance note and C1/C2 residential-overlay district footnotes do not change the stated C4-4 office scenario.",
+        "writerFlatOperativeTableTextPresent": true,
+        "writerStructured36_62GridPresent": false,
+        "actualOtherStructuredWriterSources": [
+          "ZR Table 36-661"
+        ],
+        "structuredFidelityLimitation": "Actual writer 36-62 record carries flattened table text, not its cell grid. Canonical HTML row/column structure was independently inspected to avoid treating flattened threshold or expected-ID presence as authoritative mapping."
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 10.893403916999931
+    },
+    {
+      "id": "context-hold-11-office-loading-table-2",
+      "split": "heldout",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "Correction: the total office floor area is only 95,000 square feet. What does the same loading table require then?",
+      "label": "withheld",
+      "strictPass": false,
+      "reasoning": "The delivered response withholds the zero-berth result. The first draft correctly applies the explicit correction to 95,000 square feet and the C4-4/LRC-C first-100,000 band. The revision adds an unnecessary lowered-yard measurement condition instead of accepting the stated total office floor area as the narrow table premise.",
+      "failureStage": "deterministic_definition_condition_gate",
+      "factReading": "The draft correctly overrides the initial 120,000-square-foot project fact with the user correction to 95,000. The later yard-history missing fact is unrelated to the requested calculation from an expressly supplied total floor-area premise.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "deliveredMode": "clarification",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "ZR 36-62"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "36-62 applicability, explicit office category and C4-4 loading bands",
+            "presentInActualSourceIDs": [],
+            "presentInWriterRequestFiles": [
+              "72afccca-18cd-4bbf-a2d1-a0242bd477a9-request.json",
+              "50337e6d-4ce3-4588-9945-174e401e51b5-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:20017974-1",
+              "research-permitext_cross_reference-id:11-interpretation-01"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "ZR 36-61": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+          "ZR 36-62": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "99de5f4ea32eea8fa0f7e6173fc68793cda7ccd235e4cf06d9454ae1a569291f",
+        "fixtureStructuredFactsSHA256": "7d1a5d465c29b258419b02fea8ab93ca4da62f871af91803765f51ba3569adf8",
+        "projectInformationSHA256": "121073e7cddbc78ab90704739ec802a5e821446a7aef31408cb5a5e7a1be6000",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current imported NYC Zoning Resolution",
+            "status": "confirmed"
+          },
+          {
+            "key": "zoning-district",
+            "value": "C4-4",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-work",
+            "value": "New development",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-use",
+            "value": "Only Use Group VII offices, within Loading Requirement Category C",
+            "status": "confirmed"
+          },
+          {
+            "key": "floor-area",
+            "value": "120,000 square feet for this development; no other use or enlargement portion",
+            "status": "confirmed"
+          },
+          {
+            "key": "modifications",
+            "value": "No special district modification, waiver, grandfathering or approved loading relief",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "The draft correctly overrides the initial 120,000-square-foot project fact with the user correction to 95,000. The later yard-history missing fact is unrelated to the requested calculation from an expressly supplied total floor-area premise."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": null,
+        "actualCitedSources": [],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "ZR 36-61",
+            "canonicalParentReference": "ZR 36-61",
+            "sectionID": 20017973,
+            "id": 20017973,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+            "actualResolverTextLength": 423,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Permitted Accessory Off-street Loading Berths",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "ZR 36-62",
+            "canonicalParentReference": "ZR 36-62",
+            "sectionID": 20017974,
+            "id": 20017974,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "872e1bd1c59da33fd61233fd2a415308b8e38e4a4045f3b82ccf981a6a4fe9e2",
+            "actualResolverTextLength": 3130,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Required Accessory Off-street Loading Berths",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 0,
+        "materialContradictionFound": false,
+        "notes": "Delivered supportedPoints are empty; draft points were inspected for failure attribution only."
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "72afccca-18cd-4bbf-a2d1-a0242bd477a9-request.json",
+          "requestSHA256": "9986dde2244f008fbeed8aa8182e760b95cebc8879eec372de258d35a11bc7e3",
+          "responseFile": "72afccca-18cd-4bbf-a2d1-a0242bd477a9-response.json",
+          "responseSHA256": "2c57397148c6847453a73af5beceb78b9ba774b554d59799d64512b03afec220",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "On the corrected **95,000-square-foot** premise, the ordinary table requires **no loading berths**: in C4-4, LRC-C has no berth requirement for the first 100,000 square feet, and 95,000 is below that threshold (ZR § 36-62).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": null
+        },
+        {
+          "file": "50337e6d-4ce3-4588-9945-174e401e51b5-request.json",
+          "requestSHA256": "4f38a0dbc9fdcbfa3db3ce82dc0af1dae95d4980dc6f7730bb8f6bda8ebcfc9e",
+          "responseFile": "50337e6d-4ce3-4588-9945-174e401e51b5-response.json",
+          "responseSHA256": "67a502c61254a6c7333e85ace3d30e4858605385f54ed65466826e6299c3cadb",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "On the stated **95,000-square-foot** total, the ordinary table requires **no loading berths**: the C4-4 column’s LRC-C tier requires none for the first 100,000 square feet (ZR § 36-62). This is conditional on 95,000 square feet being the floor area counted under the Zoning Resolution; the supplied definition includes a special rule for certain yards lowered after December 5, 1990, and whether that measurement condition applies is unresolved.",
+          "draftMissingFacts": [
+            "Whether, after December 5, 1990, any yard on the zoning lot was lowered below the base-plane level in a way that affects the Zoning Resolution floor-area measurement."
+          ],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": "1. zoning_definition_lowered_yard_fact: The supplied definition's post-December 5, 1990 lowered-yard condition is unresolved. Keep the direct answer and conclusion conditional, and name that measurement fact in missingFacts."
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Raw revision feedback records zoning_definition_lowered_yard_fact instructing conditional wording and a post-December-5-1990 lowered-yard missing fact. The revised draft follows that instruction. The packet contains complete flattened 36-62 bands but unrelated structured BC 506.2 and BC 1004.1.3 tables. No exact-question medium verifier request exists. Exact final post-revision gate finding is not retained and is unknown.",
+        "noMediumVerifierRequestFound": true,
+        "unrecordedFinalGateFinding": "unknown",
+        "records": []
+      },
+      "structuredTableReview": {
+        "canonicalTableGrids": [
+          {
+            "blockID": "zr-17974-block-008",
+            "htmlSHA256": "b3fc87e1dbe1aa385712fa35851ae607ec4e1088e3c72dcdac0496e49a79e477",
+            "rows": [
+              [
+                {
+                  "text": "Loading Requirement Category",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Use or Use Group",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – A",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Groups IX(A), IX(B) and X",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – B",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Group VI, except automotive equipment rental and leasing, automotive repair and maintenance, or gasoline stations; all uses listed under Use Group VIII",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – C",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Groups V and VII; court houses listed under Use Group IV(A)",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – D",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Hospitals and related facilities listed under Use Group III(B); prisons listed under Use Group IV(A)",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – E",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Funeral establishments listed under Use Group VI",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            ]
+          },
+          {
+            "blockID": "zr-17974-block-011",
+            "htmlSHA256": "2cbbcaafc537c2f946b337b8275432c6068429a48e102101319905b538772123",
+            "rows": [
+              [
+                {
+                  "text": "Loading Requirement Category",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Districts",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ],
+              [
+                {
+                  "text": "C1 2 C2 2 C3 C4-1 C4-2 C4-3 C8-1 C8-2 C7 outside the Greater Transit Zone",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "C1 3 C1-6 C1-7 C1-8 C1-9 C2 3 C2-6 C2-7 C2-8 C4-4 C4-5 C4-6 C4-7 C4-8 C4-9 C4-11 C4-12 C5 C6 C8-3 C8-4 C7 within the Greater Transit Zone",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-A",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 8,000 sq. ft.: None Next 17,000 sq. ft.: 1 Next 15,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Each additional 80,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 15,000 sq. ft.: None Next 25,000 sq. ft.: 1 Next 40,000 sq. ft.: 1 Each additional 80,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-B",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 8,000 sq. ft.: None Next 17,000 sq. ft.: 1 Next 15,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Next 40,000 sq. ft.: 1 Each additional 150,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 25,000 sq. ft.: None Next 15,000 sq. ft.: 1 Next 60,000 sq. ft.: 1 Each additional 150,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-C",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 25,000 sq. ft.: None Next 75,000 sq. ft.: 1 Next 200,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 100,000 sq. ft.: None Next 200,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-D 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 10,000 sq. ft.: None Next 290,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ],
+              [
+                {
+                  "text": "LRC E",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 10,000 sq. ft.: None Next 20,000 sq. ft.: 1 Any additional amount : 1",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ]
+            ]
+          }
+        ],
+        "selectedDistrict": "C4-4",
+        "selectedCategory": "LRC-C",
+        "useClassificationCell": "All uses listed under Use Groups V and VII; court houses listed under Use Group IV(A)",
+        "districtColumnIndex": 2,
+        "districtColumnCounting": "Zero-based among all three table columns (category=0, lower district group=1, C4-4 group=2).",
+        "operativeCell": "First 100,000 sq. ft.: None; Next 200,000 sq. ft.: 1; Each additional 300,000 sq. ft.: 1",
+        "cumulativeBands": [
+          {
+            "throughSquareFeet": 100000,
+            "totalBerths": 0
+          },
+          {
+            "throughSquareFeet": 300000,
+            "totalBerths": 1
+          },
+          {
+            "throughSquareFeet": 600000,
+            "totalBerths": 2
+          }
+        ],
+        "scenarioFloorArea": 95000,
+        "expectedBerths": 0,
+        "applicableFootnotes": "Hospital ambulance note and C1/C2 residential-overlay district footnotes do not change the stated C4-4 office scenario.",
+        "writerFlatOperativeTableTextPresent": true,
+        "writerStructured36_62GridPresent": false,
+        "actualOtherStructuredWriterSources": [
+          "BC Table 506.2",
+          "BC Table 1004.1.3"
+        ],
+        "structuredFidelityLimitation": "Actual writer 36-62 record carries flattened table text, not its cell grid. Canonical HTML row/column structure was independently inspected to avoid treating flattened threshold or expected-ID presence as authoritative mapping."
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 12.458187999999966
+    },
+    {
+      "id": "context-hold-11-office-loading-table-3",
+      "split": "heldout",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "For a larger version with 350,000 square feet of office floor area in the same district, how many loading berths would the table require?",
+      "label": "withheld",
+      "strictPass": false,
+      "reasoning": "The delivered response withholds the requested two-berth result even though both drafts calculate the cumulative C4-4/LRC-C bands correctly: first 100,000 none; next 200,000 one; remaining 50,000 occupies the next 300,000-square-foot increment. The revised draft adds an unnecessary lowered-yard floor-area condition.",
+      "failureStage": "deterministic_table_binding_and_definition_condition_gates",
+      "factReading": "Uses the explicit larger 350,000-square-foot hypothetical in the same C4-4 district rather than either previous area. The ordinary table question does not require proving an unrelated yard history.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "deliveredMode": "clarification",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "ZR 36-62"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "36-62 applicability, explicit office category and C4-4 cumulative loading bands",
+            "presentInActualSourceIDs": [],
+            "presentInWriterRequestFiles": [
+              "37b34ac8-4041-4821-9dc9-9928b0bb48ec-request.json",
+              "8c9cc2fa-c638-46e8-a00d-044f113bf80a-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:20017974-1",
+              "research-permitext_cross_reference-id:11-interpretation-01"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "ZR 36-61": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+          "ZR 36-62": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "99de5f4ea32eea8fa0f7e6173fc68793cda7ccd235e4cf06d9454ae1a569291f",
+        "fixtureStructuredFactsSHA256": "7d1a5d465c29b258419b02fea8ab93ca4da62f871af91803765f51ba3569adf8",
+        "projectInformationSHA256": "121073e7cddbc78ab90704739ec802a5e821446a7aef31408cb5a5e7a1be6000",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current imported NYC Zoning Resolution",
+            "status": "confirmed"
+          },
+          {
+            "key": "zoning-district",
+            "value": "C4-4",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-work",
+            "value": "New development",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-use",
+            "value": "Only Use Group VII offices, within Loading Requirement Category C",
+            "status": "confirmed"
+          },
+          {
+            "key": "floor-area",
+            "value": "120,000 square feet for this development; no other use or enlargement portion",
+            "status": "confirmed"
+          },
+          {
+            "key": "modifications",
+            "value": "No special district modification, waiver, grandfathering or approved loading relief",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Uses the explicit larger 350,000-square-foot hypothetical in the same C4-4 district rather than either previous area. The ordinary table question does not require proving an unrelated yard history."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": null,
+        "actualCitedSources": [],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "ZR 36-61",
+            "canonicalParentReference": "ZR 36-61",
+            "sectionID": 20017973,
+            "id": 20017973,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d",
+            "actualResolverTextLength": 423,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Permitted Accessory Off-street Loading Berths",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          },
+          {
+            "reference": "ZR 36-62",
+            "canonicalParentReference": "ZR 36-62",
+            "sectionID": 20017974,
+            "id": 20017974,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "872e1bd1c59da33fd61233fd2a415308b8e38e4a4045f3b82ccf981a6a4fe9e2",
+            "actualResolverTextLength": 3130,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Required Accessory Off-street Loading Berths",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 0,
+        "materialContradictionFound": false,
+        "notes": "Delivered supportedPoints are empty; draft points were inspected for failure attribution only."
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "37b34ac8-4041-4821-9dc9-9928b0bb48ec-request.json",
+          "requestSHA256": "7dcd961e3059aca5861800df1b6e1433cdf0342390633884e95e4a96f371d51b",
+          "responseFile": "37b34ac8-4041-4821-9dc9-9928b0bb48ec-response.json",
+          "responseSHA256": "feb17babd956b19f5f124c35acdde1e304e831ac83139e01bf0b3e0857b8e3b6",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "**Two loading berths.** For the hypothetical 350,000-square-foot office development in C4-4, the LRC-C row applies: the first 100,000 square feet require none, the next 200,000 require one, and each additional 300,000-square-foot increment requires one. The remaining 50,000 square feet falls within that next increment, so the table total is **2 berths** (ZR § 36-62).",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": null
+        },
+        {
+          "file": "8c9cc2fa-c638-46e8-a00d-044f113bf80a-request.json",
+          "requestSHA256": "9ec5390c9516b1fd9305fb5363e49928ec96ba6b003f00a859039cfe1323dd72",
+          "responseFile": "8c9cc2fa-c638-46e8-a00d-044f113bf80a-response.json",
+          "responseSHA256": "294569567743ceb5a6a6a30aba49194b16a22af2ae58f6592259795b67342572",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "**Two loading berths**, using the stated 350,000 square feet as the applicable floor area. For LRC-C in the C4-4 column, the table requires none for the first 100,000 square feet, one for the next 200,000, and one for each additional 300,000 square feet; the remaining 50,000 square feet falls within the next additional increment (ZR § 36-62). The supplied floor-area definition includes a special rule for floor space affected by a yard lowered after December 5, 1990; whether that rule affects the stated area is unresolved, so the count is conditional on 350,000 square feet being the floor area counted under that definition (ZR § 12-10).",
+          "draftMissingFacts": [
+            "Whether any floor space counted in the stated 350,000 square feet is affected by a yard lowered below the base-plane level after December 5, 1990, which could affect the floor area used for the table calculation."
+          ],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": "1. zoning_table_binding: Bind the table-derived result to the exact structured-table PASSAGE_ID. Do not present a table row, category, symbol, or numeric limit as uncited prose.\n2. zoning_definition_lowered_yard_fact: The supplied definition's post-December 5, 1990 lowered-yard condition is unresolved. Keep the direct answer and conclusion conditional, and name that measurement fact in missingFacts."
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Raw revision feedback records both zoning_table_binding and zoning_definition_lowered_yard_fact. The actual writer packet has complete flattened 36-62 bands but an unrelated structured ZR 36-661 dimension grid, without a structured 36-62 grid. No exact-question medium verifier request exists. The exact final post-revision gate finding is unknown.",
+        "noMediumVerifierRequestFound": true,
+        "unrecordedFinalGateFinding": "unknown",
+        "records": []
+      },
+      "structuredTableReview": {
+        "canonicalTableGrids": [
+          {
+            "blockID": "zr-17974-block-008",
+            "htmlSHA256": "b3fc87e1dbe1aa385712fa35851ae607ec4e1088e3c72dcdac0496e49a79e477",
+            "rows": [
+              [
+                {
+                  "text": "Loading Requirement Category",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Use or Use Group",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – A",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Groups IX(A), IX(B) and X",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – B",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Group VI, except automotive equipment rental and leasing, automotive repair and maintenance, or gasoline stations; all uses listed under Use Group VIII",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – C",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "All uses listed under Use Groups V and VII; court houses listed under Use Group IV(A)",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – D",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Hospitals and related facilities listed under Use Group III(B); prisons listed under Use Group IV(A)",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC – E",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Funeral establishments listed under Use Group VI",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            ]
+          },
+          {
+            "blockID": "zr-17974-block-011",
+            "htmlSHA256": "2cbbcaafc537c2f946b337b8275432c6068429a48e102101319905b538772123",
+            "rows": [
+              [
+                {
+                  "text": "Loading Requirement Category",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Districts",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ],
+              [
+                {
+                  "text": "C1 2 C2 2 C3 C4-1 C4-2 C4-3 C8-1 C8-2 C7 outside the Greater Transit Zone",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "C1 3 C1-6 C1-7 C1-8 C1-9 C2 3 C2-6 C2-7 C2-8 C4-4 C4-5 C4-6 C4-7 C4-8 C4-9 C4-11 C4-12 C5 C6 C8-3 C8-4 C7 within the Greater Transit Zone",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-A",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 8,000 sq. ft.: None Next 17,000 sq. ft.: 1 Next 15,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Each additional 80,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 15,000 sq. ft.: None Next 25,000 sq. ft.: 1 Next 40,000 sq. ft.: 1 Each additional 80,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-B",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 8,000 sq. ft.: None Next 17,000 sq. ft.: 1 Next 15,000 sq. ft.: 1 Next 20,000 sq. ft.: 1 Next 40,000 sq. ft.: 1 Each additional 150,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 25,000 sq. ft.: None Next 15,000 sq. ft.: 1 Next 60,000 sq. ft.: 1 Each additional 150,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-C",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 25,000 sq. ft.: None Next 75,000 sq. ft.: 1 Next 200,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 100,000 sq. ft.: None Next 200,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ],
+              [
+                {
+                  "text": "LRC-D 1",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 10,000 sq. ft.: None Next 290,000 sq. ft.: 1 Each additional 300,000 sq. ft.: 1",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ],
+              [
+                {
+                  "text": "LRC E",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "First 10,000 sq. ft.: None Next 20,000 sq. ft.: 1 Any additional amount : 1",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                }
+              ]
+            ]
+          }
+        ],
+        "selectedDistrict": "C4-4",
+        "selectedCategory": "LRC-C",
+        "useClassificationCell": "All uses listed under Use Groups V and VII; court houses listed under Use Group IV(A)",
+        "districtColumnIndex": 2,
+        "districtColumnCounting": "Zero-based among all three table columns (category=0, lower district group=1, C4-4 group=2).",
+        "operativeCell": "First 100,000 sq. ft.: None; Next 200,000 sq. ft.: 1; Each additional 300,000 sq. ft.: 1",
+        "cumulativeBands": [
+          {
+            "throughSquareFeet": 100000,
+            "totalBerths": 0
+          },
+          {
+            "throughSquareFeet": 300000,
+            "totalBerths": 1
+          },
+          {
+            "throughSquareFeet": 600000,
+            "totalBerths": 2
+          }
+        ],
+        "scenarioFloorArea": 350000,
+        "expectedBerths": 2,
+        "applicableFootnotes": "Hospital ambulance note and C1/C2 residential-overlay district footnotes do not change the stated C4-4 office scenario.",
+        "writerFlatOperativeTableTextPresent": true,
+        "writerStructured36_62GridPresent": false,
+        "actualOtherStructuredWriterSources": [
+          "ZR Table 36-661"
+        ],
+        "structuredFidelityLimitation": "Actual writer 36-62 record carries flattened table text, not its cell grid. Canonical HTML row/column structure was independently inspected to avoid treating flattened threshold or expected-ID presence as authoritative mapping."
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 16.136396582999964
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-1",
+      "split": "heldout",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "For this project, may accessory parking spaces sit between the street line and the apartment building street wall?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly rejects parking between the street line and apartment-building street wall under R7 multiple-dwelling ordinary interior-lot facts. The source contains paragraph(c), prolongations and the through-lot/entire-block/large-site exceptions; the supplied facts exclude those exceptions. The added multiple-dwelling definition is actually present in this turn's supplied 12-10 passage.",
+      "failureStage": null,
+      "factReading": "Uses R7, multiple-dwelling apartment use and interior-lot/no-modification facts. Does not import single/two-family driveway exceptions.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "No. On the supplied facts—an R7 lot with an apartment building, proposed accessory parking, and no through-lot, entire-block, or large-site exception—the spaces may not be between the street line and the building’s street wall. ZR 25-621(c) requires accessory parking for multiple-dwelling residences to be within the building or in an open area not between the street line and street wall; its stated exceptions do not fit the described lot. The supplied definition confirms an apartment residence is a “multiple dwelling residence.” (ZR 25-621(c); ZR 12-10.)",
+      "answerTextSHA256": "134cb99f43553e468918785d43e2c0ce2fb7042cef7517587f22293fd58bcdce",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "ZR 25-621"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "R7 multiple-dwelling parking only in building or open area outside street-line/street-wall and prolongations, with lot exceptions",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:20017588-1"
+            ],
+            "presentInWriterRequestFiles": [
+              "d5725336-c39e-4a2c-bac3-c58a85c982e0-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:20017588-1"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "ZR 25-621": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "16cee57ef0ae72419c97f7a5ade11bcd6577d764e76a1cc1cd95aa7a603ff4dd",
+        "fixtureStructuredFactsSHA256": "6cadd49f9f08d54205fd9eb743b90290e38186c61270c4701cc44a522da98a26",
+        "projectInformationSHA256": "7d407ed7df579dc149da92ebbf63fb94bd39a668c7af84107d43a26b45ed739f",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current imported NYC Zoning Resolution",
+            "status": "confirmed"
+          },
+          {
+            "key": "zoning-district",
+            "value": "R7",
+            "status": "confirmed"
+          },
+          {
+            "key": "building-use",
+            "value": "Multiple dwelling apartment residence",
+            "status": "confirmed"
+          },
+          {
+            "key": "lot",
+            "value": "Ordinary interior zoning lot initially; not a through lot, entire block or large site",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-parking",
+            "value": "Accessory off-street parking between the street line and street wall",
+            "status": "confirmed"
+          },
+          {
+            "key": "special-modifications",
+            "value": "No special district or approved location modification",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Uses R7, multiple-dwelling apartment use and interior-lot/no-modification facts. Does not import single/two-family driveway exceptions."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017588-1",
+            "sectionID": "20017588",
+            "reference": "ZR 25-621",
+            "textSHA256": "44b35ec4e671bca6cf48dcb1f0f9fee8d86f201e54f74b81458154a6b1f6eb30",
+            "evidenceRole": "supporting"
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:20018523-11",
+            "sectionID": "20018523",
+            "reference": "ZR 12-10",
+            "textSHA256": "9a6d7d6fb44effa0394019ec8d95249d078760a8bf8381cdc7edcd13a4e6986b",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "ZR 25-621",
+            "canonicalParentReference": "ZR 25-621",
+            "sectionID": 20017588,
+            "id": 20017588,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092",
+            "actualResolverTextLength": 3367,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Location of parking spaces in certain districts",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false,
+        "notes": null
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "d5725336-c39e-4a2c-bac3-c58a85c982e0-request.json",
+          "requestSHA256": "08a5addddbd6e49d6a3599b826670142d25a138a62d97ef0c1585da9ae34d6c5",
+          "responseFile": "d5725336-c39e-4a2c-bac3-c58a85c982e0-response.json",
+          "responseSHA256": "828bccf14ae285f414e68545ae05c24e1a4f3f0fd495e23c693262c0226b7190",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "No. On the supplied facts—an R7 lot with an apartment building, proposed accessory parking, and no through-lot, entire-block, or large-site exception—the spaces may not be between the street line and the building’s street wall. ZR 25-621(c) requires accessory parking for multiple-dwelling residences to be within the building or in an open area not between the street line and street wall; its stated exceptions do not fit the described lot. The supplied definition confirms an apartment residence is a “multiple dwelling residence.” (ZR 25-621(c); ZR 12-10.)",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": true,
+          "observedRevisionFeedback": null
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Delivered answer compared independently with actual source clauses and frozen canonical packets.",
+        "noMediumVerifierRequestFound": false,
+        "unrecordedFinalGateFinding": null,
+        "records": [
+          {
+            "file": "5c1e4a3f-1e1f-4d04-8f30-34476050f98c-request.json",
+            "requestSHA256": "23f39f645249d62638ccf7f9da75f9f31e8725f031ec41bc4f31c9e75c4e1e5f",
+            "responseFile": "5c1e4a3f-1e1f-4d04-8f30-34476050f98c-response.json",
+            "responseSHA256": "58566cd931a9a8c86d3f30cd72fa324aefa41fe1effd65b3bef6fa070c96776b",
+            "recordedJudgment": {
+              "pass": true,
+              "issues": [],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          }
+        ]
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 10.316962708999984
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-2",
+      "split": "heldout",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "What if we relocate the spaces behind the street wall in an open side or rear area instead?",
+      "label": "withheld",
+      "strictPass": false,
+      "reasoning": "The draft correctly says relocation to an open area outside the street-line/street-wall/prolongations band fits this location rule, but delivery is blocked by an unsupported ancillary definition attribution. No substantive location answer reaches the user.",
+      "failureStage": "writer_unnecessary_unsupported_definition_citation_then_incomplete_strict_removal",
+      "factReading": "The actual draft applies the explicit behind-the-wall open-area hypothetical while preserving R7/multiple-dwelling use; the use is already an established project premise and does not need a definition to answer the location question.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "04ac2cb886e67597ffbc1bdb3583cecae6c1ff813f696aeda8249ffb36b814db",
+      "deliveredMode": "clarification",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "ZR 25-621"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "Open area behind the wall/prolongations satisfies this location restriction while other access rules remain separate",
+            "presentInActualSourceIDs": [],
+            "presentInWriterRequestFiles": [
+              "80487e3e-16fd-4f8b-a468-3f3b37d8e7cf-request.json",
+              "70d8301b-437f-4612-b1e1-2d727142970d-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:20017588-1",
+              "research-permitext_discovered-id:20018523-11"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "ZR 25-621": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "16cee57ef0ae72419c97f7a5ade11bcd6577d764e76a1cc1cd95aa7a603ff4dd",
+        "fixtureStructuredFactsSHA256": "6cadd49f9f08d54205fd9eb743b90290e38186c61270c4701cc44a522da98a26",
+        "projectInformationSHA256": "7d407ed7df579dc149da92ebbf63fb94bd39a668c7af84107d43a26b45ed739f",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current imported NYC Zoning Resolution",
+            "status": "confirmed"
+          },
+          {
+            "key": "zoning-district",
+            "value": "R7",
+            "status": "confirmed"
+          },
+          {
+            "key": "building-use",
+            "value": "Multiple dwelling apartment residence",
+            "status": "confirmed"
+          },
+          {
+            "key": "lot",
+            "value": "Ordinary interior zoning lot initially; not a through lot, entire block or large site",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-parking",
+            "value": "Accessory off-street parking between the street line and street wall",
+            "status": "confirmed"
+          },
+          {
+            "key": "special-modifications",
+            "value": "No special district or approved location modification",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "The actual draft applies the explicit behind-the-wall open-area hypothetical while preserving R7/multiple-dwelling use; the use is already an established project premise and does not need a definition to answer the location question."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": null,
+        "actualCitedSources": [],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "ZR 25-621",
+            "canonicalParentReference": "ZR 25-621",
+            "sectionID": 20017588,
+            "id": 20017588,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092",
+            "actualResolverTextLength": 3367,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Location of parking spaces in certain districts",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 0,
+        "materialContradictionFound": false,
+        "notes": "Delivered supportedPoints are empty; draft points were inspected for failure attribution only."
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "80487e3e-16fd-4f8b-a468-3f3b37d8e7cf-request.json",
+          "requestSHA256": "deccebf611087b7d3a07462ff9186924f46fa8da80b096ff7667893c22b12541",
+          "responseFile": "80487e3e-16fd-4f8b-a468-3f3b37d8e7cf-response.json",
+          "responseSHA256": "f5f6cff90c08e2ce2cf40ddea0cbf0688e4493f77bfa027ce61c9cc183144b3b",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "Yes. If the accessory spaces are moved to an open area on the zoning lot behind the street wall—so they are not between the street line and the street wall or its prolongations—that location fits the stated location rule for parking serving a multiple-dwelling residence in R7 (ZR 25-621(c)). This assumes the described apartment-residence use and R7 district; those are user-provided project premises, not independently verified. Other applicable requirements, including access and space dimensions, are not resolved by this location answer.",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": null
+        },
+        {
+          "file": "70d8301b-437f-4612-b1e1-2d727142970d-request.json",
+          "requestSHA256": "4cb8e4a2bfe0612718dc073a5c597fec154c667d45e9cefade73f8855298272a",
+          "responseFile": "70d8301b-437f-4612-b1e1-2d727142970d-response.json",
+          "responseSHA256": "64722fe8cd4df2d6b70bee7133118ef49db649a8cc4df7e69b5ba0134285258a",
+          "responseStatus": "completed",
+          "outputShape": "strict_edit",
+          "draftAnswerText": null,
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": false,
+          "observedRevisionFeedback": "1. incorrect_citation: The answer says ZR 12-10 supplies a definition treating the apartment residence as a multiple-dwelling residence, but the supplied ZR 12-10 passage contains no such definition. The user-provided project fact already identifies the use as a multiple-dwelling apartment residence, so the ZR 25-621(c) location conclusion is supported on that premise; remove the unsupported definition claim and its citation."
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "The first verifier correctly flags that this turn's supplied 12-10 excerpt lacks the asserted multiple-dwelling definition. The low-effort strict repair removes definition prose from supportedPoints and a citation entry, but the remaining citation relevance still attributes that definition to 12-10. The second verifier flags that exact surviving attribution. The delivered reason is verification_source. Actual operative 25-621(c) coverage is complete; it is not a missing location-rule retrieval.",
+        "noMediumVerifierRequestFound": false,
+        "unrecordedFinalGateFinding": null,
+        "records": [
+          {
+            "file": "4d0cc237-cf85-44bf-bf6f-45a1cff5d093-request.json",
+            "requestSHA256": "693ac65071d5c89b13db5168da862208c7b584bd84db9ffc864250cce69c47c9",
+            "responseFile": "4d0cc237-cf85-44bf-bf6f-45a1cff5d093-response.json",
+            "responseSHA256": "edaabb5695f4feb9aa9fa4f4e4fc74cdb952334402a17da44070d2ce437dca94",
+            "recordedJudgment": {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "incorrect_citation",
+                  "detail": "The answer says ZR 12-10 supplies a definition treating the apartment residence as a multiple-dwelling residence, but the supplied ZR 12-10 passage contains no such definition. The user-provided project fact already identifies the use as a multiple-dwelling apartment residence, so the ZR 25-621(c) location conclusion is supported on that premise; remove the unsupported definition claim and its citation."
+                }
+              ],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          },
+          {
+            "file": "785a41d6-19d7-416a-b80d-0f1544854fe9-request.json",
+            "requestSHA256": "2a586194defb3aa917d92b5ebf5e5a565c2455e182da042eadbede84f4c7a3f4",
+            "responseFile": "785a41d6-19d7-416a-b80d-0f1544854fe9-response.json",
+            "responseSHA256": "33c3b8653b06e19c3749b1d1b8844350db1b688fc9611c204b5b98972864c11e",
+            "recordedJudgment": {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "incorrect_citation",
+                  "detail": "The citation’s relevance field says ZR 12-10 supplies the cited residence definition, but the supplied ZR 12-10 passage does not contain that definition. Remove this unsupported attribution; the location answer is otherwise supported by the user-provided use premise and ZR 25-621(c)."
+                }
+              ],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          }
+        ]
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 24.901733791999984
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-3",
+      "split": "heldout",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "Separate version: on a through lot with the same apartment use, does the no-parking-between-street-line-and-street-wall restriction have to apply along both street frontages?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly states that the no-parking-between-street-line-and-street-wall limitation applies along only one frontage on the specified through-lot version, rather than both or neither. It appropriately limits the answer to this location rule and does not claim complete parking compliance on the other frontage.",
+      "failureStage": null,
+      "factReading": "Uses the explicit through-lot hypothetical over the initial ordinary interior-lot fact. Keeps the same multiple-dwelling use and does not assume an entire-block or large-site exception.",
+      "keyNotes": [
+        "Frozen key reviewed against canonical operative text; no material key flaw found. Key references were never supplied to normal retrieval."
+      ],
+      "answerText": "No. For the stated through-lot scenario, the restriction applies along only one street frontage—not both. ZR 25-621(c) does not identify which frontage; it does not, by itself, establish that parking is permitted at a particular location along the other frontage or resolve other zoning requirements.",
+      "answerTextSHA256": "f64890e258f53ed9038d180e7c23b3adc09261a7f1fb0eac4b6b621f21bf2343",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "ZR 25-621"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "coverageBasis": "Actual writer ENACTED_TEXT operative clauses and applicable parent scope, separately from delivered answer correctness and optional structured-grid fidelity.",
+        "actualClauseChecks": [
+          {
+            "clause": "Through-lot limitation applies only along one street frontage; entire-block and large-site exceptions separate",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:20017588-1"
+            ],
+            "presentInWriterRequestFiles": [
+              "ea647f1b-62c4-49e7-843b-fb35bd00f182-request.json"
+            ],
+            "presentInWriterSourceIDs": [
+              "research-permitext_discovered-id:20017588-1"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "ZR 25-621": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092"
+        }
+      },
+      "projectFactReview": {
+        "frozenProjectFactsSHA256": "16cee57ef0ae72419c97f7a5ade11bcd6577d764e76a1cc1cd95aa7a603ff4dd",
+        "fixtureStructuredFactsSHA256": "6cadd49f9f08d54205fd9eb743b90290e38186c61270c4701cc44a522da98a26",
+        "projectInformationSHA256": "7d407ed7df579dc149da92ebbf63fb94bd39a668c7af84107d43a26b45ed739f",
+        "statedFacts": [
+          {
+            "key": "jurisdiction",
+            "value": "New York City",
+            "status": "confirmed"
+          },
+          {
+            "key": "code-basis",
+            "value": "Current imported NYC Zoning Resolution",
+            "status": "confirmed"
+          },
+          {
+            "key": "zoning-district",
+            "value": "R7",
+            "status": "confirmed"
+          },
+          {
+            "key": "building-use",
+            "value": "Multiple dwelling apartment residence",
+            "status": "confirmed"
+          },
+          {
+            "key": "lot",
+            "value": "Ordinary interior zoning lot initially; not a through lot, entire block or large site",
+            "status": "confirmed"
+          },
+          {
+            "key": "proposed-parking",
+            "value": "Accessory off-street parking between the street line and street wall",
+            "status": "confirmed"
+          },
+          {
+            "key": "special-modifications",
+            "value": "No special district or approved location modification",
+            "status": "confirmed"
+          }
+        ],
+        "currentQuestionChangesApplied": "Uses the explicit through-lot hypothetical over the initial ordinary interior-lot fact. Keeps the same multiple-dwelling use and does not assume an entire-block or large-site exception."
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017588-1",
+            "sectionID": "20017588",
+            "reference": "ZR 25-621",
+            "textSHA256": "44b35ec4e671bca6cf48dcb1f0f9fee8d86f201e54f74b81458154a6b1f6eb30",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "reference": "ZR 25-621",
+            "canonicalParentReference": "ZR 25-621",
+            "sectionID": 20017588,
+            "id": 20017588,
+            "available": true,
+            "canonicalOperativeExcerptPresent": true,
+            "actualResolverTextSHA256": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092",
+            "actualResolverTextLength": 3367,
+            "corpusID": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "title": "Location of parking spaces in certain districts",
+            "checkedAt": "2026-10-03T02:54:17.279Z"
+          }
+        ],
+        "claimScopeIssue": null
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false,
+        "notes": null
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "ea647f1b-62c4-49e7-843b-fb35bd00f182-request.json",
+          "requestSHA256": "db22abadf89784385e69a6463dfd6c46811baa0c250f6dfa80b69789e9e21761",
+          "responseFile": "ea647f1b-62c4-49e7-843b-fb35bd00f182-response.json",
+          "responseSHA256": "bd7422d5691da6cf55a1f28d85c250c74adcbf6ca2252e917f8677646e53e134",
+          "responseStatus": "completed",
+          "outputShape": "answer",
+          "draftAnswerText": "No. For the stated through-lot scenario, the restriction applies along only one street frontage—not both. ZR 25-621(c) does not identify which frontage; it does not, by itself, establish that parking is permitted at a particular location along the other frontage or resolve other zoning requirements.",
+          "draftMissingFacts": [],
+          "finalAnswerTextMatch": true,
+          "observedRevisionFeedback": null
+        }
+      ],
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "diagnosis": "Delivered answer compared independently with actual source clauses and frozen canonical packets.",
+        "noMediumVerifierRequestFound": false,
+        "unrecordedFinalGateFinding": null,
+        "records": [
+          {
+            "file": "bf10b8a5-c1ef-4bfb-955c-85c619170004-request.json",
+            "requestSHA256": "3be09de6aa205642272b68162ded864fc9284e35fa16cbbd9fd7dd6a140fce74",
+            "responseFile": "bf10b8a5-c1ef-4bfb-955c-85c619170004-response.json",
+            "responseSHA256": "5c57e98cf88daea756a4159d094ce747bf9192fb781942baed9b718710c001d8",
+            "recordedJudgment": {
+              "pass": true,
+              "issues": [],
+              "priorReviewCorrection": "",
+              "projectFactQuestions": [],
+              "missingFactsOnly": false,
+              "unnecessaryMissingFactIndices": []
+            }
+          }
+        ]
+      },
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 13.263453207999934
+    }
+  ],
+  "qualifications": [
+    "This is assistant source review against imported canonical NYC text, not legal advice, licensed adjudication or authoritative determination of real project compliance.",
+    "Twelve turns are correlated within four conversations; these counts do not establish population accuracy or a 95% reliability guarantee.",
+    "Part C alone is not the complete 36-turn reserved cohort. Root owns aggregation and release acceptance.",
+    "FC and ZR identity/edition were checked against current imported source metadata. A current-consolidated Fire Code label does not claim historical original text.",
+    "A complete decisive-text coverage score means the necessary operative clause reached the writer. It does not mean the final answer was correct or delivered; structured grid fidelity is recorded separately.",
+    "The wrong rooftop-door answer and every withheld response remain scored as observed. Draft correctness does not turn a nonanswer into a passing answer."
+  ],
+  "costSummary": {
+    "notAnAccuracyInput": true,
+    "parentPaidRunOwner": true,
+    "noPaidCallsByReviewer": true,
+    "providerAccounting": "Parent reconciles writer, verifier and retrieval spend for the entire run separately."
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "description": "10 ordinary-language diagnostic turns in five two-turn conversations; not reserved scores.",
+  "conversations": [
+    {
+      "id": "context-dev-01-door-landings",
+      "familyID": "door-landings",
+      "codeFamily": "BC",
+      "questions": [
+        "Under the 2022 NYC building rules, an office door has a landing only 36 inches long in the direction of travel. Does that length meet the ordinary minimum?",
+        "Change the situation to a door wholly within an individual apartment. Is a 36-inch landing length allowed for that situation?"
+      ],
+      "checks": [
+        "No. The ordinary door-landing length in the direction of travel is at least 44 inches. Width and door-swing conditions remain separate.",
+        "Yes for this length condition. Within individual Group R-2 units the landing length need not exceed 36 inches. This does not waive width or door-swing requirements."
+      ],
+      "references": [
+        "BC 1010.1.6"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      }
+    },
+    {
+      "id": "context-dev-02-bathtub-outlets",
+      "familyID": "bathtub-outlets",
+      "codeFamily": "PC",
+      "questions": [
+        "For a new NYC bathtub, the waste outlet and overflow connect to 1-inch waste tubing. Is that size enough?",
+        "If we enlarge the tubing to 1.5 inches, can we leave out the overflow outlet?"
+      ],
+      "checks": [
+        "No. Bathtub waste and overflow outlets must connect to tubing or piping at least 1.5 inches in diameter.",
+        "No. Both a waste outlet and an overflow outlet are required; the waste outlet also needs a watertight stopper."
+      ],
+      "references": [
+        "PC 407.1",
+        "PC 407.2"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      }
+    },
+    {
+      "id": "context-dev-03-bathroom-oil-appliance",
+      "familyID": "bathroom-oil-appliance",
+      "codeFamily": "MC",
+      "questions": [
+        "Under the 2022 NYC mechanical rules, can an ordinary fuel-oil-fired appliance that takes combustion air from the bathroom be installed in that bathroom?",
+        "Suppose it is instead a direct-vent appliance taking all combustion air directly outdoors, listed for the installation and installed according to the manufacturer. Does the bathroom location exception permit it?"
+      ],
+      "checks": [
+        "No. Bathrooms are prohibited appliance locations unless an enumerated exception is met; the described ordinary bathroom-air appliance does not meet one.",
+        "Yes under the stated direct-vent exception in a room not used for sleeping. All combustion air must come directly outdoors, and listing and manufacturer conditions must be met."
+      ],
+      "references": [
+        "MC 303.1",
+        "MC 303.3"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [
+          "Fuel oil expressly avoids treating gas-appliance location rules as Mechanical Code authority."
+        ],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      }
+    },
+    {
+      "id": "context-dev-04-gas-meter-valve",
+      "familyID": "gas-meter-valve",
+      "codeFamily": "FGC",
+      "questions": [
+        "For a new NYC natural-gas meter, may its shutoff valve be located only on the outlet side of the meter?",
+        "If we put the valve on the supply side, may we use any valve type without utility approval?"
+      ],
+      "checks": [
+        "No. Every meter must have a shutoff valve on the supply side.",
+        "No. Meter valves must be of a type approved by the utility company."
+      ],
+      "references": [
+        "FGC 409.1",
+        "FGC 409.2"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      }
+    },
+    {
+      "id": "context-dev-05-sprinkler-visual-records",
+      "familyID": "sprinkler-visual-records",
+      "codeFamily": "FC",
+      "questions": [
+        "For a NYC office sprinkler system, is a visual inspection once every three months enough for the routine visual-inspection rule?",
+        "When the monthly inspection finds a defect, does it have to appear on the inspection report?"
+      ],
+      "checks": [
+        "No. A visual inspection must be completed monthly by the certificate of fitness holder in accordance with NFPA 25.",
+        "Yes. All defects or violations must be noted on the inspection report."
+      ],
+      "references": [
+        "FC 901.6",
+        "FC 901.6.2",
+        "FC 901.6.2.1"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      }
+    }
+  ]
+}

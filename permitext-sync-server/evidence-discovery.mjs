@@ -3,7 +3,7 @@ import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-canonical-scope-current-question-discovery-v44";
+export const evidenceDiscoveryVersion = "20261003-use-scope-discovery-v45";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -997,15 +997,38 @@ function zoningScopeRankingFactor(section, question, currentQuestion = question)
   const chapterFamily = /Commercial District Regulations/i.test(labels) ? "C"
     : /Manufacturing District Regulations/i.test(labels) ? "M"
       : /Residence District Regulations/i.test(labels) ? "R" : null;
-  if (chapterFamily && families.size) return families.has(chapterFamily) ? 1.55 : 0.65;
+  let factor = chapterFamily && families.size ? (families.has(chapterFamily) ? 1.55 : 0.65) : 1;
+  // The published chapter subject is another retrieval prior. A commercial
+  // district alone cannot choose between its mixed, residential and non-
+  // residential building frameworks. Current scenario wording supersedes
+  // saved inventory; this does not classify the building under a definition.
+  const useCategory = value => {
+    const original = String(value || "");
+    // null means that the current scenario deliberately leaves the category
+    // open; undefined means it says nothing about category. Only the latter
+    // permits an inherited subject to supply a weak retrieval hint.
+    if (/\b(?:compare|comparison|difference|versus|vs\.?)\b/i.test(original)) return null;
+    if (/\b(?:maybe|might be|possibly|whether|is (?:this|it|the building))\b[\s\S]{0,80}\b(?:mixed|residential|commercial|retail)\b/i.test(original)) return null;
+    const text = original.replace(/\b(?:not|no longer|never)\s+(?:a\s+)?(?:(?:entirely|exclusively|only|purely)\s+)?(?:mixed(?:[- ]use)?|residential(?:[- ]only)?|commercial(?:[- ]only)?|retail(?:[- ]only)?)\b/gi, "");
+    if (/\b(?:entirely|exclusively|only|purely)\s+residential\b|\bresidential[- ]only\b/i.test(text)) return "residential";
+    if (/\b(?:entirely|exclusively|only|purely)\s+(?:commercial|retail|community facility)\b|\b(?:commercial|retail|community[- ]facility)[- ]only\b/i.test(text)) return "nonresidential";
+    if (/\bmixed(?:[- ]use)?\s+(?:residential|commercial|building)|\bmixed[- ]use\s+(?:project|development)|\b(?:residential|apartments?)\s*(?:\/|and|with|plus)\s*(?:commercial|retail)\b|\b(?:commercial|retail)\s*(?:\/|and|with|plus)\s*(?:residential|apartments?)\b/i.test(text)) return "mixed";
+    return text !== original ? null : undefined;
+  };
+  const currentCategory = useCategory(currentQuestion);
+  const category = currentCategory === undefined ? useCategory(question) : currentCategory;
+  const chapterCategory = /Bulk Regulations for Mixed Buildings/i.test(labels) ? "mixed"
+    : /Bulk Regulations for Residential Buildings/i.test(labels) ? "residential"
+      : /Bulk Regulations for Commercial or Community Facility Buildings/i.test(labels) ? "nonresidential" : null;
+  if (category && chapterCategory) factor *= category === chapterCategory ? 1.5 : 0.7;
   const specialDistrict = labels.match(/Special\s+([^\n—()]+?)\s+District(?:\s*\(([A-Z][A-Z0-9-]+)\))?/i);
-  if (!specialDistrict) return 1;
+  if (!specialDistrict) return factor;
   const titleTokens = rawTokens(specialDistrict[1]).filter(token => !stopWords.has(token) && token.length > 2);
   const applicabilityQuestion = currentFamilies.size ? currentQuestion : question;
   const text = normalizedText(applicabilityQuestion);
   const districtNamed = titleTokens.length && titleTokens.every(token => text.includes(token));
   const abbreviationNamed = specialDistrict[2] && new RegExp(`\\b${specialDistrict[2]}\\b`, "i").test(applicabilityQuestion);
-  return districtNamed || abbreviationNamed ? 1.2 : 0.5;
+  return factor * (districtNamed || abbreviationNamed ? 1.2 : 0.5);
 }
 
 function singularForms(token) {

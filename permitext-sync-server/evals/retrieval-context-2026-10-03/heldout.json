@@ -1,0 +1,880 @@
+{
+  "description": "36 reserved ordinary-language turns in twelve three-turn scenarios across BC, PC, MC, FGC, FC and ZR. Explicit fictional project facts; follow-up correlations are disclosed.",
+  "scope": {
+    "professionalAdjudication": false,
+    "modelPromptIsolation": "Send only question, explicit project facts and normal prior conversation. Exclude checks, references, metadata and keys."
+  },
+  "conversations": [
+    {
+      "id": "context-hold-01-accessible-ramp",
+      "familyID": "accessible-ramp",
+      "codeFamily": "BC",
+      "questions": [
+        "For this project, does the proposed 1-in-10 ramp slope meet the running-slope limit?",
+        "We change the running slope to 1 in 12, but the ramp rises 32 inches in one run. Is one run allowed?",
+        "We split the rise into two 16-inch runs. Can we use a 1-in-40 cross slope on the ramp surface?"
+      ],
+      "checks": [
+        "No. A means-of-egress or accessible-route ramp has a running slope no steeper than 1 vertical in 12 horizontal.",
+        "No. A ramp run may rise no more than 30 inches; meeting running slope alone does not permit a 32-inch run.",
+        "No. Cross slope may not be steeper than 1 in 48. The two 16-inch rises satisfy the rise limit but do not waive cross slope."
+      ],
+      "references": [
+        "BC 1012.1",
+        "BC 1012.2",
+        "BC 1012.4",
+        "BC 1012.3"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — accessible-ramp",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "ramp-function",
+            "label": "Ramp function",
+            "value": "Ordinary pedestrian ramp that is both an accessible route and part of the means of egress",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "ramp-running-slope",
+            "label": "Ramp running slope",
+            "value": "1 vertical in 10 horizontal",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "excluded-situations",
+            "label": "Excluded situations",
+            "value": "Not an assembly aisle, curb ramp or vehicle ramp in a parking garage",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-02-terrace-guard",
+      "familyID": "terrace-guard",
+      "codeFamily": "BC",
+      "questions": [
+        "For this project, is a guard required along the open side of the terrace?",
+        "Correction: the largest drop anywhere within 36 inches horizontally of the edge is exactly 30 inches. Does this drop-height rule still require a guard?",
+        "Separate situation: does the same guard rule require a guard across the loading side of a loading dock with a 40-inch drop?"
+      ],
+      "checks": [
+        "Yes. The 31-inch drop within 36 inches of the open edge is more than 30 inches, triggering a guard under the stated ordinary open-sided terrace conditions.",
+        "No under this drop-height trigger. It says more than 30 inches; an exact 30-inch greatest drop within the stated horizontal zone does not satisfy that predicate. Do not claim immunity from another applicable roof/guard requirement.",
+        "No under this provision. The loading side of loading docks or piers is an express guard exception. Do not extend that exception to other sides or ordinary terraces."
+      ],
+      "references": [
+        "BC 1015.2"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — terrace-guard",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "proposed-walking-surface",
+            "label": "Proposed walking surface",
+            "value": "An ordinary at-grade exterior pedestrian terrace, not a building rooftop",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "edge-condition",
+            "label": "Edge condition",
+            "value": "Open side with a 31-inch vertical drop to adjacent grade at a point 12 inches horizontally from the edge",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "exceptions",
+            "label": "Exceptions",
+            "value": "No stage, dock, vehicle service pit, assembly seating or other listed exception applies to the initial terrace",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing",
+      "familyID": "shower-waterproofing",
+      "codeFamily": "PC",
+      "questions": [
+        "For this project, may the shower liner turn up only 1 inch above the finished threshold?",
+        "We raise the liner to 2 inches above the threshold, but put fasteners through it only half an inch above the threshold. Is that allowed?",
+        "Before covering the completed liner, what water depth and minimum holding time are required for its leak test?"
+      ],
+      "checks": [
+        "No. The liner must turn up on all sides at least 2 inches above the finished threshold.",
+        "No. The liner may not be nailed or perforated less than 1 inch above the finished threshold. Adequate turn-up height does not waive this condition.",
+        "Plug the shower drain watertight, use potable water at least 2 inches deep measured at the threshold, retain it for at least 15 minutes, and show no leakage. If there is no threshold at least 2 inches high, construct a temporary threshold for the test."
+      ],
+      "references": [
+        "PC 417.5",
+        "PC 417.5.2",
+        "PC 312.9"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — shower-waterproofing",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Plumbing Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "shower-construction",
+            "label": "Shower construction",
+            "value": "Site-built shower compartment with an ordinary liner; no prefabricated receptor",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "threshold",
+            "label": "Threshold",
+            "value": "Finished threshold is 2 inches high",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "liner-turn-up",
+            "label": "Liner turn-up",
+            "value": "1 inch above finished threshold initially",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "exceptions",
+            "label": "Exceptions",
+            "value": "Not an outdoor rinsing shower laid directly on ground; not a sheet-applied load-bearing bonded membrane",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-04-restaurant-grease",
+      "familyID": "restaurant-grease",
+      "codeFamily": "PC",
+      "questions": [
+        "For this project, does the kitchen sink waste need a grease interceptor or automatic grease removal device?",
+        "Could we run the toilet waste through that same grease interceptor too?",
+        "Now consider an ordinary kitchen inside one private dwelling unit instead of this restaurant. Does the same grease-interceptor requirement apply?"
+      ],
+      "checks": [
+        "Yes. Food-preparation fixtures and equipment discharging fats, oils or grease must drain to a grease interceptor or automatic grease removal device in accordance with DEP requirements.",
+        "No. Grease interceptors or automatic grease removal devices may receive waste only from fixtures/equipment that allow fats, oils or grease to be discharged; ordinary toilet sanitary waste does not belong on that connection.",
+        "No under this ordinary grease-interceptor requirement. Individual dwelling units and private living quarters are expressly excepted; do not carry restaurant facts into the hypothetical dwelling."
+      ],
+      "references": [
+        "PC 1003.1",
+        "PC 1003.3",
+        "PC 1003.3.4",
+        "PC 1003.3.1",
+        "PC 1003.3.3"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — restaurant-grease",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Plumbing Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "proposed-use",
+            "label": "Proposed use",
+            "value": "Commercial restaurant kitchen",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "kitchen-sink-waste",
+            "label": "Kitchen sink waste",
+            "value": "Food-preparation sink discharging fats, oils and grease",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "dwelling-exception",
+            "label": "Dwelling exception",
+            "value": "Initial scenario is not a private dwelling, private living quarters or non-culinary school",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-05-condensate-protection",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "questions": [
+        "For this project, does a half-inch fall over an 8-foot condensate-drain run meet the minimum slope?",
+        "We correct the drain slope. If the primary drain clogs, water could damage the ceiling below. Do we need an overflow-protection method?",
+        "Could a listed water-level detector that shuts off the cooling equipment before the auxiliary pan overflows satisfy an allowed method without a separate drain from that pan?"
+      ],
+      "checks": [
+        "No. The condensate piping minimum is 1/8 inch per foot, so an 8-foot horizontal run needs at least 1 inch fall in the direction of discharge.",
+        "Yes. Where primary condensate overflow could damage building components, provide one of the listed auxiliary/secondary protection methods; the stated no-floor-drain facts exclude that exception.",
+        "Yes as an expressly allowed method, provided the auxiliary pan meets the specified dimensions/material/construction requirements and has a listed water-level device shutting equipment off before pan overflow. It does not waive the primary condensate drain."
+      ],
+      "references": [
+        "MC 307.2",
+        "MC 307.2.1",
+        "MC 307.2.3"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — condensate-protection",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Mechanical Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "equipment",
+            "label": "Equipment",
+            "value": "Cooling coil above a finished gypsum-board ceiling; it produces condensate",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "primary-drain-run",
+            "label": "Primary drain run",
+            "value": "8 feet horizontal with half an inch fall",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "overflow-consequence",
+            "label": "Overflow consequence",
+            "value": "Primary drain blockage could damage building components below",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "floor-drain",
+            "label": "Floor drain",
+            "value": "No suitably sized and located floor drain",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "fuel-fired-shutdown-exception",
+            "label": "Fuel-fired shutdown exception",
+            "value": "Cooling coil is not a fuel-fired appliance",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-06-dryer-duct",
+      "familyID": "dryer-duct",
+      "codeFamily": "MC",
+      "questions": [
+        "For this project, can the permanent domestic dryer exhaust duct be ordinary flexible foil duct?",
+        "We replace it with compliant smooth metal duct. May the joint screws project a quarter inch into the duct?",
+        "If we change to fasteners projecting no more than one-eighth inch, are duct supports spaced every 6 feet acceptable?"
+      ],
+      "checks": [
+        "No for the permanent exhaust duct. It must have a smooth interior finish and be metal at least 0.016 inch thick, normally 4 inches nominal diameter unless the manufacturer specifically requires larger. Do not confuse a permitted transition duct with the permanent exhaust duct.",
+        "No. Screws or similar fasteners in a single-appliance duct may not protrude more than 1/8 inch inside.",
+        "No. The exhaust duct must be supported at 4-foot intervals and secured. Meeting the fastener projection condition does not waive support spacing."
+      ],
+      "references": [
+        "MC 504.8",
+        "MC 504.8.1",
+        "MC 504.8.2"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — dryer-duct",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Mechanical Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "dryer-type",
+            "label": "Dryer type",
+            "value": "One domestic clothes dryer",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "duct-segment",
+            "label": "Duct segment",
+            "value": "Permanent exhaust duct after the appliance transition duct, not the transition connector",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "manufacturer-duct-size-requirement",
+            "label": "Manufacturer duct-size requirement",
+            "value": "No requirement for a duct larger than 4 inches",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "questions": [
+        "For this project, may the appliance gas shutoff valve be concealed behind permanent drywall?",
+        "What if we put the valve in an open, reachable location but leave it where moving equipment can hit it?",
+        "Separate hypothetical: for a vented decorative gas appliance, may its identified dedicated shutoff valve be in another area with ready access instead of right next to the appliance?"
+      ],
+      "checks": [
+        "No. Shutoff valves are prohibited in concealed locations and furnace plenums.",
+        "No. Shutoff valves must be accessible for operation and protected from damage. Accessibility alone does not meet the protection condition.",
+        "Yes under the vented-decorative-appliance exception. It must have ready access, be permanently identified, serve no other appliance, and piping from it to within 6 feet of the appliance must meet the stated gas-piping requirements. This is not a general remote-valve allowance for cooking ranges."
+      ],
+      "references": [
+        "FGC 409.1",
+        "FGC 409.5",
+        "FGC 409.1.2",
+        "FGC 409.1.3",
+        "FGC 409.5.2"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — gas-shutoff-access",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Fuel Gas Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "fuel",
+            "label": "Fuel",
+            "value": "Natural gas",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "appliance",
+            "label": "Appliance",
+            "value": "Ordinary gas cooking range initially",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "shutoff-proposal",
+            "label": "Shutoff proposal",
+            "value": "Valve concealed behind permanent drywall with no access opening",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-08-gas-restoration",
+      "familyID": "gas-restoration",
+      "codeFamily": "FGC",
+      "questions": [
+        "For this project, after restoring gas service, does the earlier pressure test mean we can skip checking the piping for leakage immediately after gas is turned back on?",
+        "During that check we find a leak. Can gas stay on while the necessary repair is being arranged?",
+        "After the repairs, what approved kinds of methods can be used for the required leakage check?"
+      ],
+      "checks": [
+        "No. Immediately after gas is turned on into a new system or initially restored after service interruption, check for abnormal conditions and leakage. An earlier pressure test is not that operating leakage check.",
+        "No. Where leakage is indicated or an abnormal condition presents a hazard, shut off gas until necessary repairs are made.",
+        "Use a combustible-gas indicator meeting the stated instrument requirements or a noncorrosive leak-detection fluid. Repairs to the affected piping must also be retested; do not imply the leakage check replaces required pressure testing."
+      ],
+      "references": [
+        "FGC 406.6",
+        "FGC 406.6.1",
+        "FGC 406.7.1.4",
+        "FGC 406.6.3",
+        "FGC 406.5.2"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — gas-restoration",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Fuel Gas Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "system",
+            "label": "System",
+            "value": "Natural-gas piping in an occupied NYC building",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "work-state",
+            "label": "Work state",
+            "value": "Gas service is being initially restored after an interruption; prior required pressure testing has been completed",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-09-rooftop-access",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "questions": [
+        "For this project, is a 5-foot-wide rooftop clear path enough for firefighter access?",
+        "We widen the clear path to 6 feet, but a fixed overhead structure leaves only 8 feet of vertical clearance. Does that meet the clear-path height?",
+        "The path is now clear to 9 feet. How much clear space must we keep around the bulkhead door that opens onto this rooftop?"
+      ],
+      "checks": [
+        "No. The rooftop clear path must be at least 6 feet horizontally wide under the stated flat 60-foot-high building conditions.",
+        "No. The rooftop clear path must have at least 9 feet of height as well as the 6-foot horizontal width.",
+        "At least 6 feet clearance in all directions from the door opening, measured from the door hinge. This door clearance is separate from the clear path and perimeter landing requirements."
+      ],
+      "references": [
+        "FC 504.4",
+        "FC 504.4.4",
+        "FC 504.4.6"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — rooftop-access",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "Current enacted NYC Fire Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "building-height",
+            "label": "Building height",
+            "value": "60 feet",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "roof-slope",
+            "label": "Roof slope",
+            "value": "Flat roof, zero degrees",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "clear-path-proposal",
+            "label": "Clear path proposal",
+            "value": "5 feet horizontal width",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "door",
+            "label": "Door",
+            "value": "Ordinary bulkhead door opening onto the roof",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "approval-modifications",
+            "label": "Approval modifications",
+            "value": "No approved alternative or modification of rooftop access requirements",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-10-emergency-light-tests",
+      "familyID": "emergency-light-tests",
+      "codeFamily": "FC",
+      "questions": [
+        "For this project, are 10-second monthly emergency-light activation tests long enough?",
+        "We switch to equipment with automated self-testing and self-diagnostics. Can we skip the monthly visual inspection too?",
+        "Apart from the monthly checks, what minimum duration and frequency apply to the battery-power test?"
+      ],
+      "checks": [
+        "No. Activation tests last at least 30 seconds and are conducted manually at least monthly unless the equipment has the specified automated features; a trained knowledgeable person conducts the manual test.",
+        "No. The automated-testing option still requires a visual inspection at least monthly for supervisory/trouble signals or other signs of malfunction.",
+        "Battery-powered emergency lighting is operated on battery power for at least 90 minutes, at least once a year, by a qualified person under the referenced qualification rules."
+      ],
+      "references": [
+        "FC 1027.1",
+        "FC 1027.9",
+        "FC 604.5",
+        "FC 1027.9.1",
+        "FC 1027.9.2"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — emergency-light-tests",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "Current enacted NYC Fire Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "use",
+            "label": "Use",
+            "value": "Group B office",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "equipment",
+            "label": "Equipment",
+            "value": "Battery-powered emergency lighting for the means of egress",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "current-activation-testing",
+            "label": "Current activation testing",
+            "value": "Manual tests lasting 10 seconds once a month; no automated testing feature initially",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-11-office-loading-table",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "questions": [
+        "For this project, how many accessory off-street loading berths does the ordinary zoning table require?",
+        "Correction: the total office floor area is only 95,000 square feet. What does the same loading table require then?",
+        "For a larger version with 350,000 square feet of office floor area in the same district, how many loading berths would the table require?"
+      ],
+      "checks": [
+        "One loading berth. In C4-4, LRC-C has none for the first 100,000 square feet and one for the next 200,000; the stated 120,000 square feet is in that tier.",
+        "None under this ordinary table, because 95,000 square feet is within the first 100,000-square-foot tier for LRC-C in C4-4.",
+        "Two loading berths: none for the first 100,000, one for the next 200,000, and one for the additional 50,000 within the next 300,000-square-foot increment."
+      ],
+      "references": [
+        "ZR 36-61",
+        "ZR 36-62"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [
+          "Use Group VII/LRC-C classification is expressly supplied. Current table columns and footnotes must be retained, not inferred from another district."
+        ],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — office-loading-table",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "Current imported NYC Zoning Resolution",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "zoning-district",
+            "label": "Zoning district",
+            "value": "C4-4",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "proposed-work",
+            "label": "Proposed work",
+            "value": "New development",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "proposed-use",
+            "label": "Proposed use",
+            "value": "Only Use Group VII offices, within Loading Requirement Category C",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "floor-area",
+            "label": "Floor area",
+            "value": "120,000 square feet for this development; no other use or enlargement portion",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "modifications",
+            "label": "Modifications",
+            "value": "No special district modification, waiver, grandfathering or approved loading relief",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-hold-12-residential-parking-location",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "questions": [
+        "For this project, may accessory parking spaces sit between the street line and the apartment building street wall?",
+        "What if we relocate the spaces behind the street wall in an open side or rear area instead?",
+        "Separate version: on a through lot with the same apartment use, does the no-parking-between-street-line-and-street-wall restriction have to apply along both street frontages?"
+      ],
+      "checks": [
+        "No under the stated ordinary multiple-dwelling interior-lot facts. Spaces may be within the building or in open areas that are not between the street line and street wall and their prolongations.",
+        "Yes as to this location restriction if the area is not between the street line and street wall or their prolongations. Other parking, yard, access and curb-cut requirements still apply.",
+        "No. On through lots this limitation applies along only one street frontage; it does not disappear along both. Entire-block lots and large sites have separate exceptions not assumed here."
+      ],
+      "references": [
+        "ZR 25-621"
+      ],
+      "evaluationMetadata": {
+        "provenance": "Explicit fictional test scenario",
+        "sourceScopeNotes": [],
+        "turnDependence": "Shared facts and sources; later turns change a stated condition or ask a related operational question."
+      },
+      "project": {
+        "name": "Synthetic evaluation — residential-parking-location",
+        "description": "Fictional NYC project used only for evaluation. These stated proposed facts are not attributes of 1070 Southern Boulevard or any real project.",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "Current imported NYC Zoning Resolution",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "zoning-district",
+            "label": "Zoning district",
+            "value": "R7",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "building-use",
+            "label": "Building use",
+            "value": "Multiple dwelling apartment residence",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "lot",
+            "label": "Lot",
+            "value": "Ordinary interior zoning lot initially; not a through lot, entire block or large site",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "proposed-parking",
+            "label": "Proposed parking",
+            "value": "Accessory off-street parking between the street line and street wall",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "special-modifications",
+            "label": "Special modifications",
+            "value": "No special district or approved location modification",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      }
+    }
+  ]
+}

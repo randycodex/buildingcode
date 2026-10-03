@@ -1,0 +1,142 @@
+{
+  "status": "frozen-before-paid-answers",
+  "frozenAt": "2026-10-03T02:58:47.009305+00:00",
+  "paidCallsAtFreeze": 0,
+  "directory": "evals/retrieval-context-2026-10-03",
+  "files": {
+    "development.json": {
+      "sha256": "5f7172e1f2d433352433a06cd29677238da52fff2272b0fa6cdf7f9e89f80292",
+      "bytes": 5456
+    },
+    "heldout.json": {
+      "sha256": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+      "bytes": 39061
+    },
+    "source-keys.json": {
+      "sha256": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb",
+      "bytes": 76983
+    },
+    "source-packets.json": {
+      "sha256": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213",
+      "bytes": 110890
+    },
+    "source-audit.json": {
+      "sha256": "80641cc9153e2bbc7517bbd36c8644b4e52f481f1eab09517191465c07d7fdd3",
+      "bytes": 44382
+    },
+    "protocol.json": {
+      "sha256": "9eab840662f8c6e269ba2e6b7cce9a9edc59426721a7e33b896aa0be5811f57a",
+      "bytes": 3893
+    }
+  },
+  "splits": {
+    "development": {
+      "turnCount": 10,
+      "scenarioFamilyCount": 5,
+      "codeFamilyTurnCounts": {
+        "BC": 2,
+        "PC": 2,
+        "MC": 2,
+        "FGC": 2,
+        "FC": 2
+      },
+      "fictionalProjectCount": 0,
+      "fictionalProjectTurns": 0,
+      "broadChapterClusterCount": 5,
+      "broadChapterClusters": {
+        "BC chapter 10": [
+          "door-landings"
+        ],
+        "PC chapter 4": [
+          "bathtub-outlets"
+        ],
+        "MC chapter 3": [
+          "bathroom-oil-appliance"
+        ],
+        "FGC chapter 4": [
+          "gas-meter-valve"
+        ],
+        "FC chapter 9": [
+          "sprinkler-visual-records"
+        ]
+      },
+      "correlationNote": "Three reserved turns share sources/facts in each scenario; different scenarios can share broad chapters. Exact reference disjointness is not statistical independence."
+    },
+    "reserved": {
+      "turnCount": 36,
+      "scenarioFamilyCount": 12,
+      "codeFamilyTurnCounts": {
+        "BC": 6,
+        "PC": 6,
+        "MC": 6,
+        "FGC": 6,
+        "FC": 6,
+        "ZR": 6
+      },
+      "fictionalProjectCount": 12,
+      "fictionalProjectTurns": 36,
+      "broadChapterClusterCount": 10,
+      "broadChapterClusters": {
+        "BC chapter 10": [
+          "accessible-ramp",
+          "terrace-guard"
+        ],
+        "PC chapter 4": [
+          "shower-waterproofing"
+        ],
+        "PC chapter 10": [
+          "restaurant-grease"
+        ],
+        "MC chapter 3": [
+          "condensate-protection"
+        ],
+        "MC chapter 5": [
+          "dryer-duct"
+        ],
+        "FGC chapter 4": [
+          "gas-shutoff-access",
+          "gas-restoration"
+        ],
+        "FC chapter 5": [
+          "rooftop-access"
+        ],
+        "FC chapter 10": [
+          "emergency-light-tests"
+        ],
+        "ZR chapter 36-6": [
+          "office-loading-table"
+        ],
+        "ZR chapter 25-6": [
+          "residential-parking-location"
+        ]
+      },
+      "correlationNote": "Three reserved turns share sources/facts in each scenario; different scenarios can share broad chapters. Exact reference disjointness is not statistical independence."
+    }
+  },
+  "totalTurns": 46,
+  "sourcePacketCount": 49,
+  "uniqueSourceFileCount": 19,
+  "actualResolverAvailableCount": 49,
+  "actualResolverNormalizedOperativeMatchCount": 49,
+  "excludedPriorReferenceCount": 273,
+  "exactPriorOperativeOverlap": [],
+  "exactDevelopmentReservedOperativeOverlap": [],
+  "independenceLimits": [
+    "Author and reviewer are the same assistant; no professional adjudication.",
+    "36 reserved turns comprise 12 correlated conversations in 10 broad chapter clusters; not 36 independent legal topics.",
+    "Exact operative references are disjoint from the inspected prior273 full references, but parent/child and broad-topic overlap remain.",
+    "All project facts are explicit fictional fixtures, not live project attributes."
+  ],
+  "noProductAccuracyClaim": true,
+  "no95PercentClaim": true,
+  "reservedAccessPolicy": "Root may read development only until candidate/source freeze. Reserved prompts, keys and source answers must remain unopened before that freeze.",
+  "manifestMetadataCorrection": {
+    "correctedAt": "2026-10-03T02:59:19.849448+00:00",
+    "field": "independenceLimits broad chapter count text",
+    "before": 8,
+    "after": 10,
+    "matchesComputedSplitCount": true,
+    "paidCallsForCohort": 0,
+    "fixturesKeysAndPacketsChanged": false
+  }
+}

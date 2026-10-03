@@ -1,0 +1,2284 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "passage_index independent source review",
+  "reviewAuthority": "Assistant source review of frozen canonical text and fictional fixtures; not licensed professional adjudication.",
+  "candidateVersion": "20261003-query-scope-context-v54",
+  "candidateFreezePath": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/evals/retrieval-context-2026-10-03/candidate-freeze.json",
+  "candidateFreezeSHA256": "e1fddf6683cb9ccca43d2ae39e625a004e1f2f4b6b972e7381ef58d114e6978c",
+  "baseCommit": "cb90fc092",
+  "runPath": "/tmp/permitext-retrieval-context-heldout-20261003-v1/results.json",
+  "runStartedAt": "2026-10-03T03:06:20.335Z",
+  "runSnapshotSHA256": "d88b0210722ea299d24d9e7125698af6cc7718e8d87cc00d1299437b0c3e8cc3",
+  "assignment": {
+    "conversationIDs": [
+      "context-hold-01-accessible-ramp",
+      "context-hold-02-terrace-guard",
+      "context-hold-03-shower-waterproofing",
+      "context-hold-04-restaurant-grease"
+    ],
+    "turnCount": 12
+  },
+  "gradingBasis": "Delivered answerText, supportedPoints, canonical citations, applicable whole operative conditions/exceptions and stated/current project facts. Model verifier and answerQuality booleans do not determine source correctness. All assigned cases came from reserved v1 execution after candidate freeze; no retuning.",
+  "coverageCaveat": "Cited/answerQuality/sourceSummary coverage is not total writer evidence. Each case records actual captured writer provision references and request hashes. Uncited parent/exception text may have been supplied to the writer.",
+  "cases": [
+    {
+      "id": "context-hold-01-accessible-ramp-1",
+      "familyID": "accessible-ramp",
+      "question": "For this project, does the proposed 1-in-10 ramp slope meet the running-slope limit?",
+      "grade": "correct",
+      "reason": "Correctly applies the 1:12 running-slope maximum to the stated accessible-route/means-of-egress ramp. The proposed 1:10 is steeper. It does not substitute the other-pedestrian-ramp 1:8 rule or the nonaccessible garage exception.",
+      "projectFactApplication": "Uses the stated ramp function and excluded assembly/curb/vehicle-ramp scenarios.",
+      "operativeConditionsAndExceptionsReview": "Running slope maximum and relevant exceptions are supplied in full BC1012.2; BC1012.1 parent scope is consistent with that text and project facts.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** For the stated ordinary pedestrian ramp that is both an accessible route and part of the means of egress, the 2022 NYC Building Code limit is 1:12 (8%); the proposed 1:10 (10%) is steeper and does not meet it (BC § 1012.2).",
+      "finalAnswerTextSHA256": "0f0fd73698de503c9412178ace0b70c89441fc07b54efc87144fbbb385e7417d",
+      "finalAnswerObjectSHA256": "7842c5017656426d8346960fcd2b601683c88babf92204b9f57002990fd739f7",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "BC 1012.2"
+      ],
+      "citationReview": [
+        {
+          "reference": "BC 1012.2",
+          "sectionID": "2342",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2342-1"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Running-slope limit",
+          "explanation": "Ramps used as part of a means of egress or an accessible route must have a running slope no steeper than 1 vertical in 12 horizontal (8%). The stated 1:10 slope is 10%, so it exceeds that limit. The other-pedestrian-ramp limit and the listed exceptions do not apply to the stated ramp: it is not an assembly aisle or a parking-garage ramp, and the garage exception concerns a nonaccessible means of egress.",
+          "sectionID": "2342",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2342-1"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "BC 1006.2.2.5",
+          "BC 1006.4",
+          "BC 1012.2",
+          "BC 1012.4",
+          "BC 1012.6",
+          "BC 1012.6.1",
+          "BC 1012.6.2",
+          "BC 1012.6.3",
+          "BC 1012.6.4",
+          "BC 1012.6.5",
+          "BC 1012.7",
+          "BC 1014.8",
+          "BC 102.1",
+          "BC 1029.13",
+          "BC 1029.13.1",
+          "BC 202",
+          "BC 3315.1.4",
+          "BC 406.4.4"
+        ],
+        "writerProvisionCount": 18,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 18,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "BC 1012.1",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.2",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.4",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.3",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/81f080b9-aa91-475b-a90f-0caa50eb1bd3-request.json",
+            "fileSHA256": "bcf285c47eccc2be6ff33820c80293ced12b9642ad636c40445505a406f64909",
+            "provisionCount": 18
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-01-accessible-ramp-2",
+      "familyID": "accessible-ramp",
+      "question": "We change the running slope to 1 in 12, but the ramp rises 32 inches in one run. Is one run allowed?",
+      "grade": "correct",
+      "reason": "Correctly rejects a 32-inch single run under the 30-inch rise maximum even after running slope changes to 1:12. It separates running slope from rise.",
+      "projectFactApplication": "Honors the current 1:12 correction over the initial saved 1:10 value and applies the current 32-inch rise.",
+      "operativeConditionsAndExceptionsReview": "BC1012.4 is complete. The final caveat says the supplied rule does not specify the required landing arrangement; read narrowly, this is true of the cited vertical-rise rule. Actual writer evidence also includes BC1012.6.2 landing width and BC1012.6.4 direction-change landings, so this should not be generalized into a claim that all landing text was missing. No operative answer is withheld.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** At a 1:12 running slope, a 32-inch rise still exceeds the 30-inch maximum rise for any ramp run; it must be divided into more than one run (BC § 1012.4). The supplied rule does not specify the required landing arrangement.",
+      "finalAnswerTextSHA256": "4e0ec3179cd87336eb60f328f925c34655fb6dafe06f87e01fb7aec838b5c089",
+      "finalAnswerObjectSHA256": "cc8b62ef128e5234a5be878499d0390ae25556c9b654f09d3a05df4ef1476201",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "BC 1012.4"
+      ],
+      "citationReview": [
+        {
+          "reference": "BC 1012.4",
+          "sectionID": "2344",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2344-3"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Maximum rise per run",
+          "explanation": "The rise for any ramp run is limited to 30 inches maximum. A single run rising 32 inches exceeds that limit, regardless of its 1:12 running slope.",
+          "sectionID": "2344",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2344-3"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "BC 1003.5",
+          "BC 1006.4",
+          "BC 1011.5",
+          "BC 1012.2",
+          "BC 1012.4",
+          "BC 1012.6.2",
+          "BC 1012.6.4",
+          "BC 1012.8",
+          "BC 102.1",
+          "BC 1029.13",
+          "BC 1029.13.1",
+          "BC 1029.13.2",
+          "BC 1029.15",
+          "BC 202",
+          "BC 3315.1.2",
+          "BC 3315.1.4",
+          "BC 406.4.4"
+        ],
+        "writerProvisionCount": 17,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 17,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "BC 1012.1",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.2",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.4",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.3",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/7cddffc6-405c-4f4f-b9e7-962543966ed4-request.json",
+            "fileSHA256": "819e0e1476a52ae5f5a8fa30942870564a71a9cbca0ee9253b002f13a1b1ded0",
+            "provisionCount": 17
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-01-accessible-ramp-3",
+      "familyID": "accessible-ramp",
+      "question": "We split the rise into two 16-inch runs. Can we use a 1-in-40 cross slope on the ramp surface?",
+      "grade": "correct",
+      "reason": "Correctly rejects 1:40 cross slope against the 1:48 maximum and explains that splitting the rise does not waive cross slope.",
+      "projectFactApplication": "Keeps the ramp scenario and new two 16-inch runs distinct from cross-slope compliance.",
+      "operativeConditionsAndExceptionsReview": "BC1012.3 is complete and BC1012.4 remains supplied to distinguish the independent rise condition.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** For the stated ordinary pedestrian ramp, BC § 1012.3 limits cross slope to 1:48 (2%); 1:40 is 2.5%, so it exceeds the limit. Splitting the rise into two 16-inch runs does not change that cross-slope limit. (BC § 1012.3)",
+      "finalAnswerTextSHA256": "7855b35f160aec6a39aaae5ebcdd01d9dbdbba2c577e5956edd346095b195c21",
+      "finalAnswerObjectSHA256": "ce1307ecee46880eaafe0cebd122887c1b2f96f29c069339a72bf57a55b6339f",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "BC 1012.3"
+      ],
+      "citationReview": [
+        {
+          "reference": "BC 1012.3",
+          "sectionID": "2343",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2343-2"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Ramp cross-slope limit",
+          "explanation": "The slope measured perpendicular to a ramp’s direction of travel must not be steeper than 1 unit vertical in 48 units horizontal (2 percent). A 1:40 cross slope is 2.5 percent and exceeds that limit.",
+          "sectionID": "2343",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2343-2"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "BC 1006.4",
+          "BC 1011.3",
+          "BC 1012.2",
+          "BC 1012.3",
+          "BC 1012.4",
+          "BC 1012.7.1",
+          "BC 1014.8",
+          "BC 102.1",
+          "BC 1029.13",
+          "BC 1029.13.1",
+          "BC 1029.13.1.1",
+          "BC 202",
+          "BC 3315.1.4",
+          "BC 406.3.3.1",
+          "BC 406.4.4"
+        ],
+        "writerProvisionCount": 15,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 15,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "BC 1012.1",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.2",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.4",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "BC 1012.3",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/7e636bac-26b8-4e61-97df-a175bca5803c-request.json",
+            "fileSHA256": "6e04fad8895cb75012da0dae501b49bceba144d13166c5d76829e697de76e625",
+            "provisionCount": 15
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-02-terrace-guard-1",
+      "familyID": "terrace-guard",
+      "question": "For this project, is a guard required along the open side of the terrace?",
+      "grade": "correct",
+      "reason": "Correctly requires a guard: 31 inches is more than 30 inches and the measured point is 12 inches from the edge, within the 36-inch zone.",
+      "projectFactApplication": "Applies the ordinary at-grade open-sided walking surface and excludes listed exceptions. Does not require rooftop facts for this ordinary open-sided walking-surface trigger.",
+      "operativeConditionsAndExceptionsReview": "Complete BC1015.2 trigger, examples and all listed exceptions are present.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**Yes.** Under the 2022 NYC Building Code, an open-sided walking surface needs a guard when it is more than 30 inches above the floor or grade below at any point within 36 inches horizontally of the edge. The stated terrace drop is 31 inches at 12 inches from the edge, so it meets that trigger. The listed exceptions do not apply on the supplied facts. (BC § 1015.2)",
+      "finalAnswerTextSHA256": "1b8af8156e64f9ab83a234cfd327a34831fa430b5c3f76d861a5aee55f99c027",
+      "finalAnswerObjectSHA256": "71b4d4c299f2ef824aff81e5889396a87c4932e9b423b188eed0bcb740e825c0",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "BC 1015.2"
+      ],
+      "citationReview": [
+        {
+          "reference": "BC 1015.2",
+          "sectionID": "2385",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2385-2"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Guard trigger and application",
+          "explanation": "BC § 1015.2 requires guards along open-sided walking surfaces more than 30 inches above the floor or grade below at any point within 36 inches horizontally of the open-side edge. The stated 31-inch drop at 12 inches horizontally meets both conditions; the passage also expressly includes terraces among its examples. Its listed exceptions do not apply under the supplied project facts.",
+          "sectionID": "2385",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2385-2"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "BC 1011.12",
+          "BC 1011.13",
+          "BC 1015.2",
+          "BC 1015.2.1",
+          "BC 1015.4",
+          "BC 1015.7",
+          "BC 102.1",
+          "BC 1027.3",
+          "BC 1029.16.1",
+          "BC 1029.16.2",
+          "BC 1029.16.3",
+          "BC 1029.16.4",
+          "BC 1510.8",
+          "BC 1607.8",
+          "BC 202",
+          "BC 505.3.3",
+          "FGC 102.1",
+          "FGC 306.6",
+          "MC 304.11"
+        ],
+        "writerProvisionCount": 19,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 19,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "BC 1015.2",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/d6eb0ab6-95ca-42b5-825c-5ae52885f552-request.json",
+            "fileSHA256": "212aede5f37e474486fe95e0d252b2d5ff10fb80ccb5ce45eeff18036b38175d",
+            "provisionCount": 19
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-02-terrace-guard-2",
+      "familyID": "terrace-guard",
+      "question": "Correction: the largest drop anywhere within 36 inches horizontally of the edge is exactly 30 inches. Does this drop-height rule still require a guard?",
+      "grade": "correct",
+      "reason": "Correctly says exactly 30 inches does not satisfy the strictly more-than-30-inch trigger, with an express limit to this drop-height rule.",
+      "projectFactApplication": "Current greatest-drop correction supersedes the saved initial 31-inch drop. Does not claim exemption from all other possible guard requirements.",
+      "operativeConditionsAndExceptionsReview": "Complete BC1015.2 preserves the any-point/36-inch measurement condition and independent rooftop references.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** Under 2022 NYC BC § 1015.2, this drop-height trigger applies only when the surface is **more than 30 inches** above the floor or grade below within 36 inches horizontally of the open-side edge. Exactly 30 inches does not exceed that threshold, so this rule does not require a guard on the stated terrace. This answers only the drop-height trigger, not any separate guard requirement that might apply for another reason.",
+      "finalAnswerTextSHA256": "05eb8835183eb0a10fdb820a2b7b75b30bf4ea6b2594faa700fb8e48a1c97f82",
+      "finalAnswerObjectSHA256": "925c228338b936eeb0eea5904b2dd7aee4055a8ac31c6729df7c2b0919233bf8",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "BC 1015.2"
+      ],
+      "citationReview": [
+        {
+          "reference": "BC 1015.2",
+          "sectionID": "2385",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2385-1"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "The threshold is strictly greater than 30 inches",
+          "explanation": "BC § 1015.2 requires guards along open-sided walking surfaces more than 30 inches above the floor or grade below at any point within 36 inches horizontally of the open-side edge. At exactly 30 inches, the stated condition does not meet that trigger.",
+          "sectionID": "2385",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2385-1"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "BC 1011.12",
+          "BC 1012.10",
+          "BC 1012.10.1",
+          "BC 1015.2",
+          "BC 1015.3",
+          "BC 1015.4",
+          "BC 1015.6",
+          "BC 1015.7",
+          "BC 102.1",
+          "BC 1029.16",
+          "BC 1029.16.1",
+          "BC 1029.16.2",
+          "BC 1029.16.3",
+          "BC 1510.8",
+          "BC 1607.8",
+          "BC 202",
+          "BC 2406.4.6",
+          "FGC 102.1",
+          "FGC 306.6"
+        ],
+        "writerProvisionCount": 19,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 19,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "BC 1015.2",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/a23e9797-54d5-4abb-9d79-b308791fa718-request.json",
+            "fileSHA256": "4b639039ecbd6ef9de6f7bb6543f94e392d5bf00c1fca3d3afc60f3c49e4c584",
+            "provisionCount": 19
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-02-terrace-guard-3",
+      "familyID": "terrace-guard",
+      "question": "Separate situation: does the same guard rule require a guard across the loading side of a loading dock with a 40-inch drop?",
+      "grade": "correct",
+      "reason": "Correctly applies the express loading-side-of-docks/piers exception despite the stated 40-inch drop. It limits the conclusion to the questioned rule.",
+      "projectFactApplication": "Uses the separate loading-dock situation rather than applying the ordinary terrace exceptions statement. Does not extend this exception to other dock sides.",
+      "operativeConditionsAndExceptionsReview": "Complete BC1015.2 exception item1 is present; current delivered answer is supported despite unrelated FGC/MC guard candidates also in writer evidence.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** Under 2022 NYC BC § 1015.2, guards are not required “on the loading side of loading docks or piers.” That exception applies to the stated loading-dock side despite the 40-inch drop. This answers only the guard rule in question.",
+      "finalAnswerTextSHA256": "35123079270b9052e55c14a216d21cbed2f6aa00222db7ad062f8bfbded07aa0",
+      "finalAnswerObjectSHA256": "5d9d7f23956de2a30bfeeef5188160ea014e49e954aa2cbd084285251a73c7cc",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "BC 1015.2"
+      ],
+      "citationReview": [
+        {
+          "reference": "BC 1015.2",
+          "sectionID": "2385",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2385-2"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Loading-side exception",
+          "explanation": "BC § 1015.2 requires guards along open-sided walking surfaces more than 30 inches above the floor or grade below at any point within 36 inches horizontally of the edge, but expressly states: “Guards are not required” on the loading side of loading docks or piers. The stated 40-inch drop does not negate that exception.",
+          "sectionID": "2385",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2385-2"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 2,
+        "writerProvisionReferences": [
+          "BC 1011.12",
+          "BC 1015.2",
+          "BC 1015.6",
+          "BC 1015.7",
+          "BC 102.1",
+          "BC 1029.16.2",
+          "BC 1510.8",
+          "BC 1607.8",
+          "BC 202",
+          "BC 3303.4.5.1",
+          "BC 3303.4.5.2",
+          "BC 3308.5",
+          "BC 3315.2.2",
+          "FC 202",
+          "FC 2909",
+          "FGC 102.1",
+          "FGC 102.4.2.2",
+          "FGC 306.6",
+          "MC 102.4.2.2",
+          "MC 304.11"
+        ],
+        "writerProvisionCount": 20,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 20,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "BC 1015.2",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/8c80a3bf-fb68-4f83-b25e-d69aded7cc2c-request.json",
+            "fileSHA256": "6002cabf0011355fd8e6a82624aa208e01ce3d44300acd68b2ac9d1dcb0f8eb8",
+            "provisionCount": 20
+          },
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/f4eb9ce1-edcb-4ed7-93ee-681a87a3967d-request.json",
+            "fileSHA256": "0de88eb6cdb4f67083a385fd2cfa36c9582557f220bcbd9e19f5d5abcaf86503",
+            "provisionCount": 20
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-1",
+      "familyID": "shower-waterproofing",
+      "question": "For this project, may the shower liner turn up only 1 inch above the finished threshold?",
+      "grade": "correct",
+      "reason": "Correctly rejects a 1-inch turn-up against the minimum 2-inch turn-up on all sides above the finished threshold.",
+      "projectFactApplication": "Uses site-built/no-prefabricated-receptor scenario; outdoor-rinsing exception is excluded. Correctly says bonded membrane exception only concerns recessing.",
+      "operativeConditionsAndExceptionsReview": "Complete PC417.5.2 includes all operative liner conditions and both exceptions, not a sliced numeric rule alone.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** The liner must turn up at least 2 inches above the finished threshold, so the proposed 1-inch turn-up is 1 inch short. The stated shower is not within the outdoor-rinsing exception; the bonded-membrane exception concerns only whether the membrane must be recessed, not the 2-inch turn-up requirement (2022 NYC PC § 417.5.2).",
+      "finalAnswerTextSHA256": "9db12dae805e580f0de4fb14a7316ae5fcbd7ce1fdeab00228cbf34d6026ca4a",
+      "finalAnswerObjectSHA256": "70d4549b0b7ccb429329a84478a5b6f05ef992ff6972fbef447a577045a94daa",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "PC 417.5.2"
+      ],
+      "citationReview": [
+        {
+          "reference": "PC 417.5.2",
+          "sectionID": "11990",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11990-1"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Minimum liner turn-up",
+          "explanation": "For shower compartments without prefabricated receptors, the liner must turn up on all sides at least 2 inches above the finished threshold. The outdoor-rinsing exception does not apply to the stated project. The bonded-membrane exception waives only the recess requirement, not the minimum turn-up. Thus, a 1-inch turn-up does not meet the stated minimum.",
+          "sectionID": "11990",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11990-1"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 2,
+        "writerProvisionReferences": [
+          "BC 1010.1.7",
+          "BC 102.1",
+          "BC 1107.2.2.8.2",
+          "BC 1210.2.3",
+          "BC 202",
+          "PC 102.1",
+          "PC 312.9",
+          "PC 417.4",
+          "PC 417.4.1",
+          "PC 417.5",
+          "PC 417.5.1",
+          "PC 417.5.2",
+          "PC 417.5.2.1",
+          "PC 417.5.2.2",
+          "PC 417.5.2.3",
+          "PC 417.5.2.4",
+          "PC 417.5.2.5",
+          "PC 417.5.2.6",
+          "ZR 64-321"
+        ],
+        "writerProvisionCount": 19,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 19,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "PC 417.5",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 417.5.2",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 312.9",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/76abf133-6fee-4a03-9c04-6d1f2ba09a03-request.json",
+            "fileSHA256": "856eb43c025672c5bba0ba01e8f8e6c4242018046fd5b4f48ca66f46c1dc77a8",
+            "provisionCount": 19
+          },
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/8b7b4f1c-05df-423b-b763-71d06616bf81-request.json",
+            "fileSHA256": "70ba6ce4b71c4e361cd7cbf8833b012f6943f4bb3f5c424d510d79ec5146b0a7",
+            "provisionCount": 19
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-2",
+      "familyID": "shower-waterproofing",
+      "question": "We raise the liner to 2 inches above the threshold, but put fasteners through it only half an inch above the threshold. Is that allowed?",
+      "grade": "correct",
+      "reason": "Correctly says the new 2-inch turn-up meets its minimum while a fastener at half an inch above the finished threshold violates the separate no-perforation-below-1-inch condition.",
+      "projectFactApplication": "Honors changed turn-up over initial saved 1-inch turn-up and keeps fastener location separate.",
+      "operativeConditionsAndExceptionsReview": "Complete PC417.5.2 contains both turn-up and perforation predicates and exceptions.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** The 2-inch liner turn-up meets the minimum, but fasteners ½ inch above the finished threshold are too low: the liner must not be nailed or perforated less than 1 inch above it. Locate fasteners at least 1 inch above the threshold. (2022 NYC PC § 417.5.2)",
+      "finalAnswerTextSHA256": "f53237a1b37f433661c92d55aa9f53995c292627f077c77244c350324207a9eb",
+      "finalAnswerObjectSHA256": "f2b983800d91545d0bf5a750ef400d4ba24bb78dc1f28073fd715aba5df5886c",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "PC 417.5.2"
+      ],
+      "citationReview": [
+        {
+          "reference": "PC 417.5.2",
+          "sectionID": "11990",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11990-1"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Turn-up height and fastener location are separate requirements",
+          "explanation": "For a shower floor without a prefabricated receptor, the liner must turn up on all sides at least 2 inches above the finished threshold, and it must not be nailed or perforated at any point less than 1 inch above the finished threshold. Accordingly, the proposed 2-inch turn-up meets the height minimum, but fasteners ½ inch above the threshold violate the fastener restriction. The stated outdoor-rinsing and sheet-applied bonded-membrane exceptions do not apply to the supplied project facts.",
+          "sectionID": "11990",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11990-1"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 2,
+        "writerProvisionReferences": [
+          "BC 1003.5",
+          "BC 1010.1.5",
+          "BC 1010.1.7",
+          "BC 102.1",
+          "BC 1210.2.3",
+          "BC 1507.2.8",
+          "BC 202",
+          "BC 3102.3.1",
+          "PC 102.1",
+          "PC 312.9",
+          "PC 417.4.1",
+          "PC 417.5.1",
+          "PC 417.5.2",
+          "PC 417.5.2.1",
+          "PC 417.5.2.2",
+          "PC 417.5.2.3",
+          "PC 417.5.2.4",
+          "PC 417.5.2.5",
+          "PC 417.5.2.6"
+        ],
+        "writerProvisionCount": 19,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 19,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "PC 417.5",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 417.5.2",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 312.9",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/23145fd9-9964-43df-8cd5-c280b51556b5-request.json",
+            "fileSHA256": "483b43ddad7ffa8b1926708ea381c8239de273a6941253a532b34472bad3bdc5",
+            "provisionCount": 19
+          },
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/327a8c45-a87d-482f-94b9-d60ad2755e46-request.json",
+            "fileSHA256": "3454aca53fabeb3aaf5b483df360dafbeaf4fb521854693d2ca6276acd06b7bc",
+            "provisionCount": 19
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-03-shower-waterproofing-3",
+      "familyID": "shower-waterproofing",
+      "question": "Before covering the completed liner, what water depth and minimum holding time are required for its leak test?",
+      "grade": "correct",
+      "reason": "Correctly states potable water at least 2 inches deep measured at the threshold, at least 15 minutes, watertight drain plug and no evidence of leakage. It accurately applies the threshold-dependent temporary-threshold condition.",
+      "projectFactApplication": "Uses the stated finished 2-inch-high threshold; temporary threshold is unnecessary under that provided condition.",
+      "operativeConditionsAndExceptionsReview": "Complete PC312.9 supplies measurement, water type, plugging, threshold condition, holding time and leakage criterion; PC417.5.2 establishes test dependency.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "Fill the lined floor/receptor area with potable water at least **2 inches deep, measured at the threshold**, and retain it for at least **15 minutes**. Because the stated finished threshold is 2 inches high, the code’s temporary-threshold instruction for a threshold under 2 inches does not apply. The plugged shower-drain pipe must be watertight, and the test must show no evidence of leakage (2022 NYC PC § 312.9).",
+      "finalAnswerTextSHA256": "a8e60a6d9f02bad0756ea3caa8891f2f1ec062d2064f61865c4c9a716276ad8d",
+      "finalAnswerObjectSHA256": "3090e35102181d625f23e9996693fdb48a2e765144ed6994fe9646257f37d77a",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "PC 312.9"
+      ],
+      "citationReview": [
+        {
+          "reference": "PC 312.9",
+          "sectionID": "11883",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11883-2"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        },
+        {
+          "reference": "PC 417.5.2",
+          "sectionID": "11990",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11990-1"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Test depth and duration",
+          "explanation": "For a shower liner installation covered by PC § 417.5.2, fill the floor and receptor area with potable water to a depth of at least 2 inches measured at the threshold; retain the water for at least 15 minutes, with no evidence of leakage. Plug the shower-drain pipe watertight for the test. A temporary threshold is required only where a threshold at least 2 inches high does not exist, to retain water to the stated minimum depth.",
+          "sectionID": "11883",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11883-2",
+            "research-permitext_discovered-id:11990-1"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "BC 102.1",
+          "BC 1210.2.3",
+          "BC 1210.2.4",
+          "BC 202",
+          "BC 3102.3.1",
+          "BC 3102.8.3",
+          "PC 102.1",
+          "PC 312.9",
+          "PC 417.4",
+          "PC 417.4.1",
+          "PC 417.5",
+          "PC 417.5.1",
+          "PC 417.5.2",
+          "PC 417.5.2.1",
+          "PC 417.5.2.2",
+          "PC 417.5.2.3",
+          "PC 417.5.2.4",
+          "PC 417.5.2.5",
+          "PC 417.5.2.6"
+        ],
+        "writerProvisionCount": 19,
+        "citedProvisionCount": 2,
+        "sourceSummaryEnactedProvisionCount": 19,
+        "sourceSummaryCitedProvisionCount": 2,
+        "keyPacketCoverage": [
+          {
+            "reference": "PC 417.5",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 417.5.2",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 312.9",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/f05549a9-3952-4918-96fe-eb111ab7d394-request.json",
+            "fileSHA256": "f67b9296394e6345e09feb1b11ceb7f30aeef05e29c1a2205476e616e3616e93",
+            "provisionCount": 19
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-1",
+      "familyID": "restaurant-grease",
+      "question": "For this project, does the kitchen sink waste need a grease interceptor or automatic grease removal device?",
+      "grade": "correct",
+      "reason": "Correctly requires a grease interceptor OR automatic grease removal device for the stated food-preparation sink discharging fats/oils/grease, under DEP requirements. Additional installation/sizing/standards claims are supported by complete supplied PC1003.3.4 and PC1003.3.5.",
+      "projectFactApplication": "Applies the commercial restaurant and discharges; does not require both device types or invoke the dwelling/private-quarters exception.",
+      "operativeConditionsAndExceptionsReview": "PC1003.3.1,1003.3.3,1003.3.4 and supplemental canonical1003.3.5 are complete in writer evidence. Supplemental1003.3.5 was checked against the unchanged canonical chapter without changing frozen keys.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**Yes.** On the stated facts, the food-preparation sink waste must be served by **a grease interceptor or an automatic grease removal device**; the Plumbing Code does not require both. The dwelling/private-quarters/non-culinary-school exception does not apply to your stated scenario. (2022 NYC PC §§ 1003.3.1, 1003.3.3)\n\nThe selected device must comply with DEP requirements. If an automatic device is used, it must be downstream of the fixture, sized for the connected flow under DEP sizing requirements, and accessible for inspection and maintenance; both device types must be sized under DEP rules and designed/tested to one of the standards listed in PC § 1003.3.4. (§§ 1003.3.4, 1003.3.5)",
+      "finalAnswerTextSHA256": "8af39fa6615a169bcaca12731aead6d5166c500654f1c8603bfc44be91fab481",
+      "finalAnswerObjectSHA256": "217b3f56798835039e45e9b43afd6b343f662619e92d5d56406e47592512d359",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "PC 1003.3.1"
+      ],
+      "citationReview": [
+        {
+          "reference": "PC 1003.3.1",
+          "sectionID": "12622",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12622-4"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        },
+        {
+          "reference": "PC 1003.3.3",
+          "sectionID": "12624",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12624-3"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        },
+        {
+          "reference": "PC 1003.3.5",
+          "sectionID": "12628",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12628-2"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        },
+        {
+          "reference": "PC 1003.3.4",
+          "sectionID": "12625",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12625-5"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "A grease-control device is required for the stated sink waste",
+          "explanation": "A grease interceptor or automatic grease removal device is required to receive drainage from fixtures or equipment in food-preparation areas whose waste contains fats, oils, or grease. The stated food-preparation sink meets that description. The stated scenario is not within the exception for individual dwelling units, private living quarters, or qualifying non-culinary schools.",
+          "sectionID": "12622",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12622-4",
+            "research-permitext_discovered-id:12624-3"
+          ],
+          "supported": true
+        },
+        {
+          "heading": "The code allows either device, with applicable installation and sizing rules",
+          "explanation": "An automatic grease removal device, if installed, must be downstream of each fixture or group of fixtures in accordance with manufacturer instructions, sized to pretreat measured or calculated flows under DEP sizing requirements, and readily accessible for inspection and maintenance. Grease interceptors and automatic devices must be sized under DEP rules and designed and tested in accordance with PDI G101, ASME A112.14.3, or ASME A112.14.4, and installed under manufacturer instructions.",
+          "sectionID": "12628",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12628-2",
+            "research-permitext_discovered-id:12625-5"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "FC 202",
+          "FC 609",
+          "PC 1003.3",
+          "PC 1003.3.1",
+          "PC 1003.3.3",
+          "PC 1003.3.4",
+          "PC 1003.3.4.1",
+          "PC 1003.3.5",
+          "PC 1003.3.6",
+          "PC 102.1",
+          "PC 1102.4",
+          "PC 1501.3",
+          "PC 201.4",
+          "PC 608.1",
+          "PC 702.1",
+          "PC 702.2",
+          "PC 702.3",
+          "PC 702.4"
+        ],
+        "writerProvisionCount": 18,
+        "citedProvisionCount": 4,
+        "sourceSummaryEnactedProvisionCount": 18,
+        "sourceSummaryCitedProvisionCount": 4,
+        "keyPacketCoverage": [
+          {
+            "reference": "PC 1003.1",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.4",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.1",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.3",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/ad8ed8e0-b4e5-43d3-9cf0-319d4872297f-request.json",
+            "fileSHA256": "03d80cc798aa50b70e456ebbc58393c7573a297ab741016a52b4143f53cac0e4",
+            "provisionCount": 18
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-2",
+      "familyID": "restaurant-grease",
+      "question": "Could we run the toilet waste through that same grease interceptor too?",
+      "grade": "correct",
+      "reason": "Correctly rejects ordinary toilet waste through the grease interceptor because connections are limited to fixtures/equipment that discharge fats/oils/grease.",
+      "projectFactApplication": "Retains grease-interceptor context and distinguishes sanitary toilet waste from qualifying kitchen drainage.",
+      "operativeConditionsAndExceptionsReview": "Complete PC1003.3.1 includes both the requirement and restrictive only-from connection sentence.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** The grease interceptor may receive waste only from fixtures or equipment that allow fats, oils, or grease to be discharged; toilet waste does not meet that condition, so it cannot be routed through the kitchen grease interceptor. (2022 NYC PC § 1003.3.1)",
+      "finalAnswerTextSHA256": "3c1610d254326d1aee96152474a3904254e2cf27c2b0aa616edb8cd6e239c5a5",
+      "finalAnswerObjectSHA256": "5ae43a2d1324b55281cec537d7b34c3d04b3ce8de9598f561817b258f700dc07",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "PC 1003.3.1"
+      ],
+      "citationReview": [
+        {
+          "reference": "PC 1003.3.1",
+          "sectionID": "12622",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12622-2"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Grease-interceptor connections are limited",
+          "explanation": "A grease interceptor shall receive waste only from fixtures and equipment that allow fats, oils, or grease to be discharged. Toilet waste is outside that stated limit.",
+          "sectionID": "12622",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12622-2"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "PC 1003.10",
+          "PC 1003.3",
+          "PC 1003.3.1",
+          "PC 1003.3.3",
+          "PC 1003.3.4",
+          "PC 1003.3.4.1",
+          "PC 1003.3.5",
+          "PC 1003.3.6",
+          "PC 102.1",
+          "PC 1102.4",
+          "PC 1501.3",
+          "PC 201.4",
+          "PC 608.1",
+          "PC 702.1",
+          "PC 702.2",
+          "PC 702.3",
+          "PC 702.4"
+        ],
+        "writerProvisionCount": 17,
+        "citedProvisionCount": 1,
+        "sourceSummaryEnactedProvisionCount": 17,
+        "sourceSummaryCitedProvisionCount": 1,
+        "keyPacketCoverage": [
+          {
+            "reference": "PC 1003.1",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.4",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.1",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.3",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/cf128869-6dcf-4a3d-ba3d-81ece93dff05-request.json",
+            "fileSHA256": "f12a62455b37cc0976fa8fd8cf469c33d066070ac7207f6b6b04a8eac7af85eb",
+            "provisionCount": 17
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    },
+    {
+      "id": "context-hold-04-restaurant-grease-3",
+      "familyID": "restaurant-grease",
+      "question": "Now consider an ordinary kitchen inside one private dwelling unit instead of this restaurant. Does the same grease-interceptor requirement apply?",
+      "grade": "correct",
+      "reason": "Correctly applies the individual dwelling-unit exception and says the ordinary private dwelling kitchen does not require the restaurant grease-control device under this rule.",
+      "projectFactApplication": "Current alternate dwelling scenario supersedes restaurant facts within this scenario. It does not change saved project use or extend the exception to restaurants.",
+      "operativeConditionsAndExceptionsReview": "Complete PC1003.3.3 exception and PC1003.3.1 general requirement are supplied together.",
+      "failureStage": null,
+      "inappropriateClarification": false,
+      "incorrectCorrectionApplication": false,
+      "fixtureAmbiguity": false,
+      "finalAnswerText": "**No.** A grease interceptor or automatic grease removal device is not required for an individual dwelling unit, so the restaurant-kitchen requirement does not apply to the ordinary kitchen in the stated private dwelling unit (2022 NYC PC §§ 1003.3.1, 1003.3.3).",
+      "finalAnswerTextSHA256": "430092fe95f9256857d0725889076f88a327f606d3cc8ce373e113d44ad574e5",
+      "finalAnswerObjectSHA256": "f4441e65cc36f01cb161132eeae63a5366a371b763d5f787740ac2aa505a5ffd",
+      "deliveredMode": "openai",
+      "expectedDecisiveReferences": [
+        "PC 1003.3.3"
+      ],
+      "citationReview": [
+        {
+          "reference": "PC 1003.3.3",
+          "sectionID": "12624",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12624-2"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        },
+        {
+          "reference": "PC 1003.3.1",
+          "sectionID": "12622",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12622-3"
+          ],
+          "allSupportingPassagesPresentInWriter": true,
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes"
+        }
+      ],
+      "supportedPointReview": [
+        {
+          "heading": "Individual dwelling-unit exception",
+          "explanation": "Section 1003.3.3 provides that a grease interceptor or automatic grease removal device is not required for individual dwelling units. This exception applies to the kitchen described, even though the general rule requires a device for qualifying food-preparation drainage containing fats, oils, or grease.",
+          "sectionID": "12624",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12624-2",
+            "research-permitext_discovered-id:12622-3"
+          ],
+          "supported": true
+        }
+      ],
+      "writerEvidenceCoverage": {
+        "writerRequestCount": 1,
+        "writerProvisionReferences": [
+          "BC 102.1",
+          "BC 1107.2.3",
+          "BC 1109.4",
+          "BC 202",
+          "PC 1003.3",
+          "PC 1003.3.1",
+          "PC 1003.3.3",
+          "PC 1003.3.4",
+          "PC 1003.3.4.1",
+          "PC 1003.3.5",
+          "PC 1003.6",
+          "PC 102.1",
+          "PC 1102.4",
+          "PC 1501.3",
+          "PC 608.1",
+          "PC 702.1",
+          "PC 702.2",
+          "PC 702.3",
+          "PC 702.4"
+        ],
+        "writerProvisionCount": 19,
+        "citedProvisionCount": 2,
+        "sourceSummaryEnactedProvisionCount": 19,
+        "sourceSummaryCitedProvisionCount": 2,
+        "keyPacketCoverage": [
+          {
+            "reference": "PC 1003.1",
+            "decisive": false,
+            "writerContainsReference": false,
+            "writerContainsWholeFrozenExcerpt": false,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.4",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": false,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.1",
+            "decisive": false,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          },
+          {
+            "reference": "PC 1003.3.3",
+            "decisive": true,
+            "writerContainsReference": true,
+            "writerContainsWholeFrozenExcerpt": true,
+            "cited": true,
+            "keyExcerptSHA256MatchesPacket": true
+          }
+        ],
+        "writerRequests": [
+          {
+            "path": "/tmp/permitext-retrieval-context-heldout-20261003-v1/d7ff5aa4-697e-432d-80db-294e291a62c2-request.json",
+            "fileSHA256": "bf9799c08cb5321163fbd0e1c878f9e445724ea63f1467e4b98bfb625bd84e1a",
+            "provisionCount": 19
+          }
+        ]
+      },
+      "verifierPassObservedNotUsedAsGrade": true,
+      "answerQualityPassObservedNotUsedAsGrade": true,
+      "candidateVersion": "20261003-query-scope-context-v54"
+    }
+  ],
+  "sourceHashCoverage": {
+    "candidateSourceFilesChecked": 137,
+    "allCandidateSourceFilesMatch": true,
+    "candidateSourceChecks": [
+      {
+        "path": "account-data-export.mjs",
+        "frozenSHA256": "7cb9054d04f3632e00323eef5d0029f6b2d3a6f5c0baf34b4dfb4ea4165141bc",
+        "matches": true
+      },
+      {
+        "path": "account-lifecycle.mjs",
+        "frozenSHA256": "ebbe30a3461164d760f6321d165d2de3d450a08c672ac9712203ce91ee169b14",
+        "matches": true
+      },
+      {
+        "path": "account-private-assets.mjs",
+        "frozenSHA256": "427c8e34811765bebc72edb0e43fc3fcde911ffefd1a9d8ea85903631b8d08b6",
+        "matches": true
+      },
+      {
+        "path": "active-code-search-scope.mjs",
+        "frozenSHA256": "f3850a676e76d14793196e56aba904792e859cf3927e98629b9daa3a33ee436d",
+        "matches": true
+      },
+      {
+        "path": "active-code-source-catalog.mjs",
+        "frozenSHA256": "a95d6689eaa6bc0433b382519e13fcac2f91bdb05f59bf36ee55370762d60f0e",
+        "matches": true
+      },
+      {
+        "path": "admin-token-auth.mjs",
+        "frozenSHA256": "b4a7d88559a91d8477e588743be8a62ccdc12ee4fed76c54778e5e4ddbdbf935",
+        "matches": true
+      },
+      {
+        "path": "app.mjs",
+        "frozenSHA256": "8ad233d4599d062288a15b4987f2f689c6c9fe70a08f33f2c56c6e1dcc9a5725",
+        "matches": true
+      },
+      {
+        "path": "apple-sandbox-readiness.mjs",
+        "frozenSHA256": "a2d4433464d4a815061cd187aefe670ca217a72e34a13d20c27451561f6f13ac",
+        "matches": true
+      },
+      {
+        "path": "approved-policy-artifacts.mjs",
+        "frozenSHA256": "1fe3e3ba8f371b0cd85146399457202b93a6d769fe69ea2b5dd961156713239b",
+        "matches": true
+      },
+      {
+        "path": "beta1-readiness.mjs",
+        "frozenSHA256": "abf5768c1d12751ee8545e89c254b5456050ba8eb9f0d40159b83b410ac3ba74",
+        "matches": true
+      },
+      {
+        "path": "chapter-body-contract.mjs",
+        "frozenSHA256": "48f21f5726e671dc78396ce01a9036bea1c79a7acd6f4406c7ac3c0a275bf4f8",
+        "matches": true
+      },
+      {
+        "path": "clerk-auth.mjs",
+        "frozenSHA256": "cd9ed3d41a21468692fa277a367d8cb1738fb4c883dad04a8739e679eeb8a652",
+        "matches": true
+      },
+      {
+        "path": "code-asset-manifest.mjs",
+        "frozenSHA256": "0beb07cfc1dc0d37abb2b7dfb50c73cfafd1202db9de5bf5c086e08359420b72",
+        "matches": true
+      },
+      {
+        "path": "code-asset-store.mjs",
+        "frozenSHA256": "03289cf745db41066adf0dca7e956d5e109cd461bb59ef22f33fcdb61bfc6996",
+        "matches": true
+      },
+      {
+        "path": "code-hierarchy-audit.mjs",
+        "frozenSHA256": "6f890d4a0cc875793ca28eec44f7b5cf9c62ece065d61d50ff4e794dac7ba467",
+        "matches": true
+      },
+      {
+        "path": "code-navigation-hierarchy.mjs",
+        "frozenSHA256": "f74966b7f71eaa3f382640e9f19d88387cf00db280d5cdd9cf64840179645392",
+        "matches": true
+      },
+      {
+        "path": "code-question-commands.mjs",
+        "frozenSHA256": "a75a495806f4f1011cfdb75f76979e841eab288beb822bf52f607e14bac78744",
+        "matches": true
+      },
+      {
+        "path": "code-question-contract.mjs",
+        "frozenSHA256": "747fccc5f648b45fbec1f0cc51efc2e9b428bf32b66db9ff038145fecb69b96f",
+        "matches": true
+      },
+      {
+        "path": "code-question-rollout.mjs",
+        "frozenSHA256": "e7d21f0a718c05e91199cd13bba1b3c4c819c380de8496aeea7b668914949670",
+        "matches": true
+      },
+      {
+        "path": "code-trust-contract.mjs",
+        "frozenSHA256": "3223a88b0ddb7c247872384f2e7c6a67137753f999312521257a23c93f60d8fe",
+        "matches": true
+      },
+      {
+        "path": "collaboration-contract.mjs",
+        "frozenSHA256": "9ad3e26562606c0ececb5041e24c073be119c079122a35cd437c33c2b0cafd27",
+        "matches": true
+      },
+      {
+        "path": "construction-html-content.mjs",
+        "frozenSHA256": "9907dff7f7350b0bb6f8dd9d0335214dc9abc54d528589332118a1a740558f15",
+        "matches": true
+      },
+      {
+        "path": "continuity-merge.mjs",
+        "frozenSHA256": "3ced1d6861ab37bf04fa9145ae3ba812f5eccaf7d89731cb846bcafc731ae6d7",
+        "matches": true
+      },
+      {
+        "path": "enacted-code-content.mjs",
+        "frozenSHA256": "9a1c3c42282a910f83ebbbc3797b56c6ae5e1381f57ce06ab615bd9283b2d441",
+        "matches": true
+      },
+      {
+        "path": "entitlement-contract.mjs",
+        "frozenSHA256": "bebd96ae110ac3bcf6af0e89e182dd4f850758b9eb95a81b052443eac36023a7",
+        "matches": true
+      },
+      {
+        "path": "evidence-discovery.mjs",
+        "frozenSHA256": "3d06db512b362fdac532cdd33d25a21f2e60e617eddb35441b15107d8348c2af",
+        "matches": true
+      },
+      {
+        "path": "existing-building-content.mjs",
+        "frozenSHA256": "deaaaebe3f62c1f2e151c954fc3bae18032c0b14de9cdfa62d407e375b8463e7",
+        "matches": true
+      },
+      {
+        "path": "file-store-coordinator.mjs",
+        "frozenSHA256": "4d927f1d5484091af045ad23e8ab55009423725bd287b1cff011681a9f790c0b",
+        "matches": true
+      },
+      {
+        "path": "firm-controls-contract.mjs",
+        "frozenSHA256": "27612c228f27a784db64110c882f32dbe3453463766a8fb62d36d7a092d6ddd2",
+        "matches": true
+      },
+      {
+        "path": "historical-construction-content.mjs",
+        "frozenSHA256": "2c5e2e9bee0a0b9f4b193dd28e050beab4ebed98950f1e4039631aa1ff358ace",
+        "matches": true
+      },
+      {
+        "path": "image-storage.mjs",
+        "frozenSHA256": "61d67dac0ba8c61e52d1474483557d8d1c3ad8a9ffeb6c80ca1d6d79dfc861bc",
+        "matches": true
+      },
+      {
+        "path": "lifetime-grant-admin.mjs",
+        "frozenSHA256": "17836cfb87cd881e6cd5d67c2a438cfa885b31048d9e9b3cd98a5258bbc76e84",
+        "matches": true
+      },
+      {
+        "path": "notebook-contract.mjs",
+        "frozenSHA256": "72f3f8ec14d527faa9c248c44e50dce1525c8d8d3aaf99c925d1e94e5bfd801c",
+        "matches": true
+      },
+      {
+        "path": "notebook-persistence.mjs",
+        "frozenSHA256": "cf8da7ae54737f2a2d795d9676efed1e32b7d566990e8f303051c6dea187bceb",
+        "matches": true
+      },
+      {
+        "path": "nyc-property-context.mjs",
+        "frozenSHA256": "2a2c6a5a5bbbd9a7b23e3816cb9c7de7540db0328553eb42d24e2d180391b559",
+        "matches": true
+      },
+      {
+        "path": "operational-readiness.mjs",
+        "frozenSHA256": "102c2cc1e059c59e1a223a46dc4d8691cd25c07cad48831a232b0c881ad6444f",
+        "matches": true
+      },
+      {
+        "path": "organization-contract.mjs",
+        "frozenSHA256": "52cade48d3a834b1c23d85581db144c68dee94258935ed1c45a94c64b0377daf",
+        "matches": true
+      },
+      {
+        "path": "policy-acceptance.mjs",
+        "frozenSHA256": "6c99b846331a38eb3eacdbbd8df809b36dd59fa7b85f625d26b94cb1e007d1fc",
+        "matches": true
+      },
+      {
+        "path": "policy-publication-audit.mjs",
+        "frozenSHA256": "b4d3a0996f5f055086fff7e9928e602e01118cca1378d8456a64d84e9dd3cc77",
+        "matches": true
+      },
+      {
+        "path": "postgres-account-repository.mjs",
+        "frozenSHA256": "063893466311390fc666e8c404324c111ff941842a494e3a7ae06e31a8aecbdd",
+        "matches": true
+      },
+      {
+        "path": "postgres-organization-repository.mjs",
+        "frozenSHA256": "d0acd407f00f12e57ec5995e3f82ea3892252b0fe1bc7513c4d212e660d61e2e",
+        "matches": true
+      },
+      {
+        "path": "postgres-rate-limit-repository.mjs",
+        "frozenSHA256": "4aa1c910857e45dc4538d5b527c0eb08b8a9f28746dd30bce4f281d69420e979",
+        "matches": true
+      },
+      {
+        "path": "postgres-schema-readiness.mjs",
+        "frozenSHA256": "31e52848de6d0774031c4cc6039d625049c62e5c769bbc7b897d91400b558c4b",
+        "matches": true
+      },
+      {
+        "path": "postgres-sync-repository.mjs",
+        "frozenSHA256": "9f4ac9d90fb71620314bbdb612749cc707181114957444f93794ca1828e8590e",
+        "matches": true
+      },
+      {
+        "path": "private-path-containment.mjs",
+        "frozenSHA256": "44c7a54ea30f4c6bd13a1f102b694b346c2397899837b9f3e7f89d177629dd37",
+        "matches": true
+      },
+      {
+        "path": "production-auth-audit.mjs",
+        "frozenSHA256": "e3dc378d10344f514d39cd23ef09278533eda5f431b5abf90f9e14d7b8c141fc",
+        "matches": true
+      },
+      {
+        "path": "production-environment-key-audit.mjs",
+        "frozenSHA256": "445619e5301b012199b6f8cee4a104c12f870c4ad12abf7211044e3514ad0149",
+        "matches": true
+      },
+      {
+        "path": "production-monitoring-audit.mjs",
+        "frozenSHA256": "467c65bc7b005b49f270be24c4573c3d43371076415aeaa3157c54a57810c266",
+        "matches": true
+      },
+      {
+        "path": "project-fact-projection.mjs",
+        "frozenSHA256": "83dc94e5887aacd14e64765df8d60d552133189364418cf52bc354fe39d788bb",
+        "matches": true
+      },
+      {
+        "path": "project-foundation-contract.mjs",
+        "frozenSHA256": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "matches": true
+      },
+      {
+        "path": "public-beta-readiness.mjs",
+        "frozenSHA256": "d8d9938836b5bb417aba3b0914e5c00b8ebfadbdf548d9d823e28fa3159a8a40",
+        "matches": true
+      },
+      {
+        "path": "public-code-response-cache.mjs",
+        "frozenSHA256": "b6a712559e3996f92b09525cb1aa138591a27378aa52404857ee77797d355fd5",
+        "matches": true
+      },
+      {
+        "path": "public-code-timing.mjs",
+        "frozenSHA256": "4b1a128297e095c40c8923c02fa3e9fb557236cef1f444b127e575cd3c585d9d",
+        "matches": true
+      },
+      {
+        "path": "rate-limit.mjs",
+        "frozenSHA256": "349aae71ec6778b408d1ce1589c0810e4196dc52398a03988ac8b8c622240d3c",
+        "matches": true
+      },
+      {
+        "path": "reader-definition-index.mjs",
+        "frozenSHA256": "d3384de256ec43b72a1f35b121fdc2ab1cbf1254f4df6ed99cb7bb0e53ab6611",
+        "matches": true
+      },
+      {
+        "path": "reader-search-index.mjs",
+        "frozenSHA256": "c7130676aff85a387c4cfa88076308b62febede1e4898bcc129674147d6dbe33",
+        "matches": true
+      },
+      {
+        "path": "release-branch-integrity.mjs",
+        "frozenSHA256": "3df197bce0d9c5f8df63341d39c7fdae5f3c330bc4041de91120e87d62549e52",
+        "matches": true
+      },
+      {
+        "path": "report-contract.mjs",
+        "frozenSHA256": "1d9800bc9989fead4148da0951a131fb113f2a120a27e808e4351ab4aa978166",
+        "matches": true
+      },
+      {
+        "path": "report-pdf.mjs",
+        "frozenSHA256": "85d037b2030a64215b332d927a9de2010effbdab26e9b2b75d314169b4340bd2",
+        "matches": true
+      },
+      {
+        "path": "report-presentation.mjs",
+        "frozenSHA256": "4a3ad9f904d71a6900055679006b5f0934ea25810cebd62ba29bb01968c67b0a",
+        "matches": true
+      },
+      {
+        "path": "research-answer-presentation.mjs",
+        "frozenSHA256": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "matches": true
+      },
+      {
+        "path": "research-answer-quality.mjs",
+        "frozenSHA256": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "matches": true
+      },
+      {
+        "path": "research-claim-materiality.mjs",
+        "frozenSHA256": "7f63e125db92f0dd1fbf48506439591774025126783b71ffd22c70cdc713065a",
+        "matches": true
+      },
+      {
+        "path": "research-claim-scope.mjs",
+        "frozenSHA256": "18215827168c93e8ae335e47d9117833b58a1508d6d1a7fc86b3171e50bb108e",
+        "matches": true
+      },
+      {
+        "path": "research-code-basis.mjs",
+        "frozenSHA256": "5cd738abb4fc65c13245feb476752d22f50447eec09c6cb5698bf4e1a403c675",
+        "matches": true
+      },
+      {
+        "path": "research-config.mjs",
+        "frozenSHA256": "acfe048896d8e39476ff25a9acce18b65e41679e32e58076739be0ec946dabe3",
+        "matches": true
+      },
+      {
+        "path": "research-context-state.mjs",
+        "frozenSHA256": "2e128bc9b0cd124cb571ea2716e9dbd1707c266f1891ecd613518ddbc1d21024",
+        "matches": true
+      },
+      {
+        "path": "research-conversation-continuity.mjs",
+        "frozenSHA256": "c1cd6acb85b03211f62189d68e2d23231cb5bb828cb9f7e88563e8746a3607fa",
+        "matches": true
+      },
+      {
+        "path": "research-conversation-facts.mjs",
+        "frozenSHA256": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "matches": true
+      },
+      {
+        "path": "research-conversation-topic.mjs",
+        "frozenSHA256": "79931aa591e5ae72ead2fcbce10b1f86f35d93b6966ccee1bb9716daa1bc5382",
+        "matches": true
+      },
+      {
+        "path": "research-corpus-registry.mjs",
+        "frozenSHA256": "7c916830bc6f4bd4386d277733d2a105ced3d82666383969edc3431a9bb18970",
+        "matches": true
+      },
+      {
+        "path": "research-cost-usage.mjs",
+        "frozenSHA256": "b5a080a037c4df64e8ffb8842d9e4b4dcc4a8c6ca29b997b5fab5ee6eec89f12",
+        "matches": true
+      },
+      {
+        "path": "research-decision-fact-repair.mjs",
+        "frozenSHA256": "67e78545d58b71de7af5b1736f67dc4cf11b658c3801ac9e094a2b3009805e61",
+        "matches": true
+      },
+      {
+        "path": "research-definition-excerpts.mjs",
+        "frozenSHA256": "22590aca7e9ebd8cba25807da3f8aba3d8fd6675af9ad2d313b7083ee9d39486",
+        "matches": true
+      },
+      {
+        "path": "research-dob-workflow-routing.mjs",
+        "frozenSHA256": "ce8c4f4d5a1bd329c2425806e5c7e2631c9b9fdcd8a68747e46d83e6db818022",
+        "matches": true
+      },
+      {
+        "path": "research-economics.mjs",
+        "frozenSHA256": "122a4b603f1e1f59146f1ccd56a43b1e23da0559bbf7179050c2905f1994302f",
+        "matches": true
+      },
+      {
+        "path": "research-evidence-assembly.mjs",
+        "frozenSHA256": "bf191449a97f8e282cf32e8a618665abdb814a531c6362d62031a2e22f3da151",
+        "matches": true
+      },
+      {
+        "path": "research-evidence-boundary.mjs",
+        "frozenSHA256": "565c126edb8ba09d50c4fd2ec72ea1bab9475e17828f5fe2ba07536fbf7f8c05",
+        "matches": true
+      },
+      {
+        "path": "research-evidence-priority.mjs",
+        "frozenSHA256": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "matches": true
+      },
+      {
+        "path": "research-fact-qualification.mjs",
+        "frozenSHA256": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+        "matches": true
+      },
+      {
+        "path": "research-failure-explanation.mjs",
+        "frozenSHA256": "7360863fe0dbc8217d7b04d76e2016290dd22f0da27d45e98f20c6debcdbfe0a",
+        "matches": true
+      },
+      {
+        "path": "research-feedback.mjs",
+        "frozenSHA256": "2bced20e149198dc1dcd61aaeb1251bce465e9cbbcf55a9a0ee30ff64d50f918",
+        "matches": true
+      },
+      {
+        "path": "research-focused-technical-scope.mjs",
+        "frozenSHA256": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+        "matches": true
+      },
+      {
+        "path": "research-guidance-action-repairs.mjs",
+        "frozenSHA256": "dfb50cfce0ece7a7af83ac1295497d72aa935974f479eb35df4925c0b49518f0",
+        "matches": true
+      },
+      {
+        "path": "research-guidance-qualification-review.mjs",
+        "frozenSHA256": "078b33463be298a81607edc2764f4bdc27c022a5b24d257b85cf13c302cffc5e",
+        "matches": true
+      },
+      {
+        "path": "research-guidance-source-relationships.mjs",
+        "frozenSHA256": "ac24fac72ff4b1d80d936d824d57a6af61acf20173ac02d2f88ac88a5396578c",
+        "matches": true
+      },
+      {
+        "path": "research-guidance-source-resolutions.mjs",
+        "frozenSHA256": "d80cb9c62475f40d118bd3e6951b9fff88975a9cc8afe941e0ed89a08e640379",
+        "matches": true
+      },
+      {
+        "path": "research-history-content.mjs",
+        "frozenSHA256": "44a12f46373c378774fbe935aea81a06f72d22a1d3d70487cf0569909e4a8865",
+        "matches": true
+      },
+      {
+        "path": "research-interpretation-context.mjs",
+        "frozenSHA256": "f85aebe5fa45682b71cbd9e4d899a6e00658656112ef969f19120767a5826b7b",
+        "matches": true
+      },
+      {
+        "path": "research-model-routing.mjs",
+        "frozenSHA256": "f0aee7b476742df4d183dc27202bed13e40d44eda14d4164d58ed238836b4369",
+        "matches": true
+      },
+      {
+        "path": "research-narrative-source-bindings.mjs",
+        "frozenSHA256": "306ef02acf54660f4a0e4e98358a4f5da71b56de8855bff9ce5d39a3ca45d936",
+        "matches": true
+      },
+      {
+        "path": "research-official-guidance-summary.mjs",
+        "frozenSHA256": "790fc5e37287ec882c0195f4fe15eeed128b2837c777f5be8d8ab667a7cf134f",
+        "matches": true
+      },
+      {
+        "path": "research-official-html-attribution.mjs",
+        "frozenSHA256": "8fed224a3991063800cba055850da744e83c46957df739e3b216bf807fc4dec0",
+        "matches": true
+      },
+      {
+        "path": "research-official-pdf-attribution.mjs",
+        "frozenSHA256": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+        "matches": true
+      },
+      {
+        "path": "research-official-pdf-ranking.mjs",
+        "frozenSHA256": "52abb4ff71c8a8e34b940141c4f212ee96ae09b22ef48fb57de4c5a33bd5947b",
+        "matches": true
+      },
+      {
+        "path": "research-official-pdf-worker.mjs",
+        "frozenSHA256": "39ec76ae01ef399819d5a815f980e2ac52b4fc0844510b7944622d18f4539587",
+        "matches": true
+      },
+      {
+        "path": "research-passage-index.mjs",
+        "frozenSHA256": "6c6e1e278de1bb25ac8924c1fbb943cd334bd6fede201d39198d7c7df73d6732",
+        "matches": true
+      },
+      {
+        "path": "research-plumbing-source-repairs.mjs",
+        "frozenSHA256": "616cafaaa7453d32925fc35fbc003231788648c064a6c48d9b9cb7cdf093422c",
+        "matches": true
+      },
+      {
+        "path": "research-practical-next-step.mjs",
+        "frozenSHA256": "9f493586835093492fc18d939305a6a285d0ab48e9d187eb7be65ce3f30a1d26",
+        "matches": true
+      },
+      {
+        "path": "research-product-example-repaired-runtime-environment.mjs",
+        "frozenSHA256": "e46a985cdf1aa1ba5b7a66b28b9ee3e5af5f7f10bebe6b3e3a2fa7f1bd432396",
+        "matches": true
+      },
+      {
+        "path": "research-project-fact-coverage.mjs",
+        "frozenSHA256": "7aa3ee319e0fb02c999ea135a627ed8d42dc7e7b17fd2fc904862929bfa311f6",
+        "matches": true
+      },
+      {
+        "path": "research-property-context.mjs",
+        "frozenSHA256": "7c10ed71460a5335b62c749b43e7763bfdbcb66862f3c79949d2889eaf11f0d5",
+        "matches": true
+      },
+      {
+        "path": "research-provider-client.mjs",
+        "frozenSHA256": "2f6ae2dd1aa109e9c4de682bd3dbe35695bf09d54b89dad035c6e6c690c41567",
+        "matches": true
+      },
+      {
+        "path": "research-question-intent.mjs",
+        "frozenSHA256": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "matches": true
+      },
+      {
+        "path": "research-required-claim-coverage.mjs",
+        "frozenSHA256": "3748dc7d6cc3e0e48771538587b770ea2ba12b91a968d0c9888c2a912d4937a8",
+        "matches": true
+      },
+      {
+        "path": "research-retrieval-query-context.mjs",
+        "frozenSHA256": "b5c2a866ced85c8358495cb51b71e3308fd3c658cdafcf565513aee554de7d63",
+        "matches": true
+      },
+      {
+        "path": "research-rule-packets.mjs",
+        "frozenSHA256": "e82eacb6d3319b335b1631c8f5564cac4b727c55402f4db411de6675fe546fc4",
+        "matches": true
+      },
+      {
+        "path": "research-semantic-passages.mjs",
+        "frozenSHA256": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012",
+        "matches": true
+      },
+      {
+        "path": "research-source-policy.mjs",
+        "frozenSHA256": "976468e0e9586949d9e2e064e7155a983c67ae510d6e72ba24991d8e79af0e58",
+        "matches": true
+      },
+      {
+        "path": "research-supplied-text.mjs",
+        "frozenSHA256": "ff65ba451facf525ebb79666e7191c3ae7a5f3a3cc42df9d044d829e3d5302a2",
+        "matches": true
+      },
+      {
+        "path": "research-targeted-revision.mjs",
+        "frozenSHA256": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+        "matches": true
+      },
+      {
+        "path": "research-technical-topic-routes.mjs",
+        "frozenSHA256": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "matches": true
+      },
+      {
+        "path": "research-topic-dependencies.mjs",
+        "frozenSHA256": "25a944ab24fb46b2e270f3294ffa1a7e92e4a5f78ee00d15afb34b792639bc29",
+        "matches": true
+      },
+      {
+        "path": "research-turns.mjs",
+        "frozenSHA256": "dd5f2ca3ba955ce773f801ea0760c8d4974dba32433c67d24621f97db92102ed",
+        "matches": true
+      },
+      {
+        "path": "research-verification-followups.mjs",
+        "frozenSHA256": "d453d4cfe54545c606576dbeccb141d0d3df440636e2e7745a2e7fb57aa635a8",
+        "matches": true
+      },
+      {
+        "path": "research-web-attribution.mjs",
+        "frozenSHA256": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-attribution.mjs",
+        "frozenSHA256": "b1dd6eae636524dcc88cc17f67949c0dcd30039bd829f7e2c1f4752a65682f09",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-conditional-explanation.mjs",
+        "frozenSHA256": "2b315f17504028f817b667279b9367c6e10b95c2ff8d4b148c5fc73827907a93",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-context-excerpts.mjs",
+        "frozenSHA256": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-lot-history.mjs",
+        "frozenSHA256": "bb31a791175f7a165974123424326e82d47f61fcd84b826ac3cdbc0710fe3dfa",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-mapped-review.mjs",
+        "frozenSHA256": "e33a470646fe8bb6d770631443806d6be198b6f6608f2188e9d6ce93a9aacbfb",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-metadata.mjs",
+        "frozenSHA256": "4f877fd927b2844b1636eaad971047dbff371292e583f389e9ae7fe63f59303c",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-planner.mjs",
+        "frozenSHA256": "4720e6ac94df01e44ce5eada9d74b02eaf624629589c8b65f1bd09a1835ddda9",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-safety.mjs",
+        "frozenSHA256": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-storage-branches.mjs",
+        "frozenSHA256": "8dc1d6de2a440d4f5b1df872e00a78e509a33c532446517d6b5a6a8642efbd07",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-temporal-application.mjs",
+        "frozenSHA256": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+        "matches": true
+      },
+      {
+        "path": "research-zoning-verification-instructions.mjs",
+        "frozenSHA256": "0168b49977faa12fdf090ae3840ed4d91e95da82401a24ae4823aa29194d2614",
+        "matches": true
+      },
+      {
+        "path": "restore-drill-contract.mjs",
+        "frozenSHA256": "0f67aeebd5c0dd4931044a66da69677628b5f2ae42445509ab98959203997e86",
+        "matches": true
+      },
+      {
+        "path": "search-postings.mjs",
+        "frozenSHA256": "f949f401ff970355666650ff630e94eb18fa915fa5e11caed462647c3376c1b5",
+        "matches": true
+      },
+      {
+        "path": "server.mjs",
+        "frozenSHA256": "927d20952baba2414f26001506e92854603669a6dffa1754695c335d5805b132",
+        "matches": true
+      },
+      {
+        "path": "stripe-tax.mjs",
+        "frozenSHA256": "0b2df6c3d7bf9f9f292c39a6f49e1b02d71552bbc45ce25bfce386f552006ed7",
+        "matches": true
+      },
+      {
+        "path": "trash-recovery.mjs",
+        "frozenSHA256": "242537c718164a61032c621e4635bf716db2f7f6d024f5ecbfaa9882221606ad",
+        "matches": true
+      },
+      {
+        "path": "zoning-content.mjs",
+        "frozenSHA256": "d757daf7fc81cf82c309482ae4cdf4f53826b4efcac54fa1e88aedff83651b80",
+        "matches": true
+      },
+      {
+        "path": "zoning-freshness.mjs",
+        "frozenSHA256": "4549368bed1048d82c8b1b3544f34546ef3fc177bcd786b75e8f0cc04593d4f3",
+        "matches": true
+      },
+      {
+        "path": "zoning-resolution.mjs",
+        "frozenSHA256": "fbf6a35111821912bedb5e65c4ebe1861fc517dcc50f7093853e71dadfc7443c",
+        "matches": true
+      },
+      {
+        "path": "scripts/research-accuracy-holdout.mjs",
+        "frozenSHA256": "d1e5d2d4c28c078af1e61b9b7627fd4080dd999e617349d4453eefe1d6455e3a",
+        "matches": true
+      },
+      {
+        "path": "scripts/research-evaluation-budget.mjs",
+        "frozenSHA256": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "matches": true
+      }
+    ],
+    "assignedFrozenPacketsChecked": 13,
+    "allAssignedSourceAndExcerptHashesMatch": true,
+    "packetChecks": [
+      {
+        "reference": "BC 1012.1",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/10.json",
+        "sourceFileSHA256": "88657f598a57b4d4ff3a871f9a418408266f8d7c1c7f8e2d1358d61e3c039fa4",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "cf85915b0c5f7b04a9f2539cb85cbe212ea9c0f27f39f9a2d93614cb41fd48fa",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "BC 1012.2",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/10.json",
+        "sourceFileSHA256": "88657f598a57b4d4ff3a871f9a418408266f8d7c1c7f8e2d1358d61e3c039fa4",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "92a935f71c04a3fa7c32ec76980c1941a827ab7770eca0d6f31c2a3e6008e539",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "BC 1012.3",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/10.json",
+        "sourceFileSHA256": "88657f598a57b4d4ff3a871f9a418408266f8d7c1c7f8e2d1358d61e3c039fa4",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "a1d23b0da3988b0ff0fc59bc63840556adf31b81d1bc79bdd0ef6ed7ac484209",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "BC 1012.4",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/10.json",
+        "sourceFileSHA256": "88657f598a57b4d4ff3a871f9a418408266f8d7c1c7f8e2d1358d61e3c039fa4",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "d4aa536c0cd3cb23700142e0a74e9271ed43939a58c024457ec54a848e018403",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "BC 1015.2",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/10.json",
+        "sourceFileSHA256": "88657f598a57b4d4ff3a871f9a418408266f8d7c1c7f8e2d1358d61e3c039fa4",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "225a85956fd4380ed84d6119114e1f9e3a4df698fd669797a217ddb21ad07a43",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "PC 1003.1",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/113.json",
+        "sourceFileSHA256": "f5866b01359c31c66c67ba9b454e47e7268e371cf13831e451763bc55fc002ad",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "1ab207aa97e1d3f8ba7e60f88263b52443ac18451dfefb36eb75f718bd0ee065",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "PC 1003.3",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/113.json",
+        "sourceFileSHA256": "f5866b01359c31c66c67ba9b454e47e7268e371cf13831e451763bc55fc002ad",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "d7abdc72218d07d97d5d5bb07ecdaf2fbaa6fc03eabdc64ad517ccd87e2d3b96",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "PC 1003.3.1",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/113.json",
+        "sourceFileSHA256": "f5866b01359c31c66c67ba9b454e47e7268e371cf13831e451763bc55fc002ad",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "6883e741d93e2cc6096b5249d4a1f2c15270c03237c5787e4a052211fb0ffbb6",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "PC 1003.3.3",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/113.json",
+        "sourceFileSHA256": "f5866b01359c31c66c67ba9b454e47e7268e371cf13831e451763bc55fc002ad",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "d28d3f548537f67b824ab1df85e76cad443d8edb24e1f0bf26c310cf633e7b26",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "PC 1003.3.4",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/113.json",
+        "sourceFileSHA256": "f5866b01359c31c66c67ba9b454e47e7268e371cf13831e451763bc55fc002ad",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "3cc72ce4ab9800f5b30b07ed50023482f62b3b89928e0510fd43ffbfcac4de57",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "PC 312.9",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/106.json",
+        "sourceFileSHA256": "ece67c61b0e87993798d2edfebfe8edee021015fe843ed16a9f95fb637578129",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "44377fdf04d46c4a9927b7d3635f00b1e604bb33e99e8a65e591059da8674af3",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "PC 417.5",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/107.json",
+        "sourceFileSHA256": "e23495a57ce1379513ea2ee33066f788e37222f51d8cd0399a4b7c682d427ea2",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "6985d69476c01f47d8965ab2f9b452e395b55650b756466192790c6ce8f30bee",
+        "excerptHashMatches": true
+      },
+      {
+        "reference": "PC 417.5.2",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/107.json",
+        "sourceFileSHA256": "e23495a57ce1379513ea2ee33066f788e37222f51d8cd0399a4b7c682d427ea2",
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "864ab3c3d06a0f0d587d689c25d67313b6eb59619b2b2eae94385181a315c114",
+        "excerptHashMatches": true
+      }
+    ],
+    "artifactHashes": {
+      "heldout.json": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+      "source-keys.json": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb",
+      "source-packets.json": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213",
+      "frozen-manifest.json": "1c6e3c2f30a48b8b28c50b6e343c8ff85b50682c3df4858adf299f21a20c0b16"
+    },
+    "supplementalCanonicalSourceChecks": [
+      {
+        "reference": "PC 1003.3.5",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/113.json",
+        "sourceFileSHA256": "f5866b01359c31c66c67ba9b454e47e7268e371cf13831e451763bc55fc002ad",
+        "sourceFileMatchesFrozenSameChapterPacket": true,
+        "canonicalExcerptSHA256": "ef50c5b79854d2870f0bce4fb0670d879c39ba42cacc8f8382e3879f88dc91d0",
+        "excerpt": "1003.3.5 Automatic grease removal devices.\n\nWhere automatic grease removal devices are installed, such devices shall be located downstream of each fixture or multiple fixtures in accordance with the manufacturer's instructions. The automatic grease removal device shall be sized to pretreat the measured or calculated flows for all connected fixtures or equipment in accordance with the sizing requirements of the Department of Environmental Protection. Ready access shall be provided for inspection and maintenance.\n\n",
+        "purpose": "Review of extra delivered installation/sizing claims; not a key/packet/candidate edit."
+      }
+    ]
+  },
+  "fixtureIssues": [],
+  "nonFailingObservations": [
+    {
+      "caseIDs": [
+        "context-hold-01-accessible-ramp-2",
+        "context-hold-02-terrace-guard-2",
+        "context-hold-02-terrace-guard-3"
+      ],
+      "observation": "Captured semantic query search context retains stale custom numeric inventory facts (initial1:10 or31-inch terrace drop) after current changes or separate situations. Delivered answers nonetheless use corrected/hypothetical current facts correctly. This is not scored as a delivered-answer failure; no frozen source changed."
+    },
+    {
+      "caseIDs": [
+        "context-hold-01-accessible-ramp-2"
+      ],
+      "observation": "Cited vertical-rise rule does not specify landing arrangement, but actual writer evidence includes partial landing provisions1012.6.2/.6.4. Do not equate the answer caveat or one cited source with absence of all supplied landing text. Operative32-inch rejection is correct."
+    }
+  ],
+  "inappropriateClarificationCount": 0,
+  "incorrectCorrectionCount": 0,
+  "totals": {
+    "reviewed": 12,
+    "gradable": 12,
+    "strictPass": 12,
+    "strictPassRate": 1.0,
+    "correct": 12,
+    "minor_issue": 0,
+    "materially_wrong": 0,
+    "withheld": 0,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0
+  },
+  "familyResults": [
+    {
+      "familyID": "accessible-ramp",
+      "turnCount": 3,
+      "correct": 3,
+      "withheld": 0,
+      "materially_wrong": 0
+    },
+    {
+      "familyID": "terrace-guard",
+      "turnCount": 3,
+      "correct": 3,
+      "withheld": 0,
+      "materially_wrong": 0
+    },
+    {
+      "familyID": "shower-waterproofing",
+      "turnCount": 3,
+      "correct": 3,
+      "withheld": 0,
+      "materially_wrong": 0
+    },
+    {
+      "familyID": "restaurant-grease",
+      "turnCount": 3,
+      "correct": 3,
+      "withheld": 0,
+      "materially_wrong": 0
+    }
+  ],
+  "summary": "12/12 correct operative delivered answers across4 correlated three-turn scenarios. Current corrections and alternate scenarios are applied correctly; no withheld/nonanswer or unsupported decisive rule. This subset is not a general product-accuracy estimate.",
+  "completedAt": "2026-10-03T03:13:33.507380+00:00",
+  "sourceEdits": false,
+  "paidCallsByReviewer": 0,
+  "keyEdits": false
+}

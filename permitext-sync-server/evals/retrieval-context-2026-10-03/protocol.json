@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-03T02:58:47.009305+00:00",
+  "purpose": "Fresh ordinary-language source-scope and three-turn context diagnostic. No product accuracy estimate or 95-percent claim.",
+  "development": {
+    "turnCount": 10,
+    "conversationCount": 5,
+    "turnsPerConversation": 2,
+    "mayBeReadBeforeCandidateFreeze": true,
+    "includedInReservedScore": false
+  },
+  "reserved": {
+    "turnCount": 36,
+    "conversationCount": 12,
+    "turnsPerConversation": 3,
+    "codeFamilyTurnCounts": {
+      "BC": 6,
+      "PC": 6,
+      "MC": 6,
+      "FGC": 6,
+      "FC": 6,
+      "ZR": 6
+    },
+    "fictionalProjectCount": 12,
+    "fictionalProjectTurns": 36,
+    "doNotReadPromptsKeysOrSourceAnswersBeforeCandidateFreeze": true
+  },
+  "freezeOrder": [
+    "Review canonical source scope/definitions/tables/exceptions and real resolver availability.",
+    "Freeze fixtures, keys, packets, audit and this protocol; no paid answers precede that freeze.",
+    "Root may inspect only development prompts for implementation.",
+    "Root freezes the candidate/source hashes before opening or running reserved prompts.",
+    "Run reserved questions with normal history and identical explicit project facts; never send answer checks, source references, metadata, keys or packets to models.",
+    "Review actual operative answers/citations/packets against keys; verifier approval is not correctness.",
+    "Any candidate edit after inspecting reserved outcomes turns this cohort into a regression diagnostic; a later fresh reserved cohort is required for another untouched evaluation."
+  ],
+  "runtimePolicy": {
+    "models": "Existing current Luna writer low / verifier medium; no model overrides by fixture author.",
+    "budget": "Use existing shared $13.97 campaign ledger; fixture author makes zero paid calls and adds no separate allowance.",
+    "projectIsolation": "Runner creates isolated fictional project IDs and normalizes through researchProjectInformation; no production user project/history mutation.",
+    "sourceAvailabilityRead": "Actual resolver audit disabled API key and semantic search; no answer generation or retrieval optimization."
+  },
+  "grading": {
+    "labels": [
+      "correct",
+      "minor_issue",
+      "materially_wrong",
+      "withheld",
+      "appropriate_clarification",
+      "fixture_ambiguous"
+    ],
+    "strictPass": [
+      "correct",
+      "appropriate_clarification"
+    ],
+    "notStrictPass": [
+      "minor_issue",
+      "materially_wrong",
+      "withheld",
+      "fixture_ambiguous"
+    ],
+    "rule": "Grade directly asked operative rule and supplied facts; conditional qualifications must be truthful and scoped. Withholding a directly supported narrow answer is unsuccessful. No provider mode/verification boolean alone establishes correctness.",
+    "coverage": "Inspect actual supplied operative clauses, complete exceptions and table rows separately from answer correctness; expected source ID presence alone is not coverage.",
+    "keyFlawPolicy": "Record ambiguous/flawed keys separately without rewriting frozen prompts or scoring them as wrong answers.",
+    "reviewAuthority": "Assistant source review; licensed professional adjudication not established."
+  },
+  "reporting": [
+    "Report all36 turns and12 scenario-family outcomes, initial turns and follow-ups separately, six code-family subsets, project-fact/correction handling, stages, actual decisive-text coverage, latency, estimated/provider-accounting limitations and source/output hashes.",
+    "Do not treat36 turns as independent samples. Three turns in each scenario share facts/rules; adjacent chapters may correlate prior campaigns.",
+    "No representative population sampling, professional adjudication or production cold-start evidence is established.",
+    "The result cannot support an overall95-percent product accuracy statement."
+  ]
+}

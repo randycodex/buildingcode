@@ -1,0 +1,1364 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-03T03:11:03.356Z",
+  "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+  "cohort": "evals/retrieval-context-2026-10-03",
+  "split": "development",
+  "runDirectory": "/tmp/permitext-retrieval-context-development-20261003-v1",
+  "runFinishedAt": "2026-10-03T03:05:30.474Z",
+  "candidateFrozenAt": "2026-10-03T03:05:43.444Z",
+  "candidateVersion": "20261003-query-scope-context-v54",
+  "baseCommit": "cb90fc092",
+  "noPaidCallsByReviewer": true,
+  "noCandidateSourceEdits": true,
+  "noReservedPromptsOrKeysReviewed": true,
+  "sourceAndFixtureIntegrity": {
+    "sourceHashCount": 137,
+    "sourceHashMismatches": [],
+    "fixtureChecks": {
+      "development.json": {
+        "expected": "5f7172e1f2d433352433a06cd29677238da52fff2272b0fa6cdf7f9e89f80292",
+        "actual": "5f7172e1f2d433352433a06cd29677238da52fff2272b0fa6cdf7f9e89f80292"
+      },
+      "source-keys.json": {
+        "expected": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb",
+        "actual": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb"
+      },
+      "source-packets.json": {
+        "expected": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213",
+        "actual": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213"
+      },
+      "source-audit.json": {
+        "expected": "80641cc9153e2bbc7517bbd36c8644b4e52f481f1eab09517191465c07d7fdd3",
+        "actual": "80641cc9153e2bbc7517bbd36c8644b4e52f481f1eab09517191465c07d7fdd3"
+      },
+      "protocol.json": {
+        "expected": "9eab840662f8c6e269ba2e6b7cce9a9edc59426721a7e33b896aa0be5811f57a",
+        "actual": "9eab840662f8c6e269ba2e6b7cce9a9edc59426721a7e33b896aa0be5811f57a"
+      },
+      "frozen-manifest.json": {
+        "expected": "1c6e3c2f30a48b8b28c50b6e343c8ff85b50682c3df4858adf299f21a20c0b16",
+        "actual": "1c6e3c2f30a48b8b28c50b6e343c8ff85b50682c3df4858adf299f21a20c0b16"
+      }
+    },
+    "developmentCanonicalPacketChecks": [
+      {
+        "reference": "BC 1010.1.6",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "d0a6ca6d5cc6b49451473f93aa86f70f5c7de162000e945286e821ff1c8d9bec",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/10.json"
+      },
+      {
+        "reference": "PC 407.1",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "480c0c610ccdc857e77dbe66a4f309164b8efdfbb04247e7006baffca55f3b6e",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/107.json"
+      },
+      {
+        "reference": "PC 407.2",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "3cd5c55aca833f292e49ee5c06fe842dd128f0c765e68333cdd60e22f2bfa4a3",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/107.json"
+      },
+      {
+        "reference": "MC 303.1",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "967f2d87ff572bbe24dcdb6360e2c89e18411ebd26a8806498a11db39058e2d4",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/84.json"
+      },
+      {
+        "reference": "MC 303.3",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "2e9c81d4881639c6f130a4c2781e28f65ff145e9f908cf2d1c1213d4cc8957f8",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/84.json"
+      },
+      {
+        "reference": "FGC 409.1",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "f38ce4be55a85544e7c06084ea8f611648c7e7011ac3b00712814a7a256923e9",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/69.json"
+      },
+      {
+        "reference": "FGC 409.2",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "55796170e17c40981845905de07cd3eea7f7a4d77fd3ea44132463356da14efa",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/69.json"
+      },
+      {
+        "reference": "FC 901.6",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "3b274609af80ae6ad7a33552e0b5cac59e4067477b69fb0ef79464c7f1a6a40a",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004756.json"
+      },
+      {
+        "reference": "FC 901.6.2",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "738366ca91a10506b541ee27bbc54d80cb563c4ba3129775b00c3270b3bebbbc",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004756.json"
+      },
+      {
+        "reference": "FC 901.6.2.1",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "canonicalExcerptSHA256": "e5e42e19950e85d745f916906eb3e6ee73b4a34f218ffd3a6b51b71271f76160",
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004756.json"
+      }
+    ]
+  },
+  "methodology": [
+    "Graded delivered answerText and supportedPoints against only development frozen checks and corresponding actual canonical packets.",
+    "Inspected actual cited answerQuality.sources operative clauses, complete relevant exception context and table text. IDs and verifier approval are not correctness or decisive-text coverage.",
+    "Inspected writer and verifier request/response records for apartment landing and oil direct-vent follow-up to attribute condition framing without accepting their judgments automatically.",
+    "Minor factual/scope uncertainty that leaves the narrow operative answer correct is distinguished from a material legal error and from withholding."
+  ],
+  "totals": {
+    "turnCount": 10,
+    "labels": {
+      "correct": 8,
+      "minor_issue": 2,
+      "materially_wrong": 0,
+      "withheld": 0,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 0
+    },
+    "strictPass": 8,
+    "narrowOperativeConclusionsCorrect": 10,
+    "decisiveTextCoverage": {
+      "complete": 10,
+      "incomplete": 0
+    },
+    "conversationFamilies": 5,
+    "strictPassingFamilies": 3,
+    "initialTurns": {
+      "correct": 5
+    },
+    "followUpTurns": {
+      "minor_issue": 2,
+      "correct": 3
+    }
+  },
+  "families": [
+    {
+      "familyID": "door-landings",
+      "codeFamily": "BC",
+      "turnCount": 2,
+      "labels": [
+        "correct",
+        "minor_issue"
+      ],
+      "strictPass": false
+    },
+    {
+      "familyID": "bathtub-outlets",
+      "codeFamily": "PC",
+      "turnCount": 2,
+      "labels": [
+        "correct",
+        "correct"
+      ],
+      "strictPass": true
+    },
+    {
+      "familyID": "bathroom-oil-appliance",
+      "codeFamily": "MC",
+      "turnCount": 2,
+      "labels": [
+        "correct",
+        "minor_issue"
+      ],
+      "strictPass": false
+    },
+    {
+      "familyID": "gas-meter-valve",
+      "codeFamily": "FGC",
+      "turnCount": 2,
+      "labels": [
+        "correct",
+        "correct"
+      ],
+      "strictPass": true
+    },
+    {
+      "familyID": "sprinkler-visual-records",
+      "codeFamily": "FC",
+      "turnCount": 2,
+      "labels": [
+        "correct",
+        "correct"
+      ],
+      "strictPass": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "context-dev-01-door-landings-1",
+      "split": "development",
+      "familyID": "door-landings",
+      "codeFamily": "BC",
+      "question": "Under the 2022 NYC building rules, an office door has a landing only 36 inches long in the direction of travel. Does that length meet the ordinary minimum?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly rejects 36 inches for the ordinary office door length, states 44 inches and distinguishes the residential/U exceptions. The question requests the length rule, so separate width and swing design requirements need not become missing project facts.",
+      "failureStage": null,
+      "factReading": "Office remains the active first-turn scenario; no residential classification is imported.",
+      "keyNotes": null,
+      "answerText": "**No.** The ordinary minimum landing length at a door is 44 inches in the direction of travel, so 36 inches is 8 inches short (BC § 1010.1.6). The stated exception allowing 36 inches applies only to Groups R-3 and U and within individual units of Group R-2; it does not cover the stated office door.",
+      "answerTextSHA256": "cba6fde6bc06d6796f2dd4dff9c215cccbbbf6468bf784d370e11061d704f338",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "BC 1010.1.6"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "Landings shall have a length measured in the direction of travel of not less than 44 inches",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:2262-1"
+            ]
+          },
+          {
+            "clause": "within individual units of Group R-2 need not exceed 36 inches",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:2262-1"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "Landings shall have a length measured in the direction of travel of not less than 44 inches",
+            "presentInWriterRequestFiles": [
+              "206585ea-ade4-42fb-8f8b-52b256659015-request.json"
+            ]
+          },
+          {
+            "clause": "within individual units of Group R-2 need not exceed 36 inches",
+            "presentInWriterRequestFiles": [
+              "206585ea-ade4-42fb-8f8b-52b256659015-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "BC 1010.1.6": "d0a6ca6d5cc6b49451473f93aa86f70f5c7de162000e945286e821ff1c8d9bec"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:2262-1",
+            "sectionID": "2262",
+            "reference": "BC 1010.1.6",
+            "textSHA256": "855273b2f240f60a782004e4865e2eb9af6a2a04e4a9240118914eafb431eccc",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "1010.1.6",
+            "sectionID": "2262",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": false
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "206585ea-ade4-42fb-8f8b-52b256659015-request.json",
+          "requestSHA256": "94e872ca283735329e5433f11e3b50a4e39c114263dee51f6dd9ea43ccda2344",
+          "responseFile": "206585ea-ade4-42fb-8f8b-52b256659015-response.json",
+          "responseSHA256": "fa4dbfc84dc8448b8c28db92683f90dc412f6dd1cfa33ee59ee36e781d9296e0",
+          "finalAnswerTextMatch": true
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 27.026614041
+    },
+    {
+      "id": "context-dev-01-door-landings-2",
+      "split": "development",
+      "familyID": "door-landings",
+      "codeFamily": "BC",
+      "question": "Change the situation to a door wholly within an individual apartment. Is a 36-inch landing length allowed for that situation?",
+      "label": "minor_issue",
+      "strictPass": false,
+      "reasoning": "Delivers the 36-inch individual-unit exception and does not give a wrong ordinary threshold, but dilutes the narrow apartment answer with an occupancy-group question and a separate Group R-2 stairway exception. The user moved the door wholly within an individual apartment; no common stairway landing was introduced. The final statement that these facts must be established before resolving this narrow length condition is unnecessarily broad. Width/swing compliance and a truly applicable stairway exception can be kept separate without presenting the supplied individual-unit scenario as unresolved.",
+      "failureStage": "verifier-induced collateral-scope expansion followed by writer repair",
+      "factReading": "The explicit change to an individual apartment is understood, but an unintroduced stairway scenario is treated as a missing fact.",
+      "keyNotes": "The key intends an individual Group R-2 apartment. The final source-true conditional stairway statement does not itself prove material legal error; grading therefore records a minor clarity/scope issue, not materially_wrong.",
+      "answerText": "**Yes, if** the apartment is an individual unit in Group R-2, R-3, or U: the exception permits a 36-inch landing length. The ordinary minimum is 44 inches (BC § 1010.1.6). **For a Group R-2 stairway landing**, however, if it serves a 36-inch-wide stairway permitted under the cited stairway exception, the landing must be at least 36 inches or the stairway width, whichever is greater; in that case, a 36-inch length is allowed only if the stairway is no wider than 36 inches. The facts do not establish the occupancy group or whether that stairway-landing condition applies.",
+      "answerTextSHA256": "62295da98c40869e90ef468f0fa1b6de3dfe367950a35f88713f2201ac33419a",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "BC 1010.1.6"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "within individual units of Group R-2 need not exceed 36 inches",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:2262-1"
+            ]
+          },
+          {
+            "clause": "such stairway landing length in the direction of travel shall be permitted to be not less than 36 inches",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:2262-1"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "within individual units of Group R-2 need not exceed 36 inches",
+            "presentInWriterRequestFiles": [
+              "049f9677-a09e-45cd-b4a4-b3cfe9a53b6b-request.json",
+              "ccbcddc5-f6a9-46b5-a25b-32eefcb859c7-request.json"
+            ]
+          },
+          {
+            "clause": "such stairway landing length in the direction of travel shall be permitted to be not less than 36 inches",
+            "presentInWriterRequestFiles": [
+              "049f9677-a09e-45cd-b4a4-b3cfe9a53b6b-request.json",
+              "ccbcddc5-f6a9-46b5-a25b-32eefcb859c7-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "BC 1010.1.6": "d0a6ca6d5cc6b49451473f93aa86f70f5c7de162000e945286e821ff1c8d9bec"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:2262-1",
+            "sectionID": "2262",
+            "reference": "BC 1010.1.6",
+            "textSHA256": "855273b2f240f60a782004e4865e2eb9af6a2a04e4a9240118914eafb431eccc",
+            "evidenceRole": "supporting"
+          },
+          {
+            "sourceID": "research-permitext_cross_reference-id:2306-1",
+            "sectionID": "2306",
+            "reference": "BC 1011.2",
+            "textSHA256": "1fbf249f0c757a8eaa43323198dfef2a01c86199872a4e42a6aad6bf51931823",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "1010.1.6",
+            "sectionID": "2262",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          },
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "1011.2",
+            "sectionID": "2306",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": true
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 2,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [
+        "The apartment’s occupancy group.",
+        "Whether the door opens onto a Group R-2 stairway landing served by a 36-inch stairway permitted under BC § 1011.2, Exception 1.2; if so, the stairway width.",
+        "What is the building’s occupancy group, and does this door open onto a Group R-2 stairway landing served by a stairway permitted under BC § 1011.2, Exception 1.2? If so, what is the stairway’s width?"
+      ],
+      "finalFollowUpQuestions": [
+        "What is the building’s occupancy group, and does this door open onto a Group R-2 stairway landing served by a stairway permitted under BC § 1011.2, Exception 1.2? If so, what is the stairway’s width?"
+      ],
+      "requestAudit": [
+        {
+          "file": "049f9677-a09e-45cd-b4a4-b3cfe9a53b6b-request.json",
+          "requestSHA256": "4772ce329364b3bcca1d6b40a2762aefdd68942549e9fd6c7096c06eee30b3e0",
+          "responseFile": "049f9677-a09e-45cd-b4a4-b3cfe9a53b6b-response.json",
+          "responseSHA256": "08730799668d8063ac8cb9c54c857d17008682aa132b1478527ecb5678a72e33",
+          "finalAnswerTextMatch": true
+        },
+        {
+          "file": "ccbcddc5-f6a9-46b5-a25b-32eefcb859c7-request.json",
+          "requestSHA256": "ff0b5f7ba49cca2c1d7e373ac1266adfdad65d740bcd7a5eb9bfbfecc1f178de",
+          "responseFile": "ccbcddc5-f6a9-46b5-a25b-32eefcb859c7-response.json",
+          "responseSHA256": "f1a2aa105f3cd4086acf1520365ab438778c5e630f1a47888f5f08c7d73ca8dd",
+          "finalAnswerTextMatch": false
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 77.868273792,
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "records": [
+          {
+            "requestFile": "7e0782bc-54a3-4e54-af7f-cbdad6c95ab6-request.json",
+            "requestSHA256": "933d09e01e7a3b20f1066c8756f9914349719bd00bddbfa2b7d078952d5299b8",
+            "responseFile": "7e0782bc-54a3-4e54-af7f-cbdad6c95ab6-response.json",
+            "responseSHA256": "cc31f668698e3b9085839aa962d3b6e3011156c30d1fef99993d8d0fdd09d921",
+            "reportedIssues": [
+              {
+                "type": "missed_material_conclusion",
+                "detail": "The answer omits Exception 2 to BC 1010.1.6. For a Group R-2 stairway landing where a 36-inch stairway is permitted under BC 1011.2, Exception 1.2, that exception specifies a landing length not less than 36 inches or the stairway width, whichever is greater. Thus, the answer’s unqualified statement that 36 inches is allowed for a landing within an R-2 apartment could be misleading if this is such a stairway landing. State that condition and its effect; the supplied evidence does not establish whether it applies here."
+              }
+            ],
+            "reportedProjectFactQuestions": []
+          },
+          {
+            "requestFile": "08ed8cae-d190-473e-982c-525b73480068-request.json",
+            "requestSHA256": "a699cc697d60211ee71efe6026ab81aef161708f67001e70d6c4743cd83388cd",
+            "responseFile": "08ed8cae-d190-473e-982c-525b73480068-response.json",
+            "responseSHA256": "e004ce48bbaf8fc41c1337b54fe3646d535bef430b794c9932d781343926b6f2",
+            "reportedIssues": [],
+            "reportedProjectFactQuestions": [
+              "What is the building’s occupancy group, and does this door open onto a Group R-2 stairway landing served by a stairway permitted under BC § 1011.2, Exception 1.2? If so, what is the stairway’s width?"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-dev-02-bathtub-outlets-1",
+      "split": "development",
+      "familyID": "bathtub-outlets",
+      "codeFamily": "PC",
+      "question": "For a new NYC bathtub, the waste outlet and overflow connect to 1-inch waste tubing. Is that size enough?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly rejects 1-inch tubing and cites the actual 1.5-inch minimum for both outlet connections. Citation and edition match the supplied canonical rule.",
+      "failureStage": null,
+      "factReading": "Uses the new bathtub and 1-inch scenario directly.",
+      "keyNotes": null,
+      "answerText": "No. For a new bathtub, the waste outlet and overflow must connect to waste tubing or piping at least 1½ inches (38 mm) in diameter; 1-inch tubing is undersized (2022 NYC Plumbing Code § 407.2).",
+      "answerTextSHA256": "55f26020d69a2f1b9f62ff5af8fb3b3a04784463a3808e47ff69ed56e9256301",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "PC 407.2"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "The outlets shall be connected to waste tubing or piping not less than 1 1/2 inches",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:11950-1"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "The outlets shall be connected to waste tubing or piping not less than 1 1/2 inches",
+            "presentInWriterRequestFiles": [
+              "8c0346a5-dce6-4899-ada3-7e7e5b08e54b-request.json",
+              "d511cef4-6291-4aa9-9a56-c35259138ede-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "PC 407.1": "480c0c610ccdc857e77dbe66a4f309164b8efdfbb04247e7006baffca55f3b6e",
+          "PC 407.2": "3cd5c55aca833f292e49ee5c06fe842dd128f0c765e68333cdd60e22f2bfa4a3"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:11950-1",
+            "sectionID": "11950",
+            "reference": "PC 407.2",
+            "textSHA256": "c7b2554d2637878c728847cc07f7528c7554f31e5635438c50e1cb096c8d96c3",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "407.2",
+            "sectionID": "11950",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": false
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "8c0346a5-dce6-4899-ada3-7e7e5b08e54b-request.json",
+          "requestSHA256": "709dd4ff3ac935a8c07b607c3d03169a0068e3dabe6a9dafa162ce4830fb2779",
+          "responseFile": "8c0346a5-dce6-4899-ada3-7e7e5b08e54b-response.json",
+          "responseSHA256": "dbe3cb8935b48487c3832e6a84b2067d68ccacef2a9fa92997e1120fd13718c8",
+          "finalAnswerTextMatch": false
+        },
+        {
+          "file": "d511cef4-6291-4aa9-9a56-c35259138ede-request.json",
+          "requestSHA256": "eb9170e9b7a2bcfc1cbc2d882dbdd59872d02328e9437515ff2a616abc95e2ac",
+          "responseFile": "d511cef4-6291-4aa9-9a56-c35259138ede-response.json",
+          "responseSHA256": "75742668e289dad63c03f2dba12262038d0a62d0c1e7ca586a597d7b8b6ddc30",
+          "finalAnswerTextMatch": false
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 18.311911875000007
+    },
+    {
+      "id": "context-dev-02-bathtub-outlets-2",
+      "split": "development",
+      "familyID": "bathtub-outlets",
+      "codeFamily": "PC",
+      "question": "If we enlarge the tubing to 1.5 inches, can we leave out the overflow outlet?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly retains the overflow outlet requirement after the tubing size changes to 1.5 inches. It answers the directly asked rule without claiming whole-fixture compliance; the separate stopper condition need not be recited to answer whether overflow may be omitted.",
+      "failureStage": null,
+      "factReading": "Applies the 1.5-inch correction while preserving the same new bathtub scenario.",
+      "keyNotes": null,
+      "answerText": "No. For the new bathtub discussed, the 2022 NYC Plumbing Code requires both a waste outlet and an overflow outlet; increasing the tubing to 1½ inches meets the stated minimum diameter but does not eliminate the separate overflow-outlet requirement (PC § 407.2).",
+      "answerTextSHA256": "0abf6f222ae55d946d9a545fac622ae55d544c40b2d66c2e20a9ce55d6d8c1a1",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "PC 407.2"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "Bathtubs shall be equipped with a waste outlet and an overflow outlet",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:11950-1"
+            ]
+          },
+          {
+            "clause": "The waste outlet shall be equipped with a water-tight stopper",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:11950-1"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "Bathtubs shall be equipped with a waste outlet and an overflow outlet",
+            "presentInWriterRequestFiles": [
+              "24d3f256-a17c-4231-a4be-22354a9d64a5-request.json"
+            ]
+          },
+          {
+            "clause": "The waste outlet shall be equipped with a water-tight stopper",
+            "presentInWriterRequestFiles": [
+              "24d3f256-a17c-4231-a4be-22354a9d64a5-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "PC 407.1": "480c0c610ccdc857e77dbe66a4f309164b8efdfbb04247e7006baffca55f3b6e",
+          "PC 407.2": "3cd5c55aca833f292e49ee5c06fe842dd128f0c765e68333cdd60e22f2bfa4a3"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:11950-1",
+            "sectionID": "11950",
+            "reference": "PC 407.2",
+            "textSHA256": "c7b2554d2637878c728847cc07f7528c7554f31e5635438c50e1cb096c8d96c3",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "407.2",
+            "sectionID": "11950",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": false
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "24d3f256-a17c-4231-a4be-22354a9d64a5-request.json",
+          "requestSHA256": "94d73007ff1547862906fa50062399f8f45d8be40e8527e15d98ee6a87ffae9b",
+          "responseFile": "24d3f256-a17c-4231-a4be-22354a9d64a5-response.json",
+          "responseSHA256": "e0c1d0224eac2b81b7d94448050b58b75f2655cff5320f747da489d58289c3a2",
+          "finalAnswerTextMatch": true
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 6.389676542000001
+    },
+    {
+      "id": "context-dev-03-bathroom-oil-appliance-1",
+      "split": "development",
+      "familyID": "bathroom-oil-appliance",
+      "codeFamily": "MC",
+      "question": "Under the 2022 NYC mechanical rules, can an ordinary fuel-oil-fired appliance that takes combustion air from the bathroom be installed in that bathroom?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly states the bathroom prohibition for the described ordinary oil appliance and explains why its bathroom combustion air does not meet the direct-vent or dedicated-enclosure outdoor-air exceptions. It accurately acknowledges the distinct named-appliance/room-volume exception rather than inventing a universal prohibition on every fuel-oil appliance. Additional combustion-air rules are not presented as an override.",
+      "failureStage": null,
+      "factReading": "Retains fuel oil and Mechanical Code authority; does not substitute parallel Fuel Gas Code appliance text.",
+      "keyNotes": "The ordinary-appliance fixture does not name every possible equipment subtype. A careful general prohibition with acknowledged enumerated exceptions is more defensible than an unconditional ban covering all oil-fired equipment; this qualification is not graded as a key failure.",
+      "answerText": "**No—not as an ordinary fuel-oil-fired appliance taking combustion air from the bathroom.** The 2022 NYC Mechanical Code prohibits appliances in bathrooms unless a listed exception applies (MC § 303.3). The direct-vent exception requires all combustion air to come directly from outdoors, and the dedicated-enclosure exception likewise requires all combustion air from outdoors, so neither fits the arrangement described. A separate exception covers specified vented room heaters and other named appliances in rooms meeting § 702 volume criteria; the supplied facts and text do not establish that an ordinary fuel-oil appliance qualifies for that exception. The Code also requires combustion air for fuel-burning appliances and free air circulation in rooms containing them (MC §§ 701.2, 701.3), but those requirements do not themselves override the bathroom-location prohibition.",
+      "answerTextSHA256": "c0e378fcd2a5d92d0a0a87280e3b7dfe5e6f8bee68cb16b87238b2bc99994e42",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "MC 303.3"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "Appliances shall not be located in sleeping rooms, bathrooms",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:10320-8"
+            ]
+          },
+          {
+            "clause": "direct-vent appliances that obtain all combustion air directly from the outdoors",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:10320-8"
+            ]
+          },
+          {
+            "clause": "vented room heaters, wall furnaces",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:10320-8"
+            ]
+          },
+          {
+            "clause": "appliances installed in a dedicated enclosure in which all combustion air is taken directly from the outdoors",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:10320-8"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "Appliances shall not be located in sleeping rooms, bathrooms",
+            "presentInWriterRequestFiles": [
+              "adfa0fce-5c44-401e-bb77-ba754c2a8be2-request.json"
+            ]
+          },
+          {
+            "clause": "direct-vent appliances that obtain all combustion air directly from the outdoors",
+            "presentInWriterRequestFiles": [
+              "adfa0fce-5c44-401e-bb77-ba754c2a8be2-request.json"
+            ]
+          },
+          {
+            "clause": "vented room heaters, wall furnaces",
+            "presentInWriterRequestFiles": [
+              "adfa0fce-5c44-401e-bb77-ba754c2a8be2-request.json"
+            ]
+          },
+          {
+            "clause": "appliances installed in a dedicated enclosure in which all combustion air is taken directly from the outdoors",
+            "presentInWriterRequestFiles": [
+              "adfa0fce-5c44-401e-bb77-ba754c2a8be2-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "MC 303.1": "967f2d87ff572bbe24dcdb6360e2c89e18411ebd26a8806498a11db39058e2d4",
+          "MC 303.3": "2e9c81d4881639c6f130a4c2781e28f65ff145e9f908cf2d1c1213d4cc8957f8"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:10906-1",
+            "sectionID": "10906",
+            "reference": "MC 701.3",
+            "textSHA256": "a59b551b940a6d9951902ca143434822ed93c20edf88deb492320ef5326be772",
+            "evidenceRole": "supporting"
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:10320-8",
+            "sectionID": "10320",
+            "reference": "MC 303.3",
+            "textSHA256": "1f4f6445ff949f183b2fd6c284bf728d078fdb3c7a215208b27849a9486ca90b",
+            "evidenceRole": "supporting"
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:10905-9",
+            "sectionID": "10905",
+            "reference": "MC 701.2",
+            "textSHA256": "e1cba1aebbaf73e32adf69bfad2417de1f686479c6d83865ff2f3e2ce6d20749",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "MC",
+            "sectionNumber": "303.3",
+            "sectionID": "10320",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          },
+          {
+            "codePrefix": "MC",
+            "sectionNumber": "701.2",
+            "sectionID": "10905",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          },
+          {
+            "codePrefix": "MC",
+            "sectionNumber": "701.3",
+            "sectionID": "10906",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": false
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 2,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [
+        "Whether the appliance is one of the specifically listed types in the vented-room-heater exception; if so, whether the bathroom meets the applicable § 702 volume criteria.",
+        "What exact type of appliance is proposed—for example, a vented room heater or wall furnace? It matters because MC 303.3 has a separate exception for certain named appliances, subject to the room meeting MC 702’s volume criteria."
+      ],
+      "finalFollowUpQuestions": [
+        "What exact type of appliance is proposed—for example, a vented room heater or wall furnace? It matters because MC 303.3 has a separate exception for certain named appliances, subject to the room meeting MC 702’s volume criteria."
+      ],
+      "requestAudit": [
+        {
+          "file": "adfa0fce-5c44-401e-bb77-ba754c2a8be2-request.json",
+          "requestSHA256": "bf3fffecdb7a61ba5ae3c3433f05e470681ab32e4b3db768c6cc6996dd74765d",
+          "responseFile": "adfa0fce-5c44-401e-bb77-ba754c2a8be2-response.json",
+          "responseSHA256": "600482f2609c33a2ec49a685f6778ba2d56cbf752fdf97f87938896a74b799e6",
+          "finalAnswerTextMatch": true
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 34.639957792000004
+    },
+    {
+      "id": "context-dev-03-bathroom-oil-appliance-2",
+      "split": "development",
+      "familyID": "bathroom-oil-appliance",
+      "codeFamily": "MC",
+      "question": "Suppose it is instead a direct-vent appliance taking all combustion air directly outdoors, listed for the installation and installed according to the manufacturer. Does the bathroom location exception permit it?",
+      "label": "minor_issue",
+      "strictPass": false,
+      "reasoning": "The final conditional yes accurately states the direct-vent bathroom exception and its full conditions. Its reminder that installation must comply with listing conditions is legally supported: listed for this installation is not identical to a factual certification that every listing condition has been followed. However, the answer frames the ordinary bathroom as an unresolved sleeping room and expands a narrow stated hypothetical into repetitive project-fact questions. A direct yes for this location exception with a concise non-sleeping/listing-condition qualification would better respect the supplied scenario. This is not a nonanswer or a materially wrong rule.",
+      "failureStage": "verifier condition correction followed by writer fact/uncertainty framing",
+      "factReading": "Preserves direct vent and outdoor combustion air; adds avoidable sleeping-room uncertainty to the stated bathroom and duplicates listing-condition clarification.",
+      "keyNotes": "The key affirmative is conditional on a room not used for sleeping and compliant installation. The prompt says listed for the installation, not expressly compliance with every listing condition. The final truthful qualification should not be mislabeled materially wrong simply for differing from a shorthand yes key.",
+      "answerText": "**Yes, if** the room is not used for sleeping purposes and the installation also complies with the appliance’s listing conditions. MC § 303.3 permits a direct-vent appliance in a room other than one used for sleeping when all combustion air comes directly from outdoors and installation follows both the listing conditions and the manufacturer’s instructions. The hypothetical establishes the outdoor-air and manufacturer-instruction conditions, but not the other two conditions.",
+      "answerTextSHA256": "be1a9eca52841601e47bcbd63e7c8a45df2d30283fcd11b1b6429771c83eb795",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "MC 303.3"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "In rooms other than those used for sleeping purposes, direct-vent appliances that obtain all combustion air directly from the outdoors",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:10320-1"
+            ]
+          },
+          {
+            "clause": "installed in accordance with the conditions of the listing and manufacturer",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:10320-1"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "In rooms other than those used for sleeping purposes, direct-vent appliances that obtain all combustion air directly from the outdoors",
+            "presentInWriterRequestFiles": [
+              "47ec858f-1f07-4fa4-8778-87dd055eaa85-request.json",
+              "be39d521-65fe-491c-aea2-88ae8faf911b-request.json"
+            ]
+          },
+          {
+            "clause": "installed in accordance with the conditions of the listing and manufacturer",
+            "presentInWriterRequestFiles": [
+              "47ec858f-1f07-4fa4-8778-87dd055eaa85-request.json",
+              "be39d521-65fe-491c-aea2-88ae8faf911b-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "MC 303.1": "967f2d87ff572bbe24dcdb6360e2c89e18411ebd26a8806498a11db39058e2d4",
+          "MC 303.3": "2e9c81d4881639c6f130a4c2781e28f65ff145e9f908cf2d1c1213d4cc8957f8"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:10320-1",
+            "sectionID": "10320",
+            "reference": "MC 303.3",
+            "textSHA256": "1f4f6445ff949f183b2fd6c284bf728d078fdb3c7a215208b27849a9486ca90b",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "MC",
+            "sectionNumber": "303.3",
+            "sectionID": "10320",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": true
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [
+        "Whether the room is used for sleeping purposes.",
+        "Whether the installation complies with the appliance’s listing conditions.",
+        "Is the bathroom also used for sleeping purposes?",
+        "Does the installation comply with all conditions in the appliance’s listing?"
+      ],
+      "finalFollowUpQuestions": [
+        "Is the bathroom also used for sleeping purposes?"
+      ],
+      "requestAudit": [
+        {
+          "file": "47ec858f-1f07-4fa4-8778-87dd055eaa85-request.json",
+          "requestSHA256": "75088aa32a01bd84e44651d620f29473fd03c29e21c8759f089eab6b417813f2",
+          "responseFile": "47ec858f-1f07-4fa4-8778-87dd055eaa85-response.json",
+          "responseSHA256": "725590af08cc1c663b9e2204a13d51ffbb4a1578950c0f71e57cb5ce4e3e0a40",
+          "finalAnswerTextMatch": false
+        },
+        {
+          "file": "be39d521-65fe-491c-aea2-88ae8faf911b-request.json",
+          "requestSHA256": "4ad491761815a33249c7773e2c53d61714412f72e83a1105619499e366505f91",
+          "responseFile": "be39d521-65fe-491c-aea2-88ae8faf911b-response.json",
+          "responseSHA256": "944eceb2aff2b276685130005afcf6861eb080b7ad5db65a69ce2a56804d0323",
+          "finalAnswerTextMatch": true
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 43.637382040999974,
+      "diagnosticStageAudit": {
+        "usedOnlyForFailureAttribution": true,
+        "verifierJudgmentsNotGroundTruth": true,
+        "records": [
+          {
+            "requestFile": "6caa8798-dcdb-4a42-aff2-cae4e75a52fd-request.json",
+            "requestSHA256": "69be7787039a86cd7111bded1d2a94179ef35c64c4668d8b06e83080ca9b1bfb",
+            "responseFile": "6caa8798-dcdb-4a42-aff2-cae4e75a52fd-response.json",
+            "responseSHA256": "b0f7f0992941b7318cce9f73a74683058ff330b138b00076895a542a991f661c",
+            "reportedIssues": [
+              {
+                "type": "overstated_compliance",
+                "detail": "The answer says the hypothetical “meets those conditions,” but MC 303.3 requires the appliance to be installed in accordance with both the conditions of its listing and the manufacturer’s instructions. The user stipulated that it is listed for the installation and installed according to the manufacturer, but did not expressly establish that the installation complies with the listing conditions. Keep the result conditional on that condition as well as on the room not being used for sleeping purposes."
+              }
+            ],
+            "reportedProjectFactQuestions": []
+          },
+          {
+            "requestFile": "b95a2f76-b725-4da3-a1da-5528a16f99e4-request.json",
+            "requestSHA256": "092d5be8d6907cd54bd525ae2f7c80700e533ae8dced9468bb88420b48724384",
+            "responseFile": "b95a2f76-b725-4da3-a1da-5528a16f99e4-response.json",
+            "responseSHA256": "8efa84f170b7e94f38b1499f0e15a07ecfcda903be2cee0924b29b12ac4379f0",
+            "reportedIssues": [],
+            "reportedProjectFactQuestions": [
+              "Is the bathroom also used for sleeping purposes?",
+              "Does the installation comply with all conditions in the appliance’s listing?"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-dev-04-gas-meter-valve-1",
+      "split": "development",
+      "familyID": "gas-meter-valve",
+      "codeFamily": "FGC",
+      "question": "For a new NYC natural-gas meter, may its shutoff valve be located only on the outlet side of the meter?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly requires the meter shutoff on the supply side and utility-approved type; an outlet-side-only valve does not meet the directly cited rule.",
+      "failureStage": null,
+      "factReading": "Uses the new natural-gas meter scenario without importing oil-appliance requirements.",
+      "keyNotes": null,
+      "answerText": "**No.** Under the 2022 NYC Fuel Gas Code, every meter must have a shutoff valve on the **supply side** of the meter, so an outlet-side-only valve does not meet that rule (FGC § 409.2). The valve must also be a type approved by the utility company.",
+      "answerTextSHA256": "a665b678cc8703ef0ccffc311f69c8edbed417e2d657d3fdb4262072c64c662a",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FGC 409.2"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "Every meter shall be equipped with a shutoff valve located on the supply side of the meter",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:8329-1"
+            ]
+          },
+          {
+            "clause": "Meter valves shall be of a type approved by the utility company",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:8329-1"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "Every meter shall be equipped with a shutoff valve located on the supply side of the meter",
+            "presentInWriterRequestFiles": [
+              "3ef4f37d-9242-42fa-b4c1-a809cf71177e-request.json"
+            ]
+          },
+          {
+            "clause": "Meter valves shall be of a type approved by the utility company",
+            "presentInWriterRequestFiles": [
+              "3ef4f37d-9242-42fa-b4c1-a809cf71177e-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FGC 409.1": "f38ce4be55a85544e7c06084ea8f611648c7e7011ac3b00712814a7a256923e9",
+          "FGC 409.2": "55796170e17c40981845905de07cd3eea7f7a4d77fd3ea44132463356da14efa"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:8329-1",
+            "sectionID": "8329",
+            "reference": "FGC 409.2",
+            "textSHA256": "49a997511f42279aac9b967e6ec7f6ec3ade68fb419e72a771d90f2c1e7d9aea",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "FGC",
+            "sectionNumber": "409.2",
+            "sectionID": "8329",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": false
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "3ef4f37d-9242-42fa-b4c1-a809cf71177e-request.json",
+          "requestSHA256": "154db19e5c41a15031479cbcbf394400f8e8ece1cb310f574a471c8268bde293",
+          "responseFile": "3ef4f37d-9242-42fa-b4c1-a809cf71177e-response.json",
+          "responseSHA256": "34367a8ee44aebac7bd93b228eeb2457dc719446f9c9c7966585e28a9303eed3",
+          "finalAnswerTextMatch": true
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 5.281415290999983
+    },
+    {
+      "id": "context-dev-04-gas-meter-valve-2",
+      "split": "development",
+      "familyID": "gas-meter-valve",
+      "codeFamily": "FGC",
+      "question": "If we put the valve on the supply side, may we use any valve type without utility approval?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly keeps utility type approval separate from supply-side location. The additional general valve-approval/material/pressure-standard statement is supported by the actual supplied FGC409.1.1 text and table; it does not select an unsupported table row for this meter.",
+      "failureStage": null,
+      "factReading": "Treats the supply-side move as satisfying only location, preserving the independent approval condition.",
+      "keyNotes": null,
+      "answerText": "No. Putting the meter valve on the supply side satisfies the location rule, but does not waive the separate requirement that a meter valve be a type approved by the utility company (2022 NYC FGC §§ 409.1.1, 409.2). The valve must also be an approved type, be compatible with the piping materials, and comply with the standard applicable to its pressure and application under Table 409.1.1.",
+      "answerTextSHA256": "6023bc8125d08d7c498419d0a5af3e23dc9a418eb4a361adee7739fa69998ac1",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FGC 409.2"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "Meter valves shall be of a type approved by the utility company",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:8329-2"
+            ]
+          },
+          {
+            "clause": "Shutoff valves shall be of an approved type",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:8326-1"
+            ]
+          },
+          {
+            "clause": "shall be constructed of materials compatible with the piping",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:8326-1"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "Meter valves shall be of a type approved by the utility company",
+            "presentInWriterRequestFiles": [
+              "d114c1a8-f17b-4131-b8b5-f92c9f40a1c4-request.json"
+            ]
+          },
+          {
+            "clause": "Shutoff valves shall be of an approved type",
+            "presentInWriterRequestFiles": [
+              "d114c1a8-f17b-4131-b8b5-f92c9f40a1c4-request.json"
+            ]
+          },
+          {
+            "clause": "shall be constructed of materials compatible with the piping",
+            "presentInWriterRequestFiles": [
+              "d114c1a8-f17b-4131-b8b5-f92c9f40a1c4-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FGC 409.1": "f38ce4be55a85544e7c06084ea8f611648c7e7011ac3b00712814a7a256923e9",
+          "FGC 409.2": "55796170e17c40981845905de07cd3eea7f7a4d77fd3ea44132463356da14efa"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:8326-1",
+            "sectionID": "8326",
+            "reference": "FGC 409.1.1",
+            "textSHA256": "ba70fbf7a1a94eb576014c86da83aac8b127d1eada6bbba40535db5d11365480",
+            "evidenceRole": "supporting"
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:8329-2",
+            "sectionID": "8329",
+            "reference": "FGC 409.2",
+            "textSHA256": "49a997511f42279aac9b967e6ec7f6ec3ade68fb419e72a771d90f2c1e7d9aea",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "FGC",
+            "sectionNumber": "409.2",
+            "sectionID": "8329",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          },
+          {
+            "codePrefix": "FGC",
+            "sectionNumber": "409.1.1",
+            "sectionID": "8326",
+            "corpusID": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": false
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 2,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "d114c1a8-f17b-4131-b8b5-f92c9f40a1c4-request.json",
+          "requestSHA256": "d07458e95d77a97321d00d8abbbbbbfc5c6261729a8e47c2466006f1d4a4b15a",
+          "responseFile": "d114c1a8-f17b-4131-b8b5-f92c9f40a1c4-response.json",
+          "responseSHA256": "6e180c2f61dcde93facc3764b5650fce336ee4df324404e6eaa3f1f0f3dd2675",
+          "finalAnswerTextMatch": true
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 8.221572874999984
+    },
+    {
+      "id": "context-dev-05-sprinkler-visual-records-1",
+      "split": "development",
+      "familyID": "sprinkler-visual-records",
+      "codeFamily": "FC",
+      "question": "For a NYC office sprinkler system, is a visual inspection once every three months enough for the routine visual-inspection rule?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Correctly rejects quarterly routine visual inspection, states the actual monthly certificate-of-fitness/NFPA25 requirement, and avoids guessing unprovided exceptions. The additional FC903.5 monthly maintenance statement is supported and appropriately distinguishes exception scope.",
+      "failureStage": null,
+      "factReading": "Answers the expressly posited office sprinkler-system scenario. The structured extractor marks sprinkler_status unknown, but the delivered answer does not use that artifact to block or change the narrow rule.",
+      "keyNotes": null,
+      "answerText": "**No.** The supplied NYC Fire Code text requires a visual inspection of a standpipe or sprinkler system monthly, not once every three months. The inspection must be completed by a certificate-of-fitness holder in accordance with NFPA 25, and defects or violations must be noted on the inspection report (FC § 901.6.2.1). FC § 903.5 also sets a monthly inspection minimum for sprinkler systems. The supplied text identifies no quarterly exception applicable to an office sprinkler system.",
+      "answerTextSHA256": "99227898ccb47fd87e0156337c75a0ae40db75aa8440d6dcd20df78f523abdb0",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FC 901.6.2.1"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "A visual inspection shall be completed monthly by the certificate of fitness holder",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004756-7"
+            ]
+          },
+          {
+            "clause": "All defects or violations shall be noted on the inspection report",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004756-7"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "A visual inspection shall be completed monthly by the certificate of fitness holder",
+            "presentInWriterRequestFiles": [
+              "a1d9fc1c-7fb8-40af-80f6-07c873d8eff7-request.json"
+            ]
+          },
+          {
+            "clause": "All defects or violations shall be noted on the inspection report",
+            "presentInWriterRequestFiles": [
+              "a1d9fc1c-7fb8-40af-80f6-07c873d8eff7-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FC 901.6": "3b274609af80ae6ad7a33552e0b5cac59e4067477b69fb0ef79464c7f1a6a40a",
+          "FC 901.6.2": "738366ca91a10506b541ee27bbc54d80cb563c4ba3129775b00c3270b3bebbbc",
+          "FC 901.6.2.1": "e5e42e19950e85d745f916906eb3e6ee73b4a34f218ffd3a6b51b71271f76160"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004758-1",
+            "sectionID": "31004758",
+            "reference": "FC 903",
+            "textSHA256": "75c2f080ffad67435709f1c52b8356185849cb4111f0d21d94093e08db41cc7c",
+            "evidenceRole": "supporting"
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:31004756-7",
+            "sectionID": "31004756",
+            "reference": "FC 901",
+            "textSHA256": "c950efd425d5cc39c3021a2fc1c75f271111b1435d387c7733eacc09847fdecb",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "FC",
+            "sectionNumber": "901",
+            "sectionID": "31004756",
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1"
+          },
+          {
+            "codePrefix": "FC",
+            "sectionNumber": "903",
+            "sectionID": "31004758",
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": false
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 2,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "a1d9fc1c-7fb8-40af-80f6-07c873d8eff7-request.json",
+          "requestSHA256": "4ce323a3443a8d721e22ee856630f1588e015f81528de0337b9b3bc5445da6d0",
+          "responseFile": "a1d9fc1c-7fb8-40af-80f6-07c873d8eff7-response.json",
+          "responseSHA256": "79eead4687485032c07798d6661364a4d90f15a56659928f59d8f58beb1311f1",
+          "finalAnswerTextMatch": true
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 19.286152415999997
+    },
+    {
+      "id": "context-dev-05-sprinkler-visual-records-2",
+      "split": "development",
+      "familyID": "sprinkler-visual-records",
+      "codeFamily": "FC",
+      "question": "When the monthly inspection finds a defect, does it have to appear on the inspection report?",
+      "label": "correct",
+      "strictPass": true,
+      "reasoning": "Directly and correctly requires every defect or violation to appear on the monthly inspection report under the actual supplied FC901.6.2.1 clause.",
+      "failureStage": null,
+      "factReading": "Retains the monthly sprinkler inspection context across the follow-up.",
+      "keyNotes": null,
+      "answerText": "Yes. For a standpipe or sprinkler system, all defects or violations found during the monthly visual inspection must be noted on the inspection report (2022 NYC Fire Code § 901.6.2.1).",
+      "answerTextSHA256": "122ad0da3c0cf010efb4d2a570431463314d08901fca862e3724552ac269c49d",
+      "deliveredMode": "openai",
+      "decisiveTextCoverage": {
+        "label": "complete",
+        "expectedReferences": [
+          "FC 901.6.2.1"
+        ],
+        "expectedSourceIDPresenceNotUsedAsGroundTruth": true,
+        "actualClauseChecks": [
+          {
+            "clause": "All defects or violations shall be noted on the inspection report",
+            "presentInActualSourceIDs": [
+              "research-permitext_discovered-id:31004756-1"
+            ]
+          }
+        ],
+        "actualWriterClauseChecks": [
+          {
+            "clause": "All defects or violations shall be noted on the inspection report",
+            "presentInWriterRequestFiles": [
+              "524b40ce-893b-4348-8eac-4483d9bbf1fd-request.json"
+            ]
+          }
+        ],
+        "sourcePacketExcerptHashes": {
+          "FC 901.6": "3b274609af80ae6ad7a33552e0b5cac59e4067477b69fb0ef79464c7f1a6a40a",
+          "FC 901.6.2": "738366ca91a10506b541ee27bbc54d80cb563c4ba3129775b00c3270b3bebbbc",
+          "FC 901.6.2.1": "e5e42e19950e85d745f916906eb3e6ee73b4a34f218ffd3a6b51b71271f76160"
+        }
+      },
+      "citationReview": {
+        "editionAndCorpusMatch": true,
+        "actualCitedSources": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004756-1",
+            "sectionID": "31004756",
+            "reference": "FC 901",
+            "textSHA256": "c950efd425d5cc39c3021a2fc1c75f271111b1435d387c7733eacc09847fdecb",
+            "evidenceRole": "supporting"
+          }
+        ],
+        "canonicalCitationIdentities": [
+          {
+            "codePrefix": "FC",
+            "sectionNumber": "901",
+            "sectionID": "31004756",
+            "corpusID": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code — current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1"
+          }
+        ],
+        "claimScopeIssue": false
+      },
+      "supportedPointReview": {
+        "reviewed": true,
+        "count": 1,
+        "materialContradictionFound": false
+      },
+      "finalMissingFacts": [],
+      "finalFollowUpQuestions": [],
+      "requestAudit": [
+        {
+          "file": "524b40ce-893b-4348-8eac-4483d9bbf1fd-request.json",
+          "requestSHA256": "e9742d3f0ad6b76a4018038c24fd2221f6e1e7a6ab87bcba1f79679d83526f2c",
+          "responseFile": "524b40ce-893b-4348-8eac-4483d9bbf1fd-response.json",
+          "responseSHA256": "f56657514686f37bba77bdbf802638726998708c30f3c6f70eaaf570de699d25",
+          "finalAnswerTextMatch": true
+        }
+      ],
+      "verifierPassNotUsedAsCorrectness": true,
+      "seconds": 6.888873541000008
+    }
+  ],
+  "qualifications": [
+    "Ten diagnostic development turns are not reserved evaluation results and cannot establish product-wide accuracy.",
+    "Pairs share facts and source rules; five families are correlated and not ten independent accuracy samples.",
+    "No population sampling, independent professional adjudication or production browser verification is established.",
+    "No representative 95-percent accuracy claim is supported. Minor issues are retained as non-strict passes under the frozen protocol."
+  ],
+  "costSummary": {
+    "notAnAccuracyInput": true,
+    "paidRunOwnedByParent": true,
+    "providerAccountingNotReconciledByThisSourceReview": true
+  }
+}

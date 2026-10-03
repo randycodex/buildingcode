@@ -1,0 +1,47 @@
+{
+  "scope": "Post-freeze development priorities; diagnostic cases are now known regressions, not new reserved validation",
+  "productionChange": false,
+  "priorities": [
+    {
+      "priority": 1,
+      "problem": "Parent identity and prior child selection do not establish delivery of the current question's decisive subsection",
+      "evidence": ["context-hold-07-gas-shutoff-access-2", "context-hold-09-rooftop-access-3"],
+      "action": "Select current-detail relevant complete children and qualified companions within canonical identity and evidence budgets; preserve exact pin restrictions and record unresolved dependencies",
+      "acceptance": "Inspect actual writer requests for complete governing text; a retrieved source ID or verifier pass alone is insufficient"
+    },
+    {
+      "priority": 2,
+      "problem": "Quality guards consume unrelated discovered zoning sources and structured tables",
+      "evidence": ["context-hold-09-rooftop-access-1", "context-hold-11-office-loading-table-1", "context-hold-11-office-loading-table-2", "context-hold-11-office-loading-table-3"],
+      "action": "Scope each legal/table/definition guard to the active question and the claims and evidence it governs; retain checks for genuine unsupported conclusions and incomplete table bindings",
+      "acceptance": "Known correct narrow answers survive irrelevant evidence without allowing unsupported zoning claims"
+    },
+    {
+      "priority": 3,
+      "problem": "Narrow revision cannot edit citation relevance even though that field can contain rejected legal claims",
+      "evidence": ["context-hold-12-residential-parking-location-2"],
+      "action": "Expose citation explanatory text as an identified bounded edit target while keeping source identities and authoritative text immutable; freshly verify the complete repaired answer",
+      "acceptance": "An unnecessary definition attribution is removed from every narrative location without dropping a still-required operative citation"
+    },
+    {
+      "priority": 4,
+      "problem": "A correct main answer can be suppressed by an unnecessary method overview after bounded revision",
+      "evidence": ["context-hold-05-condensate-protection-2"],
+      "action": "Prefer the narrow requested conclusion and complete material conditions; evaluate whether a bounded source-checked removal repair can preserve supported claims without ignoring a substantive defect",
+      "acceptance": "Every retained legal claim is checked against supplied complete evidence; partial verified conclusions are distinguished from unresolved design choices"
+    },
+    {
+      "priority": 5,
+      "problem": "Some custom numeric project facts remain as stale semantic query hints after a current correction",
+      "evidence": ["Non-failing observations in heldout-review-a.json"],
+      "action": "Extend correction shadowing to labeled custom facts conservatively; keep current user values, hypothetical scope and existing-property inventory distinct",
+      "acceptance": "Corrected dimensions do not coexist with contradicted saved values as active query premises; unrelated facts remain available"
+    },
+    {
+      "priority": 6,
+      "problem": "A diagnostic replay and a current local source snapshot do not establish reliable hosted performance or current enacted authority",
+      "action": "After generic fixes, freeze a new candidate and unused ordinary-language multi-turn cohort; continue source-version ingestion, changed-text reindexing, cache invalidation, durable semantic spend accounting and hosted browser acceptance",
+      "acceptance": "Separate decisive-text recall, interpretation, delivered correctness, sustained family success, cost and latency; require professional review before broad accuracy claims"
+    }
+  ]
+}

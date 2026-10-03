@@ -19,8 +19,13 @@ import {
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
+import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
+import {
+  activeResearchRetrievalFacts, semanticResearchProjectFacts,
+  semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
+} from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-whitespace-containment-v53";
+export const researchEvidenceAssemblyVersion = "20261003-query-scope-context-v54";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -279,10 +284,6 @@ export function researchEvidenceRetrievalQuery({
   });
   const rootTopic = topicDecision.rootTopic.text;
   const immediateTopic = topicDecision.currentTopic.text || previousConversationTopic(previousMessages);
-  const factContext = prioritizedProjectFacts(normalizedQuestion, projectFactsForRetrieval(`${normalizedQuestion} ${rootTopic} ${immediateTopic}`, projectFacts))
-    .slice(0, 30)
-    .join("; ")
-    .slice(0, 4_000);
   const maximumQueryCharacters = 2_000;
   let retrievalQuery = normalizedQuestion;
   let previousTopicApplied = false;
@@ -312,6 +313,10 @@ export function researchEvidenceRetrievalQuery({
   ) {
     contextualTopics.push({ label: "Previous topic", text: immediateTopic });
   }
+  const activeProjectFacts = activeResearchRetrievalFacts({ question: normalizedQuestion, contextualTopics, projectFacts });
+  const factContext = prioritizedProjectFacts(normalizedQuestion, projectFactsForRetrieval(
+    `${normalizedQuestion} ${contextualTopics.map(context => context.text).join(" ")}`, activeProjectFacts))
+    .slice(0, 30).join("; ").slice(0, 4_000);
   if (contextualTopics.length) {
     const followUpPrefix = "Follow-up: ";
     let contextualQuery = `${followUpPrefix}${normalizedQuestion}`;
@@ -335,7 +340,8 @@ export function researchEvidenceRetrievalQuery({
   const inheritedAuthorityReferences = contextDependentFollowUp &&
       !extractResearchCodeReferences(normalizedQuestion).length &&
       !/\b\d{1,3}-\d{2,4}\b/.test(normalizedQuestion)
-    ? researchInheritedAuthorityReferences({ question: normalizedQuestion, previousMessages, topicDecision }) : [];
+    ? researchQueryInheritedReferences(normalizedQuestion,
+      researchInheritedAuthorityReferences({ question: normalizedQuestion, previousMessages, topicDecision })) : [];
   // Carry the discussed citation into a short follow-up. An explicit new
   // citation takes precedence over previously discussed provisions.
   if (inheritedAuthorityReferences.length) retrievalQuery = `${retrievalQuery}\nPreviously discussed provisions: ${inheritedAuthorityReferences.map(reference => reference.reference).join(", ")}`.slice(0, maximumQueryCharacters);
@@ -344,21 +350,23 @@ export function researchEvidenceRetrievalQuery({
   // the previous answer's detail. Short source titles resolve the subject;
   // previous measurements and conclusions do not enter a substantive query.
   const substantiveTerms = questionSpecificTerms(normalizedQuestion);
-  const shortSubjects = checkedPriorSources.map(source => source.title
-    .replace(/^(?:(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*)?\d+(?:[-.]\d+)*\s*[:.]?\s*/i, ""))
-    .filter(Boolean).join("; ").slice(0, 140);
-  const semanticContext = !contextDependentFollowUp ? ""
-    : substantiveTerms.length < 6 || topicDecision.signals?.returnToOriginal
-      ? (rootTopic || immediateTopic).slice(0, 400)
-      : shortSubjects;
+  const semanticContext = semanticResearchSubjectContext({ question: normalizedQuestion, contextualTopics,
+    checkedPriorSources, contextDependentFollowUp,
+    returnToOriginal: topicDecision.signals?.returnToOriginal, substantiveTerms });
   // Do not make explicitly excluded examples the subject of meaning search.
   // The complete question, including these exclusions, still goes to corpus
   // routing and the answer/verifier as the user's scenario.
-  const semanticQuestion = normalizedQuestion.replace(
-    /\b(?:this|it|these|those)\s+(?:is|are|was|were)\s+not\b[^?!]*?(?:[!.](?=\s|$)|$)/gi, ""
-  ).trim() || normalizedQuestion;
-  const semanticQuery = [semanticQuestion,
-    semanticContext && `Subject context: ${semanticContext}`].filter(Boolean).join("\n").slice(0, maximumQueryCharacters);
+  const semanticQuestion = semanticResearchScenarioText(normalizedQuestion);
+  let semanticQuery = semanticQuestion;
+  if (semanticContext) {
+    const prefix = "\nSubject context: ";
+    if (semanticQuery.length + prefix.length + semanticContext.length <= maximumQueryCharacters) semanticQuery += `${prefix}${semanticContext}`;
+  }
+  const semanticFactPrefix = "\nProject search context (supplied facts, not applicability): ";
+  const semanticFactContext = excludesSavedProjectFacts(normalizedQuestion, contextualTopics) ? ""
+    : semanticResearchProjectFacts({ question: normalizedQuestion, contextualTopics, projectFacts,
+      maximumCharacters: maximumQueryCharacters - semanticQuery.length - semanticFactPrefix.length });
+  if (semanticFactContext) semanticQuery += `${semanticFactPrefix}${semanticFactContext}`;
   let projectFactsApplied = false;
   if (factContext && !excludesSavedProjectFacts(normalizedQuestion, contextualTopics)) {
     const factsPrefix = "\nProject facts: ";
@@ -1725,7 +1733,76 @@ export async function assembleResearchEvidence({
     characterCount += additionalCharacters;
   }
 
-  // Operative sources and their direct dependencies receive their budget first.
+  // Same-authority interpretation context can help distinguish a specific
+  // exception from a general requirement. It is supporting enacted evidence,
+  // never a legal conclusion, mandatory output claim or substitute code family.
+  // Operative sources and their complete direct dependencies receive space first.
+  const interpretationPlan = researchInterpretationContextPlan({
+    anchors: sources.map(source => {
+      const candidate = candidates.find(candidate => candidate.codePrefix === source.codePrefix &&
+        candidate.sectionNumber === source.sectionNumber && sectionIdentity(candidate) === sectionIdentity(source));
+      const pin = pinnedEvidence.find(pin => pin.codePrefix === source.codePrefix &&
+        pin.sectionNumber === source.sectionNumber && sectionIdentity(pin) === sectionIdentity(source));
+      const inherited = candidate?.signals?.inheritedAuthorityReference === true;
+      return { ...source,
+        eligiblePrimary: source.canonicalContextResolved === true && source.retrievalDepth === 0 &&
+          [sourceOrigins.discovered, sourceOrigins.pinned].includes(source.origin) &&
+          !source.targetedDefinition && !source.discoveryPassageOnly && !source.referenceOnly &&
+          candidate?.referenceOnly !== true && pin?.referenceOnly !== true &&
+          candidate?.selectionMode !== "section_reference" && pin?.selectionMode !== "section_reference" &&
+          source.richSourceKind !== "amendment-history" &&
+          !["contextual", "irrelevant"].includes(source.evidencePriority?.evidenceRole) &&
+          !isDefinitionCandidate(source) && !source.evidencePriority?.functions?.includes("definition"),
+        ...(inherited ? { inheritedAuthorityReference: true, activeTopic: query.contextDependentFollowUp === true } : {})
+      };
+    }),
+    strategy: appliedStrategy, strictBoundary: strictPinnedEvidenceBoundary, pinnedEvidence,
+    explicitlyAuthorizedBroadening: appliedStrategy.mode === researchEvidenceStrategies.broad
+  });
+  let interpretationContextCount = 0;
+  for (const [index, reference] of interpretationPlan.references.entries()) {
+    const existing = sources.find(source => source.codePrefix === reference.codePrefix &&
+      source.sectionNumber === reference.sectionNumber && sameTopicDependencyCorpus(source, reference));
+    if (existing?.canonicalContextComplete && !existing.truncated) continue;
+    // A partial non-selected copy can be restored atomically. Exact user
+    // selections stay untouched; authorized broadening may append full context.
+    const replacement = existing?.origin !== sourceOrigins.pinned ? existing : null;
+    const remainingCharacters = supplementalCharacterCeiling - characterCount + (replacement?.text.length || 0);
+    if (remainingCharacters < 1) break;
+    const { source: resolved, limitation } = await resolveResearchInterpretationContext(reference, resolveSection);
+    if (!resolved) {
+      limitations.push({ ...limitation, text: `Optional edition-matched ${reference.codePrefix} interpretation context was unavailable. This does not establish that the operative rule is missing.` });
+      continue;
+    }
+    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters);
+    if (resolved.text.length > allowance) {
+      limitations.push({ kind: "optional-interpretation-context-budget", optional: true,
+        reference: `${reference.codePrefix} ${reference.sectionNumber}`,
+        text: "Complete optional interpretation context did not fit the remaining budget; operative evidence was preserved." });
+      continue;
+    }
+    const record = sourceRecord(resolved, {
+      origin: replacement?.origin || sourceOrigins.crossReference,
+      sourceID: replacement?.sourceID || deterministicSourceID(sourceOrigins.crossReference, resolved, `interpretation-${index}`),
+      relationship: `Same-edition interpretation context for operative ${reference.codePrefix} evidence`,
+      characterAllowance: allowance, canonicalResolved: true,
+      retrievalReason: "Optional same-authority enacted interpretation context",
+      retrievalVersion: interpretationPlan.version, retrievalDepth: replacement?.retrievalDepth ?? 1,
+      evidencePriority: replacement?.evidencePriority || resolved.evidencePriority, retrievedAt
+    });
+    if (!record.text || record.truncated) continue;
+    Object.assign(record, { interpretationContext: true, optional: record.evidencePriority?.claimCoverageRequired !== true,
+      referencePurpose: reference.referencePurpose, anchorSourceIDs: resolved.anchorSourceIDs,
+      anchorSectionIDs: resolved.anchorSectionIDs });
+    if (replacement) {
+      characterCount -= replacement.text.length;
+      Object.assign(replacement, record);
+    } else sources.push(record);
+    includedSectionIdentities.add(sectionIdentity(record));
+    characterCount += record.text.length;
+    interpretationContextCount += 1;
+  }
+
   // Optional definitions fill the remaining space; an oversized definitions
   // section must not displace the complete closing conditions of a short rule.
   const definitionCandidates = dependencyPlan?.corpusPrefix === "ZR" && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
@@ -1908,6 +1985,7 @@ export async function assembleResearchEvidence({
       targetedDefinitionCount,
       crossReferenceCount,
       topicDependencyCount,
+      interpretationContextCount,
       characterCount,
       resolverFailureCount,
       nonMaterialCandidateCount
