@@ -92,7 +92,7 @@ const historicalFailureExplanations = Object.freeze({
 });
 
 export function researchVerificationFailureReason(error = {}) {
-  if (error.code === "INVALID_RESEARCH_RESPONSE") return "verification_format";
+  if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_VERIFICATION"].includes(error.code)) return "verification_format";
   if (["INVALID_RESEARCH_CITATION", "INVALID_RESEARCH_WEB_CITATION"].includes(error.code)) return "verification_source";
   // Earlier findings may already have been repaired. Explain the unresolved
   // final review, rather than presenting a corrected issue as the current error.

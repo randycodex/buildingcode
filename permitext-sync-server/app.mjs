@@ -10863,11 +10863,28 @@ const researchDecisionFactVerificationSchema = {
   required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices", "missingFactsOnly", "projectFactQuestions", "priorReviewCorrection"]
 };
 
+function invalidResearchVerificationEnvelope(invariant, value, missingFactCount = 0) {
+  const error = new Error("The Research verifier returned an inconsistent result envelope.");
+  error.code = "INVALID_RESEARCH_VERIFICATION";
+  error.failureStage = "verification_envelope_validation";
+  error.verificationInvariant = invariant;
+  // Operational diagnostics describe structure only, never answer text,
+  // project facts, issue details or the rejected model's private narrative.
+  error.verificationEnvelopeDiagnostics = {
+    invariant,
+    passType: typeof value?.pass,
+    issueCount: Array.isArray(value?.issues) ? value.issues.length : null,
+    projectFactQuestionCount: Array.isArray(value?.projectFactQuestions) ? value.projectFactQuestions.length : null,
+    missingFactIndexCount: Array.isArray(value?.unnecessaryMissingFactIndices) ? value.unnecessaryMissingFactIndices.length : null,
+    missingFactCount,
+    envelopeHash: createHash("sha256").update(JSON.stringify(value) ?? "undefined").digest("hex")
+  };
+  return error;
+}
+
 function validateResearchVerification(value, missingFactCount = 0) {
   if (!value || typeof value !== "object" || typeof value.pass !== "boolean" || !Array.isArray(value.issues)) {
-    const error = new Error("The Research verifier returned an invalid result.");
-    error.code = "INVALID_RESEARCH_VERIFICATION";
-    throw error;
+    throw invalidResearchVerificationEnvelope("result_shape", value, missingFactCount);
   }
   const issues = value.issues.map((issue) => ({
     type: String(issue?.type || "").trim(),
@@ -10877,24 +10894,23 @@ function validateResearchVerification(value, missingFactCount = 0) {
   // valid indices in a failed response can authorize a candidate fact edit.
   const projectFactQuestions = value.projectFactQuestions ?? [];
   const indices = value.unnecessaryMissingFactIndices === undefined ? [] : value.unnecessaryMissingFactIndices;
-  if (
-    (value.missingFactsOnly !== undefined && typeof value.missingFactsOnly !== "boolean") ||
-    (value.priorReviewCorrection !== undefined && (typeof value.priorReviewCorrection !== "string" || value.priorReviewCorrection.length > 1500)) ||
-    !Array.isArray(projectFactQuestions) || projectFactQuestions.length > 6 ||
-    projectFactQuestions.some(q => typeof q !== "string" || !q.trim() || q.length > 500) ||
-    (!value.pass && projectFactQuestions.length > 0) ||
-    issues.length > 12 ||
-    issues.some((issue) => !researchVerificationIssueTypes.has(issue.type) || !issue.detail) ||
-    (value.pass && issues.length) ||
-    (!value.pass && !issues.length) ||
-    !Array.isArray(indices) || indices.length > 12 || new Set(indices).size !== indices.length ||
-    indices.some((index) => !Number.isSafeInteger(index) || index < 0 || index >= missingFactCount) ||
-    (indices.length > 0 && (value.pass || !issues.some((issue) => issue.type === "unnecessary_qualification")))
-  ) {
-    const error = new Error("The Research verifier returned inconsistent issues.");
-    error.code = "INVALID_RESEARCH_VERIFICATION";
-    throw error;
-  }
+  const invariant =
+    value.missingFactsOnly !== undefined && typeof value.missingFactsOnly !== "boolean" ? "missing_facts_only_type" :
+    value.priorReviewCorrection !== undefined && (typeof value.priorReviewCorrection !== "string" || value.priorReviewCorrection.length > 1500) ? "prior_review_correction" :
+    !Array.isArray(projectFactQuestions) ? "project_fact_questions_type" :
+    projectFactQuestions.length > 6 ? "project_fact_questions_count" :
+    projectFactQuestions.some(q => typeof q !== "string" || !q.trim() || q.length > 500) ? "project_fact_question_item" :
+    !value.pass && projectFactQuestions.length > 0 ? "project_fact_questions_on_failure" :
+    issues.length > 12 ? "issue_count" :
+    issues.some(issue => !researchVerificationIssueTypes.has(issue.type) || !issue.detail) ? "issue_item" :
+    value.pass && issues.length ? "pass_with_issues" :
+    !value.pass && !issues.length ? "failure_without_issues" :
+    !Array.isArray(indices) ? "missing_fact_indices_type" :
+    indices.length > 12 ? "missing_fact_indices_count" :
+    new Set(indices).size !== indices.length ? "missing_fact_indices_duplicates" :
+    indices.some(index => !Number.isSafeInteger(index) || index < 0 || index >= missingFactCount) ? "missing_fact_index_bounds" :
+    indices.length > 0 && (value.pass || !issues.some(issue => issue.type === "unnecessary_qualification")) ? "missing_fact_indices_without_failed_qualification" : null;
+  if (invariant) throw invalidResearchVerificationEnvelope(invariant, value, missingFactCount);
   return { pass: value.pass, issues, ...(value.priorReviewCorrection?.trim() ? { priorReviewCorrection: value.priorReviewCorrection.trim() } : {}), ...(projectFactQuestions.length ? { projectFactQuestions: projectFactQuestions.map(q => q.trim()) } : {}), missingFactsOnly: value.missingFactsOnly === true, ...(indices.length ? { unnecessaryMissingFactIndices: indices } : {}) };
 }
 
@@ -10905,6 +10921,11 @@ export async function openAIResearchVerification(question, evidence, interpretat
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
+  // A verifier-format repair reviews exactly the same immutable material.
+  // It cannot inherit a concurrent caller mutation or revise the answer.
+  evidence = structuredClone(evidence);
+  interpretation = structuredClone(interpretation);
+  options = { ...options, mappedScopeReview: structuredClone(options.mappedScopeReview) };
   const configuration = researchVerificationConfigurationForEvidence({
     ...researchModelConfiguration(process.env, options.model),
     ...(options.model ? { model: options.model } : {})
@@ -11111,6 +11132,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
     }
   };
   requestBody.instructions = researchZoningVerificationInstructions({ question, evidence, options }) || requestBody.instructions;
+  const originalRequestBody = structuredClone(requestBody);
+  const envelopeRetryState = options.verificationEnvelopeRetryState || { attempted: false };
   const { payload } = await requestResearchProvider({
     apiKey,
     requestBody,
@@ -11123,25 +11146,88 @@ export async function openAIResearchVerification(question, evidence, interpretat
     reserveProviderSpend: reserveResearchProviderSpend,
     settleProviderSpend: settleResearchProviderSpend
   });
-  let value;
-  try {
-    value = JSON.parse(outputTextFromResponse(payload));
-  } catch (error) {
-    if (error.code === "RESEARCH_REFUSAL") throw error;
-    const invalid = new Error("The Research verifier returned invalid structured output.");
-    invalid.code = "INVALID_RESEARCH_VERIFICATION";
-    invalid.providerStatus = payload?.status || null;
-    invalid.incompleteReason = payload?.incomplete_details?.reason || null;
-    invalid.providerUsage = researchUsageFromProviderPayload(payload);
-    throw invalid;
-  }
-  return {
-    result: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
-      verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }),
-    model: payload.model || configuration.model,
-    reasoningEffort: configuration.verificationReasoningEffort,
-    usage: researchUsageFromProviderPayload(payload, configuration.model)
+  const parseVerification = (responsePayload) => {
+    const usage = researchUsageFromProviderPayload(responsePayload, configuration.model);
+    let value;
+    try {
+      value = JSON.parse(outputTextFromResponse(responsePayload));
+    } catch (error) {
+      error.providerUsage = usage;
+      if (error.code === "RESEARCH_REFUSAL") throw error;
+      const invalid = new Error("The Research verifier returned invalid structured output.");
+      invalid.code = "INVALID_RESEARCH_VERIFICATION";
+      invalid.failureStage = "verification_output_parse";
+      invalid.providerStatus = responsePayload?.status || null;
+      invalid.incompleteReason = responsePayload?.incomplete_details?.reason || null;
+      invalid.providerUsage = usage;
+      throw invalid;
+    }
+    try {
+      return {
+        result: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
+          verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }),
+        model: responsePayload.model || configuration.model,
+        reasoningEffort: configuration.verificationReasoningEffort,
+        usage
+      };
+    } catch (error) {
+      error.providerStatus = responsePayload?.status || null;
+      error.incompleteReason = responsePayload?.incomplete_details?.reason || null;
+      error.providerUsage = usage;
+      // The rejected envelope is used only inside the guarded repair request,
+      // not in operational logs, stored answers or client-visible diagnostics.
+      error.rejectedVerificationEnvelope = value;
+      throw error;
+    }
   };
+  try {
+    return parseVerification(payload);
+  } catch (error) {
+    if (error.code !== "INVALID_RESEARCH_VERIFICATION" ||
+        error.failureStage !== "verification_envelope_validation" ||
+        payload?.status !== "completed" || envelopeRetryState.attempted) {
+      delete error.rejectedVerificationEnvelope;
+      throw error;
+    }
+    envelopeRetryState.attempted = true;
+    const rejectedEnvelope = error.rejectedVerificationEnvelope;
+    delete error.rejectedVerificationEnvelope;
+    const firstUsage = error.providerUsage;
+    const diagnostics = error.verificationEnvelopeDiagnostics;
+    const repairedRequestBody = {
+      ...originalRequestBody,
+      instructions: `${originalRequestBody.instructions} VERIFIER ENVELOPE REPAIR: the previous result violated the structural invariant listed below. Review the SAME proposed answer and supplied evidence under ALL original semantic checks; do not edit the answer, facts, citations, source text, schema or mapped-scope packet. The invalid prior verdict is untrusted and does not establish correctness. Return a fresh valid verdict. A passing verdict requires issues=[]; a failing verdict requires at least one supported issue and projectFactQuestions=[]. Missing-fact indices must be unique in-range indices of the unchanged missingFacts array, and only a failing unnecessary_qualification issue can authorize them. Never discard a substantive issue to obtain pass=true.`,
+      input: `${originalRequestBody.input}\n\nINVALID VERIFIER ENVELOPE — NOT AUTHORITY\n${JSON.stringify({ invariant: diagnostics.invariant, missingFactCount: diagnostics.missingFactCount, rejectedEnvelope })}`
+    };
+    console.warn(JSON.stringify({ event: "research_verification_envelope_repair", retry: 1,
+      ...diagnostics, requestHash: createHash("sha256").update(JSON.stringify(originalRequestBody)).digest("hex") }));
+    try {
+      // Do not reserve another request after this turn was cancelled between
+      // the settled first review and the format repair.
+      options.signal?.throwIfAborted();
+      const { payload: repairedPayload } = await requestResearchProvider({
+        apiKey,
+        requestBody: repairedRequestBody,
+        signal: options.signal,
+        timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000,
+        failureMessage: "The Research verifier request failed.",
+        maximumAttempts: 1,
+        failureCode: "RESEARCH_VERIFIER_ERROR",
+        reserveEvaluationSpend: reserveResearchEvaluationSpend,
+        reserveProviderSpend: reserveResearchProviderSpend,
+        settleProviderSpend: settleResearchProviderSpend
+      });
+      const repaired = parseVerification(repairedPayload);
+      return { ...repaired, usage: combinedResearchUsage(firstUsage, repaired.usage),
+        verificationEnvelopeRetryCount: 1, verificationEnvelopeDiagnostics: diagnostics };
+    } catch (repairError) {
+      delete repairError.rejectedVerificationEnvelope;
+      repairError.providerUsage = combinedResearchUsage(firstUsage, repairError.providerUsage);
+      repairError.verificationEnvelopeRetryCount = 1;
+      repairError.firstVerificationEnvelopeDiagnostics = diagnostics;
+      throw repairError;
+    }
+  }
 }
 
 function zoningResearchRepairPatchSchema(repairPacket) {
@@ -19650,6 +19736,9 @@ async function handleResearchConversationMessage(request, response) {
   }
   const researchOperationStartedAt = performance.now();
   const researchOperationCreatedAt = new Date().toISOString();
+  // One verifier-envelope repair for the entire turn, including later
+  // substantive answer revisions. This does not raise any spend allowance.
+  const verificationEnvelopeRetryState = { attempted: false };
   const researchOperation = {
     id: randomUUID(),
     createdAt: researchOperationCreatedAt,
@@ -20698,6 +20787,7 @@ async function handleResearchConversationMessage(request, response) {
       const verifyZoningRepair = async () => {
         const verification = await openAIResearchVerification(
           question, assembledEvidence, result.interpretation, context.userID, {
+            verificationEnvelopeRetryState,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts, conversationFactContext,
             webSupport, allowOfficialGuidanceOnly, codeBasis: answerCodeBasis,
@@ -20710,7 +20800,11 @@ async function handleResearchConversationMessage(request, response) {
         const checked = researchVerificationResultForWebContext(
           verification.result, { webSupport, webAttribution }
         );
-        verificationAttempts.push({ ...checked, model: verification.model, reasoningEffort: verification.reasoningEffort });
+        verificationAttempts.push({ ...checked, model: verification.model, reasoningEffort: verification.reasoningEffort,
+          ...(verification.verificationEnvelopeRetryCount ? {
+            verificationEnvelopeRetryCount: verification.verificationEnvelopeRetryCount,
+            verificationEnvelopeDiagnostics: verification.verificationEnvelopeDiagnostics
+          } : {}) });
         if (!checked.pass) {
           const error = new Error("The revised Zoning answer did not pass source verification.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
@@ -20809,6 +20903,7 @@ async function handleResearchConversationMessage(request, response) {
           result.interpretation,
           context.userID,
           {
+            verificationEnvelopeRetryState,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
@@ -20842,7 +20937,11 @@ async function handleResearchConversationMessage(request, response) {
         }
         verificationAttempts.push({
           ...contextualVerification,
-          model: verification.model, reasoningEffort: verification.reasoningEffort
+          model: verification.model, reasoningEffort: verification.reasoningEffort,
+          ...(verification.verificationEnvelopeRetryCount ? {
+            verificationEnvelopeRetryCount: verification.verificationEnvelopeRetryCount,
+            verificationEnvelopeDiagnostics: verification.verificationEnvelopeDiagnostics
+          } : {})
         });
         if (!contextualVerification.pass && !applyEvidenceBoundaryFallback()) {
           await repairZoningAnswer(
@@ -21023,6 +21122,7 @@ async function handleResearchConversationMessage(request, response) {
           result.interpretation,
           context.userID,
           {
+            verificationEnvelopeRetryState,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
@@ -21056,7 +21156,11 @@ async function handleResearchConversationMessage(request, response) {
         }
         verificationAttempts.push({
           ...contextualVerification,
-          model: verification.model, reasoningEffort: verification.reasoningEffort
+          model: verification.model, reasoningEffort: verification.reasoningEffort,
+          ...(verification.verificationEnvelopeRetryCount ? {
+            verificationEnvelopeRetryCount: verification.verificationEnvelopeRetryCount,
+            verificationEnvelopeDiagnostics: verification.verificationEnvelopeDiagnostics
+          } : {})
         });
         if (!contextualVerification.pass && (contextualVerification.priorReviewCorrection ||
             (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length) ||
@@ -21479,17 +21583,28 @@ async function handleResearchConversationMessage(request, response) {
     if (error.code === "RESEARCH_REQUEST_HANDLED") return;
     const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
     if (!researchReservationCompleted && ["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_CITATION",
-      "INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_WEB_CITATION"].includes(failureCode)) {
+      "INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_VERIFICATION", "INVALID_RESEARCH_WEB_CITATION"].includes(failureCode)) {
       if (researchReservationID) {
         await releaseResearchUsageReservation(context.userID, researchReservationID);
         researchReservationID = null;
       }
       console.warn(JSON.stringify({ event: "research_clarification_recovery", code: failureCode,
-        message: error.message, verificationAttempts: error.verificationAttempts || [] }));
+        message: error.message, verificationAttempts: error.verificationAttempts || [],
+        ...(error.verificationEnvelopeDiagnostics ? { verificationEnvelopeDiagnostics: error.verificationEnvelopeDiagnostics } : {}),
+        ...(error.firstVerificationEnvelopeDiagnostics ? { firstVerificationEnvelopeDiagnostics: error.firstVerificationEnvelopeDiagnostics } : {}),
+        ...(error.verificationEnvelopeRetryCount ? { verificationEnvelopeRetryCount: error.verificationEnvelopeRetryCount } : {}),
+        ...(failureCode === "INVALID_RESEARCH_VERIFICATION" ? { failureStage: error.failureStage || null,
+          providerStatus: error.providerStatus || null, providerUsage: error.providerUsage || null } : {}) }));
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: researchVerificationFailureReason(error) });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode, verificationAttemptCount: error.verificationAttempts?.length || 0,
+        ...(failureCode === "INVALID_RESEARCH_VERIFICATION" ? {
+          failureStage: error.failureStage || null,
+          verificationEnvelopeRetryCount: error.verificationEnvelopeRetryCount || 0,
+          ...(error.verificationEnvelopeDiagnostics ? { verificationEnvelopeDiagnostics: error.verificationEnvelopeDiagnostics } : {}),
+          ...(error.firstVerificationEnvelopeDiagnostics ? { firstVerificationEnvelopeDiagnostics: error.firstVerificationEnvelopeDiagnostics } : {})
+        } : {}),
         verificationIssueTypes: Array.from(new Set((error.verificationAttempts || []).flatMap(attempt =>
           (attempt.issues || []).map(issue => issue?.type).filter(Boolean)))),
         verificationAttemptDiagnostics: researchVerificationAttemptDiagnostics(error.verificationAttempts) });
