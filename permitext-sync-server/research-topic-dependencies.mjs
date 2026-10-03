@@ -5,7 +5,16 @@
 // guard standard. Guard scoping stays present; detailed guard design is separate.
 import { zoningContextExcerptVersion } from "./research-zoning-context-excerpts.mjs";
 
-export const researchTopicDependencyVersion = "20260930-transparency-applicability-definitions-v7";
+export const researchTopicDependencyVersion = "20261003-complete-dependency-budget-v8";
+
+// Complete definition groups supply the meaning of scope and exceptions. Keep
+// them atomic and ahead of optional framework branches when a budget is tight;
+// the original order within each group remains stable.
+export function orderedResearchTopicDependencies(plan) {
+  const references = plan?.references || [];
+  return [...references.filter(reference => reference.definitionLabels?.length),
+    ...references.filter(reference => !reference.definitionLabels?.length)];
+}
 
 const rampDependencies = Object.freeze([
   ["1012.6.1", "landing slope"],

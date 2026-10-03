@@ -1,0 +1,20 @@
+{
+  "candidate": "v14",
+  "providerCalls": 0,
+  "passedChecks": [
+    "research-topic-dependency-budget-contract: real canonical six-discovery replay under24k; 12completeframeworks/2completeentries/edition and pinnednegativechecks/counts",
+    "research-evidence-assembly-contract",
+    "research-indexed-reference-dependency-contract",
+    "research-transparency-applicability-contract",
+    "research-revision-verification-http-contract: mocked final gates",
+    "syntax/diff checks"
+  ],
+  "sourcePriority": {
+    "sourceCount": 18,
+    "characterCount": 22082,
+    "characterCeiling": 24000,
+    "definitionCharacters": 656
+  },
+  "modelsBudgetsPinnedBoundariesAndVerificationGatesUnchanged": true,
+  "liveAcceptance": "pending"
+}

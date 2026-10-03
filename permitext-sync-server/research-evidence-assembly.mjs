@@ -10,7 +10,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
-import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
+import { orderedResearchTopicDependencies, researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import {
   researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery,
@@ -25,7 +25,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-action-subject-query-context-v59";
+export const researchEvidenceAssemblyVersion = "20261003-complete-dependency-budget-v60";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1312,6 +1312,54 @@ export async function assembleResearchEvidence({
     ? Math.min(limits.maximumCharacters, pinnedCharacterCount + limits.maximumSupplementalCharacters)
     : limits.maximumCharacters;
 
+  let dependencyPlan = null;
+  const reservedTopicDependencies = new Map();
+  const dependencyKey = reference => `${reference.codePrefix}:${reference.sectionNumber}`;
+  const existingTopicDependency = reference => sources.find(source => source.codePrefix === reference.codePrefix &&
+    source.sectionNumber === reference.sectionNumber && sameTopicDependencyCorpus(source, dependencyPlan?.anchor));
+  const reservedTopicCharacters = () => [...reservedTopicDependencies.values()].reduce((total, entry) =>
+    total + (entry ? Math.max(0, entry.textLength - (existingTopicDependency(entry.reference)?.text.length || 0)) : 0), 0);
+  const reserveCompleteTopicDependencies = async () => {
+    if (dependencyPlan || pinnedEvidence.length || appliedStrategy.mode !== researchEvidenceStrategies.broad) return;
+    dependencyPlan = researchTopicDependencyPlan({ question: query.retrievalQuery, sources });
+    if (!dependencyPlan) return;
+    // A positively resolved anchor is required before reserving any space.
+    // Resolve complete, edition-matched dependencies once, then protect only
+    // their actual size. No provision is inferred or clipped to make it fit.
+    for (const reference of orderedResearchTopicDependencies(dependencyPlan)) {
+      const existing = existingTopicDependency(reference);
+      if (existing?.canonicalContextComplete) continue;
+      if ([...reservedTopicDependencies.values()].filter(entry => entry && !existingTopicDependency(entry.reference)).length >=
+          limits.maximumTopicDependencies) break;
+      const remaining = supplementalCharacterCeiling - characterCount - reservedTopicCharacters();
+      if (remaining < 1) break;
+      let resolved;
+      try {
+        resolved = await canonicalSection(async request => {
+          const value = await resolveSection(request);
+          if (value?.codePrefix !== reference.codePrefix || value?.sectionNumber !== reference.sectionNumber ||
+            !sameTopicDependencyCorpus(value, dependencyPlan.anchor)) throw new Error("Dependency corpus mismatch");
+          return value;
+        }, reference, sourceOrigins.crossReference);
+      } catch {
+        resolverFailureCount += 1;
+        reservedTopicDependencies.set(dependencyKey(reference), null);
+        continue;
+      }
+      const definitionExcerpt = reference.definitionLabels?.length ? targetedDefinitionExcerpt(resolved,
+        reference.definitionLabels.join(" "), { completeDefinitionLabels: reference.definitionLabels,
+          maximumCharacters: Math.min(limits.maximumCharactersPerSource, remaining + (existing?.text.length || 0)) }) : null;
+      if (reference.definitionLabels?.length && !definitionExcerpt) {
+        reservedTopicDependencies.set(dependencyKey(reference), null);
+        continue;
+      }
+      const textLength = (definitionExcerpt?.text || resolved.text).length;
+      if (textLength > limits.maximumCharactersPerSource ||
+          textLength - (existing?.text.length || 0) > remaining) continue;
+      reservedTopicDependencies.set(dependencyKey(reference), { reference, resolved, definitionExcerpt, textLength });
+    }
+  };
+
   let discoveredCount = 0;
   const includeRequestedHistory = (section, explicitlyPinned = false) => {
     if (strictPinnedEvidenceBoundary || discoveredCount >= limits.maximumDiscovered) return false;
@@ -1335,8 +1383,12 @@ export async function assembleResearchEvidence({
     if (discoveredCount >= limits.maximumDiscovered) break;
     const identity = sectionIdentity(candidate);
     if (!identity || includedSectionIdentities.has(identity)) continue;
-    const remainingCharacters = supplementalCharacterCeiling - characterCount;
-    if (remainingCharacters < 1) break;
+    const ownReservation = reservedTopicDependencies.get(dependencyKey(candidate));
+    const reservedCharacters = candidate.evidencePriority?.claimCoverageRequired === true ? 0
+      : reservedTopicCharacters() - (ownReservation
+        ? Math.max(0, ownReservation.textLength - (existingTopicDependency(candidate)?.text.length || 0)) : 0);
+    const remainingCharacters = supplementalCharacterCeiling - characterCount - reservedCharacters;
+    if (remainingCharacters < 1) continue;
     let resolved;
     try {
       resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered, {
@@ -1450,6 +1502,7 @@ export async function assembleResearchEvidence({
     includedSectionIdentities.add(sectionIdentity(resolved));
     characterCount += record.text.length;
     discoveredCount += 1;
+    await reserveCompleteTopicDependencies();
   }
 
   // A numerical question whose leading passages contain no requested measure
@@ -1481,15 +1534,9 @@ export async function assembleResearchEvidence({
     recoveryAttempted = true;
   }
 
-  // Definitions rank after controlling provisions, so a bounded discovery set can
-  // legitimately fill before a giant canonical definition section such as BC 202.
-  // Reserve a separate, small budget for query-targeted enacted definition entries.
-  const dependencyPlan = !pinnedEvidence.length && appliedStrategy.mode === researchEvidenceStrategies.broad
-    ? researchTopicDependencyPlan({ question: query.retrievalQuery, sources })
-    : null;
-  // A reviewed topic plan already reserves its governing dependencies. Keep
-  // that package within its established request budget; incidental dictionaries
-  // must not consume the space needed for those complete governing provisions.
+  // Finish any plan not identified until the final discovered anchor. Its
+  // complete dependencies share the original count and character ceilings.
+  await reserveCompleteTopicDependencies();
 
   await onStage?.("reviewing_provisions", "completed");
   await onStage?.("following_cross_references", "active");
@@ -1498,7 +1545,10 @@ export async function assembleResearchEvidence({
   // the existing character and provider-spend ceilings.
   let topicDependencyCount = 0;
   const missingTopicDependencies = [];
-  for (const [index, reference] of (dependencyPlan?.references || []).entries()) {
+  for (const [index, reference] of orderedResearchTopicDependencies(dependencyPlan).entries()) {
+    const reserved = reservedTopicDependencies.get(dependencyKey(reference));
+    const reservationAttempted = reservedTopicDependencies.has(dependencyKey(reference));
+    reservedTopicDependencies.delete(dependencyKey(reference));
     const existing = sources.find((source) => source.codePrefix === reference.codePrefix &&
       source.sectionNumber === reference.sectionNumber && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
     const completeDefinitionDependency = reference.definitionLabels?.length > 0;
@@ -1523,7 +1573,8 @@ export async function assembleResearchEvidence({
     }
     let resolved;
     try {
-      resolved = await canonicalSection(async (request) => {
+      if (reservationAttempted && !reserved) throw new Error("Dependency corpus mismatch");
+      resolved = reserved?.resolved || await canonicalSection(async (request) => {
         const value = await resolveSection(request);
         // Validate the resolver's own identity before canonicalSection can fill
         // omitted descriptor fields from the requested reference.
@@ -1532,11 +1583,11 @@ export async function assembleResearchEvidence({
         return value;
       }, reference, sourceOrigins.crossReference);
     } catch {
-      resolverFailureCount += 1;
+      if (!reservationAttempted) resolverFailureCount += 1;
       missingTopicDependencies.push(reference.sectionNumber);
       continue;
     }
-    const definitionExcerpt = completeDefinitionDependency ? targetedDefinitionExcerpt(resolved,
+    const definitionExcerpt = completeDefinitionDependency ? reserved?.definitionExcerpt || targetedDefinitionExcerpt(resolved,
       reference.definitionLabels.join(" "), { completeDefinitionLabels: reference.definitionLabels,
         maximumCharacters: Math.min(limits.maximumCharactersPerSource, remainingCharacters) }) : null;
     if (completeDefinitionDependency && !definitionExcerpt) {
