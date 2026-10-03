@@ -17697,3 +17697,22 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   cursor: pointer;
 }
 .reader-selection-research-action[hidden] { display: none; }
+
+/* Keep answer actions on one shared center line, including reported answers. */
+.research-answer-review-row > .research-evidence-reviewed {
+  align-self: start;
+}
+.research-answer-review-row > .research-feedback-compact {
+  padding-top: 0;
+  min-height: 32px;
+}
+.research-answer-review-row .research-feedback-icon {
+  height: 32px;
+}
+.research-answer-review-row .research-feedback-add-details {
+  min-height: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding-block: 0;
+}
