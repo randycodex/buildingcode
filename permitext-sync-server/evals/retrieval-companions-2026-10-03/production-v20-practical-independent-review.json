@@ -1,0 +1,1017 @@
+{
+  "sealed": true,
+  "reviewer": "Assistant independent source review of browser-delivered text; verifier status is not ground truth",
+  "cohort": "v20-practical-supplement",
+  "candidateCommit": "862571620678b02b27163d991e30879cff98a289",
+  "deploymentID": "dpl_9QxinqYxksdMPit6Yky15kh4WpSX",
+  "createdAt": "2026-10-03T17:56:38.108404+00:00",
+  "updatedAt": "2026-10-03T18:09:08.736613+00:00",
+  "plannedConversationCount": 4,
+  "plannedTurnCount": 8,
+  "reviewedTurns": 8,
+  "reviewScope": "Full8actual freshpracticalturns (4pairs) reviewed independently against unchanged separately sealed keys/fullcanonical, including every failed answer. Eight repeated-v19regressions are separate. No unseen private answer credit or95%claim.",
+  "capturePath": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v20-visible-answers.json",
+  "captureFileSHA256AtReview": "3de82861f9d48ed7ceda962fc09da5ec2e26fc0048bcf97e4e2af56aad13bbae",
+  "captureRowsAtReview": 16,
+  "frozenSupplementManifestSHA256": "5ab9111e92049be0d6f814f38701c65ee84f32ac81b3846affb84468fa81743a",
+  "frozenSupplementArtifactHashes": {
+    "questions-only.json": "c9b82a49edbd0d10aedd1779f5c940cc856080b98f997d7406b16ae1d5618942",
+    "reviewer-key.json": "d7bdae70c3fe9c433125a834cd70797834288fae849353303b3b6c2f95b11f3e",
+    "source-packets.json": "4df795ddd3e6aa90ebb16070597590d80c74ff3085bdc5d46779bfd632343a9f",
+    "source-audit.json": "83fde99649905037fcf82cee0f2db2ace1f4a2b882c03bbb76e8a2528ded6eca",
+    "protocol.json": "cfb3d4669858fbb431d316146ec5a6d8ab8be0d80dd8e637307bb963aec3a061"
+  },
+  "verifiedCanonicalSources": [
+    {
+      "packetID": "PC 416.5",
+      "sectionID": "11981",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "0017436add39f1b24007eda8405df0fa4235889c30ac9631d43bc3fd2a1181dd",
+      "textSHA256": "14bd161a6eebe90b337bceafa9cf0ebb3231d6a367646c801fb02fbad6fab309",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 4.html",
+        "sha256": "e24b3242e8e14af6fe95a8876bd57fe6500a3f8d04f0ecf85f183c7cc19d66cc",
+        "bytes": 333438
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "PC 607.1",
+      "sectionID": "12209",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "a369d5dc40340c5d948fc4c01e186cc8d1dca7d33a17ae12702d384522433e5d",
+      "textSHA256": "cab0221d683aedce123644cf89e3dff85a3bfd0e468078a697e49bd22ba49616",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
+        "sha256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
+        "bytes": 402348
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "PC 607.1.1",
+      "sectionID": "12210",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "36343e6932939c241a66cd51001beeefddb1718c6f1456874c20b5b943ab2b20",
+      "textSHA256": "99c75d1a52ab87c671c1e420739fd0465e336abc3539098c94f29272088fefbc",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
+        "sha256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
+        "bytes": 402348
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "PC 607.1.2",
+      "sectionID": "12211",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "242713d0bc2fbeb16e6b0fa31e56645738a29ba58de5de54809c11da75c3a815",
+      "textSHA256": "0e55ce6a74bb72d032cca724790f4393b81db33954560eb49de1340786f21c6f",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
+        "sha256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
+        "bytes": 402348
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "BC 1011.11",
+      "sectionID": "2329",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "3f3cfb30cae32d9ffc0f062ac1c60ebf949a24604055e4a96329bb993d3f081a",
+      "textSHA256": "5cdd93aa0d52ff83a355362d73ba9dcc98bbfd1fd0c3f49e031fd7dc813eff1c",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/10.html",
+        "sha256": "bcd0144f59fce3902beff150683b665769367cfcc81e27a2555c6b615333e23f",
+        "bytes": 975397
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "BC 1014.1",
+      "sectionID": "2373",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "82a69cbfb49ee7b81d8c403f4fdb1c4d652160c81f3f77c83a9dd91f6204e6dc",
+      "textSHA256": "d3210d4d0a0dfabddee19badb642d363c3d1aca2fae5520a53cd01f411000ded",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/10.html",
+        "sha256": "bcd0144f59fce3902beff150683b665769367cfcc81e27a2555c6b615333e23f",
+        "bytes": 975397
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "BC 1014.6",
+      "sectionID": "2380",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "4507cf817c8756fb2bbe2e6e815cef62853a53833b6649d361b3a47c60aab70d",
+      "textSHA256": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/10.html",
+        "sha256": "bcd0144f59fce3902beff150683b665769367cfcc81e27a2555c6b615333e23f",
+        "bytes": 975397
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "MC 401.4",
+      "sectionID": "10406",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "4b15730a750458d030ee3d8d8a82aeb35ef951ddb93e8ace387096a21e5cc0b6",
+      "textSHA256": "a4b230aaaadbd5c7d80c1163504dd7291a1ab42a179262ff9463392c5bc40044",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 4.html",
+        "sha256": "aa987a57bc2d68b95016e8e5fae77e5e4982ce7e80f6fb92081c850075bda40d",
+        "bytes": 364401
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "MC 501.3.1",
+      "sectionID": "10455",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "bb4383b51fd01d74981e8b5e7a848b1242a76d8cd697f583438964d72b9e810a",
+      "textSHA256": "e818e378f393ae0d9850683d4a17d53b82861f33efb5bc013478490e33a7d393",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 5.html",
+        "sha256": "28f46999f485048d8c06e1410e4b00c9442f1fe90b8dc8643081434274579fbe",
+        "bytes": 430346
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "FC 912",
+      "sectionID": "31004767",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-fire-code",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "codeEdition": "2022 NYC Fire Code — current consolidated text",
+        "applicabilityStatus": "current-consolidation"
+      },
+      "bodySHA256": "f4200bc4f0becc303e055c8e523472259a26d9838927ef82ed47a5ba88f38be2",
+      "textSHA256": "6ecc8d414f319ec530edf1a5f5d3939d79df79a40fd86cb0432e597f5b81ce2d",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004767.json",
+        "sha256": "e75c075822dd34e92d8a4aaf7852aec1d5302cf6956050c513b28a47bed866c3",
+        "bytes": 16198
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "BC 912.4",
+      "sectionID": "2044",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "0ea2b1fe2fddc626878d54c07ae8e035cd949b4edfa461a5e1142b84adc15d57",
+      "textSHA256": "29d6233582776fc000f4ed725efd0fe87d04eccef2ed7117a1d366336dfffcd1",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/9.html",
+        "sha256": "88d0b3180d4e535df4013fa144cd5c4e41ab24d025c66a91c3cbe70f35b0e1ff",
+        "bytes": 836918
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    },
+    {
+      "packetID": "BC 912.4.2",
+      "sectionID": "2046",
+      "identity": {
+        "jurisdiction": "New York City",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "applicabilityStatus": "current-enacted-edition"
+      },
+      "bodySHA256": "5da5fb145c5fff7e1e922edeae35814953372c67f85f7362921f005575e83795",
+      "textSHA256": "91ac9d8a468bc0c7e47653ceea1c8c1f0321515d7e9e98f328ae99a8eb3427ef",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/9.html",
+        "sha256": "88d0b3180d4e535df4013fa144cd5c4e41ab24d025c66a91c3cbe70f35b0e1ff",
+        "bytes": 836918
+      },
+      "audit": {
+        "appBodyResolver": "researchBodyForCatalogSection",
+        "canonicalBodyComplete": true,
+        "excerptClipping": false,
+        "sourceMetadataEstablishesProjectApplicability": false
+      }
+    }
+  ],
+  "additionalCanonicalSourceChecks": [
+    {
+      "reference": "PC 604.4",
+      "resolver": "researchBodyForCatalogSection",
+      "canonicalSourceSnapshotPath": "/tmp/permitext-v20-pc6044-canonical.json",
+      "canonicalSourceSnapshotSHA256": "ae96433aaa13e7b6eb331bc53ccb275711353d5056d2586295b309ca0438adb5",
+      "textSHA256": "42148cf60caaf48ba62c0f7b019e6efbc12f03b70ebf29bc3323650068b1214b",
+      "physicalSource": {
+        "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
+        "sha256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
+        "bytes": 402348
+      },
+      "reviewScope": "Full canonical consumption table and notes/exception inspected only for initial delivered ancillary claim. Frozen rubric unchanged."
+    }
+  ],
+  "rows": [
+    {
+      "id": "practical-01-01",
+      "cohort": "v20-practical-supplement",
+      "grade": "withheld",
+      "question": "What do we need to prevent scalding at the lavatory in the ground-floor public restroom?",
+      "deliveredAnswerText": "The supplied 2022 NYC Construction Codes excerpts do not establish an anti-scald temperature limit or require a particular temperature-limiting device at the public-restroom lavatory, so I can’t determine from this packet what scald-prevention measure is required. The supplied lavatory flow-rate limits address water consumption, not water temperature (PC § 604.4).",
+      "deliveredAnswerSHA256": "66be2f0c1a1694ac3a7f7103d5b6fcae11eb29e48e888de658ed714fae8ae2b1",
+      "visibleCaptureTextSHA256": "8f47ddd4b6fe70bc7e5316d9d22f658ad909158fabd89d8822767e79dba9aaf1",
+      "capturedAt": "2026-10-03T17:49:37.903Z",
+      "displayedDuration": "00:32",
+      "substantiveAnswerDelivered": false,
+      "askedOperativeConclusionDelivered": false,
+      "strictCompleteCorrect": false,
+      "operativeConclusionReview": "The requested scald-prevention baseline is explicitly not delivered. Ordinary public hand-washing premises suffice for explaining416.5 approved ASSE1070 tempered-water protection,607.1.2 maximum110°F, and the regulated point-of-use-heater exception. Correctly separating604.4 consumption from temperature is an ancillary explanation, not an answer to the asked safety requirement.",
+      "sourceClauseReasons": [
+        {
+          "reference": "PC 416.5",
+          "reason": "Public customer/patron/visitor hand-washing facilities require tempered delivery through approved ASSE1070temperature-limiting device; exception for regulated point-of-use heaters retained. No additional project fact is needed to explain this baseline."
+        },
+        {
+          "reference": "PC 607.1.1",
+          "reason": "Water-heater thermostat shall not serve as required fixture delivery-temperature limiting means. Explicit central-heater premise does not invoke the416.5point-of-use exception."
+        },
+        {
+          "reference": "PC 607.1.2",
+          "reason": "Tempered-water limiting device conforms toASSE1070and limits delivery to110°F(43°C); clause does not supersede required shower protection. The initial baseline omits this numerical cap; the follow-up central-setting question is resolved by thermostat prohibition without having to restate a cap it does not purport to approve."
+        },
+        {
+          "reference": "PC 604.4",
+          "reason": "Full canonical table/notes and exceptions reviewed: flow/consumption quantities, not anti-scald temperature protection. Correct collateral statement does not replace needed416.5/607.1.2rules."
+        }
+      ],
+      "materiallyFalseOperativeConclusionIdentified": false,
+      "materialErrorAbsenceScope": "Only reviewed delivered text and complete canonical public-lavatory clauses; no claim about unseen drafts or general code-answer accuracy. Initial statement is a packet-limited nonanswer, not an assertion that enacted law has no protection rule.",
+      "usefulness": {
+        "rating": "not_useful_for_requested_safety_baseline",
+        "notes": "No substantive anti-scald method,110°Fcap or point-of-use exception is supplied. Asking the same question again is not needed to retrieve available canonical rules."
+      },
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "PC 416.5",
+          "PC 607.1.2"
+        ],
+        "accountingEvidenceReferences": [
+          "PC 405.3.2",
+          "PC 405.3.4",
+          "PC 604.4",
+          "BC 1109.2.3",
+          "PC 107.5",
+          "PC 410.4",
+          "BC 1109.2.1.2",
+          "PC 201.4",
+          "PC 420.5",
+          "BC 1109.2.1",
+          "PC 102.1",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "actualWriterExcerptCompleteness": "Unknown: complete actual writer request was not supplied. Full frozen canonical packets independently reviewed; accounting references only establish listed coverage.",
+        "partialCoverageGap": "Initial accounting has604.4consumption and unrelated lavatory/accessibility records but no416.5,607.1.1or607.1.2. The delivered answer explicitly says it cannot establish anti-scald protection; decisive enacted sources available in frozen library are missing from this listed packet."
+      },
+      "failureStage": "ordinary_language_decisive_safety_source_retrieval_gap",
+      "reviewerKeyCaveat": "Initial public-hand-washing question requires a baseline, not final installation approval. Follow-up key requires direct thermostat-only No and retains point-of-use exception; numeric cap is a supporting rather than separately required repeat for that narrower question.",
+      "accounting": {
+        "path": "/tmp/permitext-production-v20-practical-01-01.accounting.json",
+        "sha256": "fed5650a0178a960cb862e7804cefd4429f2b81b427095ef03726bb45d942e2d",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "estimatedProviderCostUSD": 0.009506,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "retrievalMilliseconds": 23935,
+        "durationMilliseconds": 32851
+      }
+    },
+    {
+      "id": "practical-01-02",
+      "cohort": "v20-practical-supplement",
+      "grade": "correct",
+      "question": "The central water heater would be set to 110°F. Can we rely on its thermostat and leave out the temperature-limiting device at the lavatory?",
+      "deliveredAnswerText": "No. A water-heater thermostat cannot serve as the required temperature-limiting means, even if set to 110°F (PC § 607.1.1). For lavatories in public toilet facilities provided for customers, patrons, or visitors, tempered water must be delivered through an approved ASSE 1070 temperature-limiting device. The stated exception applies to a point-of-use heater whose outlet is regulated to provide tempered water—not to the proposed central heater (PC § 416.5).",
+      "deliveredAnswerSHA256": "716dd4a0121f3075765d7c361f6dda6b03f482ccf13c0cb2095a87980618dd48",
+      "visibleCaptureTextSHA256": "6cbbd74f9900638a97df4133b49d86ef5eb7e753b4c91a750c77ecbcd391b9d3",
+      "capturedAt": "2026-10-03T17:51:14.327Z",
+      "displayedDuration": "00:37",
+      "substantiveAnswerDelivered": true,
+      "askedOperativeConclusionDelivered": true,
+      "strictCompleteCorrect": true,
+      "operativeConclusionReview": "Direct No is supported by607.1.1: a water-heater thermostat cannot serve as the code-required maximum fixture-delivery temperature limiting means, even with110°Fsetting. Public customer/patron/visitor lavatory must receive tempered water through approved ASSE1070device under416.5; its regulated point-of-use heater exception is preserved and correctly distinguished from the stated central heater. No final installation approval or categorical alternate-arrangement prohibition is claimed.",
+      "sourceClauseReasons": [
+        {
+          "reference": "PC 416.5",
+          "reason": "Public customer/patron/visitor hand-washing facilities require tempered delivery through approved ASSE1070temperature-limiting device; exception for regulated point-of-use heaters retained. No additional project fact is needed to explain this baseline."
+        },
+        {
+          "reference": "PC 607.1.1",
+          "reason": "Water-heater thermostat shall not serve as required fixture delivery-temperature limiting means. Explicit central-heater premise does not invoke the416.5point-of-use exception."
+        },
+        {
+          "reference": "PC 607.1.2",
+          "reason": "Tempered-water limiting device conforms toASSE1070and limits delivery to110°F(43°C); clause does not supersede required shower protection. The initial baseline omits this numerical cap; the follow-up central-setting question is resolved by thermostat prohibition without having to restate a cap it does not purport to approve."
+        }
+      ],
+      "materiallyFalseOperativeConclusionIdentified": false,
+      "materialErrorAbsenceScope": "Only reviewed delivered text and complete canonical public-lavatory clauses; no claim about unseen drafts or general code-answer accuracy. Initial statement is a packet-limited nonanswer, not an assertion that enacted law has no protection rule.",
+      "usefulness": {
+        "rating": "useful_direct_answer",
+        "notes": "Concise direct answer supplies the necessary device standard and qualified exception, without demanding system details before rejecting thermostat-only substitution."
+      },
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "PC 607.1.1",
+          "PC 416.5"
+        ],
+        "accountingEvidenceReferences": [
+          "PC 607.1.1",
+          "PC 607.1.2",
+          "PC 604.4",
+          "PC 408.3",
+          "PC 501.6",
+          "PC 416.5",
+          "PC 424.5",
+          "PC 607.2",
+          "PC 1501.3",
+          "PC 607.2.2",
+          "PC 608.1",
+          "PC 702.1",
+          "PC 702.2",
+          "PC 702.3",
+          "PC 702.4",
+          "PC 1102.4",
+          "PC 102.1"
+        ],
+        "actualWriterExcerptCompleteness": "Unknown: complete actual writer request was not supplied. Full frozen canonical packets independently reviewed; accounting references only establish listed coverage.",
+        "partialCoverageGap": "Follow-up accounting lists607.1.1,607.1.2and416.5; operative prohibition/device/exception all delivered accurately. No private draft or verifier-pass correctness credit."
+      },
+      "failureStage": null,
+      "reviewerKeyCaveat": "Initial public-hand-washing question requires a baseline, not final installation approval. Follow-up key requires direct thermostat-only No and retains point-of-use exception; numeric cap is a supporting rather than separately required repeat for that narrower question.",
+      "accounting": {
+        "path": "/tmp/permitext-production-v20-practical-01-02.accounting.json",
+        "sha256": "a9d5ffc3944feee8a68dc6168ba1d8d9b320824df4a825760b3cf143ac8f9ee6",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "estimatedProviderCostUSD": 0.013978,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "retrievalMilliseconds": 24453,
+        "durationMilliseconds": 37951
+      }
+    },
+    {
+      "id": "practical-02-01",
+      "cohort": "v20-practical-supplement",
+      "grade": "minor_issue",
+      "question": "For the enclosed common exit stair, how far should the handrail extend past the top and bottom of each flight?",
+      "deliveredAnswerText": "For a common exit stair, where handrails are not continuous between flights, each handrail must extend horizontally at least 12 inches beyond the top riser, and continue sloping for one tread depth beyond the bottom riser. The extensions must follow the direction of the stair flight. (BC § 1014.6)\n\nThe stated exceptions are limited: handrails within certain dwelling units may extend only from top riser to bottom riser; handrails serving assembly aisles may follow § 1029.15; and handrails for alternating tread devices or ship ladders need not extend beyond the risers. The supplied facts do not suggest those exceptions apply to this common exit stair.",
+      "deliveredAnswerSHA256": "2e0809dc9528107528437c4861f1cd3d00e011b76ded7f685ae44d3ddac0e5b3",
+      "visibleCaptureTextSHA256": "ae27f946a60bfd30e703a7a60641d9a12ee9e43e1a6da87e707aa399e93a9008",
+      "capturedAt": "2026-10-03T17:53:18.501Z",
+      "displayedDuration": "00:09",
+      "substantiveAnswerDelivered": true,
+      "askedOperativeConclusionDelivered": true,
+      "strictCompleteCorrect": false,
+      "operativeConclusionReview": "Correct geometry: if not continuous between flights, top at least12inches horizontal, bottom one-tread-depth sloped, following flight direction. Qualified exception summary does not automatically exempt common stair. Frozen baseline key also explicitly requires termination by return to wall/guard/walking surface or adjacent-flight continuity; delivered first answer omits that detail. Minor omission, not a false asked distance or approval of unsafe termination.",
+      "sourceClauseReasons": [
+        {
+          "reference": "BC 1014.6, main clauses",
+          "reason": "Noncontinuous stair-flight rails extend12inches horizontally beyond top riser and continue sloping one tread depth beyond bottom riser in flight direction. Rails must also return to wall/guard/walking surface or continue to adjacent flight; return and extension are simultaneous distinct constraints. Ramp top/bottom12inchhorizontal geometry is not substituted."
+        },
+        {
+          "reference": "BC 1014.6, exceptions1–4",
+          "reason": "Reviewed full accessibility-qualified internal dwelling-unit exceptions, Type B+NYC multistory conditions, assembly aisle reference, alternating-tread/ship-ladder relief. Stated enclosed common exit stair is not an internal-dwelling-unit/assembly-aisle/device scenario. A wall return is not an exception."
+        },
+        {
+          "reference": "BC 1014.1 and1011.11",
+          "reason": "Stairway handrails are governed by1014extension provisions; other strength/attachment, side-count and glass requirements are not silently approved by this narrow extension answer."
+        }
+      ],
+      "materiallyFalseOperativeConclusionIdentified": false,
+      "materialErrorAbsenceScope": "Only delivered extension/termination claims and stated common-stair context. First-answer missing termination detail retained as minor, not credited as strict key completion. No full stair installation approval inferred.",
+      "usefulness": {
+        "rating": "useful_geometry_baseline_minor_detail_omitted",
+        "notes": "Concise correct distances/direction and exception-scope distinction. A short termination-return sentence would complete the frozen baseline; no missing project fact blocks the given distances."
+      },
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "BC 1014.6"
+        ],
+        "accountingEvidenceReferences": [
+          "BC 1007.1.1",
+          "BC 1007.1.3",
+          "BC 1014.6",
+          "BC 1011.11",
+          "BC 403.5.1",
+          "BC 1011.7.3",
+          "BC 1006.3.2",
+          "BC 1009.3",
+          "BC 1011.7.4",
+          "BC 403.5.2",
+          "BC 1006.2.1",
+          "BC 903.3.1.1",
+          "BC 1107.2.5",
+          "BC 1029.15",
+          "BC 1509.2",
+          "BC 903.3.1.2",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "actualWriterExcerptCompleteness": "Unknown: actual writer request not supplied. Canonical1014.6 full body including closing exceptions independently verified, not verifier-pass credit.",
+        "partialCoverageGap": "1014.6 appears in accounting and correct geometry/limited exceptions are delivered, but separate required termination sentence is absent. Source-ID evidence cannot establish whether it was omitted from writer packet or answer."
+      },
+      "failureStage": "baseline_termination_detail_omission",
+      "reviewerKeyCaveat": "Minor score for first answer honors explicit frozen termination check while recognizing correct asked distance geometry. Tread depth determines a project dimension but is not needed to explain the one-tread-depth rule. Full installation/device approval is outside the question.",
+      "accounting": {
+        "path": "/tmp/permitext-production-v20-practical-02-01.accounting.json",
+        "sha256": "be3498f0893fb896b0966f050e7ff36ad9271114944a1c4f6d557357c01ce86f",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "estimatedProviderCostUSD": 0.012585,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "retrievalMilliseconds": 1913,
+        "durationMilliseconds": 9294
+      }
+    },
+    {
+      "id": "practical-02-02",
+      "cohort": "v20-practical-supplement",
+      "grade": "correct",
+      "question": "The lower end would stop directly above the bottom riser, then return into the wall. Is that enough?",
+      "deliveredAnswerText": "No—for the enclosed common exit stair described, returning into the wall directly above the bottom riser is not enough. Where the handrail is not continuous between flights, it must continue to slope for one tread depth beyond the bottom riser, in the direction of the stair flight. A wall return satisfies the termination requirement, but does not replace that extension. (2022 BC § 1014.6)",
+      "deliveredAnswerSHA256": "1bd6a09940e9210ec4311f8cb29c3d62660b64fd2813d2919a6d2bfea849fd6e",
+      "visibleCaptureTextSHA256": "e30edbc8a4fe94a1191618d8551c62e5d386a3bb8fd0d0173c903e5522f16551",
+      "capturedAt": "2026-10-03T17:55:21.412Z",
+      "displayedDuration": "00:44",
+      "substantiveAnswerDelivered": true,
+      "askedOperativeConclusionDelivered": true,
+      "strictCompleteCorrect": true,
+      "operativeConclusionReview": "Correct direct No: the described noncontinuous lower rail stopping above the bottom riser lacks the one-tread-depth sloped extension. Returning to the wall meets an independent termination requirement and cannot replace extension. Common enclosed stair context retained; no unsupported private-dwelling/device exception applied.",
+      "sourceClauseReasons": [
+        {
+          "reference": "BC 1014.6, main clauses",
+          "reason": "Noncontinuous stair-flight rails extend12inches horizontally beyond top riser and continue sloping one tread depth beyond bottom riser in flight direction. Rails must also return to wall/guard/walking surface or continue to adjacent flight; return and extension are simultaneous distinct constraints. Ramp top/bottom12inchhorizontal geometry is not substituted."
+        },
+        {
+          "reference": "BC 1014.6, exceptions1–4",
+          "reason": "Reviewed full accessibility-qualified internal dwelling-unit exceptions, Type B+NYC multistory conditions, assembly aisle reference, alternating-tread/ship-ladder relief. Stated enclosed common exit stair is not an internal-dwelling-unit/assembly-aisle/device scenario. A wall return is not an exception."
+        },
+        {
+          "reference": "BC 1014.1 and1011.11",
+          "reason": "Stairway handrails are governed by1014extension provisions; other strength/attachment, side-count and glass requirements are not silently approved by this narrow extension answer."
+        }
+      ],
+      "materiallyFalseOperativeConclusionIdentified": false,
+      "materialErrorAbsenceScope": "Only delivered extension/termination claims and stated common-stair context. First-answer missing termination detail retained as minor, not credited as strict key completion. No full stair installation approval inferred.",
+      "usefulness": {
+        "rating": "useful_direct_answer",
+        "notes": "Concise one-decisive-reason response explains why wall return does not waive lower extension; no redundant factual intake."
+      },
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "BC 1014.6"
+        ],
+        "accountingEvidenceReferences": [
+          "BC 1014.6",
+          "BC 1014.4",
+          "MC 606.2.3",
+          "BC 1011.5.5.3",
+          "BC 1029.15.2",
+          "BC Q105.1",
+          "BC K101.1",
+          "BC 403.3.1.1",
+          "BC 1006.3.2",
+          "BC 1029.15.3",
+          "BC 1107.2.5",
+          "BC 1029.15",
+          "BC 1029.15.1",
+          "BC 1009.3",
+          "BC 905.7",
+          "BC 905.4",
+          "BC 102.1",
+          "MC 102.1",
+          "BC 202"
+        ],
+        "actualWriterExcerptCompleteness": "Unknown: actual writer request not supplied. Canonical1014.6 full body including closing exceptions independently verified, not verifier-pass credit.",
+        "partialCoverageGap": "Delivered extension/return explanation matches full canonical1014.6. Source-reference presence alone does not establish full writer packet; no material delivered claim depends on unseen content."
+      },
+      "failureStage": null,
+      "reviewerKeyCaveat": "Minor score for first answer honors explicit frozen termination check while recognizing correct asked distance geometry. Tread depth determines a project dimension but is not needed to explain the one-tread-depth rule. Full installation/device approval is outside the question.",
+      "accounting": {
+        "path": "/tmp/permitext-production-v20-practical-02-02.accounting.json",
+        "sha256": "555c1f2063b8fb1781ebcce8d798d85ed8b61d3b75bdeb9574830d7048e42114",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "estimatedProviderCostUSD": 0.151166,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "retrievalMilliseconds": 24829,
+        "durationMilliseconds": 44263
+      }
+    },
+    {
+      "id": "practical-03-01",
+      "cohort": "v20-practical-supplement",
+      "grade": "minor_issue",
+      "question": "Where should we place the outdoor-air intake for the ground-floor retail space if there’s a loading dock nearby?",
+      "deliveredAnswerText": "Keep the retail outdoor-air intake at least 10 feet horizontally from the loading dock. If it is closer, the code permits that only when the intake is at least 25 feet vertically above the dock. If neither arrangement is achievable, the supplied rule gives an alternative: place the intake at least 3 feet below contaminant sources within 10 feet. (2022 NYC MC § 401.4, Items 3–4)\n\nI can’t identify a specific spot without the proposed intake and dock locations and their elevations. The separate 20-foot-above-ground and 30-foot-from-exhaust/vehicular-exhaust-area distances apply only to the specified high-rise office-occupancy case, not simply because a loading dock is nearby. (2022 NYC MC § 401.4, Item 2)\n\nWhat are the proposed intake’s horizontal distance from the dock and its elevation relative to the dock?",
+      "deliveredAnswerSHA256": "8e4b22cf668045ca8b49d89aa2e16f76a0c301cee31aaecc88fffa47adbcd4ec",
+      "visibleCaptureTextSHA256": "554e66d3ad2574fa475083126566db76ef812e49044d3460d2cd85684f865cb2",
+      "capturedAt": "2026-10-03T17:57:56.418Z",
+      "displayedDuration": "00:47",
+      "substantiveAnswerDelivered": true,
+      "askedOperativeConclusionDelivered": true,
+      "strictCompleteCorrect": false,
+      "operativeConclusionReview": "Asked loading-dock baseline correct:10feet horizontal, listed-location lesser-horizontal permission if25feet vertically above. Item4conditional3feetbelow contaminant sources within10feet retains item3cannot-achieve prerequisite, reasonably described as fallback rather than automatic relaxation. Ancillary item2summary is numerically wrong: it groups vehicular-exhaust areas into30foot distance; actual item2requires20feetfrom such areas, while30feet applies to exhaust outlets/discharges. The answer expressly limits this to the unrelated specified high-rise-office case, so it does not change the retail dock conclusion; retain as minor ancillary threshold error, not strict complete correctness.",
+      "sourceClauseReasons": [
+        {
+          "reference": "MC 401.4, item3",
+          "reason": "Ordinary outdoor intakes10feethorizontally from hazardous/noxious sources. Only listed streets/alleys/parkinglots/loadingdocks receive lesser-horizontal permission with at least25feetvertically above those locations.6horizontal/26above satisfies this limited dock allowance; datum is dock, not general ground grade."
+        },
+        {
+          "reference": "MC 401.4, item4",
+          "reason": "Starts where item3requirements cannot be achieved, then requires opening at least3feetbelow sources within10feet. This is conditional fallback geometry in the text, not an unconditional option for any intake or authority to ignore independently applicable conditions. T1retains cannot-achieve prerequisite and source proximity; use of alternative is not itself a material error."
+        },
+        {
+          "reference": "MC 401.4, item2",
+          "reason": "Specified qualifying office intakes require20feetaboveground,30feetfrom exhaust outlets/other exhaust discharges,20feetfrom areas collecting vehicular exhaust. T1wrongly groups vehicular-exhaust areas under30feet, though explicitly keeps item2inapplicable to asked retail. This numerical flaw is recorded, not excused by correct citations."
+        },
+        {
+          "reference": "MC 401.4, items1,5,6 and closing exception;MC501.3.1item3",
+          "reason": "Lot-line/building spacing, qualifying GroupI/flood rules and GroupR-3exception remain separately scoped. This mixed retail setting is not automatically GroupR-3. Environmental exhaust exceptions under501.3.1carry airclass/flow/scope/crosscontamination requirements and do not automatically apply to loading-dock fumes; answer does not make that substitution."
+        }
+      ],
+      "materiallyFalseOperativeConclusionIdentified": false,
+      "ancillaryFalseNumericalRuleIdentified": true,
+      "materialErrorAbsenceScope": "Asked retail-dock separation conclusion is correct; first answer contains explicit ancillary office20vs30foot error classified minor because unrelated-office scope is expressly excluded from asked application. This is not a statement that every delivered numeric rule is accurate.",
+      "usefulness": {
+        "rating": "useful_loading_dock_baseline_ancillary_error",
+        "notes": "Useful normal/height allowance then targeted geometry question; requested geometry is needed for selecting a proposed spot, not to supply basic rule. Item2numeric aside is unnecessary and inaccurate."
+      },
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "MC 401.4"
+        ],
+        "accountingEvidenceReferences": [
+          "ZR 12-10",
+          "BC 403.7",
+          "MC 401.5",
+          "MC 401.4",
+          "ZR 74-84",
+          "BC 1206.3.2",
+          "BC 2111.14.3",
+          "ZR APPENDIX E",
+          "BC 510.8",
+          "ZR 79-32",
+          "MC 501.3.1",
+          "BC 102.1",
+          "MC 102.1",
+          "BC 202"
+        ],
+        "actualWriterExcerptCompleteness": "Unknown: actual writer request not supplied. Frozen full401.4including closing exceptions/amendment and501.3.1scope reviewed independently; accounting citation presence is not completeness proof.",
+        "partialCoverageGap": "Governing401.4listed and decisive dock/fallback content delivered. Optional item2numerical paraphrase error is actual delivered false collateral rule; cannot determine writer-packet vs paraphrase cause from accounting alone."
+      },
+      "failureStage": "ancillary_inapplicable_rule_numeric_paraphrase",
+      "reviewerKeyCaveat": "Frozen key preserved. Independent full-text audit catches item2numeric aside beyond minimal expected dock rule. Item4cannot-achieve proviso remains meaningful; no rewritten key or hardcoded candidate adjustment.",
+      "accounting": {
+        "path": "/tmp/permitext-production-v20-practical-03-01.accounting.json",
+        "sha256": "7070631c2ee6163db940c85f55fc0476fca395245079be5030d70dc814b2848f",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "estimatedProviderCostUSD": 0.012761,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "retrievalMilliseconds": 22844,
+        "durationMilliseconds": 47924
+      }
+    },
+    {
+      "id": "practical-03-02",
+      "cohort": "v20-practical-supplement",
+      "grade": "correct",
+      "question": "We have only 6 feet horizontally, but the intake would be 26 feet above the loading dock. Is that arrangement allowed?",
+      "deliveredAnswerText": "Yes—this satisfies the loading-dock separation rule. The 2022 NYC Mechanical Code permits an outdoor-air intake less than 10 feet horizontally from a loading dock when the intake opening is at least 25 feet vertically above the dock. Your proposed 6-foot horizontal separation and 26-foot vertical separation meet that allowance, exceeding the vertical minimum by 1 foot. (MC § 401.4, Item 3) This conclusion addresses loading-dock separation only, not overall intake compliance.",
+      "deliveredAnswerSHA256": "e2ce416c74a036c701f559d1d0bb3ac03697231799d04360c10d087f604e4c5d",
+      "visibleCaptureTextSHA256": "e54601268d9a99a1142c5620cea08546a49ddcdcdb56f143456a592fe9c7ac5e",
+      "capturedAt": "2026-10-03T17:59:35.466Z",
+      "displayedDuration": "00:41",
+      "substantiveAnswerDelivered": true,
+      "askedOperativeConclusionDelivered": true,
+      "strictCompleteCorrect": true,
+      "operativeConclusionReview": "Qualified Yes correctly applies item3:6feet horizontal is less than10but26feet vertically above the stated loading dock exceeds25feetby1. The answer explicitly limits conclusion to loading-dock separation and does not approve all intake/lot-line/other-contaminant requirements. No high-rise-office premise or separate Class1environmental-exhaust exception is imported.",
+      "sourceClauseReasons": [
+        {
+          "reference": "MC 401.4, item3",
+          "reason": "Ordinary outdoor intakes10feethorizontally from hazardous/noxious sources. Only listed streets/alleys/parkinglots/loadingdocks receive lesser-horizontal permission with at least25feetvertically above those locations.6horizontal/26above satisfies this limited dock allowance; datum is dock, not general ground grade."
+        },
+        {
+          "reference": "MC 401.4, item4",
+          "reason": "Starts where item3requirements cannot be achieved, then requires opening at least3feetbelow sources within10feet. This is conditional fallback geometry in the text, not an unconditional option for any intake or authority to ignore independently applicable conditions. T1retains cannot-achieve prerequisite and source proximity; use of alternative is not itself a material error."
+        },
+        {
+          "reference": "MC 401.4, item2",
+          "reason": "Specified qualifying office intakes require20feetaboveground,30feetfrom exhaust outlets/other exhaust discharges,20feetfrom areas collecting vehicular exhaust. T1wrongly groups vehicular-exhaust areas under30feet, though explicitly keeps item2inapplicable to asked retail. This numerical flaw is recorded, not excused by correct citations."
+        },
+        {
+          "reference": "MC 401.4, items1,5,6 and closing exception;MC501.3.1item3",
+          "reason": "Lot-line/building spacing, qualifying GroupI/flood rules and GroupR-3exception remain separately scoped. This mixed retail setting is not automatically GroupR-3. Environmental exhaust exceptions under501.3.1carry airclass/flow/scope/crosscontamination requirements and do not automatically apply to loading-dock fumes; answer does not make that substitution."
+        }
+      ],
+      "materiallyFalseOperativeConclusionIdentified": false,
+      "ancillaryFalseNumericalRuleIdentified": false,
+      "materialErrorAbsenceScope": "Asked retail-dock separation conclusion is correct; first answer contains explicit ancillary office20vs30foot error classified minor because unrelated-office scope is expressly excluded from asked application. This is not a statement that every delivered numeric rule is accurate.",
+      "usefulness": {
+        "rating": "useful_limited_yes",
+        "notes": "Clear limited Yes and1foot margin, followed by explicit overall-compliance boundary; no redundant fact intake."
+      },
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "MC 401.4"
+        ],
+        "accountingEvidenceReferences": [
+          "MC 401.4",
+          "MC 401.5",
+          "BC 3305.8.7.4",
+          "MC 607.5.6.1",
+          "MC 908.2",
+          "MC 506.3.8.1",
+          "MC 502.1.2",
+          "MC 403.3.1.1.2.3.3",
+          "MC 514.3",
+          "MC 608.2.3",
+          "BC 3305.8.6.1",
+          "MC 501.3.1",
+          "MC 504.4",
+          "MC 102.1",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "actualWriterExcerptCompleteness": "Unknown: actual writer request not supplied. Frozen full401.4including closing exceptions/amendment and501.3.1scope reviewed independently; accounting citation presence is not completeness proof.",
+        "partialCoverageGap": "401.4is listed and item3limited allowance accurately delivered, including specified datum. No global compliance conclusion inferred."
+      },
+      "failureStage": null,
+      "reviewerKeyCaveat": "Frozen key preserved. Independent full-text audit catches item2numeric aside beyond minimal expected dock rule. Item4cannot-achieve proviso remains meaningful; no rewritten key or hardcoded candidate adjustment.",
+      "accounting": {
+        "path": "/tmp/permitext-production-v20-practical-03-02.accounting.json",
+        "sha256": "a4c012ab5aebbcb54341e0011851a581c0aa1f46f82aedecbfaacb359041f785",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "estimatedProviderCostUSD": 0.104399,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "retrievalMilliseconds": 25612,
+        "durationMilliseconds": 41937
+      }
+    },
+    {
+      "id": "practical-04-01",
+      "cohort": "v20-practical-supplement",
+      "grade": "minor_issue",
+      "question": "For the fire department connection on the street wall, what clear space do we need to leave around it?",
+      "deliveredAnswerText": "Leave a working space at least 36 inches wide × 36 inches deep × 78 inches high in front of and to the sides of the wall-mounted fire department connection, unless otherwise required or approved by the Fire Commissioner. This space must be provided and maintained (2022 NYC Building Code § 912.4.2).",
+      "deliveredAnswerSHA256": "e2b7bbb834d1cbae433829e1a176cebbf102a62a5ac6326aa6323aae348515b2",
+      "visibleCaptureTextSHA256": "82cdc2a37f3e97f4decb57ceda90d03e6660431fd2f1cdd282a8bb3ec73a2104",
+      "capturedAt": "2026-10-03T18:01:54.236Z",
+      "displayedDuration": "00:42",
+      "substantiveAnswerDelivered": true,
+      "askedOperativeConclusionDelivered": true,
+      "strictCompleteCorrect": false,
+      "operativeConclusionReview": "Accurately supplies wall-mounted FDC working space36incheswide×36inchesdeep×78incheshigh in front/to sides, maintained, retaining FireCommissioner otherwise-required/approved exception. Frozen useful-baseline key also requires distinct immediate unobstructed access, which is omitted. Dimensions directly answer the asked clear-space question; omitted companion access rule is minor incompleteness, not false dimensions or approval of an obstruction.",
+      "sourceClauseReasons": [
+        {
+          "reference": "BC 912.4.2",
+          "reason": "Wall-mounted space must be at least36incheswide,36inchesdeep,78incheshigh in front/to sides, except otherwise required/approved by FireCommissioner.24inchdepthis12short absent established alternate. Front access is not replaced by mere visible hose couplings."
+        },
+        {
+          "reference": "FC 912.3 and912.3.2;BC912.4",
+          "reason": "Immediate unobstructed access separately required, in addition to dimensioned working space. Fence exception requires approved accessgate/emergencyoperation and signage/maintenance conditions, not a generic visible planter. FullFCbody/BCcompanion scopes reviewed; first answer omits access companion, second provides no substantive decision."
+        }
+      ],
+      "materiallyFalseOperativeConclusionIdentified": false,
+      "materialErrorAbsenceScope": "First-answer requested dimension rule is accurate; companion access omission remains minor under frozen key. Follow-up is a system nonanswer, so no private conclusion credited or material false delivered permission inferred.",
+      "usefulness": {
+        "rating": "useful_dimension_baseline_companion_access_omitted",
+        "notes": "Compact correct dimensions and Commissioner exception. A brief immediate-unobstructed-access clause would complete key baseline; no site-design facts needed to state it."
+      },
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "FC 912",
+          "BC 912.4.2"
+        ],
+        "accountingEvidenceReferences": [
+          "ZR 12-10",
+          "BC 912.4.2",
+          "BC 912.4.1",
+          "FC 912",
+          "BC 912.2.1.6",
+          "BC 912.2.1.1",
+          "ZR 124-31",
+          "BC 102.1"
+        ],
+        "actualWriterExcerptCompleteness": "Unknown: actual writer packet not supplied. BC912.4.2reference listed, independently complete canonical available; source-IDpresence is not complete actual writer text proof.",
+        "partialCoverageGap": "BC912.4.2andFC912listed; correct dimension clause delivered, immediate access clause omitted. Packet-vs-answer cause unknown."
+      },
+      "failureStage": "baseline_companion_access_rule_omission",
+      "reviewerKeyCaveat": "Immediate access is an explicit frozen baseline check alongside asked dimensions; treating omission as minor does not pretend asked dimensions wrong. Follow-up is withheld even though accountingstatuscompleted; clear canonical shortfall is not awarded as an unseen answer.",
+      "accounting": {
+        "path": "/tmp/permitext-production-v20-practical-04-01.accounting.json",
+        "sha256": "ec86932f5452f6f7230f0751d6fdd5f6e61c648748b7d37b3378261363326ff0",
+        "status": "completed",
+        "charged": true,
+        "failureCode": null,
+        "estimatedProviderCostUSD": 0.087472,
+        "providerRequestCount": 5,
+        "pendingProviderRequestCount": 0,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "retrievalMilliseconds": 26148,
+        "durationMilliseconds": 42612
+      }
+    },
+    {
+      "id": "practical-04-02",
+      "cohort": "v20-practical-supplement",
+      "grade": "withheld",
+      "question": "Could a planter leave only 24 inches in front of it if the hose couplings are still visible?",
+      "deliveredAnswerText": "Research couldn’t resolve this question from the sources it retrieved.\n\nYour question and conversation are saved. You don’t need to repeat the question.\n\nReport this issue\nSend",
+      "deliveredAnswerSHA256": "6c6df8e253dbbf6e3569ce0954a087444001d6d0590a5e76b0b7b2c0ddff196e",
+      "visibleCaptureTextSHA256": "2e5a03642ff862e615030010e1f2af83b140c7f2ff935ea50d5d1d4a5b09eac9",
+      "capturedAt": "2026-10-03T18:03:53.167Z",
+      "displayedDuration": "00:34",
+      "substantiveAnswerDelivered": false,
+      "askedOperativeConclusionDelivered": false,
+      "strictCompleteCorrect": false,
+      "operativeConclusionReview": "No operative answer is delivered to a simple planter-depth/visibility question. With stated24inchfrontdepth and no established Commissioner alternate, required36inchdepth leaves12inchshortfall; visible couplings do not replace immediate unobstructed access or working space. Governing BC912.4.2is listed in accounting. Safe structural logs show two failed deterministic gates with zoning_unbound_conclusion; missing retrieval cannot be assumed, and no private draft gets correctness credit.",
+      "sourceClauseReasons": [
+        {
+          "reference": "BC 912.4.2",
+          "reason": "Wall-mounted space must be at least36incheswide,36inchesdeep,78incheshigh in front/to sides, except otherwise required/approved by FireCommissioner.24inchdepthis12short absent established alternate. Front access is not replaced by mere visible hose couplings."
+        },
+        {
+          "reference": "FC 912.3 and912.3.2;BC912.4",
+          "reason": "Immediate unobstructed access separately required, in addition to dimensioned working space. Fence exception requires approved accessgate/emergencyoperation and signage/maintenance conditions, not a generic visible planter. FullFCbody/BCcompanion scopes reviewed; first answer omits access companion, second provides no substantive decision."
+        }
+      ],
+      "materiallyFalseOperativeConclusionIdentified": false,
+      "materialErrorAbsenceScope": "First-answer requested dimension rule is accurate; companion access omission remains minor under frozen key. Follow-up is a system nonanswer, so no private conclusion credited or material false delivered permission inferred.",
+      "usefulness": {
+        "rating": "no_operative_answer",
+        "notes": "Saved-conversation/report UI preserves question but supplies no24-versus36inchdecision. This is not a legitimate missing-fact clarification; frozen key has no needed unknown premise for the stated shortfall."
+      },
+      "decisiveCoverage": {
+        "canonicalNeeded": [
+          "FC 912",
+          "BC 912.4.2"
+        ],
+        "accountingEvidenceReferences": [
+          "ZR APPENDIX E",
+          "BC 912.4.2",
+          "BC 1020.2",
+          "BC 1004.1.3",
+          "ZR 62-64",
+          "BC 3202.2.1.2",
+          "BC 1004.3",
+          "BC 402.8.2",
+          "BC 102.1",
+          "BC 202"
+        ],
+        "actualWriterExcerptCompleteness": "Unknown: actual writer packet not supplied. BC912.4.2reference listed, independently complete canonical available; source-IDpresence is not complete actual writer text proof.",
+        "partialCoverageGap": "BC912.4.2is listed; source gap cannot be assigned merely because recovery copy mentions retrieved sources. Structural deterministic quality gate zoning_unbound_conclusion is observed rejection stage. Actual draft and source-binding flags unavailable, so exact trigger cannot be established."
+      },
+      "failureStage": "deterministic_quality_gate_zoning_unbound_conclusion",
+      "reviewerKeyCaveat": "Immediate access is an explicit frozen baseline check alongside asked dimensions; treating omission as minor does not pretend asked dimensions wrong. Follow-up is withheld even though accountingstatuscompleted; clear canonical shortfall is not awarded as an unseen answer.",
+      "accounting": {
+        "path": "/tmp/permitext-production-v20-practical-04-02.accounting.json",
+        "sha256": "dfcc7993dd4584a858b95a44cbd7db52dc7356eb57075df1bef9c3546d130796",
+        "status": "completed",
+        "charged": false,
+        "failureCode": "RESEARCH_VERIFICATION_FAILED",
+        "estimatedProviderCostUSD": 0.063462,
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "projectLinked": true,
+        "projectFactCount": 33,
+        "retrievalMilliseconds": 24499,
+        "durationMilliseconds": 34390
+      },
+      "safeStructuralTelemetry": {
+        "path": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v20-practical04-02-safe-structural-telemetry.json",
+        "sha256": "8de1fd6bf7d0fcbe97717226a06e4fe1d66af6904475734d4db91e580dccfc88",
+        "rawLogPath": "/tmp/permitext-production-v20-practical-04-02.jsonl",
+        "rawLogSHA256": "2fb3238a6d2ae35c0b809f0f9713da3b268e7300ff4831cd029b556d9f9360eb",
+        "deduplicatedVerificationAttempts": [
+          {
+            "pass": false,
+            "model": "permitext-deterministic-answer-quality-gate",
+            "issueTypes": [
+              "zoning_unbound_conclusion"
+            ]
+          },
+          {
+            "pass": false,
+            "model": "permitext-deterministic-answer-quality-gate",
+            "issueTypes": [
+              "zoning_unbound_conclusion"
+            ]
+          }
+        ],
+        "noProviderVerificationPhaseObserved": true,
+        "observedProviderStages": [
+          "permitext_code_interpretation"
+        ],
+        "unknownCause": "Private delivered-draft text, supported-point bindings and evidence roles not supplied/inspected. Cannot choose contextualReference/referenceOnly/section_reference/categorical-approval predicate branch from structural telemetry alone."
+      }
+    }
+  ],
+  "totals": {
+    "correct": 3,
+    "minor_issue": 3,
+    "materially_wrong": 0,
+    "withheld": 2,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0
+  },
+  "strictCorrectTurns": 3,
+  "strictCorrectDenominator": 8,
+  "sealedCapturedPairs": [
+    "practical-01",
+    "practical-02",
+    "practical-03",
+    "practical-04"
+  ],
+  "limitations": [
+    "Assistant-authored practical sample with prior legal-source exposure; not statistical/source-disjoint/user-authored accuracy. Candidate remains frozen. Actual delivered answers only; no private draft/verifier-pass credit. Actual writer packets unavailable, and source reference presence does not prove complete operative text. No paid providers, browser tests, code/source/key edits performed by reviewer. Earlier repeated-v19 cohort kept separate.",
+    "Two compact baseline answers give correct asked geometry/dimensions but omit a frozen-key required companion termination/access condition; retained as minor, not scored as wrong numeric baseline. An unrelated-office numeric false statement is separately retained. SystemFDCfailure has observed deterministic gate stage, not an assumed retrieval miss."
+  ],
+  "sealedAt": "2026-10-03T18:09:08.736613+00:00",
+  "failureTaxonomy": {
+    "withheld": [
+      {
+        "id": "practical-01-01",
+        "stage": "ordinary_language_decisive_safety_source_retrieval_gap",
+        "askedBaseline": true
+      },
+      {
+        "id": "practical-04-02",
+        "stage": "deterministic_quality_gate_zoning_unbound_conclusion",
+        "askedBaseline": false,
+        "actualUnderlyingPredicate": "unknown_without_private_draft_bindings"
+      }
+    ],
+    "minor": [
+      {
+        "id": "practical-02-01",
+        "kind": "key_required_companion_termination_rule_omitted",
+        "askedQuantitativeGeometryCorrect": true
+      },
+      {
+        "id": "practical-03-01",
+        "kind": "ancillary_inapplicable_office_numeric_threshold_wrong",
+        "askedDockRuleCorrect": true
+      },
+      {
+        "id": "practical-04-01",
+        "kind": "key_required_companion_unobstructed_access_omitted",
+        "askedClearanceDimensionsCorrect": true
+      }
+    ],
+    "materially_wrong": []
+  }
+}

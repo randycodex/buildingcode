@@ -1,0 +1,128 @@
+{
+  "phase": "ready_for_parent_review_not_committed",
+  "checkout": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code",
+  "baseCommit": "a2b4aed5e",
+  "productionUnchangedCommit": "8018ad11d",
+  "ownedFiles": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/app.mjs",
+      "sha256": "5cf83bd7833595e97bd6443b95b16e4976f348b8c4d9b921774283884a9e94ca"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-conversation-continuity.mjs",
+      "sha256": "5c8df3a73f3e776e4a66a0fdcc5d41523b57b96e49aa096f180e6fe253051a46"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/tests/research-verifier-envelope-repair-contract.mjs",
+      "sha256": "f0e060ca1a0d1910ef3bd73fe3532c7eb36f1487865e6aef2ab46f6c57f1eb91"
+    }
+  ],
+  "changes": [
+    "One verifier-envelope repair per conversation turn only for a completed typed envelope inconsistency; shared turn state across substantive revisions.",
+    "The original draft, evidence, schema, model, effort, output caps and source/mapped review requirements are preserved. Normal and mapped validation both rerun. A valid failed verdict remains failed.",
+    "Existing provider reservation and accounting hooks retain both requests, caps and cancellation; no whole-question repetition or provider calls outside synthetic tests.",
+    "Exhausted INVALID_RESEARCH_VERIFICATION saves canonical uncharged format recovery, releasing the customer turn reservation while retaining question/conversation/project/request.",
+    "Structural invariant/count/hash diagnostics and failure stage/retry count are retained without raw rejected envelope or verifier narrative.",
+    "Original verifier schemas remain unchanged; historical stored answers are not modified."
+  ],
+  "passedCommands": [
+    "node permitext-sync-server/tests/research-verifier-envelope-repair-contract.mjs",
+    "node permitext-sync-server/tests/research-decision-fact-repair-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-mapped-review-contract.mjs",
+    "node permitext-sync-server/tests/research-message-durable-contract.mjs",
+    "node permitext-sync-server/tests/research-instruction-compaction-contract.mjs",
+    "node permitext-sync-server/tests/research-clarification-copy-contract.mjs",
+    "node permitext-sync-server/tests/research-verification-report-contract.mjs",
+    "node permitext-sync-server/tests/research-failure-explanation-contract.mjs",
+    "node permitext-sync-server/tests/research-provider-client-contract.mjs",
+    "node permitext-sync-server/tests/research-provider-cost-usage-contract.mjs",
+    "node permitext-sync-server/tests/research-economics-contract.mjs",
+    "node permitext-sync-server/tests/research-scenario-continuity-contract.mjs",
+    "node permitext-sync-server/tests/research-cited-subject-continuity-contract.mjs",
+    "node permitext-sync-server/tests/web-research-recovery-contract.mjs",
+    "node permitext-sync-server/tests/research-client-context-recovery-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-repair-completeness-contract.mjs",
+    "node --check permitext-sync-server/app.mjs",
+    "node --check permitext-sync-server/research-conversation-continuity.mjs",
+    "node --check permitext-sync-server/tests/research-verifier-envelope-repair-contract.mjs",
+    "git diff --check"
+  ],
+  "preexistingFailedChecks": [
+    {
+      "test": "research-cross-code-continuity-contract.mjs",
+      "failure": "MC403.3.1.1 source absent for private bathroom airflow ordinary-language question at line27",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    },
+    {
+      "test": "research-decision-fact-contract.mjs",
+      "failure": "Retained September draft references an unknown sourceID in supportedPoints/1, declared sectionID12088; fails before verifier dispatch",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    },
+    {
+      "test": "research-decision-fact-repair-http-contract.mjs",
+      "failure": "Recorded mock draft/source-binding expectation fails during first verifier call; phases stop after initial writer and verifier rather than expected4",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    }
+  ],
+  "baselineMethod": "Git-archived source modules/tests at both refs with read-only corpus symlink; canonical corpus Git tree identical d12ab3653b2640a0fc3d377132f5d8ab76dc2203 and checkout corpus unchanged. Existing checks block/mock all external provider access. No fixture edits.",
+  "baselineRecords": [
+    {
+      "ref": "a2b4aed5e",
+      "archive": "/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-a2b4aed5e-763lph7c",
+      "exitCode": 1,
+      "output": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: MC: governing source must be retrieved for Under the 2022 NYC Mechanical Code, what is the minimum exhaust rate for a private dwelling-unit bathroom for intermittent versus continuous operation?\n    at file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-a2b4aed5e-763lph7c/permitext-sync-server/tests/research-cross-code-continuity-contract.mjs:27:5 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n",
+      "corpusTree": "d12ab3653b2640a0fc3d377132f5d8ab76dc2203",
+      "additionalChecks": [
+        {
+          "test": "research-decision-fact-contract.mjs",
+          "exitCode": 1,
+          "output": "file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-a2b4aed5e-763lph7c/permitext-sync-server/app.mjs:10045\n      const error = new Error(\"The model tied an explanation to evidence outside the selected code sections.\");\n                    ^\n\nError: The model tied an explanation to evidence outside the selected code sections.\n    at file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-a2b4aed5e-763lph7c/permitext-sync-server/app.mjs:10045:21\n    at Array.map (<anonymous>)\n    at validateResearchInterpretation (file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-a2b4aed5e-763lph7c/permitext-sync-server/app.mjs:10026:49)\n    at researchDecisionFactFixtures (file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-a2b4aed5e-763lph7c/permitext-sync-server/evals/research-decision-fact-fixtures.mjs:17:20)\n    at async file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-a2b4aed5e-763lph7c/permitext-sync-server/tests/research-decision-fact-contract.mjs:9:18 {\n  code: 'INVALID_RESEARCH_CITATION',\n  bindingIssue: {\n    collection: 'supportedPoints',\n    index: 1,\n    headingPresent: true,\n    explanationPresent: true,\n    declaredSectionID: '12088',\n    declaredSectionKnown: true,\n    sourceIDCount: 1,\n    duplicateSourceIDs: false,\n    sourceSectionIDs: [ 'unknown' ]\n  }\n}\n\nNode.js v24.18.0\n"
+        },
+        {
+          "test": "research-decision-fact-repair-http-contract.mjs",
+          "exitCode": 1,
+          "output": "{\"event\":\"research_operation_accounting\",\"operationID\":\"3d9f0a50-598b-4ef7-b5c0-487366c78571\",\"status\":\"failed\",\"charged\":false,\"failureCode\":\"RESEARCH_VERIFIER_ERROR\",\"providerRequestCount\":2,\"pendingProviderRequestCount\":1,\"embeddingProviderRequestCount\":0,\"embeddingPendingProviderRequestCount\":0,\"embeddingInputTokens\":0,\"semanticSearch\":{\"status\":\"not_used\",\"enabled\":false,\"fallbackReason\":null,\"queryCached\":false,\"hitCount\":0,\"coveredPassages\":0,\"totalPassages\":0},\"estimatedProviderCostUSD\":0.04469,\"conservativeProviderCostUSD\":0.136863,\"durationMilliseconds\":1649,\"preparationMilliseconds\":53,\"retrievalMilliseconds\":1528,\"projectLinked\":false,\"projectFactCount\":0,\"establishedConversationFactCount\":0,\"evidenceReferences\":[\"PC 412.4\",\"PC 412.3\",\"PC 1003.6\",\"PC 406.2\",\"PC 412.2\",\"PC 1104.2\",\"PC 709.1\",\"PC 405.9\",\"PC 713.9\",\"BC E105.2.2\",\"PC 709.2\",\"PC 709.4.1\",\"PC 709.4\",\"PC 102.1\",\"BC 102.1\",\"BC 202\"],\"evidenceCharacterCount\":9020,\"verificationIssueTypes\":[]}\n{\"event\":\"research_conversation_failure\",\"user\":\"df96e5c5d375840d\",\"conversation\":\"1df0f09eee82789b\",\"code\":\"RESEARCH_VERIFIER_ERROR\",\"failureStage\":null,\"message\":\"The Research verifier request failed.\",\"verificationAttempts\":[],\"providerStatus\":null,\"incompleteReason\":null,\"providerUsage\":{\"input_tokens\":0,\"input_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0},\"permitext_cost_entries\":[],\"output_tokens\":0,\"total_tokens\":0,\"permitext_provider_attempts\":1,\"permitext_unreconciled_cost_usd\":0.050852},\"bindingIssue\":null,\"providerCause\":\"ERR_ASSERTION\",\"providerRequestID\":null,\"providerAttempts\":1,\"webSupport\":null}\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'permitext_code_interpretation',\n    'permitext_research_verification',\n-   'permitext_research_targeted_revision',\n-   'permitext_research_verification'\n  ]\n\n    at file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-a2b4aed5e-763lph7c/permitext-sync-server/tests/research-decision-fact-repair-http-contract.mjs:115:12\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [\n    'permitext_code_interpretation',\n    'permitext_research_verification'\n  ],\n  expected: [\n    'permitext_code_interpretation',\n    'permitext_research_verification',\n    'permitext_research_targeted_revision',\n    'permitext_research_verification'\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+        }
+      ]
+    },
+    {
+      "ref": "8018ad11d",
+      "archive": "/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-8018ad11d-clj5kejj",
+      "exitCode": 1,
+      "output": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: MC: governing source must be retrieved for Under the 2022 NYC Mechanical Code, what is the minimum exhaust rate for a private dwelling-unit bathroom for intermittent versus continuous operation?\n    at file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-8018ad11d-clj5kejj/permitext-sync-server/tests/research-cross-code-continuity-contract.mjs:27:5 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n",
+      "corpusTree": "d12ab3653b2640a0fc3d377132f5d8ab76dc2203",
+      "additionalChecks": [
+        {
+          "test": "research-decision-fact-contract.mjs",
+          "exitCode": 1,
+          "output": "file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-8018ad11d-clj5kejj/permitext-sync-server/app.mjs:10045\n      const error = new Error(\"The model tied an explanation to evidence outside the selected code sections.\");\n                    ^\n\nError: The model tied an explanation to evidence outside the selected code sections.\n    at file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-8018ad11d-clj5kejj/permitext-sync-server/app.mjs:10045:21\n    at Array.map (<anonymous>)\n    at validateResearchInterpretation (file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-8018ad11d-clj5kejj/permitext-sync-server/app.mjs:10026:49)\n    at researchDecisionFactFixtures (file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-8018ad11d-clj5kejj/permitext-sync-server/evals/research-decision-fact-fixtures.mjs:17:20)\n    at async file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-8018ad11d-clj5kejj/permitext-sync-server/tests/research-decision-fact-contract.mjs:9:18 {\n  code: 'INVALID_RESEARCH_CITATION',\n  bindingIssue: {\n    collection: 'supportedPoints',\n    index: 1,\n    headingPresent: true,\n    explanationPresent: true,\n    declaredSectionID: '12088',\n    declaredSectionKnown: true,\n    sourceIDCount: 1,\n    duplicateSourceIDs: false,\n    sourceSectionIDs: [ 'unknown' ]\n  }\n}\n\nNode.js v24.18.0\n"
+        },
+        {
+          "test": "research-decision-fact-repair-http-contract.mjs",
+          "exitCode": 1,
+          "output": "{\"event\":\"research_operation_accounting\",\"operationID\":\"abf5fdfd-a4a2-4d69-b52e-a4dd61ee0a7a\",\"status\":\"failed\",\"charged\":false,\"failureCode\":\"RESEARCH_VERIFIER_ERROR\",\"providerRequestCount\":2,\"pendingProviderRequestCount\":1,\"embeddingProviderRequestCount\":0,\"embeddingPendingProviderRequestCount\":0,\"embeddingInputTokens\":0,\"semanticSearch\":{\"status\":\"not_used\",\"enabled\":false,\"fallbackReason\":null,\"queryCached\":false,\"hitCount\":0,\"coveredPassages\":0,\"totalPassages\":0},\"estimatedProviderCostUSD\":0.04469,\"conservativeProviderCostUSD\":0.136874,\"durationMilliseconds\":1639,\"preparationMilliseconds\":54,\"retrievalMilliseconds\":1513,\"projectLinked\":false,\"projectFactCount\":0,\"establishedConversationFactCount\":0,\"evidenceReferences\":[\"PC 412.4\",\"PC 412.3\",\"PC 1003.6\",\"PC 406.2\",\"PC 412.2\",\"PC 1104.2\",\"PC 709.1\",\"PC 405.9\",\"PC 713.9\",\"BC E105.2.2\",\"PC 709.2\",\"PC 709.4.1\",\"PC 709.4\",\"PC 102.1\",\"BC 102.1\",\"BC 202\"],\"evidenceCharacterCount\":9020,\"verificationIssueTypes\":[]}\n{\"event\":\"research_conversation_failure\",\"user\":\"3134a0c606bc6430\",\"conversation\":\"af9d1a6bcbcdf33d\",\"code\":\"RESEARCH_VERIFIER_ERROR\",\"failureStage\":null,\"message\":\"The Research verifier request failed.\",\"verificationAttempts\":[],\"providerStatus\":null,\"incompleteReason\":null,\"providerUsage\":{\"input_tokens\":0,\"input_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0},\"permitext_cost_entries\":[],\"output_tokens\":0,\"total_tokens\":0,\"permitext_provider_attempts\":1,\"permitext_unreconciled_cost_usd\":0.050863},\"bindingIssue\":null,\"providerCause\":\"ERR_ASSERTION\",\"providerRequestID\":null,\"providerAttempts\":1,\"webSupport\":null}\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'permitext_code_interpretation',\n    'permitext_research_verification',\n-   'permitext_research_targeted_revision',\n-   'permitext_research_verification'\n  ]\n\n    at file:///private/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-envelope-baseline-8018ad11d-clj5kejj/permitext-sync-server/tests/research-decision-fact-repair-http-contract.mjs:115:12\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [\n    'permitext_code_interpretation',\n    'permitext_research_verification'\n  ],\n  expected: [\n    'permitext_code_interpretation',\n    'permitext_research_verification',\n    'permitext_research_targeted_revision',\n    'permitext_research_verification'\n  ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+        }
+      ]
+    }
+  ],
+  "sideEffects": {
+    "paidProviderCalls": 0,
+    "browserInteractions": 0,
+    "commits": 0,
+    "deployments": 0
+  },
+  "limitations": [
+    "Synthetic contracts validate bounded recovery and protocol/accounting invariants, not correctness of future generated legal answers.",
+    "Three pre-existing retained/retrieval checks remain failed and are not acceptance passes.",
+    "Parent-owned assembly/rule-packet/new dependency test changes remain outside this handoff."
+  ]
+}

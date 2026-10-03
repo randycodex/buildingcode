@@ -1,0 +1,90 @@
+{
+  "candidateVersion": "20261003-shared-subject-method-dependencies-verifier-envelope-v20",
+  "candidateCommit": "862571620678b02b27163d991e30879cff98a289",
+  "createdAt": "2026-10-03T17:06:52.539826+00:00",
+  "offlineChecksPassed": true,
+  "paidProviderCallsDuringAuthoring": 0,
+  "productionDeploymentVerified": true,
+  "productionAnswerAcceptancePassed": false,
+  "productionAnswerAcceptanceStatus": "completed_failed_criteria",
+  "passedRootContracts": [
+    "research-shared-question-subject-contract",
+    "research-corpus-registry-contract",
+    "research-semantic-query-context-contract",
+    "research-historical-topic-routing-contract",
+    "research-code-basis-contract",
+    "research-evidence-assembly-contract",
+    "research-current-detail-packet-contract",
+    "research-canonical-method-dependencies-contract",
+    "research-verifier-envelope-repair-contract",
+    "research-source-edition-integrity-contract"
+  ],
+  "passedAgentMethodContracts": [
+    "research-canonical-method-dependencies-contract",
+    "research-current-detail-packet-contract",
+    "research-rule-packets-contract",
+    "research-evidence-assembly-contract",
+    "research-indexed-reference-dependency-contract",
+    "research-technical-source-boundaries-contract",
+    "research-source-edition-integrity-contract",
+    "research-referenced-table-assembly-contract",
+    "git diff --check"
+  ],
+  "passedAgentVerifierContracts": [
+    "node permitext-sync-server/tests/research-verifier-envelope-repair-contract.mjs",
+    "node permitext-sync-server/tests/research-decision-fact-repair-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-mapped-review-contract.mjs",
+    "node permitext-sync-server/tests/research-message-durable-contract.mjs",
+    "node permitext-sync-server/tests/research-instruction-compaction-contract.mjs",
+    "node permitext-sync-server/tests/research-clarification-copy-contract.mjs",
+    "node permitext-sync-server/tests/research-verification-report-contract.mjs",
+    "node permitext-sync-server/tests/research-failure-explanation-contract.mjs",
+    "node permitext-sync-server/tests/research-provider-client-contract.mjs",
+    "node permitext-sync-server/tests/research-provider-cost-usage-contract.mjs",
+    "node permitext-sync-server/tests/research-economics-contract.mjs",
+    "node permitext-sync-server/tests/research-scenario-continuity-contract.mjs",
+    "node permitext-sync-server/tests/research-cited-subject-continuity-contract.mjs",
+    "node permitext-sync-server/tests/web-research-recovery-contract.mjs",
+    "node permitext-sync-server/tests/research-client-context-recovery-contract.mjs",
+    "node permitext-sync-server/tests/research-zoning-repair-completeness-contract.mjs",
+    "node --check permitext-sync-server/app.mjs",
+    "node --check permitext-sync-server/research-conversation-continuity.mjs",
+    "node --check permitext-sync-server/tests/research-verifier-envelope-repair-contract.mjs",
+    "git diff --check"
+  ],
+  "deployContentVerification": "npm run verify:deploy-content passed;1111public assets,32551indexed sections",
+  "preexistingFailedChecks": [
+    {
+      "test": "research-cross-code-continuity-contract.mjs",
+      "failure": "MC403.3.1.1 source absent for private bathroom airflow ordinary-language question at line27",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    },
+    {
+      "test": "research-decision-fact-contract.mjs",
+      "failure": "Retained September draft references an unknown sourceID in supportedPoints/1, declared sectionID12088; fails before verifier dispatch",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    },
+    {
+      "test": "research-decision-fact-repair-http-contract.mjs",
+      "failure": "Recorded mock draft/source-binding expectation fails during first verifier call; phases stop after initial writer and verifier rather than expected4",
+      "baselineRefs": [
+        "a2b4aed5e",
+        "8018ad11d"
+      ]
+    }
+  ],
+  "sourcePacketLimitations": [
+    "Captured-Q1 reconstruction remains unchanged: the methods parent is itself first-hop after the six ordinary cross-reference slots are consumed; this patch does not add recursive expansion or certify that initial answer.",
+    "Hosted ranked candidates and indexed source slices were not captured. Reconstructed with observed first10 accounting references as discovered source order and current canonical resolver, plus an explicit bounded tail-nomination variant. No new production answer is certified."
+  ],
+  "verificationPolicy": "One per-turn completed-envelope repair; unchanged immutable draft/evidence/model/schema and semantic/mapped checks, existing cancellation/reservation/spend guards; final failure remains an explained saved system recovery.",
+  "retrievalPolicy": "Shared ordinary-question discipline hints and retrieval-only relevant project facets; explicit current/historical/source pins retained. Complete canonical enumerated-method links may reserve existing bounded dependencies; no legal applicability inferred.",
+  "productionReleaseFile": "production-release-v20.json",
+  "productionAcceptanceSummaryFile": "production-v20-summary.json"
+}

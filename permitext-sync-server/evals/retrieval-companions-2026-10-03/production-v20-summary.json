@@ -1,0 +1,79 @@
+{
+  "createdAt": "2026-10-03T18:11:33.570498+00:00",
+  "candidateCommit": "862571620678b02b27163d991e30879cff98a289",
+  "deploymentID": "dpl_9QxinqYxksdMPit6Yky15kh4WpSX",
+  "productionWebsiteTest": true,
+  "sourceFrozenThroughoutSample": true,
+  "modelsOrServiceSettingsChangedDuringSample": false,
+  "plannedTurns": 16,
+  "capturedTurns": 16,
+  "uiRetryUsed": false,
+  "sourceAndEvidenceConstraintsPreserved": true,
+  "cohorts": [
+    {
+      "cohort": "repeated_regressions",
+      "file": "production-v20-regression-independent-review.json",
+      "sha256": "dc0859f7be28f75899eb9ebcec7165730dc621a862cc3b03e42101107be0b323",
+      "turns": 8,
+      "totals": {
+        "correct": 3,
+        "minor_issue": 2,
+        "materially_wrong": 0,
+        "withheld": 3,
+        "appropriate_clarification": 0,
+        "fixture_ambiguous": 0
+      },
+      "strictCorrectTurns": 3
+    },
+    {
+      "cohort": "new_practical_questions",
+      "file": "production-v20-practical-independent-review.json",
+      "sha256": "f14c4dbf5792a73809648a9ac93c914637b0b79c751d986a0121ac154df4a1ae",
+      "turns": 8,
+      "totals": {
+        "correct": 3,
+        "minor_issue": 3,
+        "materially_wrong": 0,
+        "withheld": 2,
+        "appropriate_clarification": 0,
+        "fixture_ambiguous": 0
+      },
+      "strictCorrectTurns": 3
+    }
+  ],
+  "strictCorrectTurns": 6,
+  "strictCorrectDenominator": 16,
+  "totals": {
+    "correct": 6,
+    "minor_issue": 5,
+    "materially_wrong": 0,
+    "withheld": 5,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0
+  },
+  "betaAcceptancePassed": false,
+  "productionReliabilityEstablished": false,
+  "statisticalProductAccuracyClaim": false,
+  "estimatedProviderCostUSD": 1.234944,
+  "providerRequestCount": 65,
+  "medianDurationSeconds": 43.796,
+  "allTurnsProjectLinked": true,
+  "projectFactCountPerTurn": 33,
+  "pendingProviderRequestCount": 0,
+  "failedOperations": [
+    {
+      "id": "practical-04-02",
+      "failureCode": "RESEARCH_VERIFICATION_FAILED",
+      "verificationIssueTypes": [
+        "zoning_unbound_conclusion"
+      ]
+    }
+  ],
+  "screenshot": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/production-v20-coating-full.jpg",
+  "limitations": [
+    "Sixteen assistant-authored practical and regression turns are diagnostic coverage, not a statistical estimate of product accuracy.",
+    "Reviewers checked canonical provisions; ChatGPT was not used as ground truth in this round.",
+    "No actual hosted ranked slices, stored citation ordering, or failed draft text were captured, so offline cause reconstructions remain qualified.",
+    "Three known broader contract failures reproduced on unchanged v19 and v20 baseline; they are not counted as passes."
+  ]
+}

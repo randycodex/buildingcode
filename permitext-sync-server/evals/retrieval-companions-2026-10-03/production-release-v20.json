@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-03T17:10:43.270081+00:00",
+  "gitCommit": "862571620678b02b27163d991e30879cff98a289",
+  "deploymentID": "dpl_9QxinqYxksdMPit6Yky15kh4WpSX",
+  "deploymentHost": "permitext-sync-1xz3trox6-randycodexs-projects-b72fc111.vercel.app",
+  "publicURL": "https://permitext.com",
+  "protectedReleaseIdentityPassed": true,
+  "protectedHealthPassed": true,
+  "privateVectorHTTP": 404,
+  "publicReleaseIdentityPassed": true,
+  "publicHealthPassed": true,
+  "storage": "postgres",
+  "publicAppSHA256": "9ccc7e92c1ed4e259fe83cbb0343ed456469a12d600621725cb1d5e751545b49",
+  "publicAppMatchesFreeze": true,
+  "authenticatedAnswerAcceptance": "completed_failed_answer_acceptance",
+  "modelAndServiceChanges": false,
+  "authenticatedAnswerAcceptanceSummaryFile": "production-v20-summary.json"
+}

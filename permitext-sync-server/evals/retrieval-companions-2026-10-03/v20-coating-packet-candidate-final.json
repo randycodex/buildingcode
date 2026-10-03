@@ -1,0 +1,441 @@
+{
+  "providerCalls": 0,
+  "sourceVersions": {
+    "researchEvidenceAssemblyVersion": "20261003-canonical-method-dependencies-v64",
+    "researchRulePacketVersion": "20261003-canonical-method-dependencies-v5"
+  },
+  "limitations": "Hosted ranked candidates and indexed source slices were not captured. Reconstructed with observed first10 accounting references as discovered source order and current canonical resolver, plus an explicit bounded tail-nomination variant. No new production answer is certified.",
+  "variants": [
+    {
+      "turn": 1,
+      "tailDiscoveryCandidate": false,
+      "delivered": false,
+      "exactCanonical": false,
+      "sourceSHA256": null,
+      "canonicalSHA256": "674788413f9c3db905c74b020632a048826f8e089d75b221ecccd8ab3d19e8b4",
+      "refs": [
+        "FGC 404.9",
+        "FGC 404.3",
+        "FGC 107.5",
+        "FGC 404.8.1",
+        "FGC 404.14.1",
+        "FGC 404.6",
+        "FGC 404.4",
+        "FGC 503.7.2",
+        "FGC 503.7.4",
+        "FGC 404.8",
+        "FGC 404.11",
+        "FGC 401.5",
+        "FGC 404.11.1",
+        "FGC 404.11.6",
+        "FGC 404.11.2",
+        "FGC 404.11.3",
+        "FGC 102.1"
+      ],
+      "usage": {
+        "pinnedCount": 0,
+        "pinnedCharacterCount": 0,
+        "pinnedCanonicalContextCharacterCount": 0,
+        "pinnedSelectionExactCount": 0,
+        "pinnedSelectionTruncatedCount": 0,
+        "pinnedSelectionExcerptedCount": 0,
+        "structuredPinnedCount": 0,
+        "supplementalCharacterCeiling": 48000,
+        "supplementalCharacterCount": 10872,
+        "candidateCount": 10,
+        "discoveredCount": 10,
+        "targetedDefinitionCount": 0,
+        "crossReferenceCount": 2,
+        "topicDependencyCount": 0,
+        "interpretationContextCount": 1,
+        "characterCount": 10872,
+        "resolverFailureCount": 0,
+        "nonMaterialCandidateCount": 0
+      },
+      "limits": {
+        "maximumTopicDependencies": 14,
+        "maximumCandidates": 12,
+        "maximumDiscovered": 10,
+        "maximumTargetedDefinitions": 2,
+        "maximumCrossReferences": 6,
+        "maximumCharacters": 48000,
+        "maximumSupplementalCharacters": 48000,
+        "maximumCharactersPerSource": 12000
+      },
+      "readRequests": [
+        {
+          "ref": "FGC:404.9",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.11",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:404.3",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:107.5",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.8.1",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.14.1",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.6",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.4",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:503.7.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:503.7.4",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.8",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.8.2",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:404.8.1",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:401.5",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:401.5",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:404.11.1",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:404.11.6",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:404.11.2",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:404.11.3",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:102.1",
+          "origin": "permitext_cross_reference"
+        }
+      ],
+      "parentDetailScore": 2,
+      "childDetailScore": 1
+    },
+    {
+      "turn": 2,
+      "tailDiscoveryCandidate": false,
+      "delivered": true,
+      "deliveredText": "404.11.5 404.11.5 Protective coatings. Pipe protective coatings shall be approved for the application and shall be factory applied or field applied in accordance with the manufacturer's instructions. Exception: Where installed in accordance with the manufacturer's instructions, field application of coatings shall be permitted for pipe, fittings and locations where the factory coating has been damaged or necessarily removed at joints.",
+      "complete": true,
+      "exactCanonical": true,
+      "sourceSHA256": "674788413f9c3db905c74b020632a048826f8e089d75b221ecccd8ab3d19e8b4",
+      "canonicalSHA256": "674788413f9c3db905c74b020632a048826f8e089d75b221ecccd8ab3d19e8b4",
+      "authorityExact": true,
+      "refs": [
+        "FGC 404.11.2",
+        "BC 722.4.1",
+        "AC 28-315.2.2",
+        "FGC 404.11",
+        "BC 2212.2",
+        "BC 3501.3",
+        "FGC 403.8",
+        "FGC 404.9",
+        "FGC 302.8",
+        "FGC 406.4.1.2",
+        "FGC 404.11.4",
+        "FGC 404.11.5",
+        "BC 1904.4.2",
+        "BC 1613.5",
+        "BC 1705.2",
+        "BC 1705.3",
+        "FGC 102.1",
+        "BC 102.1"
+      ],
+      "usage": {
+        "pinnedCount": 0,
+        "pinnedCharacterCount": 0,
+        "pinnedCanonicalContextCharacterCount": 0,
+        "pinnedSelectionExactCount": 0,
+        "pinnedSelectionTruncatedCount": 0,
+        "pinnedSelectionExcerptedCount": 0,
+        "structuredPinnedCount": 0,
+        "supplementalCharacterCeiling": 48000,
+        "supplementalCharacterCount": 31591,
+        "candidateCount": 10,
+        "discoveredCount": 10,
+        "targetedDefinitionCount": 0,
+        "crossReferenceCount": 6,
+        "topicDependencyCount": 0,
+        "interpretationContextCount": 2,
+        "characterCount": 31591,
+        "resolverFailureCount": 0,
+        "nonMaterialCandidateCount": 0
+      },
+      "limits": {
+        "maximumTopicDependencies": 14,
+        "maximumCandidates": 12,
+        "maximumDiscovered": 10,
+        "maximumTargetedDefinitions": 2,
+        "maximumCrossReferences": 6,
+        "maximumCharacters": 48000,
+        "maximumSupplementalCharacters": 48000,
+        "maximumCharactersPerSource": 12000
+      },
+      "readRequests": [
+        {
+          "ref": "FGC:404.11.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.11.4",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:404.11.5",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:722.4.1",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "AC:28-315.2.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.11",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "BC:2212.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "BC:3501.3",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:403.8",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.9",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:302.8",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:406.4.1.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "BC:722.4.1",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:721.1",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:1904.4.2",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:1613.5",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:1705.2",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:1705.3",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:102.1",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:102.1",
+          "origin": "permitext_cross_reference"
+        }
+      ],
+      "parentDetailScore": 2,
+      "childDetailScore": 0
+    },
+    {
+      "turn": 2,
+      "tailDiscoveryCandidate": true,
+      "delivered": true,
+      "deliveredText": "404.11.5 404.11.5 Protective coatings. Pipe protective coatings shall be approved for the application and shall be factory applied or field applied in accordance with the manufacturer's instructions. Exception: Where installed in accordance with the manufacturer's instructions, field application of coatings shall be permitted for pipe, fittings and locations where the factory coating has been damaged or necessarily removed at joints.",
+      "complete": true,
+      "exactCanonical": true,
+      "sourceSHA256": "674788413f9c3db905c74b020632a048826f8e089d75b221ecccd8ab3d19e8b4",
+      "canonicalSHA256": "674788413f9c3db905c74b020632a048826f8e089d75b221ecccd8ab3d19e8b4",
+      "authorityExact": true,
+      "refs": [
+        "FGC 404.11.2",
+        "BC 722.4.1",
+        "AC 28-315.2.2",
+        "FGC 404.11",
+        "BC 2212.2",
+        "BC 3501.3",
+        "FGC 403.8",
+        "FGC 404.9",
+        "FGC 302.8",
+        "FGC 406.4.1.2",
+        "FGC 404.11.4",
+        "FGC 404.11.5",
+        "BC 1904.4.2",
+        "BC 1613.5",
+        "BC 1705.2",
+        "BC 1705.3",
+        "FGC 102.1",
+        "BC 102.1"
+      ],
+      "usage": {
+        "pinnedCount": 0,
+        "pinnedCharacterCount": 0,
+        "pinnedCanonicalContextCharacterCount": 0,
+        "pinnedSelectionExactCount": 0,
+        "pinnedSelectionTruncatedCount": 0,
+        "pinnedSelectionExcerptedCount": 0,
+        "structuredPinnedCount": 0,
+        "supplementalCharacterCeiling": 48000,
+        "supplementalCharacterCount": 31591,
+        "candidateCount": 11,
+        "discoveredCount": 10,
+        "targetedDefinitionCount": 0,
+        "crossReferenceCount": 6,
+        "topicDependencyCount": 0,
+        "interpretationContextCount": 2,
+        "characterCount": 31591,
+        "resolverFailureCount": 0,
+        "nonMaterialCandidateCount": 0
+      },
+      "limits": {
+        "maximumTopicDependencies": 14,
+        "maximumCandidates": 12,
+        "maximumDiscovered": 10,
+        "maximumTargetedDefinitions": 2,
+        "maximumCrossReferences": 6,
+        "maximumCharacters": 48000,
+        "maximumSupplementalCharacters": 48000,
+        "maximumCharactersPerSource": 12000
+      },
+      "readRequests": [
+        {
+          "ref": "FGC:404.11.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.11.4",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:404.11.5",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:722.4.1",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "AC:28-315.2.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.11",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "BC:2212.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "BC:3501.3",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:403.8",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:404.9",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:302.8",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "FGC:406.4.1.2",
+          "origin": "permitext_discovered"
+        },
+        {
+          "ref": "BC:722.4.1",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:721.1",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:1904.4.2",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:1613.5",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:1705.2",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:1705.3",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "FGC:102.1",
+          "origin": "permitext_cross_reference"
+        },
+        {
+          "ref": "BC:102.1",
+          "origin": "permitext_cross_reference"
+        }
+      ],
+      "parentDetailScore": 2,
+      "childDetailScore": 0
+    }
+  ]
+}

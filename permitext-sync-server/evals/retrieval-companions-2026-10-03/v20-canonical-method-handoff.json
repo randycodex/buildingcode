@@ -1,0 +1,58 @@
+{
+  "scope": "bounded canonical alternative-method dependency reservation; no providers, commits or deployment",
+  "files": [
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-evidence-assembly.mjs",
+      "sha256": "07a43a2e53ced818cf48f713e70055f03537e9ee62bfe5f98387fcb9298fcf2d"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/research-rule-packets.mjs",
+      "sha256": "958c18a51239f43b53a46139afe21d9211204e9d236a0d7c9a8142f28aebc57a"
+    },
+    {
+      "path": "/Users/randy/.codex/worktrees/research-hosted-release/Building Code/permitext-sync-server/tests/research-canonical-method-dependencies-contract.mjs",
+      "sha256": "57f1d31024d606dbca827bb20cb9c5c895e5912734bb20b7cc3a0ceb5aec58ff"
+    }
+  ],
+  "versions": {
+    "researchEvidenceAssemblyVersion": "20261003-canonical-method-dependencies-v64",
+    "researchRulePacketVersion": "20261003-canonical-method-dependencies-v5"
+  },
+  "providerCalls": 0,
+  "testsPassed": [
+    "research-canonical-method-dependencies-contract",
+    "research-current-detail-packet-contract",
+    "research-rule-packets-contract",
+    "research-evidence-assembly-contract",
+    "research-indexed-reference-dependency-contract",
+    "research-technical-source-boundaries-contract",
+    "research-source-edition-integrity-contract",
+    "research-referenced-table-assembly-contract",
+    "git diff --check"
+  ],
+  "diagnosis": {
+    "confirmed": [
+      "A shortlist nominee was excluded before any proof it was actually supplied.",
+      "The current-question detail score for captured04-02 is2 for the exact method-list parent and0 for the complete linked protective-coatings child. Removing shortlist exclusion alone is insufficient."
+    ],
+    "repair": "Complete current-relevant canonical enumerations nominate at most the existing two same-branch complete dependency reservations, through exact actual method links. A later admitted candidate shares the verified canonical read. Complete actually supplied evidence is excluded, not an undelivered discovery nominee.",
+    "unchanged": "Total/per-source/source-count/read/spend caps, strict pinned boundaries, exact authority/edition checks, atomic full-source conditions and exceptions."
+  },
+  "replay": {
+    "baseline": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v20-coating-packet-baseline.json",
+    "candidate": "/Users/randy/.codex/artifacts/permitext-production-natural-acceptance-2026-10-03/v20-coating-packet-candidate-final.json",
+    "conclusion": "Both captured-Q2 reconstruction variants deliver complete FGC404.11.5 with exact source/authority/hash and one canonical read,31591charswithin48000. This is unpaid packet delivery evidence, not new hosted answer quality.",
+    "limitation": "Hosted ranked candidates and indexed source slices were not captured. Reconstructed with observed first10 accounting references as discovered source order and current canonical resolver, plus an explicit bounded tail-nomination variant. No new production answer is certified."
+  },
+  "residual": "Captured-Q1 reconstruction remains unchanged: the methods parent is itself first-hop after the six ordinary cross-reference slots are consumed; this patch does not add recursive expansion or certify that initial answer.",
+  "sharedSubjectReview": {
+    "commit": "a2b4aed5e467f762e4aaf7c2f4864ea619114016",
+    "blockingRegressionFound": false,
+    "notes": [
+      "Changes nominate soft search discipline/current corpus and select relevant retrieval facts only; no canonical source identity, edition binding, pin or source-boundary checks changed.",
+      "Independent explicit zoning cues/current-library recall remain; full writer/reviewer project facts are retained.",
+      "Negative-term keyword over-recall can still occur; the soft cue does not itself establish legal applicability.",
+      "MC private-bathroom cross-code issue is independently confirmed by another agent as pre-existing on v19; not repaired here."
+    ]
+  }
+}
