@@ -259,7 +259,8 @@ import {
   reserveResearchEvaluationSpend,
   settleResearchProviderSpend,
   researchModelConfiguration,
-  researchAnswerConfigurationForRevision
+  researchAnswerConfigurationForRevision,
+  researchAnswerConfigurationForEvidence
 } from "./research-config.mjs";
 import {
   createResearchOperationMetric,
@@ -10495,10 +10496,10 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const baseConfiguration = researchAnswerConfigurationForRevision({
+  const baseConfiguration = researchAnswerConfigurationForRevision(researchAnswerConfigurationForEvidence({
     ...researchModelConfiguration(),
     ...(options.model ? { model: options.model } : {})
-  }, options);
+  }, evidence), options);
   const conversational = options.responseStyle === "conversational";
   const configuration = conversational
     ? {

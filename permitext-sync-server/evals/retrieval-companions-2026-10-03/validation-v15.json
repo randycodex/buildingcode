@@ -1,0 +1,14 @@
+{
+  "candidate": "v15",
+  "providerCalls": 0,
+  "passedChecks": [
+    "initial structural reasoning 24exactrequestenvelopes and negativeauthority/boundary preservation",
+    "revision reasoning24requestenvelopes",
+    "fastconversation HTTP mockedfinalreview",
+    "Luna6high HTTP preservehigherconfigured",
+    "sharedclaimscope220checks byagent",
+    "revision-verification HTTP mockedgate byagent"
+  ],
+  "sameModelsCapsSourcesAndVerificationGates": true,
+  "liveAcceptance": "pending"
+}
