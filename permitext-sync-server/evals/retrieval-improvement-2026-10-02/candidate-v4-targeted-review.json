@@ -1,0 +1,665 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "fresh-development-v4-targeted-answer-source-review",
+  "reviewStatus": "complete",
+  "reviewedAt": "2026-10-03T00:08:33.614763+00:00",
+  "reviewer": "Codex assistant; not professional adjudication",
+  "inputs": {
+    "resultsPath": "/tmp/permitext-fresh-hybrid-v4-targeted-live-20261002/results.json",
+    "resultsFileSHA256": "17c5cc9c8dec6bf47bcab96350e35e89ec7efd960103e5c4159dd149b2863a41",
+    "resultsFinishedAt": "2026-10-03T00:05:18.910Z",
+    "developmentFixture": "evals/retrieval-improvement-2026-10-02/development.json",
+    "developmentFixtureSHA256": "13bfea14062d269c36ad748a0090a0b7161bf135839e72f884ceb82c72d526a0",
+    "developmentKeysSHA256": "5c2c9bd713354531a9cf75777c885e846ae3804c917d5faf617b1e2bd26e3e51",
+    "developmentSourcePacketsSHA256": "db395356c4c9641026960a4ec80b02fb96d8055bcc3b7deedec2eac45caa9d26",
+    "baselineReview": "evals/retrieval-improvement-2026-10-02/baseline-development-review.json",
+    "sourceScope": "Same frozen development-only checks and source packets as baseline; no fresh heldout keys or outputs used.",
+    "selectionScope": "Nine development turns from three known-issue families; all questions unchanged from the frozen30-turn development fixture. This is not a new full development or heldout run."
+  },
+  "method": {
+    "labels": [
+      "correct",
+      "minor_issue",
+      "materially_wrong",
+      "withheld",
+      "appropriate_clarification",
+      "fixture_ambiguous"
+    ],
+    "strictPassLabels": [
+      "correct",
+      "appropriate_clarification"
+    ],
+    "providerVerificationIsNotCorrectness": true,
+    "evaluated": [
+      "Decisive operative conclusion, numerical threshold/condition and exceptions against frozen enacted text.",
+      "Full returned cited passages for support, attribution and source edition.",
+      "Scenario follow-up continuity and applicability limits.",
+      "Unnecessary missing-fact or code-section requests and unsupported nonanswers."
+    ],
+    "citationAssessment": "Every reviewed case includes passage-source review; expected ID presence alone is not graded as correctness.",
+    "sameFrozenGradingPolicyAsBaseline": true,
+    "sourceEditionLimitation": "Imported frozen corpus is the evaluation authority; this does not certify every later amendment.",
+    "additionalCitedPassageReview": [
+      "BC1029.13.2.2 full stepped-aisle nonuniformity rule and exception.",
+      "PC607.1.2 ASSE1070 limiter and110Fmaximum.",
+      "PC416.5 public hand-washing tempered-water rule and point-of-use exception."
+    ]
+  },
+  "summary": {
+    "reviewedCases": 9,
+    "completedRunnerCases": 9,
+    "totalTargetedCases": 9,
+    "labels": {
+      "correct": 8,
+      "minor_issue": 0,
+      "materially_wrong": 0,
+      "withheld": 1,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 0
+    },
+    "strictPassCount": 8,
+    "strictPassFraction": 0.8888888888888888,
+    "fullyPassingFamilies": 2,
+    "totalFamilies": 3,
+    "recoveredBaselineFailures": [
+      "fresh-dev-03-water-1",
+      "fresh-dev-09-candles-2",
+      "fresh-dev-09-candles-3"
+    ],
+    "regressedBaselinePasses": [],
+    "withheldExpectedProvisionAbsentFromExposedEvidence": 1,
+    "withheldDecisiveTextAbsentFromExposedEvidence": 1,
+    "expectedIDPresentButDecisiveTextAbsent": [],
+    "withheldNoPacketVisible": 0,
+    "costAccounting": "Excluded; parent reports live-run cost separately."
+  },
+  "limitations": [
+    "Development grading is not heldout certification or broad population accuracy.",
+    "Nine targeted development turns in three families are correlated, selected for known issues, and are not independent population samples.",
+    "Frozen keys and this source review are assistant-authored, not professional independent adjudication.",
+    "A verifier pass does not establish correctness; withholding an answer with sufficient source/facts is a failure.",
+    "Some returned extra authoritative passages may improve on terse frozen checks and are accepted only after source review.",
+    "Generic multi-corpus answer-level edition is assessed through specific citation source metadata rather than treated as a wrong edition by itself.",
+    "The subset was selected for previously observed development failures; it is not unbiased accuracy evidence or a full rerun of the30 cases."
+  ],
+  "families": [
+    {
+      "familyID": "ordinary-stair-dimensions",
+      "codeFamily": "BC",
+      "reviewed": 3,
+      "total": 3,
+      "strictPasses": 3,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 3
+      }
+    },
+    {
+      "familyID": "hot-water-service-and-limiting",
+      "codeFamily": "PC",
+      "reviewed": 3,
+      "total": 3,
+      "strictPasses": 3,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 3
+      }
+    },
+    {
+      "familyID": "candle-open-flame-safety",
+      "codeFamily": "FC",
+      "reviewed": 3,
+      "total": 3,
+      "strictPasses": 2,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "withheld": 1,
+        "correct": 2
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "fresh-dev-02-stairs-1",
+      "familyID": "ordinary-stair-dimensions",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For an ordinary straight office stair in a new NYC building under the 2022 codes, are 7.5-inch risers acceptable? This is not a dwelling, spiral stair, or assembly aisle.",
+      "expectedAnswer": "No. Ordinary riser maximum is 7 inches and minimum 4 inches.",
+      "decisiveReferences": [
+        "BC 1011.5.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1011.5.2": "0d2c71ad77962a902119f2cd62af034401b99030bd8ec5482d305051da8f2a79",
+        "BC 1011.5.4": "ca9ec232099a88a9bc3a8897849324736c71c29093fb378fad8f477698c9b31a"
+      },
+      "answerText": "No. For an ordinary straight stair, 7.5-inch risers exceed the 2022 NYC Building Code’s 7-inch maximum; the stated dwelling, spiral-stair, and assembly-aisle exceptions do not apply to your described stair (BC § 1011.5.2).",
+      "answerTextSHA256": "c246d7501f061c0e2704946cb0443b0cb65e4961eb4f2c685f71ef61f4079743",
+      "answerPayloadSHA256": "831a753125ef5c91adbb4aa8593e8335aafd6323f4fcf3eae158131cbeab3ba6",
+      "citationReferences": [
+        "BC 1011.5.2",
+        "BC 1011.5"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1011.5.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1011.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1011.5.2": "58263654f5877e4fae4a08588d0540767f236c760334b5afd948aa0bd42b2af3",
+        "BC 1011.5": "94a07e2e082fd825105d147fc2b8ad06c4deae2c42905cd1daa3eecda9b4316b"
+      },
+      "decisiveTextPresentInExposedEvidence": true,
+      "rawWriterDecisiveTextPresentInRecordedRequest": null,
+      "rawProviderDiagnosis": null,
+      "operativeRuleReview": "The 2022 BC 1011.5.2 cited leading passage includes the decisive ordinary 7-inch maximum and 4-inch minimum and measurement between adjacent nosings. The answer correctly rejects 7.5 inches for the stated ordinary office stair, which explicitly excludes dwelling, spiral and assembly-aisle cases. Irrelevant residential exception text remains truncated, but does not affect this conclusion.",
+      "editionReview": "Returned governing citations use the correct 2022 NYC Construction Code edition; generic multi-corpus answer-level edition does not override specific citation metadata.",
+      "applicabilityReview": "The stated scenario is sufficient for the cited condition; answer does not imply universal design or filing approval.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1011.5.2"
+      ],
+      "decisiveSourceReferences": [
+        "BC 1011.5.2"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "correct",
+      "baselineStrictPass": true
+    },
+    {
+      "id": "fresh-dev-02-stairs-2",
+      "familyID": "ordinary-stair-dimensions",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "I will reduce the risers to 7 inches. Can the rectangular treads be 10 inches deep?",
+      "expectedAnswer": "No. Rectangular tread depth is at least 11 inches measured horizontally between foremost projections of adjacent treads.",
+      "decisiveReferences": [
+        "BC 1011.5.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1011.5.2": "0d2c71ad77962a902119f2cd62af034401b99030bd8ec5482d305051da8f2a79",
+        "BC 1011.5.4": "ca9ec232099a88a9bc3a8897849324736c71c29093fb378fad8f477698c9b31a"
+      },
+      "answerText": "**No.** For the ordinary stair described, reducing the risers to 7 inches does not permit 10-inch rectangular treads: the 2022 NYC Building Code requires rectangular treads to be at least 11 inches deep, measured horizontally as specified (BC § 1011.5.2).",
+      "answerTextSHA256": "6dae0e2e35de7b39ef687c295cabe5c7d4baaaa977a2e324663c9a1a4fb042a3",
+      "answerPayloadSHA256": "ec62b243112a38f9ca86a3f449fd426aa75f38358c44ecb13945fb8b0cec6ad3",
+      "citationReferences": [
+        "BC 1011.5.2",
+        "BC 1011.5"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1011.5.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1011.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1011.5.2": "e951ad1006ef61b5482adb252b0fe6d95476930e8a174ecaeb42e943f56d04d3",
+        "BC 1011.5": "526a74b3a4d1d833abbaa78fd3bcbb4037fdce6ad257a6f866a8d87d2f010cf0"
+      },
+      "decisiveTextPresentInExposedEvidence": true,
+      "rawWriterDecisiveTextPresentInRecordedRequest": null,
+      "rawProviderDiagnosis": null,
+      "operativeRuleReview": "The complete cited 2022 BC 1011.5.2 passage requires ordinary rectangular treads at least 11 inches deep and risers at most 7 inches. The answer correctly rejects 10-inch rectangular treads after reducing the riser; the parent BC 1011.5 citation does not substitute for the operative rule.",
+      "editionReview": "Returned governing citations use the correct 2022 NYC Construction Code edition; generic multi-corpus answer-level edition does not override specific citation metadata.",
+      "applicabilityReview": "The stated scenario is sufficient for the cited condition; answer does not imply universal design or filing approval.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1011.5.2"
+      ],
+      "decisiveSourceReferences": [
+        "BC 1011.5.2"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "correct",
+      "baselineStrictPass": true
+    },
+    {
+      "id": "fresh-dev-02-stairs-3",
+      "familyID": "ordinary-stair-dimensions",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "In that same flight, the smallest riser is 6 inches and the largest is 6.5 inches. Is that variation acceptable?",
+      "expectedAnswer": "No. The half-inch variation exceeds the 3/8-inch maximum variation in a flight. No stated exception applies.",
+      "decisiveReferences": [
+        "BC 1011.5.4"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1011.5.2": "0d2c71ad77962a902119f2cd62af034401b99030bd8ec5482d305051da8f2a79",
+        "BC 1011.5.4": "ca9ec232099a88a9bc3a8897849324736c71c29093fb378fad8f477698c9b31a"
+      },
+      "answerText": "**No.** The riser variation is 0.5 inch (6.5 − 6), exceeding the 3/8-inch maximum allowed between the largest and smallest riser heights in a flight (BC § 1011.5.4). The supplied stepped-aisle exception applies only to stairs connecting stepped aisles to cross aisles or concourses; no such condition is stated here.",
+      "answerTextSHA256": "0aadb24852177079f659769593237ac419e1aaacb5f9c8a10dcf5a1cbebaaf35",
+      "answerPayloadSHA256": "a043310f633536792e0cb53de441ccc997a31ab85b7a76cc4087cc029af6b880",
+      "citationReferences": [
+        "BC 1011.5.4",
+        "BC 1029.13.2.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1011.5.4",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1029.13.2.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1011.5.4": "f7755159f6faf1ba624dc3a8a8396dfcb76d4e6ed0d1b793bfdb94778d869184",
+        "BC 1029.13.2.2": "1a02106732a9172c20e45306480a389e3f1b53a6b3c3be5a28bfe628f331fd9a"
+      },
+      "decisiveTextPresentInExposedEvidence": true,
+      "rawWriterDecisiveTextPresentInRecordedRequest": true,
+      "rawProviderDiagnosis": "Recorded interpretation request db319cde-fe08-46fe-8ce6-60b033aa6b2f-request.json includes complete BC 1011.5.4, including the entire <4in sloping-riser exception. This confirms operative source completeness recovery, not merely a changed final citation.",
+      "operativeRuleReview": "The complete cited 2022 BC 1011.5.4 passage includes all exceptions, including the top/bottom slope provision limited to reduction below 4 inches. The answer correctly computes a half-inch variation and rejects it against the three-eighths maximum without V3's unnecessary uncertainty. Its additional complete BC 1029.13.2.2 stepped-aisle passage is accurately scoped to a connection excluded by the stated ordinary office-stair premise.",
+      "editionReview": "Returned governing citations use the correct 2022 NYC Construction Code edition; generic multi-corpus answer-level edition does not override specific citation metadata.",
+      "applicabilityReview": "The stated scenario is sufficient for the cited condition; answer does not imply universal design or filing approval.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1011.5.4"
+      ],
+      "decisiveSourceReferences": [
+        "BC 1011.5.4"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "correct",
+      "baselineStrictPass": true
+    },
+    {
+      "id": "fresh-dev-03-water-1",
+      "familyID": "hot-water-service-and-limiting",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a new NYC office under the 2022 codes, may washbasins be supplied with tempered water instead of hot water? I am asking about the required type of supply, not its exact temperature.",
+      "expectedAnswer": "Yes. Nonresidential bathing and washing purposes may be supplied with hot or tempered water.",
+      "decisiveReferences": [
+        "PC 607.1"
+      ],
+      "sourceExcerptHashes": {
+        "PC 607.1": "a2a651b27e076aa88ff3a4084d3b0b537623971cc6e39749314543196af22bf2",
+        "PC 607.1.1": "b902fa9762601f8dac5c43b0eb073ef9c55d654cfcaf5fc92680facefb181e13"
+      },
+      "answerText": "**Yes.** For a nonresidential office, the 2022 NYC Plumbing Code permits hot **or tempered** water for bathing and washing purposes, so tempered water may supply washbasins used for washing (PC § 607.1). Where tempered water is supplied, it must pass through an ASSE 1070 water-temperature-limiting device that limits it to 110°F (PC § 607.1.2). A separate rule expressly requires tempered water at lavatories in public toilet facilities provided for customers, patrons, and visitors (PC § 416.5).",
+      "answerTextSHA256": "413923b5c4f6b4ae3e9da59356821eace6588400c0a672398e873a478ace46a7",
+      "answerPayloadSHA256": "665783c0cc592c0cdfd1a014e0cc114e4f79a2d1a86c72e3d772b1d6797157d3",
+      "citationReferences": [
+        "PC 607.1",
+        "PC 607.1.2",
+        "PC 416.5"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "607.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "607.1.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "416.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 607.1": "5d93a7e7ed4f2edbfa66343fb3d2014b8c13a055a8d6a2644bfc3556d18e5d23",
+        "PC 607.1.2": "0850691ceddbbf753984c3c0e32bcfeb3d52dcd03d3d574da7dd48cfea593b0f",
+        "PC 416.5": "9ced1e9bdf91886b1f48ac92115432e3c144bb14a73a0632b52916c368cef7b2"
+      },
+      "decisiveTextPresentInExposedEvidence": true,
+      "rawWriterDecisiveTextPresentInRecordedRequest": null,
+      "rawProviderDiagnosis": null,
+      "operativeRuleReview": "Complete 2022 PC 607.1 expressly permits hot or tempered water for washing in nonresidential occupancies. The answer correctly permits tempered water for office washbasins. Its added full 607.1.2 ASSE1070/110°F rule and 416.5 public hand-washing requirement with point-of-use-heater exception are accurately sourced and scoped, without requesting whether the office facilities are public as a prerequisite to the main answer.",
+      "editionReview": "Returned governing citations use the correct 2022 NYC Construction Code edition; generic multi-corpus answer-level edition does not override specific citation metadata.",
+      "applicabilityReview": "The stated scenario is sufficient for the cited condition; answer does not imply universal design or filing approval.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 607.1"
+      ],
+      "decisiveSourceReferences": [
+        "PC 607.1"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "withheld",
+      "baselineStrictPass": false
+    },
+    {
+      "id": "fresh-dev-03-water-2",
+      "familyID": "hot-water-service-and-limiting",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "What about a nonresidential laundry in the same project: would only cold water satisfy the supply rule?",
+      "expectedAnswer": "No. Nonresidential laundry purposes require hot water.",
+      "decisiveReferences": [
+        "PC 607.1"
+      ],
+      "sourceExcerptHashes": {
+        "PC 607.1": "a2a651b27e076aa88ff3a4084d3b0b537623971cc6e39749314543196af22bf2",
+        "PC 607.1.1": "b902fa9762601f8dac5c43b0eb073ef9c55d654cfcaf5fc92680facefb181e13"
+      },
+      "answerText": "No. Under the 2022 NYC Plumbing Code, hot water shall be supplied for laundry purposes in nonresidential occupancies; the hot-or-tempered option applies only to bathing and washing purposes. Cold water alone therefore does not satisfy the stated supply rule for a nonresidential laundry (PC § 607.1).",
+      "answerTextSHA256": "9887895c53366540e4039bcee098cb10114e83b046cf08dfae734db83592b544",
+      "answerPayloadSHA256": "d6a08e8d7314b0fdf5f1c21afb85a5b02fbcea96d3809bb5b32d68f68277943e",
+      "citationReferences": [
+        "PC 607.1"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "607.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 607.1": "43f0bb890250d83c628bfe5aa9620d22874d37376f83e7a3f5da16bbd7e607f6"
+      },
+      "decisiveTextPresentInExposedEvidence": true,
+      "rawWriterDecisiveTextPresentInRecordedRequest": null,
+      "rawProviderDiagnosis": null,
+      "operativeRuleReview": "Complete 2022 PC 607.1 separately requires hot water for nonresidential laundry; the hot-or-tempered option is for bathing/washing. The answer correctly rejects cold water alone and does not carry the washbasin allowance into laundry.",
+      "editionReview": "Returned governing citations use the correct 2022 NYC Construction Code edition; generic multi-corpus answer-level edition does not override specific citation metadata.",
+      "applicabilityReview": "The stated scenario is sufficient for the cited condition; answer does not imply universal design or filing approval.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 607.1"
+      ],
+      "decisiveSourceReferences": [
+        "PC 607.1"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "correct",
+      "baselineStrictPass": true
+    },
+    {
+      "id": "fresh-dev-03-water-3",
+      "familyID": "hot-water-service-and-limiting",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Where a fixture has a maximum permitted delivery temperature, can the water-heater thermostat alone serve as its required temperature-limiting means?",
+      "expectedAnswer": "No. A water-heater thermostat must not serve as the code-required temperature-limiting means for maximum hot or tempered delivery temperatures at fixtures.",
+      "decisiveReferences": [
+        "PC 607.1.1"
+      ],
+      "sourceExcerptHashes": {
+        "PC 607.1": "a2a651b27e076aa88ff3a4084d3b0b537623971cc6e39749314543196af22bf2",
+        "PC 607.1.1": "b902fa9762601f8dac5c43b0eb073ef9c55d654cfcaf5fc92680facefb181e13"
+      },
+      "answerText": "**No.** Under the 2022 NYC Plumbing Code, a water-heater thermostat cannot serve as the temperature-limiting means for compliance with fixture maximum hot- or tempered-water delivery-temperature requirements (PC § 607.1.1).",
+      "answerTextSHA256": "23277cf25e3570c76bd752ffa4e22b52671a18e2375ff95f12515b2ae0903613",
+      "answerPayloadSHA256": "c423ba07c0f458264ce649dcd0c31fb7271529522321ac74b810126ca5952343",
+      "citationReferences": [
+        "PC 607.1.1"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "607.1.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 607.1.1": "9f9d4cd20693fc43049663b3f7c027a66a2ea38523f779863fd2b8520a36d5cb"
+      },
+      "decisiveTextPresentInExposedEvidence": true,
+      "rawWriterDecisiveTextPresentInRecordedRequest": null,
+      "rawProviderDiagnosis": null,
+      "operativeRuleReview": "Complete 2022 PC 607.1.1 expressly bars a heater thermostat as the temperature-limiting means for compliance with maximum fixture delivery temperature. The answer directly says No with accurate scope.",
+      "editionReview": "Returned governing citations use the correct 2022 NYC Construction Code edition; generic multi-corpus answer-level edition does not override specific citation metadata.",
+      "applicabilityReview": "The stated scenario is sufficient for the cited condition; answer does not imply universal design or filing approval.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 607.1",
+        "PC 607.1.1"
+      ],
+      "decisiveSourceReferences": [
+        "PC 607.1",
+        "PC 607.1.1"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "correct",
+      "baselineStrictPass": true
+    },
+    {
+      "id": "fresh-dev-09-candles-1",
+      "familyID": "candle-open-flame-safety",
+      "codeFamily": "FC",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "In NYC, may students keep and use ordinary wax candles in a Group R-1 college dormitory?",
+      "expectedAnswer": "No. Storage or use of candles, incense and similar open-flame producing items is prohibited in Group R-1 college and university dormitories.",
+      "decisiveReferences": [
+        "FC 308.3(4)"
+      ],
+      "sourceExcerptHashes": {
+        "FC 308": "9fe9a98084c9ed21296d1dbcc65922e13aab426d48297814ceb09964f7bf12fa"
+      },
+      "answerText": "The supplied text does **not establish whether students may keep or use ordinary wax candles**. It prohibits portable electric space heaters in Group R-1 college and university dormitories, but that rule does not address candles (2022 NYC Fire Code § 605.10.3). The candle-specific rule, if any, is not included in the supplied evidence, so neither permission nor a candle ban can be concluded here.",
+      "answerTextSHA256": "7aa583ded5c7812836d8521beb49f06e57998c07c3958834d5e80f4bfc4909f3",
+      "answerPayloadSHA256": "1fa961dc6cd069ae41c7f33862a7fa0bea8dec2419bdfd485a60f7d8007435d5",
+      "citationReferences": [
+        "FC 605"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "605",
+          "codeEdition": "2022 NYC Fire Code — current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 605": "57fe3931d9d4647a38fdf88719ca9d62f22d27adcdfaa8169a07154392cea707"
+      },
+      "decisiveTextPresentInExposedEvidence": false,
+      "rawWriterDecisiveTextPresentInRecordedRequest": false,
+      "rawProviderDiagnosis": "Recorded interpretation request 1230d53c-07c7-4fce-828c-979df57b14d9-request.json has BC907.2.8.4/1107.6.1/202, ZR32-131/22-131, FC605/410 and BC1107.6.1.1. No FC308 or dormitory candle prohibition is present. The writer accurately states this evidence limitation and verification 3daeffeb-6c9b-47cc-91c8-16e065292afe-response.json passes the bounded nonanswer. Root cause is missing governing source retrieval, not a false substantive writer conclusion or verifier suppression of a supported answer.",
+      "operativeRuleReview": "The final answer withholds candle possession/use in a Group R-1 college dormitory, while frozen FC 308.3(4) directly prohibits it for these sufficient facts. Its current-consolidated FC 605 excerpt concerns electric space heaters, not candles. This remains an answerable source-retrieval/nonanswer failure.",
+      "editionReview": "Correct 2022 NYC Fire Code source family, but the cited FC 605 provision does not govern the candle question.",
+      "applicabilityReview": "The supplied R-1 college dormitory facts suffice for the frozen FC308.3(4) prohibition.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": false,
+      "matchedExpectedProvisionReferences": [],
+      "decisiveSourceReferences": [
+        "FC 308"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "withheld",
+      "baselineStrictPass": false
+    },
+    {
+      "id": "fresh-dev-09-candles-2",
+      "familyID": "candle-open-flame-safety",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a separate ordinary office where candle use is otherwise allowed, how far must a lit candle be kept from curtains or other combustible materials?",
+      "expectedAnswer": "At least 3 feet from combustible material or combustible waste; other safety precautions remain applicable.",
+      "decisiveReferences": [
+        "FC 308.4(4)"
+      ],
+      "sourceExcerptHashes": {
+        "FC 308": "9fe9a98084c9ed21296d1dbcc65922e13aab426d48297814ceb09964f7bf12fa"
+      },
+      "answerText": "Keep the lit candle at least **3 feet (914 mm)** from curtains and any other combustible material. This is the stated minimum when candle use is allowed; FC 308.4 also requires constant attendance, protection from accidental contact and tipping, and placement on a noncombustible surface, subject to its stated surface-mounted-device exception for that surface requirement.",
+      "answerTextSHA256": "60eb4e875721181f59413c67d15e345603ced5894f570847b36498019b3775aa",
+      "answerPayloadSHA256": "f9c211845d5a10cc0768d372de1ea5412f1f5f3aca1c3c723660f67d9bed7f79",
+      "citationReferences": [
+        "FC 308"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "308",
+          "codeEdition": "2022 NYC Fire Code — current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 308": "c7ff9cc1a3058da309334683fec74c12d2e78fb82030e68b559156074779add6"
+      },
+      "decisiveTextPresentInExposedEvidence": true,
+      "rawWriterDecisiveTextPresentInRecordedRequest": null,
+      "rawProviderDiagnosis": null,
+      "operativeRuleReview": "The complete current-consolidated 2022 FC 308.4 block includes item4 requiring at least3ft from combustible material/waste. The answer correctly applies that distance in the otherwise-allowed ordinary office scenario, and all added attendance/holder/surface/exit precautions match the same complete source.",
+      "editionReview": "Correct 2022 NYC Fire Code current-consolidated source; FC308.4 content matches frozen development authority.",
+      "applicabilityReview": "The stated scenario is sufficient for the cited condition; answer does not imply universal design or filing approval.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "FC 308"
+      ],
+      "decisiveSourceReferences": [
+        "FC 308"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "withheld",
+      "baselineStrictPass": false
+    },
+    {
+      "id": "fresh-dev-09-candles-3",
+      "familyID": "candle-open-flame-safety",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If the holder is secured and on a noncombustible surface, may the person attending that office candle leave while it is still lit?",
+      "expectedAnswer": "No. Candles and other unenclosed open flames must be constantly attended while lit; placement precautions do not waive attendance.",
+      "decisiveReferences": [
+        "FC 308.4(1)"
+      ],
+      "sourceExcerptHashes": {
+        "FC 308": "9fe9a98084c9ed21296d1dbcc65922e13aab426d48297814ceb09964f7bf12fa"
+      },
+      "answerText": "No. While the candle is lit, it must be constantly attended; securing it in a suitable holder and placing it on a noncombustible surface do not replace that requirement (2022 NYC Fire Code § 308.4(1)–(3)).",
+      "answerTextSHA256": "bdfea5beaa91852fa9bda7dc3e63d1121b9a10cf730e9995ef631944ea6c8f3c",
+      "answerPayloadSHA256": "0e8f279703566a66867aec986331cb3f0a33d9ef9c295938e46e24792868f16f",
+      "citationReferences": [
+        "FC 308"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "308",
+          "codeEdition": "2022 NYC Fire Code — current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 308": "c7ff9cc1a3058da309334683fec74c12d2e78fb82030e68b559156074779add6"
+      },
+      "decisiveTextPresentInExposedEvidence": true,
+      "rawWriterDecisiveTextPresentInRecordedRequest": null,
+      "rawProviderDiagnosis": null,
+      "operativeRuleReview": "Complete current-consolidated 2022 FC308.4 item1 requires constant attendance while lit. The answer correctly says secured holder and noncombustible placement do not waive attendance, because these are separate item2–3 precautions.",
+      "editionReview": "Correct 2022 NYC Fire Code current-consolidated source; cited FC308.4 items1–3 match frozen development authority.",
+      "applicabilityReview": "The stated scenario is sufficient for the cited condition; answer does not imply universal design or filing approval.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "FC 308"
+      ],
+      "decisiveSourceReferences": [
+        "FC 308"
+      ],
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "providerVerificationUsedForGrade": false,
+      "baselineLabel": "withheld",
+      "baselineStrictPass": false
+    }
+  ],
+  "targetedComparison": {
+    "v3StrictPassCountForSameNine": 7,
+    "v4StrictPassCount": 8,
+    "recoveredV3StrictFailures": [
+      "fresh-dev-02-stairs-3"
+    ],
+    "regressedV3StrictPasses": []
+  },
+  "remainingFailureDiagnosis": {
+    "fresh-dev-09-candles-1": {
+      "stage": "governing-source-retrieval",
+      "decisiveWriterTextPresent": false,
+      "writerSubstantiveFaultObserved": false,
+      "verifierFaultObserved": false,
+      "explanation": "The writer and verifier correctly describe the available nonresponsive evidence; retrieval omitted FC308.3(4). The end-to-end answer is nevertheless a failure because the question is answerable from the frozen corpus."
+    }
+  },
+  "interpretation": "Eight of nine targeted turns pass, compared with seven of these same turns in V3. Complete BC1011.5.4 resolves the previously truncated-exception stair followup. Office water and remaining candle followups remain correct. The dormitory candle question still fails because the writer never receives FC308.3(4); the accurately bounded nonanswer and verifier pass do not establish answer correctness. Do not combine rerun outcomes with V3 to call a30-case accuracy result or95percentpopulation accuracy."
+}

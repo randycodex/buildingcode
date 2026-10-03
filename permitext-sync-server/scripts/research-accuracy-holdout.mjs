@@ -5,25 +5,35 @@ import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID, createHash } from "node:crypto";
+import { pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
 import { evaluationBudget, evaluationReservation, evaluationCost } from "./research-evaluation-budget.mjs";
+import { researchSemanticEmbeddingModel, researchSemanticEmbeddingReservation, researchSemanticEmbeddingCost } from "../research-semantic-passages.mjs";
 const live = process.argv.includes("--live");
+const retrievalLive = process.argv.includes("--retrieval-live");
 const fixedEvidence = process.argv.includes("--fixed-evidence");
 const advisoryRoutes = process.argv.includes("--advisory-routes");
 const currentCorpusRecall = process.argv.includes("--current-corpus-recall");
 const advisoryRanking = process.argv.includes("--advisory-ranking");
+const passageSearch = process.argv.includes("--passage-search");
 const root = new URL("../", import.meta.url);
 const options = new Map();
 for (let index = 2; index < process.argv.length; index++) {
   const [name, ...suffix] = process.argv[index].split("=");
-  if (["--live", "--fixed-evidence", "--advisory-routes", "--current-corpus-recall", "--advisory-ranking"].includes(name)) { assert(!suffix.length); continue; }
-  assert(["--fixture", "--only", "--budget-ledger"].includes(name), `Unknown option: ${name}`);
+  if (["--live", "--retrieval-live", "--fixed-evidence", "--advisory-routes", "--current-corpus-recall", "--advisory-ranking", "--passage-search"].includes(name)) { assert(!suffix.length); continue; }
+  assert(["--fixture", "--only", "--budget-ledger", "--campaign-cap-usd", "--application-root", "--semantic-vectors"].includes(name), `Unknown option: ${name}`);
   const value = suffix.length ? suffix.join("=") : process.argv[++index];
   assert(value && !value.startsWith("--"), `Missing value for ${name}`);
   options.set(name, value);
 }
 const argument = name => options.get(name);
-const campaignBudget = argument("--budget-ledger") ? evaluationBudget(argument("--budget-ledger")) : null;
+const applicationRoot = argument("--application-root") ? pathToFileURL(`${argument("--application-root").replace(/\/$/, "")}/`) : root;
+const campaignCapUSD = Number(argument("--campaign-cap-usd") || 15.73);
+assert(Number.isFinite(campaignCapUSD) && campaignCapUSD > 0 && campaignCapUSD <= 15.73);
+const campaignBudget = argument("--budget-ledger") ? evaluationBudget(argument("--budget-ledger"), campaignCapUSD) : null;
+const semanticVectorPath = argument("--semantic-vectors");
+if (semanticVectorPath) assert(passageSearch && campaignBudget && (live || retrievalLive), "Semantic query calls require passage search, explicit paid mode and shared budget ledger");
+if (retrievalLive) assert(semanticVectorPath && !live, "Retrieval-only paid mode requires semantic vectors and excludes answer calls");
 const fixturePath = argument("--fixture") || "evals/research-accuracy-holdout-2026-10-01.json";
 const fixtureText = await readFile(new URL(fixturePath, root), "utf8");
 const fixture = JSON.parse(fixtureText);
@@ -34,7 +44,7 @@ const directory = process.env.PERMITEXT_ACCURACY_OUTPUT || join(tmpdir(), `permi
 await mkdir(directory); // Refuse an existing directory rather than overwrite its spend ledger.
 const scratch = await mkdtemp(join(tmpdir(), "permitext-accuracy-store-"));
 for (const key of Object.keys(process.env)) if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(key)) delete process.env[key];
-if (live) {
+if (live || retrievalLive) {
   const local = await readFile(new URL(".env.local", root), "utf8");
   const key = local.match(/^OPENAI_API_KEY=(.+)$/m)?.[1]?.trim().replace(/^['"]|['"]$/g, "");
   if (!key) throw Error("A local API key is required for explicit live evaluation.");
@@ -49,6 +59,9 @@ Object.assign(process.env, {
   PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES: advisoryRoutes ? "1" : "0",
   PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL: currentCorpusRecall ? "1" : "0",
   PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING: advisoryRanking ? "1" : "0",
+  PERMITEXT_RESEARCH_PASSAGE_SEARCH: passageSearch ? "1" : "0",
+  PERMITEXT_RESEARCH_SEMANTIC_SEARCH: semanticVectorPath ? "1" : "0",
+  PERMITEXT_RESEARCH_SEMANTIC_VECTOR_PATH: semanticVectorPath || "",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: ".1",
   PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".01",
   PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: ".5",
@@ -65,25 +78,32 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-question-intent.mjs", "research-conversation-continuity.mjs", "research-answer-presentation.mjs", "research-answer-quality.mjs",
   "research-zoning-safety.mjs", "project-foundation-contract.mjs",
   "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/research-accuracy-holdout.mjs"]) {
-  sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, root))).digest("hex");
+  sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex");
 }
-const result = { fixturePath, fixtureHash: createHash("sha256").update(fixtureText).digest("hex"), sourceHashes, selectedIDs,
-  live, advisoryRoutes, currentCorpusRecall, advisoryRanking, mode: fixedEvidence ? "fixed-evidence-reasoning" : "end-to-end", capUSD: 2, startedAt: new Date().toISOString(), provider: [], cases: [] };
+for (const name of ["research-passage-index.mjs", "research-semantic-passages.mjs"]) {
+  try { sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex"); }
+  catch (error) { if (error.code !== "ENOENT") throw error; }
+}
+const result = { fixturePath, applicationRoot: applicationRoot.href, fixtureHash: createHash("sha256").update(fixtureText).digest("hex"), sourceHashes, selectedIDs,
+  live, retrievalLive, semanticVectorPath, advisoryRoutes, currentCorpusRecall, advisoryRanking, passageSearch, campaignCapUSD,
+  mode: fixedEvidence ? "fixed-evidence-reasoning" : "end-to-end", capUSD: 2, startedAt: new Date().toISOString(), provider: [], cases: [] };
 const persist = () => writeFile(join(directory, "results.json"), JSON.stringify(result, null, 2));
 globalThis.fetch = async (url, options = {}) => {
   const target = new URL(String(url));
   if (target.hostname === "127.0.0.1") return nativeFetch(url, options);
-  assert(live && target.hostname === "api.openai.com" && target.pathname === "/v1/responses", "External access is not allowed for this evaluation");
+  const embedding = target.pathname === "/v1/embeddings";
+  assert((live || (retrievalLive && embedding)) && target.hostname === "api.openai.com" &&
+    (target.pathname === "/v1/responses" || (semanticVectorPath && embedding)), "External access is not allowed for this evaluation");
   const body = JSON.parse(options.body);
-  assert.equal(body.model, "gpt-6-luna", "Do not silently change the evaluated model");
+  assert.equal(body.model, embedding ? researchSemanticEmbeddingModel : "gpt-6-luna", "Do not silently change the evaluated model");
   assert(!body.tools?.length && !body.previous_response_id && !body.conversation);
   assert(!body.service_tier || body.service_tier === "default");
-  const reserved = evaluationReservation(body);
+  const reserved = embedding ? researchSemanticEmbeddingReservation(body.input) : evaluationReservation(body);
   assert(!result.provider.some(call => call.status === "pending" || call.status === "unknown"), "Reconcile unsettled requests before spending more");
   const spent = result.provider.reduce((sum, call) => sum + (call.costUSD ?? call.reservedUSD), 0);
   if (spent + reserved > result.capUSD) throw Object.assign(Error("Evaluation cap reached"), { code: "RESEARCH_EVAL_SPEND_CAP" });
   const call = { id: randomUUID(), case: result.activeCase, model: body.model, effort: body.reasoning?.effort,
-    phase: body.text?.format?.name, status: "pending", reservedUSD: reserved, startedAt: new Date().toISOString() };
+    phase: embedding ? "query_embeddings" : body.text?.format?.name, status: "pending", reservedUSD: reserved, startedAt: new Date().toISOString() };
   campaignBudget?.reserve({ ...call, runDirectory: directory });
   result.provider.push(call); await persist();
   await writeFile(join(directory, `${call.id}-request.json`), JSON.stringify(body));
@@ -96,7 +116,7 @@ globalThis.fetch = async (url, options = {}) => {
     call.usage = payload.usage;
     call.status = payload.usage ? "settled" : response.ok ? "unknown" : "rejected";
     if (payload.usage) {
-      call.costUSD = evaluationCost(payload);
+      call.costUSD = embedding ? researchSemanticEmbeddingCost(payload.usage) : evaluationCost(payload);
     }
     campaignBudget?.settle(call.id, { status: call.status, costUSD: call.costUSD, usage: call.usage, endedAt: new Date().toISOString() });
     await persist(); return response;
@@ -110,10 +130,11 @@ globalThis.fetch = async (url, options = {}) => {
 let server;
 try {
   const { assembledResearchEvidenceForTurn, handleRequest, researchBodyForCatalogSection,
-    openAIResearchInterpretation, openAIResearchVerification } = await import("../app.mjs");
+    openAIResearchInterpretation, openAIResearchVerification } = await import(new URL("app.mjs", applicationRoot));
   // Save first-question retrieval separately from answer scoring. The expected
   // references never enter normal retrieval or the user's question.
   for (const conversation of fixture.conversations) {
+    result.activeCase = `${conversation.id}-retrieval`;
     const question = conversation.questions[0];
     const packet = await assembledResearchEvidenceForTurn({ question, messages: [], projectFacts: [], pinnedEvidence: [] });
     await writeFile(join(directory, `${conversation.id}-retrieval.json`), JSON.stringify(packet, null, 2));

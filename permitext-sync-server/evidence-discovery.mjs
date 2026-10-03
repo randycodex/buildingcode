@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
+import { searchResearchPassages } from "./research-passage-index.mjs";
 
-export const evidenceDiscoveryVersion = "20261002-specific-heading-recall-v40";
+export const evidenceDiscoveryVersion = "20261002-exact-subsection-hybrid-passage-discovery-v43";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -967,6 +968,8 @@ function questionDisciplinePrefixes(question) {
   // A soft ranking signal, never a corpus exclusion or a substitute for a
   // section reference. Cross-code requirements can still be selected.
   const prefixes = new Set();
+  if (/\b(?:Fire\s+Code|FC)\b/i.test(question)) prefixes.add("FC");
+  if (/\b(?:Zoning\s+Resolution|ZR)\b/i.test(question)) prefixes.add("ZR");
   if (/\b(?:fuel[- ]gas|natural[- ]gas|gas[- ]fired|gas\s+(?:piping|pipe|system|appliance|connector|connection))\b/i.test(question)) prefixes.add("FGC");
   if (/\b(?:ventilat\w*|exhaust|ducts?|air[- ]condition\w*|makeup[- ]air|mechanical\s+(?:code|system)|combustion\s+air)\b/i.test(question)) prefixes.add("MC");
   if (/\b(?:plumbing|sanitary|drain(?:age|s)?|sewer|trap(?:s|ping)?|lavator\w*|toilet|shower|water[- ]heater|drinking[- ]fountain)\b/i.test(question)) prefixes.add("PC");
@@ -1493,6 +1496,8 @@ export async function discoverRelevantEvidence({
   retrievalContext = null,
   catalog,
   invertedIndex,
+  passageIndex = null,
+  semanticSearch = null,
   readSectionBody,
   resolveVisualSource,
   availableCodePrefixes = [],
@@ -1516,8 +1521,26 @@ export async function discoverRelevantEvidence({
   // Context resolves pronouns and preserves citations; it must not overwhelm
   // new terms when the user asks about a related but different provision.
   const questionTerms = queryTermWeights(currentQuestion);
+  const rankingBoilerplate = passageIndex ? new Set(["nyc", "new", "york", "city", "code", "codes", "edition", "editions", "ordinary",
+    ...Array.from(currentQuestion.matchAll(/\b((?:19|20)\d{2})\s+(?:(?:building|construction|plumbing|mechanical|fuel\s+gas|fire)\s+)?codes?\b/gi), match => match[1])]) : new Set();
+  if (passageIndex) {
+    // Jurisdiction/edition are enforced by corpus identity. Repeating those
+    // boilerplate words in ranking favors administrative scope paragraphs
+    // over the concrete rule the user is asking about.
+    for (const term of rankingBoilerplate) questionTerms.delete(term);
+    // District labels supply applicability facts, but rare literal labels can
+    // overpower the requested property (e.g. surfacing) and select a special
+    // program that happens to name the same district. Keep them as a small
+    // relevance signal; the complete question still governs source review.
+    if (/\b(?:district|zoning)\b/i.test(currentQuestion)) {
+      for (const match of currentQuestion.matchAll(/\b[RCM]\d+[A-Za-z]*(?:-\d+[A-Za-z]*)?\b/gi)) {
+        const term = match[0].toLowerCase();
+        if (questionTerms.has(term)) questionTerms.set(term, 0.12);
+      }
+    }
+  }
   const contextualTerms = [...queryTermWeights(normalizedQuestion)]
-    .filter(([term]) => !questionTerms.has(term));
+    .filter(([term]) => !questionTerms.has(term) && !rankingBoilerplate.has(term));
   // A full project inventory can contain hundreds of extra terms. A per-term
   // discount alone still lets their combined score overwhelm the question.
   // Bound their total influence while preserving the complete facts downstream.
@@ -1547,6 +1570,21 @@ export async function discoverRelevantEvidence({
       : []
   );
   const catalogByID = new Map(sections.map((section) => [comparableSectionID(section.id), section]));
+  const passageHits = passageIndex ? searchResearchPassages(passageIndex, sourceQuestion,
+    { queryWeights: terms, limit: 100 }) : [];
+  const passageHitsByID = new Map(passageHits.map(hit => [comparableSectionID(hit.sectionID), hit]));
+  const semanticResult = passageIndex && semanticSearch
+    ? await semanticSearch.search(passageIndex, retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }) : null;
+  const semanticHits = semanticResult?.hits || [];
+  const fusedScores = new Map();
+  if (semanticHits.length) {
+    passageHits.forEach((hit, rank) => fusedScores.set(comparableSectionID(hit.sectionID), 4000 / (61 + rank)));
+    semanticHits.forEach((hit, rank) => {
+      const id = comparableSectionID(hit.sectionID);
+      fusedScores.set(id, (fusedScores.get(id) || 0) + 8000 / (61 + rank));
+      if (!passageHitsByID.get(id)?.exactReference) passageHitsByID.set(id, hit);
+    });
+  }
   const scores = new Map();
   const matchedTermsByID = new Map();
   // Short, specific headings often contain the requested property while their
@@ -1644,6 +1682,8 @@ export async function discoverRelevantEvidence({
   exactReferenceIDs.forEach((id) => scores.set(id, (scores.get(id) || 0) + 100));
   routesByID.forEach(({ score }, id) => scores.set(id, (scores.get(id) || 0) + score));
   headingScores.forEach((score, id) => scores.set(id, (scores.get(id) || 0) + score));
+  [...passageHits, ...semanticHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
+    Math.max(scores.get(comparableSectionID(hit.sectionID)) || 0, hit.score * 3)));
 
   const preliminary = Array.from(scores, ([id, score]) => ({ id, score }))
     .sort((left, right) => right.score - left.score)
@@ -1652,6 +1692,13 @@ export async function discoverRelevantEvidence({
   // term definitions even when a broad topic route fills the lexical shortlist.
   // Their complete text is never admitted automatically by this reservation.
   const preliminaryIDs = new Set(preliminary.map((entry) => entry.id));
+  for (const hit of [...passageHits, ...semanticHits]) {
+    const id = comparableSectionID(hit.sectionID);
+    if (catalogByID.has(id) && !preliminaryIDs.has(id)) {
+      preliminary.push({ id, score: scores.get(id) || 0 });
+      preliminaryIDs.add(id);
+    }
+  }
   // A one-letter technical compound (for example S-trap or U-tube) can
   // lose its distinguishing letter in the token index. Reserve a bounded
   // shortlist from its substantive word before full-text phrase scoring;
@@ -1693,7 +1740,11 @@ export async function discoverRelevantEvidence({
     const coverage = originalTerms.length
       ? originalMatches.size / new Set(originalTerms).size
       : 0;
-    const exactReference = exactReferenceIDs.has(entry.id);
+    const indexedPassage = passageHitsByID.get(entry.id);
+    // A monolithic source can contain the exact subsection the user named.
+    // Keep that passage-level identity through fusion and final sorting; its
+    // containing catalog section need not have the same section number.
+    const exactReference = exactReferenceIDs.has(entry.id) || indexedPassage?.exactReference === true;
     const routeMatch = routesByID.get(entry.id);
     const contextualReference = Boolean(
       relevanceComparison &&
@@ -1702,10 +1753,15 @@ export async function discoverRelevantEvidence({
       (
         comparisonReferenceKeys.has(
           `${String(section.codePrefix || "").toUpperCase()}:${String(section.sectionNumber || "")}`
-        ) || comparisonReferenceKeys.has(`*:${String(section.sectionNumber || "")}`)
+        ) || comparisonReferenceKeys.has(`*:${String(section.sectionNumber || "")}`) ||
+        (indexedPassage?.exactReference === true && (
+          comparisonReferenceKeys.has(`${String(section.codePrefix || "").toUpperCase()}:${indexedPassage.subsectionNumber}`) ||
+          comparisonReferenceKeys.has(`*:${indexedPassage.subsectionNumber}`)
+        ))
       )
     );
-    let passage = bestPassage(body, passageTerms, bigrams);
+    let passage = indexedPassage ? { text: indexedPassage.text, score: indexedPassage.score,
+      blockID: indexedPassage.blockID } : bestPassage(body, passageTerms, bigrams);
     if (!passage) continue;
     if (routeMatch?.useSelectedPassageOnly && routeMatch.selectedExcerptPatterns.length) {
       const selectedExcerpts = routeMatch.selectedExcerptPatterns
@@ -1724,16 +1780,18 @@ export async function discoverRelevantEvidence({
     const namedCompoundScore = namedCompounds.some(phrase => new RegExp(`\\b${phrase}s?\\b`, "i").test(phraseText)) ? 80 : 0;
     const measurementScore = requestedTemperature &&
       /\d+(?:\.\d+)?\s*(?:[°º]\s*[FC]|degrees?\b)/i.test(fullText) ? 30 : 0;
-    const lexicalScore = entry.score * 0.05 +
+    const lexicalScore = fusedScores.has(entry.id) ? fusedScores.get(entry.id)
+      : indexedPassage ? indexedPassage.score * 3 : entry.score * 0.05 +
       titleScore * 0.8 +
       passage.score;
-    const finalScore = lexicalScore * (disciplinePrefixes.has(section.codePrefix) ? 1.4 : 1) +
-      (routeMatch?.score || 0) +
+    const finalScore = lexicalScore * (disciplinePrefixes.has(section.codePrefix) ? (semanticHits.length ? 1.1 : 1.4) : 1) +
+      (routeMatch?.score || 0) * (passageIndex ? 0.15 : 1) +
       (exactReference ? 100 : 0) + namedCompoundScore + measurementScore + (headingScores.get(entry.id) || 0);
     detailed.push({
       section,
       body,
       passage,
+      indexedPassage,
       score: finalScore,
       coverage,
       exactReference,
@@ -1748,7 +1806,7 @@ export async function discoverRelevantEvidence({
   }
 
   detailed.sort((left, right) =>
-    (!advisoryRanking ? Number(right.exactTopicRouteTarget) - Number(left.exactTopicRouteTarget) : 0) ||
+    (!advisoryRanking && !passageIndex ? Number(right.exactTopicRouteTarget) - Number(left.exactTopicRouteTarget) : 0) ||
     Number(right.exactReference && !right.contextualReference) -
       Number(left.exactReference && !left.contextualReference) ||
     Number(right.contextualReference) - Number(left.contextualReference) ||
@@ -1838,6 +1896,20 @@ export async function discoverRelevantEvidence({
       corpusLabel: String(item.section.corpusLabel || ""),
       applicabilityStatus: String(item.section.applicabilityStatus || ""),
       selectedText: item.passage.text,
+      ...(item.indexedPassage && !item.useSelectedPassageOnly ? { indexedPassage: {
+        id: item.indexedPassage.id, subsectionNumber: item.indexedPassage.subsectionNumber,
+        contextTexts: item.indexedPassage.contextTexts, text: item.indexedPassage.text,
+        completeSubsectionText: item.indexedPassage.completeSubsectionText,
+        scopeComplete: item.indexedPassage.scopeComplete, sourceOffsets: item.indexedPassage.sourceOffsets,
+        sourceTextHash: item.indexedPassage.sourceTextHash,
+        alternatives: (item.indexedPassage.passages || []).slice(0, 3).map(passage => ({
+          id: passage.id, subsectionNumber: passage.subsectionNumber, text: passage.text,
+          contextTexts: passage.contextTexts, completeSubsectionText: passage.completeSubsectionText,
+          sourceOffsets: passage.sourceOffsets, sourceTextHash: passage.sourceTextHash,
+          scopeComplete: passage.scopeComplete
+        })),
+        sameSectionReferences: item.indexedPassage.sameSectionReferences || []
+      } } : {}),
       displayBlock: item.displayBlock,
       blockID: item.passage.blockID || null,
       preparationEligible: item.sourceReviewRequirements.length === 0,
@@ -1941,6 +2013,8 @@ export async function discoverRelevantEvidence({
   return {
     schemaVersion: 2,
     retrievalVersion: evidenceDiscoveryVersion,
+    ...(passageIndex ? { passageIndexFingerprint: passageIndex.fingerprint } : {}),
+    ...(semanticResult ? { semanticSearch: semanticResult.metadata } : {}),
     candidateDisplayVersion: evidenceCandidateDisplayVersion,
     question: normalizedQuestion,
     candidateState: "unreviewed",

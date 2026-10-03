@@ -1,0 +1,2429 @@
+{
+  "grading": "Assistant source review; not a professional legal determination. No live outputs were inspected to set these keys.",
+  "keys": [
+    {
+      "id": "fresh-dev-01-door-1",
+      "split": "development",
+      "familyID": "door-clear-width",
+      "codeFamily": "BC",
+      "question": "For a new NYC office under the 2022 codes, does a required exit door with a 31-inch clear opening meet the ordinary minimum width? There is no special door exception and its occupant load does not require a larger opening.",
+      "expectedAnswer": "No. Ordinary required minimum clear opening is 32 inches, subject to occupant-load capacity. Clear opening is not nominal door-leaf width.",
+      "sourceReferences": [
+        "BC 1010.1.1.1"
+      ],
+      "decisiveReferences": [
+        "BC 1010.1.1.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1010.1.1.1": "6b972bbb0114d93692a1ed4fca60eda41e4c439df745b03805c6aa7e89292c3d"
+      }
+    },
+    {
+      "id": "fresh-dev-01-door-2",
+      "split": "development",
+      "familyID": "door-clear-width",
+      "codeFamily": "BC",
+      "question": "If I use two 30-inch-clear leaves without a center mullion, can I add their widths together to satisfy that minimum?",
+      "expectedAnswer": "No. Where the 32-inch minimum applies, at least one leaf of a pair without a mullion must provide a 32-inch clear opening.",
+      "sourceReferences": [
+        "BC 1010.1.1.1"
+      ],
+      "decisiveReferences": [
+        "BC 1010.1.1.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1010.1.1.1": "6b972bbb0114d93692a1ed4fca60eda41e4c439df745b03805c6aa7e89292c3d"
+      }
+    },
+    {
+      "id": "fresh-dev-01-door-3",
+      "split": "development",
+      "familyID": "door-clear-width",
+      "codeFamily": "BC",
+      "question": "When checking a swinging door, do I measure with it open at 90 degrees or use the nominal leaf width?",
+      "expectedAnswer": "Measure the clear opening between the face of the door and the stop with the door open 90 degrees; nominal leaf width alone is not the clear opening.",
+      "sourceReferences": [
+        "BC 1010.1.1.1"
+      ],
+      "decisiveReferences": [
+        "BC 1010.1.1.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1010.1.1.1": "6b972bbb0114d93692a1ed4fca60eda41e4c439df745b03805c6aa7e89292c3d"
+      }
+    },
+    {
+      "id": "fresh-dev-02-stairs-1",
+      "split": "development",
+      "familyID": "ordinary-stair-dimensions",
+      "codeFamily": "BC",
+      "question": "For an ordinary straight office stair in a new NYC building under the 2022 codes, are 7.5-inch risers acceptable? This is not a dwelling, spiral stair, or assembly aisle.",
+      "expectedAnswer": "No. Ordinary riser maximum is 7 inches and minimum 4 inches.",
+      "sourceReferences": [
+        "BC 1011.5.2",
+        "BC 1011.5.4"
+      ],
+      "decisiveReferences": [
+        "BC 1011.5.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1011.5.2": "0d2c71ad77962a902119f2cd62af034401b99030bd8ec5482d305051da8f2a79",
+        "BC 1011.5.4": "ca9ec232099a88a9bc3a8897849324736c71c29093fb378fad8f477698c9b31a"
+      }
+    },
+    {
+      "id": "fresh-dev-02-stairs-2",
+      "split": "development",
+      "familyID": "ordinary-stair-dimensions",
+      "codeFamily": "BC",
+      "question": "I will reduce the risers to 7 inches. Can the rectangular treads be 10 inches deep?",
+      "expectedAnswer": "No. Rectangular tread depth is at least 11 inches measured horizontally between foremost projections of adjacent treads.",
+      "sourceReferences": [
+        "BC 1011.5.2",
+        "BC 1011.5.4"
+      ],
+      "decisiveReferences": [
+        "BC 1011.5.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1011.5.2": "0d2c71ad77962a902119f2cd62af034401b99030bd8ec5482d305051da8f2a79",
+        "BC 1011.5.4": "ca9ec232099a88a9bc3a8897849324736c71c29093fb378fad8f477698c9b31a"
+      }
+    },
+    {
+      "id": "fresh-dev-02-stairs-3",
+      "split": "development",
+      "familyID": "ordinary-stair-dimensions",
+      "codeFamily": "BC",
+      "question": "In that same flight, the smallest riser is 6 inches and the largest is 6.5 inches. Is that variation acceptable?",
+      "expectedAnswer": "No. The half-inch variation exceeds the 3/8-inch maximum variation in a flight. No stated exception applies.",
+      "sourceReferences": [
+        "BC 1011.5.2",
+        "BC 1011.5.4"
+      ],
+      "decisiveReferences": [
+        "BC 1011.5.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1011.5.2": "0d2c71ad77962a902119f2cd62af034401b99030bd8ec5482d305051da8f2a79",
+        "BC 1011.5.4": "ca9ec232099a88a9bc3a8897849324736c71c29093fb378fad8f477698c9b31a"
+      }
+    },
+    {
+      "id": "fresh-dev-03-water-1",
+      "split": "development",
+      "familyID": "hot-water-service-and-limiting",
+      "codeFamily": "PC",
+      "question": "For a new NYC office under the 2022 codes, may washbasins be supplied with tempered water instead of hot water? I am asking about the required type of supply, not its exact temperature.",
+      "expectedAnswer": "Yes. Nonresidential bathing and washing purposes may be supplied with hot or tempered water.",
+      "sourceReferences": [
+        "PC 607.1",
+        "PC 607.1.1"
+      ],
+      "decisiveReferences": [
+        "PC 607.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 607.1": "a2a651b27e076aa88ff3a4084d3b0b537623971cc6e39749314543196af22bf2",
+        "PC 607.1.1": "b902fa9762601f8dac5c43b0eb073ef9c55d654cfcaf5fc92680facefb181e13"
+      }
+    },
+    {
+      "id": "fresh-dev-03-water-2",
+      "split": "development",
+      "familyID": "hot-water-service-and-limiting",
+      "codeFamily": "PC",
+      "question": "What about a nonresidential laundry in the same project: would only cold water satisfy the supply rule?",
+      "expectedAnswer": "No. Nonresidential laundry purposes require hot water.",
+      "sourceReferences": [
+        "PC 607.1",
+        "PC 607.1.1"
+      ],
+      "decisiveReferences": [
+        "PC 607.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 607.1": "a2a651b27e076aa88ff3a4084d3b0b537623971cc6e39749314543196af22bf2",
+        "PC 607.1.1": "b902fa9762601f8dac5c43b0eb073ef9c55d654cfcaf5fc92680facefb181e13"
+      }
+    },
+    {
+      "id": "fresh-dev-03-water-3",
+      "split": "development",
+      "familyID": "hot-water-service-and-limiting",
+      "codeFamily": "PC",
+      "question": "Where a fixture has a maximum permitted delivery temperature, can the water-heater thermostat alone serve as its required temperature-limiting means?",
+      "expectedAnswer": "No. A water-heater thermostat must not serve as the code-required temperature-limiting means for maximum hot or tempered delivery temperatures at fixtures.",
+      "sourceReferences": [
+        "PC 607.1",
+        "PC 607.1.1"
+      ],
+      "decisiveReferences": [
+        "PC 607.1.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 607.1": "a2a651b27e076aa88ff3a4084d3b0b537623971cc6e39749314543196af22bf2",
+        "PC 607.1.1": "b902fa9762601f8dac5c43b0eb073ef9c55d654cfcaf5fc92680facefb181e13"
+      }
+    },
+    {
+      "id": "fresh-dev-04-vents-1",
+      "split": "development",
+      "familyID": "plumbing-roof-vent-extension",
+      "codeFamily": "PC",
+      "question": "For a new NYC building under the 2022 codes, can an open plumbing vent terminate 18 inches above a roof used only for maintenance?",
+      "expectedAnswer": "No. Open vent termination through an ordinary roof is at least 24 inches above the roof.",
+      "sourceReferences": [
+        "PC 903.1",
+        "PC 903.2"
+      ],
+      "decisiveReferences": [
+        "PC 903.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 903.1": "48425dc39138671cb0d0992957d187b192a7d8e9a0766a14671a0045bc14ab70",
+        "PC 903.2": "adf910df038ea5c985a37adb39e8785d657e391c58537b39fd3ce04a9c0901b1"
+      }
+    },
+    {
+      "id": "fresh-dev-04-vents-2",
+      "split": "development",
+      "familyID": "plumbing-roof-vent-extension",
+      "codeFamily": "PC",
+      "question": "If that roof becomes an occupied observation deck, what height above the roof is required for the open vent?",
+      "expectedAnswer": "At least 7 feet above the roof for an assembly, promenade, observation, sunbathing or similar occupied roof.",
+      "sourceReferences": [
+        "PC 903.1",
+        "PC 903.2"
+      ],
+      "decisiveReferences": [
+        "PC 903.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 903.1": "48425dc39138671cb0d0992957d187b192a7d8e9a0766a14671a0045bc14ab70",
+        "PC 903.2": "adf910df038ea5c985a37adb39e8785d657e391c58537b39fd3ce04a9c0901b1"
+      }
+    },
+    {
+      "id": "fresh-dev-04-vents-3",
+      "split": "development",
+      "familyID": "plumbing-roof-vent-extension",
+      "codeFamily": "PC",
+      "question": "For the roof extension, can a 3-inch vent continue unchanged through the roof? Where would an increase to the required size have to occur?",
+      "expectedAnswer": "No. Roof or wall vent extension must be at least 4 inches diameter; increase must occur at least 1 foot inside the thermal envelope.",
+      "sourceReferences": [
+        "PC 903.1",
+        "PC 903.2"
+      ],
+      "decisiveReferences": [
+        "PC 903.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 903.1": "48425dc39138671cb0d0992957d187b192a7d8e9a0766a14671a0045bc14ab70",
+        "PC 903.2": "adf910df038ea5c985a37adb39e8785d657e391c58537b39fd3ce04a9c0901b1"
+      }
+    },
+    {
+      "id": "fresh-dev-05-exhaust-1",
+      "split": "development",
+      "familyID": "mechanical-exhaust-discharge",
+      "codeFamily": "MC",
+      "question": "In a new NYC office under the 2022 codes, can ordinary mechanical exhaust air be discharged into the attic instead of outside? This is not a whole-house attic fan or a listed ductless cooking hood.",
+      "expectedAnswer": "No. Ordinary mechanical exhaust discharges outdoors; air must not be exhausted into an attic or crawl space. Stated exceptions do not apply.",
+      "sourceReferences": [
+        "MC 501.3"
+      ],
+      "decisiveReferences": [
+        "MC 501.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 501.3": "3cc190ab765caa2f84e304db568a0b6052704710653159ca3d8e999e72385846"
+      }
+    },
+    {
+      "id": "fresh-dev-05-exhaust-2",
+      "split": "development",
+      "familyID": "mechanical-exhaust-discharge",
+      "codeFamily": "MC",
+      "question": "If we move that exhaust outside right beside the fresh-air intake, does reaching the exterior alone satisfy the rule?",
+      "expectedAnswer": "No. Exhaust discharge must not cause a nuisance and must be located so it cannot readily be drawn back in by a ventilating system; outlet distance provisions also apply.",
+      "sourceReferences": [
+        "MC 501.3"
+      ],
+      "decisiveReferences": [
+        "MC 501.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 501.3": "3cc190ab765caa2f84e304db568a0b6052704710653159ca3d8e999e72385846"
+      }
+    },
+    {
+      "id": "fresh-dev-05-exhaust-3",
+      "split": "development",
+      "familyID": "mechanical-exhaust-discharge",
+      "codeFamily": "MC",
+      "question": "For a separate residential kitchen, is a listed and labeled ductless range hood always required to discharge outdoors? Assume it is installed to the manufacturer instructions and the kitchen otherwise has the required ventilation.",
+      "expectedAnswer": "No. The stated listed/labeled domestic ductless range-hood exception allows no outdoor discharge when manufacturer instructions and other required mechanical or natural ventilation are satisfied. This is not a blanket exemption for all exhaust systems.",
+      "sourceReferences": [
+        "MC 501.3"
+      ],
+      "decisiveReferences": [
+        "MC 501.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 501.3": "3cc190ab765caa2f84e304db568a0b6052704710653159ca3d8e999e72385846"
+      }
+    },
+    {
+      "id": "fresh-dev-06-tailpipe-1",
+      "split": "development",
+      "familyID": "stationary-motor-vehicle-exhaust",
+      "codeFamily": "MC",
+      "question": "In a commercial NYC vehicle service area under the 2022 codes, gasoline engines are run while vehicles remain stationary for diagnostics. Is general room ventilation enough, or is tailpipe capture also required?",
+      "expectedAnswer": "Source capture directly connected to motor-vehicle exhaust systems is additionally required, alongside mechanical ventilation. Capture must be engineered by a registered design professional or factory-built and designed/sized for the purpose.",
+      "sourceReferences": [
+        "MC 502.14"
+      ],
+      "decisiveReferences": [
+        "MC 502.14"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 502.14": "d8ba7e3b7228f7c5f555057706ddbe957642460778b4fc0267c3177062f7618f"
+      }
+    },
+    {
+      "id": "fresh-dev-06-tailpipe-2",
+      "split": "development",
+      "familyID": "stationary-motor-vehicle-exhaust",
+      "codeFamily": "MC",
+      "question": "If the service area operates and repairs only electric vehicles, does that same tailpipe-capture section apply?",
+      "expectedAnswer": "No. That section expressly does not apply to vehicles operated or repaired that are electrically powered. Do not claim exemption from every other ventilation requirement.",
+      "sourceReferences": [
+        "MC 502.14"
+      ],
+      "decisiveReferences": [
+        "MC 502.14"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 502.14": "d8ba7e3b7228f7c5f555057706ddbe957642460778b4fc0267c3177062f7618f"
+      }
+    },
+    {
+      "id": "fresh-dev-06-tailpipe-3",
+      "split": "development",
+      "familyID": "stationary-motor-vehicle-exhaust",
+      "codeFamily": "MC",
+      "question": "What if gasoline engines are run indoors only long enough to move vehicles in and out, with all diagnostics done outside?",
+      "expectedAnswer": "The service-area exception to this section applies when engines operate inside only for movement into and out of the building; do not claim no other ventilation rules apply.",
+      "sourceReferences": [
+        "MC 502.14"
+      ],
+      "decisiveReferences": [
+        "MC 502.14"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 502.14": "d8ba7e3b7228f7c5f555057706ddbe957642460778b4fc0267c3177062f7618f"
+      }
+    },
+    {
+      "id": "fresh-dev-07-sediment-1",
+      "split": "development",
+      "familyID": "appliance-sediment-trap",
+      "codeFamily": "FGC",
+      "question": "For a gas-fired boiler in a new NYC building under the 2022 codes, is a sediment trap required if the boiler has none built into it?",
+      "expectedAnswer": "Yes. A sediment trap is required where not incorporated in the appliance, unless a named exempt appliance applies; ordinary boiler is not listed as exempt.",
+      "sourceReferences": [
+        "FGC 408.4"
+      ],
+      "decisiveReferences": [
+        "FGC 408.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce"
+      }
+    },
+    {
+      "id": "fresh-dev-07-sediment-2",
+      "split": "development",
+      "familyID": "appliance-sediment-trap",
+      "codeFamily": "FGC",
+      "question": "Should that trap be upstream or downstream of the appliance shutoff valve?",
+      "expectedAnswer": "Downstream of the appliance shutoff valve, as close to appliance inlet as practical.",
+      "sourceReferences": [
+        "FGC 408.4"
+      ],
+      "decisiveReferences": [
+        "FGC 408.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce"
+      }
+    },
+    {
+      "id": "fresh-dev-07-sediment-3",
+      "split": "development",
+      "familyID": "appliance-sediment-trap",
+      "codeFamily": "FGC",
+      "question": "Would the same external-trap requirement apply to an ordinary gas range with no built-in sediment trap?",
+      "expectedAnswer": "No. Ranges are expressly among appliances that need not be equipped with the sediment trap under this provision. Do not turn the boiler answer into a universal requirement.",
+      "sourceReferences": [
+        "FGC 408.4"
+      ],
+      "decisiveReferences": [
+        "FGC 408.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce"
+      }
+    },
+    {
+      "id": "fresh-dev-08-route-1",
+      "split": "development",
+      "familyID": "gas-piping-prohibited-locations",
+      "codeFamily": "FGC",
+      "question": "In a new NYC building under the 2022 codes, may fuel-gas piping run through an ordinary HVAC return-air duct?",
+      "expectedAnswer": "No. Gas piping must not be installed in or through supply, return or exhaust ducts.",
+      "sourceReferences": [
+        "FGC 404.3"
+      ],
+      "decisiveReferences": [
+        "FGC 404.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 404.3": "5562a93e03d358a4f6d2b2fac0e832ecda224959a7d55884d4aaa0c44ab0adcc"
+      }
+    },
+    {
+      "id": "fresh-dev-08-route-2",
+      "split": "development",
+      "familyID": "gas-piping-prohibited-locations",
+      "codeFamily": "FGC",
+      "question": "Could we move it into a shaft that contains a fire standpipe riser instead?",
+      "expectedAnswer": "No. Gas piping must not be installed in any shaft containing standpipe risers.",
+      "sourceReferences": [
+        "FGC 404.3"
+      ],
+      "decisiveReferences": [
+        "FGC 404.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 404.3": "5562a93e03d358a4f6d2b2fac0e832ecda224959a7d55884d4aaa0c44ab0adcc"
+      }
+    },
+    {
+      "id": "fresh-dev-08-route-3",
+      "split": "development",
+      "familyID": "gas-piping-prohibited-locations",
+      "codeFamily": "FGC",
+      "question": "What about using the fire-pump room as the access route into a gas-meter room?",
+      "expectedAnswer": "No. Access to gas-meter rooms must not pass through spaces housing a fire pump. Gas piping, appliances and other gas equipment are also prohibited within such spaces.",
+      "sourceReferences": [
+        "FGC 404.3"
+      ],
+      "decisiveReferences": [
+        "FGC 404.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 404.3": "5562a93e03d358a4f6d2b2fac0e832ecda224959a7d55884d4aaa0c44ab0adcc"
+      }
+    },
+    {
+      "id": "fresh-dev-09-candles-1",
+      "split": "development",
+      "familyID": "candle-open-flame-safety",
+      "codeFamily": "FC",
+      "question": "In NYC, may students keep and use ordinary wax candles in a Group R-1 college dormitory?",
+      "expectedAnswer": "No. Storage or use of candles, incense and similar open-flame producing items is prohibited in Group R-1 college and university dormitories.",
+      "sourceReferences": [
+        "FC 308"
+      ],
+      "decisiveReferences": [
+        "FC 308.3(4)"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 308": "9fe9a98084c9ed21296d1dbcc65922e13aab426d48297814ceb09964f7bf12fa"
+      }
+    },
+    {
+      "id": "fresh-dev-09-candles-2",
+      "split": "development",
+      "familyID": "candle-open-flame-safety",
+      "codeFamily": "FC",
+      "question": "For a separate ordinary office where candle use is otherwise allowed, how far must a lit candle be kept from curtains or other combustible materials?",
+      "expectedAnswer": "At least 3 feet from combustible material or combustible waste; other safety precautions remain applicable.",
+      "sourceReferences": [
+        "FC 308"
+      ],
+      "decisiveReferences": [
+        "FC 308.4(4)"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 308": "9fe9a98084c9ed21296d1dbcc65922e13aab426d48297814ceb09964f7bf12fa"
+      }
+    },
+    {
+      "id": "fresh-dev-09-candles-3",
+      "split": "development",
+      "familyID": "candle-open-flame-safety",
+      "codeFamily": "FC",
+      "question": "If the holder is secured and on a noncombustible surface, may the person attending that office candle leave while it is still lit?",
+      "expectedAnswer": "No. Candles and other unenclosed open flames must be constantly attended while lit; placement precautions do not waive attendance.",
+      "sourceReferences": [
+        "FC 308"
+      ],
+      "decisiveReferences": [
+        "FC 308.4(1)"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 308": "9fe9a98084c9ed21296d1dbcc65922e13aab426d48297814ceb09964f7bf12fa"
+      }
+    },
+    {
+      "id": "fresh-dev-10-surfacing-1",
+      "split": "development",
+      "familyID": "commercial-parking-surfacing",
+      "codeFamily": "ZR",
+      "question": "For a permanent open accessory parking facility in a NYC C4-2 commercial district, can we leave the surface as dusty bare soil?",
+      "expectedAnswer": "No. Grading, construction, surfacing and maintenance must provide adequate drainage and prevent dust. Permanent open accessory group parking requires permeable paving, asphaltic or Portland cement concrete, or another hard-surfaced dustless material.",
+      "sourceReferences": [
+        "ZR 36-54"
+      ],
+      "decisiveReferences": [
+        "ZR 36-54"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-54": "e86c143d17e1c6f6a1484ffe9212c2261caa55f86d29d2fcedd2fa9e96d7120d"
+      }
+    },
+    {
+      "id": "fresh-dev-10-surfacing-2",
+      "split": "development",
+      "familyID": "commercial-parking-surfacing",
+      "codeFamily": "ZR",
+      "question": "Would permeable paving be allowed, or must the surface be conventional asphalt?",
+      "expectedAnswer": "Permeable paving is expressly allowed; conventional asphalt is not mandatory. Adequate drainage and dust prevention still apply.",
+      "sourceReferences": [
+        "ZR 36-54"
+      ],
+      "decisiveReferences": [
+        "ZR 36-54"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-54": "e86c143d17e1c6f6a1484ffe9212c2261caa55f86d29d2fcedd2fa9e96d7120d"
+      }
+    },
+    {
+      "id": "fresh-dev-10-surfacing-3",
+      "split": "development",
+      "familyID": "commercial-parking-surfacing",
+      "codeFamily": "ZR",
+      "question": "If the paving is dustless but the site is graded so water collects without adequate drainage, is the surfacing rule satisfied?",
+      "expectedAnswer": "No. Adequate drainage is required as well as dust prevention; one does not substitute for the other.",
+      "sourceReferences": [
+        "ZR 36-54"
+      ],
+      "decisiveReferences": [
+        "ZR 36-54"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-54": "e86c143d17e1c6f6a1484ffe9212c2261caa55f86d29d2fcedd2fa9e96d7120d"
+      }
+    },
+    {
+      "id": "fresh-hold-01-projections-1",
+      "split": "heldout",
+      "familyID": "egress-horizontal-projections",
+      "codeFamily": "BC",
+      "question": "For an ordinary office circulation path in a new NYC building under the 2022 codes, may a wall-mounted cabinet project 5 inches when its leading edge is 40 inches above the floor? Assume no special exception.",
+      "expectedAnswer": "No. Objects with leading edges more than 27 and not more than 80 inches above floor may project at most 4 inches into circulation path.",
+      "sourceReferences": [
+        "BC 1003.3.3"
+      ],
+      "decisiveReferences": [
+        "BC 1003.3.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1003.3.3": "f30965141210bf1006affc90c2934c9e44112c66ac7d2082c813b2657490895f"
+      }
+    },
+    {
+      "id": "fresh-hold-01-projections-2",
+      "split": "heldout",
+      "familyID": "egress-horizontal-projections",
+      "codeFamily": "BC",
+      "question": "If it is a handrail projecting 4.5 inches instead of a cabinet, does the projection exception allow it?",
+      "expectedAnswer": "Yes. Handrails may protrude 4.5 inches from the wall under the stated exception; this is only the projection condition, not approval of all clearances.",
+      "sourceReferences": [
+        "BC 1003.3.3"
+      ],
+      "decisiveReferences": [
+        "BC 1003.3.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1003.3.3": "f30965141210bf1006affc90c2934c9e44112c66ac7d2082c813b2657490895f"
+      }
+    },
+    {
+      "id": "fresh-hold-02-duration-1",
+      "split": "heldout",
+      "familyID": "emergency-egress-power-duration",
+      "codeFamily": "BC",
+      "question": "For a new NYC office under the 2022 codes, is a 60-minute battery supply sufficient for the required emergency means-of-egress lighting duration?",
+      "expectedAnswer": "No. Emergency power must supply at least 90 minutes.",
+      "sourceReferences": [
+        "BC 1008.3.4"
+      ],
+      "decisiveReferences": [
+        "BC 1008.3.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1008.3.4": "3eeedb4fe0d16da51945ddf6243d64421306b79ece6d3dcc9f499c8924b6ac03"
+      }
+    },
+    {
+      "id": "fresh-hold-02-duration-2",
+      "split": "heldout",
+      "familyID": "emergency-egress-power-duration",
+      "codeFamily": "BC",
+      "question": "Would an on-site generator be an allowed source instead of storage batteries if it provides that duration and complies with the installation requirements?",
+      "expectedAnswer": "Yes. Storage batteries, unit equipment or an on-site generator are named permissible sources; at least 90 minutes and installation requirements still apply.",
+      "sourceReferences": [
+        "BC 1008.3.4"
+      ],
+      "decisiveReferences": [
+        "BC 1008.3.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1008.3.4": "3eeedb4fe0d16da51945ddf6243d64421306b79ece6d3dcc9f499c8924b6ac03"
+      }
+    },
+    {
+      "id": "fresh-hold-03-exit-sign-1",
+      "split": "heldout",
+      "familyID": "externally-illuminated-exit-sign",
+      "codeFamily": "BC",
+      "question": "In a new NYC office under the 2022 codes, what minimum illumination intensity is required on the face of an exit sign lit by an external lamp?",
+      "expectedAnswer": "At least 25 footcandles at the face of an externally illuminated exit sign. Do not substitute walking-surface illumination or generic 5-footcandle guidance.",
+      "sourceReferences": [
+        "BC 1013.6.2"
+      ],
+      "decisiveReferences": [
+        "BC 1013.6.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1013.6.2": "ed8ec0d06978faea168d6c5b495ca6b059918dfe09c1ce99a9d2efe814d05682"
+      }
+    },
+    {
+      "id": "fresh-hold-03-exit-sign-2",
+      "split": "heldout",
+      "familyID": "externally-illuminated-exit-sign",
+      "codeFamily": "BC",
+      "question": "So a measured intensity of 10 footcandles on that externally lit sign face is sufficient?",
+      "expectedAnswer": "No. 10 footcandles is below the 25-footcandle minimum; maintain external-sign-face context.",
+      "sourceReferences": [
+        "BC 1013.6.2"
+      ],
+      "decisiveReferences": [
+        "BC 1013.6.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1013.6.2": "ed8ec0d06978faea168d6c5b495ca6b059918dfe09c1ce99a9d2efe814d05682"
+      }
+    },
+    {
+      "id": "fresh-hold-04-stair-penetrations-1",
+      "split": "heldout",
+      "familyID": "interior-exit-stair-penetrations",
+      "codeFamily": "BC",
+      "question": "In a new NYC office under the 2022 codes, may a general office supply-air duct penetrate an interior exit stair enclosure merely because the opening is firestopped? It does not serve independent stair ventilation or pressurization.",
+      "expectedAnswer": "No. Interior exit stair/ramp penetrations are prohibited except listed necessary systems. General office supply duct is not a listed exception; firestopping alone does not authorize it.",
+      "sourceReferences": [
+        "BC 1023.5"
+      ],
+      "decisiveReferences": [
+        "BC 1023.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1023.5": "8f692bb70f129f0b3bf308e19582038d5c5d5900db267a7a55eaa64124b15351"
+      }
+    },
+    {
+      "id": "fresh-hold-04-stair-penetrations-2",
+      "split": "heldout",
+      "familyID": "interior-exit-stair-penetrations",
+      "codeFamily": "BC",
+      "question": "Can a protected communication opening connect the two adjacent interior exit stair enclosures?",
+      "expectedAnswer": "No. Penetrations or communication openings between adjacent interior exit stairways/ramps are prohibited whether protected or not.",
+      "sourceReferences": [
+        "BC 1023.5"
+      ],
+      "decisiveReferences": [
+        "BC 1023.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1023.5": "8f692bb70f129f0b3bf308e19582038d5c5d5900db267a7a55eaa64124b15351"
+      }
+    },
+    {
+      "id": "fresh-hold-05-travel-1",
+      "split": "heldout",
+      "familyID": "exit-access-travel-measurement",
+      "codeFamily": "BC",
+      "question": "For an ordinary NYC office under the 2022 codes, should exit-access travel distance be drawn as a straight line through partitions or along the actual unobstructed route to an exit? This is not an open garage or assembly occupancy.",
+      "expectedAnswer": "Measure from most remote point on story along natural unobstructed path of horizontal and vertical egress travel to entrance to an exit; not through partitions.",
+      "sourceReferences": [
+        "BC 1017.3"
+      ],
+      "decisiveReferences": [
+        "BC 1017.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1017.3": "7e885f6ab989b51f6c0bb97065ca8ec39b85589d4a92117a7fa7a13da910e4c7"
+      }
+    },
+    {
+      "id": "fresh-hold-05-travel-2",
+      "split": "heldout",
+      "familyID": "exit-access-travel-measurement",
+      "codeFamily": "BC",
+      "question": "Does the measurement generally stop at the entrance to the exit, or continue all the way to the street?",
+      "expectedAnswer": "For this exit-access travel distance measure it stops at entrance to an exit; do not confuse exit access with total route to street or discharge.",
+      "sourceReferences": [
+        "BC 1017.3"
+      ],
+      "decisiveReferences": [
+        "BC 1017.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1017.3": "7e885f6ab989b51f6c0bb97065ca8ec39b85589d4a92117a7fa7a13da910e4c7"
+      }
+    },
+    {
+      "id": "fresh-hold-06-sound-1",
+      "split": "heldout",
+      "familyID": "dwelling-separation-airborne-sound",
+      "codeFamily": "BC",
+      "question": "For a wall separating apartments in a new NYC building under the 2022 codes, is a laboratory-tested airborne-sound rating of STC 45 sufficient?",
+      "expectedAnswer": "No. Laboratory-tested airborne-sound transmission class must be at least 50 under ASTM E 90 for stated dwelling-unit separation. Distinguish field-tested alternative.",
+      "sourceReferences": [
+        "BC 1207.2"
+      ],
+      "decisiveReferences": [
+        "BC 1207.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1207.2": "291940ddd6c8e943c2f7fa911cb02e048dee90058bbaa9e95b9f51869032597c"
+      }
+    },
+    {
+      "id": "fresh-hold-06-sound-2",
+      "split": "heldout",
+      "familyID": "dwelling-separation-airborne-sound",
+      "codeFamily": "BC",
+      "question": "If the completed separating construction is instead field tested to ASTM E 336 at STC 45, does that meet the stated field-tested minimum?",
+      "expectedAnswer": "Yes. Field-tested minimum under ASTM E 336 is STC 45; laboratory minimum remains 50. Penetrations must maintain required rating if addressed.",
+      "sourceReferences": [
+        "BC 1207.2"
+      ],
+      "decisiveReferences": [
+        "BC 1207.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "BC 1207.2": "291940ddd6c8e943c2f7fa911cb02e048dee90058bbaa9e95b9f51869032597c"
+      }
+    },
+    {
+      "id": "fresh-hold-07-relief-1",
+      "split": "heldout",
+      "familyID": "water-heater-relief-discharge",
+      "codeFamily": "PC",
+      "question": "For a NYC water heater under the 2022 codes, may its temperature-and-pressure relief discharge pipe be connected directly to the sanitary drain without an air gap?",
+      "expectedAnswer": "No. Relief discharge must not connect directly to drainage; discharge through an air gap located in same room as water heater.",
+      "sourceReferences": [
+        "PC 504.6"
+      ],
+      "decisiveReferences": [
+        "PC 504.6"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 504.6": "eafe67abe1829419a63d9cadd650fa34684fa2736314ce9453c99521d70d2271"
+      }
+    },
+    {
+      "id": "fresh-hold-07-relief-2",
+      "split": "heldout",
+      "familyID": "water-heater-relief-discharge",
+      "codeFamily": "PC",
+      "question": "If it is routed to the required air gap, can we add a shutoff valve to that relief discharge pipe?",
+      "expectedAnswer": "No. Relief discharge piping must not have valves or tee fittings. Air-gap compliance does not waive this restriction.",
+      "sourceReferences": [
+        "PC 504.6"
+      ],
+      "decisiveReferences": [
+        "PC 504.6"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 504.6": "eafe67abe1829419a63d9cadd650fa34684fa2736314ce9453c99521d70d2271"
+      }
+    },
+    {
+      "id": "fresh-hold-08-trap-size-1",
+      "split": "heldout",
+      "familyID": "fixture-trap-relative-size",
+      "codeFamily": "PC",
+      "question": "Under the 2022 NYC codes, can a fixture use a 3-inch trap that discharges into a 2-inch drainage pipe? I am asking about the relative sizes, not the fixture table minimum.",
+      "expectedAnswer": "No. A trap must not be larger than the drainage pipe into which it discharges. Fixture table minimum and sufficient drainage must also be met.",
+      "sourceReferences": [
+        "PC 1002.5"
+      ],
+      "decisiveReferences": [
+        "PC 1002.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 1002.5": "1cc0840300fd66c936052ccb3fc331018c3d5f44df42c2067631b3b102d3ea69"
+      }
+    },
+    {
+      "id": "fresh-hold-08-trap-size-2",
+      "split": "heldout",
+      "familyID": "fixture-trap-relative-size",
+      "codeFamily": "PC",
+      "question": "Would changing the downstream pipe to 3 inches eliminate that particular size conflict, assuming the fixture table minimum is met?",
+      "expectedAnswer": "Yes as to this relative-size restriction: a 3-inch trap discharging into a 3-inch pipe is not larger than downstream pipe. Do not give blanket installation approval.",
+      "sourceReferences": [
+        "PC 1002.5"
+      ],
+      "decisiveReferences": [
+        "PC 1002.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 1002.5": "1cc0840300fd66c936052ccb3fc331018c3d5f44df42c2067631b3b102d3ea69"
+      }
+    },
+    {
+      "id": "fresh-hold-09-trap-recess-1",
+      "split": "heldout",
+      "familyID": "underground-trap-recess",
+      "codeFamily": "PC",
+      "question": "In a new NYC building under the 2022 codes, what construction is required for the sides and bottom of a recess used to connect a bathtub trap below a slab?",
+      "expectedAnswer": "Sides and bottom of trap-connection recess must be corrosion-resistant and insect- and vermin-proof.",
+      "sourceReferences": [
+        "PC 1002.8"
+      ],
+      "decisiveReferences": [
+        "PC 1002.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 1002.8": "74250dd922cb145d819ae5267df3ac718c4f3a15397281e3ddbccd9cbe889cd8"
+      }
+    },
+    {
+      "id": "fresh-hold-09-trap-recess-2",
+      "split": "heldout",
+      "familyID": "underground-trap-recess",
+      "codeFamily": "PC",
+      "question": "If the sides meet that requirement but the bottom is left as exposed soil, has the stated recess-construction condition been met?",
+      "expectedAnswer": "No. Both sides and bottom must have corrosion-resistant, insect- and vermin-proof construction; compliant sides alone are insufficient.",
+      "sourceReferences": [
+        "PC 1002.8"
+      ],
+      "decisiveReferences": [
+        "PC 1002.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 1002.8": "74250dd922cb145d819ae5267df3ac718c4f3a15397281e3ddbccd9cbe889cd8"
+      }
+    },
+    {
+      "id": "fresh-hold-10-cleanout-1",
+      "split": "heldout",
+      "familyID": "cleanout-cleaning-direction",
+      "codeFamily": "PC",
+      "question": "For an ordinary one-way sanitary-drain cleanout in a new NYC building under the 2022 codes, should its installation permit cleaning against the drainage flow? This is not a test tee or approved two-way cleanout.",
+      "expectedAnswer": "No. Ordinary arrangement must enable cleaning only in direction of drainage flow.",
+      "sourceReferences": [
+        "PC 708.1.8"
+      ],
+      "decisiveReferences": [
+        "PC 708.1.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 708.1.8": "ec370155ee91a6dc8ff7d95ffe8667c963e9325a1bc7ea106c7192e6f6f369ae"
+      }
+    },
+    {
+      "id": "fresh-hold-10-cleanout-2",
+      "split": "heldout",
+      "familyID": "cleanout-cleaning-direction",
+      "codeFamily": "PC",
+      "question": "If we use an approved two-way cleanout meeting the change-of-direction requirements, does the ordinary one-direction restriction still prohibit it?",
+      "expectedAnswer": "No. Approved two-way cleanout meeting the referenced requirements is a stated exception; do not require every cleanout to be one-way.",
+      "sourceReferences": [
+        "PC 708.1.8"
+      ],
+      "decisiveReferences": [
+        "PC 708.1.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 708.1.8": "ec370155ee91a6dc8ff7d95ffe8667c963e9325a1bc7ea106c7192e6f6f369ae"
+      }
+    },
+    {
+      "id": "fresh-hold-11-dishwasher-1",
+      "split": "heldout",
+      "familyID": "commercial-dishwasher-indirect-waste",
+      "codeFamily": "PC",
+      "question": "For a commercial dishwasher in a new NYC restaurant under the 2022 codes, can its discharge connect directly to sanitary piping without an air gap or air break?",
+      "expectedAnswer": "No. Commercial dishwasher discharge must be through air gap or air break into waste receptor, subject to indirect-waste installation requirements.",
+      "sourceReferences": [
+        "PC 802.1.7"
+      ],
+      "decisiveReferences": [
+        "PC 802.1.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 802.1.7": "9fc0bb7c36ae6dee69c9b905cc5d840f2cc67b641a75656f2c1aad3d85df6ff7"
+      }
+    },
+    {
+      "id": "fresh-hold-11-dishwasher-2",
+      "split": "heldout",
+      "familyID": "commercial-dishwasher-indirect-waste",
+      "codeFamily": "PC",
+      "question": "Is an air break into a waste receptor expressly an option, or does this rule allow only an air gap?",
+      "expectedAnswer": "Air break as well as air gap is expressly an option under this commercial-dishwasher provision; related installation requirements remain.",
+      "sourceReferences": [
+        "PC 802.1.7"
+      ],
+      "decisiveReferences": [
+        "PC 802.1.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 802.1.7": "9fc0bb7c36ae6dee69c9b905cc5d840f2cc67b641a75656f2c1aad3d85df6ff7"
+      }
+    },
+    {
+      "id": "fresh-hold-12-nonpotable-1",
+      "split": "heldout",
+      "familyID": "nonpotable-water-identification",
+      "codeFamily": "PC",
+      "question": "For a new NYC building under the 2022 codes, how should a hose outlet using nonpotable water be marked so users do not mistake it for drinking water?",
+      "expectedAnswer": "Sign/tag or indelible fixture marking must identify application and warn CAUTION: NONPOTABLE WATER \u2013 DO NOT DRINK; corrosion-resistant waterproof signage, contrasting letters at least 0.5 inch high, plus Do Not Drink pictograph.",
+      "sourceReferences": [
+        "PC 608.8.1",
+        "PC 608.8.2"
+      ],
+      "decisiveReferences": [
+        "PC 608.8.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 608.8.1": "6e74bc9f3c2b52d516c371bcaa13766118eba8cd5e51c94f43fa97fc4c529e5e",
+        "PC 608.8.2": "e67a5cd2506d6ad7768cb4e5a538c508e80ef30d8e0dc66616328f8894eeec30"
+      }
+    },
+    {
+      "id": "fresh-hold-12-nonpotable-2",
+      "split": "heldout",
+      "familyID": "nonpotable-water-identification",
+      "codeFamily": "PC",
+      "question": "For the nonpotable distribution pipes, can the identification be repeated every 40 feet rather than every 25 feet?",
+      "expectedAnswer": "No. Repeat identification at intervals no more than 25 feet and at wall/floor/roof penetrations. Purple piping or purple tape/wrap and required warning/contents/flow arrow apply.",
+      "sourceReferences": [
+        "PC 608.8.1",
+        "PC 608.8.2"
+      ],
+      "decisiveReferences": [
+        "PC 608.8.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "PC 608.8.1": "6e74bc9f3c2b52d516c371bcaa13766118eba8cd5e51c94f43fa97fc4c529e5e",
+        "PC 608.8.2": "e67a5cd2506d6ad7768cb4e5a538c508e80ef30d8e0dc66616328f8894eeec30"
+      }
+    },
+    {
+      "id": "fresh-hold-13-crawl-1",
+      "split": "heldout",
+      "familyID": "under-floor-appliance-access",
+      "codeFamily": "MC",
+      "question": "For an under-floor HVAC appliance in a new NYC office under the 2022 codes, is a 25-foot-long passage only 30 inches high and 22 inches wide acceptable? The appliance cannot be serviced or removed directly through the access opening.",
+      "expectedAnswer": "No. Ordinary under-floor passage max 20 feet with minimum 30-inch height/22-inch width. Stated facts do not meet either length exception.",
+      "sourceReferences": [
+        "MC 306.4"
+      ],
+      "decisiveReferences": [
+        "MC 306.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 306.4": "a36fb67b4badc2a97fd7fb60aa08fa278213aa5f2c69fc75db7fc256c599073f"
+      }
+    },
+    {
+      "id": "fresh-hold-13-crawl-2",
+      "split": "heldout",
+      "familyID": "under-floor-appliance-access",
+      "codeFamily": "MC",
+      "question": "If that same passage is unobstructed and 6 feet high and 22 inches wide for its entire length, is it still limited to 20 feet by this passage-length rule?",
+      "expectedAnswer": "No. Unobstructed passage at least 6 feet high and 22 inches wide for entire length is not limited in length under exception. Keep other access/removal/service requirements.",
+      "sourceReferences": [
+        "MC 306.4"
+      ],
+      "decisiveReferences": [
+        "MC 306.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 306.4": "a36fb67b4badc2a97fd7fb60aa08fa278213aa5f2c69fc75db7fc256c599073f"
+      }
+    },
+    {
+      "id": "fresh-hold-14-roof-1",
+      "split": "heldout",
+      "familyID": "rooftop-equipment-access",
+      "codeFamily": "MC",
+      "question": "For rooftop HVAC equipment on a new NYC office under the 2022 codes, service personnel must climb 18 feet above grade. Can the required access depend on bringing a portable ladder?",
+      "expectedAnswer": "No. Where climb is higher than 16 feet, interior/exterior means of access must be provided and required access cannot use portable ladders. Office is not Group R-3 exception.",
+      "sourceReferences": [
+        "MC 306.5"
+      ],
+      "decisiveReferences": [
+        "MC 306.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 306.5": "b883e27fbce2a571e2275e779fffba1042e8acb8be6fec0a66c7640b12ebbee7"
+      }
+    },
+    {
+      "id": "fresh-hold-14-roof-2",
+      "split": "heldout",
+      "familyID": "rooftop-equipment-access",
+      "codeFamily": "MC",
+      "question": "Along that required route, can personnel be made to climb over a 36-inch-high obstruction?",
+      "expectedAnswer": "No. Route must not require climbing over obstructions greater than 30 inches; 36 inches fails this condition.",
+      "sourceReferences": [
+        "MC 306.5"
+      ],
+      "decisiveReferences": [
+        "MC 306.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 306.5": "b883e27fbce2a571e2275e779fffba1042e8acb8be6fec0a66c7640b12ebbee7"
+      }
+    },
+    {
+      "id": "fresh-hold-15-vessel-1",
+      "split": "heldout",
+      "familyID": "pressure-vessel-relief-device",
+      "codeFamily": "MC",
+      "question": "For a pressure vessel in a new NYC mechanical installation under the 2022 codes, is a pressure relief valve always the only permitted protection, or can a pressure-limiting device be used?",
+      "expectedAnswer": "A pressure relief valve or pressure-limiting device is permitted as required by vessel manufacturer instructions and ASME Boiler and Pressure Vessel Code or ASME CSD-1. Do not claim either is freely interchangeable without requirements.",
+      "sourceReferences": [
+        "MC 1006.3"
+      ],
+      "decisiveReferences": [
+        "MC 1006.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 1006.3": "d7081b82626590590601ddace6e93694ab5d3d08a09a98475fca4b5222d6973d"
+      }
+    },
+    {
+      "id": "fresh-hold-15-vessel-2",
+      "split": "heldout",
+      "familyID": "pressure-vessel-relief-device",
+      "codeFamily": "MC",
+      "question": "If the vessel manufacturer requires a relief valve, may we choose a pressure-limiting device instead merely because the code mentions that alternative?",
+      "expectedAnswer": "No. Provision requires protection consistent with manufacturer instructions and referenced standards; named alternative does not override manufacturer requirement.",
+      "sourceReferences": [
+        "MC 1006.3"
+      ],
+      "decisiveReferences": [
+        "MC 1006.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 1006.3": "d7081b82626590590601ddace6e93694ab5d3d08a09a98475fca4b5222d6973d"
+      }
+    },
+    {
+      "id": "fresh-hold-16-duct-support-1",
+      "split": "heldout",
+      "familyID": "duct-support-suspended-ceiling",
+      "codeFamily": "MC",
+      "question": "For new NYC HVAC ductwork under the 2022 codes, may the ducts be hung from a suspended-ceiling grid?",
+      "expectedAnswer": "No. Ducts must not be hung from or supported by suspended ceilings; applicable support standards/manufacturer instructions govern.",
+      "sourceReferences": [
+        "MC 603.10"
+      ],
+      "decisiveReferences": [
+        "MC 603.10"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 603.10": "8f07a8c316e5a544b3132c06ee189eee2f431a9e24d141d2d104e7ff7f02f4d2"
+      }
+    },
+    {
+      "id": "fresh-hold-16-duct-support-2",
+      "split": "heldout",
+      "familyID": "duct-support-suspended-ceiling",
+      "codeFamily": "MC",
+      "question": "For flexible factory-made ducts, whose installation instructions govern the supports?",
+      "expectedAnswer": "Manufacturer instructions govern flexible and other factory-made duct supports; suspended ceiling support prohibition still applies.",
+      "sourceReferences": [
+        "MC 603.10"
+      ],
+      "decisiveReferences": [
+        "MC 603.10"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 603.10": "8f07a8c316e5a544b3132c06ee189eee2f431a9e24d141d2d104e7ff7f02f4d2"
+      }
+    },
+    {
+      "id": "fresh-hold-17-vapor-1",
+      "split": "heldout",
+      "familyID": "externally-insulated-cooling-duct-vapor-retarder",
+      "codeFamily": "MC",
+      "question": "For a new NYC cooling duct under the 2022 codes, externally applied insulation has a permeance of 0.1 perm. Is that low enough to omit a separate vapor retarder under the stated insulation exception?",
+      "expectedAnswer": "No. Exception for insulation itself applies at permeance 0.05 perm or less. Otherwise retarder max 0.05 perm or aluminum foil at least 2 mils, with sealed joints/seams.",
+      "sourceReferences": [
+        "MC 604.11"
+      ],
+      "decisiveReferences": [
+        "MC 604.11"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 604.11": "aeae227d027c9396500208e11989882d7918b3dbda021fd936762c96859f9f7c"
+      }
+    },
+    {
+      "id": "fresh-hold-17-vapor-2",
+      "split": "heldout",
+      "familyID": "externally-insulated-cooling-duct-vapor-retarder",
+      "codeFamily": "MC",
+      "question": "If the insulation itself is rated 0.04 perm, does that specific exception allow it to be used without a separate vapor-retarder covering?",
+      "expectedAnswer": "Yes. Insulation with permeance no more than 0.05 perm need not be covered with separate vapor retarder; maintain applicable seam/continuity provisions.",
+      "sourceReferences": [
+        "MC 604.11"
+      ],
+      "decisiveReferences": [
+        "MC 604.11"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 604.11": "aeae227d027c9396500208e11989882d7918b3dbda021fd936762c96859f9f7c"
+      }
+    },
+    {
+      "id": "fresh-hold-18-liner-1",
+      "split": "heldout",
+      "familyID": "duct-liner-downstream-cooling-coil",
+      "codeFamily": "MC",
+      "question": "For a new NYC HVAC system under the 2022 codes, can water-permeable exposed internal duct insulation line the portion from the cooling-coil exit to the downstream end of its drain pan?",
+      "expectedAnswer": "No. Exposed internal insulation not impermeable to water is prohibited in that segment.",
+      "sourceReferences": [
+        "MC 604.13"
+      ],
+      "decisiveReferences": [
+        "MC 604.13"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 604.13": "fbf8ba98de15ace9f15f30d0b834b103d058ae7745a4a6f26376ddc43fbcff5f"
+      }
+    },
+    {
+      "id": "fresh-hold-18-liner-2",
+      "split": "heldout",
+      "familyID": "duct-liner-downstream-cooling-coil",
+      "codeFamily": "MC",
+      "question": "Would a durable water-impermeable liner avoid that particular prohibition, assuming it satisfies the required durability testing?",
+      "expectedAnswer": "Yes as to the specific water-permeability prohibition. Internal airstream insulation must show durability under UL 181; no blanket approval of all system requirements.",
+      "sourceReferences": [
+        "MC 604.13"
+      ],
+      "decisiveReferences": [
+        "MC 604.13"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "MC 604.13": "fbf8ba98de15ace9f15f30d0b834b103d058ae7745a4a6f26376ddc43fbcff5f"
+      }
+    },
+    {
+      "id": "fresh-hold-19-floor-gas-1",
+      "split": "heldout",
+      "familyID": "gas-piping-solid-floor",
+      "codeFamily": "FGC",
+      "question": "For a new NYC building under the 2022 codes, can gas piping in a solid floor be buried without an accessible channel or approved conduit alternative?",
+      "expectedAnswer": "No. Piping must be in covered channels allowing access with minimal building damage, or alternative Schedule 40 steel/wrought-iron conduit installed to applicable end-termination requirements.",
+      "sourceReferences": [
+        "FGC 404.8"
+      ],
+      "decisiveReferences": [
+        "FGC 404.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 404.8": "5a7bb2da59816b8a3c97e2d804f551cda7b7a05781339aec8cd61d6e18b9765d"
+      }
+    },
+    {
+      "id": "fresh-hold-19-floor-gas-2",
+      "split": "heldout",
+      "familyID": "gas-piping-solid-floor",
+      "codeFamily": "FGC",
+      "question": "If the gas pipe is installed in such a channel but is exposed to excessive moisture or corrosive substances, is the channel alone sufficient?",
+      "expectedAnswer": "No. Piping exposed to excessive moisture/corrosive substances requires protection in an approved manner in addition to access condition.",
+      "sourceReferences": [
+        "FGC 404.8"
+      ],
+      "decisiveReferences": [
+        "FGC 404.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 404.8": "5a7bb2da59816b8a3c97e2d804f551cda7b7a05781339aec8cd61d6e18b9765d"
+      }
+    },
+    {
+      "id": "fresh-hold-20-branch-1",
+      "split": "heldout",
+      "familyID": "gas-riser-branch-takeoff",
+      "codeFamily": "FGC",
+      "question": "For a new NYC gas riser under the 2022 codes, may a branch take off using only a single elbow?",
+      "expectedAnswer": "No. Branches off the riser require not less than a two-elbow swing.",
+      "sourceReferences": [
+        "FGC 404.7"
+      ],
+      "decisiveReferences": [
+        "FGC 404.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 404.7": "acecf9c0c9dcde01b8c4236e0d1abf7c10275156ee3c86771e7b59a2e4174477"
+      }
+    },
+    {
+      "id": "fresh-hold-20-branch-2",
+      "split": "heldout",
+      "familyID": "gas-riser-branch-takeoff",
+      "codeFamily": "FGC",
+      "question": "If we provide a two-elbow swing, does that meet this particular minimum number of elbows?",
+      "expectedAnswer": "Yes for the stated branch-takeoff condition; not approval of every other gas-piping requirement.",
+      "sourceReferences": [
+        "FGC 404.7"
+      ],
+      "decisiveReferences": [
+        "FGC 404.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 404.7": "acecf9c0c9dcde01b8c4236e0d1abf7c10275156ee3c86771e7b59a2e4174477"
+      }
+    },
+    {
+      "id": "fresh-hold-21-gas-support-1",
+      "split": "heldout",
+      "familyID": "gas-piping-support-independence",
+      "codeFamily": "FGC",
+      "question": "For a new NYC fuel-gas installation under the 2022 codes, can the gas pipe be supported by another plumbing pipe?",
+      "expectedAnswer": "No. Gas piping must not be supported by other piping; suitable independent supports or structural components are required.",
+      "sourceReferences": [
+        "FGC 407.2"
+      ],
+      "decisiveReferences": [
+        "FGC 407.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 407.2": "c635be6a46adc450e00176dc019c385d42da35a6b7cfbad92e05364e6d70d0f4"
+      }
+    },
+    {
+      "id": "fresh-hold-21-gas-support-2",
+      "split": "heldout",
+      "familyID": "gas-piping-support-independence",
+      "codeFamily": "FGC",
+      "question": "May its hangers prevent all free expansion and contraction between the anchors?",
+      "expectedAnswer": "No. Supports/hangers/anchors must not interfere with free expansion and contraction between anchors; must support/damp vibration and avoid undue appliance strain.",
+      "sourceReferences": [
+        "FGC 407.2"
+      ],
+      "decisiveReferences": [
+        "FGC 407.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 407.2": "c635be6a46adc450e00176dc019c385d42da35a6b7cfbad92e05364e6d70d0f4"
+      }
+    },
+    {
+      "id": "fresh-hold-22-louvers-1",
+      "split": "heldout",
+      "familyID": "gas-combustion-air-louver-free-area",
+      "codeFamily": "FGC",
+      "question": "For combustion-air openings serving gas appliances in a new NYC building under the 2022 codes, the metal-louver manufacturer gives no free-area data. What free area should be assumed for a 200-square-inch gross opening?",
+      "expectedAnswer": "Metal louvers without manufacturer information are deemed 60 percent net free area: 120 square inches; do not assume 75 percent.",
+      "sourceReferences": [
+        "FGC 304.10"
+      ],
+      "decisiveReferences": [
+        "FGC 304.10"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 304.10": "a4e5342f0e1ed2192066a9e663eed0423d0149f098bce2112db900043b6555fc"
+      }
+    },
+    {
+      "id": "fresh-hold-22-louvers-2",
+      "split": "heldout",
+      "familyID": "gas-combustion-air-louver-free-area",
+      "codeFamily": "FGC",
+      "question": "If the same-size opening has wood louvers with no manufacturer data, what net free area should be assumed?",
+      "expectedAnswer": "Wood louvers without manufacturer information are deemed 10 percent net free area: 20 square inches; retain gross area of 200 square inches.",
+      "sourceReferences": [
+        "FGC 304.10"
+      ],
+      "decisiveReferences": [
+        "FGC 304.10"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 304.10": "a4e5342f0e1ed2192066a9e663eed0423d0149f098bce2112db900043b6555fc"
+      }
+    },
+    {
+      "id": "fresh-hold-23-ignition-1",
+      "split": "heldout",
+      "familyID": "garage-gas-appliance-ignition-height",
+      "codeFamily": "FGC",
+      "question": "For a gas appliance in a NYC garage under the 2022 codes, is an ignition source 12 inches above the floor sufficient if the appliance is not listed as flammable-vapor-ignition-resistant?",
+      "expectedAnswer": "No. Ignition source must be at least 18 inches above floor in stated garage/hazardous locations unless FVIR exception applies.",
+      "sourceReferences": [
+        "FGC 305.3"
+      ],
+      "decisiveReferences": [
+        "FGC 305.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 305.3": "3941dc7f17e60622478ca872b5027191049a579408a83be64b8d5e88697ab2fb"
+      }
+    },
+    {
+      "id": "fresh-hold-23-ignition-2",
+      "split": "heldout",
+      "familyID": "garage-gas-appliance-ignition-height",
+      "codeFamily": "FGC",
+      "question": "If the appliance is listed as flammable-vapor-ignition-resistant, does that specific elevation requirement still apply?",
+      "expectedAnswer": "No. The stated FVIR listing exception removes this ignition-source elevation requirement, not all appliance safety rules.",
+      "sourceReferences": [
+        "FGC 305.3"
+      ],
+      "decisiveReferences": [
+        "FGC 305.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 305.3": "3941dc7f17e60622478ca872b5027191049a579408a83be64b8d5e88697ab2fb"
+      }
+    },
+    {
+      "id": "fresh-hold-24-regulator-1",
+      "split": "heldout",
+      "familyID": "gas-pressure-regulator-vent",
+      "codeFamily": "FGC",
+      "question": "For a gas-pressure regulator in a new NYC building under the 2022 codes that requires an outdoor vent and has no approved vent-limiting device, may its terminal be only 12 inches above grade?",
+      "expectedAnswer": "No. Required regulator vent goes directly outdoors, terminal at least 18 inches above grade, not under building opening/overhang, protected against water/insects.",
+      "sourceReferences": [
+        "FGC 410.3"
+      ],
+      "decisiveReferences": [
+        "FGC 410.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 410.3": "31d781358c5c0d7e645aae4d9d6fe3c827e3472b5fb725dd6f80dbc7d764e5b5"
+      }
+    },
+    {
+      "id": "fresh-hold-24-regulator-2",
+      "split": "heldout",
+      "familyID": "gas-pressure-regulator-vent",
+      "codeFamily": "FGC",
+      "question": "Can an approved vent-limiting device remove the outdoor-vent requirement if the regulator is labeled for it, it is installed to the standard and manufacturer instructions, and the location is sufficiently ventilated?",
+      "expectedAnswer": "Yes under explicit exception. Regulator must be equipped/labeled for approved vent-limiting device, installed to ANSI Z21.18/manufacturer instructions and sufficiently ventilated to dissipate discharged gas.",
+      "sourceReferences": [
+        "FGC 410.3"
+      ],
+      "decisiveReferences": [
+        "FGC 410.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FGC 410.3": "31d781358c5c0d7e645aae4d9d6fe3c827e3472b5fb725dd6f80dbc7d764e5b5"
+      }
+    },
+    {
+      "id": "fresh-hold-25-emergency-maint-1",
+      "split": "heldout",
+      "familyID": "emergency-power-maintenance-records",
+      "codeFamily": "FC",
+      "question": "For a NYC emergency power system, is a maintenance log containing only the service date sufficient? What information must be recorded?",
+      "expectedAnswer": "No. Records must include date, servicing technician name, summary of conditions noted, detailed corrective conditions and corrective action taken.",
+      "sourceReferences": [
+        "FC 604"
+      ],
+      "decisiveReferences": [
+        "FC 604.3.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8"
+      }
+    },
+    {
+      "id": "fresh-hold-25-emergency-maint-2",
+      "split": "heldout",
+      "familyID": "emergency-power-maintenance-records",
+      "codeFamily": "FC",
+      "question": "May the transfer switches be omitted from the maintenance schedule because only the generator needs attention?",
+      "expectedAnswer": "No. Transfer switches must be included, kept free of dust/dirt, inspected for contact deterioration, and deteriorated contacts replaced to manufacturer instructions.",
+      "sourceReferences": [
+        "FC 604"
+      ],
+      "decisiveReferences": [
+        "FC 604.3.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8"
+      }
+    },
+    {
+      "id": "fresh-hold-26-cords-1",
+      "split": "heldout",
+      "familyID": "extension-cord-use",
+      "codeFamily": "FC",
+      "question": "In a NYC office, may extension cords run beneath doorways and be used as the permanent wiring supply for office equipment?",
+      "expectedAnswer": "No. Extension/flexible cords are not a substitute for permanent wiring and must not run under doors; only portable devices and other installation restrictions apply.",
+      "sourceReferences": [
+        "FC 605"
+      ],
+      "decisiveReferences": [
+        "FC 605.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 605": "1a97f616e91a51cd927d778c9ed302ef996aa20448b371481edb6f20111b9c5f"
+      }
+    },
+    {
+      "id": "fresh-hold-26-cords-2",
+      "split": "heldout",
+      "familyID": "extension-cord-use",
+      "codeFamily": "FC",
+      "question": "For a portable electric space heater, may we use an extension cord of sufficient ampacity instead of plugging the heater directly into a receptacle?",
+      "expectedAnswer": "No. Portable electric space heaters must plug directly into a receptacle; extension cords are prohibited for their electrical connections even if ampacity is adequate.",
+      "sourceReferences": [
+        "FC 605"
+      ],
+      "decisiveReferences": [
+        "FC 605.10.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 605": "1a97f616e91a51cd927d778c9ed302ef996aa20448b371481edb6f20111b9c5f"
+      }
+    },
+    {
+      "id": "fresh-hold-27-fryer-1",
+      "split": "heldout",
+      "familyID": "commercial-deep-fryer-separation",
+      "codeFamily": "FC",
+      "question": "In a NYC commercial kitchen, may a deep-fat fryer be only 8 inches from an adjacent open-flame cooking appliance with no separating baffle?",
+      "expectedAnswer": "No. Requires at least 16 inches separation, specified 16-inch steel baffle, or combination distance/baffle height at least 16 inches.",
+      "sourceReferences": [
+        "FC 609"
+      ],
+      "decisiveReferences": [
+        "FC 609.4.1.1.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 609": "f5675f2563f27d61e4ade4e04d26f8cc5dcb815215784727eb89fb6afc5630f7"
+      }
+    },
+    {
+      "id": "fresh-hold-27-fryer-2",
+      "split": "heldout",
+      "familyID": "commercial-deep-fryer-separation",
+      "codeFamily": "FC",
+      "question": "If we keep the 8-inch distance and add an 8-inch-high, one-eighth-inch-thick steel baffle permanently attached to the longer appliance and extending its full depth, does that meet the stated combination dimension?",
+      "expectedAnswer": "Yes. 8-inch distance plus 8-inch baffle height equals 16-inch combination minimum, with specified steel attachment/depth requirements satisfied; not blanket kitchen approval.",
+      "sourceReferences": [
+        "FC 609"
+      ],
+      "decisiveReferences": [
+        "FC 609.4.1.1.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 609": "f5675f2563f27d61e4ade4e04d26f8cc5dcb815215784727eb89fb6afc5630f7"
+      }
+    },
+    {
+      "id": "fresh-hold-28-shaft-1",
+      "split": "heldout",
+      "familyID": "shaft-opening-maintained-closure",
+      "codeFamily": "FC",
+      "question": "For a NYC interior shaft connecting two stories where the construction codes require a protected opening, may its door simply be left open without self-closing or automatic smoke-operated closure?",
+      "expectedAnswer": "No. Openings required to be protected must be maintained self-closing or automatic-closing by smoke detection.",
+      "sourceReferences": [
+        "FC 704"
+      ],
+      "decisiveReferences": [
+        "FC 704.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 704": "b4885e8e9beda5bdf8958549c6431b757d7828fa9e5c41d2a35e976e1cb1fc73"
+      }
+    },
+    {
+      "id": "fresh-hold-28-shaft-2",
+      "split": "heldout",
+      "familyID": "shaft-opening-maintained-closure",
+      "codeFamily": "FC",
+      "question": "Would an existing fusible-link automatic closer rated at 155 degrees Fahrenheit qualify under the existing-device allowance?",
+      "expectedAnswer": "No. Existing fusible-link automatic closing allowance requires link rating no more than 135 degrees Fahrenheit.",
+      "sourceReferences": [
+        "FC 704"
+      ],
+      "decisiveReferences": [
+        "FC 704.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 704": "b4885e8e9beda5bdf8958549c6431b757d7828fa9e5c41d2a35e976e1cb1fc73"
+      }
+    },
+    {
+      "id": "fresh-hold-29-extinguisher-1",
+      "split": "heldout",
+      "familyID": "portable-extinguisher-mounting-height",
+      "codeFamily": "FC",
+      "question": "In NYC, how high above the floor may the top of a wall-mounted hand-held extinguisher be if its gross weight is 45 pounds?",
+      "expectedAnswer": "At most 3.5 feet for hand-held extinguisher exceeding 40 pounds. Bottom floor clearance at least 4 inches if addressed.",
+      "sourceReferences": [
+        "FC 906"
+      ],
+      "decisiveReferences": [
+        "FC 906.9.2",
+        "FC 906.9.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 906": "e08d8237f9f1d0ff11fc030b2e182f9a8eb30f31a3d504f338058f4c8a933cf0"
+      }
+    },
+    {
+      "id": "fresh-hold-29-extinguisher-2",
+      "split": "heldout",
+      "familyID": "portable-extinguisher-mounting-height",
+      "codeFamily": "FC",
+      "question": "If we replace it with one weighing exactly 40 pounds, does the top-height limit become 5 feet?",
+      "expectedAnswer": "Yes. Gross weight not exceeding 40 pounds has top limit 5 feet; bottom floor clearance still at least 4 inches.",
+      "sourceReferences": [
+        "FC 906"
+      ],
+      "decisiveReferences": [
+        "FC 906.9.1",
+        "FC 906.9.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 906": "e08d8237f9f1d0ff11fc030b2e182f9a8eb30f31a3d504f338058f4c8a933cf0"
+      }
+    },
+    {
+      "id": "fresh-hold-30-firewatch-1",
+      "split": "heldout",
+      "familyID": "hot-work-post-work-fire-watch",
+      "codeFamily": "FC",
+      "question": "In NYC, may the fire watch leave as soon as ordinary indoor welding ends? I am asking about the minimum post-work watch, not the rest of the permit requirements.",
+      "expectedAnswer": "No. Fire watch required during hot work and continues at least 30 minutes after conclusion; duration may be extended by commissioner/responsible hot-work-program person.",
+      "sourceReferences": [
+        "FC 3504"
+      ],
+      "decisiveReferences": [
+        "FC 3504.2.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 3504": "32172fdb04ccee9a2074b63e5196c105b6d486c65155329d6b936f37a3ffb90c"
+      }
+    },
+    {
+      "id": "fresh-hold-30-firewatch-2",
+      "split": "heldout",
+      "familyID": "hot-work-post-work-fire-watch",
+      "codeFamily": "FC",
+      "question": "Does 30 minutes always guarantee the watch can end even when the responsible person determines the hazards require longer?",
+      "expectedAnswer": "No. 30 minutes is minimum; commissioner or responsible hot-work-program person may extend based on hazards/work.",
+      "sourceReferences": [
+        "FC 3504"
+      ],
+      "decisiveReferences": [
+        "FC 3504.2.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "FC 3504": "32172fdb04ccee9a2074b63e5196c105b6d486c65155329d6b936f37a3ffb90c"
+      }
+    },
+    {
+      "id": "fresh-hold-31-loading-size-1",
+      "split": "heldout",
+      "familyID": "commercial-loading-berth-dimensions",
+      "codeFamily": "ZR",
+      "question": "For a NYC C4-2 site, a required loading berth has already been classified as loading category B. What are its minimum length, width and vertical clearance? I am not asking how many berths are required.",
+      "expectedAnswer": "LRC-B minimum 37 feet long, 12 feet wide, 14 feet vertical clearance; driveway/entrances/exits not included in berth dimensions.",
+      "sourceReferences": [
+        "ZR 36-661"
+      ],
+      "decisiveReferences": [
+        "ZR 36-661"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-661": "4c7a5e061c6702166ef22f3668f41ee763cbb7ad899f949a08fc982eb06d905c"
+      }
+    },
+    {
+      "id": "fresh-hold-31-loading-size-2",
+      "split": "heldout",
+      "familyID": "commercial-loading-berth-dimensions",
+      "codeFamily": "ZR",
+      "question": "Could a 10-foot-long entrance driveway be counted toward that berth length?",
+      "expectedAnswer": "No. Berth dimensions exclude driveways and entrances/exits; retain LRC-B 37-foot minimum berth length.",
+      "sourceReferences": [
+        "ZR 36-661"
+      ],
+      "decisiveReferences": [
+        "ZR 36-661"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-661": "4c7a5e061c6702166ef22f3668f41ee763cbb7ad899f949a08fc982eb06d905c"
+      }
+    },
+    {
+      "id": "fresh-hold-32-loading-near-1",
+      "split": "heldout",
+      "familyID": "commercial-loading-near-residence-boundary",
+      "codeFamily": "ZR",
+      "question": "For a NYC C4-2 commercial site, can an accessory loading berth located 40 feet from a Residence District boundary remain unenclosed outside?",
+      "expectedAnswer": "No. Accessory loading berths within 60 feet of Residence District boundary must be enclosed within a building.",
+      "sourceReferences": [
+        "ZR 36-663"
+      ],
+      "decisiveReferences": [
+        "ZR 36-663"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-663": "d41a12f476ee53276270ff5858b2a17a7bfc6b3fe872e909da19c33971145ba8"
+      }
+    },
+    {
+      "id": "fresh-hold-32-loading-near-2",
+      "split": "heldout",
+      "familyID": "commercial-loading-near-residence-boundary",
+      "codeFamily": "ZR",
+      "question": "If it is enclosed, may the street entrance to that berth be only 20 feet from the Residence District boundary?",
+      "expectedAnswer": "No. Entrance or exit to street must be at least 30 feet from district boundary for the stated near-boundary berth.",
+      "sourceReferences": [
+        "ZR 36-663"
+      ],
+      "decisiveReferences": [
+        "ZR 36-663"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-663": "d41a12f476ee53276270ff5858b2a17a7bfc6b3fe872e909da19c33971145ba8"
+      }
+    },
+    {
+      "id": "fresh-hold-33-ev-1",
+      "split": "heldout",
+      "familyID": "accessory-parking-ev-charging",
+      "codeFamily": "ZR",
+      "question": "For a NYC C4-2 commercial site, is EV charging allowed at accessory off-street parking spaces used by the building occupants?",
+      "expectedAnswer": "Yes. EV charging facilities permitted at all accessory off-street parking spaces for authorized users of those spaces including owners/occupants/employees/customers/residents/visitors.",
+      "sourceReferences": [
+        "ZR 36-48"
+      ],
+      "decisiveReferences": [
+        "ZR 36-48"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-48": "5c6816050de3e230cfe7a6fbaf067bdda2af7dbac14c805df570d08a27373f48"
+      }
+    },
+    {
+      "id": "fresh-hold-33-ev-2",
+      "split": "heldout",
+      "familyID": "accessory-parking-ev-charging",
+      "codeFamily": "ZR",
+      "question": "Does the zoning charging allowance also include customers and visitors using those accessory spaces, or only owners?",
+      "expectedAnswer": "Customers and visitors using the accessory spaces are expressly included; allowance is not owners-only.",
+      "sourceReferences": [
+        "ZR 36-48"
+      ],
+      "decisiveReferences": [
+        "ZR 36-48"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-48": "5c6816050de3e230cfe7a6fbaf067bdda2af7dbac14c805df570d08a27373f48"
+      }
+    },
+    {
+      "id": "fresh-hold-34-corner-1",
+      "split": "heldout",
+      "familyID": "commercial-parking-access-near-corner",
+      "codeFamily": "ZR",
+      "question": "For a NYC C4-2 site with a 20-space accessory group parking facility, may a street entrance be 30 feet from the intersection of two street lines without a traffic-safety certification?",
+      "expectedAnswer": "No. Ordinary entrance/exit separation is at least 50 feet from street-line intersection; closer location needs applicable certification that it is not hazardous or likely to create congestion.",
+      "sourceReferences": [
+        "ZR 36-53"
+      ],
+      "decisiveReferences": [
+        "ZR 36-53"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-53": "93850dd563eb93b59a87968f1e2f8d74707ac5b1d38685349a96df25efcf7f05"
+      }
+    },
+    {
+      "id": "fresh-hold-34-corner-2",
+      "split": "heldout",
+      "familyID": "commercial-parking-access-near-corner",
+      "codeFamily": "ZR",
+      "question": "Can a location within 50 feet ever be allowed if the authorized agency certifies it is not hazardous to traffic safety and not likely to create congestion?",
+      "expectedAnswer": "Yes. Explicit closer-access certification route exists by DOB or, for specified Article VII Chapter 4 public facilities, CPC. No unconditional permission without certification.",
+      "sourceReferences": [
+        "ZR 36-53"
+      ],
+      "decisiveReferences": [
+        "ZR 36-53"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-53": "93850dd563eb93b59a87968f1e2f8d74707ac5b1d38685349a96df25efcf7f05"
+      }
+    },
+    {
+      "id": "fresh-hold-35-joint-1",
+      "split": "heldout",
+      "familyID": "joint-commercial-loading-facility",
+      "codeFamily": "ZR",
+      "question": "For two adjoining NYC C4-2 buildings on the same block, can their required loading berths be supplied by one shared facility if it has enough berths for the combined floor area, direct access to both buildings, and a compliant design?",
+      "expectedAnswer": "Yes if all conditions including direct access to all served buildings/lots, number at least combined requirement, and adequate design/layout under DOB regulations are met. The stated direct-access premise satisfies that condition; do not invent a missing fact.",
+      "sourceReferences": [
+        "ZR 36-65"
+      ],
+      "decisiveReferences": [
+        "ZR 36-65"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-65": "41e7682a11ef666bc6b0babd0a9e721c2c64db125fc775740fc393de626f7429"
+      }
+    },
+    {
+      "id": "fresh-hold-35-joint-2",
+      "split": "heldout",
+      "familyID": "joint-commercial-loading-facility",
+      "codeFamily": "ZR",
+      "question": "If the shared facility provides no direct access to one of the two buildings, does it satisfy the shared-loading conditions?",
+      "expectedAnswer": "No. Direct access from joint facilities to every served building or lot is required.",
+      "sourceReferences": [
+        "ZR 36-65"
+      ],
+      "decisiveReferences": [
+        "ZR 36-65"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion with stated assumptions and applicable exceptions.",
+        "Citations must substantiate the stated rule; valid authoritative equivalents may be accepted only after source review.",
+        "Avoid universal installation approval when the question concerns one condition.",
+        "An unsupported refusal or nonanswer to these supplied facts is a failure, not an accuracy pass."
+      ],
+      "reviewStatus": "assistant source-reviewed before model outputs; not professional adjudication",
+      "sourceExcerptHashes": {
+        "ZR 36-65": "41e7682a11ef666bc6b0babd0a9e721c2c64db125fc775740fc393de626f7429"
+      }
+    }
+  ]
+}

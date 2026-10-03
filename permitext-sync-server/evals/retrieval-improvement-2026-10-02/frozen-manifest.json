@@ -1,0 +1,436 @@
+{
+  "frozenAt": "2026-10-02T23:02:37.548371+00:00",
+  "freezeBeforeLiveOutputs": true,
+  "status": "frozen fixtures and keys; candidate must be separately frozen before heldout outputs",
+  "files": {
+    "development.json": {
+      "sha256": "3718c7e49a0f4ced8568a350fdb44a04dc7a8cc426477981d1bffc9723cd256b",
+      "bytes": 11634
+    },
+    "heldout.json": {
+      "sha256": "417368e2fb4db8dad468925f294026cc6370b35df27f572cc1026df4e7bae5db",
+      "bytes": 30722
+    },
+    "source-keys.json": {
+      "sha256": "51ef91267dfe22f8a5af6135831516f4fab96f0c94ff9101a945e6ff51e0dfc4",
+      "bytes": 130149
+    },
+    "source-packets.json": {
+      "sha256": "a12fdbc61a092afdc616c0104fcc2cce604b018a074fae70e80d94e419739b8d",
+      "bytes": 149033
+    },
+    "source-audit.json": {
+      "sha256": "f08736e73c4c6ac4a1ab68aec08b8206ecdc3d8092659c8333b3a5cfe268ae79",
+      "bytes": 3639
+    }
+  },
+  "splits": {
+    "development": {
+      "turnCount": 30,
+      "conversationCount": 10,
+      "scenarioFamilyCount": 10,
+      "questionIDs": [
+        "fresh-dev-01-door-1",
+        "fresh-dev-01-door-2",
+        "fresh-dev-01-door-3",
+        "fresh-dev-02-stairs-1",
+        "fresh-dev-02-stairs-2",
+        "fresh-dev-02-stairs-3",
+        "fresh-dev-03-water-1",
+        "fresh-dev-03-water-2",
+        "fresh-dev-03-water-3",
+        "fresh-dev-04-vents-1",
+        "fresh-dev-04-vents-2",
+        "fresh-dev-04-vents-3",
+        "fresh-dev-05-exhaust-1",
+        "fresh-dev-05-exhaust-2",
+        "fresh-dev-05-exhaust-3",
+        "fresh-dev-06-tailpipe-1",
+        "fresh-dev-06-tailpipe-2",
+        "fresh-dev-06-tailpipe-3",
+        "fresh-dev-07-sediment-1",
+        "fresh-dev-07-sediment-2",
+        "fresh-dev-07-sediment-3",
+        "fresh-dev-08-route-1",
+        "fresh-dev-08-route-2",
+        "fresh-dev-08-route-3",
+        "fresh-dev-09-candles-1",
+        "fresh-dev-09-candles-2",
+        "fresh-dev-09-candles-3",
+        "fresh-dev-10-surfacing-1",
+        "fresh-dev-10-surfacing-2",
+        "fresh-dev-10-surfacing-3"
+      ],
+      "codeFamilyTurnCounts": {
+        "BC": 6,
+        "PC": 6,
+        "MC": 6,
+        "FGC": 6,
+        "FC": 3,
+        "ZR": 3
+      },
+      "primarySourceReferences": [
+        "BC 1010.1.1.1",
+        "BC 1011.5.2",
+        "BC 1011.5.4",
+        "FC 308",
+        "FGC 404.3",
+        "FGC 408.4",
+        "MC 501.3",
+        "MC 502.14",
+        "PC 607.1",
+        "PC 607.1.1",
+        "PC 903.1",
+        "PC 903.2",
+        "ZR 36-54"
+      ],
+      "distinctChapterCount": 7,
+      "chapterClusters": {
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/10.json": [
+          "door-clear-width",
+          "ordinary-stair-dimensions"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/109.json": [
+          "hot-water-service-and-limiting"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/112.json": [
+          "plumbing-roof-vent-extension"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/86.json": [
+          "mechanical-exhaust-discharge",
+          "stationary-motor-vehicle-exhaust"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/69.json": [
+          "appliance-sediment-trap",
+          "gas-piping-prohibited-locations"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/chapters/30000095.json": [
+          "candle-open-flame-safety"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/chapters/15000306.json": [
+          "commercial-parking-surfacing"
+        ]
+      },
+      "broadNumberRootClusterCount": 10,
+      "broadNumberRootClusters": {
+        "BC 1010": [
+          "door-clear-width"
+        ],
+        "BC 1011": [
+          "ordinary-stair-dimensions"
+        ],
+        "PC 607": [
+          "hot-water-service-and-limiting"
+        ],
+        "PC 903": [
+          "plumbing-roof-vent-extension"
+        ],
+        "MC 501": [
+          "mechanical-exhaust-discharge"
+        ],
+        "MC 502": [
+          "stationary-motor-vehicle-exhaust"
+        ],
+        "FGC 408": [
+          "appliance-sediment-trap"
+        ],
+        "FGC 404": [
+          "gas-piping-prohibited-locations"
+        ],
+        "FC 308": [
+          "candle-open-flame-safety"
+        ],
+        "ZR 36": [
+          "commercial-parking-surfacing"
+        ]
+      }
+    },
+    "heldout": {
+      "turnCount": 70,
+      "conversationCount": 35,
+      "scenarioFamilyCount": 35,
+      "questionIDs": [
+        "fresh-hold-01-projections-1",
+        "fresh-hold-01-projections-2",
+        "fresh-hold-02-duration-1",
+        "fresh-hold-02-duration-2",
+        "fresh-hold-03-exit-sign-1",
+        "fresh-hold-03-exit-sign-2",
+        "fresh-hold-04-stair-penetrations-1",
+        "fresh-hold-04-stair-penetrations-2",
+        "fresh-hold-05-travel-1",
+        "fresh-hold-05-travel-2",
+        "fresh-hold-06-sound-1",
+        "fresh-hold-06-sound-2",
+        "fresh-hold-07-relief-1",
+        "fresh-hold-07-relief-2",
+        "fresh-hold-08-trap-size-1",
+        "fresh-hold-08-trap-size-2",
+        "fresh-hold-09-trap-recess-1",
+        "fresh-hold-09-trap-recess-2",
+        "fresh-hold-10-cleanout-1",
+        "fresh-hold-10-cleanout-2",
+        "fresh-hold-11-dishwasher-1",
+        "fresh-hold-11-dishwasher-2",
+        "fresh-hold-12-nonpotable-1",
+        "fresh-hold-12-nonpotable-2",
+        "fresh-hold-13-crawl-1",
+        "fresh-hold-13-crawl-2",
+        "fresh-hold-14-roof-1",
+        "fresh-hold-14-roof-2",
+        "fresh-hold-15-vessel-1",
+        "fresh-hold-15-vessel-2",
+        "fresh-hold-16-duct-support-1",
+        "fresh-hold-16-duct-support-2",
+        "fresh-hold-17-vapor-1",
+        "fresh-hold-17-vapor-2",
+        "fresh-hold-18-liner-1",
+        "fresh-hold-18-liner-2",
+        "fresh-hold-19-floor-gas-1",
+        "fresh-hold-19-floor-gas-2",
+        "fresh-hold-20-branch-1",
+        "fresh-hold-20-branch-2",
+        "fresh-hold-21-gas-support-1",
+        "fresh-hold-21-gas-support-2",
+        "fresh-hold-22-louvers-1",
+        "fresh-hold-22-louvers-2",
+        "fresh-hold-23-ignition-1",
+        "fresh-hold-23-ignition-2",
+        "fresh-hold-24-regulator-1",
+        "fresh-hold-24-regulator-2",
+        "fresh-hold-25-emergency-maint-1",
+        "fresh-hold-25-emergency-maint-2",
+        "fresh-hold-26-cords-1",
+        "fresh-hold-26-cords-2",
+        "fresh-hold-27-fryer-1",
+        "fresh-hold-27-fryer-2",
+        "fresh-hold-28-shaft-1",
+        "fresh-hold-28-shaft-2",
+        "fresh-hold-29-extinguisher-1",
+        "fresh-hold-29-extinguisher-2",
+        "fresh-hold-30-firewatch-1",
+        "fresh-hold-30-firewatch-2",
+        "fresh-hold-31-loading-size-1",
+        "fresh-hold-31-loading-size-2",
+        "fresh-hold-32-loading-near-1",
+        "fresh-hold-32-loading-near-2",
+        "fresh-hold-33-ev-1",
+        "fresh-hold-33-ev-2",
+        "fresh-hold-34-corner-1",
+        "fresh-hold-34-corner-2",
+        "fresh-hold-35-joint-1",
+        "fresh-hold-35-joint-2"
+      ],
+      "codeFamilyTurnCounts": {
+        "BC": 12,
+        "PC": 12,
+        "MC": 12,
+        "FGC": 12,
+        "FC": 12,
+        "ZR": 10
+      },
+      "primarySourceReferences": [
+        "BC 1003.3.3",
+        "BC 1008.3.4",
+        "BC 1013.6.2",
+        "BC 1017.3",
+        "BC 1023.5",
+        "BC 1207.2",
+        "FC 3504",
+        "FC 604",
+        "FC 605",
+        "FC 609",
+        "FC 704",
+        "FC 906",
+        "FGC 304.10",
+        "FGC 305.3",
+        "FGC 404.7",
+        "FGC 404.8",
+        "FGC 407.2",
+        "FGC 410.3",
+        "MC 1006.3",
+        "MC 306.4",
+        "MC 306.5",
+        "MC 603.10",
+        "MC 604.11",
+        "MC 604.13",
+        "PC 1002.5",
+        "PC 1002.8",
+        "PC 504.6",
+        "PC 608.8.1",
+        "PC 608.8.2",
+        "PC 708.1.8",
+        "PC 802.1.7",
+        "ZR 36-48",
+        "ZR 36-53",
+        "ZR 36-65",
+        "ZR 36-661",
+        "ZR 36-663"
+      ],
+      "distinctChapterCount": 14,
+      "chapterClusters": {
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/10.json": [
+          "egress-horizontal-projections",
+          "emergency-egress-power-duration",
+          "exit-access-travel-measurement",
+          "externally-illuminated-exit-sign",
+          "interior-exit-stair-penetrations"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/12.json": [
+          "dwelling-separation-airborne-sound"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/108.json": [
+          "water-heater-relief-discharge"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/113.json": [
+          "fixture-trap-relative-size",
+          "underground-trap-recess"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/110.json": [
+          "cleanout-cleaning-direction"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/111.json": [
+          "commercial-dishwasher-indirect-waste"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/109.json": [
+          "nonpotable-water-identification"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/84.json": [
+          "rooftop-equipment-access",
+          "under-floor-appliance-access"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/91.json": [
+          "pressure-vessel-relief-device"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/87.json": [
+          "duct-liner-downstream-cooling-coil",
+          "duct-support-suspended-ceiling",
+          "externally-insulated-cooling-duct-vapor-retarder"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/69.json": [
+          "gas-piping-solid-floor",
+          "gas-piping-support-independence",
+          "gas-pressure-regulator-vent",
+          "gas-riser-branch-takeoff"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapters/68.json": [
+          "garage-gas-appliance-ignition-height",
+          "gas-combustion-air-louver-free-area"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/chapters/30000095.json": [
+          "commercial-deep-fryer-separation",
+          "emergency-power-maintenance-records",
+          "extension-cord-use",
+          "hot-work-post-work-fire-watch",
+          "portable-extinguisher-mounting-height",
+          "shaft-opening-maintained-closure"
+        ],
+        "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/chapters/15000306.json": [
+          "accessory-parking-ev-charging",
+          "commercial-loading-berth-dimensions",
+          "commercial-loading-near-residence-boundary",
+          "commercial-parking-access-near-corner",
+          "joint-commercial-loading-facility"
+        ]
+      },
+      "broadNumberRootClusterCount": 27,
+      "broadNumberRootClusters": {
+        "BC 1003": [
+          "egress-horizontal-projections"
+        ],
+        "BC 1008": [
+          "emergency-egress-power-duration"
+        ],
+        "BC 1013": [
+          "externally-illuminated-exit-sign"
+        ],
+        "BC 1023": [
+          "interior-exit-stair-penetrations"
+        ],
+        "BC 1017": [
+          "exit-access-travel-measurement"
+        ],
+        "BC 1207": [
+          "dwelling-separation-airborne-sound"
+        ],
+        "PC 504": [
+          "water-heater-relief-discharge"
+        ],
+        "PC 1002": [
+          "fixture-trap-relative-size",
+          "underground-trap-recess"
+        ],
+        "PC 708": [
+          "cleanout-cleaning-direction"
+        ],
+        "PC 802": [
+          "commercial-dishwasher-indirect-waste"
+        ],
+        "PC 608": [
+          "nonpotable-water-identification"
+        ],
+        "MC 306": [
+          "rooftop-equipment-access",
+          "under-floor-appliance-access"
+        ],
+        "MC 1006": [
+          "pressure-vessel-relief-device"
+        ],
+        "MC 603": [
+          "duct-support-suspended-ceiling"
+        ],
+        "MC 604": [
+          "duct-liner-downstream-cooling-coil",
+          "externally-insulated-cooling-duct-vapor-retarder"
+        ],
+        "FGC 404": [
+          "gas-piping-solid-floor",
+          "gas-riser-branch-takeoff"
+        ],
+        "FGC 407": [
+          "gas-piping-support-independence"
+        ],
+        "FGC 304": [
+          "gas-combustion-air-louver-free-area"
+        ],
+        "FGC 305": [
+          "garage-gas-appliance-ignition-height"
+        ],
+        "FGC 410": [
+          "gas-pressure-regulator-vent"
+        ],
+        "FC 604": [
+          "emergency-power-maintenance-records"
+        ],
+        "FC 605": [
+          "extension-cord-use"
+        ],
+        "FC 609": [
+          "commercial-deep-fryer-separation"
+        ],
+        "FC 704": [
+          "shaft-opening-maintained-closure"
+        ],
+        "FC 906": [
+          "portable-extinguisher-mounting-height"
+        ],
+        "FC 3504": [
+          "hot-work-post-work-fire-watch"
+        ],
+        "ZR 36": [
+          "accessory-parking-ev-charging",
+          "commercial-loading-berth-dimensions",
+          "commercial-loading-near-residence-boundary",
+          "commercial-parking-access-near-corner",
+          "joint-commercial-loading-facility"
+        ]
+      }
+    }
+  },
+  "totalTurns": 100,
+  "totalScenarioFamilies": 45,
+  "sourcePacketCount": 49,
+  "interpretation": "100 turns are clustered in45 related scenario conversations, not100 independent legal topics. Chapter and broad-number-root clusters shown explicitly. Fresh heldout70 is35 scenarios; no population95-percent claim follows from this curated set.",
+  "modelPromptIsolation": "Normal research-accuracy-holdout runner sends questions/history; checks/references/source keys are grader metadata and must never be passed to writer or retrieval. Do not use --fixed-evidence for end-to-end accuracy claims.",
+  "reviewAuthority": "Assistant-authored/source-reviewed, not professional adjudication."
+}

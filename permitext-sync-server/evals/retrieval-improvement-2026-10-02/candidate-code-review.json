@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-10-02",
+  "scope": "Local opt-in retrieval candidate: passage indexing, semantic search, source and edition boundaries, exact-reference ranking, source assembly, provider budget and persistence, and model configuration. No paid calls or heldout prompts or answer keys were accessed for this review.",
+  "disposition": "No remaining material issue found for the authorized local evaluation scope after the exact-reference fix. Production semantic activation remains blocked on normal provider accounting integration.",
+  "resolvedFindings": [
+    {
+      "id": "indexed-child-reference-priority",
+      "severity": "P1",
+      "status": "resolved",
+      "problem": "An explicitly named subsection inside a monolithic catalog section was recognized by passage search but lost its exact-reference priority in final discovery ranking. Semantic fusion could evict the requested provision from the candidate limit.",
+      "reproduction": "An offline synthetic index recognized a requested FC child subsection as lexical rank one with exactReference=true. With semantic hits favoring twelve distractors and a three-candidate limit, the previous discovery implementation returned only distractors.",
+      "resolution": "Discovery now carries indexedPassage.exactReference into the existing exact-reference sort and candidate signals. Child subsection references also preserve contextual-reference handling for relevance comparisons. Canonical source and edition identities are unchanged.",
+      "implementation": {
+        "file": "evidence-discovery.mjs",
+        "lines": [1743, 1761]
+      },
+      "regression": {
+        "file": "tests/research-hybrid-passage-discovery-contract.mjs",
+        "lines": [31, 59],
+        "command": "node tests/research-hybrid-passage-discovery-contract.mjs",
+        "result": "passed",
+        "coverage": [
+          "Exact child provision survives adversarial semantic ranking",
+          "Canonical corpus and edition identity retained",
+          "Relevance comparisons retain contextual-reference treatment",
+          "Existing catalog-reference priority and observable lexical fallback remain covered"
+        ]
+      }
+    }
+  ],
+  "productionRolloutBlockers": [
+    {
+      "id": "semantic-provider-accounting",
+      "status": "open",
+      "scope": "Normal application semantic activation outside the isolated evaluation harness",
+      "problem": "researchSemanticSearchResource creates the semantic client without beforeRequest or afterRequest accounting hooks. Enabling semantic search in an ordinary app process would dispatch query embeddings outside the normal Research provider spend reservation and settlement path.",
+      "evidence": [
+        {
+          "file": "app.mjs",
+          "lines": [8059, 8066],
+          "detail": "Opt-in client construction supplies vectors, enabled and apiKey but no spend hooks."
+        },
+        {
+          "file": "research-semantic-passages.mjs",
+          "lines": [212, 249],
+          "detail": "Embedding dispatch invokes optional caller-owned reservation and settlement hooks; absent hooks do not block dispatch."
+        }
+      ],
+      "localEvaluationProtection": {
+        "file": "scripts/research-accuracy-holdout.mjs",
+        "lines": [91, 127],
+        "detail": "The isolated harness intercepts embedding fetches, enforces the fixed embedding model, reserves against its per-run and shared campaign limits, persists the request, and settles usage or retains unknown outcomes before allowing further spending."
+      },
+      "requiredBeforeProductionActivation": "Wire query embeddings into normal provider accounting with durable reservation, settlement and unknown-outcome handling, or retain an explicit evaluation-only gate. Keep the semantic flags off in normal operation until that work is validated.",
+      "currentCampaignImpact": "Does not block the explicitly authorized local evaluation; no accounting code or production settings were changed by this review."
+    }
+  ],
+  "otherReviewResults": {
+    "sourceAndEditionBoundaries": "No additional material issue found: vectors nominate passages only from the caller's authorized live index; assembled indexed excerpts are checked against current canonical source text.",
+    "semanticFallback": "No additional material issue found: missing, invalid, outdated or failed semantic resources leave lexical search available with an observable fallback reason.",
+    "evaluationBudgetAndPersistence": "No additional material issue found in the isolated harness and prepared-index builder: reservations precede provider dispatch, unknown outcomes block further shared-ledger spending, and vector artifacts use atomic writes and hash-addressed checkpoints.",
+    "modelSettings": "No accidental writer or verifier model-setting change found in the retrieval candidate. The added embedding model is separate from the unchanged Luna answer and verification configuration."
+  },
+  "validation": {
+    "paidProviderCalls": 0,
+    "heldoutContentRead": false,
+    "gitDiffCheck": "passed for the exact-reference implementation and regression file",
+    "limitations": "Code review and offline regression evidence do not establish live answer accuracy or production readiness."
+  }
+}

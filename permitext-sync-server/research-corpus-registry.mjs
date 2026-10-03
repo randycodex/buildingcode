@@ -1,6 +1,7 @@
 import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
+import { researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 
-export const researchCorpusRegistryVersion = "20261002-current-library-recall-experiment-v15";
+export const researchCorpusRegistryVersion = "20261002-cited-authority-continuity-v16";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -234,10 +235,13 @@ export function routeResearchCorpora({
   // Generic terms such as travel distance occur in several codes. A follow-up
   // inherits its subject's corpus unless the user actually changes authority.
   const inheritedSubject = !explicitCurrentAuthority && !currentHasEditionCue &&
+    (!inheritsEditionContext || topicDecision.signals.returnToOriginal) &&
     topicDecision.contextPolicy.includeRootTopic
     ? (topicDecision.signals.returnToOriginal && compactText(topicContext?.originalTopic)) || topicDecision.rootTopic.text
     : "";
-  const context = inheritedSubject
+  const context = inheritsEditionContext && !topicDecision.signals.returnToOriginal
+    ? [currentQuestion, latestEditionContext].join("\n")
+    : inheritedSubject
     ? [currentQuestion, inheritedSubject].join("\n")
     : currentHasCorpusCue
     ? [currentQuestion, inheritsEditionContext ? latestEditionContext : ""].filter(Boolean).join("\n")
@@ -292,6 +296,23 @@ export function routeResearchCorpora({
     requestedIDs.set("nyc-2014-construction-codes", "Appendix P cross-edition context");
   }
   if (historicalRequested) requestedIDs.set("nyc-1968-building-code", "historical-code cue");
+  // The latest checked answer can preserve a follow-up's code book even when
+  // the user no longer names it. Match the actual source identity, never just
+  // a prefix shared by current and historical books. These are search hints;
+  // the next answer still resolves and checks its own enacted sources.
+  const inheritedReferences = !explicitCurrentAuthority && !currentHasEditionCue &&
+    !inheritsEditionContext && !buildingCodeOnlyScope
+    ? researchInheritedAuthorityReferences({ question: currentQuestion, previousMessages, topicDecision }) : [];
+  for (const reference of inheritedReferences) {
+    const identityFields = ["corpusID", "codeVersion", "codeEdition"].filter(field => reference[field]);
+    if (!identityFields.length) continue;
+    const corpus = availableRegistry.find(candidate =>
+      candidate.codePrefixes.includes(reference.codePrefix) && identityFields.every(field =>
+        compactText(reference[field]) === compactText(field === "corpusID" ? candidate.id : candidate[field])));
+    if (corpus && (corpus.automaticResearchEligible || corpus.optInRequired)) {
+      requestedIDs.set(corpus.id, "latest verified citation in the continuing subject");
+    }
+  }
   if (!requestedIDs.size) {
     const configuredVersion = compactText(projectCodeVersion).toLocaleLowerCase("en-US");
     const projectCorpus = configuredVersion

@@ -1,0 +1,573 @@
+{
+  "description": "Fresh ordinary-language retrieval evaluation, heldout: 70 turns in 35 related scenario families. No section numbers in user prompts. Source keys do not enter normal retrieval/writer.",
+  "scope": {
+    "jurisdiction": "New York City",
+    "constructionCodeEdition": "2022 with imported amendments",
+    "fireCode": "2022 consolidated imported text",
+    "zoningTextThrough": "2026-08-13; source version, not proof of all later amendments",
+    "grading": "Assistant-authored and source-reviewed, not professionally adjudicated; correlated follow-ups are reported by family."
+  },
+  "conversations": [
+    {
+      "id": "fresh-hold-01-projections",
+      "familyID": "egress-horizontal-projections",
+      "codeFamily": "BC",
+      "questions": [
+        "For an ordinary office circulation path in a new NYC building under the 2022 codes, may a wall-mounted cabinet project 5 inches when its leading edge is 40 inches above the floor? Assume no special exception.",
+        "If it is a handrail projecting 4.5 inches instead of a cabinet, does the projection exception allow it?"
+      ],
+      "checks": [
+        "No. Objects with leading edges more than 27 and not more than 80 inches above floor may project at most 4 inches into circulation path.",
+        "Yes. Handrails may protrude 4.5 inches from the wall under the stated exception; this is only the projection condition, not approval of all clearances."
+      ],
+      "references": [
+        "BC 1003.3.3"
+      ]
+    },
+    {
+      "id": "fresh-hold-02-duration",
+      "familyID": "emergency-egress-power-duration",
+      "codeFamily": "BC",
+      "questions": [
+        "For a new NYC office under the 2022 codes, is a 60-minute battery supply sufficient for the required emergency means-of-egress lighting duration?",
+        "Would an on-site generator be an allowed source instead of storage batteries if it provides that duration and complies with the installation requirements?"
+      ],
+      "checks": [
+        "No. Emergency power must supply at least 90 minutes.",
+        "Yes. Storage batteries, unit equipment or an on-site generator are named permissible sources; at least 90 minutes and installation requirements still apply."
+      ],
+      "references": [
+        "BC 1008.3.4"
+      ]
+    },
+    {
+      "id": "fresh-hold-03-exit-sign",
+      "familyID": "externally-illuminated-exit-sign",
+      "codeFamily": "BC",
+      "questions": [
+        "In a new NYC office under the 2022 codes, what minimum illumination intensity is required on the face of an exit sign lit by an external lamp?",
+        "So a measured intensity of 10 footcandles on that externally lit sign face is sufficient?"
+      ],
+      "checks": [
+        "At least 25 footcandles at the face of an externally illuminated exit sign. Do not substitute walking-surface illumination or generic 5-footcandle guidance.",
+        "No. 10 footcandles is below the 25-footcandle minimum; maintain external-sign-face context."
+      ],
+      "references": [
+        "BC 1013.6.2"
+      ]
+    },
+    {
+      "id": "fresh-hold-04-stair-penetrations",
+      "familyID": "interior-exit-stair-penetrations",
+      "codeFamily": "BC",
+      "questions": [
+        "In a new NYC office under the 2022 codes, may a general office supply-air duct penetrate an interior exit stair enclosure merely because the opening is firestopped? It does not serve independent stair ventilation or pressurization.",
+        "Can a protected communication opening connect the two adjacent interior exit stair enclosures?"
+      ],
+      "checks": [
+        "No. Interior exit stair/ramp penetrations are prohibited except listed necessary systems. General office supply duct is not a listed exception; firestopping alone does not authorize it.",
+        "No. Penetrations or communication openings between adjacent interior exit stairways/ramps are prohibited whether protected or not."
+      ],
+      "references": [
+        "BC 1023.5"
+      ]
+    },
+    {
+      "id": "fresh-hold-05-travel",
+      "familyID": "exit-access-travel-measurement",
+      "codeFamily": "BC",
+      "questions": [
+        "For an ordinary NYC office under the 2022 codes, should exit-access travel distance be drawn as a straight line through partitions or along the actual unobstructed route to an exit? This is not an open garage or assembly occupancy.",
+        "Does the measurement generally stop at the entrance to the exit, or continue all the way to the street?"
+      ],
+      "checks": [
+        "Measure from most remote point on story along natural unobstructed path of horizontal and vertical egress travel to entrance to an exit; not through partitions.",
+        "For this exit-access travel distance measure it stops at entrance to an exit; do not confuse exit access with total route to street or discharge."
+      ],
+      "references": [
+        "BC 1017.3"
+      ]
+    },
+    {
+      "id": "fresh-hold-06-sound",
+      "familyID": "dwelling-separation-airborne-sound",
+      "codeFamily": "BC",
+      "questions": [
+        "For a wall separating apartments in a new NYC building under the 2022 codes, is a laboratory-tested airborne-sound rating of STC 45 sufficient?",
+        "If the completed separating construction is instead field tested to ASTM E 336 at STC 45, does that meet the stated field-tested minimum?"
+      ],
+      "checks": [
+        "No. Laboratory-tested airborne-sound transmission class must be at least 50 under ASTM E 90 for stated dwelling-unit separation. Distinguish field-tested alternative.",
+        "Yes. Field-tested minimum under ASTM E 336 is STC 45; laboratory minimum remains 50. Penetrations must maintain required rating if addressed."
+      ],
+      "references": [
+        "BC 1207.2"
+      ]
+    },
+    {
+      "id": "fresh-hold-07-relief",
+      "familyID": "water-heater-relief-discharge",
+      "codeFamily": "PC",
+      "questions": [
+        "For a NYC water heater under the 2022 codes, may its temperature-and-pressure relief discharge pipe be connected directly to the sanitary drain without an air gap?",
+        "If it is routed to the required air gap, can we add a shutoff valve to that relief discharge pipe?"
+      ],
+      "checks": [
+        "No. Relief discharge must not connect directly to drainage; discharge through an air gap located in same room as water heater.",
+        "No. Relief discharge piping must not have valves or tee fittings. Air-gap compliance does not waive this restriction."
+      ],
+      "references": [
+        "PC 504.6"
+      ]
+    },
+    {
+      "id": "fresh-hold-08-trap-size",
+      "familyID": "fixture-trap-relative-size",
+      "codeFamily": "PC",
+      "questions": [
+        "Under the 2022 NYC codes, can a fixture use a 3-inch trap that discharges into a 2-inch drainage pipe? I am asking about the relative sizes, not the fixture table minimum.",
+        "Would changing the downstream pipe to 3 inches eliminate that particular size conflict, assuming the fixture table minimum is met?"
+      ],
+      "checks": [
+        "No. A trap must not be larger than the drainage pipe into which it discharges. Fixture table minimum and sufficient drainage must also be met.",
+        "Yes as to this relative-size restriction: a 3-inch trap discharging into a 3-inch pipe is not larger than downstream pipe. Do not give blanket installation approval."
+      ],
+      "references": [
+        "PC 1002.5"
+      ]
+    },
+    {
+      "id": "fresh-hold-09-trap-recess",
+      "familyID": "underground-trap-recess",
+      "codeFamily": "PC",
+      "questions": [
+        "In a new NYC building under the 2022 codes, what construction is required for the sides and bottom of a recess used to connect a bathtub trap below a slab?",
+        "If the sides meet that requirement but the bottom is left as exposed soil, has the stated recess-construction condition been met?"
+      ],
+      "checks": [
+        "Sides and bottom of trap-connection recess must be corrosion-resistant and insect- and vermin-proof.",
+        "No. Both sides and bottom must have corrosion-resistant, insect- and vermin-proof construction; compliant sides alone are insufficient."
+      ],
+      "references": [
+        "PC 1002.8"
+      ]
+    },
+    {
+      "id": "fresh-hold-10-cleanout",
+      "familyID": "cleanout-cleaning-direction",
+      "codeFamily": "PC",
+      "questions": [
+        "For an ordinary one-way sanitary-drain cleanout in a new NYC building under the 2022 codes, should its installation permit cleaning against the drainage flow? This is not a test tee or approved two-way cleanout.",
+        "If we use an approved two-way cleanout meeting the change-of-direction requirements, does the ordinary one-direction restriction still prohibit it?"
+      ],
+      "checks": [
+        "No. Ordinary arrangement must enable cleaning only in direction of drainage flow.",
+        "No. Approved two-way cleanout meeting the referenced requirements is a stated exception; do not require every cleanout to be one-way."
+      ],
+      "references": [
+        "PC 708.1.8"
+      ]
+    },
+    {
+      "id": "fresh-hold-11-dishwasher",
+      "familyID": "commercial-dishwasher-indirect-waste",
+      "codeFamily": "PC",
+      "questions": [
+        "For a commercial dishwasher in a new NYC restaurant under the 2022 codes, can its discharge connect directly to sanitary piping without an air gap or air break?",
+        "Is an air break into a waste receptor expressly an option, or does this rule allow only an air gap?"
+      ],
+      "checks": [
+        "No. Commercial dishwasher discharge must be through air gap or air break into waste receptor, subject to indirect-waste installation requirements.",
+        "Air break as well as air gap is expressly an option under this commercial-dishwasher provision; related installation requirements remain."
+      ],
+      "references": [
+        "PC 802.1.7"
+      ]
+    },
+    {
+      "id": "fresh-hold-12-nonpotable",
+      "familyID": "nonpotable-water-identification",
+      "codeFamily": "PC",
+      "questions": [
+        "For a new NYC building under the 2022 codes, how should a hose outlet using nonpotable water be marked so users do not mistake it for drinking water?",
+        "For the nonpotable distribution pipes, can the identification be repeated every 40 feet rather than every 25 feet?"
+      ],
+      "checks": [
+        "Sign/tag or indelible fixture marking must identify application and warn CAUTION: NONPOTABLE WATER \u2013 DO NOT DRINK; corrosion-resistant waterproof signage, contrasting letters at least 0.5 inch high, plus Do Not Drink pictograph.",
+        "No. Repeat identification at intervals no more than 25 feet and at wall/floor/roof penetrations. Purple piping or purple tape/wrap and required warning/contents/flow arrow apply."
+      ],
+      "references": [
+        "PC 608.8.1",
+        "PC 608.8.2"
+      ]
+    },
+    {
+      "id": "fresh-hold-13-crawl",
+      "familyID": "under-floor-appliance-access",
+      "codeFamily": "MC",
+      "questions": [
+        "For an under-floor HVAC appliance in a new NYC office under the 2022 codes, is a 25-foot-long passage only 30 inches high and 22 inches wide acceptable? The appliance cannot be serviced or removed directly through the access opening.",
+        "If that same passage is unobstructed and 6 feet high and 22 inches wide for its entire length, is it still limited to 20 feet by this passage-length rule?"
+      ],
+      "checks": [
+        "No. Ordinary under-floor passage max 20 feet with minimum 30-inch height/22-inch width. Stated facts do not meet either length exception.",
+        "No. Unobstructed passage at least 6 feet high and 22 inches wide for entire length is not limited in length under exception. Keep other access/removal/service requirements."
+      ],
+      "references": [
+        "MC 306.4"
+      ]
+    },
+    {
+      "id": "fresh-hold-14-roof",
+      "familyID": "rooftop-equipment-access",
+      "codeFamily": "MC",
+      "questions": [
+        "For rooftop HVAC equipment on a new NYC office under the 2022 codes, service personnel must climb 18 feet above grade. Can the required access depend on bringing a portable ladder?",
+        "Along that required route, can personnel be made to climb over a 36-inch-high obstruction?"
+      ],
+      "checks": [
+        "No. Where climb is higher than 16 feet, interior/exterior means of access must be provided and required access cannot use portable ladders. Office is not Group R-3 exception.",
+        "No. Route must not require climbing over obstructions greater than 30 inches; 36 inches fails this condition."
+      ],
+      "references": [
+        "MC 306.5"
+      ]
+    },
+    {
+      "id": "fresh-hold-15-vessel",
+      "familyID": "pressure-vessel-relief-device",
+      "codeFamily": "MC",
+      "questions": [
+        "For a pressure vessel in a new NYC mechanical installation under the 2022 codes, is a pressure relief valve always the only permitted protection, or can a pressure-limiting device be used?",
+        "If the vessel manufacturer requires a relief valve, may we choose a pressure-limiting device instead merely because the code mentions that alternative?"
+      ],
+      "checks": [
+        "A pressure relief valve or pressure-limiting device is permitted as required by vessel manufacturer instructions and ASME Boiler and Pressure Vessel Code or ASME CSD-1. Do not claim either is freely interchangeable without requirements.",
+        "No. Provision requires protection consistent with manufacturer instructions and referenced standards; named alternative does not override manufacturer requirement."
+      ],
+      "references": [
+        "MC 1006.3"
+      ]
+    },
+    {
+      "id": "fresh-hold-16-duct-support",
+      "familyID": "duct-support-suspended-ceiling",
+      "codeFamily": "MC",
+      "questions": [
+        "For new NYC HVAC ductwork under the 2022 codes, may the ducts be hung from a suspended-ceiling grid?",
+        "For flexible factory-made ducts, whose installation instructions govern the supports?"
+      ],
+      "checks": [
+        "No. Ducts must not be hung from or supported by suspended ceilings; applicable support standards/manufacturer instructions govern.",
+        "Manufacturer instructions govern flexible and other factory-made duct supports; suspended ceiling support prohibition still applies."
+      ],
+      "references": [
+        "MC 603.10"
+      ]
+    },
+    {
+      "id": "fresh-hold-17-vapor",
+      "familyID": "externally-insulated-cooling-duct-vapor-retarder",
+      "codeFamily": "MC",
+      "questions": [
+        "For a new NYC cooling duct under the 2022 codes, externally applied insulation has a permeance of 0.1 perm. Is that low enough to omit a separate vapor retarder under the stated insulation exception?",
+        "If the insulation itself is rated 0.04 perm, does that specific exception allow it to be used without a separate vapor-retarder covering?"
+      ],
+      "checks": [
+        "No. Exception for insulation itself applies at permeance 0.05 perm or less. Otherwise retarder max 0.05 perm or aluminum foil at least 2 mils, with sealed joints/seams.",
+        "Yes. Insulation with permeance no more than 0.05 perm need not be covered with separate vapor retarder; maintain applicable seam/continuity provisions."
+      ],
+      "references": [
+        "MC 604.11"
+      ]
+    },
+    {
+      "id": "fresh-hold-18-liner",
+      "familyID": "duct-liner-downstream-cooling-coil",
+      "codeFamily": "MC",
+      "questions": [
+        "For a new NYC HVAC system under the 2022 codes, can water-permeable exposed internal duct insulation line the portion from the cooling-coil exit to the downstream end of its drain pan?",
+        "Would a durable water-impermeable liner avoid that particular prohibition, assuming it satisfies the required durability testing?"
+      ],
+      "checks": [
+        "No. Exposed internal insulation not impermeable to water is prohibited in that segment.",
+        "Yes as to the specific water-permeability prohibition. Internal airstream insulation must show durability under UL 181; no blanket approval of all system requirements."
+      ],
+      "references": [
+        "MC 604.13"
+      ]
+    },
+    {
+      "id": "fresh-hold-19-floor-gas",
+      "familyID": "gas-piping-solid-floor",
+      "codeFamily": "FGC",
+      "questions": [
+        "For a new NYC building under the 2022 codes, can gas piping in a solid floor be buried without an accessible channel or approved conduit alternative?",
+        "If the gas pipe is installed in such a channel but is exposed to excessive moisture or corrosive substances, is the channel alone sufficient?"
+      ],
+      "checks": [
+        "No. Piping must be in covered channels allowing access with minimal building damage, or alternative Schedule 40 steel/wrought-iron conduit installed to applicable end-termination requirements.",
+        "No. Piping exposed to excessive moisture/corrosive substances requires protection in an approved manner in addition to access condition."
+      ],
+      "references": [
+        "FGC 404.8"
+      ]
+    },
+    {
+      "id": "fresh-hold-20-branch",
+      "familyID": "gas-riser-branch-takeoff",
+      "codeFamily": "FGC",
+      "questions": [
+        "For a new NYC gas riser under the 2022 codes, may a branch take off using only a single elbow?",
+        "If we provide a two-elbow swing, does that meet this particular minimum number of elbows?"
+      ],
+      "checks": [
+        "No. Branches off the riser require not less than a two-elbow swing.",
+        "Yes for the stated branch-takeoff condition; not approval of every other gas-piping requirement."
+      ],
+      "references": [
+        "FGC 404.7"
+      ]
+    },
+    {
+      "id": "fresh-hold-21-gas-support",
+      "familyID": "gas-piping-support-independence",
+      "codeFamily": "FGC",
+      "questions": [
+        "For a new NYC fuel-gas installation under the 2022 codes, can the gas pipe be supported by another plumbing pipe?",
+        "May its hangers prevent all free expansion and contraction between the anchors?"
+      ],
+      "checks": [
+        "No. Gas piping must not be supported by other piping; suitable independent supports or structural components are required.",
+        "No. Supports/hangers/anchors must not interfere with free expansion and contraction between anchors; must support/damp vibration and avoid undue appliance strain."
+      ],
+      "references": [
+        "FGC 407.2"
+      ]
+    },
+    {
+      "id": "fresh-hold-22-louvers",
+      "familyID": "gas-combustion-air-louver-free-area",
+      "codeFamily": "FGC",
+      "questions": [
+        "For combustion-air openings serving gas appliances in a new NYC building under the 2022 codes, the metal-louver manufacturer gives no free-area data. What free area should be assumed for a 200-square-inch gross opening?",
+        "If the same-size opening has wood louvers with no manufacturer data, what net free area should be assumed?"
+      ],
+      "checks": [
+        "Metal louvers without manufacturer information are deemed 60 percent net free area: 120 square inches; do not assume 75 percent.",
+        "Wood louvers without manufacturer information are deemed 10 percent net free area: 20 square inches; retain gross area of 200 square inches."
+      ],
+      "references": [
+        "FGC 304.10"
+      ]
+    },
+    {
+      "id": "fresh-hold-23-ignition",
+      "familyID": "garage-gas-appliance-ignition-height",
+      "codeFamily": "FGC",
+      "questions": [
+        "For a gas appliance in a NYC garage under the 2022 codes, is an ignition source 12 inches above the floor sufficient if the appliance is not listed as flammable-vapor-ignition-resistant?",
+        "If the appliance is listed as flammable-vapor-ignition-resistant, does that specific elevation requirement still apply?"
+      ],
+      "checks": [
+        "No. Ignition source must be at least 18 inches above floor in stated garage/hazardous locations unless FVIR exception applies.",
+        "No. The stated FVIR listing exception removes this ignition-source elevation requirement, not all appliance safety rules."
+      ],
+      "references": [
+        "FGC 305.3"
+      ]
+    },
+    {
+      "id": "fresh-hold-24-regulator",
+      "familyID": "gas-pressure-regulator-vent",
+      "codeFamily": "FGC",
+      "questions": [
+        "For a gas-pressure regulator in a new NYC building under the 2022 codes that requires an outdoor vent and has no approved vent-limiting device, may its terminal be only 12 inches above grade?",
+        "Can an approved vent-limiting device remove the outdoor-vent requirement if the regulator is labeled for it, it is installed to the standard and manufacturer instructions, and the location is sufficiently ventilated?"
+      ],
+      "checks": [
+        "No. Required regulator vent goes directly outdoors, terminal at least 18 inches above grade, not under building opening/overhang, protected against water/insects.",
+        "Yes under explicit exception. Regulator must be equipped/labeled for approved vent-limiting device, installed to ANSI Z21.18/manufacturer instructions and sufficiently ventilated to dissipate discharged gas."
+      ],
+      "references": [
+        "FGC 410.3"
+      ]
+    },
+    {
+      "id": "fresh-hold-25-emergency-maint",
+      "familyID": "emergency-power-maintenance-records",
+      "codeFamily": "FC",
+      "questions": [
+        "For a NYC emergency power system, is a maintenance log containing only the service date sufficient? What information must be recorded?",
+        "May the transfer switches be omitted from the maintenance schedule because only the generator needs attention?"
+      ],
+      "checks": [
+        "No. Records must include date, servicing technician name, summary of conditions noted, detailed corrective conditions and corrective action taken.",
+        "No. Transfer switches must be included, kept free of dust/dirt, inspected for contact deterioration, and deteriorated contacts replaced to manufacturer instructions."
+      ],
+      "references": [
+        "FC 604"
+      ]
+    },
+    {
+      "id": "fresh-hold-26-cords",
+      "familyID": "extension-cord-use",
+      "codeFamily": "FC",
+      "questions": [
+        "In a NYC office, may extension cords run beneath doorways and be used as the permanent wiring supply for office equipment?",
+        "For a portable electric space heater, may we use an extension cord of sufficient ampacity instead of plugging the heater directly into a receptacle?"
+      ],
+      "checks": [
+        "No. Extension/flexible cords are not a substitute for permanent wiring and must not run under doors; only portable devices and other installation restrictions apply.",
+        "No. Portable electric space heaters must plug directly into a receptacle; extension cords are prohibited for their electrical connections even if ampacity is adequate."
+      ],
+      "references": [
+        "FC 605"
+      ]
+    },
+    {
+      "id": "fresh-hold-27-fryer",
+      "familyID": "commercial-deep-fryer-separation",
+      "codeFamily": "FC",
+      "questions": [
+        "In a NYC commercial kitchen, may a deep-fat fryer be only 8 inches from an adjacent open-flame cooking appliance with no separating baffle?",
+        "If we keep the 8-inch distance and add an 8-inch-high, one-eighth-inch-thick steel baffle permanently attached to the longer appliance and extending its full depth, does that meet the stated combination dimension?"
+      ],
+      "checks": [
+        "No. Requires at least 16 inches separation, specified 16-inch steel baffle, or combination distance/baffle height at least 16 inches.",
+        "Yes. 8-inch distance plus 8-inch baffle height equals 16-inch combination minimum, with specified steel attachment/depth requirements satisfied; not blanket kitchen approval."
+      ],
+      "references": [
+        "FC 609"
+      ]
+    },
+    {
+      "id": "fresh-hold-28-shaft",
+      "familyID": "shaft-opening-maintained-closure",
+      "codeFamily": "FC",
+      "questions": [
+        "For a NYC interior shaft connecting two stories where the construction codes require a protected opening, may its door simply be left open without self-closing or automatic smoke-operated closure?",
+        "Would an existing fusible-link automatic closer rated at 155 degrees Fahrenheit qualify under the existing-device allowance?"
+      ],
+      "checks": [
+        "No. Openings required to be protected must be maintained self-closing or automatic-closing by smoke detection.",
+        "No. Existing fusible-link automatic closing allowance requires link rating no more than 135 degrees Fahrenheit."
+      ],
+      "references": [
+        "FC 704"
+      ]
+    },
+    {
+      "id": "fresh-hold-29-extinguisher",
+      "familyID": "portable-extinguisher-mounting-height",
+      "codeFamily": "FC",
+      "questions": [
+        "In NYC, how high above the floor may the top of a wall-mounted hand-held extinguisher be if its gross weight is 45 pounds?",
+        "If we replace it with one weighing exactly 40 pounds, does the top-height limit become 5 feet?"
+      ],
+      "checks": [
+        "At most 3.5 feet for hand-held extinguisher exceeding 40 pounds. Bottom floor clearance at least 4 inches if addressed.",
+        "Yes. Gross weight not exceeding 40 pounds has top limit 5 feet; bottom floor clearance still at least 4 inches."
+      ],
+      "references": [
+        "FC 906"
+      ]
+    },
+    {
+      "id": "fresh-hold-30-firewatch",
+      "familyID": "hot-work-post-work-fire-watch",
+      "codeFamily": "FC",
+      "questions": [
+        "In NYC, may the fire watch leave as soon as ordinary indoor welding ends? I am asking about the minimum post-work watch, not the rest of the permit requirements.",
+        "Does 30 minutes always guarantee the watch can end even when the responsible person determines the hazards require longer?"
+      ],
+      "checks": [
+        "No. Fire watch required during hot work and continues at least 30 minutes after conclusion; duration may be extended by commissioner/responsible hot-work-program person.",
+        "No. 30 minutes is minimum; commissioner or responsible hot-work-program person may extend based on hazards/work."
+      ],
+      "references": [
+        "FC 3504"
+      ]
+    },
+    {
+      "id": "fresh-hold-31-loading-size",
+      "familyID": "commercial-loading-berth-dimensions",
+      "codeFamily": "ZR",
+      "questions": [
+        "For a NYC C4-2 site, a required loading berth has already been classified as loading category B. What are its minimum length, width and vertical clearance? I am not asking how many berths are required.",
+        "Could a 10-foot-long entrance driveway be counted toward that berth length?"
+      ],
+      "checks": [
+        "LRC-B minimum 37 feet long, 12 feet wide, 14 feet vertical clearance; driveway/entrances/exits not included in berth dimensions.",
+        "No. Berth dimensions exclude driveways and entrances/exits; retain LRC-B 37-foot minimum berth length."
+      ],
+      "references": [
+        "ZR 36-661"
+      ]
+    },
+    {
+      "id": "fresh-hold-32-loading-near",
+      "familyID": "commercial-loading-near-residence-boundary",
+      "codeFamily": "ZR",
+      "questions": [
+        "For a NYC C4-2 commercial site, can an accessory loading berth located 40 feet from a Residence District boundary remain unenclosed outside?",
+        "If it is enclosed, may the street entrance to that berth be only 20 feet from the Residence District boundary?"
+      ],
+      "checks": [
+        "No. Accessory loading berths within 60 feet of Residence District boundary must be enclosed within a building.",
+        "No. Entrance or exit to street must be at least 30 feet from district boundary for the stated near-boundary berth."
+      ],
+      "references": [
+        "ZR 36-663"
+      ]
+    },
+    {
+      "id": "fresh-hold-33-ev",
+      "familyID": "accessory-parking-ev-charging",
+      "codeFamily": "ZR",
+      "questions": [
+        "For a NYC C4-2 commercial site, is EV charging allowed at accessory off-street parking spaces used by the building occupants?",
+        "Does the zoning charging allowance also include customers and visitors using those accessory spaces, or only owners?"
+      ],
+      "checks": [
+        "Yes. EV charging facilities permitted at all accessory off-street parking spaces for authorized users of those spaces including owners/occupants/employees/customers/residents/visitors.",
+        "Customers and visitors using the accessory spaces are expressly included; allowance is not owners-only."
+      ],
+      "references": [
+        "ZR 36-48"
+      ]
+    },
+    {
+      "id": "fresh-hold-34-corner",
+      "familyID": "commercial-parking-access-near-corner",
+      "codeFamily": "ZR",
+      "questions": [
+        "For a NYC C4-2 site with a 20-space accessory group parking facility, may a street entrance be 30 feet from the intersection of two street lines without a traffic-safety certification?",
+        "Can a location within 50 feet ever be allowed if the authorized agency certifies it is not hazardous to traffic safety and not likely to create congestion?"
+      ],
+      "checks": [
+        "No. Ordinary entrance/exit separation is at least 50 feet from street-line intersection; closer location needs applicable certification that it is not hazardous or likely to create congestion.",
+        "Yes. Explicit closer-access certification route exists by DOB or, for specified Article VII Chapter 4 public facilities, CPC. No unconditional permission without certification."
+      ],
+      "references": [
+        "ZR 36-53"
+      ]
+    },
+    {
+      "id": "fresh-hold-35-joint",
+      "familyID": "joint-commercial-loading-facility",
+      "codeFamily": "ZR",
+      "questions": [
+        "For two adjoining NYC C4-2 buildings on the same block, can their required loading berths be supplied by one shared facility if it has enough berths for the combined floor area, direct access to both buildings, and a compliant design?",
+        "If the shared facility provides no direct access to one of the two buildings, does it satisfy the shared-loading conditions?"
+      ],
+      "checks": [
+        "Yes if all conditions including direct access to all served buildings/lots, number at least combined requirement, and adequate design/layout under DOB regulations are met. The stated direct-access premise satisfies that condition; do not invent a missing fact.",
+        "No. Direct access from joint facilities to every served building or lot is required."
+      ],
+      "references": [
+        "ZR 36-65"
+      ]
+    }
+  ]
+}

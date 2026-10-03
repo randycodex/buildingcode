@@ -1,4 +1,6 @@
-export const researchConversationTopicVersion = "20261001-citation-request-continuity-v7";
+import { researchPriorAnswerSources } from "./research-conversation-continuity.mjs";
+
+export const researchConversationTopicVersion = "20261002-definite-subject-continuity-v9";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -132,6 +134,65 @@ function tokenOverlap(left, right) {
   return overlap / Math.min(leftTokens.size, rightTokens.size);
 }
 
+const subjectBoilerplate = new Set([
+  ...stopWords, "allow", "allowed", "applicable", "applies", "apply", "code", "codes",
+  "dimension", "dimensions", "general", "governing", "maximum", "minimum", "need",
+  "needed", "normal", "nyc", "ordinary", "permit", "permitted", "require", "required",
+  "requirement", "requirements", "requiring", "rule", "rules", "section", "sections",
+  "size", "table", "tables"
+]);
+
+function subjectTokens(value) {
+  return new Set((normalizedText(value).toLowerCase().match(/[a-z]+/g) || [])
+    .filter(token => token.length > 2 && !subjectBoilerplate.has(token))
+    .map(token => token.length > 4 && token.endsWith("s") && !token.endsWith("ss")
+      ? token.slice(0, -1) : token));
+}
+
+function citedSubjectContinuation(question, previousMessages) {
+  const questionTokens = subjectTokens(question);
+  if (questionTokens.size < 3) return false;
+  // An implicit question may name a different detail in the provision just
+  // discussed, even when it shares few words with the earlier user question.
+  // Require several substantive terms in one local passage; shared units,
+  // generic requirement language or scattered terms in a chapter do not count.
+  return researchPriorAnswerSources(previousMessages).some(source => {
+    const passages = [source.title, ...source.selectedText.split(/(?<=[.!?])\s+(?=[A-Z])/)]
+      .filter(text => text && text.length <= 1_200);
+    return passages.some(passage => {
+      const passageTokens = subjectTokens(passage);
+      const matches = [...questionTokens].filter(token => passageTokens.has(token)).length;
+      return matches >= 3 && matches / questionTokens.size >= 0.4;
+    });
+  });
+}
+
+function definiteSubjectContinuation(question, rootTopic, currentTopic) {
+  // A phrase such as "the surface" refers back to a subject even if the last
+  // answer failed and therefore supplies no verified citation. Match the noun
+  // at the end of a short phrase, not a shared modifier such as "office".
+  // Fully introduced settings remain subject to the ordinary topic signals.
+  if (/^(?:for|in)\s+(?:a|an|another|different)\b/i.test(question)) return false;
+  const priorSubjects = subjectTokens(`${rootTopic} ${currentTopic}`);
+  const phraseStops = new Set([
+    ...stopWords, "will", "shall", "need", "needs", "require", "requires",
+    "meet", "meets", "satisfy", "satisfies", "apply", "applies", "count", "counts"
+  ]);
+  const genericHeads = new Set(["building", "structure", "project", "property"]);
+  for (const match of question.matchAll(/\bthe\s+((?:[a-z][a-z-]*\s*){1,6})/gi)) {
+    const phrase = [];
+    for (const word of match[1].toLowerCase().match(/[a-z][a-z-]*/g) || []) {
+      if (phraseStops.has(word)) break;
+      phrase.push(word);
+    }
+    const head = phrase.at(-1);
+    if (!head || genericHeads.has(head)) continue;
+    const [subject] = subjectTokens(head);
+    if (subject && priorSubjects.has(subject)) return true;
+  }
+  return false;
+}
+
 function sectionNumbersRelated(left, right) {
   if (left.referenceKind !== right.referenceKind) return false;
   if (left.codePrefix && right.codePrefix && left.codePrefix !== right.codePrefix) return false;
@@ -151,7 +212,7 @@ export function researchQuestionReturnsToOriginalTopic(question) {
     .test(normalizedText(question));
 }
 
-function decisionSignals(question, rootTopic, currentTopic) {
+function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
   const returnToOriginal = researchQuestionReturnsToOriginalTopic(question);
   const correction = /^(?:correction\b|actually\b|to clarify\b|clarification\b)|\bI meant\b|\bnot\s+.+\s+but\b|\brather than\b/i.test(question);
   // A scope exclusion is not a request to compare this source with a prior topic.
@@ -175,6 +236,7 @@ function decisionSignals(question, rootTopic, currentTopic) {
     /\b(?:short|brief|concise|quick)\b[\s\S]{0,80}\b(?:summary|paragraph|version|explanation)\b/i.test(question);
   const uncertaintyContinuation = /^(?:(?:i(?:['’]m| am)|we(?:['’]re| are)) (?:not sure|unsure)|(?:i|we) (?:do not|don['’]t) know|what should (?:i|we) check (?:first|next))\b/i.test(question);
   const explicitFollowUp = /^(?:then\b|and\b|yes\b|so\b|where should (?:I|we) measure\b|what is the governing\b)/i.test(question);
+  const definiteSubject = definiteSubjectContinuation(question, rootTopic.text, currentTopic.text);
   const contextualContinuation =
     explicitFollowUp ||
     /^(?:why|how so|explain|tell me more|more details?|go on|what about)\b/i.test(question) ||
@@ -182,7 +244,8 @@ function decisionSignals(question, rootTopic, currentTopic) {
     uncertaintyContinuation ||
     formatTransformation ||
     projectSubjectContinuation ||
-    hypotheticalContinuation;
+    hypotheticalContinuation ||
+    definiteSubject;
   const questionReferences = extractResearchCodeReferences(question);
   const topicReferences = [...rootTopic.codeReferences, ...currentTopic.codeReferences];
   const relatedReference = referencesOverlap(questionReferences, topicReferences);
@@ -190,6 +253,7 @@ function decisionSignals(question, rootTopic, currentTopic) {
   const rootTokenOverlap = tokenOverlap(question, rootTopic.text);
   const currentTokenOverlap = tokenOverlap(question, currentTopic.text);
   const maximumTokenOverlap = Math.max(rootTokenOverlap, currentTokenOverlap);
+  const citedSubject = citedSubjectContinuation(question, previousMessages);
   const selfContained = significantTokens(question).size >= 4 && !contextualContinuation;
   return {
     returnToOriginal,
@@ -207,6 +271,8 @@ function decisionSignals(question, rootTopic, currentTopic) {
     rootTokenOverlap,
     currentTokenOverlap,
     maximumTokenOverlap,
+    citedSubjectContinuation: citedSubject,
+    definiteSubjectContinuation: definiteSubject,
     questionReferences
   };
 }
@@ -220,7 +286,7 @@ function classification(signals, hasPriorTopic) {
   if (!hasPriorTopic || signals.explicitSwitch || signals.disjointExplicitReference) {
     return researchConversationTopicDecisions.topicSwitch;
   }
-  if (signals.contextualContinuation || signals.relatedReference || signals.maximumTokenOverlap >= 0.2) {
+  if (signals.contextualContinuation || signals.relatedReference || signals.citedSubjectContinuation || signals.maximumTokenOverlap >= 0.2) {
     return researchConversationTopicDecisions.continuation;
   }
   if (signals.selfContained) return researchConversationTopicDecisions.topicSwitch;
@@ -250,7 +316,7 @@ export function decideResearchConversationTopic({
           ? root.source
           : "none"
   );
-  const signals = decisionSignals(normalizedQuestion, root, current);
+  const signals = decisionSignals(normalizedQuestion, root, current, previousMessages);
   const decision = classification(signals, Boolean(root.text || current.text));
   const questionTopic = topicRecord(normalizedQuestion, "current_question");
   const switchesTopic = decision === researchConversationTopicDecisions.topicSwitch;
@@ -280,6 +346,8 @@ export function decideResearchConversationTopic({
       hypotheticalContinuation: signals.hypotheticalContinuation,
       formatTransformation: signals.formatTransformation,
       contextualContinuation: signals.contextualContinuation,
+      citedSubjectContinuation: signals.citedSubjectContinuation,
+      definiteSubjectContinuation: signals.definiteSubjectContinuation,
       relatedReference: signals.relatedReference,
       disjointExplicitReference: signals.disjointExplicitReference,
       selfContained: signals.selfContained,

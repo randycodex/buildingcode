@@ -1,0 +1,3864 @@
+{
+  "reviewVersion": "20261002-manual-decisive-text-regression-v1",
+  "reviewedAt": "2026-10-02T23:07:52.987825+00:00",
+  "reviewType": "offline retrieval sufficiency; no candidate answer accuracy judgment",
+  "reviewer": "Codex assistant; not independent professional legal adjudication",
+  "fixturePath": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/evals/independent-accuracy-2026-10-01/freeform-paired.json",
+  "fixtureSHA256": "e5d1d2b196f50c8b9f336156b981e45228d95089aaed559fe8480d431fb22d3f",
+  "baselineDirectory": "/tmp/permitext-independent-freeform-20261002",
+  "candidateDirectory": "/tmp/permitext-passage-advisory-regression-offline-20261002",
+  "summary": {
+    "cases": 50,
+    "baselineExpectedIDPresent": 36,
+    "candidateExpectedIDPresent": 47,
+    "baselineDecisiveTextAvailable": 37,
+    "candidateDecisiveTextAvailable": 47,
+    "recoveredDecisiveTextCases": [
+      "freeform-18-1",
+      "freeform-33-1",
+      "freeform-34-1",
+      "freeform-36-1",
+      "freeform-37-1",
+      "freeform-38-1",
+      "freeform-39-1",
+      "freeform-40-1",
+      "freeform-41-1",
+      "freeform-43-1",
+      "freeform-45-1"
+    ],
+    "lostDecisiveTextCases": [
+      "freeform-15-1"
+    ],
+    "candidateMissingDecisiveTextCases": [
+      "freeform-06-1",
+      "freeform-07-1",
+      "freeform-15-1"
+    ]
+  },
+  "method": [
+    "Read each supplied question, prior frozen expected reference/check and the actual assembled baseline/candidate target text.",
+    "Inspected all source identities and searched potentially equivalent passages where the expected source was missing.",
+    "Checked operative thresholds/prohibitions/permissions together with explicit exceptions, scope conditions and requested table row/header/footnotes.",
+    "Accepted BC 914.1.1 as a parallel source for exterior shaftway markings even though fixture reference names FC 316.",
+    "Did not count generic definitions, incidental numerical matches or a rule from another unestablished discipline as decisive evidence."
+  ],
+  "limitations": [
+    "This is the previous campaign regression set, so it is development evidence rather than fresh held-out performance.",
+    "47/50 decisive-text availability is not 47/50 correct answers; live drafting, applicability reasoning, citation entailment and conversation behavior still need assessment.",
+    "No fresh held-out keys or answers were inspected.",
+    "Passage completeness was read from source text, not inferred from canonicalContextComplete metadata alone.",
+    "The baseline/candidate packets may contain distracting or conflicting provisions beyond the decisive text. This review does not certify their ranking or prompt sufficiency.",
+    "Tables 706.3 and 401.5 were inspected as plain text; no rendered-table or import-correctness certification was performed.",
+    "Cases 03 and 17 retain previously identified pane-area and hub-drain wording ambiguities. Cases 29 and 50 omit code-family/district cues from their original named-section prompts.",
+    "Review compares supplied local corpus text; it does not establish a fully audited amendment/effective-date state for every source.",
+    "Cross-reference installation/design details not needed for each narrow question were distinguished from completeness required for a full compliance determination."
+  ],
+  "cases": [
+    {
+      "id": "freeform-01-1",
+      "question": "For New York City under the 2022 code edition: Does ordinary glazing in a swinging door count as a hazardous location?",
+      "expectedReference": "BC 2406.4.1",
+      "reviewNote": "Door-glazing hazardous-location sentence and all four explicit exceptions are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "d90c2245415e408f6739d25c1ec1ad2b0cb4f8a7e823eead210be82e601a5c47",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5131-1",
+            "reference": "BC 2406.4.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 405,
+            "textSHA256": "35e877f9ad62b217ddbdf7848622ca50beebd4fd7da44e3892288912ce661081",
+            "canonicalContextComplete": true,
+            "truncated": false
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:5130-2",
+            "reference": "BC 2406.4",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 187,
+            "textSHA256": "27cf3c3e63a295a8476f990d8be677882c37561f82d747587aab379989594942",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 2406.4.1",
+          "BC 2406.4",
+          "FGC 303.2",
+          "MC 303.2",
+          "MC 901.4",
+          "BC 716.5.5.1",
+          "AC 28-202.4",
+          "BC 717.2.2",
+          "BC 307.1.2",
+          "BC 2702.2.9",
+          "BC 202",
+          "AC 28-101.5",
+          "BC 2406.4.7",
+          "BC 2406.4.2",
+          "BC 2406.4.3",
+          "BC 2406.4.4",
+          "BC 2406.4.5",
+          "BC 2406.4.6"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "28d8d612034ad5f77fdb0e2cea9525a32900785b03057529bd696b77668e0607",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5131-1",
+            "reference": "BC 2406.4.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 405,
+            "textSHA256": "35e877f9ad62b217ddbdf7848622ca50beebd4fd7da44e3892288912ce661081",
+            "canonicalContextComplete": true,
+            "truncated": false
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:5130-5",
+            "reference": "BC 2406.4",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 187,
+            "textSHA256": "27cf3c3e63a295a8476f990d8be677882c37561f82d747587aab379989594942",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 2406.4.1",
+          "BC 716.5.5.1",
+          "BC 2406.4.2",
+          "PC 407.3",
+          "BC 2406.4",
+          "PC 417.6",
+          "BC 716.5.1",
+          "BC 2406.2",
+          "BC 716.5",
+          "BC 716.5.8.4",
+          "BC 202",
+          "BC 716.5.5",
+          "BC 2406.4.3",
+          "BC 2406.4.4",
+          "BC 2406.4.5",
+          "BC 2406.4.6",
+          "BC 2406.4.7"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-02-1",
+      "question": "For New York City under the 2022 code edition: is door-adjacent glazing hazardous if its nearest edge is within a 24-inch arc and bottom exposed edge 40 inches above the walking surface, with no exception?",
+      "expectedReference": "BC 2406.4.2",
+      "reviewNote": "The 24-inch door-edge arc, bottom-edge less-than-60-inch condition, and four explicit exceptions are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "29a6319808d7fd513789f9d501bc51d6296a467d6f9dff6a3ca96fe432fc30b6",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5132-1",
+            "reference": "BC 2406.4.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 880,
+            "textSHA256": "946f0db88148ce9908d422f6a08f4680bd377534facaf0a9fd5f382075bebbf1",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 2406.4.2",
+          "BC 716.5.5.1",
+          "BC 2406.4.1",
+          "BC 2406.4.6",
+          "BC 2406.4.3",
+          "BC 2406.4.5",
+          "BC 2406.4.7",
+          "BC 1029.11.1",
+          "BC 903.2.11.8",
+          "FGC 306.6",
+          "BC 202",
+          "BC 716.5.5",
+          "BC 1607.8",
+          "BC 1011.7.1",
+          "BC 903.3.1.1",
+          "BC 903.3.1.2"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "6b57f7082a373840ce7e04b3ec299c48d5d9eb6f6fc706fa7f38d38808df6aaf",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5132-1",
+            "reference": "BC 2406.4.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 880,
+            "textSHA256": "946f0db88148ce9908d422f6a08f4680bd377534facaf0a9fd5f382075bebbf1",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 2406.4.2",
+          "BC 2406.4.6",
+          "BC 2406.4.3",
+          "BC 2406.4.5",
+          "BC 2406.2",
+          "BC 2406.4.7",
+          "BC 2406.4.1",
+          "BC 2403.4",
+          "BC 716.5.5.1",
+          "BC 2406.4.4",
+          "BC 202",
+          "BC 716.5.5"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-03-1",
+      "question": "For New York City under the 2022 code edition: a 12 sf window has bottom 12 inches above floor, top 60 inches high and walking surface 24 inches away. No exception applies. Is it hazardous?",
+      "expectedReference": "BC 2406.4.3",
+      "reviewNote": "All four window-glazing criteria and exceptions are present, including exposed area of an individual pane greater than 9 square feet. The question gives window area, so the answer must qualify whether this is individual-pane area.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "130cb5e7e3c6cdd68b0f27e1bd10a206f3a2d78d45355f43a7afdc5186a1da9d",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5133-7",
+            "reference": "BC 2406.4.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1230,
+            "textSHA256": "fb261ac73141f8120de9428432609f137b62eab14e30546bf8aeb0b34c58885b",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 1003.4",
+          "BC 406.4.5",
+          "BC 1029.11.1",
+          "BC 406.8.3",
+          "BC 412.4.3",
+          "BC 2406.4.5",
+          "BC 2406.4.3",
+          "BC 2406.4.6",
+          "BC 903.2.11.8",
+          "BC 2304.8",
+          "BC 202",
+          "BC 2304.8.1",
+          "BC 2304.8.2",
+          "BC 1011.7.1",
+          "BC 1607.8"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "e30a2dbab8fc62816ce55ae776966bbec5e0022ed518751ba2401c985a6db91a",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5133-5",
+            "reference": "BC 2406.4.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1230,
+            "textSHA256": "fb261ac73141f8120de9428432609f137b62eab14e30546bf8aeb0b34c58885b",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 1003.4",
+          "BC 1011.7.1",
+          "BC 2406.4.6",
+          "ZR APPENDIX E",
+          "BC 2406.4.3",
+          "BC 2403.4",
+          "BC 2406.4.5",
+          "BC 2304.12.2.6",
+          "BC 1015.9",
+          "ZR 133-32",
+          "BC 202",
+          "ZR 12-10",
+          "ZR 133-31",
+          "ZR 62-611"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    },
+    {
+      "id": "freeform-04-1",
+      "question": "For New York City under the 2022 code edition: does the hazardous-glazing rule for a shower enclosure apply to every pane of multiple glazing?",
+      "expectedReference": "BC 2406.4.5",
+      "reviewNote": "Wet-surface hazardous location, bottom-edge height condition, express application to every pane, and stated exception are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "1a5c4b99133dba3ad25669774e92b1b7f2089a2ccc083159702bcfd2e6623e6c",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5135-2",
+            "reference": "BC 2406.4.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 637,
+            "textSHA256": "2ed2c01ce6a26b553f79d6c3f6227891f17aff0dbf76c7630a4d7338118b292d",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 417.6",
+          "BC 2406.4.5",
+          "PC 407.3",
+          "AC 28-105.1.3",
+          "AC 28-202.4",
+          "BC 717.2.2",
+          "BC 307.1.2",
+          "BC G311.1",
+          "BC 2702.2.9",
+          "AC 28-104.1.1",
+          "BC 202",
+          "BC 414.5.2"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "50218f194af8e7e7db799e040c4ccfdc8b335cfa78a3f9cbb61a0412cf5f83b8",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5135-3",
+            "reference": "BC 2406.4.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 637,
+            "textSHA256": "2ed2c01ce6a26b553f79d6c3f6227891f17aff0dbf76c7630a4d7338118b292d",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 417.6",
+          "PC 407.3",
+          "BC 2406.4.5",
+          "BC 2406.4.3",
+          "BC 2406.4.1",
+          "BC 2406.2",
+          "BC 2401.2",
+          "BC 2406.3",
+          "BC 2406.4.2",
+          "BC 703.6",
+          "BC 202",
+          "BC 716.3",
+          "BC 2406.3.1",
+          "BC 2403.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-05-1",
+      "question": "For New York City under the 2022 code edition: bottom-stair landing glazing 40 inches above landing and within the specified 60-inch arc is hazardous absent an exception, correct?",
+      "expectedReference": "BC 2406.4.7",
+      "reviewNote": "Bottom-stair landing height/arc conditions and guard exception are present. Question excludes the exception; full guard-design references are not necessary to this narrow inquiry.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "a57e81b85d2d529923f0a1cf61b55a5511340d391e409bdfb39515e69f703bb3",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5137-1",
+            "reference": "BC 2406.4.7",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 521,
+            "textSHA256": "7003c7e0b9cfdaa6402baa4c142413c7f0a43225748be4b118f82953fe81007f",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 2406.4.7",
+          "BC 2406.4.6",
+          "BC 903.2.11.8",
+          "BC 2406.4.2",
+          "BC 2406.4.3",
+          "BC 2406.4.5",
+          "BC 3303.11.2",
+          "BC 1009.3",
+          "BC 414.2.5",
+          "BC 1011.6",
+          "BC 202",
+          "AC 28-101.5",
+          "BC 1009.6",
+          "BC 1009.8",
+          "BC 1607.8",
+          "BC 903.3.1.1",
+          "BC 903.3.1.2",
+          "BC 1029.6.2"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "67f046ecad27a8dfade509e6681c813d92e5f1f47af11644d77a14e05aa905c4",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:5137-1",
+            "reference": "BC 2406.4.7",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 521,
+            "textSHA256": "7003c7e0b9cfdaa6402baa4c142413c7f0a43225748be4b118f82953fe81007f",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 2406.4.7",
+          "BC 2406.4.6",
+          "BC 2406.4.2",
+          "BC 2405.2",
+          "BC 2406.4.5",
+          "BC 2406.4.3",
+          "BC U202.8.4",
+          "PC 407.3",
+          "PC 417.6",
+          "BC 2406.4.1",
+          "BC 202",
+          "BC 2405.3",
+          "BC 2110.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-06-1",
+      "question": "For New York City under the 2022 code edition: what ordinary vertical nonabsorbent base height applies to an office toilet room outside a dwelling unit?",
+      "expectedReference": "BC 1210.2.1",
+      "reviewNote": "Neither packet supplies the 4-inch vertical nonabsorbent toilet-room base requirement. Fixture counts/location and dwelling-unit accessibility are not equivalent finish rules.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "07d5dab0dcd37e27621acc70dc70bbaa8daa806774ed2d43e794e459e91bfbf3",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "PC 201.4",
+          "BC 1210.4",
+          "PC 403.1",
+          "BC 1208.3.2",
+          "PC 403.1.2",
+          "PC 614.1.3",
+          "PC 403.3",
+          "BC 1107.2.2",
+          "PC 614.1",
+          "PC 425.1.2",
+          "BC 202",
+          "PC 403.1.1",
+          "PC 403.2",
+          "PC 403.2.1",
+          "BC 1107.2.2.1",
+          "BC 1107.2.2.9",
+          "BC 1107.2.2.7"
+        ]
+      },
+      "candidate": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "4020278238840f75bb6fbe72d97f77b9edba18bc7385931ae383fa78e30d849d",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "PC 403.1",
+          "PC 102.4.2.1",
+          "BC 1208.3.2",
+          "PC 614.1",
+          "AC 28-210.3",
+          "PC 425.1.2",
+          "PC 403.1.2",
+          "PC 424.1.3",
+          "ZR 15-111",
+          "PC 403.3",
+          "BC 202",
+          "PC 403.1.1",
+          "PC 403.2.1",
+          "PC 614.1.1",
+          "PC 614.1.2",
+          "PC 614.1.3",
+          "PC 614.1.4"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-07-1",
+      "question": "For New York City under the 2022 code edition: how high must the nonabsorbent wall surface extend within 2 feet of a WC in an ordinary public toilet room?",
+      "expectedReference": "BC 1210.2.2",
+      "reviewNote": "Neither packet supplies the 4-foot nonabsorbent surface requirement within 2 feet of a water closet. Nonabsorbent water-closet seat material is not an equivalent wall-finish requirement.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "778c4c1f30f03c83080d108826b5edecf501d6556792633a8e316af4f4eb1ca9",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "PC 403.3",
+          "BC 1210.4",
+          "PC 403.1.2",
+          "PC 614.1.3",
+          "PC 403.1.3",
+          "PC 403.1",
+          "PC 405.3.4",
+          "PC 102.4.2.1",
+          "PC 201.4",
+          "PC 405.3.2",
+          "BC 202",
+          "PC 403.2.1",
+          "PC 403.1.1",
+          "PC 403.2",
+          "PC 304.1",
+          "PC 309.1",
+          "PC 1104.3"
+        ]
+      },
+      "candidate": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "79a0083439c1004ba196667c5f4722b82c1a32baf201e43d16ed7c1618cd0b4a",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "PC 403.3",
+          "PC 102.4.2.1",
+          "PC 403.1.2",
+          "PC 405.3.4",
+          "PC 405.9",
+          "PC 403.1.3",
+          "PC 405.3.2",
+          "PC 402.1",
+          "PC 614.1.3",
+          "PC 420.3",
+          "PC 403.2.1",
+          "PC 304.1",
+          "PC 1104.3",
+          "PC 304.2"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-08-1",
+      "question": "For New York City under the 2022 code edition: what minimum net glazed area corresponds to a 200 sf room under the ten-percent rule?",
+      "expectedReference": "BC 1205.2.1",
+      "reviewNote": "The 10-percent net-glazed-area formula, 12-square-foot required-opening baseline, and Group R-3 exception are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "8c3066088ef72626cf1e97363d821755ca2c9561cfa532eaae6f2ff5a1ff9be5",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:2985-2",
+            "reference": "BC 1205.2.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 423,
+            "textSHA256": "7fb9a17835eb4269eda9639c40ee011235be4b4e4ca5bad969fa6f24fc447a35",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 1208.3",
+          "BC 1205.2.1",
+          "BC 1208.3.2.1",
+          "BC 3304.3.5",
+          "FGC 634.1",
+          "BC 1208.3.2.2",
+          "BC Q107.1",
+          "BC 1208.3.1",
+          "BC Q108.1",
+          "BC Q106.1",
+          "BC 202",
+          "BC 1208.3.2",
+          "BC 907.2.1.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "5e62908cf0ed5cd8a4aeae8b2264a891f2c82934437de30ee8030bd2fd5cc46c",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:2985-1",
+            "reference": "BC 1205.2.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 423,
+            "textSHA256": "7fb9a17835eb4269eda9639c40ee011235be4b4e4ca5bad969fa6f24fc447a35",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 1205.2.1",
+          "BC 2406.2",
+          "BC 1205.2.7",
+          "BC 1205.2.6",
+          "BC 1208.3",
+          "BC U202.6",
+          "BC 2406.4.1",
+          "PC 407.3",
+          "PC 417.6",
+          "BC 2401.2",
+          "BC 202",
+          "BC 2406.4.3",
+          "BC 2406.4.2",
+          "BC 2406.4.5",
+          "BC 1205.2.7.1",
+          "BC 1208.3.1",
+          "BC 1203.5.1.2.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-09-1",
+      "question": "For New York City under the 2022 code edition: what ordinary minimum plan dimension applies to a habitable room other than a kitchen with no exception?",
+      "expectedReference": "BC 1208.1",
+      "reviewNote": "The 8-foot minimum plan dimension and its explicit four exceptions are present; question excludes exceptions.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "6c9cc37020f1893eeccb94ea23f43193a7cea47b311371014d51a79400d9ab0a",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:3020-1",
+            "reference": "BC 1208.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1014,
+            "textSHA256": "2165801888673a4e04c513734d152c0b7ace70fe74179eca5a6db8981e6fc3ec",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 1208.1",
+          "BC 1208.3.1",
+          "BC 202",
+          "BC 307.1.1",
+          "MC 1104.2.2",
+          "AC 28-308.5",
+          "MC 513.1",
+          "BC 909.1",
+          "BC 414.2.5.1",
+          "AC 28-105.12.13",
+          "AC 28-101.5",
+          "BC 307.1",
+          "BC 414.2.2",
+          "MC 1104.3.3",
+          "MC 1104.4",
+          "AC 28-308.7",
+          "AC 28-308.2"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "0ab95baf5e6f047309d34ea427404203526918222ba174b7efbee0951697fd79",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:3020-1",
+            "reference": "BC 1208.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1014,
+            "textSHA256": "2165801888673a4e04c513734d152c0b7ace70fe74179eca5a6db8981e6fc3ec",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 1208.1",
+          "BC 1208.3.1",
+          "BC 2306.3",
+          "AC 28-104.10",
+          "BC U103.7",
+          "BC 1203.5.2",
+          "MC 1004.6",
+          "BC 1204.1",
+          "AC 28-507.9",
+          "BC Q106.1",
+          "BC 202",
+          "BC 2306.1",
+          "AC 28-507.3"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-10-1",
+      "question": "For New York City under the 2022 code edition: can a finished shower compartment be 28 inches in its least dimension just because its area is 950 squareinches?",
+      "expectedReference": "PC 417.4",
+      "reviewNote": "Both 900-square-inch area and independent 30-inch minimum finished dimension are present with measurement-height conditions.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "dc819eca5f318af4e8c8713361d56e0f47693983c217c25e2b15d62be9e1587e",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:11985-1",
+            "reference": "PC 417.4",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 692,
+            "textSHA256": "16f82e169044e73a1e186437564cb0243be95662ca2f907c920cfa42fb4de377",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 417.4",
+          "PC 417.3",
+          "PC 417.4.2",
+          "PC 417.5.2",
+          "PC 312.9",
+          "BC 1210.2.3",
+          "PC 417.4.1",
+          "BC 1203.5.1.4.",
+          "PC C101.1.5",
+          "BC 406.7.3",
+          "BC 202",
+          "PC 417.5.2.1",
+          "PC 417.5.2.6",
+          "PC 417.5.2.2",
+          "PC 417.5.2.3",
+          "PC 417.5.2.4",
+          "PC 417.5.2.5"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "f705fafe8e3e9614fd94cebfa867696ef40965e7bea0be09aa2679fa7967c8d8",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:11985-1",
+            "reference": "PC 417.4",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 692,
+            "textSHA256": "16f82e169044e73a1e186437564cb0243be95662ca2f907c920cfa42fb4de377",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 417.4",
+          "PC 417.4.2",
+          "BC 1210.2.3",
+          "PC 417.5.2",
+          "FC 2909",
+          "PC 102.2.2",
+          "BC 721.1",
+          "PC 417.3",
+          "PC 307.1",
+          "PC 708.1.10",
+          "BC 202",
+          "FC 202",
+          "PC 417.5.2.1",
+          "PC 417.5.2.2",
+          "PC 417.5.2.3",
+          "PC 417.5.2.4",
+          "PC 417.5.2.5",
+          "PC 417.5.2.6"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-11-1",
+      "question": "For New York City under the 2022 code edition: do lavatories for customers in public toilet facilities need tempered water?",
+      "expectedReference": "PC 416.5",
+      "reviewNote": "Public customer/patron/visitor lavatory scope, tempered-water requirement, approved ASSE 1070 device, and point-of-use-heater exception are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "5ce40d1b1ebcf2430af988aaf5e97f29c10d04794f36acbcc88c4e3bd92fa0e7",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:11981-1",
+            "reference": "PC 416.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 482,
+            "textSHA256": "830bafd6207c978a48e99b8653bb86f43ab3c209f6df932129a5ae4a05a64ae0",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 416.5",
+          "PC 403.3",
+          "PC 405.3.2",
+          "PC 403.2",
+          "PC 420.2",
+          "PC 403.1",
+          "PC 403.2.1",
+          "BC 1109.2.3",
+          "PC 405.3.1",
+          "PC 403.3.4",
+          "BC 202",
+          "PC 403.1.1",
+          "PC 403.4",
+          "PC 304.1",
+          "PC 309.1",
+          "PC 419.2",
+          "PC 303.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "0bb6a80377b672698e88f7c97c5bfec67182c7919c58bb003da516f5632e0e22",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:11981-1",
+            "reference": "PC 416.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 482,
+            "textSHA256": "830bafd6207c978a48e99b8653bb86f43ab3c209f6df932129a5ae4a05a64ae0",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 416.5",
+          "PC 607.2",
+          "PC 403.3",
+          "PC 607.1.2",
+          "PC 405.3.2",
+          "PC 403.2",
+          "PC 420.2",
+          "PC 102.4.2.1",
+          "PC 403.1",
+          "PC 607.1.1",
+          "PC 403.1.1",
+          "PC 403.2.1",
+          "PC 304.1",
+          "PC 424.3",
+          "PC 419.2",
+          "PC 303.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-12-1",
+      "question": "For New York City under the 2022 code edition: may urinals replace 60 percent of required WCs in a toilet room?",
+      "expectedReference": "PC 419.2",
+      "reviewNote": "The maximum 50-percent water-closet substitution sentence is present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "74af06b55043ba882495bbfeae4738e0994e85935475305545b918579d823499",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:12002-4",
+            "reference": "PC 419.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 165,
+            "textSHA256": "224b8197c9a903c5967c5c921b337bc7efc98743888c57dbba711bdb98eb7875",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 403.1",
+          "PC 405.3.1",
+          "PC 403.1.2",
+          "PC 419.2",
+          "BC 1210.4",
+          "PC 614.1.3",
+          "PC 403.1.3",
+          "PC 403.3",
+          "PC 102.4.2.1",
+          "PC 405.3.5",
+          "BC 202",
+          "PC 403.1.1",
+          "PC 403.2",
+          "PC 403.2.1",
+          "PC 303.1",
+          "PC 304.1",
+          "PC 1104.3"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "08e2c6866f5dfda0d53cbf62100fc6bf409248c2b8cb3ea1864f5ecf054b57db",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:12002-1",
+            "reference": "PC 419.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 165,
+            "textSHA256": "224b8197c9a903c5967c5c921b337bc7efc98743888c57dbba711bdb98eb7875",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 419.2",
+          "PC 102.4.2.1",
+          "PC 403.1.2",
+          "PC 403.3",
+          "PC 403.1",
+          "PC 405.3.1",
+          "PC 604.4.1",
+          "PC 403.1.3",
+          "PC 405.3.2",
+          "PC 404.1",
+          "BC 202",
+          "PC 403.1.1",
+          "PC 403.2",
+          "PC 403.2.1",
+          "PC 304.1",
+          "PC 303.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-13-1",
+      "question": "For New York City under the 2022 code edition: what minimum drain-outlet diameter applies to a floor drain?",
+      "expectedReference": "PC 412.3",
+      "reviewNote": "The minimum 3-inch floor-drain outlet diameter sentence is present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "7f4b7f792b8b06cf9a92b6aa034cd16769c7e30e64fc823a4dee0d47ed779f10",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:11967-3",
+            "reference": "PC 412.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 116,
+            "textSHA256": "1017b9ff55efd7896ea9afc1f499c0f78e631a6f8315f3bc7a1f9a7c6bac6025",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 412.2",
+          "PC 1104.2",
+          "PC 412.3",
+          "PC 201.4",
+          "BC 307.1.1",
+          "MC 513.1",
+          "AC 28-105.12.13",
+          "BC 909.1",
+          "AC 28-104.10",
+          "AC 28-308.5",
+          "BC 307.1",
+          "AC 28-105.12.12",
+          "AC 28-308.7",
+          "AC 28-308.2",
+          "AC 28-308.3",
+          "BC 414.2.5"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "4f6644ca651db20d036092182c03c0efdbde51fe071f66b26955a124982be700",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:11967-1",
+            "reference": "PC 412.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 116,
+            "textSHA256": "1017b9ff55efd7896ea9afc1f499c0f78e631a6f8315f3bc7a1f9a7c6bac6025",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 412.3",
+          "PC 412.2",
+          "PC 1104.2",
+          "PC 413.2",
+          "PC 102.2.2",
+          "PC 1113.1.3",
+          "PC 201.3",
+          "PC 417.3",
+          "PC 1501.3",
+          "BC 2306.3",
+          "BC 202",
+          "PC 608.1",
+          "PC 702.1",
+          "PC 702.2",
+          "PC 702.3",
+          "PC 702.4",
+          "PC 1102.4"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-14-1",
+      "question": "For New York City under the 2022 code edition: must the central washing room of a multifamily building have floor drains?",
+      "expectedReference": "PC 412.4",
+      "reviewNote": "Central multifamily washing facilities must drain the entire floor area; minimum 3-inch outlets and lint strainers are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "291d3c7e5f6df2c230c77fd257358eb103794a91707e17549d72b6da41a39918",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:11968-1",
+            "reference": "PC 412.4",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 451,
+            "textSHA256": "8db3e2df2cbe950392425169e576e57d0321b4eda9d95f8019a1457d7997c204",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 412.4",
+          "PC 412.3",
+          "PC 412.2",
+          "PC 1104.2",
+          "BC 905.11.1",
+          "BC 903.6.1",
+          "PC 715.1",
+          "BC 1503.4.1",
+          "MC 1004.6",
+          "AC 28-104.10",
+          "BC 202"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "03fde08524caa1d669e58ecb6eea9996da024a00b214026ab4ce6a301d02ec39",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:11968-1",
+            "reference": "PC 412.4",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 451,
+            "textSHA256": "8db3e2df2cbe950392425169e576e57d0321b4eda9d95f8019a1457d7997c204",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 412.4",
+          "PC 412.2",
+          "PC 1104.2",
+          "PC 703.4",
+          "PC 703.5",
+          "BC E105.2.1",
+          "PC 102.2.2",
+          "PC 607.1",
+          "PC 305.4.1",
+          "PC 708.1.1",
+          "BC 202"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-15-1",
+      "question": "For New York City under the 2022 code edition: may an ordinary drainage line reduce from 4 inches to 3 inches downstream?",
+      "expectedReference": "PC 704.2",
+      "reviewNote": "Baseline provides the no-downstream-size-reduction sentence and 4-inch-by-3-inch water-closet connection exception. Candidate provides drainage sizing/venting and general rearrangement requirements but no equivalent prohibition.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "ada2ebf74f89f6aa2ede3cebd6ed0a1f4bc2792c4fecbc3f92ac7cb4a0d6fe65",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:12335-1",
+            "reference": "PC 704.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 227,
+            "textSHA256": "0dbfb7c561aa546bc0663fc87b82b3e70ff7e1cfbacfbf9254078deb34d1caa1",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 704.2",
+          "AC 28-104.10",
+          "BC 3202.2.5",
+          "PC C101.1.5",
+          "PC C101.1.2",
+          "BC Q108.1",
+          "BC Q106.1",
+          "BC Q107.1",
+          "BC 428.3.7",
+          "BC 2304.5",
+          "BC 202",
+          "AC 28-101.5",
+          "BC 907.2.1.1"
+        ]
+      },
+      "candidate": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "09aa1a0a10bba7d4bdc9015c114cf17b1bb2c950cd3fa31699ac6732fbbe7b9c",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "PC 102.2.2",
+          "PC 201.3",
+          "PC 709.2",
+          "PC 915.2.2",
+          "PC 709.1",
+          "PC 710.1",
+          "PC 912.3",
+          "PC 102.8.1",
+          "PC 1106.5",
+          "AC 28-104.10",
+          "PC 709.4"
+        ]
+      },
+      "change": "lost_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-16-1",
+      "question": "For New York City under the 2022 code edition: may a sanitary tee provide a horizontal-to-horizontal drainage change?",
+      "expectedReference": "PC 706.3",
+      "reviewNote": "Table 706.3 column labels, sanitary-tee row X/c, dash, dash, and footnotes survive together with the installation rule. This is plain-text table review, not a visual/table-parser certification.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "2788ca6e0c6956894105ab475b468b114b56e55f4bff706d65001a5e37d126e9",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:12397-2",
+            "reference": "PC 706.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1040,
+            "textSHA256": "18c4b6e1c7bd1b074130baff0ac9f62f0329695fbf2245e54baaae157f44f53c",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 1104.3",
+          "PC 706.3",
+          "PC 1303.6",
+          "BC Q107.1",
+          "AC 28-104.10",
+          "BC Q102.1",
+          "BC Q103.1",
+          "BC 3303.2.4",
+          "BC Q106.1",
+          "BC Q104.1",
+          "BC 202",
+          "BC 907.2.1.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "27346bb0c28cb44d1bbb1786e6dd2cc118e366f19dadd7b9afef6748df64c205",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:12397-1",
+            "reference": "PC 706.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1040,
+            "textSHA256": "18c4b6e1c7bd1b074130baff0ac9f62f0329695fbf2245e54baaae157f44f53c",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 706.3",
+          "PC 706.1",
+          "PC 1104.3",
+          "PC 102.8.1",
+          "PC 1501.3",
+          "PC 102.2.2",
+          "PC 703.3",
+          "PC 201.3",
+          "PC 1303.6",
+          "PC 307.1",
+          "BC 202",
+          "PC 608.1",
+          "PC 702.1",
+          "PC 702.2",
+          "PC 702.3",
+          "PC 702.4",
+          "PC 1102.4"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-17-1",
+      "question": "For New York City under the 2022 code edition: how far must a hub drain extend above a water-impervious floor?",
+      "expectedReference": "PC 802.3.2",
+      "reviewNote": "The entire short hub-drain provision is present. Its wording attaches extending-not-less-than-1-inch to a hub or a pipe ambiguously; presence does not resolve the professional interpretation identified in the prior key audit.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "948914721e2ede391dc59c9510320d91b8c2c8d729d81a0bcc17ea20edc28cfe",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:12489-1",
+            "reference": "PC 802.3.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 150,
+            "textSHA256": "22d3beb44cd9dd6eeefb36a389008c892dab04df05b430609355909ca84fac20",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 802.3.2",
+          "PC 412.2",
+          "PC 1104.2",
+          "PC 1101.2.1",
+          "PC 417.5",
+          "PC 709.4.1",
+          "PC 1303.2",
+          "PC 607.2.1",
+          "BC 1503.4.1",
+          "PC 607.5",
+          "BC 202"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "ef15b322c1083daa2c4fa7a1129c9f89723ab0171b0d9196d94a1c75ed146d96",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:12489-1",
+            "reference": "PC 802.3.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 150,
+            "textSHA256": "22d3beb44cd9dd6eeefb36a389008c892dab04df05b430609355909ca84fac20",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 802.3.2",
+          "PC 412.2",
+          "PC 1104.2",
+          "PC 1101.2.1",
+          "PC 102.2.2",
+          "PC 1303.6",
+          "PC 1104.4",
+          "PC 502.1.1",
+          "PC 201.3",
+          "PC 1501.3",
+          "BC 202",
+          "PC 608.1",
+          "PC 702.1",
+          "PC 702.2",
+          "PC 702.3",
+          "PC 702.4",
+          "PC 1102.4"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    },
+    {
+      "id": "freeform-18-1",
+      "question": "For New York City under the 2022 code edition: may a fixture be double trapped?",
+      "expectedReference": "PC 1002.1",
+      "reviewNote": "Candidate supplies the express no-double-trapping sentence and six exceptions in PC 1002.1. Baseline supplies general fixture counts/location and lacks that prohibition.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "5303ab29bc5ccba5afdb6c755f504be0cf3d7de2ef4191de0014bde92e3bf872",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "PC 403.1",
+          "PC 614.1.3",
+          "PC 403.1.2",
+          "PC 102.4.2.1",
+          "BC 1210.1",
+          "BC 1107.2.2.9",
+          "PC 607.2",
+          "BC 1109.2.1",
+          "PC 403.3",
+          "AC 28-315.8.1",
+          "BC 202",
+          "AC 28-101.5",
+          "PC 403.1.1",
+          "PC 403.2",
+          "PC 403.2.1",
+          "PC 419.2",
+          "PC 303.1",
+          "PC 304.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "1d3c57c96958f5c79a527d1ac1604d390557391fc48e0f818c44db69215a88b5",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:12605-1",
+            "reference": "PC 1002.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 2044,
+            "textSHA256": "cc82edcb3daecc3d98e74eebee0a88fe971c852f0af807a8feadc9408b60fc81",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 1002.1",
+          "PC 911.1",
+          "PC 901.2.1",
+          "PC 910.1",
+          "PC 102.4.2.1",
+          "MC 307.2.4",
+          "FGC 307.4.",
+          "PC 314.2.4",
+          "BC 1210.1",
+          "BC 101.4.4",
+          "BC 202",
+          "PC 802.3.3",
+          "PC 1103.1",
+          "PC 803.2",
+          "PC 909.1"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-19-1",
+      "question": "For New York City under the 2022 code edition: what special lot-line rule applies to an outdoor ventilation-air intake on a lot 18 feet wide?",
+      "expectedReference": "MC 401.4",
+      "reviewNote": "The less-than-20-foot-lot centerline rule and explicit Group R-3 exception are present. Other intake-location conditions are preserved; occupancy still matters for application.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "9b96c7a3c883bcd5b3592c77f3d053dda9b1ac752a7da43b300465fa08c515c3",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10406-1",
+            "reference": "MC 401.4",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 2486,
+            "textSHA256": "942a172101a43b2670a92a4d8e044462bac5f75ad881aa6d9a2e2d91c3af0be2",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 401.4",
+          "MC 703.1",
+          "BC 403.7",
+          "BC 1206.3.2",
+          "MC 607.5.6.1",
+          "MC 918.5",
+          "MC 401.5",
+          "MC 501.3.1",
+          "MC 403.3",
+          "MC 513.1",
+          "BC 202",
+          "MC 703.1.1",
+          "MC 703.1.2",
+          "MC 403.3.1.1.2",
+          "MC 403.3.1.1",
+          "MC 403.3.1.6",
+          "MC 403.3.1.2"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "309fd7755f55720938efcb089f616ab37de00412d033251ee5f2a057243748d6",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10406-5",
+            "reference": "MC 401.4",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 2486,
+            "textSHA256": "942a172101a43b2670a92a4d8e044462bac5f75ad881aa6d9a2e2d91c3af0be2",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 703.1",
+          "BC 403.7",
+          "MC 918.5",
+          "MC 607.5.6.1",
+          "MC 401.4",
+          "MC 403.1",
+          "MC 401.5",
+          "MC 1105.6.1",
+          "MC 601.3",
+          "MC 403.3",
+          "BC 202",
+          "MC 703.1.1",
+          "MC 703.1.2",
+          "MC 403.3.1.1",
+          "MC 403.3.1.2",
+          "MC 403.3.1.3",
+          "MC 403.3.1.4"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    },
+    {
+      "id": "freeform-20-1",
+      "question": "For New York City under the 2022 code edition: can a residential outdoor intake screen have 3/4-inch openings?",
+      "expectedReference": "MC 401.5",
+      "reviewNote": "Table 401.5 retains the residential intake row with minimum 1/4-inch and maximum 1/2-inch openings, clearly distinguished from nonresidential limits.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "ba6821b836e12b2ebc156cba745e043f3a74702a2b3a08b56842060c934ceb0d",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10408-2",
+            "reference": "MC 401.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 982,
+            "textSHA256": "26d16242543f2359d80a59f1d853f7ceb9ecb320eacef4446b3d085dcb57bd9c",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 903.5.2",
+          "MC 401.5",
+          "MC 918.5",
+          "FGC 618.5",
+          "MC 401.4",
+          "FGC 304.10.3",
+          "BC 403.7",
+          "MC 501.3.2",
+          "MC 607.5.6.1",
+          "BC 310.4",
+          "BC 202",
+          "MC 501.3.1",
+          "FGC 401.5",
+          "FGC 401.6"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "ee43cb8068779a50ff272cd45dbc0b6c4265b4e9320badf3cc2ed6e6f581aafa",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10408-1",
+            "reference": "MC 401.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 982,
+            "textSHA256": "26d16242543f2359d80a59f1d853f7ceb9ecb320eacef4446b3d085dcb57bd9c",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 401.5",
+          "PC 903.5.2",
+          "MC 501.3.2",
+          "MC 918.5",
+          "FGC 304.10.3",
+          "BC 2111.14.3",
+          "MC 401.4",
+          "FGC 618.5",
+          "MC 607.5.6.1",
+          "FGC 304.7.3",
+          "BC 202",
+          "FGC 304.6",
+          "FGC 401.5",
+          "MC 501.3.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-21-1",
+      "question": "For New York City under the 2022 code edition: may the required outdoor-air quantity be replaced with recirculated air?",
+      "expectedReference": "MC 403.2.1",
+      "reviewNote": "The rule prohibits recirculating required outdoor air while allowing excess supply air subject to four listed restrictions. The outdoor-air engineering exception is also retained.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "276dc0fc86b20fccdf243c2e067f1ab71b4de5ef689d842055c6f201eb5ce9d6",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10417-1",
+            "reference": "MC 403.2.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1255,
+            "textSHA256": "d4cd1b982adae8cd0b13b39513dcdde592984aa2ad7f9d9a4c3553f23ca77e6b",
+            "canonicalContextComplete": true,
+            "truncated": false
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:10416-5",
+            "reference": "MC 403.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 356,
+            "textSHA256": "010b5926103ca2c6bbc129142118f349361826ecdc8c6b4ca95b50606b52641f",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 403.2.1",
+          "MC 403.2.2",
+          "MC 703.1",
+          "MC 514.4",
+          "MC 403.2",
+          "MC 403.3",
+          "BC 403.7",
+          "MC 918.5",
+          "BC 415.11.1.8",
+          "MC 606.2.1",
+          "BC 202",
+          "MC 403.3.1.1",
+          "MC 703.1.1",
+          "MC 703.1.2",
+          "MC 403.3.1.1.2",
+          "MC 403.3.1.6",
+          "MC 403.3.1.2"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "6056ff627750988d47832dadb6b69fd4843d09576986a64e9ff48fef4f2fc471",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10417-2",
+            "reference": "MC 403.2.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1255,
+            "textSHA256": "d4cd1b982adae8cd0b13b39513dcdde592984aa2ad7f9d9a4c3553f23ca77e6b",
+            "canonicalContextComplete": true,
+            "truncated": false
+          },
+          {
+            "sourceID": "research-permitext_discovered-id:10416-6",
+            "reference": "MC 403.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 356,
+            "textSHA256": "010b5926103ca2c6bbc129142118f349361826ecdc8c6b4ca95b50606b52641f",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 514.4",
+          "MC 403.2.1",
+          "MC 606.4.2",
+          "MC 703.1",
+          "MC 403.3.1.1.2.3",
+          "MC 403.2",
+          "MC 403.3.1.1.2.3.1",
+          "BC 415.11.1.8",
+          "MC 608.2.1",
+          "FC 2404",
+          "FC 202",
+          "BC 202",
+          "FC 503",
+          "MC 403.3.1.1",
+          "MC 703.1.1",
+          "MC 703.1.2",
+          "MC 403.3.1.1.2.3.2",
+          "MC 403.3.1.1.2.3.3"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-22-1",
+      "question": "For New York City under the 2022 code edition: can transfer air serve as makeup air for a bathroom exhaust system in principle?",
+      "expectedReference": "MC 403.2.2",
+      "reviewNote": "Transfer-air permission, recirculation prohibition caveat, required airflow, and direct/transferred-space outdoor-air conditions are present. This supports a qualified in-principle answer; individual ventilation design still requires the applicable table row.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "d7eac8e532f0e82fcb138224355e0dc3b0fa6dcc45d28b3ce24eebc0432a1120",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10418-1",
+            "reference": "MC 403.2.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 619,
+            "textSHA256": "829b9b27e27837ca2f9c7099e5b63f02e19313d692c926d0e9469cd8cffdb58d",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 403.2.2",
+          "MC 403.2.1",
+          "MC 508.1",
+          "MC 510.6.5",
+          "MC 1105.6.2",
+          "MC 504.6",
+          "BC 910.4.3.1",
+          "FGC 304.9.1",
+          "BC 409.3.2",
+          "MC 1211.2",
+          "BC 202",
+          "MC 403.3.1.1",
+          "MC 401.4",
+          "MC 502.20",
+          "MC 403.1",
+          "MC 502.6"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "19320c34b4995a996750ccb4d1b2ff411f4f5eef63464f3a21d34fc5c3c11a62",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10418-3",
+            "reference": "MC 403.2.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 619,
+            "textSHA256": "829b9b27e27837ca2f9c7099e5b63f02e19313d692c926d0e9469cd8cffdb58d",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 508.1",
+          "MC 510.6.5",
+          "MC 403.2.2",
+          "MC 1105.6.2",
+          "MC 504.6",
+          "MC 508.1.2",
+          "MC 505.2",
+          "MC 403.1",
+          "FGC 304.9.1",
+          "BC 910.4.3.1",
+          "BC 202",
+          "MC 403.3.1.1",
+          "MC 401.4",
+          "MC 501.3.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    },
+    {
+      "id": "freeform-23-1",
+      "question": "For New York City under the 2022 code edition: which detectors control intermittent enclosed-garage ventilation?",
+      "expectedReference": "MC 404.1",
+      "reviewNote": "Both carbon-monoxide and nitrogen-dioxide detectors and 25-ppm/500-ppb control thresholds are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "cde170442950146a079bcdbe019c84afbdbc9ee555e59a74bc711b30c0ca2cad",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10442-1",
+            "reference": "MC 404.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 519,
+            "textSHA256": "9a68d40a2f6bb5f7a1094133ca010389e925a6c4eede90e4989fe52dc3d10c77",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 404.1",
+          "MC 1006.9",
+          "BC 908.6",
+          "MC 606.2.1",
+          "MC 403.1",
+          "BC 907.3.1",
+          "MC 606.3",
+          "MC 502.8.1",
+          "MC 607.5.4.1",
+          "MC 607.2.1",
+          "BC 202",
+          "MC 606.4",
+          "BC 907.2",
+          "MC 607.3.3.2",
+          "MC 909.4"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "af615e02963b43ead89956055438305d4217837386709d658ef329d769b88587",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10442-1",
+            "reference": "MC 404.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 519,
+            "textSHA256": "9a68d40a2f6bb5f7a1094133ca010389e925a6c4eede90e4989fe52dc3d10c77",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 404.1",
+          "MC 1006.9",
+          "MC 601.3",
+          "BC 908.6",
+          "MC 510.7.2",
+          "MC 606.3",
+          "MC 606.2.1",
+          "MC 403.1",
+          "MC 607.5.4.1",
+          "BC 510.3",
+          "BC 202",
+          "BC 406.5.4",
+          "MC 606.4",
+          "MC 607.3.3.2"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-24-1",
+      "question": "For New York City under the 2022 code edition: how low may automatic garage ventilation reduce the airflow rate?",
+      "expectedReference": "MC 404.2",
+      "reviewNote": "The 0.05-cfm-per-square-foot reduction floor and 0.75-cfm-per-square-foot capability requirement are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "f9ce38a6a614a647088b164b676541c767b89d4c9bcf221be7da8dd468d5bfec",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10443-2",
+            "reference": "MC 404.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 323,
+            "textSHA256": "371c59bbff0b707cc6b1232d11dbaf97ecdcb5c2a8ba804428849b2a708d0859",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 1105.6.3",
+          "MC 404.2",
+          "MC 403.3",
+          "MC 403.3.1.1",
+          "MC 706.1",
+          "MC 403.1",
+          "MC 1106.3",
+          "MC 403.3.1.6",
+          "MC 508.1.2",
+          "MC 406.1",
+          "MC 1105.6.3.1",
+          "MC 1105.6.3.2",
+          "MC 403.3.1.1.2",
+          "MC 403.3.1.2",
+          "MC 403.3.1.3",
+          "MC 403.3.1.4"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "fbc1ed764c1ff055481a2fdfb08aedb7f7e0511dbfabe8e47b777142dd8e4afb",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10443-3",
+            "reference": "MC 404.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 323,
+            "textSHA256": "371c59bbff0b707cc6b1232d11dbaf97ecdcb5c2a8ba804428849b2a708d0859",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 1105.6.3",
+          "MC 403.3.1.1",
+          "MC 404.2",
+          "MC 403.1",
+          "MC 403.3.1.6",
+          "MC 403.3",
+          "MC 502.16.2",
+          "MC 502.10",
+          "MC 706.1",
+          "MC 403.2",
+          "MC 1105.6.3.1",
+          "MC 403.2.1",
+          "MC 403.3.1.2",
+          "MC 403.3.1.3",
+          "MC 403.3.1.4",
+          "MC 403.3.1.5"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-25-1",
+      "question": "For New York City under the 2022 code edition: does a dryer installation exhausting 250 cfm require makeup air?",
+      "expectedReference": "MC 504.6",
+      "reviewNote": "The more-than-200-cfm makeup-air trigger and closet-opening/approved-means alternative are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "63215823abdbd64b089c94b982a6a1f442a493030ceeb00c5488d60fbd3af671",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10589-1",
+            "reference": "MC 504.6",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 357,
+            "textSHA256": "7755401517c8f8c205b3adb9b60cfd556d598889478145605646d17da8cb31a4",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 504.6",
+          "MC 508.1",
+          "MC 510.6.5",
+          "MC 1105.6.2",
+          "BC 910.4.3.1",
+          "FGC 304.9.1",
+          "MC 504.1",
+          "MC 508.1.2",
+          "MC 606.2.1",
+          "AC 28-103.1.1",
+          "BC 202",
+          "MC 606.4",
+          "MC 401.4",
+          "MC 501.3.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "9c1b69120b8c87e3179aa60061587ee4b8f1194d9d6706eafcfaa705543b2f3b",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10589-1",
+            "reference": "MC 504.6",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 357,
+            "textSHA256": "7755401517c8f8c205b3adb9b60cfd556d598889478145605646d17da8cb31a4",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 504.6",
+          "MC 508.1",
+          "MC 510.6.5",
+          "MC 1105.6.2",
+          "FGC 304.9.1",
+          "MC 504.1",
+          "MC 701.3.1",
+          "MC 505.2",
+          "MC 503.5",
+          "MC 913.2",
+          "BC 202",
+          "MC 403.3.1.1",
+          "MC 401.4",
+          "MC 501.3.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-26-1",
+      "question": "For New York City under the 2022 code edition: what dampers generally protect permitted ducts through fire walls?",
+      "expectedReference": "MC 607.5.1",
+      "reviewNote": "Both listed fire and smoke dampers are required for permitted fire-wall ducts. Complete smoke-damper exception wording is retained; it must not be reduced to an unqualified standby-power alternative.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "c0f05d8d95fb9aadf2101ba4484c83074bc6b88f8b618646fa1e60c1531c3ea4",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10864-1",
+            "reference": "MC 607.5.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 598,
+            "textSHA256": "89f3b10ec69ac34a453db0901f68d4ec38ada4f9d4161efa6f0b0048d00a5f63",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 607.5.1",
+          "MC 607.1.2",
+          "BC 717.5.1",
+          "MC 510.7.4",
+          "MC 607.5.6",
+          "MC 502.10.2",
+          "MC 607.6.2.1",
+          "MC 504.2",
+          "BC 1607.15.2",
+          "MC 510.7.1",
+          "BC 202",
+          "MC 607.3.1",
+          "BC 706.11",
+          "MC 603.4",
+          "BC 706.2"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "1765fc7af82f3126fa994611a077c914305fe5900028ff0dc10c05fa52a9c91d",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10864-1",
+            "reference": "MC 607.5.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 598,
+            "textSHA256": "89f3b10ec69ac34a453db0901f68d4ec38ada4f9d4161efa6f0b0048d00a5f63",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 607.5.1",
+          "MC 607.1.2",
+          "MC 607.5.6",
+          "MC 510.7.1",
+          "BC 717.5.1",
+          "MC 502.10.2",
+          "BC 714.1.1",
+          "MC 607.5.2",
+          "MC 607.6.2.1",
+          "MC 603.7",
+          "BC 202",
+          "BC 714.2",
+          "BC 714.4",
+          "MC 607.5.2.1",
+          "MC 607.3.1",
+          "BC 706.11",
+          "BC 717.6"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    },
+    {
+      "id": "freeform-27-1",
+      "question": "For New York City under the 2022 code edition: does installing a fire damper by itself authorize penetrating an interior exit stair enclosure?",
+      "expectedReference": "MC 607.5.2",
+      "reviewNote": "The fire-barrier damper rule expressly prohibits interior-exit-stair penetration except where BC 1023.5 permits it. Detailed BC permission text is not needed to answer that a damper alone grants no permission.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "533aee81597a533f9e2a1e641333d15ea895f23f40e4aeb1314286a7ee0dba77",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10866-8",
+            "reference": "MC 607.5.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1657,
+            "textSHA256": "14452464b65763174b3a2bd0104dc494aa97ae76a76594ef6c9a93add4fe9926",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 3303.7.7.1",
+          "BC 403.5.1",
+          "BC 403.2.3",
+          "BC 1007.1.1",
+          "BC 403.5.2",
+          "BC 909.20",
+          "AC 28-103.1.1",
+          "MC 607.5.2",
+          "MC 601.3",
+          "BC 1002.1.1",
+          "BC 202",
+          "BC 3303.11",
+          "BC 403.2.3.1",
+          "BC 403.2.3.4",
+          "BC 403.2.3.2",
+          "BC 403.2.3.3",
+          "MC 607.5.2.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "a8b7ef886e37f5093a1a6bf6d67f49a7fc40f13cd9d6c3b8efeebc2de5d0f4be",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:10866-4",
+            "reference": "MC 607.5.2",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1657,
+            "textSHA256": "14452464b65763174b3a2bd0104dc494aa97ae76a76594ef6c9a93add4fe9926",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 3303.7.7.1",
+          "MC 502.10.2",
+          "FC 2703",
+          "MC 607.5.2",
+          "BC 717.6.3",
+          "BC 403.5.1",
+          "MC 607.6.3",
+          "MC 607.1.2.1",
+          "MC 507.2.7",
+          "MC 501.3.2.1",
+          "BC 202",
+          "FC 202",
+          "BC 3303.11",
+          "MC 607.5.2.1",
+          "BC 3308.7",
+          "MC 506.3.11",
+          "MC 506.3.11.2",
+          "BC 3303.11.1"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-28-1",
+      "question": "For New York City under the 2022 code edition: does the direct-vent exception allow a gas appliance in a sleeping room?",
+      "expectedReference": "FGC 303.3",
+      "reviewNote": "The main sleeping-room prohibition and non-sleeping-only direct-vent exception are present. The related narrower FGC 303.3.1 direct-vent space-heater provision is also supplied and must be distinguished.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "0b5917d4f4b659cbadfd08d5c5084205408850d0153dc9b840fbc152b2f970c4",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8063-1",
+            "reference": "FGC 303.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1098,
+            "textSHA256": "010ff603251321c3635c89343d59217afd993beef63ab4ff2c072fd88ad81cc9",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 303.3",
+          "FGC 303.3.1",
+          "FGC 503.2.3",
+          "BC 2113.11.1.2",
+          "FGC 306.2",
+          "FGC 503.6",
+          "MC 306.2",
+          "MC 502.9.8.4",
+          "BC 415.10.2",
+          "FGC 304.1",
+          "BC 202",
+          "FGC 303.3.1.1",
+          "FGC 303.3.1.7",
+          "FGC 303.3.1.2",
+          "FGC 303.3.1.3",
+          "FGC 303.3.1.4",
+          "FGC 303.3.1.5"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "e9808262f7fab45485f335c7c32146753b835154cfbbb43274d405b801210788",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8063-2",
+            "reference": "FGC 303.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1098,
+            "textSHA256": "010ff603251321c3635c89343d59217afd993beef63ab4ff2c072fd88ad81cc9",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 303.3.1",
+          "FGC 303.3",
+          "FGC 503.2.3",
+          "BC 407.4.4.5",
+          "FGC 624.1.1",
+          "MC 303.3",
+          "FGC 303.5.1",
+          "BC 2113.11.1.2",
+          "FGC 304.1",
+          "BC 907.2.8.3",
+          "BC 202",
+          "FGC 303.3.1.1",
+          "FGC 303.3.1.2",
+          "FGC 303.3.1.3",
+          "FGC 303.3.1.4",
+          "FGC 303.3.1.5",
+          "FGC 303.3.1.6"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    },
+    {
+      "id": "freeform-29-1",
+      "question": "For New York City under the 2022 code edition: may an appliance rated 400000 Btu/h rely solely on indoor combustion air?",
+      "expectedReference": "FGC 304.5",
+      "reviewNote": "FGC 304.5 includes the greater-than-350000-Btu/h outdoor-only condition and indoor-air-volume context. The section-number removal leaves appliance/fuel applicability less explicit, so source presence supports a qualified answer rather than a universal appliance conclusion.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "56bfc2e1e267e3e01a75945fbbb2d41fcec2335c44a7e9057d334abcf4b0c3e3",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8088-1",
+            "reference": "FGC 304.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 832,
+            "textSHA256": "874196e5c66cb3c45d5405a7855c592b974668c84ca57fd3a56542362e48a25d",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 304.5",
+          "MC 702.1",
+          "MC 701.2",
+          "MC 903.6",
+          "MC 706.1",
+          "MC 905.5",
+          "FGC 304.9",
+          "MC 701.1",
+          "MC 703.1",
+          "FGC 304.1",
+          "FGC 304.5.1",
+          "FGC 304.5.2",
+          "FGC 304.5.3",
+          "MC 703.1.1",
+          "MC 703.1.2",
+          "FGC 304.6"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "d96310dc56a3960270cfe42a6d95946fae57d3218bd008c5d1da67f110836dfc",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8088-3",
+            "reference": "FGC 304.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 832,
+            "textSHA256": "874196e5c66cb3c45d5405a7855c592b974668c84ca57fd3a56542362e48a25d",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "MC 706.1",
+          "MC 701.2",
+          "FGC 304.5",
+          "MC 702.1",
+          "MC 903.6",
+          "FGC 304.9",
+          "MC 701.1",
+          "MC 905.5",
+          "MC 1302.2",
+          "MC 703.1",
+          "FGC 304.5.1",
+          "FGC 304.5.2",
+          "FGC 304.5.3",
+          "MC 703.1.1",
+          "MC 703.1.2"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    },
+    {
+      "id": "freeform-30-1",
+      "question": "For New York City under the 2022 code edition: what is the minimum dimension of an outdoor combustion-air opening?",
+      "expectedReference": "FGC 304.6",
+      "reviewNote": "The 3-inch minimum air-opening dimension and outdoor supply/DEP qualification are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "dcc86dc4e3d9d1bcae132464d0485bea090e9c9bccc3c6cc021c90f1f4123012",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8094-1",
+            "reference": "FGC 304.6",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 415,
+            "textSHA256": "7fe07892aee11cec46e306adbb8d89c4b17df4f42f2156512a25cbf7825520bb",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 304.6",
+          "MC 703.1",
+          "PC 903.5.2",
+          "FGC 304.11",
+          "MC 918.5",
+          "FGC 304.10.3",
+          "FGC 304.9",
+          "FGC 304.1.1.1",
+          "MC 701.4.1",
+          "MC 701.2",
+          "FGC 304.6.1",
+          "FGC 304.6.2",
+          "MC 703.1.1",
+          "MC 703.1.2",
+          "MC 401.4",
+          "FGC 401.5"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "66c27be40d240b489dcc68f62280239cea9b23be1d5ceeebf9cc18ee2e887ef6",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8094-1",
+            "reference": "FGC 304.6",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 415,
+            "textSHA256": "7fe07892aee11cec46e306adbb8d89c4b17df4f42f2156512a25cbf7825520bb",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 304.6",
+          "MC 703.1",
+          "FGC 304.7.3",
+          "FGC 304.10.3",
+          "MC 401.5",
+          "PC 903.5.2",
+          "FGC 304.11",
+          "MC 918.5",
+          "MC 501.3.2",
+          "FGC 304.7.2",
+          "BC 202",
+          "FGC 304.6.1",
+          "MC 703.1.1",
+          "MC 703.1.2",
+          "FGC 401.5",
+          "MC 401.4"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-31-1",
+      "question": "For New York City under the 2022 code edition: are threaded gas-piping elbows among the fittings permitted in concealed locations?",
+      "expectedReference": "FGC 404.5",
+      "reviewNote": "The complete permitted concealed-fitting list contains threaded elbows, tees and couplings and welded fittings.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "1988816bdbba82def2da7e53259b20548350ffb67a5ef23b83894125679f375f",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8233-1",
+            "reference": "FGC 404.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 187,
+            "textSHA256": "90579d2cc0e0d0e4c3ee78816691f49c2d21e8cad0fe6597adcc737434cd0533",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 404.5",
+          "FGC 303.3.1.4",
+          "MC 1107.2",
+          "FGC 102.4.2.1",
+          "BC 918.6",
+          "FGC 107.5",
+          "FGC 408.3",
+          "BC 718.5",
+          "AC 28-316.1",
+          "BC 1705.24",
+          "BC 202",
+          "AC 28-101.5",
+          "BC 1705.12",
+          "FGC 404.3",
+          "BC 720.7"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "7c4968ea04b29c0b8bad5839f0bb2c947316f554dfee442d0ac830700b791f6e",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8233-1",
+            "reference": "FGC 404.5",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 187,
+            "textSHA256": "90579d2cc0e0d0e4c3ee78816691f49c2d21e8cad0fe6597adcc737434cd0533",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 404.5",
+          "FC 5703",
+          "BC 718.5",
+          "PC 705.16.2",
+          "AC 28-316.1",
+          "PC 605.24.1",
+          "PC 803.3.4.1.3",
+          "PC 705.16.3",
+          "MC 1305.2.2",
+          "FGC 408.3",
+          "FC 202",
+          "BC 202",
+          "BC 720.7"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-32-1",
+      "question": "For New York City under the 2022 code edition: how far must a protective sleeve for below-grade gas piping project beyond the inside and outside foundation wall?",
+      "expectedReference": "FGC 404.6",
+      "reviewNote": "The 1-inch inside/4-inch outside sleeve projection, gas-provider qualification, and sealed/waterproof annular-space condition are present.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "81f9e99c36d88226d449a2fcf901ce92b7f022241ce433dc5d3eba437104dc32",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8234-1",
+            "reference": "FGC 404.6",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 510,
+            "textSHA256": "76eac03d78f02437f54e0f9e09b9dccb063fa13cc1395542b37f46760bfc7447",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 404.6",
+          "FGC 303.3.1.4",
+          "BC 1809.5.8",
+          "BC 1705.25.4.1",
+          "BC 1705.25.3.2",
+          "FGC 107.5",
+          "FGC 404.3",
+          "FGC 404.9",
+          "FGC 401.1.1",
+          "FGC 107.4",
+          "BC 202",
+          "FGC 404.11",
+          "FGC 401.5"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "09a71697b77dce54d69415cacd027bd376dda663c1ff483cfdddc0ef90da7e32",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8234-1",
+            "reference": "FGC 404.6",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 510,
+            "textSHA256": "76eac03d78f02437f54e0f9e09b9dccb063fa13cc1395542b37f46760bfc7447",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 404.6",
+          "FGC 303.3.1.4",
+          "FGC 404.9",
+          "FGC 401.1.1",
+          "FGC 107.5",
+          "FGC 302.8",
+          "FGC 102.4.2.1",
+          "FGC 302.1",
+          "FGC 406.6.2.3",
+          "FGC 503.4.1",
+          "FGC 404.11",
+          "FGC 401.5",
+          "FGC 404.3"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-33-1",
+      "question": "For New York City under the 2022 code edition: what minimum elevation above the roof applies to outdoor gas piping crossing the roof?",
+      "expectedReference": "FGC 404.9",
+      "reviewNote": "Candidate supplies the 3-1/2-inch above-roof requirement and identification/nonconcealment/support/protection context. Baseline lacks the elevation requirement.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "f5e154fa4670d72b6f2819caf788f3c0eb826057c088cb42e74dc3057cc1f736",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "AC 28-401.3",
+          "FGC 303.3.1.4",
+          "BC 307.1.1",
+          "BC 101.4.2",
+          "MC 513.1",
+          "BC 414.2.5.1",
+          "MC 1305.9.13",
+          "PC 502.1.1",
+          "AC 28-105.12.13",
+          "FGC 304.1",
+          "BC 202",
+          "AC 28-101.5",
+          "BC 307.1",
+          "BC 414.2.2",
+          "MC 1305.9.3.2",
+          "MC 1305.9.3",
+          "MC 1305.9.4",
+          "AC 28-105.12.12"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "27fcada47522e7794a3f6941b368681c067365d549a2bff6cdc3f5ddff2de656",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8239-2",
+            "reference": "FGC 404.9",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 1040,
+            "textSHA256": "87a5248d4eddc639a7a7c8cb7eb307ce8020cc5e9e02e479b055b85ba193f1f7",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 303.3.1.4",
+          "FGC 404.9",
+          "FGC 401.1.1",
+          "FGC 302.8",
+          "FGC 406.4.1.2",
+          "FGC 406.7.2",
+          "FGC 102.4.2.1",
+          "PC 1301.11",
+          "FGC 406.4.1.1",
+          "FGC 107.5",
+          "FGC 406.7.1.1",
+          "PC 702.3",
+          "PC 605.4",
+          "PC 702.2",
+          "FGC 404.11",
+          "FGC 406.7.2.1"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-34-1",
+      "question": "For New York City under the 2022 code edition: what bearing condition must a gas-pipe trench provide?",
+      "expectedReference": "FGC 404.13",
+      "reviewNote": "Candidate supplies the firm, substantially continuous bearing on the trench bottom sentence. Baseline lacks a gas-trench bearing rule.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "4cc4f9c2857a395a69d0a263aed766938d847318591cae5c9f4e7f648d945320",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "AC 28-104.1.1",
+          "AC 28-104.10",
+          "BC Q102.1",
+          "BC Q103.1",
+          "BC Q108.1",
+          "BC Q107.1",
+          "BC Q104.1",
+          "BC Q106.1",
+          "MC 101.2",
+          "AC 28-318.3.4",
+          "BC 202",
+          "BC 907.2.1.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "b4e6fe6e516eb39a51c887ba6c2154b8faabd619f244f64358a7e517df7f4520",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8249-1",
+            "reference": "FGC 404.13",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 141,
+            "textSHA256": "e906f272d0cc4c2ab5cf8218552e79547bbf4dbb6b0ccfc0c82116e89f1c07f0",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 404.13",
+          "BC 3305.8.2",
+          "BC 1810.3.1.3",
+          "BC 1806.1",
+          "BC 2308.4.5",
+          "BC 1806.2",
+          "BC 2308.5.5.2",
+          "BC 2308.5.1",
+          "PC 306.2.2",
+          "BC 1912.3.3",
+          "BC 202",
+          "BC 2308.4.1.1",
+          "BC 2308.5.5.1",
+          "BC 1809.3"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-35-1",
+      "question": "For New York City under the 2022 code edition: is underground gas piping beneath a building unconditionally prohibited?",
+      "expectedReference": "FGC 404.14",
+      "reviewNote": "The prohibition and wrought-iron/steel conduit exception with load capacity, corrosion and child-section conditions are present. Not all child details survive in candidate, so evidence is sufficient for this narrow nonabsolute-prohibition question, not complete installation approval.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "9454f0bbad9f982261fec72cad680935381e431a35f8dd6b443d3ee294468664",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8251-1",
+            "reference": "FGC 404.14",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 398,
+            "textSHA256": "c7bee2f1565c911148743a3d7ad842c4f12969c99d74781f7068b12729c336b3",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 404.14",
+          "FGC 303.3.1.4",
+          "PC 1301.6.2",
+          "BC 2702.2.15",
+          "BC 905.3.5",
+          "BC 907.2.19",
+          "BC 905.11.1",
+          "BC 903.6.1",
+          "FGC 401.1.1",
+          "FGC 107.5",
+          "BC 202",
+          "PC 702.2",
+          "FGC 404.11",
+          "FGC 404.14.1",
+          "FGC 404.14.2",
+          "FGC 404.14.3",
+          "BC 907.5.2.2"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "33dd55a7a1e62a5b934077fb712b53581d46481dd135647c667e09d14e82e38a",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8251-1",
+            "reference": "FGC 404.14",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 398,
+            "textSHA256": "c7bee2f1565c911148743a3d7ad842c4f12969c99d74781f7068b12729c336b3",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 404.14",
+          "FGC 102.4.2.1",
+          "FGC 404.11.1",
+          "FGC 303.3.1.4",
+          "FGC 401.1.1",
+          "FGC 404.3",
+          "FGC 404.18",
+          "PC 1301.6.2",
+          "FGC 404.2.1",
+          "FGC 302.1",
+          "PC 702.2",
+          "FGC 404.11",
+          "FGC 404.14.1",
+          "FGC 404.11.6",
+          "FGC 404.11.2",
+          "FGC 404.11.3"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    },
+    {
+      "id": "freeform-36-1",
+      "question": "For New York City under the 2022 code edition: how are gas appliances rated below the gas-piping test pressure isolated for testing?",
+      "expectedReference": "FGC 406.3.3",
+      "reviewNote": "Candidate supplies appliance disconnection and capping when designed operating pressure is less than test pressure, plus leak check after energization. Baseline lacks the disconnection condition.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "d8d60ecb003ce8f0313fe3d7d4ff7fe48519608eea0c36dd9fff8e288e9802d4",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "FGC 404.20",
+          "FGC 406.1",
+          "BC 2113.11.1.2",
+          "FGC 406.4.1",
+          "FGC 303.3.1.4",
+          "MC 1108.2",
+          "MC 301.6",
+          "MC 801.2.5",
+          "BC 1705.24.3",
+          "FGC 107.5",
+          "BC 202"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "8f070e43fdf1f7857be736bce604ee9e36f4ba6d2cb7e1bf388da7deb5e5c243",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:8281-3",
+            "reference": "FGC 406.3.3",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 455,
+            "textSHA256": "c3d788a6ed4e48be8a3aee1f2446caafe9a7aff232c4e31b7fb04d0e6b7b983a",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FGC 404.20",
+          "FGC 406.4.1",
+          "FGC 406.3.3",
+          "FGC 406.3.4",
+          "BC 1705.23.3",
+          "FGC 406.3.2",
+          "BC 1705.24.3",
+          "FGC 406.1.1.1",
+          "MC 1107.2.2",
+          "BC 2113.11.1.2",
+          "BC 202",
+          "FC 202"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-37-1",
+      "question": "For New York City under the 2022 code edition: may hot ashes be deposited in a combustible container?",
+      "expectedReference": "FC 305",
+      "reviewNote": "Candidate supplies the hot-ash combustible-container prohibition and separation requirements. The exception changes separation distance, not permission to use a combustible container.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "4d8f543e5196862629e7dd66c5a65f219d84ceee3d223fa166e560be57232165",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "PC 302.1",
+          "AC 28-104.10",
+          "BC 1109.5.3",
+          "BC Q108.1",
+          "BC Q107.1",
+          "BC 1705.23",
+          "BC Q104.1",
+          "BC Q106.1",
+          "BC Q103.1",
+          "BC Q102.1",
+          "BC 202",
+          "BC 1705.12",
+          "BC 410.1",
+          "BC 907.2.1.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "50ba174db9d3089d1d8cb8f713554e72f14d83e8e23e84334b6169ab8fd8a30c",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004686-2",
+            "reference": "FC 305",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 1352,
+            "textSHA256": "45ae1fef81f7790706b923953e714e33c2dd4dc0b966fcbb0d851e083f89cbf5",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 143-02",
+          "FC 305",
+          "FC 3703",
+          "PC 302.1",
+          "BC 1905.10",
+          "BC 1905.10.3",
+          "BC 1905.10.1",
+          "AC 28-104.10",
+          "ZR 81-642",
+          "ZR 81-722",
+          "ZR 12-10",
+          "FC 202",
+          "BC 1905.10.2",
+          "BC 1905.10.4",
+          "BC 1905.10.5",
+          "BC 1905.10.6",
+          "BC 1905.10.7",
+          "BC 1905.10.8"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-38-1",
+      "question": "For New York City under the 2022 code edition: may an allowed open fire be left unattended before it is extinguished?",
+      "expectedReference": "FC 307",
+      "reviewNote": "Candidate supplies open-fire general prohibition/allowed exceptions and the constant-attendance-until-extinguished sentence. Baseline lacks the attendance rule.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "868cc91ac3373549547c703f88921b4bd18741d3ee1a68ead7658a6e1d06d848",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "AC 28-104.10",
+          "BC Q107.1",
+          "BC Q106.1",
+          "BC Q105.1",
+          "BC Q108.1",
+          "BC Q104.1",
+          "BC Q103.1",
+          "BC Q102.1",
+          "BC 415.8.2",
+          "BC 427.7.1",
+          "BC 202",
+          "BC 415.6.2",
+          "BC 907.2.1.1",
+          "BC 905.7",
+          "BC 905.4",
+          "BC 905.3.3.2",
+          "BC 905.3"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "4a318c9d31bb5f4bb352f840b6f5c6751ae246b33c61b0f6053221568dc5e16f",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004688-1",
+            "reference": "FC 307",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 7761,
+            "textSHA256": "81a9e840dae502b89a8b7f3438cead9ceeb393b1814f9e1002364700214ac153",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FC 307",
+          "FC 308",
+          "FC 5609",
+          "BC 3320.7.2.3",
+          "FC 904",
+          "FC 5608",
+          "FC 5003",
+          "FC 5704",
+          "FC 5007",
+          "AC 28-104.1.1",
+          "FC 202",
+          "BC 202",
+          "FC 903"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-39-1",
+      "question": "For New York City under the 2022 code edition: is smoking prohibited in an ordinary GroupM occupancy that is not an authorized hookah establishment?",
+      "expectedReference": "FC 310",
+      "reviewNote": "Candidate supplies the Group M smoking prohibition and the explicit authorized non-tobacco-hookah exception; baseline only contains ventilation or construction-site smoking provisions.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "758471f34e34e060d87e1a6cea2d518879682af8e013b5df1d2a2315c1da1e93",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "BC 3303.7.3",
+          "MC 403.3.1.1",
+          "AC 28-315.8.1",
+          "AC 28-104.10",
+          "AC 28-118.3",
+          "MC 603.18.2",
+          "BC Q106.1",
+          "BC Q104.1",
+          "AC 28-118.17",
+          "BC Q107.1",
+          "BC 202",
+          "AC 28-101.5",
+          "MC 403.2.1",
+          "MC 403.1",
+          "AC 28-118.3.1",
+          "AC 28-118.3.4",
+          "AC 28-118.3.2",
+          "AC 28-118.3.3"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "123edb2dee497ddc318ed7f10e6d16406e3943dd24752e9f1ea94b46a99d16fd",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004691-7",
+            "reference": "FC 310",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 6652,
+            "textSHA256": "7fd9e964ae7d9b2f7bebf7c30150e232922cf45d59cb9cfc40ca912daa48cecc",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FC 3304",
+          "BC 3303.7.3",
+          "FC 6306",
+          "FC 6303",
+          "FC 3404",
+          "FC 2104",
+          "FC 310",
+          "FC 2311",
+          "FC 2403",
+          "FC 3205",
+          "FC 202",
+          "BC 202"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-40-1",
+      "question": "For New York City under the 2022 code edition: what maximum center-to-center spacing applies to prescriptive impact-protection posts?",
+      "expectedReference": "FC 312",
+      "reviewNote": "Candidate supplies maximum 4-foot on-center post spacing with the other prescriptive post requirements and approved-barrier alternative. Baseline lacks the spacing rule.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "7b65db24f275b4eb24719581623842e6fa115cbb5c7855d7047c4da143b1a46a",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "BC 704.9",
+          "FGC 628.3",
+          "BC 307.1.1",
+          "MC 513.1",
+          "BC 414.2.5.1",
+          "BC 909.1",
+          "BC 1901.3",
+          "BC 912.4.3",
+          "AC 28-105.12.13",
+          "AC 28-104.10",
+          "BC 202",
+          "BC 307.1",
+          "BC 414.2.2",
+          "AC 28-105.12.12",
+          "BC 414.2.5",
+          "BC 414.2",
+          "BC 903.3.1.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "1173aed04079b196b8932898650851abc6b5e509caad7005c9936c1fb5ccdbf8",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004693-1",
+            "reference": "FC 312",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 1115,
+            "textSHA256": "f491dce7ec1a1eec14c5813304a61003c9b204fd9e004caa42a0e44824ec223b",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FC 312",
+          "FGC 628.3",
+          "FC 507",
+          "BC 2308.6.3",
+          "BC 2306.3",
+          "MC 305.4",
+          "PC 308.5",
+          "BC 2308.5.11",
+          "FC 5704",
+          "BC 912.4.3",
+          "BC 202",
+          "FC 202",
+          "BC 2304.10.1",
+          "BC 2308.6.5.1",
+          "BC 2308.6.5.2"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-41-1",
+      "question": "For New York City under the 2022 code edition: may highly combustible display goods sit 3 feet from an exterior exit door?",
+      "expectedReference": "FC 314",
+      "reviewNote": "Candidate supplies the 5-foot highly-combustible-display clearance from exits/exterior exit doors and general unobstructed exit-access requirement. Baseline lacks this specific display clearance.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "135831a8c6af972b87c05dd838bcdf5c6d5bb5e4b2603ed4818f12c5f7a786df",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "BC 202",
+          "BC 1022.2",
+          "BC 1026.4.2",
+          "BC 403.5.2",
+          "BC 1002.1.1",
+          "AC 28-103.1.1",
+          "BC 1007.1.1",
+          "BC 1027.6",
+          "BC 2702.2.10",
+          "BC 1006.3",
+          "BC 1010.1.1",
+          "BC 1005.1",
+          "BC 3008.1",
+          "BC 3008.11",
+          "BC 3008.9",
+          "BC 3008.3"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "079345c15979e0035641bcfaf23885c77a880a126e447f1bdaabae0f5cd586a8",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004695-1",
+            "reference": "FC 314",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 3375,
+            "textSHA256": "518314ca2c875d69f2b332d855f6e81b47d84f725f13bdd01728804f1d5e274e",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FC 314",
+          "BC 1022.2",
+          "BC 1007.1.1",
+          "BC 1026.4.2",
+          "BC 1027.6",
+          "FC 504",
+          "BC 1027.1",
+          "BC 403.5.1",
+          "BC 1002.1.1",
+          "BC G501.1",
+          "BC 202",
+          "FC 202",
+          "BC 307.1",
+          "BC 1010.1.1",
+          "BC 903.3.1.1",
+          "BC 403.5.2",
+          "BC 1023.2",
+          "BC 1023.7"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-42-1",
+      "question": "For New York City under the 2022 code edition: what lettering height and colors identify an exterior-accessible shaftway opening communicating between floors?",
+      "expectedReference": "FC 316",
+      "reviewNote": "Baseline BC 914.1.1 is a valid parallel enacted provision: exterior shaftway access, two or more floors, SHAFTWAY, red letters at least 6 inches high on white background. Candidate supplies both that parallel text and FC 316.",
+      "baseline": {
+        "label": "sufficient_parallel_provision",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": false,
+        "packetSHA256": "1fadef830722c041645d96c4af4ef16fdb152286f08c77481b1a04cf2d4669c7",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:2060-4",
+            "reference": "BC 914.1.1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "textCharacters": 427,
+            "textSHA256": "29bb773ccb625955ab0847cefa02fd2bd93f38e8605f3d6f4a6e3c32bc78feaa",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "BC 408.5.1",
+          "PC 903.5.2",
+          "BC 1030.3",
+          "BC 914.1.1",
+          "BC 1031.4.3",
+          "BC Q104.1",
+          "AC 28-313.2",
+          "BC Q107.1",
+          "BC Q108.1",
+          "MC 607.5.6",
+          "BC 202",
+          "AC 28-101.5",
+          "BC 907.2.1.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "6dbafb5e2aadff75ea5ef306ca801807be9b1db23c39866960a515f841a4a881",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004697-1",
+            "reference": "FC 316",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 2203,
+            "textSHA256": "8889fdd9d1d6ae4c3b936513125f43e2453fc613752f14f68fc12b358cf33ceb",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FC 316",
+          "BC 914.1.1",
+          "BC 408.5.2",
+          "FGC 304.7.3",
+          "MC 508.1.2",
+          "BC 1031.4.3",
+          "PC 608.8.2.2",
+          "MC 703.1.1",
+          "PC 903.5.2",
+          "FC 5706",
+          "BC 202",
+          "FC 202",
+          "BC 408.5.1",
+          "FGC 304.6"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-43-1",
+      "question": "For New York City under the 2022 code edition: what minimum height and stroke width apply to building address numbers?",
+      "expectedReference": "FC 505",
+      "reviewNote": "Baseline BC 501.2 specifies character width, not the requested stroke width; it cannot establish the stroke dimension. Candidate FC 505.1 supplies 4-inch height and 1/2-inch stroke width with contrast/visibility and additional-law qualifications.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "44ac6be6cb65eb939ac50fdb279e3c8aacf35f0fe8646a01b56587475debca39",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "BC 402.6.4.2",
+          "BC 905.11.1",
+          "BC 903.6.1",
+          "AC 28-118.16.2",
+          "AC 28-118.3.2.1",
+          "BC 501.2",
+          "AC 28-104.10",
+          "PC 403.1",
+          "AC 28-401.18",
+          "BC Q104.1",
+          "BC 202",
+          "PC 403.1.1",
+          "PC 403.2",
+          "PC 403.2.1",
+          "AC 28-104.7.18",
+          "PC 419.2",
+          "PC 303.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "973b20c2f03a23d54c3eafda4aa7bfc9576bb1caf188c8e707c0efba235e93ac",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004727-1",
+            "reference": "FC 505",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 7659,
+            "textSHA256": "51f05fb725a1e32b6000faa280c9d2da26b557a6c5b4cb95f58a238b130f8d8c",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FC 505",
+          "ZR 136-314",
+          "PC 102.2.2",
+          "AC 28-103.29",
+          "FGC 107.4",
+          "MC 107.4",
+          "PC 107.4",
+          "BC 101.1",
+          "AC 28-313.2",
+          "AC 28-313.1",
+          "FC 1024",
+          "AC 28-204.1.1"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-44-1",
+      "question": "For New York City under the 2022 code edition: what must the owner do with the fire department key-box key when a relevant lock is changed?",
+      "expectedReference": "FC 506",
+      "reviewNote": "Both packets supply FC 506.2.2 requiring the owner to replace the key in the lock box whenever the relevant lock is changed or rekeyed.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "04d9ee0a764295e2147fafde8583fec735158ff0a670595eefc1a2805de86b9b",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004728-2",
+            "reference": "FC 506",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 3840,
+            "textSHA256": "9a3f85b02c6af37aa63624f90a786362177cb39dddcf30d181f2a1ccef8e654e",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FC 502",
+          "FC 506",
+          "FC 3319",
+          "BC Q105.1",
+          "BC Q107.1",
+          "AC 28-101.4.4",
+          "BC Q106.1",
+          "AC 28-401.18",
+          "FC 3310",
+          "AC 28-324.3.2",
+          "BC 202",
+          "FC 202",
+          "BC 905.7",
+          "BC 905.4",
+          "BC 905.3.3.2",
+          "BC 905.3",
+          "BC 907.2.1.1"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "5d9465c01f690608c59d5a494649b5e261300eed8497c6423df9873a71daa87b",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004728-1",
+            "reference": "FC 506",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 3840,
+            "textSHA256": "9a3f85b02c6af37aa63624f90a786362177cb39dddcf30d181f2a1ccef8e654e",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "FC 506",
+          "BC 912.4.1",
+          "ZR 53-20",
+          "BC 106.7.2",
+          "BC 907.2.6.3.2.1",
+          "BC Q107.1",
+          "PC 307.1",
+          "AC 28-104.1.1",
+          "FC 3310",
+          "ZR 52-35",
+          "BC 202",
+          "ZR 32-41",
+          "BC 907.2.1.1",
+          "ZR 52-32",
+          "ZR 52-36"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-45-1",
+      "question": "For New York City under the 2022 code edition: may stored boxes impede access to sprinkler valves?",
+      "expectedReference": "FC 509",
+      "reviewNote": "Candidate FC 509.2 expressly protects ready access to fire protection equipment against stored items. Baseline PC 606.3 supplies a generic plumbing valve-access rule without establishing application to sprinkler-system valves.",
+      "baseline": {
+        "label": "missing_decisive_text",
+        "decisiveTextAvailable": false,
+        "expectedIDPresent": false,
+        "packetSHA256": "ebd3f21039abac79342a5ab8555738e1a6d209a2e2b1c58c8132870ce549ae77",
+        "evidence": [],
+        "allRetrievedReferences": [
+          "PC 606.3",
+          "BC 907.2.6.3.2",
+          "BC 1104.3.2",
+          "FGC 409.1.3",
+          "BC 1108.2.2.3",
+          "BC 907.2.6.3.2.1",
+          "BC 907.4.2",
+          "BC 905.9",
+          "PC 712.2",
+          "BC Q104.1",
+          "BC 202",
+          "BC 1108.2.2.1",
+          "BC 1108.2.2.2",
+          "BC 907.4.2.1",
+          "BC 907.4.2.6",
+          "BC 907.4.2.2",
+          "BC 907.4.2.3"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "bd6261c1cd10202526523a33c12483919cabf5a7f7fef0f3b53a7edc92a95724",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:31004731-6",
+            "reference": "FC 509",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "corpusID": "nyc-2022-fire-code",
+            "textCharacters": 1861,
+            "textSHA256": "88bc6bef7ea3daff5b98dd953083893a12c867c35603b7f484af0941c5cb2a0e",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "PC 606.3",
+          "MC 1105.12",
+          "FC 5608",
+          "BC 903.6",
+          "FC 6109",
+          "FC 509",
+          "BC 1110.4.5",
+          "MC 927.2",
+          "FC 3310",
+          "BC 415.9.1.8",
+          "BC 202",
+          "FC 202",
+          "BC 903.6.1",
+          "BC 903.6.2",
+          "BC 903.6.3",
+          "BC 903.6.4",
+          "BC 903.6.5"
+        ]
+      },
+      "change": "recovered_decisive_text",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-46-1",
+      "question": "For New York City under the current Zoning Resolution: must natural grade be disturbed to lower a Manufacturing District yard to curb level?",
+      "expectedReference": "ZR 43-22",
+      "reviewNote": "Both packets retain the Manufacturing District curb-level yard rule and the express natural-grade-disturbance proviso.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "1f0d66473027b4b461f768266499927a431781b957c9ac514a7e4be4ab673b65",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017387-2",
+            "reference": "ZR 43-22",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 501,
+            "textSHA256": "0d270f844a72e91885d9d22f93b72aa463e476cb2739458f5793fe2cd6f68d86",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 12-10",
+          "ZR 43-22",
+          "ZR 33-22",
+          "ZR 52-42",
+          "ZR 24-32",
+          "ZR 23-313",
+          "ZR 62-332",
+          "ZR 64-323",
+          "ZR 43-303",
+          "ZR 37-41",
+          "ZR 43-23",
+          "ZR 33-23",
+          "ZR 52-41",
+          "ZR 52-35",
+          "ZR 24-33",
+          "ZR 23-30"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "a788b768d6ccbddbf425f91677aff9c7e104a98d1c90df37001159a0701a9f35",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017387-1",
+            "reference": "ZR 43-22",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 501,
+            "textSHA256": "0d270f844a72e91885d9d22f93b72aa463e476cb2739458f5793fe2cd6f68d86",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 43-22",
+          "ZR 33-22",
+          "ZR 43-303",
+          "ZR 23-313",
+          "ZR 24-32",
+          "ZR 43-262",
+          "ZR 43-302",
+          "AC 28-212.1",
+          "ZR 52-42",
+          "ZR 43-301",
+          "ZR 12-10",
+          "ZR 43-23",
+          "ZR 33-23",
+          "ZR 23-30",
+          "ZR 24-33",
+          "ZR 52-41",
+          "ZR 52-35"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-47-1",
+      "question": "For New York City under the current Zoning Resolution: what height limit applies to the listed energy infrastructure and accessory mechanical equipment obstruction in an M-district required yard?",
+      "expectedReference": "ZR 43-23",
+      "reviewNote": "Both packets retain the energy-infrastructure/accessory-mechanical-equipment 23-foot-above-curb limit within Manufacturing District required yards, distinct from other obstruction limits.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "3219b708ce58dd21b8b1faf617072d4710c303043af39d44937e887ba5f19880",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017388-1",
+            "reference": "ZR 43-23",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 2472,
+            "textSHA256": "4a2d95220bc168de559e8ab1798c3361798ed54ce7ffc1c1ac7807244a1556b2",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 43-23",
+          "ZR 73-652",
+          "ZR 73-147",
+          "ZR 116-622",
+          "ZR 64-312",
+          "ZR 24-33",
+          "ZR 114-122",
+          "ZR 92-23",
+          "ZR 54-51",
+          "ZR 33-23",
+          "ZR 12-10",
+          "ZR 23-311",
+          "ZR 43-42",
+          "ZR 64-52",
+          "ZR 23-312",
+          "ZR 24-164",
+          "ZR 25-85"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "2b55b0963eeb137ffe0a74ce4c58f166083aa12953d1d40227950d5f51425eef",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017388-1",
+            "reference": "ZR 43-23",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 2472,
+            "textSHA256": "4a2d95220bc168de559e8ab1798c3361798ed54ce7ffc1c1ac7807244a1556b2",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 43-23",
+          "ZR 64-312",
+          "ZR 73-147",
+          "ZR 73-652",
+          "ZR 24-33",
+          "ZR 54-51",
+          "ZR 23-341",
+          "ZR 33-23",
+          "ZR 114-122",
+          "ZR 23-734",
+          "ZR 12-10",
+          "ZR 23-311",
+          "ZR 43-42",
+          "ZR 64-52",
+          "ZR 23-312",
+          "ZR 24-164",
+          "ZR 25-85"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-48-1",
+      "question": "For New York City under the current Zoning Resolution: how are Manufacturing District yard width and depth measured relative to lot lines?",
+      "expectedReference": "ZR 43-24",
+      "reviewNote": "Both packets retain the Manufacturing District requirement to measure yard width/depth perpendicular to lot lines.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "383afbce4642b7cb8bee9c0f947557d477d2fdd3550642bf6c128ae56052d4ae",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017389-3",
+            "reference": "ZR 43-24",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 171,
+            "textSHA256": "f2f5035a1a2f6037eb04fd6c7f4602b6e5d17fd06de0167ce86636a7007c239f",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 137-31",
+          "ZR 52-42",
+          "ZR 43-24",
+          "ZR 24-32",
+          "ZR 33-24",
+          "ZR 11-16",
+          "ZR 33-292",
+          "ZR 23-313",
+          "ZR 43-313",
+          "ZR 33-303",
+          "ZR 12-10",
+          "ZR 23-11",
+          "ZR 52-41",
+          "ZR 52-35",
+          "ZR 24-33",
+          "ZR 23-30",
+          "ZR 52-31"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "d07d707626328fe905cd01b8ae1967cfd5324bfefd8800b60ca209ddb0b33b52",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017389-1",
+            "reference": "ZR 43-24",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 171,
+            "textSHA256": "f2f5035a1a2f6037eb04fd6c7f4602b6e5d17fd06de0167ce86636a7007c239f",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 43-24",
+          "ZR 43-303",
+          "ZR 24-32",
+          "ZR 43-262",
+          "ZR 33-24",
+          "ZR 43-302",
+          "ZR 139-223",
+          "ZR 23-313",
+          "ZR 106-31",
+          "ZR 43-301",
+          "ZR 12-10",
+          "ZR 24-33",
+          "ZR 43-304",
+          "ZR 33-292",
+          "ZR 23-30",
+          "ZR 123-20"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-49-1",
+      "question": "For New York City under the current Zoning Resolution: what maximum distance applies to required off-site accessory parking spaces in manufacturing districts?",
+      "expectedReference": "ZR 44-32",
+      "reviewNote": "Both packets retain 600 feet measured from the nearest boundary of the served zoning lot plus same/adjoining C8 or Manufacturing District conditions. Baseline target occurs after many alternative-district rules, which increases selection ambiguity but does not remove its decisive text.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "d45ad127b49b236e509f953913c9a44eb545ec35a4f9f535010fc4c5d7d58c0d",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_cross_reference-id:20017462-10",
+            "reference": "ZR 44-32",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 453,
+            "textSHA256": "ddeb92d319a2e24e8bc152022131b86e2954aff6151db18fbcc6e4c2ccb82947",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 92-31",
+          "ZR 77-321",
+          "ZR 52-42",
+          "ZR 86-42",
+          "ZR 44-34",
+          "ZR 101-55",
+          "ZR 25-55",
+          "ZR 25-84",
+          "ZR 36-74",
+          "ZR 36-45",
+          "ZR 12-10",
+          "ZR 25-31",
+          "ZR 36-21",
+          "ZR 52-41",
+          "ZR 52-35",
+          "ZR 36-42",
+          "ZR 44-32"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "4eebcde75d17c85a2ea4a6a8ec732b335149d5bea955fd2a8d1fa133e586ac48",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017462-5",
+            "reference": "ZR 44-32",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 453,
+            "textSHA256": "ddeb92d319a2e24e8bc152022131b86e2954aff6151db18fbcc6e4c2ccb82947",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 63-24",
+          "ZR 36-50",
+          "ZR 36-30",
+          "ZR 86-42",
+          "ZR 44-32",
+          "ZR 25-55",
+          "ZR 44-34",
+          "ZR 146-31",
+          "ZR 44-46",
+          "ZR 36-43",
+          "ZR 12-10",
+          "ZR 63-40",
+          "ZR 63-50",
+          "ZR 36-23",
+          "ZR 36-20",
+          "ZR 36-42",
+          "ZR 25-52"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": false
+    },
+    {
+      "id": "freeform-50-1",
+      "question": "For New York City under the current Zoning Resolution: can required off-site spaces rely only on a revocable informal arrangement without the specified ownership and recorded deed restrictions?",
+      "expectedReference": "ZR 44-34",
+      "reviewNote": "Both packets retain same ownership including permitted zoning-lot alternatives, recorded deed restrictions binding heirs/assigns for the use lifetime, and applicable district regulations. The ordinary-language question omits Manufacturing District scope; multiple district families are retrieved, so the answer must identify applicability rather than assume it.",
+      "baseline": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "3d6c9567871268bfc8b75d2feaab21bdb49f4614cf0912297dda8794b27db885",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017466-1",
+            "reference": "ZR 44-34",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 869,
+            "textSHA256": "506e885971bf90b5d87305ffa99bfdf87bc94609d08a1f27c425d681f7d2ca7b",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 44-34",
+          "ZR 36-45",
+          "ZR 25-55",
+          "ZR 101-55",
+          "ZR 36-73",
+          "ZR 25-83",
+          "ZR 91-511",
+          "ZR 84-141",
+          "ZR 62-452",
+          "ZR 25-52",
+          "ZR 12-10",
+          "ZR 44-32",
+          "ZR 36-42",
+          "ZR 25-50",
+          "ZR 25-521",
+          "ZR 36-421",
+          "ZR 36-74"
+        ]
+      },
+      "candidate": {
+        "label": "sufficient_decisive_text",
+        "decisiveTextAvailable": true,
+        "expectedIDPresent": true,
+        "packetSHA256": "030d09622ac408a9f4880a3b3aeacac15cb0ac47b4140f7c51b70448643b0725",
+        "evidence": [
+          {
+            "sourceID": "research-permitext_discovered-id:20017466-3",
+            "reference": "ZR 44-34",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "textCharacters": 869,
+            "textSHA256": "506e885971bf90b5d87305ffa99bfdf87bc94609d08a1f27c425d681f7d2ca7b",
+            "canonicalContextComplete": true,
+            "truncated": false
+          }
+        ],
+        "allRetrievedReferences": [
+          "ZR 36-45",
+          "ZR 25-55",
+          "ZR 44-34",
+          "ZR 36-711",
+          "ZR 25-811",
+          "ZR 81-747",
+          "ZR 36-43",
+          "ZR 81-642",
+          "ZR 73-45",
+          "ZR 81-743",
+          "ZR 12-10",
+          "ZR 36-42",
+          "ZR 25-52",
+          "ZR 44-32",
+          "ZR 36-73",
+          "ZR 25-83",
+          "ZR 81-213"
+        ]
+      },
+      "change": "unchanged",
+      "interpretationOrApplicabilityQualificationRequired": true
+    }
+  ]
+}

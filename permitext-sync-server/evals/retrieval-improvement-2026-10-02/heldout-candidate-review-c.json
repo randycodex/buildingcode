@@ -1,0 +1,908 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "frozen-heldout-candidate-part-c-answer-source-review",
+  "reviewStatus": "complete",
+  "reviewedAt": "2026-10-03T00:32:20.272260+00:00",
+  "reviewer": "Codex assistant source review; not professional adjudication",
+  "inputs": {
+    "resultsPath": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/results.json",
+    "resultsFileSHA256AtReview": "54ce9fea4b534efa3a2e3969129c4d6dfab6e64eb4ca81ba17041c9f5ba84cf8",
+    "resultsFinishedAt": "2026-10-03T00:28:05.001Z",
+    "candidateFreeze": "evals/retrieval-improvement-2026-10-02/candidate-freeze.json",
+    "candidateFreezeSHA256": "bd1ce9faf5acb73a0e3667b565cccfdd6b4de3fdec1f5759d4a59f64c05fad61",
+    "candidateFrozenAt": "2026-10-03T00:12:35.509Z",
+    "sourceHashValidation": {
+      "currentFrozenFilesMatch": true,
+      "checkedSourceFiles": 21,
+      "checkedFixtures": 4,
+      "runRecordedSourceHashesMatch": true,
+      "runOmittedFreezePaths": [
+        "scripts/build-research-semantic-index.mjs"
+      ],
+      "semanticArtifactMatches": true
+    },
+    "heldoutFixtureSHA256": "417368e2fb4db8dad468925f294026cc6370b35df27f572cc1026df4e7bae5db",
+    "sourceKeysSHA256": "51ef91267dfe22f8a5af6135831516f4fab96f0c94ff9101a945e6ff51e0dfc4",
+    "sourcePacketsSHA256": "a12fdbc61a092afdc616c0104fcc2cce604b018a074fae70e80d94e419739b8d",
+    "assignedScope": "Last7 conversations (indices28–34) in heldout.json, 14 turns; PartA owns0–17 and PartB owns18–27.",
+    "assignedConversationIDs": [
+      "fresh-hold-29-extinguisher",
+      "fresh-hold-30-firewatch",
+      "fresh-hold-31-loading-size",
+      "fresh-hold-32-loading-near",
+      "fresh-hold-33-ev",
+      "fresh-hold-34-corner",
+      "fresh-hold-35-joint"
+    ]
+  },
+  "method": {
+    "labels": [
+      "correct",
+      "minor_issue",
+      "materially_wrong",
+      "withheld",
+      "appropriate_clarification",
+      "fixture_ambiguous"
+    ],
+    "strictPassLabels": [
+      "correct",
+      "appropriate_clarification"
+    ],
+    "providerVerificationIsNotCorrectness": true,
+    "candidateTuningPermitted": false,
+    "evaluated": [
+      "Operative conclusion, thresholds, conditions, exceptions and scope against frozen source keys.",
+      "Actual cited enacted passages and specific source-edition metadata.",
+      "Followup continuity and unnecessary fact requests.",
+      "Recorded writer/provider packets for material errors or omissions; not every provider body is inspected for plainly supported correct answers."
+    ],
+    "sourceCoverageIsSeparateFromAnswerCorrectness": true,
+    "correctReferenceIDAloneIsNotDecisiveRuleRecall": true,
+    "additionalCitedPassageReview": [
+      "ZR36-61 loading permission expressly subject to36-663.",
+      "ZR44-563 parallel Manufacturing District near-boundary rule cannot govern the C4-2 site.",
+      "ZR36-461 public-EV-charging allocation cap differs from ordinary authorized-user charging under36-48.",
+      "ZR25-34 Residential District waiver does not support C-rule36-53 references to36-24/36-33.",
+      "ZR144-53 canonical prepared section20022175 metadata identifies Special Brooklyn Navy Yard District(BNY); no site facts establish that scope."
+    ]
+  },
+  "summary": {
+    "reviewedCases": 14,
+    "completedAssignedCases": 14,
+    "assignedCases": 14,
+    "completedRunnerCasesTotal": 70,
+    "labels": {
+      "correct": 9,
+      "minor_issue": 0,
+      "materially_wrong": 1,
+      "withheld": 4,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 0
+    },
+    "strictPassCount": 9,
+    "strictPassFraction": 0.6428571428571429,
+    "fullyPassingFamilies": 3,
+    "assignedFamilies": 7,
+    "failureStages": {
+      "governing-source-retrieval-gap": 1,
+      "source-context-truncation-and-binding-repair": 1,
+      "unsupported-extra-citation-and-boundary-fallback": 1,
+      "governing-source-retrieval-gap-and-repair": 1,
+      "special-district-scope-and-verifier-fault": 1
+    },
+    "costAccounting": "Excluded; parent reconciles live-run provider cost separately."
+  },
+  "decisiveRuleCoverage": {
+    "exposedFinalEvidence": {
+      "present": 10,
+      "absent": 1,
+      "unknown": 3
+    },
+    "actualWriterPacketWhenInspected": {
+      "present": 2,
+      "absent": 3,
+      "unknown": 9
+    },
+    "expectedIDPresentButDecisiveRuleAbsent": [],
+    "ruleRetrievedButFinalStrictFailure": [
+      "fresh-hold-34-corner-1",
+      "fresh-hold-35-joint-1"
+    ],
+    "combinedObservedFinalEvidenceOrActualWriterPacket": {
+      "present": 11,
+      "absent": 3,
+      "unknown": 0,
+      "interpretation": "Decisive operative text was manually reviewed in final assembled sources, with actual writer packets inspected for all four withheld cases and the material source-scope failure."
+    }
+  },
+  "limitations": [
+    "Assistant-written frozen source keys and this assistant source review are not professional independent adjudication.",
+    "Two followup turns per family are correlated; 14 turns are not14 independent population samples.",
+    "This part of the heldout campaign alone does not establish whole-campaign or population accuracy.",
+    "Frozen imported source text and its version are the grading authority; later legal amendments are not certified.",
+    "A verifier pass is not correctness and an answerable nonanswer is a failure."
+  ],
+  "families": [
+    {
+      "familyID": "portable-extinguisher-mounting-height",
+      "codeFamily": "FC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "hot-work-post-work-fire-watch",
+      "codeFamily": "FC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "commercial-loading-berth-dimensions",
+      "codeFamily": "ZR",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "commercial-loading-near-residence-boundary",
+      "codeFamily": "ZR",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 1,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "withheld": 1,
+        "correct": 1
+      }
+    },
+    {
+      "familyID": "accessory-parking-ev-charging",
+      "codeFamily": "ZR",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 1,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "withheld": 1,
+        "correct": 1
+      }
+    },
+    {
+      "familyID": "commercial-parking-access-near-corner",
+      "codeFamily": "ZR",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 0,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "withheld": 2
+      }
+    },
+    {
+      "familyID": "joint-commercial-loading-facility",
+      "codeFamily": "ZR",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 1,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "materially_wrong": 1,
+        "correct": 1
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "fresh-hold-29-extinguisher-1",
+      "familyID": "portable-extinguisher-mounting-height",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "In NYC, how high above the floor may the top of a wall-mounted hand-held extinguisher be if its gross weight is 45 pounds?",
+      "expectedAnswer": "At most 3.5 feet for hand-held extinguisher exceeding 40 pounds. Bottom floor clearance at least 4 inches if addressed.",
+      "decisiveReferences": [
+        "FC 906.9.2",
+        "FC 906.9.3"
+      ],
+      "sourceExcerptHashes": {
+        "FC 906": "e08d8237f9f1d0ff11fc030b2e182f9a8eb30f31a3d504f338058f4c8a933cf0"
+      },
+      "answerText": "**3.5 feet (42 inches / 1,067 mm) maximum above the floor.** The 2022 NYC Fire Code sets that limit for a hand-held portable extinguisher with a gross weight exceeding 40 pounds; at 45 pounds, this extinguisher falls within that rule (FC § 906.9.2).",
+      "answerTextSHA256": "4e43b75a55256b0984cc66a99d0b448ee19b1f2798620d6539a0b8f04a38429b",
+      "answerPayloadSHA256": "e8b878ace1a133d8d29f9b0e7ca944116ec3dc7621530eae313a5829e9a9692a",
+      "citationReferences": [
+        "FC 906"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "906",
+          "codeEdition": "2022 NYC Fire Code — current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 906": "1d2ce9a22643696b73e0e100c719849e8e0215fe605afdf375f3999e129ce54f"
+      },
+      "operativeRuleReview": "The cited 2022 FC 906 excerpt includes complete 906.9.2: a hand-held extinguisher exceeding 40 lb has a top-height limit of 3.5 ft. The answer correctly applies the 45 lb premise and gives the equivalent 42 in/1067 mm. Bottom clearance is an independent unasked condition; no whole-installation approval is implied.",
+      "editionReview": "Correct 2022 NYC Fire Code current-consolidated citation and 906.9.2 text match frozen authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "FC 906"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-29-extinguisher-2",
+      "familyID": "portable-extinguisher-mounting-height",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If we replace it with one weighing exactly 40 pounds, does the top-height limit become 5 feet?",
+      "expectedAnswer": "Yes. Gross weight not exceeding 40 pounds has top limit 5 feet; bottom floor clearance still at least 4 inches.",
+      "decisiveReferences": [
+        "FC 906.9.1",
+        "FC 906.9.3"
+      ],
+      "sourceExcerptHashes": {
+        "FC 906": "e08d8237f9f1d0ff11fc030b2e182f9a8eb30f31a3d504f338058f4c8a933cf0"
+      },
+      "answerText": "**Yes.** If the replacement hand-held extinguisher’s gross weight is exactly 40 pounds, its top may be no more than 5 feet above the floor: the 5-foot rule covers extinguishers weighing 40 pounds or less. The 3.5-foot limit applies only when gross weight exceeds 40 pounds (FC §§ 906.9.1–906.9.2).",
+      "answerTextSHA256": "95b586bc089fac1c9d7d5d22766b65d771879efc87bf8471a81e6c60296163e1",
+      "answerPayloadSHA256": "333ed1d7ed656401baca68b2b4f6175f2c156e3fa39efdf11514860ffaf68cfa",
+      "citationReferences": [
+        "FC 906"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "906",
+          "codeEdition": "2022 NYC Fire Code — current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 906": "1d2ce9a22643696b73e0e100c719849e8e0215fe605afdf375f3999e129ce54f"
+      },
+      "operativeRuleReview": "The complete cited 906.9.1/.2 rules distinguish at most 40 lb (top at most 5 ft) from more than 40 lb (top at most 3.5 ft). Exactly 40 lb correctly falls in the 5 ft category. Not repeating the unasked bottom-clearance reminder does not make the top-height answer wrong.",
+      "editionReview": "Correct 2022 NYC Fire Code current-consolidated citation; operative 906.9.1–.3 are present.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "FC 906"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-30-firewatch-1",
+      "familyID": "hot-work-post-work-fire-watch",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "In NYC, may the fire watch leave as soon as ordinary indoor welding ends? I am asking about the minimum post-work watch, not the rest of the permit requirements.",
+      "expectedAnswer": "No. Fire watch required during hot work and continues at least 30 minutes after conclusion; duration may be extended by commissioner/responsible hot-work-program person.",
+      "decisiveReferences": [
+        "FC 3504.2.1"
+      ],
+      "sourceExcerptHashes": {
+        "FC 3504": "32172fdb04ccee9a2074b63e5196c105b6d486c65155329d6b936f37a3ffb90c"
+      },
+      "answerText": "**No.** For hot work, the fire watch must continue for **at least 30 minutes after the work ends**. The commissioner or the person responsible for implementing the hot-work program may extend it based on the hazards or work performed (2022 NYC Fire Code § 3504.2.1).",
+      "answerTextSHA256": "6903b43a82d3a92f252ab6a48473bbb002bd60aa8dd77233d27b6856c8f53036",
+      "answerPayloadSHA256": "e24e06f0e4c98b09a71f6f8ed3216cda08950b8e24cc4affa02d80faaf08ffe6",
+      "citationReferences": [
+        "FC 3504"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "3504",
+          "codeEdition": "2022 NYC Fire Code — current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 3504": "e58e58b27c483db779dd68bd9a16a0c1c2af7df928e2f62eac25f9a1436b2ebf"
+      },
+      "operativeRuleReview": "Complete FC 3504.2.1 requires watch during hot work and for at least 30 min after it ends, with hazard-based extension by the commissioner or responsible hot-work-program person. The answer correctly rejects immediate departure.",
+      "editionReview": "Correct 2022 NYC Fire Code current-consolidated 3504.2.1.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "FC 3504"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-30-firewatch-2",
+      "familyID": "hot-work-post-work-fire-watch",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Does 30 minutes always guarantee the watch can end even when the responsible person determines the hazards require longer?",
+      "expectedAnswer": "No. 30 minutes is minimum; commissioner or responsible hot-work-program person may extend based on hazards/work.",
+      "decisiveReferences": [
+        "FC 3504.2.1"
+      ],
+      "sourceExcerptHashes": {
+        "FC 3504": "32172fdb04ccee9a2074b63e5196c105b6d486c65155329d6b936f37a3ffb90c"
+      },
+      "answerText": "**No.** Thirty minutes is the minimum post-work fire-watch period, not a guaranteed end time. The commissioner or the person responsible for implementing the hot-work program may extend the watch based on the hazards or work being performed (2022 NYC Fire Code § 3504.2.1). The text authorizes an extension; it does not expressly say that an extension is mandatory once the responsible person determines more time is needed.",
+      "answerTextSHA256": "56661d71fb31b353cdc09186049e43c0377599060238646d2e1fb4a11ed5702a",
+      "answerPayloadSHA256": "7d83307f48a0de591e3b8f8260afe262b2035ac27abbc2405cd81d8b53846572",
+      "citationReferences": [
+        "FC 3504"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "3504",
+          "codeEdition": "2022 NYC Fire Code — current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 3504": "13c88cd2f099060106d18e554c988f57be0ca06d7c8c80a53a764cdfda85abd7"
+      },
+      "operativeRuleReview": "Complete FC 3504.2.1 treats 30 min as the minimum and allows hazard-based extension. The answer correctly says it is not a guaranteed ending time and does not convert permissive extension wording into an unsupported universal mandate.",
+      "editionReview": "Correct 2022 NYC Fire Code current-consolidated 3504.2.1.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "FC 3504"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-31-loading-size-1",
+      "familyID": "commercial-loading-berth-dimensions",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a NYC C4-2 site, a required loading berth has already been classified as loading category B. What are its minimum length, width and vertical clearance? I am not asking how many berths are required.",
+      "expectedAnswer": "LRC-B minimum 37 feet long, 12 feet wide, 14 feet vertical clearance; driveway/entrances/exits not included in berth dimensions.",
+      "decisiveReferences": [
+        "ZR 36-661"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-661": "4c7a5e061c6702166ef22f3668f41ee763cbb7ad899f949a08fc982eb06d905c"
+      },
+      "answerText": "For a required **LRC-B** berth in C4-2, the minimum dimensions are **37 ft long × 12 ft wide, with 14 ft of vertical clearance** (ZR § 36-661). The dimensions exclude driveways and entrances to or exits from the berth.",
+      "answerTextSHA256": "44a3ffaa2a293ac10be0f8cf1e91ea0cab866e5cb85def5a37a3ba7e7870cb98",
+      "answerPayloadSHA256": "c52a19939edd79fad64b34216380005918a3b1fdf17c950f55f692136e7813de",
+      "citationReferences": [
+        "ZR 36-661"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-661",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 36-661": "b4c7d3745a89cf309002933c7d7069ffa73f6f9f11bf86786f00d80a6857551f"
+      },
+      "operativeRuleReview": "Complete ZR 36-661 includes the LRC-B table row:37 ft length,12 ft width and 14 ft clearance. The answer gives all three dimensions for the already classified berth and correctly excludes drives/entrances/exits without calculating berth counts.",
+      "editionReview": "Correct imported NYC ZR through 2026-08-13;C4-2 is included inC4.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "ZR 36-661"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-31-loading-size-2",
+      "familyID": "commercial-loading-berth-dimensions",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Could a 10-foot-long entrance driveway be counted toward that berth length?",
+      "expectedAnswer": "No. Berth dimensions exclude driveways and entrances/exits; retain LRC-B 37-foot minimum berth length.",
+      "decisiveReferences": [
+        "ZR 36-661"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-661": "4c7a5e061c6702166ef22f3668f41ee763cbb7ad899f949a08fc982eb06d905c"
+      },
+      "answerText": "No. For the stated LRC-B berth, the required length is 37 feet, and ZR § 36-661 expressly excludes driveways and entrances to or exits from the berth from its dimensions. The 10-foot entrance driveway therefore cannot count toward the required berth length.",
+      "answerTextSHA256": "c6a6f302bc90fedea920e8842b0de8c9361cae403d6d141dd9a0185b48b573aa",
+      "answerPayloadSHA256": "e1f714e1caa5767e444b75b7932db9dc88bcdd5ead6201b962a787b4ac91a783",
+      "citationReferences": [
+        "ZR 36-661"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-661",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 36-661": "413f6c4014738c080e143b3da97b9e0e0ffa025509d54206c635a4dbf4013f36"
+      },
+      "operativeRuleReview": "Complete ZR 36-661 expressly excludes driveways and entrances/exits from berth dimensions. The answer correctly rejects counting the 10 ft entrance driveway and retains the 37 ft LRC-B berth-length minimum.",
+      "editionReview": "Correct imported NYC ZR through 2026-08-13.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "ZR 36-661"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-32-loading-near-1",
+      "familyID": "commercial-loading-near-residence-boundary",
+      "codeFamily": "ZR",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "For a NYC C4-2 commercial site, can an accessory loading berth located 40 feet from a Residence District boundary remain unenclosed outside?",
+      "expectedAnswer": "No. Accessory loading berths within 60 feet of Residence District boundary must be enclosed within a building.",
+      "decisiveReferences": [
+        "ZR 36-663"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-663": "d41a12f476ee53276270ff5858b2a17a7bfc6b3fe872e909da19c33971145ba8"
+      },
+      "answerText": "**Cannot determine from the supplied text whether it may remain unenclosed.** For C4 districts, ZR § 36-61 permits accessory loading berths to be open or enclosed, but makes that permission subject to § 36-663, which is not supplied. The supplied 40-foot distance therefore does not settle the enclosure question; the M-district rule in § 44-563 cannot be substituted for the missing C-district provision. (ZR §§ 36-61, 44-563)",
+      "answerTextSHA256": "131c4d54931ef6bf0398716c552c88d1920adcebba78218d80988a8b1f3254e9",
+      "answerPayloadSHA256": "2015115e08cbc728785118697363b736d6463fb71a25e52decfe8fab232120c1",
+      "citationReferences": [
+        "ZR 36-61",
+        "ZR 44-563"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-61",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "44-563",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 36-61": "9446726503015619d6024b078ded7f8ab222cd880e49652fe14aaf4e20d58ff5",
+        "ZR 44-563": "24b2d35e0aff3cdcf5880abd06ab53a066c8ed54215688b5eceb2e337d10558c"
+      },
+      "operativeRuleReview": "The answer withholds the enclosure conclusion at 40 ft from a Residence District boundary even though frozen C-district ZR 36-663 requires enclosure within 60 ft. Refusing to substitute the parallel M-district rule 44-563 is correct on the packet received, but missing governing C-rule retrieval makes the end-to-end answer fail.",
+      "editionReview": "Correct imported current ZR edition, but the responsive 36-663 C-district provision is absent.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": false,
+      "matchedExpectedProvisionReferences": [],
+      "decisiveRulePresentInExposedEvidence": false,
+      "decisiveRulePresentInActualWriterPacket": false,
+      "failureStage": "governing-source-retrieval-gap",
+      "rawProviderDiagnosis": "Interpretation requestba 417 e 3 d-48 cd-4726-a 616-8 f 13516 be 956 contains 36-61's direct 36-663 reference, M-rule 44-563 and otherR/M/special loading sections, but never 36-663 itself. Verificationacf 3 d 725 passes an accurately bounded nonanswer. MissingC-rule retrieval is confirmed from actualwriter packet.",
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-32-loading-near-2",
+      "familyID": "commercial-loading-near-residence-boundary",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If it is enclosed, may the street entrance to that berth be only 20 feet from the Residence District boundary?",
+      "expectedAnswer": "No. Entrance or exit to street must be at least 30 feet from district boundary for the stated near-boundary berth.",
+      "decisiveReferences": [
+        "ZR 36-663"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-663": "d41a12f476ee53276270ff5858b2a17a7bfc6b3fe872e909da19c33971145ba8"
+      },
+      "answerText": "**No.** For a C4 berth within 60 feet of a Residence District boundary, enclosure is required, and the street entrance must also be at least 30 feet from the boundary. Enclosing it does not allow an entrance only 20 feet away. (ZR §§ 36-61, 36-663)",
+      "answerTextSHA256": "1bfe9ab3511fcaa72e94df788ee651cefc3ecde8378f5c1d6b8d2f9f1830a0a8",
+      "answerPayloadSHA256": "c10608cc4ec507f8ac6b43320e4ec48e237863bc1fdddfa63c73101eb0f121ed",
+      "citationReferences": [
+        "ZR 36-61",
+        "ZR 36-663"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-61",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-663",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 36-61": "9446726503015619d6024b078ded7f8ab222cd880e49652fe14aaf4e20d58ff5",
+        "ZR 36-663": "910c6b8784c771d4e72852bb019df18d01de3f098e6729e839721213a48d8ea0"
+      },
+      "operativeRuleReview": "Complete ZR 36-663 requires enclosure within 60 ft and independently at least 30 ft for a street entrance/exit. The answer correctly rejects 20 ft after enclosure, retaining the prior near-boundary scenario and recovering the governing rule missing in turn 1.",
+      "editionReview": "Correct imported current ZR through 2026-08-13;C4 scope explicit.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "ZR 36-663"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-33-ev-1",
+      "familyID": "accessory-parking-ev-charging",
+      "codeFamily": "ZR",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "For a NYC C4-2 commercial site, is EV charging allowed at accessory off-street parking spaces used by the building occupants?",
+      "expectedAnswer": "Yes. EV charging facilities permitted at all accessory off-street parking spaces for authorized users of those spaces including owners/occupants/employees/customers/residents/visitors.",
+      "decisiveReferences": [
+        "ZR 36-48"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-48": "5c6816050de3e230cfe7a6fbaf067bdda2af7dbac14c805df570d08a27373f48"
+      },
+      "answerText": "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "04ac2cb886e67597ffbc1bdb3583cecae6c1ff813f696aeda8249ffb36b814db",
+      "answerPayloadSHA256": "28ae2d4e537c53bc01941254732e033ce14a88898aa654b1dc2ea3b64fb834bf",
+      "citationReferences": [],
+      "citationDetails": [],
+      "citationPassageSHA256": {},
+      "operativeRuleReview": "The final response reports a mismatch without answering whether occupant charging is allowed. The actual C-rule 36-48 cross-reference is truncated before its operative permission. The writer binds M-rule 44-37 without C-district support, and targeted repair changes prose but leaves categorical heading/citation claims inconsistent with that uncertainty.",
+      "editionReview": "Final blocked response discloses no governing citation; actual currentZR packet has wrong-district parallels and an incompleteC-rule.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": null,
+      "matchedExpectedProvisionReferences": [],
+      "decisiveRulePresentInExposedEvidence": null,
+      "decisiveRulePresentInActualWriterPacket": false,
+      "failureStage": "source-context-truncation-and-binding-repair",
+      "rawProviderDiagnosis": "Interpretationd 5 a 93 dbd request has 36-48 only as 150 character crossref ending 'charging facilities shall be p'; full 44-37 lacksMdistrict labels. Initial writer claimsC4 Yes from 44-37. Verifier 6 af 30 f 1 f correctly rejects unsupportedC4 binding. Revisiondafa 4 d 66 changes prose to gap and adds 36-48 but leaves heading 'Occupant-use charging is permitted' and wrong citationrelevance; verifier 5988 d 461 rejects. The first retrieval/completeness gap and incomplete repair both contribute.",
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "Blocked/nonanswer response exposes no packet; recorded writer packet reviewed where diagnosis is needed.",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-33-ev-2",
+      "familyID": "accessory-parking-ev-charging",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Does the zoning charging allowance also include customers and visitors using those accessory spaces, or only owners?",
+      "expectedAnswer": "Customers and visitors using the accessory spaces are expressly included; allowance is not owners-only.",
+      "decisiveReferences": [
+        "ZR 36-48"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-48": "5c6816050de3e230cfe7a6fbaf067bdda2af7dbac14c805df570d08a27373f48"
+      },
+      "answerText": "It includes **customers and visitors**, not only owners. For the C4-2 commercial-site context, the Zoning Resolution permits EV charging at all accessory off-street parking spaces, and says charging is for “owners, occupants, employees, customers, residents or visitors” using those spaces (ZR § 36-48). This general allowance is distinct from § 36-461’s limited allowance for allocating spaces to **publicly available** charging facilities.",
+      "answerTextSHA256": "33be466415ed69f9f1a7c6cded89987d9dd03eb98ce5a523feefdf8abe66eb58",
+      "answerPayloadSHA256": "b58ab6de88aece2c06c50aab76fd473c4a9220c741ca4925f1f9d29f5b7cc799",
+      "citationReferences": [
+        "ZR 36-48",
+        "ZR 36-461"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-48",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-461",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 36-48": "62a4c7db18c38ef0b1dd954ebf829a2e4021e0d16d274a254979f22868588f17",
+        "ZR 36-461": "42a279906d62cb84600589e4baaf43b7e06f7cf58f52b3918cbd0f1911227c4d"
+      },
+      "operativeRuleReview": "Complete ZR 36-48 expressly includes customers and visitors among authorized accessory-space users in C1–C8. The answer correctly includes them and distinguishes the separately cited 36-461 public-charging allocation cap from the general authorized-user charging permission.",
+      "editionReview": "Correct imported NYC ZR through 2026-08-13;C4 scope explicit.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "ZR 36-48"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-34-corner-1",
+      "familyID": "commercial-parking-access-near-corner",
+      "codeFamily": "ZR",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "For a NYC C4-2 site with a 20-space accessory group parking facility, may a street entrance be 30 feet from the intersection of two street lines without a traffic-safety certification?",
+      "expectedAnswer": "No. Ordinary entrance/exit separation is at least 50 feet from street-line intersection; closer location needs applicable certification that it is not hazardous or likely to create congestion.",
+      "decisiveReferences": [
+        "ZR 36-53"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-53": "93850dd563eb93b59a87968f1e2f8d74707ac5b1d38685349a96df25efcf7f05"
+      },
+      "answerText": "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.\n\nPermitext cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.",
+      "answerTextSHA256": "514aacd7b10f0a742c46278163bdd1341dccacb59458a246dcc2ba66e3437e1c",
+      "answerPayloadSHA256": "3146dc42564a3d635739b4a2fbc57a1a8f8012fba49ca43e625b2658ac7b201e",
+      "citationReferences": [],
+      "citationDetails": [],
+      "citationPassageSHA256": {},
+      "operativeRuleReview": "The final response says no governing evidence and asks for a section, although the actual writer packet contains complete C-rule 36-53 and a correct ordinary No draft. An unasked waiver caveat binds unrelated Residential District 25-34 instead of the C-rule references 36-24/36-33; rejection discards the supported core answer.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "Asking for a code section or narrower topic is unnecessary: the suppliedC4-2/20 spaces/30 ft/no-certification facts and retrieved 36-53 already support the requested ordinary conclusion.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "ZR 36-53"
+      ],
+      "decisiveRulePresentInExposedEvidence": null,
+      "decisiveRulePresentInActualWriterPacket": true,
+      "failureStage": "unsupported-extra-citation-and-boundary-fallback",
+      "rawProviderDiagnosis": "Interpretation 0 cc 6671 d has complete 36-53 and drafts correct ordinary 50 ft/certificationNo. It binds an unasked waiver caveat to 25-34; verifier 8728481 c correctly flags irrelevant/incorrectR-rule attribution. No targeted revision is recorded for thiscase; instead output becomes generic no-governing-evidence fallback, which misdescribes the responsive governing source that was present.",
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-34-corner-2",
+      "familyID": "commercial-parking-access-near-corner",
+      "codeFamily": "ZR",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "Can a location within 50 feet ever be allowed if the authorized agency certifies it is not hazardous to traffic safety and not likely to create congestion?",
+      "expectedAnswer": "Yes. Explicit closer-access certification route exists by DOB or, for specified Article VII Chapter 4 public facilities, CPC. No unconditional permission without certification.",
+      "decisiveReferences": [
+        "ZR 36-53"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-53": "93850dd563eb93b59a87968f1e2f8d74707ac5b1d38685349a96df25efcf7f05"
+      },
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "answerPayloadSHA256": "d1bb1346bc712d32e832405228d090e02dfd0a51af2964c2d6776092adf22520",
+      "citationReferences": [],
+      "citationDetails": [],
+      "citationPassageSHA256": {},
+      "operativeRuleReview": "The blocked followup fails the C-district certification route under 36-53. The actual writer packet lacks that provision even though topic continuity retains the original C4-2 root. R/M parallel rules yield a scoped draft, then bounded repairs fail on their different facility thresholds.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": null,
+      "matchedExpectedProvisionReferences": [],
+      "decisiveRulePresentInExposedEvidence": null,
+      "decisiveRulePresentInActualWriterPacket": false,
+      "failureStage": "governing-source-retrieval-gap-and-repair",
+      "rawProviderDiagnosis": "Interpretation 3175 fd 18 contains 44-43,25-63 andspecialdistrictparallels but no 36-53. TopicContext is continuation and retainsC4-2/20 spaceoriginalroot, so this is not a topicreset. Verifier 22 fcec 32 flags 10 space threshold incorrectlyapplied toallMaccessoryfacilities and legal-source missingFact. Revisionf 76 c 5 f 0 f fixesMscope but verifier 27581140 flags newlymissing 10 spacethreshold inR narrative; finalwithheld. GoverningC-source omission is the primary scopegap.",
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "Blocked/nonanswer response exposes no packet; recorded writer packet reviewed where diagnosis is needed.",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-35-joint-1",
+      "familyID": "joint-commercial-loading-facility",
+      "codeFamily": "ZR",
+      "label": "materially_wrong",
+      "strictPass": false,
+      "question": "For two adjoining NYC C4-2 buildings on the same block, can their required loading berths be supplied by one shared facility if it has enough berths for the combined floor area, direct access to both buildings, and a compliant design?",
+      "expectedAnswer": "Yes if all conditions including direct access to all served buildings/lots, number at least combined requirement, and adequate design/layout under DOB regulations are met. The stated direct-access premise satisfies that condition; do not invent a missing fact.",
+      "decisiveReferences": [
+        "ZR 36-65"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-65": "41e7682a11ef666bc6b0babd0a9e721c2c64db125fc775740fc393de626f7429"
+      },
+      "answerText": "**Yes, under ZR § 36-65:** required loading berths may be provided in one joint facility for adjoining buildings within a single block if the facility has at least the number required for their combined floor area, provides direct access to each building, and its design and layout meet the adequacy standards set by the Commissioner of Buildings. But ZR § 144-53 separately states that loading berths are not required in any district, although they are permitted. It also says that any berths provided are deemed required for determining the amount of floor area in a building. The supplied provisions state these rules without resolving their relationship. The supplied text identifies C4 districts, including C4-2, for this joint-berth provision. Your stated facts address those conditions, assuming “compliant design” means compliance with those standards.\n\nThe required count is determined under ZR § 36-62; the supplied table places C4-2 among the listed districts, but the excerpt does not provide enough table structure to independently verify a specific count. ZR § 144-53 separately states that loading berths are not required in any district, although they are permitted; any berths provided are deemed required for determining the amount of floor area in a building.",
+      "answerTextSHA256": "938ab5051a71c879df4a4b7282b44c85dd392011951dc674d82b50aae8c29132",
+      "answerPayloadSHA256": "e2f704bf7ba8873e8a058d99b2cc3109137b2d08a447a8990a6125613885f917",
+      "citationReferences": [
+        "ZR 36-65",
+        "ZR 36-62",
+        "ZR 144-53"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-65",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-62",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "144-53",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 36-65": "afa44d34dd1d4f4e84beb25acada06ff080e95b6523b5f0d3add24f6364d38a9",
+        "ZR 36-62": "ea03a9f4126b7b7ab9026c192698d149015ebfe5f8b7e9500e04805698f70201",
+        "ZR 144-53": "1c8590a71324743771abf5f98dd29cd9f869e93afc0d0ac8e616552ff309f4c7"
+      },
+      "operativeRuleReview": "The main Yes and all joint-facility conditions under 36-65 are correct. The answer nevertheless repeatedly presents 144-53 as an apparent general waiver/conflict for ordinary C4-2 loading requirements. Canonical 144-53 belongs to the Special Brooklyn Navy Yard District(BNY), and no BNY location or applicability is supplied. The added unsupported geographic scope claim is material despite the correct main sharing answer.",
+      "editionReview": "All citedsections use the correctcurrentZRversion; the fault is omitted geographic/specialdistrictscope, not edition.",
+      "applicabilityReview": "ZR 36-65 appliesinC4 and statedsharedfacilityfacts suffice. No facts establishBNY applicability; the unrelated 144-53 passage must not be presented as a generalC4 loadingrequirement qualification.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "ZR 36-65"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": true,
+      "failureStage": "special-district-scope-and-verifier-fault",
+      "rawProviderDiagnosis": "Actualinterpretatione 32 cc 22 b packet includes complete 36-65 but 144-53 without its canonicalBNYchaptermetadata. Initialwriter flagged its applicability asunestablished. Verifierf 833 e 18 b wrongly says 'In all districts' contradicts thatuncertainty aboutC4-2 and requires theno-loading-requiredqualification. Revisioneebd 2952 inserts theunscopedqualification; verifier 20 ede 076 passes it. Preparedsection 20022175.json identifies ArticleXIV/Chapter 4 SpecialBrooklynNavyYardDistrict(BNY), sourcecontenthash 88 a 36523128 c 44 e 595 d 8 de 125 ae 7 eed 423 fe 3 f 3 ad 147 b 5251 b 2160 e 486 dcebe 7. Bothsourcecontextloss andverifierfault confirmed.",
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-35-joint-2",
+      "familyID": "joint-commercial-loading-facility",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If the shared facility provides no direct access to one of the two buildings, does it satisfy the shared-loading conditions?",
+      "expectedAnswer": "No. Direct access from joint facilities to every served building or lot is required.",
+      "decisiveReferences": [
+        "ZR 36-65"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-65": "41e7682a11ef666bc6b0babd0a9e721c2c64db125fc775740fc393de626f7429"
+      },
+      "answerText": "**No.** ZR § 36-65 requires the joint facility to provide direct access to **all** buildings it serves. If it lacks direct access to either building, it does not satisfy the shared-loading conditions, regardless of its berth count or design.",
+      "answerTextSHA256": "3af9f68f688567114a05116f34fd245dd544a5a12dff7b6eb5951fd34fee261e",
+      "answerPayloadSHA256": "e17c5babb5a9cd9a4488e040e511dd49ce49d07a28e8c66fb383b70ec4c9f17c",
+      "citationReferences": [
+        "ZR 36-65"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "36-65",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 36-65": "61d938266c923b352860cc532acc2a23db218aedd9bd4d0f5339f9f686662840"
+      },
+      "operativeRuleReview": "Complete ZR 36-65 requires direct access to every served building or lot. The answer correctly rejects a joint facility lacking access to one building regardless of berth count or design, without repeating the unrelated special-district qualification.",
+      "editionReview": "Correct imported NYCZR through 2026-08-13.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "ZR 36-65"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    }
+  ],
+  "interpretation": "Part C: nine correct, four withheld and one materially wrong among14 turns. Three of seven two-turn families pass completely. Decisive governing rule text is observed in11/14 cases, including two strict failures with a responsive rule available. Four withheld outcomes arise from district-specific retrieval, truncated cross-reference context, irrelevant extra citation and bounded repair failures. Joint-loading turn1 gives the correct main sharing conclusion but materially misapplies the Special Brooklyn Navy Yard no-required-loading rule as an apparent general C4-2 qualification; an erroneous verifier instruction amplifies the missing geographic scope. The parent reviewer independently agrees that this delivered scope claim is material. This frozen candidate is experimental and has not passed release acceptance.",
+  "releaseAcceptance": {
+    "accepted": false,
+    "productionEnablementAuthorizedByThisReview": false,
+    "reason": "Material special-district scope error and answerable withheld outcomes remain."
+  }
+}

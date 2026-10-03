@@ -1,0 +1,73 @@
+{
+  "measuredAt": "2026-10-03T00:09:55.243Z",
+  "unpaid": true,
+  "method": "Separate local Node processes, one load per format, forced GC before/after; not a repeated benchmark or hosted result",
+  "binary": {
+    "format": "normalized-float32le",
+    "inputCount": 50294,
+    "bytes": 53110832,
+    "milliseconds": 150.210791,
+    "before": {
+      "rss": 49037312,
+      "heapTotal": 7356416,
+      "heapUsed": 4375144,
+      "external": 2128079,
+      "arrayBuffers": 143611
+    },
+    "after": {
+      "rss": 147341312,
+      "heapTotal": 50888704,
+      "heapUsed": 15650912,
+      "external": 55299664,
+      "arrayBuffers": 53254651
+    },
+    "maximumRSSKiB": 143888,
+    "node": "v24.18.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "scope": "local artifact loading only; excludes passage-index build, query search, model calls and hosted cold start"
+  },
+  "json": {
+    "format": "json",
+    "inputCount": 50294,
+    "bytes": 235141984,
+    "milliseconds": 1342.1656249999999,
+    "before": {
+      "rss": 48955392,
+      "heapTotal": 7356416,
+      "heapUsed": 4375088,
+      "external": 2128079,
+      "arrayBuffers": 143611
+    },
+    "after": {
+      "rss": 852459520,
+      "heapTotal": 218923008,
+      "heapUsed": 20460608,
+      "external": 53689888,
+      "arrayBuffers": 51644875
+    },
+    "maximumRSSKiB": 832880,
+    "node": "v24.18.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "scope": "local artifact loading only; excludes passage-index build, query search, model calls and hosted cold start"
+  },
+  "fullCorpus": {
+    "buildMilliseconds": 9467.094125,
+    "totalMilliseconds": 9732.939625,
+    "corpusIDs": [
+      "nyc-2022-construction-codes",
+      "nyc-2022-fire-code",
+      "nyc-zoning-resolution"
+    ],
+    "passageCount": 52946,
+    "inputCount": 50294,
+    "rssAfterGCBytes": 1128841216,
+    "heapUsedAfterGCBytes": 499994552,
+    "maximumRSSKiB": 1170848,
+    "node": "v24.18.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "scope": "One local full-current-corpus passage-index build plus binary load; excludes semantic alignment/query, model calls and hosted cold start"
+  }
+}

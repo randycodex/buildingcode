@@ -1,0 +1,18 @@
+{
+  "objective": "Improve ordinary-language decisive-rule retrieval and followup continuity, keeping current Luna configuration; validate against regression and fresh ordinary-language questions.",
+  "budgetUSD": 13.97,
+  "baselineCommit": "0efaf6d52",
+  "isolation": "Local temporary HTTP accounts/history; no production calls or deployment during evaluation.",
+  "stages": [
+    "Audit known failures and implement general subsection search and continuity.",
+    "Offline decisive-text recall regression; verify direct references and edition boundaries.",
+    "Freeze fresh source-linked answer keys before paid outputs.",
+    "Compare live baseline and candidate on fresh ordinary-language set; source-key review distinct from verifier.",
+    "Check plausible model answer differences with ChatGPT Instant if diagnosis requires them.",
+    "Deliver tested improvements and honest accuracy/cost/latency report."
+  ],
+  "success": "Meaningful improved ordinary-language answers and preserved scope/edition/source integrity; no global95percent accuracy claim from curated test.",
+  "status": "evaluation complete; production enablement rejected",
+  "candidateFreeze": "candidate-freeze.json",
+  "releaseDisposition": "Rejected for production enablement: material scope error, nonanswers, missing/truncated provisions, operational/accounting gates remain."
+}

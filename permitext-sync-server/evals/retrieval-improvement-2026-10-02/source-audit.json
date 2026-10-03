@@ -1,0 +1,75 @@
+{
+  "reviewedAt": "2026-10-02T23:02:37.547701+00:00",
+  "noLiveOutputsObserved": true,
+  "professionalAdjudication": false,
+  "scope": "Keys grounded in imported enacted text; this audit is assistant source review, not an edition-completeness certification or professional legal determination.",
+  "ordinaryLanguageCheck": "All100 prompts have no governing section-number citations. Building/code edition, occupancy and equipment facts may be supplied normally.",
+  "priorCaseOverlap": "No primary operative source reference overlaps pilot/heldout/development-continuity from independent-accuracy-2026-10-01. Some adjacent provisions in broad previously tested chapters remain, which is reported rather than treated as topic independence.",
+  "splitLeakage": "No primary source reference shared between development and heldout; thematic/chapter clustering remains and is explicitly reported.",
+  "knownSourceLimitations": [
+    {
+      "reference": "BC 1011.5.2",
+      "note": "Excerpt ends at introduction to Group R-2 subexceptions; complete descendants are in hashed chapter. Development questions explicitly concern ordinary office straight stairs, outside those subexceptions."
+    },
+    {
+      "reference": "FGC 404.3",
+      "note": "Excerpt ends at introduction to residential public-corridor exception; complete descendants are in hashed chapter. Questions concern ducts, standpipe shafts and fire-pump access, not that corridor exception."
+    }
+  ],
+  "selectiveExternalChecks": [
+    {
+      "references": [
+        "ZR 36-661"
+      ],
+      "url": "https://zr.planning.nyc.gov/article-iii/chapter-6/36-661",
+      "status": "Official live page agrees with imported loading dimension table and driveway exclusion."
+    },
+    {
+      "references": [
+        "ZR 36-663"
+      ],
+      "url": "https://zr.planning.nyc.gov/article-iii/chapter-6/36-663",
+      "status": "Official live page agrees with 60-foot enclosure and 30-foot entrance boundary rules."
+    },
+    {
+      "references": [
+        "ZR 36-48"
+      ],
+      "url": "https://zr.planning.nyc.gov/article-iii/chapter-6/36-48",
+      "status": "Official live page agrees with charging permission and listed accessory-space users."
+    },
+    {
+      "references": [
+        "ZR 36-53"
+      ],
+      "url": "https://zr.planning.nyc.gov/article-iii/chapter-6/36-53",
+      "status": "Official live page agrees with 50-foot ordinary separation and certification exception."
+    },
+    {
+      "references": [
+        "ZR 36-65"
+      ],
+      "url": "https://zr.planning.nyc.gov/article-iii/chapter-6/36-65",
+      "status": "Official live page agrees with three joint-loading conditions."
+    },
+    {
+      "references": [
+        "FGC 408.4",
+        "FGC 404.7",
+        "FGC 404.8",
+        "FGC 407.2",
+        "FGC 410.3"
+      ],
+      "url": "https://home4.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022FGC_Chapter4_GasPipingWB.pdf",
+      "status": "Official PDF operative wording reviewed; agrees with imported requirements and named exceptions."
+    },
+    {
+      "references": [
+        "BC 1013.6.2",
+        "PC 903.1"
+      ],
+      "status": "Official NYC index links were identified, but direct PDF access via web tool failed; keys rely on hashed imported canonical chapter text. Do not claim external confirmation."
+    }
+  ],
+  "rubric": "Count conclusions, governing evidence, conditions and exceptions. An unnecessary nonanswer fails. Material additional unsupported legal claims can fail an otherwise correct core answer. Evaluate narrow-condition answers as narrow-condition answers, without demanding full project approval."
+}

@@ -14,8 +14,10 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery } from "./research-rule-packets.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
+import { createHash } from "node:crypto";
+import { researchPriorAnswerSources } from "./research-conversation-continuity.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261002-complete-leading-provision-v45";
+export const researchEvidenceAssemblyVersion = "20261002-atomic-canonical-indexed-passage-v48";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -325,18 +327,35 @@ export function researchEvidenceRetrievalQuery({
       previousTopicApplied = true;
     }
   }
+  const checkedPriorSources = contextDependentFollowUp
+    ? researchPriorAnswerSources(previousMessages) : [];
   // Carry the discussed citation into a short follow-up. An explicit new
   // citation takes precedence over previously discussed provisions.
   if (contextDependentFollowUp && !extractResearchCodeReferences(normalizedQuestion).length &&
       !/\b\d{1,3}-\d{2,4}\b/.test(normalizedQuestion)) {
-    const priorAnswer = previousMessages.findLast(message => message.role === "assistant")?.answer;
-    const citedReferences = (priorAnswer?.citations || []).filter(citation => citation.codePrefix && citation.sectionNumber)
-      .map(citation => ({ ...citation, reference: `${citation.codePrefix} § ${citation.sectionNumber}` }));
-    const priorReferences = (citedReferences.length ? citedReferences : extractResearchCodeReferences(priorAnswer?.answerText || ""))
-      .filter(reference => /^(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)$/.test(reference.codePrefix)).slice(0, 3);
+    const priorReferences = topicDecision.signals?.returnToOriginal ? [] : checkedPriorSources;
     if (priorReferences.length) retrievalQuery = `${retrievalQuery}\nPreviously discussed provisions: ${priorReferences.map(reference => reference.reference).join(", ")}`.slice(0, maximumQueryCharacters);
   }
   const sourceQuery = retrievalQuery;
+  // Meaning search should answer the new detail, rather than repeatedly find
+  // the previous answer's detail. Short source titles resolve the subject;
+  // previous measurements and conclusions do not enter a substantive query.
+  const substantiveTerms = questionSpecificTerms(normalizedQuestion);
+  const shortSubjects = checkedPriorSources.map(source => source.title
+    .replace(/^(?:(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*)?\d+(?:[-.]\d+)*\s*[:.]?\s*/i, ""))
+    .filter(Boolean).join("; ").slice(0, 140);
+  const semanticContext = !contextDependentFollowUp ? ""
+    : substantiveTerms.length < 6 || topicDecision.signals?.returnToOriginal
+      ? (rootTopic || immediateTopic).slice(0, 400)
+      : shortSubjects;
+  // Do not make explicitly excluded examples the subject of meaning search.
+  // The complete question, including these exclusions, still goes to corpus
+  // routing and the answer/verifier as the user's scenario.
+  const semanticQuestion = normalizedQuestion.replace(
+    /\b(?:this|it|these|those)\s+(?:is|are|was|were)\s+not\b[^?!]*?(?:[!.](?=\s|$)|$)/gi, ""
+  ).trim() || normalizedQuestion;
+  const semanticQuery = [semanticQuestion,
+    semanticContext && `Subject context: ${semanticContext}`].filter(Boolean).join("\n").slice(0, maximumQueryCharacters);
   let projectFactsApplied = false;
   if (factContext && !excludesSavedProjectFacts(normalizedQuestion, contextualTopics)) {
     const factsPrefix = "\nProject facts: ";
@@ -349,6 +368,7 @@ export function researchEvidenceRetrievalQuery({
   return {
     question: normalizedQuestion,
     sourceQuery,
+    semanticQuery,
     retrievalQuery: retrievalQuery.trim(),
     previousTopicApplied,
     projectFactsApplied,
@@ -786,6 +806,40 @@ function deterministicSourceID(origin, value, index) {
   return `research-${origin}-${identity || "unknown"}-${index + 1}`;
 }
 
+function canonicalIndexedPassage(value, candidate, allowance, question = "") {
+  const passage = candidate?.indexedPassage;
+  if (!passage?.text || !passage.sourceTextHash || !value?.body?.blocks) return null;
+  const valid = item => {
+    const block = value.body.blocks.find(block =>
+      (!item.sourceOffsets?.blockID || String(block.id || "") === String(item.sourceOffsets.blockID)) &&
+      createHash("sha256").update(String(block.plainText || "")).digest("hex") === item.sourceTextHash);
+    const { start, end } = item.sourceOffsets || {};
+    return !!block && Number.isSafeInteger(start) && Number.isSafeInteger(end) && start >= 0 && end > start &&
+      String(block.plainText).slice(start, end) === item.text;
+  };
+  if (!valid(passage)) return null;
+  const fullText = compactText(canonicalText(value));
+  const terms = questionSpecificTerms(question);
+  const alternatives = [...(passage.alternatives || []), ...(passage.sameSectionReferences || [])]
+    .filter(item => item.id !== passage.id && valid(item))
+    .map(item => ({ item, matches: terms.filter(term => compactText(item.text).toLowerCase().includes(term)).length }))
+    .filter(entry => entry.matches >= 2)
+    .sort((left, right) => right.matches - left.matches);
+  for (const item of [passage, ...alternatives.map(entry => entry.item)]) {
+    const slices = [...(item.contextTexts || []), item.completeSubsectionText || item.text]
+      .map(compactText).filter(Boolean);
+    if (!slices.length || slices.some(text => !fullText.includes(text))) continue;
+    const selected = fullText.length <= allowance ? fullText : [...new Set(slices)].join("\n\n");
+    // A complete alternative is preferable to an unrelated prefix when the
+    // highest-ranked parent subtree cannot fit the bounded answer package.
+    if (selected.length > allowance) continue;
+    return { text: selected, id: item.id, subsectionNumber: item.subsectionNumber,
+      sourceTextHash: item.sourceTextHash, sourceOffsets: item.sourceOffsets,
+      completeSection: selected === fullText, completeSubsection: Boolean(item.completeSubsectionText || item.scopeComplete) };
+  }
+  return null;
+}
+
 function focusedVentilationCandidates(query, candidates, pinnedCount) {
   const question = compactText(query.question);
   if (pinnedCount || query.contextDependentFollowUp || query.relevanceComparison ||
@@ -891,6 +945,7 @@ export async function assembleResearchEvidence({
         limit: limits.maximumCandidates,
         retrievalContext: {
           sourceQuery: query.sourceQuery,
+          semanticQuery: query.semanticQuery,
           currentQuestion: query.question,
           conversationTopic: query.conversationTopic,
           immediateContext: query.immediateContext,
@@ -1211,6 +1266,8 @@ export async function assembleResearchEvidence({
     // Otherwise a fair share can cut a short section just before its exception
     // or final condition. Oversized ordinary candidates still share the budget.
     const fairCandidateShare = Math.max(1, Math.floor(remainingCharacters / remainingCandidateSlots));
+    const completeIndexedExcerpt = canonicalIndexedPassage(resolved, candidate,
+      Math.min(limits.maximumCharactersPerSource, Math.floor(remainingCharacters / 2)), query.question);
     const containsOwnTable = new RegExp(`\\btable\\s+${String(resolved.sectionNumber || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
       .test(resolved.text || resolved.canonicalText || '');
     const allowance = Math.min(
@@ -1221,9 +1278,10 @@ export async function assembleResearchEvidence({
         (!candidates.some(value => value.evidencePriority?.claimCoverageRequired === true) ||
           candidate.evidencePriority?.claimCoverageRequired === true)) ||
       (index < 3 && (candidate.evidencePriority?.functions?.includes("calculation_table") || containsOwnTable))
-        ? remainingCharacters : fairCandidateShare
+        ? remainingCharacters : Math.max(fairCandidateShare, completeIndexedExcerpt?.text.length || 0)
     );
-    const contextExcerpt = candidate?.signals?.useSelectedPassageOnly === true ? null
+    const indexedExcerpt = canonicalIndexedPassage(resolved, candidate, allowance, query.question);
+    const contextExcerpt = indexedExcerpt || candidate?.signals?.useSelectedPassageOnly === true ? null
       : targetedZoningContextExcerpt(resolved, { question: query.question, plan: questionPlan });
     // A scoped excerpt is atomic. When it cannot fit, retain the ordinary
     // shortened-source limitation rather than mislabel a partial excerpt.
@@ -1237,7 +1295,8 @@ export async function assembleResearchEvidence({
           allowance
         )
       : { value: resolved, excerpt: null };
-    const passageValue = targeted.excerpt || contextExcerpt ? targeted.value
+    const passageValue = indexedExcerpt ? { ...resolved, text: indexedExcerpt.text, canonicalText: indexedExcerpt.text }
+      : targeted.excerpt || contextExcerpt ? targeted.value
       : questionSpecificBlockValue(targeted.value, query.retrievalQuery, allowance);
     const record = sourceRecord(passageValue, {
       origin: sourceOrigins.discovered,
@@ -1255,6 +1314,11 @@ export async function assembleResearchEvidence({
       retrievedAt
     });
     const useSelectedPassageOnly = candidate?.signals?.useSelectedPassageOnly === true;
+    if (indexedExcerpt) {
+      record.canonicalContextComplete = indexedExcerpt.completeSection;
+      record.truncated = false;
+      record.indexedPassage = { ...indexedExcerpt, text: undefined };
+    }
     if (useSelectedPassageOnly) {
       const selectedPassage = compactText(candidate.selectedText).slice(0, allowance);
       if (selectedPassage) {
@@ -1268,12 +1332,14 @@ export async function assembleResearchEvidence({
     sources.push(record);
     if (record.truncated && (candidate.evidencePriority?.claimCoverageRequired === true ||
         (query.contextDependentFollowUp && index < 2)) &&
-        !useSelectedPassageOnly && !targeted.excerpt && !query.relevanceComparison) {
+        !useSelectedPassageOnly && !indexedExcerpt && !targeted.excerpt && !query.relevanceComparison) {
       incompleteGoverningPassages.push({ record, value: resolved });
     }
     if (targeted.excerpt) targetedDefinitionCount += 1;
     canonicalForExpansion.push({
-      ...(useSelectedPassageOnly || query.relevanceComparison || targeted.excerpt
+      ...(indexedExcerpt ? { ...resolved, text: record.text, canonicalText: record.text,
+          crossReferences: inlineCrossReferences(record.text, resolved.codePrefix) }
+        : useSelectedPassageOnly || query.relevanceComparison || targeted.excerpt
         ? { ...resolved, text: record.text, canonicalText: record.text, crossReferences: [] }
         : resolved),
       researchAssemblyOrigin: sourceOrigins.discovered
@@ -1814,6 +1880,8 @@ export async function assembleResearchEvidence({
     limitations,
     discovery: {
       retrievalVersion: compactText(discovery?.retrievalVersion),
+      ...(discovery?.semanticSearch ? { semanticSearch: structuredClone(discovery.semanticSearch) } : {}),
+      ...(discovery?.passageIndexFingerprint ? { passageIndexFingerprint: discovery.passageIndexFingerprint } : {}),
       searchedSectionCount: Number.isFinite(Number(discovery?.searchedSectionCount))
         ? Number(discovery.searchedSectionCount)
         : null,

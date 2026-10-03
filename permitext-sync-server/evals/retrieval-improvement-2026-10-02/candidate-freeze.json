@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "frozenAt": "2026-10-03T00:12:35.509Z",
+  "baselineCommit": "0efaf6d52",
+  "scope": "Local opt-in experiment; no production enablement",
+  "sourceHashes": {
+    "app.mjs": "b559e4b9a44e017ce00fd3f215d4877196b5c734567e47e97bc5e6c4c587abb9",
+    "research-rule-packets.mjs": "3429231b1936f234c980f22e5ecf7045d3c471b8f62b420d781dc6caf3f00231",
+    "research-evidence-assembly.mjs": "242a48464a45c104569883050122f83024e1c72822a5c1435d9a7c7975333593",
+    "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+    "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+    "evidence-discovery.mjs": "8156ffe7a0e9cfa5414b70cfc5865707d9b57261dfaebe4e3d0ea50ac59634a9",
+    "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+    "research-conversation-topic.mjs": "b4aace8dd05e13170560586c3cf3b2aed7e9c2719c5bf0356399afdceba94dc7",
+    "research-corpus-registry.mjs": "2bcde9468b1030078cca11ede6ab0abcd4e6c2de89b45a2a36e519e7625160e8",
+    "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+    "research-conversation-continuity.mjs": "d5c74ec290d69ffe52464e841203376ab55bb5c1bb7e9c9be4518d1660eb663d",
+    "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+    "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+    "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+    "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+    "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+    "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+    "scripts/research-accuracy-holdout.mjs": "68ab91e2a0ab3433abac1d5a9b33b1cfee3fb4707c86ccedd91d774b326b45cc",
+    "research-passage-index.mjs": "11d7af11e912535098ae075ee96e2de11b21a16d8f520fd1f70ec24139ded5cb",
+    "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012",
+    "scripts/build-research-semantic-index.mjs": "f9b794ab05db4bb170b24e7ce97dba47734af46801b16042492664d3efd86e3f"
+  },
+  "fixtureHashes": {
+    "development": "3718c7e49a0f4ced8568a350fdb44a04dc7a8cc426477981d1bffc9723cd256b",
+    "heldout": "417368e2fb4db8dad468925f294026cc6370b35df27f572cc1026df4e7bae5db",
+    "sourceKeys": "51ef91267dfe22f8a5af6135831516f4fab96f0c94ff9101a945e6ff51e0dfc4",
+    "sourcePackets": "a12fdbc61a092afdc616c0104fcc2cce604b018a074fae70e80d94e419739b8d"
+  },
+  "semanticArtifact": {
+    "path": "/Users/randy/.codex/artifacts/permitext-retrieval-improvement-2026-10-02/semantic-index/vectors.bin",
+    "sha256": "db8f16e0d173ee285a6f43e09f1a34a8fd75da6a188d736cfe54cc5e2bbbcc31",
+    "format": "normalized-float32le",
+    "model": "text-embedding-3-small",
+    "dimensions": 256
+  },
+  "configuration": {
+    "writer": "gpt-6-luna",
+    "writerEffort": "low",
+    "verifier": "gpt-6-luna",
+    "verifierEffort": "medium",
+    "serviceTier": "default",
+    "passageSearch": true,
+    "currentCorpusRecall": true,
+    "advisoryRanking": true,
+    "advisoryRoutes": true,
+    "webSupport": false,
+    "fixedEvidence": false,
+    "projectFacts": [],
+    "campaignCapUSD": 13.97
+  },
+  "policy": "Heldout questions/results may now be opened for evaluation. Do not tune this candidate against heldout answers. All source-key grading is separate from application verifier results.",
+  "knownDevelopmentLimitation": "Dormitory decorative-flame question misses FC 308 in the writer packet and is withheld.",
+  "productionRolloutGates": [
+    "Integrate embedding reservations/settlement with normal application accounting",
+    "Reduce and verify full-current-corpus cold-start memory/build work",
+    "Run project-linked end-to-end checks using structured facts",
+    "Deploy prepared artifact and test hosted availability, versioning and fallback"
+  ]
+}

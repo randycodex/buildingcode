@@ -13,6 +13,63 @@ export function earlierResearchUserContext(messages = [], maximumCharacters = 16
   return retained.join("\n\n");
 }
 
+// Retain only the last answer's checked source identity. This is a retrieval
+// hint, not permission to reuse the answer's conclusions or to skip resolving
+// the cited provision from the authorized corpus again.
+export function researchPriorAnswerSources(messages = [], {
+  maximumSources = 3,
+  maximumCharactersPerSource = 6_000
+} = {}) {
+  const sourceLimit = Math.max(0, Math.min(3, Math.floor(Number(maximumSources) || 0)));
+  const textLimit = Math.max(0, Math.min(6_000, Math.floor(Number(maximumCharactersPerSource) || 0)));
+  if (!sourceLimit) return [];
+  const answer = (Array.isArray(messages) ? messages : [])
+    .findLast(message => message?.role === "assistant")?.answer;
+  if (answer?.verification?.pass !== true || answer?.mode === "clarification") return [];
+  const sources = [];
+  const seen = new Set();
+  for (const citation of Array.isArray(answer.citations) ? answer.citations : []) {
+    const codePrefix = String(citation?.codePrefix || "").trim().toUpperCase();
+    const sectionNumber = String(citation?.sectionNumber || "").trim();
+    if (!/^(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)$/.test(codePrefix) ||
+        !/^[A-Z]?\d+(?:[-.][0-9A-Za-z]+)*$/.test(sectionNumber)) continue;
+    const identity = [codePrefix, sectionNumber, citation.codeVersion || citation.codeEdition || ""].join(":");
+    if (seen.has(identity)) continue;
+    seen.add(identity);
+    sources.push({
+      codePrefix,
+      sectionNumber,
+      sectionID: citation.sectionID || null,
+      reference: `${codePrefix} § ${sectionNumber}`,
+      codeEdition: citation.codeEdition || null,
+      codeVersion: citation.codeVersion || null,
+      corpusID: citation.corpusID || null,
+      applicabilityStatus: citation.applicabilityStatus || null,
+      title: String(citation.title || "").slice(0, 300),
+      selectedText: (Array.isArray(citation.supportingPassages) ? citation.supportingPassages : [])
+        .map(passage => String(passage?.selectedText || "")).filter(Boolean)
+        .join("\n").slice(0, textLimit)
+    });
+    if (sources.length >= sourceLimit) break;
+  }
+  return sources;
+}
+
+export function researchInheritedAuthorityReferences({
+  question,
+  previousMessages = [],
+  topicDecision,
+  maximumReferences = 3
+} = {}) {
+  if (!String(question || "").trim() || !topicDecision ||
+      topicDecision.decision === "topic_switch" ||
+      topicDecision.signals?.returnToOriginal ||
+      topicDecision.question?.codeReferences?.length ||
+      !topicDecision.contextPolicy?.includeRootTopic) return [];
+  return researchPriorAnswerSources(previousMessages, { maximumSources: maximumReferences })
+    .map(({ title, selectedText, ...reference }) => reference);
+}
+
 const failureExplanations = Object.freeze({
   verification_source: "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.",
   verification_context: "Research detected a conflict between the draft and the project facts or scenario discussed in this conversation. It could not resolve that conflict on this attempt.",

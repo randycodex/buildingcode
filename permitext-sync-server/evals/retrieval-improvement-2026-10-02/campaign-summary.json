@@ -1,0 +1,992 @@
+{
+  "schemaVersion": 1,
+  "status": "evaluation complete; production enablement rejected",
+  "baselineCommit": "0efaf6d52",
+  "reviewType": "Assistant source-key review, not professional adjudication",
+  "runs": [
+    {
+      "label": "baseline-development",
+      "cases": 30,
+      "review": {
+        "reviewedCases": 30,
+        "totalDevelopmentCases": 30,
+        "labels": {
+          "correct": 20,
+          "minor_issue": 0,
+          "materially_wrong": 0,
+          "withheld": 10,
+          "appropriate_clarification": 0,
+          "fixture_ambiguous": 0
+        },
+        "strictPassCount": 20,
+        "strictPassFraction": 0.6666666666666666,
+        "fullyPassingFamilies": 5,
+        "totalFamilies": 10,
+        "withheldExpectedRuleAbsentFromExposedEvidence": 8,
+        "withheldNoPacketVisible": 2,
+        "materiallyWrongSubstantiveAnswerCount": 0,
+        "interpretation": "20/30 turns answered the frozen rules correctly; 10/30 withheld rather than giving a wrong substantive conclusion. This is end-to-end answer performance on these 10 correlated development families, not 95% accuracy across NYC code questions.",
+        "costAccounting": "Excluded from grading; live-run usage/cost remains separately reported by the parent runner."
+      },
+      "providerCalls": 74,
+      "modelCounts": {
+        "gpt-6-luna": 74
+      },
+      "usagePricedCostUSD": 0.13050963,
+      "unsettled": 0,
+      "p50Seconds": 13.972964042,
+      "p90Seconds": 49.325313167000076,
+      "latencyScope": "Local full answer HTTP turns after fixture-wide first-question retrieval preflight; corpus/query caches are warm. Not production or cold-start latency.",
+      "rawDirectory": "/tmp/permitext-fresh-baseline-development-live-20261002",
+      "startedAt": "2026-10-02T23:03:23.524Z",
+      "finishedAt": "2026-10-02T23:13:25.924Z",
+      "fixtureHash": "3718c7e49a0f4ced8568a350fdb44a04dc7a8cc426477981d1bffc9723cd256b",
+      "sourceHashes": {
+        "app.mjs": "776769edbc1bfece131db632d08ef0df89b30f5c49a5e766ec8cdcb6dbec4b31",
+        "research-rule-packets.mjs": "3429231b1936f234c980f22e5ecf7045d3c471b8f62b420d781dc6caf3f00231",
+        "research-evidence-assembly.mjs": "98f9eb5f4c0ddc34ca1eb5cd6a1af3cdf26c8a747065e7aff4bc151722d62295",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+        "evidence-discovery.mjs": "9ed3c4edf5d8d92d7a35f612a77fa6067f245cf3574475aa01615b3511cbc30b",
+        "research-evidence-priority.mjs": "ecac14e2a1879208b4ed1cee824e722cabb8b233ecf8290ec08b84a19b1fe984",
+        "research-conversation-topic.mjs": "53900cc5aae9873665fd4d875d6938c5e504e57ffe409571814f989475e900d6",
+        "research-corpus-registry.mjs": "af986af29d7616486f835dfe924504e151a15d79b310a7c3148af6f7df187e1d",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "f4efab89bee8a48a27e11c5bde01406badfdba54a5e47bbb1d8d1697fabaf155",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "36de6cd7e0361c4a154b990811546b424fb6ab64b88adba73626385ef414814a"
+      }
+    },
+    {
+      "label": "candidate-v1-development",
+      "cases": 30,
+      "review": {
+        "reviewedCases": 30,
+        "completedRunnerCases": 30,
+        "totalDevelopmentCases": 30,
+        "labels": {
+          "correct": 23,
+          "minor_issue": 0,
+          "materially_wrong": 0,
+          "withheld": 7,
+          "appropriate_clarification": 0,
+          "fixture_ambiguous": 0
+        },
+        "strictPassCount": 23,
+        "strictPassFraction": 0.7666666666666667,
+        "fullyPassingFamilies": 6,
+        "totalFamilies": 10,
+        "recoveredBaselineFailures": [
+          "fresh-dev-01-door-1",
+          "fresh-dev-01-door-2",
+          "fresh-dev-01-door-3",
+          "fresh-dev-03-water-1",
+          "fresh-dev-08-route-1",
+          "fresh-dev-09-candles-3"
+        ],
+        "regressedBaselinePasses": [
+          "fresh-dev-04-vents-3",
+          "fresh-dev-05-exhaust-3",
+          "fresh-dev-10-surfacing-3"
+        ],
+        "withheldExpectedProvisionAbsentFromExposedEvidence": 2,
+        "withheldDecisiveTextAbsentFromExposedEvidence": 3,
+        "expectedIDPresentButDecisiveTextAbsent": [
+          "fresh-dev-09-candles-2"
+        ],
+        "withheldNoPacketVisible": 4,
+        "costAccounting": "Excluded; parent reports live-run cost separately.",
+        "baselineStrictPassCount": 20,
+        "netStrictPassChange": 3,
+        "interpretation": "23/30 turns correctly answer the frozen rules, compared with baseline 20/30. Six baseline failures recover and three baseline passes regress; 7 candidate answers remain withheld. This is a modest development improvement with regressions, not a reliability target pass or broad answer-accuracy certification."
+      },
+      "providerCalls": 104,
+      "modelCounts": {
+        "text-embedding-3-small": 32,
+        "gpt-6-luna": 72
+      },
+      "usagePricedCostUSD": 0.09454847499999997,
+      "unsettled": 0,
+      "p50Seconds": 9.047238499999999,
+      "p90Seconds": 35.91638275000002,
+      "latencyScope": "Local full answer HTTP turns after fixture-wide first-question retrieval preflight; corpus/query caches are warm. Not production or cold-start latency.",
+      "rawDirectory": "/tmp/permitext-fresh-hybrid-development-live-20261002",
+      "startedAt": "2026-10-02T23:17:03.627Z",
+      "finishedAt": "2026-10-02T23:26:02.381Z",
+      "fixtureHash": "3718c7e49a0f4ced8568a350fdb44a04dc7a8cc426477981d1bffc9723cd256b",
+      "sourceHashes": {
+        "app.mjs": "4b0bfed2bcd9f7a60af53eb57945e5519e04024bdfe3b8cec7db31673a3682d1",
+        "research-rule-packets.mjs": "3429231b1936f234c980f22e5ecf7045d3c471b8f62b420d781dc6caf3f00231",
+        "research-evidence-assembly.mjs": "3be2d4ae4bf05ba30c71217b187075e4225005538b902f7c84fcb7a54e184fa3",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+        "evidence-discovery.mjs": "83a02fcd9d176bcca9d5b082162951c79bf15ad3fd404ad54878d83efba7850f",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "f0680a1e1cc2d5428cd3eda9b30ba9df2f0e9d00179f75401d874c05d539ce7b",
+        "research-corpus-registry.mjs": "2bcde9468b1030078cca11ede6ab0abcd4e6c2de89b45a2a36e519e7625160e8",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "d5c74ec290d69ffe52464e841203376ab55bb5c1bb7e9c9be4518d1660eb663d",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "c4b2166f3a392edbd117f9fc8d077eb6b86f3db203faf6815c83a6ca5831ab26"
+      }
+    },
+    {
+      "label": "candidate-v2-development-rejected",
+      "cases": 30,
+      "review": {
+        "reviewedCases": 30,
+        "completedRunnerCases": 30,
+        "totalDevelopmentCases": 30,
+        "labels": {
+          "correct": 24,
+          "minor_issue": 0,
+          "materially_wrong": 0,
+          "withheld": 6,
+          "appropriate_clarification": 0,
+          "fixture_ambiguous": 0
+        },
+        "strictPassCount": 24,
+        "strictPassFraction": 0.8,
+        "fullyPassingFamilies": 6,
+        "totalFamilies": 10,
+        "recoveredBaselineFailures": [
+          "fresh-dev-01-door-1",
+          "fresh-dev-01-door-2",
+          "fresh-dev-01-door-3",
+          "fresh-dev-08-route-1",
+          "fresh-dev-09-candles-1",
+          "fresh-dev-09-candles-3",
+          "fresh-dev-10-surfacing-1",
+          "fresh-dev-10-surfacing-2"
+        ],
+        "regressedBaselinePasses": [
+          "fresh-dev-02-stairs-1",
+          "fresh-dev-02-stairs-2",
+          "fresh-dev-02-stairs-3",
+          "fresh-dev-05-exhaust-3"
+        ],
+        "withheldExpectedProvisionAbsentFromExposedEvidence": 2,
+        "withheldDecisiveTextAbsentFromExposedEvidence": 3,
+        "expectedIDPresentButDecisiveTextAbsent": [
+          "fresh-dev-09-candles-2"
+        ],
+        "withheldNoPacketVisible": 3,
+        "costAccounting": "Excluded; parent reports live-run cost separately."
+      },
+      "providerCalls": 114,
+      "modelCounts": {
+        "text-embedding-3-small": 32,
+        "gpt-6-luna": 82
+      },
+      "usagePricedCostUSD": 0.11395161000000002,
+      "unsettled": 0,
+      "p50Seconds": 10.248642541999986,
+      "p90Seconds": 62.21886112500005,
+      "latencyScope": "Local full answer HTTP turns after fixture-wide first-question retrieval preflight; corpus/query caches are warm. Not production or cold-start latency.",
+      "rawDirectory": "/tmp/permitext-fresh-hybrid-v2-development-live-20261002",
+      "startedAt": "2026-10-02T23:34:44.681Z",
+      "finishedAt": "2026-10-02T23:46:38.518Z",
+      "fixtureHash": "3718c7e49a0f4ced8568a350fdb44a04dc7a8cc426477981d1bffc9723cd256b",
+      "sourceHashes": {
+        "app.mjs": "4b0bfed2bcd9f7a60af53eb57945e5519e04024bdfe3b8cec7db31673a3682d1",
+        "research-rule-packets.mjs": "3429231b1936f234c980f22e5ecf7045d3c471b8f62b420d781dc6caf3f00231",
+        "research-evidence-assembly.mjs": "d49f41d65775da8f2965691cff94b5fd362462cf286f33c51530640098ef5a4b",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+        "evidence-discovery.mjs": "014349a622d08e2fd9153cc9e8857d913c4ac17d6a8b54215a5e9e98dd4b7fd4",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "b4aace8dd05e13170560586c3cf3b2aed7e9c2719c5bf0356399afdceba94dc7",
+        "research-corpus-registry.mjs": "2bcde9468b1030078cca11ede6ab0abcd4e6c2de89b45a2a36e519e7625160e8",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "d5c74ec290d69ffe52464e841203376ab55bb5c1bb7e9c9be4518d1660eb663d",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "68ab91e2a0ab3433abac1d5a9b33b1cfee3fb4707c86ccedd91d774b326b45cc",
+        "research-passage-index.mjs": "11d7af11e912535098ae075ee96e2de11b21a16d8f520fd1f70ec24139ded5cb",
+        "research-semantic-passages.mjs": "1e40b464caad61d4bb4b5ea4ecbfe42454dcce1fd41ea497104f5a6da3b962e0"
+      }
+    },
+    {
+      "label": "candidate-v3-development",
+      "cases": 30,
+      "review": {
+        "reviewedCases": 30,
+        "completedRunnerCases": 30,
+        "totalDevelopmentCases": 30,
+        "labels": {
+          "correct": 28,
+          "minor_issue": 1,
+          "materially_wrong": 0,
+          "withheld": 1,
+          "appropriate_clarification": 0,
+          "fixture_ambiguous": 0
+        },
+        "strictPassCount": 28,
+        "strictPassFraction": 0.9333333333333333,
+        "fullyPassingFamilies": 8,
+        "totalFamilies": 10,
+        "recoveredBaselineFailures": [
+          "fresh-dev-01-door-1",
+          "fresh-dev-01-door-2",
+          "fresh-dev-01-door-3",
+          "fresh-dev-03-water-1",
+          "fresh-dev-08-route-1",
+          "fresh-dev-09-candles-2",
+          "fresh-dev-09-candles-3",
+          "fresh-dev-10-surfacing-1",
+          "fresh-dev-10-surfacing-2"
+        ],
+        "regressedBaselinePasses": [
+          "fresh-dev-02-stairs-3"
+        ],
+        "withheldExpectedProvisionAbsentFromExposedEvidence": 1,
+        "withheldDecisiveTextAbsentFromExposedEvidence": 1,
+        "expectedIDPresentButDecisiveTextAbsent": [
+          "fresh-dev-02-stairs-3"
+        ],
+        "withheldNoPacketVisible": 0,
+        "costAccounting": "Excluded; parent reports live-run cost separately."
+      },
+      "providerCalls": 107,
+      "modelCounts": {
+        "text-embedding-3-small": 32,
+        "gpt-6-luna": 75
+      },
+      "usagePricedCostUSD": 0.10949992499999998,
+      "unsettled": 0,
+      "p50Seconds": 9.672606709000014,
+      "p90Seconds": 40.279144833000025,
+      "latencyScope": "Local full answer HTTP turns after fixture-wide first-question retrieval preflight; corpus/query caches are warm. Not production or cold-start latency.",
+      "rawDirectory": "/tmp/permitext-fresh-hybrid-v3-development-live-20261002",
+      "startedAt": "2026-10-02T23:50:29.110Z",
+      "finishedAt": "2026-10-02T23:58:42.760Z",
+      "fixtureHash": "3718c7e49a0f4ced8568a350fdb44a04dc7a8cc426477981d1bffc9723cd256b",
+      "sourceHashes": {
+        "app.mjs": "b559e4b9a44e017ce00fd3f215d4877196b5c734567e47e97bc5e6c4c587abb9",
+        "research-rule-packets.mjs": "3429231b1936f234c980f22e5ecf7045d3c471b8f62b420d781dc6caf3f00231",
+        "research-evidence-assembly.mjs": "cdc00a5dfa19a499c7f9f9d7f0022d97742b28e7ad81ad8809623247c79d0b2c",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+        "evidence-discovery.mjs": "53a871f7bb1ab100f9bfd921eebe5aef2a3200d2769faf31c9ec94aad74df33a",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "b4aace8dd05e13170560586c3cf3b2aed7e9c2719c5bf0356399afdceba94dc7",
+        "research-corpus-registry.mjs": "2bcde9468b1030078cca11ede6ab0abcd4e6c2de89b45a2a36e519e7625160e8",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "d5c74ec290d69ffe52464e841203376ab55bb5c1bb7e9c9be4518d1660eb663d",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "68ab91e2a0ab3433abac1d5a9b33b1cfee3fb4707c86ccedd91d774b326b45cc",
+        "research-passage-index.mjs": "11d7af11e912535098ae075ee96e2de11b21a16d8f520fd1f70ec24139ded5cb",
+        "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012"
+      }
+    },
+    {
+      "label": "candidate-v4-targeted",
+      "cases": 9,
+      "review": {
+        "reviewedCases": 9,
+        "completedRunnerCases": 9,
+        "totalTargetedCases": 9,
+        "labels": {
+          "correct": 8,
+          "minor_issue": 0,
+          "materially_wrong": 0,
+          "withheld": 1,
+          "appropriate_clarification": 0,
+          "fixture_ambiguous": 0
+        },
+        "strictPassCount": 8,
+        "strictPassFraction": 0.8888888888888888,
+        "fullyPassingFamilies": 2,
+        "totalFamilies": 3,
+        "recoveredBaselineFailures": [
+          "fresh-dev-03-water-1",
+          "fresh-dev-09-candles-2",
+          "fresh-dev-09-candles-3"
+        ],
+        "regressedBaselinePasses": [],
+        "withheldExpectedProvisionAbsentFromExposedEvidence": 1,
+        "withheldDecisiveTextAbsentFromExposedEvidence": 1,
+        "expectedIDPresentButDecisiveTextAbsent": [],
+        "withheldNoPacketVisible": 0,
+        "costAccounting": "Excluded; parent reports live-run cost separately."
+      },
+      "providerCalls": 29,
+      "modelCounts": {
+        "text-embedding-3-small": 11,
+        "gpt-6-luna": 18
+      },
+      "usagePricedCostUSD": 0.021178505,
+      "unsettled": 0,
+      "p50Seconds": 14.824110708000001,
+      "p90Seconds": 35.955119917000005,
+      "latencyScope": "Local full answer HTTP turns after fixture-wide first-question retrieval preflight; corpus/query caches are warm. Not production or cold-start latency.",
+      "rawDirectory": "/tmp/permitext-fresh-hybrid-v4-targeted-live-20261002",
+      "startedAt": "2026-10-03T00:02:48.751Z",
+      "finishedAt": "2026-10-03T00:05:18.910Z",
+      "fixtureHash": "3718c7e49a0f4ced8568a350fdb44a04dc7a8cc426477981d1bffc9723cd256b",
+      "sourceHashes": {
+        "app.mjs": "b559e4b9a44e017ce00fd3f215d4877196b5c734567e47e97bc5e6c4c587abb9",
+        "research-rule-packets.mjs": "3429231b1936f234c980f22e5ecf7045d3c471b8f62b420d781dc6caf3f00231",
+        "research-evidence-assembly.mjs": "242a48464a45c104569883050122f83024e1c72822a5c1435d9a7c7975333593",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+        "evidence-discovery.mjs": "d82c75a4dfc755aab291af5e84b1b7af37743e345baf0abd6b3120fcf7f2252d",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "b4aace8dd05e13170560586c3cf3b2aed7e9c2719c5bf0356399afdceba94dc7",
+        "research-corpus-registry.mjs": "2bcde9468b1030078cca11ede6ab0abcd4e6c2de89b45a2a36e519e7625160e8",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "d5c74ec290d69ffe52464e841203376ab55bb5c1bb7e9c9be4518d1660eb663d",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "68ab91e2a0ab3433abac1d5a9b33b1cfee3fb4707c86ccedd91d774b326b45cc",
+        "research-passage-index.mjs": "11d7af11e912535098ae075ee96e2de11b21a16d8f520fd1f70ec24139ded5cb",
+        "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012"
+      }
+    }
+  ],
+  "interpretation": "V3 is the last complete development run. V4 targets only nine turns and must not be spliced into V3 to claim a new complete 30-turn result. The candidate freeze also includes a later exact-reference regression fix.",
+  "limitations": [
+    "Development results are used for tuning and are not heldout accuracy.",
+    "Fresh heldout turns share conversation families and source chapters.",
+    "No ChatGPT Instant comparison was needed in this campaign.",
+    "Project facts are empty in these fresh fixtures; project-linked production behavior is not established.",
+    "No production model or retrieval enablement was changed."
+  ],
+  "heldout": {
+    "frozenCandidateUnchanged": true,
+    "reviewType": "Assistant source-key review; application verifier verdicts are not ground truth",
+    "totalTurns": 70,
+    "totalFamilies": 35,
+    "labels": {
+      "correct": 56,
+      "minor_issue": 1,
+      "withheld": 11,
+      "materially_wrong": 1,
+      "fixture_ambiguous": 1,
+      "runtime_failure": 0
+    },
+    "rawStrictPassFraction": 0.8,
+    "gradableTurns": 69,
+    "strictPassFractionExcludingAmbiguity": 0.8115942028985508,
+    "fullyPassingFamilies": 24,
+    "failureStages": {
+      "deterministic-gate-false-rejection": 1,
+      "governing-source-retrieval-gap": 7,
+      "governing-source-context-truncation": 1,
+      "fixture-ambiguity": 1,
+      "source-context-truncation-and-binding-repair": 1,
+      "unsupported-extra-citation-and-boundary-fallback": 1,
+      "governing-source-retrieval-gap-and-repair": 1,
+      "special-district-scope-and-verifier-fault": 1
+    },
+    "providerCalls": 236,
+    "usagePricedCostUSD": 0.21325453000000014,
+    "p50Seconds": 9.491135666000016,
+    "p90Seconds": 18.883518875000068,
+    "latencyScope": "Local full HTTP answer turns after fixture-wide retrieval preflight; caches warm, not production latency",
+    "reviewFiles": [
+      "heldout-candidate-review-a.json",
+      "heldout-candidate-review-b.json",
+      "heldout-candidate-review-c.json"
+    ],
+    "cases": [
+      {
+        "id": "fresh-hold-01-projections-1",
+        "familyID": "egress-horizontal-projections",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "0059ca22fe9b20af50cdda44eb79c8d00c7e53e539f7b0f217c9f73cf6ced1a6",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-01-projections-2",
+        "familyID": "egress-horizontal-projections",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+        "failureStage": "deterministic-gate-false-rejection"
+      },
+      {
+        "id": "fresh-hold-02-duration-1",
+        "familyID": "emergency-egress-power-duration",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "4d1fb72e5915e4b4713ce52639e706adacc74255b10c9a8bc0b368b4f5b2f63b",
+        "failureStage": "governing-source-retrieval-gap"
+      },
+      {
+        "id": "fresh-hold-02-duration-2",
+        "familyID": "emergency-egress-power-duration",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "864ce1887d78cbea92659ceb39ee547888c7c6ea97d983ffad06c987a1fafd74",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-03-exit-sign-1",
+        "familyID": "externally-illuminated-exit-sign",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "3811f04b41f6b0fbfc4874545130106402fc2ce3081c20e025ac5969602828e7",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-03-exit-sign-2",
+        "familyID": "externally-illuminated-exit-sign",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "155640031d6a544bd731fc56e72e6c57493eb56695a614bc465cc981fc8bdaf0",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-04-stair-penetrations-1",
+        "familyID": "interior-exit-stair-penetrations",
+        "label": "minor_issue",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "8e5e3dd375fb4e6c1353dc4c68c704deba61f6269060f6cce297d5f22c2c24ce",
+        "failureStage": "governing-source-context-truncation"
+      },
+      {
+        "id": "fresh-hold-04-stair-penetrations-2",
+        "familyID": "interior-exit-stair-penetrations",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "ab7db7318f1a7ca712cb972cd95cb60f52f2145a21191ab09c325ed8c3ebef8d",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-05-travel-1",
+        "familyID": "exit-access-travel-measurement",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "7c6e33a995a563ad0b44c0af6c195482d725ba3586352c71f3925b75ef8674d0",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-05-travel-2",
+        "familyID": "exit-access-travel-measurement",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "79eb49c41897b90d48b631ec6935ed9a3d1a907be1503abbe8e5f75a35882751",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-06-sound-1",
+        "familyID": "dwelling-separation-airborne-sound",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "d46f7f78ba654d011c3584e9ea750364901804ad035ad843e12fe69133645ddd",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-06-sound-2",
+        "familyID": "dwelling-separation-airborne-sound",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "9ca254b9ee30ad1b454ce0756503e9fe80a9301ff21ee663fbaeae81ba79987e",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-07-relief-1",
+        "familyID": "water-heater-relief-discharge",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "94ed9236134e5168b5a24dcca4dedcdf320d562cfcb649530dcc1ea2232c0b3c",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-07-relief-2",
+        "familyID": "water-heater-relief-discharge",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "f525d30624f4a430b993d8d31c594e562d23f8f45590af2b02dde1b133bbeee4",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-08-trap-size-1",
+        "familyID": "fixture-trap-relative-size",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "bd9193375f9dfc8a8fbe60edc14fc4ba78374d859fb888d0c2e92d74235d025c",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-08-trap-size-2",
+        "familyID": "fixture-trap-relative-size",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "ce7dedd060bb096c6589b1e2b01ac0c9ee1882c2af9126cf730d2fb44d083c6f",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-09-trap-recess-1",
+        "familyID": "underground-trap-recess",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "e8702d2edd935fd509be93b8a1771974cea1221595a8d625b59579494ea2e055",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-09-trap-recess-2",
+        "familyID": "underground-trap-recess",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "ddd91648262bc348d473bf2555b505eb2c3f7641d6b5ffd537c219291c79c3c1",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-10-cleanout-1",
+        "familyID": "cleanout-cleaning-direction",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "798756b17bc570623cef38508cd08515f2c69563d3c1fb983efe0ca885c542f6",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-10-cleanout-2",
+        "familyID": "cleanout-cleaning-direction",
+        "label": "fixture_ambiguous",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "b193d30757b2954ec80cf3695b9aeee7b9294629b0e3e54dc691fb79595ad391",
+        "failureStage": "fixture-ambiguity"
+      },
+      {
+        "id": "fresh-hold-11-dishwasher-1",
+        "familyID": "commercial-dishwasher-indirect-waste",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "4efe432a637f4f90810c89e09221e58102e630ebaebcb41437a407329b985b01",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-11-dishwasher-2",
+        "familyID": "commercial-dishwasher-indirect-waste",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "07558cbc27678966f77e0a58964ae1cea479027659b5d9c2c6740595b5f9a2cf",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-12-nonpotable-1",
+        "familyID": "nonpotable-water-identification",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "ff3095758f581e00835da64a634ccbe5850430381647336a21c40002831e9875",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-12-nonpotable-2",
+        "familyID": "nonpotable-water-identification",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "3844841f1bf69f11db444f5a1a84caaeb8eddb15beca7bb497f11df39fc22e74",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-13-crawl-1",
+        "familyID": "under-floor-appliance-access",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "ffde8c3aa42cff873dc99091beb7c2a878d0a3d45223e9f1babffcd379f424ff",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-13-crawl-2",
+        "familyID": "under-floor-appliance-access",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "fd5ec846e72fe6090d4fc2fda8ffac41a1a1d36ce19ac2c8dab981adb8da28bd",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-14-roof-1",
+        "familyID": "rooftop-equipment-access",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "5b134c593f0e15f15c970c15f831932177855508235135e611e5032c6e6afc72",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-14-roof-2",
+        "familyID": "rooftop-equipment-access",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "da38a7797e6317442b168cf39170775a9bc26cc3b56ce4ea4bfbeb9a96115e2f",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-15-vessel-1",
+        "familyID": "pressure-vessel-relief-device",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "dcad629fcc2ce0c91e3d507bff10b96a3b46b4b85bf2a18f7760ef5aeb20ebb3",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-15-vessel-2",
+        "familyID": "pressure-vessel-relief-device",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "f1b77b8215e7fbca7d4faec027ded8d1503bf744eb470b41a900658a1ab45ded",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-16-duct-support-1",
+        "familyID": "duct-support-suspended-ceiling",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "9e68fc9d5cbdeaf859c96badab62227049944c2a8d24454b73c05e1f151e3b18",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-16-duct-support-2",
+        "familyID": "duct-support-suspended-ceiling",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "9d83d9efeaa5ed891a4ef18ec06ba16d2cffc4f38fdce1a00ca21ed060a8c105",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-17-vapor-1",
+        "familyID": "externally-insulated-cooling-duct-vapor-retarder",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "da6755c0f3f44d0b37194201fecaf52fc6cac3fdfad79f2816278711687ef081",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-17-vapor-2",
+        "familyID": "externally-insulated-cooling-duct-vapor-retarder",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "5b8925c22508fc345348dab97099ce107141c370c9babe64aca608b3a1211e45",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-18-liner-1",
+        "familyID": "duct-liner-downstream-cooling-coil",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "dfe9d1c06af5cf402cf76487bed1bcf37e2be6a739bd8d1f2fb8b7b2b67ecda4",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-18-liner-2",
+        "familyID": "duct-liner-downstream-cooling-coil",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-a.json",
+        "answerTextSHA256": "19a7d1c181df8c0d988083c451d556e59d78c68b6e0a9eee30957054d69b7c8d",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-19-floor-gas-1",
+        "familyID": "gas-piping-solid-floor",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "edf280f4a22c633ca72f0dfb7df1c587e320410c5b6428fb10f11da4e2165854",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-19-floor-gas-2",
+        "familyID": "gas-piping-solid-floor",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "58d065ddbe70b946e3da898ab6ac2923d3eb1ac941ef658840c9401fb771d862",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-20-branch-1",
+        "familyID": "gas-riser-branch-takeoff",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "c25ed220fc1843256869bf4cd07a10a9d80b1334ac2e5658bcee661d38c1078a",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-20-branch-2",
+        "familyID": "gas-riser-branch-takeoff",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "702be4f85eb6bb8ba3c04b278d0747ad91b72071c626760d891406eebc029b8c",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-21-gas-support-1",
+        "familyID": "gas-piping-support-independence",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "4ef94ec452743db16b99d31f26cf47038320beb79b77a2cb74d2883641640a22",
+        "failureStage": "governing-source-retrieval-gap"
+      },
+      {
+        "id": "fresh-hold-21-gas-support-2",
+        "familyID": "gas-piping-support-independence",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "54c9863fc3230b912170a77a1f9e11c9a911c195021b142043609e1dcdebf0a4",
+        "failureStage": "governing-source-retrieval-gap"
+      },
+      {
+        "id": "fresh-hold-22-louvers-1",
+        "familyID": "gas-combustion-air-louver-free-area",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "b28e6344a5a183d85e562e8f8c7ee5fbc51b224a30e4032e057334402c1d0cc2",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-22-louvers-2",
+        "familyID": "gas-combustion-air-louver-free-area",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "e57f861cf876c57a251a3685bdfda74da78d358f0ddcde2ebfe03f10071cf6cf",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-23-ignition-1",
+        "familyID": "garage-gas-appliance-ignition-height",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "e54551b20b3c983e4dbfaa658fecb1a8e6b256d56ddd9cb0e4510cc48b59c5d4",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-23-ignition-2",
+        "familyID": "garage-gas-appliance-ignition-height",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "889054d2821327a6d86e4a7dac434ba4f136255af11c2803c855a848cd9df17e",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-24-regulator-1",
+        "familyID": "gas-pressure-regulator-vent",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "2ef813d5d2b45fe97627129871efdabcdac3544e9ae9e7cdcda60a6a68b92820",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-24-regulator-2",
+        "familyID": "gas-pressure-regulator-vent",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "b3aac4ede69ca8a5327e5beedfbd19cb5e895ba85ab26d52c8c2403e697e834f",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-25-emergency-maint-1",
+        "familyID": "emergency-power-maintenance-records",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "2dd3c768b05d853237aa5a771edb53c0e976d7eb599513377f339bfae07721fc",
+        "failureStage": "governing-source-retrieval-gap"
+      },
+      {
+        "id": "fresh-hold-25-emergency-maint-2",
+        "familyID": "emergency-power-maintenance-records",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "64be84b36b515d1026d84d5bedc6e7b3f4f6a6af4c3ec5676750dd5d1b0025af",
+        "failureStage": "governing-source-retrieval-gap"
+      },
+      {
+        "id": "fresh-hold-26-cords-1",
+        "familyID": "extension-cord-use",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "12cacec1a4e61552ac8d17af1fe460dd914eea04e247b3cef92f2e7970e79e0d",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-26-cords-2",
+        "familyID": "extension-cord-use",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "82c2b0b31a09a381acc1a8eae42e28d4ba84b67d5c086ce278110ae80142dc3b",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-27-fryer-1",
+        "familyID": "commercial-deep-fryer-separation",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "52d517fb063c73e4b274de2e4bbb58140296929e2a6ab72d339dd59cd154fc0e",
+        "failureStage": "governing-source-retrieval-gap"
+      },
+      {
+        "id": "fresh-hold-27-fryer-2",
+        "familyID": "commercial-deep-fryer-separation",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "a6fd35a42bf8d0c35517f256368bb6efd95fd419f6d00d436bcc3db622024ddd",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-28-shaft-1",
+        "familyID": "shaft-opening-maintained-closure",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "1918e24c95d772bc919c5beb8705bd5c1d43f4cdc1b1ee7af56ba301f41efa06",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-28-shaft-2",
+        "familyID": "shaft-opening-maintained-closure",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-b.json",
+        "answerTextSHA256": "4a9a92cc8a9fdd4b7ee9ec14c52f60f7a7c6e8759d173efe7954d87e63c96443",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-29-extinguisher-1",
+        "familyID": "portable-extinguisher-mounting-height",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "4e43b75a55256b0984cc66a99d0b448ee19b1f2798620d6539a0b8f04a38429b",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-29-extinguisher-2",
+        "familyID": "portable-extinguisher-mounting-height",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "95b586bc089fac1c9d7d5d22766b65d771879efc87bf8471a81e6c60296163e1",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-30-firewatch-1",
+        "familyID": "hot-work-post-work-fire-watch",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "6903b43a82d3a92f252ab6a48473bbb002bd60aa8dd77233d27b6856c8f53036",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-30-firewatch-2",
+        "familyID": "hot-work-post-work-fire-watch",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "56661d71fb31b353cdc09186049e43c0377599060238646d2e1fb4a11ed5702a",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-31-loading-size-1",
+        "familyID": "commercial-loading-berth-dimensions",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "44a3ffaa2a293ac10be0f8cf1e91ea0cab866e5cb85def5a37a3ba7e7870cb98",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-31-loading-size-2",
+        "familyID": "commercial-loading-berth-dimensions",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "c6a6f302bc90fedea920e8842b0de8c9361cae403d6d141dd9a0185b48b573aa",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-32-loading-near-1",
+        "familyID": "commercial-loading-near-residence-boundary",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "131c4d54931ef6bf0398716c552c88d1920adcebba78218d80988a8b1f3254e9",
+        "failureStage": "governing-source-retrieval-gap"
+      },
+      {
+        "id": "fresh-hold-32-loading-near-2",
+        "familyID": "commercial-loading-near-residence-boundary",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "1bfe9ab3511fcaa72e94df788ee651cefc3ecde8378f5c1d6b8d2f9f1830a0a8",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-33-ev-1",
+        "familyID": "accessory-parking-ev-charging",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "04ac2cb886e67597ffbc1bdb3583cecae6c1ff813f696aeda8249ffb36b814db",
+        "failureStage": "source-context-truncation-and-binding-repair"
+      },
+      {
+        "id": "fresh-hold-33-ev-2",
+        "familyID": "accessory-parking-ev-charging",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "33be466415ed69f9f1a7c6cded89987d9dd03eb98ce5a523feefdf8abe66eb58",
+        "failureStage": null
+      },
+      {
+        "id": "fresh-hold-34-corner-1",
+        "familyID": "commercial-parking-access-near-corner",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "514aacd7b10f0a742c46278163bdd1341dccacb59458a246dcc2ba66e3437e1c",
+        "failureStage": "unsupported-extra-citation-and-boundary-fallback"
+      },
+      {
+        "id": "fresh-hold-34-corner-2",
+        "familyID": "commercial-parking-access-near-corner",
+        "label": "withheld",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+        "failureStage": "governing-source-retrieval-gap-and-repair"
+      },
+      {
+        "id": "fresh-hold-35-joint-1",
+        "familyID": "joint-commercial-loading-facility",
+        "label": "materially_wrong",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "938ab5051a71c879df4a4b7282b44c85dd392011951dc674d82b50aae8c29132",
+        "failureStage": "special-district-scope-and-verifier-fault"
+      },
+      {
+        "id": "fresh-hold-35-joint-2",
+        "familyID": "joint-commercial-loading-facility",
+        "label": "correct",
+        "reviewFile": "heldout-candidate-review-c.json",
+        "answerTextSHA256": "3af9f68f688567114a05116f34fd245dd544a5a12dff7b6eb5951fd34fee261e",
+        "failureStage": null
+      }
+    ],
+    "releaseDisposition": "Rejected for production enablement: material scope error, nonanswers, missing/truncated provisions, operational/accounting gates remain.",
+    "rawDirectory": "/tmp/permitext-fresh-hybrid-heldout-live-20261002",
+    "preservedRawDirectory": "/Users/randy/.codex/artifacts/permitext-retrieval-improvement-2026-10-02/permitext-fresh-hybrid-heldout-live-20261002",
+    "startedAt": "2026-10-03T00:12:44.695Z",
+    "finishedAt": "2026-10-03T00:28:05.001Z"
+  },
+  "campaign": {
+    "capUSD": 13.97,
+    "usagePricedCostUSD": 0.823705255,
+    "remainingAuthorizedUSD": 13.146294745,
+    "providerCalls": 1057,
+    "unsettledProviderCalls": 0,
+    "answerTurns": 199,
+    "semanticBuildCostUSD": 0.14076258000000005
+  }
+}

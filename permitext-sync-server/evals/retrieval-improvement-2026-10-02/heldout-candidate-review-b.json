@@ -1,0 +1,3461 @@
+{
+  "status": "complete",
+  "reviewer": "fresh_retrieval_evals agent; assistant source review, not professional adjudication",
+  "scope": {
+    "conversationIndicesZeroBased": [
+      18,
+      27
+    ],
+    "turnCount": 20,
+    "scenarioFamilyCount": 10,
+    "codeFamilies": [
+      "FGC",
+      "FC"
+    ],
+    "scopeNote": "Root narrowed ownership; PartC independently reviews indices28\u201334. Supplemental observations below are excluded from headline and aggregation."
+  },
+  "runDirectory": "/tmp/permitext-fresh-hybrid-heldout-live-20261002",
+  "frozenAt": "2026-10-02T23:02:37.548371+00:00",
+  "fixtureHash": "417368e2fb4db8dad468925f294026cc6370b35df27f572cc1026df4e7bae5db",
+  "keysHash": "51ef91267dfe22f8a5af6135831516f4fab96f0c94ff9101a945e6ff51e0dfc4",
+  "candidateFreezeHash": "bd1ce9faf5acb73a0e3667b565cccfdd6b4de3fdec1f5759d4a59f64c05fad61",
+  "expectedCaseIDs": [
+    "fresh-hold-19-floor-gas-1",
+    "fresh-hold-19-floor-gas-2",
+    "fresh-hold-20-branch-1",
+    "fresh-hold-20-branch-2",
+    "fresh-hold-21-gas-support-1",
+    "fresh-hold-21-gas-support-2",
+    "fresh-hold-22-louvers-1",
+    "fresh-hold-22-louvers-2",
+    "fresh-hold-23-ignition-1",
+    "fresh-hold-23-ignition-2",
+    "fresh-hold-24-regulator-1",
+    "fresh-hold-24-regulator-2",
+    "fresh-hold-25-emergency-maint-1",
+    "fresh-hold-25-emergency-maint-2",
+    "fresh-hold-26-cords-1",
+    "fresh-hold-26-cords-2",
+    "fresh-hold-27-fryer-1",
+    "fresh-hold-27-fryer-2",
+    "fresh-hold-28-shaft-1",
+    "fresh-hold-28-shaft-2"
+  ],
+  "categories": [
+    "correct",
+    "minor_issue",
+    "withheld",
+    "materially_wrong",
+    "ambiguous_key/ungradable",
+    "runtime_failure"
+  ],
+  "rubric": "Evaluate final user-facing output against frozen source keys and original imported text. Keep verifier pass separate. Count unnecessary nonanswers as withheld, including actual writer-packet diagnosis. No code/key tuning after outputs. Related follow-ups are correlated;34 turns are17 scenarios, not34 independent topics.",
+  "startedReviewAt": "2026-10-03T00:15:41.851167+00:00",
+  "cases": [
+    {
+      "id": "fresh-hold-19-floor-gas-1",
+      "familyID": "gas-piping-solid-floor",
+      "questionSHA256": "b7c58cdfaa5a85ee95f5f35a8ce27b229621362f0e934d90b6ac4f36db87dcc7",
+      "question": "For a new NYC building under the 2022 codes, can gas piping in a solid floor be buried without an accessible channel or approved conduit alternative?",
+      "frozenKeySHA256": "77b96665b8c96417366763d8e6da13c169e47705aa6a47f1aa791662d698083d",
+      "finalOutputSHA256": "c85dd088c4c87a945bab7aa8e56c01140a3918247a5d6b6c3d2125a20c604b87",
+      "answerTextSHA256": "edf280f4a22c633ca72f0dfb7df1c587e320410c5b6428fb10f11da4e2165854",
+      "answerText": "**No.** Under the 2022 NYC Fuel Gas Code, piping in a solid floor must be laid in a channel and covered so it can be accessed with minimal building damage, or\u2014 as the stated alternative\u2014installed in Schedule 40 steel or wrought-iron conduit in accordance with Section 404.8.1 or 404.8.2. Burying it without either arrangement is not permitted by this rule (FGC \u00a7 404.8).",
+      "httpStatus": 200,
+      "seconds": 6.605764291999978,
+      "grade": "correct",
+      "reason": "Correctly prohibits unprotected burial and identifies accessible-channel and Schedule40 steel/wrought-iron conduit alternatives under FGC404.8. Cites the governing provision and limits conclusion to this condition.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 404.8"
+      ],
+      "decisiveReferences": [
+        "FGC 404.8"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8236",
+          "sectionNumber": "404.8",
+          "title": "404.8 Piping in solid floors.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8236-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8236-1",
+              "selectedText": "404.8 404.8 Piping in solid floors. Piping in solid floors shall be laid in channels in the floor and covered in a manner that will allow access to the piping with a minimum amount of damage to the building. Where such piping is subject to exposure to excessive moisture or corrosive substances, the piping shall be protected in an approved manner. As an alternative to installation in channels, the piping shall be installed in a conduit of Schedule 40 steel or wrought iron pipe installed in accordance with Section 404.8.1 or 404.8.2.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes the channel requirement and the specified conduit alternative for piping in solid floors."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "f37977ab-228c-4016-b8a9-5856a21cdcf0",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/f37977ab-228c-4016-b8a9-5856a21cdcf0-request.json",
+          "requestSHA256": "e5df0cf49e70cad17bba5bfdda8a319f8027d7fee35bbf677bd9ba05ef70cf0a",
+          "sourceReferenceCount": 8,
+          "sourceReferences": [
+            {
+              "reference": "FGC 404.8",
+              "sectionID": "8236",
+              "enactedTextSHA256": "3356adc993c4d18acb38cf759aca0ac027dd22a934da84c9c19da0895dd89086",
+              "enactedTextCharacters": 537
+            }
+          ]
+        },
+        {
+          "id": "8e791e2b-f796-421c-ae26-064e1bc8f925",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/8e791e2b-f796-421c-ae26-064e1bc8f925-request.json",
+          "requestSHA256": "01f13521616bba4439845fb867d31c919aeaacf857ee75a72764e3a4352d8bd2",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:20:41.715940+00:00"
+    },
+    {
+      "id": "fresh-hold-19-floor-gas-2",
+      "familyID": "gas-piping-solid-floor",
+      "questionSHA256": "2c460bcde0a4c641a658a0a21fbd6760e78d101727503294bf1e3bcaab881e7c",
+      "question": "If the gas pipe is installed in such a channel but is exposed to excessive moisture or corrosive substances, is the channel alone sufficient?",
+      "frozenKeySHA256": "528c93c17337ce7d06c843908c3171475904fb9384536411674e1c029b01a53b",
+      "finalOutputSHA256": "b6aa894ee419bbdacd420c35b4abae8d3183abc938ae3c4ad981f4de66ab65e7",
+      "answerTextSHA256": "58d065ddbe70b946e3da898ab6ac2923d3eb1ac941ef658840c9401fb771d862",
+      "answerText": "No. The channel alone is not sufficient when the gas piping is exposed to excessive moisture or corrosive substances: the piping must also be protected in an approved manner. The channel must still allow access with minimum damage to the building. (2022 NYC FGC \u00a7 404.8)",
+      "httpStatus": 200,
+      "seconds": 5.600730875000008,
+      "grade": "correct",
+      "reason": "Correctly retains solid-floor channel context and states approved protection against excessive moisture/corrosion is additional to accessible channel. Governed by supplied FGC404.8.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 404.8"
+      ],
+      "decisiveReferences": [
+        "FGC 404.8"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8236",
+          "sectionNumber": "404.8",
+          "title": "404.8 Piping in solid floors.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8236-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8236-1",
+              "selectedText": "404.8 404.8 Piping in solid floors. Piping in solid floors shall be laid in channels in the floor and covered in a manner that will allow access to the piping with a minimum amount of damage to the building. Where such piping is subject to exposure to excessive moisture or corrosive substances, the piping shall be protected in an approved manner. As an alternative to installation in channels, the piping shall be installed in a conduit of Schedule 40 steel or wrought iron pipe installed in accordance with Section 404.8.1 or 404.8.2.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Governs solid-floor gas piping in channels and requires approved protection when exposed to excessive moisture or corrosive substances."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "30d5db78-c48c-4193-9ee7-1faad30c94ce",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/30d5db78-c48c-4193-9ee7-1faad30c94ce-request.json",
+          "requestSHA256": "7d75d3a6a90660f33eee43a59ce961af4a7eabc22081de4e05f43155ea57cc05",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FGC 404.8",
+              "sectionID": "8236",
+              "enactedTextSHA256": "3356adc993c4d18acb38cf759aca0ac027dd22a934da84c9c19da0895dd89086",
+              "enactedTextCharacters": 537
+            }
+          ]
+        },
+        {
+          "id": "99672d80-b1a7-4f5a-bb72-041992bc6398",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/99672d80-b1a7-4f5a-bb72-041992bc6398-request.json",
+          "requestSHA256": "d11d535c9d599ef0dd99800921eaabe7699593816119a73089fc51c45c891e4d",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:20:41.717850+00:00"
+    },
+    {
+      "id": "fresh-hold-20-branch-1",
+      "familyID": "gas-riser-branch-takeoff",
+      "questionSHA256": "64679b4b65b1dbea820bc76a7a8f6862c12bf63dd55e87cdf512f765c839bc5c",
+      "question": "For a new NYC gas riser under the 2022 codes, may a branch take off using only a single elbow?",
+      "frozenKeySHA256": "cba06b531831f201c350407b24439442115bf6e1f7cf409f5e421674f4378974",
+      "finalOutputSHA256": "034e1b603661b008d46177f21777bf1d00c08f4dc4228cdc52e8ccd80712cc50",
+      "answerTextSHA256": "c25ed220fc1843256869bf4cd07a10a9d80b1334ac2e5658bcee661d38c1078a",
+      "answerText": "No. Under the 2022 NYC Fuel Gas Code, a branch taken off a riser must have \u201cnot less than a two-elbow swing\u201d; a single-elbow takeoff does not meet that stated minimum (FGC \u00a7 404.7).",
+      "httpStatus": 200,
+      "seconds": 5.291838584000012,
+      "grade": "correct",
+      "reason": "Correctly rejects one-elbow branch off gas riser and gives required two-elbow swing under FGC404.7.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 404.7"
+      ],
+      "decisiveReferences": [
+        "FGC 404.7"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8235",
+          "sectionNumber": "404.7",
+          "title": "404.7 Branch take-off.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8235-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8235-2",
+              "selectedText": "404.7 404.7 Branch take-off. Branches shall be taken off the riser with not less than a two-elbow swing.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Directly establishes the minimum elbow swing for branches taken off a riser."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "2099a630-f863-4eb6-86f5-9566f913b825",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/2099a630-f863-4eb6-86f5-9566f913b825-request.json",
+          "requestSHA256": "b58270366e2521373b22e756a20c1a1939d64623ea02bce19c14308e24863749",
+          "sourceReferenceCount": 10,
+          "sourceReferences": [
+            {
+              "reference": "FGC 404.7",
+              "sectionID": "8235",
+              "enactedTextSHA256": "4e22231327fc2dda3f65aa033bb0c6e5f7b40aede406c0a7cb10ef1c41c524fb",
+              "enactedTextCharacters": 104
+            }
+          ]
+        },
+        {
+          "id": "bb45dbf3-af67-4110-b491-268eff11ffc6",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/bb45dbf3-af67-4110-b491-268eff11ffc6-request.json",
+          "requestSHA256": "13c6120b43c16a09e18fa49d50492c367707a7565514bd62c567bdf6c71844eb",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:20:41.719113+00:00"
+    },
+    {
+      "id": "fresh-hold-20-branch-2",
+      "familyID": "gas-riser-branch-takeoff",
+      "questionSHA256": "736b1fc0e9c9121bff9c4a62f8c979ea5e2f65c41cf78b3df61804d9c0e0b9ef",
+      "question": "If we provide a two-elbow swing, does that meet this particular minimum number of elbows?",
+      "frozenKeySHA256": "1132d5c8ede7e464e3386584f496f93edf2c5c1c0f5463bb60d1349b78cfeb2e",
+      "finalOutputSHA256": "2d8e9e530113a186d2cb4189ebacabc05d7532d4c4b357682657bb5207434eb9",
+      "answerTextSHA256": "702be4f85eb6bb8ba3c04b278d0747ad91b72071c626760d891406eebc029b8c",
+      "answerText": "Yes. A two-elbow swing meets the stated minimum: FGC \u00a7 404.7 requires a branch taken off the riser to have \u201cnot less than a two-elbow swing.\u201d",
+      "httpStatus": 200,
+      "seconds": 11.83738149999996,
+      "grade": "correct",
+      "reason": "Final answer directly confirms two-elbow swing satisfies the stated minimum, preserving gas-riser context. Verifier repaired an unnecessary qualification in the first draft; final answer is supported and useful.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "unnecessary_qualification",
+                "detail": "The answer makes its Yes conditional on whether this concerns the branch take-off from the riser described earlier, but that context is established in the conversation. FGC \u00a7 404.7 states that branches taken off the riser must have \u201cnot less than a two-elbow swing,\u201d so answer directly that a two-elbow swing meets this stated minimum."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 404.7"
+      ],
+      "decisiveReferences": [
+        "FGC 404.7"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8235",
+          "sectionNumber": "404.7",
+          "title": "404.7 Branch take-off.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8235-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8235-1",
+              "selectedText": "404.7 404.7 Branch take-off. Branches shall be taken off the riser with not less than a two-elbow swing.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Governing 2022 NYC Fuel Gas Code minimum for a branch take-off from a riser."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "40e069bd-8119-4f27-8046-2f15418afd5b",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/40e069bd-8119-4f27-8046-2f15418afd5b-request.json",
+          "requestSHA256": "4c92d0359609b95db2c7ecfb53cf96ed9c9ddf4471863c35e7bbe53f0444729a",
+          "sourceReferenceCount": 9,
+          "sourceReferences": [
+            {
+              "reference": "FGC 404.7",
+              "sectionID": "8235",
+              "enactedTextSHA256": "4e22231327fc2dda3f65aa033bb0c6e5f7b40aede406c0a7cb10ef1c41c524fb",
+              "enactedTextCharacters": 104
+            }
+          ]
+        },
+        {
+          "id": "f66b0236-b4bc-436f-b422-1b1cd7d8a034",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/f66b0236-b4bc-436f-b422-1b1cd7d8a034-request.json",
+          "requestSHA256": "390a159c88d154b96a2efadb8a76676fa73255cb293aeb137daa891c5ac0f528",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        },
+        {
+          "id": "8a3700bc-b365-4816-9ecf-fdb4f692e304",
+          "phase": "permitext_research_targeted_revision",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/8a3700bc-b365-4816-9ecf-fdb4f692e304-request.json",
+          "requestSHA256": "4d6ce6ff258eadfc956103263482ca54c2e6b6277e09c90a75ce2691f3affdc5",
+          "sourceReferenceCount": 9,
+          "sourceReferences": [
+            {
+              "reference": "FGC 404.7",
+              "sectionID": "8235",
+              "enactedTextSHA256": "4e22231327fc2dda3f65aa033bb0c6e5f7b40aede406c0a7cb10ef1c41c524fb",
+              "enactedTextCharacters": 104
+            }
+          ]
+        },
+        {
+          "id": "2e86d59e-c22b-43ee-a09b-14278fc1f927",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/2e86d59e-c22b-43ee-a09b-14278fc1f927-request.json",
+          "requestSHA256": "545f1dbeed66ba2ba694b9c65b3e7211af7d9aa46645036d59d8527ab65a76f0",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:20:41.722176+00:00"
+    },
+    {
+      "id": "fresh-hold-21-gas-support-1",
+      "familyID": "gas-piping-support-independence",
+      "questionSHA256": "dd7c70ab97ce02658f1baf9458548ccba2b19c7c9caac814a21b69794c01137b",
+      "question": "For a new NYC fuel-gas installation under the 2022 codes, can the gas pipe be supported by another plumbing pipe?",
+      "frozenKeySHA256": "02396f52ba7dd69b311174ae3dca7752b4f7e7c79fedff95058f942d5db4d647",
+      "finalOutputSHA256": "6cac9014ea6cced2f806c68a2fdfb393a6954c42b00d9957a5ca4d945ff72e08",
+      "answerTextSHA256": "4ef94ec452743db16b99d31f26cf47038320beb79b77a2cb74d2883641640a22",
+      "answerText": "**The supplied 2022 code text does not establish whether fuel-gas pipe may be supported by another plumbing pipe.** It assigns fuel-gas piping installation to the NYC Fuel Gas Code (PC \u00a7 101.2), but the packet does not include a gas-pipe support rule that resolves this specific arrangement. PC \u00a7 308.1 addresses support of plumbing piping, not whether plumbing piping may support gas piping. So this packet supports neither a yes nor a no.",
+      "httpStatus": 200,
+      "seconds": 9.931858415999974,
+      "grade": "withheld",
+      "reason": "Answerable gas-support restriction is not explained. Final answer correctly says supplied plumbing support text cannot establish a gas-pipe conclusion, but the necessary FGC407.2 rule exists in the frozen library. This is an unnecessary nonanswer due to missing governing evidence.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 407.2"
+      ],
+      "decisiveReferences": [
+        "FGC 407.2"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "11730",
+          "sectionNumber": "101.2",
+          "title": "101.2 Scope.",
+          "codePrefix": "PC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11730-6"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:11730-6",
+              "selectedText": "101.2 101.2 Scope. The provisions of this code shall apply to the erection, installation, alteration, repair, relocation, replacement, addition to, use or maintenance of plumbing systems. This code shall also regulate nonflammable medical and nonmedical gas, nonmedical oxygen systems, and sanitary and condensate vacuum collection systems. The installation of fuel gas distribution piping and equipment, fuel gas-fired water heaters, and water heater venting systems shall be regulated by the New York City Fuel Gas Code. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes that fuel-gas distribution piping installation is regulated by the Fuel Gas Code."
+        },
+        {
+          "sectionID": "11853",
+          "sectionNumber": "308.1",
+          "title": "308.1 General.",
+          "codePrefix": "PC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11853-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:11853-2",
+              "selectedText": "308.1 308.1 General. Plumbing piping shall be supported in accordance with this section.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Clarifies that the supplied plumbing-piping support provision does not resolve whether plumbing pipe can support fuel-gas pipe."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "a1f0703e-e3b6-4243-8e69-32c357d6e09d",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/a1f0703e-e3b6-4243-8e69-32c357d6e09d-request.json",
+          "requestSHA256": "8d8f4943b6055ebd19efe91afc1f6780dbe98741503948c4fca848291c1f2b5f",
+          "sourceReferenceCount": 8,
+          "sourceReferences": [
+            {
+              "reference": "AC 28-101.5",
+              "sectionID": "8796",
+              "enactedTextSHA256": "20b7acb64c65be0fc42541b890bd065661908c57951deb97056f25bcb5ab5e69",
+              "enactedTextCharacters": 1333
+            },
+            {
+              "reference": "PC 308.1",
+              "sectionID": "11853",
+              "enactedTextSHA256": "ab5ef97847c3a37c82885fd3c34ac04fcbff4b6168f472ed9e72870e874513c8",
+              "enactedTextCharacters": 88
+            },
+            {
+              "reference": "FGC 305.12",
+              "sectionID": "8125",
+              "enactedTextSHA256": "8b02d174788503787befd6b8997c1db5b2c1659267722cd3a56ec1c4f480df85",
+              "enactedTextCharacters": 193
+            },
+            {
+              "reference": "FGC 406.4.5",
+              "sectionID": "8291",
+              "enactedTextSHA256": "a2eba8779a4e21a3545c8dcc1d43c1d6f617af87ad096cb0a9ad6d2dbdc20324",
+              "enactedTextCharacters": 301
+            },
+            {
+              "reference": "FGC 503.6.11",
+              "sectionID": "8507",
+              "enactedTextSHA256": "83c75a309b995cc06b1c49ce8a70b0b32ce6a9af364f80e08db9aefcb340a49b",
+              "enactedTextCharacters": 150
+            },
+            {
+              "reference": "PC 101.2",
+              "sectionID": "11730",
+              "enactedTextSHA256": "a3536d7c2b32982ad0f57b50bed890db6fb12c75c74ecb43b4a343768cc6bbfc",
+              "enactedTextCharacters": 657
+            },
+            {
+              "reference": "AC 28-101.4.2",
+              "sectionID": "8785",
+              "enactedTextSHA256": "f513a682529cf8d399a6be9a6a55ab949d50c61381e615fe288fa99e6b812365",
+              "enactedTextCharacters": 1906
+            },
+            {
+              "reference": "AC 28-104.6",
+              "sectionID": "8930",
+              "enactedTextSHA256": "ae766c854d9ac3afb8d886d0fefac6f72817c29284b739e0dc65526533ce16bf",
+              "enactedTextCharacters": 7896
+            }
+          ]
+        },
+        {
+          "id": "bff00f63-9310-4389-a979-90bba85c0cf3",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/bff00f63-9310-4389-a979-90bba85c0cf3-request.json",
+          "requestSHA256": "41e1f424969870f0dda3df351da50df20df1b5a48d5fcc591e4d4b4f054fd3fd",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": {
+        "subtype": "unnecessary_nonanswer",
+        "stage": "retrieval_or_selection",
+        "expectedRule": "FGC407.2 prohibits support by other piping.",
+        "actualWriterRequestID": "a1f0703e-e3b6-4243-8e69-32c357d6e09d",
+        "expectedRuleInWriterPacket": false,
+        "actualRelevantSources": [
+          "PC308.1",
+          "PC101.2"
+        ],
+        "incidentalFuelGasSources": [
+          "FGC305.12",
+          "FGC406.4.5",
+          "FGC503.6.11"
+        ],
+        "packetObservation": "No FGC407.2 source, section token, or operative 'shall not be supported by other piping' text occurs in the actual writer input. The final refusal follows the packet boundary rather than inventing a wrong gas requirement."
+      },
+      "reviewedAt": "2026-10-03T00:23:04.998754+00:00"
+    },
+    {
+      "id": "fresh-hold-21-gas-support-2",
+      "familyID": "gas-piping-support-independence",
+      "questionSHA256": "194dbfe145e84d4e9fb125c34519a3dd99fb495afe72c189612297d3ef36f204",
+      "question": "May its hangers prevent all free expansion and contraction between the anchors?",
+      "frozenKeySHA256": "8c08827188f73eedc7b01bf7f95ad95340e88c3314d7ca6208481d4eb6b7cc42",
+      "finalOutputSHA256": "c99e559e7a4b7e13b1b7e5b0dc13732c26538646abf6d4ed933222598be10e26",
+      "answerTextSHA256": "54c9863fc3230b912170a77a1f9e11c9a911c195021b142043609e1dcdebf0a4",
+      "answerText": "**The supplied evidence cannot establish whether fuel-gas hangers may prevent all free expansion and contraction between anchors.** The 2022 Plumbing Code assigns fuel-gas piping installation to the New York City Fuel Gas Code (PC \u00a7 101.2); the supplied plumbing-piping support provisions do not resolve this fuel-gas hanger question (PC \u00a7\u00a7 308.1, 308.3). The applicable Fuel Gas Code requirement is not included in the evidence.",
+      "httpStatus": 200,
+      "seconds": 12.15774450000003,
+      "grade": "withheld",
+      "reason": "Follow-up again fails to provide the gas-support expansion/contraction rule. FGC407.2 expressly requires supports/hangers/anchors not to interfere with free expansion and contraction between anchors. The final answer is evidence-limited but unhelpful despite the source being available in the library.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 407.2"
+      ],
+      "decisiveReferences": [
+        "FGC 407.2"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "11730",
+          "sectionNumber": "101.2",
+          "title": "101.2 Scope.",
+          "codePrefix": "PC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11730-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:11730-2",
+              "selectedText": "101.2 101.2 Scope. The provisions of this code shall apply to the erection, installation, alteration, repair, relocation, replacement, addition to, use or maintenance of plumbing systems. This code shall also regulate nonflammable medical and nonmedical gas, nonmedical oxygen systems, and sanitary and condensate vacuum collection systems. The installation of fuel gas distribution piping and equipment, fuel gas-fired water heaters, and water heater venting systems shall be regulated by the New York City Fuel Gas Code. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes that fuel-gas distribution piping installation is regulated by the New York City Fuel Gas Code."
+        },
+        {
+          "sectionID": "11853",
+          "sectionNumber": "308.1",
+          "title": "308.1 General.",
+          "codePrefix": "PC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11853-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:11853-1",
+              "selectedText": "308.1 308.1 General. Plumbing piping shall be supported in accordance with this section.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Limits the general support provision to plumbing piping."
+        },
+        {
+          "sectionID": "11855",
+          "sectionNumber": "308.3",
+          "title": "308.3 Materials.",
+          "codePrefix": "PC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11855-4"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:11855-4",
+              "selectedText": "308.3 308.3 Materials. Hangers, anchors and supports shall support the piping and the contents of the piping. Hangers and strapping material shall be of approved material that will not promote galvanic action.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Addresses support materials and capacity for piping without resolving fuel-gas expansion or contraction."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "0df54bd4-422a-4d3d-bbe8-2134b4ce8735",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/0df54bd4-422a-4d3d-bbe8-2134b4ce8735-request.json",
+          "requestSHA256": "59380c3f3d1dc34fa6bc129bfb7101203d6f768b40462773f1ddec0ba5ea877e",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "PC 308.1",
+              "sectionID": "11853",
+              "enactedTextSHA256": "ab5ef97847c3a37c82885fd3c34ac04fcbff4b6168f472ed9e72870e874513c8",
+              "enactedTextCharacters": 88
+            },
+            {
+              "reference": "PC 101.2",
+              "sectionID": "11730",
+              "enactedTextSHA256": "a3536d7c2b32982ad0f57b50bed890db6fb12c75c74ecb43b4a343768cc6bbfc",
+              "enactedTextCharacters": 657
+            },
+            {
+              "reference": "PC 308.4",
+              "sectionID": "11856",
+              "enactedTextSHA256": "484b842d685ffc71a790d597141b0394c42ea21f340108dbcdabede93e498856",
+              "enactedTextCharacters": 124
+            },
+            {
+              "reference": "PC 308.3",
+              "sectionID": "11855",
+              "enactedTextSHA256": "8fc40edf669a14825db685597080b361340c4b9d9d8d343c22330150e885c221",
+              "enactedTextCharacters": 209
+            },
+            {
+              "reference": "BC 2304.10.3",
+              "sectionID": "4930",
+              "enactedTextSHA256": "007562d7789246552bd18e905a141190a048effcd390c774a01015fa2bed2cd3",
+              "enactedTextCharacters": 364
+            },
+            {
+              "reference": "BC 1705.37",
+              "sectionID": "3871",
+              "enactedTextSHA256": "f3d5b591f7323801dc99166e86a2011d1aacf26f70461e786659f31231ca6e2b",
+              "enactedTextCharacters": 1505
+            },
+            {
+              "reference": "BC 202",
+              "sectionID": "113",
+              "enactedTextSHA256": "60454608596a15ce764021428749c6fcabcac40bc5489a9a57d41df06c39e409",
+              "enactedTextCharacters": 8497
+            }
+          ]
+        },
+        {
+          "id": "703ed2d7-8231-48cb-a04b-1471844cf1b7",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/703ed2d7-8231-48cb-a04b-1471844cf1b7-request.json",
+          "requestSHA256": "6a913efef9f8c866835f0acab6408dafcee32f01c5ddbf1294274dc1d7908c88",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": {
+        "subtype": "unnecessary_nonanswer",
+        "stage": "retrieval_and_authority_continuity",
+        "expectedRule": "FGC407.2 requires free expansion/contraction between anchors.",
+        "actualWriterRequestID": "0df54bd4-422a-4d3d-bbe8-2134b4ce8735",
+        "expectedRuleInWriterPacket": false,
+        "actualRelevantSources": [
+          "PC308.1",
+          "PC101.2",
+          "PC308.4",
+          "PC308.3"
+        ],
+        "packetObservation": "Writer input has plumbing-support sources and incidental BC sources; FGC407.2 and its free-expansion requirement are absent. Earlier cited plumbing scope/support evidence is carried forward without recovering the Fuel Gas Code requirement."
+      },
+      "reviewedAt": "2026-10-03T00:23:05.000793+00:00"
+    },
+    {
+      "id": "fresh-hold-22-louvers-1",
+      "familyID": "gas-combustion-air-louver-free-area",
+      "questionSHA256": "b5e0e87d90951b2f73db72d9dc94d17979eebb26149f1f63b6b2e80d4a8d475b",
+      "question": "For combustion-air openings serving gas appliances in a new NYC building under the 2022 codes, the metal-louver manufacturer gives no free-area data. What free area should be assumed for a 200-square-inch gross opening?",
+      "frozenKeySHA256": "7988963fbe58c93b039676f698aecc104d94af8fe2e866c45915ba435487387b",
+      "finalOutputSHA256": "2c5410018adec319d13b4aeebfa6553ae7e52d108a6eb232c949fab3fd2f0a2f",
+      "answerTextSHA256": "b28e6344a5a183d85e562e8f8c7ee5fbc51b224a30e4032e057334402c1d0cc2",
+      "answerText": "Assuming the 200-square-inch gross opening is covered by a metal louver and the manufacturer provides no free-area data, use **120 square inches of net free area** (200 \u00d7 60%). The 2022 NYC codes deem metal-louver openings to have 60% net free area when manufacturer information is absent (FGC \u00a7 304.10; MC \u00a7 709.1). Louvers and grilles must be fixed open, except operable louvers may be used with the specified appliance interlocks and shutdown protection.",
+      "httpStatus": 200,
+      "seconds": 10.04340625,
+      "grade": "correct",
+      "reason": "Correct NYC metal-louver default of60-percent free area, computes200x0.60=120square inches, and accurately retains fixed-open/interlocked-louver exception. FGC304.10 is cited; MC709.1 is a parallel provision.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 304.10"
+      ],
+      "decisiveReferences": [
+        "FGC 304.10"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8106",
+          "sectionNumber": "304.10",
+          "title": "304.10 Opening obstructions locations, and protection.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8106-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8106-1",
+              "selectedText": "304.10 304.10 Opening obstructions locations, and protection. The required size of openings for combustion, ventilation, and dilution air shall be based on the net free area of each opening. The net free area of an opening shall be that specified by the manufacturer of the opening covering. In the absence of such information, openings covered with metal louvers shall be deemed to have a net free area of 60 percent of the area of the opening, and openings covered with wood louvers shall be deemed to have a net free area of 10 percent of the area of the opening. Louvers and grilles shall be fixed in the open position. Exception: Operable louvers shall be interlocked with the appliance so that they are proven to be in the full open position prior to main burner ignition and during main burner operation. Means shall be provided to prevent the main burner from igniting if the louvers fail to open during burner startup and to shut down the main burner if the louvers close during operation.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes the 60% default for metal-louver openings without manufacturer free-area information, and the louver position rule and exception."
+        },
+        {
+          "sectionID": "10934",
+          "sectionNumber": "709.1",
+          "title": "709.1 General.",
+          "codePrefix": "MC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10934-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:10934-2",
+              "selectedText": "709.1 709.1 General. The required size of openings for combustion, ventilation, and dilution air shall be based on the net free area of each opening. The net free area of an opening shall be that specified by the manufacturer of the opening covering. In the absence of such information, openings covered with metal louvers shall be deemed to have a net free area of 60 percent of the area of the opening, and openings covered with wood louvers shall be deemed to have a net free area of 10 percent of the area of the opening. Louvers and grills shall be fixed in the open position. Exception: Operable louvers shall be interlocked with the appliance so that they are proven to be in the full open position prior to main burner ignition and during main burner operation. Means shall be provided to prevent the main burner from igniting if the louvers fail to open during burner startup and to shut down the main burner if the louvers close during operation.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes the 60% default for metal-louver openings without manufacturer free-area information, and the louver position rule and exception."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "fa43860d-e394-4b65-ba1a-9e747b35be17",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/fa43860d-e394-4b65-ba1a-9e747b35be17-request.json",
+          "requestSHA256": "69be5c6721895c7d9b2e7f2ca1329366b20fa01b481392a6d8d762ef25708c7f",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FGC 304.10",
+              "sectionID": "8106",
+              "enactedTextSHA256": "ef8ddee38c5d528525952eab71f9becaeccd3144a9ced0c6cd4fd4aa9ed7105a",
+              "enactedTextCharacters": 998
+            }
+          ]
+        },
+        {
+          "id": "bfbebd1f-2b20-47b5-92b4-9198c2eb30a8",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/bfbebd1f-2b20-47b5-92b4-9198c2eb30a8-request.json",
+          "requestSHA256": "2ff546a145a37801ae462ec9c6fa9dccdd1f3f7afc57ff9c2ee7ee5aee9f566f",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:23:05.002928+00:00"
+    },
+    {
+      "id": "fresh-hold-22-louvers-2",
+      "familyID": "gas-combustion-air-louver-free-area",
+      "questionSHA256": "62d92b6ce6b511e990d6eeea6a9d58f910e6376e22c278560d1d873eca471ca8",
+      "question": "If the same-size opening has wood louvers with no manufacturer data, what net free area should be assumed?",
+      "frozenKeySHA256": "3f0c013e3c1adfa21893148dd5b96a1640d328aa5232f532dd5f07b18b2a744e",
+      "finalOutputSHA256": "f228e31129fc1a5adf538d9579b8fae22074174ca757350c97c9250a081b6459",
+      "answerTextSHA256": "e57f861cf876c57a251a3685bdfda74da78d358f0ddcde2ebfe03f10071cf6cf",
+      "answerText": "Assuming the wood louver covers the same 200-square-inch gross opening and no manufacturer free-area data is available, use **10% of the opening\u2019s area, or 20 square inches net free area** (200 \u00d7 10%; MC \u00a7 709.1; FGC \u00a7 304.10). The opening must be fixed open; an operable louver is allowed only with the specified appliance interlocks and burner protections.",
+      "httpStatus": 200,
+      "seconds": 15.16710129099997,
+      "grade": "correct",
+      "reason": "Final answer preserves gross area200square inches and correctly computes wood-louver default10-percent=20square inches. Verifier repaired first-draft omission of requested numerical value.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "missed_material_conclusion",
+                "detail": "The answer gives the 10% rule but omits the requested net-free-area value for the same 200-square-inch gross opening established in the conversation: 200 \u00d7 10% = 20 square inches. MC \u00a7 709.1 and FGC \u00a7 304.10 support that calculation."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 304.10"
+      ],
+      "decisiveReferences": [
+        "FGC 304.10"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "10934",
+          "sectionNumber": "709.1",
+          "title": "709.1 General.",
+          "codePrefix": "MC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10934-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:10934-1",
+              "selectedText": "709.1 709.1 General. The required size of openings for combustion, ventilation, and dilution air shall be based on the net free area of each opening. The net free area of an opening shall be that specified by the manufacturer of the opening covering. In the absence of such information, openings covered with metal louvers shall be deemed to have a net free area of 60 percent of the area of the opening, and openings covered with wood louvers shall be deemed to have a net free area of 10 percent of the area of the opening. Louvers and grills shall be fixed in the open position. Exception: Operable louvers shall be interlocked with the appliance so that they are proven to be in the full open position prior to main burner ignition and during main burner operation. Means shall be provided to prevent the main burner from igniting if the louvers fail to open during burner startup and to shut down the main burner if the louvers close during operation.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Both supplied provisions establish the default net-free-area percentage for wood-louver-covered openings and the fixed-open rule and exception."
+        },
+        {
+          "sectionID": "8106",
+          "sectionNumber": "304.10",
+          "title": "304.10 Opening obstructions locations, and protection.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8106-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8106-2",
+              "selectedText": "304.10 304.10 Opening obstructions locations, and protection. The required size of openings for combustion, ventilation, and dilution air shall be based on the net free area of each opening. The net free area of an opening shall be that specified by the manufacturer of the opening covering. In the absence of such information, openings covered with metal louvers shall be deemed to have a net free area of 60 percent of the area of the opening, and openings covered with wood louvers shall be deemed to have a net free area of 10 percent of the area of the opening. Louvers and grilles shall be fixed in the open position. Exception: Operable louvers shall be interlocked with the appliance so that they are proven to be in the full open position prior to main burner ignition and during main burner operation. Means shall be provided to prevent the main burner from igniting if the louvers fail to open during burner startup and to shut down the main burner if the louvers close during operation.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Both supplied provisions establish the default net-free-area percentage for wood-louver-covered openings and the fixed-open rule and exception."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "fb30e9d0-fcc6-4fb3-bbc1-b73bd5d5ebb2",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/fb30e9d0-fcc6-4fb3-bbc1-b73bd5d5ebb2-request.json",
+          "requestSHA256": "e078f7a8847d31a304cd93d7742e7344d5b7eef04879d5cc2454e0cf78eb64a7",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FGC 304.10",
+              "sectionID": "8106",
+              "enactedTextSHA256": "ef8ddee38c5d528525952eab71f9becaeccd3144a9ced0c6cd4fd4aa9ed7105a",
+              "enactedTextCharacters": 998
+            }
+          ]
+        },
+        {
+          "id": "9f1dc702-0b4b-46af-a406-ccb735ca1eae",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/9f1dc702-0b4b-46af-a406-ccb735ca1eae-request.json",
+          "requestSHA256": "e8b40e678916ff7636dc96fb2ec0fb26c32dcfa59053eab31b1cb4d8a4352bcd",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        },
+        {
+          "id": "125df36b-caa5-450e-9d9d-ed86cfcd327a",
+          "phase": "permitext_research_targeted_revision",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/125df36b-caa5-450e-9d9d-ed86cfcd327a-request.json",
+          "requestSHA256": "3fa1d1083856ddf679e35af087ed57013b1ac318c05af2663e25d8ad21332adf",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FGC 304.10",
+              "sectionID": "8106",
+              "enactedTextSHA256": "ef8ddee38c5d528525952eab71f9becaeccd3144a9ced0c6cd4fd4aa9ed7105a",
+              "enactedTextCharacters": 998
+            }
+          ]
+        },
+        {
+          "id": "1a82f5dd-16b6-44ec-a306-118ccebf5843",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/1a82f5dd-16b6-44ec-a306-118ccebf5843-request.json",
+          "requestSHA256": "6755fd700f5092bfa9b28ef18aaf35a837273451d99c4aa45139bf945dbf1493",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:23:05.006421+00:00"
+    },
+    {
+      "id": "fresh-hold-23-ignition-1",
+      "familyID": "garage-gas-appliance-ignition-height",
+      "questionSHA256": "fbbae12bc02b5f30c1c945f6ffac84bf9ac2bdff1e5c2a157ad69e91ae6ee347",
+      "question": "For a gas appliance in a NYC garage under the 2022 codes, is an ignition source 12 inches above the floor sufficient if the appliance is not listed as flammable-vapor-ignition-resistant?",
+      "frozenKeySHA256": "7e3a2c787269065e0f885df87dd8a3daa3b0d8df872b1ed96b87d14920ed8294",
+      "finalOutputSHA256": "1df1b8a314986d6fda0d83301cb7a8f7eaf601c20caf9aac9e6a9e614febd409",
+      "answerTextSHA256": "e54551b20b3c983e4dbfaa658fecb1a8e6b256d56ddd9cb0e4510cc48b59c5d4",
+      "answerText": "No. For equipment or an appliance with an ignition source in a private, public, repair, or parking garage, the 2022 NYC Fuel Gas Code requires the ignition source to be at least 18 inches above the floor. The exception removes that elevation requirement only for appliances listed as flammable-vapor-ignition-resistant; on the stated premise that this appliance is not so listed, 12 inches is insufficient (FGC \u00a7 305.3). The Mechanical Code states the same 18-inch minimum and listing-based exception (MC \u00a7 304.3).",
+      "httpStatus": 200,
+      "seconds": 9.471328500000004,
+      "grade": "correct",
+      "reason": "Correct18-inch garage ignition-source minimum and rejection of12inches for appliance not listed FVIR. Cites FGC305.3 and parallel MC304.3; states listing exception accurately.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 305.3"
+      ],
+      "decisiveReferences": [
+        "FGC 305.3"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8114",
+          "sectionNumber": "305.3",
+          "title": "305.3 Elevation of ignition source.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8114-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8114-1",
+              "selectedText": "305.3 305.3 Elevation of ignition source. Equipment and appliances having an ignition source shall be elevated such that the source of ignition is not less than 18 inches (457.2 mm) above the floor in hazardous locations and public garages, private garages, repair garages, motor fuel-dispensing facilities and parking garages. For the purpose of this section, rooms or spaces that are not part of the living space of a dwelling unit and that communicate directly with a private garage through openings shall be considered to be part of the private garage. Exception: Elevation of the ignition source is not required for appliances that are listed as flammable vapor ignition resistant.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes the 18-inch minimum in garages and the listing-based exception under 2022 NYC FGC \u00a7 305.3."
+        },
+        {
+          "sectionID": "10328",
+          "sectionNumber": "304.3",
+          "title": "304.3 Elevation of ignition source.",
+          "codePrefix": "MC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10328-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:10328-2",
+              "selectedText": "304.3 304.3 Elevation of ignition source. Equipment and appliances having an ignition source and located in hazardous locations and public garages, private garages, repair garages, automotive motor fuel-dispensing facilities and parking garages shall be elevated such that the source of ignition is not less than 18 inches (457.2 mm) above the floor surface on which the equipment or appliance rests. For the purpose of this section, rooms or spaces that are not part of the living space of a dwelling unit and that communicate directly with a private garage through openings shall be considered to be part of the private garage. Exception: Elevation of the ignition source is not required for appliances that are listed as flammable vapor ignition resistant.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Confirms the 18-inch minimum and listing-based exception under 2022 NYC MC \u00a7 304.3."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "f90cb257-36ed-4d33-8e2a-d9a8d80030fc",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/f90cb257-36ed-4d33-8e2a-d9a8d80030fc-request.json",
+          "requestSHA256": "25eef7599a32647537a610b18a35791f41dc1e234e9c64d9267b07c01db82c0e",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FGC 305.3",
+              "sectionID": "8114",
+              "enactedTextSHA256": "0252bc6702210a6332a54319627c7992bf8c71b116dd4d4be9c0fd8b0c126430",
+              "enactedTextCharacters": 686
+            }
+          ]
+        },
+        {
+          "id": "78f86595-7eb8-499e-95aa-4050c0ec20fd",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/78f86595-7eb8-499e-95aa-4050c0ec20fd-request.json",
+          "requestSHA256": "70956fa16e7700a745bb62e640e53506f033698762bd697324a76843a294eca7",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:23:05.008446+00:00"
+    },
+    {
+      "id": "fresh-hold-23-ignition-2",
+      "familyID": "garage-gas-appliance-ignition-height",
+      "questionSHA256": "3368f16f8a9f9c98faf644960bc6365152986f572e751c6ffb39497875a674fb",
+      "question": "If the appliance is listed as flammable-vapor-ignition-resistant, does that specific elevation requirement still apply?",
+      "frozenKeySHA256": "ef5d9d942d09376921f0885bef43d723245d5ad56c581270bc39c9e2165be04a",
+      "finalOutputSHA256": "29a5a4cbb13fdfb3a76912655a3b1413a0614d34f72d370b6f8d3e6cb26e5a7a",
+      "answerTextSHA256": "889054d2821327a6d86e4a7dac434ba4f136255af11c2803c855a848cd9df17e",
+      "answerText": "No. If the appliance is listed as flammable-vapor-ignition-resistant, the 18-inch elevation requirement does not apply. Both the Fuel Gas Code and Mechanical Code state this exception (FGC \u00a7 305.3; MC \u00a7 304.3).",
+      "httpStatus": 200,
+      "seconds": 16.63945545800001,
+      "grade": "correct",
+      "reason": "Final answer applies updated FVIR-listed premise and correctly removes specific18-inch elevation requirement under explicit exception. Verifier repaired first-draft persistence of prior not-listed premise.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "missed_premise_contradiction",
+                "detail": "The answer applies the prior scenario\u2019s premise that the appliance is not listed, but the current question asks what happens if it is listed as flammable-vapor-ignition-resistant. Both FGC \u00a7 305.3 and MC \u00a7 304.3 expressly state that elevation is not required for appliances with that listing. Answer the current conditional premise: the 18-inch elevation requirement does not apply under that exception."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 305.3"
+      ],
+      "decisiveReferences": [
+        "FGC 305.3"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8114",
+          "sectionNumber": "305.3",
+          "title": "305.3 Elevation of ignition source.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8114-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8114-1",
+              "selectedText": "305.3 305.3 Elevation of ignition source. Equipment and appliances having an ignition source shall be elevated such that the source of ignition is not less than 18 inches (457.2 mm) above the floor in hazardous locations and public garages, private garages, repair garages, motor fuel-dispensing facilities and parking garages. For the purpose of this section, rooms or spaces that are not part of the living space of a dwelling unit and that communicate directly with a private garage through openings shall be considered to be part of the private garage. Exception: Elevation of the ignition source is not required for appliances that are listed as flammable vapor ignition resistant.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Both governing provisions establish the 18-inch minimum and the exception for listed flammable-vapor-ignition-resistant appliances."
+        },
+        {
+          "sectionID": "10328",
+          "sectionNumber": "304.3",
+          "title": "304.3 Elevation of ignition source.",
+          "codePrefix": "MC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10328-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:10328-2",
+              "selectedText": "304.3 304.3 Elevation of ignition source. Equipment and appliances having an ignition source and located in hazardous locations and public garages, private garages, repair garages, automotive motor fuel-dispensing facilities and parking garages shall be elevated such that the source of ignition is not less than 18 inches (457.2 mm) above the floor surface on which the equipment or appliance rests. For the purpose of this section, rooms or spaces that are not part of the living space of a dwelling unit and that communicate directly with a private garage through openings shall be considered to be part of the private garage. Exception: Elevation of the ignition source is not required for appliances that are listed as flammable vapor ignition resistant.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Both governing provisions establish the 18-inch minimum and the exception for listed flammable-vapor-ignition-resistant appliances."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "5c75c3f3-df3e-4868-927d-f3429b7f2a9b",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/5c75c3f3-df3e-4868-927d-f3429b7f2a9b-request.json",
+          "requestSHA256": "39fe39ae5ce57c3e3bb187e8eef3db5d336a5732292d40adec66c02a7ab19faf",
+          "sourceReferenceCount": 5,
+          "sourceReferences": [
+            {
+              "reference": "FGC 305.3",
+              "sectionID": "8114",
+              "enactedTextSHA256": "0252bc6702210a6332a54319627c7992bf8c71b116dd4d4be9c0fd8b0c126430",
+              "enactedTextCharacters": 686
+            }
+          ]
+        },
+        {
+          "id": "0b4370f5-4fd0-4781-9997-2ad0cbfa5412",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/0b4370f5-4fd0-4781-9997-2ad0cbfa5412-request.json",
+          "requestSHA256": "5c5eb1ddc46ff285a3a3cdda1faed306fcc5146692a1b5eff41df56646f150e0",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        },
+        {
+          "id": "aa33038c-c08f-4726-92b8-a95d6bc3d2ce",
+          "phase": "permitext_research_targeted_revision",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/aa33038c-c08f-4726-92b8-a95d6bc3d2ce-request.json",
+          "requestSHA256": "6d592ad42bb4f16ee0ecdbb9afbaed5643fdf470ba8c919a70eb31af2b85abe7",
+          "sourceReferenceCount": 5,
+          "sourceReferences": [
+            {
+              "reference": "FGC 305.3",
+              "sectionID": "8114",
+              "enactedTextSHA256": "0252bc6702210a6332a54319627c7992bf8c71b116dd4d4be9c0fd8b0c126430",
+              "enactedTextCharacters": 686
+            }
+          ]
+        },
+        {
+          "id": "398b516b-1ba0-4599-a279-48e1530bb96f",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/398b516b-1ba0-4599-a279-48e1530bb96f-request.json",
+          "requestSHA256": "4ce6943290f225ab4fbb371dc36082d7495d3f04c8547796dea06b33b35b9714",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:23:05.012519+00:00"
+    },
+    {
+      "id": "fresh-hold-24-regulator-1",
+      "familyID": "gas-pressure-regulator-vent",
+      "questionSHA256": "c396126c9ee7d91d11e6bf55c2e9d58fc72d286eb26e93ab89670def07bbf224",
+      "question": "For a gas-pressure regulator in a new NYC building under the 2022 codes that requires an outdoor vent and has no approved vent-limiting device, may its terminal be only 12 inches above grade?",
+      "frozenKeySHA256": "2c45506ccf8bb0fb0ee36092e31621cfab3dfae7d3aaabb034cbe7e9758b7bfc",
+      "finalOutputSHA256": "57195f7a5e48193be670b20e7b4e313ce294b89f07b63fe8765cc410cc4e87cc",
+      "answerTextSHA256": "2ef813d5d2b45fe97627129871efdabcdac3544e9ae9e7cdcda60a6a68b92820",
+      "answerText": "**No.** Under the 2022 NYC Fuel Gas Code, a pressure regulator that requires a vent must vent directly outdoors, and its terminal must be at least **18 inches above grade**\u2014so 12 inches is insufficient. The terminal also must not be under a building opening or overhang and must be installed to prevent water and insect entry (FGC \u00a7 410.3). The exception removes the outdoor-vent requirement only for a regulator equipped with and labeled for use with an approved vent-limiting device; the stated facts exclude that exception.",
+      "httpStatus": 200,
+      "seconds": 18.883518875000068,
+      "grade": "correct",
+      "reason": "Correctly rejects12-inch vent-terminal height, states18-inch minimum plus outdoor placement/no-opening-or-overhang/water-insect protection, and recognizes stated absence of vent-limiting exception.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 410.3"
+      ],
+      "decisiveReferences": [
+        "FGC 410.3"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8344",
+          "sectionNumber": "410.3",
+          "title": "410.3 Venting of regulators.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8344-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8344-2",
+              "selectedText": "410.3 410.3 Venting of regulators. Pressure regulators that require a vent shall be vented directly to the outdoors. The vent terminal shall be a minimum of 18 inches (457.2 mm) above grade, not under a building-opening or overhang, and shall be installed so as to prevent the entrance of water and insects. Exception: A vent to the outdoors is not required for regulators equipped with and labeled for utilization with an approved vent-limiting device installed in accordance with ANSI Z21.18 and the manufacturer's instructions. The vent-limiting device shall be installed in a location sufficiently ventilated to dissipate any gas discharged from the device.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Directly establishes the regulator vent terminal's 18-inch minimum, placement and installation requirements, and the vent-limiting-device exception."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "9824ac8c-5597-4e8f-b5cf-21c4a444c783",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/9824ac8c-5597-4e8f-b5cf-21c4a444c783-request.json",
+          "requestSHA256": "0da2aaa3f8bd249e11b62160489e66b197b8eaa947461ed36cf5cfa2e370e101",
+          "sourceReferenceCount": 16,
+          "sourceReferences": [
+            {
+              "reference": "FGC 410.3",
+              "sectionID": "8344",
+              "enactedTextSHA256": "5ea6578a644e55838d0954604fa1bb699df86a2f8b9f85855260301d85aafb7d",
+              "enactedTextCharacters": 661
+            }
+          ]
+        },
+        {
+          "id": "afc19152-1b3b-43d0-b283-1c81dc5b6660",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/afc19152-1b3b-43d0-b283-1c81dc5b6660-request.json",
+          "requestSHA256": "66d12759d48afe1a7f2e2824ea0299277a1f455b21a9444d1187b31287f312b2",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:23:05.014110+00:00"
+    },
+    {
+      "id": "fresh-hold-24-regulator-2",
+      "familyID": "gas-pressure-regulator-vent",
+      "questionSHA256": "181ea3ac722b5d646b9594c47a4e1886d83d68b6609d58d8e1e7a03ade5d0468",
+      "question": "Can an approved vent-limiting device remove the outdoor-vent requirement if the regulator is labeled for it, it is installed to the standard and manufacturer instructions, and the location is sufficiently ventilated?",
+      "frozenKeySHA256": "3194594bcfa8f6c6592f70e2db98ecc94665f87d2d9296742ec7e18171202bda",
+      "finalOutputSHA256": "fa20e7442fdd534941c4c35358d8e6239ab67e3948a975a2a3d6d2f66919d52d",
+      "answerTextSHA256": "b3aac4ede69ca8a5327e5beedfbd19cb5e895ba85ab26d52c8c2403e697e834f",
+      "answerText": "**Yes\u2014conditionally.** FGC \u00a7 410.3 says an outdoor vent is not required for a regulator equipped with and labeled for use with an approved vent-limiting device, **if** the device is installed in accordance with ANSI Z21.18 and the manufacturer\u2019s instructions, and is located where discharged gas can dissipate. The facts you describe meet the stated conditions; the exception removes the outdoor-vent requirement.",
+      "httpStatus": 200,
+      "seconds": 6.8800709999999965,
+      "grade": "correct",
+      "reason": "Correctly applies approved labeled vent-limiting-device exception with ANSI Z21.18, manufacturer installation and sufficiently ventilated location. Confirms supplied facts satisfy this narrow exception.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FGC 410.3"
+      ],
+      "decisiveReferences": [
+        "FGC 410.3"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8344",
+          "sectionNumber": "410.3",
+          "title": "410.3 Venting of regulators.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8344-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8344-1",
+              "selectedText": "410.3 410.3 Venting of regulators. Pressure regulators that require a vent shall be vented directly to the outdoors. The vent terminal shall be a minimum of 18 inches (457.2 mm) above grade, not under a building-opening or overhang, and shall be installed so as to prevent the entrance of water and insects. Exception: A vent to the outdoors is not required for regulators equipped with and labeled for utilization with an approved vent-limiting device installed in accordance with ANSI Z21.18 and the manufacturer's instructions. The vent-limiting device shall be installed in a location sufficiently ventilated to dissipate any gas discharged from the device.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes the outdoor-vent exception and its labeling, installation, and ventilation conditions."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "47c18939-998d-4162-895f-5911b16dfc50",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/47c18939-998d-4162-895f-5911b16dfc50-request.json",
+          "requestSHA256": "aca3f92cc9f8dc0a5ab912fffdd427ef6f5c037aa95aead644afcfa0a7e627ed",
+          "sourceReferenceCount": 8,
+          "sourceReferences": [
+            {
+              "reference": "FGC 410.3",
+              "sectionID": "8344",
+              "enactedTextSHA256": "5ea6578a644e55838d0954604fa1bb699df86a2f8b9f85855260301d85aafb7d",
+              "enactedTextCharacters": 661
+            }
+          ]
+        },
+        {
+          "id": "c436ddae-1600-466a-8ca0-57cfb810883e",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/c436ddae-1600-466a-8ca0-57cfb810883e-request.json",
+          "requestSHA256": "04aa15bfdae4d457d64dc1c46ddb33da88ac50377cdcd55f5b43efc3352108db",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:23:05.015820+00:00"
+    },
+    {
+      "id": "fresh-hold-25-emergency-maint-1",
+      "familyID": "emergency-power-maintenance-records",
+      "questionSHA256": "88ab0620edce92e6081fce006a9c26abf1a3a2c8b0251ba9375453c46d59d95c",
+      "question": "For a NYC emergency power system, is a maintenance log containing only the service date sufficient? What information must be recorded?",
+      "frozenKeySHA256": "2c806fbf98c2be7a0f3b800ed47cb579004f5390ef57c3681f245c6055eeda8a",
+      "finalOutputSHA256": "48863a31607d0c4b0b6b5e06d31fad612885fd47ece846903247a546da85ecd8",
+      "answerTextSHA256": "2dd3c768b05d853237aa5a771edb53c0e976d7eb599513377f339bfae07721fc",
+      "answerText": "**The supplied 2022 NYC Building Code does not establish whether a log containing only the service date is sufficient or what entries a log must contain.** It requires emergency and standby power systems to be maintained and tested in accordance with the NYC Fire Code and NYC Electrical Code (BC \u00a7 2702.3). Those referenced codes\u2019 applicable recordkeeping provisions are not included here, so the required log information\u2014and whether a service date alone meets it\u2014cannot be determined from this evidence.",
+      "httpStatus": 200,
+      "seconds": 13.032315292000073,
+      "grade": "withheld",
+      "reason": "Does not answer required emergency-power maintenance-log fields despite FC604.3.2 available in frozen library. Final response states the governing recordkeeping text is not supplied and gives no entries beyond insufficient date. Necessary source is absent from actual writer input.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 604"
+      ],
+      "decisiveReferences": [
+        "FC 604.3.2"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "5400",
+          "sectionNumber": "2702.3",
+          "title": "2702.3 Maintenance.",
+          "codePrefix": "BC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:5400-6"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:5400-6",
+              "selectedText": "2702.3 2702.3 Maintenance. Emergency and standby power systems shall be maintained and tested in accordance with the New York City Fire Code and New York City Electrical Code .",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes the Building Code\u2019s maintenance-and-testing cross-reference and that this provision does not specify log contents."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "724c2075-fd8c-441c-b489-d81090e406fe",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/724c2075-fd8c-441c-b489-d81090e406fe-request.json",
+          "requestSHA256": "200211014a58b349b9e2e4a787a74f840907cc1a8490ca5ca411d5db7e850065",
+          "sourceReferenceCount": 17,
+          "sourceReferences": [
+            {
+              "reference": "BC 3310.8.4",
+              "sectionID": "6506",
+              "enactedTextSHA256": "dcb0024f7834720efc15644ffafdc11bb369c5022a4074e94db8e1aceb7e2bba",
+              "enactedTextCharacters": 1123
+            },
+            {
+              "reference": "BC 3310.8.4.1",
+              "sectionID": "6507",
+              "enactedTextSHA256": "c554b767b0279d8c312726ac983b9ad96226be3bc35c706177f4871f3cdef65f",
+              "enactedTextCharacters": 815
+            },
+            {
+              "reference": "BC 3301.13.13",
+              "sectionID": "5903",
+              "enactedTextSHA256": "0c6555f4d9ec728d7f13f2d553eaa207d1102d3bce0119faf7377ef9d1546980",
+              "enactedTextCharacters": 3293
+            },
+            {
+              "reference": "AC 28-218.8",
+              "sectionID": "9478",
+              "enactedTextSHA256": "55932c01677d9d27aaf346869b8d2000ee5bc58580f6c0bfc8301562eb524fed",
+              "enactedTextCharacters": 441
+            },
+            {
+              "reference": "AC 28-309.4.2",
+              "sectionID": "9626",
+              "enactedTextSHA256": "cc11c2f1d583caed64dd4602ac58ac2c808f88babaedc7d2d07de74059c09cfc",
+              "enactedTextCharacters": 970
+            },
+            {
+              "reference": "BC 2702.3",
+              "sectionID": "5400",
+              "enactedTextSHA256": "ac898eae353254b13364e3743d780e776205ad62a6ee3ff97a10770d87e707e6",
+              "enactedTextCharacters": 176
+            },
+            {
+              "reference": "AC 28-325.2.2",
+              "sectionID": "9807",
+              "enactedTextSHA256": "9403460aec54ab8c1307a7b01671b91a2246a76672b84e9eaafe52cca39f7e87",
+              "enactedTextCharacters": 368
+            },
+            {
+              "reference": "BC 3310.8.3.4",
+              "sectionID": "6505",
+              "enactedTextSHA256": "6c5d16397e0f4c8158a016ecff486ad043ede3c2358c9f44c6785826562b1481",
+              "enactedTextCharacters": 200
+            },
+            {
+              "reference": "MC 108.2.2.1",
+              "sectionID": "10267",
+              "enactedTextSHA256": "532e35c305f3d6be3b4ce8085deb5c8d15e649a369ad7888419aa41a45868eba",
+              "enactedTextCharacters": 282
+            },
+            {
+              "reference": "BC 1705.25.10",
+              "sectionID": "3838",
+              "enactedTextSHA256": "35a5c734c8c036d5fd0c90900ec12dc9deb899bd330992627bc5f713342c4c14",
+              "enactedTextCharacters": 778
+            },
+            {
+              "reference": "BC 202",
+              "sectionID": "113",
+              "enactedTextSHA256": "d10909d077323cf819952d570398caabd82b8067be01885b172d9a2765951872",
+              "enactedTextCharacters": 1082
+            },
+            {
+              "reference": "BC 3310.8.3",
+              "sectionID": "6501",
+              "enactedTextSHA256": "7a0e73a561da10ed9be522f28d3dd9ed92d7dc897b27bde3051c8bd9c387fda7",
+              "enactedTextCharacters": 143
+            },
+            {
+              "reference": "BC 3310.8.1",
+              "sectionID": "6496",
+              "enactedTextSHA256": "76199c8a7694d06b6ae7167f76ac52d8428e024953e0999a1284afef843ef2e2",
+              "enactedTextCharacters": 287
+            },
+            {
+              "reference": "BC 3310.11",
+              "sectionID": "6516",
+              "enactedTextSHA256": "8ffe8fcdf7d7d09727f48182f88cab533bb00f47e828d859cd62e842dc30aff2",
+              "enactedTextCharacters": 345
+            },
+            {
+              "reference": "BC 3301.13.9",
+              "sectionID": "5899",
+              "enactedTextSHA256": "ebc45f872637893cc9d0cd93df406f169fef04ab1b769bdf8973360723993b4b",
+              "enactedTextCharacters": 1339
+            },
+            {
+              "reference": "BC 3301.13.12",
+              "sectionID": "5902",
+              "enactedTextSHA256": "3d3125391d55ee2011502f3a0e53064a342a3c722b28b68e0a0daf0e4074e349",
+              "enactedTextCharacters": 1662
+            },
+            {
+              "reference": "BC 3301.13.19",
+              "sectionID": "5909",
+              "enactedTextSHA256": "ea5409c0a7c375542a5ef4fad30e6121115ec93380f2f59d3843c3218f7ef877",
+              "enactedTextCharacters": 3950
+            }
+          ]
+        },
+        {
+          "id": "f6a8f693-0e9e-426f-9c5f-080344b11c75",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/f6a8f693-0e9e-426f-9c5f-080344b11c75-request.json",
+          "requestSHA256": "02d7204bbdc70edbfcf4a78f131a40812916850b63615ae4b3e2ea3771191c40",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": {
+        "subtype": "unnecessary_nonanswer",
+        "stage": "retrieval_or_selection",
+        "expectedRule": "FC604.3.2 requires date, technician name, conditions summary, corrective conditions and action.",
+        "actualWriterRequestID": "724c2075-fd8c-441c-b489-d81090e406fe",
+        "expectedRuleInWriterPacket": false,
+        "actualRelevantSources": [
+          "BC2702.3"
+        ],
+        "packetObservation": "No FC604/604.3.2 text supplied. BC2702.3 refers maintenance/testing to Fire and Electrical Codes, while numerous construction-hoist and inspection-report provisions displace the actual emergency-power recordkeeping rule."
+      },
+      "reviewedAt": "2026-10-03T00:25:02.020105+00:00"
+    },
+    {
+      "id": "fresh-hold-25-emergency-maint-2",
+      "familyID": "emergency-power-maintenance-records",
+      "questionSHA256": "3a7e19dda79d600827c6168c3c3174773d10778fb8810ab629f793fc8af154ed",
+      "question": "May the transfer switches be omitted from the maintenance schedule because only the generator needs attention?",
+      "frozenKeySHA256": "0cefeb5ab14b6362f9e1428d37935af529ef6cc8cd52dadcd58c0a567e6de4f6",
+      "finalOutputSHA256": "eb1c51048bc42c8e8882c47cf43bebce5f9ea7f9425edbfba2a5687a92c7a800",
+      "answerTextSHA256": "64be84b36b515d1026d84d5bedc6e7b3f4f6a6af4c3ec5676750dd5d1b0025af",
+      "answerText": "**No\u2014not on the stated reason alone.** The 2022 NYC Building Code requires emergency and standby power systems to be maintained and tested under the NYC Fire Code and Electrical Code, and expressly includes automatic transfer devices among the equipment governed by its emergency-power provisions (BC \u00a7\u00a7 2702.3, 2702.1.7). But the supplied Building Code text does not specify which items must appear on a maintenance schedule, so it does not establish whether these switches may be omitted; the referenced Fire Code and Electrical Code requirements are needed to resolve that point.",
+      "httpStatus": 200,
+      "seconds": 25.93927229200001,
+      "grade": "withheld",
+      "reason": "Headline says No on the stated reason alone, but final answer expressly says whether switches may be omitted from the maintenance schedule cannot be established. That unresolved schedule conclusion is an unnecessary nonanswer rather than the clear requirement in FC604.3.3. Do not credit negative headline alone as a complete source-supported answer.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 604"
+      ],
+      "decisiveReferences": [
+        "FC 604.3.3"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "5400",
+          "sectionNumber": "2702.3",
+          "title": "2702.3 Maintenance.",
+          "codePrefix": "BC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:5400-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:5400-1",
+              "selectedText": "2702.3 2702.3 Maintenance. Emergency and standby power systems shall be maintained and tested in accordance with the New York City Fire Code and New York City Electrical Code .",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes the Building Code requirement to maintain and test emergency and standby power systems under the referenced Fire and Electrical Codes."
+        },
+        {
+          "sectionID": "5370",
+          "sectionNumber": "2702.1.7",
+          "title": "2702.1.7 Automatic transfer devices and power system feeders.",
+          "codePrefix": "BC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:5370-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:5370-2",
+              "selectedText": "2702.1.7 2702.1.7 Automatic transfer devices and power system feeders. Automatic transfer devices, emergency generators and emergency or standby power system feeders shall comply with Sections 2702.1.7.1 through 2702.1.7.2.1.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes that automatic transfer devices are included among equipment governed by the emergency-power provisions."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "03316be0-9e69-4833-a227-c2b33f26d789",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/03316be0-9e69-4833-a227-c2b33f26d789-request.json",
+          "requestSHA256": "b4fc163aaee6d0521da2fadb062585b87c295e85664f60b52c2eab738f18681e",
+          "sourceReferenceCount": 17,
+          "sourceReferences": [
+            {
+              "reference": "BC 2702.3",
+              "sectionID": "5400",
+              "enactedTextSHA256": "ac898eae353254b13364e3743d780e776205ad62a6ee3ff97a10770d87e707e6",
+              "enactedTextCharacters": 176
+            },
+            {
+              "reference": "BC 2702.1.7",
+              "sectionID": "5370",
+              "enactedTextSHA256": "fbc51f9dcb32ae7195a86d4283e1cb4b4593a2c26665e532f0f03d5c9b0f1385",
+              "enactedTextCharacters": 225
+            },
+            {
+              "reference": "PC 1303.16.3",
+              "sectionID": "12861",
+              "enactedTextSHA256": "9c006f85d9dcc4fbb9b58d7ae5ee82ca9e748a6abe41aea16850e350fbd72503",
+              "enactedTextCharacters": 241
+            },
+            {
+              "reference": "PC 1302.13.3",
+              "sectionID": "12813",
+              "enactedTextSHA256": "7cf8ee789ecfa2e5f7a462ea4d34ad290b6041bc628e58117140dc768b7317f8",
+              "enactedTextCharacters": 229
+            },
+            {
+              "reference": "BC K101.1",
+              "sectionID": "7287",
+              "enactedTextSHA256": "33de8736a2609b829e5aa79bc3f47f46cb6cbf8075c4a09ba35e5370f9af6b0f",
+              "enactedTextCharacters": 7854
+            },
+            {
+              "reference": "BC Q106.1",
+              "sectionID": "7827",
+              "enactedTextSHA256": "d8460082d991a9ef0da588f1abd90ce28e30a953c6dbc5fcb586f119449e873c",
+              "enactedTextCharacters": 10608
+            },
+            {
+              "reference": "BC 2702.1.2.3",
+              "sectionID": "5365",
+              "enactedTextSHA256": "21200a31109d5f3c5cf3f6048d8239b2c83a1ddbed4763e837f84f4007c084ee",
+              "enactedTextCharacters": 352
+            },
+            {
+              "reference": "BC K301.1",
+              "sectionID": "7690",
+              "enactedTextSHA256": "4661ae819279d1e85e0cf651a7072e0a10667fbac959c69ae230aef5e0b1e1d6",
+              "enactedTextCharacters": 9438
+            },
+            {
+              "reference": "MC 102.3",
+              "sectionID": "10217",
+              "enactedTextSHA256": "a3b80db3bd9f5118787999a2a14f33ff2ca155cba6f2d49ebacb349d95c322d0",
+              "enactedTextCharacters": 363
+            },
+            {
+              "reference": "PC 102.3",
+              "sectionID": "11737",
+              "enactedTextSHA256": "9ed611c8c2d659e15415aaaf375c75bc91cb53607745a6156dad1fd08e2e2ba1",
+              "enactedTextCharacters": 358
+            },
+            {
+              "reference": "BC 202",
+              "sectionID": "113",
+              "enactedTextSHA256": "ad11ed9120e37e673f0d52a8b9831544e24b89a83f6e2627cea59da1d0691818",
+              "enactedTextCharacters": 1017
+            },
+            {
+              "reference": "BC 2702.1.7.1",
+              "sectionID": "5371",
+              "enactedTextSHA256": "de0a565fbc22bf8c7ade19a545257437e38c6550473386598b9c7645f0058afa",
+              "enactedTextCharacters": 535
+            },
+            {
+              "reference": "BC 408.4",
+              "sectionID": "465",
+              "enactedTextSHA256": "ecd1a27ce6c7db781e0f5d4f7760b4c90153ae1517fe5d8f0984f891c88e0e4a",
+              "enactedTextCharacters": 373
+            },
+            {
+              "reference": "BC 3001.2",
+              "sectionID": "5410",
+              "enactedTextSHA256": "bb40ef38044816c8a974a18b6e89ebfa323b48bb68e4c2e79c429600755d10a7",
+              "enactedTextCharacters": 819
+            },
+            {
+              "reference": "BC 1607.8.1",
+              "sectionID": "3491",
+              "enactedTextSHA256": "8269d784be13ab153cf28615da45fe28761f0b3e8b6c60929b0337be9148b95a",
+              "enactedTextCharacters": 609
+            },
+            {
+              "reference": "BC 3001.4",
+              "sectionID": "5412",
+              "enactedTextSHA256": "1303e03377c7cfc04250a8d0691dabd566ab9f8bb6e1b029064a6d1f52bfc4da",
+              "enactedTextCharacters": 212
+            },
+            {
+              "reference": "BC 3002.5",
+              "sectionID": "5437",
+              "enactedTextSHA256": "f865e1a239ee9548710d6fbf51a05354ac86c626e8e11993e94520be3cb6cc21",
+              "enactedTextCharacters": 3548
+            }
+          ]
+        },
+        {
+          "id": "11a8b95b-b92e-4945-be6a-e081a66f9c1a",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/11a8b95b-b92e-4945-be6a-e081a66f9c1a-request.json",
+          "requestSHA256": "e755dc1c909479a130b03ccba0871e3747dc0cf7f8ff43ad813689940e7f888a",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": {
+        "subtype": "unnecessary_nonanswer_with_partially_correct_headline",
+        "stage": "retrieval_and_authority_continuity",
+        "expectedRule": "FC604.3.3 expressly includes transfer switches in maintenance schedule.",
+        "actualWriterRequestID": "03316be0-9e69-4833-a227-c2b33f26d789",
+        "expectedRuleInWriterPacket": false,
+        "actualRelevantSources": [
+          "BC2702.3",
+          "BC2702.1.7"
+        ],
+        "packetObservation": "No FC604/604.3.3 text supplied. BC sources require general system maintenance/testing and govern automatic transfer device installations, but packet omits Fire Code schedule inclusion, dust/contact inspection and replacement rule. Final prose declares schedule question unresolved."
+      },
+      "reviewedAt": "2026-10-03T00:25:02.023401+00:00"
+    },
+    {
+      "id": "fresh-hold-26-cords-1",
+      "familyID": "extension-cord-use",
+      "questionSHA256": "0b3f8c2df4ae3e914061ef33ba5eddb9db895a10aa3f30285836ea8c47cdd415",
+      "question": "In a NYC office, may extension cords run beneath doorways and be used as the permanent wiring supply for office equipment?",
+      "frozenKeySHA256": "79f7cba7e2b893fcbfe1631ca170831d2719badc317749022b10ad4b5a4c53bd",
+      "finalOutputSHA256": "3a02ef17763d886c1f0eb4a595c363d3b8ecaf9966a10eb1337f44e09bca1be3",
+      "answerTextSHA256": "12cacec1a4e61552ac8d17af1fe460dd914eea04e247b3cef92f2e7970e79e0d",
+      "answerText": "**No.** Under the supplied current-consolidated 2022 NYC Fire Code, extension cords cannot be used as permanent wiring, run under doors, or used for anything other than portable devices. Thus they cannot serve as permanent power supplies for office equipment; the supplied text does not establish whether particular equipment qualifies as a portable device. (FC \u00a7 605.5)",
+      "httpStatus": 200,
+      "seconds": 9.608722042000037,
+      "grade": "correct",
+      "reason": "Correctly rejects permanent-wiring use and under-door routing under FC605.5. Extra note about unknown equipment portability is unnecessary to resolve the prohibited proposed arrangement but does not change the supported No conclusion.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 605"
+      ],
+      "decisiveReferences": [
+        "FC 605.5"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004739",
+          "sectionNumber": "605",
+          "title": "FC 605: Electrical Equipment, Wiring and Hazards",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004739-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004739-1",
+              "selectedText": "605.2 Illumination.\n\nIllumination shall be provided for service equipment areas, motor control centers and electrical panelboards.\n\n605.5 Extension cords.\n\nExtension cords and flexible cords shall not be a substitute for permanent wiring. Extension cords and flexible cords shall not be affixed to buildings or structures, extended through walls, ceilings or floors, or under doors or floor coverings, nor shall such cords be subject to environmental damage or physical impact. Extension cords shall be used only with portable devices.\n\n605.5.1 Power supply.\n\nExtension cords shall be plugged directly into an approved receptacle, power tap or multiplug adapter and, except for approved multiplug extension cords, shall serve only one portable device.\n\n605.5.2 Ampacity.\n\nThe ampacity of the extension cords shall not be less than the rated capacity of the portable appliance supplied by the cord.\n\n605.5.4 Grounding.\n\nExtension cords shall be grounded when serving grounded portable devices.\n\n605.10 Portable electric space heaters.\n\nThe use of portable electric space heaters shall be in accordance with this section.\n\n605.10.2 Power supply.\n\nPortable electric space heaters shall be plugged directly into a receptacle. Extension cords shall not be used for electrical connections for portable electric space heaters.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Supplies the prohibition on substituting extension cords for permanent wiring and running them under doors, and limits extension-cord use to portable devices."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "6b2a8d38-ae4a-4f4c-836d-6dc83657059b",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/6b2a8d38-ae4a-4f4c-836d-6dc83657059b-request.json",
+          "requestSHA256": "df4107195b2e2d15cf3a271505508f2faaa0a509aef3bd5c3c63a4d77c84386c",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FC 605",
+              "sectionID": "31004739",
+              "enactedTextSHA256": "36c4f81a83acd0786341e900eb7815e8100061046f19ad471f18833fb075d573",
+              "enactedTextCharacters": 1319
+            }
+          ]
+        },
+        {
+          "id": "d4f03948-d5ad-4406-aba1-40a1f6817157",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/d4f03948-d5ad-4406-aba1-40a1f6817157-request.json",
+          "requestSHA256": "678fbecaf539a1066186ca56b45778993a8cf477ab5fa9dab6d39feb688cd2a8",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:25:02.025620+00:00"
+    },
+    {
+      "id": "fresh-hold-26-cords-2",
+      "familyID": "extension-cord-use",
+      "questionSHA256": "182ee1065f8f48e33772db48864ebd0f143fe21d5ff731a9aea95d344e1ef7bd",
+      "question": "For a portable electric space heater, may we use an extension cord of sufficient ampacity instead of plugging the heater directly into a receptacle?",
+      "frozenKeySHA256": "409ae5cc273dca36b12aada7d939a75ee46e651972cb1336204b7699083eeb3c",
+      "finalOutputSHA256": "c7458865d9e7e66a0364a1a006faec9c9eb8c2bbdb486bdbe1279d4d76a4a25b",
+      "answerTextSHA256": "82c2b0b31a09a381acc1a8eae42e28d4ba84b67d5c086ce278110ae80142dc3b",
+      "answerText": "No. The 2022 NYC Fire Code requires portable electric space heaters to be plugged directly into a receptacle and expressly prohibits using extension cords for their electrical connections; sufficient cord ampacity does not create an exception (FC \u00a7 605.10.2).",
+      "httpStatus": 200,
+      "seconds": 6.21691091700003,
+      "grade": "correct",
+      "reason": "Correctly requires portable electric heater direct receptacle connection and prohibits extension cords regardless of adequate ampacity under FC605.10.2.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 605"
+      ],
+      "decisiveReferences": [
+        "FC 605.10.2"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004739",
+          "sectionNumber": "605",
+          "title": "FC 605: Electrical Equipment, Wiring and Hazards",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004739-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004739-1",
+              "selectedText": "605.10 Portable electric space heaters.\n\nThe use of portable electric space heaters shall be in accordance with this section.\n\n605.10.1 Listed and labeled.\n\nPortable electric space heaters shall be listed and labeled. Portable electric space heaters shall be operated only in locations for which they are listed.\n\n605.10.2 Power supply.\n\nPortable electric space heaters shall be plugged directly into a receptacle. Extension cords shall not be used for electrical connections for portable electric space heaters.\n\n605.10.3 Prohibited use.\n\nIt shall be unlawful to use portable electric space heaters in the following locations:\n\n1.In any building or occupancy, where the power requirements for the portable electric space heater exceed the rating of the electrical circuit or receptacle from which the heater will draw current.\n\n2.In any occupancy, within 3 feet (914 mm) of any combustible material.\n\n3.In Group I-2 occupancies, except that a portable electric space heater with a heating element designed not to exceed a temperature of 212\u00b0F (100\u00b0C) may be used in nonsleeping staff and employee areas.\n\n4.In Group R-1 college and university dormitories.\n\n5.In any location considered to be a hazardous location in accordance with the Electrical Code, unless listed for such use.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes the direct-plug requirement and prohibition on extension cords for portable electric space heaters."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "602a41a2-c09c-4df3-a2e5-b1206ee284ee",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/602a41a2-c09c-4df3-a2e5-b1206ee284ee-request.json",
+          "requestSHA256": "c6fb4f97a5c469ae029830efe8a44c68acaf2f4d828a8fa1fc9a7c0912efc3bb",
+          "sourceReferenceCount": 8,
+          "sourceReferences": [
+            {
+              "reference": "FC 605",
+              "sectionID": "31004739",
+              "enactedTextSHA256": "c1eec40c7fbf3f42baf65ecdf409537292e177d1dea0df2c0e664b9d21881e26",
+              "enactedTextCharacters": 1281
+            }
+          ]
+        },
+        {
+          "id": "4cdf8f08-452c-4636-8612-80a2c30023fd",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/4cdf8f08-452c-4636-8612-80a2c30023fd-request.json",
+          "requestSHA256": "ea05e2caadbc8d8fc73b0eaa7165cdcf95ea55adadbc52f97883faf065a52b6c",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:25:02.027920+00:00"
+    },
+    {
+      "id": "fresh-hold-27-fryer-1",
+      "familyID": "commercial-deep-fryer-separation",
+      "questionSHA256": "f44236cc40de42b4094d1a5ccc5e184195164d7782b79c1b1e90367f852bcd96",
+      "question": "In a NYC commercial kitchen, may a deep-fat fryer be only 8 inches from an adjacent open-flame cooking appliance with no separating baffle?",
+      "frozenKeySHA256": "af489d29474a19b1b97cae08b44a3240d614ccb330f6673cb35a6cd3cc87dff9",
+      "finalOutputSHA256": "a70c09290984ff9f389b9bfebb36e52bc8f6611c25970dab466989a8e088a48e",
+      "answerTextSHA256": "52d517fb063c73e4b274de2e4bbb58140296929e2a6ab72d339dd59cd154fc0e",
+      "answerText": "**The supplied text does not establish whether 8 inches with no baffle is permitted.** It requires permanently installed cooking appliances, including fryers, to be installed in accordance with the manufacturer\u2019s instructions, but the supplied provisions do not state a fryer-to-open-flame-appliance clearance or baffle rule (FGC \u00a7 623.1; MC \u00a7 917.1). Whether this arrangement is allowed therefore cannot be determined without the instructions for the specific appliances; the evidence provided also does not resolve whether another applicable provision imposes a separation requirement.\n\nDo you have the fryer and adjacent appliance manufacturers\u2019 installation instructions? They may establish whether this spacing and configuration are permitted for those appliances.",
+      "httpStatus": 200,
+      "seconds": 22.118353834000068,
+      "grade": "withheld",
+      "reason": "Does not supply Fire Code fryer/open-flame separation rule, instead requests manufacturer instructions and leaves8-inch/no-baffle legality unresolved. FC609.4.1.1.1 supplies an independently applicable16-inch separation/baffle/combination requirement and is absent from writer packet.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "projectFactQuestions": [
+              "What do the fryer and adjacent appliance manufacturers\u2019 installation instructions say about the permitted spacing or separation between them?"
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 609"
+      ],
+      "decisiveReferences": [
+        "FC 609.4.1.1.1"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "8727",
+          "sectionNumber": "623.1",
+          "title": "623.1 Cooking appliances.",
+          "codePrefix": "FGC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8727-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:8727-1",
+              "selectedText": "623.1 623.1 Cooking appliances. Cooking appliances that are designed for permanent installation, including ranges, ovens, stoves, broilers, grills, fryers, griddles, hot plates and barbecues, shall be tested in accordance with ANSI Z21.1/CSA 6.5, ANSI Z21.58/CSA 1.6 or ANSI Z83.11/CSA 1.8 and shall be installed in accordance with the manufacturer's instructions.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Requires permanently installed cooking appliances, including fryers, to be installed in accordance with manufacturer instructions; it does not establish appliance-to-appliance clearance."
+        },
+        {
+          "sectionID": "11133",
+          "sectionNumber": "917.1",
+          "title": "917.1 Cooking appliances.",
+          "codePrefix": "MC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11133-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:11133-2",
+              "selectedText": "917.1 917.1 Cooking appliances. Cooking appliances that are designed for permanent installation, including ranges, ovens, stoves, broilers, grills, fryers and griddles shall be listed, labeled and installed in accordance with the manufacturer's instructions. Oil-fired cooking appliances are prohibited. Commercial electric cooking appliances shall be listed and labeled in accordance with UL 197. Household electric ranges shall be listed and labeled in accordance with UL 858. Microwave cooking appliances shall be listed and labeled in accordance with UL 923. Oil-burning stoves shall be listed and labeled in accordance with UL 896. Solid-fuel-fired ovens shall be listed and labeled in accordance with UL 2162.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Requires commercial cooking appliances designed for permanent installation to be listed, labeled, and installed per manufacturer instructions; it does not establish appliance-to-appliance clearance."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "24259c5d-a23d-42a2-9426-4912f3608368",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/24259c5d-a23d-42a2-9426-4912f3608368-request.json",
+          "requestSHA256": "9e205d95c902e64495eb3f41f6d7bbf53336327664275f7a8a7760cc93798d7c",
+          "sourceReferenceCount": 13,
+          "sourceReferences": [
+            {
+              "reference": "FGC 623.1",
+              "sectionID": "8727",
+              "enactedTextSHA256": "c5e00e65fc052463d83aee5b62c5764506e0eb1ed59bc3765974e306d7a2ce3d",
+              "enactedTextCharacters": 364
+            },
+            {
+              "reference": "MC 917.1",
+              "sectionID": "11133",
+              "enactedTextSHA256": "9fe8708c122ed92c95b0045bbe6be73e5c67a4326dc95fc88867c06e5cb8614a",
+              "enactedTextCharacters": 715
+            },
+            {
+              "reference": "FGC 411.1.1",
+              "sectionID": "8349",
+              "enactedTextSHA256": "e809e1d89be2ccca9ae6c9f88af97cb5118d2f0ad0ca61f36319c1478b5d11dc",
+              "enactedTextCharacters": 633
+            },
+            {
+              "reference": "MC 507.2.8",
+              "sectionID": "10673",
+              "enactedTextSHA256": "b1b2d477417753e99d84f7414e68b436f8dc42965019f2ff3e3813ee0e5438d1",
+              "enactedTextCharacters": 646
+            },
+            {
+              "reference": "MC 917.2",
+              "sectionID": "11134",
+              "enactedTextSHA256": "de21f98bc1ee4e497acf6a62ac3d3149296ca3730c262f3a134ee51a2ef3991b",
+              "enactedTextCharacters": 227
+            },
+            {
+              "reference": "FGC 623.2",
+              "sectionID": "8729",
+              "enactedTextSHA256": "21ee755d369d039ca4d9dd562416a127432e24d08e03135aff9db9974b7a3c04",
+              "enactedTextCharacters": 302
+            },
+            {
+              "reference": "BC 407.2.6",
+              "sectionID": "425",
+              "enactedTextSHA256": "2362e42954ce718d60e7db9c8e7dc7b61d5c26233feb8f4b0e053f0da9b486cb",
+              "enactedTextCharacters": 2142
+            },
+            {
+              "reference": "FGC 623.5.1",
+              "sectionID": "8734",
+              "enactedTextSHA256": "33e8dc10439e267af797200b274ca949f315f4e1a6df6103a05100c3ec4f0335",
+              "enactedTextCharacters": 251
+            },
+            {
+              "reference": "MC 803.10.6",
+              "sectionID": "11021",
+              "enactedTextSHA256": "62e046066d6da16318f5f68b1614c409f37c9ac3634378f3490e3b88b3855f43",
+              "enactedTextCharacters": 3492
+            },
+            {
+              "reference": "BC 903.2.11.9",
+              "sectionID": "1621",
+              "enactedTextSHA256": "deee3325e9960d7ebb2cbdd5709ec31a0d6cbc7001cb39f8d9ef4e6454b8dc4c",
+              "enactedTextCharacters": 433
+            },
+            {
+              "reference": "BC 202",
+              "sectionID": "113",
+              "enactedTextSHA256": "fb9416571b9a9bb31da004fa4def80426c8265d490d10281f37e3963f10e496f",
+              "enactedTextCharacters": 1210
+            },
+            {
+              "reference": "FGC 411.1",
+              "sectionID": "8348",
+              "enactedTextSHA256": "1f7f5602c8ceb44018ee6f13b3ef2fc3f235cb27fbbb4b2d3d2729f612999e76",
+              "enactedTextCharacters": 1534
+            },
+            {
+              "reference": "BC 904.12.1",
+              "sectionID": "1699",
+              "enactedTextSHA256": "48569854b247c3994adb489785f3d35b201c31fb73df935f9ec462203a3c7d5f",
+              "enactedTextCharacters": 3348
+            }
+          ]
+        },
+        {
+          "id": "0181427a-9c7c-4d75-9c8f-2cd89bdff8f6",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/0181427a-9c7c-4d75-9c8f-2cd89bdff8f6-request.json",
+          "requestSHA256": "3ae20374b2335cbc688882a962a1ff48d1140470533e4e16d1be2ebc762fac06",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": {
+        "subtype": "unnecessary_nonanswer_and_unnecessary_project_fact_question",
+        "stage": "retrieval_or_selection",
+        "expectedRule": "FC609.4.1.1.1 requires16-inch separation or specified steel baffle or combination dimension at least16inches.",
+        "actualWriterRequestID": "24259c5d-a23d-42a2-9426-4912f3608368",
+        "expectedRuleInWriterPacket": false,
+        "actualRelevantSources": [
+          "FGC623.1",
+          "MC917.1"
+        ],
+        "packetObservation": "No FC609/609.4.1.1.1 source or token supplied. Packet contains generic manufacturer-installation rules for cooking appliances, grease-hood coverage, appliance connectors and incidental building protection provisions. The system asks user for installation instructions before finding the enacted separation minimum."
+      },
+      "reviewedAt": "2026-10-03T00:25:02.030135+00:00"
+    },
+    {
+      "id": "fresh-hold-27-fryer-2",
+      "familyID": "commercial-deep-fryer-separation",
+      "questionSHA256": "356fb2475d1cad6b4521e436fb3f1d24e71eb2e2df2765fe7dfa4b882277d8f3",
+      "question": "If we keep the 8-inch distance and add an 8-inch-high, one-eighth-inch-thick steel baffle permanently attached to the longer appliance and extending its full depth, does that meet the stated combination dimension?",
+      "frozenKeySHA256": "37936fc20ee60aa660d2715f7206536fc03dbadabf9dfe8340bf1a2edbbdc11c",
+      "finalOutputSHA256": "e647a0bc60b49dcc0e8e78163181b2a9b130b2773e1730daa40ebd73fbbd97f8",
+      "answerTextSHA256": "a6fd35a42bf8d0c35517f256368bb6efd95fd419f6d00d436bcc3db622024ddd",
+      "answerText": "**Yes.** Under the supplied combination option, 8 inches of separation plus an 8-inch-high baffle equals the required 16 inches. The baffle must be 1/8-inch-thick steel, permanently attached to the longer appliance, and extend the full depth; your stated details meet those dimensions and conditions (NYC Fire Code \u00a7 609.4.1.1.1). This answers the combination-dimension question, not whether the complete installation complies with all other applicable requirements.",
+      "httpStatus": 200,
+      "seconds": 16.21155320799991,
+      "grade": "correct",
+      "reason": "Correctly retrieves FC609.4.1.1.1 on follow-up and applies8-inch distance plus8-inch baffle height=16-inch combined minimum; preserves one-eighth-inch steel, attachment to longer appliance, full-depth requirements and narrow scope.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 609"
+      ],
+      "decisiveReferences": [
+        "FC 609.4.1.1.1"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004743",
+          "sectionNumber": "609",
+          "title": "FC 609: Commercial Cooking Systems",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004743-3"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004743-3",
+              "selectedText": "609.2 Unlawful operation.\n\nIt shall be unlawful to operate a commercial cooking appliance that generates smoke or grease-laden vapors, smoke or fumes:\n\n1.without a permit for the operation of the commercial kitchen in which the commercial cooking appliance is installed.\n\n2.when the appliance is not an approved commercial cooking appliance.\n\n3.when the appliance is a portable fueled device, unless otherwise authorized by the department.\n\n4.without an approved, lawfully-installed and tested fire extinguishing system.\n\n5.without an approved and lawfully-installed exhaust system.\n\n6.without the required grease filters.\n\n7.when its fire extinguishing system or exhaust system is out of service.\n\n8.when the operation of a commercial cooking appliance is unsafe due to excessive grease accumulation on or in such appliance or in the commercial cooking exhaust system.\n\n609.4 Commercial cooking appliances.\n\nCommercial cooking appliances shall be designed and installed in accordance with FC 609.4.1 through 609.4.3.\n\n609.4.1 Design and installation.\n\nCommercial cooking appliances requiring a fire extinguishing system shall be designed and installed in accordance with the construction codes, including the Mechanical Code and Fuel Gas Code, and the Electrical Code. Commercial cooking appliances shall not be relocated, or replaced with appliances utilizing a different power source, change in gas valve, or other change affecting the design of the commercial cooking fire extinguishing system, without prior department approval.\n\n609.4.1.1 Deep fat fryers.\n\nDeep fat fryers shall be designed and installed in accordance with this section.\n\n609.4.1.1.1 Separation.\n\nDeep fat fryers shall be separated from any adjacent cooking equipment that uses an open flame by:\n\n1.A separation distance of at least 16 inches (406 mm); or\n\n2.A 16-inch (406-mm) high by 1/8-inch (3.2-mm) thick steel baffle permanently attached to the longer of the two adjacent cooking appliances. The baffle shall extend to the full depth of the cooking equipment to which it is attached; or\n\n3.A combination of separation distance and baffle height equal to at least 16 inches.\n\n609.9 Portable fire extinguishers.\n\nEach commercial kitchen shall be provided with one or more Class K portable fire extinguishers, which shall be readily available for use in the cooking area but in any event no further than 30 feet (9144 mm) of travel distance from any commercial cooking appliance.\n\n609.9.1 Deep fat fryers.\n\nWhen deep fat fryers are installed in a commercial kitchen, additional Class K portable fire extinguishers shall be provided, as follows:\n\n1.For up to four fryers individually having a maximum cooking medium capacity of 80 pounds (36.3 kg) and a maximum surface area of 6 square feet (0.56 m 2 ): One Class K portable fire extinguisher having a minimum 1 1/2 gallon (6 L) capacity.\n\n2.For every additional group of up to four fryers, individually having a maximum cooking medium capacity of 80 pounds (36.3 kg) and a maximum surface area of 6 square feet (0.56 m 2 ) each: One additional Class K portable fire extinguisher having a minimum 1 1/2 gallon (6 L) capacity.\n\n3.For individual fryers having a maximum cooking medium capacity exceeding 80 pounds (36.3 kg) or 6 square feet (0.56 m 2 ) in surface area: Provide Class K portable fire extinguishers in accordance with the portable fire extinguisher manufacturer's recommendations.\n\n609.10 Recordkeeping.\n\nA record shall be maintained of the following commercial cooking system maintenance in accordance with FC 107.7:\n\n609.10.1. Commercial cooking appliances.\n\nThe owner of a commercial cooking system shall maintain records of any required inspection and other maintenance of commercial cooking appliances, including the replacement of deep fat fryer high-limit controls as required by FC 609.4.1.1.2, and the cleaning of cooking appliance exhaust flues.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes the fryer separation alternatives, including the combined 16-inch distance-plus-baffle-height option and the baffle\u2019s material, attachment, and depth conditions."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "fb7deba5-a53a-448d-8ea6-82b468138de3",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/fb7deba5-a53a-448d-8ea6-82b468138de3-request.json",
+          "requestSHA256": "3c8b7fb353849d54c4fe312cd0e17cc646da6685f5f3183a7f0a3971d1690a22",
+          "sourceReferenceCount": 6,
+          "sourceReferences": [
+            {
+              "reference": "FC 609",
+              "sectionID": "31004743",
+              "enactedTextSHA256": "80171b065068fca1d28c7a8bb661d6867eee698d041672ef82b0f26cb650c3d7",
+              "enactedTextCharacters": 3894
+            }
+          ]
+        },
+        {
+          "id": "5d0f6e89-9610-4e25-a4b0-78afef689f92",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/5d0f6e89-9610-4e25-a4b0-78afef689f92-request.json",
+          "requestSHA256": "65211a00d5ec6bc2c92b9fb73e522beb0445fd9db2f6b881e6f46017e88b4e7d",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:25:02.032596+00:00"
+    },
+    {
+      "id": "fresh-hold-28-shaft-1",
+      "familyID": "shaft-opening-maintained-closure",
+      "questionSHA256": "501e742b964a606c3146f4fe124731f0e343ac10aaaaa20554fa8785bc882adb",
+      "question": "For a NYC interior shaft connecting two stories where the construction codes require a protected opening, may its door simply be left open without self-closing or automatic smoke-operated closure?",
+      "frozenKeySHA256": "ee2d6d24f8fcbad6345a56e28a44003ae91d35fb1451de1be03a88698ebbf94b",
+      "finalOutputSHA256": "0b39e17ed12e32303f2f66b1fcaf39ad37dfb779e010ac1a36acb9bda91f885d",
+      "answerTextSHA256": "1918e24c95d772bc919c5beb8705bd5c1d43f4cdc1b1ee7af56ba301f41efa06",
+      "answerText": "**No.** For an interior shaft connecting two stories, when the construction codes require its openings to be protected, the opening must be maintained self-closing or automatic-closing by smoke detection; it cannot simply be left open. (2022 NYC Fire Code \u00a7 704.1.) A fire door also must be latching and self- or automatic-closing under the Building Code. (2022 NYC BC \u00a7 716.5.9.) The supplied exceptions do not establish a general exception for an interior shaft door: the \u00a7 705.8.2 exception concerns specified exterior openings protected by a water curtain, and \u00a7 716.5.9\u2019s listed exceptions concern particular other doors.",
+      "httpStatus": 200,
+      "seconds": 12.646961459000012,
+      "grade": "correct",
+      "reason": "Correctly requires self/automatic smoke-operated closure for protected openings in multi-story interior shaft under FC704.1. Added BC716.5.9 latching/closure statement and BC705.8.2 exterior-water-curtain distinction were checked against imported text and are accurate, though unnecessary to the narrow question.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 704"
+      ],
+      "decisiveReferences": [
+        "FC 704.1"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004749",
+          "sectionNumber": "704",
+          "title": "FC 704: Floor Openings and Shafts",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004749-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004749-2",
+              "selectedText": "704 FC 704: Floor Openings and Shafts 704.1 Enclosures. Interior vertical shafts, including stairways, elevator hoistways, service and utility shafts, that connect two or more stories of a building shall be enclosed or protected as specified in the construction codes, including the Building Code. When openings are required to be protected by the construction codes, including the Building Code, openings into such shafts shall be maintained self-closing or automatic-closing by smoke detection. Existing fusible-link-type automatic door-closing devices are allowed if the fusible link rating does not exceed 135\u00b0F (57\u00b0C).",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Direct requirement for openings into interior shafts connecting two or more stories when protected openings are required."
+        },
+        {
+          "sectionID": "1258",
+          "sectionNumber": "716.5.9",
+          "title": "716.5.9 Door closing.",
+          "codePrefix": "BC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:1258-4"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:1258-4",
+              "selectedText": "716.5.9 716.5.9 Door closing. Fire doors shall be latching and self- or automatic-closing in accordance with this section. Exceptions: 1. Fire doors located in common walls separating sleeping units in Group R-1 shall be permitted without self- or automatic-closing devices. 2. The elevator car doors and the associated hoistway enclosure doors at the floor level designated for recall in accordance with Section 3003.2 shall be permitted to remain open during Phase I emergency recall operation. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Fire-door closing rule and the specific exceptions supplied."
+        },
+        {
+          "sectionID": "1016",
+          "sectionNumber": "705.8.2",
+          "title": "705.8.2 Protected openings.",
+          "codePrefix": "BC",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "corpusID": "nyc-2022-construction-codes",
+          "corpusLabel": "2022 NYC Construction Codes",
+          "applicabilityStatus": "current-enacted-edition",
+          "sourceIDs": [
+            "research-permitext_discovered-id:1016-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:1016-1",
+              "selectedText": "705.8.2 705.8.2 Protected openings. Where openings are required to be protected, fire doors and fire shutters shall comply with Section 716.5 and fire window assemblies shall comply with Section 716.6. Exception: Opening protectives are not required where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1 and the exterior openings are protected by a water curtain using automatic sprinklers approved for that use. The sprinklers and the water curtain shall be installed in accordance with NFPA 13, as modified by Appendix Q of this code.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Shows the supplied protected-opening exception is limited to specified exterior openings."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "25f96e6a-ff9f-4b11-9fa1-1951078191bd",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/25f96e6a-ff9f-4b11-9fa1-1951078191bd-request.json",
+          "requestSHA256": "bc92efc15d595824f65d1a85700ee1011d30e3c76e8506121c2ea07451cea43a",
+          "sourceReferenceCount": 9,
+          "sourceReferences": [
+            {
+              "reference": "FC 704",
+              "sectionID": "31004749",
+              "enactedTextSHA256": "e4ac8cf9e33c7418e935ce2b274e9d5b2a5161e6bf73e02e1f2a7e43e3e0c3e5",
+              "enactedTextCharacters": 623
+            }
+          ]
+        },
+        {
+          "id": "6cf75674-7299-4e97-b1ab-989258ea70f0",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/6cf75674-7299-4e97-b1ab-989258ea70f0-request.json",
+          "requestSHA256": "06bc0f6e5d7a478b5e9f339829ace99933e83018e19e3fd3338ffb5f2557cb87",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.638975+00:00"
+    },
+    {
+      "id": "fresh-hold-28-shaft-2",
+      "familyID": "shaft-opening-maintained-closure",
+      "questionSHA256": "3410effe9703d54006110e2c8d3a9b2446f6165e3f6a8655e57851f140b6fb2e",
+      "question": "Would an existing fusible-link automatic closer rated at 155 degrees Fahrenheit qualify under the existing-device allowance?",
+      "frozenKeySHA256": "c9a0513391ddf70fea035ceaa8b275cf2a77270caf7258b888bd5206405a7961",
+      "finalOutputSHA256": "6a3890a9d1551592d2fab3bea065e2c3b73f400ee67910c46f547fb491b8ebe5",
+      "answerTextSHA256": "4a9a92cc8a9fdd4b7ee9ec14c52f60f7a7c6e8759d173efe7954d87e63c96443",
+      "answerText": "**No.** The existing-device allowance applies only when the fusible-link rating does not exceed 135\u00b0F; a 155\u00b0F link exceeds that limit by 20\u00b0F and does not qualify (2022 NYC FC \u00a7 704.1).",
+      "httpStatus": 200,
+      "seconds": 6.88504683300003,
+      "grade": "correct",
+      "reason": "Correctly rejects155F fusible-link rating under existing-device exception capped at135F; maintains shaft-opening context and cites FC704.1.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 704"
+      ],
+      "decisiveReferences": [
+        "FC 704.1"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004749",
+          "sectionNumber": "704",
+          "title": "FC 704: Floor Openings and Shafts",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004749-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004749-1",
+              "selectedText": "704 FC 704: Floor Openings and Shafts 704.1 Enclosures. Interior vertical shafts, including stairways, elevator hoistways, service and utility shafts, that connect two or more stories of a building shall be enclosed or protected as specified in the construction codes, including the Building Code. When openings are required to be protected by the construction codes, including the Building Code, openings into such shafts shall be maintained self-closing or automatic-closing by smoke detection. Existing fusible-link-type automatic door-closing devices are allowed if the fusible link rating does not exceed 135\u00b0F (57\u00b0C).",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes the existing-device allowance and its maximum fusible-link rating of 135\u00b0F."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "bed38a21-450b-46b5-bde2-9e453484f4c9",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/bed38a21-450b-46b5-bde2-9e453484f4c9-request.json",
+          "requestSHA256": "21d6b695ed69d12a147b84e5be52dee2c23ea50ececa0bbbb1b17147140098b6",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FC 704",
+              "sectionID": "31004749",
+              "enactedTextSHA256": "e4ac8cf9e33c7418e935ce2b274e9d5b2a5161e6bf73e02e1f2a7e43e3e0c3e5",
+              "enactedTextCharacters": 623
+            }
+          ]
+        },
+        {
+          "id": "3139e284-fa67-4b59-814a-8a999cc593b2",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/3139e284-fa67-4b59-814a-8a999cc593b2-request.json",
+          "requestSHA256": "8dd26e633065618f64b7c76d94fae502f9ceabd863fdb3e74ad0195aaff72d31",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.640955+00:00"
+    }
+  ],
+  "reviewedTurnCount": 20,
+  "gradeCounts": {
+    "correct": 15,
+    "minor_issue": 0,
+    "withheld": 5,
+    "materially_wrong": 0,
+    "ambiguous_key/ungradable": 0,
+    "runtime_failure": 0
+  },
+  "pendingCaseIDs": [],
+  "updatedAt": "2026-10-03T00:27:06.655937+00:00",
+  "originalReviewScope": {
+    "conversationIndicesZeroBased": [
+      18,
+      34
+    ],
+    "turnCount": 34,
+    "scenarioFamilyCount": 17,
+    "codeFamilies": [
+      "FGC",
+      "FC",
+      "ZR"
+    ]
+  },
+  "independentSupplementaryObservationsExcludedFromHeadline": [
+    {
+      "id": "fresh-hold-29-extinguisher-1",
+      "familyID": "portable-extinguisher-mounting-height",
+      "questionSHA256": "f2b30e31d17c822a27004e24f63e20b54e486dcbec81806fba6a122e76955bda",
+      "question": "In NYC, how high above the floor may the top of a wall-mounted hand-held extinguisher be if its gross weight is 45 pounds?",
+      "frozenKeySHA256": "401fef0fc45c89a807d9dbc9b9c04cca176a9c43fdc2ff07611b547f1bc0c3d5",
+      "finalOutputSHA256": "f9f4ae0b36f5112abb2d46cb8a92902fb5781969ce03d6dca09b2387da4a9ae3",
+      "answerTextSHA256": "4e43b75a55256b0984cc66a99d0b448ee19b1f2798620d6539a0b8f04a38429b",
+      "answerText": "**3.5 feet (42 inches / 1,067 mm) maximum above the floor.** The 2022 NYC Fire Code sets that limit for a hand-held portable extinguisher with a gross weight exceeding 40 pounds; at 45 pounds, this extinguisher falls within that rule (FC \u00a7 906.9.2).",
+      "httpStatus": 200,
+      "seconds": 6.29962570799992,
+      "grade": "correct",
+      "reason": "Correct3.5-foot/42-inch maximum top height for45-pound gross hand-held extinguisher under FC906.9.2; no unsupported scope expansion.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 906"
+      ],
+      "decisiveReferences": [
+        "FC 906.9.2",
+        "FC 906.9.3"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004761",
+          "sectionNumber": "906",
+          "title": "FC 906: Portable Fire Extinguishers",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004761-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004761-1",
+              "selectedText": "906.2 General requirements.\n\nPortable fire extinguishers shall be selected, installed and maintained in accordance with this section and NFPA 10.\n\nExceptions:\n\n1.The travel distance to reach a portable fire extinguisher shall not apply to the spectator seating portions of Group A-5 occupancies.\n\n2.In Group I-3, portable fire extinguishers may be provided at staff locations.\n\n906.2.1 Maintenance.\n\nPortable fire extinguishers shall be maintained in accordance with FC 901.6 and this section.\n\n906.2.1.4 Proof of compliance.\n\nA portable fire extinguisher servicing company holding a company certificate shall document its servicing of a portable fire extinguisher by affixing to the portable fire extinguisher the proof of compliance approved for such purposes and in such other manner as may be required by the rules.\n\n906.3 Size and distribution.\n\nThe size and distribution of portable fire extinguishers shall be in accordance with FC 906.3.1 through 906.3.4.\n\n906.3.4 Class D fire hazards.\n\nThe minimum size, number and placement of portable fire extinguishers in occupancies in which there is a Class D fire hazard risk (combustible metals) shall be in accordance with NFPA 10.\n\nFC Table 906.3.1Portable Fire Extinguishers for Class a Fire Hazards\n\nLight (Low) Hazard Occupancy d\n\nOrdinary (Moderate) Hazard Occupancy d\n\nExtra (High) Hazard Occupancy d\n\nMinimum Rated Single Extinguisher\n\n2-A c\n\n2-A\n\n4-A a\n\nMaximum Floor Area Per Unit of A\n\n3,000 square feet e\n\n1,500 square feet\n\n1,000 square feet\n\nMaximum Travel Distance to Extinguisher\n\n75 feet\n\nFor SI: 1 foot = 304.8 mm, 1 square foot = 0.0929 m 2 , 1 gallon = 3.785 L.\n\na.Two 2 1/2-gallon water-type extinguishers shall be deemed the equivalent of one 4-A rated extinguisher.\n\nb.Reserved.\n\nc.Two water-type extinguishers each with a 1-A rating shall be deemed the equivalent of one 2-A rated extinguisher for Light (Low) Hazard Occupancies.\n\nd.For the purposes of FC Table 906.3.1, the terms \"Light (Low) Hazard\", \"Ordinary (Moderate) Hazard\" and \"Extra (High) Hazard\" shall be as defined in NFPA 10.\n\ne.In occupancies classified as Groups A-3, B, or E which are protected throughout by a sprinkler system, the maximum floor area per unit of A may be doubled.\n\nFC Table 906.3.2Flammable or Combustible Liquids with Depths of less than or Equal to 0.25-inch a\n\nType of Hazard\n\nBasic Minimum Portable Fire Extinguisher Rating\n\nMaximum Travel Distance to Portable Fire Extinguishers (feet)\n\nLight (Low)\n\n5-B10-B\n\n3050\n\nOrdinary (Moderate)\n\n10-B20-B\n\n3050\n\nExtra (High)\n\n40-B80-B\n\n3050\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\na.For requirements on water-soluble flammable liquids and alternative sizing criteria, see NFPA 10.\n\n906.7 Hangers and brackets.\n\nHand-held portable fire extinguishers, not housed in cabinets, shall be installed on the hangers or brackets supplied. Hangers or brackets shall be securely anchored to the mounting surface in accordance with the manufacturer's installation instructions.\n\n906.9 Extinguisher installation.\n\nThe installation of portable fire extinguishers shall be in accordance with FC 906.9.1 through 906.9.3.\n\n906.9.1 Extinguishers weighing 40 pounds or less.\n\nPortable fire extinguishers having a gross weight not exceeding 40 pounds (18 kg) shall be installed so that the top of the extinguisher is not more than 5 feet (1524 mm) above the floor.\n\n906.9.2 Extinguishers weighing more than 40 pounds.\n\nHand-held portable fire extinguishers having a gross weight exceeding 40 pounds (18 kg) shall be installed so that the top of the extinguisher is not more than 3.5 feet (1067 mm) above the floor.\n\n906.9.3 Floor clearance.\n\nThe clearance between the floor and the bottom of installed hand-held portable fire extinguishers shall not be less than 4 inches (102 mm).\n\n906.10 Wheeled units.\n\nWheeled portable fire extinguishers shall be kept in a designated location that is readily accessible.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "FC \u00a7 906.9.2 directly supplies the height limit and weight threshold."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "3601cb04-bc4f-421b-b0bd-b3056c5430e7",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/3601cb04-bc4f-421b-b0bd-b3056c5430e7-request.json",
+          "requestSHA256": "cb54eb9cc442952a6948525173d2d9d6747d19df87c3b4a0ffc4f47d09d2fd6c",
+          "sourceReferenceCount": 6,
+          "sourceReferences": [
+            {
+              "reference": "FC 906",
+              "sectionID": "31004761",
+              "enactedTextSHA256": "31957e9200a2e77168e35a4ffdb3d4d6f94df5203b01e6afdd3b54526b34e115",
+              "enactedTextCharacters": 3900
+            }
+          ]
+        },
+        {
+          "id": "4cacd344-3b33-4cd5-93c7-883f2f3cbaa6",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/4cacd344-3b33-4cd5-93c7-883f2f3cbaa6-request.json",
+          "requestSHA256": "9fce7077ec034c1a0a539ff6cebbd81f99654a2a8c48208b6f3df3fef34afecc",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.642621+00:00"
+    },
+    {
+      "id": "fresh-hold-29-extinguisher-2",
+      "familyID": "portable-extinguisher-mounting-height",
+      "questionSHA256": "99033e9cdc2749c7a9e1d93b5ff2822a4ed0a62c9d236edc9497ad5db44f9f00",
+      "question": "If we replace it with one weighing exactly 40 pounds, does the top-height limit become 5 feet?",
+      "frozenKeySHA256": "fe3267c86c432697998d09ad5150f9ee4c323a71014fbad18fb206a19cc5ac5f",
+      "finalOutputSHA256": "2c025c7c6ae597b88f4441d6e53c6d87548e497cbe5eac1d1ce4b821581c06db",
+      "answerTextSHA256": "95b586bc089fac1c9d7d5d22766b65d771879efc87bf8471a81e6c60296163e1",
+      "answerText": "**Yes.** If the replacement hand-held extinguisher\u2019s gross weight is exactly 40 pounds, its top may be no more than 5 feet above the floor: the 5-foot rule covers extinguishers weighing 40 pounds or less. The 3.5-foot limit applies only when gross weight exceeds 40 pounds (FC \u00a7\u00a7 906.9.1\u2013906.9.2).",
+      "httpStatus": 200,
+      "seconds": 6.432452333000023,
+      "grade": "correct",
+      "reason": "Correct5-foot top limit at exactly40pounds (not exceeding40), contrasting over40-pound3.5-foot rule. Question asks top height; omission of separate bottom clearance does not fail this narrow answer.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 906"
+      ],
+      "decisiveReferences": [
+        "FC 906.9.1",
+        "FC 906.9.3"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004761",
+          "sectionNumber": "906",
+          "title": "FC 906: Portable Fire Extinguishers",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004761-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004761-1",
+              "selectedText": "906.2 General requirements.\n\nPortable fire extinguishers shall be selected, installed and maintained in accordance with this section and NFPA 10.\n\nExceptions:\n\n1.The travel distance to reach a portable fire extinguisher shall not apply to the spectator seating portions of Group A-5 occupancies.\n\n2.In Group I-3, portable fire extinguishers may be provided at staff locations.\n\n906.2.1 Maintenance.\n\nPortable fire extinguishers shall be maintained in accordance with FC 901.6 and this section.\n\n906.2.1.4 Proof of compliance.\n\nA portable fire extinguisher servicing company holding a company certificate shall document its servicing of a portable fire extinguisher by affixing to the portable fire extinguisher the proof of compliance approved for such purposes and in such other manner as may be required by the rules.\n\n906.3 Size and distribution.\n\nThe size and distribution of portable fire extinguishers shall be in accordance with FC 906.3.1 through 906.3.4.\n\n906.3.4 Class D fire hazards.\n\nThe minimum size, number and placement of portable fire extinguishers in occupancies in which there is a Class D fire hazard risk (combustible metals) shall be in accordance with NFPA 10.\n\nFC Table 906.3.1Portable Fire Extinguishers for Class a Fire Hazards\n\nLight (Low) Hazard Occupancy d\n\nOrdinary (Moderate) Hazard Occupancy d\n\nExtra (High) Hazard Occupancy d\n\nMinimum Rated Single Extinguisher\n\n2-A c\n\n2-A\n\n4-A a\n\nMaximum Floor Area Per Unit of A\n\n3,000 square feet e\n\n1,500 square feet\n\n1,000 square feet\n\nMaximum Travel Distance to Extinguisher\n\n75 feet\n\nFor SI: 1 foot = 304.8 mm, 1 square foot = 0.0929 m 2 , 1 gallon = 3.785 L.\n\na.Two 2 1/2-gallon water-type extinguishers shall be deemed the equivalent of one 4-A rated extinguisher.\n\nb.Reserved.\n\nc.Two water-type extinguishers each with a 1-A rating shall be deemed the equivalent of one 2-A rated extinguisher for Light (Low) Hazard Occupancies.\n\nd.For the purposes of FC Table 906.3.1, the terms \"Light (Low) Hazard\", \"Ordinary (Moderate) Hazard\" and \"Extra (High) Hazard\" shall be as defined in NFPA 10.\n\ne.In occupancies classified as Groups A-3, B, or E which are protected throughout by a sprinkler system, the maximum floor area per unit of A may be doubled.\n\nFC Table 906.3.2Flammable or Combustible Liquids with Depths of less than or Equal to 0.25-inch a\n\nType of Hazard\n\nBasic Minimum Portable Fire Extinguisher Rating\n\nMaximum Travel Distance to Portable Fire Extinguishers (feet)\n\nLight (Low)\n\n5-B10-B\n\n3050\n\nOrdinary (Moderate)\n\n10-B20-B\n\n3050\n\nExtra (High)\n\n40-B80-B\n\n3050\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\na.For requirements on water-soluble flammable liquids and alternative sizing criteria, see NFPA 10.\n\n906.7 Hangers and brackets.\n\nHand-held portable fire extinguishers, not housed in cabinets, shall be installed on the hangers or brackets supplied. Hangers or brackets shall be securely anchored to the mounting surface in accordance with the manufacturer's installation instructions.\n\n906.9 Extinguisher installation.\n\nThe installation of portable fire extinguishers shall be in accordance with FC 906.9.1 through 906.9.3.\n\n906.9.1 Extinguishers weighing 40 pounds or less.\n\nPortable fire extinguishers having a gross weight not exceeding 40 pounds (18 kg) shall be installed so that the top of the extinguisher is not more than 5 feet (1524 mm) above the floor.\n\n906.9.2 Extinguishers weighing more than 40 pounds.\n\nHand-held portable fire extinguishers having a gross weight exceeding 40 pounds (18 kg) shall be installed so that the top of the extinguisher is not more than 3.5 feet (1067 mm) above the floor.\n\n906.9.3 Floor clearance.\n\nThe clearance between the floor and the bottom of installed hand-held portable fire extinguishers shall not be less than 4 inches (102 mm).\n\n906.10 Wheeled units.\n\nWheeled portable fire extinguishers shall be kept in a designated location that is readily accessible.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes the 5-foot maximum for gross weight not exceeding 40 pounds and the 3.5-foot maximum for gross weight exceeding 40 pounds."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "c1d263f1-341b-447e-a767-78106bc7417e",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/c1d263f1-341b-447e-a767-78106bc7417e-request.json",
+          "requestSHA256": "9906a916b92f785dd9aced407571552eaafc6dca3695c2fcbcef49842645325b",
+          "sourceReferenceCount": 3,
+          "sourceReferences": [
+            {
+              "reference": "FC 906",
+              "sectionID": "31004761",
+              "enactedTextSHA256": "31957e9200a2e77168e35a4ffdb3d4d6f94df5203b01e6afdd3b54526b34e115",
+              "enactedTextCharacters": 3900
+            }
+          ]
+        },
+        {
+          "id": "bc9bdc1a-dc12-49db-abd5-904305c9ec3e",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/bc9bdc1a-dc12-49db-abd5-904305c9ec3e-request.json",
+          "requestSHA256": "011fd26100cca1d5e87fce498ee64d4eaf6231aea5813d03e6e8d0ac9eb94f49",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.644283+00:00"
+    },
+    {
+      "id": "fresh-hold-30-firewatch-1",
+      "familyID": "hot-work-post-work-fire-watch",
+      "questionSHA256": "9eb30ac0aa85b58de95b73657383ea4dc80c820ec69ba466785ddcc80fb7f806",
+      "question": "In NYC, may the fire watch leave as soon as ordinary indoor welding ends? I am asking about the minimum post-work watch, not the rest of the permit requirements.",
+      "frozenKeySHA256": "0af119276ac60410ba93da3c102546a48722e51289d33423cec74010ca4d31b4",
+      "finalOutputSHA256": "6ee21d5277c8a64e0f91e206a04a7ad7f8516db882188a607dff7c7499aa2afb",
+      "answerTextSHA256": "6903b43a82d3a92f252ab6a48473bbb002bd60aa8dd77233d27b6856c8f53036",
+      "answerText": "**No.** For hot work, the fire watch must continue for **at least 30 minutes after the work ends**. The commissioner or the person responsible for implementing the hot-work program may extend it based on the hazards or work performed (2022 NYC Fire Code \u00a7 3504.2.1).",
+      "httpStatus": 200,
+      "seconds": 6.132518875000067,
+      "grade": "correct",
+      "reason": "Correctly rejects immediate departure and states at least30minutes post-hot-work watch, with authorized extension based on hazards/work, under FC3504.2.1.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 3504"
+      ],
+      "decisiveReferences": [
+        "FC 3504.2.1"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004926",
+          "sectionNumber": "3504",
+          "title": "FC 3504: Fire Safety Requirements",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004926-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004926-2",
+              "selectedText": "3504.2 Fire watch.\n\nA fire watch shall be maintained and fire guards provided in accordance with FC 3504.2.1 through 3504.2.7.1.\n\n3504.2.1 When required.\n\nA fire watch shall be maintained during hot work operations. The fire watch shall continue for a minimum of 30 minutes after the conclusion of the work. The commissioner, or the responsible person implementing a hot work program, may extend the duration of the fire watch based on the hazards or work being performed.\n\n3504.2.2 Location.\n\nThe fire watch shall observe the entire hot work area. Hot work conducted in areas with vertical or horizontal fire exposures that are not observable by a single individual shall have additional personnel assigned to ensure that exposed areas are monitored, including compliance with FC 3504.2.7.1.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "FC 3504.2.1 states the 30-minute minimum after hot work concludes and the authority to extend the watch."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "6a68c7df-9af5-4e6a-98b2-504029d00088",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/6a68c7df-9af5-4e6a-98b2-504029d00088-request.json",
+          "requestSHA256": "98b966dac21e8952dd8fb4e614ab56a9937aa87b32b6e76c9bf509730075a5fb",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FC 3504",
+              "sectionID": "31004926",
+              "enactedTextSHA256": "13e296b98e81de2cd1ac7717ea7545f289f531f650722c6ea7a116b93618befe",
+              "enactedTextCharacters": 792
+            }
+          ]
+        },
+        {
+          "id": "d0de3054-761e-4e7f-abb8-2778a6fd3331",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/d0de3054-761e-4e7f-abb8-2778a6fd3331-request.json",
+          "requestSHA256": "ec5de78002e7320f9c956ea4f5ef704a45f2a40a413a5dee0f40996eb658d126",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.646127+00:00"
+    },
+    {
+      "id": "fresh-hold-30-firewatch-2",
+      "familyID": "hot-work-post-work-fire-watch",
+      "questionSHA256": "10054a6a27e9dcb28451797092642f0144a5f79405a73b688a621d38c79bf7d7",
+      "question": "Does 30 minutes always guarantee the watch can end even when the responsible person determines the hazards require longer?",
+      "frozenKeySHA256": "0065ed0a974a3c3f3d12ceb200d7c106b9a99852e65a42233afc3ec965bd24ec",
+      "finalOutputSHA256": "8d1f15d54535e0c63feb4a341198885305bb120426f4f7f8e5b7377e44325ee5",
+      "answerTextSHA256": "56661d71fb31b353cdc09186049e43c0377599060238646d2e1fb4a11ed5702a",
+      "answerText": "**No.** Thirty minutes is the minimum post-work fire-watch period, not a guaranteed end time. The commissioner or the person responsible for implementing the hot-work program may extend the watch based on the hazards or work being performed (2022 NYC Fire Code \u00a7 3504.2.1). The text authorizes an extension; it does not expressly say that an extension is mandatory once the responsible person determines more time is needed.",
+      "httpStatus": 200,
+      "seconds": 9.354119540999992,
+      "grade": "correct",
+      "reason": "Correctly treats30minutes as minimum rather than guaranteed end time and identifies responsible-person/commissioner extension authority. Added textual distinction between may extend and an express mandatory trigger is accurate to supplied wording but distracts from narrow practical conclusion.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "FC 3504"
+      ],
+      "decisiveReferences": [
+        "FC 3504.2.1"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "31004926",
+          "sectionNumber": "3504",
+          "title": "FC 3504: Fire Safety Requirements",
+          "codePrefix": "FC",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "corpusLabel": "2022 NYC Fire Code",
+          "applicabilityStatus": "current-consolidation",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004926-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:31004926-1",
+              "selectedText": "3504.2 Fire watch.\n\nA fire watch shall be maintained and fire guards provided in accordance with FC 3504.2.1 through 3504.2.7.1.\n\n3504.2.1 When required.\n\nA fire watch shall be maintained during hot work operations. The fire watch shall continue for a minimum of 30 minutes after the conclusion of the work. The commissioner, or the responsible person implementing a hot work program, may extend the duration of the fire watch based on the hazards or work being performed.\n\n3504.2.3 Duties.\n\nPersons conducting a fire watch shall have the duties and responsibilities set forth in FC 901.7.2.1 with respect to the areas being monitored in connection with hot work operations.\n\n3504.2.7 Fire guards for torch operations.\n\nThe fire watch for torch operations conducted at the following locations shall be conducted by fire guards:\n\n1.Construction sites.\n\n2.On any rooftop, or in connection with any torch-applied roofing system operation.\n\n3.In any building or structure, when the torch operation is conducted by a person holding a citywide permit for torch operations.\n\n3504.2.7.1 Construction sites and torch-applied roofing systems.\n\nA fire watch shall be maintained for each torch operation at a construction site and torch-applied roofing system operations in compliance with the requirements of FC 3504.2.7.1.1 and 3504.2.7.1.2.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes the 30-minute minimum and authorizes the commissioner or responsible person to extend the fire watch based on hazards or work performed."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "76d7f8e7-340f-4032-9e90-40323ab8ce08",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/76d7f8e7-340f-4032-9e90-40323ab8ce08-request.json",
+          "requestSHA256": "b3c31400b0e513d2fbb928967f43f79b340b438fcb07d301ae3fc57380820a1e",
+          "sourceReferenceCount": 7,
+          "sourceReferences": [
+            {
+              "reference": "FC 3504",
+              "sectionID": "31004926",
+              "enactedTextSHA256": "de0861a157a71bb9b8b79d978e38321400ec0ffb97a388f0fe06e334390bb8dc",
+              "enactedTextCharacters": 1331
+            }
+          ]
+        },
+        {
+          "id": "d9f7aade-43bd-4181-a41b-dd4291f293d0",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/d9f7aade-43bd-4181-a41b-dd4291f293d0-request.json",
+          "requestSHA256": "94f2fe823be792558ad10c3cd917e58fb17b0aeae6245044133d07c13f9f9db4",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.647907+00:00"
+    },
+    {
+      "id": "fresh-hold-31-loading-size-1",
+      "familyID": "commercial-loading-berth-dimensions",
+      "questionSHA256": "ba62ff8794ecd3a0f20bc4ea08174c9fdb4a815367de1a6b7c96649d3be29d8c",
+      "question": "For a NYC C4-2 site, a required loading berth has already been classified as loading category B. What are its minimum length, width and vertical clearance? I am not asking how many berths are required.",
+      "frozenKeySHA256": "d4109c94a4f6cd42c1e69604ef3ae6163af8107d414f6631b8d2032bacda1d92",
+      "finalOutputSHA256": "6ba25ecaa38a20148666b28ea99d82e236a0bdc198331c85441d8387c0c04e7e",
+      "answerTextSHA256": "44a3ffaa2a293ac10be0f8cf1e91ea0cab866e5cb85def5a37a3ba7e7870cb98",
+      "answerText": "For a required **LRC-B** berth in C4-2, the minimum dimensions are **37 ft long \u00d7 12 ft wide, with 14 ft of vertical clearance** (ZR \u00a7 36-661). The dimensions exclude driveways and entrances to or exits from the berth.",
+      "httpStatus": 200,
+      "seconds": 9.879229040999897,
+      "grade": "correct",
+      "reason": "Correct LRC-B berth37ft length,12ft width,14ft vertical clearance and driveway/entrance exclusion under ZR36-661. Uses stated category rather than asking for unrelated loading count facts.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "ZR 36-661"
+      ],
+      "decisiveReferences": [
+        "ZR 36-661"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "20017981",
+          "sectionNumber": "36-661",
+          "title": "Size of required berths",
+          "codePrefix": "ZR",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "corpusLabel": "NYC Zoning Resolution",
+          "applicabilityStatus": "continuously-amended",
+          "sourceIDs": [
+            "research-permitext_cross_reference-id:20017981-4"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_cross_reference-id:20017981-4",
+              "selectedText": "36-661 Size of required berths C1 C2 C3 C4 C5 C6 C7 C8 In all districts, as indicated, all required accessory off- street loading berths, open or enclosed, shall conform to the regulations on minimum dimensions set forth in the following table. The dimensions of off-street berths shall not include driveways or entrances to or exits from such off-street berths. Loading requirement categories (LRC) shall be as set forth in Section 36-62 (Required Accessory Off-street Loading Berths). MINIMUM DIMENSIONS FOR REQUIRED ACCESSORY OFF-STREET LOADING BERTHS (in feet) Length Width Vertical Clearance LRC-A with less than 10,000 sq. ft. of floor area 37 12 14 with 10,000 sq. ft. or more of floor area 50 12 14 LRC-B 37 12 14 LRC-C 37 12 12 LRC-D 37 12 12 LRC-E 25 10 8",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Provides the LRC-B minimum dimensions and the rule excluding driveways and access openings from the berth dimensions."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "b80ac51a-38ce-4972-bd36-ed39b2efa05d",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/b80ac51a-38ce-4972-bd36-ed39b2efa05d-request.json",
+          "requestSHA256": "de27d3f997a94af00c1243d725157c56e9d997d5fcdce31535ae0ce66f994978",
+          "sourceReferenceCount": 11,
+          "sourceReferences": [
+            {
+              "reference": "ZR 36-661",
+              "sectionID": "20017981",
+              "enactedTextSHA256": "705affd85b3cd4ec01e68636aff6a25c8d6132e526d849059a8d9e352420f54e",
+              "enactedTextCharacters": 13161
+            }
+          ]
+        },
+        {
+          "id": "4b5b25c7-9113-49e0-9696-0d6adf75599b",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/4b5b25c7-9113-49e0-9696-0d6adf75599b-request.json",
+          "requestSHA256": "a877fec255f89cecb81837c28430f90d3e5a885a90e67592a5493512faf11907",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.650260+00:00"
+    },
+    {
+      "id": "fresh-hold-31-loading-size-2",
+      "familyID": "commercial-loading-berth-dimensions",
+      "questionSHA256": "f020697f6c0377fc0b363804d42d5ff45be620b703281083621c444589a6fb04",
+      "question": "Could a 10-foot-long entrance driveway be counted toward that berth length?",
+      "frozenKeySHA256": "75c30c64f6136d96a9b8b2feffe74934fcf54ecb3c8f4d112be5a6df2a397763",
+      "finalOutputSHA256": "d5b771dad515aa64a21d731ff46c3069dc42429969016f3d74bdd51a6b4fac2f",
+      "answerTextSHA256": "c6a6f302bc90fedea920e8842b0de8c9361cae403d6d141dd9a0185b48b573aa",
+      "answerText": "No. For the stated LRC-B berth, the required length is 37 feet, and ZR \u00a7 36-661 expressly excludes driveways and entrances to or exits from the berth from its dimensions. The 10-foot entrance driveway therefore cannot count toward the required berth length.",
+      "httpStatus": 200,
+      "seconds": 8.406911415999987,
+      "grade": "correct",
+      "reason": "Correctly excludes10ft entrance driveway from retained37ft berth length under ZR36-661.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "ZR 36-661"
+      ],
+      "decisiveReferences": [
+        "ZR 36-661"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "20017981",
+          "sectionNumber": "36-661",
+          "title": "Size of required berths",
+          "codePrefix": "ZR",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "corpusLabel": "NYC Zoning Resolution",
+          "applicabilityStatus": "continuously-amended",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017981-1"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:20017981-1",
+              "selectedText": "36-661 Size of required berths C1 C2 C3 C4 C5 C6 C7 C8 In all districts, as indicated, all required accessory off- street loading berths, open or enclosed, shall conform to the regulations on minimum dimensions set forth in the following table. The dimensions of off-street berths shall not include driveways or entrances to or exits from such off-street berths. Loading requirement categories (LRC) shall be as set forth in Section 36-62 (Required Accessory Off-street Loading Berths). MINIMUM DIMENSIONS FOR REQUIRED ACCESSORY OFF-STREET LOADING BERTHS (in feet) Length Width Vertical Clearance LRC-A with less than 10,000 sq. ft. of floor area 37 12 14 with 10,000 sq. ft. or more of floor area 50 12 14 LRC-B 37 12 14 LRC-C 37 12 12 LRC-D 37 12 12 LRC-E 25 10 8",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes both the LRC-B minimum berth length and that driveways and entrances are excluded from berth dimensions."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "512eb0bc-af3e-4d2d-b267-1ea6fed20b93",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/512eb0bc-af3e-4d2d-b267-1ea6fed20b93-request.json",
+          "requestSHA256": "271afa30e9a302db446d8c23a00615f631c1c757ad91519a5d15002102beacf4",
+          "sourceReferenceCount": 8,
+          "sourceReferences": [
+            {
+              "reference": "ZR 36-661",
+              "sectionID": "20017981",
+              "enactedTextSHA256": "a84950db3e51e7ba06813d327d9b93d197e439f98215287f811263cf423e8549",
+              "enactedTextCharacters": 2297
+            }
+          ]
+        },
+        {
+          "id": "57a58aff-2b1e-4a0b-bd0d-8b0716521041",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/57a58aff-2b1e-4a0b-bd0d-8b0716521041-request.json",
+          "requestSHA256": "ed6dad780ff2758e1ad7ab6323ae0c84ab158cd1dfec8d18ca60cfb31158f97a",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.652235+00:00"
+    },
+    {
+      "id": "fresh-hold-32-loading-near-1",
+      "familyID": "commercial-loading-near-residence-boundary",
+      "questionSHA256": "db8bc8aa825ea716ce04b64884a4c5d28e4a7b79924bdae405e15016fcaefb49",
+      "question": "For a NYC C4-2 commercial site, can an accessory loading berth located 40 feet from a Residence District boundary remain unenclosed outside?",
+      "frozenKeySHA256": "b44ce4aecda102df5c07783f92039b811a211183554449114d2c47da0825fd21",
+      "finalOutputSHA256": "67050f9451c2dab719667ba14cc1aa925c07ddbfa5b21293817aff830b290ee4",
+      "answerTextSHA256": "131c4d54931ef6bf0398716c552c88d1920adcebba78218d80988a8b1f3254e9",
+      "answerText": "**Cannot determine from the supplied text whether it may remain unenclosed.** For C4 districts, ZR \u00a7 36-61 permits accessory loading berths to be open or enclosed, but makes that permission subject to \u00a7 36-663, which is not supplied. The supplied 40-foot distance therefore does not settle the enclosure question; the M-district rule in \u00a7 44-563 cannot be substituted for the missing C-district provision. (ZR \u00a7\u00a7 36-61, 44-563)",
+      "httpStatus": 200,
+      "seconds": 11.657152207999955,
+      "grade": "withheld",
+      "reason": "Fails to explain C4 loading-berth enclosure requirement within60ft of Residence District boundary despite ZR36-663 in frozen library. It correctly refuses to apply parallel M-district rule, but misses an expressly named dependency from supplied C-district parent ZR36-61.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "ZR 36-663"
+      ],
+      "decisiveReferences": [
+        "ZR 36-663"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "20017973",
+          "sectionNumber": "36-61",
+          "title": "Permitted Accessory Off-street Loading Berths",
+          "codePrefix": "ZR",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "corpusLabel": "NYC Zoning Resolution",
+          "applicabilityStatus": "continuously-amended",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017973-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:20017973-2",
+              "selectedText": "36-61 Permitted Accessory Off-street Loading Berths C1 C2 C3 C4 C5 C6 C7 C8 In all districts, as indicated, accessory off-street loading berths, open or enclosed, may be provided for all permitted uses, under rules and regulations promulgated by the Commissioner of Buildings, and subject to the provisions of Sections 36-662 (Location of access to the street), 36-663 (Restrictions on location of berths near Residence Districts), 36-664 (Surfacing) and 36-665 (Screening).",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes the C1\u2013C8 permission for open or enclosed accessory loading berths and its express dependency on \u00a7 36-663."
+        },
+        {
+          "sectionID": "20017490",
+          "sectionNumber": "44-563",
+          "title": "Restrictions on location of berths near Residence Districts",
+          "codePrefix": "ZR",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "corpusLabel": "NYC Zoning Resolution",
+          "applicabilityStatus": "continuously-amended",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017490-5"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:20017490-5",
+              "selectedText": "44-563 Restrictions on location of berths near Residence Districts M1 M2 M3 In all districts, as indicated, where accessory off-street loading berths are located within 60 feet of a Residence District boundary, such berths shall be enclosed within a building, and no entrance to or exit from the berths on to the street shall be less than 30 feet from the district boundary.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Shows that the supplied 60-foot enclosure rule applies to M1\u2013M3, not C4."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "ba417e3d-48cd-4726-a616-8f13516be956",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/ba417e3d-48cd-4726-a616-8f13516be956-request.json",
+          "requestSHA256": "51958636fc47e2832f39f2cf9cd592f9f19a4da9522594267f6d008e894815b9",
+          "sourceReferenceCount": 9,
+          "sourceReferences": [
+            {
+              "reference": "ZR 44-51",
+              "sectionID": "20017480",
+              "enactedTextSHA256": "141204f719d611212ab368f5622a8746cf4b192321384a9207446e8db902cda8",
+              "enactedTextCharacters": 459
+            },
+            {
+              "reference": "ZR 36-61",
+              "sectionID": "20017973",
+              "enactedTextSHA256": "f3935398dc64b427bed4927fbb4ab4cadaf089357f70ded33289a89a51112e99",
+              "enactedTextCharacters": 474
+            },
+            {
+              "reference": "ZR 144-53",
+              "sectionID": "20022175",
+              "enactedTextSHA256": "95056aa674bb27462e60db1363e52be1ecb7c513caf18607a74ca0b34a5797dd",
+              "enactedTextCharacters": 229
+            },
+            {
+              "reference": "ZR 25-71",
+              "sectionID": "20017605",
+              "enactedTextSHA256": "68c55c3634e33fe31856b0974901831c56fc5628af665ebe8defe7a73b850b83",
+              "enactedTextCharacters": 588
+            },
+            {
+              "reference": "ZR 44-563",
+              "sectionID": "20017490",
+              "enactedTextSHA256": "c830cd586c9eed995cab7e54a448d55cb74f30d0c79af57bc4ac88d887dd762a",
+              "enactedTextCharacters": 374
+            },
+            {
+              "reference": "ZR 101-743",
+              "sectionID": "20020887",
+              "enactedTextSHA256": "9a5ee5334feedc95813eb9f6e7f8fa12debc47b4a892d1de43085417013d617b",
+              "enactedTextCharacters": 891
+            },
+            {
+              "reference": "ZR 12-10",
+              "sectionID": "20018523",
+              "enactedTextSHA256": "43d85d983cec271e16471dcb1de0899283f91f7804203614e54e018e12ccc59b",
+              "enactedTextCharacters": 1685
+            },
+            {
+              "reference": "ZR 44-562",
+              "sectionID": "20017489",
+              "enactedTextSHA256": "4f71e84de8ecb0babf2503402d32a9d90c2d9c43bd4f69c085295a44c5fea1e9",
+              "enactedTextCharacters": 901
+            },
+            {
+              "reference": "ZR 36-662",
+              "sectionID": "20022663",
+              "enactedTextSHA256": "0d9a2f6b6846e518903edecfcee1c773254f9296ea85a451bc9349ea8e344b9f",
+              "enactedTextCharacters": 8714
+            }
+          ]
+        },
+        {
+          "id": "acf3d725-b751-4a34-a30e-7aadd8b50e0e",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/acf3d725-b751-4a34-a30e-7aadd8b50e0e-request.json",
+          "requestSHA256": "c0bec645600bce5b501b97773e2cf3b63375f1d1405288e872f42a66716116fe",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": {
+        "subtype": "unnecessary_nonanswer",
+        "stage": "dependency_retrieval_or_selection",
+        "expectedRule": "ZR36-663 requires enclosure within60ft, plus street entrance at least30ft from Residence District boundary.",
+        "actualWriterRequestID": "ba417e3d-48cd-4726-a616-8f13516be956",
+        "expectedRuleInWriterPacket": false,
+        "actualRelevantSources": [
+          "ZR36-61",
+          "ZR44-563",
+          "ZR36-662"
+        ],
+        "packetObservation": "Actual source list omits ZR36-663. C-district parent36-61 explicitly makes permission subject to36-663. Parallel44-563 has correct numeric rule but applies to M districts, and model correctly declines substitution. The missing decisive reference is identifiable in the supplied parent text."
+      },
+      "reviewedAt": "2026-10-03T00:27:06.654008+00:00"
+    },
+    {
+      "id": "fresh-hold-32-loading-near-2",
+      "familyID": "commercial-loading-near-residence-boundary",
+      "questionSHA256": "eb4070016eb504097c7d0a4b8f8da0ad9a3ddac325e2db5d5c91af1bc34fbc96",
+      "question": "If it is enclosed, may the street entrance to that berth be only 20 feet from the Residence District boundary?",
+      "frozenKeySHA256": "da3412b4e74f16c236adbe646c3b8f80d29e0dff88fdc1473d754cd21bd36f5c",
+      "finalOutputSHA256": "37d50928c4ffff35db0bb4b4be12ed49444d8d06dccef101f097b28ccf916a44",
+      "answerTextSHA256": "1bfe9ab3511fcaa72e94df788ee651cefc3ecde8378f5c1d6b8d2f9f1830a0a8",
+      "answerText": "**No.** For a C4 berth within 60 feet of a Residence District boundary, enclosure is required, and the street entrance must also be at least 30 feet from the boundary. Enclosing it does not allow an entrance only 20 feet away. (ZR \u00a7\u00a7 36-61, 36-663)",
+      "httpStatus": 200,
+      "seconds": 10.496171666000038,
+      "grade": "correct",
+      "reason": "Follow-up recovers ZR36-663 and correctly preserves40ft/within60ft berth context, rejects20ft street entrance and gives30ft minimum. Enclosure does not waive entrance separation.",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "expectedSourceReferences": [
+        "ZR 36-663"
+      ],
+      "decisiveReferences": [
+        "ZR 36-663"
+      ],
+      "citedSources": [
+        {
+          "sectionID": "20017973",
+          "sectionNumber": "36-61",
+          "title": "Permitted Accessory Off-street Loading Berths",
+          "codePrefix": "ZR",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "corpusLabel": "NYC Zoning Resolution",
+          "applicabilityStatus": "continuously-amended",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017973-2"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:20017973-2",
+              "selectedText": "36-61 Permitted Accessory Off-street Loading Berths C1 C2 C3 C4 C5 C6 C7 C8 In all districts, as indicated, accessory off-street loading berths, open or enclosed, may be provided for all permitted uses, under rules and regulations promulgated by the Commissioner of Buildings, and subject to the provisions of Sections 36-662 (Location of access to the street), 36-663 (Restrictions on location of berths near Residence Districts), 36-664 (Surfacing) and 36-665 (Screening).",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "governing",
+          "relevance": "Establishes that accessory off-street loading berths in C4 districts are subject to ZR \u00a7 36-663."
+        },
+        {
+          "sectionID": "20017983",
+          "sectionNumber": "36-663",
+          "title": "Restrictions on location of berths near Residence Districts",
+          "codePrefix": "ZR",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "corpusLabel": "NYC Zoning Resolution",
+          "applicabilityStatus": "continuously-amended",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017983-3"
+          ],
+          "supportingPassages": [
+            {
+              "sourceID": "research-permitext_discovered-id:20017983-3",
+              "selectedText": "36-663 Restrictions on location of berths near Residence Districts C1 C2 C3 C4 C5 C6 C7 C8 In all districts, as indicated, where accessory off-street loading berths are located within 60 feet of a Residence District boundary, such berths shall be enclosed within a building, and no entrance to or exit from the berths onto the street shall be less than 30 feet from the district boundary.",
+              "visualSources": []
+            }
+          ],
+          "evidenceRole": "supporting",
+          "relevance": "Establishes both the enclosure requirement within 60 feet and the separate 30-foot minimum for a street entrance or exit."
+        }
+      ],
+      "writerAndVerifierRequests": [
+        {
+          "id": "279f4c42-1e53-46d0-a755-35454cc0234f",
+          "phase": "permitext_code_interpretation",
+          "effort": "low",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/279f4c42-1e53-46d0-a755-35454cc0234f-request.json",
+          "requestSHA256": "085c68f96a3ce88c34a89ac4490d6784a4c917ce30cb75096da0359d9cda49ce",
+          "sourceReferenceCount": 9,
+          "sourceReferences": [
+            {
+              "reference": "ZR 36-663",
+              "sectionID": "20017983",
+              "enactedTextSHA256": "dcdc96b901690575eef97b057c9de1dcef33c38efea5e686b8f34b3820216aac",
+              "enactedTextCharacters": 388
+            }
+          ]
+        },
+        {
+          "id": "d6415841-887d-423e-80cb-d1618156178f",
+          "phase": "permitext_research_verification",
+          "effort": "medium",
+          "requestFile": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/d6415841-887d-423e-80cb-d1618156178f-request.json",
+          "requestSHA256": "c0f06181270891481c510e4d20e7281a3427bab3acd3379f55371e8bb26980c4",
+          "sourceReferenceCount": 0,
+          "sourceReferences": []
+        }
+      ],
+      "failureDiagnosis": null,
+      "reviewedAt": "2026-10-03T00:27:06.655890+00:00"
+    }
+  ],
+  "completedReviewAt": "2026-10-03T00:28:24.311540+00:00",
+  "supplementaryObservationCount": 8,
+  "headlineSummary": "20 turns in10 related scenario conversations:15correct,5withheld,0minor/material errors/runtime failures/key ambiguities. Five withheld outputs are unnecessary nonanswers because actual writer packets omit FGC407.2, FC604.3.2/.3, or FC609.4.1.1.1. Related followups remain correlated; assistant review, not professional adjudication.",
+  "completionAudit": {
+    "frozenFixtureAndKeyHashesIntact": true,
+    "questionAndFinalOutputHashesVerified": true,
+    "writerRequestFileHashesVerified": true,
+    "all20AssignedTurnsReviewed": true,
+    "overlapExcludedFromAggregation": true,
+    "professionalAdjudication": false,
+    "accuracyPopulationClaim": false
+  }
+}

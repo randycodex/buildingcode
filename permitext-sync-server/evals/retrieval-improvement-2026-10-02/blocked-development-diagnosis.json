@@ -1,0 +1,958 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-02T23:36:21.355009+00:00",
+  "resultsPath": "/tmp/permitext-fresh-hybrid-development-live-20261002/results.json",
+  "resultsSHA256": "bb2d4c50f42bd137e5a2d97ce654e2d4b9038e0344f6d7768496fd562d61dfc0",
+  "scope": "Fresh development outputs/provider messages only; no heldout content or paid calls. Encrypted provider reasoning was not interpreted or included. Cost is separately reported.",
+  "cases": [
+    {
+      "id": "fresh-dev-05-exhaust-3",
+      "cause": "Citation/binding repair failure despite complete decisive text.",
+      "sourceDiagnosis": "Writer received complete MC501.3 and MC505.1, including ductless exceptions. Missing canonical text is not the cause.",
+      "repairDiagnosis": "First revision reattributes prose to MC501.3; second removes citation index1 but leaves MC505.1 sourceID research-permitext_discovered-id:10603-3 in supportedPoints[0].sourceIDs. Final verifier still sees/rejects MC505.1 attribution without its I-1/I-2 exclusion.",
+      "fixOwner": "Root: targeted citation/source binding repair and precise exception qualification.",
+      "decisiveReference": "MC 501.3",
+      "decisiveTextPresent": true,
+      "writerSources": [
+        {
+          "sourceID": "research-permitext_discovered-id:10454-1",
+          "reference": "MC 501.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": {
+            "sourceID": "research-permitext_discovered-id:10454-1",
+            "sectionNumber": "501.3",
+            "textComplete": true,
+            "missingReferences": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "501.3.1",
+                "referenceKind": "section"
+              }
+            ],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "6a322c67309670b0c7352c4f4ea7f653444bfc10533cb0293c5e403be6f4ddf6",
+          "textCharacters": 881
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:10455-2",
+          "reference": "MC 501.3.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": {
+            "sourceID": "research-permitext_discovered-id:10455-2",
+            "sectionNumber": "501.3.1",
+            "textComplete": false,
+            "missingReferences": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "510",
+                "referenceKind": "section"
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "504.4",
+                "referenceKind": "section"
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "506.3.13",
+                "referenceKind": "section"
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "506.4",
+                "referenceKind": "section"
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "506.5",
+                "referenceKind": "section"
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "511",
+                "referenceKind": "section"
+              }
+            ],
+            "additionalUnlistedReferenceCount": 4
+          },
+          "textSHA256": "959aaeb2d1cebfc80f4d213f344580972e35fdcf9de0016af8093185a0aba2f3",
+          "textCharacters": 2373
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:10603-3",
+          "reference": "MC 505.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "acc81a4d08668c246f32ba928816fa488c7dd3389fa0c1a0451f97a74dd4c70b",
+          "textCharacters": 1531
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:10658-4",
+          "reference": "MC 507.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "710df5c88125851383d937017ec94db64a0705a3d8b1f6c09aef985212283f16",
+          "textCharacters": 1664
+        },
+        {
+          "sourceID": "research-permitext_cross_reference-id:10665-2",
+          "reference": "MC 507.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "fe1b323b597ecace48034220fdaff61eae1b40ca3bb3b0375cec7107862badb6",
+          "textCharacters": 535
+        },
+        {
+          "sourceID": "research-permitext_cross_reference-id:10664-3",
+          "reference": "MC 507.1.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "faddd38bac7e1d67e8c7f2acb02d1a9ffcb68b8c42a459089ba4c14acc88fdbc",
+          "textCharacters": 6403
+        }
+      ],
+      "recordedCalls": [
+        {
+          "phase": "permitext_code_interpretation",
+          "id": "d9a2ca75-454e-40f2-8628-7586180d3339",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/d9a2ca75-454e-40f2-8628-7586180d3339-request.json",
+          "requestSHA256": "878d509fd7107f112651fb6db87b47e801c315d9758b13a490ce299a946d32af",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/d9a2ca75-454e-40f2-8628-7586180d3339-response.json",
+          "responseSHA256": "cce7919ff9b6610b94474b5b96bf92170c035bdfdc0cd729a3bce28de94e6800",
+          "writerAnswerText": "**No.** Under the 2022 NYC Mechanical Code, a listed and labeled domestic ductless range hood need not discharge outdoors when it is installed according to the manufacturer’s instructions and mechanical or natural ventilation is otherwise provided as required by Chapter 4. That is an express exception to the general outdoor-discharge rule, and the facts you stipulated meet its stated conditions (MC §§ 501.3, 505.1).",
+          "writerPointBindings": [
+            {
+              "sectionID": "10454",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10454-1",
+                "research-permitext_discovered-id:10603-3"
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "permitext_research_verification",
+          "id": "d62d2a20-aaf5-4360-aff8-d92a1d09a918",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/d62d2a20-aaf5-4360-aff8-d92a1d09a918-request.json",
+          "requestSHA256": "daf252b148de3dc21259e2e94294657a6603b8dff7540e5f69a1f82be20c9168",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/d62d2a20-aaf5-4360-aff8-d92a1d09a918-response.json",
+          "responseSHA256": "32874981a960086b84892f32dd71ca2c75eea7a23e848fbd02c1ad03aa8a99b5",
+          "pass": false,
+          "issues": [
+            {
+              "type": "misstated_provision",
+              "detail": "The answer cites MC 505.1 as support for an unqualified ductless-hood exception but omits that this section’s exception applies only “in other than Group I-1 and I-2” (passage research-permitext_discovered-id:10603-3). The conclusion is directly supported by MC 501.3’s separately worded exception, which has no such occupancy qualification; however, the answer should not present MC 505.1 as establishing the same unqualified rule. Clarify or remove the MC 505.1 support."
+            }
+          ],
+          "proposedPointBindings": [
+            {
+              "heading": "Ductless-hood exception",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10454-1",
+                "research-permitext_discovered-id:10603-3"
+              ]
+            }
+          ],
+          "proposedCitations": [
+            {
+              "reference": "MC 501.3",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10454-1"
+              ]
+            },
+            {
+              "reference": "MC 505.1",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10603-3"
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "permitext_research_targeted_revision",
+          "id": "980c097b-cc82-474d-8b6c-08955c8c180a",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/980c097b-cc82-474d-8b6c-08955c8c180a-request.json",
+          "requestSHA256": "823e8e6cf2b9114f73688e5e5c471be49b347b0ff8c68238a207f0b16cd34060",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/980c097b-cc82-474d-8b6c-08955c8c180a-response.json",
+          "responseSHA256": "6847e9002dc34c32522842fab9dafe62b2a4dc1b84015e4a61679149c0830fd0",
+          "revision": {
+            "pointRemovals": [],
+            "citationRemovals": [],
+            "edits": [
+              {
+                "targetID": "t1",
+                "after": " That is an express exception in MC § 501.3; the conditions you stipulated match the conditions stated there.",
+                "remove": false
+              },
+              {
+                "targetID": "t2",
+                "after": "Although the general rule requires mechanical exhaust to discharge outdoors, MC § 501.3 expressly provides that listed and labeled domestic ductless range hoods need not discharge outdoors when installed in accordance with the manufacturer’s instructions and when mechanical or natural ventilation is otherwise provided in accordance with Chapter 4.",
+                "remove": false
+              }
+            ],
+            "bindingAdditions": []
+          }
+        },
+        {
+          "phase": "permitext_research_verification",
+          "id": "20c5269a-7320-4649-8e76-72abf8f5016a",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/20c5269a-7320-4649-8e76-72abf8f5016a-request.json",
+          "requestSHA256": "37d5750df2bb3f44b92d621396683534948e2f5e23a35c784daefd6d7a2bbcee",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/20c5269a-7320-4649-8e76-72abf8f5016a-response.json",
+          "responseSHA256": "1fb34d36a1d473e8bde6ac3fd2be396aecac2cc3a005f28f554be584cbb371d1",
+          "pass": false,
+          "issues": [
+            {
+              "type": "incorrect_citation",
+              "detail": "The separate citation to MC § 505.1 is described as establishing “the applicable exception” without its stated limitation: that exception applies only “in other than Group I-1 and I-2.” The user has not established an occupancy group. MC § 501.3 independently supports the answer without that qualification, so remove the § 505.1 citation and its source ID from the supported point rather than weakening the § 501.3 conclusion."
+            }
+          ],
+          "proposedPointBindings": [
+            {
+              "heading": "Ductless-hood exception",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10454-1",
+                "research-permitext_discovered-id:10603-3"
+              ]
+            }
+          ],
+          "proposedCitations": [
+            {
+              "reference": "MC 501.3",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10454-1"
+              ]
+            },
+            {
+              "reference": "MC 505.1",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10603-3"
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "permitext_research_targeted_revision",
+          "id": "d4ae37e5-2d82-46df-83ad-9895ee422b75",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/d4ae37e5-2d82-46df-83ad-9895ee422b75-request.json",
+          "requestSHA256": "a628812d96b6c6e148a68781c6b8610db03ea432ed989c8f351f8cb0922d942c",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/d4ae37e5-2d82-46df-83ad-9895ee422b75-response.json",
+          "responseSHA256": "b924ccd180da335538d148c014e4f9eaae30c5666d92e280e596ef6176a4fdcd",
+          "revision": {
+            "pointRemovals": [],
+            "citationRemovals": [
+              1
+            ],
+            "edits": [],
+            "bindingAdditions": []
+          }
+        },
+        {
+          "phase": "permitext_research_verification",
+          "id": "4ea87c7d-4457-457b-83cd-31d2b3d3d886",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/4ea87c7d-4457-457b-83cd-31d2b3d3d886-request.json",
+          "requestSHA256": "650e1f345af50ca2f69f86112aa74f4cf832ca5bf1f07bb4407a2224634ba5f9",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/4ea87c7d-4457-457b-83cd-31d2b3d3d886-response.json",
+          "responseSHA256": "fa758b837bc81cff9061b81cb4ebb31981a21705bb65fe1f77306f188e6a0620",
+          "pass": false,
+          "issues": [
+            {
+              "type": "incorrect_citation",
+              "detail": "Remove MC § 505.1 (source research-permitext_discovered-id:10603-3) from the supported point and citations. Its ductless-hood exception applies only “in other than Group I-1 and I-2,” a qualification not established by the project facts. The answer’s conclusion is independently supported by MC § 501.3, whose exception has no such occupancy qualification."
+            }
+          ],
+          "proposedPointBindings": [
+            {
+              "heading": "Ductless-hood exception",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10454-1",
+                "research-permitext_discovered-id:10603-3"
+              ]
+            }
+          ],
+          "proposedCitations": [
+            {
+              "reference": "MC 501.3",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10454-1"
+              ]
+            },
+            {
+              "reference": "MC 505.1",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10603-3"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fresh-dev-10-surfacing-1",
+      "cause": "Wrong governing zoning provision retrieved, followed by applicability repair/heading failure.",
+      "sourceDiagnosis": "ZR36-54 is absent. Writer receives complete M-district ZR44-44, FRESH/special-district parking and conditional BC drainage; M1/M2/M3 notation cannot establish C4-2 applicability.",
+      "repairDiagnosis": "Verifier first rejects conditional No applying wrong district rule, then rejects unqualified supported-point heading even after explanatory prose is narrowed. Repairing heading alone would produce a bounded nonanswer, not the missing governing C-district rule.",
+      "fixOwner": "Root: retrieval must find ordinary commercial ZR36-54; canonical expansion of already complete ZR44-44 cannot fix this.",
+      "decisiveReference": "ZR 36-54",
+      "decisiveTextPresent": false,
+      "writerSources": [
+        {
+          "sourceID": "research-permitext_discovered-id:20019068-1",
+          "reference": "ZR 63-24",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "completeness": {
+            "sourceID": "research-permitext_discovered-id:20019068-1",
+            "sectionNumber": "63-24",
+            "textComplete": true,
+            "missingReferences": [
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "63-50",
+                "referenceKind": "section"
+              },
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "36-23",
+                "referenceKind": "section"
+              },
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "36-20",
+                "referenceKind": "section"
+              }
+            ],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "416dd10b2b74498599fe18bcee26094fb46cf550614379ce3f917d6145c63824",
+          "textCharacters": 3005
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:20019750-2",
+          "reference": "ZR 97-51",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "completeness": {
+            "sourceID": "research-permitext_discovered-id:20019750-2",
+            "sectionNumber": "97-51",
+            "textComplete": true,
+            "missingReferences": [
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "36-21",
+                "referenceKind": "section"
+              },
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "97-50",
+                "referenceKind": "section"
+              }
+            ],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "3c781436a42d99644b30250e3e0f216949267eeaf6b563b9da89d35c5845096f",
+          "textCharacters": 551
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:20017473-3",
+          "reference": "ZR 44-44",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "completeness": null,
+          "textSHA256": "1bad077b4337e3fec6f0b3e5d697d1f298c35f718cf29bc1c8164a33b265f569",
+          "textCharacters": 565
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:402-4",
+          "reference": "BC 406.9.4.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "8a1647582bc4076ecc7e71286ad4005ba9ff98fd417e1cdc7f4e6a1e400b953f",
+          "textCharacters": 177
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:20018523-7",
+          "reference": "ZR 12-10",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "completeness": null,
+          "textSHA256": "48f9d665a3345597673f60c363568d47c462620649b7466ea65cf023b04acc1e",
+          "textCharacters": 2496
+        },
+        {
+          "sourceID": "research-permitext_cross_reference-id:20019071-1",
+          "reference": "ZR 63-40",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "completeness": {
+            "sourceID": "research-permitext_cross_reference-id:20019071-1",
+            "sectionNumber": "63-40",
+            "textComplete": true,
+            "missingReferences": [
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "63-30",
+                "referenceKind": "section"
+              }
+            ],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "fdac233a1b6928e9756a04cd782f0abcde1f4c3a06b6b6010d49502259a41ffd",
+          "textCharacters": 951
+        },
+        {
+          "sourceID": "research-permitext_cross_reference-id:20019072-2",
+          "reference": "ZR 63-50",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "completeness": {
+            "sourceID": "research-permitext_cross_reference-id:20019072-2",
+            "sectionNumber": "63-50",
+            "textComplete": false,
+            "missingReferences": [
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "63-30",
+                "referenceKind": "section"
+              }
+            ],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "b6dc30e2f8355c8cadd5833f6a8e0232255c76cf50c2643afa8613c04fb3a2d0",
+          "textCharacters": 7509
+        }
+      ],
+      "recordedCalls": [
+        {
+          "phase": "permitext_code_interpretation",
+          "id": "dfeac7a7-44a8-4f11-bae7-96ae8b73b393",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/dfeac7a7-44a8-4f11-bae7-96ae8b73b393-request.json",
+          "requestSHA256": "e115ed39a50eaf3d0868690f9400d16a48b6470d0a4beda1ce3b90e600174701",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/dfeac7a7-44a8-4f11-bae7-96ae8b73b393-response.json",
+          "responseSHA256": "fa6d57db8b5bc706303dab63e54838208d0f474dd54c9a1dbc7e68c65c1bcf88",
+          "writerAnswerText": "**No, if the area is a “group parking facility” under the supplied definition:** an area intended for permanent use as an open accessory group parking facility must have permeable paving, asphaltic or Portland cement concrete, or another hard-surfaced dustless material. Dusty bare soil does not meet that stated surfacing rule (ZR §§ 44-44, 12-10). The definition requires more than one parking space and street access common to all spaces. The supplied passage’s district applicability notation does not clearly establish whether § 44-44 applies in C4-2, so I cannot conclude that this rule governs this specific district from this evidence alone.",
+          "writerPointBindings": [
+            {
+              "sectionID": "20017473",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20017473-3"
+              ]
+            },
+            {
+              "sectionID": "20018523",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-7"
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "permitext_research_verification",
+          "id": "34478c9d-9972-4bcb-aa12-030eaa270d5b",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/34478c9d-9972-4bcb-aa12-030eaa270d5b-request.json",
+          "requestSHA256": "13a2685cc11b13a7386821f2df874f1963bf103b0627f80fea25cc5c58ee1418",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/34478c9d-9972-4bcb-aa12-030eaa270d5b-response.json",
+          "responseSHA256": "299071bd246a734a3af5f0a92aa3284e36e30d9c073c5106d68bc0f0befc8912",
+          "pass": false,
+          "issues": [
+            {
+              "type": "misstated_provision",
+              "detail": "The answer says it is unclear whether ZR § 44-44 applies in C4-2. But the supplied passage identifies the section as applying to “M1 M2 M3”; it does not establish the section’s surfacing requirement for C4-2. The opening “No, if…” also risks applying that requirement to this C4-2 facility. Revise to say that § 44-44 requires dustless hard surfacing for the covered permanent open accessory group parking facilities, but the supplied text does not establish that this rule governs C4-2. Do not infer that bare soil is permitted overall: the supplied evidence does not resolve that question under other potentially applicable rules."
+            }
+          ],
+          "proposedPointBindings": [
+            {
+              "heading": "Permanent group-parking areas must be surfaced",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20017473-3"
+              ]
+            },
+            {
+              "heading": "Meaning of group parking facility",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-7"
+              ]
+            }
+          ],
+          "proposedCitations": [
+            {
+              "reference": "ZR 44-44",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20017473-3"
+              ]
+            },
+            {
+              "reference": "ZR 12-10",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-7"
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "permitext_research_targeted_revision",
+          "id": "a3946346-fdda-40aa-af34-e669431beb3a",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/a3946346-fdda-40aa-af34-e669431beb3a-request.json",
+          "requestSHA256": "0df80af694b9fc16092026478051df0008baaf1dd96dca3415fc2378b3604a35",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/a3946346-fdda-40aa-af34-e669431beb3a-response.json",
+          "responseSHA256": "747d34fd52a722951648f883d1787686e43ed093789fe3d7de835ad1cf7ed450",
+          "revision": {
+            "pointRemovals": [],
+            "citationRemovals": [],
+            "edits": [
+              {
+                "targetID": "t0",
+                "after": "ZR § 44-44 states that an area intended for permanent use as an open accessory group parking facility must be surfaced with permeable paving, asphaltic or Portland cement concrete, or another hard-surfaced dustless material. The supplied text does not establish whether that rule governs a C4-2 facility.",
+                "remove": false
+              },
+              {
+                "targetID": "t1",
+                "after": " Dusty bare soil would not meet the stated surfacing rule, but the supplied evidence does not resolve whether that rule applies to this C4-2 facility or whether bare soil is permitted under other potentially applicable rules (ZR § 44-44).",
+                "remove": false
+              },
+              {
+                "targetID": "t2",
+                "after": " The definition describes a group parking facility as including an open parking area, and requires more than one parking space and street access common to all spaces (ZR § 12-10).",
+                "remove": false
+              },
+              {
+                "targetID": "t3",
+                "after": " The supplied § 44-44 passage is marked “M1 M2 M3”; it does not establish that the surfacing requirement applies in C4-2. The evidence therefore does not resolve whether dusty bare soil is permitted overall.",
+                "remove": false
+              },
+              {
+                "targetID": "t4",
+                "after": "The supplied § 44-44 passage states a dustless hard-surfacing requirement for areas intended for permanent use as open accessory group parking facilities, but its “M1 M2 M3” notation does not establish that the rule applies in C4-2. The supplied evidence does not resolve whether dusty bare soil is permitted in this C4-2 facility under other potentially applicable rules.",
+                "remove": false
+              },
+              {
+                "targetID": "t5",
+                "after": "",
+                "remove": true
+              },
+              {
+                "targetID": "t6",
+                "after": "ZR § 44-44 states that any area intended to be used permanently for an open accessory group parking facility shall be surfaced with permeable paving materials, asphaltic or Portland cement concrete, or other hard-surfaced dustless material. The supplied passage is marked “M1 M2 M3” and does not establish that this requirement applies in C4-2.",
+                "remove": false
+              },
+              {
+                "targetID": "t7",
+                "after": " Dusty bare soil would not meet the stated surfacing rule, but the supplied evidence does not establish that the rule governs this C4-2 facility or resolve whether bare soil is permitted under other potentially applicable rules.",
+                "remove": false
+              },
+              {
+                "targetID": "t8",
+                "after": "The supplied definition describes a group parking facility as a building, structure, or open use on a zoning lot or portion thereof used to store motor vehicles, containing more than one parking space, with street access common to all spaces; it includes an open parking area.",
+                "remove": false
+              }
+            ],
+            "bindingAdditions": []
+          }
+        },
+        {
+          "phase": "permitext_research_verification",
+          "id": "7526ba18-f7ec-4361-a28d-a5033ffbb9b8",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/7526ba18-f7ec-4361-a28d-a5033ffbb9b8-request.json",
+          "requestSHA256": "38130a43b447410070684e75b08785156c0e08dddb331fe2ec01150bea58d2da",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/7526ba18-f7ec-4361-a28d-a5033ffbb9b8-response.json",
+          "responseSHA256": "ccf4ae0b57b111cc2eb7380777b807d45778110ca450bcc9d2da0be9944f3dbb",
+          "pass": false,
+          "issues": [
+            {
+              "type": "misstated_provision",
+              "detail": "The supported-point heading “Permanent group-parking areas must be surfaced” states an unqualified rule. ZR § 44-44 is marked “M1 M2 M3,” and the answer itself correctly notes that the supplied text does not establish that its requirement governs C4-2. Narrow the heading to identify the rule as applying to the districts covered by § 44-44; the answerText’s conditional explanation and evidence limitation can remain."
+            }
+          ],
+          "proposedPointBindings": [
+            {
+              "heading": "Permanent group-parking areas must be surfaced",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20017473-3"
+              ]
+            },
+            {
+              "heading": "Meaning of group parking facility",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-7"
+              ]
+            }
+          ],
+          "proposedCitations": [
+            {
+              "reference": "ZR 44-44",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20017473-3"
+              ]
+            },
+            {
+              "reference": "ZR 12-10",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-7"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fresh-dev-10-surfacing-2",
+      "cause": "Implicit follow-up resets topic; C4-2/permanent accessory parking removed from retrieval query.",
+      "sourceDiagnosis": "ZR36-54 is absent. Writer sees original user prompt in conversation history but retrieval uses current material question alone and fetches BC406.9.4.2 plus waterfront ZR62-656.",
+      "repairDiagnosis": "Verifier passes the resulting bounded nonanswer; provider pass does not establish end-to-end correctness.",
+      "fixOwner": "This agent: definite-noun-head continuity; root: focus current retrieval intent while retaining relevant original scope.",
+      "decisiveReference": "ZR 36-54",
+      "decisiveTextPresent": false,
+      "writerSources": [
+        {
+          "sourceID": "research-permitext_discovered-id:402-1",
+          "reference": "BC 406.9.4.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": {
+            "sourceID": "research-permitext_discovered-id:402-1",
+            "sectionNumber": "406.9.4.2",
+            "textComplete": true,
+            "missingReferences": [],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "8a1647582bc4076ecc7e71286ad4005ba9ff98fd417e1cdc7f4e6a1e400b953f",
+          "textCharacters": 177
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:20019015-2",
+          "reference": "ZR 62-656",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "completeness": {
+            "sourceID": "research-permitext_discovered-id:20019015-2",
+            "sectionNumber": "62-656",
+            "textComplete": true,
+            "missingReferences": [],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "0768a25bc2842f88035c09e11fdcf086b6d5b36a18c7d92866fda9fd318c371c",
+          "textCharacters": 2171
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:20022206-3",
+          "reference": "ZR 139-545",
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "completeness": null,
+          "textSHA256": "e5c204795f83d29116802ee5f0450b2663a39a89326b2224e2911451628ab0e7",
+          "textCharacters": 732
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:6862-4",
+          "reference": "BC 3501.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "e3e8f977e99e56e033b1b65f9bd4da6fc53944d68418caa92565f1a8d1303065",
+          "textCharacters": 6599
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:113-7",
+          "reference": "BC 202",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "eaa81fe2c379caa8db90909be012f3a44058d27e56cdbe8c3e246f99d210f349",
+          "textCharacters": 1046
+        },
+        {
+          "sourceID": "research-permitext_cross_reference-id:1364-1",
+          "reference": "BC 721.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "87345da51479446c12956ac090694675b2b38f335ceeacd73e67ecd415747a35",
+          "textCharacters": 7590
+        }
+      ],
+      "recordedCalls": [
+        {
+          "phase": "permitext_code_interpretation",
+          "id": "b5e828b0-847f-4038-9459-32aeeb8291ef",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/b5e828b0-847f-4038-9459-32aeeb8291ef-request.json",
+          "requestSHA256": "1752ca26939ad492e11690ee76437145804e62427fcb3d63fe97984f9f69cf5c",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/b5e828b0-847f-4038-9459-32aeeb8291ef-response.json",
+          "responseSHA256": "dc7a933cbdd36c35d3311660b8a6bf165f424c85b75c0238e46f531ef917414a",
+          "writerAnswerText": "**The supplied text does not require conventional asphalt, but it also does not establish that permeable paving is permitted for this parking lot.** For an open parking lot, the Building Code says only that *if* its paving is non-porous, the lot must be drained as required by the Plumbing Code (BC §§ 202, 406.9.4.2). The Zoning Resolution’s express permission for permeable concrete and porous asphalt is limited to waterfront public access areas; the supplied facts do not establish that this lot is such an area (ZR § 62-656).",
+          "writerPointBindings": [
+            {
+              "sectionID": "402",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-7",
+                "research-permitext_discovered-id:402-1"
+              ]
+            },
+            {
+              "sectionID": "20019015",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20019015-2"
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "permitext_research_verification",
+          "id": "8572a3e2-39a9-4c1a-b22d-118998d7ab0b",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/8572a3e2-39a9-4c1a-b22d-118998d7ab0b-request.json",
+          "requestSHA256": "e7ca517104cbeda5813d0869c3a13204c9c3b09c2cb8f33172605b1918673195",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/8572a3e2-39a9-4c1a-b22d-118998d7ab0b-response.json",
+          "responseSHA256": "bd685120ab426003a1c62f0d8b6552e56255aa040ffd98dfd07da15b46a8cd25",
+          "pass": true,
+          "issues": [],
+          "proposedPointBindings": [
+            {
+              "heading": "Drainage rule for non-porous open-lot paving",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-7",
+                "research-permitext_discovered-id:402-1"
+              ]
+            },
+            {
+              "heading": "Limited Zoning Resolution paving permission",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20019015-2"
+              ]
+            }
+          ],
+          "proposedCitations": [
+            {
+              "reference": "BC 202",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-7"
+              ]
+            },
+            {
+              "reference": "BC 406.9.4.2",
+              "sourceIDs": [
+                "research-permitext_discovered-id:402-1"
+              ]
+            },
+            {
+              "reference": "ZR 62-656",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20019015-2"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fresh-dev-10-surfacing-3",
+      "cause": "Governing zoning scope lost after prior topic reset; irrelevant BC/PC text and repair failures.",
+      "sourceDiagnosis": "ZR36-54 is absent. Writer receives BC406.9.4 durable/dustless surfacing and PC1101.12 site grading, which omit ZR36-54 drainage condition.",
+      "repairDiagnosis": "Initial draft opens No but says drainage alone does not establish failure of the BC rule; verifier catches contradiction. Revision changes conclusion to drainage not determinative. Next verifier rejects universal PC1101.12 grading statement without Administrative Code definition and an irrelevant missing-fact item. Correct ZR36-54 would resolve the asked drainage condition directly.",
+      "fixOwner": "This agent: topic continuity; root: retrieve governing ordinary commercial parking surfacing text and avoid collateral qualification.",
+      "decisiveReference": "ZR 36-54",
+      "decisiveTextPresent": false,
+      "writerSources": [
+        {
+          "sourceID": "research-permitext_discovered-id:12661-1",
+          "reference": "PC 1101.12",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": {
+            "sourceID": "research-permitext_discovered-id:12661-1",
+            "sectionNumber": "1101.12",
+            "textComplete": true,
+            "missingReferences": [
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "19-137",
+                "referenceKind": "section"
+              }
+            ],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "e6f703e4f00a9e89ccb4fcf1d6ae5fb80febbc5f12e37e5af1eac56c41dc103b",
+          "textCharacters": 479
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:400-2",
+          "reference": "BC 406.9.4",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": {
+            "sourceID": "research-permitext_discovered-id:400-2",
+            "sectionNumber": "406.9.4",
+            "textComplete": true,
+            "missingReferences": [],
+            "additionalUnlistedReferenceCount": 0
+          },
+          "textSHA256": "d57089f38efb8b1d3a03d05e66d8ecb543317717f00e2c5e79943f74fa54e77d",
+          "textCharacters": 206
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:3242-3",
+          "reference": "BC 1504.8",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "8e6e4f5ae4758eaad421a874f1e0d5c2ff539ad1a2924f03dca82cd492deaa5d",
+          "textCharacters": 132
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:12816-4",
+          "reference": "PC 1303.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "84963b33cd2d7ba1e5a3996c4b5378de3a1aad3a54b3990657ff076509e519b7",
+          "textCharacters": 305
+        },
+        {
+          "sourceID": "research-permitext_discovered-id:113-7",
+          "reference": "BC 202",
+          "codeEdition": "2022 New York City Construction Codes",
+          "completeness": null,
+          "textSHA256": "7bf74aebd3d0b61680db06bef0755f8e43bbe223102810b1d86f2b06f8d0e347",
+          "textCharacters": 5422
+        }
+      ],
+      "recordedCalls": [
+        {
+          "phase": "permitext_code_interpretation",
+          "id": "577d771d-cf1c-4217-a7ba-d5f7c8a9f275",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/577d771d-cf1c-4217-a7ba-d5f7c8a9f275-request.json",
+          "requestSHA256": "3d6a50134eefba83557869394a58d2b4403b6e6e915971411dfe3d70932440e1",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/577d771d-cf1c-4217-a7ba-d5f7c8a9f275-response.json",
+          "responseSHA256": "b99085b4540c9f4f48f2e84260e7ca7a3791918085c9e73032647d4845849c16",
+          "writerAnswerText": "**No—not on the facts stated.** For driveways, parking stalls, and open spaces used to park or store motor vehicles, the surface must be concrete, asphalt, or an equivalent durable, dustless material. Dustlessness alone is not enough if the paving is not also durable; but inadequate drainage or water collecting does not, by itself, establish that this surfacing rule is unsatisfied. (BC § 406.9.4)\n\nSeparately, site grading must not cause storm water to flow across sidewalks or onto adjacent property, subject to what the code otherwise permits. The supplied rule does not say that all water must drain away from the site or prohibit water collecting there. (PC § 1101.12)",
+          "writerPointBindings": [
+            {
+              "sectionID": "400",
+              "sourceIDs": [
+                "research-permitext_discovered-id:400-2"
+              ]
+            },
+            {
+              "sectionID": "12661",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12661-1"
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "permitext_research_verification",
+          "id": "0fb44dd4-8176-43d2-b7ee-edeed7891bca",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/0fb44dd4-8176-43d2-b7ee-edeed7891bca-request.json",
+          "requestSHA256": "b53cb77c5ecbbd6eb77ebc8591e3f4275c67b057a5e319935d20fb402b1cc2ed",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/0fb44dd4-8176-43d2-b7ee-edeed7891bca-response.json",
+          "responseSHA256": "c5e30bd74725ad93aa031d979033673022d34956a32bd42b1040c41167858348",
+          "pass": false,
+          "issues": [
+            {
+              "type": "missed_material_conclusion",
+              "detail": "The opening “No—not on the facts stated” answers that the surfacing rule is not satisfied, but the cited BC § 406.9.4 requires a qualifying surface—concrete, asphalt, or an equivalent durable, dustless material—and does not make adequate site drainage a condition of that surfacing rule. The answer itself later says water collecting does not establish that the surfacing rule is unsatisfied. State instead that drainage alone does not determine compliance; dustlessness is established, but whether the surface meets the rule also depends on its material and durability."
+            }
+          ],
+          "proposedPointBindings": [
+            {
+              "heading": "Vehicle-parking surfacing",
+              "sourceIDs": [
+                "research-permitext_discovered-id:400-2"
+              ]
+            },
+            {
+              "heading": "Site grading limitation",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12661-1"
+              ]
+            }
+          ],
+          "proposedCitations": [
+            {
+              "reference": "BC 406.9.4",
+              "sourceIDs": [
+                "research-permitext_discovered-id:400-2"
+              ]
+            },
+            {
+              "reference": "PC 1101.12",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12661-1"
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "permitext_research_targeted_revision",
+          "id": "789efb04-3c45-4f66-a1a9-d5785d01c5d1",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/789efb04-3c45-4f66-a1a9-d5785d01c5d1-request.json",
+          "requestSHA256": "9ef039e8577af7dcbd458123967887085822b6ee55113f581d5c8a0b67aab8fb",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/789efb04-3c45-4f66-a1a9-d5785d01c5d1-response.json",
+          "responseSHA256": "fef5164891b8100ee17573b32e8a31e6d76beb62aa2ea1c58cd76a587449c31a",
+          "revision": {
+            "pointRemovals": [],
+            "citationRemovals": [],
+            "edits": [
+              {
+                "targetID": "t0",
+                "after": "**Drainage alone does not determine whether the surfacing rule is satisfied.** For driveways, parking stalls, and open spaces used to park or store motor vehicles, the surface must be concrete, asphalt, or an equivalent durable, dustless material.",
+                "remove": false
+              },
+              {
+                "targetID": "t1",
+                "after": " Dustlessness is established, but whether the surface meets the rule also depends on its material and durability; water collecting due to inadequate drainage does not, by itself, establish noncompliance. (BC § 406.9.4)",
+                "remove": false
+              },
+              {
+                "targetID": "t4",
+                "after": "Whether the dustless paving is concrete, asphalt, or an equivalent durable material.",
+                "remove": false
+              }
+            ],
+            "bindingAdditions": []
+          }
+        },
+        {
+          "phase": "permitext_research_verification",
+          "id": "7e474f3d-9865-440f-9c0f-d99ed951c0ef",
+          "requestFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/7e474f3d-9865-440f-9c0f-d99ed951c0ef-request.json",
+          "requestSHA256": "f2354f781288308d92bd29fea72c8c63c33a44e07f641916efa87664966a7c37",
+          "responseFile": "/tmp/permitext-fresh-hybrid-development-live-20261002/7e474f3d-9865-440f-9c0f-d99ed951c0ef-response.json",
+          "responseSHA256": "1f853d687f9b50bf3d1c5efb0e45a826585e04837366a9b534c5dde8a4414bf3",
+          "pass": false,
+          "issues": [
+            {
+              "type": "misstated_provision",
+              "detail": "The answer says without qualification that “site grading must not cause” storm water to cross a sidewalk or reach adjacent property. PC § 1101.12 limits that rule to site grading or land-contour work “as defined in Section 19-137” of the Administrative Code. That definition is not supplied, so the answer cannot state the rule as applying to all site grading. Narrow or remove this separate grading claim; the omission does not affect the answer about surfacing."
+            },
+            {
+              "type": "unnecessary_qualification",
+              "detail": "The missing fact asking whether grading causes storm water to flow across a sidewalk or onto adjacent property concerns the separate PC § 1101.12 issue, not whether the surfacing rule is satisfied. It cannot change the requested surfacing conclusion and should not be listed as a needed project fact."
+            }
+          ],
+          "proposedPointBindings": [
+            {
+              "heading": "Vehicle-parking surfacing",
+              "sourceIDs": [
+                "research-permitext_discovered-id:400-2"
+              ]
+            },
+            {
+              "heading": "Site grading limitation",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12661-1"
+              ]
+            }
+          ],
+          "proposedCitations": [
+            {
+              "reference": "BC 406.9.4",
+              "sourceIDs": [
+                "research-permitext_discovered-id:400-2"
+              ]
+            },
+            {
+              "reference": "PC 1101.12",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12661-1"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "continuityFix": {
+    "version": "20261002-definite-subject-continuity-v9",
+    "files": [
+      "research-conversation-topic.mjs",
+      "tests/research-definite-subject-continuity-contract.mjs"
+    ],
+    "mechanism": "A short definite noun phrase such as the surface/the paving retains active user topic when its head noun appears there, even after blocked answers without verified citations. Generic building/project words, shared modifiers, newly introduced settings and explicit topic/disjoint-code switches do not gain this signal.",
+    "developmentReplay": "Disabling only this new signal and replaying the 30 candidate development turns changes exactly surfacing-2 and surfacing-3 from switches to continuations. No generated answer correctness or paid run is claimed by this replay."
+  }
+}

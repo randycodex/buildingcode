@@ -1,0 +1,2268 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "frozen-heldout-candidate-part-a-answer-source-review",
+  "reviewStatus": "complete",
+  "reviewedAt": "2026-10-03T00:20:29.783250+00:00",
+  "reviewer": "Codex assistant source review; not professional adjudication",
+  "inputs": {
+    "resultsPath": "/tmp/permitext-fresh-hybrid-heldout-live-20261002/results.json",
+    "resultsFileSHA256AtReview": "59c552a61d817e74709bf0e97cba78de030fa993b90c1320e6b7172817df1b26",
+    "resultsFinishedAt": null,
+    "candidateFreeze": "evals/retrieval-improvement-2026-10-02/candidate-freeze.json",
+    "candidateFreezeSHA256": "bd1ce9faf5acb73a0e3667b565cccfdd6b4de3fdec1f5759d4a59f64c05fad61",
+    "candidateFrozenAt": "2026-10-03T00:12:35.509Z",
+    "sourceHashValidation": {
+      "currentFrozenFilesMatch": true,
+      "checkedSourceFiles": 21,
+      "checkedFixtures": 4,
+      "runRecordedSourceHashesMatch": true,
+      "runOmittedFreezePaths": [
+        "scripts/build-research-semantic-index.mjs"
+      ],
+      "semanticArtifactMatches": true
+    },
+    "heldoutFixtureSHA256": "417368e2fb4db8dad468925f294026cc6370b35df27f572cc1026df4e7bae5db",
+    "sourceKeysSHA256": "51ef91267dfe22f8a5af6135831516f4fab96f0c94ff9101a945e6ff51e0dfc4",
+    "sourcePacketsSHA256": "a12fdbc61a092afdc616c0104fcc2cce604b018a074fae70e80d94e419739b8d",
+    "assignedScope": "First18 conversations in heldout.json, 36 turns; other reviewer handles remaining17 conversations.",
+    "assignedConversationIDs": [
+      "fresh-hold-01-projections",
+      "fresh-hold-02-duration",
+      "fresh-hold-03-exit-sign",
+      "fresh-hold-04-stair-penetrations",
+      "fresh-hold-05-travel",
+      "fresh-hold-06-sound",
+      "fresh-hold-07-relief",
+      "fresh-hold-08-trap-size",
+      "fresh-hold-09-trap-recess",
+      "fresh-hold-10-cleanout",
+      "fresh-hold-11-dishwasher",
+      "fresh-hold-12-nonpotable",
+      "fresh-hold-13-crawl",
+      "fresh-hold-14-roof",
+      "fresh-hold-15-vessel",
+      "fresh-hold-16-duct-support",
+      "fresh-hold-17-vapor",
+      "fresh-hold-18-liner"
+    ]
+  },
+  "method": {
+    "labels": [
+      "correct",
+      "minor_issue",
+      "materially_wrong",
+      "withheld",
+      "appropriate_clarification",
+      "fixture_ambiguous"
+    ],
+    "strictPassLabels": [
+      "correct",
+      "appropriate_clarification"
+    ],
+    "providerVerificationIsNotCorrectness": true,
+    "candidateTuningPermitted": false,
+    "evaluated": [
+      "Operative conclusion, thresholds, conditions, exceptions and scope against frozen source keys.",
+      "Actual cited enacted passages and specific source-edition metadata.",
+      "Followup continuity and unnecessary fact requests.",
+      "Recorded writer/provider packets for material errors or omissions; not every provider body is inspected for plainly supported correct answers."
+    ],
+    "sourceCoverageIsSeparateFromAnswerCorrectness": true,
+    "correctReferenceIDAloneIsNotDecisiveRuleRecall": true,
+    "additionalCitedPassageReview": [
+      "BC202 circulation-path, handrail and interior-exit-stairway definitions.",
+      "BC1013.3/.4 tactile-sign exception and sign locations.",
+      "BC1017.3.1 exit-access stair/ramp distance measurements.",
+      "MC607.5.2 stair-enclosure duct prohibition and cross-reference.",
+      "PC708.1.3 actual drain/sewer junction requirement, which reveals the cleanout fixture ambiguity.",
+      "PC802.2 indirect-waste installation conditions and clear-water exception.",
+      "PC1301.3.2 parallel nonpotable outlet signage; PC608.8.2.3 tape fastening interval."
+    ]
+  },
+  "summary": {
+    "reviewedCases": 36,
+    "completedAssignedCases": 36,
+    "assignedCases": 36,
+    "completedRunnerCasesTotal": 43,
+    "labels": {
+      "correct": 32,
+      "minor_issue": 1,
+      "materially_wrong": 0,
+      "withheld": 2,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 1
+    },
+    "strictPassCount": 32,
+    "strictPassFraction": 0.8888888888888888,
+    "fullyPassingFamilies": 14,
+    "assignedFamilies": 18,
+    "failureStages": {
+      "deterministic-gate-false-rejection": 1,
+      "governing-source-retrieval-gap": 1,
+      "governing-source-context-truncation": 1,
+      "fixture-ambiguity": 1
+    },
+    "costAccounting": "Excluded; parent reconciles live-run provider cost separately.",
+    "gradableCasesExcludingFixtureAmbiguity": 35,
+    "strictPassFractionExcludingFixtureAmbiguity": 0.9142857142857143
+  },
+  "decisiveRuleCoverage": {
+    "exposedFinalEvidence": {
+      "present": 33,
+      "absent": 2,
+      "unknown": 1
+    },
+    "actualWriterPacketWhenInspected": {
+      "present": 1,
+      "absent": 2,
+      "unknown": 33
+    },
+    "expectedIDPresentButDecisiveRuleAbsent": [
+      "fresh-hold-04-stair-penetrations-1"
+    ],
+    "ruleRetrievedButFinalStrictFailure": [
+      "fresh-hold-01-projections-2"
+    ],
+    "combinedObservedFinalEvidenceOrActualWriterPacket": {
+      "present": 34,
+      "absent": 2,
+      "unknown": 0,
+      "interpretation": "Manually reviewed decisive operative text in exposed final assembled sources, supplemented by raw writer packets for failed cases. This is distinct from claiming all36writer packets were individually inspected."
+    }
+  },
+  "limitations": [
+    "Assistant-written frozen source keys and this assistant source review are not professional independent adjudication.",
+    "Two followup turns per family are correlated; 36 turns are not36 independent population samples.",
+    "This half of the heldout campaign alone does not establish whole-campaign or population accuracy.",
+    "Frozen imported source text and its version are the grading authority; later legal amendments are not certified.",
+    "A verifier pass is not correctness and an answerable nonanswer is a failure."
+  ],
+  "families": [
+    {
+      "familyID": "egress-horizontal-projections",
+      "codeFamily": "BC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 1,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "correct": 1,
+        "withheld": 1
+      }
+    },
+    {
+      "familyID": "emergency-egress-power-duration",
+      "codeFamily": "BC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 1,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "withheld": 1,
+        "correct": 1
+      }
+    },
+    {
+      "familyID": "externally-illuminated-exit-sign",
+      "codeFamily": "BC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "interior-exit-stair-penetrations",
+      "codeFamily": "BC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 1,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "minor_issue": 1,
+        "correct": 1
+      }
+    },
+    {
+      "familyID": "exit-access-travel-measurement",
+      "codeFamily": "BC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "dwelling-separation-airborne-sound",
+      "codeFamily": "BC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "water-heater-relief-discharge",
+      "codeFamily": "PC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "fixture-trap-relative-size",
+      "codeFamily": "PC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "underground-trap-recess",
+      "codeFamily": "PC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "cleanout-cleaning-direction",
+      "codeFamily": "PC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 1,
+      "allTurnsStrictPass": false,
+      "labels": {
+        "correct": 1,
+        "fixture_ambiguous": 1
+      }
+    },
+    {
+      "familyID": "commercial-dishwasher-indirect-waste",
+      "codeFamily": "PC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "nonpotable-water-identification",
+      "codeFamily": "PC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "under-floor-appliance-access",
+      "codeFamily": "MC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "rooftop-equipment-access",
+      "codeFamily": "MC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "pressure-vessel-relief-device",
+      "codeFamily": "MC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "duct-support-suspended-ceiling",
+      "codeFamily": "MC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "externally-insulated-cooling-duct-vapor-retarder",
+      "codeFamily": "MC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "duct-liner-downstream-cooling-coil",
+      "codeFamily": "MC",
+      "reviewed": 2,
+      "total": 2,
+      "strictPasses": 2,
+      "allTurnsStrictPass": true,
+      "labels": {
+        "correct": 2
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "fresh-hold-01-projections-1",
+      "familyID": "egress-horizontal-projections",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For an ordinary office circulation path in a new NYC building under the 2022 codes, may a wall-mounted cabinet project 5 inches when its leading edge is 40 inches above the floor? Assume no special exception.",
+      "expectedAnswer": "No. Objects with leading edges more than 27 and not more than 80 inches above floor may project at most 4 inches into circulation path.",
+      "decisiveReferences": [
+        "BC 1003.3.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1003.3.3": "f30965141210bf1006affc90c2934c9e44112c66ac7d2082c813b2657490895f"
+      },
+      "answerText": "No. At 40 inches above the floor, the cabinet’s leading edge falls within the code’s height range of more than 27 inches and not more than 80 inches, where a projection into a circulation path may be no more than 4 inches. A 5-inch projection exceeds that limit; the stated exception is for handrails, not cabinets (BC §§ 1003.3.3, 202).",
+      "answerTextSHA256": "0059ca22fe9b20af50cdda44eb79c8d00c7e53e539f7b0f217c9f73cf6ced1a6",
+      "answerPayloadSHA256": "a9dffdddfcd2754c566ca5ad1c22f0d85cd0b5319c07c9d2e69d955af179519e",
+      "citationReferences": [
+        "BC 1003.3.3",
+        "BC 202"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1003.3.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "202",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1003.3.3": "9a51f315b1387e4ba20e20fb5c1b82c7f748ce808defcaea7e577243d8bc8a11",
+        "BC 202": "0f02dd945a17785011a80edb0342a6452a1a76fd3b4897ba4ec6679eb0051347"
+      },
+      "operativeRuleReview": "Complete amended 2022 BC 1003.3.3 establishes the 27-to 80 in band,4 in maximum and 4½in handrail exception. The answer correctly rejects a 5 in cabinet at 40 in and does not apply the handrail exception to it. Its fully exposed BC 202 circulation-path definition supports the separate definition point.",
+      "editionReview": "Correct 2022 NYC Construction Code source with explicit LL2023/077 amendment noted in the cited 1003.3.3 text; matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1003.3.3"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-01-projections-2",
+      "familyID": "egress-horizontal-projections",
+      "codeFamily": "BC",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "If it is a handrail projecting 4.5 inches instead of a cabinet, does the projection exception allow it?",
+      "expectedAnswer": "Yes. Handrails may protrude 4.5 inches from the wall under the stated exception; this is only the projection condition, not approval of all clearances.",
+      "decisiveReferences": [
+        "BC 1003.3.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1003.3.3": "f30965141210bf1006affc90c2934c9e44112c66ac7d2082c813b2657490895f"
+      },
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "answerPayloadSHA256": "d1bb1346bc712d32e832405228d090e02dfd0a51af2964c2d6776092adf22520",
+      "citationReferences": [],
+      "citationDetails": [],
+      "citationPassageSHA256": {},
+      "operativeRuleReview": "The final response reports incomplete verification instead of applying the expressly permitted 4½in handrail exception. The actual writer packet contains complete BC 1003.3.3 and the initial writer correctly answers Yes with appropriate separate-clearance limits, so this is not a retrieval gap.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": null,
+      "matchedExpectedProvisionReferences": [],
+      "decisiveRulePresentInExposedEvidence": null,
+      "decisiveRulePresentInActualWriterPacket": true,
+      "failureStage": "deterministic-gate-false-rejection",
+      "rawProviderDiagnosis": "Interpretation request 433 ad 39 a-5327-47 fb-ad 99-f 9 d 5 b 8 a 27 a 36 includes complete 1003.3.3 and BC 202 HANDRAIL definition. The live log records twice repeated explicit_guidance_attribution at supportedPoints[1] because the enacted handrail definition says 'for guidance or support'. That enacted wording is falsely treated as unbound web guidance despite webSupport:false. Targeted revision 954 e 23 b 0-5 a 9 c-408 b-a 3 a 0-7 d 38329215 e 7 preserves the same valid definition, and the deterministic gate suppresses the supported answer.",
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "Blocked/nonanswer response exposes no packet; recorded writer packet reviewed where diagnosis is needed.",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-02-duration-1",
+      "familyID": "emergency-egress-power-duration",
+      "codeFamily": "BC",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "For a new NYC office under the 2022 codes, is a 60-minute battery supply sufficient for the required emergency means-of-egress lighting duration?",
+      "expectedAnswer": "No. Emergency power must supply at least 90 minutes.",
+      "decisiveReferences": [
+        "BC 1008.3.4"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1008.3.4": "3eeedb4fe0d16da51945ddf6243d64421306b79ece6d3dcc9f499c8924b6ac03"
+      },
+      "answerText": "The supplied evidence does not establish whether a 60-minute battery supply is sufficient for a new NYC office. The 2022 Building Code directs emergency means-of-egress illumination to BC § 1008.3 and sets illumination levels at the end of the emergency-lighting duration, but the duration itself is not stated in the supplied text (BC §§ 1008.1, 1008.3, 1008.3.5). The separate 90-minute battery test in the supplied Fire Code text is a maintenance-testing rule, not evidence of the required design duration; moreover, that text is labeled a current consolidation, and its applicability as the governing 2022 Fire Code text is unresolved (FC § 1027.9.2).",
+      "answerTextSHA256": "4d1fb72e5915e4b4713ce52639e706adacc74255b10c9a8bc0b368b4f5b2f63b",
+      "answerPayloadSHA256": "a8fc277b30b8de61643db948b4f15afa3a65062a9b0b98bd2446ea41c0436545",
+      "citationReferences": [
+        "BC 1008.1",
+        "BC 1008.3",
+        "BC 1008.3.5",
+        "FC 1027"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1008.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1008.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1008.3.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "1027",
+          "codeEdition": "2022 NYC Fire Code — current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1008.1": "9118b5931b050780035759dc35eeb9bcec9ceec27b99e41ddc2dec15b4351040",
+        "BC 1008.3": "4b326f1020ac2222674a8d84f3e70d3994e244fbf12426718398c5715cf8b730",
+        "BC 1008.3.5": "18b52effeefe1fd528bac8681af9590302e327e7a562e880933bce066bca283c",
+        "FC 1027": "cbd919ff3e0cfa93543f3ce1867aa4acd7f9b339577e39fa1e777109c52bf9ea"
+      },
+      "operativeRuleReview": "The answer withholds the emergency design-duration conclusion because retrieved lighting/maintenance passages do not include frozen BC 1008.3.4, which requires at least 90 minutes. Its refusal to substitute an FC battery-maintenance 90 minute test is appropriately evidence-bounded but still an end-to-end failure for this answerable question.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": false,
+      "matchedExpectedProvisionReferences": [],
+      "decisiveRulePresentInExposedEvidence": false,
+      "decisiveRulePresentInActualWriterPacket": false,
+      "failureStage": "governing-source-retrieval-gap",
+      "rawProviderDiagnosis": "Interpretation request 3 ea 47907-4595-4 bee-bb 31-e 17 cc 0 ca 7282 includes BC 1205.3.4,FC 1027,BC 1008.3.5/.3.1/1008.1/412.3.9.1/202 and crossrefs 1008.2/1008.3. It lacks 1008.3.4 and the emergency-design-duration 90 minute sentence. Verification 91 b 85 c 14-a 4 e 3-41 fb-903 f-5329505 dd 354 passes the accurately bounded nonanswer; verifierpass does not make it a correct answer.",
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-02-duration-2",
+      "familyID": "emergency-egress-power-duration",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Would an on-site generator be an allowed source instead of storage batteries if it provides that duration and complies with the installation requirements?",
+      "expectedAnswer": "Yes. Storage batteries, unit equipment or an on-site generator are named permissible sources; at least 90 minutes and installation requirements still apply.",
+      "decisiveReferences": [
+        "BC 1008.3.4"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1008.3.4": "3eeedb4fe0d16da51945ddf6243d64421306b79ece6d3dcc9f499c8924b6ac03"
+      },
+      "answerText": "**Yes.** For emergency means-of-egress power, the 2022 NYC Building Code expressly allows an on-site generator as an alternative to storage batteries, provided the system supplies power for at least 90 minutes and is installed in accordance with BC § 2702. So, on your stated condition that the duration and installation requirements are met, a generator is an allowed source (BC § 1008.3.4).",
+      "answerTextSHA256": "864ce1887d78cbea92659ceb39ee547888c7c6ea97d983ffad06c987a1fafd74",
+      "answerPayloadSHA256": "edf9281c294e1118c5557e5b1117661fc57b18bfd65affd3125058ac5c8107d3",
+      "citationReferences": [
+        "BC 1008.3.4"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1008.3.4",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1008.3.4": "02de11895c8aaaed01000cc2541e42579ea1aa3b9aa1f234e71ea70e4f9b3a51"
+      },
+      "operativeRuleReview": "Complete 2022 BC 1008.3.4 expressly permits an on-site generator, storage batteries or unit equipment and requires at least 90 min and installation under 2702. The answer correctly applies the stated compliant-duration/installation premise; the followup recovers the decisive rule missing in the prior turn.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1008.3.4"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-03-exit-sign-1",
+      "familyID": "externally-illuminated-exit-sign",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "In a new NYC office under the 2022 codes, what minimum illumination intensity is required on the face of an exit sign lit by an external lamp?",
+      "expectedAnswer": "At least 25 footcandles at the face of an externally illuminated exit sign. Do not substitute walking-surface illumination or generic 5-footcandle guidance.",
+      "decisiveReferences": [
+        "BC 1013.6.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1013.6.2": "ed8ec0d06978faea168d6c5b495ca6b059918dfe09c1ce99a9d2efe814d05682"
+      },
+      "answerText": "**At least 25 footcandles (269.1 lux) on the face of the exit sign** is required when it is illuminated by an external source (2022 NYC BC § 1013.6.2). BC § 1013.3 requires exit signs to be internally or externally illuminated, with an exception only for tactile signs required by § 1013.4; that exception does not change the stated intensity rule for a sign externally illuminated. (BC §§ 1013.3, 1013.4.)",
+      "answerTextSHA256": "3811f04b41f6b0fbfc4874545130106402fc2ce3081c20e025ac5969602828e7",
+      "answerPayloadSHA256": "c5d866de91053052b1bf37fc36fccfd7d5b00e030a45744af396af0ceb789b5f",
+      "citationReferences": [
+        "BC 1013.6.2",
+        "BC 1013.3",
+        "BC 1013.4"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1013.6.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1013.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1013.4",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1013.6.2": "28f4e35174699ea8d460344e6672328a4e8e9cdb339786931ab454cc1ef67f26",
+        "BC 1013.3": "5761f8f4bb1622f9e74fcd3c4fa872a34dadd07e3608aa687a8142a4c50f27b7",
+        "BC 1013.4": "586bac97de2a6cb28f016061aa92c2efa7c4135eca34e4c209275212423efb7d"
+      },
+      "operativeRuleReview": "Complete 2022 BC 1013.6.2 requires at least 25 footcandles at the externally illuminated exit-sign face. The answer correctly distinguishes sign-face intensity from walking-surface/general lighting. Additional complete 1013.3/.4 passages accurately scope the tactile-sign exception.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1013.6.2"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-03-exit-sign-2",
+      "familyID": "externally-illuminated-exit-sign",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "So a measured intensity of 10 footcandles on that externally lit sign face is sufficient?",
+      "expectedAnswer": "No. 10 footcandles is below the 25-footcandle minimum; maintain external-sign-face context.",
+      "decisiveReferences": [
+        "BC 1013.6.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1013.6.2": "ed8ec0d06978faea168d6c5b495ca6b059918dfe09c1ce99a9d2efe814d05682"
+      },
+      "answerText": "No. The 2022 NYC Building Code requires at least **25 footcandles** on the face of an exit sign illuminated by an external source, so a measured 10 footcandles is below the minimum (BC § 1013.6.2).",
+      "answerTextSHA256": "155640031d6a544bd731fc56e72e6c57493eb56695a614bc465cc981fc8bdaf0",
+      "answerPayloadSHA256": "baad38b70c2488b2bbd8655222d9ea65a28c468a112c4c2777ae87403682759c",
+      "citationReferences": [
+        "BC 1013.6.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1013.6.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1013.6.2": "28f4e35174699ea8d460344e6672328a4e8e9cdb339786931ab454cc1ef67f26"
+      },
+      "operativeRuleReview": "Complete 2022 BC 1013.6.2 requires 25 footcandles; the answer correctly rejects 10 footcandles and retains the external-source sign-face context.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1013.6.2"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-04-stair-penetrations-1",
+      "familyID": "interior-exit-stair-penetrations",
+      "codeFamily": "BC",
+      "label": "minor_issue",
+      "strictPass": false,
+      "question": "In a new NYC office under the 2022 codes, may a general office supply-air duct penetrate an interior exit stair enclosure merely because the opening is firestopped? It does not serve independent stair ventilation or pressurization.",
+      "expectedAnswer": "No. Interior exit stair/ramp penetrations are prohibited except listed necessary systems. General office supply duct is not a listed exception; firestopping alone does not authorize it.",
+      "decisiveReferences": [
+        "BC 1023.5"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1023.5": "8f692bb70f129f0b3bf308e19582038d5c5d5900db267a7a55eaa64124b15351"
+      },
+      "answerText": "**No—not merely because the opening is firestopped.** The 2022 NYC Building Code prohibits penetrations into or through interior exit stairways except for specified categories; the supplied text includes equipment and ductwork necessary for independent ventilation or pressurization. A general office supply-air duct that does not serve that purpose does not fit that stated category (BC §§ 1023.5, 607.5.2). However, the supplied text of § 1023.5 cuts off during its list of exceptions, so I cannot determine from this packet whether its remaining text contains another potentially relevant allowance.",
+      "answerTextSHA256": "8e5e3dd375fb4e6c1353dc4c68c704deba61f6269060f6cce297d5f22c2c24ce",
+      "answerPayloadSHA256": "64a5ed121f2082c93b546cbfdcacd7986239e93af8cdefde1a62f7882967052a",
+      "citationReferences": [
+        "BC 1023.5",
+        "MC 607.5.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1023.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "607.5.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1023.5": "8854c07bbf5a3ca7267dc213abafdcdec1743b22e2b63b19e4ae6620804e7017",
+        "MC 607.5.2": "8f4103ca75db306db2147eb1638aa714624380950466f6b786f696261260438e"
+      },
+      "operativeRuleReview": "The core No to firestopping alone authorizing a general office duct is correct, and both BC 1023.5 and the fully cited MC 607.5.2 establish a prohibition with limited allowances. However, the BC 1023.5 excerpt cuts off mid-list, causing an unnecessary caveat about other potentially relevant allowances that the complete frozen rule would settle for the stated ordinary-office duct. The first answer-text citation also labels 607.5.2 as BC despite the correct MC attribution in its point and citation object.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The stated general-office supply duct does not serve independent stair ventilation/pressurization and the complete rule is sufficient to settle this question. The incomplete citation produces unwarranted uncertainty despite the correct principal answer.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1023.5"
+      ],
+      "decisiveRulePresentInExposedEvidence": false,
+      "decisiveRulePresentInActualWriterPacket": false,
+      "failureStage": "governing-source-context-truncation",
+      "rawProviderDiagnosis": "The actual interpretation request contains 1023.5 clipped in the electrical-raceway clause, before the full list conclusion and membrane exception. FullMC607.5.2 points back to 1023.5 rather than supplying its missing context. Complete frozen 1023.5 has no allowance for the stated general office supply duct; bounded writer uncertainty derives from omitted enacted context.",
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-04-stair-penetrations-2",
+      "familyID": "interior-exit-stair-penetrations",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Can a protected communication opening connect the two adjacent interior exit stair enclosures?",
+      "expectedAnswer": "No. Penetrations or communication openings between adjacent interior exit stairways/ramps are prohibited whether protected or not.",
+      "decisiveReferences": [
+        "BC 1023.5"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1023.5": "8f692bb70f129f0b3bf308e19582038d5c5d5900db267a7a55eaa64124b15351"
+      },
+      "answerText": "**No.** BC § 1023.5 expressly prohibits “penetrations or communication openings, whether protected or not, between adjacent interior exit stairways and ramps.” So a protected communication opening between the two stair enclosures is not permitted; fire protection does not create an exception. MC § 607.5.2 also bars ducts and air-transfer openings through interior exit stair enclosures except as BC § 1023.5 permits.",
+      "answerTextSHA256": "ab7db7318f1a7ca712cb972cd95cb60f52f2145a21191ab09c325ed8c3ebef8d",
+      "answerPayloadSHA256": "9ba4145bd280643f597abb62c3223afb5ff9195c8ede9ba5df8c096c9031158d",
+      "citationReferences": [
+        "BC 1023.5",
+        "BC 202",
+        "MC 607.5.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1023.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "202",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "607.5.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1023.5": "a6c6b079a7c615532de6c0ae736e817455f4bc3ed443cd5de72f385c0646b4a0",
+        "BC 202": "663c627df646656554eb237cb976df278cf084aca04a50e11c931f3e89ab4387",
+        "MC 607.5.2": "663d46f590fd15ffdb25f5612280d2dca592c5eaef3fe38253be3eed47158a85"
+      },
+      "operativeRuleReview": "The complete 2022 BC 1023.5 passage expressly bars communication openings between adjacent interior exit stairways/ramps whether protected or not. The answer correctly rejects the protected opening and distinguishes the outside-only membrane exception. FullMC607.5.2 crosscheck and BC 202 definition accurately support extra points.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1023.5"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-05-travel-1",
+      "familyID": "exit-access-travel-measurement",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For an ordinary NYC office under the 2022 codes, should exit-access travel distance be drawn as a straight line through partitions or along the actual unobstructed route to an exit? This is not an open garage or assembly occupancy.",
+      "expectedAnswer": "Measure from most remote point on story along natural unobstructed path of horizontal and vertical egress travel to entrance to an exit; not through partitions.",
+      "decisiveReferences": [
+        "BC 1017.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1017.3": "7e885f6ab989b51f6c0bb97065ca8ec39b85589d4a92117a7fa7a13da910e4c7"
+      },
+      "answerText": "**Draw it along the natural, unobstructed path of egress travel—not as a straight line through partitions.** For an ordinary office that is not an open parking garage or an assembly occupancy, the 2022 NYC Building Code measures exit-access travel distance from the most remote point on a story along the natural and unobstructed horizontal and vertical route to the entrance to an exit (BC § 1017.3). The supplied exceptions permit a different measurement for open parking garages, certain Group A-5 seating, and assembly occupancies; the stated facts exclude the relevant garage and assembly cases.",
+      "answerTextSHA256": "7c6e33a995a563ad0b44c0af6c195482d725ba3586352c71f3925b75ef8674d0",
+      "answerPayloadSHA256": "1f47c52093842fd36bac26ac9571e3d08cc54d1273d56d380f8cbf4a73e85386",
+      "citationReferences": [
+        "BC 1017.3"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1017.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1017.3": "2fbd659680ce378574ffbbeec1fc9d6dfd08b0d5e42101810464568839294682"
+      },
+      "operativeRuleReview": "Complete 2022 BC 1017.3 requires natural unobstructed horizontal/vertical route from the most remote point to exit entrance. The answer correctly rejects a straight line through partitions and scopes the full garage/assembly exceptions to the premises explicitly excluded.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1017.3"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-05-travel-2",
+      "familyID": "exit-access-travel-measurement",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Does the measurement generally stop at the entrance to the exit, or continue all the way to the street?",
+      "expectedAnswer": "For this exit-access travel distance measure it stops at entrance to an exit; do not confuse exit access with total route to street or discharge.",
+      "decisiveReferences": [
+        "BC 1017.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1017.3": "7e885f6ab989b51f6c0bb97065ca8ec39b85589d4a92117a7fa7a13da910e4c7"
+      },
+      "answerText": "It stops at the **entrance to an exit**, not at the street. Trace the natural, unobstructed horizontal and vertical egress route from the most remote point on the story to that entrance; include travel on exit-access stairs and ramps in the measurement (BC §§ 1017.3, 1017.3.1).",
+      "answerTextSHA256": "79eb49c41897b90d48b631ec6935ed9a3d1a907be1503abbe8e5f75a35882751",
+      "answerPayloadSHA256": "fd1945dc969beb03489c594618155138f356f932e9e0101758fcda287a9f6711",
+      "citationReferences": [
+        "BC 1017.3",
+        "BC 1017.3.1"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1017.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1017.3.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1017.3": "ee8acaeb316aef3f684eaf8bfc53b9228321babb4fa3b7e4927dd45d80338e3b",
+        "BC 1017.3.1": "9a942c33dfa580084b64939ecdcd04ac1af2159b97e843d8ba3f3591d5ab44ce"
+      },
+      "operativeRuleReview": "Complete 2022 BC 1017.3 sets exit entrance as the exit-access travel endpoint, not street. The answer retains that measurement context and its extra full 1017.3.1 citation accurately includes exit-access stairs/ramps.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1017.3"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-06-sound-1",
+      "familyID": "dwelling-separation-airborne-sound",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a wall separating apartments in a new NYC building under the 2022 codes, is a laboratory-tested airborne-sound rating of STC 45 sufficient?",
+      "expectedAnswer": "No. Laboratory-tested airborne-sound transmission class must be at least 50 under ASTM E 90 for stated dwelling-unit separation. Distinguish field-tested alternative.",
+      "decisiveReferences": [
+        "BC 1207.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1207.2": "291940ddd6c8e943c2f7fa911cb02e048dee90058bbaa9e95b9f51869032597c"
+      },
+      "answerText": "**No.** For a wall separating dwelling units, the 2022 NYC Building Code requires an airborne sound rating of at least **STC 50 based on laboratory measurements under ASTM E 90**. The STC 45 threshold applies only if the assembly is **field-tested under ASTM E 336**; a laboratory-tested STC 45 rating does not meet the stated laboratory threshold (BC § 1207.2).",
+      "answerTextSHA256": "d46f7f78ba654d011c3584e9ea750364901804ad035ad843e12fe69133645ddd",
+      "answerPayloadSHA256": "cef3d8a49ab8d6befb0b7245730e43399b0b381f987b569571a032a4371ea4c5",
+      "citationReferences": [
+        "BC 1207.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1207.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1207.2": "cb1dd0ac76ffa156f01ea9017ecd52d731efa2289c2fe7974b838cbb93ec2632"
+      },
+      "operativeRuleReview": "Complete 2022 BC 1207.2 sets labASTME90 airborne STC50 and fieldASTME336 STC45. The answer correctly rejects laboratory STC45 for separating dwelling units and does not substitute the field-tested alternative.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1207.2"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-06-sound-2",
+      "familyID": "dwelling-separation-airborne-sound",
+      "codeFamily": "BC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If the completed separating construction is instead field tested to ASTM E 336 at STC 45, does that meet the stated field-tested minimum?",
+      "expectedAnswer": "Yes. Field-tested minimum under ASTM E 336 is STC 45; laboratory minimum remains 50. Penetrations must maintain required rating if addressed.",
+      "decisiveReferences": [
+        "BC 1207.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 1207.2": "291940ddd6c8e943c2f7fa911cb02e048dee90058bbaa9e95b9f51869032597c"
+      },
+      "answerText": "**Yes.** For the separating wall described, a completed-construction field test under ASTM E 336 yielding STC 45 meets the stated field-tested minimum of 45. (BC § 1207.2)",
+      "answerTextSHA256": "9ca254b9ee30ad1b454ce0756503e9fe80a9301ff21ee663fbaeae81ba79987e",
+      "answerPayloadSHA256": "f2053e6635b2a24018dc3489a2a775f3c4c361bf58a31db4ca6632554fa749f7",
+      "citationReferences": [
+        "BC 1207.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1207.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "BC 1207.2": "cb1dd0ac76ffa156f01ea9017ecd52d731efa2289c2fe7974b838cbb93ec2632"
+      },
+      "operativeRuleReview": "Complete 2022 BC 1207.2 expressly permits field-tested ASTME336 STC45. The answer correctly says the given field result meets that specific minimum, retains the separating-wall context and does not approve all construction requirements.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "BC 1207.2"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-07-relief-1",
+      "familyID": "water-heater-relief-discharge",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a NYC water heater under the 2022 codes, may its temperature-and-pressure relief discharge pipe be connected directly to the sanitary drain without an air gap?",
+      "expectedAnswer": "No. Relief discharge must not connect directly to drainage; discharge through an air gap located in same room as water heater.",
+      "decisiveReferences": [
+        "PC 504.6"
+      ],
+      "sourceExcerptHashes": {
+        "PC 504.6": "eafe67abe1829419a63d9cadd650fa34684fa2736314ce9453c99521d70d2271"
+      },
+      "answerText": "**No.** Under the 2022 NYC Plumbing Code, the relief-valve discharge pipe cannot connect directly to the drainage system; it must discharge through an air gap in the same room as the water heater (PC § 504.6). The supplied rule packet provides no exception allowing direct connection, so a direct connection to the sanitary drain without an air gap is not permitted.",
+      "answerTextSHA256": "94ed9236134e5168b5a24dcca4dedcdf320d562cfcb649530dcc1ea2232c0b3c",
+      "answerPayloadSHA256": "e58003ff68e198363d450b5bd78f329fe483a02de4177e85f9ef240d96825104",
+      "citationReferences": [
+        "PC 504.6"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "504.6",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 504.6": "62c5b649d4b80413ed82687645d02865352247f0f8f7fdcb3442602abdb7d002"
+      },
+      "operativeRuleReview": "Complete 2022 PC 504.6 expressly prohibits direct drainage connection and requires an air gap in the same room as the water heater. The answer correctly rejects direct sanitary-drain connection without an air gap.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 504.6"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-07-relief-2",
+      "familyID": "water-heater-relief-discharge",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If it is routed to the required air gap, can we add a shutoff valve to that relief discharge pipe?",
+      "expectedAnswer": "No. Relief discharge piping must not have valves or tee fittings. Air-gap compliance does not waive this restriction.",
+      "decisiveReferences": [
+        "PC 504.6"
+      ],
+      "sourceExcerptHashes": {
+        "PC 504.6": "eafe67abe1829419a63d9cadd650fa34684fa2736314ce9453c99521d70d2271"
+      },
+      "answerText": "**No.** The 2022 NYC Plumbing Code requires the relief-valve discharge pipe to have no valves or tee fittings. Routing it through the required air gap does not permit adding a shutoff valve (PC § 504.6).",
+      "answerTextSHA256": "f525d30624f4a430b993d8d31c594e562d23f8f45590af2b02dde1b133bbeee4",
+      "answerPayloadSHA256": "96438861e7bebc2f5d97a4c3bc0faf1f35a192995808d97620e51e38dbbd49b5",
+      "citationReferences": [
+        "PC 504.6"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "504.6",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 504.6": "ef35c03af83a0fda88cd738fcc329ea5a32f983d8c71da3c9c8ec4e65c06e3b0"
+      },
+      "operativeRuleReview": "Complete 2022 PC 504.6 item 11 prohibits valves or tees on relief discharge piping. The answer correctly says air-gap compliance does not waive that independent valve prohibition.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 504.6"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-08-trap-size-1",
+      "familyID": "fixture-trap-relative-size",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Under the 2022 NYC codes, can a fixture use a 3-inch trap that discharges into a 2-inch drainage pipe? I am asking about the relative sizes, not the fixture table minimum.",
+      "expectedAnswer": "No. A trap must not be larger than the drainage pipe into which it discharges. Fixture table minimum and sufficient drainage must also be met.",
+      "decisiveReferences": [
+        "PC 1002.5"
+      ],
+      "sourceExcerptHashes": {
+        "PC 1002.5": "1cc0840300fd66c936052ccb3fc331018c3d5f44df42c2067631b3b102d3ea69"
+      },
+      "answerText": "**No.** Under the 2022 NYC Plumbing Code, a trap cannot be larger than the drainage pipe into which it discharges. A 3-inch trap discharging into a 2-inch pipe therefore does not comply with that relative-size rule (PC § 1002.5).",
+      "answerTextSHA256": "bd9193375f9dfc8a8fbe60edc14fc4ba78374d859fb888d0c2e92d74235d025c",
+      "answerPayloadSHA256": "efeed8f1a948af85cadebb9a518d404e08d71f1002846ab7bb38abd41e9e20cd",
+      "citationReferences": [
+        "PC 1002.5"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "1002.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 1002.5": "76422843661b626a125365873f518f62e0f54301ba9eee78da5a23c6faecd73c"
+      },
+      "operativeRuleReview": "Complete 2022 PC 1002.5 bars a trap larger than its receiving drainage pipe. The answer correctly rejects a 3 in trap into 2 in pipe for the asked relative-size condition without conflating fixture-table minima.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 1002.5"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-08-trap-size-2",
+      "familyID": "fixture-trap-relative-size",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Would changing the downstream pipe to 3 inches eliminate that particular size conflict, assuming the fixture table minimum is met?",
+      "expectedAnswer": "Yes as to this relative-size restriction: a 3-inch trap discharging into a 3-inch pipe is not larger than downstream pipe. Do not give blanket installation approval.",
+      "decisiveReferences": [
+        "PC 1002.5"
+      ],
+      "sourceExcerptHashes": {
+        "PC 1002.5": "1cc0840300fd66c936052ccb3fc331018c3d5f44df42c2067631b3b102d3ea69"
+      },
+      "answerText": "Yes. If the trap is 3 inches and the pipe it discharges into is changed to 3 inches, the trap is no longer larger than the receiving drainage pipe, eliminating that particular size conflict under PC § 1002.5. This assumes the fixture’s minimum trap size is also met; it does not establish overall drainage-system compliance.",
+      "answerTextSHA256": "ce7dedd060bb096c6589b1e2b01ac0c9ee1882c2af9126cf730d2fb44d083c6f",
+      "answerPayloadSHA256": "efcb633c80fd23f9380cfd8088813021bd705ce6a12e9a5f2a21bd9b0defcd6a",
+      "citationReferences": [
+        "PC 1002.5"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "1002.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 1002.5": "76422843661b626a125365873f518f62e0f54301ba9eee78da5a23c6faecd73c"
+      },
+      "operativeRuleReview": "Complete 2022 PC 1002.5 bars larger-than-receiving-pipe traps. The answer correctly says 3 in into 3 in resolves this particular conflict, retains the supplied fixture-table-minimum assumption and avoids blanket system approval.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 1002.5"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-09-trap-recess-1",
+      "familyID": "underground-trap-recess",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "In a new NYC building under the 2022 codes, what construction is required for the sides and bottom of a recess used to connect a bathtub trap below a slab?",
+      "expectedAnswer": "Sides and bottom of trap-connection recess must be corrosion-resistant and insect- and vermin-proof.",
+      "decisiveReferences": [
+        "PC 1002.8"
+      ],
+      "sourceExcerptHashes": {
+        "PC 1002.8": "74250dd922cb145d819ae5267df3ac718c4f3a15397281e3ddbccd9cbe889cd8"
+      },
+      "answerText": "The sides and bottom of the recess must be of corrosion-resistant, insect- and vermin-proof construction (2022 NYC Plumbing Code § 1002.8). The supplied rule specifies those performance qualities, not a particular material or thickness.",
+      "answerTextSHA256": "e8702d2edd935fd509be93b8a1771974cea1221595a8d625b59579494ea2e055",
+      "answerPayloadSHA256": "9a580fbe310614dfd69bb41eb56fdd195edca313f297e34b7d2db50ad5e07dd2",
+      "citationReferences": [
+        "PC 1002.8"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "1002.8",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 1002.8": "c6fb0054ad15556b16ec096c773357bcc075c6a2415626f8556abe228655f61a"
+      },
+      "operativeRuleReview": "Complete 2022 PC 1002.8 requires both sides and bottom corrosion-resistant, insect-proof and vermin-proof. The answer lists those exact performance requirements and does not invent material or thickness.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 1002.8"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-09-trap-recess-2",
+      "familyID": "underground-trap-recess",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If the sides meet that requirement but the bottom is left as exposed soil, has the stated recess-construction condition been met?",
+      "expectedAnswer": "No. Both sides and bottom must have corrosion-resistant, insect- and vermin-proof construction; compliant sides alone are insufficient.",
+      "decisiveReferences": [
+        "PC 1002.8"
+      ],
+      "sourceExcerptHashes": {
+        "PC 1002.8": "74250dd922cb145d819ae5267df3ac718c4f3a15397281e3ddbccd9cbe889cd8"
+      },
+      "answerText": "No. PC § 1002.8 requires **both the sides and the bottom** of the recess to be corrosion-resistant and insect- and vermin-proof. Meeting the sides requirement alone does not satisfy the stated condition if the bottom is exposed soil.",
+      "answerTextSHA256": "ddd91648262bc348d473bf2555b505eb2c3f7641d6b5ffd537c219291c79c3c1",
+      "answerPayloadSHA256": "e35998c1a4b60d670bebfe127fc475681a04b9f1e73f4b46d88477d3babc5c1b",
+      "citationReferences": [
+        "PC 1002.8"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "1002.8",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 1002.8": "fb9924366b8180d7b6cbf4764b970931a372b2f0d5c59f76a4de95d9bcf162b3"
+      },
+      "operativeRuleReview": "Complete 2022 PC 1002.8 applies to both sides and bottom; the answer correctly rejects exposed soil at the bottom despite compliant sides.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 1002.8"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-10-cleanout-1",
+      "familyID": "cleanout-cleaning-direction",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For an ordinary one-way sanitary-drain cleanout in a new NYC building under the 2022 codes, should its installation permit cleaning against the drainage flow? This is not a test tee or approved two-way cleanout.",
+      "expectedAnswer": "No. Ordinary arrangement must enable cleaning only in direction of drainage flow.",
+      "decisiveReferences": [
+        "PC 708.1.8"
+      ],
+      "sourceExcerptHashes": {
+        "PC 708.1.8": "ec370155ee91a6dc8ff7d95ffe8667c963e9325a1bc7ea106c7192e6f6f369ae"
+      },
+      "answerText": "No. Under the 2022 NYC Plumbing Code, an ordinary one-way sanitary-drain cleanout must enable cleaning only in the direction of drainage flow, and must not permit cleaning against that flow. The stated exceptions are test tees serving as cleanouts and two-way cleanouts approved to meet Section 708.1.3; you have excluded both. (PC § 708.1.8)",
+      "answerTextSHA256": "798756b17bc570623cef38508cd08515f2c69563d3c1fb983efe0ca885c542f6",
+      "answerPayloadSHA256": "28e1b368b56776c53666fc9c293507497a75692e3c16cb8420be88e5bde17b89",
+      "citationReferences": [
+        "PC 708.1.8"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "708.1.8",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 708.1.8": "6735c9f9c652b6a2a5188b2e1b73972ed8ad34fe66be8eecc93132c8743c8d59"
+      },
+      "operativeRuleReview": "Complete 2022 PC 708.1.8 sets ordinary cleaning only with drainage flow and lists test-tee and approved two-way exceptions. The answer correctly rejects against-flow cleaning under the explicitly excluded-exception premise.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 708.1.8"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-10-cleanout-2",
+      "familyID": "cleanout-cleaning-direction",
+      "codeFamily": "PC",
+      "label": "fixture_ambiguous",
+      "strictPass": false,
+      "question": "If we use an approved two-way cleanout meeting the change-of-direction requirements, does the ordinary one-direction restriction still prohibit it?",
+      "expectedAnswer": "No. Approved two-way cleanout meeting the referenced requirements is a stated exception; do not require every cleanout to be one-way.",
+      "decisiveReferences": [
+        "PC 708.1.8"
+      ],
+      "sourceExcerptHashes": {
+        "PC 708.1.8": "ec370155ee91a6dc8ff7d95ffe8667c963e9325a1bc7ea106c7192e6f6f369ae"
+      },
+      "answerText": "**Not on that basis alone.** PC § 708.1.8 requires a cleanout installation to enable cleaning only in the direction of drainage flow, but expressly excepts a two-way cleanout installation approved for meeting § 708.1.3. Meeting change-of-direction requirements alone does not establish that specific approval condition. Section 708.1.3 concerns a cleanout serving the building-drain/building-sewer junction, located at the junction or within 10 feet upstream, with access not provided by water-closet removal. (PC §§ 708.1.8, 708.1.3)",
+      "answerTextSHA256": "b193d30757b2954ec80cf3695b9aeee7b9294629b0e3e54dc691fb79595ad391",
+      "answerPayloadSHA256": "2dc070891afeba6240dec864cd9ce64be11cc5b6fe473ddff82d8fe89e6a12c6",
+      "citationReferences": [
+        "PC 708.1.8",
+        "PC 708.1.3"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "708.1.8",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "708.1.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 708.1.8": "3129ab732dc62a3c4a01c9cf1af8535d3332c88e1fc3e45d71cf4f6a0900cf45",
+        "PC 708.1.3": "aa7c2d6175cb5a5a1e18ba2db7bd0e293bc7108d4c8b0179600488eff89b0412"
+      },
+      "operativeRuleReview": "The prompt describes an approved two-way cleanout meeting 'change-of-direction requirements', but the frozen 708.1.8 exception requires approval for meeting 708.1.3. The actual fully cited 708.1.3 concerns the building-drain/building-sewer junction, not change of direction. The candidate accurately preserves the exact referenced approval requirement and explains that change-of-direction compliance alone is insufficient. The frozen expectedNo assumes the referenced requirement is met while the prompt uses a different requirement; this is an authoring ambiguity rather than a demonstrated wrong candidate rule.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "A two-way cleanout approved for 708.1.3 is excepted. The prompt's change-of-direction description does not clearly establish that approval condition; do not silently repair the question after seeing the answer.",
+      "followUpReview": "No fact question; candidate accurately distinguishes the relevant approval condition.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 708.1.8"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": "fixture-ambiguity",
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-11-dishwasher-1",
+      "familyID": "commercial-dishwasher-indirect-waste",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a commercial dishwasher in a new NYC restaurant under the 2022 codes, can its discharge connect directly to sanitary piping without an air gap or air break?",
+      "expectedAnswer": "No. Commercial dishwasher discharge must be through air gap or air break into waste receptor, subject to indirect-waste installation requirements.",
+      "decisiveReferences": [
+        "PC 802.1.7"
+      ],
+      "sourceExcerptHashes": {
+        "PC 802.1.7": "9fc0bb7c36ae6dee69c9b905cc5d840f2cc67b641a75656f2c1aad3d85df6ff7"
+      },
+      "answerText": "**No.** Under the 2022 NYC Plumbing Code, a commercial dishwashing machine must discharge through an air gap or air break into a waste receptor; a direct connection to sanitary piping without either is not permitted by this rule (PC § 802.1.7). The receptor must connect to the building drainage system (PC § 802.2).",
+      "answerTextSHA256": "4efe432a637f4f90810c89e09221e58102e630ebaebcb41437a407329b985b01",
+      "answerPayloadSHA256": "d334dfdfb49900ad76a0492ebf12b01ac892460c275acf55686c98cd7d5459d8",
+      "citationReferences": [
+        "PC 802.1.7",
+        "PC 802.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "802.1.7",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "802.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 802.1.7": "0f2f52789271b67b2d01d7873c0a95e125dd2b9015b9c7b49e5245de5ae2a079",
+        "PC 802.2": "5659e19a1564363f3f41dbbc139fd30f6c8596b461849bacc908611c9ed609b8"
+      },
+      "operativeRuleReview": "Complete 2022 PC 802.1.7 requires commercial dishwasher discharge via air gap or air break into a waste receptor. The answer correctly rejects direct drainage without either, and its full 802.2 extra passage accurately supplies receptor/trap/indirect-pipe installation conditions with clear-water exception scoped.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 802.1.7"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-11-dishwasher-2",
+      "familyID": "commercial-dishwasher-indirect-waste",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Is an air break into a waste receptor expressly an option, or does this rule allow only an air gap?",
+      "expectedAnswer": "Air break as well as air gap is expressly an option under this commercial-dishwasher provision; related installation requirements remain.",
+      "decisiveReferences": [
+        "PC 802.1.7"
+      ],
+      "sourceExcerptHashes": {
+        "PC 802.1.7": "9fc0bb7c36ae6dee69c9b905cc5d840f2cc67b641a75656f2c1aad3d85df6ff7"
+      },
+      "answerText": "Yes. For a commercial dishwashing machine, the rule expressly allows either an air gap or an air break into a waste receptor (PC § 802.1.7); PC § 802.2 likewise states both options for indirect waste piping. An air break is therefore not excluded in favor of an air gap alone.",
+      "answerTextSHA256": "07558cbc27678966f77e0a58964ae1cea479027659b5d9c2c6740595b5f9a2cf",
+      "answerPayloadSHA256": "5ced4f4074c00ebd906c93ad8f0f7c9af06c8932dd3f20c3660ef04e1c92314a",
+      "citationReferences": [
+        "PC 802.1.7",
+        "PC 802.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "802.1.7",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "802.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 802.1.7": "86b1bd267cdea1e7e267b3fcc7b02b3caa33212e75b4c53d3e09182ab3bdd475",
+        "PC 802.2": "7a30e4dc103123e5eeaa9369a00b24b0247de94b0cd916b558ac0a37fce48dc5"
+      },
+      "operativeRuleReview": "Complete 2022 PC 802.1.7 and 802.2 expressly allow an air break as well as air gap. The answer correctly says air gap is not exclusive for the commercial dishwasher and retains waste-receptor scope.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 802.1.7"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-12-nonpotable-1",
+      "familyID": "nonpotable-water-identification",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a new NYC building under the 2022 codes, how should a hose outlet using nonpotable water be marked so users do not mistake it for drinking water?",
+      "expectedAnswer": "Sign/tag or indelible fixture marking must identify application and warn CAUTION: NONPOTABLE WATER – DO NOT DRINK; corrosion-resistant waterproof signage, contrasting letters at least 0.5 inch high, plus Do Not Drink pictograph.",
+      "decisiveReferences": [
+        "PC 608.8.1"
+      ],
+      "sourceExcerptHashes": {
+        "PC 608.8.1": "6e74bc9f3c2b52d516c371bcaa13766118eba8cd5e51c94f43fa97fc4c529e5e",
+        "PC 608.8.2": "e67a5cd2506d6ad7768cb4e5a538c508e80ef30d8e0dc66616328f8894eeec30"
+      },
+      "answerText": "**Mark the hose outlet at its point of use** with a legible, durable sign or tag—or indelible wording on the fixture—warning users not to drink the water. The supplied 2022 provisions require the words “CAUTION: NONPOTABLE WATER – DO NOT DRINK,” lettering at least 0.5 inch high and contrasting with the background, and a do-not-drink pictograph. (PC §§ 1301.3.2, 608.8.1)\n\nFor the wording, PC § 608.8.1 specifies: “Nonpotable water is utilized for (application name). CAUTION: NONPOTABLE WATER – DO NOT DRINK.” PC § 1301.3.2 gives the corresponding text as “Nonpotable water is utilized for. CAUTION: NONPOTABLE WATER – DO NOT DRINK.” It also requires the pictograph shown in Figure 1301.3; § 608.8.1 requires the pictograph shown in Figure 608.8.1. Use corrosion-resistant, waterproof material if the message is on a tag or sign. (PC §§ 1301.3.2, 608.8.1)\n\nThese outlet-sign rules do not replace the separate identification requirements for nonpotable piping, if applicable. (PC §§ 608.8, 608.8.2)",
+      "answerTextSHA256": "ff3095758f581e00835da64a634ccbe5850430381647336a21c40002831e9875",
+      "answerPayloadSHA256": "170a5a290e38963c65fcd7a50cc3a30729c3d704bc1aef1c9298ce43fa34f4a7",
+      "citationReferences": [
+        "PC 1301.3.2",
+        "PC 608.8.1",
+        "PC 608.8",
+        "PC 608.8.2"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "1301.3.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "608.8.1",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "608.8",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "608.8.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 1301.3.2": "bfa06a4204c9f3e05070e655cbc728d2c4e72009bd74be6b07e3a30943b5b0ca",
+        "PC 608.8.1": "c350172eefe7877c4c87e9267f027ffd2dac5f0450f0705279b64647e802c31e",
+        "PC 608.8": "c2ddba14553fecc92ed69da0aaadd4d09d56de10f7c2a1b9fd9340f4f6c17853",
+        "PC 608.8.2": "f560b189763bd892498f66965cb951ee56a569c936c5cf3a1c6812899d514e12"
+      },
+      "operativeRuleReview": "Complete 2022 PC 608.8.1 supports application-name warning text, durable corrosion-resistant waterproof signage or indelible fixture text, contrasting≥0.5 in letters and DoNotDrink pictograph. The answer supplies all decisive marking requirements. Additional full 1301.3.2 parallels the outlet rule;608.8/.2 correctly separate pipe identification. Awkward duplicated imported 1301.3.2 wording is disclosed rather than replacing the complete 608.8.1 application wording.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 608.8.1",
+        "PC 608.8.2"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-12-nonpotable-2",
+      "familyID": "nonpotable-water-identification",
+      "codeFamily": "PC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For the nonpotable distribution pipes, can the identification be repeated every 40 feet rather than every 25 feet?",
+      "expectedAnswer": "No. Repeat identification at intervals no more than 25 feet and at wall/floor/roof penetrations. Purple piping or purple tape/wrap and required warning/contents/flow arrow apply.",
+      "decisiveReferences": [
+        "PC 608.8.2"
+      ],
+      "sourceExcerptHashes": {
+        "PC 608.8.1": "6e74bc9f3c2b52d516c371bcaa13766118eba8cd5e51c94f43fa97fc4c529e5e",
+        "PC 608.8.2": "e67a5cd2506d6ad7768cb4e5a538c508e80ef30d8e0dc66616328f8894eeec30"
+      },
+      "answerText": "No. Identification on nonpotable distribution piping must be repeated at intervals not exceeding 25 feet, so 40-foot spacing would not meet that rule (PC § 608.8.2). Where identification tape is used, it must also be fastened at least every 10 feet to each pipe length and run continuously along the pipe (PC § 608.8.2.3).",
+      "answerTextSHA256": "3844841f1bf69f11db444f5a1a84caaeb8eddb15beca7bb497f11df39fc22e74",
+      "answerPayloadSHA256": "42077f276b450c0b58579eec8b79377e4b8fcc0012a9fa824f97fc2ac38b087b",
+      "citationReferences": [
+        "PC 608.8.2",
+        "PC 608.8.2.3"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "608.8.2",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "608.8.2.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "PC 608.8.2": "20c009e3e3e72898e4ef40bbe44a4796ea2dbf96e5a24ef4ebc70bdf9d05768e",
+        "PC 608.8.2.3": "99c98c6bc3da1cb8d00c183c95fb72d843885c7673a645564d60ab0368d9c025"
+      },
+      "operativeRuleReview": "Complete 2022 PC 608.8.2 sets≤25 ft repeat identification and at wall/floor/roof penetrations; answer correctly rejects 40 ft. Added complete 608.8.2.3 accurately distinguishes tape fastening≤10 ft from the identification-repeat interval.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "PC 608.8.1",
+        "PC 608.8.2"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-13-crawl-1",
+      "familyID": "under-floor-appliance-access",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For an under-floor HVAC appliance in a new NYC office under the 2022 codes, is a 25-foot-long passage only 30 inches high and 22 inches wide acceptable? The appliance cannot be serviced or removed directly through the access opening.",
+      "expectedAnswer": "No. Ordinary under-floor passage max 20 feet with minimum 30-inch height/22-inch width. Stated facts do not meet either length exception.",
+      "decisiveReferences": [
+        "MC 306.4"
+      ],
+      "sourceExcerptHashes": {
+        "MC 306.4": "a36fb67b4badc2a97fd7fb60aa08fa278213aa5f2c69fc75db7fc256c599073f"
+      },
+      "answerText": "No. Under the 2022 NYC Mechanical Code, the passage must be no more than 20 feet long, measured along its centerline from the opening to the appliance; at 25 feet, it exceeds that limit. Its 30-inch height and 22-inch width meet the minimums, but the unlimited-length exception requires a passage at least 6 feet high and 22 inches wide throughout, which this passage does not meet. The exception allowing no passage also does not apply on the stated facts because the appliance cannot be serviced and removed through the access opening. (MC § 306.4)",
+      "answerTextSHA256": "ffde8c3aa42cff873dc99091beb7c2a878d0a3d45223e9f1babffcd379f424ff",
+      "answerPayloadSHA256": "892e36f7e40c84bb050223c660d4174c45b7386231b8f574c83db01bc685d47d",
+      "citationReferences": [
+        "MC 306.4"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "306.4",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 306.4": "dcfdb6c79400c6796694928ac7fb34238b79a56623dc59d263bc06c457510e31"
+      },
+      "operativeRuleReview": "Complete 2022 MC 306.4 contains 20 ft ordinary limit with 30 in height/22 in width,6 ft-high unlimited-length exception, and direct-service/removal exception. The answer correctly rejects 25 ft at 30 in high and accurately says neither exception applies to supplied facts.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 306.4"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-13-crawl-2",
+      "familyID": "under-floor-appliance-access",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If that same passage is unobstructed and 6 feet high and 22 inches wide for its entire length, is it still limited to 20 feet by this passage-length rule?",
+      "expectedAnswer": "No. Unobstructed passage at least 6 feet high and 22 inches wide for entire length is not limited in length under exception. Keep other access/removal/service requirements.",
+      "decisiveReferences": [
+        "MC 306.4"
+      ],
+      "sourceExcerptHashes": {
+        "MC 306.4": "a36fb67b4badc2a97fd7fb60aa08fa278213aa5f2c69fc75db7fc256c599073f"
+      },
+      "answerText": "No. Under the 2022 NYC Mechanical Code, an unobstructed passageway that is at least 6 feet high and 22 inches wide for its entire length is not subject to the 20-foot limit. The stated hypothetical meets those conditions, so its 25-foot length is allowed under this passage-length rule. (MC § 306.4)",
+      "answerTextSHA256": "fd5ec846e72fe6090d4fc2fda8ffac41a1a1d36ce19ac2c8dab981adb8da28bd",
+      "answerPayloadSHA256": "752cd4f5b170a1198efceb4c2b123b54c920520620a5ee99f0bb6bca99805e2a",
+      "citationReferences": [
+        "MC 306.4"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "306.4",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 306.4": "dcfdb6c79400c6796694928ac7fb34238b79a56623dc59d263bc06c457510e31"
+      },
+      "operativeRuleReview": "Complete 2022 MC 306.4 expressly removes the length limit for an unobstructed≥6 ft-high/22 in-wide passage for its entire length. The answer correctly applies that changed dimensional premise to the 25 ft path and confines approval to this passage-length rule.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 306.4"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-14-roof-1",
+      "familyID": "rooftop-equipment-access",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For rooftop HVAC equipment on a new NYC office under the 2022 codes, service personnel must climb 18 feet above grade. Can the required access depend on bringing a portable ladder?",
+      "expectedAnswer": "No. Where climb is higher than 16 feet, interior/exterior means of access must be provided and required access cannot use portable ladders. Office is not Group R-3 exception.",
+      "decisiveReferences": [
+        "MC 306.5"
+      ],
+      "sourceExcerptHashes": {
+        "MC 306.5": "b883e27fbce2a571e2275e779fffba1042e8acb8be6fec0a66c7640b12ebbee7"
+      },
+      "answerText": "**No.** If the rooftop HVAC equipment requires access and personnel must climb 18 feet above grade to reach it, the 2022 NYC Mechanical Code requires an interior or exterior means of access, and access to the roof and from the roof to the equipment cannot require a portable ladder (MC § 306.5). The supplied text also says the height is measured to the top of a parapet when access involves climbing over one. This is the mechanical-access conclusion; the packet does not establish any separate rooftop-access rule that changes it.",
+      "answerTextSHA256": "5b134c593f0e15f15c970c15f831932177855508235135e611e5032c6e6afc72",
+      "answerPayloadSHA256": "fad731d3b5643bce459d36e28467aa705ba6c897c8d16c3eed6ad58eb394ea56",
+      "citationReferences": [
+        "MC 306.5"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "306.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 306.5": "4b07a978cae0174aa7f905e293f9d6b6e5166e4f18d5f5546cf45192a4bad8af"
+      },
+      "operativeRuleReview": "Complete 2022 MC 306.5 requires provided interior/exterior access where climb>16 ft and bars reliance on portable ladders. The answer correctly rejects portable-ladder dependence for an 18 ft office-equipment climb, with valid parapet measurement detail and no misuse of the full R-3 exception.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 306.5"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-14-roof-2",
+      "familyID": "rooftop-equipment-access",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Along that required route, can personnel be made to climb over a 36-inch-high obstruction?",
+      "expectedAnswer": "No. Route must not require climbing over obstructions greater than 30 inches; 36 inches fails this condition.",
+      "decisiveReferences": [
+        "MC 306.5"
+      ],
+      "sourceExcerptHashes": {
+        "MC 306.5": "b883e27fbce2a571e2275e779fffba1042e8acb8be6fec0a66c7640b12ebbee7"
+      },
+      "answerText": "**No.** For the rooftop-equipment access described in the prior turn, MC § 306.5 prohibits required access from involving climbing over an obstruction **greater than 30 inches** high. A 36-inch obstruction exceeds that limit by 6 inches, so personnel cannot be required to climb over it. The separate parapet-height measurement rule does not create an exception to the obstruction limit.",
+      "answerTextSHA256": "da38a7797e6317442b168cf39170775a9bc26cc3b56ce4ea4bfbeb9a96115e2f",
+      "answerPayloadSHA256": "caa4da8fa47298b9c1b5b66f2128966e9dea9492d774b534116b6487c6001c92",
+      "citationReferences": [
+        "MC 306.5"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "306.5",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 306.5": "4b07a978cae0174aa7f905e293f9d6b6e5166e4f18d5f5546cf45192a4bad8af"
+      },
+      "operativeRuleReview": "Complete 2022 MC 306.5 bars required climbing over obstructions>30 in. The answer correctly rejects 36 in, retains prior 18 ft office rooftop route and does not convert the parapet measurement rule into an exception.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 306.5"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-15-vessel-1",
+      "familyID": "pressure-vessel-relief-device",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a pressure vessel in a new NYC mechanical installation under the 2022 codes, is a pressure relief valve always the only permitted protection, or can a pressure-limiting device be used?",
+      "expectedAnswer": "A pressure relief valve or pressure-limiting device is permitted as required by vessel manufacturer instructions and ASME Boiler and Pressure Vessel Code or ASME CSD-1. Do not claim either is freely interchangeable without requirements.",
+      "decisiveReferences": [
+        "MC 1006.3"
+      ],
+      "sourceExcerptHashes": {
+        "MC 1006.3": "d7081b82626590590601ddace6e93694ab5d3d08a09a98475fca4b5222d6973d"
+      },
+      "answerText": "No. Under the 2022 NYC Mechanical Code, a pressure vessel must be protected with a pressure relief valve or a pressure-limiting device, as required by the manufacturer’s instructions and in accordance with the ASME Boiler and Pressure Vessel Code or ASME CSD-1 (MC § 1006.3). The relief valve is therefore not the only permitted option.",
+      "answerTextSHA256": "dcad629fcc2ce0c91e3d507bff10b96a3b46b4b85bf2a18f7760ef5aeb20ebb3",
+      "answerPayloadSHA256": "ca12066f079d6af0746c5dccaabbbf4e4c1b2759d8b21033e3b5eea995e93dca",
+      "citationReferences": [
+        "MC 1006.3"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "1006.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 1006.3": "a1b4becede38014c2d2f60dc355677e5f844353ccc7bc79997ca925a20c98778"
+      },
+      "operativeRuleReview": "Complete 2022 MC 1006.3 names relief valve or pressure-limiting device subject to vessel manufacturer instructions and referencedASME standards. The answer correctly says a valve is not the only possible protection, without treating alternatives as freely interchangeable.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 1006.3"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-15-vessel-2",
+      "familyID": "pressure-vessel-relief-device",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If the vessel manufacturer requires a relief valve, may we choose a pressure-limiting device instead merely because the code mentions that alternative?",
+      "expectedAnswer": "No. Provision requires protection consistent with manufacturer instructions and referenced standards; named alternative does not override manufacturer requirement.",
+      "decisiveReferences": [
+        "MC 1006.3"
+      ],
+      "sourceExcerptHashes": {
+        "MC 1006.3": "d7081b82626590590601ddace6e93694ab5d3d08a09a98475fca4b5222d6973d"
+      },
+      "answerText": "No. You may not substitute a pressure-limiting device solely because MC § 1006.3 lists it as an alternative: the section makes the choice subject to the vessel manufacturer’s instructions and the ASME Boiler and Pressure Vessel Code or ASME CSD-1. If the manufacturer requires a relief valve, the code’s alternative does not by itself authorize the substitution.",
+      "answerTextSHA256": "f1b77b8215e7fbca7d4faec027ded8d1503bf744eb470b41a900658a1ab45ded",
+      "answerPayloadSHA256": "2aeb4b94ff580dcba7f936e8670a10d45356b695abade6fa566e24cd77c8567a",
+      "citationReferences": [
+        "MC 1006.3"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "1006.3",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 1006.3": "a1b4becede38014c2d2f60dc355677e5f844353ccc7bc79997ca925a20c98778"
+      },
+      "operativeRuleReview": "Complete 2022 MC 1006.3 conditions protection on manufacturer instructions and referencedASME standards. The answer correctly rejects replacing a manufacturer-required relief valve merely because the text names a limiting-device alternative.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 1006.3"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-16-duct-support-1",
+      "familyID": "duct-support-suspended-ceiling",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For new NYC HVAC ductwork under the 2022 codes, may the ducts be hung from a suspended-ceiling grid?",
+      "expectedAnswer": "No. Ducts must not be hung from or supported by suspended ceilings; applicable support standards/manufacturer instructions govern.",
+      "decisiveReferences": [
+        "MC 603.10"
+      ],
+      "sourceExcerptHashes": {
+        "MC 603.10": "8f07a8c316e5a544b3132c06ee189eee2f431a9e24d141d2d104e7ff7f02f4d2"
+      },
+      "answerText": "No. Under the 2022 NYC Mechanical Code, ducts may not be hung from or supported by suspended ceilings, including a suspended-ceiling grid (MC § 603.10).",
+      "answerTextSHA256": "9e68fc9d5cbdeaf859c96badab62227049944c2a8d24454b73c05e1f151e3b18",
+      "answerPayloadSHA256": "dacc0fdc5345d680a4ef6475c7df6bea12cb27662d883486671d58e4046f03cc",
+      "citationReferences": [
+        "MC 603.10"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "603.10",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 603.10": "73f83bea90dd568221783f735d821f09bf18f1a0952652863c69417d4a497acc"
+      },
+      "operativeRuleReview": "Complete 2022 MC 603.10 expressly bars hanging/supporting ducts from suspended ceilings. The answer correctly applies this to a ceiling grid without treating other support standards as an exception.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 603.10"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-16-duct-support-2",
+      "familyID": "duct-support-suspended-ceiling",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For flexible factory-made ducts, whose installation instructions govern the supports?",
+      "expectedAnswer": "Manufacturer instructions govern flexible and other factory-made duct supports; suspended ceiling support prohibition still applies.",
+      "decisiveReferences": [
+        "MC 603.10"
+      ],
+      "sourceExcerptHashes": {
+        "MC 603.10": "8f07a8c316e5a544b3132c06ee189eee2f431a9e24d141d2d104e7ff7f02f4d2"
+      },
+      "answerText": "For flexible factory-made ducts, the manufacturer’s installation instructions govern the supports (2022 NYC MC § 603.10). The same section also says ducts may not be hung from or supported by suspended ceilings.",
+      "answerTextSHA256": "9d83d9efeaa5ed891a4ef18ec06ba16d2cffc4f38fdce1a00ca21ed060a8c105",
+      "answerPayloadSHA256": "7b7bd6f036caf5bbb481add82c8ad9cabcd77953fe0cf68beaff89036318f151",
+      "citationReferences": [
+        "MC 603.10"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "603.10",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 603.10": "73f83bea90dd568221783f735d821f09bf18f1a0952652863c69417d4a497acc"
+      },
+      "operativeRuleReview": "Complete 2022 MC 603.10 expressly applies manufacturer instructions to flexible/factory-made duct supports and independently bars suspended-ceiling support. The answer correctly states both, preserving the restriction across the followup.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 603.10"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-17-vapor-1",
+      "familyID": "externally-insulated-cooling-duct-vapor-retarder",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a new NYC cooling duct under the 2022 codes, externally applied insulation has a permeance of 0.1 perm. Is that low enough to omit a separate vapor retarder under the stated insulation exception?",
+      "expectedAnswer": "No. Exception for insulation itself applies at permeance 0.05 perm or less. Otherwise retarder max 0.05 perm or aluminum foil at least 2 mils, with sealed joints/seams.",
+      "decisiveReferences": [
+        "MC 604.11"
+      ],
+      "sourceExcerptHashes": {
+        "MC 604.11": "aeae227d027c9396500208e11989882d7918b3dbda021fd936762c96859f9f7c"
+      },
+      "answerText": "**No.** For a cooling duct with external insulation, MC § 604.11 allows the insulation itself to go uncovered only when its permeance is **0.05 perm or less**. At **0.1 perm**, it exceeds that limit, so the stated exception does not apply; the insulation must instead be covered with a vapor retarder with maximum permeance of 0.05 perm or aluminum foil at least 2 mils thick. Seal joints and seams to maintain continuity.",
+      "answerTextSHA256": "da6755c0f3f44d0b37194201fecaf52fc6cac3fdfad79f2816278711687ef081",
+      "answerPayloadSHA256": "443ddb79be21e06e0793c0f2d3d197724ecee4182ad25ae3c2c6a22da458febc",
+      "citationReferences": [
+        "MC 604.11"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "604.11",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 604.11": "062ae8167cb05ccedaf8420c4c79084aff4a2c011f706f0d4bb3468cf77876a4"
+      },
+      "operativeRuleReview": "Complete 2022 MC 604.11 allows uncovered external cooling-duct insulation only at≤0.05 perm. The answer correctly rejects 0.1 perm and accurately gives retarder≤0.05 perm or foil≥2 mils with sealed joints/seams.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 604.11"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-17-vapor-2",
+      "familyID": "externally-insulated-cooling-duct-vapor-retarder",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If the insulation itself is rated 0.04 perm, does that specific exception allow it to be used without a separate vapor-retarder covering?",
+      "expectedAnswer": "Yes. Insulation with permeance no more than 0.05 perm need not be covered with separate vapor retarder; maintain applicable seam/continuity provisions.",
+      "decisiveReferences": [
+        "MC 604.11"
+      ],
+      "sourceExcerptHashes": {
+        "MC 604.11": "aeae227d027c9396500208e11989882d7918b3dbda021fd936762c96859f9f7c"
+      },
+      "answerText": "Yes—if the externally insulated duct is used for cooling and the insulation’s permeance is 0.04 perm, it falls within MC 604.11’s exception and need not be covered by a separate vapor retarder. The exception is for insulation at 0.05 perm or less; the section separately requires joints and seams to be sealed to maintain continuity of the vapor retarder. (MC § 604.11)",
+      "answerTextSHA256": "5b8925c22508fc345348dab97099ce107141c370c9babe64aca608b3a1211e45",
+      "answerPayloadSHA256": "ae2b12c5b36f15202cf9c3e74c40ed26276e08a9fd86cfcf88ae1919f748f191",
+      "citationReferences": [
+        "MC 604.11"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "604.11",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 604.11": "062ae8167cb05ccedaf8420c4c79084aff4a2c011f706f0d4bb3468cf77876a4"
+      },
+      "operativeRuleReview": "Complete 2022 MC 604.11 permits insulation≤0.05 perm without a separate covering. The answer correctly accepts 0.04 perm for external cooling-duct insulation, retains sealed-joint/seam continuity and does not treat the exception as removing every insulation requirement.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 604.11"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-18-liner-1",
+      "familyID": "duct-liner-downstream-cooling-coil",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For a new NYC HVAC system under the 2022 codes, can water-permeable exposed internal duct insulation line the portion from the cooling-coil exit to the downstream end of its drain pan?",
+      "expectedAnswer": "No. Exposed internal insulation not impermeable to water is prohibited in that segment.",
+      "decisiveReferences": [
+        "MC 604.13"
+      ],
+      "sourceExcerptHashes": {
+        "MC 604.13": "fbf8ba98de15ace9f15f30d0b834b103d058ae7745a4a6f26376ddc43fbcff5f"
+      },
+      "answerText": "**No.** For a new HVAC system under the 2022 NYC Construction Codes, water-permeable exposed internal duct insulation may not line the duct from the cooling-coil exit through the downstream end of the drain pan. The restriction applies to insulation that is **not impermeable to water**; it does not prohibit water-impermeable exposed internal insulation in that segment under this provision. (MC § 604.13)",
+      "answerTextSHA256": "dfe9d1c06af5cf402cf76487bed1bcf37e2be6a739bd8d1f2fb8b7b2b67ecda4",
+      "answerPayloadSHA256": "aab41b376d153039480431cbc637195143f794c3c4d4e3ae7a1d9eb56a3f2b2e",
+      "citationReferences": [
+        "MC 604.13"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "604.13",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 604.13": "e9c372c665c7fbe22558b4f4568df9fcb671d4a4f6f3f0f299e20502e454b5fc"
+      },
+      "operativeRuleReview": "Complete 2022 MC 604.13 expressly prohibits exposed water-permeable internal insulation from cooling-coil exit to drain-pan downstream end. The answer correctly rejects it in that segment and accurately distinguishes UL181 durability from water-impermeability.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 604.13"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    },
+    {
+      "id": "fresh-hold-18-liner-2",
+      "familyID": "duct-liner-downstream-cooling-coil",
+      "codeFamily": "MC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Would a durable water-impermeable liner avoid that particular prohibition, assuming it satisfies the required durability testing?",
+      "expectedAnswer": "Yes as to the specific water-permeability prohibition. Internal airstream insulation must show durability under UL 181; no blanket approval of all system requirements.",
+      "decisiveReferences": [
+        "MC 604.13"
+      ],
+      "sourceExcerptHashes": {
+        "MC 604.13": "fbf8ba98de15ace9f15f30d0b834b103d058ae7745a4a6f26376ddc43fbcff5f"
+      },
+      "answerText": "Yes. MC § 604.13 prohibits exposed internal insulation that is “not impermeable to water” in the specified duct segment. A water-impermeable liner therefore avoids that particular prohibition; the separate requirement that exposed internal insulation be shown durable under UL 181 still applies. Meeting the durability test alone does not establish that the liner is water-impermeable or satisfy that separate condition.",
+      "answerTextSHA256": "19a7d1c181df8c0d988083c451d556e59d78c68b6e0a9eee30957054d69b7c8d",
+      "answerPayloadSHA256": "6dd5a14ecb3ef923c7bf112fa2d84c8137d35f861b1545a642a6039ff5ba2346",
+      "citationReferences": [
+        "MC 604.13"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "MC",
+          "sectionNumber": "604.13",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "corpusID": "nyc-2022-construction-codes",
+          "applicabilityStatus": "current-enacted-edition"
+        }
+      ],
+      "citationPassageSHA256": {
+        "MC 604.13": "e9c372c665c7fbe22558b4f4568df9fcb671d4a4f6f3f0f299e20502e454b5fc"
+      },
+      "operativeRuleReview": "Complete 2022 MC 604.13 limits the stated prohibition to insulation not impermeable to water. The answer correctly says a water-impermeable liner avoids this particular prohibition, retains the separate UL181 durability requirement and avoids blanket approval.",
+      "editionReview": "Correct specific 2022 NYC Construction Code citation metadata; source text matches the frozen imported authority.",
+      "applicabilityReview": "The supplied facts support the particular condition; no universal design or filing approval is implied.",
+      "followUpReview": "No unnecessary missing-fact or code-section question.",
+      "expectedProvisionPresentInExposedEvidence": true,
+      "matchedExpectedProvisionReferences": [
+        "MC 604.13"
+      ],
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "evidenceVisibility": "answerQuality.sources passages present",
+      "sourceReviewer": "Assistant source review against frozen keys; not professional adjudication."
+    }
+  ],
+  "interpretation": "PartA has32correct,1minor issue,2withheld and1ambiguous fixture among36turns. Fourteen of18two-turn families fully pass. Excluding the ambiguous fixture gives32/35strict passes; the raw all-assigned count is32/36. No materially wrong final code conclusion was observed. One withheld case is confirmed missing governing text (lighting duration), one retrieves the complete rule and a correct draft but is falsely blocked by a deterministic guidance-attribution check (handrail definition). The stair-penetration minor issue is source-context truncation plus a citation-prefix typo. This assistant source review and correlated family sample do not establish95percentpopulation accuracy."
+}

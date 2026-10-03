@@ -3,6 +3,8 @@ import { applyVerifiedProjectFollowups } from "./research-verification-followups
 import { researchPropertyContext, researchPropertyContextFacts } from "./research-property-context.mjs";
 import { earlierResearchUserContext, researchClarificationAnswer, researchVerificationFailureReason } from "./research-conversation-continuity.mjs";
 import { researchHistoryContentFacts } from "./research-history-content.mjs";
+import { buildResearchPassageIndex } from "./research-passage-index.mjs";
+import { createResearchSemanticSearch, loadResearchSemanticVectors } from "./research-semantic-passages.mjs";
 import { runPublicCodeTiming, timePublicCodePhase, countPublicCodeEvent } from "./public-code-timing.mjs";
 import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
 import { codeAssetRevision, codeAssetManifestEntry } from "./code-asset-manifest.mjs";
@@ -282,7 +284,8 @@ import {
   assembleResearchEvidence,
   researchEvidenceAssemblyLimits,
   researchEvidenceAssemblyVersion,
-  researchEvidenceStrategyForTurn
+  researchEvidenceStrategyForTurn,
+  researchEvidenceStrategies
 } from "./research-evidence-assembly.mjs";
 import { researchRulePacketInstruction, researchRulePacketPrompt } from "./research-rule-packets.mjs";
 import {
@@ -8051,6 +8054,19 @@ async function shippedSearchIndex() {
 
 let cachedResearchCorpusRegistry = null;
 const cachedResearchCorpusResources = new Map();
+let cachedResearchSemanticSearch = null;
+
+async function researchSemanticSearchResource() {
+  if (process.env.PERMITEXT_RESEARCH_SEMANTIC_SEARCH !== "1") return null;
+  const path = process.env.PERMITEXT_RESEARCH_SEMANTIC_VECTOR_PATH;
+  if (!path) return { search: async () => ({ hits: [], metadata: { fallbackReason: "semantic_vectors_missing" } }) };
+  if (!cachedResearchSemanticSearch || cachedResearchSemanticSearch.path !== path) {
+    cachedResearchSemanticSearch = { path, promise: loadResearchSemanticVectors(path)
+      .then(vectors => createResearchSemanticSearch({ vectors, enabled: true, apiKey: process.env.OPENAI_API_KEY }))
+      .catch(error => ({ search: async () => ({ hits: [], metadata: { fallbackReason: error.code || "semantic_artifact_unavailable" } }) })) };
+  }
+  return cachedResearchSemanticSearch.promise;
+}
 
 async function currentResearchCorpusRegistry() {
   if (cachedResearchCorpusRegistry) return cachedResearchCorpusRegistry;
@@ -8143,9 +8159,10 @@ function mergedResearchSearchIndex(indexes) {
   return merged;
 }
 
-async function researchCorpusResources(corpusPlan) {
+export async function researchCorpusResources(corpusPlan) {
   const selected = Array.isArray(corpusPlan?.selected) ? corpusPlan.selected : [];
-  const cacheKey = selected.map((corpus) => corpus.id).sort().join(":") || "none";
+  const passageSearch = process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1";
+  const cacheKey = selected.map((corpus) => `${corpus.id}:${corpus.codeVersion}`).sort().join(":") + `:passages=${passageSearch}`;
   if (cachedResearchCorpusResources.has(cacheKey)) {
     return cachedResearchCorpusResources.get(cacheKey);
   }
@@ -8179,8 +8196,10 @@ async function researchCorpusResources(corpusPlan) {
         indexes.push(await zoningSearchIndex());
       }
     }
+    const catalog = catalogs.flat();
     return {
-      catalog: catalogs.flat(),
+      catalog,
+      passageIndex: passageSearch ? await buildResearchPassageIndex(catalog, researchBodyForCatalogSection) : null,
       invertedIndex: mergedResearchSearchIndex(indexes),
       availableCodePrefixes: selected.flatMap((corpus) => corpus.codePrefixes || [])
     };
@@ -12082,7 +12101,7 @@ async function resolveResearchAssemblySection(request, catalog) {
     // Definition labels in the official zoning HTML are lowercase headings.
     // Preserve that structure for selecting complete entries; flattened text
     // cannot distinguish those labels from mentions inside other definitions.
-    ...((/\bdefinitions?\b/i.test(evidence.title) || String(evidence.text || "").length > 4_000) ? {
+    ...((process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1" || /\bdefinitions?\b/i.test(evidence.title) || String(evidence.text || "").length > 4_000) ? {
       body: await researchBodyForCatalogSection({ ...evidence, id: evidence.sectionID })
     } : {}),
     crossReferences: researchAssemblyCrossReferences(evidence, catalog)
@@ -12106,7 +12125,8 @@ export async function assembledResearchEvidenceForTurn({
     topicContext,
     projectFacts
   });
-  const { catalog, invertedIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
+  const { catalog, invertedIndex, passageIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
+  const semanticSearch = passageIndex ? await researchSemanticSearchResource() : null;
   const strategy = researchEvidenceStrategyForTurn({
     question,
     pinnedEvidence,
@@ -12115,9 +12135,18 @@ export async function assembledResearchEvidenceForTurn({
   const testSupplementalCharacterBudget = process.env.NODE_ENV === "test"
     ? Number(process.env.PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS)
     : Number.NaN;
-  const baseAssemblyLimits = zoningPlan
+  const plannedAssemblyLimits = zoningPlan
     ? zoningResearchEvidenceLimits(zoningPlan)
     : researchEvidenceAssemblyLimits;
+  // Indexed excerpts let more short provisions share the same character
+  // budget. Keep user selections and their boundaries unchanged; this adjusts
+  // only the ordinary planner's discovery count in the opt-in experiment.
+  const baseAssemblyLimits = passageIndex && !pinnedEvidence?.length &&
+    strategy.mode === researchEvidenceStrategies.broad
+    ? { ...plannedAssemblyLimits,
+        maximumDiscovered: Math.min(plannedAssemblyLimits.maximumCandidates,
+          Math.max(6, plannedAssemblyLimits.maximumDiscovered)) }
+    : plannedAssemblyLimits;
   const assemblyLimits = Number.isSafeInteger(testSupplementalCharacterBudget) &&
     testSupplementalCharacterBudget > 0
     ? {
@@ -12140,6 +12169,8 @@ export async function assembledResearchEvidenceForTurn({
       retrievalContext,
       catalog,
       invertedIndex,
+      passageIndex,
+      semanticSearch,
       readSectionBody: researchBodyForCatalogSection,
       resolveVisualSource: constructionVisualSourceMetadata,
       availableCodePrefixes,
