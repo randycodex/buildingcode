@@ -258,7 +258,8 @@ import {
   researchEmbeddingUsage,
   reserveResearchEvaluationSpend,
   settleResearchProviderSpend,
-  researchModelConfiguration
+  researchModelConfiguration,
+  researchAnswerConfigurationForRevision
 } from "./research-config.mjs";
 import {
   createResearchOperationMetric,
@@ -10494,10 +10495,10 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const baseConfiguration = {
+  const baseConfiguration = researchAnswerConfigurationForRevision({
     ...researchModelConfiguration(),
     ...(options.model ? { model: options.model } : {})
-  };
+  }, options);
   const conversational = options.responseStyle === "conversational";
   const configuration = conversational
     ? {
@@ -21424,6 +21425,8 @@ async function handleResearchConversationMessage(request, response) {
       user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
       mode: mockMode ? "mock" : "openai",
       model: result.model,
+      answerReasoningEffort: result.configuration?.reasoningEffort || null,
+      verificationReasoningEffort: result.configuration?.verificationReasoningEffort || null,
       requestedModel: result.requestedModel || modelRouting.model,
       routingMode: modelRouting.configuration.mode,
       answerTier: modelRouting.tier,

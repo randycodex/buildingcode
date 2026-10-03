@@ -58,6 +58,16 @@ export function researchModelConfiguration(environment = process.env) {
   };
 }
 
+export function researchAnswerConfigurationForRevision(configuration, options = {}) {
+  if (!/^gpt-6-luna(?:-|$)/.test(configuration.model || "") ||
+      configuration.reasoningEffort !== "low" ||
+      !Array.isArray(options.revisionFeedback) || !options.revisionFeedback.length) {
+    return configuration;
+  }
+  // Use more reasoning within the existing bounded source-verification repair.
+  return { ...configuration, reasoningEffort: "medium" };
+}
+
 function nonnegativeNumber(value) {
   if (value === undefined || value === null || String(value).trim() === "") return null;
   const number = Number(value);

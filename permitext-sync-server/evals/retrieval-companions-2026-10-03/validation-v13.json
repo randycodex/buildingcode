@@ -1,0 +1,26 @@
+{
+  "candidate": "v13",
+  "providerCalls": 0,
+  "passedChecks": [
+    "research-revision-reasoning-effort-contract:24 exact-source request envelopes and pure preservation checks",
+    "research-claim-scope-contract",
+    "research-exception-recipient-scope-contract",
+    "research-fast-conversation-http-contract:mocked four-request sequence with low draft/medium repair and mandatory final review",
+    "research-luna6-high-http-contract:high draft/revision preserved",
+    "research-revision-verification-http-contract:final rejection blocks save/charge; accepted reviewed revision persists",
+    "node syntax app.mjs/research-config.mjs",
+    "git diff --check"
+  ],
+  "policy": {
+    "draftLunaLow": "low",
+    "verifierFeedbackRevisionLunaLow": "medium",
+    "configuredMediumHighMax": "preserved",
+    "otherModels": "preserved",
+    "parseOnlyRetry": "unchanged",
+    "reviewer": "unchanged",
+    "modelNamesRoutingBudgetsEvidenceGates": "unchanged"
+  },
+  "newProviderAttempts": 0,
+  "sourceIdentityAndVerificationGatesUnchanged": true,
+  "liveAnswerAcceptance": "pending"
+}

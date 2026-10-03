@@ -27,7 +27,7 @@ globalThis.fetch=async(url,options)=>{
   const writer=phase!=='permitext_research_verification';
   assert.equal(body.model,'gpt-6-luna');
   assert.equal(body.service_tier,'priority');
-  assert.equal(body.reasoning.effort,writer?'low':'medium');
+  assert.equal(body.reasoning.effort,writer&&phases.filter(stage=>stage!=='permitext_research_verification').length===1?'low':'medium');
   assert.equal(body.max_output_tokens,writer?24000:8000);
   const input=typeof body.input==='string'?body.input:body.input.flatMap(item=>item.content.map(part=>part.text||'')).join('\n');
   if (turn===1) {
