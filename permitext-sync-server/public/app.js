@@ -37902,6 +37902,24 @@ function preparePaneCollapse(panel) {
     });
     panel.append(rail);
   }
+  const headerClose = header.querySelector("button[class*='close']");
+  let collapsedClose = panel.querySelector(":scope > .pane-collapsed-close");
+  if (headerClose) {
+    if (!collapsedClose) {
+      collapsedClose = document.createElement("button");
+      collapsedClose.type = "button";
+      collapsedClose.className = "icon-button pane-collapsed-close";
+      collapsedClose.addEventListener("click", (event) => {
+        event.stopPropagation();
+        header.querySelector("button[class*='close']")?.click();
+      });
+      panel.append(collapsedClose);
+    }
+    collapsedClose.innerHTML = headerClose.innerHTML;
+    collapsedClose.setAttribute("aria-label", headerClose.getAttribute("aria-label") || `Close ${label}`);
+    collapsedClose.title = collapsedClose.getAttribute("aria-label");
+    collapsedClose.disabled = headerClose.disabled;
+  }
   rail.title = `Expand ${label}`;
   rail.setAttribute("aria-label", rail.title);
   const group = workspacePrivatePresentationAllowed() ? columnGroupForPane(panel.dataset.paneId) : null;

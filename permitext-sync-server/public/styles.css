@@ -17015,7 +17015,7 @@ html body .research-compact-composer .research-question-input:focus-visible {
   overflow: hidden;
 }
 
-.workspace-panel.is-collapsed > :not(.pane-collapsed-tab) {
+.workspace-panel.is-collapsed > :not(.pane-collapsed-tab):not(.pane-collapsed-close) {
   display: none !important;
 }
 
@@ -17778,3 +17778,22 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .reader-panel > .pane-collapsed-tab:hover {
   color: var(--code-accent);
 }
+
+.pane-collapsed-close { display: none; }
+.workspace-panel.is-collapsed > .pane-collapsed-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+}
+.workspace-panel.is-collapsed > .pane-collapsed-tab { padding-top: 56px; }
