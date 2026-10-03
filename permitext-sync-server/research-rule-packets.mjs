@@ -1,7 +1,9 @@
 // A completeness audit describes what was supplied, never which law applies.
 // Recovery uses canonical references and retrieved terminology; model text is
 // never treated as evidence.
-export const researchRulePacketVersion = "20261003-continuing-canonical-packets-v6";
+import { researchSourcePublishedCitationReference } from "./research-definition-excerpts.mjs";
+
+export const researchRulePacketVersion = "20261003-published-reference-context-v7";
 
 const detailStopWords = new Set(('a an and are as at be been before between building buildings by can code codes could do does each existing feet fictional for from have how if in into is it its later may measure measured minimum maximum new not now of on one only or our project proposed question scenario section shall should same some supplied than that the their these this those to under use used using was we were what when where whether which will with without would').split(' '));
 const detailForms = word => {
@@ -135,10 +137,12 @@ export function researchCanonicalApplicabilityContext(value = {}) {
 
 export function researchSourceApplicabilityPrompt(source) {
   const context = researchCanonicalApplicabilityContext(source);
-  return `CANONICAL_SOURCE_CONTEXT: ${JSON.stringify(context)}`;
+  const publishedReference = researchSourcePublishedCitationReference(source);
+  return [`CANONICAL_SOURCE_CONTEXT: ${JSON.stringify(context)}`,
+    ...(publishedReference ? [`PUBLISHED_CITATION_REFERENCE: ${JSON.stringify(publishedReference)}`] : [])].join("\n");
 }
 
-export const researchSourceApplicabilityInstruction = "Read each rule within its CANONICAL_SOURCE_CONTEXT and its supplied enacted scope conditions. Article, chapter, section-group and special-district labels are canonical source metadata, not project facts or proof of applicability. Wording such as 'in all districts' in a special-district chapter does not by itself extend that rule to districts outside its enclosing special district. A parallel rule from another chapter, use category or district is not an applicable substitute merely because its threshold or wording is similar. Do not present a geographically or categorically scoped provision as a general conflict, waiver or exception without supplied evidence and facts establishing that scope. When that scope is not established and is immaterial to the requested ordinary rule, omit the collateral provision rather than inventing an unresolved conflict. If it can materially affect the requested conclusion, state the precise supported conditional scope and what remains unknown. Metadata is not additional selected enacted text: retain the exact selected passage, its edition and its source boundary, and never infer omitted scope clauses from titles alone.";
+export const researchSourceApplicabilityInstruction = "Read each rule within its CANONICAL_SOURCE_CONTEXT and its supplied enacted scope conditions. Article, chapter, section-group and special-district labels are canonical source metadata, not project facts or proof of applicability. Wording such as 'in all districts' in a special-district chapter does not by itself extend that rule to districts outside its enclosing special district. A parallel rule from another chapter, use category or district is not an applicable substitute merely because its threshold or wording is similar. Do not present a geographically or categorically scoped provision as a general conflict, waiver or exception without supplied evidence and facts establishing that scope. When that scope is not established and is immaterial to the requested ordinary rule, omit the collateral provision rather than inventing an unresolved conflict. If it can materially affect the requested conclusion, state the precise supported conditional scope and what remains unknown. Metadata is not additional selected enacted text: retain the exact selected passage, its edition and its source boundary, and never infer omitted scope clauses from titles alone. PUBLISHED_CITATION_REFERENCE, when present, is a server-verified published heading for the exact complete definition entries supplied in that passage. SECTION_ID, PASSAGE_ID and the carrier SECTION/TITLE remain immutable storage identifiers. Cite those supplied IDs while using the published reference in prose; normalization supplies its display label. When a citation combines ordinary carrier text and embedded definitions, its carrier label remains a storage label and the supporting passages identify any separately bound published reference. Do not relabel ordinary carrier text from a later embedded heading, invent an unbound published reference, or request model edits to server-owned citation labels. This identity distinction does not establish rule applicability or excuse a wrong scope, definition, temperature, threshold or conclusion.";
 
 export function researchMeasurementRecoveryQuery(question, sources) {
   if (!/\b(?:maximum|minimum|how (?:high|wide|far|deep|much|many)|limit|rate|temperature)\b/i.test(question)) return null;

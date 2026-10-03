@@ -300,6 +300,8 @@ import {
   researchCanonicalApplicabilityContext, researchSourceApplicabilityPrompt,
   researchSourceApplicabilityInstruction
 } from "./research-rule-packets.mjs";
+import { researchCommonPublishedCitationReference,
+  researchSourcePublishedCitationReference } from "./research-definition-excerpts.mjs";
 import {
   canonicalResearchOfficialGuidanceLimitations,
   canonicalResearchOfficialGuidanceNarrative,
@@ -10105,11 +10107,14 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       throw error;
     }
     seen.add(citationKey);
-    const source = allowedSections.get(sectionID);
+    const publishedCitationReference = researchCommonPublishedCitationReference(sourceIDs.map(sourceID => allowedSources.get(sourceID)));
+    const source = publishedCitationReference ? allowedSources.get(sourceIDs[0]) : allowedSections.get(sectionID);
     citations.push({
       sectionID: source.sectionID,
-      sectionNumber: source.sectionNumber,
-      title: source.title,
+      sectionNumber: publishedCitationReference?.sectionNumber || source.sectionNumber,
+      title: publishedCitationReference?.title || source.title,
+      ...(publishedCitationReference ? { publishedCitationReference,
+        carrierSectionNumber: source.sectionNumber, carrierTitle: source.title } : {}),
       codePrefix: source.codePrefix,
       chapterNumber: source.chapterNumber,
       chapterTitle: source.chapterTitle,
@@ -10123,6 +10128,9 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       supportingPassages: sourceIDs.map((sourceID) => ({
         sourceID,
         selectedText: allowedSources.get(sourceID).text,
+        ...(researchSourcePublishedCitationReference(allowedSources.get(sourceID)) ? {
+          publishedCitationReference: researchSourcePublishedCitationReference(allowedSources.get(sourceID))
+        } : {}),
         canonicalApplicabilityContext: researchCanonicalApplicabilityContext(allowedSources.get(sourceID)),
         visualSources: (allowedSources.get(sourceID).visualSources || []).map((visualSource) => ({
           id: visualSource.id,

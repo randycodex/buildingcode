@@ -190,7 +190,7 @@ function definitionEntries(section) {
 
 // Some canonical catalog records carry the next chapter in the same source
 // block. Recognize the enacted heading, not a guessed catalog title/number.
-// The registered carrier remains the citation identity throughout extraction.
+// The registered carrier remains the storage identity throughout extraction.
 export function researchEmbeddedDefinitionCarrier(section) {
   if (section?.truncated === true) return null;
   const prefix = compactText(section?.codePrefix).toUpperCase();
@@ -244,6 +244,103 @@ function definitionBindings(section, selected, carrier) {
     } : null;
   });
   return entries.every(Boolean) ? { embeddedDefinitionSection: carrier, canonicalEntryBindings: entries } : null;
+}
+
+const publishedCitationVersion = "canonical-published-definition-reference-v1";
+const citationAuthorityFields = ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"];
+const citationText = value => String(value || "").replace(/\s+/g, " ").trim();
+const citationHash = value => createHash("sha256").update(citationText(value)).digest("hex");
+const sameOffsets = (left, right) => ["blockIndex", "blockID", "start", "end"]
+  .every(field => left?.[field] === right?.[field]);
+const sameEntryBinding = (left, right) => left?.label === right?.label &&
+  left?.sourceTextHash === right?.sourceTextHash && sameOffsets(left?.sourceOffsets, right?.sourceOffsets);
+
+// Called only with a freshly resolved canonical record. An embedded heading
+// cannot relabel the whole carrier: only exact, complete entries wholly inside
+// that heading's hash-bound range acquire this published reference.
+export function researchBoundDefinitionPublishedReference(section, excerpt, selectedText) {
+  if (!excerpt || excerpt.sourceMode !== "canonical_enacted_definition_entries" ||
+      section?.truncated === true || section?.body?.truncated === true ||
+      citationAuthorityFields.some(field => !citationText(section?.[field])) ||
+      citationAuthorityFields.some(field => excerpt[field] !== undefined &&
+        citationText(excerpt[field]) !== citationText(section[field])) ||
+      citationText(excerpt.sectionID) !== citationText(section.sectionID || section.id) ||
+      citationText(excerpt.sectionNumber) !== citationText(section.sectionNumber)) return null;
+  const carrier = researchEmbeddedDefinitionCarrier(section);
+  const supplied = excerpt.embeddedDefinitionSection;
+  if (!carrier || !supplied || ["codePrefix", "sectionNumber", "heading", "carrierSectionID", "carrierSectionNumber", "sourceTextHash"]
+      .some(field => carrier[field] !== supplied[field]) || !sameOffsets(carrier.sourceOffsets, supplied.sourceOffsets) ||
+      carrier.definitionRange.start !== supplied.definitionRange?.start || carrier.definitionRange.end !== supplied.definitionRange?.end) return null;
+  const block = (section.body?.blocks || section.blocks || [])[carrier.sourceOffsets.blockIndex];
+  if (block?.researchClaimEligible === false || block?.truncated === true) return null;
+  const labels = excerpt.labels, passages = excerpt.passages;
+  if (!Array.isArray(labels) || !labels.length || labels.length > researchDefinitionExcerptLimits.maximumDefinitions ||
+      new Set(labels).size !== labels.length || !Array.isArray(passages) || passages.length !== labels.length) return null;
+  const entries = definitionEntries(section);
+  const selected = labels.map((label, index) => {
+    const matches = entries.filter(entry => entry.label === label);
+    return matches.length === 1 && citationText(matches[0].text) === citationText(passages[index]) ? matches[0] : null;
+  });
+  if (selected.some(entry => !entry)) return null;
+  const bindings = definitionBindings(section, selected, carrier);
+  if (!bindings || !Array.isArray(excerpt.canonicalEntryBindings) || excerpt.canonicalEntryBindings.length !== selected.length ||
+      bindings.canonicalEntryBindings.some((binding, index) => !sameEntryBinding(binding, excerpt.canonicalEntryBindings[index]))) return null;
+  const expectedText = [carrier.heading, ...selected.map(entry => entry.text)].join("\n\n");
+  if (citationText(selectedText) !== citationText(expectedText)) return null;
+  const title = carrier.heading.slice(carrier.heading.indexOf(":") + 1).trim();
+  return {
+    version: publishedCitationVersion, basis: "hash_bound_embedded_definition_entries",
+    ...Object.fromEntries(citationAuthorityFields.map(field => [field, citationText(section[field])])),
+    sectionNumber: carrier.sectionNumber, title, heading: carrier.heading,
+    carrierSectionID: carrier.carrierSectionID, carrierSectionNumber: carrier.carrierSectionNumber,
+    carrierTitle: citationText(section.title), sourceTextHash: carrier.sourceTextHash,
+    sourceOffsets: structuredClone(carrier.sourceOffsets),
+    canonicalEntryBindings: structuredClone(bindings.canonicalEntryBindings),
+    selectedTextHash: citationHash(selectedText)
+  };
+}
+
+// Consumers read the server-owned attestation, never model-supplied reference
+// numbers. Bind it again to the actual selected passage and authority so a
+// copied reference cannot migrate across entries, editions or carriers.
+export function researchSourcePublishedCitationReference(source) {
+  const reference = source?.publishedCitationReference;
+  const excerpt = source?.targetedDefinition;
+  if (!reference || reference.version !== publishedCitationVersion ||
+      reference.basis !== "hash_bound_embedded_definition_entries" || !source.canonicalContextResolved || source.truncated ||
+      !citationText(source.sourceID) ||
+      !excerpt || excerpt.sourceMode !== "canonical_enacted_definition_entries" ||
+      citationAuthorityFields.some(field => !citationText(source[field]) || reference[field] !== citationText(source[field])) ||
+      citationAuthorityFields.some(field => excerpt[field] !== undefined && citationText(excerpt[field]) !== citationText(source[field])) ||
+      citationText(excerpt.sectionID) !== citationText(source.sectionID) || citationText(excerpt.sectionNumber) !== citationText(source.sectionNumber) ||
+      reference.carrierSectionID !== citationText(source.sectionID) || reference.carrierSectionNumber !== citationText(source.sectionNumber) ||
+      reference.carrierTitle !== citationText(source.title) || reference.selectedTextHash !== citationHash(source.text) ||
+      !/^[a-f0-9]{64}$/.test(reference.sourceTextHash || "") ||
+      reference.sectionNumber !== excerpt.embeddedDefinitionSection?.sectionNumber ||
+      reference.heading !== excerpt.embeddedDefinitionSection?.heading ||
+      reference.sourceTextHash !== excerpt.embeddedDefinitionSection?.sourceTextHash ||
+      !sameOffsets(reference.sourceOffsets, excerpt.embeddedDefinitionSection?.sourceOffsets) ||
+      !Array.isArray(reference.canonicalEntryBindings) || !reference.canonicalEntryBindings.length ||
+      reference.canonicalEntryBindings.length !== excerpt.canonicalEntryBindings?.length ||
+      reference.canonicalEntryBindings.length !== excerpt.labels?.length || reference.canonicalEntryBindings.length !== excerpt.passages?.length ||
+      reference.canonicalEntryBindings.some((binding, index) => binding.label !== excerpt.labels[index]) ||
+      reference.canonicalEntryBindings.some((binding, index) => !sameEntryBinding(binding, excerpt.canonicalEntryBindings[index])) ||
+      citationText(source.text) !== citationText([reference.heading, ...(excerpt.passages || [])].join("\n\n")) ||
+      reference.title !== reference.heading.slice(reference.heading.indexOf(":") + 1).trim()) return null;
+  return structuredClone(reference);
+}
+
+export function researchCommonPublishedCitationReference(sources) {
+  if (!Array.isArray(sources) || !sources.length) return null;
+  const references = sources.map(researchSourcePublishedCitationReference);
+  if (references.some(reference => !reference)) return null;
+  const fields = ["version", "basis", ...citationAuthorityFields, "sectionNumber", "title", "heading",
+    "carrierSectionID", "carrierSectionNumber", "carrierTitle"];
+  if (references.some(reference => fields.some(field => reference[field] !== references[0][field]))) return null;
+  return { ...Object.fromEntries(fields.map(field => [field, references[0][field]])),
+    sourceBindings: references.map((reference, index) => ({ sourceID: sources[index].sourceID,
+      sourceTextHash: reference.sourceTextHash, sourceOffsets: reference.sourceOffsets,
+      canonicalEntryBindings: reference.canonicalEntryBindings, selectedTextHash: reference.selectedTextHash })) };
 }
 
 function isDefinitionSection(section, text) {

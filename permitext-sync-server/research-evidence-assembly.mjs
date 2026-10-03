@@ -8,7 +8,8 @@ import {
   researchQuestionReturnsToOriginalTopic,
   extractResearchCodeReferences
 } from "./research-conversation-topic.mjs";
-import { targetedDefinitionExcerpt, researchEmbeddedDefinitionCarrier } from "./research-definition-excerpts.mjs";
+import { targetedDefinitionExcerpt, researchEmbeddedDefinitionCarrier,
+  researchBoundDefinitionPublishedReference } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { orderedResearchTopicDependencies, researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
@@ -31,7 +32,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-bounded-enacted-chapter-scope-v68";
+export const researchEvidenceAssemblyVersion = "20261003-bound-published-definition-reference-v69";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -814,9 +815,11 @@ function sourceRecord(value, {
   const rawText = canonicalText(value);
   const text = rawText.slice(0, Math.max(0, characterAllowance)).trimEnd();
   const embeddedDefinition = targetedDefinition?.embeddedDefinitionSection;
+  const publishedCitationReference = canonicalResolved && text.length === rawText.length
+    ? researchBoundDefinitionPublishedReference(value, targetedDefinition, text) : null;
   const sourceRelationship = embeddedDefinition
     ? `${relationship}. Definition heading in this canonical source: ${embeddedDefinition.heading}. ` +
-      `The registered carrier ${value.codePrefix} ${value.sectionNumber} is not the definition's published section number.`
+      `The registered carrier ${value.codePrefix} ${value.sectionNumber} identifies storage, not the embedded definition's published section number.`
     : relationship;
   return attachStructuredTable({
     sourceID,
@@ -848,6 +851,7 @@ function sourceRecord(value, {
     ),
     truncated: targetedDefinition ? false : Boolean(value.questionSpecificPassage) || text.length < rawText.length,
     targetedDefinition: targetedDefinition ? structuredClone(targetedDefinition) : null,
+    ...(publishedCitationReference ? { publishedCitationReference } : {}),
     ...(value.targetedZoningContext ? { targetedZoningContext: structuredClone(value.targetedZoningContext) } : {})
   }, value, Math.max(0, characterAllowance));
 }
