@@ -1,0 +1,16 @@
+{
+  "candidate": "v16",
+  "providerCalls": 0,
+  "passedChecks": [
+    "research-material-zoning-revision-http-contract: full-schema positive revision and stale-point negative rejection, each four mocked calls",
+    "research-targeted-revision-contract: narrow repairs preserved",
+    "research-fast-conversation-http-contract",
+    "research-request-envelope-preflight",
+    "research-topic-dependency-budget-contract: all complete definitions fit real six-source order"
+  ],
+  "initialWriter": "Luna6 low restored from v14",
+  "existingFeedbackRevision": "Luna6 medium",
+  "verifier": "Luna6 medium",
+  "attemptAndFinalReviewLimitsUnchanged": true,
+  "liveAcceptance": "pending"
+}

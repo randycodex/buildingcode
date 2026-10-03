@@ -125,7 +125,6 @@ export const researchTargetedRevisionInstruction = "Return only edits to the lis
 export function researchTargetedRevisionEligible(options = {}) {
   const answer = options.previousInterpretation;
   if (!answer?.supportedPoints?.length || !answer?.citations?.length) return false;
-  if (options.zoningPlan?.callPolicy?.allowFullAnswerRewrite === true) return true;
   // Numeric, applicability, and premise errors still require a full revision.
   // Narrow citation/qualification defects can be repaired without rewriting
   // independently supported text. Every patch still receives full review.

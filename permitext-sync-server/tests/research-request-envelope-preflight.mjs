@@ -12,7 +12,7 @@ import {
 import { requiredResearchClaimsFromEvidence } from "../research-required-claim-coverage.mjs";
 import {
   beginResearchSpendReservation, endResearchSpendReservation,
-  researchModelConfiguration, researchAnswerConfigurationForRevision, researchAnswerConfigurationForEvidence, reserveResearchProviderSpend, settleResearchProviderSpend
+  researchModelConfiguration, researchAnswerConfigurationForRevision, reserveResearchProviderSpend, settleResearchProviderSpend
 } from "../research-config.mjs";
 import { researchEvidenceAssemblyVersion } from "../research-evidence-assembly.mjs";
 import {
@@ -69,7 +69,6 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     requestResearchProvider: () => { throw new Error("Provider dispatch is forbidden in the request preflight."); },
     researchModelConfiguration: () => researchModelConfiguration(environment),
     researchAnswerConfigurationForRevision,
-    researchAnswerConfigurationForEvidence,
     researchEvidenceAssemblyVersion,
     researchRulePacketInstruction, researchRulePacketPrompt,
     researchSourceApplicabilityPrompt, researchSourceApplicabilityInstruction,

@@ -68,23 +68,6 @@ export function researchAnswerConfigurationForRevision(configuration, options = 
   return { ...configuration, reasoningEffort: "medium" };
 }
 
-export function researchAnswerConfigurationForEvidence(configuration, evidence = []) {
-  if (!/^gpt-6-luna(?:-|$)/.test(configuration.model || "") || configuration.reasoningEffort !== "low") return configuration;
-  const sources = Array.isArray(evidence) ? evidence : [];
-  const authorityFields = ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"];
-  const completeDefinitions = sources.filter(source => source?.targetedDefinition?.completeDefinitionEntries === true &&
-    source.truncated !== true && String(source.text || "").trim() &&
-    authorityFields.every(field => String(source[field] || "").trim()));
-  const needsDefinitionApplication = completeDefinitions.some(definition => new Set(sources.filter(source =>
-    source?.evidencePriority?.applicabilityCandidate === true && source.canonicalContextComplete === true &&
-    source.truncated !== true && String(source.text || "").trim() &&
-    authorityFields.every(field => source[field] === definition[field]))
-    .map(source => String(source.sectionID || source.sectionNumber || "").trim()).filter(Boolean)).size >= 2);
-  // Applying enacted definitions across alternative complete frameworks needs
-  // more reasoning than a dictionary lookup or a narrow measurement question.
-  return needsDefinitionApplication ? { ...configuration, reasoningEffort: "medium" } : configuration;
-}
-
 function nonnegativeNumber(value) {
   if (value === undefined || value === null || String(value).trim() === "") return null;
   const number = Number(value);
