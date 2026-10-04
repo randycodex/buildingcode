@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "artifactVersion": "20261003-private-current-corpus-v1",
   "vectorFile": "current-vectors.bin",
-  "byteLength": 53110832,
-  "sha256": "db8f16e0d173ee285a6f43e09f1a34a8fd75da6a188d736cfe54cc5e2bbbcc31",
+  "byteLength": 53127728,
+  "sha256": "e6407ec404a50fe99a09e4179e6d2048ff63d7cd10986e3e448f8a313cae62a8",
   "model": "text-embedding-3-small",
   "dimensions": 256,
   "embeddingTextVersion": "20261002-passage-title-context-v1",
   "passageIndexVersion": "20261002-numbered-passage-context-v2",
-  "inputCount": 50294,
-  "currentCorpusFingerprint": "30d003b0f0dcd7e7984be1898eb9523f0443e99e9f53c0ae5655b84df42b7ed2",
+  "inputCount": 50310,
+  "currentCorpusFingerprint": "8b23b96bc2eeea92b32aee1f5ca198201556d517bd302cb6b98906556ed1130d",
   "currentCorpora": [
     {
       "id": "nyc-2022-construction-codes",
@@ -26,8 +26,8 @@
   ],
   "authorizedIndexes": [
     {
-      "fingerprint": "5d9776676e81e718d00689c5224060cd5f79b4dd99a10e91c61d7f08c32baa7c",
-      "passageCount": 20236,
+      "fingerprint": "558dba78f58bbf6b32991dfea8757a1131e6e587da89e9ef80afaf9d530ed80c",
+      "passageCount": 20252,
       "corpusIDs": [
         "nyc-2022-construction-codes"
       ]
@@ -40,8 +40,8 @@
       ]
     },
     {
-      "fingerprint": "fa46ea95ff4669292a056f62bc8463419d7d4c5b9cc8c715e1cb3a2e0b4ea24e",
-      "passageCount": 24937,
+      "fingerprint": "edb3f34d07cb4e6b7dea7040379ffa0b45fb802aed4704ce8888f9eca161113c",
+      "passageCount": 24953,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2022-fire-code"
@@ -55,8 +55,8 @@
       ]
     },
     {
-      "fingerprint": "566446908c92441306bbed64cfca25a84cf0f2151ba202602506baa5a1e44410",
-      "passageCount": 48245,
+      "fingerprint": "9593f0b06f203c53dbf4513b741e7a9590dd95a0ee2a17a3045979c6ff552208",
+      "passageCount": 48261,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-zoning-resolution"
@@ -71,8 +71,8 @@
       ]
     },
     {
-      "fingerprint": "30d003b0f0dcd7e7984be1898eb9523f0443e99e9f53c0ae5655b84df42b7ed2",
-      "passageCount": 52946,
+      "fingerprint": "8b23b96bc2eeea92b32aee1f5ca198201556d517bd302cb6b98906556ed1130d",
+      "passageCount": 52962,
       "corpusIDs": [
         "nyc-2022-construction-codes",
         "nyc-2022-fire-code",

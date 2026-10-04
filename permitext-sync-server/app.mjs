@@ -302,6 +302,7 @@ import {
 } from "./research-rule-packets.mjs";
 import { researchCommonPublishedCitationReference,
   researchSourcePublishedCitationReference } from "./research-definition-excerpts.mjs";
+import { enrichResearchConstructionDefinitionBody } from "./research-construction-definition-content.mjs";
 import {
   canonicalResearchOfficialGuidanceLimitations,
   canonicalResearchOfficialGuidanceNarrative,
@@ -459,6 +460,7 @@ import {
 import { applyVisibleSectionNumber } from "./code-navigation-hierarchy.mjs";
 import {
   constructionHTMLBodyForSection,
+  constructionChapterHTMLSource,
   officialBodyHasUnboundImages
 } from "./construction-html-content.mjs";
 import { codeAssetContentType, resolveCodeAsset } from "./code-asset-store.mjs";
@@ -8397,12 +8399,19 @@ function bodyReferencesRichSource(body) {
 
 async function bodyEnrichedWithOfficialRichSource(body, sectionID) {
   const summary = await sectionSummaryByID(sectionID);
-  const htmlBody = await constructionHTMLBodyForSection(summary);
+  const boundOfficialBody = await constructionHTMLBodyForSection(summary, { includeOfficialSourceBinding: true });
+  // Keep the established rich-source/Reader body shape unless the verified
+  // definition recovery actually uses this optional binding.
+  const { officialSourceBinding, ...htmlBodyFields } = boundOfficialBody || {};
+  const htmlBody = boundOfficialBody ? htmlBodyFields : null;
   if (officialBodyHasUnboundImages(body, htmlBody)) {
     return htmlBody;
   }
   if (bodyContainsRichSource(body) || !bodyReferencesRichSource(body)) {
-    return body;
+    const officialSource = officialSourceBinding
+      ? await constructionChapterHTMLSource(summary.codePrefix, summary.sourceChapterNumber || summary.chapterNumber)
+      : null;
+    return enrichResearchConstructionDefinitionBody(body, boundOfficialBody, summary, officialSource);
   }
   return bodyContainsRichSource(htmlBody) ? htmlBody : body;
 }
