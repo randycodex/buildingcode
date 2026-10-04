@@ -1891,7 +1891,8 @@ export async function discoverRelevantEvidence({
   // competing/multiple shared concepts retain ordinary cross-code retrieval.
   const vocabularyConcept = !equipmentIntent && vocabulary.concepts.length === 1
     ? vocabulary.concepts[0] : null;
-  const foregroundQuery = equipmentIntent?.query || (vocabularyConcept ? vocabulary.query : currentQuestion);
+  const foregroundQuery = equipmentIntent?.query || (vocabularyConcept
+    ? (vocabularyConcept.foregroundTerms || vocabularyConcept.terms).join(' ') : currentQuestion);
   const foregroundWords = rawTokens(foregroundQuery).filter(word => word.length > 2 && /[a-z]/i.test(word) &&
     !stopWords.has(word) && !rankingBoilerplate.has(word) && !genericPassageHeadingWords.has(word) &&
     !["need", "needed", "project", "fictional", "scenario", "ground", "floor", "make"].includes(word));

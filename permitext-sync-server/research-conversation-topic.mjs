@@ -1,8 +1,8 @@
 import { researchPriorAnswerSources } from "./research-conversation-continuity.mjs";
 import { researchQuestionSubject } from "./research-question-subject.mjs";
-import { researchSearchVocabulary } from "./research-search-vocabulary.mjs";
+import { researchSearchVocabulary, researchLeadingTopicSwitch } from "./research-search-vocabulary.mjs";
 
-export const researchConversationTopicVersion = "20261003-positive-human-subject-continuity-v12";
+export const researchConversationTopicVersion = "20261004-leading-modifier-topic-continuity-v13";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -301,8 +301,7 @@ export function researchQuestionReturnsToOriginalTopic(question) {
 export function researchQuestionExplicitlySwitchesTopic(question) {
   // Only an affirmative leading user instruction changes the topic here.
   // Quoted examples, negated mentions and a shared project/location do not.
-  return /^(?:(?:new|different|unrelated|another)\s+(?:topic|question|issue|problem|concern|subject|matter)|separate(?:ly)?|moving on)\b/i
-    .test(normalizedText(question));
+  return researchLeadingTopicSwitch(normalizedText(question));
 }
 
 function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
