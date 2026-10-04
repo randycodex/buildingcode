@@ -24,6 +24,18 @@ const savedMessage = answer => ({ id: "historical-v6", role: "assistant", answer
   researchProgress: { status: "completed", startedAt: "2026-10-03T06:59:40.000Z", completedAt: "2026-10-03T07:00:00.000Z",
     stages: researchProgressStages.map(stage => ({ id: stage.id, state: "completed" })) } });
 
+const requestID = "c0eb7e24-567c-4c80-9547-41b53e8d40ad";
+const identifiedMessage = { ...savedMessage({ mode: "openai", verification: { pass: true }, answerText: "Private synthetic answer." }), requestID };
+const identifiedBefore = JSON.stringify(identifiedMessage);
+const identifiedProgress = context.researchProgressFromSavedMessage(identifiedMessage);
+assert.equal(identifiedProgress.id, requestID, "A restored completed card keeps its durable UI request identity.");
+assert.equal(context.renderResearchProgressCard(identifiedProgress, { completed: true }).dataset.researchProgressId, requestID);
+assert(!JSON.stringify(identifiedProgress).includes(identifiedMessage.answer.answerText), "Progress identity never carries the answer text.");
+assert.equal(JSON.stringify(identifiedMessage), identifiedBefore, "Restoration never rewrites the saved message.");
+for (const message of [savedMessage({}), { ...savedMessage({}), requestID: "" }]) {
+  assert.equal(context.researchProgressFromSavedMessage(message).id, `saved-${message.id}`, "Legacy records retain their saved-message fallback.");
+}
+
 for (const reason of researchSystemRecoveryReasons) {
   const message = savedMessage(researchClarificationAnswer("Does this room have enough headroom?", reason));
   const snapshot = JSON.stringify(message);
@@ -69,9 +81,12 @@ for (const [answer, expected] of [
     researchRequestRecoveryScope: () => ({}), removeResearchRequestRecovery() {},
     refreshResearchProgressCard(value) { paints.push(live.researchProgressStatusLabel(value)); },
     researchFailureMessage: error => error.message, researchUsage: null });
-  vm.runInContext(["researchAnswerHasVerificationRecovery", "researchProgressStatusLabel", "runResearchProgressSession"].map(extract).join("\n"), live);
+  vm.runInContext(["researchAnswerHasVerificationRecovery", "researchProgressStatusLabel", "researchProgressFromSavedMessage", "runResearchProgressSession"].map(extract).join("\n"), live);
   await live.runResearchProgressSession(progress);
   assert.equal(progress.status, "completed", progress.error);
   assert.deepEqual(paints, [expected]);
+  const restored = live.researchProgressFromSavedMessage(message);
+  assert.equal(restored.id, progress.id, "Completion and subsequent saved-card rendering keep one request identity.");
+  assert.equal(live.researchProgressStatusLabel(restored), expected);
 }
 console.log("Research answer status passed: live and reopened verification recovery read incomplete, success/factual clarification stay complete, elapsed/history/lifecycle remain intact; synthetic transport only.");

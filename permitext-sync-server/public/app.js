@@ -98,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261004-research-source-notes-v636";
+} from "./offline-storage.js?v=20261004-research-progress-request-v638";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -136,7 +136,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261004-research-source-notes-v636";
+} from "./research-intent-state.js?v=20261004-research-progress-request-v638";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -21417,7 +21417,7 @@ function researchProgressFromSavedMessage(message) {
   const value = message?.researchProgress;
   if (!value || value.status !== "completed" || !Array.isArray(value.stages)) return null;
   return {
-    id: `saved-${message.id}`,
+    id: message.requestID || `saved-${message.id}`,
     status: "completed",
     answerIncomplete: researchAnswerHasVerificationRecovery(message.answer),
     startedAt: Date.parse(value.startedAt) || Date.parse(message.createdAt) || Date.now(),
