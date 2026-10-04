@@ -98,14 +98,32 @@ function normalizedStructuredAttemptFailureStages(value) {
     .slice(0, 2);
 }
 
+function normalizedClaimApplicabilityDiagnostic(value) {
+  const hashes = ["packetHash", "answerHash", "evidenceHash", "factsHash"];
+  if (!["20261004-claim-applicability-v1", "20261004-claim-applicability-v2"].includes(value?.version) || !hashes.every((field) => /^[a-f0-9]{64}$/.test(value[field] || ""))) return null;
+  const reasons = new Set(["source_identity", "scope_identity", "source_binding", "unit_coverage", "edge_coverage", "packet_capacity", "stale_packet",
+    "review_hash", "edge_shape", "duplicate_reference", "source_span", "fact_span", "predicate_relation", "unbound_disposition", "unused_fact_binding",
+    "edge_state", "binding_coverage", "binding_shape", "ineligible_fact_status", "hypothetical_project_fact", "unbound_predicate", "irrelevant_fact_binding", "unit_shape", "unit_state", "categorical_scope", "categorical_witness", "condition_witness"]);
+  const counts = ["unitCount", "edgeCount", "bindingCount", "reviewedBindingCount", "factCount", "predicateReferenceCount", "factReferenceCount"];
+  const boundedCounts = (keys, values) => Object.fromEntries(keys.map((key) => [key, Math.min(10_000, nonnegativeInteger(values?.[key]))]));
+  return { version: value.version, ...Object.fromEntries(hashes.map((field) => [field, value[field]])), pass: value.pass === true,
+    ...boundedCounts(counts, value), reasonCodes: [...new Set((Array.isArray(value.reasonCodes) ? value.reasonCodes : [])
+      .filter((reason) => reasons.has(reason)))].slice(0, 24),
+    modes: boundedCounts(["source_explanation", "conditional_application", "project_determination", "scenario_determination", "practical_recommendation"], value.modes),
+    states: boundedCounts(["established", "excluded", "unresolved", "not_material_to_this_claim"], value.states) };
+}
+
 export function createResearchVerificationAttemptDiagnostics(value) {
   return (Array.isArray(value) ? value : []).slice(0, 2).flatMap((attempt, index) => {
+    const applicability = normalizedClaimApplicabilityDiagnostic(attempt?.claimApplicabilityReview);
+    const generic = applicability ? { claimApplicabilityReview: applicability } : {};
+    const genericAttempt = applicability ? [{ attempt: index + 1, ...generic }] : [];
     const zoning = attempt?.zoningSafety;
     if (zoning?.kind === "zoning_answer_scope") {
       const scope = normalizedZoningScopeDiagnostic(zoning);
-      return scope ? [{ attempt: index + 1, zoningSafety: scope }] : [];
+      return scope ? [{ attempt: index + 1, ...generic, zoningSafety: scope }] : genericAttempt;
     }
-    if (zoning?.kind !== "zoning_mapped_location") return [];
+    if (zoning?.kind !== "zoning_mapped_location") return genericAttempt;
     const scopeDecision = normalizedZoningScopeDiagnostic(zoning.scopeDecision);
     const triggeringClauses = (Array.isArray(zoning.triggeringClauses)
       ? zoning.triggeringClauses
@@ -126,6 +144,7 @@ export function createResearchVerificationAttemptDiagnostics(value) {
     });
     return [{
       attempt: index + 1,
+      ...generic,
       zoningSafety: {
         schemaVersion: 1,
         kind: "zoning_mapped_location",
