@@ -1,5 +1,4 @@
-import { buildResearchClaimApplicabilityPacket, researchClaimApplicabilityInstruction, researchClaimApplicabilitySchema,
-  validateResearchClaimApplicabilityReview } from "../research-claim-applicability-review.mjs";
+import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "../research-claim-applicability-review.mjs";
 import { researchZoningWriterInstructions, researchZoningVerificationInstructions } from "../research-zoning-verification-instructions.mjs";
 import { earlierResearchUserContext } from "../research-conversation-continuity.mjs";
 import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "../research-supplied-text.mjs";
@@ -93,8 +92,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
   assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
   const verificationDependencies = { ...dependencies, earlierResearchUserContext, zoningResearchSafetyPromptContext, zoningResearchPromptContext, zoningContextExcerptPrompt,
     isZoningConditionalExplanation, zoningMappedReviewInstruction, zoningMappedReviewSchema, evaluateResearchWebAttribution,
-    buildResearchClaimApplicabilityPacket, researchClaimApplicabilityInstruction, researchClaimApplicabilitySchema,
-    validateResearchClaimApplicabilityReview };
+    buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction };
   const buildVerifierRequest = new Function(...Object.keys(verificationDependencies),
     `${source.slice(schemaStart, schemaEnd)} return ${source.slice(verificationStart, verificationEnd).replace(/^async function/, "function")} return requestBody; };`
   )(...Object.values(verificationDependencies));

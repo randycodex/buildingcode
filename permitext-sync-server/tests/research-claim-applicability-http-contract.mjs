@@ -1,13 +1,13 @@
 // Fictional user-supplied clause, never a code fixture or frozen acceptance
-// case. Intercepted responses exercise writer -> gate -> one bounded revision
-// -> fresh gate -> durable persistence. No live semantic verdict is made.
+// case. Intercepted ordinary scope verdicts exercise writer -> one bounded
+// revision -> full ordinary re-review -> persistence. No semantic proof claim.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { applicabilityPacketFromRequest, syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
+import { applicabilityPacketFromRequest } from "./research-applicability-response-double.mjs";
 const scratch = await mkdtemp(join(tmpdir(), "permitext-claim-applicability-"));
 for (const name of Object.keys(process.env)) if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(name)) delete process.env[name];
 Object.assign(process.env, {
@@ -37,27 +37,22 @@ globalThis.fetch = async (url, options) => {
     let value;
     if (phase === "permitext_code_interpretation") {
       writerCount++;
-      if (writerCount === 2) assert.match(body.input, /Required claim applicability review failed/);
+      if (writerCount === 2) assert.match(body.input, /Unsupported actual project determination/);
       value = writerCount === 1 ? draft : revised;
     } else {
       assert.equal(phase, "permitext_research_verification");
-      assert.match(body.instructions, /CLAIM APPLICABILITY REVIEW is mandatory/);
-      assert(body.text.format.schema.required.includes("claimApplicabilityReview"));
+      assert.match(body.instructions, /SOURCE SCOPE AND HUMAN CONTEXT REVIEW is mandatory/);
+      assert(!body.text.format.schema.required.includes("claimApplicabilityReview"));
       assert.equal(body.max_output_tokens, 8000);
       assert.equal(body.reasoning.effort, "medium");
       const packet = applicabilityPacketFromRequest(body); packets.push(packet);
-      assert(packet.units[0].fields.includes("answerText"));
+      assert.equal(packet.units, undefined); assert.equal(packet.facts.currentHumanQuestion.statement, question);
       const actual = JSON.parse(body.input.split("PROPOSED ANSWER JSON\n")[1]);
       assert.equal(actual.answerText, writerCount === 1 ? draft.answerText : revised.answerText);
-      const review = syntheticApplicabilityReview(body);
-      if (writerCount === 1) {
-        review.units.unit_0.assertedMode = "project_determination";
-        review.units.unit_0.categoricalTarget = "actual";
-        review.units.unit_0.categoricalSpanIndex = 0;
-      } else if (mode === "stale") review.packetHash = packets[0].packetHash;
-      else if (mode === "missing") delete review.units[packet.units.at(-1).id];
-      value = { pass: true, issues: [], projectFactQuestions: [], missingFactsOnly: false,
-        unnecessaryMissingFactIndices: [], priorReviewCorrection: "", claimApplicabilityReview: review };
+      const pass = writerCount === 2 && mode === "fresh";
+      value = { pass, issues: pass ? [] : [{ type: writerCount === 1 ? "overstated_compliance" : mode === "unsupported" ? "unsupported_requirement" : "incorrect_citation",
+        detail: writerCount === 1 ? "Unsupported actual project determination: the fictional supplied clause does not establish project compliance." : "The ordinary verifier still found an unsupported claim or source binding." }],
+        projectFactQuestions: [], missingFactsOnly: false, unnecessaryMissingFactIndices: [], priorReviewCorrection: "" };
     }
     return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100, total_tokens: 200 },
       output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
@@ -76,7 +71,7 @@ try {
   const account = signed.body.account, token = account.backendSessionToken, auth = { accountUserID: account.appUserID };
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const seenOperations = new Set();
-  for (mode of ["fresh", "stale", "missing"]) {
+  for (mode of ["fresh", "unsupported", "source"]) {
     phases = []; packets = []; writerCount = 0; providerError = null;
     const created = await request("/research/conversations/create", { auth }, token), conversationID = created.body.conversation.id;
     const result = await request("/research/conversations/message", { auth, conversationID, question, requestID: randomUUID() }, token);
@@ -84,13 +79,13 @@ try {
     assert.equal(result.status, 200, JSON.stringify(result.body));
     assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]);
     assert.equal(packets.length, 2); assert.notEqual(packets[0].answerHash, packets[1].answerHash);
-    assert.notEqual(packets[0].packetHash, packets[1].packetHash, "Changed prose rebuilds the immutable packet.");
+    assert.notEqual(packets[0].contextHash, packets[1].contextHash, "Changed prose rebuilds immutable scope/human context.");
     assert.equal(packets[0].factsHash, packets[1].factsHash); assert.equal(packets[0].evidenceHash, packets[1].evidenceHash);
     const reopened = await request("/research/conversations/get", { auth, conversationID }, token), answer = reopened.body.conversation.messages.at(-1).answer;
     if (mode === "fresh") {
       assert.equal(answer.answerText, revised.answerText);
-      assert.equal(answer.verification.history.at(-1).claimApplicabilityReview.pass, true);
-      assert.equal(answer.verification.history.at(-1).claimApplicabilityReview.packetHash, packets[1].packetHash);
+      assert.equal(answer.verification.history.at(-1).pass, true);
+      assert.equal(answer.verification.history.at(-1).claimApplicabilityReview, undefined);
       const saved = await request("/research/answers/get", { auth, answerID: reopened.body.conversation.messages.at(-1).id }, token);
       assert.equal(saved.status, 200); assert.equal(saved.body.answer.answer.answerText, revised.answerText);
       assert(!JSON.stringify(answer.verification).includes('"statement"'), "Private ledger is not persisted in review diagnostics.");
@@ -99,12 +94,10 @@ try {
     const operation = telemetry.body.researchSpend.operationMetrics.find((operation) => operation.providerRequestCount === 4 && !seenOperations.has(operation.id));
     seenOperations.add(operation?.id);
     assert(operation); assert.equal(operation.pendingProviderRequestCount, 0);
-    assert.equal(operation.verificationAttemptDiagnostics.length, 2);
-    assert.equal(operation.verificationAttemptDiagnostics[0].claimApplicabilityReview.pass, false);
-    assert.equal(operation.verificationAttemptDiagnostics[1].claimApplicabilityReview.pass, mode === "fresh");
+    assert.equal(operation.verificationAttemptDiagnostics.length, 0, "Ordinary reviews persist verdict history without auxiliary proof diagnostics.");
     assert(!JSON.stringify(operation.verificationAttemptDiagnostics).includes("fictional clause"));
   }
-  console.log("Claim applicability HTTP mechanics passed: contradictory opener rejected despite blanket pass, one bounded revision, changed packet re-reviewed, stale/missing final review unsaved and uncharged, fresh final review persisted; intercepted calls only, no semantic acceptance claim.");
+  console.log("Ordinary scope HTTP mechanics passed: genuine unsupported-scope verdict triggers one bounded revision, changed immutable context re-reviewed, failed final verdict unsaved/uncharged, valid ordinary final verdict persisted without proof output; intercepted calls only, no semantic acceptance claim.");
 } finally {
   globalThis.fetch = nativeFetch;
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

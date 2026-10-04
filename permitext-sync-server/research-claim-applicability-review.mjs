@@ -145,7 +145,7 @@ function answerUnits(answer) {
   return units;
 }
 
-export function buildResearchClaimApplicabilityPacket({ question = "", answer = {}, evidence = [], options = {}, maximumOutputTokens = 8000 } = {}) {
+function researchSourceScopeGraph(evidence) {
   const preflightReasons = new Set();
   const sources = evidenceIdentity(evidence), byID = new Map(evidence.map((source) => [source.sourceID, source]));
   if (byID.size !== evidence.length || sources.some((source) => !source.sourceID || !source.textHash)) preflightReasons.add("source_identity");
@@ -181,6 +181,34 @@ export function buildResearchClaimApplicabilityPacket({ question = "", answer = 
       for (const gap of source[field] || []) addEdge(source, null, kind, gap);
     }
   }
+  return { sources, byID, graph, preflightReasons };
+}
+
+// Immutable advisory input for ordinary semantic verification. No proof-output
+// matrix, output-capacity preflight or acceptance verdict is derived here.
+export function buildResearchClaimScopeContext({ question = "", answer = {}, evidence = [], options = {} } = {}) {
+  const { sources, graph, preflightReasons } = researchSourceScopeGraph(evidence);
+  const context = options.applicabilityFactContext;
+  const facts = { advisoryOnly: true, currentHumanQuestion: { origin: "current_user", statement: question },
+    recentHumanMessages: (options.messages || []).slice(-8).filter(message => message.role === "user")
+      .map(message => ({ origin: "earlier_user", statement: text(message.question || message.content), contextRevision: message.contextRevision ?? null })),
+    savedProjectFacts: (context?.projectFacts || options.projectContextFacts || []).map(statement => ({ origin: "saved_project_user", statement })),
+    propertyContextFacts: (context?.propertyFacts || []).map(statement => ({ origin: "property_record", status: "context_only_not_proposed_design", statement })),
+    activeTopic: context?.topicContext || null,
+    structuredFactHints: context?.conversationFactState || options.conversationFactContext || null };
+  const body = { version: "20261004-claim-scope-context-v1", answerHash: hash(answer), evidenceHash: hash(sources),
+    factsHash: hash(facts), sources, graph, facts, sourceRelationWarnings: [...preflightReasons], answerUnitCount: answerUnits(answer).length };
+  return { ...body, contextHash: hash(body) };
+}
+
+export const researchClaimScopeVerificationInstruction = [
+  "SOURCE SCOPE AND HUMAN CONTEXT REVIEW is mandatory before pass=true. Read the complete answer, including its opening, headings, conditions, practical actions and citations, against exact authorized operative text and its explicit sourceID-bound parent/chapter graph, exceptions, definitions, gaps and edition. Correct citation identities alone do not establish applicability. Reject unsupported categorical application, omitted material conditions/exceptions, wrong source/edition or an ungrounded project determination through the ordinary pass=false/issues result.",
+  "Distinguish enacted-rule descriptions, conditional rules, the user's stipulated scenario and actual-project findings. A component/configuration stated or proposed within a human question can be a scenario premise; the legal result being asked is not itself a premise. A direct Yes/No for an express scenario is valid when its material premises support that result, without repeated hypothetical disclaimers. Keep unknown material scope conditional, and never transfer hypothetical premises to the actual saved project. Preserve independently supported conclusions and practical actions while an unrelated rule remains conditional; do not demand unrelated intake to permit a useful supported answer.",
+  "Resolve current human wording and active raw human history, even if structured fact extraction produced no facts. A correction replaces the premise actually corrected, preserving other current premises; it does not erase the entire scenario. Current corrections and explicit unknowns supersede older statements. Keep unrelated topics and assistant conclusions separate. The source graph and fact-status metadata are advisory input, not an applicability verdict or a requirement to repeat scope/prove fact IDs. Review their underlying wording and current context. Return the supplied ordinary verifier schema, including any existing mapped-scope fields; no new copied quote, span witness or applicability proof output is required. All existing citation, source-binding, format and substantive checks still apply."
+].join(" ");
+
+export function buildResearchClaimApplicabilityPacket({ question = "", answer = {}, evidence = [], options = {}, maximumOutputTokens = 8000 } = {}) {
+  const { sources, byID, graph, preflightReasons } = researchSourceScopeGraph(evidence);
   const units = answerUnits(answer);
   if (!units.length) preflightReasons.add("unit_coverage");
   const edges = [], edgeMap = new Map();
