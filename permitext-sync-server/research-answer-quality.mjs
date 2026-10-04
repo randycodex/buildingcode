@@ -2,16 +2,67 @@ import { researchRequestedAreaConversions } from "./research-answer-presentation
 import { applyResearchPlumbingSourceRepairs } from "./research-plumbing-source-repairs.mjs";
 
 export const researchAnswerQualityVersion =
-  "20261001-opening-conclusion-consistency-v32";
+  "20261004-opening-applicability-consistency-v33";
+
+const applicabilitySubjectWords = value => String(value).toLowerCase()
+  .replace(/['’]s\b/g, "")
+  .match(/[a-z0-9]+(?:[.-][a-z0-9]+)*/g)?.filter(word => !['a', 'an', 'the', 'same', 'this', 'that', 'these', 'those', 'still'].includes(word)) || [];
+const applicabilitySubjectHead = value => applicabilitySubjectWords(String(value).split(/\b(?:on|of|for|to|in|under|against|with|from)\b/i)[0]).at(-1);
+const literalConditionText = value => compactText(value).toLowerCase().replace(/\bactually\b/g, '').replace(/\s+/g, ' ').trim();
+
+function applicabilityOpeningContradiction(query, opening) {
+  // Earlier contextual negation does not negate the final question. Require a
+  // single affirmative applicability proposition; compound/negative queries
+  // and unresolved conditional alternatives remain semantic-review work.
+  if ((query.match(/\?/g) || []).length !== 1) return false;
+  const finalQuestion = query.match(/(?:^|[.!?]\s+)((?:does|do|is|are)\b[^?]*\?)$/i)?.[1];
+  if (!finalQuestion || /\b(?:not|never|without|isn't|aren't|doesn't|don't|and|or|if|unless|when|provided)\b/i.test(finalQuestion)) return false;
+  const proposition = finalQuestion.match(/^(?:does|do)\s+(.+?)\s+(?:still\s+|also\s+|continue\s+to\s+)?apply(?:\s+(?:to|for|in)\s+(.+?))?\?$/i) ||
+    finalQuestion.match(/^(?:is|are)\s+(.+?)\s+(?:still\s+|also\s+)?applicable(?:\s+(?:to|for|in)\s+(.+?))?\?$/i);
+  if (!proposition) return false;
+  let clause = opening.split(';', 1)[0];
+  if (/\b(?:but|otherwise|unless|except|provided|when|while)\b/i.test(clause)) return false;
+  const condition = clause.match(/^if\s+([^,]+),\s*([\s\S]+)$/i);
+  if (condition) {
+    // Require a direct, immediately preceding assertion, not an embedded
+    // assumption or a premise followed by a correction. A simple noun-phrase
+    // contrast may qualify it; other clauses remain semantic-review work.
+    const context = query.slice(0, query.length - finalQuestion.length);
+    const assertion = literalConditionText(context).split(/[.!?](?:\s+|$)/).filter(Boolean).at(-1)?.trim() || '';
+    const premise = literalConditionText(condition[1]);
+    if (!assertion.startsWith(premise)) return false;
+    const contrast = assertion.slice(premise.length);
+    if (contrast && (!/^(?:,\s*|\s+)(?:rather than|not)\s+[^,;]+$/.test(contrast) ||
+        /\b(?:is|are|was|were|has|have|had|does|do|did|but|that|which|if|unless)\b/i.test(contrast))) return false;
+    clause = condition[2];
+  } else if (/\bif\b/i.test(clause)) return false;
+  const denial = clause.match(/^(.*?)\b(?:does\s+not\s+apply|do\s+not\s+apply|doesn't\s+apply|don't\s+apply|is\s+not\s+applicable|are\s+not\s+applicable|isn't\s+applicable|aren't\s+applicable)\b(.*)$/i);
+  if (!denial) return false;
+  const subject = denial[1].split(',').at(-1);
+  const queriedWords = applicabilitySubjectWords(proposition[1]);
+  const deniedWords = new Set(applicabilitySubjectWords(subject));
+  const queriedHead = applicabilitySubjectHead(proposition[1]);
+  if (!queriedWords.length || queriedHead !== applicabilitySubjectHead(subject) ||
+      !queriedWords.every(word => deniedWords.has(word))) return false;
+  if (['other', 'another', 'different', 'separate', 'alternative'].some(word => deniedWords.has(word) && !queriedWords.includes(word))) return false;
+  const qualifier = subject.match(/\b(?:on|of|for|to|in|under|against|with|from)\b([\s\S]*)$/i)?.[1];
+  if (qualifier && !applicabilitySubjectWords(qualifier).some(word => word !== queriedHead && queriedWords.includes(word))) return false;
+  // A different object or a trailing condition cannot establish a conflict.
+  const target = denial[2].trim();
+  return proposition[2]
+    ? literalConditionText(target.replace(/^(?:to|for|in)\s+/i, '').replace(/[.!]+$/, '')) === literalConditionText(proposition[2])
+    : !target || /^[.!]+$/.test(target);
+}
 
 // A narrow contradiction check, not a compliance inference: require a positive
-// compliance question, an unqualified Yes, and an immediately negative answer.
+// queried proposition, an unqualified Yes, and an immediately negative answer.
 // Revisions still need full source verification; never flip Yes to No here.
 export function researchOpeningConclusionContradiction(question, answerText) {
   const query = compactText(question).replace(/[*_]/g, "");
-  if (/\b(?:not|never|without|isn't|aren't|doesn't|don't|wouldn't|cannot|can't)\b/i.test(query)) return false;
   const text = compactText(answerText).replace(/[*_]/g, "");
   const opening = text.match(/^Yes(?:[.!]\s+|[—–:]\s*)([^!?]+?)(?:[.!?](?:\s|$)|$)/i)?.[1] || "";
+  if (opening && applicabilityOpeningContradiction(query, opening)) return true;
+  if (/\b(?:not|never|without|isn't|aren't|doesn't|don't|wouldn't|cannot|can't)\b/i.test(query)) return false;
   if (/\b(?:is|are)\b[^?]*\b(?:the\s+)?same\s+(?:issue|requirement|thing|check)\b/i.test(query) &&
       /\b(?:are|is|they’re|they're)\s+(?:separate|distinct|different)\b|^(?:related\s+but\s+)?(?:separate|distinct|different)\b/i.test(opening)) return true;
   if (!/\b(?:would|does|do|will|can|is|are)\b[\s\S]*\b(?:meet|comply|compliant|acceptable|permitted|allowed|satisfy)\b/i.test(query)) return false;
@@ -783,7 +834,7 @@ export function researchAnswerQualityRevisionIssues(result) {
   if (!result || result.pass) return [];
   const issues = [];
   if (result.contradictoryOpening) issues.push({ type: "unsupported_requirement",
-    detail: "The unqualified opening Yes contradicts the immediately following explanation, which denies the requested compliance or equivalence. Reconcile the opening and explanation against the actual question and supplied evidence; do not approve conflicting conclusions." });
+    detail: "The unqualified opening Yes contradicts the immediately following explanation of the requested result. Reconcile the opening and explanation against the actual question and supplied evidence; do not approve conflicting conclusions." });
   if (result.collateralCitationSourceIDs?.length) {
     issues.push({
       type: "irrelevant_citation",
