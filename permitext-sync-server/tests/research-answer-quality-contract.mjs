@@ -1005,3 +1005,54 @@ assert.deepEqual(openingRepair.supportedPoints,openingRepairInput.supportedPoint
 assert.deepEqual(openingRepair.citations,openingRepairInput.citations);
 assert.equal(openingRepairInput.answerText,contradictory);
 assert.equal(applyResearchDeterministicAnswerRepairs({answerText:'Yes—related but separate. Width has its own requirements.'},[],{question:'Is swing direction the same issue as clear opening width?'}).answerText,'related but separate. Width has its own requirements.');
+
+// The applicability repair removes only an inconsistent acknowledgement. It
+// does not infer the opposite code conclusion or reinterpret a different case.
+const applicabilityQuestion = 'This is actually a family or assisted-use toilet room, rather than a general multi-user restroom. Does the same inside-locking prohibition still apply?';
+const applicabilityAnswer = 'Yes. If this is a family or assisted-use toilet room, the 2022 NYC Plumbing Code’s prohibition on an inside-locking egress door does not apply; separately, the Building Code says its door “shall be securable from within the room” (PC § 403.3.6; BC § 1109.2.1.7). This establishes that the door must be capable of being secured from inside, not approval of any particular lock or hardware.';
+const applicabilityConflicts = [
+  [applicabilityQuestion, applicabilityAnswer],
+  ['Does the alarm-testing rule still apply?', 'Yes. The alarm-testing rule does not apply.'],
+  ['Is the cable-label rule applicable to this installation?', 'Yes—The cable-label rule is not applicable to this installation.'],
+  ['Does the inspection restriction apply?', "**Yes.** The inspection restriction **doesn't apply**."],
+  ['This is the indoor assembly, not the outdoor assembly. Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.']
+];
+for (const [question, answerText] of applicabilityConflicts) {
+  assert(researchOpeningConclusionContradiction(question, answerText), question);
+  const quality = evaluateResearchAnswerQuality({ question, answer: { answerText } });
+  assert.equal(quality.pass, false, question);
+  assert(researchAnswerQualityRevisionIssues(quality).some(issue => issue.type === 'unsupported_requirement'));
+  const input = { answerText, conclusion: answerText, supportedPoints: [{ heading: 'Independent detail', explanation: 'Retain this detail.', sourceIDs: ['source-a'] }], citations: [{ sourceIDs: ['source-a'] }] };
+  const before = structuredClone(input);
+  const repaired = applyResearchDeterministicAnswerRepairs(input, [], { question });
+  assert.equal(repaired.answerText, answerText.replace(/^\*{0,2}Yes(?:[.!]\*{0,2}\s+|\*{0,2}[—–:]\s*)/i, ''));
+  assert.equal(repaired.conclusion, repaired.answerText);
+  assert.deepEqual(repaired.supportedPoints, before.supportedPoints);
+  assert.deepEqual(repaired.citations, before.citations);
+  assert.deepEqual(input, before, 'The original answer stays immutable.');
+}
+const validApplicabilityOpenings = [
+  ['Does the inspection rule not apply?', 'Yes. The inspection rule does not apply.'],
+  ["Doesn't the inspection rule apply?", 'Yes. The inspection rule does not apply.'],
+  ['Does the inspection rule apply?', 'No. The inspection rule does not apply.'],
+  ['Does the inspection rule apply?', 'Yes. The inspection rule applies here; its exception does not apply.'],
+  ['Does the inspection rule apply?', 'Yes. The exception to the inspection rule does not apply.'],
+  ['Does the inspection rule apply?', 'Yes. The other inspection rule does not apply.'],
+  ['Does the inspection rule apply?', 'Yes. The inspection rule for outdoor assemblies does not apply.'],
+  ['Does the inspection rule apply?', 'Yes, if this is the outdoor assembly. It does not apply to the indoor assembly.'],
+  ['Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.'],
+  ['This is not the indoor assembly. Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.'],
+  ['Does the inspection rule apply to this installation?', 'Yes. The inspection rule does not apply to the other installation.'],
+  ['Does the inspection rule apply?', 'Yes. It does not apply to the other installation.'],
+  ['Does the inspection rule apply and is an enclosure required?', 'Yes. The inspection rule does not apply.'],
+  ['Does the inspection rule apply if this is the indoor assembly?', 'Yes. The inspection rule does not apply.'],
+  ['Can the label be omitted?', 'Yes. The label is not required.'],
+  ['Does this correction change the answer?', 'Yes. The inspection rule does not apply.'],
+  ["Does the tenant’s inspection rule apply?", 'Yes. The owner’s inspection rule does not apply.'],
+  ['Does the inspection rule apply?', 'Yes. The inspection rule does not apply unless the assembly is outdoors.']
+];
+for (const [question, answerText] of validApplicabilityOpenings) {
+  assert.equal(researchOpeningConclusionContradiction(question, answerText), false, question + ' / ' + answerText);
+  assert.equal(applyResearchDeterministicAnswerRepairs({ answerText }, [], { question }).answerText, answerText);
+}
+console.log('Research opening applicability contradiction and conservative acknowledgement repair contrasts passed.');
