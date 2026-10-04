@@ -1,3 +1,5 @@
+import { buildResearchClaimApplicabilityPacket } from "../research-claim-applicability-review.mjs";
+import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { openAIResearchVerification } from "../app.mjs";
@@ -26,6 +28,9 @@ let currentSignal;
 let duringFirstRequest;
 let afterEnvelopeEvent;
 const events = [];
+let selectedTimeouts = [];
+const oldTimeout = AbortSignal.timeout;
+AbortSignal.timeout = milliseconds => { selectedTimeouts.push(milliseconds); return oldTimeout(milliseconds); };
 const oldWarn = console.warn;
 const oldLog = console.log;
 const oldInfo = console.info;
@@ -42,15 +47,18 @@ globalThis.fetch = async (url, options) => {
   requests.push(body);
   if (currentSignal) assert(options.signal, "The existing guarded provider cancellation signal is retained.");
   if (requests.length === 1 && duringFirstRequest) duringFirstRequest();
-  const reply = replies.shift();
+  const originalReply = replies.shift();
+  const reply = originalReply && { ...originalReply, value: originalReply.value && typeof originalReply.value === "object"
+    ? { ...originalReply.value, claimApplicabilityReview: syntheticApplicabilityReview(body) } : originalReply.value };
   assert.notEqual(reply, undefined, "No extra provider request is authorized by this contract.");
   return Response.json({ model: body.model, status: reply.status || "completed",
     ...(reply.incomplete_details ? { incomplete_details: reply.incomplete_details } : {}),
-    usage: { input_tokens: 20, output_tokens: 10, total_tokens: 30 },
+    usage: { input_tokens: 20, output_tokens: 10, total_tokens: 30,
+      ...(Object.hasOwn(reply, "reasoningTokens") ? { output_tokens_details: { reasoning_tokens: reply.reasoningTokens } } : {}) },
     output: [{ type: "message", content: reply.refusal ? [{ type: "refusal", refusal: "Declined." }]
       : [{ type: "output_text", text: reply.raw ?? JSON.stringify(reply.value) }] }] });
 };
-const setup = (values, mutation) => { replies = values; requests = []; duringFirstRequest = mutation; currentSignal = null; afterEnvelopeEvent = null; };
+const setup = (values, mutation) => { replies = values; requests = []; selectedTimeouts = []; duringFirstRequest = mutation; currentSignal = null; afterEnvelopeEvent = null; };
 const run = async (options = {}, suppliedEvidence = evidence, suppliedAnswer = answer) =>
   openAIResearchVerification("Synthetic source-scope question.", suppliedEvidence, suppliedAnswer, "offline-user",
     { model: "gpt-5.6-luna", ...options });
@@ -65,6 +73,102 @@ async function reservationTest(callback, environment = process.env) {
 }
 
 try {
+  // Exact budget selection runs through the real request/reservation/parser.
+  for (const [effort, boundAnswer, expectedEffort, expectedCap, expectedTimeout, expectedProfile] of [
+    ["medium", answer, "low", 12_000, 90_000, "claim_applicability"],
+    ["low", answer, "low", 12_000, 90_000, "claim_applicability"],
+    ["medium", { answerText: "A source-free explanation." }, "medium", 8_000, 90_000, "ordinary"],
+    ["low", { answerText: "A source-free explanation." }, "low", 4_000, 45_000, "ordinary"]]) {
+    process.env.PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT = effort;
+    setup([{ value: validPass }]);
+    await reservationTest(async () => {
+      const result = await run({}, evidence, boundAnswer);
+      assert.equal(result.result.pass, true);
+      assert.equal(result.reasoningEffort, expectedEffort, "Routing/result telemetry reports the actual dispatched effort");
+      assert.equal(requests.length, 1);
+      assert.equal(requests[0].max_output_tokens, expectedCap);
+      assert.equal(requests[0].reasoning.effort, expectedEffort);
+      assert.equal(requests[0].model, "gpt-5.6-luna");
+      assert.deepEqual(selectedTimeouts, [expectedTimeout]);
+      const profile = events.map(line => JSON.parse(line)).filter(event => event.event === "research_verification_profile").at(-1);
+      assert.deepEqual(profile, { event: "research_verification_profile", profile: expectedProfile,
+        reasoningEffort: expectedEffort, maximumOutputTokens: expectedCap, timeoutMilliseconds: expectedTimeout,
+        unitCount: result.result.claimApplicabilityReview.unitCount, edgeCount: result.result.claimApplicabilityReview.edgeCount,
+        bindingCount: result.result.claimApplicabilityReview.bindingCount });
+      assert(!JSON.stringify(profile).includes("Synthetic"), "Profile telemetry contains no question, source or fact prose");
+    });
+  }
+  process.env.PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT = "medium";
+  const actualBuilder = (await import("./research-request-envelope-preflight.mjs")).buildResearchRequestEnvelopeBuilders;
+  const { buildVerifierRequest } = await actualBuilder();
+  const serializedRequest = buildVerifierRequest("Synthetic source-scope question.", evidence, answer, "offline-user", { model: "gpt-5.6-luna" });
+  assert.equal(serializedRequest.max_output_tokens, 12_000);
+  assert.equal(serializedRequest.reasoning.effort, "low");
+  assert(serializedRequest.text.format.schema.required.includes("claimApplicabilityReview"));
+  assert.match(serializedRequest.instructions, /Do not emit binding\/unit aggregate states/);
+  await reservationTest(async () => {
+    const reserved = reserveResearchProviderSpend(serializedRequest);
+    const bytes = Buffer.byteLength(JSON.stringify(serializedRequest), "utf8") + 1_024;
+    // Versioned offline Fast-model rates, including existing conservative
+    // cache-write/long-context ceilings. The final cap/schema/input are bound.
+    const expectedBound = Math.ceil((bytes * .2 * 2.5 + 12_000 * 1.2 * 1.5)) / 1_000_000;
+    assert.equal(reserved.maximumRequestUSD, expectedBound);
+    settleResearchProviderSpend(reserved, { usage: { input_tokens: 0, output_tokens: 0 } });
+    const lower = reserveResearchProviderSpend({ ...serializedRequest, max_output_tokens: 8_000 });
+    assert(lower.maximumRequestUSD < reserved.maximumRequestUSD);
+    settleResearchProviderSpend(lower, { usage: { input_tokens: 0, output_tokens: 0 } });
+    const enlarged = reserveResearchProviderSpend({ ...serializedRequest, input: serializedRequest.input + "Extra synthetic frame.".repeat(100) });
+    assert(enlarged.maximumRequestUSD > reserved.maximumRequestUSD);
+    settleResearchProviderSpend(enlarged, { usage: { input_tokens: 0, output_tokens: 0 } });
+  });
+  // A packet that exceeds the old medium allocation is finalized under12k,
+  // before dispatch. No missing obligations or stale provisional hash survives.
+  const manyEvidence = Array.from({ length: 24 }, (_, index) => ({ sourceID: `fictional-${index}`, sectionID: `fictional-${index}`,
+    codePrefix: "LIB", codeEdition: "2041", codeVersion: "original", corpusID: "fictional", text: `Fictional source ${index}.` }));
+  const manyAnswer = { answerText: "Independent fictional rules are explained.", citations: [{ sourceIDs: manyEvidence.map((source) => source.sourceID) }],
+    supportedPoints: manyEvidence.map((source, index) => ({ heading: `Fictional point ${index}`, explanation: `Separate explanation ${index}.`, sourceIDs: [source.sourceID] })) };
+  const provisional = buildResearchClaimApplicabilityPacket({ question: "Synthetic source-scope question.", evidence: manyEvidence, answer: manyAnswer,
+    maximumOutputTokens: 8_000 });
+  assert(provisional.preflightReasons.includes("packet_capacity"));
+  setup([{ value: validPass }]);
+  await reservationTest(async () => {
+    const result = await run({}, manyEvidence, manyAnswer);
+    assert.equal(result.result.pass, true);
+    const packet = JSON.parse(requests[0].input.split("CLAIM APPLICABILITY REVIEW\n")[1].split("\n\n")[0]);
+    assert.deepEqual(packet.preflightReasons, []);
+    assert.equal(requests[0].max_output_tokens, 12_000);
+    assert.notEqual(packet.packetHash, provisional.packetHash);
+    assert.equal(packet.units.length, provisional.units.length);
+    assert.equal(packet.bindingCount, provisional.bindingCount);
+  });
+
+  // Safe diagnostics and fail-closed handling cover truncated and parseable
+  // otherwise-valid incomplete responses without adding a provider call.
+  for (const [reply, expectedReason, expectedReasoning] of [
+    [{ raw: "{PRIVATE DRAFT", status: "incomplete", incomplete_details: { reason: "max_output_tokens" }, reasoningTokens: 7 }, "max_output_tokens", 7],
+    [{ value: validPass, status: "incomplete", incomplete_details: { reason: "max_output_tokens" }, reasoningTokens: 3 }, "max_output_tokens", 3],
+    [{ value: validPass, status: "incomplete", incomplete_details: { reason: "PRIVATE FACT" }, reasoningTokens: "PRIVATE FACT" }, "unknown", undefined]
+  ]) {
+    setup([reply]);
+    await reservationTest(async () => {
+      await assert.rejects(run(), (error) => {
+        assert.equal(error.code, "INVALID_RESEARCH_VERIFICATION");
+        assert.equal(error.failureStage, "verification_output_parse");
+        assert.equal(error.verificationOutputDiagnostics.selectedProfile, "claim_applicability");
+        assert.equal(error.verificationOutputDiagnostics.selectedReasoningEffort, "low");
+        assert.equal(error.verificationOutputDiagnostics.selectedOutputTokenCap, 12_000);
+        assert.equal(error.verificationOutputDiagnostics.selectedTimeoutMilliseconds, 90_000);
+        assert.equal(error.verificationOutputDiagnostics.incompleteReason, expectedReason);
+        assert.equal(error.verificationOutputDiagnostics.reasoningTokenCount, expectedReasoning);
+        assert.equal(error.verificationOutputDiagnostics.unitCount, 3);
+        assert(error.verificationOutputDiagnostics.edgeCount > 0 && error.verificationOutputDiagnostics.bindingCount > 0);
+        assert(!JSON.stringify(error.verificationOutputDiagnostics).includes("PRIVATE"));
+        assert.equal(error.incompleteReason, expectedReason);
+        return true;
+      });
+      assert.equal(requests.length, 1);
+    });
+  }
   // Valid semantic failure remains a failure; no formatting retry is allowed.
   setup([{ value: validFail }]);
   await reservationTest(async () => {
@@ -89,6 +193,8 @@ try {
     assert.equal(result.usage.modelUsage.length, 2);
     assert.equal(requests.length, 2);
     normalRequest = requests[0];
+    assert.deepEqual(selectedTimeouts, [90_000, 90_000], "Envelope repair retains the selected timeout");
+    assert.equal(result.reasoningEffort, "low");
     for (const field of ["model", "store", "service_tier", "reasoning", "max_output_tokens", "safety_identifier", "text"]) {
       assert.deepEqual(requests[1][field], requests[0][field], `Repair cannot change ${field}.`);
     }
@@ -284,6 +390,7 @@ try {
   assert.deepEqual(researchOperation.firstVerificationEnvelopeDiagnostics, { invariant: "pass_with_issues", issueCount: 1 });
   assert(!JSON.stringify(researchOperation).includes("Envelope failed twice."), "Operation diagnostics must not retain verifier narrative.");
 } finally {
+  AbortSignal.timeout = oldTimeout;
   console.warn = oldWarn;
   console.log = oldLog;
   console.info = oldInfo;

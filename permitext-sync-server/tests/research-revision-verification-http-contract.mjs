@@ -1,3 +1,4 @@
+import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
 // Replay actual draft/revision records with explicit final-verifier doubles.
 // This verifies the delivery gate, not the legal correctness of the recorded answer.
 import assert from "node:assert/strict";
@@ -76,7 +77,9 @@ globalThis.fetch = async (url, options) => {
   if (recorded) {
     assert.equal(body.text.format.name, recorded.phase);
     return Response.json({ model: recorded.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 },
-      output: recorded.phase === "permitext_code_interpretation" ? rebindRecordedPassages(recorded.output, body.input) : recorded.output });
+      output: recorded.phase === "permitext_code_interpretation" ? rebindRecordedPassages(recorded.output, body.input)
+        : recorded.output.map((item) => ({ ...item, content: (item.content || []).map((content) => content.type === "output_text"
+          ? { ...content, text: JSON.stringify({ ...JSON.parse(content.text), claimApplicabilityReview: syntheticApplicabilityReview(body) }) } : content) })) });
   }
   assert.equal(callIndex, 6, "Only one bounded revision and its final check are allowed.");
   assert.equal(body.text.format.name, "permitext_research_verification");
@@ -87,6 +90,7 @@ globalThis.fetch = async (url, options) => {
   const value = acceptRevision ? { pass: true, issues: [] } : {
     pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final-verifier rejection: the revised conclusion has not passed semantic review." }]
   };
+  value.claimApplicabilityReview = syntheticApplicabilityReview(body);
   return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
  } catch (error) { providerDoubleError = error; throw error; }
 };
