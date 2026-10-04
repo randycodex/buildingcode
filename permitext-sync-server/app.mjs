@@ -1,5 +1,5 @@
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
-import { applyVerifiedProjectFollowups } from "./research-verification-followups.mjs";
+import { applyVerifiedProjectFollowups, researchResponseFollowupQuestions } from "./research-verification-followups.mjs";
 import { researchPropertyContext, researchPropertyContextFacts } from "./research-property-context.mjs";
 import { earlierResearchUserContext, researchClarificationAnswer, researchVerificationFailureReason } from "./research-conversation-continuity.mjs";
 import { researchHistoryContentFacts } from "./research-history-content.mjs";
@@ -10398,10 +10398,7 @@ export function researchFollowUpQuestionsForResponse(
   evidenceAnalysis,
   { supportingGuidanceOnly = false } = {}
 ) {
-  if (supportingGuidanceOnly) return [];
-  return interpretation?.followUpQuestions?.length
-    ? interpretation.followUpQuestions
-    : evidenceAnalysis?.highValueFollowUpQuestions || [];
+  return researchResponseFollowupQuestions(interpretation, evidenceAnalysis, { supportingGuidanceOnly });
 }
 
 export function researchEvidenceAnalysisForResponse(
@@ -11069,7 +11066,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "Do not fail merely because the answer omits an unrelated permit, agency, or record. The completeness review is limited to inputs material to the question, a relied-on existing legal condition, a supplied provision, or an express cross-reference in the authorized evidence.",
       "Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts.",
       "Treat every item in STRUCTURED UNRESOLVED PROJECT FACTS as unresolved. A material fact omitted only from missingFacts is a projectFactQuestions follow-up when the narrative already clearly makes the project-specific conclusion conditional. Fail with overstated_compliance if the answer relies on an owner/applicant claim, position, assertion, or representation as independently proven.",
-      "Separate answer correctness from incomplete project intake. If ALL substantive claims, citations, legal conditions and qualifications pass, and the only remaining gap is a project fact needed to choose among explicitly conditional rules, return pass=true, issues=[], and projectFactQuestions containing concise questions for those unresolved facts. Missing street-facing uses or frontage designation must not alone reject an otherwise supported conditional explanation. Do not demand every later-stage fact in missingFacts before allowing a useful answer. Do not use this path when a legal condition is omitted from a stated rule, the answer assumes an unknown fact, makes an unsupported site-specific determination, or any other field needs correction. In those cases return pass=false with the appropriate issues and projectFactQuestions=[]. Return projectFactQuestions=[] when no additional material project question is needed. Never put legal requirements, citations, or suggested compliance conclusions in projectFactQuestions; they must only ask for project facts.",
+      "Separate answer correctness from incomplete project intake. If ALL substantive claims, citations, legal conditions and qualifications pass, and the only remaining gap is a project fact that can change or determine the current requested result among explicitly conditional rules, return pass=true, issues=[], and projectFactQuestions containing concise questions for those unresolved facts. A fact that merely refines a conditional side rule or later design choice is not a question for an already resolved decision; preserve its necessary condition in the explanation. Missing street-facing uses or frontage designation must not alone reject an otherwise supported conditional explanation. Do not demand every later-stage fact in missingFacts before allowing a useful answer. Do not use this path when a legal condition is omitted from a stated rule, the answer assumes an unknown fact, makes an unsupported site-specific determination, or any other field needs correction. In those cases return pass=false with the appropriate issues and projectFactQuestions=[]. Return projectFactQuestions=[] when no additional material project question is needed. Never put legal requirements, citations, or suggested compliance conclusions in projectFactQuestions; they must only ask for project facts.",
       "Apply current-turn hypothetical facts only to the current question, and keep user-stated unknowns unresolved.",
       "Do not demand a final yes-or-no result when project facts genuinely remain unresolved.",
       "Return a compact structured result."
