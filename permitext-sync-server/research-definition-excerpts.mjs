@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { researchSearchVocabulary, researchPositiveSearchText } from "./research-search-vocabulary.mjs";
 
-export const researchDefinitionExcerptVersion = "20261004-requested-definition-carrier-v8";
+export const researchDefinitionExcerptVersion = "20261004-active-human-definition-v9";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -631,4 +631,69 @@ export function researchRequestedDefinitionMatch(section, {
   return { origin: excerpt.requestedDefinitionPriority === 2 ? "current" : "human_context",
     priority: excerpt.requestedDefinitionPriority, labels: excerpt.labels,
     excerptCharacterCount: excerpt.excerptCharacterCount };
+}
+
+// Nominate one whole entry for a positively resolved continuing human subject.
+// This is a bounded retrieval hint, never legal applicability or a historical
+// citation requirement. The assembler recomputes it from fresh canonical text.
+export function researchActiveHumanDefinitionMatch(section, {
+  question = "", humanTopics = [], contextDependentFollowUp = false,
+  relevanceComparison = false, topicDecision = null, sourceSelectionRestricted = false,
+  maximumCharacters = researchDefinitionExcerptLimits.maximumCharacters
+} = {}) {
+  const positive = researchPositiveSearchText(question);
+  const decision = typeof topicDecision === "string" ? topicDecision : topicDecision?.decision;
+  if (!contextDependentFollowUp || relevanceComparison || sourceSelectionRestricted ||
+      (decision && !["continuation", "correction"].includes(decision)) || topicDecision?.signals?.returnToOriginal ||
+      /\b(?:define|definitions?|meaning)\b|\b(?:based|rely|using) only on\b|\bonly (?:the )?(?:selected|saved|pinned) (?:sources?|evidence|passages?)\b/i.test(positive) ||
+      /\bcompar\w*\b|\bboth\b[^.!?]{0,35}\b(?:codes?|definitions?|rules?|sections?|books?)\b|^\s*(?:(?:new|different|separate)\s+(?:topic|question|issue|subject)|switch\w*\s+(?:to|topics?|subjects?))\b|\b(?:back to|return\w* to)\b/i.test(positive) ||
+      /\b(?:section|table)\s+[A-Z]?\d|\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*\d|§/i.test(positive)) return null;
+  const vocabulary = researchSearchVocabulary(question, { contextDependentFollowUp, humanTopics });
+  if (vocabulary.concepts.length !== 1 || vocabulary.concepts[0].origin !== "human_context") return null;
+  const concept = vocabulary.concepts[0];
+  const namedFamilies = [["AC", "Administrative"], ["BC", "Building"], ["EBC", "Existing[-\\s]+Building"],
+    ["FC", "Fire"], ["FGC", "Fuel[-\\s]+Gas"], ["MC", "Mechanical"], ["PC", "Plumbing"], ["ZR", "Zoning"]]
+    .filter(([prefix, name]) => new RegExp(`\\b${prefix}\\b|\\b${name}\\s+(?:Code|Resolution|Rules|Regulations)\\b`, "i").test(positive))
+    .map(([prefix]) => prefix);
+  if (namedFamilies.some(prefix => !concept.codePrefixes.includes(prefix))) return null;
+  const activeHumanText = (Array.isArray(humanTopics) ? humanTopics : []).filter(value => typeof value === "string")
+    .slice(0, 2).map(value => researchPositiveSearchText(value.slice(0, 640))).join("\n");
+  const humanEditions = new Set([...`${positive}\n${activeHumanText}`.matchAll(/\b((?:19|20)\d{2})\b(?=[^.!?]{0,55}\b(?:codes?|edition|version)\b)/gi)]
+    .map(match => match[1]));
+  if (humanEditions.size > 1 || (humanEditions.size === 1 &&
+      !new RegExp(`\\b${[...humanEditions][0]}\\b`).test(section?.codeEdition || "")) ||
+      (/\b(?:NYC|New York City)\b/i.test(activeHumanText) && !/^(?:New York City|NYC)$/i.test(section?.jurisdiction || "")) ||
+      /^(?:prior-edition-case-specific|historical|superseded)$/i.test(section?.applicabilityStatus || "")) return null;
+  const authorityFields = ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction", "sectionNumber"];
+  const sectionID = compactText(section?.sectionID || section?.id);
+  const blocks = section?.body?.blocks || section?.blocks || [];
+  if (!sectionID || !authorityFields.every(key => compactText(section?.[key])) ||
+      !concept.codePrefixes.includes(compactText(section.codePrefix).toUpperCase()) ||
+      section.truncated || section.textComplete === false || section.researchClaimEligible === false ||
+      section.body?.truncated || section.body?.textComplete === false || !blocks.length ||
+      blocks.some(block => block?.truncated || block?.textComplete === false || block?.researchClaimEligible === false)) return null;
+  const text = compactText(blocks.map(block => block?.plainText || "").join("\n\n"));
+  if (!text || !isDefinitionSection(section, text)) return null;
+  const phrases = new Set(concept.terms.map(comparableText));
+  const entries = definitionEntries({ ...section, text, canonicalText: text })
+    .filter(entry => phrases.has(comparableText(entry.label)));
+  // A broad concept can nominate several dictionary terms. Do not guess which
+  // one is governing, or turn an incidental word/mention into this reservation.
+  if (entries.length !== 1) return null;
+  const entry = entries[0];
+  const excerpt = targetedDefinitionExcerpt({ ...section, text, canonicalText: text }, vocabulary.definitionQuery, {
+    allowShortSection: true, completeDefinitionLabels: [entry.label], maximumCharacters
+  });
+  const location = exactWhitespaceLocation(text, entry.text);
+  if (!excerpt || excerpt.passages.length !== 1 || excerpt.passages[0] !== entry.text || !location) return null;
+  return {
+    schemaVersion: 1, sourceMode: "canonical_enacted_active_human_definition", origin: "human_context",
+    subject: concept.subject, label: entry.label,
+    alignment: { origin: "human_context", subject: concept.subject, wholeLabel: entry.label,
+      phrase: concept.terms.find(term => comparableText(term) === comparableText(entry.label)) },
+    sectionID, ...Object.fromEntries(authorityFields.map(key => [key, compactText(section[key])])),
+    canonicalTextHash: createHash("sha256").update(text).digest("hex"),
+    entryTextHash: createHash("sha256").update(entry.text).digest("hex"),
+    entrySourceOffsets: location, excerptCharacterCount: excerpt.excerptCharacterCount
+  };
 }

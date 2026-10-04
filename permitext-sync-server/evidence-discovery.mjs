@@ -6,11 +6,12 @@ import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 import { researchCurrentRuleDetailScore, researchCheckedRuleIndexPassage } from "./research-rule-packets.mjs";
-import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch } from "./research-definition-excerpts.mjs";
+import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch,
+  researchActiveHumanDefinitionMatch } from "./research-definition-excerpts.mjs";
 import { nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261004-positive-gas-equipment-v61";
+export const evidenceDiscoveryVersion = "20261004-active-human-definition-v62";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -2384,15 +2385,31 @@ export async function discoverRelevantEvidence({
     item.requestedDefinitionCarrier = researchRequestedDefinitionMatch({ ...item.section, body: item.body }, {
       question: currentQuestion, humanContext: definitionHumanContext
     });
+    if (!directReferenceKeys.size) item.activeHumanDefinitionMatch = researchActiveHumanDefinitionMatch(
+      { ...item.section, body: item.body }, {
+        question: currentQuestion, humanTopics: [retrievalContext?.conversationTopic, retrievalContext?.immediateContext],
+        contextDependentFollowUp: retrievalContext?.contextDependentFollowUp === true,
+        relevanceComparison, topicDecision: retrievalContext?.topicDecision,
+        sourceSelectionRestricted: retrievalContext?.sourceSelectionRestricted === true
+      });
   }
-  const supplementalDefinitions = definitionPool.filter(item => !selectedIDs.has(item.section.id))
+  const activeHumanMatches = definitionPool.filter(item => item.activeHumanDefinitionMatch);
+  // At most one already-read, uniquely aligned carrier gets one of the same
+  // two supplemental slots. Ambiguous carriers retain the normal ordering.
+  const activeHumanDefinition = activeHumanMatches.length === 1 ? activeHumanMatches[0] : null;
+  if (activeHumanDefinition) activeHumanDefinition.activeHumanDefinitionReservation = activeHumanDefinition.activeHumanDefinitionMatch;
+  const rankedSupplementalDefinitions = definitionPool.filter(item => !selectedIDs.has(item.section.id))
     .sort((left, right) =>
       (right.requestedDefinitionCarrier?.priority || 0) - (left.requestedDefinitionCarrier?.priority || 0) ||
       Number(foregroundPrefixes.has(right.section.codePrefix)) - Number(foregroundPrefixes.has(left.section.codePrefix)) ||
       selectedPrefixCounts.get(right.section.codePrefix) - selectedPrefixCounts.get(left.section.codePrefix) ||
       Number(String(right.section.sectionNumber) === "202") - Number(String(left.section.sectionNumber) === "202") ||
-      right.score - left.score)
-    .slice(0, 2);
+      right.score - left.score);
+  const reservedHumanDefinition = activeHumanDefinition && !selectedIDs.has(activeHumanDefinition.section.id)
+    ? activeHumanDefinition : null;
+  const supplementalDefinitions = reservedHumanDefinition
+    ? [reservedHumanDefinition, ...rankedSupplementalDefinitions.filter(item => item !== reservedHumanDefinition)].slice(0, 2)
+    : rankedSupplementalDefinitions.slice(0, 2);
   // Structured tables and image metadata cannot affect lexical ranking. Resolve
   // them for the chosen candidates, keeping all existing source-review checks.
   for (const [index, item] of [...selectedCandidates, ...supplementalDefinitions].entries()) {
@@ -2508,6 +2525,7 @@ export async function discoverRelevantEvidence({
         ...(item.currentQuestionForeground ? { currentQuestionForeground: item.currentQuestionForeground } : {}),
         ...(item.definitionCarrier ? { canonicalEmbeddedDefinitions: item.definitionCarrier } : {}),
         ...(item.requestedDefinitionCarrier ? { requestedDefinitionCarrier: item.requestedDefinitionCarrier } : {}),
+        ...(item.activeHumanDefinitionReservation ? { activeHumanDefinitionReservation: item.activeHumanDefinitionReservation } : {}),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
         rootClaimCoverage: item.rootClaimCoverage,

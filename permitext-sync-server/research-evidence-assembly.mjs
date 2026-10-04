@@ -9,7 +9,7 @@ import {
   extractResearchCodeReferences
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt, researchEmbeddedDefinitionCarrier,
-  researchBoundDefinitionPublishedReference } from "./research-definition-excerpts.mjs";
+  researchBoundDefinitionPublishedReference, researchActiveHumanDefinitionMatch } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { orderedResearchTopicDependencies, researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261004-requested-definition-priority-v72";
+export const researchEvidenceAssemblyVersion = "20261004-active-human-definition-v73";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1124,7 +1124,10 @@ export async function assembleResearchEvidence({
           conversationTopic: query.conversationTopic,
           immediateContext: query.immediateContext,
           contextDependentFollowUp: query.contextDependentFollowUp,
-          relevanceComparison: query.relevanceComparison
+          relevanceComparison: query.relevanceComparison,
+          topicDecision: query.topicDecision,
+          sourceSelectionRestricted: pinnedEvidence.length > 0 ||
+            /\b(?:based|rely|using) only on\b|\bonly (?:the )?(?:selected|saved|pinned) (?:sources?|evidence|passages?)\b/i.test(query.question)
         }
       });
   const currentReferences = extractResearchCodeReferences(query.question);
@@ -1400,10 +1403,23 @@ export async function assembleResearchEvidence({
   if (!pinnedEvidence.length && appliedStrategy.mode === researchEvidenceStrategies.broad) {
     const humanDefinitionQuery = [query.definitionQuery, query.definitionHumanContext]
       .map(researchPositiveSearchText).filter(Boolean).join("\n");
-    const requestedDefinitions = [...candidates,
+    const requestedDefinitionCandidates = [...candidates,
       ...(Array.isArray(discovery.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [])]
-      .filter(candidate => isDefinitionCandidate(candidate) && !candidate.signals?.useSelectedPassageOnly &&
+      .filter(candidate => (isDefinitionCandidate(candidate) || candidate.signals?.activeHumanDefinitionReservation) &&
+        !candidate.signals?.useSelectedPassageOnly &&
         (!selectedBuildingCodePassageBoundary || !routedTopicPresent || candidate.codePrefix === "BC"));
+    const activeHumanNominees = requestedDefinitionCandidates.filter(candidate => candidate.signals?.activeHumanDefinitionReservation);
+    const activeHumanNominee = activeHumanNominees.length === 1 && !currentReferences.length &&
+      !selectedBuildingCodePassageBoundary ? activeHumanNominees[0] : null;
+    // A disabled or ambiguous hint must not create an early admission path
+    // for a dictionary that the unchanged legacy queue did not recognize.
+    const requestedDefinitions = requestedDefinitionCandidates.filter(candidate =>
+      isDefinitionCandidate(candidate) || candidate === activeHumanNominee);
+    // Protected current references stay first. One actively aligned human
+    // entry can precede incidental current words within the existing two slots.
+    requestedDefinitions.sort((left, right) =>
+      Number(Boolean(right.signals?.exactReference)) - Number(Boolean(left.signals?.exactReference)) ||
+      Number(right === activeHumanNominee) - Number(left === activeHumanNominee));
     for (const [index, candidate] of requestedDefinitions.entries()) {
       if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
       const identity = sectionIdentity(candidate);
@@ -1411,14 +1427,41 @@ export async function assembleResearchEvidence({
       const allowance = Math.min(limits.maximumCharactersPerSource,
         Math.floor((supplementalCharacterCeiling - characterCount) / 2));
       if (allowance < 1) break;
-      let resolved;
-      try { resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered); }
+      let resolved, fresh;
+      try { resolved = await canonicalSection(async request => {
+        fresh = await resolveSection(request); return fresh;
+      }, candidate, sourceOrigins.discovered); }
       catch { resolverFailureCount += 1; continue; }
       if (["sectionID", "codePrefix", "sectionNumber", "corpusID", "codeVersion", "codeEdition", "jurisdiction"]
         .some(key => candidate[key] && candidate[key] !== resolved[key])) continue;
+      let activeHumanMatch = null;
+      if (candidate === activeHumanNominee) {
+        // canonicalSection may fill ordinary descriptor fields from a request.
+        // This reservation requires independently present fresh authority, not
+        // requested metadata standing in for a resolver's missing identity.
+        if (compactText(fresh?.sectionID || fresh?.id) !== resolved.sectionID ||
+            ["codePrefix", "sectionNumber", "corpusID", "codeVersion", "codeEdition", "jurisdiction"]
+              .some(key => !compactText(fresh?.[key]) || compactText(fresh[key]) !== resolved[key])) continue;
+        activeHumanMatch = researchActiveHumanDefinitionMatch({ ...resolved,
+          truncated: fresh?.truncated, textComplete: fresh?.textComplete,
+          researchClaimEligible: fresh?.researchClaimEligible }, {
+          question: query.question, humanTopics: [query.conversationTopic, query.immediateContext],
+          contextDependentFollowUp: query.contextDependentFollowUp,
+          relevanceComparison: query.relevanceComparison, topicDecision: query.topicDecision,
+          sourceSelectionRestricted: selectedBuildingCodePassageBoundary,
+          maximumCharacters: allowance
+        });
+        const nomination = candidate.signals.activeHumanDefinitionReservation;
+        if (!activeHumanMatch || ["schemaVersion", "sourceMode", "origin", "subject", "label", "sectionID",
+          "codePrefix", "sectionNumber", "corpusID", "codeVersion", "codeEdition", "jurisdiction",
+          "canonicalTextHash", "entryTextHash", "excerptCharacterCount"].some(key => nomination[key] !== activeHumanMatch[key]) ||
+          ["origin", "subject", "wholeLabel", "phrase"].some(key => nomination.alignment?.[key] !== activeHumanMatch.alignment[key]) ||
+          ["start", "end"].some(key => nomination.entrySourceOffsets?.[key] !== activeHumanMatch.entrySourceOffsets[key])) continue;
+      }
       const targeted = targetedDefinitionValue(resolved, humanDefinitionQuery, allowance, {
         allowShortSection: true, preferredQuery: query.definitionQuery,
-        preferredHumanContext: query.definitionHumanContext
+        preferredHumanContext: query.definitionHumanContext,
+        ...(activeHumanMatch ? { completeDefinitionLabels: [activeHumanMatch.label] } : {})
       });
       if (!targeted.excerpt) continue;
       const record = sourceRecord(targeted.value, {
@@ -1429,11 +1472,15 @@ export async function assembleResearchEvidence({
         retrievalReason: "Human-requested canonical definition entries reserved before incidental expansion",
         retrievalRank: candidate.rank ?? index + 1, retrievalScore: candidate.score,
         retrievalVersion: compactText(discovery.retrievalVersion) || researchEvidenceAssemblyVersion,
-        retrievalDepth: 0, evidencePriority: candidate.evidencePriority,
+        retrievalDepth: 0, evidencePriority: activeHumanMatch
+          ? researchEvidencePriorityMetadata({ ...resolved,
+              signals: { canonicalEmbeddedDefinitions: targeted.excerpt.embeddedDefinitionSection } }, { pinnedScopeActive: true })
+          : candidate.evidencePriority,
         targetedDefinition: targeted.excerpt, retrievedAt
       });
       if (!record.text || record.truncated) continue;
       record.requestedDefinitionReservation = true;
+      if (activeHumanMatch) record.activeHumanDefinitionReservation = activeHumanMatch;
       sources.push(record);
       includedSectionIdentities.add(sectionIdentity(resolved));
       characterCount += record.text.length;
