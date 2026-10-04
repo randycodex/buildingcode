@@ -24,6 +24,8 @@ import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
 import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "./research-claim-applicability-review.mjs";
+import { buildResearchMaterialScopeReviewPacket, researchMaterialScopeReviewSchema,
+  researchMaterialScopeReviewInstruction, validateResearchMaterialScopeReview } from "./research-material-scope-review.mjs";
 import { planZoningMappedScopeReview, zoningMappedReviewInstruction, zoningMappedReviewSchema,
   validateZoningMappedScopeReview, resolveZoningMappedScopeSafety } from "./research-zoning-mapped-review.mjs";
 import {
@@ -10955,6 +10957,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     maximumOutputTokens: configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000,
     timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000 };
   const scopeContext = buildResearchClaimScopeContext({ question, evidence, answer: interpretation, options });
+  const materialScopePacket = buildResearchMaterialScopeReviewPacket(scopeContext, interpretation);
   const hasAmendmentMetadata = evidence.some((source) => source.richSourceKind === "amendment-history");
   const hasNumericComparison = options.zoningDeterministicContext?.answerObligations?.some((item) => item.numericComparison);
   const evidenceText = evidence.map((source) => [
@@ -11145,6 +11148,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
           })}`
         : "",
       `SOURCE SCOPE AND HUMAN CONTEXT — ADVISORY INPUT\n${JSON.stringify(scopeContext)}`,
+      `MATERIAL SCOPE CHECKS\n${JSON.stringify({
+        packetHash: materialScopePacket.packetHash, checks: materialScopePacket.checks
+      })}`,
       options.mappedScopeReview ? `MAPPED SCOPE REVIEW\n${JSON.stringify(options.mappedScopeReview)}` : "",
       options.priorVerificationAttempts?.length ? `PRIOR REVIEW HISTORY — NOT AUTHORITY\n${JSON.stringify(options.priorVerificationAttempts)}` : "",
       `PROPOSED ANSWER JSON\n${JSON.stringify(interpretation)}`
@@ -11154,7 +11160,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
         type: "json_schema",
         name: "permitext_research_verification",
         strict: true,
-        schema: zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview)
+        schema: researchMaterialScopeReviewSchema(
+          zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview), materialScopePacket)
       }
     }
   };
@@ -11162,6 +11169,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
   // Zoning may replace the base instructions; this generic obligation applies
   // to the same existing verifier call after that replacement too.
   requestBody.instructions += ` ${researchClaimScopeVerificationInstruction}`;
+  requestBody.instructions += ` ${researchMaterialScopeReviewInstruction}`;
   console.info(JSON.stringify({ event: "research_verification_profile", profile: verificationProfile.name,
     reasoningEffort: ["none", "minimal", "low", "medium", "high", "xhigh"].includes(verificationProfile.reasoningEffort)
       ? verificationProfile.reasoningEffort : "unknown",
@@ -11215,8 +11223,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
     }
     try {
       return {
-        result: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
-          verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }),
+        result: validateResearchMaterialScopeReview({ packet: materialScopePacket, value,
+          verification: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
+            verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }) }),
         model: responsePayload.model || configuration.model,
         reasoningEffort: verificationProfile.reasoningEffort,
         usage
@@ -12494,13 +12503,16 @@ export function researchAuthorityClassification({
   citations = [],
   supportingSources = [],
   missingFacts = [],
-  evidence = []
+  evidence = [],
+  materialScopeReview = null
 } = {}) {
   const metadataIDs = new Set((Array.isArray(evidence) ? evidence : [])
     .filter((source) => source.richSourceKind === "amendment-history")
     .map((source) => source.sourceID));
   const materialCitations = (Array.isArray(citations) ? citations : []).filter((citation) =>
-    !["contextual", "irrelevant"].includes(String(citation?.evidenceRole || "supporting"))
+    !["contextual", "irrelevant"].includes(String(citation?.evidenceRole || "supporting")) &&
+    (!(citation.sourceIDs || []).length || !(citation.sourceIDs || []).every(id =>
+      materialScopeReview?.checks?.[id]?.sourceResult === "evidence_gap_only"))
   );
   const hasMetadataCitation = materialCitations.some((citation) => (citation.sourceIDs || []).some((id) => metadataIDs.has(id)));
   const hasEnactedCitation = materialCitations.some((citation) =>
@@ -21282,6 +21294,7 @@ async function handleResearchConversationMessage(request, response) {
       citations: result.interpretation.citations,
       supportingSources: result.interpretation.supportingSources,
       missingFacts: result.interpretation.missingFacts,
+      materialScopeReview: verificationAttempts.at(-1)?.materialScopeReview,
       evidence: assembledEvidence
     });
     const authorityStatus = authority.status;

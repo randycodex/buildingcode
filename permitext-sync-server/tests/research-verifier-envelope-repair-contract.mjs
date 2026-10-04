@@ -1,5 +1,5 @@
 import { buildResearchClaimApplicabilityPacket } from "../research-claim-applicability-review.mjs";
-import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
+import { syntheticMaterialScopeReview } from "./research-applicability-response-double.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { openAIResearchVerification } from "../app.mjs";
@@ -49,7 +49,8 @@ globalThis.fetch = async (url, options) => {
   if (requests.length === 1 && duringFirstRequest) duringFirstRequest();
   const originalReply = replies.shift();
   const reply = originalReply && { ...originalReply, value: originalReply.value && typeof originalReply.value === "object"
-    ? { ...originalReply.value, claimApplicabilityReview: syntheticApplicabilityReview(body) } : originalReply.value };
+    ? { ...originalReply.value, materialScopeReview: Object.hasOwn(originalReply.value, "materialScopeReview")
+      ? originalReply.value.materialScopeReview : syntheticMaterialScopeReview(body) } : originalReply.value };
   assert.notEqual(reply, undefined, "No extra provider request is authorized by this contract.");
   return Response.json({ model: body.model, status: reply.status || "completed",
     ...(reply.incomplete_details ? { incomplete_details: reply.incomplete_details } : {}),
@@ -184,6 +185,36 @@ try {
     const scopeFail = { ...validFail, issues: [{ type, detail: "A material enacted scope, exception, source basis or human premise is unsupported." }] };
     setup([{ value: scopeFail }]);
     await reservationTest(async () => { const result = await run(); assert.equal(result.result.pass, false); assert.deepEqual(result.result.issues, scopeFail.issues); assert.equal(requests.length, 1); });
+  }
+  // The compact assessment rejects an otherwise supportive ordinary verdict
+  // in the same call. Omitted/stale coverage uses only the existing shared
+  // formatting repair and keeps the immutable packet/body/reservation.
+  const material = syntheticMaterialScopeReview(serializedRequest);
+  const unsupported = structuredClone(material);
+  unsupported.checks["source-a"].categoricalApplication = true;
+  unsupported.checks["source-a"].sourceResult = "unsupported";
+  unsupported.checks["source-a"].reason = "The categorical use lacks its material source condition.";
+  setup([{ value: { ...validPass, materialScopeReview: unsupported } }]);
+  await reservationTest(async () => {
+    const result = await run();
+    assert.equal(result.result.pass, false);
+    assert.equal(result.result.issues[0].type, "fact_evidence_confusion");
+    assert.equal(result.result.missingFactsOnly, false);
+    assert.equal(requests.length, 1, "A semantic scope failure does not add a formatting/provider retry.");
+    assert.equal(requests[0].max_output_tokens, 8_000);
+    assert.equal(requests[0].reasoning.effort, "medium");
+    assert.deepEqual(selectedTimeouts, [90_000]);
+  });
+  for (const rejected of [null, { ...material, packetHash: "stale" }]) {
+    setup([{ value: { ...validPass, materialScopeReview: rejected } }, { value: validPass }]);
+    await reservationTest(async () => {
+      const result = await run();
+      assert.equal(result.result.pass, true); assert.equal(requests.length, 2);
+      assert.equal(result.verificationEnvelopeDiagnostics.invariant, "material_scope_identity_coverage");
+      assert.deepEqual(requests[0].text.format.schema, requests[1].text.format.schema);
+      assert(requests[1].input.startsWith(requests[0].input));
+      assert.deepEqual(selectedTimeouts, [90_000, 90_000]);
+    });
   }
   // Raw human scenario/correction context and exact source graph are retained
   // when fact extraction supplies no structured facts. No semantic pass claim.

@@ -10,8 +10,9 @@ import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch,
   researchActiveHumanDefinitionMatch } from "./research-definition-excerpts.mjs";
 import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup, researchImmediateChildDetailGain } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
+import { researchCurrentPurposeTerms, researchCurrentPurposeMatches } from "./research-current-purpose.mjs";
 
-export const evidenceDiscoveryVersion = "20261004-immediate-child-detail-gain-v65";
+export const evidenceDiscoveryVersion = "20261004-current-purpose-fusion-recall-v66";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1663,7 +1664,7 @@ function mergedIndexedPassages(primary, lexical, semantic, currentScores, curren
   return { ...selected, passages: merged, ...(companion ? { companion } : {}) };
 }
 
-function strongCurrentLexicalReservation({ currentHits, detailed, selected, currentQuestion, contextQuestion, preferredPrefixes }) {
+function strongCurrentLexicalReservation({ currentHits, detailed, selected, currentQuestion, contextQuestion, preferredPrefixes, allowPurpose = true }) {
   const currentTerms = new Set(rawTokens(currentQuestion).flatMap(term => [...singularForms(term)])
     .filter(term => term.length > 2 && /[a-z]/i.test(term) && !stopWords.has(term) &&
       !genericPassageHeadingWords.has(term) && !["nyc", "new", "york", "city", "fictional", "scenario", "project"].includes(term)));
@@ -1672,19 +1673,30 @@ function strongCurrentLexicalReservation({ currentHits, detailed, selected, curr
   if (!(bestScore > 0)) return null;
   const protectedIDs = new Set(selected.filter((item, index) => index === 0 || item.directReference ||
     item.completeSiblingCompanionOf || item.useSelectedPassageOnly).map(item => comparableSectionID(item.section.id)));
-  const eligible = currentHits.slice(0, 5).map((hit, rank) => {
+  const purposeTerms = allowPurpose ? researchCurrentPurposeTerms(currentQuestion) : [];
+  const currentEdition = /\b(?:codes?|edition|version)\b/i.test(currentQuestion)
+    ? currentQuestion.match(/\b(?:19|20)\d{2}\b/)?.[0] : null;
+  const eligible = currentHits.map((hit, rank) => {
     const id = comparableSectionID(hit.sectionID);
     const item = detailed.find(value => comparableSectionID(value.section.id) === id);
     const strength = hit.score / bestScore;
     const words = new Set(rawTokens(hit.text).flatMap(term => [...singularForms(term)]));
     const subjectOverlap = [...currentTerms].filter(term => words.has(term)).length;
-    return { item, hit, rank: rank + 1, strength, subjectOverlap };
-  }).filter(({ item, hit, strength, subjectOverlap }) => item && !protectedIDs.has(comparableSectionID(hit.sectionID)) &&
+    const purposeMatches = item && (!currentEdition || sectionCodeEdition(item.section) === currentEdition) &&
+      !item.section.referenceOnly && !item.section.truncated && item.section.textComplete !== false &&
+      item.section.researchClaimEligible !== false && item.body?.researchClaimEligible !== false &&
+      (!item.section.authorityClass || item.section.authorityClass === 'enacted') &&
+      boundCanonicalRulePassage({ ...item.section, body: item.body, text: sectionText(item.section, item.body) }, hit, false, true)
+      ? researchCurrentPurposeMatches(hit.text, purposeTerms) : 0;
+    return { item, hit, rank: rank + 1, strength, subjectOverlap, purposeMatches };
+  }).filter(({ item, hit, rank, strength, subjectOverlap, purposeMatches }) => (rank <= 5 || purposeMatches > 0) &&
+    item && !protectedIDs.has(comparableSectionID(hit.sectionID)) &&
     !item.useSelectedPassageOnly && !item.contextualReference && !item.inheritedReference &&
     completeIndexedScope(hit) && completeIndexedScope(item.indexedPassage) &&
     zoningScopeRankingFactor(item.section, contextQuestion, currentQuestion) >= 1 &&
     strength >= 0.7 && subjectOverlap >= 2);
   eligible.sort((left, right) =>
+    right.purposeMatches - left.purposeMatches ||
     Number(preferredPrefixes.has(right.item.section.codePrefix)) - Number(preferredPrefixes.has(left.item.section.codePrefix)) ||
     left.rank - right.rank);
   return eligible[0] || null;
@@ -1976,15 +1988,33 @@ export async function discoverRelevantEvidence({
     });
   }
   const semanticHitsByID = new Map(semanticHits.map(hit => [comparableSectionID(hit.sectionID), hit]));
+  const purposeTerms = retrievalContext?.sourceSelectionRestricted === true ? [] : researchCurrentPurposeTerms(currentQuestion);
   for (const [id, primary] of passageHitsByID) {
-    passageHitsByID.set(id, mergedIndexedPassages(primary, lexicalHitsByID.get(id),
-      semanticHitsByID.get(id), currentPassageScores, currentQuestion));
+    const lexical = lexicalHitsByID.get(id), semantic = semanticHitsByID.get(id);
+    const merged = mergedIndexedPassages(primary, lexical, semantic, currentPassageScores, currentQuestion);
+    // A meaning hit in the same source can name a different sibling. Preserve
+    // the strong current-purpose passage, including for an existing lead;
+    // authorized index identity and later fresh body binding still apply.
+    const preservePurpose = lexical && completeIndexedScope(lexical) &&
+      (currentPassageScores.get(passageIdentity(lexical)) || 0) >= (currentPassageHits[0]?.score || Infinity) * 0.7 &&
+      researchCurrentPurposeMatches(lexical.text, purposeTerms) > researchCurrentPurposeMatches(merged.text, purposeTerms) &&
+      !(completeIndexedScope(merged.companion) && researchCurrentPurposeMatches(merged.companion.text, purposeTerms) >=
+        researchCurrentPurposeMatches(lexical.text, purposeTerms));
+    passageHitsByID.set(id, preservePurpose
+      ? mergedIndexedPassages(lexical, lexical, semantic, currentPassageScores, currentQuestion, true) : merged);
   }
   // Contextual words can evict a strong current-only hit from the first lexical
   // hundred. Keep its authorized scope available for the bounded reservation;
   // this nomination does not by itself admit a source to the final shortlist.
-  const currentLexicalRecallHits = currentPassageHits.slice(0, 5).filter(hit =>
+  const strongCurrentHits = currentPassageHits.filter(hit =>
     completeIndexedScope(hit) && hit.score >= (currentPassageHits[0]?.score || Infinity) * 0.7);
+  const purposeRecall = strongCurrentHits.filter(hit => researchCurrentPurposeMatches(hit.text, purposeTerms) > 0)
+    .sort((left, right) => researchCurrentPurposeMatches(right.text, purposeTerms) - researchCurrentPurposeMatches(left.text, purposeTerms) || right.score - left.score)
+    .slice(0, 1);
+  // Use the existing five nomination opportunities, never a larger read pool.
+  // Fresh canonical/authority binding remains required at final reservation.
+  const currentLexicalRecallHits = [...purposeRecall, ...currentPassageHits.slice(0, 5).filter(hit =>
+    strongCurrentHits.includes(hit) && !purposeRecall.includes(hit))].slice(0, 5);
   const foregroundRecallHits = equipmentForegroundHits.filter(hit => completeIndexedScope(hit));
   for (const hit of [...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits, ...foregroundRecallHits]) {
     const id = comparableSectionID(hit.sectionID);
@@ -2324,21 +2354,23 @@ export async function discoverRelevantEvidence({
     const reservation = measurementReservation || activeReservation || (semanticHits.length && (strongActionSubjectReservation({ probeHits: actionSubjectRecallHits, detailed,
       selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes }) ||
       strongCurrentLexicalReservation({ currentHits: currentPassageHits, detailed,
-        selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes })));
+        selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes,
+        allowPurpose: retrievalContext?.sourceSelectionRestricted !== true })));
     const replaceIndex = selectedCandidates.findLastIndex(item => item !== lead &&
       !item.directReference && !item.completeSiblingCompanionOf && !item.useSelectedPassageOnly);
     if (reservation && replaceIndex >= 0) {
       const id = comparableSectionID(reservation.hit.sectionID);
       reservation.item.indexedPassage = mergedIndexedPassages(reservation.hit, reservation.hit,
         semanticHitsByID.get(id), currentPassageScores, currentQuestion,
-        reservation.actionSubject === true || reservation === measurementReservation || reservation.activePacket === true);
+        reservation.actionSubject === true || reservation === measurementReservation || reservation.activePacket === true || reservation.purposeMatches > 0);
       reservation.item.passage = { text: reservation.item.indexedPassage.text,
         score: reservation.hit.score, blockID: reservation.item.indexedPassage.blockID };
       reservation.item.currentQuestionLexicalReservation = { rank: reservation.rank,
         strength: reservation.strength == null ? null : Math.round(reservation.strength * 1000) / 1000,
         ...(reservation === measurementReservation ? { kind: "dependent_measurement_user_subject" }
           : reservation.activePacket ? { kind: "active_checked_rule_current_detail" }
-          : reservation.actionSubject ? { kind: "current_action_resolved_subject" } : {}) };
+          : reservation.actionSubject ? { kind: "current_action_resolved_subject" }
+          : reservation.purposeMatches > 0 ? { kind: "current_requested_purpose" } : {}) };
       const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference || item.completeSiblingCompanionOf);
       selectedCandidates = [...protectedItems, reservation.item, ...selectedCandidates.filter(item =>
         !protectedItems.includes(item) && item !== reservation.item)].slice(0, candidateLimit);

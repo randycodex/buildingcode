@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Replay actual plumbing omissions and an uncited narrative rule with explicit verifier doubles.
 // This verifies the delivery gate, not the legal correctness of the recorded answer.
 import assert from "node:assert/strict";
@@ -123,7 +124,7 @@ globalThis.fetch = async (url, options) => {
     assert.equal(phase, "permitext_code_interpretation");
     output = activeRun.providerCalls.find((call) => call.caseID === activeID && call.phase === phase).output;
   }
-  return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output });
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output }));
  } catch(error) { providerDoubleError=error; throw error; }
 };
 let server;

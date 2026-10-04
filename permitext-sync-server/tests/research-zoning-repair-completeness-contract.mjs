@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { syntheticMaterialScopeReview } from "./research-applicability-response-double.mjs";
 import { readFile } from "node:fs/promises";
 import { ownerResearchScopeInput } from "../evals/research-owner-scope-input.mjs";
 import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
@@ -57,7 +58,8 @@ globalThis.fetch = async (url, options) => {
   for (const report of reports) assert(passage.includes(report));
   // A transport double establishes request contents, not semantic acceptance.
   return Response.json({ model: body.model, usage: { input_tokens: 0, output_tokens: 0 },
-    output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify({ pass: true, issues: [] }) }] }] });
+    output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify({ pass: true, issues: [],
+      materialScopeReview: syntheticMaterialScopeReview(body) }) }] }] });
 };
 await openAIResearchVerification(input.question, assembled.sources, answer, "offline-verifier-contract");
 assert.equal(verifierRequests, 1);

@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Exercise actual ramp routing plus recorded draft/revision responses with provider doubles.
 // This verifies bounded generation/recovery, not live legal correctness.
 import assert from "node:assert/strict";
@@ -49,21 +50,21 @@ globalThis.fetch = async (url, options) => {
     assert.equal(index, 0, "Do not repeat a broad response's already exhausted 6000-token ceiling");
     assert.equal(body.text.format.name, "permitext_code_interpretation");
     assert.equal(body.max_output_tokens, 6000);
-    return Response.json({ model: body.model, status: "incomplete", incomplete_details: { reason: "max_output_tokens" },
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "incomplete", incomplete_details: { reason: "max_output_tokens" },
       usage: { input_tokens: 100, output_tokens: 6000 },
-      output: [{type:"message",role:"assistant",content:[{type:"output_text",text:'{"answerText":'}]}] });
+      output: [{type:"message",role:"assistant",content:[{type:"output_text",text:'{"answerText":'}]}] }));
   }
 
   if (index >= 4 && index <= 5) {
     assert.equal(body.text.format.name, "permitext_code_interpretation");
     budgets.push(body.max_output_tokens);
     assert.equal(body.max_output_tokens, index === 4 ? 3000 : mode === "malformed" ? 3000 : 6000);
-    if (index === 4 || mode !== "recover") return Response.json({
+    if (index === 4 || mode !== "recover") return Response.json(withSyntheticMaterialScopeProviderResponse(body, {
       model: body.model, status: mode === "malformed" ? "completed" : "incomplete",
       incomplete_details: mode === "malformed" ? undefined : { reason: "max_output_tokens" },
       usage: { input_tokens: 100, output_tokens: body.max_output_tokens },
       output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: '{"answerText":' }] }]
-    });
+    }));
   }
   let output;
   if (index <= 3) output = run.providerCalls[index].output;
@@ -74,7 +75,7 @@ globalThis.fetch = async (url, options) => {
     finalVerifierCalls++;
     output = [{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify({pass:true,issues:[]})}]}];
   }
-  return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output});
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, {model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output}));
 };
 let server;
 try {

@@ -1,4 +1,4 @@
-import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
+import { syntheticMaterialScopeReview } from "./research-applicability-response-double.mjs";
 // Replay actual draft/revision records with explicit final-verifier doubles.
 // This verifies the delivery gate, not the legal correctness of the recorded answer.
 import assert from "node:assert/strict";
@@ -42,8 +42,22 @@ Object.assign(process.env, {
 const nativeFetch = globalThis.fetch;
 let callIndex = 0;
 let acceptRevision = false;
+let compactScopeOverride = false;
 let finalVerifierCalls = 0;
 let providerDoubleError;
+function currentVerifierOutput(content, body) {
+  const value = { ...JSON.parse(content.text), materialScopeReview: syntheticMaterialScopeReview(body) };
+  if (compactScopeOverride && callIndex === 4) {
+    // Supportive ordinary output plus a genuine synthetic scope failure must
+    // take the existing revision path, not save or add a second reviewer call.
+    value.pass = true; value.issues = []; value.unnecessaryMissingFactIndices = [];
+    value.missingFactsOnly = false; value.projectFactQuestions = [];
+    const row = Object.values(value.materialScopeReview.checks)[0]; assert(row);
+    row.categoricalApplication = true; row.sourceResult = "unsupported";
+    row.reason = "This categorical application lacks its material enacted condition.";
+  }
+  return { ...content, text: JSON.stringify(value) };
+}
 function rebindRecordedPassages(output, input) {
   const sources = [...String(input).matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)/g)];
   const replay = structuredClone(output);
@@ -79,7 +93,7 @@ globalThis.fetch = async (url, options) => {
     return Response.json({ model: recorded.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 },
       output: recorded.phase === "permitext_code_interpretation" ? rebindRecordedPassages(recorded.output, body.input)
         : recorded.output.map((item) => ({ ...item, content: (item.content || []).map((content) => content.type === "output_text"
-          ? { ...content, text: JSON.stringify({ ...JSON.parse(content.text), claimApplicabilityReview: syntheticApplicabilityReview(body) }) } : content) })) });
+          ? currentVerifierOutput(content, body) : content) })) });
   }
   assert.equal(callIndex, 6, "Only one bounded revision and its final check are allowed.");
   assert.equal(body.text.format.name, "permitext_research_verification");
@@ -90,7 +104,7 @@ globalThis.fetch = async (url, options) => {
   const value = acceptRevision ? { pass: true, issues: [] } : {
     pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final-verifier rejection: the revised conclusion has not passed semantic review." }]
   };
-  value.claimApplicabilityReview = syntheticApplicabilityReview(body);
+  value.materialScopeReview = syntheticMaterialScopeReview(body);
   return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
  } catch (error) { providerDoubleError = error; throw error; }
 };
@@ -110,8 +124,9 @@ try {
   const token = account.backendSessionToken;
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const auth = { accountUserID: account.appUserID };
-  for (const accepted of [false, true]) {
+  for (const [accepted, scopeOverride] of [[false, false], [true, false], [true, true]]) {
     acceptRevision = accepted;
+    compactScopeOverride = scopeOverride;
     callIndex = 0;
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
@@ -137,12 +152,17 @@ try {
       const message = response.body.conversation.messages.at(-1);
       assert.equal(message.answer.verification.history.at(-1).model, "gpt-5.6-luna");
       assert.equal(message.answer.verification.history.at(-1).pass, true);
+      if (scopeOverride) {
+        assert.equal(message.answer.verification.history[0].issues[0].type, "fact_evidence_confusion");
+        assert.equal(message.answer.verification.attempts, 2);
+        assert.equal(message.answer.verification.regenerated, true);
+      }
       const saved = await request("/research/answers/get", { auth, answerID: message.id }, token);
       assert.equal(saved.status, 200);
       assert.equal(saved.body.answer.answer.answerText, message.answer.answerText);
     }
   }
-  assert.equal(finalVerifierCalls, 2);
+  assert.equal(finalVerifierCalls, 3);
   console.log("Revised-answer semantic gate HTTP replay passed: final rejection blocks save/turn charge; final acceptance persists the reviewed revision. All provider responses mocked, no external calls.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

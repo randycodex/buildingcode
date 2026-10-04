@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Actual Research HTTP and verification path, with retained draft text and
 // synthetic repair patches. No provider traffic or Project workflow.
 import assert from "node:assert/strict";
@@ -57,8 +58,8 @@ globalThis.fetch = async (url, options) => {
       assert.equal(verified.answerText, proposed.answerText);
       output = { pass: true, issues: [], unnecessaryMissingFactIndices: [] };
     }
-    return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
-      output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(output) }] }] });
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
+      output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(output) }] }] }));
   } catch (error) { doubleError = error; throw error; }
 };
 let server;
