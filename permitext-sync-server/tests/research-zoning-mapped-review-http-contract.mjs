@@ -1,4 +1,3 @@
-import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
 // Real unassigned Research HTTP handler with intercepted provider calls.
 // The retained generated draft is supplemented only in explicitly handwritten
 // test cases. No result here is live generation or semantic-quality evidence.
@@ -77,7 +76,7 @@ globalThis.fetch = async (url, options) => {
       })) };
       value = { pass: mode !== "semantic_reject", issues: mode === "semantic_reject"
         ? [{ type: "incorrect_citation", detail: "Synthetic unsupported rule despite acceptable source-vs-property scope." }] : [],
-        unnecessaryMissingFactIndices: [], mappedScopeReview: review, claimApplicabilityReview: syntheticApplicabilityReview(body) };
+        unnecessaryMissingFactIndices: [], mappedScopeReview: review };
       if (mode === "missing_review") delete value.mappedScopeReview;
       if (mode === "missing_unit") review.units.pop();
       if (mode === "stale_review") review.packetHash = "old-answer-hash";

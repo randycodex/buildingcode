@@ -1,4 +1,3 @@
-import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { openAIResearchVerification } from "../app.mjs";
@@ -43,9 +42,7 @@ globalThis.fetch = async (url, options) => {
   requests.push(body);
   if (currentSignal) assert(options.signal, "The existing guarded provider cancellation signal is retained.");
   if (requests.length === 1 && duringFirstRequest) duringFirstRequest();
-  const originalReply = replies.shift();
-  const reply = originalReply && { ...originalReply, value: originalReply.value && typeof originalReply.value === "object"
-    ? { ...originalReply.value, claimApplicabilityReview: syntheticApplicabilityReview(body) } : originalReply.value };
+  const reply = replies.shift();
   assert.notEqual(reply, undefined, "No extra provider request is authorized by this contract.");
   return Response.json({ model: body.model, status: reply.status || "completed",
     ...(reply.incomplete_details ? { incomplete_details: reply.incomplete_details } : {}),

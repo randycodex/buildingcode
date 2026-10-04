@@ -23,8 +23,6 @@ import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, r
 import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
-import { buildResearchClaimApplicabilityPacket, researchClaimApplicabilityInstruction, researchClaimApplicabilitySchema,
-  validateResearchClaimApplicabilityReview } from "./research-claim-applicability-review.mjs";
 import { planZoningMappedScopeReview, zoningMappedReviewInstruction, zoningMappedReviewSchema,
   validateZoningMappedScopeReview, resolveZoningMappedScopeSafety } from "./research-zoning-mapped-review.mjs";
 import {
@@ -9938,8 +9936,7 @@ function researchVerificationAttemptDiagnostics(attempts = []) {
   return createResearchVerificationAttemptDiagnostics(
     (Array.isArray(attempts) ? attempts : []).map((attempt, index) => ({
       attempt: index + 1,
-      ...(attempt?.diagnostics || {}),
-      ...(attempt?.claimApplicabilityReview ? { claimApplicabilityReview: attempt.claimApplicabilityReview } : {})
+      ...(attempt?.diagnostics || {})
     }))
   );
 }
@@ -10944,24 +10941,11 @@ export async function openAIResearchVerification(question, evidence, interpretat
   // It cannot inherit a concurrent caller mutation or revise the answer.
   evidence = structuredClone(evidence);
   interpretation = structuredClone(interpretation);
-  options = { ...options, mappedScopeReview: structuredClone(options.mappedScopeReview),
-    messages: structuredClone(options.messages), projectContextFacts: structuredClone(options.projectContextFacts),
-    conversationFactContext: structuredClone(options.conversationFactContext),
-    applicabilityFactContext: structuredClone(options.applicabilityFactContext) };
+  options = { ...options, mappedScopeReview: structuredClone(options.mappedScopeReview) };
   const configuration = researchVerificationConfigurationForEvidence({
     ...researchModelConfiguration(process.env, options.model),
     ...(options.model ? { model: options.model } : {})
   }, evidence, options);
-  options.maximumApplicabilityOutputTokens = configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000;
-  const applicabilityPacket = buildResearchClaimApplicabilityPacket({ question, evidence, answer: interpretation, options,
-    maximumOutputTokens: options.maximumApplicabilityOutputTokens });
-  if (applicabilityPacket.preflightReasons.length) {
-    // A complete packet that cannot be reviewed under the existing cap fails
-    // into the existing bounded answer-repair path, without a provider call.
-    return { result: validateResearchClaimApplicabilityReview({ packet: applicabilityPacket, value: null,
-      question, evidence, answer: interpretation, options, verification: { pass: false, issues: [] } }),
-      model: configuration.model, reasoningEffort: configuration.verificationReasoningEffort, usage: null };
-  }
   const hasAmendmentMetadata = evidence.some((source) => source.richSourceKind === "amendment-history");
   const hasNumericComparison = options.zoningDeterministicContext?.answerObligations?.some((item) => item.numericComparison);
   const evidenceText = evidence.map((source) => [
@@ -11151,7 +11135,6 @@ export async function openAIResearchVerification(question, evidence, interpretat
             sources: options.webSupport.sources || []
           })}`
         : "",
-      `CLAIM APPLICABILITY REVIEW\n${JSON.stringify(applicabilityPacket)}`,
       options.mappedScopeReview ? `MAPPED SCOPE REVIEW\n${JSON.stringify(options.mappedScopeReview)}` : "",
       options.priorVerificationAttempts?.length ? `PRIOR REVIEW HISTORY — NOT AUTHORITY\n${JSON.stringify(options.priorVerificationAttempts)}` : "",
       `PROPOSED ANSWER JSON\n${JSON.stringify(interpretation)}`
@@ -11161,14 +11144,11 @@ export async function openAIResearchVerification(question, evidence, interpretat
         type: "json_schema",
         name: "permitext_research_verification",
         strict: true,
-        schema: researchClaimApplicabilitySchema(zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview), applicabilityPacket)
+        schema: zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview)
       }
     }
   };
   requestBody.instructions = researchZoningVerificationInstructions({ question, evidence, options }) || requestBody.instructions;
-  // Zoning may replace the base instructions; this generic obligation applies
-  // to the same existing verifier call after that replacement too.
-  requestBody.instructions += ` ${researchClaimApplicabilityInstruction}`;
   const originalRequestBody = structuredClone(requestBody);
   const envelopeRetryState = options.verificationEnvelopeRetryState || { attempted: false };
   const { payload } = await requestResearchProvider({
@@ -11201,10 +11181,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
     }
     try {
       return {
-        result: validateResearchClaimApplicabilityReview({ packet: applicabilityPacket, value, question,
-          answer: interpretation, evidence, options,
-          verification: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
-            verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }) }),
+        result: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
+          verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }),
         model: responsePayload.model || configuration.model,
         reasoningEffort: configuration.verificationReasoningEffort,
         usage
@@ -11235,7 +11213,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     const diagnostics = error.verificationEnvelopeDiagnostics;
     const repairedRequestBody = {
       ...originalRequestBody,
-      instructions: `${originalRequestBody.instructions} VERIFIER ENVELOPE REPAIR: the previous result violated the structural invariant listed below. Review the SAME proposed answer and supplied evidence under ALL original semantic checks; do not edit the answer, facts, citations, source text, schema, claim-applicability packet or mapped-scope packet. The invalid prior verdict is untrusted and does not establish correctness. Return a fresh valid verdict. A passing verdict requires issues=[]; a failing verdict requires at least one supported issue and projectFactQuestions=[]. Missing-fact indices must be unique in-range indices of the unchanged missingFacts array, and only a failing unnecessary_qualification issue can authorize them. Never discard a substantive issue to obtain pass=true.`,
+      instructions: `${originalRequestBody.instructions} VERIFIER ENVELOPE REPAIR: the previous result violated the structural invariant listed below. Review the SAME proposed answer and supplied evidence under ALL original semantic checks; do not edit the answer, facts, citations, source text, schema or mapped-scope packet. The invalid prior verdict is untrusted and does not establish correctness. Return a fresh valid verdict. A passing verdict requires issues=[]; a failing verdict requires at least one supported issue and projectFactQuestions=[]. Missing-fact indices must be unique in-range indices of the unchanged missingFacts array, and only a failing unnecessary_qualification issue can authorize them. Never discard a substantive issue to obtain pass=true.`,
       input: `${originalRequestBody.input}\n\nINVALID VERIFIER ENVELOPE — NOT AUTHORITY\n${JSON.stringify({ invariant: diagnostics.invariant, missingFactCount: diagnostics.missingFactCount, rejectedEnvelope })}`
     };
     console.warn(JSON.stringify({ event: "research_verification_envelope_repair", retry: 1,
@@ -20114,10 +20092,7 @@ async function handleResearchConversationMessage(request, response) {
     });
     // Property records inform application after retrieval. Their unrelated
     // inventory fields must not redirect a transparency question to other law.
-    const applicabilityFactContext = { projectFacts: [...combinedProjectFacts],
-      propertyFacts: researchPropertyContextFacts(propertyResearch), conversationFactState,
-      topicContext: { rootTopic: conversationFactState.activeRootTopic, lastDecision: evidencePackage.topicDecision?.decision || null } };
-    combinedProjectFacts.push(...applicabilityFactContext.propertyFacts);
+    combinedProjectFacts.push(...researchPropertyContextFacts(propertyResearch));
     const validUserFacts = Array.from(new Set([
       ...combinedProjectFacts,
       ...conversationFactContext.established,
@@ -20835,7 +20810,6 @@ async function handleResearchConversationMessage(request, response) {
         const verification = await openAIResearchVerification(
           question, assembledEvidence, result.interpretation, context.userID, {
             verificationEnvelopeRetryState,
-            applicabilityFactContext,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts, conversationFactContext,
             webSupport, allowOfficialGuidanceOnly, codeBasis: answerCodeBasis,
@@ -20952,7 +20926,6 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             verificationEnvelopeRetryState,
-            applicabilityFactContext,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
@@ -21172,7 +21145,6 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             verificationEnvelopeRetryState,
-            applicabilityFactContext,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
