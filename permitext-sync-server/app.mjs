@@ -10952,6 +10952,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     `PASSAGE_ID: ${source.sourceID}`,
     `SECTION_ID: ${source.sectionID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
+    `TITLE: ${source.title}`,
     // Scope and edition matter for every rule, not only history requests.
       source.codeEdition ? `CODE_EDITION: ${source.codeEdition}` : "",
       source.codeVersion ? `CODE_VERSION: ${source.codeVersion}` : "",

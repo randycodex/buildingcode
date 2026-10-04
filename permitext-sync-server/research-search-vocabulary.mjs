@@ -1,6 +1,6 @@
 // These aliases nominate enacted text. They never supply a rule, a section
 // reference, an applicability decision, or a fact about the project.
-export const researchSearchVocabularyVersion = '20261004-current-action-vocabulary-v4';
+export const researchSearchVocabularyVersion = '20261004-current-test-property-v5';
 
 function compact(value) { return String(value || '').replace(/\s+/g, ' ').trim(); }
 
@@ -171,6 +171,58 @@ function matched(definition, positive) {
     (!definition.detail || definition.detail.test(positive));
 }
 
+const physicalTestSubject = /\b(?:piping|pipes?|pipework|plumbing|refrigerant|hydraulic|sprinkler|gas[-\s]+(?:lines?|systems?))\b/i;
+const testAction = /\b(?:pressure[-\s]+test\w*|leak[-\s]+test\w*|test(?:s|ing|ed)?)\b/i;
+const testMediumProperty = /\b(?:test(?:ing)?[-\s]+(?:medium|media|gases?|fluids?|liquids?)|(?:gases?|fluids?|liquids?|medium|media)[-\s]+(?:for|used[-\s]+for)[-\s]+(?:the[-\s]+)?test(?:ing)?)\b/i;
+const testOtherProperty = /\b(?:how[-\s]+(?:high|long|much)|duration|minutes?|hours?|gauge|pressure[-\s]+(?:level|value|reading)|test[-\s]+pressure|(?:psi|psig|kpa)|leak[-\s]+(?:location|repair))\b/i;
+const materialStopWords = new Set('a an the and or it its this that these those them they gas gases fluid fluids liquid liquids medium media piping pipes pipework system systems test testing acceptable required permitted allowed only instead tank tanks cylinder cylinders bottle bottles pump pumps gauge gauges compressor compressors hose hoses valve valves'.split(' '));
+
+function testMaterial(value) {
+  const words = compact(value).toLowerCase().replace(/^(?:a|an|the)\s+/, '').split(/[\s-]+/);
+  return words.length > 0 && words.length <= 3 && words.every(word => /^[a-z]{3,}$/.test(word) && !materialStopWords.has(word))
+    ? words.join(' ') : null;
+}
+
+// Resolve the property from current human wording. Prior human context may
+// identify the physical system, but never supplies a test material, an old
+// pressure/duration question, or a legal permission. This has no source route.
+export function researchTestMediumVocabulary(question = '', options = {}) {
+  const original = compact(question);
+  if (!original || original.length > 4000) return null;
+  const current = currentText(original);
+  const positive = researchPositiveSearchText(current);
+  const requested = positive.match(/[^.!?]*\?/g)?.at(-1) || positive;
+  if (!testAction.test(positive) || /\b(?:compar\w*|versus|vs|both|difference)\b/i.test(current) ||
+      /\b(?:egress|exit[-\s]+paths?|home[-\s]+business|software|blood|medical|laboratory|lab[-\s]+samples?)\b/i.test(requested) ||
+      testOtherProperty.test(requested)) return null;
+  const phrases = [];
+  const remember = value => { const material = testMaterial(value); if (material) phrases.push(material); };
+  for (const match of positive.matchAll(/\b(?:use|using)\s+([a-z]+(?:[ -]+[a-z]+){0,2}?)\s+(?:to|for)\s+(?:(?:the|a|this|that|such)\s+)?(?:pressure[-\s]+|leak[-\s]+)?test\w*\b/gi)) remember(match[1]);
+  for (const match of positive.matchAll(/\b(?:pressure[-\s]+|leak[-\s]+)?test\w*\b[^.!?;]{0,80}?\b(?:with|using|use)\s+([a-z]+(?:[ -]+[a-z]+){0,2}?)(?=\s*(?:[.!?;,]|$)|\s+(?:for|to|instead|or)\b)/gi)) remember(match[1]);
+  for (const match of positive.matchAll(/\b(?:is|would|could|can)\s+([a-z]+(?:[ -]+[a-z]+){0,2}?)\s+(?:be\s+)?(?:acceptable|allowed|permitted|suitable|used)\b[^.!?;]{0,80}\btest\w*\b/gi)) remember(match[1]);
+  if (testMediumProperty.test(positive)) {
+    for (const match of positive.matchAll(/\b(?:corrected|changed|switched)\b[^.!?;]{0,35}\bto\s+([a-z]+(?:[ -]+[a-z]+){0,2}?)(?=\s*(?:[.!?;,]|$))/gi)) remember(match[1]);
+  }
+  const materials = [...new Set(phrases)];
+  if (materials.length > 2 || !materials.length && !testMediumProperty.test(positive)) return null;
+  // A quoted/negated proposal is not a positive material nomination. A second
+  // retained request about another property is deliberately left to recall.
+  if (!testMediumProperty.test(requested) && !/\b(?:acceptable|allowed|permitted|suitable|use|using)\b/i.test(requested)) return null;
+  const named = namedPrefixes(positive);
+  const currentSubject = physicalTestSubject.test(positive);
+  const continuing = options.contextDependentFollowUp === true && current === original;
+  const edition = positive.match(/\b(?:19|20)\d{2}\b(?=[^.!?]{0,35}\b(?:codes?|edition|version)\b)/i)?.[0];
+  const topics = continuing ? (options.humanTopics || []).filter(value => typeof value === 'string').slice(0, 2)
+    .map(value => researchPositiveSearchText(currentText(value.slice(0, 640))))
+    .filter(value => physicalTestSubject.test(value) && testAction.test(value) &&
+      (!edition || !/\b(?:19|20)\d{2}\b/.test(value) || value.includes(edition)) &&
+      (!named.length || named.every(prefix => namedPrefixes(value).includes(prefix)))) : [];
+  if (!currentSubject && !topics.length) return null;
+  const terms = ['test', 'medium', ...materials];
+  return { subject: 'test_medium', property: 'medium', codePrefixes: named, terms,
+    foregroundTerms: terms, materials, origin: currentSubject ? 'current' : 'human_context' };
+}
+
 export function researchSearchVocabulary(question = '', options = {}) {
   const original = compact(question);
   const empty = { version: researchSearchVocabularyVersion, query: '', currentQuery: '',
@@ -215,6 +267,8 @@ export function researchSearchVocabulary(question = '', options = {}) {
         ...(definition.currentProperty?.(positive) ? { property: definition.currentProperty(positive) } : {}) });
     }
   }
+  const testMedium = researchTestMediumVocabulary(original, options);
+  if (testMedium && concepts.length === 0) concepts.push(testMedium);
   const query = [...new Set(concepts.flatMap(concept => concept.terms))].join(' ');
   const currentQuery = [...new Set(concepts.filter(concept => concept.origin === 'current').flatMap(concept => concept.terms))].join(' ');
   const definitionQuery = query && original.length + query.length + 1 <= 2000 ? `${original} ${query}` : original;
@@ -223,6 +277,19 @@ export function researchSearchVocabulary(question = '', options = {}) {
 }
 
 export function researchSearchVocabularyMatches(text, concept) {
+  if (concept?.subject === 'test_medium') {
+    // The complete enacted text must itself regulate the requested property.
+    // A generic pressure rule merely mentioning stabilization of a testing
+    // medium is not a medium rule. Negative operative prohibitions remain law.
+    const canonical = String(text || '');
+    if (!Array.isArray(concept.materials) || concept.materials.length > 2) return false;
+    const words = compact(canonical).toLowerCase().replace(/-/g, ' ');
+    if (!concept.materials.every(material => testMaterial(material) === material &&
+        new RegExp(`\\b${material.replace(/ /g, '\\s+')}\\b`, 'i').test(words))) return false;
+    return /\b(?:test(?:ing)?\s+(?:medium|media|gases?|fluids?|liquids?)|(?:medium|media|gases?|fluids?|liquids?)\s+(?:used\s+)?for\s+(?:the\s+)?(?:pressure[-\s]+)?test(?:ing)?)\b[^.!?]{0,100}\b(?:shall|must|may|permitted|prohibited|allowed)\b/i.test(canonical) ||
+      /\btests?\s+(?:shall|must)\s+be\s+(?:performed|made|conducted)\s+with\b/i.test(canonical) ||
+      concept.materials.some(material => new RegExp(`\\b(?:shall|must|may)\\b[^.!?]{0,35}\\btest(?:ed|ing)?\\b[^.!?]{0,35}\\b(?:using|with)\\s+${material.replace(/ /g, '\\s+')}\\b`, 'i').test(words));
+  }
   const definition = definitions.find(value => value.subject === concept?.subject);
   const canonical = definition?.guardedContinuation ? String(text || '') : researchPositiveSearchText(text);
   return Boolean(definition?.canonical.test(canonical) &&

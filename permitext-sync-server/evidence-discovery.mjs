@@ -11,7 +11,7 @@ import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch,
 import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261004-current-inherited-foreground-v63";
+export const evidenceDiscoveryVersion = "20261004-current-property-foreground-v64";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1910,11 +1910,17 @@ export async function discoverRelevantEvidence({
   // This is one vocabulary-focused use of the same foreground probe/slots.
   // Require the equipment in the complete source's own text, not shared water
   // words or inherited context; legal applicability remains unresolved.
-  const equipmentForegroundHits = equipmentIntent || vocabularyConcept ? foregroundHits.filter(hit =>
-    equipmentPrefixes.has(hit.codePrefix) &&
-    hit.score >= (foregroundHits[0]?.score || Infinity) * 0.7 &&
+  const qualifiedForegroundHits = equipmentIntent || vocabularyConcept ? foregroundHits.filter(hit =>
+    (equipmentPrefixes.size ? equipmentPrefixes : foregroundPrefixes).has(hit.codePrefix) &&
     (equipmentIntent ? researchEquipmentSubjectMatches(hit.text, equipmentIntent)
       : researchSearchVocabularyMatches(hit.text, vocabularyConcept))) : foregroundHits;
+  // Compare a requested property's strength against the same property. A
+  // pressure clause's incidental mention of the testing medium is not a
+  // stronger material rule; retain the existing five-hit probe and read caps.
+  const foregroundStrengthBaseline = vocabularyConcept?.subject === 'test_medium'
+    ? qualifiedForegroundHits[0]?.score : foregroundHits[0]?.score;
+  const equipmentForegroundHits = qualifiedForegroundHits.filter(hit =>
+    (!equipmentIntent && !vocabularyConcept) || hit.score >= (foregroundStrengthBaseline || Infinity) * 0.7);
   const activePacketHits = passageIndex && retrievalContext?.contextDependentFollowUp && !relevanceComparison
     ? (retrievalContext.activeRulePacketReferences || []).slice(0, 3).flatMap(reference => {
       if (!['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => reference[key]) ||
@@ -2352,7 +2358,8 @@ export async function discoverRelevantEvidence({
       const positiveCurrent = researchPositiveSearchText(currentQuestion);
       const currentEdition = /\b(?:codes?|edition|version)\b/i.test(positiveCurrent)
         ? positiveCurrent.match(/\b(?:19|20)\d{2}\b/)?.[0] : null;
-      const independentlyCurrentInherited = Boolean(item?.inheritedReference && (equipmentIntent || vocabularyConcept) &&
+      const propertyVocabulary = vocabularyConcept?.subject === 'test_medium';
+      const freshlyBoundCurrentSource = Boolean(item &&
         !relevanceComparison && retrievalContext?.sourceSelectionRestricted !== true &&
         !/\b(?:compar\w*|versus|vs|both|difference)\b/i.test(positiveCurrent) &&
         (!currentEdition || sectionCodeEdition(item.section) === currentEdition) &&
@@ -2363,9 +2370,12 @@ export async function discoverRelevantEvidence({
         (!item.section.authorityClass || item.section.authorityClass === 'enacted') &&
         (!item.section.authorityStatus || item.section.authorityStatus === 'enacted') &&
         boundCanonicalRulePassage({ ...item.section, body: item.body, text: sectionText(item.section, item.body) }, hit, false, true));
+      const independentlyCurrentInherited = Boolean(item?.inheritedReference && (equipmentIntent || vocabularyConcept) &&
+        freshlyBoundCurrentSource);
       if (!item || protectedItems.includes(item) || item.definitionCarrier ||
           (vocabularyConcept && /\bdefinitions?\b/i.test(item.section.title || "")) || !foregroundPrefixes.has(item.section.codePrefix) ||
           item.contextualReference || (item.inheritedReference && !independentlyCurrentInherited) || item.useSelectedPassageOnly ||
+          (propertyVocabulary && !freshlyBoundCurrentSource) ||
           !completeIndexedScope(hit) || !completeIndexedScope(item.indexedPassage) || overlap < foregroundOverlapMinimum ||
           zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) < 1) return [];
       item.currentQuestionForeground = { rank: rank + 1,
