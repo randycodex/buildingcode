@@ -63,7 +63,7 @@ const webSettings = web.slice(
   web.indexOf("function singleExpandedDividerEdge(")
 );
 const webResearchAnswerDisplay = web.slice(
-  web.indexOf("function researchAnswerNarrativeText(result)"),
+  web.indexOf("function researchAnswerNarrativeText("),
   web.indexOf("async function renderUtilityInstance(instance)")
 );
 
@@ -134,7 +134,7 @@ assert.match(web, /const researchDisclosureAcknowledgmentVersion = "2026-08-27-v
 assert.doesNotMatch(web, /ensureResearchDisclosureAcknowledged|Before your first Research question/);
 assert.match(web, /Unassigned: no saved Project facts will be sent\. Private notes are not included\./);
 assert.match(web, /Project context sent:/);
-assert.match(web, /function researchAnswerCopyText\(result\)/);
+assert.match(web, /function researchAnswerCopyText\(result, question = ""\)/);
 assert.match(web, /function researchCorpusMetadataLines\(codeBasis\)/);
 assert.match(web, /Edition: \$\{corpus\.codeEdition\}/);
 assert.match(web, /Applicability: \$\{researchApplicabilityStatusLabel\(corpus\.applicabilityStatus\)\}/);

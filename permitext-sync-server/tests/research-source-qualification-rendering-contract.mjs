@@ -65,7 +65,7 @@ const context = vm.createContext({
   fetch() { throw Error("External calls are forbidden"); }
 });
 vm.runInContext([
-  "researchDisplayText", "researchDisplayList", "researchAnswerHasVerificationRecovery", "researchVerificationRecoveryText",
+  "researchDisplayText", "researchDisplayList", "researchAnswerHasVerificationRecovery", "researchRecoveryQuestionForMessage", "researchVerificationRecoveryText",
   "researchAnswerNarrativeText", "researchApplicabilityStatusLabel", "researchCorpusMetadataLines", "researchAnswerCopyText",
   "appendResearchInlineFormatting", "appendResearchInlineLines", "researchAnswerTable", "researchAnswerDisplayMarkdown",
   "appendResearchAnswerNarrative", "appendResearchList", "appendResearchSupportedPoints", "appendResearchUnresolved",
@@ -144,7 +144,7 @@ const { container: recovered } = render({
   authorityLabel: "Clarification — no determination", verification: { status: "clarification", pass: false, reason: "verification_source" }
 });
 assert.equal(recovered.querySelector(".research-authority-status").textContent, "Clarification — no determination");
-assert(recovered.textContent.includes("Your question and conversation are saved. You don’t need to repeat the question."));
+assert(recovered.textContent.includes("Use Report this issue below to report this attempt."));
 
 // Empty lists create no headings. All warnings remain, with deduplication
 // only within each existing field, never based on the legal words they use.
