@@ -1,3 +1,4 @@
+import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
 // Offline provider doubles exercise delivery, durable provenance and rejection.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
@@ -30,6 +31,7 @@ globalThis.fetch=async(url,options)=>{
  const body=JSON.parse(options.body); const phase=body.text.format.name; calls.push(phase);
  assert(body.instructions.includes('USER-SUPPLIED TEXT ONLY'));
  const value=phase==='permitext_code_interpretation'?guidance:{pass:accept,issues:accept?[]:[{type:'unsupported_requirement',detail:'Synthetic external claim rejection.'}],missingFactsOnly:false,unnecessaryMissingFactIndices:[]};
+ if(phase==='permitext_research_verification') value.claimApplicabilityReview=syntheticApplicabilityReview(body);
  return Response.json({model:body.model,status:'completed',usage:{input_tokens:100,output_tokens:100,total_tokens:200},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(value)}]}]});
 };
 let server;

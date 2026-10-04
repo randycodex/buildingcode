@@ -28,6 +28,7 @@ class Element {
   }
   get textContent() { return (this.text || "") + this.children.map(node => node.textContent).join(""); }
   set textContent(value) { this.text = String(value); this.children = []; }
+  get innerText() { return this.children.length ? this.children.map(node => node.innerText).join("\n\n") : this.textContent; }
   get lastElementChild() { return this.children.filter(node => node.localName !== "#text").at(-1); }
   append(...nodes) {
     for (const node of nodes) {
@@ -51,6 +52,7 @@ class Element {
       : this.localName === selector;
   }
   querySelectorAll(selector) {
+    if (selector.includes(",")) return [...new Set(selector.split(",").flatMap(value => this.querySelectorAll(value.trim())))];
     if (selector.startsWith(":scope > ")) return this.children.filter(node => node.matches(selector.slice(9)));
     return this.children.flatMap(node => [...(node.matches(selector) ? [node] : []), ...node.querySelectorAll(selector)]);
   }
@@ -76,36 +78,42 @@ const context = vm.createContext({ document, Date, URL, Set, Map, console,
   fetch() { throw Error("External calls are forbidden"); }
 });
 vm.runInContext([
-  "researchDisplayText", "researchDisplayList", "researchAnswerHasVerificationRecovery", "researchVerificationRecoveryText",
+  "researchDisplayText", "researchDisplayList", "researchAnswerHasVerificationRecovery", "researchRecoveryQuestionForMessage", "researchVerificationRecoveryText",
   "researchAnswerNarrativeText", "researchApplicabilityStatusLabel", "researchCorpusMetadataLines", "researchAnswerCopyText",
   "appendResearchInlineFormatting", "appendResearchInlineLines", "researchAnswerTable", "researchAnswerDisplayMarkdown",
   "appendResearchAnswerNarrative", "appendResearchList", "researchFeedbackUserStatus", "renderResearchFeedback",
   "renderResearchInterpretation"
 ].map(extract).join("\n"), context);
 
+const originalQuestion = "  Does **this route**\n meet the requirement? [SECTION_ID: intact] <literal>  ";
+const normalizedQuestion = "Does **this route** meet the requirement? [SECTION_ID: intact] <literal>";
 const expected = {
-  verification_source: "Research couldn’t finish because its explanation and source references didn’t agree.",
-  verification_context: "Research couldn’t finish because its explanation didn’t consistently use the project details already provided.",
-  verification_format: "Research received an answer or review it couldn’t read.",
-  verification_incomplete: "Research couldn’t complete its source checks for this question.",
-  evidence_unavailable: "Research couldn’t prepare the code evidence needed to answer this question.",
-  research_unresolved: "Research couldn’t resolve the conditions needed to answer this question."
+  verification_source: `I found a mismatch between my explanation and its source references while preparing the answer to “${normalizedQuestion}”, so I couldn’t finish it.`,
+  verification_context: `I couldn’t consistently use the project details already provided while preparing the answer to “${normalizedQuestion}”, so I couldn’t finish it.`,
+  verification_format: `I ran into a problem while preparing the answer to “${normalizedQuestion}”, so I couldn’t finish it.`,
+  verification_incomplete: `I couldn’t finish the source checks for the answer to “${normalizedQuestion}”, so I couldn’t finish it.`,
+  evidence_unavailable: `I couldn’t prepare the code evidence needed to answer “${normalizedQuestion}”, so I couldn’t finish it.`,
+  research_unresolved: `I couldn’t resolve the conditions needed to answer “${normalizedQuestion}”, so I couldn’t finish it.`
 };
 for (const [reason, explanation] of Object.entries(expected)) {
-  const answer = researchClarificationAnswer("Does the proposed route meet the requirement?", reason);
+  const answer = researchClarificationAnswer(originalQuestion, reason);
   // Historical coarse failure records may contain the old repeat instruction
   // or an unrelated generated missing-fact question. Neither is a user burden.
   answer.answerText = "I couldn’t verify the explanation. Retry this question here.";
   answer.followUpQuestions = ["Which project fact are you missing?"];
   const before = JSON.stringify(answer);
-  const message = { id: `old-${reason}`, role: "assistant", answer };
+  const message = { id: `old-${reason}`, role: "assistant", requestID: `request-${reason}`, answer };
+  const conversation = { id: "saved-conversation", messages: [
+    { role: "user", requestID: message.requestID, question: originalQuestion }, message,
+    { role: "user", requestID: "later-request", question: "A later unrelated question" }
+  ] };
   const container = document.createElement("section");
   const composerDraft = { value: "Unsent follow-up draft" };
-  context.renderResearchInterpretation(container, answer, { message, conversationID: "saved-conversation" });
+  context.renderResearchInterpretation(container, answer, { message, conversation, conversationID: "saved-conversation" });
   const narrative = container.querySelector(".research-answer-narrative");
   assert.equal(narrative.children[0].textContent, explanation);
-  assert.equal(narrative.children[1].textContent, "Your question and conversation are saved. You don’t need to repeat the question.");
-  assert.doesNotMatch(container.textContent, /Retry this question|Which project fact are you missing\?/);
+  assert.equal(narrative.children[1].textContent, "Use Report this issue below to report this attempt.");
+  assert.doesNotMatch(container.textContent, /Retry this question|Which project fact are you missing\?|saved|still here|A later unrelated question/);
   assert.equal(container.querySelector(".research-feedback-icon"), null, "An incomplete system result must not invite Helpful approval.");
   const report = container.querySelector(".research-feedback-report");
   assert.equal(report.textContent, "Report this issue", "The recovery action is visible text, not an unexplained icon.");
@@ -131,9 +139,35 @@ for (const [reason, explanation] of Object.entries(expected)) {
   assert.equal(requests.at(-1).body.answerID, message.id);
   assert.equal(requests.at(-1).body.category, "missing_information");
   await container.querySelector(".research-answer-copy").events.click();
-  assert.equal(copied.at(-1), `${explanation}\n\nYour question and conversation are saved. You don’t need to repeat the question.`);
+  assert.equal(copied.at(-1), narrative.innerText, "Copy uses the visibly rendered text including literal question symbols");
+  assert.equal(copied.at(-1), `${explanation}\n\nUse Report this issue below to report this attempt.`);
   assert.equal(JSON.stringify(answer), before, "Rendering, copying and reporting never rewrite the saved historical answer.");
   assert.equal(composerDraft.value, "Unsent follow-up draft");
+}
+
+// Bind only the unique preceding user for this assistant request. A current
+// composer value, later user message or another conversation cannot substitute.
+{
+  const message={id:"assistant",role:"assistant",requestID:"request"};
+  const prior={role:"user",requestID:"request",question:"Exact preceding question"};
+  const conversation={id:"owned",messages:[prior,message,{role:"user",requestID:"later",question:"Later question"}]};
+  const bind=changes=>context.researchRecoveryQuestionForMessage({message,conversation,conversationID:"owned",...changes});
+  assert.equal(bind(),prior.question);
+  assert.equal(bind({conversationID:"another"}),"");
+  assert.equal(bind({message:{...message,requestID:"unmatched"}}),"");
+  assert.equal(bind({conversation:{...conversation,messages:[message,prior]}}),"");
+  assert.equal(bind({conversation:{...conversation,messages:[prior,{...prior},message]}}),"");
+  assert.equal(bind({conversation:{...conversation,messages:[prior,message,{...message}]}}),"");
+  const legacy={id:"legacy",role:"assistant"}, user={role:"user",question:"Exact legacy question"};
+  assert.equal(bind({message:legacy,conversation:{id:"owned",messages:[user,legacy]}}),user.question);
+  assert.equal(bind({message:legacy,conversation:{id:"owned",messages:[user,{role:"assistant",id:"other"},legacy]}}),"");
+  assert.equal(bind({message:legacy,conversation:{id:"owned",messages:[prior,legacy]}}),"");
+  const answer=researchClarificationAnswer("Original", "verification_format"), container=document.createElement("section");
+  context.renderResearchInterpretation(container,answer,{message,conversationID:"unbound"});
+  assert.equal(container.querySelector(".research-answer-narrative").innerText,researchVerificationRecoveryTextForReason("verification_format"));
+  const recordContainer=document.createElement("section");
+  context.renderResearchInterpretation(recordContainer,answer,{recordQuestion:"Exact record question"});
+  assert.equal(recordContainer.querySelector(".research-answer-narrative").innerText,researchVerificationRecoveryTextForReason("verification_format","Exact record question"));
 }
 
 for (const answer of [
