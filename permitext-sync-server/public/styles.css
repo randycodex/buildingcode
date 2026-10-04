@@ -17837,7 +17837,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .workspace-panel.is-collapsed > .pane-collapsed-tab { padding-top: 56px; }
 
 .project-refresh-dialog {
-  border: 2px solid #168bff;
+  border: 1px solid var(--border);
   width: min(680px, calc(100vw - 32px));
   max-height: calc(100dvh - 64px);
   overflow-y: auto;
