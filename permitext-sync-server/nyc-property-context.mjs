@@ -228,11 +228,13 @@ export function structuredFactsFromNYCPropertyData({ lot, specialDistricts = [],
   return facts.map(fact => ({ ...fact, sourceText: lot.version ? fact.sourceText.replace("MapPLUTO;", `MapPLUTO ${lot.version};`) : fact.sourceText }));
 }
 
-export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now = () => new Date() } = {}) {
-  const query = normalizedNYCPropertyAddress(address);
+export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now = () => new Date(), bbl: requestedBBL = "" } = {}) {
+  const savedBBL = validBBL(requestedBBL);
+  if (requestedBBL && !savedBBL) throw new NYCPropertyLookupError("Invalid saved BBL.", { status: 400 });
+  const query = savedBBL ? String(address || "").trim() : normalizedNYCPropertyAddress(address);
   const searchURL = new URL(nycPlanningSearchURL);
   searchURL.searchParams.set("q", query);
-  const searchPayload = await fetchJSON(searchURL, { fetchImpl });
+  const searchPayload = savedBBL ? [{ type: "lot", bbl: savedBBL }] : await fetchJSON(searchURL, { fetchImpl });
   const searchMatch = (Array.isArray(searchPayload) ? searchPayload : [])
     .find((item) => item?.type === "lot" && validBBL(item?.bbl));
   if (!searchMatch) {

@@ -13361,7 +13361,7 @@ async function handleProjectPropertyLookup(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
   try {
-    const property = await lookupNYCPropertyContext(context.body.address);
+    const property = await lookupNYCPropertyContext(context.body.address, { bbl: context.body.bbl });
     sendJSON(response, 200, { property });
   } catch (error) {
     if (error instanceof NYCPropertyLookupError) {

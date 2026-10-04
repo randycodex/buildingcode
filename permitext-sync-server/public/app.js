@@ -1,4 +1,4 @@
-import { nycMappedFactFields, mergeNYCPropertyFacts } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
+import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
@@ -31190,8 +31190,16 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     value.className = "saved-project-structured-fact-value";
     value.value = projectAddress ? address.value : factsByKey.get(key)?.value || "";
     value.setAttribute("aria-label", fieldLabel);
+    const fact = factsByKey.get(key);
+    if (fact?.sourceText) value.title = fact.sourceText;
     label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
     row.append(label, value);
+    if (fact?.status === "unknown") {
+      const review = document.createElement("small");
+      review.className = "project-fact-review-status";
+      review.textContent = "Needs review";
+      row.append(review);
+    }
     value.addEventListener("input", () => {
       if (projectAddress) address.value = value.value;
       else replaceFact(key, fieldLabel, value.value);
@@ -31251,38 +31259,135 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     const refreshFacts = document.createElement("button");
     refreshFacts.type = "button";
     refreshFacts.className = "saved-project-refresh-facts";
-    refreshFacts.textContent = "Refresh NYC facts";
-    refreshFacts.setAttribute("aria-label", "Refresh NYC property facts");
+    refreshFacts.textContent = "Refresh ZoLa data";
+    refreshFacts.setAttribute("aria-label", "Refresh ZoLa data");
     structuredHeading.append(refreshFacts);
+    const refreshedStatus = document.createElement("p");
+    refreshedStatus.className = "project-refresh-status";
+    refreshedStatus.setAttribute("role", "status");
+    const updateRefreshDate = () => {
+      const dates = structuredFacts.filter(f => f.source === "nyc-planning").map(f => f.updatedAt).filter(Boolean).sort();
+      refreshedStatus.textContent = dates.length ? `Last fetched ${new Date(dates.at(-1)).toLocaleString()}` : "";
+    };
+    structuredBody.prepend(refreshedStatus);
+    updateRefreshDate();
     refreshFacts.addEventListener("click", async () => {
       const lookupAddress = address.value.trim();
-      if (!lookupAddress) {
-        void showWebNotice("Address required", "Enter a Project address to refresh NYC property facts.");
+      const oldBBL = structuredFacts.find(fact => fact.key === "bbl")?.value;
+      if (!lookupAddress && !oldBBL) {
+        void showWebNotice("Address required", "Enter a Project address to refresh ZoLa data.");
         return;
       }
+      const snapshot = JSON.stringify(structuredFacts);
       refreshFacts.disabled = true;
-      refreshFacts.textContent = "Refreshing…";
+      refreshFacts.textContent = "Fetching…";
       try {
-        const property = (await postResearch("/projects/property/lookup", { address: lookupAddress }))?.property;
+        const property = (await postResearch("/projects/property/lookup", { address: lookupAddress, bbl: oldBBL }))?.property;
         requireCurrentAccountRequest(requestIdentity);
-        if (address.value.trim() !== lookupAddress || !property?.structuredFacts?.length) return;
-        const oldBBL = structuredFacts.find(fact => fact.key === "bbl" && fact.source === "nyc-planning")?.value;
-        if (oldBBL && oldBBL !== property.bbl) {
-          void showWebNotice("Address matches a different tax lot", "Edit the Project address to replace its property facts.");
-          return;
+        if (!structuredSection.isConnected || address.value.trim() !== lookupAddress || JSON.stringify(structuredFacts) !== snapshot) return;
+        if (!property?.structuredFacts?.length) throw new Error("No property facts returned. Your current facts are unchanged.");
+        if (oldBBL && oldBBL !== property.bbl) throw new Error("The returned tax lot does not match the saved BBL.");
+        const preview = previewNYCPropertyRefresh(structuredFacts, property.structuredFacts, property.retrievedAt);
+        const overlay = document.createElement("section");
+        overlay.className = "project-sheet-overlay project-refresh-overlay";
+        const dialog = document.createElement("section");
+        dialog.className = "project-refresh-dialog";
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+        dialog.setAttribute("aria-label", "Review ZoLa updates");
+        const title = document.createElement("h2");
+        title.textContent = "Review ZoLa updates";
+        const intro = document.createElement("p");
+        intro.textContent = `BBL ${property.bbl} · Fetched ${new Date(property.retrievedAt).toLocaleString()}. Your edited or confirmed facts are unchecked. Select a conflict only to replace your value.`;
+        dialog.append(title, intro);
+        const choices = new Map();
+        const labels = { new: "New", changed: "Changed", conflict: "Your value differs", unavailable: "Needs review", unchanged: "Unchanged" };
+        for (const kind of ["new", "changed", "conflict", "unavailable", "unchanged"]) {
+          const rows = preview.filter(row => row.kind === kind);
+          if (!rows.length) continue;
+          const group = document.createElement("details");
+          group.open = kind !== "unchanged";
+          const summary = document.createElement("summary");
+          summary.textContent = `${labels[kind]} (${rows.length})`;
+          group.append(summary);
+          for (const row of rows) {
+            const label = document.createElement("label");
+            label.className = "project-refresh-choice";
+            const choice = document.createElement("input");
+            choice.type = "checkbox";
+            choice.checked = row.selected;
+            choice.setAttribute("aria-label", `Update ${row.label}`);
+            choices.set(row.key, choice);
+            const text = document.createElement("span");
+            const name = document.createElement("strong");
+            name.textContent = row.label;
+            const values = document.createElement("span");
+            values.textContent = kind === "new" ? row.next.value : kind === "unavailable" || row.next?.status === "unknown" ? `Current: ${row.current.value}. Current source unavailable; keep this value and flag it for review.` : kind === "unchanged" ? row.current.value : `Current: ${row.current.value} → Latest: ${row.next.value}`;
+            const source = document.createElement("small");
+            source.textContent = row.next?.sourceText || row.replacement.sourceText;
+            text.append(name, values, source);
+            label.append(choice, text);
+            group.append(label);
+          }
+          dialog.append(group);
         }
-        structuredFacts = mergeNYCPropertyFacts(structuredFacts, property.structuredFacts, property.retrievedAt);
-        renderStructuredFacts();
-        await save({ reportFailure: true });
-        if (isCurrentAccountRequest(requestIdentity)) {
-          const sourced = property.structuredFacts.filter(fact => fact.status === "sourced").length;
-          void showWebNotice("NYC facts refreshed", [`Retrieved ${sourced} sourced facts. Manually entered facts were preserved.`, ...(property.warnings || [])].join(" "));
-        }
+        const warnings = document.createElement("p");
+        warnings.textContent = (property.warnings || []).join(" ");
+        dialog.append(warnings);
+        const actions = document.createElement("div");
+        actions.className = "project-refresh-actions";
+        const cancel = document.createElement("button");
+        cancel.type = "button";
+        cancel.textContent = "Cancel";
+        const apply = document.createElement("button");
+        apply.type = "button";
+        apply.textContent = "Apply updates";
+        const close = () => { overlay.remove(); refreshFacts.focus(); };
+        cancel.addEventListener("click", close);
+        overlay.addEventListener("keydown", event => {
+          if (event.key === "Escape" && !apply.disabled) { event.preventDefault(); close(); }
+          if (event.key === "Tab") {
+            const controls = [...dialog.querySelectorAll('button:not(:disabled), input, summary')].filter(e => e.getClientRects().length);
+            const first = controls[0], last = controls.at(-1);
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+          }
+        });
+        apply.addEventListener("click", async () => {
+          if (!isCurrentAccountRequest(requestIdentity) || !structuredSection.isConnected || address.value.trim() !== lookupAddress || JSON.stringify(structuredFacts) !== snapshot) {
+            close();
+            void showWebNotice("Project changed", "Fetch the property data again before applying updates.");
+            return;
+          }
+          const previous = structuredFacts;
+          structuredFacts = applyNYCPropertyRefresh(structuredFacts, preview, new Set([...choices].filter(([, control]) => control.checked).map(([key]) => key)));
+          apply.disabled = cancel.disabled = true;
+          apply.textContent = "Saving…";
+          try {
+            await save({ reportFailure: true });
+            if (isCurrentAccountRequest(requestIdentity) && structuredSection.isConnected) {
+              renderStructuredFacts();
+              updateRefreshDate();
+              refreshedStatus.textContent += " · Selected updates applied";
+            }
+            close();
+          } catch (error) {
+            structuredFacts = previous;
+            apply.disabled = cancel.disabled = false;
+            apply.textContent = "Apply updates";
+            warnings.textContent = error.message || "Could not save updates. Try again.";
+          }
+        });
+        actions.append(cancel, apply);
+        dialog.append(actions);
+        overlay.append(dialog);
+        document.body.append(overlay);
+        cancel.focus();
       } catch (error) {
-        if (isCurrentAccountRequest(requestIdentity)) void showWebNotice("NYC facts could not be refreshed", error.message || "Try again.");
+        if (isCurrentAccountRequest(requestIdentity)) void showWebNotice("ZoLa data could not be fetched", error.message || "Try again.");
       } finally {
         refreshFacts.disabled = false;
-        refreshFacts.textContent = "Refresh NYC facts";
+        refreshFacts.textContent = "Refresh ZoLa data";
       }
     });
   }

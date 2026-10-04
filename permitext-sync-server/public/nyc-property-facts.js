@@ -40,3 +40,33 @@ export function mergeNYCPropertyFacts(existingFacts, incomingFacts, retrievedAt)
   });
   return [...merged, ...incoming.values()];
 }
+
+export function previewNYCPropertyRefresh(existingFacts, incomingFacts, retrievedAt) {
+  const existing = new Map(existingFacts.map(fact => [fact.key, fact]));
+  const incoming = new Map(incomingFacts.map(fact => [fact.key, fact]));
+  return [...new Set([...incoming.keys(), ...existing.keys()])].flatMap(key => {
+    const current = existing.get(key);
+    const next = incoming.get(key);
+    const protectedFact = current && (current.source !== "nyc-planning" || ["confirmed", "rejected"].includes(current.status));
+    if (!next && (!current || protectedFact)) return [];
+    const unavailable = !next || next.status === "unknown";
+    if (!current && unavailable) return [];
+    const kind = protectedFact ? "conflict" : unavailable ? "unavailable" : !current ? "new" : current.value !== next.value ? "changed" : "unchanged";
+    const replacement = unavailable ? {
+      ...current, status: "unknown", updatedAt: retrievedAt,
+      sourceText: `${current.sourceText || ""} Last refresh ${retrievedAt}: current NYC Planning data unavailable; retained previous value for review.`
+    } : next;
+    return [{ key, label: next?.label || current.label || key, current, next, replacement, kind,
+      selected: !protectedFact, retrievedAt }];
+  });
+}
+
+export function applyNYCPropertyRefresh(existingFacts, preview, selectedKeys) {
+  const replacements = new Map(preview.filter(row => selectedKeys.has(row.key)).map(row => [row.key, row.replacement]));
+  const merged = existingFacts.map(fact => {
+    const replacement = replacements.get(fact.key);
+    replacements.delete(fact.key);
+    return replacement || fact;
+  });
+  return [...merged, ...replacements.values()];
+}
