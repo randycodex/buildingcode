@@ -24,7 +24,7 @@ import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
 import { researchQuestionSubject } from "./research-question-subject.mjs";
-import { researchSearchVocabulary } from "./research-search-vocabulary.mjs";
+import { researchSearchVocabulary, researchPositiveSearchText } from "./research-search-vocabulary.mjs";
 import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage } from "./research-rule-groups.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import { researchChapterScopeContextPlan, resolveResearchChapterScopeContext } from "./research-chapter-scope-context.mjs";
@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-human-search-vocabulary-definitions-v71";
+export const researchEvidenceAssemblyVersion = "20261004-requested-definition-priority-v72";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -391,6 +391,8 @@ export function researchEvidenceRetrievalQuery({
     sourceQuery,
     semanticQuery,
     definitionQuery: searchVocabulary.definitionQuery,
+    definitionHumanContext: contextDependentFollowUp
+      ? contextualTopics.slice(0, 2).map(context => context.text.slice(0, 640)).join("\n") : "",
     searchVocabulary,
     dependentMeasurementSubject,
     resolvedSubjectContext: contextDependentFollowUp && checkedPriorSources.length ? semanticContext : "",
@@ -1261,7 +1263,8 @@ export async function assembleResearchEvidence({
       ? targetedDefinitionValue(
           entry.value,
           definitionSelectionContext(query.retrievalQuery, [entry.pinned]),
-          allowance
+          allowance,
+          { preferredQuery: query.definitionQuery, preferredHumanContext: query.definitionHumanContext }
         )
       : { value: entry.value, excerpt: null };
     if (!targeted.excerpt && !entry.contextExcerpt && !entry.completeZoningText && !entry.pinned.richSourceID && allowance > 0) {
@@ -1389,6 +1392,54 @@ export async function assembleResearchEvidence({
   const supplementalCharacterCeiling = pinnedEvidence.length
     ? Math.min(limits.maximumCharacters, pinnedCharacterCount + limits.maximumSupplementalCharacters)
     : limits.maximumCharacters;
+
+  // A requested definition may contain the operative conditions themselves.
+  // Reserve its complete canonical entries before incidental expansion can
+  // consume the package. This uses the existing definition slots and leaves
+  // at least half the remaining character budget for other enacted evidence.
+  if (!pinnedEvidence.length && appliedStrategy.mode === researchEvidenceStrategies.broad) {
+    const humanDefinitionQuery = [query.definitionQuery, query.definitionHumanContext]
+      .map(researchPositiveSearchText).filter(Boolean).join("\n");
+    const requestedDefinitions = [...candidates,
+      ...(Array.isArray(discovery.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [])]
+      .filter(candidate => isDefinitionCandidate(candidate) && !candidate.signals?.useSelectedPassageOnly &&
+        (!selectedBuildingCodePassageBoundary || !routedTopicPresent || candidate.codePrefix === "BC"));
+    for (const [index, candidate] of requestedDefinitions.entries()) {
+      if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
+      const identity = sectionIdentity(candidate);
+      if (!identity || includedSectionIdentities.has(identity)) continue;
+      const allowance = Math.min(limits.maximumCharactersPerSource,
+        Math.floor((supplementalCharacterCeiling - characterCount) / 2));
+      if (allowance < 1) break;
+      let resolved;
+      try { resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered); }
+      catch { resolverFailureCount += 1; continue; }
+      if (["sectionID", "codePrefix", "sectionNumber", "corpusID", "codeVersion", "codeEdition", "jurisdiction"]
+        .some(key => candidate[key] && candidate[key] !== resolved[key])) continue;
+      const targeted = targetedDefinitionValue(resolved, humanDefinitionQuery, allowance, {
+        allowShortSection: true, preferredQuery: query.definitionQuery,
+        preferredHumanContext: query.definitionHumanContext
+      });
+      if (!targeted.excerpt) continue;
+      const record = sourceRecord(targeted.value, {
+        origin: sourceOrigins.discovered,
+        sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, `requested-definition-${index}`),
+        relationship: "Complete canonical definitions requested by the current question or related human topic",
+        characterAllowance: allowance, canonicalResolved: true,
+        retrievalReason: "Human-requested canonical definition entries reserved before incidental expansion",
+        retrievalRank: candidate.rank ?? index + 1, retrievalScore: candidate.score,
+        retrievalVersion: compactText(discovery.retrievalVersion) || researchEvidenceAssemblyVersion,
+        retrievalDepth: 0, evidencePriority: candidate.evidencePriority,
+        targetedDefinition: targeted.excerpt, retrievedAt
+      });
+      if (!record.text || record.truncated) continue;
+      record.requestedDefinitionReservation = true;
+      sources.push(record);
+      includedSectionIdentities.add(sectionIdentity(resolved));
+      characterCount += record.text.length;
+      targetedDefinitionCount += 1;
+    }
+  }
 
   let dependencyPlan = null;
   const reservedTopicDependencies = new Map();
@@ -1643,7 +1694,8 @@ export async function assembleResearchEvidence({
       ? targetedDefinitionValue(
           resolved,
           definitionSelectionContext(query.definitionQuery, canonicalForExpansion, resolved),
-          allowance
+          allowance,
+          { preferredQuery: query.definitionQuery, preferredHumanContext: query.definitionHumanContext }
         )
       : { value: resolved, excerpt: null };
     const passageValue = activeCheckedPacket ? resolved : indexedExcerpt ? { ...resolved, text: indexedExcerpt.text, canonicalText: indexedExcerpt.text }
@@ -2050,7 +2102,8 @@ export async function assembleResearchEvidence({
       ? targetedDefinitionValue(
           resolved,
           definitionSelectionContext(query.definitionQuery, canonicalForExpansion, resolved),
-          allowance
+          allowance,
+          { preferredQuery: query.definitionQuery, preferredHumanContext: query.definitionHumanContext }
         )
       : { value: resolved, excerpt: null };
     const ancestorScope = reference.referencePurpose === "canonical_ancestor_scope";
@@ -2280,7 +2333,7 @@ export async function assembleResearchEvidence({
       resolved,
       definitionSelectionContext(query.definitionQuery, canonicalForExpansion, resolved),
       allowance,
-      { allowShortSection: true }
+      { allowShortSection: true, preferredQuery: query.definitionQuery, preferredHumanContext: query.definitionHumanContext }
     );
     if (!targeted.excerpt) continue;
     const record = sourceRecord(targeted.value, {
