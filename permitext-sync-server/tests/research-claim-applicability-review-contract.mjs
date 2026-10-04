@@ -5,6 +5,8 @@ import { buildResearchClaimApplicabilityPacket, researchClaimApplicabilitySchema
   validateResearchClaimApplicabilityReview, resolveResearchApplicabilityQuote } from "../research-claim-applicability-review.mjs";
 import { createResearchVerificationAttemptDiagnostics } from "../research-economics.mjs";
 import { researchVerificationResultForWebContext } from "../research-web-attribution.mjs";
+import { decideResearchConversationTopic } from "../research-conversation-topic.mjs";
+import { resolveResearchConversationFacts } from "../research-conversation-facts.mjs";
 const authority = { corpusID: "fictional-library", codePrefix: "LIB", codeEdition: "2041", codeVersion: "original" };
 const evidence = [
   { ...authority, sourceID: "cabinet", sectionID: "cabinet-rule", text: "A red cabinet shall have a latch." },
@@ -33,7 +35,7 @@ function witness(args, target = "none", outcome = "established", factClause = ar
     factSpans: target === "none" || outcome === "unresolved" ? [] : [quote(packet.facts.records[0], "fact", factClause)],
     units: Object.fromEntries(packet.units.map(unit => [unit.id, {
       assertedMode: target === "actual" ? "project_determination" : target === "scenario" ? "scenario_determination" : "source_explanation",
-      categoricalTarget: target, categoricalQuote: target === "none" ? "" : claimText(packet, args.answer, unit.id),
+      categoricalTarget: target, categoricalSpanIndex: target === "none" ? null : 0,
       bindings: Object.fromEntries(unit.edgeIDs.map(edgeID => [edgeID, target === "none" ? { treatment: "condition_preserved",
         predicateIndices: packet.edges.find(edge => edge.id === edgeID).gap ? [] : [0], answerQuote: claimText(packet, args.answer, unit.id) }
         : { treatment: "applied", applications: [{ predicateIndex: 0, outcome, factSpanIndices: outcome === "unresolved" ? [] : [0], reason: "Explicit synthetic relation, not proof of entailment." }] }]))
@@ -56,7 +58,7 @@ for (const longAnswer of [{ answerText: longClaim, citations: answer.citations }
   const longUnit = longWitness.packet.units.find(unit => unit.maximumClaimQuoteLength === longClaim.length);
   assert(longUnit); assert(longClaim.length > 1500);
   const schema = researchClaimApplicabilitySchema({ type: "object", additionalProperties: false, properties: {}, required: [] }, longWitness.packet);
-  assert.equal(schema.properties.claimApplicabilityReview.properties.units.properties[longUnit.id].properties.categoricalQuote.maxLength, longClaim.length);
+  assert.deepEqual(schema.properties.claimApplicabilityReview.properties.units.properties[longUnit.id].properties.categoricalSpanIndex.enum, [null, ...longUnit.claimTargets.map((_, index) => index)]);
   assert.equal(validateResearchClaimApplicabilityReview({ ...longArgs, ...longWitness, value: { claimApplicabilityReview: longWitness.review }, verification: { pass: true, issues: [] } }).pass, true);
 }
 const hugeClaim = buildResearchClaimApplicabilityPacket({ ...args, answer: { answerText: longClaim.repeat(30), citations: answer.citations }, maximumOutputTokens: 12000 });
@@ -86,7 +88,7 @@ reject(row => row.units.unit_0.bindings.edge_0.applications[0].factSpanIndices =
 reject(row => row.units.unit_0.bindings.edge_0.applications[0].predicateIndex = 9, "predicate_relation");
 reject(row => row.units.unit_0.applicabilityState = "established", "unit_shape");
 reject(row => row.units.unit_0.bindings.edge_0.state = "established", "unbound_disposition");
-reject(row => row.units.unit_0.categoricalQuote = "red cabinets", "categorical_witness");
+reject(row => row.units.unit_0.categoricalSpanIndex = 999, "categorical_witness");
 for (const outcome of ["excluded", "unresolved"]) reject(row => {
   const atom = row.units.unit_0.bindings.edge_0.applications[0]; atom.outcome = outcome;
   if (outcome === "unresolved") atom.factSpanIndices = [];
@@ -95,7 +97,7 @@ reject(row => { const fact = packet.facts.records.find(fact => fact.origin === "
 reject(row => row.units.unit_0.bindings.edge_0.answerQuote = "Invented answer condition", "condition_witness", review);
 reject(row => row.units.unit_0.bindings.edge_0.factSpanIndices = [0], "unbound_predicate", review);
 const misleadingLabel = structuredClone(review);
-misleadingLabel.units.unit_0.categoricalTarget = "actual"; misleadingLabel.units.unit_0.categoricalQuote = claimText(packet, answer, "unit_0");
+misleadingLabel.units.unit_0.categoricalTarget = "actual"; misleadingLabel.units.unit_0.categoricalSpanIndex = 0;
 assert.equal(check(misleadingLabel).pass, false, "An explanation mode cannot bypass a separately identified categorical result.");
 assert(check(misleadingLabel).claimApplicabilityReview.reasonCodes.includes("categorical_scope"));
 const inventedFact = structuredClone(review); inventedFact.factSpans.push(quote(packet.facts.records[0], "fact", question));
@@ -119,13 +121,43 @@ function contextCheck(phrasing, target, mode, expected, clause = phrasing) {
   assert.equal(validate().pass, expected); return { scoped, built, validate };
 }
 contextCheck("Assume the cabinet is red and city-owned in a reading room.", "actual", null, false);
+contextCheck("Assume the cabinet is red and city-owned in a reading room. Can its latch be omitted?", "scenario", null, true);
+contextCheck("Assume the cabinet is red and city-owned in a reading room. Can its latch be omitted?", "actual", null, false);
 const scenario = contextCheck("Can a red city-owned cabinet in a reading room omit its latch?", "scenario", null, true, "a red city-owned cabinet in a reading room");
 scenario.built.review.units.unit_0.bindings.edge_0.applications[0].outcome = "unresolved";
 scenario.built.review.units.unit_0.bindings.edge_0.applications[0].factSpanIndices = [];
 assert.equal(scenario.validate().pass, false, "A scenario label cannot excuse an unresolved predicate.");
 const practical = contextCheck("Assume the cabinet is red and city-owned in a reading room.", "scenario", "practical_recommendation", true);
-for (const row of Object.values(practical.built.review.units)) { row.categoricalTarget = "none"; row.categoricalQuote = ""; }
+for (const row of Object.values(practical.built.review.units)) { row.categoricalTarget = "none"; row.categoricalSpanIndex = null; }
 assert.equal(practical.validate().pass, true, "A bounded scenario action may use those premises without an actual-project determination.");
+// Use the real context constructors with an unrecognized fictional scenario;
+// its raw human root remains a scenario-only carrier without extracted facts.
+const rawRoot = "Could a violet widget in a display alcove omit its label?";
+const rootDecision = decideResearchConversationTopic({ question: rawRoot });
+const rootFacts = resolveResearchConversationFacts({ question: rawRoot, topicDecision: rootDecision });
+assert.equal(rootFacts.extractedFactKeys.length, 0); assert.equal(rootFacts.nextFactTopics[0].scenarioActive, false);
+function rawFlow(currentQuestion, extraMessages = [], rootOverride = null) {
+  const messages = [{ role: "user", question: rawRoot }, { role: "assistant", answer: { answerText: "The assistant cannot supply an input fact." } }, ...extraMessages];
+  const topicContext = { rootTopic: rootDecision.nextRootTopic.text, currentTopic: rootDecision.nextCurrentTopic.text, factTopics: rootFacts.nextFactTopics };
+  const decision = decideResearchConversationTopic({ question: currentQuestion, rootTopic: topicContext.rootTopic, currentTopic: topicContext.currentTopic, previousMessages: messages });
+  const state = resolveResearchConversationFacts({ question: currentQuestion, topicDecision: decision, topicContext });
+  const currentArgs = { ...args, question: currentQuestion, options: { messages, applicabilityFactContext: { conversationFactState: rootOverride ? { ...state, activeRootTopic: rootOverride } : state,
+    topicContext: { rootTopic: state.activeRootTopic, lastDecision: decision.decision } } } };
+  const built = witness(currentArgs, "scenario");
+  const rawFact = built.packet.facts.records.find(fact => fact.origin === "earlier_user" && fact.statement === rawRoot);
+  assert(rawFact); built.review.factSpans = [quote(rawFact, "fact", rawRoot)];
+  const validate = () => validateResearchClaimApplicabilityReview({ ...currentArgs, ...built, value: { claimApplicabilityReview: built.review }, verification: { pass: true, issues: [] } });
+  return { ...built, state, rawFact, validate };
+}
+const raw = rawFlow("Can it omit its label?");
+assert.equal(raw.state.turnKind, "established"); assert.equal(raw.packet.facts.scenarioActive, false);
+assert.equal(raw.rawFact.status, "context_only"); assert.equal(raw.rawFact.scenarioContext, true); assert.equal(raw.validate().pass, true);
+for (const row of Object.values(raw.review.units)) { row.assertedMode = "project_determination"; row.categoricalTarget = "actual"; }
+assert.equal(raw.validate().pass, false, "Raw scenario context cannot become an actual project finding.");
+assert.equal(rawFlow("Actually, the widget is orange. Can it omit its label?").validate().pass, false, "A correction cannot restore the earlier root premise.");
+assert.equal(rawFlow("Can it omit its label?", [{ role: "user", question: "Actually, the widget is orange." }]).validate().pass, false, "An earlier correction still dominates a later continuation.");
+assert.equal(rawFlow("Can it omit its label?", [], "An unrelated active topic.").validate().pass, false, "An old or unrelated root remains context only.");
+assert(raw.packet.facts.records.every(fact => fact.origin !== "assistant" && !fact.statement.includes("assistant cannot")));
 const unknownArgs = { ...args, question: "The cabinet's location is unknown." }, unknownWitness = witness(unknownArgs, "actual");
 assert.equal(validateResearchClaimApplicabilityReview({ ...unknownArgs, ...unknownWitness, value: { claimApplicabilityReview: unknownWitness.review }, verification: { pass: true, issues: [] } }).pass, false);
 for (const question of ["The cabinet is missing its latch.", "The cabinet is installed on May Avenue."]) {
@@ -138,10 +170,10 @@ for (const question of ["The cabinet is missing its latch.", "The cabinet is ins
 const headedArgs = { ...args, answer: { answerText: "A rule explanation.", supportedPoints: [{ heading: "The cabinet must have a latch.", explanation: "If city ownership and reading-room location apply, the latch rule applies.", sourceIDs: ["cabinet"] }], citations: [{ sourceIDs: ["cabinet"] }] } };
 const headed = witness(headedArgs), headingUnit = headed.packet.units.find(unit => unit.fields.includes("supportedPoints[0].heading"));
 headed.review.units[headingUnit.id].categoricalTarget = "actual";
-headed.review.units[headingUnit.id].categoricalQuote = headedArgs.answer.supportedPoints[0].heading;
+headed.review.units[headingUnit.id].categoricalSpanIndex = 0;
 const headedCheck = () => validateResearchClaimApplicabilityReview({ ...headedArgs, ...headed, value: { claimApplicabilityReview: headed.review }, verification: { pass: true, issues: [] } });
 assert(headedCheck().claimApplicabilityReview.reasonCodes.includes("categorical_scope"));
-headed.review.units[headingUnit.id].categoricalQuote = "If city ownership";
+headed.review.units[headingUnit.id].categoricalSpanIndex = 999;
 assert(headedCheck().claimApplicabilityReview.reasonCodes.includes("categorical_witness"));
 
 const mixedEvidence = [ { ...authority, sourceID: "label", sectionID: "label", text: "Installed equipment shall carry a label." },
@@ -153,7 +185,7 @@ mixed.review.factSpans = [quote(mixed.packet.facts.records[0], "fact", "The equi
 for (const unit of mixed.packet.units) {
   const row = mixed.review.units[unit.id], direct = /^(?:No\.|The label)/.test(claimText(mixed.packet, mixedArgs.answer, unit.id));
   row.assertedMode = direct ? "scenario_determination" : "conditional_application";
-  row.categoricalTarget = direct ? "scenario" : "none"; row.categoricalQuote = direct ? claimText(mixed.packet, mixedArgs.answer, unit.id) : "";
+  row.categoricalTarget = direct ? "scenario" : "none"; row.categoricalSpanIndex = direct ? 0 : null;
   for (const edge of mixed.packet.edges) {
     if (direct && edge.scopeSourceID === "label") row.bindings[edge.id] = { treatment: "applied", applications: [{ predicateIndex: 0, outcome: "established", factSpanIndices: [0], reason: "Installed equipment is the supplied subject." }] };
     else if (direct || edge.scopeSourceID === "label") row.bindings[edge.id] = { treatment: "not_material", reason: "Independent label duty and corridor condition are distinct claims." };
@@ -162,7 +194,7 @@ for (const unit of mixed.packet.units) {
 const mixedCheck = () => validateResearchClaimApplicabilityReview({ ...mixedArgs, ...mixed, value: { claimApplicabilityReview: mixed.review }, verification: { pass: true, issues: [] } });
 assert.equal(mixedCheck().pass, true);
 const conditionalID = mixed.packet.units.at(-1).id;
-mixed.review.units[conditionalID].categoricalTarget = "scenario"; mixed.review.units[conditionalID].categoricalQuote = claimText(mixed.packet, mixedArgs.answer, conditionalID);
+mixed.review.units[conditionalID].categoricalTarget = "scenario"; mixed.review.units[conditionalID].categoricalSpanIndex = 0;
 assert.equal(mixedCheck().pass, false, "A conditional alternative cannot become a categorical result.");
 
 const repeated = buildResearchClaimApplicabilityPacket({ evidence, answer: { answerText: "Actual installation. Yes. Hypothetical installation. Yes.", conclusion: "Yes.", citations: [{ sourceIDs: ["cabinet"] }] } });
