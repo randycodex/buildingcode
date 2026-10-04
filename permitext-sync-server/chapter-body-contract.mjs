@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { codeAssetRevision } from "./code-asset-manifest.mjs";
+import { researchConstructionDefinitionContentVersion } from "./research-construction-definition-content.mjs";
 
 // Literal URL reads let the deployment file tracer include every revision manifest.
 // Keep injected roots available for isolated contract tests.
@@ -20,6 +21,22 @@ const bundledRevisionLoaders = {
 // source trees. It therefore changes for rich-body edits, not just search text.
 const sourceRevisions = new Map();
 let publicRevisionPromise;
+
+// Source files may be unchanged while a canonical loader repairs the body
+// served from them. Bind that transformation only to its actual source family;
+// unrelated editions and Research-only changes must retain their identities.
+const canonicalBodyVersions = Object.freeze({
+  "2022-construction-codes": researchConstructionDefinitionContentVersion
+});
+
+export function canonicalServedSourceRevision(source, codeVersion) {
+  if (!/^[a-f0-9]{64}$/.test(source || "")) throw new Error("Missing chapter source revision");
+  const match = /^CodeContent\/authored\/new-york-city\/([a-z0-9-]+)\/bundle\.json#\d+$/.exec(codeVersion);
+  if (!match) throw new Error("Invalid chapter edition identity");
+  const canonicalBodyVersion = canonicalBodyVersions[match[1]];
+  return canonicalBodyVersion ? createHash("sha256")
+    .update(JSON.stringify({ source, canonicalBodyVersion })).digest("hex") : source;
+}
 
 // All bundled source families participate, including changes outside a user's
 // current edition. Version the response contract when its projection changes.
@@ -44,7 +61,7 @@ async function sourceRevision(authoredRoot, codeVersion) {
     const pending = (bundledLoader ? bundledLoader() : readFile(path, "utf8")).then((text) => {
       const revision = JSON.parse(text).sourceRevision;
       if (!/^[a-f0-9]{64}$/.test(revision || "")) throw new Error("Missing chapter source revision");
-      return revision;
+      return canonicalServedSourceRevision(revision, codeVersion);
     }).catch((error) => { sourceRevisions.delete(path); throw error; });
     sourceRevisions.set(path, pending);
   }

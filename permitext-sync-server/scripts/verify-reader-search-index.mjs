@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createReaderSearchProjection } from './reader-search-projection.mjs';
+import { projectChapter } from './generate-reader-search-index.mjs';
 
 const defaultOutput = fileURLToPath(new URL('../generated/reader-search/', import.meta.url));
 const historicalVersion = 'CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1';
@@ -55,6 +56,14 @@ export async function verifyReaderSearchIndex({ get, outputDirectory = defaultOu
         assert.equal(block.text, block.text.replace(/\s+/g, ' ').trim());
       }
     }
+    // Identity and shape alone can miss a loader/body repair when the original
+    // source manifests did not change. Use the same bounded, revision-checked
+    // body windows and projection as generation; never infer source text from
+    // metadata or accept an old index just because its revision label matches.
+    const fresh = await projectChapter(id, get, projector);
+    assert.equal(fresh.corpusRevision, value.corpusRevision, `${id}: chapter changed during verification`);
+    assert.equal(fresh.codeVersion, value.codeVersion, `${id}: edition changed during verification`);
+    assert.deepEqual(value.sections, fresh.sections, `${id}: Reader index differs from fresh projected enacted bodies`);
     sectionCount += value.sections.length;
   }
   return { chapters: selected.length, sections: sectionCount, projectionRevision: projector.projectionRevision };
