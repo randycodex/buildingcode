@@ -1,3 +1,4 @@
+import { nycMappedFactFields, mergeNYCPropertyFacts } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
@@ -97,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261003-workspace-columns-v633";
+} from "./offline-storage.js?v=20261004-zola-facts-v634";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +136,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261003-workspace-columns-v633";
+} from "./research-intent-state.js?v=20261004-zola-facts-v634";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -12582,7 +12583,7 @@ const projectStructuredFactGroups = [
       { key: "zoning-lot-composition", label: "Zoning Lot Composition" },
       { key: "zoning-districts", label: "Zoning District(s)" },
       { key: "commercial-overlays", label: "Commercial Overlay(s)" },
-      { key: "special-purpose-district", label: "Special Purpose District / Subdistrict / Subarea" },
+      { key: "special-purpose-district", label: "Special Purpose District(s)" },
       { key: "zoning-map", label: "Zoning Map" },
       { key: "community-district", label: "Community District" },
       { key: "zoning-lot-area", label: "Zoning Lot Area" },
@@ -12590,14 +12591,8 @@ const projectStructuredFactGroups = [
       { key: "lot-depth", label: "Lot Depth" },
       { key: "lot-type", label: "Lot Type" },
       { key: "street-frontages", label: "Street Frontage(s)" },
-      { key: "mih-area-options", label: "MIH Area / Applicable Option(s)" },
-      { key: "affordable-housing-zoning-status", label: "Affordable Housing Zoning Status" },
-      { key: "transit-zone", label: "Transit Zone" },
-      { key: "limited-height-district", label: "Limited Height District" },
-      { key: "waterfront-status", label: "Waterfront Status / Waterfront Access Plan" },
-      { key: "lower-density-growth-management-area", label: "Lower Density Growth Management Area" },
-      { key: "fresh-program-area", label: "FRESH Program Area" },
-      { key: "appendix-j-designated-m-district", label: "Appendix J Designated M District" }
+      { key: "transit-zone", label: "Transit Zone (Legacy Record)" },
+      ...nycMappedFactFields
     ]
   }
 ];
@@ -30587,7 +30582,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
           .map((warning) => String(warning || "").trim()).filter(Boolean);
         propertyLookupStatus.dataset.state = warnings.length ? "warning" : "success";
         propertyLookupStatus.textContent = [
-          `Imported ${property.structuredFacts.length} sourced facts from NYC Planning.`,
+          `Imported ${property.structuredFacts.filter(fact => fact.status === "sourced").length} sourced facts from NYC Planning.`,
           ...warnings
         ].join(" ");
         return property;
@@ -31118,7 +31113,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     structuredFacts: storedStructuredFacts
   };
   let saveSequence = Promise.resolve();
-  const save = () => {
+  const save = ({ reportFailure = false } = {}) => {
     if (!isCurrentAccountRequest(requestIdentity)) return Promise.resolve();
     const next = {
       address: address.value.trim(),
@@ -31140,6 +31135,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       }).then(() => {
         if (isCurrentAccountRequest(requestIdentity)) saved = next;
       }).catch((error) => {
+      if (reportFailure) throw error;
       void showWebNotice("Project context not saved", error.message || "Could not save Project context");
     });
     return saveSequence;
@@ -31245,10 +31241,51 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     groupLists.forEach((list) => clear(list));
     const factsByKey = new Map(structuredFacts.map((fact) => [fact.key, fact]));
     projectStructuredFactGroups.forEach((group) => {
-      group.fields.forEach((field) => appendDefaultFactField(groupLists.get(group.key), field, factsByKey));
+      group.fields.filter(field => field.key !== "transit-zone" || factsByKey.has(field.key))
+        .forEach((field) => appendDefaultFactField(groupLists.get(group.key), field, factsByKey));
     });
   };
   renderStructuredFacts();
+  if (!identity.sharedOnly) {
+    const refreshFacts = document.createElement("button");
+    refreshFacts.type = "button";
+    refreshFacts.className = "saved-project-refresh-facts";
+    refreshFacts.textContent = "Refresh NYC facts";
+    refreshFacts.setAttribute("aria-label", "Refresh NYC property facts");
+    structuredHeading.append(refreshFacts);
+    refreshFacts.addEventListener("click", async () => {
+      const lookupAddress = address.value.trim();
+      if (!lookupAddress) {
+        void showWebNotice("Address required", "Enter a Project address to refresh NYC property facts.");
+        return;
+      }
+      refreshFacts.disabled = true;
+      refreshFacts.textContent = "Refreshing…";
+      try {
+        const property = (await postResearch("/projects/property/lookup", { address: lookupAddress }))?.property;
+        requireCurrentAccountRequest(requestIdentity);
+        if (address.value.trim() !== lookupAddress || !property?.structuredFacts?.length) return;
+        const oldBBL = structuredFacts.find(fact => fact.key === "bbl" && fact.source === "nyc-planning")?.value;
+        if (oldBBL && oldBBL !== property.bbl) {
+          void showWebNotice("Address matches a different tax lot", "Edit the Project address to replace its property facts.");
+          return;
+        }
+        structuredFacts = mergeNYCPropertyFacts(structuredFacts, property.structuredFacts, property.retrievedAt);
+        renderStructuredFacts();
+        await save({ reportFailure: true });
+        if (isCurrentAccountRequest(requestIdentity)) {
+          const sourced = property.structuredFacts.filter(fact => fact.status === "sourced").length;
+          void showWebNotice("NYC facts refreshed", [`Retrieved ${sourced} sourced facts. Manually entered facts were preserved.`, ...(property.warnings || [])].join(" "));
+        }
+      } catch (error) {
+        if (isCurrentAccountRequest(requestIdentity)) void showWebNotice("NYC facts could not be refreshed", error.message || "Try again.");
+      } finally {
+        refreshFacts.disabled = false;
+        refreshFacts.textContent = "Refresh NYC facts";
+      }
+    });
+  }
+
   if (
     !identity.sharedOnly &&
     JSON.stringify(structuredFacts) !== JSON.stringify(storedStructuredFacts)

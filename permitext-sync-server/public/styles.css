@@ -10077,6 +10077,29 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-primary);
 }
 
+.saved-project-refresh-facts {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: calc(var(--chrome-font-size) * 0.85);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.saved-project-refresh-facts:hover,
+.saved-project-refresh-facts:focus-visible {
+  color: var(--text-primary);
+}
+
+.saved-project-refresh-facts:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .saved-project-facts-chevron {
   margin-left: var(--space-2);
 }

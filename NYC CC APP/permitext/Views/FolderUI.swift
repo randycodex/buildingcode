@@ -236,7 +236,8 @@ struct FolderEditorSheet: View {
             propertyContext = result
             propertyLookupAddress = result.normalizedAddress
             address = result.normalizedAddress
-            propertyLookupStatus = "Imported \(result.structuredFacts.count) sourced facts from NYC Planning."
+            let sourcedCount = result.structuredFacts.filter { $0.status == "sourced" }.count
+            propertyLookupStatus = "Imported \(sourcedCount) sourced facts from NYC Planning."
             propertyLookupSucceeded = true
             return result
         } catch {

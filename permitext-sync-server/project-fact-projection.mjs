@@ -1,3 +1,4 @@
+import { nycMappedFactFields } from "./public/nyc-property-facts.js";
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
 export const projectFactProjectionVersion = "20260930-existing-property-scope-v2";
@@ -21,7 +22,8 @@ const zoningKeys = new Set([
   "zoning-lot-area", "lot-width", "lot-depth", "lot-type", "street-frontages",
   "mih-area-options", "affordable-housing-zoning-status", "transit-zone",
   "limited-height-district", "waterfront-status", "lower-density-growth-management-area",
-  "fresh-program-area", "appendix-j-designated-m-district"
+  "fresh-program-area", "appendix-j-designated-m-district",
+  ...nycMappedFactFields.map(field => field.key)
 ]);
 
 // Planning property lookup describes the existing inventory and mapped tax lot.
@@ -37,6 +39,8 @@ function propertyFactScope(key, source) {
   if (source !== "nyc-planning") return null;
   if (existingPropertyKeys.has(key)) return "existing-property";
   if (mappedTaxLotKeys.has(key)) return "mapped-tax-lot";
+  if (key === "pending-zoning-map-amendments") return "pending-map-amendment";
+  if (nycMappedFactFields.some(field => field.key === key)) return "mapped-area";
   return null;
 }
 
@@ -96,6 +100,8 @@ export function researchProjectFactLine(fact) {
   const qualifiers = [statusLabel];
   if (fact.subjectScope === "existing-property") qualifiers.push("existing-property record; does not describe the proposed building or work");
   if (fact.subjectScope === "mapped-tax-lot") qualifiers.push("mapped tax-lot record; zoning-lot composition and street-frontage applicability are not established");
+  if (fact.subjectScope === "mapped-area") qualifiers.push("mapped tax-lot record; boundaries and project applicability require official review");
+  if (fact.key === "pending-zoning-map-amendments") qualifiers.push("pending proposal; does not establish adopted zoning");
   if (fact.hypothetical) qualifiers.push("hypothetical assumption; not an established condition");
   if (fact.qualified) qualifiers.push("preserve the stated negation, scope and uncertainty");
   const source = fact.sourceText && fact.sourceText !== fact.value ? ` Original user/source wording: ${fact.sourceText}` : "";
