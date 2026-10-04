@@ -2,11 +2,88 @@ import { createHash } from 'node:crypto';
 import { researchCurrentRuleDetailScore } from './research-rule-packets.mjs';
 import { researchPassagesForSection } from './research-passage-index.mjs';
 
-export const researchRuleGroupVersion = '20261003-bounded-canonical-rule-groups-v2';
+export const researchRuleGroupVersion = '20261004-enclosing-operative-parent-v5';
 const fields = ['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'];
 const identity = value => String(value?.sectionID || value?.id || '');
 const compact = value => String(value || '').replace(/\s+/g, ' ').trim();
 const sameAuthority = (left, right) => fields.every(key => left?.[key] && left[key] === right?.[key]);
+
+const namedReferenceBooks = { 'existing building': 'EBC', building: 'BC', plumbing: 'PC', mechanical: 'MC',
+  'fuel gas': 'FGC', fire: 'FC', administrative: 'AC' };
+function referenceCodeQualifier(value, side, ownPrefix) {
+  const text = compact(value).replace(/\b(?:New York City|NYC)\b/gi, ' ').replace(/\s+/g, ' ').trim();
+  const book = '(?:(?<name>existing[-\\s]+building|building|plumbing|mechanical|fuel[-\\s]+gas|fire|administrative)\\s+code|(?<prefix>AC|BC|EBC|FC|FGC|MC|PC|ZR)(?:\\s+code)?)';
+  const qualified = `(?:(?<edition>(?:19|20)\\d{2})\\s+)?${book}`;
+  const expression = side === 'before' ? `\\b${qualified}$` : `^of\\s+(?:the\\s+)?${qualified}\\b`;
+  const match = text.match(new RegExp(expression, 'i'));
+  if (match) return { codePrefix: match.groups.prefix?.toUpperCase() ||
+      namedReferenceBooks[match.groups.name.toLowerCase().replace(/[-\s]+/g, ' ')], edition: match.groups.edition || '' };
+  // An expressly named edition without a book retains the own-book locator,
+  // but does not silently become a reference to the current edition.
+  const edition = side === 'before' ? text.match(/\b((?:19|20)\d{2})\s+(?:code|edition)$/i)
+    : text.match(/^of\s+(?:the\s+)?((?:19|20)\d{2})\s+(?:code|edition)\b/i);
+  return edition ? { codePrefix: ownPrefix, edition: edition[1] } : null;
+}
+
+// A structural parent link must bind the actual current authority. Explicit
+// book/edition qualifiers on a literal reference override an own-book default.
+// This locator alone never supplies an obligation or establishes applicability.
+function* parentChildReferenceClauses(parent, child) {
+  const number = String(parent?.sectionNumber || '');
+  const childNumber = String(child?.sectionNumber || '');
+  if (!identity(parent) || !identity(child) || !sameAuthority(parent, child) ||
+      !/^\d+(?:\.\d+)+$/.test(number) || !/^\d+(?:\.\d+){2,}$/.test(childNumber) ||
+      childNumber.split('.').slice(0, -1).join('.') !== number ||
+      !parent.body?.blocks?.length || parent.body.researchClaimEligible === false || parent.body.truncated ||
+      parent.body.blocks.some(block => block.researchClaimEligible === false || block.truncated || !compact(block.plainText))) return;
+  const bodyText = parent.body.blocks.map(block => block.plainText).join('\n\n');
+  const sourceTextSHA256 = createHash('sha256').update(bodyText).digest('hex');
+  const unquoted = bodyText.replace(/`[^`]*`|"[^"\n]*"|“[^”\n]*”/g, ' ');
+  const clauses = unquoted.split(/(?<=[.!?])\s+(?=[A-Z])|[;\n]+/);
+  for (const clause of clauses) {
+    for (const match of clause.matchAll(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?Sections?\s+(\d+(?:\.\d+)+)(?:\s+(?:through|to)\s+(\d+(?:\.\d+)+))?((?:\s*(?:,\s*|\s+(?:and|or)\s+)(?:Sections?\s+)?\d+(?:\.\d+)+){0,3})\b/gi)) {
+      const prefix = match[1]?.toUpperCase() || parent.codePrefix;
+      const start = match[2], end = match[3];
+      if (prefix !== child.codePrefix) continue;
+      const before = clause.slice(0, match.index).trim();
+      const after = clause.slice(match.index + match[0].length);
+      const qualifiers = [referenceCodeQualifier(`${before} ${match[1] || ''}`, 'before', parent.codePrefix),
+        referenceCodeQualifier(after, 'after', parent.codePrefix)].filter(Boolean);
+      if (qualifiers.some(qualifier => qualifier.codePrefix !== child.codePrefix ||
+          qualifier.edition && !String(child.codeEdition).includes(qualifier.edition))) continue;
+      const literalNumbers = [start, ...(match[4].match(/\d+(?:\.\d+)+/g) || [])];
+      if (!end && literalNumbers.includes(childNumber)) yield { clause, before, after, kind: 'literal_child', sourceTextSHA256 };
+      const first = start.split('.'), last = end?.split('.'), parts = childNumber.split('.');
+      if (last && first.length === parts.length && last.length === parts.length &&
+          first.slice(0, -1).join('.') === number && last.slice(0, -1).join('.') === number &&
+          Number(first.at(-1)) <= Number(parts.at(-1)) && Number(parts.at(-1)) <= Number(last.at(-1)))
+        yield { clause, before, after, kind: 'child_range', sourceTextSHA256 };
+    }
+  }
+}
+
+export function researchParentChildReferenceLink(parent, child) {
+  const bound = parentChildReferenceClauses(parent, child).next().value;
+  return bound ? { kind: bound.kind, sourceTextSHA256: bound.sourceTextSHA256 } : null;
+}
+
+// A fresh enacted immediate parent can supply the effect of classification.
+// Reference and obligation must be grammatically connected in the raw clause;
+// hierarchy/title alone is not scope evidence. The caller budgets whole bytes.
+export function researchOperativeParentLink(parent, child) {
+  for (const { clause, before, after, kind, sourceTextSHA256 } of parentChildReferenceClauses(parent, child)) {
+    if (!/\b(?:shall|must)\b/i.test(clause) ||
+        !/\b(?:comply|meet|require[sd]?|requiring|be provided|be equipped|be constructed|be installed|be protected|be tested|be maintained|conform)\b/i.test(clause) ||
+        /\b(?:not|never)\s+(?:be\s+)?(?:required|requiring|subject|governed)\b/i.test(clause)) continue;
+    const scopedSubject = /\b(?:specified|defined|classified|listed|regulated|identified|covered|described|governed)\s+(?:in|by|under)\s*$/i.test(before) ||
+      /\b(?:in accordance with|subject to|under|within)\s*$/i.test(before) || !before;
+    const scopedPredicate = /^[^,;.!?]{0,160}\b(?:shall|must)\b/i.test(after) &&
+      !/^[^.!?]*?\b(?:and|but|while|whereas)\b[^.!?]*?\b(?:shall|must)\b/i.test(after);
+    const directCompliance = /\b(?:shall|must)\b[^,;.!?]{0,100}\b(?:(?:comply|conform)\s+(?:with|to)|in accordance with)\s*$/i.test(before);
+    if (scopedSubject && scopedPredicate || directCompliance) return { kind, sourceTextSHA256 };
+  }
+  return null;
+}
 
 export function boundCanonicalRulePassage(canonical, passage, wholeSection = false, completeSubtree = false) {
   if (!canonical?.body?.blocks || canonical.truncated || canonical.body.truncated || canonical.researchClaimEligible === false ||
