@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { researchCurrentRuleDetailScore } from './research-rule-packets.mjs';
+import { researchCurrentRuleDetailScore, researchCurrentRuleDetails } from './research-rule-packets.mjs';
 import { researchPassagesForSection } from './research-passage-index.mjs';
 
 export const researchRuleGroupVersion = '20261004-enclosing-operative-parent-v5';
@@ -65,6 +65,21 @@ function* parentChildReferenceClauses(parent, child) {
 export function researchParentChildReferenceLink(parent, child) {
   const bound = parentChildReferenceClauses(parent, child).next().value;
   return bound ? { kind: bound.kind, sourceTextSHA256: bound.sourceTextSHA256 } : null;
+}
+
+// A complete indexed immediate child can add literal current-question detail
+// missing from its parent. Hierarchy nominates advisory recall, not legal scope.
+export function researchImmediateChildDetailGain(parent, child, question) {
+  if (!identity(parent) || !identity(child) || identity(parent) === identity(child) || !sameAuthority(parent, child) ||
+      !/^\d+(?:\.\d+)+$/.test(parent.sectionNumber || '') ||
+      !/^\d+$/.test(String(child.sectionNumber || '').slice(String(parent.sectionNumber).length + 1)) ||
+      !String(child.sectionNumber || '').startsWith(parent.sectionNumber + '.') ||
+      [parent, child].some(value => value.subsectionNumber !== value.sectionNumber || value.scopeComplete !== true ||
+        value.sourceOffsets?.start !== 0 || !value.sourceTextHash || !value.text)) return null;
+  const covered = new Set(researchCurrentRuleDetails(parent, question));
+  const childDetails = researchCurrentRuleDetails(child, question);
+  const gained = childDetails.filter(term => !covered.has(term));
+  return covered.size && childDetails.length >= 2 && gained.length ? gained : null;
 }
 
 // A fresh enacted immediate parent can supply the effect of classification.

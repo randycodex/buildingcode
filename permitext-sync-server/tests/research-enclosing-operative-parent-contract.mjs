@@ -99,10 +99,63 @@ assert.equal(supplied.enclosingOperativeParent.linkKind, 'child_range');
 assert.equal(supplied.enclosingOperativeParent.childSectionID, child.id);
 assert.equal(supplied.enclosingOperativeParent.sourceTextSHA256, sha(parent.text));
 assert.equal(supplied.qualifyingParentBodySHA256, sha(parent.text));
-assert(supplied.relationship.includes('obligation') && supplied.relationship.includes('applicability requires review'));
+assert(supplied.relationship.includes('advisory scope') && supplied.relationship.includes('applicability requires review'));
+assert.deepEqual(supplied.applicabilityScopeAnchors, [{ sourceID: first.packet.sources.find(s => s.sectionID === child.id).sourceID,
+  sectionID: child.id, kind: 'parent_scope' }]);
 assert.equal(supplied.evidencePriority.claimCoverageRequired, false);
 assert(first.reads.filter(r => r.sectionNumber === parent.sectionNumber).length === 1);
 assert(first.packet.usage.crossReferenceCount <= 6 && first.packet.usage.characterCount <= 48000);
+// Whole discovered three-component children need their literal immediate parent
+// even when the parent's grammar is not recognized as an operative obligation.
+for (const text of [
+  'Inspection grilles shall be installed where indicated in Sections 995.3.1 through 995.3.4.',
+  'For Section 995.3.2, protection is unnecessary under the following complete qualification. Exception: The fixed-cover conditions remain distinct.',
+  'Section 995.3.2 describes one of the locations. The enclosing scope retains its own conditions.',
+  'Locations specified in Section 995.3.2 shall not be required to have protection.'
+]) {
+  const freshParent = withText(parent, text);
+  assert(researchParentChildReferenceLink(freshParent, child));
+  assert.equal(researchOperativeParentLink(freshParent, child), null, 'No operative grammar verdict is necessary.');
+  const { packet, reads } = await assemble({ parentChange: freshParent });
+  const advisory = packet.sources.find(s => s.sectionID === parent.id);
+  assert.equal(advisory?.text, text);
+  assert(advisory.canonicalContextComplete && !advisory.truncated && advisory.relationship.includes('advisory scope'));
+  assert.equal(advisory.qualifyingParentBodySHA256, sha(text));
+  for (const key of ['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction']) assert.equal(advisory[key], child[key]);
+  assert.equal(advisory.applicabilityScopeAnchors[0].sourceID, packet.sources.find(s => s.sectionID === child.id).sourceID);
+  assert.equal(reads.filter(r => r.sectionNumber === parent.sectionNumber).length, 1);
+  assert.equal(advisory.evidencePriority.claimCoverageRequired, false, 'Available context does not establish an independent determination.');
+}
+for (const text of [
+  'Inspection grilles shall be installed where indicated in Sections 995.3.5 through 995.3.8.',
+  'Inspection grilles shall be installed where indicated in Sections 995.3.1.1 through 995.3.4.1.',
+  'Inspection grilles shall be installed where indicated in PC Section 995.3.2.',
+  'Inspection grilles shall be installed where indicated in Section 995.3.2 of the 2014 Mechanical Code.',
+  'The note says “Inspection grilles shall be installed where indicated in Section 995.3.2.”'
+]) {
+  const { packet } = await assemble({ parentChange: withText(parent, text) });
+  assert(!packet.sources.some(s => s.sectionID === parent.id), 'Unbound references do not admit parent scope.');
+  assert(packet.sources.find(s => s.sectionID === child.id).parentScopeContextGaps.some(g => g.reference === 'MC 995.3'));
+}
+const deeperChild = section('independent-deeper-child', 'MC', '795.6.3.2', child.title, child.text);
+const deeperParent = section('independent-deeper-parent', 'MC', '795.6.3', 'Immediate context',
+  'Inspection grilles shall be installed where indicated in Section 795.6.3.2. The enclosing condition remains part of this complete text.');
+const deeperIndex = await buildResearchPassageIndex([deeperChild], async s => s.body);
+const ancestorReads = [];
+const deeper = await assembleResearchEvidence({ question,
+  discover: async () => ({ candidates: [{ ...deeperChild, rank: 1, indexedPassage: deeperIndex.passages[0] }] }),
+  resolveSection: async request => { ancestorReads.push(request);
+    return request.sectionID === deeperChild.id ? deeperChild : request.sectionNumber === deeperParent.sectionNumber ? deeperParent : null; } });
+assert.equal(deeper.sources.find(s => s.sectionID === deeperParent.id)?.text, deeperParent.text);
+assert.equal(ancestorReads.filter(r => r.sectionNumber === deeperParent.sectionNumber).length, 1);
+assert(!ancestorReads.some(r => r.sectionNumber === '795.6'), 'The immediate-parent lane does not promote an unbound grandparent.');
+const shallowChild = section('independent-shallow-child', 'MC', '795.6', child.title, child.text);
+const shallowIndex = await buildResearchPassageIndex([shallowChild], async s => s.body);
+const shallowReads = [];
+await assembleResearchEvidence({ question,
+  discover: async () => ({ candidates: [{ ...shallowChild, rank: 1, indexedPassage: shallowIndex.passages[0] }] }),
+  resolveSection: async request => { shallowReads.push(request); return request.sectionID === shallowChild.id ? shallowChild : null; } });
+assert(!shallowReads.some(r => r.sectionNumber === '795'), 'A chapter hierarchy alone does not nominate a literal child parent.');
 for (const parentChange of [{ id: '', sectionID: '' }, { sectionNumber: '995.4' }, { codePrefix: 'PC' }, { corpusID: 'foreign' },
   { codeVersion: 'stale' }, { codeEdition: '2014' }, { jurisdiction: 'Elsewhere' }, { jurisdiction: '' },
   { referenceOnly: true }, { selectionMode: 'section_reference' }, { truncated: true }, { textComplete: false },
@@ -187,28 +240,40 @@ const siblingIndex = await buildResearchPassageIndex([sibling], async s => s.bod
 const common = await assemble({ otherSources: [sibling], otherCandidates: [{ ...sibling, rank: 2, score: .9, signals: {}, indexedPassage: siblingIndex.passages[0] }] });
 assert.equal(common.packet.sources.filter(s => s.sectionID === parent.id).length, 1);
 assert.equal(common.reads.filter(r => r.sectionNumber === parent.sectionNumber).length, 1);
+assert.equal(common.packet.sources.find(s => s.sectionID === parent.id).applicabilityScopeAnchors.length, 2);
+const partialRange = await assemble({ parentChange: withText(parent, 'Inspection grilles shall be installed where indicated in Section 995.3.2.'),
+  otherSources: [sibling], otherCandidates: [{ ...sibling, rank: 2, score: .9, signals: {}, indexedPassage: siblingIndex.passages[0] }] });
+assert.equal(partialRange.packet.sources.find(s => s.sectionID === parent.id).applicabilityScopeAnchors.length, 1,
+  'A deduplicated parent cannot create an unverified relation to another child.');
+assert(partialRange.packet.sources.find(s => s.sectionID === sibling.id).parentScopeContextGaps.some(g => g.reference === 'MC 995.3'));
 const oneSlot = await assemble({ q: 'Do both the movable inspection grille and movable service panel need protection at their access openings?',
   otherSources: [pcChild, pcParent], otherCandidates: [{ ...pcChild, rank: 2, score: .9, signals: {}, indexedPassage: pcIndex.passages[0] }],
   extra: { limits: { maximumCrossReferences: 1 } } });
 assert.equal(oneSlot.packet.sources.filter(s => s.enclosingOperativeParent).length, 1);
 assert(oneSlot.packet.sources.some(s => s.sectionID === child.id) && oneSlot.packet.sources.some(s => s.sectionID === pcChild.id),
   'A dependency cap cannot discard either direct child.');
+assert(oneSlot.packet.sources.find(s => s.sectionID === pcChild.id).parentScopeContextGaps.some(g => g.reference === 'PC 731.5'),
+  'A parent excluded by existing slots remains an explicit gap.');
+assert.equal(oneSlot.reads.filter(r => r.sectionNumber === pcParent.sectionNumber).length, 0);
 const speculativeChildren = Array.from({ length: 5 }, (_, i) => section('speculative-child-' + i, 'MC', (990 + i) + '.7.2', child.title, child.text));
 const speculativeIndex = await buildResearchPassageIndex(speculativeChildren, async s => s.body);
 const speculativeReads = [];
-await assembleResearchEvidence({ question, discover: async () => ({ candidates: speculativeChildren.map((s, i) => ({ ...s, rank: i + 1,
+const speculativePacket = await assembleResearchEvidence({ question, discover: async () => ({ candidates: speculativeChildren.map((s, i) => ({ ...s, rank: i + 1,
   indexedPassage: speculativeIndex.passages.find(p => p.sectionID === s.id) })) }),
   resolveSection: async request => { speculativeReads.push(request);
     return request.sectionID ? speculativeChildren.find(s => s.id === request.sectionID) : null; } });
 assert.equal(speculativeReads.filter(r => speculativeChildren.some(s => s.sectionNumber.split('.').slice(0, -1).join('.') === r.sectionNumber)).length, 4,
   'Unavailable enclosing bodies remain bounded by the existing four-read lane.');
+assert(speculativePacket.sources.filter(s => speculativeChildren.some(c => c.id === s.sectionID)).every(s =>
+  s.parentScopeContextGaps?.some(g => g.reference === 'MC ' + s.sectionNumber.split('.').slice(0, -1).join('.'))),
+  'Unavailable and unread parent contexts remain explicit for every admitted child.');
 const extraReferences = Array.from({ length: 7 }, (_, i) => section('generic-reference-' + i, 'MC', '880.' + (i + 1), 'Optional reference', 'Optional complete context.'));
 const referencedChild = { ...withText(child, child.text + ' ' + extraReferences.map(s => 'See Section ' + s.sectionNumber + '.').join(' ')),
   crossReferences: extraReferences.map(s => ({ codePrefix: s.codePrefix, sectionNumber: s.sectionNumber })) };
 const referencedIndex = await buildResearchPassageIndex([referencedChild], async s => s.body);
 const competed = await assemble({ childChange: referencedChild, otherSources: extraReferences,
   candidateChange: { ...referencedChild, indexedPassage: referencedIndex.passages[0] } });
-assert(competed.packet.sources.some(s => s.sectionID === parent.id), 'Enclosing obligation wins an existing slot before generic expansion.');
+assert(competed.packet.sources.some(s => s.sectionID === parent.id), 'Literal parent context wins an existing slot before generic expansion.');
 assert.equal(competed.packet.usage.crossReferenceCount, 6);
 const oversized = withText(parent, parent.text + ' Complete remaining parent qualification.'.repeat(100));
 const small = await assemble({ parentChange: oversized, extra: { limits: { maximumCharacters: 1100, maximumCharactersPerSource: 900 } } });
@@ -216,6 +281,7 @@ assert(!small.packet.sources.some(s => s.sectionID === parent.id));
 assert(small.packet.limitations.some(l => l.kind === 'current-action-parent-context-budget'));
 assert(small.packet.sources.some(s => s.sectionID === child.id), 'An oversized enclosing context cannot discard the current child.');
 assert(small.packet.usage.characterCount <= 1100);
+assert(small.packet.sources.find(s => s.sectionID === child.id).parentScopeContextGaps.some(g => g.reference === 'MC 995.3'));
 const strictQuestion = 'Based only on the selected passage, ' + question;
 const pin = { ...child, selectedText: child.text, selectionMode: 'passage' };
 let broad = 0;
