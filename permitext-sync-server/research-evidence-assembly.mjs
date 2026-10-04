@@ -703,6 +703,7 @@ function canonicalAncestorReferences(source, maximum = maximumPinnedAncestorCont
       sectionNumber: parts.join("."),
       referenceKind: "ancestor_scope",
       referencePurpose: "canonical_ancestor_scope",
+      anchorSectionIDs: [String(source.sectionID || source.id)],
       corpusID: source.corpusID,
       codeVersion: source.codeVersion,
       codeEdition: source.codeEdition
@@ -1507,6 +1508,7 @@ export async function assembleResearchEvidence({
   const attemptedPacketDependencies = new Set();
   let packetDependencyReads = 0;
   let qualifyingParentCount = 0;
+  const applicabilityParentReferences = [];
   const packetDependencyKey = reference => [reference.corpusID, reference.codeVersion, reference.codeEdition,
     reference.codePrefix, reference.sectionNumber, reference.referenceKind || 'section'].join(':');
   const reservedPacketCharacters = () => [...reservedPacketDependencies.values()].reduce((sum, entry) =>
@@ -1613,7 +1615,9 @@ export async function assembleResearchEvidence({
     const number = canonical.sectionNumber.split('.').slice(0, -1).join('.');
     const reference = { codePrefix: canonical.codePrefix, sectionNumber: number,
       corpusID: canonical.corpusID, codeVersion: canonical.codeVersion, codeEdition: canonical.codeEdition,
-      jurisdiction: canonical.jurisdiction, referenceKind: 'section', referencePurpose: 'complete_qualifying_parent' };
+      jurisdiction: canonical.jurisdiction, referenceKind: 'section', referencePurpose: 'complete_qualifying_parent',
+      anchorSourceIDs: [record.sourceID], anchorSectionIDs: [String(record.sectionID)] };
+    applicabilityParentReferences.push(reference);
     const key = packetDependencyKey(reference);
     if (attemptedPacketDependencies.has(key) || suppliedRuleReference(sources, reference)) return;
     attemptedPacketDependencies.add(key);
@@ -2104,6 +2108,7 @@ export async function assembleResearchEvidence({
       if (!entry.resolved) continue;
       const ancestorReferences = canonicalAncestorReferences(entry.value);
       for (const reference of ancestorReferences) {
+        applicabilityParentReferences.push(reference);
         const identity = sectionIdentity(reference);
         if (
           !identity ||
@@ -2670,7 +2675,34 @@ export async function assembleResearchEvidence({
         ` Complete enacted chapter applicability for this source (${label}) is not supplied. ` +
         "Treat chapter applicability as unresolved; do not infer its scope or exclusion from metadata or a parallel rule.";
       source.chapterScopeContextGaps = [...source.chapterScopeContextGaps || [],
-        { reference: label, reason: gap?.kind || "chapter-scope-context-unavailable" }];
+        { reference: label, reason: gap?.kind || "chapter-scope-context-unavailable",
+          identity: { sectionNumber: reference.sectionNumber, codePrefix: reference.codePrefix, corpusID: reference.corpusID || null,
+            codeVersion: reference.codeVersion || null, codeEdition: reference.codeEdition || null } }];
+    }
+  }
+  // Publish exact parent/child identities even when a scope was already
+  // supplied or could not fit. Relationship prose alone is not a review edge.
+  // These are canonical structural candidates, not established applicability.
+  for (const reference of applicabilityParentReferences) {
+    const anchors = sources.filter((source) =>
+      (reference.anchorSourceIDs?.includes(source.sourceID) || reference.anchorSectionIDs?.includes(String(source.sectionID))) &&
+      source.codePrefix === reference.codePrefix && sameTopicDependencyCorpus(source, reference));
+    const parents = sources.filter((source) => sectionIdentity(source) === sectionIdentity(reference) &&
+      source.codePrefix === reference.codePrefix && sameTopicDependencyCorpus(source, reference) &&
+      source.canonicalContextComplete && !source.truncated);
+    for (const anchor of anchors) {
+      if (parents.length) for (const parent of parents) {
+        parent.applicabilityScopeAnchors = [...parent.applicabilityScopeAnchors || [],
+          { sourceID: anchor.sourceID, sectionID: anchor.sectionID, kind: "parent_scope" }]
+          .filter((value, index, values) => values.findIndex((other) => other.sourceID === value.sourceID) === index);
+      }
+      else {
+        const gap = { reference: `${reference.codePrefix} ${reference.sectionNumber}`, reason: "parent_scope_unavailable",
+          identity: { sectionNumber: reference.sectionNumber, codePrefix: reference.codePrefix, corpusID: reference.corpusID || null,
+            codeVersion: reference.codeVersion || null, codeEdition: reference.codeEdition || null } };
+        anchor.parentScopeContextGaps = [...anchor.parentScopeContextGaps || [], gap]
+          .filter((value, index, values) => values.findIndex((other) => other.reference === value.reference) === index);
+      }
     }
   }
   return {
