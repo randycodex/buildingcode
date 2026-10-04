@@ -23,8 +23,7 @@ import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, r
 import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
-import { buildResearchClaimApplicabilityPacket, researchClaimApplicabilityInstruction, researchClaimApplicabilitySchema,
-  validateResearchClaimApplicabilityReview } from "./research-claim-applicability-review.mjs";
+import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "./research-claim-applicability-review.mjs";
 import { planZoningMappedScopeReview, zoningMappedReviewInstruction, zoningMappedReviewSchema,
   validateZoningMappedScopeReview, resolveZoningMappedScopeSafety } from "./research-zoning-mapped-review.mjs";
 import {
@@ -10952,27 +10951,10 @@ export async function openAIResearchVerification(question, evidence, interpretat
     ...researchModelConfiguration(process.env, options.model),
     ...(options.model ? { model: options.model } : {})
   }, evidence, options);
-  const baseVerificationOutputTokens = configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000;
-  // Inspect the complete graph before selecting a budget, then finalize the
-  // packet under that same cap used by dispatch and validation. Provisional
-  // capacity failures never skip obligations or prevent the final rebuild.
-  const provisionalApplicabilityPacket = buildResearchClaimApplicabilityPacket({ question, evidence, answer: interpretation, options,
-    maximumOutputTokens: baseVerificationOutputTokens });
-  const verificationProfile = provisionalApplicabilityPacket.edges.length
-    ? { name: "claim_applicability", reasoningEffort: "low", maximumOutputTokens: 12_000, timeoutMilliseconds: 90_000 }
-    : { name: "ordinary", reasoningEffort: configuration.verificationReasoningEffort,
-      maximumOutputTokens: baseVerificationOutputTokens,
-      timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000 };
-  options.maximumApplicabilityOutputTokens = verificationProfile.maximumOutputTokens;
-  const applicabilityPacket = buildResearchClaimApplicabilityPacket({ question, evidence, answer: interpretation, options,
-    maximumOutputTokens: options.maximumApplicabilityOutputTokens });
-  if (applicabilityPacket.preflightReasons.length) {
-    // A complete packet that cannot be reviewed under the existing cap fails
-    // into the existing bounded answer-repair path, without a provider call.
-    return { result: validateResearchClaimApplicabilityReview({ packet: applicabilityPacket, value: null,
-      question, evidence, answer: interpretation, options, verification: { pass: false, issues: [] } }),
-      model: configuration.model, reasoningEffort: verificationProfile.reasoningEffort, usage: null };
-  }
+  const verificationProfile = { name: "ordinary", reasoningEffort: configuration.verificationReasoningEffort,
+    maximumOutputTokens: configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000,
+    timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000 };
+  const scopeContext = buildResearchClaimScopeContext({ question, evidence, answer: interpretation, options });
   const hasAmendmentMetadata = evidence.some((source) => source.richSourceKind === "amendment-history");
   const hasNumericComparison = options.zoningDeterministicContext?.answerObligations?.some((item) => item.numericComparison);
   const evidenceText = evidence.map((source) => [
@@ -11017,7 +10999,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     store: false,
     service_tier: configuration.serviceTier,
     reasoning: { effort: verificationProfile.reasoningEffort },
-    max_output_tokens: options.maximumApplicabilityOutputTokens,
+    max_output_tokens: verificationProfile.maximumOutputTokens,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       researchQuestionIntentInstruction(question),
@@ -11162,7 +11144,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
             sources: options.webSupport.sources || []
           })}`
         : "",
-      `CLAIM APPLICABILITY REVIEW\n${JSON.stringify(applicabilityPacket)}`,
+      `SOURCE SCOPE AND HUMAN CONTEXT — ADVISORY INPUT\n${JSON.stringify(scopeContext)}`,
       options.mappedScopeReview ? `MAPPED SCOPE REVIEW\n${JSON.stringify(options.mappedScopeReview)}` : "",
       options.priorVerificationAttempts?.length ? `PRIOR REVIEW HISTORY — NOT AUTHORITY\n${JSON.stringify(options.priorVerificationAttempts)}` : "",
       `PROPOSED ANSWER JSON\n${JSON.stringify(interpretation)}`
@@ -11172,20 +11154,20 @@ export async function openAIResearchVerification(question, evidence, interpretat
         type: "json_schema",
         name: "permitext_research_verification",
         strict: true,
-        schema: researchClaimApplicabilitySchema(zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview), applicabilityPacket)
+        schema: zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview)
       }
     }
   };
   requestBody.instructions = researchZoningVerificationInstructions({ question, evidence, options }) || requestBody.instructions;
   // Zoning may replace the base instructions; this generic obligation applies
   // to the same existing verifier call after that replacement too.
-  requestBody.instructions += ` ${researchClaimApplicabilityInstruction}`;
+  requestBody.instructions += ` ${researchClaimScopeVerificationInstruction}`;
   console.info(JSON.stringify({ event: "research_verification_profile", profile: verificationProfile.name,
     reasoningEffort: ["none", "minimal", "low", "medium", "high", "xhigh"].includes(verificationProfile.reasoningEffort)
       ? verificationProfile.reasoningEffort : "unknown",
     maximumOutputTokens: requestBody.max_output_tokens, timeoutMilliseconds: verificationProfile.timeoutMilliseconds,
-    unitCount: applicabilityPacket.units.length, edgeCount: applicabilityPacket.edges.length,
-    bindingCount: applicabilityPacket.bindingCount }));
+    unitCount: scopeContext.answerUnitCount, edgeCount: scopeContext.graph.length,
+    bindingCount: 0 }));
   const originalRequestBody = structuredClone(requestBody);
   const envelopeRetryState = options.verificationEnvelopeRetryState || { attempted: false };
   const { payload } = await requestResearchProvider({
@@ -11222,10 +11204,10 @@ export async function openAIResearchVerification(question, evidence, interpretat
         selectedProfile: verificationProfile.name,
         selectedReasoningEffort: ["none", "minimal", "low", "medium", "high", "xhigh"].includes(verificationProfile.reasoningEffort)
           ? verificationProfile.reasoningEffort : "unknown",
-        selectedOutputTokenCap: options.maximumApplicabilityOutputTokens,
+        selectedOutputTokenCap: verificationProfile.maximumOutputTokens,
         selectedTimeoutMilliseconds: verificationProfile.timeoutMilliseconds,
-        unitCount: applicabilityPacket.units.length, edgeCount: applicabilityPacket.edges.length,
-        bindingCount: applicabilityPacket.bindingCount,
+        unitCount: scopeContext.answerUnitCount, edgeCount: scopeContext.graph.length,
+        bindingCount: 0,
         incompleteReason: invalid.incompleteReason,
         ...(Number.isSafeInteger(reasoningTokenCount) && reasoningTokenCount >= 0 ? { reasoningTokenCount } : {})
       };
@@ -11233,10 +11215,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
     }
     try {
       return {
-        result: validateResearchClaimApplicabilityReview({ packet: applicabilityPacket, value, question,
-          answer: interpretation, evidence, options,
-          verification: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
-            verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }) }),
+        result: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
+          verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }),
         model: responsePayload.model || configuration.model,
         reasoningEffort: verificationProfile.reasoningEffort,
         usage
@@ -11267,7 +11247,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     const diagnostics = error.verificationEnvelopeDiagnostics;
     const repairedRequestBody = {
       ...originalRequestBody,
-      instructions: `${originalRequestBody.instructions} VERIFIER ENVELOPE REPAIR: the previous result violated the structural invariant listed below. Review the SAME proposed answer and supplied evidence under ALL original semantic checks; do not edit the answer, facts, citations, source text, schema, claim-applicability packet or mapped-scope packet. The invalid prior verdict is untrusted and does not establish correctness. Return a fresh valid verdict. A passing verdict requires issues=[]; a failing verdict requires at least one supported issue and projectFactQuestions=[]. Missing-fact indices must be unique in-range indices of the unchanged missingFacts array, and only a failing unnecessary_qualification issue can authorize them. Never discard a substantive issue to obtain pass=true.`,
+      instructions: `${originalRequestBody.instructions} VERIFIER ENVELOPE REPAIR: the previous result violated the structural invariant listed below. Review the SAME proposed answer and supplied evidence under ALL original semantic checks; do not edit the answer, facts, citations, source text, schema, source-scope/human context or mapped-scope packet. The invalid prior verdict is untrusted and does not establish correctness. Return a fresh valid verdict. A passing verdict requires issues=[]; a failing verdict requires at least one supported issue and projectFactQuestions=[]. Missing-fact indices must be unique in-range indices of the unchanged missingFacts array, and only a failing unnecessary_qualification issue can authorize them. Never discard a substantive issue to obtain pass=true.`,
       input: `${originalRequestBody.input}\n\nINVALID VERIFIER ENVELOPE — NOT AUTHORITY\n${JSON.stringify({ invariant: diagnostics.invariant, missingFactCount: diagnostics.missingFactCount, rejectedEnvelope })}`
     };
     console.warn(JSON.stringify({ event: "research_verification_envelope_repair", retry: 1,

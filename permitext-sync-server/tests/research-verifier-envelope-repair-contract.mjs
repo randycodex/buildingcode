@@ -75,8 +75,8 @@ async function reservationTest(callback, environment = process.env) {
 try {
   // Exact budget selection runs through the real request/reservation/parser.
   for (const [effort, boundAnswer, expectedEffort, expectedCap, expectedTimeout, expectedProfile] of [
-    ["medium", answer, "low", 12_000, 90_000, "claim_applicability"],
-    ["low", answer, "low", 12_000, 90_000, "claim_applicability"],
+    ["medium", answer, "medium", 8_000, 90_000, "ordinary"],
+    ["low", answer, "low", 4_000, 45_000, "ordinary"],
     ["medium", { answerText: "A source-free explanation." }, "medium", 8_000, 90_000, "ordinary"],
     ["low", { answerText: "A source-free explanation." }, "low", 4_000, 45_000, "ordinary"]]) {
     process.env.PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT = effort;
@@ -91,10 +91,12 @@ try {
       assert.equal(requests[0].model, "gpt-5.6-luna");
       assert.deepEqual(selectedTimeouts, [expectedTimeout]);
       const profile = events.map(line => JSON.parse(line)).filter(event => event.event === "research_verification_profile").at(-1);
+      const context = JSON.parse(requests[0].input.split("SOURCE SCOPE AND HUMAN CONTEXT — ADVISORY INPUT\n")[1].split("\n\n")[0]);
       assert.deepEqual(profile, { event: "research_verification_profile", profile: expectedProfile,
         reasoningEffort: expectedEffort, maximumOutputTokens: expectedCap, timeoutMilliseconds: expectedTimeout,
-        unitCount: result.result.claimApplicabilityReview.unitCount, edgeCount: result.result.claimApplicabilityReview.edgeCount,
-        bindingCount: result.result.claimApplicabilityReview.bindingCount });
+        unitCount: context.answerUnitCount, edgeCount: context.graph.length, bindingCount: 0 });
+      assert.equal(result.result.claimApplicabilityReview, undefined);
+      assert(!requests[0].text.format.schema.required.includes("claimApplicabilityReview"));
       assert(!JSON.stringify(profile).includes("Synthetic"), "Profile telemetry contains no question, source or fact prose");
     });
   }
@@ -102,27 +104,27 @@ try {
   const actualBuilder = (await import("./research-request-envelope-preflight.mjs")).buildResearchRequestEnvelopeBuilders;
   const { buildVerifierRequest } = await actualBuilder();
   const serializedRequest = buildVerifierRequest("Synthetic source-scope question.", evidence, answer, "offline-user", { model: "gpt-5.6-luna" });
-  assert.equal(serializedRequest.max_output_tokens, 12_000);
-  assert.equal(serializedRequest.reasoning.effort, "low");
-  assert(serializedRequest.text.format.schema.required.includes("claimApplicabilityReview"));
-  assert.match(serializedRequest.instructions, /Do not emit binding\/unit aggregate states/);
+  assert.equal(serializedRequest.max_output_tokens, 8_000);
+  assert.equal(serializedRequest.reasoning.effort, "medium");
+  assert(!serializedRequest.text.format.schema.required.includes("claimApplicabilityReview"));
+  assert.match(serializedRequest.instructions, /SOURCE SCOPE AND HUMAN CONTEXT REVIEW is mandatory/);
   await reservationTest(async () => {
     const reserved = reserveResearchProviderSpend(serializedRequest);
     const bytes = Buffer.byteLength(JSON.stringify(serializedRequest), "utf8") + 1_024;
     // Versioned offline Fast-model rates, including existing conservative
     // cache-write/long-context ceilings. The final cap/schema/input are bound.
-    const expectedBound = Math.ceil((bytes * .2 * 2.5 + 12_000 * 1.2 * 1.5)) / 1_000_000;
+    const expectedBound = Math.ceil((bytes * .2 * 2.5 + 8_000 * 1.2 * 1.5)) / 1_000_000;
     assert.equal(reserved.maximumRequestUSD, expectedBound);
     settleResearchProviderSpend(reserved, { usage: { input_tokens: 0, output_tokens: 0 } });
-    const lower = reserveResearchProviderSpend({ ...serializedRequest, max_output_tokens: 8_000 });
+    const lower = reserveResearchProviderSpend({ ...serializedRequest, max_output_tokens: 4_000 });
     assert(lower.maximumRequestUSD < reserved.maximumRequestUSD);
     settleResearchProviderSpend(lower, { usage: { input_tokens: 0, output_tokens: 0 } });
     const enlarged = reserveResearchProviderSpend({ ...serializedRequest, input: serializedRequest.input + "Extra synthetic frame.".repeat(100) });
     assert(enlarged.maximumRequestUSD > reserved.maximumRequestUSD);
     settleResearchProviderSpend(enlarged, { usage: { input_tokens: 0, output_tokens: 0 } });
   });
-  // A packet that exceeds the old medium allocation is finalized under12k,
-  // before dispatch. No missing obligations or stale provisional hash survives.
+  // A former proof-output capacity failure must not block ordinary review.
+  // Complete source/fact/answer snapshots remain available without a matrix.
   const manyEvidence = Array.from({ length: 24 }, (_, index) => ({ sourceID: `fictional-${index}`, sectionID: `fictional-${index}`,
     codePrefix: "LIB", codeEdition: "2041", codeVersion: "original", corpusID: "fictional", text: `Fictional source ${index}.` }));
   const manyAnswer = { answerText: "Independent fictional rules are explained.", citations: [{ sourceIDs: manyEvidence.map((source) => source.sourceID) }],
@@ -134,12 +136,11 @@ try {
   await reservationTest(async () => {
     const result = await run({}, manyEvidence, manyAnswer);
     assert.equal(result.result.pass, true);
-    const packet = JSON.parse(requests[0].input.split("CLAIM APPLICABILITY REVIEW\n")[1].split("\n\n")[0]);
-    assert.deepEqual(packet.preflightReasons, []);
-    assert.equal(requests[0].max_output_tokens, 12_000);
-    assert.notEqual(packet.packetHash, provisional.packetHash);
-    assert.equal(packet.units.length, provisional.units.length);
-    assert.equal(packet.bindingCount, provisional.bindingCount);
+    const context = JSON.parse(requests[0].input.split("SOURCE SCOPE AND HUMAN CONTEXT — ADVISORY INPUT\n")[1].split("\n\n")[0]);
+    assert.equal(context.preflightReasons, undefined); assert.equal(context.units, undefined); assert.equal(context.bindingCount, undefined);
+    assert.equal(requests[0].max_output_tokens, 8_000); assert.equal(context.sources.length, manyEvidence.length);
+    assert.equal(context.answerHash, provisional.answerHash); assert.equal(context.evidenceHash, provisional.evidenceHash);
+    assert.equal(context.answerUnitCount, provisional.units.length);
   });
 
   // Safe diagnostics and fail-closed handling cover truncated and parseable
@@ -154,14 +155,14 @@ try {
       await assert.rejects(run(), (error) => {
         assert.equal(error.code, "INVALID_RESEARCH_VERIFICATION");
         assert.equal(error.failureStage, "verification_output_parse");
-        assert.equal(error.verificationOutputDiagnostics.selectedProfile, "claim_applicability");
-        assert.equal(error.verificationOutputDiagnostics.selectedReasoningEffort, "low");
-        assert.equal(error.verificationOutputDiagnostics.selectedOutputTokenCap, 12_000);
+        assert.equal(error.verificationOutputDiagnostics.selectedProfile, "ordinary");
+        assert.equal(error.verificationOutputDiagnostics.selectedReasoningEffort, "medium");
+        assert.equal(error.verificationOutputDiagnostics.selectedOutputTokenCap, 8_000);
         assert.equal(error.verificationOutputDiagnostics.selectedTimeoutMilliseconds, 90_000);
         assert.equal(error.verificationOutputDiagnostics.incompleteReason, expectedReason);
         assert.equal(error.verificationOutputDiagnostics.reasoningTokenCount, expectedReasoning);
         assert.equal(error.verificationOutputDiagnostics.unitCount, 3);
-        assert(error.verificationOutputDiagnostics.edgeCount > 0 && error.verificationOutputDiagnostics.bindingCount > 0);
+        assert.equal(error.verificationOutputDiagnostics.edgeCount, 0); assert.equal(error.verificationOutputDiagnostics.bindingCount, 0);
         assert(!JSON.stringify(error.verificationOutputDiagnostics).includes("PRIVATE"));
         assert.equal(error.incompleteReason, expectedReason);
         return true;
@@ -179,6 +180,36 @@ try {
     assert.equal(result.verificationEnvelopeRetryCount, undefined);
   });
 
+  for (const type of ["overstated_compliance", "missed_material_conclusion", "wrong_attribution", "fact_evidence_confusion"]) {
+    const scopeFail = { ...validFail, issues: [{ type, detail: "A material enacted scope, exception, source basis or human premise is unsupported." }] };
+    setup([{ value: scopeFail }]);
+    await reservationTest(async () => { const result = await run(); assert.equal(result.result.pass, false); assert.deepEqual(result.result.issues, scopeFail.issues); assert.equal(requests.length, 1); });
+  }
+  // Raw human scenario/correction context and exact source graph are retained
+  // when fact extraction supplies no structured facts. No semantic pass claim.
+  const scopedEvidence = [...evidence, { sourceID: "parent", sectionID: "parent", codePrefix: "ZR", codeVersion: "snapshot-A", text: "A material parent condition.",
+    applicabilityScopeAnchors: [{ sourceID: "source-a" }] }];
+  const humanHistory = [{ role: "user", question: "Assume a violet widget has a required label." },
+    { role: "assistant", answer: { answerText: "An assistant statement is not a human premise." } },
+    { role: "user", question: "Correction: the widget is blue; the required label is unchanged." }];
+  setup([{ value: validPass }]);
+  await reservationTest(async () => {
+    const result = await run({ messages: humanHistory, applicabilityFactContext: { conversationFactState: { activeRootTopic: humanHistory[0].question,
+      turnKind: "established", establishedFacts: [], hypotheticalFacts: [], unknownFacts: [] }, topicContext: { rootTopic: humanHistory[0].question, lastDecision: "continuation" } } }, scopedEvidence);
+    assert.equal(result.result.pass, true);
+    const request = requests[0], context = JSON.parse(request.input.split("SOURCE SCOPE AND HUMAN CONTEXT — ADVISORY INPUT\n")[1].split("\n\n")[0]);
+    assert(context.graph.some(edge => edge.kind === "parent_scope" && edge.anchorSourceID === "source-a" && edge.scopeSourceID === "parent"));
+    assert(context.sources.every(source => /^[a-f0-9]{64}$/.test(source.textHash)));
+    assert(context.facts.recentHumanMessages.some(fact => fact.statement === humanHistory[0].question));
+    assert(context.facts.recentHumanMessages.some(fact => fact.statement === humanHistory[2].question));
+    assert(context.facts.recentHumanMessages.every(fact => fact.origin !== "assistant")); assert.equal(context.facts.advisoryOnly, true);
+    assert.match(request.instructions, /correction replaces the premise actually corrected, preserving other current premises/);
+    assert.match(request.instructions, /never transfer hypothetical premises to the actual saved project/);
+    assert.match(request.instructions, /source graph and fact-status metadata are advisory input/);
+    assert(request.input.includes(humanHistory[2].question)); assert(request.input.includes(scopedEvidence[1].text));
+    assert.equal(request.max_output_tokens, 8000); assert(!request.text.format.schema.properties.claimApplicabilityReview);
+  });
+
   setup([{ value: badPass }, { value: validPass }]);
   let normalRequest;
   await reservationTest(async () => {
@@ -194,7 +225,7 @@ try {
     assert.equal(requests.length, 2);
     normalRequest = requests[0];
     assert.deepEqual(selectedTimeouts, [90_000, 90_000], "Envelope repair retains the selected timeout");
-    assert.equal(result.reasoningEffort, "low");
+    assert.equal(result.reasoningEffort, "medium");
     for (const field of ["model", "store", "service_tier", "reasoning", "max_output_tokens", "safety_identifier", "text"]) {
       assert.deepEqual(requests[1][field], requests[0][field], `Repair cannot change ${field}.`);
     }

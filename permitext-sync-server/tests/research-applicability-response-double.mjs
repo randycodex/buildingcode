@@ -3,9 +3,10 @@
 // real fact entails a predicate. Those contracts retain their semantic verdict
 // doubles and are not acceptance evidence for legal reasoning.
 export function applicabilityPacketFromRequest(body) {
-  return JSON.parse(body.input.split("CLAIM APPLICABILITY REVIEW\n")[1].split("\n\n")[0]);
+  return JSON.parse(body.input.split("SOURCE SCOPE AND HUMAN CONTEXT — ADVISORY INPUT\n")[1].split("\n\n")[0]);
 }
 export function syntheticApplicabilityReview(body) {
+  if (!body.text.format.schema.properties.claimApplicabilityReview) return undefined;
   const packet = applicabilityPacketFromRequest(body);
   return { packetHash: packet.packetHash,
     predicates: Object.fromEntries(packet.edges.map(edge => [edge.id, []])), factSpans: [],
