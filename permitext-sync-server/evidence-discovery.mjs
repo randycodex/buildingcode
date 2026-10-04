@@ -10,9 +10,9 @@ import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch,
   researchActiveHumanDefinitionMatch } from "./research-definition-excerpts.mjs";
 import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup, researchImmediateChildDetailGain } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
-import { researchCurrentPurposeTerms, researchCurrentPurposeMatches } from "./research-current-purpose.mjs";
+import { researchCurrentPurposeTerms, researchCurrentPurposeMatches, researchCurrentEditionContext } from "./research-current-purpose.mjs";
 
-export const evidenceDiscoveryVersion = "20261004-current-purpose-fusion-recall-v66";
+export const evidenceDiscoveryVersion = "20261004-current-purpose-edition-recall-v67";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1673,9 +1673,8 @@ function strongCurrentLexicalReservation({ currentHits, detailed, selected, curr
   if (!(bestScore > 0)) return null;
   const protectedIDs = new Set(selected.filter((item, index) => index === 0 || item.directReference ||
     item.completeSiblingCompanionOf || item.useSelectedPassageOnly).map(item => comparableSectionID(item.section.id)));
-  const purposeTerms = allowPurpose ? researchCurrentPurposeTerms(currentQuestion) : [];
-  const currentEdition = /\b(?:codes?|edition|version)\b/i.test(currentQuestion)
-    ? currentQuestion.match(/\b(?:19|20)\d{2}\b/)?.[0] : null;
+  const { edition: currentEdition, ambiguous } = researchCurrentEditionContext(currentQuestion);
+  const purposeTerms = allowPurpose && !ambiguous ? researchCurrentPurposeTerms(currentQuestion) : [];
   const eligible = currentHits.map((hit, rank) => {
     const id = comparableSectionID(hit.sectionID);
     const item = detailed.find(value => comparableSectionID(value.section.id) === id);
@@ -1988,14 +1987,18 @@ export async function discoverRelevantEvidence({
     });
   }
   const semanticHitsByID = new Map(semanticHits.map(hit => [comparableSectionID(hit.sectionID), hit]));
-  const purposeTerms = retrievalContext?.sourceSelectionRestricted === true ? [] : researchCurrentPurposeTerms(currentQuestion);
+  const currentEditionContext = researchCurrentEditionContext(currentQuestion);
+  const purposeTerms = retrievalContext?.sourceSelectionRestricted === true || currentEditionContext.ambiguous
+    ? [] : researchCurrentPurposeTerms(currentQuestion);
+  const purposeEditionMatches = hit => !currentEditionContext.edition ||
+    sectionCodeEdition(catalogByID.get(comparableSectionID(hit.sectionID))) === currentEditionContext.edition;
   for (const [id, primary] of passageHitsByID) {
     const lexical = lexicalHitsByID.get(id), semantic = semanticHitsByID.get(id);
     const merged = mergedIndexedPassages(primary, lexical, semantic, currentPassageScores, currentQuestion);
     // A meaning hit in the same source can name a different sibling. Preserve
     // the strong current-purpose passage, including for an existing lead;
     // authorized index identity and later fresh body binding still apply.
-    const preservePurpose = lexical && completeIndexedScope(lexical) &&
+    const preservePurpose = lexical && purposeEditionMatches(lexical) && completeIndexedScope(lexical) &&
       (currentPassageScores.get(passageIdentity(lexical)) || 0) >= (currentPassageHits[0]?.score || Infinity) * 0.7 &&
       researchCurrentPurposeMatches(lexical.text, purposeTerms) > researchCurrentPurposeMatches(merged.text, purposeTerms) &&
       !(completeIndexedScope(merged.companion) && researchCurrentPurposeMatches(merged.companion.text, purposeTerms) >=
@@ -2008,7 +2011,7 @@ export async function discoverRelevantEvidence({
   // this nomination does not by itself admit a source to the final shortlist.
   const strongCurrentHits = currentPassageHits.filter(hit =>
     completeIndexedScope(hit) && hit.score >= (currentPassageHits[0]?.score || Infinity) * 0.7);
-  const purposeRecall = strongCurrentHits.filter(hit => researchCurrentPurposeMatches(hit.text, purposeTerms) > 0)
+  const purposeRecall = strongCurrentHits.filter(hit => purposeEditionMatches(hit) && researchCurrentPurposeMatches(hit.text, purposeTerms) > 0)
     .sort((left, right) => researchCurrentPurposeMatches(right.text, purposeTerms) - researchCurrentPurposeMatches(left.text, purposeTerms) || right.score - left.score)
     .slice(0, 1);
   // Use the existing five nomination opportunities, never a larger read pool.
@@ -2388,11 +2391,10 @@ export async function discoverRelevantEvidence({
       // independently qualified for this current positive subject. Bind the
       // indexed scope to the body already read here; add no reads or slots.
       const positiveCurrent = researchPositiveSearchText(currentQuestion);
-      const currentEdition = /\b(?:codes?|edition|version)\b/i.test(positiveCurrent)
-        ? positiveCurrent.match(/\b(?:19|20)\d{2}\b/)?.[0] : null;
+      const { edition: currentEdition, ambiguous } = currentEditionContext;
       const propertyVocabulary = vocabularyConcept?.subject === 'test_medium';
       const freshlyBoundCurrentSource = Boolean(item &&
-        !relevanceComparison && retrievalContext?.sourceSelectionRestricted !== true &&
+        !relevanceComparison && !ambiguous && retrievalContext?.sourceSelectionRestricted !== true &&
         !/\b(?:compar\w*|versus|vs|both|difference)\b/i.test(positiveCurrent) &&
         (!currentEdition || sectionCodeEdition(item.section) === currentEdition) &&
         ['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(key => item.section[key]) &&
@@ -2461,8 +2463,7 @@ export async function discoverRelevantEvidence({
     (String(item.section.sectionNumber) === "202" || /\bdefinitions?\b/i.test(item.section.title || "") || item.definitionCarrier));
   const positiveQuestion = researchPositiveSearchText(currentQuestion);
   const definitionPrefixes = explicitQuestionDisciplinePrefixes(positiveQuestion);
-  const definitionEdition = /\b(?:codes?|edition)\b/i.test(positiveQuestion)
-    ? positiveQuestion.match(/\b(?:19|20)\d{2}\b/)?.[0] : null;
+  const definitionEdition = currentEditionContext.edition;
   const definitionHumanContext = retrievalContext?.contextDependentFollowUp === true && !relevanceComparison
     ? [...new Set([retrievalContext.conversationTopic, retrievalContext.immediateContext]
         .filter(value => typeof value === "string").map(value => value.slice(0, 640)))].slice(0, 2).join("\n") : "";

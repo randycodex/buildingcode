@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { buildResearchPassageIndex, searchResearchPassages } from "../research-passage-index.mjs";
 import { discoverRelevantEvidence } from "../evidence-discovery.mjs";
 import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
-import { researchCurrentPurposeTerms, researchCurrentPurposeMatches } from "../research-current-purpose.mjs";
+import { researchCurrentPurposeTerms, researchCurrentPurposeMatches, researchCurrentEditionContext } from "../research-current-purpose.mjs";
 
 globalThis.fetch = () => { throw Error("This contract forbids provider/network access."); };
 for (const [question, included] of [
@@ -30,6 +30,32 @@ for (const question of ["The plans show how identification is handled.",
   assert.deepEqual(researchCurrentPurposeTerms(question), []);
 assert.equal(researchCurrentPurposeMatches("Cabinets shall be calibrated before operation.", ["calibr"]), 1);
 
+// Edition belongs to the affirmative authority, not the first date. The
+// helper is vocabulary-only and treats a true comparison conservatively.
+for (const [request, edition, ambiguous = false] of [
+  ["Under the 2022 codes, what calibration is required?", "2022"],
+  ["Ignore the 2014 code. Under the 2022 codes, what calibration is required?", "2022"],
+  ["Ignore the 2014 code and use the 2022 code. What calibration is required?", "2022"],
+  ["The previous 2014 code assumption was wrong. Under the 2022 codes, what calibration is required?", "2022"],
+  ['The example says "under the 2014 code". Under the 2022 codes, what calibration is required?', "2022"],
+  ["Use the 2022 code, rather than the 2014 edition. What calibration is required?", "2022"],
+  ["The building was constructed in 2014. Under the 2022 codes, what calibration is required?", "2022"],
+  ["The equipment was installed in 2014 under the 2022 codes. What calibration is required?", "2022"],
+  ["Our 2014 building is under the codes. What calibration is required?", null],
+  ["The cabinets were installed in 2014. What calibration does the code require?", null],
+  ["Under the 2014 code, what calibration is required?", "2014"],
+  ["Under the old 2014 code, what calibration should we perform?", "2014"],
+  ["The old equipment was installed in 2014 and is reviewed under the 2022 code. What calibration should we perform?", "2022"],
+  ["The equipment has an incorrect label under the 2022 code. What identification is required?", "2022"],
+  ["In the code edition of 2014, what calibration is required?", "2014"],
+  ["Compare the 2014 and 2022 codes. What calibration is required?", null, true],
+  ["Under the 2014 code or the 2022 code, what calibration is required?", null, true],
+  ["Under the 2014 code. Under the 2022 code. What calibration is required?", null, true],
+  ["Can we leave the cabinet without a label under the 2022 code?", "2022"],
+  ["Not under the 2014 code. Under the 2022 code, what calibration is required?", "2022"],
+  ["What calibration is required under the 2022 code, not the 2014 code?", "2022"]
+]) assert.deepEqual(researchCurrentEditionContext(request), { edition, ambiguous }, request);
+
 // Real BM25 ordering plus controlled semantic crowding: the matching requested
 // action is ninth, strong, and absent from the previous five nominations.
 const authority = { corpusID: "synthetic-purpose", codeVersion: "synthetic-purpose-v1",
@@ -53,7 +79,7 @@ const semantic = crowd.map((section, i) => ({ ...index.passages.find(hit => hit.
 const reads = [];
 const run = (options = {}) => discoverRelevantEvidence({ question: options.question || question,
   retrievalContext: { currentQuestion: options.question || question, sourceQuery: options.question || question,
-    ...(options.context || {}) }, catalog: options.catalog || catalog, passageIndex: index, invertedIndex: new Map(),
+    ...(options.context || {}) }, catalog: options.catalog || catalog, passageIndex: options.index || index, invertedIndex: new Map(),
   readSectionBody: async section => { reads.push(section.id); return options.body?.(section) || section.body; },
   limit: options.limit || 3, availableCodePrefixes: ["MC"],
   semanticSearch: { search: async () => ({ hits: options.semantic || semantic, metadata: { enabled: true } }) } });
@@ -74,6 +100,41 @@ assert(complete?.canonicalContextComplete && complete.text.includes("shall be ca
 assert(complete.text.includes("Exception: Listed cabinets"));
 assert.equal(complete.codeVersion, authority.codeVersion); assert.equal(complete.codeEdition, authority.codeEdition);
 assert(delivered.usage.discoveredCount <= 2 && delivered.usage.characterCount <= 3000);
+
+// Matched actual discovery paths: ignored/retracted/quoted/construction years
+// retain the same complete purpose candidate in the unchanged three slots.
+const affirmative = question.replace("on them?", "on them under the 2022 codes?");
+for (const request of [affirmative, "Ignore the 2014 code. " + affirmative,
+  "The previous 2014 code assumption was wrong. " + affirmative,
+  'Ignore "under the 2014 code". ' + affirmative,
+  "The building was constructed in 2014. " + affirmative,
+  "The cabinets were installed in 2014. " + affirmative]) {
+  const found = await run({ question: request });
+  assert.equal(found.candidates.find(item => item.sectionID === target.id)?.signals.currentQuestionLexicalReservation?.kind,
+    "current_requested_purpose", request);
+  assert.equal(found.candidates.length, 3);
+}
+// Noncurrent editions are equally eligible when they are the affirmative
+// request and the indexed/fresh authority really belongs to that edition.
+const historicalCatalog = catalog.map(item => ({ ...item, codeEdition: "2014", codeVersion: "synthetic-historical-v1" }));
+const historicalIndex = await buildResearchPassageIndex(historicalCatalog, async item => item.body);
+const historicalSemantic = historicalCatalog.slice(0, 8).map((item, i) =>
+  ({ ...historicalIndex.passages.find(hit => hit.sectionID === item.id), score: 1 - i / 1000 }));
+const historical = await run({ question: question.replace("on them?", "on them under the 2014 code?"),
+  catalog: historicalCatalog, index: historicalIndex, semantic: historicalSemantic });
+assert.equal(historical.candidates.find(item => item.sectionID === target.id)?.signals.currentQuestionLexicalReservation?.kind,
+  "current_requested_purpose");
+const foreignTarget = { ...target, codeEdition: "2014", codeVersion: "synthetic-historical-v1" };
+const mixedCatalog = [...crowd, foreignTarget];
+const mixedIndex = await buildResearchPassageIndex(mixedCatalog, async item => item.body);
+const foreignFound = await run({ question: affirmative, catalog: mixedCatalog, index: mixedIndex });
+assert(!foreignFound.candidates.find(item => item.sectionID === target.id)?.signals.currentQuestionLexicalReservation,
+  "An actually indexed/fresh foreign edition cannot receive current-purpose nomination or reservation.");
+for (const request of ["Compare the 2014 and 2022 codes. " + question,
+  question.replace("on them?", "on them under the 2014 code or the 2022 code?")]) {
+  const found = await run({ question: request });
+  assert(!found.candidates.find(item => item.sectionID === target.id)?.signals.currentQuestionLexicalReservation);
+}
 
 // Exact authorities, selection boundaries and fresh canonical identity remain
 // stronger than this advisory language recall. A stale body is not a witness.
@@ -111,4 +172,4 @@ const splitDelivery = await assembleResearchEvidence({ question, discover: async
   limits: { maximumDiscovered: 3, maximumCharacters: 3000, maximumCharactersPerSource: 1000 } });
 assert.match(splitDelivery.sources.find(item => item.sectionID === split.id).text, /shall be calibrated/);
 console.log(JSON.stringify({ passed: true, networkCalls: 0, targetRank, candidateCount: discovered.candidates.length,
-  assembledCount: delivered.usage.discoveredCount, ordinaryLanguageAndBoundaries: true, purposePassageSurvivesSameSectionMerge: true }));
+  assembledCount: delivered.usage.discoveredCount, ordinaryLanguageAndBoundaries: true, purposePassageSurvivesSameSectionMerge: true, affirmativeEditionContrasts: true }));
