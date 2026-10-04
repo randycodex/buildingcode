@@ -9,7 +9,7 @@ import { researchEmbeddedDefinitionCarrier } from "./research-definition-excerpt
 import { nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-equipment-foreground-recall-v57";
+export const evidenceDiscoveryVersion = "20261003-air-opening-foreground-recall-v58";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1864,14 +1864,19 @@ export async function discoverRelevantEvidence({
   // Filter its family shortlist before the cap; ordinary
   // semantic/lexical recall remains cross-code. At most three complete sources
   // can enter the existing shortlist, preserving every protected slot.
-  const equipmentIntent = researchEquipmentSearchIntent(currentQuestion);
+  const equipmentIntent = researchEquipmentSearchIntent(currentQuestion, {
+    contextDependentFollowUp: retrievalContext?.contextDependentFollowUp === true,
+    humanTopics: [retrievalContext?.conversationTopic, retrievalContext?.immediateContext]
+  });
   const foregroundQuery = equipmentIntent?.query || currentQuestion;
   const foregroundWords = rawTokens(foregroundQuery).filter(word => word.length > 2 && /[a-z]/i.test(word) &&
     !stopWords.has(word) && !rankingBoilerplate.has(word) && !genericPassageHeadingWords.has(word) &&
     !["need", "needed", "project", "fictional", "scenario", "ground", "floor", "make"].includes(word));
   const foregroundWeights = new Map(foregroundWords.flatMap(word => [...singularForms(word)].map(form => [form, 1])));
   const foregroundOverlapMinimum = Math.max(2, Math.ceil(new Set(foregroundWords).size / 4));
-  const foregroundPrefixes = explicitDisciplinePrefixes.size ? explicitDisciplinePrefixes : disciplinePrefixes;
+  const equipmentPrefixes = new Set(equipmentIntent?.codePrefixes || (equipmentIntent?.codePrefix ? [equipmentIntent.codePrefix] : []));
+  const foregroundPrefixes = explicitDisciplinePrefixes.size ? explicitDisciplinePrefixes
+    : equipmentPrefixes.size ? equipmentPrefixes : disciplinePrefixes;
   const foregroundHits = passageIndex && foregroundWeights.size >= 2 && foregroundPrefixes.size
     ? searchResearchPassages(passageIndex, foregroundQuery, { queryWeights: foregroundWeights,
       explicitReferenceQuery: currentQuestion, limit: 5, passagesPerSection: 8, codePrefixes: foregroundPrefixes })
@@ -1881,7 +1886,7 @@ export async function discoverRelevantEvidence({
   // Require the equipment in the complete source's own text, not shared water
   // words or inherited context; legal applicability remains unresolved.
   const equipmentForegroundHits = equipmentIntent ? foregroundHits.filter(hit =>
-    hit.codePrefix === equipmentIntent.codePrefix &&
+    equipmentPrefixes.has(hit.codePrefix) &&
     hit.score >= (foregroundHits[0]?.score || Infinity) * 0.7 &&
     researchEquipmentSubjectMatches(hit.text, equipmentIntent)) : foregroundHits;
   const activePacketHits = passageIndex && retrievalContext?.contextDependentFollowUp && !relevanceComparison
