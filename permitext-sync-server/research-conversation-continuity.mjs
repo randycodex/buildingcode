@@ -1,3 +1,5 @@
+import { researchFailureReason, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./public/research-failure-recovery.js";
+
 // History storage has no exchange-count cutoff. Provider context stays bounded;
 // earlier user statements are context, never independently verified authority.
 export function earlierResearchUserContext(messages = [], maximumCharacters = 16_000) {
@@ -75,7 +77,7 @@ export function researchInheritedAuthorityReferences({
     .map(({ title, selectedText, ...reference }) => reference);
 }
 
-const failureExplanations = Object.freeze({
+const priorFailureExplanations = Object.freeze({
   verification_source: "Research couldn’t finish because its explanation and source references didn’t agree.",
   verification_context: "Research couldn’t finish because its explanation didn’t consistently use the project details already provided.",
   verification_format: "Research received an answer it couldn’t read.",
@@ -92,17 +94,10 @@ const historicalFailureExplanations = Object.freeze({
 });
 
 export function researchVerificationFailureReason(error = {}) {
-  if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_VERIFICATION"].includes(error.code)) return "verification_format";
-  if (["INVALID_RESEARCH_CITATION", "INVALID_RESEARCH_WEB_CITATION"].includes(error.code)) return "verification_source";
-  // Earlier findings may already have been repaired. Explain the unresolved
-  // final review, rather than presenting a corrected issue as the current error.
-  const issues = (error.verificationAttempts || []).findLast(attempt => !attempt.pass)?.issues?.map(issue => issue.type) || [];
-  if (issues.some(type => /premise|established_fact/.test(type))) return "verification_context";
-  if (issues.some(type => /citation|unsupported_requirement/.test(type))) return "verification_source";
-  return "verification_incomplete";
+  return researchFailureReason(error);
 }
 
-function clarificationAnswer(question = "", reason = "verification", legacy = false, historicalFailureCopy = false) {
+function clarificationAnswer(question = "", reason = "verification", legacy = false, historicalFailureCopy = false, priorFailureCopy = false) {
   let nextQuestion;
   if (/\b(?:transparency|glazing|storefront|street[- ]wall|frontage)\b/i.test(question)) {
     nextQuestion = "Which ground-floor uses face the street—retail, residential lobby or amenity space, community facility, or a combination?";
@@ -116,7 +111,9 @@ function clarificationAnswer(question = "", reason = "verification", legacy = fa
   const lead = reason === "evidence"
     ? "I need more source information to explain this accurately."
     : "I couldn’t verify the explanation well enough to give you a reliable answer yet.";
-  const failureExplanation = (historicalFailureCopy ? historicalFailureExplanations : failureExplanations)[reason];
+  const currentFailureCopy = researchVerificationRecoveryTextForReason(reason).split("\n\n")[0];
+  const failureExplanation = historicalFailureCopy ? historicalFailureExplanations[reason]
+    : priorFailureCopy ? priorFailureExplanations[reason] : currentFailureCopy;
   const recovery = historicalFailureCopy
     ? "Your question and earlier messages are saved. You can retry this question here without starting a new conversation."
     : "Your question and conversation are saved. You don’t need to repeat the question.";
@@ -139,10 +136,14 @@ export function researchClarificationAnswer(question = "", reason = "verificatio
 }
 
 export function isCanonicalResearchClarification(question, answer) {
-  if (!["verification", "evidence", ...Object.keys(failureExplanations)].includes(answer?.verification?.reason)) return false;
+  const reason = answer?.verification?.reason;
+  if (!["verification", "evidence", ...researchSystemRecoveryReasons].includes(reason)) return false;
   // Historical records remain valid without rewriting their immutable content.
-  return [false, true].some(legacy => [false, true].some(historicalFailureCopy => {
-    const expected = clarificationAnswer(question, answer.verification.reason, legacy, historicalFailureCopy);
+  const variants = [{ historical: false, prior: false },
+    ...(Object.hasOwn(historicalFailureExplanations, reason) ? [{ historical: true, prior: false }] : []),
+    ...(Object.hasOwn(priorFailureExplanations, reason) ? [{ historical: false, prior: true }] : [])];
+  return [false, true].some(legacy => variants.some(copy => {
+    const expected = clarificationAnswer(question, reason, legacy, copy.historical, copy.prior);
     return Object.keys(expected).every(key => JSON.stringify(answer?.[key]) === JSON.stringify(expected[key]));
   }));
 }

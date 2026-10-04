@@ -4,8 +4,10 @@ import { researchEvidencePriorityMetadata } from "./research-evidence-priority.m
 
 // These are exact-text nominations, not chapter applicability decisions. The
 // canonical resolver must supply the complete enacted qualification afresh.
-export const researchChapterScopeContextVersion = "20261003-bounded-enacted-chapter-scope-v1";
-export const researchChapterScopeContextMaximumChapters = 2;
+export const researchChapterScopeContextVersion = "20261003-admitted-rule-chapter-scope-v2";
+// Actual primary evidence already bounds this plan. Assembly reuses complete
+// supplied scopes or admits them within its structural and character limits.
+export const researchChapterScopeContextMaximumChapters = null;
 const purpose = "canonical_chapter_scope";
 const fields = ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"];
 const registry = createResearchCorpusRegistry({ zoningResearchEligibility: true });
@@ -102,10 +104,17 @@ function anchorRejection(anchor) {
   if (inherited(anchor) && anchor.activeTopic !== true) return "inactive_inherited_authority";
   return null;
 }
+function currentForeground(anchor) {
+  const signal = anchor.signals?.currentQuestionForeground;
+  if (signal === true) return { source: "literal_current_question" };
+  return signal && Number.isSafeInteger(signal.rank) && signal.rank >= 1 && signal.rank <= 5 &&
+    ["positive_equipment_subject", "literal_current_question"].includes(signal.source) ? signal : null;
+}
 const importance = anchor => Number(anchor.origin === "user_pinned") * 8 +
   Number(anchor.signals?.exactReference === true) * 4 +
-  Number(anchor.signals?.currentQuestionForeground === true || !!anchor.signals?.currentQuestionLexicalReservation ||
-    anchor.signals?.exactTopicRouteTarget === true) * 2 + Number(!inherited(anchor));
+  Number(!!currentForeground(anchor) || !!anchor.signals?.currentQuestionLexicalReservation ||
+    anchor.signals?.exactTopicRouteTarget === true) * 2 +
+  Number(currentForeground(anchor)?.source === "positive_equipment_subject") + Number(!inherited(anchor));
 
 /** Only actual primary writer evidence can admit its nominated chapter scope. */
 export function researchChapterScopeContextPlan({ anchors = [], canonicalScopeRecords = [], strategy = { mode: "broad" },
@@ -125,15 +134,13 @@ export function researchChapterScopeContextPlan({ anchors = [], canonicalScopeRe
     if (reason) { plan.skippedAnchors.push({ index, reason }); continue; }
     const key = chapterKey(anchor);
     if (!groups.has(key)) {
-      if (groups.size >= researchChapterScopeContextMaximumChapters) {
-        plan.skippedAnchors.push({ index, reason: "chapter_limit" }); continue;
-      }
       const record = canonicalScopeRecords.find(value => sameChapter(value, anchor) && registeredAuthority(value) &&
         value.chapterScopeContext === true && value.referencePurpose === purpose && scopeTitle(value) &&
         chapterWideText(value.indexedCanonicalScopeText) && hash(value.indexedCanonicalScopeText) === value.canonicalScopeTextHash &&
         value.matchedAnchorSectionIDs?.includes(identity(anchor)));
       if (!record) { plan.skippedAnchors.push({ index, reason: "no_qualified_indexed_scope" }); continue; }
-      groups.set(key, { ...record, referenceKind: "section", anchorSourceIDs: [], anchorSectionIDs: [], parentDepth: 0 });
+      groups.set(key, { ...record, referenceKind: "section", anchorSourceIDs: [], anchorSectionIDs: [], parentDepth: 0,
+        scopeAnchorPriority: importance(anchor) });
     }
     const reference = groups.get(key);
     if (text(anchor.sourceID) && !reference.anchorSourceIDs.includes(text(anchor.sourceID))) reference.anchorSourceIDs.push(text(anchor.sourceID));

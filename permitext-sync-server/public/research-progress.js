@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20260928-research-recovery-presence-v123";
+export const researchProgressVersion = "20261003-failure-recovery-v124";
 
 export const researchRequestRecoveryStorageKey = "permitext:research-request-recovery:v1";
 export const researchRequestRecoveryMaxAgeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
@@ -108,6 +108,8 @@ function normalizedResearchRequestRecovery(value) {
     updatedAt,
     error: String(value.error || "").trim().slice(0, 1_000),
     errorCode: String(value.errorCode || "").trim().slice(0, 160),
+    errorStatus: Number.isInteger(value.errorStatus) && value.errorStatus >= 400 && value.errorStatus <= 599 ? value.errorStatus : 0,
+    recoveryReason: researchSystemRecoveryReasons.includes(value.recoveryReason) ? value.recoveryReason : "",
     stages
   };
 }
@@ -215,8 +217,9 @@ export function researchRecoveryFromFailedMessage(message, conversationID) {
     status: message.failure.status,
     startedAt: Date.parse(message.createdAt) || Date.now(),
     endedAt: Date.parse(message.failure.failedAt) || Date.now(),
-    error: message.failure.message || "Research did not produce a saved answer. Your question is still here.",
-    errorCode: message.failure.code || "UNKNOWN_RESEARCH_ERROR",
+    error: researchFailureRecovery({ code: message.failure.code || (message.failure.status === "cancelled" ? "RESEARCH_CANCELLED" : "UNKNOWN_RESEARCH_ERROR") }).text,
+    errorCode: message.failure.code || (message.failure.status === "cancelled" ? "RESEARCH_CANCELLED" : "UNKNOWN_RESEARCH_ERROR"),
     stages: [{ id: "preparing_question", state: message.failure.status }]
   };
 }
+import { researchFailureRecovery, researchSystemRecoveryReasons } from "./research-failure-recovery.js?v=20261003-failure-recovery-v1";

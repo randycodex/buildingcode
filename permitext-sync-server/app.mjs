@@ -14,7 +14,7 @@ import { withCodeAssetRevision } from "./public/code-asset-identity.js";
 import { searchIndexedReaderChapter, ReaderSearchIndexError } from "./reader-search-index.mjs";
 import { chapterBodyContractResponse, publicCodeCorpusRevision } from "./chapter-body-contract.mjs";
 import { reportEvidenceEdition } from "./report-presentation.mjs";
-import { researchVerificationFailureExplanation } from "./research-failure-explanation.mjs";
+import { researchFailureRecovery } from "./public/research-failure-recovery.js";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
@@ -19367,9 +19367,7 @@ export function researchConversationWithFailedQuestion(current, { userID, reques
       code, status, failedAt, origin,
       message: status === "cancelled" ? "Research was cancelled. Your question is still here."
         : origin === "client-recovery" ? "Research was interrupted before an answer was saved. Your question is still here."
-        : code === "INVALID_RESEARCH_RESPONSE" ? "Research could not finish generating a complete answer. Your question is still here."
-        : code === "INVALID_RESEARCH_VERIFICATION" ? "Permitext could not read the result of its answer check, so no answer was saved. This is a processing error, not a problem with your question. Your question is saved; use Retry to try again."
-        : "Research did not produce a saved answer. Your question is still here. Retry to recover the same request."
+        : researchFailureRecovery({ code }).text
     }
   };
   next.messages = (next.messages || []).filter((item) => item.id !== message.id &&
@@ -20120,7 +20118,7 @@ async function handleResearchConversationMessage(request, response) {
       : evidencePackage.sources || [];
     if (zoningPlan && evidencePackage.zoningSelection?.pass === false) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence" });
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence_unavailable" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode: "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED" });
       return;
@@ -20143,14 +20141,14 @@ async function handleResearchConversationMessage(request, response) {
     const conditionalZoningExplanation = isZoningConditionalExplanation(zoningPlan);
     if (zoningPlan && zoningPlan.disposition !== zoningResearchDispositions.ready && !conditionalZoningExplanation) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence" });
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "research_unresolved" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode: "RESEARCH_ZONING_PREREQUISITES_REQUIRED" });
       return;
     }
     if (!assembledEvidence.length) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence" });
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence_unavailable" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode: "RESEARCH_EVIDENCE_NOT_FOUND" });
       return;
@@ -20174,7 +20172,7 @@ async function handleResearchConversationMessage(request, response) {
       : { pass: true, issues: [] };
     if (zoningPlan && !zoningEvidenceReadiness.pass) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence" });
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence_unavailable" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode: "RESEARCH_ZONING_EVIDENCE_REQUIRED" });
       return;
@@ -21776,22 +21774,12 @@ async function handleResearchConversationMessage(request, response) {
         webSupport: error.webSupport || null
       }));
       progressResponse.failActive("failed");
-      const providerUnavailable = [
-        "RESEARCH_PROVIDER_ERROR",
-        "RESEARCH_VERIFIER_ERROR",
-        "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE",
-        "TimeoutError"
-      ]
-        .includes(failureCode);
-      const failureMessage = failureCode === "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"
-        ? "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."
-        : providerUnavailable
-          ? "Permitext Research is temporarily unavailable. Your question is still here."
-          : failureCode === "INVALID_RESEARCH_CITATION"
-            ? "The generated answer cited evidence that did not match the selected code sections or question. Permitext withheld the answer because its citations could not be validated. Your question is still here."
-            : researchVerificationFailureExplanation(error.verificationAttempts);
-      progressResponse.error(502, failureMessage, {
-        code: failureCode
+      const failureRecovery = researchFailureRecovery({
+        code: failureCode, verificationAttempts: error.verificationAttempts
+      });
+      progressResponse.error(502, failureRecovery.text, {
+        code: failureCode,
+        ...(failureRecovery.reason ? { recoveryReason: failureRecovery.reason } : {})
       });
       return;
     }

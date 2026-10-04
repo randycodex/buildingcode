@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
+import { researchFailureRecovery } from "../public/research-failure-recovery.js";
 import {
   clearResearchRequestRecoveries,
   createResearchProgressEvent,
@@ -241,7 +242,8 @@ assert(clientSource.includes("restoreResearchProgressSession(conversation)"));
 assert(clientSource.includes("{ retrying: true }"));
 assert(clientSource.includes("requestID: progress.id"));
 assert(clientSource.includes("removeResearchRequestRecovery("));
-assert(clientSource.includes("Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."));
+assert.equal(researchFailureRecovery({code:"RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"}).action,"report");
+assert.match(researchFailureRecovery({code:"RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"}).text,/attributable official guidance/);
 assert(clientSource.includes('error.name === "AbortError"'));
 assert(!clientSource.includes('className = "research-progress-details"'), "Research progress cards still expose the internal stage checklist.");
 assert(!clientSource.includes('className = "research-progress-tasks"'), "Research progress task rows are still rendered.");

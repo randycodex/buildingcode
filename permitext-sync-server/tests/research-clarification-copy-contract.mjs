@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {researchClarificationAnswer,isCanonicalResearchClarification,researchVerificationFailureReason} from '../research-conversation-continuity.mjs';
+import {researchFailureRecovery,researchSystemRecoveryReasons,researchVerificationRecoveryTextForReason} from '../public/research-failure-recovery.js';
 const source=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
-const narrative=new Function(`${source.slice(source.indexOf('function researchDisplayText('),source.indexOf('function researchApplicabilityStatusLabel('))}; return researchAnswerNarrativeText;`)();
-const failure=new Function(`${source.slice(source.indexOf('function researchFailureMessage('),source.indexOf('function renderNewResearchComposer('))}; return researchFailureMessage;`)();
+const narrative=new Function('researchSystemRecoveryReasons','researchVerificationRecoveryTextForReason',`${source.slice(source.indexOf('function researchDisplayText('),source.indexOf('function researchApplicabilityStatusLabel('))}; return researchAnswerNarrativeText;`)(researchSystemRecoveryReasons,researchVerificationRecoveryTextForReason);
+const failure=new Function('researchFailureRecovery',`${source.slice(source.indexOf('function researchFailureMessage('),source.indexOf('function renderNewResearchComposer('))}; return researchFailureMessage;`)(researchFailureRecovery);
 for(const reason of ['verification','evidence']) {
  const question='Explain transparency';
  const answer=researchClarificationAnswer(question,reason);
@@ -20,12 +21,12 @@ for(const reason of ['verification','evidence']) {
 }
 const message=failure({code:'INVALID_RESEARCH_VERIFICATION'});
 for (const [error,expected] of [
- [{code:'INVALID_RESEARCH_RESPONSE'}, /answer it couldn’t read/],
+ [{code:'INVALID_RESEARCH_RESPONSE'}, /answer or review it couldn’t read/],
  [{code:'INVALID_RESEARCH_CITATION'}, /explanation and source references didn’t agree/],
  [{verificationAttempts:[{issues:[{type:'missed_premise_contradiction'}]}]}, /project details already provided/],
  [{verificationAttempts:[{pass:false,issues:[{type:'missed_premise_contradiction'}]},
-   {pass:false,issues:[{type:'unnecessary_qualification'}]}]}, /sources it retrieved/],
- [{code:'RESEARCH_VERIFICATION_FAILED'}, /sources it retrieved/]
+   {pass:false,issues:[{type:'unnecessary_qualification'}]}]}, /source checks/],
+ [{code:'RESEARCH_VERIFICATION_FAILED'}, /source checks/]
 ]) {
  const answer=researchClarificationAnswer('The new building has retail space.',researchVerificationFailureReason(error));
  assert.match(answer.answerText,expected);
@@ -56,10 +57,10 @@ for(const [reason,conclusion] of Object.entries(historicalFailureCopy)) {
   assert(!isCanonicalResearchClarification(question,forged),`Historical compatibility must remain strict for ${field}`);
  }
 }
-assert.match(message,/processing error/);
-assert.match(message,/Retry/);
+assert.match(message,/answer or review it couldn’t read/);
+assert.doesNotMatch(message,/Retry/i);
 assert.doesNotMatch(message,/could not complete its evidence check/);
 assert.equal(narrative({answerText:'A substantive answer.'}),'A substantive answer.');
 console.log('Clarification copy: question first, historical integrity preserved, answer-check failures do not ask users to repeat unchanged questions.');
 
-assert(source.includes('["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_VERIFICATION"].includes(progress.errorCode)'), "Saved progress cards must translate historical verification errors too.");
+assert(source.includes('researchProgressFailureRecovery(progress).text'), "Saved progress cards must translate historical machine-coded failures too.");

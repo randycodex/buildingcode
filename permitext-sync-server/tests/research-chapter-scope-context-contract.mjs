@@ -84,8 +84,8 @@ assert(!nominateResearchChapterScopeCandidates([anchor], catalog, { ...index, pa
   passagesByID: new Map(foreignPassages.map(value => [value.id, value])) }).some(value => value.sectionID === "scope"),
   "A conflicting supplied indexed jurisdiction is rejected even when section registration is genuine.");
 
-// Two actual currently operative chapters lead over a low-ranked incidental
-// chapter, and sourceChapterNumber binds source rather than navigation labels.
+// Current/direct anchors lead over an incidental chapter without dropping its
+// qualified scope before the existing assembly budgets can consider it.
 const other = fixture("other", "880.1", "This chapter shall govern other appliances.", { codePrefix: "PC", chapterNumber: "8" });
 const third = fixture("third", "770.1", "This chapter shall govern third appliances.", { codePrefix: "BC", chapterNumber: "7" });
 const manyCatalog = [scope, other, third];
@@ -94,8 +94,8 @@ const manyAnchors = [anchor, { ...other, eligiblePrimary: true, title: "Operativ
   { ...third, eligiblePrimary: true, title: "Operative rule", signals: { currentQuestionForeground: true } }];
 const many = researchChapterScopeContextPlan({ anchors: manyAnchors,
   canonicalScopeRecords: nominateResearchChapterScopeCandidates(manyAnchors, manyCatalog, manyIndex) });
-assert.deepEqual(many.references.map(value => value.codePrefix), ["PC", "BC"]);
-assert(many.skippedAnchors.some(value => value.reason === "chapter_limit"));
+assert.deepEqual(many.references.map(value => value.codePrefix), ["PC", "BC", "MC"]);
+assert(!many.skippedAnchors.some(value => value.reason === "chapter_limit"));
 assert.equal(plan({ anchors: [{ ...anchor, chapterNumber: "navigation-only", sourceChapterNumber: "9" }] }).references.length, 1);
 
 // Actual full current enacted sources, including local Scope false positives.
