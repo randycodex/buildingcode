@@ -1,17 +1,10 @@
 // Equipment vocabulary is search intent, never authority or a legal result.
-export const researchEquipmentSearchIntentVersion = '20261003-air-opening-equipment-language-v2';
+import { researchPositiveSearchText as positiveCurrentText } from './research-search-vocabulary.mjs';
+export const researchEquipmentSearchIntentVersion = '20261003-shared-positive-equipment-language-v3';
 
 const hoseEquipment = /\b(?:hose[-\s]+(?:faucets?|taps?|bibb?s?|connections?|outlets?)|sillcocks?|(?:faucets?|taps?|spigots?|outlets?)\b[^.!?;]{0,120}\b(?:garden[-\s]+)?hoses?(?:[-\s]+threads?)?|(?:attach|connect|hook\s+up)\b[^.!?;]{0,30}\b(?:garden[-\s]+)?hoses?\b[^.!?;]{0,60}\b(?:faucets?|taps?|spigots?|outlets?))\b/i;
 const technicalHoseEquipment = /\b(?:sillcocks?|hose[-\s]+bibbs?|hose[-\s]+connections?)\b/i;
 const otherEquipment = /\b(?:lavator\w*|sinks?|drinking[-\s]+fountains?|toilets?|showers?|water[-\s]+heaters?|boilers?|ducts?|extinguishers?)\b/i;
-
-function positiveCurrentText(question) {
-  // Quoted examples and contrasted/negated objects cannot nominate equipment.
-  // Clause boundaries retain a following affirmative correction.
-  return String(question || '').replace(/`[^`]*`|"[^"\n]*"|“[^”\n]*”|(?<!\p{L})'[^'\n]+'(?!\p{L})/gu, ' ')
-    .replace(/\b(?:not|no|never|without|excluding|instead\s+of|rather\s+than|unlike|(?:do|does|did)\s+not|don['’]t)\b[^.;!?]*?(?=\s*[;.!?]|\bbut\b|$)/gi, ' ')
-    .replace(/\b(?:compare[ds]?\s+with|compared\s+to|in\s+contrast\s+to)\b[^.;!?]*?(?=\s*[,;.!?]|\bbut\b|$)/gi, ' ');
-}
 
 function hoseSearchIntent(question = '') {
   const original = String(question || '');

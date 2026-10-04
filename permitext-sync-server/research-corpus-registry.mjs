@@ -1,8 +1,8 @@
 import { researchQuestionSubject, researchFloorAreaRatioRequested } from "./research-question-subject.mjs";
-import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
+import { decideResearchConversationTopic, researchQuestionExplicitlySwitchesTopic } from "./research-conversation-topic.mjs";
 import { researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 
-export const researchCorpusRegistryVersion = "20261003-shared-subject-corpus-v19";
+export const researchCorpusRegistryVersion = "20261003-explicit-issue-corpus-boundary-v20";
 const currentLibraryRecallReason = "authorized current-library recall; applicability unresolved";
 
 const constructionCodeVersion =
@@ -25,7 +25,7 @@ const projectDependentZoningCuePattern = /\b(?:parking|floor\s+area|permitted\s+
 // Preserve lowercase FAR when its surrounding words establish ratio intent.
 const floorAreaRatioCue = researchFloorAreaRatioRequested;
 const independentlyNamedZoningCue = /\b(?:and|plus|as\s+well\s+as|under)\s+(?:the\s+)?zoning\b|\bzoning\s+(?:and|plus|as\s+well\s+as)\b/i;
-const zoningCue = { test: value => zoningCuePattern.test(value) || independentlyNamedZoningCue.test(value) || floorAreaRatioCue(value) };
+const zoningCue = { test: value => zoningCuePattern.test(value) || independentlyNamedZoningCue.test(value) || floorAreaRatioCue(value) || researchQuestionSubject(value).codePrefixes.includes("ZR") };
 const projectDependentZoningCue = { test: value => projectDependentZoningCuePattern.test(value) || floorAreaRatioCue(value) };
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\b/i;
 const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas|Administrative)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b|\b(?:BC|AC|PC|MC|FGC)14\b|\b2014\s+code\b|\b(?:BC|AC|PC|MC|FGC|Building\s+Code|Construction\s+Codes?)\s*2014\b/i;
@@ -61,6 +61,20 @@ function recentUserContext(messages) {
     .map((message) => compactText(message?.question || message?.content || message?.text))
     .filter(Boolean)
     .join("\n");
+}
+
+function editionOnlyRoutingContext(value) {
+  // An explicit edition preference can survive a new subject, but the old
+  // question's equipment, legal topic and incidental authority cannot.
+  const text = compactText(value);
+  const shorthand = year => new RegExp(`\\b(?:what|how)\\s+about\\s+(?:the\\s+)?${year}\\b`, "i").test(text);
+  return [
+    historicalBuildingCue.test(text) || shorthand(1968) ? "1968 Building Code" : "",
+    historical2014ConstructionCue.test(text) || shorthand(2014) ? "2014 Construction Codes" : "",
+    current2022ConstructionCue.test(text) || shorthand(2022) ? "2022 Construction Codes" : "",
+    unsupported2008ConstructionCue.test(text) || shorthand(2008) ? "2008 Construction Codes" : "",
+    futureExistingBuildingCue.test(text) ? "Existing Building Code" : ""
+  ].filter(Boolean).join("\n");
 }
 
 function immutableCorpus(value) {
@@ -245,9 +259,12 @@ export function routeResearchCorpora({
     ? currentQuestion.replace(/\b27-\d{3,4}\b/g, "") : currentQuestion;
   const changesDomain = fireCue.test(currentQuestion) || zoningCue.test(domainQuestion) || appendixPCrossEditionCue.test(currentQuestion) || projectZoningRequested;
   const inheritsEditionContext = Boolean(latestEditionContext && !currentHasEditionCue && !changesDomain);
-  const explicitCurrentAuthority = /\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas|fire)\s+code\b|\bzoning\b|\b(?:new|different|unrelated|separate)\s+(?:topic|question)\b/i.test(currentQuestion);
+  const explicitCurrentAuthority = /\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas|fire)\s+code\b|\bzoning\b/i.test(currentQuestion) ||
+    researchQuestionExplicitlySwitchesTopic(currentQuestion);
   const topicDecision = decideResearchConversationTopic({ question: currentQuestion, previousMessages,
     rootTopic: topicContext?.rootTopic, currentTopic: topicContext?.currentTopic });
+  const routingEditionContext = topicDecision.contextPolicy.includeRootTopic
+    ? latestEditionContext : editionOnlyRoutingContext(latestEditionContext);
   // Generic terms such as travel distance occur in several codes. A follow-up
   // inherits its subject's corpus unless the user actually changes authority.
   const inheritedSubject = !explicitCurrentAuthority && !currentHasEditionCue &&
@@ -256,12 +273,12 @@ export function routeResearchCorpora({
     ? (topicDecision.signals.returnToOriginal && compactText(topicContext?.originalTopic)) || topicDecision.rootTopic.text
     : "";
   const context = inheritsEditionContext && !topicDecision.signals.returnToOriginal
-    ? [currentQuestion, latestEditionContext].join("\n")
+    ? [currentQuestion, routingEditionContext].filter(Boolean).join("\n")
     : inheritedSubject
     ? [currentQuestion, inheritedSubject].join("\n")
     : currentHasCorpusCue
-    ? [currentQuestion, inheritsEditionContext ? latestEditionContext : ""].filter(Boolean).join("\n")
-    : [currentQuestion, latestEditionContext || conversationContext].filter(Boolean).join("\n");
+    ? [currentQuestion, inheritsEditionContext ? routingEditionContext : ""].filter(Boolean).join("\n")
+    : [currentQuestion, routingEditionContext || (topicDecision.contextPolicy.includeRootTopic ? conversationContext : "")].filter(Boolean).join("\n");
   const unsupported2008Requested = unsupported2008ConstructionCue.test(context) ||
     shorthand2008Requested ||
     (inheritsEditionContext && !inheritedSubject && latestEditionContext && /\b2008\b/.test(latestEditionContext));

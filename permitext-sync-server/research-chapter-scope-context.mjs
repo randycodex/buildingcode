@@ -4,7 +4,7 @@ import { researchEvidencePriorityMetadata } from "./research-evidence-priority.m
 
 // These are exact-text nominations, not chapter applicability decisions. The
 // canonical resolver must supply the complete enacted qualification afresh.
-export const researchChapterScopeContextVersion = "20261003-admitted-rule-chapter-scope-v2";
+export const researchChapterScopeContextVersion = "20261003-search-vocabulary-scope-priority-v3";
 // Actual primary evidence already bounds this plan. Assembly reuses complete
 // supplied scopes or admits them within its structural and character limits.
 export const researchChapterScopeContextMaximumChapters = null;
@@ -108,13 +108,13 @@ function currentForeground(anchor) {
   const signal = anchor.signals?.currentQuestionForeground;
   if (signal === true) return { source: "literal_current_question" };
   return signal && Number.isSafeInteger(signal.rank) && signal.rank >= 1 && signal.rank <= 5 &&
-    ["positive_equipment_subject", "literal_current_question"].includes(signal.source) ? signal : null;
+    ["positive_equipment_subject", "positive_search_vocabulary", "literal_current_question"].includes(signal.source) ? signal : null;
 }
 const importance = anchor => Number(anchor.origin === "user_pinned") * 8 +
   Number(anchor.signals?.exactReference === true) * 4 +
   Number(!!currentForeground(anchor) || !!anchor.signals?.currentQuestionLexicalReservation ||
     anchor.signals?.exactTopicRouteTarget === true) * 2 +
-  Number(currentForeground(anchor)?.source === "positive_equipment_subject") + Number(!inherited(anchor));
+  Number(["positive_equipment_subject", "positive_search_vocabulary"].includes(currentForeground(anchor)?.source)) + Number(!inherited(anchor));
 
 /** Only actual primary writer evidence can admit its nominated chapter scope. */
 export function researchChapterScopeContextPlan({ anchors = [], canonicalScopeRecords = [], strategy = { mode: "broad" },

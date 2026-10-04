@@ -1,6 +1,8 @@
 import { researchPriorAnswerSources } from "./research-conversation-continuity.mjs";
+import { researchQuestionSubject } from "./research-question-subject.mjs";
+import { researchSearchVocabulary } from "./research-search-vocabulary.mjs";
 
-export const researchConversationTopicVersion = "20261003-bounded-causal-equipment-continuity-v11";
+export const researchConversationTopicVersion = "20261003-positive-human-subject-continuity-v12";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -271,13 +273,41 @@ function referencesOverlap(questionReferences, topicReferences) {
   );
 }
 
+function humanVocabularySubjectContinuation(question, rootTopic, currentTopic, explicitSwitch) {
+  if (explicitSwitch || !rootTopic.text && !currentTopic.text) return false;
+  const references = extractResearchCodeReferences(question);
+  const priorReferences = [...rootTopic.codeReferences, ...currentTopic.codeReferences];
+  if (references.length && priorReferences.length && !referencesOverlap(references, priorReferences)) return false;
+  const currentPrefixes = new Set([
+    ...researchQuestionSubject(question).codePrefixes,
+    ...references.map(reference => reference.codePrefix).filter(Boolean)
+  ]);
+  // Only the shared positive vocabulary can resolve an omitted user subject.
+  // Current named/recognized equipment and references keep their own family;
+  // assistant claims, source titles and private topic-specific aliases cannot.
+  const vocabulary = researchSearchVocabulary(question, {
+    contextDependentFollowUp: true,
+    humanTopics: [rootTopic.text, currentTopic.text]
+  });
+  return vocabulary.concepts.some(concept => concept.origin === "human_context" &&
+    [...currentPrefixes].every(prefix => concept.codePrefixes.includes(prefix)));
+}
+
 export function researchQuestionReturnsToOriginalTopic(question) {
   return /\b(?:(?:back|return(?:ing)?|go back)\s+to\s+|what\s+about\s+)(?:the\s+|our\s+)?(?:original|first|earlier|initial)\b/i
     .test(normalizedText(question));
 }
 
+export function researchQuestionExplicitlySwitchesTopic(question) {
+  // Only an affirmative leading user instruction changes the topic here.
+  // Quoted examples, negated mentions and a shared project/location do not.
+  return /^(?:(?:new|different|unrelated|another)\s+(?:topic|question|issue|problem|concern|subject|matter)|separate(?:ly)?|moving on)\b/i
+    .test(normalizedText(question));
+}
+
 function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
   const returnToOriginal = researchQuestionReturnsToOriginalTopic(question);
+  const explicitSwitch = researchQuestionExplicitlySwitchesTopic(question);
   const correction = /^(?:correction\b|actually\b|to clarify\b|clarification\b)|\bI meant\b|\bnot\s+.+\s+but\b|\brather than\b/i.test(question);
   // A scope exclusion is not a request to compare this source with a prior topic.
   // A request to cite the relevant rule identifies supporting authority; it
@@ -295,8 +325,7 @@ function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
     (/\b(?:compare|relationship)\b/i.test(comparisonQuestion) && extractResearchCodeReferences(comparisonQuestion).length >= 2);
   const relevanceComparison = comparesSourceRelevance &&
     /\b(?:related|relevant|responsive|contribute|support|apply|applicable|compare|relationship)\b/i.test(comparisonQuestion) &&
-    !/^\s*(?:new|different|separate|unrelated)\s+(?:topic|question)\b/i.test(comparisonQuestion);
-  const explicitSwitch = /^(?:new topic|different (?:topic|question)|separate(?:ly)?|unrelated (?:topic|question)|moving on|another (?:topic|question))\b/i.test(question);
+    !explicitSwitch;
   const projectSubjectContinuation = /^(?:the|this|that|our|my)\s+(?:building|structure|project|work|scope|space|room|application|occupant load|(?:exit access )?travel distance|construction type|building height)\b/i.test(question);
   const hypotheticalContinuation = /^(?:what if|suppose|assuming|assume|hypothetically)\b/i.test(question);
   const formatTransformation =
@@ -306,6 +335,7 @@ function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
   const explicitFollowUp = /^(?:then\b|and\b|yes\b|so\b|where should (?:I|we) measure\b|what is the governing\b)/i.test(question);
   const definiteSubject = definiteSubjectContinuation(question, rootTopic.text, currentTopic.text);
   const causalSubject = !explicitSwitch && causalSubjectContinuation(question, rootTopic.text, currentTopic.text, previousMessages);
+  const vocabularySubject = humanVocabularySubjectContinuation(question, rootTopic, currentTopic, explicitSwitch);
   const contextualContinuation =
     explicitFollowUp ||
     /^(?:why|how so|explain|tell me more|more details?|go on|what about)\b/i.test(question) ||
@@ -315,7 +345,8 @@ function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
     projectSubjectContinuation ||
     hypotheticalContinuation ||
     definiteSubject ||
-    causalSubject;
+    causalSubject ||
+    vocabularySubject;
   const questionReferences = extractResearchCodeReferences(question);
   const topicReferences = [...rootTopic.codeReferences, ...currentTopic.codeReferences];
   const relatedReference = referencesOverlap(questionReferences, topicReferences);
@@ -344,6 +375,7 @@ function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
     citedSubjectContinuation: citedSubject,
     causalSubjectContinuation: causalSubject,
     definiteSubjectContinuation: definiteSubject,
+    humanVocabularySubjectContinuation: vocabularySubject,
     questionReferences
   };
 }
@@ -420,6 +452,7 @@ export function decideResearchConversationTopic({
       citedSubjectContinuation: signals.citedSubjectContinuation,
       causalSubjectContinuation: signals.causalSubjectContinuation,
       definiteSubjectContinuation: signals.definiteSubjectContinuation,
+      humanVocabularySubjectContinuation: signals.humanVocabularySubjectContinuation,
       relatedReference: signals.relatedReference,
       disjointExplicitReference: signals.disjointExplicitReference,
       selfContained: signals.selfContained,
