@@ -18,12 +18,16 @@ const detailForms = word => {
 
 // Literal current details nominate complete canonical packets; neither titles
 // nor this overlap establish applicability. Numeric premises never enter it.
-export function researchCurrentRuleDetailScore(source, question) {
+export function researchCurrentRuleDetails(source, question) {
   const terms = [...new Set(String(question || '').toLowerCase().match(/[a-z]{3,}/g) || [])]
     .filter(word => !detailStopWords.has(word));
   const words = new Set((String(source?.text || source?.selectedText || source?.canonicalText || '')
     .toLowerCase().match(/[a-z]{3,}/g) || []).flatMap(word => [...detailForms(word)]));
-  return terms.filter(word => [...detailForms(word)].some(form => words.has(form))).length;
+  return terms.filter(word => [...detailForms(word)].some(form => words.has(form)));
+}
+
+export function researchCurrentRuleDetailScore(source, question) {
+  return researchCurrentRuleDetails(source, question).length;
 }
 
 // A complete canonical alternatives list can name a method differently from

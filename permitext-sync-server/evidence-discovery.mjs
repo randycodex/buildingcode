@@ -8,10 +8,10 @@ import { searchResearchPassages } from "./research-passage-index.mjs";
 import { researchCurrentRuleDetailScore, researchCheckedRuleIndexPassage } from "./research-rule-packets.mjs";
 import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch,
   researchActiveHumanDefinitionMatch } from "./research-definition-excerpts.mjs";
-import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
+import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup, researchImmediateChildDetailGain } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261004-current-property-foreground-v64";
+export const evidenceDiscoveryVersion = "20261004-immediate-child-detail-gain-v65";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -2389,6 +2389,36 @@ export async function discoverRelevantEvidence({
     selectedCandidates = [...protectedItems, ...foreground, ...selectedCandidates.filter(item =>
       !protectedItems.includes(item) && !foreground.includes(item))].slice(0, candidateLimit);
   }
+  // One already-read whole child may add current details absent from an admitted
+  // parent. Reserve added coverage, not merely the highest broad lexical score.
+  // Exact/protected reservations keep precedence; no reads or slots are added.
+  if (candidateLimit > 1 && retrievalContext?.sourceSelectionRestricted !== true && !relevanceComparison) {
+    for (const parent of selectedCandidates) {
+      if (!parent.indexedPassage || parent.useSelectedPassageOnly || parent.contextualReference || parent.inheritedReference ||
+          !boundCanonicalRulePassage({ ...parent.section, body: parent.body,
+            text: sectionText(parent.section, parent.body) }, parent.indexedPassage, true)) continue;
+      const children = detailed.filter(item => item !== parent && !selectedCandidates.includes(item) &&
+        item.indexedPassage && !item.useSelectedPassageOnly && !item.contextualReference && !item.inheritedReference &&
+        zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) >= 1 &&
+        boundCanonicalRulePassage({ ...item.section, body: item.body, text: sectionText(item.section, item.body) }, item.indexedPassage, true))
+        .map(item => ({ item, gained: researchImmediateChildDetailGain(parent.indexedPassage, item.indexedPassage, currentQuestion) }))
+        .filter(value => value.gained)
+        .sort((left, right) => right.gained.length - left.gained.length ||
+          researchCurrentRuleDetailScore(right.item.indexedPassage, currentQuestion) - researchCurrentRuleDetailScore(left.item.indexedPassage, currentQuestion) ||
+          right.item.score - left.item.score);
+      const child = children[0];
+      if (!child) continue;
+      const protectedItems = selectedCandidates.filter(item => item === lead || item === parent || item.directReference ||
+        item.completeSiblingCompanionOf || item.currentQuestionLexicalReservation || item.currentQuestionForeground);
+      if (protectedItems.length >= candidateLimit) continue;
+      child.item.currentDetailChildParent = Object.fromEntries(['id', 'sectionID', 'sectionNumber', 'subsectionNumber',
+        'codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction', 'text', 'scopeComplete',
+        'sourceTextHash', 'sourceOffsets'].map(key => [key, parent.indexedPassage[key]]));
+      selectedCandidates = [...protectedItems, child.item, ...selectedCandidates.filter(item => !protectedItems.includes(item))]
+        .slice(0, candidateLimit);
+      break;
+    }
+  }
   const selectedIDs = new Set(selectedCandidates.map((item) => item.section.id));
   const selectedPrefixCounts = new Map();
   for (const item of selectedCandidates) {
@@ -2549,6 +2579,7 @@ export async function discoverRelevantEvidence({
       signals: {
         matchedTerms: item.matchedTerms.slice(0, 12),
         ...(item.completeSiblingCompanionOf ? { completeSiblingCompanionOf: item.completeSiblingCompanionOf } : {}),
+        ...(item.currentDetailChildParent ? { currentDetailChildParent: item.currentDetailChildParent } : {}),
         ...(item.currentQuestionLexicalReservation ? { currentQuestionLexicalReservation: item.currentQuestionLexicalReservation } : {}),
         ...(item.currentQuestionForeground ? { currentQuestionForeground: item.currentQuestionForeground } : {}),
         ...(item.definitionCarrier ? { canonicalEmbeddedDefinitions: item.definitionCarrier } : {}),

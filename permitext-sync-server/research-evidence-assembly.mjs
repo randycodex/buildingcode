@@ -25,7 +25,7 @@ import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from
 import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
 import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { researchSearchVocabulary, researchPositiveSearchText, researchSearchVocabularyMatches } from "./research-search-vocabulary.mjs";
-import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage, researchOperativeParentLink, researchParentChildReferenceLink } from "./research-rule-groups.mjs";
+import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage, researchOperativeParentLink, researchParentChildReferenceLink, researchImmediateChildDetailGain } from "./research-rule-groups.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import { researchChapterScopeContextPlan, resolveResearchChapterScopeContext } from "./research-chapter-scope-context.mjs";
 import {
@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261004-literal-parent-scope-context-v78";
+export const researchEvidenceAssemblyVersion = "20261004-bound-immediate-child-detail-v79";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1185,6 +1185,16 @@ export async function assembleResearchEvidence({
     : relevanceCandidates;
   const candidates = focusedTechnicalCandidates(query,
     focusedVentilationCandidates(query, boundaryCandidates, pinnedEvidence.length), pinnedEvidence.length);
+  // A recall child depends on the fresh admitted parent. Materiality ordering
+  // may move an exception ahead of it; restore only this dependency order.
+  for (const child of [...candidates]) {
+    const parentID = child.signals?.currentDetailChildParent?.sectionID;
+    const parent = parentID && candidates.find(value => value.sectionID === parentID);
+    if (parent && candidates.indexOf(child) < candidates.indexOf(parent)) {
+      candidates.splice(candidates.indexOf(child), 1);
+      candidates.splice(candidates.indexOf(parent) + 1, 0, child);
+    }
+  }
   const nonMaterialCandidateCount = prioritizedCandidates.length - candidates.length;
   await onStage?.("searching_authorized_library", "completed");
   await onStage?.("reviewing_provisions", "active");
@@ -1559,6 +1569,7 @@ export async function assembleResearchEvidence({
     }
   };
   const reserveCurrentActionParent = async (canonical, record, candidate, freshCandidateSource) => {
+    if (record.currentDetailChildParent) return; // Complete bound parent context is already supplied.
     const vocabulary = query.searchVocabulary;
     const concept = vocabulary?.concepts?.length === 1 ? vocabulary.concepts[0] : null;
     const fields = ['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'];
@@ -1768,6 +1779,8 @@ export async function assembleResearchEvidence({
 
   let discoveredCount = 0;
   let completeActivePacketCount = 0;
+  let completeDetailChildCount = 0;
+  const freshDiscoveredSources = new Map();
   const includeRequestedHistory = (section, explicitlyPinned = false) => {
     if (strictPinnedEvidenceBoundary || discoveredCount >= limits.maximumDiscovered) return false;
     const history = requestedZoningAmendmentHistory(section, query.question, { explicitlyPinned });
@@ -1823,6 +1836,23 @@ export async function assembleResearchEvidence({
       resolverFailureCount += 1;
       continue;
     }
+    const detailNomination = candidate.signals?.currentDetailChildParent;
+    let detailParentRecord = null;
+    if (detailNomination) {
+      const freshParent = freshDiscoveredSources.get(String(detailNomination.sectionID));
+      detailParentRecord = sources.find(value => String(value.sectionID) === String(detailNomination.sectionID) &&
+        value.canonicalContextComplete && !value.truncated && value.codePrefix === candidate.codePrefix &&
+        sameTopicDependencyCorpus(value, candidate));
+      if (completeDetailChildCount || pinnedEvidence.length || strictPinnedEvidenceBoundary ||
+          candidate.signals?.useSelectedPassageOnly || candidate.referenceOnly || candidate.selectionMode === 'section_reference' ||
+          !detailParentRecord || !freshWholeCanonicalSource(freshParent) || !freshWholeCanonicalSource(freshCandidateSource) ||
+          String(freshCandidateSource.sectionID || freshCandidateSource.id) !== String(candidate.sectionID) ||
+          ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].some(field =>
+            !candidate[field] || freshCandidateSource[field] !== candidate[field]) ||
+          !boundCanonicalRulePassage(freshParent, detailNomination, true) ||
+          !boundCanonicalRulePassage(freshCandidateSource, candidate.indexedPassage, true) ||
+          !researchImmediateChildDetailGain(detailNomination, { ...candidate, ...candidate.indexedPassage }, query.question)) continue;
+    }
     if (includeRequestedHistory(resolved)) {
       includedSectionIdentities.add(sectionIdentity(resolved));
       continue;
@@ -1851,7 +1881,7 @@ export async function assembleResearchEvidence({
     const allowance = Math.min(
       activeCheckedPacket ? remainingCharacters : limits.maximumCharactersPerSource,
       remainingCharacters,
-      activeCheckedPacket || ((candidate.rank ?? index + 1) <= 2 && remainingCharacters >= 2 * canonicalText(resolved).length &&
+      activeCheckedPacket || detailParentRecord || ((candidate.rank ?? index + 1) <= 2 && remainingCharacters >= 2 * canonicalText(resolved).length &&
         canonicalText(resolved).length <= limits.maximumCharactersPerSource &&
         (!candidates.some(value => value.evidencePriority?.claimCoverageRequired === true) ||
           candidate.evidencePriority?.claimCoverageRequired === true)) ||
@@ -1921,8 +1951,19 @@ export async function assembleResearchEvidence({
     // If its complete source cannot fit, omit this optional reservation rather
     // than deliver a clipped or narrower block as the complete companion.
     if (candidate?.signals?.completeSiblingCompanionOf && !record.canonicalContextComplete) continue;
+    if (detailParentRecord) {
+      if (!record.canonicalContextComplete || record.truncated) continue;
+      record.relationship = `Complete immediate child adding current-question detail to source ${detailParentRecord.sourceID}; hierarchy is advisory context, not established applicability`;
+      record.currentDetailChildParent = { sourceID: detailParentRecord.sourceID, sectionID: detailParentRecord.sectionID,
+        parentPassageSourceTextHash: detailNomination.sourceTextHash, childPassageSourceTextHash: candidate.indexedPassage.sourceTextHash };
+      detailParentRecord.applicabilityScopeAnchors = [...detailParentRecord.applicabilityScopeAnchors || [],
+        { sourceID: record.sourceID, sectionID: record.sectionID, kind: 'parent_scope', basis: 'indexed_immediate_child_detail_gain' }];
+      completeDetailChildCount += 1;
+    }
     if (!record.text) break;
     sources.push(record);
+    if (record.canonicalContextComplete && !record.truncated && freshWholeCanonicalSource(freshCandidateSource))
+      freshDiscoveredSources.set(String(record.sectionID), freshCandidateSource);
     if (activeCheckedPacket) completeActivePacketCount += 1;
     if (record.truncated && (candidate.evidencePriority?.claimCoverageRequired === true ||
         (query.contextDependentFollowUp && index < 2)) &&
