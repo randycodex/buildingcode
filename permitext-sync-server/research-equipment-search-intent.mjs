@@ -1,6 +1,6 @@
 // Equipment vocabulary is search intent, never authority or a legal result.
-import { researchPositiveSearchText as positiveCurrentText } from './research-search-vocabulary.mjs';
-export const researchEquipmentSearchIntentVersion = '20261003-shared-positive-equipment-language-v3';
+import { researchPositiveSearchText as positiveCurrentText, researchGasEquipmentVocabulary } from './research-search-vocabulary.mjs';
+export const researchEquipmentSearchIntentVersion = '20261004-shared-positive-equipment-language-v4';
 
 const hoseEquipment = /\b(?:hose[-\s]+(?:faucets?|taps?|bibb?s?|connections?|outlets?)|sillcocks?|(?:faucets?|taps?|spigots?|outlets?)\b[^.!?;]{0,120}\b(?:garden[-\s]+)?hoses?(?:[-\s]+threads?)?|(?:attach|connect|hook\s+up)\b[^.!?;]{0,30}\b(?:garden[-\s]+)?hoses?\b[^.!?;]{0,60}\b(?:faucets?|taps?|spigots?|outlets?))\b/i;
 const technicalHoseEquipment = /\b(?:sillcocks?|hose[-\s]+bibbs?|hose[-\s]+connections?)\b/i;
@@ -87,10 +87,22 @@ function airOpeningSearchIntent(question, options) {
 
 export function researchEquipmentSearchIntent(question = '', options = {}) {
   if (!String(question || '').trim() || String(question).length > 4000) return null;
-  return hoseSearchIntent(question) || airOpeningSearchIntent(question, options);
+  const gas = researchGasEquipmentVocabulary(question, options);
+  return hoseSearchIntent(question) || airOpeningSearchIntent(question, options) || (gas?.query ? {
+    version: researchEquipmentSearchIntentVersion, kind: 'positive_equipment_subject', ...gas
+  } : null);
 }
 
 export function researchEquipmentSubjectMatches(text, intent) {
+  // Negative operative clauses still identify their regulated equipment.
+  // Positive-language filtering is for human intent, not canonical law.
+  if (intent?.subject === 'gas_appliance') {
+    const canonical = String(text || '');
+    if (!/\bappliances?\b/i.test(canonical)) return false;
+    if (intent.aspect === 'location') return /\b(?:locat\w*|rooms?|bathrooms?|bedrooms?|closets?)\b/i.test(canonical);
+    if (intent.aspect === 'shutoff') return /\bshut[-\s]?off\b/i.test(canonical) && /\bvalves?\b/i.test(canonical);
+    return intent.aspect === 'combustion_air' && /\bcombustion[-\s]+air\b/i.test(canonical);
+  }
   const positive = positiveCurrentText(text);
   if (intent?.subject === 'hose_connection') return technicalHoseEquipment.test(positive);
   if (intent?.subject !== 'air_opening' || !/\b(?:air|combustion|ventilation)\b/i.test(positive) ||

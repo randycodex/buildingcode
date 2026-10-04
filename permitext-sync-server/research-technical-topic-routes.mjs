@@ -2,16 +2,17 @@
 // These routes supply enacted evidence, never answers, thresholds or Project
 // facts. The corpus router still owns edition eligibility and selected scope.
 import { focusedTechnicalTopicRoutes } from "./research-focused-technical-scope.mjs";
-const route = (pattern, label, codePrefix, sections, options = {}) => ({
-  pattern, label,
-  targets: sections.map((sectionPrefix) => ({ codePrefix, sectionPrefix, codeEdition: "2022", ...options }))
-});
+const route = (pattern, label, codePrefix, sections, options = {}) => {
+  const { nominationVocabulary, ...targetOptions } = options;
+  return { pattern, label, ...(nominationVocabulary ? { nominationVocabulary } : {}),
+    targets: sections.map((sectionPrefix) => ({ codePrefix, sectionPrefix, codeEdition: "2022", ...targetOptions })) };
+};
 
 export const researchTechnicalTopicRoutes = [
   route(/\bextinguishers?\b/i,
     "portable fire extinguisher coverage and travel distance", "FC", ["906"], { descendantClaimCoverage: false }),
   route(/^(?=[\s\S]*\bgas\b)(?=[\s\S]*\bappliances?\b)(?=[\s\S]*\bshut[- ]?off\b)/i,
-    "gas appliance shutoff valve location", "FGC", ["409.5.1"], { descendantClaimCoverage: false }),
+    "gas appliance shutoff valve location", "FGC", ["409.5.1"], { descendantClaimCoverage: false, nominationVocabulary: 'gas_equipment' }),
   route(/^(?=[\s\S]*\btraps?\b)(?=[\s\S]*\b(?:liquid|water|seal)\b)/i,
     "fixture trap liquid seals", "PC", ["1002.4"], { descendantClaimCoverage: false }),
   {
@@ -30,9 +31,9 @@ export const researchTechnicalTopicRoutes = [
   },
   ...focusedTechnicalTopicRoutes,
   route(/^(?=[\s\S]*\b(?:gas[- ]fired|gas\s+appliances?|fuel[- ]gas)\b)(?=[\s\S]*\b(?:bathrooms?|toilet\s+rooms?|storage\s+closets?|surgical\s+rooms?)\b)/i,
-    "fuel-gas appliance location restrictions and exceptions", "FGC", ["303.3"], { descendantClaimCoverage: false }),
+    "fuel-gas appliance location restrictions and exceptions", "FGC", ["303.3"], { descendantClaimCoverage: false, nominationVocabulary: 'gas_equipment' }),
   route(/^(?=[\s\S]*\b(?:gas[- ]fired|gas\s+appliances?|fuel[- ]gas)\b)(?=[\s\S]*\b(?:bedrooms?|sleeping\s+rooms?)\b)/i,
-    "fuel-gas appliance sleeping-room restrictions and exceptions", "FGC", ["303.3"]),
+    "fuel-gas appliance sleeping-room restrictions and exceptions", "FGC", ["303.3"], { nominationVocabulary: 'gas_equipment' }),
   route(/^(?=[\s\S]*\bgas\b)(?=[\s\S]*\bpip(?:e|es|ing)\b)(?=[\s\S]*\b(?:tests?|testing|tested|inspect\w*|acceptance|commission\w*|service|operat\w*)\b)/i,
     "fuel-gas piping inspection and testing before service", "FGC", ["404.20", "406.1"]),
   route(/^(?=[\s\S]*\bgas\b)(?=[\s\S]*\bpip(?:e|es|ing)\b)(?=[\s\S]*\b(?:support\w*|strapp?\w*|hang(?:er|ers|ing)?|brackets?|anchor\w*)\b)/i,
