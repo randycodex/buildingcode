@@ -6,7 +6,7 @@ export const researchAnswerQualityVersion =
 
 const applicabilitySubjectWords = value => String(value).toLowerCase()
   .replace(/['’]s\b/g, "")
-  .match(/[a-z]+/g)?.filter(word => !['a', 'an', 'the', 'same', 'this', 'that', 'these', 'those', 'still'].includes(word)) || [];
+  .match(/[a-z0-9]+(?:[.-][a-z0-9]+)*/g)?.filter(word => !['a', 'an', 'the', 'same', 'this', 'that', 'these', 'those', 'still'].includes(word)) || [];
 const applicabilitySubjectHead = value => applicabilitySubjectWords(String(value).split(/\b(?:on|of|for|to|in|under|against|with|from)\b/i)[0]).at(-1);
 const literalConditionText = value => compactText(value).toLowerCase().replace(/\bactually\b/g, '').replace(/\s+/g, ' ').trim();
 
@@ -24,10 +24,16 @@ function applicabilityOpeningContradiction(query, opening) {
   if (/\b(?:but|otherwise|unless|except|provided|when|while)\b/i.test(clause)) return false;
   const condition = clause.match(/^if\s+([^,]+),\s*([\s\S]+)$/i);
   if (condition) {
-    // Preserve a condition explicitly repeated from this user's current
-    // premise. Do not treat an arbitrary alternate scenario as a contradiction.
+    // Require a direct, immediately preceding assertion, not an embedded
+    // assumption or a premise followed by a correction. A simple noun-phrase
+    // contrast may qualify it; other clauses remain semantic-review work.
     const context = query.slice(0, query.length - finalQuestion.length);
-    if (!literalConditionText(context).includes(literalConditionText(condition[1]))) return false;
+    const assertion = literalConditionText(context).split(/[.!?](?:\s+|$)/).filter(Boolean).at(-1)?.trim() || '';
+    const premise = literalConditionText(condition[1]);
+    if (!assertion.startsWith(premise)) return false;
+    const contrast = assertion.slice(premise.length);
+    if (contrast && (!/^(?:,\s*|\s+)(?:rather than|not)\s+[^,;]+$/.test(contrast) ||
+        /\b(?:is|are|was|were|has|have|had|does|do|did|but|that|which|if|unless)\b/i.test(contrast))) return false;
     clause = condition[2];
   } else if (/\bif\b/i.test(clause)) return false;
   const denial = clause.match(/^(.*?)\b(?:does\s+not\s+apply|do\s+not\s+apply|doesn't\s+apply|don't\s+apply|is\s+not\s+applicable|are\s+not\s+applicable|isn't\s+applicable|aren't\s+applicable)\b(.*)$/i);

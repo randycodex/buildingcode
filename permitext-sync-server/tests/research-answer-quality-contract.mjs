@@ -1015,6 +1015,9 @@ const applicabilityConflicts = [
   ['Does the alarm-testing rule still apply?', 'Yes. The alarm-testing rule does not apply.'],
   ['Is the cable-label rule applicable to this installation?', 'Yes—The cable-label rule is not applicable to this installation.'],
   ['Does the inspection restriction apply?', "**Yes.** The inspection restriction **doesn't apply**."],
+  ['Does Section 915.2 apply?', 'Yes. Section 915.2 does not apply.'],
+  ['Does the 2022 inspection rule apply?', 'Yes. The 2022 inspection rule does not apply.'],
+  ['The previous assumption was wrong. This is the indoor assembly. Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.'],
   ['This is the indoor assembly, not the outdoor assembly. Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.']
 ];
 for (const [question, answerText] of applicabilityConflicts) {
@@ -1049,7 +1052,13 @@ const validApplicabilityOpenings = [
   ['Can the label be omitted?', 'Yes. The label is not required.'],
   ['Does this correction change the answer?', 'Yes. The inspection rule does not apply.'],
   ["Does the tenant’s inspection rule apply?", 'Yes. The owner’s inspection rule does not apply.'],
-  ['Does the inspection rule apply?', 'Yes. The inspection rule does not apply unless the assembly is outdoors.']
+  ['Does the inspection rule apply?', 'Yes. The inspection rule does not apply unless the assembly is outdoors.'],
+  ['Does Section 915.2 apply?', 'Yes. Section 915.3 does not apply.'],
+  ['Does the 2022 inspection rule apply?', 'Yes. The 2014 inspection rule does not apply.'],
+  ['The previous assumption that this is the indoor assembly is wrong. Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.'],
+  ['This is the indoor assembly. That assumption is wrong. Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.'],
+  ['This is the indoor assembly, but that assumption is wrong. Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.'],
+  ['This is the indoor assembly, rather than the outdoor assembly that was previously assumed. Does the inspection rule apply?', 'Yes. If this is the indoor assembly, the inspection rule does not apply.']
 ];
 for (const [question, answerText] of validApplicabilityOpenings) {
   assert.equal(researchOpeningConclusionContradiction(question, answerText), false, question + ' / ' + answerText);
