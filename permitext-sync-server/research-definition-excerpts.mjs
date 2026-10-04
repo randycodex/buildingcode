@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
+import { researchSearchVocabulary } from "./research-search-vocabulary.mjs";
 
-export const researchDefinitionExcerptVersion = "20261003-operative-definition-context-v5";
+export const researchDefinitionExcerptVersion = "20261003-ordinary-definition-vocabulary-v6";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -458,9 +459,13 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
 
   // Match the enacted definition's full label when a zoning question uses
   // its ordinary abbreviation. This adds a retrieval term, never a code rule.
-  const definitionQuery = String(section?.codePrefix || "").toUpperCase() === "ZR"
+  const prefix = String(section?.codePrefix || "").toUpperCase();
+  const nominatedTerms = researchSearchVocabulary(query).concepts
+    .filter(concept => concept.codePrefixes.includes(prefix)).flatMap(concept => concept.terms);
+  const originalQuery = prefix === "ZR"
     ? String(query || "").replace(/\bFAR\b/gi, "FAR floor area ratio")
     : query;
+  const definitionQuery = `${originalQuery || ""} ${[...new Set(nominatedTerms)].join(" ")}`;
   const normalizedQuery = terms(definitionQuery).join(" ");
   const queryTerms = new Set(terms(definitionQuery));
   if (!queryTerms.size) return null;

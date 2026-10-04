@@ -1,5 +1,6 @@
 import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { researchEquipmentSearchIntent, researchEquipmentSubjectMatches } from "./research-equipment-search-intent.mjs";
+import { researchSearchVocabulary, researchSearchVocabularyMatches } from "./research-search-vocabulary.mjs";
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
@@ -9,7 +10,7 @@ import { researchEmbeddedDefinitionCarrier } from "./research-definition-excerpt
 import { nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-air-opening-foreground-recall-v58";
+export const evidenceDiscoveryVersion = "20261003-shared-search-vocabulary-v59";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1786,7 +1787,18 @@ export async function discoverRelevantEvidence({
   }
   // Context resolves pronouns and preserves citations; it must not overwhelm
   // new terms when the user asks about a related but different provision.
+  const vocabulary = researchSearchVocabulary(currentQuestion, {
+    contextDependentFollowUp: retrievalContext?.contextDependentFollowUp === true,
+    humanTopics: [retrievalContext?.conversationTopic, retrievalContext?.immediateContext]
+  });
   const questionTerms = queryTermWeights(currentQuestion);
+  // Shared aliases nominate technical wording without changing the human
+  // question, explicit references, applicability facts or numerical premises.
+  // Only positive current concepts enter the current-only lexical shortlist.
+  for (const term of rawTokens(vocabulary.currentQuery)) {
+    if (term.length <= 2 || stopWords.has(term)) continue;
+    for (const form of singularForms(term)) questionTerms.set(form, Math.max(1, questionTerms.get(form) || 0));
+  }
   const rankingBoilerplate = passageIndex ? new Set(["nyc", "new", "york", "city", "code", "codes", "edition", "editions", "ordinary",
     ...Array.from(currentQuestion.matchAll(/\b((?:19|20)\d{2})\s+(?:(?:building|construction|plumbing|mechanical|fuel\s+gas|fire)\s+)?codes?\b/gi), match => match[1])]) : new Set();
   if (passageIndex) {
@@ -1805,7 +1817,7 @@ export async function discoverRelevantEvidence({
       }
     }
   }
-  const contextualTerms = [...queryTermWeights(normalizedQuestion)]
+  const contextualTerms = [...queryTermWeights([normalizedQuestion, vocabulary.query].filter(Boolean).join("\n"))]
     .filter(([term]) => !questionTerms.has(term) && !rankingBoilerplate.has(term));
   // A full project inventory can contain hundreds of extra terms. A per-term
   // discount alone still lets their combined score overwhelm the question.
@@ -1868,13 +1880,19 @@ export async function discoverRelevantEvidence({
     contextDependentFollowUp: retrievalContext?.contextDependentFollowUp === true,
     humanTopics: [retrievalContext?.conversationTopic, retrievalContext?.immediateContext]
   });
-  const foregroundQuery = equipmentIntent?.query || currentQuestion;
+  // A compact concept can use the existing foreground slots only when the
+  // subject is unambiguous. Existing equipment intent keeps its own guards;
+  // competing/multiple shared concepts retain ordinary cross-code retrieval.
+  const vocabularyConcept = !equipmentIntent && vocabulary.concepts.length === 1
+    ? vocabulary.concepts[0] : null;
+  const foregroundQuery = equipmentIntent?.query || (vocabularyConcept ? vocabulary.query : currentQuestion);
   const foregroundWords = rawTokens(foregroundQuery).filter(word => word.length > 2 && /[a-z]/i.test(word) &&
     !stopWords.has(word) && !rankingBoilerplate.has(word) && !genericPassageHeadingWords.has(word) &&
     !["need", "needed", "project", "fictional", "scenario", "ground", "floor", "make"].includes(word));
   const foregroundWeights = new Map(foregroundWords.flatMap(word => [...singularForms(word)].map(form => [form, 1])));
   const foregroundOverlapMinimum = Math.max(2, Math.ceil(new Set(foregroundWords).size / 4));
-  const equipmentPrefixes = new Set(equipmentIntent?.codePrefixes || (equipmentIntent?.codePrefix ? [equipmentIntent.codePrefix] : []));
+  const equipmentPrefixes = new Set(equipmentIntent?.codePrefixes ||
+    (equipmentIntent?.codePrefix ? [equipmentIntent.codePrefix] : vocabularyConcept?.codePrefixes || []));
   const foregroundPrefixes = explicitDisciplinePrefixes.size ? explicitDisciplinePrefixes
     : equipmentPrefixes.size ? equipmentPrefixes : disciplinePrefixes;
   const foregroundHits = passageIndex && foregroundWeights.size >= 2 && foregroundPrefixes.size
@@ -1885,10 +1903,11 @@ export async function discoverRelevantEvidence({
   // This is one vocabulary-focused use of the same foreground probe/slots.
   // Require the equipment in the complete source's own text, not shared water
   // words or inherited context; legal applicability remains unresolved.
-  const equipmentForegroundHits = equipmentIntent ? foregroundHits.filter(hit =>
+  const equipmentForegroundHits = equipmentIntent || vocabularyConcept ? foregroundHits.filter(hit =>
     equipmentPrefixes.has(hit.codePrefix) &&
     hit.score >= (foregroundHits[0]?.score || Infinity) * 0.7 &&
-    researchEquipmentSubjectMatches(hit.text, equipmentIntent)) : foregroundHits;
+    (equipmentIntent ? researchEquipmentSubjectMatches(hit.text, equipmentIntent)
+      : researchSearchVocabularyMatches(hit.text, vocabularyConcept))) : foregroundHits;
   const activePacketHits = passageIndex && retrievalContext?.contextDependentFollowUp && !relevanceComparison
     ? (retrievalContext.activeRulePacketReferences || []).slice(0, 3).flatMap(reference => {
       if (!['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => reference[key]) ||
@@ -2319,12 +2338,13 @@ export async function discoverRelevantEvidence({
       const item = detailed.find(value => comparableSectionID(value.section.id) === comparableSectionID(hit.sectionID));
       const words = new Set(rawTokens(hit.text).flatMap(word => [...singularForms(word)]));
       const overlap = [...new Set(foregroundWords)].filter(word => [...singularForms(word)].some(form => words.has(form))).length;
-      if (!item || protectedItems.includes(item) || item.definitionCarrier || !foregroundPrefixes.has(item.section.codePrefix) ||
+      if (!item || protectedItems.includes(item) || item.definitionCarrier ||
+          (vocabularyConcept && /\bdefinitions?\b/i.test(item.section.title || "")) || !foregroundPrefixes.has(item.section.codePrefix) ||
           item.contextualReference || item.inheritedReference || item.useSelectedPassageOnly ||
           !completeIndexedScope(hit) || !completeIndexedScope(item.indexedPassage) || overlap < foregroundOverlapMinimum ||
           zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) < 1) return [];
       item.currentQuestionForeground = { rank: rank + 1,
-        source: equipmentIntent ? "positive_equipment_subject" : "literal_current_question" };
+        source: equipmentIntent ? "positive_equipment_subject" : vocabularyConcept ? "positive_search_vocabulary" : "literal_current_question" };
       // Preserve the exact scope that qualified, not a semantic sibling.
       item.indexedPassage = mergedIndexedPassages(hit, hit, semanticHitsByID.get(comparableSectionID(hit.sectionID)),
         currentPassageScores, currentQuestion, true);

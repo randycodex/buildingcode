@@ -1,7 +1,8 @@
 // Shared search intent: vocabulary chooses candidate books and context facets,
 // never a governing provision, code edition or legal/project conclusion.
 import { researchEquipmentSearchIntent } from "./research-equipment-search-intent.mjs";
-export const researchQuestionSubjectVersion = "20261003-air-opening-question-subject-v3";
+import { researchSearchVocabulary } from "./research-search-vocabulary.mjs";
+export const researchQuestionSubjectVersion = "20261003-ordinary-language-question-subject-v4";
 export function researchFloorAreaRatioRequested(text = "") {
   return /\bFAR\b/.test(text) || /\b(?:permitted|maximum|allowable|calculate)\s+far\b|\bfar\s*(?:of|=|\d)/i.test(text);
 }
@@ -16,6 +17,7 @@ export function researchQuestionSubject(question = "") {
   if (/\b(?:plumbing|sanitary|drain(?:age|s)?|sewer|trap(?:s|ping)?|lavator\w*|toilet|shower|water[- ]heater|drinking[- ]fountain)\b/i.test(text)) prefixes.add("PC");
   const equipmentIntent = researchEquipmentSearchIntent(text);
   for (const prefix of equipmentIntent?.codePrefixes || (equipmentIntent?.codePrefix ? [equipmentIntent.codePrefix] : [])) prefixes.add(prefix);
+  for (const prefix of researchSearchVocabulary(text).codePrefixes) prefixes.add(prefix);
   if (/\b(?:propane|LPG|liquefied[- ]petroleum|flammable[- ]liquids?|hazardous[- ]materials?|fire[- ]safety|extinguishers?|fire[- ]lanes?|fire[- ]apparatus\s+access)\b/i.test(text)) prefixes.add("FC");
   if (/\b(?:DOB\s+inspection|certificate\s+of\s+occupancy|stop[- ]work\s+order|permit\s+application)\b/i.test(text)) prefixes.add("AC");
   return { version: researchQuestionSubjectVersion, codePrefixes: [...prefixes], roomDimensions,

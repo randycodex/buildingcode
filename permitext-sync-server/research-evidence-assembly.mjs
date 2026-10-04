@@ -24,6 +24,7 @@ import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
 import { researchQuestionSubject } from "./research-question-subject.mjs";
+import { researchSearchVocabulary } from "./research-search-vocabulary.mjs";
 import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage } from "./research-rule-groups.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import { researchChapterScopeContextPlan, resolveResearchChapterScopeContext } from "./research-chapter-scope-context.mjs";
@@ -32,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-admitted-rule-chapter-scope-v70";
+export const researchEvidenceAssemblyVersion = "20261003-human-search-vocabulary-definitions-v71";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -357,6 +358,16 @@ export function researchEvidenceRetrievalQuery({
     const prefix = "\nSubject context: ";
     if (semanticQuery.length + prefix.length + semanticContext.length <= maximumQueryCharacters) semanticQuery += `${prefix}${semanticContext}`;
   }
+  // Search aliases can resolve a human subject, including a short correction.
+  // They carry no prior quantities, assistant conclusions, or project facts.
+  const searchVocabulary = researchSearchVocabulary(normalizedQuestion, {
+    contextDependentFollowUp,
+    humanTopics: contextualTopics.map(context => context.text)
+  });
+  const vocabularyPrefix = "\nSearch vocabulary (nomination only): ";
+  if (searchVocabulary.query && semanticQuery.length + vocabularyPrefix.length + searchVocabulary.query.length <= maximumQueryCharacters) {
+    semanticQuery += `${vocabularyPrefix}${searchVocabulary.query}`;
+  }
   const semanticFactPrefix = "\nProject search context (supplied facts, not applicability): ";
   const semanticFactContext = excludesSavedProjectFacts(normalizedQuestion, contextualTopics) ? ""
     : semanticResearchProjectFacts({ question: normalizedQuestion, contextualTopics, projectFacts,
@@ -379,6 +390,8 @@ export function researchEvidenceRetrievalQuery({
     question: normalizedQuestion,
     sourceQuery,
     semanticQuery,
+    definitionQuery: searchVocabulary.definitionQuery,
+    searchVocabulary,
     dependentMeasurementSubject,
     resolvedSubjectContext: contextDependentFollowUp && checkedPriorSources.length ? semanticContext : "",
     inheritedAuthorityReferences,
@@ -1629,7 +1642,7 @@ export async function assembleResearchEvidence({
       : targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
           resolved,
-          definitionSelectionContext(query.question, canonicalForExpansion, resolved),
+          definitionSelectionContext(query.definitionQuery, canonicalForExpansion, resolved),
           allowance
         )
       : { value: resolved, excerpt: null };
@@ -2036,7 +2049,7 @@ export async function assembleResearchEvidence({
     const targeted = targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
           resolved,
-          definitionSelectionContext(query.question, canonicalForExpansion, resolved),
+          definitionSelectionContext(query.definitionQuery, canonicalForExpansion, resolved),
           allowance
         )
       : { value: resolved, excerpt: null };
@@ -2239,7 +2252,7 @@ export async function assembleResearchEvidence({
   // Optional definitions fill the remaining space; an oversized definitions
   // section must not displace the complete closing conditions of a short rule.
   const definitionPrefixes = new Set([...currentReferences.map(reference => reference.codePrefix),
-    ...researchQuestionSubject(query.question).codePrefixes]);
+    ...researchQuestionSubject(query.question).codePrefixes, ...query.searchVocabulary.codePrefixes]);
   const definitionCandidates = dependencyPlan?.corpusPrefix === "ZR" && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
     Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
     { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
@@ -2262,10 +2275,10 @@ export async function assembleResearchEvidence({
       .some(key => candidate[key] && candidate[key] !== resolved[key])) continue;
     const identity = sectionIdentity(resolved);
     if (!identity || includedSectionIdentities.has(identity)) continue;
-    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters, 2_500);
+    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters);
     const targeted = targetedDefinitionValue(
       resolved,
-      definitionSelectionContext(query.question, canonicalForExpansion, resolved),
+      definitionSelectionContext(query.definitionQuery, canonicalForExpansion, resolved),
       allowance,
       { allowShortSection: true }
     );
