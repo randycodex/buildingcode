@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { researchAnswerPresentationContract, researchGuidedNextStepInstruction,
-  researchDecisionFactInstruction } from "../research-answer-presentation.mjs";
+  researchDecisionFactInstruction, researchAnswerPresentationVersion } from "../research-answer-presentation.mjs";
+import { isResearchPracticalNextStep, researchPracticalNextStepInstruction } from "../research-practical-next-step.mjs";
 import { applyVerifiedProjectFollowups, researchResponseFollowupQuestions } from "../research-verification-followups.mjs";
 import { buildResearchRequestEnvelopeBuilders } from "./research-request-envelope-preflight.mjs";
 import { researchFollowUpQuestionsForResponse } from "../app.mjs";
@@ -22,11 +23,17 @@ const { buildAnswerRequest, buildVerifierRequest } = await buildResearchRequestE
 const question = "Does that substitution work under the stated rule?";
 const before = structuredClone({ answer, evidence, messages });
 const writer = buildAnswerRequest(question, evidence, "offline-clarity", { messages, responseStyle: "conversational" });
+const revision = buildAnswerRequest(question, evidence, "offline-clarity", { messages, responseStyle: "conversational",
+  previousInterpretation: answer, revisionFeedback: [{ type: "missed_material_conclusion", detail: "Preserve the source-required operative action in the explanation." }] });
 const verifier = buildVerifierRequest(question, evidence, answer, "offline-clarity", { messages });
 const contract = researchAnswerPresentationContract({ question, evidence, messages });
+assert.equal(contract.version, researchAnswerPresentationVersion);
 assert(contract.universalRules.includes(researchGuidedNextStepInstruction));
 assert(contract.universalRules.includes(researchDecisionFactInstruction));
 assert(writer.instructions.includes(researchGuidedNextStepInstruction), "The actual writer receives the shared presentation contract in its instructions.");
+assert(revision.instructions.includes(researchGuidedNextStepInstruction), "The actual revision writer retains the shared instruction.");
+assert.match(revision.input, /VERIFIER FEEDBACK FOR ONE BOUNDED REVISION/);
+assert(revision.input.includes(answer.answerText));
 assert(verifier.instructions.includes(researchGuidedNextStepInstruction), "The actual verifier receives the same current-decision policy.");
 for (const phrase of [
   "only when its answer can change or determine the current requested result",
@@ -36,7 +43,16 @@ for (const phrase of [
   "Do not merely report unavailable excerpts",
   "Put the precise legal-evidence boundary",
   "do not promise an unperformed lookup",
-  "Never waive material qualifications"
+  "Never waive material qualifications",
+  "For ordinary enacted-code answers",
+  "practical objective or action independently supported by the supplied sources",
+  "even while a separate rule's applicability remains conditional",
+  "Distinguish cited source-established duties from clearly labeled optional recommendations",
+  "never invent a routing method, approval, source condition, deadline or universal Yes/No",
+  "required trigger and resulting action",
+  "rather than saying only that it responds",
+  "Do not substitute one action for another or add an unsupplied function",
+  "Missing merely optional advice is not a substantive verification failure"
 ]) assert(researchGuidedNextStepInstruction.includes(phrase), phrase);
 assert(writer.input.includes(evidence[0].text));
 assert(verifier.input.includes(evidence[0].text));
@@ -47,6 +63,39 @@ assert.match(verifier.instructions, /Do not treat prior assistant conclusions as
 assert.match(verifier.instructions, /do not force downstream compliance checklists/);
 assert.match(verifier.instructions, /project fact that can change or determine the current requested result/);
 assert.match(verifier.instructions, /conditional side rule or later design choice is not a question for an already resolved decision/);
+
+// These are request-envelope contrasts, not simulated model judgments. The
+// actual questions and sources remain intact, with explicit advice/function
+// boundaries, and code questions never enter guidance-only classification.
+const uncertainHistory = [{ role: "assistant", answer: { missingFacts: ["Installation type"], followUpQuestions: ["Which installation type is proposed?"] } }];
+for (const [label, request, sourceText, boundary] of [
+  ["quotation-only", "Quote the supplied provision without adding advice.", "The label shall identify the equipment.", "Quotation-only requests"],
+  ["answered-threshold", "Does a width of 8 meet the stated minimum of 5?", "The minimum width is 5 units.", "fully answered threshold questions do not need added advice"],
+  ["unsupported-method", "What method is approved for this outlet?", "Outlet disposal requires approval; no method is stated here.", "never invent a routing method, approval, source condition, deadline"],
+  ["optional-downstream-detail", "Is the stated trigger present?", "The trigger is an installation of this type. Separate maintenance details do not change the trigger.", "unrelated downstream details"],
+  ["alarm-only", "How does the required alarm operate?", "An alarm shall sound automatically when circulation stops.", "Do not substitute one action for another or add an unsupplied function"]
+]) {
+  const source = { ...evidence[0], sourceID: label, text: sourceText };
+  const sourceBefore = structuredClone(source);
+  const draft = { ...answer, answerText: "Synthetic review input; no model conclusion is asserted.", supportedPoints: [], citations: [] };
+  const initialBody = buildAnswerRequest(request, [source], "offline-boundary", { responseStyle: "conversational" });
+  const reviewBody = buildVerifierRequest(request, [source], draft, "offline-boundary");
+  assert(initialBody.input.includes(sourceText) && reviewBody.input.includes(sourceText), label);
+  assert(initialBody.input.includes(request) && reviewBody.input.includes(request), label);
+  assert(initialBody.instructions.includes(boundary) && reviewBody.instructions.includes(boundary), label);
+  assert.equal(isResearchPracticalNextStep(request, uncertainHistory), false, label);
+  assert.deepEqual(source, sourceBefore, label);
+}
+assert.equal(isResearchPracticalNextStep("I'm not sure. What should I check first?", uncertainHistory), true);
+const guidanceOptions = { practicalNextStep: true, practicalNextStepTarget: "Which installation type is proposed?", messages: uncertainHistory, responseStyle: "conversational" };
+const guidanceWriter = buildAnswerRequest("I'm not sure. What should I check first?", [], "offline-guidance", guidanceOptions);
+const guidanceVerifier = buildVerifierRequest("I'm not sure. What should I check first?", [], { ...answer, supportedPoints: [], citations: [] }, "offline-guidance", guidanceOptions);
+for (const body of [guidanceWriter, guidanceVerifier]) {
+  assert(body.instructions.includes(researchPracticalNextStepInstruction), "Guidance-only retains its distinct no-code-claims policy.");
+  assert.match(body.instructions, /Do not assert, paraphrase or apply code rules/);
+}
+assert.equal(guidanceWriter.text.format.schema.properties.citations.maxItems, 0);
+assert.equal(guidanceWriter.text.format.schema.properties.supportedPoints.maxItems, 0);
 
 // These helper contrasts prove delivery behavior, not that a model correctly
 // judges whether an unknown fact is decisive. Genuine unresolved choices remain
