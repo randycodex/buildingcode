@@ -23,6 +23,8 @@ import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, r
 import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
+import { buildResearchClaimApplicabilityPacket, researchClaimApplicabilityInstruction, researchClaimApplicabilitySchema,
+  validateResearchClaimApplicabilityReview } from "./research-claim-applicability-review.mjs";
 import { planZoningMappedScopeReview, zoningMappedReviewInstruction, zoningMappedReviewSchema,
   validateZoningMappedScopeReview, resolveZoningMappedScopeSafety } from "./research-zoning-mapped-review.mjs";
 import {
@@ -9936,7 +9938,8 @@ function researchVerificationAttemptDiagnostics(attempts = []) {
   return createResearchVerificationAttemptDiagnostics(
     (Array.isArray(attempts) ? attempts : []).map((attempt, index) => ({
       attempt: index + 1,
-      ...(attempt?.diagnostics || {})
+      ...(attempt?.diagnostics || {}),
+      ...(attempt?.claimApplicabilityReview ? { claimApplicabilityReview: attempt.claimApplicabilityReview } : {})
     }))
   );
 }
@@ -10941,11 +10944,35 @@ export async function openAIResearchVerification(question, evidence, interpretat
   // It cannot inherit a concurrent caller mutation or revise the answer.
   evidence = structuredClone(evidence);
   interpretation = structuredClone(interpretation);
-  options = { ...options, mappedScopeReview: structuredClone(options.mappedScopeReview) };
+  options = { ...options, mappedScopeReview: structuredClone(options.mappedScopeReview),
+    messages: structuredClone(options.messages), projectContextFacts: structuredClone(options.projectContextFacts),
+    conversationFactContext: structuredClone(options.conversationFactContext),
+    applicabilityFactContext: structuredClone(options.applicabilityFactContext) };
   const configuration = researchVerificationConfigurationForEvidence({
     ...researchModelConfiguration(process.env, options.model),
     ...(options.model ? { model: options.model } : {})
   }, evidence, options);
+  const baseVerificationOutputTokens = configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000;
+  // Inspect the complete graph before selecting a budget, then finalize the
+  // packet under that same cap used by dispatch and validation. Provisional
+  // capacity failures never skip obligations or prevent the final rebuild.
+  const provisionalApplicabilityPacket = buildResearchClaimApplicabilityPacket({ question, evidence, answer: interpretation, options,
+    maximumOutputTokens: baseVerificationOutputTokens });
+  const verificationProfile = provisionalApplicabilityPacket.edges.length
+    ? { name: "claim_applicability", reasoningEffort: "low", maximumOutputTokens: 12_000, timeoutMilliseconds: 90_000 }
+    : { name: "ordinary", reasoningEffort: configuration.verificationReasoningEffort,
+      maximumOutputTokens: baseVerificationOutputTokens,
+      timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000 };
+  options.maximumApplicabilityOutputTokens = verificationProfile.maximumOutputTokens;
+  const applicabilityPacket = buildResearchClaimApplicabilityPacket({ question, evidence, answer: interpretation, options,
+    maximumOutputTokens: options.maximumApplicabilityOutputTokens });
+  if (applicabilityPacket.preflightReasons.length) {
+    // A complete packet that cannot be reviewed under the existing cap fails
+    // into the existing bounded answer-repair path, without a provider call.
+    return { result: validateResearchClaimApplicabilityReview({ packet: applicabilityPacket, value: null,
+      question, evidence, answer: interpretation, options, verification: { pass: false, issues: [] } }),
+      model: configuration.model, reasoningEffort: verificationProfile.reasoningEffort, usage: null };
+  }
   const hasAmendmentMetadata = evidence.some((source) => source.richSourceKind === "amendment-history");
   const hasNumericComparison = options.zoningDeterministicContext?.answerObligations?.some((item) => item.numericComparison);
   const evidenceText = evidence.map((source) => [
@@ -10989,8 +11016,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
     model: configuration.model,
     store: false,
     service_tier: configuration.serviceTier,
-    reasoning: { effort: configuration.verificationReasoningEffort },
-    max_output_tokens: configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000,
+    reasoning: { effort: verificationProfile.reasoningEffort },
+    max_output_tokens: options.maximumApplicabilityOutputTokens,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       researchQuestionIntentInstruction(question),
@@ -11135,6 +11162,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
             sources: options.webSupport.sources || []
           })}`
         : "",
+      `CLAIM APPLICABILITY REVIEW\n${JSON.stringify(applicabilityPacket)}`,
       options.mappedScopeReview ? `MAPPED SCOPE REVIEW\n${JSON.stringify(options.mappedScopeReview)}` : "",
       options.priorVerificationAttempts?.length ? `PRIOR REVIEW HISTORY — NOT AUTHORITY\n${JSON.stringify(options.priorVerificationAttempts)}` : "",
       `PROPOSED ANSWER JSON\n${JSON.stringify(interpretation)}`
@@ -11144,18 +11172,27 @@ export async function openAIResearchVerification(question, evidence, interpretat
         type: "json_schema",
         name: "permitext_research_verification",
         strict: true,
-        schema: zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview)
+        schema: researchClaimApplicabilitySchema(zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview), applicabilityPacket)
       }
     }
   };
   requestBody.instructions = researchZoningVerificationInstructions({ question, evidence, options }) || requestBody.instructions;
+  // Zoning may replace the base instructions; this generic obligation applies
+  // to the same existing verifier call after that replacement too.
+  requestBody.instructions += ` ${researchClaimApplicabilityInstruction}`;
+  console.info(JSON.stringify({ event: "research_verification_profile", profile: verificationProfile.name,
+    reasoningEffort: ["none", "minimal", "low", "medium", "high", "xhigh"].includes(verificationProfile.reasoningEffort)
+      ? verificationProfile.reasoningEffort : "unknown",
+    maximumOutputTokens: requestBody.max_output_tokens, timeoutMilliseconds: verificationProfile.timeoutMilliseconds,
+    unitCount: applicabilityPacket.units.length, edgeCount: applicabilityPacket.edges.length,
+    bindingCount: applicabilityPacket.bindingCount }));
   const originalRequestBody = structuredClone(requestBody);
   const envelopeRetryState = options.verificationEnvelopeRetryState || { attempted: false };
   const { payload } = await requestResearchProvider({
     apiKey,
     requestBody,
     signal: options.signal,
-    timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000,
+    timeoutMilliseconds: verificationProfile.timeoutMilliseconds,
     failureMessage: "The Research verifier request failed.",
     maximumAttempts: isZoningConditionalExplanation(options.zoningPlan) ? 1 : 2,
     failureCode: "RESEARCH_VERIFIER_ERROR",
@@ -11167,6 +11204,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     const usage = researchUsageFromProviderPayload(responsePayload, configuration.model);
     let value;
     try {
+      if (responsePayload?.status === "incomplete") throw new Error("The Research verifier did not complete its output.");
       value = JSON.parse(outputTextFromResponse(responsePayload));
     } catch (error) {
       error.providerUsage = usage;
@@ -11175,16 +11213,32 @@ export async function openAIResearchVerification(question, evidence, interpretat
       invalid.code = "INVALID_RESEARCH_VERIFICATION";
       invalid.failureStage = "verification_output_parse";
       invalid.providerStatus = responsePayload?.status || null;
-      invalid.incompleteReason = responsePayload?.incomplete_details?.reason || null;
+      const incompleteReason = responsePayload?.incomplete_details?.reason;
+      invalid.incompleteReason = incompleteReason == null ? null :
+        ["max_output_tokens", "content_filter"].includes(incompleteReason) ? incompleteReason : "unknown";
       invalid.providerUsage = usage;
+      const reasoningTokenCount = responsePayload?.permitext_provider_accounting?.output_reasoning_tokens;
+      invalid.verificationOutputDiagnostics = {
+        selectedProfile: verificationProfile.name,
+        selectedReasoningEffort: ["none", "minimal", "low", "medium", "high", "xhigh"].includes(verificationProfile.reasoningEffort)
+          ? verificationProfile.reasoningEffort : "unknown",
+        selectedOutputTokenCap: options.maximumApplicabilityOutputTokens,
+        selectedTimeoutMilliseconds: verificationProfile.timeoutMilliseconds,
+        unitCount: applicabilityPacket.units.length, edgeCount: applicabilityPacket.edges.length,
+        bindingCount: applicabilityPacket.bindingCount,
+        incompleteReason: invalid.incompleteReason,
+        ...(Number.isSafeInteger(reasoningTokenCount) && reasoningTokenCount >= 0 ? { reasoningTokenCount } : {})
+      };
       throw invalid;
     }
     try {
       return {
-        result: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
-          verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }),
+        result: validateResearchClaimApplicabilityReview({ packet: applicabilityPacket, value, question,
+          answer: interpretation, evidence, options,
+          verification: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
+            verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }) }),
         model: responsePayload.model || configuration.model,
-        reasoningEffort: configuration.verificationReasoningEffort,
+        reasoningEffort: verificationProfile.reasoningEffort,
         usage
       };
     } catch (error) {
@@ -11213,7 +11267,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     const diagnostics = error.verificationEnvelopeDiagnostics;
     const repairedRequestBody = {
       ...originalRequestBody,
-      instructions: `${originalRequestBody.instructions} VERIFIER ENVELOPE REPAIR: the previous result violated the structural invariant listed below. Review the SAME proposed answer and supplied evidence under ALL original semantic checks; do not edit the answer, facts, citations, source text, schema or mapped-scope packet. The invalid prior verdict is untrusted and does not establish correctness. Return a fresh valid verdict. A passing verdict requires issues=[]; a failing verdict requires at least one supported issue and projectFactQuestions=[]. Missing-fact indices must be unique in-range indices of the unchanged missingFacts array, and only a failing unnecessary_qualification issue can authorize them. Never discard a substantive issue to obtain pass=true.`,
+      instructions: `${originalRequestBody.instructions} VERIFIER ENVELOPE REPAIR: the previous result violated the structural invariant listed below. Review the SAME proposed answer and supplied evidence under ALL original semantic checks; do not edit the answer, facts, citations, source text, schema, claim-applicability packet or mapped-scope packet. The invalid prior verdict is untrusted and does not establish correctness. Return a fresh valid verdict. A passing verdict requires issues=[]; a failing verdict requires at least one supported issue and projectFactQuestions=[]. Missing-fact indices must be unique in-range indices of the unchanged missingFacts array, and only a failing unnecessary_qualification issue can authorize them. Never discard a substantive issue to obtain pass=true.`,
       input: `${originalRequestBody.input}\n\nINVALID VERIFIER ENVELOPE — NOT AUTHORITY\n${JSON.stringify({ invariant: diagnostics.invariant, missingFactCount: diagnostics.missingFactCount, rejectedEnvelope })}`
     };
     console.warn(JSON.stringify({ event: "research_verification_envelope_repair", retry: 1,
@@ -11226,7 +11280,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
         apiKey,
         requestBody: repairedRequestBody,
         signal: options.signal,
-        timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000,
+        timeoutMilliseconds: verificationProfile.timeoutMilliseconds,
         failureMessage: "The Research verifier request failed.",
         maximumAttempts: 1,
         failureCode: "RESEARCH_VERIFIER_ERROR",
@@ -20092,7 +20146,10 @@ async function handleResearchConversationMessage(request, response) {
     });
     // Property records inform application after retrieval. Their unrelated
     // inventory fields must not redirect a transparency question to other law.
-    combinedProjectFacts.push(...researchPropertyContextFacts(propertyResearch));
+    const applicabilityFactContext = { projectFacts: [...combinedProjectFacts],
+      propertyFacts: researchPropertyContextFacts(propertyResearch), conversationFactState,
+      topicContext: { rootTopic: conversationFactState.activeRootTopic, lastDecision: evidencePackage.topicDecision?.decision || null } };
+    combinedProjectFacts.push(...applicabilityFactContext.propertyFacts);
     const validUserFacts = Array.from(new Set([
       ...combinedProjectFacts,
       ...conversationFactContext.established,
@@ -20810,6 +20867,7 @@ async function handleResearchConversationMessage(request, response) {
         const verification = await openAIResearchVerification(
           question, assembledEvidence, result.interpretation, context.userID, {
             verificationEnvelopeRetryState,
+            applicabilityFactContext,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts, conversationFactContext,
             webSupport, allowOfficialGuidanceOnly, codeBasis: answerCodeBasis,
@@ -20926,6 +20984,7 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             verificationEnvelopeRetryState,
+            applicabilityFactContext,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
@@ -21145,6 +21204,7 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             verificationEnvelopeRetryState,
+            applicabilityFactContext,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
@@ -21616,13 +21676,15 @@ async function handleResearchConversationMessage(request, response) {
         ...(error.firstVerificationEnvelopeDiagnostics ? { firstVerificationEnvelopeDiagnostics: error.firstVerificationEnvelopeDiagnostics } : {}),
         ...(error.verificationEnvelopeRetryCount ? { verificationEnvelopeRetryCount: error.verificationEnvelopeRetryCount } : {}),
         ...(failureCode === "INVALID_RESEARCH_VERIFICATION" ? { failureStage: error.failureStage || null,
-          providerStatus: error.providerStatus || null, providerUsage: error.providerUsage || null } : {}) }));
+          providerStatus: error.providerStatus || null, providerUsage: error.providerUsage || null,
+          ...(error.verificationOutputDiagnostics ? { verificationOutputDiagnostics: error.verificationOutputDiagnostics } : {}) } : {}) }));
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: researchVerificationFailureReason(error) });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode, verificationAttemptCount: error.verificationAttempts?.length || 0,
         ...(failureCode === "INVALID_RESEARCH_VERIFICATION" ? {
           failureStage: error.failureStage || null,
+          ...(error.verificationOutputDiagnostics ? { verificationOutputDiagnostics: error.verificationOutputDiagnostics } : {}),
           verificationEnvelopeRetryCount: error.verificationEnvelopeRetryCount || 0,
           ...(error.verificationEnvelopeDiagnostics ? { verificationEnvelopeDiagnostics: error.verificationEnvelopeDiagnostics } : {}),
           ...(error.firstVerificationEnvelopeDiagnostics ? { firstVerificationEnvelopeDiagnostics: error.firstVerificationEnvelopeDiagnostics } : {})
