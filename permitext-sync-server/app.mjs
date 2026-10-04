@@ -21865,6 +21865,7 @@ async function handleResearchConversationMessage(request, response) {
         console.info(JSON.stringify({
           event: "research_operation_accounting",
           operationID: researchOperation.id,
+          requestID: researchRequestID,
           status: researchOperation.status,
           charged: researchOperation.charged,
           failureCode: researchOperation.failureCode || null,

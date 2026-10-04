@@ -28,6 +28,14 @@ const draft = { answerText: "Your project is compliant. The supplied fictional c
   evidenceLimitations: ["Only unverified supplied text is interpreted."], additionalEvidenceNeeded: [] };
 const revised = { ...draft, answerText: "The fictional clause requires a latch on a red cabinet. This reading does not establish project compliance." };
 const nativeFetch = globalThis.fetch;
+const nativeInfo = console.info;
+const accountingEvents = [];
+console.info = (...values) => {
+  if (typeof values[0] === "string" && values[0].includes('"event":"research_operation_accounting"')) {
+    accountingEvents.push(JSON.parse(values[0]));
+  }
+  nativeInfo(...values);
+};
 let mode, phases, packets, providerError, writerCount;
 globalThis.fetch = async (url, options) => {
   try {
@@ -74,7 +82,8 @@ try {
   for (mode of ["fresh", "unsupported", "source"]) {
     phases = []; packets = []; writerCount = 0; providerError = null;
     const created = await request("/research/conversations/create", { auth }, token), conversationID = created.body.conversation.id;
-    const result = await request("/research/conversations/message", { auth, conversationID, question, requestID: randomUUID() }, token);
+    const requestID = randomUUID();
+    const result = await request("/research/conversations/message", { auth, conversationID, question, requestID }, token);
     if (providerError) throw providerError;
     assert.equal(result.status, 200, JSON.stringify(result.body));
     assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]);
@@ -94,12 +103,19 @@ try {
     const operation = telemetry.body.researchSpend.operationMetrics.find((operation) => operation.providerRequestCount === 4 && !seenOperations.has(operation.id));
     seenOperations.add(operation?.id);
     assert(operation); assert.equal(operation.pendingProviderRequestCount, 0);
+    const logged = accountingEvents.filter((event) => event.requestID === requestID);
+    assert.equal(logged.length, 1, "Exactly this UI request must correlate with its completed accounting event.");
+    assert.equal(logged[0].operationID, operation.id, "The independent operation identity is preserved.");
+    assert.notEqual(logged[0].operationID, requestID);
+    assert(!JSON.stringify(logged[0]).includes(question));
+    assert(!JSON.stringify(logged[0]).includes(draft.answerText));
     assert.equal(operation.verificationAttemptDiagnostics.length, 0, "Ordinary reviews persist verdict history without auxiliary proof diagnostics.");
     assert(!JSON.stringify(operation.verificationAttemptDiagnostics).includes("fictional clause"));
   }
   console.log("Ordinary scope HTTP mechanics passed: genuine unsupported-scope verdict triggers one bounded revision, changed immutable context re-reviewed, failed final verdict unsaved/uncharged, valid ordinary final verdict persisted without proof output; intercepted calls only, no semantic acceptance claim.");
 } finally {
   globalThis.fetch = nativeFetch;
+  console.info = nativeInfo;
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   await rm(scratch, { recursive: true, force: true });
 }
