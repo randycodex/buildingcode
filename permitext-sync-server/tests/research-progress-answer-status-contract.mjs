@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { researchClarificationAnswer } from "../research-conversation-continuity.mjs";
 import { researchProgressStages } from "../public/research-progress.js";
+import { researchSystemRecoveryReasons, researchFailureRecovery } from "../public/research-failure-recovery.js";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 function extract(name) {
@@ -16,14 +17,14 @@ function element() {
     append(...nodes) { this.children.push(...nodes); }, addEventListener() {} };
 }
 function all(node) { return [node, ...node.children.flatMap(all)]; }
-const context = vm.createContext({ Date, Map, document: { createElement: element }, researchProgressStages });
+const context = vm.createContext({ Date, Map, document: { createElement: element }, researchProgressStages, researchSystemRecoveryReasons, researchFailureRecovery });
 vm.runInContext(["researchAnswerHasVerificationRecovery", "researchProgressStatusLabel", "researchProgressFromSavedMessage",
   "researchProgressElapsed", "renderResearchPixelGrid", "renderResearchProgressCard"].map(extract).join("\n"), context);
 const savedMessage = answer => ({ id: "historical-v6", role: "assistant", answer, createdAt: "2026-10-03T07:00:00.000Z",
   researchProgress: { status: "completed", startedAt: "2026-10-03T06:59:40.000Z", completedAt: "2026-10-03T07:00:00.000Z",
     stages: researchProgressStages.map(stage => ({ id: stage.id, state: "completed" })) } });
 
-for (const reason of ["verification_source", "verification_context", "verification_format", "verification_incomplete"]) {
+for (const reason of researchSystemRecoveryReasons) {
   const message = savedMessage(researchClarificationAnswer("Does this room have enough headroom?", reason));
   const snapshot = JSON.stringify(message);
   const reopened = context.researchProgressFromSavedMessage(message);
@@ -60,7 +61,7 @@ for (const [answer, expected] of [
   const message = { ...savedMessage(answer), requestID: "request" };
   const response = { conversation: { id: "conversation", messages: [message] } };
   const progress = { id: "request", conversationID: "conversation", question: "Retained headroom question", status: "active", stages: new Map(), controller: new AbortController() };
-  const live = vm.createContext({ Date, Map, clearInterval() {}, localStorage: {}, researchProgressStages,
+  const live = vm.createContext({ Date, Map, clearInterval() {}, localStorage: {}, researchProgressStages, researchSystemRecoveryReasons, researchFailureRecovery,
     activeResearchProgress: new Map([[progress.conversationID, progress]]), captureAccountRequest: () => ({}),
     isCurrentAccountRequest: () => true, requireCurrentAccountRequest() {}, captureResearchProgressView: () => ({}),
     researchProgressConversationConflict: () => null, researchProgressViewIsCurrent: () => true,

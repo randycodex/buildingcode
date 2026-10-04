@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
+import { researchFailureRecovery } from "../public/research-failure-recovery.js";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 function extract(name) {
@@ -27,7 +28,7 @@ function harness() {
   const store = new Map([[a.id, a], [b.id, b]]);
   let refreshBarrier = null;
   const context = vm.createContext({
-    Map, Date, AbortController, localStorage: {}, clearInterval() {},
+    Map, Date, AbortController, localStorage: {}, clearInterval() {}, researchFailureRecovery,
     document: { getElementById: () => ({ parentElement: { querySelector: selector => controls[selector] } }) },
     state: { researchConversationID: a.id }, activeWorkspaceID: "workspace-a",
     researchConversationPaneOpened: true,
@@ -62,7 +63,7 @@ function harness() {
       opens.push(id); context.supplementalResearchConversations.set(id, store.get(id)); return store.get(id);
     }
   });
-  const helpers = ["currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"];
+  const helpers = ["researchProgressFailureRecovery", "currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"];
   vm.runInContext(helpers.filter(name => source.includes(`function ${name}(`)).map(extract).join("\n") + "\n" +
     ["runResearchProgressSession", "recoveredResearchProgressCallbacks", "researchProgressStatusLabel"].map(extract).join("\n"), context);
   const progress = { id: "request-a", conversationID: a.id, question: "Synthetic saved Project summary", status: "active",

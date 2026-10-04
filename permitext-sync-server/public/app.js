@@ -1,4 +1,5 @@
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
+import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261003-failure-recovery-v1";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
@@ -42,7 +43,7 @@ import {
   researchProgressStages,
   researchProgressStage,
   writeResearchRequestRecovery
-} from "./research-progress.js?v=20260928-research-recovery-presence-v123";
+} from "./research-progress.js?v=20261003-failure-recovery-v124";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
@@ -97,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261003-research-retrieval-v634";
+} from "./offline-storage.js?v=20261003-research-retrieval-v635";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +136,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261003-research-retrieval-v634";
+} from "./research-intent-state.js?v=20261003-research-retrieval-v635";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18492,19 +18493,13 @@ function researchDisplayText(value) {
 function researchAnswerHasVerificationRecovery(answer) {
   return answer?.mode === "clarification" && answer.model === "permitext-conversation-clarification" &&
     answer.verification?.status === "clarification" && answer.verification.pass === false &&
-    ["verification_source", "verification_context", "verification_format", "verification_incomplete"].includes(answer.verification.reason);
+    researchSystemRecoveryReasons.includes(answer.verification.reason);
 }
 
 function researchVerificationRecoveryText(answer) {
   if (!researchAnswerHasVerificationRecovery(answer)) return "";
-  const explanation = {
-    verification_source: "Research couldn’t finish because its explanation and source references didn’t agree.",
-    verification_context: "Research couldn’t finish because its explanation didn’t consistently use the project details already provided.",
-    verification_format: "Research received an answer it couldn’t read.",
-    verification_incomplete: "Research couldn’t resolve this question from the sources it retrieved."
-  }[answer.verification.reason];
   // Presentation only: historical stored answers and verification stay intact.
-  return `${explanation}\n\nYour question and conversation are saved. You don’t need to repeat the question.`;
+  return researchVerificationRecoveryTextForReason(answer.verification.reason);
 }
 
 function researchAnswerNarrativeText(result) {
@@ -19469,6 +19464,11 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
     requireCurrentAccountRequest(identity);
     serverReachable = false;
     updateConnectionStatus();
+    if (error.name !== "AbortError" && typeof error.code !== "string") {
+      const interrupted = new Error("The Research connection ended before a completed response.", { cause: error });
+      interrupted.code = "RESEARCH_INTERRUPTED";
+      throw interrupted;
+    }
     throw error;
   }
   updateConnectionStatus();
@@ -19511,7 +19511,18 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
     }
   };
   while (true) {
-    const { value, done } = await reader.read();
+    let chunk;
+    try { chunk = await reader.read(); }
+    catch (error) {
+      requireCurrentAccountRequest(identity);
+      if (error.name !== "AbortError" && typeof error.code !== "string") {
+        const interrupted = new Error("The Research connection ended before a completed response.", { cause: error });
+        interrupted.code = "RESEARCH_INTERRUPTED";
+        throw interrupted;
+      }
+      throw error;
+    }
+    const { value, done } = chunk;
     requireCurrentAccountRequest(identity);
     buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
     const lines = buffer.split("\n");
@@ -19520,7 +19531,11 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
     if (done) break;
   }
   consumeLine(buffer);
-  if (!result) throw new Error("Research ended before returning a verified answer.");
+  if (!result) {
+    const error = new Error("Research ended before returning a completed response.");
+    error.code = "RESEARCH_INTERRUPTED";
+    throw error;
+  }
   return result;
 }
 
@@ -21124,6 +21139,8 @@ function persistResearchProgressSession(progress) {
     endedAt: progress.endedAt,
     error: progress.error,
     errorCode: progress.errorCode,
+    errorStatus: progress.errorStatus,
+    recoveryReason: progress.recoveryReason,
     stages: researchProgressStages.map((stage) => ({
       id: stage.id,
       state: progress.stages.get(stage.id) || "pending"
@@ -21170,10 +21187,10 @@ function restoreResearchProgressSession(conversation) {
     controller: new AbortController(),
     retry: null,
     timer: null,
-    error: interrupted
-      ? "Research was interrupted before an answer was saved. Retry to recover the same request. Your question is still here."
-      : saved.error,
-    errorCode: saved.errorCode
+    error: interrupted ? researchFailureMessage({ code: "RESEARCH_INTERRUPTED" }) : saved.error,
+    errorCode: interrupted ? "RESEARCH_INTERRUPTED" : saved.errorCode,
+    errorStatus: saved.errorStatus,
+    recoveryReason: saved.recoveryReason
   };
   activeResearchProgress.set(conversationID, progress);
   persistResearchProgressSession(progress);
@@ -21222,6 +21239,35 @@ function renderResearchPixelGrid() {
   return grid;
 }
 
+function researchProgressFailureRecovery(progress) {
+  return researchFailureRecovery({ code: progress.errorCode || (progress.status === "cancelled" ? "RESEARCH_CANCELLED" : ""),
+    status: progress.errorStatus, recoveryReason: progress.recoveryReason });
+}
+
+async function openResearchProgressIssueReport(progress) {
+  const identity = progress.requestIdentity || captureAccountRequest();
+  if (!isCurrentAccountRequest(identity)) return;
+  try {
+    const conversation = supplementalResearchConversations.has(progress.conversationID)
+      ? await openSupplementalResearchConversation(progress.conversationID)
+      : await openResearchConversation(progress.conversationID, { refreshList: true });
+    requireCurrentAccountRequest(identity);
+    const message = conversation?.messages?.findLast(item => item.role === "assistant" && item.requestID === progress.id);
+    // The feedback API requires a real saved assistant identity. Opening its
+    // existing button only opens a local form; Send feedback remains explicit.
+    const detailsID = message ? `research-feedback-details-${String(message.id).replace(/[^a-zA-Z0-9_-]/g, "-")}` : "";
+    const report = detailsID ? document.querySelector(`button[aria-controls="${CSS.escape(detailsID)}"]`) : null;
+    if (report) { report.click(); return; }
+    progress.reportUnavailable = true;
+    progress.error = "No saved issue-report form is available for this attempt. Open Account feedback to contact support. Your question is still here.";
+  } catch {
+    if (!isCurrentAccountRequest(identity)) return;
+    progress.reportUnavailable = true;
+    progress.error = "The saved attempt couldn’t be opened. Open Account feedback to contact support. Your question is still here.";
+  }
+  refreshResearchProgressCard(progress);
+}
+
 function renderResearchProgressCard(progress, { completed = false, retryDisabled = false } = {}) {
   const card = document.createElement("section");
   card.className = "research-progress-card";
@@ -21245,9 +21291,8 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
     const error = document.createElement("p");
     error.className = "research-progress-error";
     error.setAttribute("role", "alert");
-    error.textContent = ["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_VERIFICATION"].includes(progress.errorCode)
-      ? researchFailureMessage({ code: progress.errorCode, message: progress.error })
-      : progress.error;
+    error.textContent = progress.reportUnavailable || progress.recoveryReviewed ? progress.error
+      : researchProgressFailureRecovery(progress).text;
     card.append(error);
   }
   if (!completed && progress.errorCode !== "RESEARCH_ZONING_SOURCE_UNAVAILABLE" && ["active", "retrying", "failed", "cancelled"].includes(progress.status)) {
@@ -21270,11 +21315,11 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
       purchase.textContent = "Buy more turns";
       purchase.addEventListener("click", () => toggleUtilityPane("settings"));
       actions.append(purchase);
-    } else if (!progress.recoveryReviewed && ["RESEARCH_CONTEXT_CHANGED", "RESEARCH_CONVERSATION_CHANGED", "RESEARCH_SOURCE_CHANGED"].includes(progress.errorCode)) {
+    } else if (!progress.recoveryReviewed && ["review_context", "review_sources"].includes(researchProgressFailureRecovery(progress).action)) {
       const review = document.createElement("button");
       review.className = "ghost-button research-progress-review";
       review.type = "button";
-      review.textContent = progress.errorCode === "RESEARCH_SOURCE_CHANGED" ? "Review sources" : "Review current Research";
+      review.textContent = researchProgressFailureRecovery(progress).action === "review_sources" ? "Review sources" : "Review current Research";
       review.addEventListener("click", async () => {
         const requestIdentity = progress.requestIdentity || captureAccountRequest();
         if (!isCurrentAccountRequest(requestIdentity)) return;
@@ -21298,7 +21343,26 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
         }
       });
       actions.append(review);
-    } else if (typeof progress.retry === "function") {
+    } else if (researchProgressFailureRecovery(progress).action === "report" && !progress.reportUnavailable) {
+      const report = document.createElement("button");
+      report.type = "button";
+      report.className = "ghost-button research-progress-report";
+      report.textContent = "Report this issue";
+      report.addEventListener("click", async () => {
+        if (report.disabled) return;
+        report.disabled = true;
+        await openResearchProgressIssueReport(progress);
+        report.disabled = false;
+      });
+      actions.append(report);
+    } else if (researchProgressFailureRecovery(progress).action === "review_account") {
+      const account = document.createElement("button");
+      account.type = "button";
+      account.className = "ghost-button research-progress-account";
+      account.textContent = "Open Account";
+      account.addEventListener("click", () => toggleUtilityPane("settings"));
+      actions.append(account);
+    } else if ((researchProgressFailureRecovery(progress).retryable || progress.recoveryReviewed) && typeof progress.retry === "function") {
       const retry = document.createElement("button");
       retry.className = "ghost-button research-progress-retry";
       retry.type = "button";
@@ -21306,6 +21370,13 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
       retry.disabled = retryDisabled;
       retry.addEventListener("click", progress.retry);
       actions.append(retry);
+    } else {
+      const support = document.createElement("button");
+      support.type = "button";
+      support.className = "ghost-button research-progress-support";
+      support.textContent = "Contact support";
+      support.addEventListener("click", () => toggleUtilityPane("settings"));
+      actions.append(support);
     }
     card.append(actions);
   }
@@ -21411,6 +21482,11 @@ async function runResearchProgressSession(
   progress.requestIdentity = requestIdentity;
   const execute = async (retrying = false) => {
     if (!isCurrentAccountRequest(requestIdentity)) return;
+    if (retrying) {
+      const recovery = researchProgressFailureRecovery(progress);
+      if (!recovery.retryable && !(progress.recoveryReviewed &&
+          ["review_context", "review_sources"].includes(recovery.action))) return;
+    }
     const competing = activeResearchProgress.get(progress.conversationID);
     if (competing && ["active", "retrying"].includes(competing.status) &&
         (competing.id !== progress.id || retrying)) return;
@@ -21423,6 +21499,8 @@ async function runResearchProgressSession(
       progress.status = "retrying";
       progress.error = "";
       progress.errorCode = "";
+      progress.errorStatus = 0;
+      progress.recoveryReason = "";
       progress.recoveryReviewed = false;
       progress.startedAt = Date.now();
       progress.endedAt = null;
@@ -21474,7 +21552,9 @@ async function runResearchProgressSession(
       progress.error = cancelled
         ? "Research was cancelled before an answer was saved. Your question is still here."
         : researchFailureMessage(error);
-      progress.errorCode = error.code || error.payload?.code || "";
+      progress.errorCode = cancelled ? "RESEARCH_CANCELLED" : error.code || error.payload?.code || "";
+      progress.errorStatus = Number(error.status || error.payload?.status || 0);
+      progress.recoveryReason = error.payload?.recoveryReason || "";
       if (error.payload?.usage) researchUsage = error.payload.usage;
       progress.endedAt = Date.now();
       clearInterval(progress.timer);
@@ -21583,58 +21663,7 @@ function researchProjectContextPreview(projectID, projectInformation = null) {
 }
 
 function researchFailureMessage(error) {
-  const code = String(error?.code || error?.payload?.code || "").trim().toUpperCase();
-  if (code === "RESEARCH_INTERRUPTED") return "Research was interrupted before an answer was saved. Your question is still here.";
-  if (code === "INVALID_RESEARCH_RESPONSE") return "Research could not finish generating a complete answer. Your question is still here.";
-  if (code === "INVALID_RESEARCH_VERIFICATION") return "Permitext could not read the result of its answer check, so no answer was saved. This is a processing error, not a problem with your question. Your question is saved; use Retry to try again.";
-  const verificationCodes = new Set([
-    "INVALID_RESEARCH_RESPONSE",
-    "INVALID_RESEARCH_CITATION",
-    "INVALID_RESEARCH_WEB_CITATION",
-    "INVALID_RESEARCH_EVIDENCE_ANALYSIS",
-    "INVALID_RESEARCH_VERIFICATION",
-    "RESEARCH_VERIFICATION_FAILED"
-  ]);
-  const providerCodes = new Set([
-    "RESEARCH_NOT_CONFIGURED",
-    "RESEARCH_PROVIDER_ERROR",
-    "RESEARCH_VERIFIER_ERROR",
-    "RESEARCH_EVAL_SPEND_CAP",
-    "TIMEOUTERROR"
-  ]);
-  if (code === "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE") {
-    return "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here.";
-  }
-  if ([
-    "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
-    "RESEARCH_ZONING_EVIDENCE_REQUIRED",
-    "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED"
-  ].includes(code)) {
-    return error?.payload?.boundary?.cannotConclude || error?.message ||
-      "Permitext needs the identified property facts or governing Zoning evidence before it can make this conclusion. Your question is still here.";
-  }
-  if (code === "INVALID_RESEARCH_CITATION") {
-    return "The generated answer cited evidence that did not match the selected code sections or question. Permitext withheld the answer because its citations could not be validated. Your question is still here.";
-  }
-  if (verificationCodes.has(code)) {
-    const suffix = " Permitext has withheld that draft. Your question is still here; you can retry it without rewriting it.";
-    const reasons = [
-      "The draft did not account for an exception in the source text consistently.",
-      "The draft did not keep supplied assumptions separate from verified evidence.",
-      "The draft’s citations did not support the conclusions they were attached to.",
-      "The draft did not accurately preserve the source’s rule or its limits.",
-      "The draft omitted a source condition needed to support its conclusion.",
-      "The draft stated a requirement that the available evidence did not support.",
-      "The draft did not pass the evidence checks needed to support a reliable conclusion."
-    ];
-    const message = error?.payload?.message || error?.payload?.error || error?.message;
-    return reasons.map(reason => reason + suffix).includes(message)
-      ? message : reasons.at(-1) + suffix;
-  }
-  if (providerCodes.has(code)) {
-    return "Permitext's Research service is temporarily unavailable. Your question is still here.";
-  }
-  return error?.message || "Permitext could not complete this Research question.";
+  return researchFailureRecovery(error).text;
 }
 
 function renderNewResearchComposer(container, researchEnabled, instance = null) {

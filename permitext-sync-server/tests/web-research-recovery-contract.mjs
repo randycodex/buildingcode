@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
+import { researchFailureRecovery } from "../public/research-failure-recovery.js";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 function extract(name, async = false) {
@@ -18,7 +19,7 @@ function harness() {
   const identity = { userID: "synthetic-a", generation: 1 };
   const progress = { id: "stable-request", conversationID: "conversation", question: "Preserve this synthetic question", status: "active", stages: new Map([["preparing_question", "active"]]), controller: new AbortController() };
   const context = vm.createContext({
-    Map, Date, AbortController, clearInterval() {}, localStorage: {}, progress,
+    Map, Date, AbortController, clearInterval() {}, localStorage: {}, progress, researchFailureRecovery,
     state: { researchConversationID: "conversation" }, activeWorkspaceID: "workspace",
     researchConversationPaneIsOpen: () => true,
     activeProjectIDForCodeQuestions: () => "project",
@@ -43,7 +44,7 @@ function harness() {
     async openResearchConversation(id) { opens.push(id); return returnConversation ? { id } : null; },
     async openSupplementalResearchConversation(id) { opens.push(id); return returnConversation ? { id } : null; }
   });
-  const helpers = ["researchConversationContainsCompletedRequest", "reconciledResearchProgressSession", "currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"].map(name => extract(name)).join("\n");
+  const helpers = ["researchProgressFailureRecovery", "researchConversationContainsCompletedRequest", "reconciledResearchProgressSession", "currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"].map(name => extract(name)).join("\n");
   vm.runInContext(`${helpers}\n${extract("runResearchProgressSession", true)}\n${extract("renderResearchProgressCard")}\nglobalThis.run = runResearchProgressSession; globalThis.render = renderResearchProgressCard; globalThis.reconcile = reconciledResearchProgressSession;`, context);
   return { context, progress, requests, writes, paints, opens, successes, failures,
     run: () => context.run(progress, { onSuccess: (payload) => successes.push(payload), onFailure: (error) => failures.push(error) }),
@@ -114,11 +115,11 @@ for (const outcome of ["success", "failure"]) {
 // stale enabled button; repeated clicks on the same retry also stay bounded.
 {
   const test = harness(); const pending = test.run();
-  const older = { ...test.progress, id: "older-request", status: "failed", question: "Older failed question" };
+  const older = { ...test.progress, id: "older-request", status: "failed", errorCode: "RESEARCH_INTERRUPTED", question: "Older failed question" };
   await test.context.run(older, {}, { retrying: true });
   assert.equal(test.requests.length, 1);
   assert.equal(test.context.activeResearchProgress.get("conversation"), test.progress);
-  test.requests[0].reject(new Error("Synthetic failure")); await pending;
+  test.requests[0].reject(Object.assign(new Error("Synthetic transport failure"), { code: "RESEARCH_INTERRUPTED" })); await pending;
   const retry = test.context.run(older, {}, { retrying: true });
   await test.context.run(older, {}, { retrying: true });
   assert.equal(test.requests.length, 2);

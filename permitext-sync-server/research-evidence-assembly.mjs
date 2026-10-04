@@ -32,7 +32,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-bound-published-definition-reference-v69";
+export const researchEvidenceAssemblyVersion = "20261003-admitted-rule-chapter-scope-v70";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1923,6 +1923,7 @@ export async function assembleResearchEvidence({
         Object.assign(existing, { chapterScopeContext: true, anchorSourceIDs: source.anchorSourceIDs,
           anchorSectionIDs: source.anchorSectionIDs });
         deliveredChapterScopes.add(sectionIdentity(reference));
+        chapterScopeContextCount += 1;
         continue;
       }
     }
@@ -1945,9 +1946,16 @@ export async function assembleResearchEvidence({
     if (reference?.sameSectionFamily === true) return 2;
     return 0;
   };
-  crossReferenceQueue.sort((left, right) =>
-    crossReferencePriority(right) - crossReferencePriority(left)
-  );
+  crossReferenceQueue.sort((left, right) => {
+    const leftPriority = crossReferencePriority(left);
+    const rightPriority = crossReferencePriority(right);
+    if (rightPriority !== leftPriority) return rightPriority - leftPriority;
+    // A scope already queued as an ordinary reference must retain its actual
+    // anchor priority, rather than its earlier incidental insertion order.
+    return leftPriority === 3.5
+      ? ((right.chapterScopeReference || right).scopeAnchorPriority || 0) -
+        ((left.chapterScopeReference || left).scopeAnchorPriority || 0) : 0;
+  });
 
   let crossReferenceCount = 0;
   // The reviewed design dependencies replace most opportunistic expansion;
@@ -1973,7 +1981,9 @@ export async function assembleResearchEvidence({
           text: "Complete enacted chapter scope could not fit; the operative evidence and exact selections were preserved. Scope applicability remains unresolved." });
         continue;
       }
-      const { source: resolved, limitation } = await resolveResearchChapterScopeContext(scopeReference, resolveSection);
+      const reserved = reservedPacketDependencies.get(packetDependencyKey(reference));
+      const { source: resolved, limitation } = await resolveResearchChapterScopeContext(scopeReference,
+        reserved?.resolved ? async () => reserved.resolved : resolveSection);
       if (!resolved || resolved.text.length > allowance) {
         unavailableChapterScopes.add(sectionIdentity(scopeReference));
         limitations.push({ ...(limitation || { kind: "chapter-scope-context-budget", optional: true }),
@@ -2077,6 +2087,7 @@ export async function assembleResearchEvidence({
     if (deliveredChapterScopes.has(sectionIdentity(reference)) || unavailableChapterScopes.has(sectionIdentity(reference))) continue;
     limitations.push({ kind: "chapter-scope-context-slot-limit", optional: true,
       reference: `${reference.codePrefix} ${reference.sectionNumber}`,
+      anchorSourceIDs: [...reference.anchorSourceIDs], anchorSectionIDs: [...reference.anchorSectionIDs],
       text: "Protected canonical dependencies used the existing structural-source slots before complete chapter scope could be supplied. No applicability conclusion or code-family exclusion is established by this gap." });
   }
   await onStage?.("following_cross_references", "completed");
@@ -2381,6 +2392,39 @@ export async function assembleResearchEvidence({
   for (const packet of finalRulePackets.packets) {
     const source = sources.find(source => source.sourceID === packet.sourceID);
     if (source) source.rulePacket = packet;
+  }
+  for (const reference of chapterScopePlan.references) {
+    if (deliveredChapterScopes.has(sectionIdentity(reference))) continue;
+    const existing = sources.find(source => sectionIdentity(source) === sectionIdentity(reference) &&
+      source.codePrefix === reference.codePrefix && sameTopicDependencyCorpus(source, reference) &&
+      source.canonicalContextComplete && !source.truncated);
+    if (existing) {
+      const canonical = canonicalForExpansion.find(value => sectionIdentity(value) === sectionIdentity(reference) &&
+        value.codePrefix === reference.codePrefix && sameTopicDependencyCorpus(value, reference));
+      const { source } = await resolveResearchChapterScopeContext(reference, async () => canonical || existing);
+      if (source && compactText(existing.text).includes(compactText(source.text))) {
+        Object.assign(existing, { chapterScopeContext: true, anchorSourceIDs: source.anchorSourceIDs,
+          anchorSectionIDs: source.anchorSectionIDs });
+        deliveredChapterScopes.add(sectionIdentity(reference));
+        chapterScopeContextCount += 1;
+        for (let index = limitations.length - 1; index >= 0; index--) {
+          if (limitations[index].kind?.startsWith("chapter-scope-context-") &&
+              limitations[index].reference === `${reference.codePrefix} ${reference.sectionNumber}`) limitations.splice(index, 1);
+        }
+        continue;
+      }
+    }
+    const label = `${reference.codePrefix} ${reference.sectionNumber}`;
+    const gap = limitations.find(value => value.kind?.startsWith("chapter-scope-context-") && value.reference === label);
+    for (const source of sources.filter(value => reference.anchorSourceIDs.includes(value.sourceID))) {
+      // Both writer and reviewer receive RELATIONSHIP. This names a legal-text
+      // boundary without presenting cached scope text as enacted evidence.
+      source.relationship = (source.relationship || "Automatically assembled enacted evidence") +
+        ` Complete enacted chapter applicability for this source (${label}) is not supplied. ` +
+        "Treat chapter applicability as unresolved; do not infer its scope or exclusion from metadata or a parallel rule.";
+      source.chapterScopeContextGaps = [...source.chapterScopeContextGaps || [],
+        { reference: label, reason: gap?.kind || "chapter-scope-context-unavailable" }];
+    }
   }
   return {
     schemaVersion: 1,

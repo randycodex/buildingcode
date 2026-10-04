@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { researchClarificationAnswer } from "../research-conversation-continuity.mjs";
+import { researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "../public/research-failure-recovery.js";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 function extract(name) {
@@ -61,6 +62,7 @@ const document = {
   createTextNode: value => Object.assign(new Element("#text"), { text: String(value) })
 };
 const context = vm.createContext({ document, Date, URL, Set, Map, console,
+  researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason,
   clear: node => { node.children = []; },
   wireResearchDetailsMotion() {}, enhanceSelect() {},
   appendResearchSupportedPoints() {}, appendResearchUnresolved() {}, appendResearchProjectContextDisclosure() {},
@@ -84,8 +86,10 @@ vm.runInContext([
 const expected = {
   verification_source: "Research couldn’t finish because its explanation and source references didn’t agree.",
   verification_context: "Research couldn’t finish because its explanation didn’t consistently use the project details already provided.",
-  verification_format: "Research received an answer it couldn’t read.",
-  verification_incomplete: "Research couldn’t resolve this question from the sources it retrieved."
+  verification_format: "Research received an answer or review it couldn’t read.",
+  verification_incomplete: "Research couldn’t complete its source checks for this question.",
+  evidence_unavailable: "Research couldn’t prepare the code evidence needed to answer this question.",
+  research_unresolved: "Research couldn’t resolve the conditions needed to answer this question."
 };
 for (const [reason, explanation] of Object.entries(expected)) {
   const answer = researchClarificationAnswer("Does the proposed route meet the requirement?", reason);

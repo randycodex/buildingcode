@@ -231,7 +231,9 @@ assert.ok(
   "The evidence-boundary response must continue through the ordinary durable answer/conversation commit."
 );
 assert.match(handler, /requestID: researchRequestID/);
-assert.match(handler, /researchVerificationFailureExplanation\(error.verificationAttempts\)/);
+assert.match(handler, /researchFailureRecovery\(\{\s*code: failureCode, verificationAttempts: error.verificationAttempts\s*\}\)/);
+assert.match(handler, /progressResponse.error\(502, failureRecovery.text/);
+assert.match(handler, /recoveryReason: failureRecovery.reason/);
 assert.match(handler, /code: failureCode/);
 
 console.log("Permitext Research deterministic evidence-boundary fallback contract passed.");

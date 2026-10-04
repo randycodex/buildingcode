@@ -1,0 +1,77 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { researchFailureRecovery, researchFailureReason, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "../public/research-failure-recovery.js";
+import { researchClarificationAnswer, isCanonicalResearchClarification } from "../research-conversation-continuity.mjs";
+import { researchRecoveryFromFailedMessage, readResearchRequestRecovery, writeResearchRequestRecovery } from "../public/research-progress.js";
+
+globalThis.fetch = () => { throw Error("No providers or network in failure recovery policy contract."); };
+for (const code of ["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_VERIFICATION", "INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_CITATION", "INVALID_RESEARCH_WEB_CITATION", "INVALID_RESEARCH_EVIDENCE_ANALYSIS"]) {
+  const recovery = researchFailureRecovery({ code, message: "PRIVATE_UNVERIFIED_DRAFT", payload: { error: "PRIVATE_DIAGNOSTIC" } });
+  assert.equal(recovery.action, "report");
+  assert.equal(recovery.retryable, false);
+  assert.doesNotMatch(recovery.text, /PRIVATE|retry|missing project fact|building complies/i);
+  assert.doesNotMatch(recovery.text, /are saved/, "HTTP failures alone cannot establish a successful persistence receipt.");
+}
+assert.equal(researchFailureRecovery({code:"RESEARCH_VERIFICATION_FAILED",payload:{recoveryReason:"verification_context"}}).reason,"verification_context");
+assert.equal(researchFailureRecovery({code:"RESEARCH_VERIFICATION_FAILED",recoveryReason:"evidence_unavailable"}).reason,"verification_incomplete");
+assert.equal(researchFailureRecovery({code:"INVALID_RESEARCH_VERIFICATION",recoveryReason:"verification_source"}).reason,"verification_format");
+assert.equal(researchFailureRecovery({code:"RESEARCH_VERIFICATION_FAILED",payload:{recoveryReason:"PRIVATE_FREEFORM"}}).reason,"verification_incomplete");
+assert.equal(researchFailureRecovery({code:"RESEARCH_NOT_CONFIGURED",recoveryReason:"verification_source"}).kind,"unavailable");
+assert.equal(researchFailureReason({verificationAttempts:[{pass:false,issues:[{type:"incorrect_citation"}]},{pass:false,issues:[{type:"unnecessary_qualification"}]}]}),"verification_incomplete");
+assert.equal(researchFailureReason({verificationAttempts:[{pass:false,issues:[{type:"misstated_provision",detail:"An exception PRIVATE_DETAIL"}]}]}),"verification_incomplete");
+
+for (const code of ["RESEARCH_EVIDENCE_NOT_FOUND", "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED", "RESEARCH_ZONING_EVIDENCE_REQUIRED"]) {
+  assert.equal(researchFailureRecovery({code}).reason,"evidence_unavailable");
+  const saved=researchClarificationAnswer("Explain the storefront or an old filing.",researchFailureReason({code}));
+  assert.deepEqual(saved.followUpQuestions,[]);
+  assert.match(saved.answerText,/prepare the code evidence/);
+  assert.doesNotMatch(saved.answerText,/Which|paste|frontage|filing date/i,"A typed library failure cannot become a topic-inferred fact question.");
+}
+const unresolved=researchClarificationAnswer("Explain the project frontage.","research_unresolved");
+assert.deepEqual(unresolved.followUpQuestions,[]);
+assert.doesNotMatch(unresolved.answerText,/code evidence|Which frontage/,"Unresolved prerequisites without a reliable fact list do not establish a library gap or missing frontage.");
+for (const reason of researchSystemRecoveryReasons) {
+  const answer=researchClarificationAnswer("A plain project question.",reason);
+  assert(isCanonicalResearchClarification("A plain project question.",answer));
+  assert.equal(answer.answerText,researchVerificationRecoveryTextForReason(reason));
+  assert.deepEqual(answer.followUpQuestions,[]);
+  assert.equal(answer.verification.pass,false);
+  assert(!isCanonicalResearchClarification("A plain project question.",{...answer,answerText:"The building complies."}));
+}
+// Exact prior canonical records remain valid, with no migration or rewrite.
+const previous={verification_format:"Research received an answer it couldn’t read.",verification_incomplete:"Research couldn’t resolve this question from the sources it retrieved."};
+for (const [reason,conclusion] of Object.entries(previous)) {
+  const answer={...researchClarificationAnswer("Old question",reason),conclusion,explanation:"Your question and conversation are saved. You don’t need to repeat the question.",answerText:`${conclusion}\n\nYour question and conversation are saved. You don’t need to repeat the question.`};
+  const before=JSON.stringify(answer);
+  assert(isCanonicalResearchClarification("Old question",answer));
+  assert.equal(JSON.stringify(answer),before);
+  assert(!isCanonicalResearchClarification("Old question",{...answer,followUpQuestions:["Which fact should we guess?"]}));
+}
+assert(researchClarificationAnswer("What project use is proposed?","evidence").followUpQuestions.length,"Legacy genuine clarifiers retain their question behavior.");
+for (const code of ["RESEARCH_INTERRUPTED","RESEARCH_PROVIDER_ERROR","RESEARCH_VERIFIER_ERROR","TimeoutError","RESEARCH_CANCELLED"]) assert.equal(researchFailureRecovery({code}).retryable,true);
+for (const [error,action] of [[{status:401},"review_account"],[{code:"RESEARCH_ADDON_REQUIRED"},"review_account"],[{code:"RESEARCH_SPEND_CAP"},"contact_support"],[{code:"RESEARCH_EVAL_SPEND_CAP"},"contact_support"],[{code:"RESEARCH_NOT_CONFIGURED"},"contact_support"],[{code:"RESEARCH_SOURCE_CHANGED"},"review_sources"],[{code:"RESEARCH_CONTEXT_CHANGED"},"review_context"],[{},"contact_support"]]) {
+  assert.equal(researchFailureRecovery(error).action,action);
+  assert.equal(researchFailureRecovery(error).retryable,false);
+}
+
+const message={role:"user",requestID:"same-request",question:"Retain exact question",createdAt:"2026-10-03T01:00:00Z",failure:{code:"RESEARCH_VERIFICATION_FAILED",status:"failed",message:"Old copy: Retry this question",failedAt:"2026-10-03T01:00:10Z"}};
+const snapshot=JSON.stringify(message), restored=researchRecoveryFromFailedMessage(message,"owned-conversation");
+assert.equal(restored.requestID,message.requestID);
+assert.equal(restored.question,message.question);
+assert.doesNotMatch(restored.error,/Retry/i);
+assert.equal(JSON.stringify(message),snapshot);
+assert.equal(restored.answerID,undefined,"A failed user question is never promoted to an assistant feedback identity.");
+const values=new Map(),storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)};
+const record={accountUserID:"account",workspaceID:"workspace",conversationID:"conversation",requestID:"request",question:"Question remains",status:"failed",startedAt:10,errorStatus:401,recoveryReason:"verification_context"};
+assert(writeResearchRequestRecovery(storage,record,100));
+assert.equal(readResearchRequestRecovery(storage,record,101).errorStatus,401);
+assert.equal(readResearchRequestRecovery(storage,record,101).recoveryReason,"verification_context");
+assert(writeResearchRequestRecovery(storage,{...record,recoveryReason:"RAW_SECRET_REASON",errorStatus:9999},102));
+assert.equal(readResearchRequestRecovery(storage,record,103).recoveryReason,"");
+assert.equal(readResearchRequestRecovery(storage,record,103).errorStatus,0);
+
+const app=await readFile(new URL("../app.mjs",import.meta.url),"utf8");
+assert.match(app,/if \(!assembledEvidence\.length\) \{[\s\S]*?clarificationReason: "evidence_unavailable"/);
+assert.match(app,/!conditionalZoningExplanation\) \{[\s\S]*?clarificationReason: "research_unresolved"/);
+assert.match(app,/recoveryReason: failureRecovery\.reason/);
+console.log("Failure recovery policy passed: typed source/verification/format distinctions, conservative prerequisites, immutable prior records, no guessed facts/private prose, correct nonretry actions and transport controls; no providers.");
