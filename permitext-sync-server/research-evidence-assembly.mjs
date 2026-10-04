@@ -25,7 +25,7 @@ import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from
 import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
 import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { researchSearchVocabulary, researchPositiveSearchText, researchSearchVocabularyMatches } from "./research-search-vocabulary.mjs";
-import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage } from "./research-rule-groups.mjs";
+import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage, researchOperativeParentLink, researchParentChildReferenceLink } from "./research-rule-groups.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import { researchChapterScopeContextPlan, resolveResearchChapterScopeContext } from "./research-chapter-scope-context.mjs";
 import {
@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261004-current-action-parent-context-v74";
+export const researchEvidenceAssemblyVersion = "20261004-enclosing-operative-parent-context-v77";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1560,14 +1560,48 @@ export async function assembleResearchEvidence({
     const vocabulary = query.searchVocabulary;
     const concept = vocabulary?.concepts?.length === 1 ? vocabulary.concepts[0] : null;
     const fields = ['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'];
-    const requestedEdition = researchPositiveSearchText(query.question).match(/\b(?:19|20)\d{2}\b(?=[^.!?]{0,35}\b(?:codes?|edition|version)\b)/i)?.[0];
-    if (qualifyingParentCount || pinnedEvidence.length || dependencyPlan || query.relevanceComparison ||
+    const positiveCurrent = researchPositiveSearchText(query.question);
+    const requestedEdition = positiveCurrent.match(/\b(?:19|20)\d{2}\b(?=[^.!?]{0,35}\b(?:codes?|edition|version)\b)/i)?.[0];
+    const explicitlyRequested = extractResearchCodeReferences(positiveCurrent).some(reference =>
+      reference.codePrefix === canonical.codePrefix && reference.sectionNumber === canonical.sectionNumber);
+    const bookQuestion = positiveCurrent.replace(/\bexisting[-\s]+building\s+code\b/gi, 'EBC code');
+    const namedBooks = [['BC', 'building'], ['PC', 'plumbing'], ['MC', 'mechanical'], ['FGC', 'fuel[-\\s]+gas'],
+      ['FC', 'fire'], ['EBC', 'EBC'], ['AC', 'administrative']]
+      .filter(([, name]) => new RegExp(`\\b${name}\\s+code\\b`, 'i').test(bookQuestion)).map(([prefix]) => prefix);
+    const namedReferences = extractResearchCodeReferences(positiveCurrent).map(reference => reference.codePrefix).filter(Boolean);
+    // A heading or the enacted clause's own subject can nominate relevance;
+    // neither establishes applicability. Do not admit a rank-one rule solely
+    // because a subordinate location phrase repeats the question's location.
+    const enactedSubject = freshCandidateSource?.body?.blocks?.map(block => block.plainText || '').join('\n')
+      .split(/\b(?:shall|must|may|is|are)\b/i, 1)[0].replace(/\b(?:at|on|near|beside|above|below)\b[\s\S]*$/i, '');
+    const vocabularyQualified = !!concept && concept.codePrefixes.includes(canonical.codePrefix) &&
+      researchSearchVocabularyMatches(record.text, concept);
+    const responsiveSubject = text => researchCurrentRuleDetailScore(record, text) >= 2 &&
+      (vocabularyQualified || researchCurrentRuleDetailScore({ text: enactedSubject }, text) >= 2 ||
+        researchCurrentRuleDetailScore({ text: canonical.title || '' }, String(text).replace(
+          /\b(?:area|areas|space|spaces|building|buildings|other|general|minimum|maximum|required|requirement|requirements|provision|provisions|code|section|location|locations|category|categories)\b/gi, ' ')) >= 1);
+    const shortHumanContinuation = query.contextDependentFollowUp && !query.relevanceComparison &&
+      /^(?:does?\s+(?:that|this|it)\s+(?:change|make)|would\s+(?:that|this|it)\s+(?:change|make)|is\s+(?:that|this|it)\s+now)\b/i.test(positiveCurrent) &&
+      questionSpecificTerms(positiveCurrent).length <= 6;
+    const humanQuestions = (Array.isArray(previousMessages) ? previousMessages : [])
+      .filter(message => message.role === 'user').map(message => compactText(message.question || message.content || ''));
+    const activeHumanSubject = shortHumanContinuation
+      ? [query.topicDecision?.rootTopic?.text, query.topicDecision?.currentTopic?.text]
+        .filter(text => text && humanQuestions.includes(compactText(text))).map(researchPositiveSearchText).join('\n') : '';
+    const directlyResponsive = (explicitlyRequested || responsiveSubject(positiveCurrent) ||
+        activeHumanSubject && responsiveSubject(`${positiveCurrent}\n${activeHumanSubject}`)) &&
+      !/\b(?:compare|comparing|comparison|versus|vs\.?|differences? between|difference in (?:the )?(?:codes?|editions?))\b/i.test(positiveCurrent) &&
+      (![...namedBooks, ...namedReferences].length || [...namedBooks, ...namedReferences].includes(canonical.codePrefix));
+    if (qualifyingParentCount && !directlyResponsive || pinnedEvidence.length || dependencyPlan || query.relevanceComparison ||
         appliedStrategy.mode !== researchEvidenceStrategies.broad || record.discoveryPassageOnly || record.truncated ||
+        candidate?.signals?.useSelectedPassageOnly || candidate?.useSelectedPassageOnly ||
+        candidate?.referenceOnly || candidate?.selectionMode === 'section_reference' ||
         record.targetedDefinition || record.targetedZoningContext || !record.canonicalContextComplete ||
         ['contextual', 'irrelevant'].includes(record.evidencePriority?.evidenceRole) ||
         candidate?.signals?.contextualReference || candidate?.signals?.historicalReference || candidate?.signals?.inheritedReference ||
-        !(candidate?.signals?.currentQuestionForeground || Number(candidate?.rank) > 0 && Number(candidate.rank) <= 2) || !concept ||
-        !concept.codePrefixes.includes(canonical.codePrefix) || !researchSearchVocabularyMatches(record.text, concept) ||
+        !(directlyResponsive || candidate?.signals?.currentQuestionForeground || Number(candidate?.rank) > 0 && Number(candidate.rank) <= 2 ||
+          candidate?.signals?.currentQuestionLexicalReservation?.kind === 'active_checked_rule_current_detail') ||
+        (!vocabularyQualified && !directlyResponsive) ||
         requestedEdition && !String(canonical.codeEdition).includes(requestedEdition) ||
         !freshWholeCanonicalSource(freshCandidateSource) || freshCandidateSource.sectionNumber !== canonical.sectionNumber ||
         String(freshCandidateSource.sectionID || freshCandidateSource.id) !== String(candidate.sectionID || candidate.id) ||
@@ -1597,17 +1631,11 @@ export async function assembleResearchEvidence({
     } catch { resolverFailureCount += 1; return; }
     const text = canonicalText(resolved);
     const enactedBody = resolved.body.blocks.map(block => block.plainText).join('\n\n');
-    const literalChild = inlineCrossReferences(enactedBody, resolved.codePrefix).some(ref =>
-      ref.codePrefix === canonical.codePrefix && ref.sectionNumber === canonical.sectionNumber);
-    const rangeChild = [...enactedBody.matchAll(/\bSections?\s+(\d+(?:\.\d+)+)\s+(?:through|to)\s+(\d+(?:\.\d+)+)\b/gi)]
-      .some(([, start, end]) => {
-        const parts = canonical.sectionNumber.split('.'), first = start.split('.'), last = end.split('.');
-        return parts.length === first.length && parts.length === last.length &&
-          first.slice(0, -1).join('.') === number && last.slice(0, -1).join('.') === number &&
-          Number(first.at(-1)) <= Number(parts.at(-1)) && Number(parts.at(-1)) <= Number(last.at(-1));
-      });
-    if (!(literalChild || rangeChild) || !/\b(?:in accordance with|subject to|governed by|shall comply|must comply)\b/i.test(enactedBody) ||
-        !/\b(?:exceptions?|unless|except|only|applicability)\b/i.test(enactedBody)) return;
+    const qualifiedActionParent = vocabularyQualified && researchParentChildReferenceLink(resolved, canonical) &&
+      /\b(?:in accordance with|subject to|governed by|shall comply|must comply)\b/i.test(enactedBody) &&
+      /\b(?:exceptions?|unless|except|only|applicability)\b/i.test(enactedBody);
+    const operativeParentLink = directlyResponsive ? researchOperativeParentLink(resolved, canonical) : null;
+    if (!qualifiedActionParent && !operativeParentLink) return;
     const allowance = Math.min(limits.maximumCharactersPerSource, supplementalCharacterCeiling - characterCount -
       reservedTopicCharacters() - reservedPacketCharacters());
     if (text.length > allowance) {
@@ -1616,15 +1644,22 @@ export async function assembleResearchEvidence({
         text: 'Complete enacted enclosing qualifications could not fit the existing evidence budget. No clipped parent was supplied; those qualifications remain unresolved.' });
       return;
     }
+    const relationship = operativeParentLink
+      ? 'Complete enacted immediate-parent obligation for the current child rule; applicability requires review'
+      : 'Complete enacted enclosing qualification for a current action rule; applicability requires review';
     const dependencyRecord = sourceRecord(resolved, { origin: sourceOrigins.crossReference,
       sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, 'qualifying-parent'),
       characterAllowance: allowance, canonicalResolved: true, retrievalDepth: 1, retrievedAt,
-      relationship: 'Complete enacted enclosing qualification for a current action rule; applicability requires review',
+      relationship,
       evidencePriority: researchEvidencePriorityMetadata({ ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1 }) });
     if (!dependencyRecord.text || dependencyRecord.truncated || !dependencyRecord.canonicalContextComplete) return;
     resolved.qualifyingParentBodySHA256 = createHash('sha256').update(enactedBody).digest('hex');
+    if (operativeParentLink) resolved.enclosingOperativeParent = {
+      childSectionID: canonical.sectionID, childSectionNumber: canonical.sectionNumber,
+      linkKind: operativeParentLink.kind, sourceTextSHA256: operativeParentLink.sourceTextSHA256
+    };
     reservedPacketDependencies.set(key, { reference, resolved, record: dependencyRecord });
-    qualifyingParentCount += 1;
+    if (!operativeParentLink) qualifyingParentCount += 1;
   };
   const reserveCurrentDetailPacket = async (canonical, record, candidate, freshCandidateSource) => {
     await reserveCurrentActionParent(canonical, record, candidate, freshCandidateSource);
@@ -2246,7 +2281,9 @@ export async function assembleResearchEvidence({
     const ancestorScope = reference.referencePurpose === "canonical_ancestor_scope";
     const qualifyingParent = reference.referencePurpose === 'complete_qualifying_parent';
     const delegatedChild = reference.referencePurpose === 'registered_delegated_rule_child';
-    const relationship = qualifyingParent
+    const relationship = qualifyingParent && resolved.enclosingOperativeParent
+      ? 'Complete enacted immediate-parent obligation for the current child rule; applicability requires review'
+      : qualifyingParent
       ? 'Complete enacted enclosing qualification for a current action rule; applicability requires review'
       : delegatedChild
       ? 'Complete registered child of a supplied canonical rule that delegates to this section; not a complete child-group claim'
@@ -2272,7 +2309,10 @@ export async function assembleResearchEvidence({
       targetedDefinition: targeted.excerpt,
       retrievedAt
     });
-    if (qualifyingParent) record.qualifyingParentBodySHA256 = resolved.qualifyingParentBodySHA256;
+    if (qualifyingParent) {
+      record.qualifyingParentBodySHA256 = resolved.qualifyingParentBodySHA256;
+      if (resolved.enclosingOperativeParent) record.enclosingOperativeParent = { ...resolved.enclosingOperativeParent };
+    }
     if (record.truncated) {
       limitations.push({ kind: "cross-reference-context-incomplete",
         reference: `${resolved.codePrefix} ${resolved.sectionNumber}`,
