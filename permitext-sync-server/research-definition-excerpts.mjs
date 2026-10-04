@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { researchSearchVocabulary, researchPositiveSearchText } from "./research-search-vocabulary.mjs";
 
-export const researchDefinitionExcerptVersion = "20261004-requested-definition-priority-v7";
+export const researchDefinitionExcerptVersion = "20261004-requested-definition-carrier-v8";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -530,7 +530,7 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
       canonicalContextComplete: false, completeDefinitionEntries: true, ...bindings
     };
   }
-  const dependencies = options.requiredTextTerms?.length ? [] : zoningDefinitionDependencies(section, query);
+  const dependencies = options.requestedOnly || options.requiredTextTerms?.length ? [] : zoningDefinitionDependencies(section, query);
   const dependencyEntries = dependencies.length ? requiredTermSelection(entries, dependencies) : null;
   // Automatically inferred dependencies must be complete entries. Never cut
   // a measurement exception simply to fit another definition in the package.
@@ -549,7 +549,7 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
       if (!score) return null;
       return { ...score, requestedPriority: current ? 2 : prior ? 1 : 0 };
     })
-    .filter(Boolean)
+    .filter(entry => entry && (!options.requestedOnly || entry.requestedPriority > 0))
     .sort((left, right) =>
       right.requestedPriority - left.requestedPriority || right.score - left.score ||
       (left.phraseIndex < 0 ? Number.MAX_SAFE_INTEGER : left.phraseIndex) -
@@ -600,6 +600,35 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     canonicalSectionCharacterCount: canonicalText.length,
     excerptCharacterCount: text.length,
     canonicalContextComplete: false,
+    ...(options.requestedOnly ? { requestedDefinitionPriority: Math.max(...selected.map(entry => entry.requestedPriority)) } : {}),
     ...bindings
   };
+}
+
+// Search nomination only. A freshly read dictionary must contain each whole
+// parsed entry in its canonical text; an HTML label or shortened fragment alone
+// cannot acquire priority. The assembler still resolves and binds it again.
+export function researchRequestedDefinitionMatch(section, {
+  question = "", humanContext = "", maximumCharacters = researchDefinitionExcerptLimits.maximumCharacters
+} = {}) {
+  const blocks = section?.body?.blocks || section?.blocks || [];
+  if (section?.truncated || section?.body?.truncated || section?.researchClaimEligible === false ||
+      blocks.some(block => block?.truncated || block?.researchClaimEligible === false) ||
+      !compactText(section?.sectionID || section?.id) ||
+      !["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"].every(key => compactText(section?.[key]))) return null;
+  // Once a body has been read, its blocks are the source authority. Catalog
+  // text can be older and must never restore words absent from that body.
+  const text = compactText(section?.body || Array.isArray(section?.blocks)
+    ? blocks.map(block => block?.plainText || "").join("\n\n")
+    : section.canonicalText || section.text);
+  if (!text) return null;
+  const query = [researchPositiveSearchText(question), researchPositiveSearchText(humanContext)].filter(Boolean).join("\n");
+  const excerpt = targetedDefinitionExcerpt({ ...section, text, canonicalText: text }, query, {
+    allowShortSection: true, requestedOnly: true, preferredQuery: question,
+    preferredHumanContext: humanContext, maximumCharacters
+  });
+  if (!excerpt || !excerpt.passages.every(passage => exactWhitespaceLocation(text, passage))) return null;
+  return { origin: excerpt.requestedDefinitionPriority === 2 ? "current" : "human_context",
+    priority: excerpt.requestedDefinitionPriority, labels: excerpt.labels,
+    excerptCharacterCount: excerpt.excerptCharacterCount };
 }

@@ -1,16 +1,16 @@
 import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { researchEquipmentSearchIntent, researchEquipmentSubjectMatches } from "./research-equipment-search-intent.mjs";
-import { researchSearchVocabulary, researchSearchVocabularyMatches } from "./research-search-vocabulary.mjs";
+import { researchSearchVocabulary, researchSearchVocabularyMatches, researchPositiveSearchText } from "./research-search-vocabulary.mjs";
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 import { researchCurrentRuleDetailScore, researchCheckedRuleIndexPassage } from "./research-rule-packets.mjs";
-import { researchEmbeddedDefinitionCarrier } from "./research-definition-excerpts.mjs";
+import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch } from "./research-definition-excerpts.mjs";
 import { nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-shared-search-vocabulary-v59";
+export const evidenceDiscoveryVersion = "20261004-requested-definition-carrier-v60";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -2359,10 +2359,29 @@ export async function discoverRelevantEvidence({
   for (const item of selectedCandidates) {
     selectedPrefixCounts.set(item.section.codePrefix, (selectedPrefixCounts.get(item.section.codePrefix) || 0) + 1);
   }
-  const supplementalDefinitions = detailed.filter((item) => !selectedIDs.has(item.section.id) &&
+  const definitionPool = detailed.filter((item) =>
     selectedPrefixCounts.has(item.section.codePrefix) &&
-    (String(item.section.sectionNumber) === "202" || /\bdefinitions?\b/i.test(item.section.title || "") || item.definitionCarrier))
+    (String(item.section.sectionNumber) === "202" || /\bdefinitions?\b/i.test(item.section.title || "") || item.definitionCarrier));
+  const positiveQuestion = researchPositiveSearchText(currentQuestion);
+  const definitionPrefixes = explicitQuestionDisciplinePrefixes(positiveQuestion);
+  const definitionEdition = /\b(?:codes?|edition)\b/i.test(positiveQuestion)
+    ? positiveQuestion.match(/\b(?:19|20)\d{2}\b/)?.[0] : null;
+  const definitionHumanContext = retrievalContext?.contextDependentFollowUp === true && !relevanceComparison
+    ? [...new Set([retrievalContext.conversationTopic, retrievalContext.immediateContext]
+        .filter(value => typeof value === "string").map(value => value.slice(0, 640)))].slice(0, 2).join("\n") : "";
+  for (const item of definitionPool) {
+    if (item.contextualReference || item.useSelectedPassageOnly ||
+        zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) < 1 ||
+        (definitionPrefixes.size && !definitionPrefixes.has(item.section.codePrefix)) ||
+        (definitionEdition && sectionCodeEdition(item.section) !== definitionEdition) ||
+        (/\b(?:NYC|New York City)\b/i.test(positiveQuestion) && !/^(?:New York City|NYC)$/i.test(item.section.jurisdiction || ""))) continue;
+    item.requestedDefinitionCarrier = researchRequestedDefinitionMatch({ ...item.section, body: item.body }, {
+      question: currentQuestion, humanContext: definitionHumanContext
+    });
+  }
+  const supplementalDefinitions = definitionPool.filter(item => !selectedIDs.has(item.section.id))
     .sort((left, right) =>
+      (right.requestedDefinitionCarrier?.priority || 0) - (left.requestedDefinitionCarrier?.priority || 0) ||
       Number(foregroundPrefixes.has(right.section.codePrefix)) - Number(foregroundPrefixes.has(left.section.codePrefix)) ||
       selectedPrefixCounts.get(right.section.codePrefix) - selectedPrefixCounts.get(left.section.codePrefix) ||
       Number(String(right.section.sectionNumber) === "202") - Number(String(left.section.sectionNumber) === "202") ||
@@ -2482,6 +2501,7 @@ export async function discoverRelevantEvidence({
         ...(item.currentQuestionLexicalReservation ? { currentQuestionLexicalReservation: item.currentQuestionLexicalReservation } : {}),
         ...(item.currentQuestionForeground ? { currentQuestionForeground: item.currentQuestionForeground } : {}),
         ...(item.definitionCarrier ? { canonicalEmbeddedDefinitions: item.definitionCarrier } : {}),
+        ...(item.requestedDefinitionCarrier ? { requestedDefinitionCarrier: item.requestedDefinitionCarrier } : {}),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
         rootClaimCoverage: item.rootClaimCoverage,
