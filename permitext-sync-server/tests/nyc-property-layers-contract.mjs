@@ -51,6 +51,10 @@ assert.equal(mapped.unavailable.length, 3);
 const crowded = await lookupMappedAreaFacts("2028500003", retrievedAt, async () => [{ records: Array.from({ length: 26 }, (_, index) => ({ projectnam: `Area ${index} ${"x".repeat(70)}`, mih_option: "Option 1", covers_lot: true })) }]);
 assert.ok(crowded.facts.every(fact => fact.value.length <= 1000));
 assert.match(crowded.facts.find(fact => fact.key === "mih-area-options").value, /Additional details require ZoLa review/);
+for (const records of [[null], ["invalid"], [{}], [{ covers_lot: null }]]) {
+  const malformed = await lookupMappedAreaFacts("2028500003", retrievedAt, async () => [{ records }]);
+  assert.ok(malformed.facts.every(fact => fact.status === "unknown"), "Malformed records must remain unknown without breaking other property data");
+}
 
 const existing = [
   { key: "parking-geography", value: "Manually checked Inner Transit Zone", source: "user", status: "confirmed" },

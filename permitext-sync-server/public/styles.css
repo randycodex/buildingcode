@@ -10100,6 +10100,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   cursor: wait;
 }
 
+.saved-project-structured-section:not(.is-open) > .saved-project-facts-heading > .saved-project-refresh-facts {
+  display: none;
+}
+
 .saved-project-facts-chevron {
   margin-left: var(--space-2);
 }

@@ -1,7 +1,7 @@
 import { nycMappedFactFields } from "./public/nyc-property-facts.js";
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
-export const projectFactProjectionVersion = "20260930-existing-property-scope-v2";
+export const projectFactProjectionVersion = "20261004-zola-mapped-area-scope-v3";
 
 const statuses = new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]);
 const aliases = new Map([

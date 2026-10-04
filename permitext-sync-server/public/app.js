@@ -31132,7 +31132,8 @@ function appendSavedProjectFactEditor(container, folder, identity) {
         structuredFacts: next.structuredFacts,
         color: projectColor(folder),
         folderType: folderType(folder)
-      }).then(() => {
+      }).then((updated) => {
+        if (reportFailure && updated === false) throw new Error("Project facts were not saved. Try again.");
         if (isCurrentAccountRequest(requestIdentity)) saved = next;
       }).catch((error) => {
       if (reportFailure) throw error;

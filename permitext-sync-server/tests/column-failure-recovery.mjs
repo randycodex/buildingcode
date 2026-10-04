@@ -17,7 +17,7 @@ function lookupHarness() {
 {
   const {c,pending} = lookupHarness(); const p=c.lookup();
   assert.match(c.propertyLookupStatus.textContent,/Looking up/);
-  pending[0].resolve({property:{structuredFacts:[{value:'R8A'}],warnings:['Mapped-area facts were unavailable.'],normalizedAddress:'Normalized address'}});
+  pending[0].resolve({property:{structuredFacts:[{value:'R8A',status:'sourced'},{value:'Unavailable',status:'unknown'}],warnings:['Mapped-area facts were unavailable.'],normalizedAddress:'Normalized address'}});
   await p;
   assert.equal(c.propertyLookupStatus.dataset.state,'warning');
   assert.match(c.propertyLookupStatus.textContent,/Imported 1 sourced facts/);

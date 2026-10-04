@@ -29,13 +29,14 @@ const projectSectionExpanded=()=>true,persistProjectSectionExpansion=()=>{},clea
 const showWebNotice=async(title,message)=>{document.querySelector('#notice').textContent=title+' — '+message;};
 const postResearch=async()=>{await new Promise(resolve=>setTimeout(resolve,100));return {property:${JSON.stringify(property)}};};
 const folder={id:'synthetic',name:'Synthetic ZoLa Project',address:'1760 Jerome Avenue',description:'Synthetic conditions',structuredFacts:[{id:'manual',key:'occupancy',label:'Occupancy',value:'Group R-2 — manual',status:'confirmed',source:'user'},{id:'old',key:'coastal-zone',label:'Coastal Zone',value:'Within mapped Coastal Zone — old record',status:'sourced',source:'nyc-planning'}]};
-const updateProjectFolder=async(_folder,details)=>{Object.assign(folder,details);document.querySelector('#state').textContent='Saved '+folder.structuredFacts.length+' facts. Manual occupancy: '+folder.structuredFacts.find(f=>f.key==='occupancy').value;};
+let syntheticSaveAttempts=0;
+const updateProjectFolder=async(_folder,details)=>{syntheticSaveAttempts++;const failure=new URL(location.href).searchParams.get('saveFailure');if(syntheticSaveAttempts===1&&failure==='false')return false;if(syntheticSaveAttempts===1&&failure==='throw')throw new Error('Synthetic save failure');Object.assign(folder,details);document.querySelector('#state').textContent='Saved '+folder.structuredFacts.length+' facts. Manual occupancy: '+folder.structuredFacts.find(f=>f.key==='occupancy').value;return true;};
 ${editor}
 appendSavedProjectFactEditor(document.querySelector('#editor'),folder,{...folder});
 </script></body></html>`;
 const server = createServer(async (request, response) => {
   try {
-    if (request.url === "/") {response.setHeader("content-type", "text/html"); response.end(html); return;}
+    if (new URL(request.url, "http://localhost").pathname === "/") {response.setHeader("content-type", "text/html"); response.end(html); return;}
     if (["/styles.css", "/nyc-property-facts.js"].includes(request.url)) {
       response.setHeader("content-type", request.url.endsWith(".css") ? "text/css" : "text/javascript");
       response.end(await readFile(new URL(`../public${request.url}`, import.meta.url))); return;

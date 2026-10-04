@@ -59,6 +59,8 @@ export async function lookupMappedAreaFacts(bbl, retrievedAt, fetchRows) {
       try {
         const rows = await fetchRows(mappedLayerSQL(layer, bbl));
         if (rows.length !== 1 || !Array.isArray(rows[0]?.records)) throw new Error("Layer coverage unavailable");
+        if (!rows[0].records.every(record => record && typeof record === "object" &&
+            !Array.isArray(record) && typeof record.covers_lot === "boolean")) throw new Error("Layer records unavailable");
         results[index] = { layer, records: rows[0].records };
       } catch { results[index] = { layer, records: null }; }
     }
