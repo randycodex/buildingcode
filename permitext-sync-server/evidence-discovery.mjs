@@ -1,6 +1,6 @@
 import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { researchEquipmentSearchIntent, researchEquipmentSubjectMatches } from "./research-equipment-search-intent.mjs";
-import { researchSearchVocabulary, researchSearchVocabularyMatches, researchPositiveSearchText } from "./research-search-vocabulary.mjs";
+import { researchSearchVocabulary, researchSearchVocabularyMatches, researchPositiveSearchText, researchGasEquipmentVocabulary } from "./research-search-vocabulary.mjs";
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
@@ -10,7 +10,7 @@ import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch } f
 import { nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261004-requested-definition-carrier-v60";
+export const evidenceDiscoveryVersion = "20261004-positive-gas-equipment-v61";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -754,6 +754,7 @@ const topicRoutes = [
   {
     pattern: /\b(?:gas[- ]fired|fuel[- ]burning|gas)\s+appliances?\b.*\bcombustion\s+air\b|\bcombustion\s+air\b.*\b(?:gas[- ]fired|mechanical\s+room|appliances?)\b/i,
     label: "fuel-gas appliance combustion-air provisions",
+    nominationVocabulary: 'gas_equipment',
     targets: [
       { codePrefix: "FGC", sectionPrefix: "304.1" },
       { codePrefix: "FGC", sectionPrefix: "304.5" }
@@ -1778,6 +1779,10 @@ export async function discoverRelevantEvidence({
   const sections = Array.isArray(catalog) ? catalog : [];
   const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
   const currentQuestion = retrievalContext?.currentQuestion || sourceQuestion;
+  const gasVocabulary = researchGasEquipmentVocabulary(currentQuestion, {
+    contextDependentFollowUp: retrievalContext?.contextDependentFollowUp === true,
+    humanTopics: [retrievalContext?.conversationTopic, retrievalContext?.immediateContext]
+  });
   const explicitDisciplinePrefixes = explicitQuestionDisciplinePrefixes(currentQuestion);
   const requestedTemperature = /\btemperature\b/i.test(currentQuestion) &&
     /\b(?:maximum|minimum|limit|how hot|how cold)\b/i.test(currentQuestion);
@@ -2012,8 +2017,9 @@ export async function discoverRelevantEvidence({
   const stipulatedOccupantLoad = /\b(?:established|stipulated|assumed|given) occupant load\b/i.test(normalizedQuestion)
     && !/\b(?:calculate|calculating|recalculate|determine|verify)\b.{0,35}\boccupant load\b/i.test(normalizedQuestion);
 
-  for (const route of topicRoutes.filter(({ pattern, calculationScope }) =>
-    pattern.test(sourceQuestion) && !(calculationScope && separateFacilitiesWithStipulatedCounts)
+  for (const route of topicRoutes.filter(({ pattern, calculationScope, nominationVocabulary }) =>
+    pattern.test(nominationVocabulary === 'gas_equipment' ? gasVocabulary?.routeQuery || '' : sourceQuestion) &&
+    !(calculationScope && separateFacilitiesWithStipulatedCounts)
   )) {
     for (const target of route.targets) {
       if (target.fountainApplicability && fountainSubstitutionWithStipulatedCount) continue;

@@ -98,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261003-research-retrieval-v635";
+} from "./offline-storage.js?v=20261004-research-source-notes-v636";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -136,7 +136,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261003-research-retrieval-v635";
+} from "./research-intent-state.js?v=20261004-research-source-notes-v636";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18828,7 +18828,8 @@ function appendResearchUnresolved(container, result) {
   const limits = [...new Set(researchDisplayList(result.evidenceLimitations))];
   const facts = [...new Set(researchDisplayList(result.missingFacts))];
   const needed = [...new Set(researchDisplayList(result.additionalEvidenceNeeded))];
-  appendResearchList(container, "Evidence limits and sources still needed", [...new Set([...limits, ...needed])]);
+  appendResearchList(container, "Scope and source notes", limits);
+  appendResearchList(container, "Sources still needed", needed);
   appendResearchList(container, "Project details that may affect the answer", facts);
 }
 
@@ -19076,10 +19077,10 @@ function renderResearchInterpretation(container, result, options = {}) {
     const authority = document.createElement("p");
     authority.className = "research-authority-status";
     authority.dataset.authorityStatus = result.authorityStatus || "";
-    const missingConclusionEvidence = result.evidenceLimitations?.length &&
-      /cannot be determined|insufficient evidence|cannot determine/i.test(researchAnswerNarrativeText(result));
-    authority.textContent = missingConclusionEvidence
-      ? "Insufficient evidence for the requested conclusion"
+    const standardEnactedSupport = result.authorityStatus === "supported_by_enacted_text" &&
+      result.authorityLabel === "Supported by enacted text";
+    authority.textContent = standardEnactedSupport
+      ? "Enacted text supports the cited points"
       : result.authorityLabel;
     metadata.append(authority);
   }
@@ -19200,7 +19201,8 @@ function renderResearchInterpretation(container, result, options = {}) {
   }
 
   const missingFactCount = result.missingFacts?.length || 0;
-  const evidenceLimitCount = result.evidenceLimitations?.length || 0;
+  const evidenceNoteCount = result.evidenceLimitations?.length || 0;
+  const neededSourceCount = result.additionalEvidenceNeeded?.length || 0;
   const sourceSummary = result.sourceSummary || {};
   const enactedCount = Number(sourceSummary.enactedProvisionCount || 0);
   const contextualCount = Number(sourceSummary.contextualProvisionCount || 0);
@@ -19252,7 +19254,8 @@ function renderResearchInterpretation(container, result, options = {}) {
       ? `${contextualCount} contextual ${contextualCount === 1 ? "provision" : "provisions"} reviewed separately`
       : "",
     missingFactCount ? `${missingFactCount} project ${missingFactCount === 1 ? "fact remains" : "facts remain"} unresolved` : "No unresolved project facts identified",
-    evidenceLimitCount ? `${evidenceLimitCount} evidence ${evidenceLimitCount === 1 ? "limit" : "limits"}` : "No additional evidence limits identified"
+    evidenceNoteCount ? `${evidenceNoteCount} scope/source ${evidenceNoteCount === 1 ? "note" : "notes"}` : "No scope/source notes listed",
+    neededSourceCount ? `${neededSourceCount} ${neededSourceCount === 1 ? "source still" : "sources still"} needed` : ""
   ].filter(Boolean).join(" · ");
   metadata.append(boundary);
 
