@@ -53,7 +53,7 @@ globalThis.fetch = async (url, options) => {
       if (writerCount === 1) {
         review.units.unit_0.assertedMode = "project_determination";
         review.units.unit_0.categoricalTarget = "actual";
-        review.units.unit_0.categoricalQuote = actual.answerText.slice(packet.units[0].spans[0].start, packet.units[0].spans[0].end);
+        review.units.unit_0.categoricalSpanIndex = 0;
       } else if (mode === "stale") review.packetHash = packets[0].packetHash;
       else if (mode === "missing") delete review.units[packet.units.at(-1).id];
       value = { pass: true, issues: [], projectFactQuestions: [], missingFactsOnly: false,

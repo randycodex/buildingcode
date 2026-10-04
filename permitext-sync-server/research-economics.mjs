@@ -100,7 +100,7 @@ function normalizedStructuredAttemptFailureStages(value) {
 
 function normalizedClaimApplicabilityDiagnostic(value) {
   const hashes = ["packetHash", "answerHash", "evidenceHash", "factsHash"];
-  if (!["20261004-claim-applicability-v1", "20261004-claim-applicability-v2"].includes(value?.version) || !hashes.every((field) => /^[a-f0-9]{64}$/.test(value[field] || ""))) return null;
+  if (!["20261004-claim-applicability-v1", "20261004-claim-applicability-v2", "20261004-claim-applicability-v3"].includes(value?.version) || !hashes.every((field) => /^[a-f0-9]{64}$/.test(value[field] || ""))) return null;
   const reasons = new Set(["source_identity", "scope_identity", "source_binding", "unit_coverage", "edge_coverage", "packet_capacity", "stale_packet",
     "review_hash", "edge_shape", "duplicate_reference", "source_span", "fact_span", "predicate_relation", "unbound_disposition", "unused_fact_binding",
     "edge_state", "binding_coverage", "binding_shape", "ineligible_fact_status", "hypothetical_project_fact", "unbound_predicate", "irrelevant_fact_binding", "unit_shape", "unit_state", "categorical_scope", "categorical_witness", "condition_witness"]);

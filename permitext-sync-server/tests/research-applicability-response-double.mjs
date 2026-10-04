@@ -9,7 +9,7 @@ export function syntheticApplicabilityReview(body) {
   const packet = applicabilityPacketFromRequest(body);
   return { packetHash: packet.packetHash,
     predicates: Object.fromEntries(packet.edges.map(edge => [edge.id, []])), factSpans: [],
-    units: Object.fromEntries(packet.units.map(unit => [unit.id, { assertedMode: "source_explanation", categoricalTarget: "none", categoricalQuote: "",
+    units: Object.fromEntries(packet.units.map(unit => [unit.id, { assertedMode: "source_explanation", categoricalTarget: "none", categoricalSpanIndex: null,
       bindings: Object.fromEntries(unit.edgeIDs.map(edgeID => [edgeID, { treatment: "not_material",
         reason: "Explicit synthetic immaterial witness; no semantic acceptance claim." }])) }])) };
 }

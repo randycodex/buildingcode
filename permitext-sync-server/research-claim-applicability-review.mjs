@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { researchFactQualification } from "./research-fact-qualification.mjs";
+import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
 
-export const researchClaimApplicabilityVersion = "20261004-claim-applicability-v2";
+export const researchClaimApplicabilityVersion = "20261004-claim-applicability-v3";
 const hash = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const text = (value) => typeof value === "string" ? value : "";
 const ids = (value) => [...new Set((Array.isArray(value) ? value : []).map(String))];
@@ -28,10 +29,10 @@ function evidenceIdentity(evidence) {
 
 function factLedger(question, options) {
   const records = [];
-  const add = (statement, origin, status, currentTopic, key = null) => {
+  const add = (statement, origin, status, currentTopic, key = null, scenarioContext = false) => {
     if (!text(statement).trim()) return;
     const qualification = researchFactQualification(statement);
-    const body = { statement, origin, status, currentTopic, key,
+    const body = { statement, origin, status, currentTopic, key, scenarioContext,
       hypothetical: status === "hypothetical" || qualification.hypothetical,
       qualified: status === "qualified" || qualification.qualified };
     records.push({ id: `fact_${hash(body).slice(0, 24)}`, ...body, statementHash: hash(statement) });
@@ -60,9 +61,23 @@ function factLedger(question, options) {
   }
   // Earlier human statements are review context, not current premises. The
   // active fact state above owns corrections, topic changes and scenarios.
-  for (const message of (options.messages || []).slice(-8)) {
+  const history = (options.messages || []).slice(-8);
+  const root = text(state?.activeRootTopic || context?.topicContext?.rootTopic);
+  const normalized = value => text(value).replace(/\s+/g, " ").trim();
+  const rootIndex = root ? history.findLastIndex(message => message.role === "user" && normalized(message.question) === normalized(root)) : -1;
+  let scenarioContext = rootIndex >= 0 && context?.topicContext?.lastDecision !== "topic_switch";
+  let current = root;
+  // A raw human scenario carrier is not an established fact. It can be used
+  // only for the active scenario and cannot restore a corrected/older topic.
+  for (const wording of [...history.slice(rootIndex + 1).filter(message => message.role === "user").map(message => text(message.question)), question]) {
+    if (!scenarioContext) break;
+    const decision = decideResearchConversationTopic({ question: wording, rootTopic: root, currentTopic: current });
+    if (decision.decision === "topic_switch" || decision.decision === "correction" || decision.signals.returnToOriginal) scenarioContext = false;
+    current = wording;
+  }
+  for (const [index, message] of history.entries()) {
     if (message.role === "user" && text(message.question) !== question)
-      add(text(message.question || message.content), "earlier_user", "context_only", false);
+      add(text(message.question || message.content), "earlier_user", "context_only", false, null, scenarioContext && index >= rootIndex);
   }
   return { scenarioActive, currentTopicHash: hash(state?.activeRootTopic || context?.topicContext || null),
     historyHash: hash((options.messages || []).slice(-8).map((message) => ({ role: message.role,
@@ -194,7 +209,11 @@ export function buildResearchClaimApplicabilityPacket({ question = "", answer = 
       const { id: _id, ...body } = edge; requireEdge(`scope:${edge.id}`, body, unit);
     }
   }
-  for (const unit of units) unit.maximumClaimQuoteLength = Math.max(0, ...unitClaimTexts(unit, answer).map(value => value.length));
+  for (const unit of units) {
+    unit.maximumClaimQuoteLength = Math.max(0, ...unitClaimTexts(unit, answer).map(value => value.length));
+    unit.claimTargets = unit.spans?.length ? unit.spans.filter(span => span.end > span.start).map(({ field, start, end, textHash }) => ({ field, start, end, textHash })) :
+      unit.fields.flatMap(field => (answer[field] || []).map((value, itemIndex) => ({ field, itemIndex, start: 0, end: text(value).length, textHash: hash(text(value)) })).filter(span => span.end > 0));
+  }
   const bindingCount = units.reduce((count, unit) => count + unit.edgeIDs.length, 0);
   const facts = factLedger(question, options);
   // Reserve response room under the existing verifier cap. Never truncate
@@ -215,10 +234,10 @@ export function buildResearchClaimApplicabilityPacket({ question = "", answer = 
 
 export const researchClaimApplicabilityInstruction = [
   "CLAIM APPLICABILITY REVIEW is mandatory. Read every exact unit span, heading and boundary field in PROPOSED ANSWER JSON with its complete parent/adjacent context. A primaryField alias shares its primary narrative context. Review every required unit and edge binding; source citations and retrieval roles do not establish applicability.",
-  "Classify each unit's actual assertion. Independently set categoricalTarget to actual or scenario whenever any part applies a rule categorically or gives a positive/negative result for that project/scenario, even if assertedMode is explanation or practical. categoricalQuote must repeat the complete asserted unit span, never a selected condition or another sentence. Use none and an empty quote only without such a result. A categorical opening cannot borrow a later caveat. A direct Yes/No within an express hypothetical is a scenario result; it cannot transfer to the actual saved project.",
+  "Classify each unit's actual assertion. Independently set categoricalTarget to actual or scenario whenever any part applies a rule categorically or gives a positive/negative result for that project/scenario, even if assertedMode is explanation or practical. categoricalSpanIndex must select the complete asserted span identity from this unit.claimTargets, never a substring or another unit. Use none and null only without such a result. A categorical opening cannot borrow a later caveat. A direct Yes/No within an express hypothetical is a scenario result; it cannot transfer to the actual saved project.",
   "Extract each edge's exact material enacted scope predicates once in predicates[edgeID], with the supplied source ID/hash and unique exact quote (occurrence=null, or its zero-based repeated occurrence). Inspect operative source_scope text and supplied parent/chapter relations, not just titles or topics. Candidates need semantic materiality review; gaps have no enacted predicate and cannot be established.",
   "For each required binding choose exactly one witness: not_material with a specific short reason why that edge has no bearing on this claim; condition_preserved with the relevant predicateIndices and an exact answerQuote stating or preserving those conditions in this claim's parent context; or applied with one atomic outcome per relied-on predicate and its human factSpanIndices. A source description or an accurate conditional rule does not assert its predicates hold for the project and needs no human-fact payload. Conditions actually asserted satisfied/excluded need applied evidence. Never classify a categorical result as a mere condition to avoid its human premises. An independent supported duty/action can remain useful while an unrelated rule is conditional.",
-  "For applied outcomes established/excluded, quote exact eligible current human facts once in factSpans, preserving subject, qualifications, negation, representations, hypothetical status and corrections; explain each entailment briefly. A real but irrelevant fact cannot establish scope. Unknowns, property records, earlier context and assistant claims cannot establish current premises. Asserted clauses embedded in a question may supply facts; a question or quoted law alone cannot invent a premise. Hypothetical facts support only their current scenario/conditional or bounded practical action, never an actual-project determination. Use unresolved when a premise is unknown rather than manufacturing support.",
+  "For applied outcomes established/excluded, quote exact eligible current human facts once in factSpans, preserving subject, qualifications, negation, representations, hypothetical status and corrections; explain each entailment briefly. A real but irrelevant fact cannot establish scope. Unknowns, property records, earlier context and assistant claims cannot establish current premises. Asserted clauses embedded in a question may supply facts; a question or quoted law alone cannot invent a premise. Exact current human questions and eligible scenarioContext history may carry stated or stipulated scenario input premises even with interrogative wording; they do not establish the requested legal result. Unknowns and corrections still dominate. Hypothetical/scenario-context premises support only the current scenario/conditional or bounded practical action, never an actual-project determination. Use unresolved when a premise is unknown rather than manufacturing support.",
   "Categorical actual/scenario results require every material binding to be applied and established with eligible relevant human facts; unresolved/excluded predicates or a condition-preserved witness cannot authorize that result. For descriptions and conditional applications, all material conditions must still be accurately represented in the answerQuote. Do not emit binding/unit aggregate states, source selection indices or repeated explanations: the server derives those. All ordinary substantive, citation, completeness, fact and scope checks remain mandatory. This witness is not proof of semantic entailment."
 ].join(" ");
 
@@ -253,7 +272,7 @@ export function researchClaimApplicabilitySchema(base, packet) {
     items: span("source", packet.sources.find(source => source.sourceID === edge.scopeSourceID)) }])));
   const units = objectSchema(Object.fromEntries(packet.units.map(unit => [unit.id, objectSchema({
     assertedMode: { type: "string", enum: modes }, categoricalTarget: { type: "string", enum: ["none", "actual", "scenario"] },
-    categoricalQuote: { type: "string", maxLength: unit.maximumClaimQuoteLength },
+    categoricalSpanIndex: { type: ["integer", "null"], enum: [null, ...unit.claimTargets.map((_, index) => index)] },
     bindings: objectSchema(Object.fromEntries(unit.edgeIDs.map(edgeID => [edgeID, { $ref: "#/$defs/claimApplicabilityBinding" }])))
   })])));
   return { ...base, $defs: { ...base.$defs, claimApplicabilityBinding: binding }, properties: { ...base.properties, claimApplicabilityReview: objectSchema({
@@ -318,11 +337,11 @@ export function validateResearchClaimApplicabilityReview({ packet, value, questi
   const usedFacts = new Set(), allBindings = [], modeCounts = Object.fromEntries(modes.map(mode => [mode, 0]));
   for (const unit of units) {
     const row = review?.units?.[unit.id];
-    if (!exactKeys(row, ["assertedMode", "categoricalTarget", "categoricalQuote", "bindings"]) || !modes.includes(row?.assertedMode) ||
+    if (!exactKeys(row, ["assertedMode", "categoricalTarget", "categoricalSpanIndex", "bindings"]) || !modes.includes(row?.assertedMode) ||
         !["none", "actual", "scenario"].includes(row?.categoricalTarget)) { reject("unit_shape", unit); continue; }
     modeCounts[row.assertedMode]++;
     const categorical = row.categoricalTarget !== "none";
-    if (categorical ? !unitClaimTexts(unit, answer).includes(row.categoricalQuote) : row.categoricalQuote !== "") reject("categorical_witness", unit);
+    if (categorical ? !Number.isSafeInteger(row.categoricalSpanIndex) || !unit.claimTargets?.[row.categoricalSpanIndex] : row.categoricalSpanIndex !== null) reject("categorical_witness", unit);
     if (row.assertedMode === "project_determination" && row.categoricalTarget !== "actual" ||
         row.assertedMode === "scenario_determination" && row.categoricalTarget !== "scenario") reject("categorical_scope", unit);
     if (!exactKeys(row.bindings, unit.edgeIDs)) reject("binding_coverage", unit);
@@ -361,8 +380,11 @@ export function validateResearchClaimApplicabilityReview({ packet, value, questi
             for (const index of atom.factSpanIndices) {
               usedFacts.add(index); const span = factSpans[index], fact = facts.get(span?.factID);
               if (!fact || !span || typeof span.quote !== "string") continue;
-              if (["unknown", "context_only"].includes(fact.status) || unknown.test(span.quote) || /[?]/.test(span.quote) ||
-                  fact.status === "current_statement" && /^(?:is|are|does|do|did|can|could|may|must|should|would|will|why|how|what|when|where|which)\b/i.test(span.quote.trim())) reject("ineligible_fact_status", unit);
+              const scenarioUse = row.categoricalTarget === "scenario" || !categorical && ["conditional_application", "practical_recommendation"].includes(row.assertedMode) &&
+                (packet.facts.scenarioActive || fact.hypothetical || fact.scenarioContext);
+              if (fact.status === "unknown" || fact.status === "context_only" && !(fact.scenarioContext && scenarioUse) || unknown.test(span.quote) ||
+                  !scenarioUse && (/[?]/.test(span.quote) || fact.status === "current_statement" && /^(?:is|are|does|do|did|can|could|may|must|should|would|will|why|how|what|when|where|which)\b/i.test(span.quote.trim()))) reject("ineligible_fact_status", unit);
+              if (fact.scenarioContext && !scenarioUse) reject("hypothetical_project_fact", unit);
               if ((fact.hypothetical || researchFactQualification(span.quote).hypothetical) &&
                   !(row.categoricalTarget === "scenario" || !categorical && ["conditional_application", "practical_recommendation"].includes(row.assertedMode))) reject("hypothetical_project_fact", unit);
             }
