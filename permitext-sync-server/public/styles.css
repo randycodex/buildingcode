@@ -17837,15 +17837,18 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .workspace-panel.is-collapsed > .pane-collapsed-tab { padding-top: 56px; }
 
 .project-refresh-dialog {
+  border: 2px solid #168bff;
   width: min(680px, calc(100vw - 32px));
   max-height: calc(100dvh - 64px);
   overflow-y: auto;
+  scrollbar-width: none;
   padding: 24px;
   border-radius: var(--radius-panel);
   background: var(--surface-raised);
   color: var(--text-primary);
   font-size: var(--chrome-font-size);
 }
+.project-refresh-dialog::-webkit-scrollbar { display: none; }
 .project-refresh-dialog h2 { margin: 0 0 12px; }
 .project-refresh-dialog p, .project-refresh-status { color: var(--text-secondary); }
 .project-refresh-status { margin: 0 0 12px; font-size: 11px; }
