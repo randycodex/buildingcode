@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
-import { researchSearchVocabulary } from "./research-search-vocabulary.mjs";
+import { researchSearchVocabulary, researchPositiveSearchText } from "./research-search-vocabulary.mjs";
 
-export const researchDefinitionExcerptVersion = "20261003-ordinary-definition-vocabulary-v6";
+export const researchDefinitionExcerptVersion = "20261004-requested-definition-priority-v7";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -371,6 +371,30 @@ function entryScore(entry, queryTerms, normalizedQuery) {
   };
 }
 
+function definitionSearchTerms(query, prefix, positiveOnly = false) {
+  const input = positiveOnly ? researchPositiveSearchText(query) : String(query || "");
+  const nominated = researchSearchVocabulary(input).concepts
+    .filter(concept => concept.codePrefixes.includes(prefix)).flatMap(concept => concept.terms);
+  const original = prefix === "ZR" ? input.replace(/\bFAR\b/gi, "FAR floor area ratio") : input;
+  const words = terms(`${original} ${[...new Set(nominated)].join(" ")}`);
+  return { normalized: words.join(" "), terms: new Set(words) };
+}
+
+function requestedEntryScore(entry, query, uniqueModifiers) {
+  const exact = entryScore(entry, query.terms, query.normalized);
+  if (exact) return exact;
+  const labelTerms = [...new Set(terms(entry.label))];
+  // A distinctive hyphenated modifier may be how a person names a defined
+  // device. Admit only an unambiguous label within this canonical dictionary;
+  // a generic partial label cannot nominate a definition this way.
+  if (labelTerms.length !== 2) return null;
+  const modifier = labelTerms[0];
+  if (!modifier.includes('-') || modifier.length < 6 || uniqueModifiers.get(modifier) !== 1 ||
+      !query.terms.has(modifier)) return null;
+  return { ...entry, labelTerms, phraseIndex: query.normalized.indexOf(modifier),
+    score: 108 - Math.min(entry.text.length / 4_000, 5) };
+}
+
 function positiveBound(value, fallback, maximum) {
   const parsed = Number.parseInt(String(value ?? ""), 10);
   if (!Number.isSafeInteger(parsed) || parsed < 1) return fallback;
@@ -460,14 +484,10 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
   // Match the enacted definition's full label when a zoning question uses
   // its ordinary abbreviation. This adds a retrieval term, never a code rule.
   const prefix = String(section?.codePrefix || "").toUpperCase();
-  const nominatedTerms = researchSearchVocabulary(query).concepts
-    .filter(concept => concept.codePrefixes.includes(prefix)).flatMap(concept => concept.terms);
-  const originalQuery = prefix === "ZR"
-    ? String(query || "").replace(/\bFAR\b/gi, "FAR floor area ratio")
-    : query;
-  const definitionQuery = `${originalQuery || ""} ${[...new Set(nominatedTerms)].join(" ")}`;
-  const normalizedQuery = terms(definitionQuery).join(" ");
-  const queryTerms = new Set(terms(definitionQuery));
+  const { normalized: normalizedQuery, terms: queryTerms } = definitionSearchTerms(query, prefix);
+  const preferred = definitionSearchTerms(options.preferredQuery, prefix, true);
+  const preferredRaw = definitionSearchTerms(options.preferredQuery, prefix);
+  const humanContext = definitionSearchTerms(options.preferredHumanContext, prefix, true);
   if (!queryTerms.size) return null;
   const maximumDefinitions = positiveBound(
     options.maximumDefinitions,
@@ -481,6 +501,12 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
   );
   const carrier = researchEmbeddedDefinitionCarrier(section);
   const entries = definitionEntries(section).filter(entry => !carrier || definitionBindings(section, [entry], carrier));
+  const modifierCounts = new Map();
+  for (const entry of entries) {
+    for (const word of new Set(terms(entry.label))) {
+      modifierCounts.set(word, (modifierCounts.get(word) || 0) + 1);
+    }
+  }
   // A dependency packet requests exact, complete definition entries. Do not
   // fall back to an incidental mention of the term or clip its conditions to
   // fit: the caller must retain an explicit evidence gap when it cannot fit.
@@ -513,10 +539,19 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
   const requiredEntries = dependencies.length && completeDependenciesFit
     ? dependencyEntries : requiredTermSelection(entries, options.requiredTextTerms);
   const ranked = requiredEntries || entries
-    .map((entry) => entryScore(entry, queryTerms, normalizedQuery))
+    .map((entry) => {
+      const current = requestedEntryScore(entry, preferred, modifierCounts);
+      // A quoted or excluded current subject cannot regain priority through
+      // an earlier human topic. Enacted contextual terms remain supplemental.
+      const excluded = !current && requestedEntryScore(entry, preferredRaw, modifierCounts);
+      const prior = !excluded && requestedEntryScore(entry, humanContext, modifierCounts);
+      const score = entryScore(entry, queryTerms, normalizedQuery) || current || prior;
+      if (!score) return null;
+      return { ...score, requestedPriority: current ? 2 : prior ? 1 : 0 };
+    })
     .filter(Boolean)
     .sort((left, right) =>
-      right.score - left.score ||
+      right.requestedPriority - left.requestedPriority || right.score - left.score ||
       (left.phraseIndex < 0 ? Number.MAX_SAFE_INTEGER : left.phraseIndex) -
         (right.phraseIndex < 0 ? Number.MAX_SAFE_INTEGER : right.phraseIndex) ||
       left.order - right.order
@@ -542,6 +577,8 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     characterCount += separatorLength + selectedText.length;
   }
   if (!selected.length) return null;
+  if (!requiredEntries && ranked.some(entry => entry.requestedPriority > 0) &&
+      !selected.some(entry => entry.requestedPriority > 0)) return null;
   if (requiredEntries && selected.length !== candidates.length) return null;
   selected.sort((left, right) => left.order - right.order);
   const text = [carrier?.heading, ...selected.map((entry) => entry.text)].filter(Boolean).join("\n\n");
