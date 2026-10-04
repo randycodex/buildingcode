@@ -8,10 +8,10 @@ import { searchResearchPassages } from "./research-passage-index.mjs";
 import { researchCurrentRuleDetailScore, researchCheckedRuleIndexPassage } from "./research-rule-packets.mjs";
 import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch,
   researchActiveHumanDefinitionMatch } from "./research-definition-excerpts.mjs";
-import { nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
+import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 
-export const evidenceDiscoveryVersion = "20261004-active-human-definition-v62";
+export const evidenceDiscoveryVersion = "20261004-current-inherited-foreground-v63";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -2346,9 +2346,26 @@ export async function discoverRelevantEvidence({
       const item = detailed.find(value => comparableSectionID(value.section.id) === comparableSectionID(hit.sectionID));
       const words = new Set(rawTokens(hit.text).flatMap(word => [...singularForms(word)]));
       const overlap = [...new Set(foregroundWords)].filter(word => [...singularForms(word)].some(form => words.has(form))).length;
+      // Prior citation identity is only a hint. It must not exclude a source
+      // independently qualified for this current positive subject. Bind the
+      // indexed scope to the body already read here; add no reads or slots.
+      const positiveCurrent = researchPositiveSearchText(currentQuestion);
+      const currentEdition = /\b(?:codes?|edition|version)\b/i.test(positiveCurrent)
+        ? positiveCurrent.match(/\b(?:19|20)\d{2}\b/)?.[0] : null;
+      const independentlyCurrentInherited = Boolean(item?.inheritedReference && (equipmentIntent || vocabularyConcept) &&
+        !relevanceComparison && retrievalContext?.sourceSelectionRestricted !== true &&
+        !/\b(?:compar\w*|versus|vs|both|difference)\b/i.test(positiveCurrent) &&
+        (!currentEdition || sectionCodeEdition(item.section) === currentEdition) &&
+        ['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(key => item.section[key]) &&
+        !item.section.referenceOnly && item.section.selectionMode !== 'section_reference' &&
+        !item.section.truncated && item.section.textComplete !== false && item.section.researchClaimEligible !== false &&
+        item.body?.researchClaimEligible !== false &&
+        (!item.section.authorityClass || item.section.authorityClass === 'enacted') &&
+        (!item.section.authorityStatus || item.section.authorityStatus === 'enacted') &&
+        boundCanonicalRulePassage({ ...item.section, body: item.body, text: sectionText(item.section, item.body) }, hit, false, true));
       if (!item || protectedItems.includes(item) || item.definitionCarrier ||
           (vocabularyConcept && /\bdefinitions?\b/i.test(item.section.title || "")) || !foregroundPrefixes.has(item.section.codePrefix) ||
-          item.contextualReference || item.inheritedReference || item.useSelectedPassageOnly ||
+          item.contextualReference || (item.inheritedReference && !independentlyCurrentInherited) || item.useSelectedPassageOnly ||
           !completeIndexedScope(hit) || !completeIndexedScope(item.indexedPassage) || overlap < foregroundOverlapMinimum ||
           zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) < 1) return [];
       item.currentQuestionForeground = { rank: rank + 1,
