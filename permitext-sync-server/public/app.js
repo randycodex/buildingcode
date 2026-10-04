@@ -1,5 +1,5 @@
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
-import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261004-failure-recovery-v2";
+import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261003-failure-recovery-v1";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
@@ -43,7 +43,7 @@ import {
   researchProgressStages,
   researchProgressStage,
   writeResearchRequestRecovery
-} from "./research-progress.js?v=20261004-failure-recovery-v125";
+} from "./research-progress.js?v=20261003-failure-recovery-v124";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
@@ -18496,31 +18496,14 @@ function researchAnswerHasVerificationRecovery(answer) {
     researchSystemRecoveryReasons.includes(answer.verification.reason);
 }
 
-function researchRecoveryQuestionForMessage({ message, conversation, conversationID } = {}) {
-  if (!message || message.role !== "assistant" || !Array.isArray(conversation?.messages) ||
-      conversationID && String(conversation.id) !== String(conversationID)) return "";
-  const positions = conversation.messages.flatMap((candidate, index) =>
-    candidate === message || message.id && candidate.id === message.id && candidate.role === "assistant" ? [index] : []);
-  if (positions.length !== 1) return "";
-  const index = positions[0], stored = conversation.messages[index];
-  if (String(stored.requestID || "") !== String(message.requestID || "")) return "";
-  const preceding = conversation.messages.slice(0, index);
-  if (stored.requestID) {
-    const matching = preceding.filter(candidate => candidate.role === "user" && candidate.requestID === stored.requestID);
-    return matching.length === 1 ? String(matching[0].question || "") : "";
-  }
-  const previous = preceding.at(-1);
-  return previous?.role === "user" && !previous.requestID ? String(previous.question || "") : "";
-}
-
-function researchVerificationRecoveryText(answer, question = "") {
+function researchVerificationRecoveryText(answer) {
   if (!researchAnswerHasVerificationRecovery(answer)) return "";
   // Presentation only: historical stored answers and verification stay intact.
-  return researchVerificationRecoveryTextForReason(answer.verification.reason, question);
+  return researchVerificationRecoveryTextForReason(answer.verification.reason);
 }
 
-function researchAnswerNarrativeText(result, question = "") {
-  const recoveryText = researchVerificationRecoveryText(result, question);
+function researchAnswerNarrativeText(result) {
+  const recoveryText = researchVerificationRecoveryText(result);
   if (recoveryText) return recoveryText;
   const adaptiveAnswer = researchDisplayText(result?.answerText);
   if (result?.mode === "clarification" && result?.model === "permitext-conversation-clarification" && result?.verification?.status === "clarification") {
@@ -18568,8 +18551,8 @@ function researchCorpusMetadataLines(codeBasis) {
   ].join(" · "));
 }
 
-function researchAnswerCopyText(result, question = "") {
-  const answer = researchAnswerNarrativeText(result, question);
+function researchAnswerCopyText(result) {
+  const answer = researchAnswerNarrativeText(result);
   const followUp = researchDisplayList(result?.followUpQuestions)[0];
   return !researchAnswerHasVerificationRecovery(result) && followUp && !answer.includes(followUp)
     ? `${answer}\n\n${followUp}` : answer;
@@ -18676,20 +18659,11 @@ function researchAnswerDisplayMarkdown(value) {
   }).join("");
 }
 
-function appendResearchAnswerNarrative(container, result, question = "") {
-  const recovery = researchVerificationRecoveryText(result, question);
-  const text = recovery || researchAnswerDisplayMarkdown(researchAnswerNarrativeText(result, question));
+function appendResearchAnswerNarrative(container, result) {
+  const text = researchAnswerDisplayMarkdown(researchAnswerNarrativeText(result));
   if (!text) return;
   const narrative = document.createElement("div");
   narrative.className = "research-answer-narrative";
-  if (recovery) {
-    // The quoted original question is plain text, including Markdown symbols.
-    for (const block of recovery.split("\n\n")) {
-      const paragraph = document.createElement("p"); paragraph.className = "research-answer-paragraph";
-      paragraph.textContent = block; narrative.append(paragraph);
-    }
-    container.append(narrative); return;
-  }
   text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean).forEach((block) => {
     const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
     const tableValue = researchAnswerTable(block);
@@ -19094,7 +19068,6 @@ function renderResearchFeedback(container, message, conversationID) {
 function renderResearchInterpretation(container, result, options = {}) {
   clear(container);
   if (!result) return;
-  const recoveryQuestion = options.message ? researchRecoveryQuestionForMessage(options) : options.recordQuestion || "";
 
   const card = document.createElement("article");
   card.className = "analysis-card research-result-card";
@@ -19111,7 +19084,7 @@ function renderResearchInterpretation(container, result, options = {}) {
       : result.authorityLabel;
     metadata.append(authority);
   }
-  appendResearchAnswerNarrative(card, result, recoveryQuestion);
+  appendResearchAnswerNarrative(card, result);
   const nextQuestion = researchDisplayList(result.followUpQuestions)[0];
   if (!researchAnswerHasVerificationRecovery(result) && nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
     const followUp = document.createElement("p");
@@ -19354,7 +19327,7 @@ function renderResearchInterpretation(container, result, options = {}) {
     copyButton.disabled = true;
     const answerText = [...card.querySelectorAll(":scope > .research-answer-narrative, :scope > .research-answer-follow-up")]
       .map((node) => node.innerText.trim()).filter(Boolean).join("\n\n");
-    const copied = await copyTextToClipboard(answerText || researchAnswerCopyText(result, recoveryQuestion));
+    const copied = await copyTextToClipboard(answerText || researchAnswerCopyText(result));
     copyStatus.textContent = copied
       ? "Answer copied"
       : "Copy unavailable";
@@ -21271,7 +21244,7 @@ function renderResearchPixelGrid() {
 
 function researchProgressFailureRecovery(progress) {
   return researchFailureRecovery({ code: progress.errorCode || (progress.status === "cancelled" ? "RESEARCH_CANCELLED" : ""),
-    status: progress.errorStatus, recoveryReason: progress.recoveryReason }, progress.question);
+    status: progress.errorStatus, recoveryReason: progress.recoveryReason });
 }
 
 async function openResearchProgressIssueReport(progress) {
@@ -21581,7 +21554,7 @@ async function runResearchProgressSession(
       progress.status = cancelled ? "cancelled" : "failed";
       progress.error = cancelled
         ? "Research was cancelled before an answer was saved. Your question is still here."
-        : researchFailureMessage(error, progress.question);
+        : researchFailureMessage(error);
       progress.errorCode = cancelled ? "RESEARCH_CANCELLED" : error.code || error.payload?.code || "";
       progress.errorStatus = Number(error.status || error.payload?.status || 0);
       progress.recoveryReason = error.payload?.recoveryReason || "";
@@ -21692,8 +21665,8 @@ function researchProjectContextPreview(projectID, projectInformation = null) {
   return preview;
 }
 
-function researchFailureMessage(error, question = "") {
-  return researchFailureRecovery(error, question).text;
+function researchFailureMessage(error) {
+  return researchFailureRecovery(error).text;
 }
 
 function renderNewResearchComposer(container, researchEnabled, instance = null) {
@@ -23090,7 +23063,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
 
   const exactAnswer = document.createElement("section");
   exactAnswer.className = "research-historical-answer";
-  renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true, recordQuestion: answerRecord.question });
+  renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true });
 
   const evidenceHeading = document.createElement("strong");
   evidenceHeading.textContent = "Cited evidence snapshots";

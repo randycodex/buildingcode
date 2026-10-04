@@ -33,11 +33,9 @@ assert.doesNotMatch(unresolved.answerText,/code evidence|Which frontage/,"Unreso
 for (const reason of researchSystemRecoveryReasons) {
   const answer=researchClarificationAnswer("A plain project question.",reason);
   assert(isCanonicalResearchClarification("A plain project question.",answer));
-  assert.equal(answer.answerText,researchVerificationRecoveryTextForReason(reason,"A plain project question."));
+  assert.equal(answer.answerText,researchVerificationRecoveryTextForReason(reason));
   assert.deepEqual(answer.followUpQuestions,[]);
-  assert.doesNotMatch(answer.answerText,/saved|repeat|still here/i);
   assert.equal(answer.verification.pass,false);
-  assert(!isCanonicalResearchClarification("Another question",answer));
   assert(!isCanonicalResearchClarification("A plain project question.",{...answer,answerText:"The building complies."}));
 }
 // Exact prior canonical records remain valid, with no migration or rewrite.
@@ -49,28 +47,6 @@ for (const [reason,conclusion] of Object.entries(previous)) {
   assert.equal(JSON.stringify(answer),before);
   assert(!isCanonicalResearchClarification("Old question",{...answer,followUpQuestions:["Which fact should we guess?"]}));
 }
-const published={
-  verification_source:"Research couldn’t finish because its explanation and source references didn’t agree.",
-  verification_context:"Research couldn’t finish because its explanation didn’t consistently use the project details already provided.",
-  verification_format:"Research received an answer or review it couldn’t read.",
-  verification_incomplete:"Research couldn’t complete its source checks for this question.",
-  evidence_unavailable:"Research couldn’t prepare the code evidence needed to answer this question.",
-  research_unresolved:"Research couldn’t resolve the conditions needed to answer this question."
-};
-for (const [reason,conclusion] of Object.entries(published)) {
-  const explanation="Your question and conversation are saved. You don’t need to repeat the question.";
-  const answer={...researchClarificationAnswer("Old question",reason),conclusion,explanation,answerText:`${conclusion}\n\n${explanation}`};
-  const before=JSON.stringify(answer);
-  assert(isCanonicalResearchClarification("Old question",answer),`Exact published ${reason} remains canonical`);
-  assert.equal(JSON.stringify(answer),before);
-  for (const field of ["answerText","conclusion","explanation"]) assert(!isCanonicalResearchClarification("Old question",{...answer,[field]:"The building complies."}));
-}
-const normalized=researchVerificationRecoveryTextForReason("verification_format","  Can **this**\n  work? <literal>  ");
-assert.equal(normalized,'I ran into a problem while preparing the answer to “Can **this** work? <literal>”, so I couldn’t finish it.\n\nUse Report this issue below to report this attempt.');
-assert.equal(researchVerificationRecoveryTextForReason("verification_format"),researchVerificationRecoveryTextForReason("verification_format","  \n "));
-assert.match(researchVerificationRecoveryTextForReason("verification_format"),/this question/);
-assert.equal(researchVerificationRecoveryTextForReason("unknown","Private question"),"");
-assert.doesNotMatch(researchFailureRecovery({code:"INVALID_RESEARCH_VERIFICATION"},"Can this work?").text,/saved|repeat|still here/i);
 assert(researchClarificationAnswer("What project use is proposed?","evidence").followUpQuestions.length,"Legacy genuine clarifiers retain their question behavior.");
 for (const code of ["RESEARCH_INTERRUPTED","RESEARCH_PROVIDER_ERROR","RESEARCH_VERIFIER_ERROR","TimeoutError","RESEARCH_CANCELLED"]) assert.equal(researchFailureRecovery({code}).retryable,true);
 for (const [error,action] of [[{status:401},"review_account"],[{code:"RESEARCH_ADDON_REQUIRED"},"review_account"],[{code:"RESEARCH_SPEND_CAP"},"contact_support"],[{code:"RESEARCH_EVAL_SPEND_CAP"},"contact_support"],[{code:"RESEARCH_NOT_CONFIGURED"},"contact_support"],[{code:"RESEARCH_SOURCE_CHANGED"},"review_sources"],[{code:"RESEARCH_CONTEXT_CHANGED"},"review_context"],[{},"contact_support"]]) {

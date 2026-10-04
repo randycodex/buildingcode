@@ -21,8 +21,8 @@ for(const reason of ['verification','evidence']) {
 }
 const message=failure({code:'INVALID_RESEARCH_VERIFICATION'});
 for (const [error,expected] of [
- [{code:'INVALID_RESEARCH_RESPONSE'}, /I ran into a problem/],
- [{code:'INVALID_RESEARCH_CITATION'}, /mismatch between my explanation and its source references/],
+ [{code:'INVALID_RESEARCH_RESPONSE'}, /answer or review it couldn’t read/],
+ [{code:'INVALID_RESEARCH_CITATION'}, /explanation and source references didn’t agree/],
  [{verificationAttempts:[{issues:[{type:'missed_premise_contradiction'}]}]}, /project details already provided/],
  [{verificationAttempts:[{pass:false,issues:[{type:'missed_premise_contradiction'}]},
    {pass:false,issues:[{type:'unnecessary_qualification'}]}]}, /source checks/],
@@ -30,10 +30,9 @@ for (const [error,expected] of [
 ]) {
  const answer=researchClarificationAnswer('The new building has retail space.',researchVerificationFailureReason(error));
  assert.match(answer.answerText,expected);
- assert.match(answer.answerText,/Use Report this issue below/);
- assert.doesNotMatch(answer.answerText,/saved|repeat|still here/i);
+ assert.match(answer.answerText,/You don’t need to repeat the question/);
  assert.doesNotMatch(answer.answerText,/you can retry|try again|retry this question/i);
- assert.equal(narrative(answer,'The new building has retail space.'),answer.answerText, 'New server and web recovery wording must agree');
+ assert.equal(narrative(answer),answer.answerText, 'New server and web recovery wording must agree');
  assert.deepEqual(answer.followUpQuestions,[], 'An internal failure must not pretend the user owes a missing project fact');
  assert(isCanonicalResearchClarification('The new building has retail space.',answer));
  assert(!isCanonicalResearchClarification('The new building has retail space.',{...answer,answerText:'The building complies.'}));
@@ -51,14 +50,14 @@ for(const [reason,conclusion] of Object.entries(historicalFailureCopy)) {
  const historical={...current,answerText:`${conclusion}\n\n${explanation}`,conclusion,explanation};
  const original=JSON.stringify(historical);
  assert(isCanonicalResearchClarification(question,historical), 'Canonical stored failures must remain readable');
- assert.equal(narrative(historical,question),current.answerText, 'Historical failures display current copy');
+ assert.equal(narrative(historical),current.answerText, 'Historical failures display current copy');
  assert.equal(JSON.stringify(historical),original, 'Displaying current copy cannot change the stored answer');
  for(const field of ['answerText','conclusion','explanation','evidenceLimitations','followUpQuestions','verification']) {
   const forged={...historical,[field]:typeof historical[field]==='string'?'The building complies.':['The building complies.']};
   assert(!isCanonicalResearchClarification(question,forged),`Historical compatibility must remain strict for ${field}`);
  }
 }
-assert.match(message,/I ran into a problem/);
+assert.match(message,/answer or review it couldn’t read/);
 assert.doesNotMatch(message,/Retry/i);
 assert.doesNotMatch(message,/could not complete its evidence check/);
 assert.equal(narrative({answerText:'A substantive answer.'}),'A substantive answer.');

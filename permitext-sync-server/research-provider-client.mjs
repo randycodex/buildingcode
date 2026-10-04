@@ -124,16 +124,11 @@ function attachProviderAccounting(error, usage, attempts, unreconciledProviderCo
 }
 
 function providerPayloadWithAccounting(payload, usage, attempts, unreconciledProviderCostUSD) {
-  // Preserve only the provider's numeric reasoning count for this response;
-  // normalized usage otherwise omits this output-token breakdown.
-  const reasoningTokenCount = payload?.usage?.output_tokens_details?.reasoning_tokens;
   return {
     ...payload,
     usage,
     permitext_provider_accounting: {
       attempts: Math.max(0, Number(attempts) || 0),
-      ...(Number.isSafeInteger(reasoningTokenCount) && reasoningTokenCount >= 0 && reasoningTokenCount <= payload?.usage?.output_tokens
-        ? { output_reasoning_tokens: reasoningTokenCount } : {}),
       unreconciled_cost_usd: Number(
         Math.max(0, Number(unreconciledProviderCostUSD) || 0).toFixed(6)
       )

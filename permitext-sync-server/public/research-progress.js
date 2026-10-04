@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20261004-failure-recovery-v125";
+export const researchProgressVersion = "20261003-failure-recovery-v124";
 
 export const researchRequestRecoveryStorageKey = "permitext:research-request-recovery:v1";
 export const researchRequestRecoveryMaxAgeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
@@ -217,9 +217,9 @@ export function researchRecoveryFromFailedMessage(message, conversationID) {
     status: message.failure.status,
     startedAt: Date.parse(message.createdAt) || Date.now(),
     endedAt: Date.parse(message.failure.failedAt) || Date.now(),
-    error: researchFailureRecovery({ code: message.failure.code || (message.failure.status === "cancelled" ? "RESEARCH_CANCELLED" : "UNKNOWN_RESEARCH_ERROR") }, message.question).text,
+    error: researchFailureRecovery({ code: message.failure.code || (message.failure.status === "cancelled" ? "RESEARCH_CANCELLED" : "UNKNOWN_RESEARCH_ERROR") }).text,
     errorCode: message.failure.code || (message.failure.status === "cancelled" ? "RESEARCH_CANCELLED" : "UNKNOWN_RESEARCH_ERROR"),
     stages: [{ id: "preparing_question", state: message.failure.status }]
   };
 }
-import { researchFailureRecovery, researchSystemRecoveryReasons } from "./research-failure-recovery.js?v=20261004-failure-recovery-v2";
+import { researchFailureRecovery, researchSystemRecoveryReasons } from "./research-failure-recovery.js?v=20261003-failure-recovery-v1";

@@ -1,31 +1,22 @@
-// Typed recovery copy and the original question only. Private review prose and
-// legal drafts never enter this policy. Shared by server and history presentation.
+// Fixed product copy/actions only. Private review prose and legal drafts never
+// enter this policy. Shared by server recovery and current history presentation.
 export const researchSystemRecoveryReasons = Object.freeze([
   "verification_source", "verification_context", "verification_format", "verification_incomplete",
   "evidence_unavailable", "research_unresolved"
 ]);
 
 const explanations = Object.freeze({
-  verification_source: ["I found a mismatch between my explanation and its source references", "while preparing the answer to"],
-  verification_context: ["I couldn’t consistently use the project details already provided", "while preparing the answer to"],
-  verification_format: ["I ran into a problem", "while preparing the answer to"],
-  verification_incomplete: ["I couldn’t finish the source checks", "for the answer to"],
-  evidence_unavailable: ["I couldn’t prepare the code evidence needed", "to answer"],
-  research_unresolved: ["I couldn’t resolve the conditions needed", "to answer"]
+  verification_source: "Research couldn’t finish because its explanation and source references didn’t agree.",
+  verification_context: "Research couldn’t finish because its explanation didn’t consistently use the project details already provided.",
+  verification_format: "Research received an answer or review it couldn’t read.",
+  verification_incomplete: "Research couldn’t complete its source checks for this question.",
+  evidence_unavailable: "Research couldn’t prepare the code evidence needed to answer this question.",
+  research_unresolved: "Research couldn’t resolve the conditions needed to answer this question."
 });
 
-function recoveryExplanation(reason, question = "") {
-  const wording = explanations[reason];
-  if (!wording) return "";
-  const originalQuestion = typeof question === "string" ? question.replace(/\s+/g, " ").trim() : "";
-  return originalQuestion
-    ? `${wording[0]} ${wording[1]} “${originalQuestion}”, so I couldn’t finish it.`
-    : `${wording[0]} ${wording[1]} this question, so I couldn’t finish it.`;
-}
-
-export function researchVerificationRecoveryTextForReason(reason, question = "") {
+export function researchVerificationRecoveryTextForReason(reason) {
   if (!researchSystemRecoveryReasons.includes(reason)) return "";
-  return `${recoveryExplanation(reason, question)}\n\nUse Report this issue below to report this attempt.`;
+  return `${explanations[reason]}\n\nYour question and conversation are saved. You don’t need to repeat the question.`;
 }
 
 export function researchFailureReason(error = {}) {
@@ -44,7 +35,7 @@ export function researchFailureReason(error = {}) {
   return "verification_incomplete";
 }
 
-export function researchFailureRecovery(error = {}, question = "") {
+export function researchFailureRecovery(error = {}) {
   const code = String(error.code || error.payload?.code || "").toUpperCase();
   const status = Number(error.status || error.payload?.status || 0);
   const suppliedReason = error.recoveryReason || error.payload?.recoveryReason || error.reason;
@@ -84,7 +75,7 @@ export function researchFailureRecovery(error = {}, question = "") {
     "INVALID_RESEARCH_EVIDENCE_ANALYSIS", "INVALID_RESEARCH_VERIFICATION", "RESEARCH_VERIFICATION_FAILED",
     "RESEARCH_EVIDENCE_NOT_FOUND", "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED", "RESEARCH_ZONING_EVIDENCE_REQUIRED", "RESEARCH_ZONING_PREREQUISITES_REQUIRED"];
   if (verificationCodes.includes(code) || researchSystemRecoveryReasons.includes(error.reason)) {
-    return { ...response(reason === "evidence_unavailable" ? "evidence" : "verification", "report", recoveryExplanation(reason, question)), reason };
+    return { ...response(reason === "evidence_unavailable" ? "evidence" : "verification", "report", explanations[reason] + preserved), reason };
   }
   if (code === "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE") {
     return response("evidence", "report", "Research couldn’t confirm attributable official guidance for this question." + preserved);

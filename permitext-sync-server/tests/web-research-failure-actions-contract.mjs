@@ -24,7 +24,7 @@ function harness(code){
     activeResearchProgress:new Map(),captureResearchProgressView:()=>({}),researchProgressViewIsCurrent:()=>true,researchProgressConversationConflict:()=>null,
     persistResearchProgressSession(){},refreshResearchProgressCard(){},startResearchProgressTimer(){},updateResearchProgressSession(){},researchRequestRecoveryScope:()=>({}),removeResearchRequestRecovery(){},
     researchProgressStatusLabel:()=>"Research interrupted",researchProgressElapsed:()=>"00:01",renderResearchPixelGrid:element,
-    researchFailureMessage:(error,question)=>researchFailureRecovery(error,question).text,hasAvailableWebResearchTurnPack:()=>false,
+    researchFailureMessage:error=>researchFailureRecovery(error).text,hasAvailableWebResearchTurnPack:()=>false,
     supplementalResearchConversations:new Map(),researchUsage:null,
     async openResearchConversation(id){opens.push(id);if(barrier)await barrier.promise;return {id,messages:saved?[{id:"real-assistant-id",role:"assistant",requestID:progress.id}]:[]};},
     async openSupplementalResearchConversation(){throw Error("Unexpected supplemental open");},
@@ -38,9 +38,6 @@ function harness(code){
 for(const code of ["RESEARCH_VERIFICATION_FAILED","INVALID_RESEARCH_VERIFICATION","INVALID_RESEARCH_RESPONSE","RESEARCH_EVIDENCE_NOT_FOUND"]){
   const test=harness(code),card=test.render(),buttons=all(card);
   assert(!buttons.some(node=>node.textContent==="Retry"));
-  const recovery=test.context.researchProgressFailureRecovery(test.progress).text;
-  assert(recovery.includes("“Exact original question”"));
-  assert.doesNotMatch(recovery,/PRIVATE|saved|repeat|still here/i);
   const report=buttons.find(node=>node.textContent==="Report this issue");assert(report);
   await test.progress.retry();assert.equal(test.requests.length,0,"A stale retry callback cannot pay to repeat a semantic failure.");
   await report.events.click();
