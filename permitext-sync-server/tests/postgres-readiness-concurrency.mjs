@@ -14,6 +14,7 @@ import { runPostgresAccountDataExportCases } from "./postgres-account-data-expor
 import { runPostgresSharedOwnershipCases } from "./postgres-account-shared-ownership-cases.mjs";
 import { runPostgresAccountLinkLifecycleCases } from "./postgres-account-link-lifecycle-cases.mjs";
 import { runPostgresAccountSignInMetadataCases } from "./postgres-account-sign-in-metadata-cases.mjs";
+import { runPostgresBoundedResearchReadCases } from "./postgres-bounded-research-read-cases.mjs";
 import { runPostgresFoundationOwnerScopeCases } from "./postgres-foundation-owner-scope-cases.mjs";
 
 assert.equal(process.env.PERMITEXT_RUN_LOCAL_POSTGRES_READINESS, "1");
@@ -126,6 +127,8 @@ try {
   );
   await runPostgresFoundationOwnerScopeCases({ sql, adapter: foundationScopeAdapter,
     setStatementHook: hook => { statementHook = hook; } });
+
+  await runPostgresBoundedResearchReadCases({ sql, adapter });
 
   const accounts = createPostgresAccountRepository(sql);
   await runPostgresAccountSignInMetadataCases({ sql, setStatementHook: hook => { statementHook = hook; } });

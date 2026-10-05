@@ -1386,6 +1386,15 @@ export function createFileStoreAdapter() {
       if (projectID) {
         conversations = conversations.filter((item) => item.primaryProjectID === projectID);
       }
+      if (options.migrationPendingOnly) {
+        const answerIDs = new Set((store.researchAnswersByUserID?.[userID] || []).map((answer) => answer.id));
+        return conversations
+          .filter((conversation) => String(conversation.id) > String(options.afterID || "") &&
+            (conversation.messages || []).some((message) =>
+              message.role === "assistant" && message.answer && message.id && !answerIDs.has(message.id)))
+          .sort((left, right) => String(left.id) < String(right.id) ? -1 : 1)
+          .slice(0, 1);
+      }
       if (options.summaryOnly) {
         return conversations.map(projectResearchConversationForList).filter(Boolean);
       }
@@ -1643,9 +1652,13 @@ export function createFileStoreAdapter() {
     async listResearchAnswers(userID, options = {}) {
       const store = await this.read();
       const projectID = String(options.projectID || "").trim();
-      return (store.researchAnswersByUserID?.[userID] || [])
-        .filter((item) => !projectID || item.projectID === projectID)
-        .slice();
+      const linkedIDs = new Set(options.linkedAnswerIDs || []);
+      const ids = options.ids ? new Set(options.ids) : null;
+      const answers = (store.researchAnswersByUserID?.[userID] || [])
+        .filter((item) => (!projectID || item.projectID === projectID || linkedIDs.has(item.id)) &&
+          (!ids || ids.has(item.id)));
+      if (options.idsOnly) return answers.map((answer) => ({ id: answer.id }));
+      return options.summaryOnly ? answers.map(projectResearchAnswerForList) : answers.slice();
     },
     async saveResearchAnswer(userID, answer) {
       return this.withMutation((store) => {
@@ -4092,6 +4105,44 @@ async function createPostgresStoreAdapter() {
     async listResearchConversations(userID, options = {}) {
       await ensureSchema();
       const projectID = String(options.projectID || "").trim();
+      if (options.migrationPendingOnly) {
+        // Migrate only missing answers, one conversation per response. Keep source
+        // snapshot fields intact, but omit retained context, debug and modern answers.
+        const rows = await sql`
+          SELECT jsonb_build_object(
+            'id', c.id,
+            'primaryProjectID', c.conversation->>'primaryProjectID',
+            'codeVersion', c.conversation->>'codeVersion',
+            'evidenceSetVersion', c.conversation->'evidenceSetVersion',
+            'createdAt', c.conversation->>'createdAt',
+            'updatedAt', c.conversation->>'updatedAt',
+            'sources', COALESCE((SELECT jsonb_agg(src)
+              FROM jsonb_array_elements(COALESCE(c.conversation->'sources', '[]'::jsonb)) AS src
+              WHERE src->>'kind' = 'selection'), '[]'::jsonb),
+            'messages', COALESCE((SELECT jsonb_agg(jsonb_build_object(
+              'id', msg->>'id', 'role', msg->>'role', 'question', msg->'question',
+              'answer', msg->'answer', 'createdAt', msg->>'createdAt') ORDER BY ordinal)
+              FROM jsonb_array_elements(COALESCE(c.conversation->'messages', '[]'::jsonb))
+                WITH ORDINALITY AS messages(msg, ordinal)
+              WHERE msg->>'role' = 'user' OR (
+                msg->>'role' = 'assistant' AND msg->'answer' IS NOT NULL AND msg->'answer' <> 'null'::jsonb
+                AND COALESCE(msg->>'id', '') <> '' AND NOT EXISTS (
+                  SELECT 1 FROM permitext_research_answers a WHERE a.user_id = ${userID} AND a.id = msg->>'id'
+                ))), '[]'::jsonb)
+          ) AS conversation
+          FROM permitext_research_conversations c
+          WHERE c.user_id = ${userID} AND c.id > ${String(options.afterID || "")}
+            AND EXISTS (
+              SELECT 1 FROM jsonb_array_elements(COALESCE(c.conversation->'messages', '[]'::jsonb)) AS msg
+              WHERE msg->>'role' = 'assistant' AND msg->'answer' IS NOT NULL AND msg->'answer' <> 'null'::jsonb
+                AND COALESCE(msg->>'id', '') <> '' AND NOT EXISTS (
+                  SELECT 1 FROM permitext_research_answers a WHERE a.user_id = ${userID} AND a.id = msg->>'id'
+                )
+            )
+          ORDER BY c.id ASC LIMIT 1
+        `;
+        return rows.map((row) => safeJSON(row.conversation, {}));
+      }
       if (options.summaryOnly) {
         // Project only list fields so large messages/visuals never leave the database row.
         const summaryRows = projectID
@@ -4863,20 +4914,32 @@ async function createPostgresStoreAdapter() {
     async listResearchAnswers(userID, options = {}) {
       await ensureSchema();
       const projectID = String(options.projectID || "").trim();
-      const rows = projectID
-        ? await sql`
-            SELECT answer
-            FROM permitext_research_answers
-            WHERE user_id = ${userID}
-              AND project_id = ${projectID}
-            ORDER BY created_at ASC
-          `
-        : await sql`
-            SELECT answer
-            FROM permitext_research_answers
-            WHERE user_id = ${userID}
-            ORDER BY created_at ASC
-          `;
+      const linkedIDs = options.linkedAnswerIDs || [];
+      const ids = options.ids || [];
+      const rows = await sql`
+        SELECT CASE
+          WHEN ${Boolean(options.idsOnly)}::boolean THEN jsonb_build_object('id', id)
+          WHEN ${Boolean(options.summaryOnly)}::boolean THEN jsonb_build_object(
+            'id', id, 'conversationID', conversation_id, 'projectID', project_id,
+            'question', answer->'question', 'reviewStatus', answer->'reviewStatus',
+            'createdAt', answer->'createdAt',
+            'answer', jsonb_build_object('conclusion', answer#>'{answer,conclusion}',
+              'answerText', LEFT(answer#>>'{answer,answerText}', 500)),
+            'evidenceCount', jsonb_array_length(COALESCE(answer->'evidence', '[]'::jsonb)),
+            'sectionIDs', COALESCE((SELECT jsonb_agg(section_id ORDER BY first_ordinal) FROM (
+              SELECT BTRIM(evidence->>'sectionID') AS section_id, MIN(ordinal) AS first_ordinal
+              FROM jsonb_array_elements(COALESCE(answer->'evidence', '[]'::jsonb))
+                WITH ORDINALITY AS entries(evidence, ordinal)
+              WHERE BTRIM(COALESCE(evidence->>'sectionID', '')) <> ''
+              GROUP BY BTRIM(evidence->>'sectionID')
+            ) AS sections), '[]'::jsonb)
+          ) ELSE answer END AS answer
+        FROM permitext_research_answers
+        WHERE user_id = ${userID}
+          AND (${projectID}::text = '' OR project_id = ${projectID} OR id = ANY(${linkedIDs}::text[]))
+          AND (${!options.ids}::boolean OR id = ANY(${ids}::text[]))
+        ORDER BY created_at ASC
+      `;
       return rows.map((row) => safeJSON(row.answer, {}));
     },
     async saveResearchAnswer(userID, answer) {
@@ -13014,6 +13077,28 @@ function deterministicFoundationLinkID(userID, projectID, targetKind, targetID) 
     .slice(0, 32)}`;
 }
 
+export function projectResearchAnswerForList(answer) {
+  return {
+    id: answer.id, conversationID: answer.conversationID, projectID: answer.projectID || null,
+    question: answer.question, reviewStatus: answer.reviewStatus, createdAt: answer.createdAt,
+    answer: { conclusion: answer.answer?.conclusion || "", answerText: answer.answer?.answerText?.slice(0, 500) || "" },
+    evidenceCount: answer.evidence?.length || 0,
+    sectionIDs: Array.from(new Set((answer.evidence || []).map((item) => String(item.sectionID || "").trim()).filter(Boolean)))
+  };
+}
+
+async function* pendingLegacyResearchConversations(userID) {
+  let afterID = "";
+  while (true) {
+    const batch = await listStoredResearchConversations(userID, { migrationPendingOnly: true, afterID });
+    if (!batch.length) return;
+    for (const conversation of batch) {
+      yield conversation;
+      afterID = conversation.id;
+    }
+  }
+}
+
 async function migrateLegacyProjectFoundation(userID) {
   const checkpointName = `project-foundation-v${projectFoundationSchemaVersion}`;
   const existingCheckpoint = await storedMigrationCheckpoint(userID, checkpointName);
@@ -13029,7 +13114,7 @@ async function migrateLegacyProjectFoundation(userID) {
     .map(({ record }) => projectIdentityForRecord(record, userID))
     .filter(Boolean));
   const existingLinks = await listStoredProjectLinks(userID);
-  const existingAnswers = await listStoredResearchAnswers(userID);
+  const existingAnswers = await listStoredResearchAnswers(userID, { idsOnly: true });
   const answerIDs = new Set(existingAnswers.map((answer) => answer.id));
   const knownKeys = new Set(existingLinks
     .map((link) => [link.projectID, link.targetKind, link.targetID].join("\u001f")));
@@ -13086,7 +13171,7 @@ async function migrateLegacyProjectFoundation(userID) {
       migratedWorkboards += 1;
     }
   }
-  for (const conversation of await listStoredResearchConversations(userID)) {
+  for await (const conversation of pendingLegacyResearchConversations(userID)) {
     const messages = conversation.messages || [];
     for (let index = 0; index < messages.length; index += 1) {
       const message = messages[index];
@@ -13225,7 +13310,9 @@ async function projectFoundationStateForStorageOwner(
       .map((link) => String(link.targetID || ""))
       .filter(Boolean)
   );
-  const answers = (await listStoredResearchAnswers(storageOwnerUserID))
+  const answers = (await listStoredResearchAnswers(storageOwnerUserID, {
+    ...scopeOptions, linkedAnswerIDs: [...linkedResearchAnswerIDs], summaryOnly: true
+  }))
     .filter((answer) =>
       !scopedProjectID ||
       answer.projectID === scopedProjectID ||
@@ -13237,8 +13324,8 @@ async function projectFoundationStateForStorageOwner(
       projectID: answer.projectID || null,
       question: answer.question,
       conclusion: answer.answer?.conclusion || "",
-      evidenceCount: answer.evidence?.length || 0,
-      sectionIDs: Array.from(new Set(
+      evidenceCount: answer.evidenceCount ?? answer.evidence?.length ?? 0,
+      sectionIDs: answer.sectionIDs || Array.from(new Set(
         (answer.evidence || [])
           .map((evidence) => String(evidence.sectionID || "").trim())
           .filter(Boolean)
@@ -16418,10 +16505,12 @@ async function currentProjectSectionRecords(userID, projectID) {
     .map(({ record }) => record);
 }
 
-async function reportSourcesForProject(userID, projectID) {
-  const links = (await listStoredProjectLinks(userID))
+async function reportSourcesForProject(userID, projectID, options = {}) {
+  const links = (await listStoredProjectLinks(userID, { projectID }))
     .filter((link) => !link.deletedAt && link.projectID === projectID);
-  const artifacts = await listStoredFoundationArtifacts(userID);
+  const artifactIDs = [...new Set(links.filter((link) =>
+    ["notebookCard", "workboardPreview", "attachment"].includes(link.targetKind)).map((link) => link.targetID))];
+  const artifacts = artifactIDs.length ? await listStoredFoundationArtifacts(userID, { ids: artifactIDs }) : [];
   const sources = [];
   const warnings = [];
 
@@ -16523,7 +16612,9 @@ async function reportSourcesForProject(userID, projectID) {
       });
     });
 
-  (await listStoredResearchAnswers(userID))
+  (await listStoredResearchAnswers(userID, {
+    projectID, summaryOnly: Boolean(options.summaryOnly), ids: options.researchAnswerIDs
+  }))
     .filter((answer) => answer.projectID === projectID)
     .forEach((answer) => {
       sources.push({
@@ -16615,7 +16706,8 @@ async function handleReportSourceList(request, response) {
   if (!access) return;
   const { sources, warnings } = await reportSourcesForProject(
     access.storageOwnerUserID,
-    access.projectID
+    access.projectID,
+    { summaryOnly: true }
   );
   sendJSON(response, 200, {
     schemaVersion: 1,
@@ -16740,7 +16832,7 @@ async function handleReportDraftGet(request, response) {
 }
 
 async function validateReportDraftSources(userID, projectID, draft) {
-  const { sources } = await reportSourcesForProject(userID, projectID);
+  const { sources } = await reportSourcesForProject(userID, projectID, { summaryOnly: true });
   const sourceKeys = new Set(sources.map((source) => `${source.kind}:${source.id}`));
   for (const block of draft.blocks) {
     if (["heading", "paragraph", "list"].includes(block.kind)) continue;
@@ -17048,7 +17140,11 @@ async function handleReportGenerate(request, response) {
       reportConfiguration.controls,
       context.body.reportTemplateID
     );
-    const { sources } = await reportSourcesForProject(storageOwnerUserID, access.projectID);
+    const { sources } = await reportSourcesForProject(storageOwnerUserID, access.projectID, {
+      researchAnswerIDs: draft.payload.blocks
+        .filter((block) => block.kind === "researchAnswer")
+        .map((block) => block.sourceID)
+    });
     const sourcesByKey = new Map(sources.map((source) => [`${source.kind}:${source.id}`, source]));
     const priorManifests = await projectReportManifests(storageOwnerUserID, access.projectID);
     const reportVersion = Math.max(
@@ -26736,7 +26832,7 @@ function workboardPreviewSummary(artifact) {
 
 async function projectWorkboardPreviews(userID, projectID) {
   const linkedPreviewIDs = new Set(
-    (await listStoredProjectLinks(userID))
+    (await listStoredProjectLinks(userID, { projectID, targetKind: "workboardPreview" }))
       .filter((link) =>
         !link.deletedAt &&
         link.projectID === projectID &&
@@ -26744,7 +26840,8 @@ async function projectWorkboardPreviews(userID, projectID) {
       )
       .map((link) => link.targetID)
   );
-  return (await listStoredFoundationArtifacts(userID))
+  if (!linkedPreviewIDs.size) return [];
+  return (await listStoredFoundationArtifacts(userID, { ids: [...linkedPreviewIDs] }))
     .filter((artifact) =>
       artifact.envelope?.type === "workboardPreview" &&
       !artifact.envelope?.deletedAt &&
