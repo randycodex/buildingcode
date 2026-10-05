@@ -1,0 +1,32 @@
+{
+  "status": "pending_independent_rubric_review",
+  "fixtureSHA256": "bfa99691b3f2d3dc3d0f7cd5342d6739e789c0a4215366d2a6b8c34e2411e97c",
+  "questionCount": 40,
+  "conversations": 20,
+  "candidateCommit": "51d854fa5",
+  "finalCandidateFrozen": false,
+  "independentReviewer": null,
+  "providerCalls": 0,
+  "sourceHashes": {
+    "PC 503.1": "18c7e658b77f376f94a29b62f3e04118483b5fb522dc1719d7f8c6acde31d611",
+    "PC 504.6": "441faeacb333ea9948b1512b362b1ce01f64b5727f0e886d892f09dd0ea7ffb1",
+    "PC 905.4": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13",
+    "MC 501.3.1": "e818e378f393ae0d9850683d4a17d53b82861f33efb5bc013478490e33a7d393",
+    "MC 505.1": "19bb5461d87fb1807a9399ca7ed55f8e87efadefe0eabd21a7fb5d72b2a62d3e",
+    "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce",
+    "FGC 406.3.3": "75b00094b32af13a533e4a88ccba08836b49bbe2826a9b535ffbcbaa230f9c4d",
+    "FGC 410.2": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+    "BC 1013.1": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+    "BC 1014.2": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+    "BC 1014.6": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc",
+    "BC 1023.2": "c4de89a4305c373fd0b9eebe68666040acb58d162e0ff1c171bad8e379598008",
+    "AC 28-105.1": "11adc798ab9699efa69395ba0a219bf375106afa82391557b4f8039b9c75c3d9",
+    "AC 28-106.1": "6639a6814c6a89d15ce0cc23341d2d9e84434fa3ac416df991c6f804f80adc16",
+    "FC 311": "bd3f7fecb9f15e0266fbadf4eee89a8300772c893499639b4a72337415f4a30a",
+    "FC 508": "c2bd3b75aca8ed84efca7504d870e1b73f9fc8f9c42289c0ff8abdc03694b3a8",
+    "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+    "ZR 37-745": "40de877fdc811dfc3253e4d5377e785ae3d869dd473723448e272492bf9344af",
+    "ZR 37-746": "6e8d1120cc3a4f5b98fbd7a4dad995f2c25b8c8a1c3c03a36f8b591cf1c2ffc2"
+  }
+}

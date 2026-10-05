@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { evaluationBudget } from "./research-evaluation-budget.mjs";
@@ -48,3 +49,15 @@ try {
   assert.throws(() => validationCost({ model: "unexpected", usage: { input_tokens: 1, output_tokens: 1 } }));
 } finally { await rm(directory, { recursive: true, force: true }); }
 console.log("Readiness, credential redaction, reservations and durable spending controls passed (zero provider calls).");
+
+const campaignRoot = new URL("../", import.meta.url);
+const campaignLedger = new URL("evals/retrieval-validation-2026-10-05/budget-ledger.json", campaignRoot);
+const ledgerBefore = await readFile(campaignLedger, "utf8");
+const pending = spawnSync(process.execPath, ["scripts/run-research-validation-20261005.mjs", "--live",
+  "--passage-search", "--budget-ledger", campaignLedger.pathname,
+  "--fixture", "evals/retrieval-validation-2026-10-05/acceptance-review-fixture.json"],
+  { cwd: campaignRoot, env: { ...process.env, OPENAI_API_KEY: "never-dispatch-pending-cohort" }, encoding: "utf8" });
+assert.notEqual(pending.status, 0);
+assert.match(pending.stderr, /Independent source\/rubric review and final freeze must be recorded/);
+assert.equal(await readFile(campaignLedger, "utf8"), ledgerBefore, "An unreviewed cohort cannot reserve or spend against the campaign");
+console.log("Pending independent acceptance review blocks before provider readiness, output creation and spend reservations.");

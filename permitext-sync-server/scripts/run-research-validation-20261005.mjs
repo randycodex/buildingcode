@@ -52,6 +52,8 @@ if (retrievalLive) assert(semanticVectorPath && !live, "Retrieval-only paid mode
 const fixturePath = argument("--fixture") || "evals/research-accuracy-holdout-2026-10-01.json";
 const fixtureText = await readFile(new URL(fixturePath, root), "utf8");
 const fixture = JSON.parse(fixtureText);
+assert(!live || (fixture.notReadyForGeneration !== true && fixture.status !== "pending_independent_rubric_review"),
+  "Independent source/rubric review and final freeze must be recorded before generating this proposed acceptance cohort");
 const selectedIDs = argument("--only")?.split(",");
 if (selectedIDs) fixture.conversations = fixture.conversations.filter(item => selectedIDs.includes(item.id));
 assert(fixture.conversations.length, "At least one evaluation conversation must be selected");

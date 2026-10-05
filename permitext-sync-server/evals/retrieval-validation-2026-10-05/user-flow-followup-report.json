@@ -1,0 +1,290 @@
+{
+  "status": "local_diagnostics_complete_independent_acceptance_review_pending",
+  "recordedAt": "2026-10-05T18:37:20.198131+00:00",
+  "candidateCommit": "51d854fa52dc2edf6e71402a7c7de5f16f066fce",
+  "sourceHashesMatchCandidateCommit": true,
+  "changes": [
+    "Scoped zoning prompts compacted below the original14000-character ceiling; exact source bindings, applicability, exceptions, dated text, unknowns and fresh-review controls retained. Generic Research instructions, evidence budgets, schemas and substantive gates unchanged.",
+    "Project-context retrieval contract now distinguishes full facts available to answer/review from relevant search hints. It tests restoration of relevant actual facts after a hypothetical and exclusion of unrelated landmark/MIH hints.",
+    "Acceptance review runner refuses explicitly pending independent rubrics before provider readiness, output creation or spend. Proposed new forty-turn review fixture and exact canonical source snapshots prepared; no acceptance generation or answer-key approval."
+  ],
+  "offline": {
+    "providerCalls": 0,
+    "passed": [
+      "research-zoning-verification-instructions-contract.mjs",
+      "research-general-rule-project-scope-contract.mjs",
+      "research-project-context-summary-contract.mjs",
+      "research-claim-scope-contract.mjs",
+      "research-zoning-conditional-explanation-contract.mjs",
+      "research-material-zoning-revision-http-contract.mjs",
+      "research-source-explanation-revision-http-contract.mjs",
+      "scripts/test-research-validation-controls-20261005.mjs"
+    ],
+    "promptCharacters": {
+      "review": 13892,
+      "writer": 13917
+    },
+    "additionalLegacyFailures": [
+      {
+        "file": "research-decision-fact-contract.mjs",
+        "reason": "Historical recorded fixture sourceID is absent from current fresh retrieval. Strict citation validation rejects it before the prompt check. No citation guard relaxed."
+      },
+      {
+        "file": "research-zoning-conditional-http-contract.mjs",
+        "reason": "Synthetic unsupported_requirement rejection expects a targeted revision, while current strict guards route it through a full rewrite and fresh verification. No unconditional patch override restored."
+      }
+    ],
+    "fullSuiteGreen": false
+  },
+  "nativeDiagnostic": {
+    "directory": "local-user-flow-diagnostic-20261005",
+    "resultSHA256": "b65d72222fa61543acf56235d69d298778c314a58069ebdce5102a23ceecbfdd",
+    "providerAPI": "responses",
+    "accountAccess": {
+      "scope": "temporary isolated local account",
+      "signInHTTPStatus": 200,
+      "grantHTTPStatus": 200,
+      "activePro": true,
+      "researchMode": "included",
+      "grantType": "lifetimeGrant",
+      "productionSubscriptionTested": false
+    },
+    "selectedPolicy": {
+      "ordinaryDraft": {
+        "model": "gpt-6-luna",
+        "reasoningEffort": "low",
+        "serviceTier": "priority"
+      },
+      "sourceReview": {
+        "model": "gpt-6-luna",
+        "reasoningEffort": "medium",
+        "serviceTier": "priority"
+      },
+      "feedbackRepair": {
+        "model": "gpt-6-luna",
+        "reasoningEffort": "high",
+        "serviceTier": "default"
+      }
+    },
+    "attemptedTurns": 11,
+    "verifiedDeliveredTurns": 11,
+    "providerRequests": 47,
+    "allNewRequestsSettled": true,
+    "roleCounts": {
+      "embedding": 11,
+      "low": 11,
+      "medium": 18,
+      "high": 7
+    },
+    "estimatedUSD": 0.24935239500000003,
+    "newAccuracyScore": null,
+    "gradingBoundary": "Real local backend verification and implementing-assistant comparison to draft checks. Five families, correlated conversational turns, one prior-known pressure topic used for switch testing. No independent semantic grade or general accuracy claim.",
+    "cases": [
+      {
+        "id": "user-condensate-1",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 2,
+        "answerText": "Under the 2022 NYC Mechanical Code, equipment and appliances that are part of building mechanical systems regulated by the code must have condensate drains when they contain evaporators or cooling coils. The exception is specifically for evaporators and cooling coils designed to operate in sensible cooling only and not support condensation. Condensate from covered coils and evaporators must run from the drain-pan outlet to an approved disposal place, with at least 1/8 unit vertical per 12 units horizontal (1% slope) toward discharge; it must not discharge into a street, alley, or other area so as to cause a nuisance (MC \u00a7\u00a7 301.1, 307.2, 307.2.1).\n\n- **Materials and ordinary pipe size:** The listed materials are cast iron, galvanized steel, copper, cross-linked polyethylene, polyethylene, ABS, CPVC, or PVC pipe or tubing. Components must suit the installation\u2019s pressure and temperature ratings. Condensate waste and drain lines must be at least 3/4-inch internal diameter and must not decrease in size from the drain-pan connection to the disposal place. Joints and connections must follow the applicable NYC Plumbing Code Chapter 7 provisions for the material type (MC \u00a7 307.2.2).\n- **Short tubing alternative:** Polypropylene tubing may be used in lengths no greater than 12 inches (304.8 mm) for an individual drain application (MC \u00a7 307.2.2).\n- **Manifolded drains:** Where drains from more than one unit are manifolded, the pipe or tubing must be sized under Table 307.2.2 by its stated equipment-capacity band:\n\n| Equipment capacity | Minimum condensate pipe diameter |\n|---|---:|\n| Up to 20 tons of refrigeration | 3/4 inch |\n| Over 20 to 40 tons | 1 inch |\n| Over 40 to 90 tons | 1 1/4 inches |\n| Over 90 to 125 tons | 1 1/2 inches |\n| Over 125 to 250 tons | 2 inches |\n\nThe text does not expressly say whether \u201cequipment capacity\u201d for a multi-unit manifold means the sum of the connected units\u2019 capacities. Also, where multiple evaporators and/or condensate pumps discharge into the same piping system, that piping must prevent condensate from one appliance discharging into another (MC \u00a7\u00a7 307.2.2, 307.2.6).",
+        "repairRetrieval": {
+          "version": "20261005-grounded-parent-table-repair-v4",
+          "attemptedReads": 1,
+          "supplied": [],
+          "unresolved": [
+            {
+              "codePrefix": "MC",
+              "corpusID": "nyc-2022-construction-codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeEdition": "2022 New York City Construction Codes",
+              "jurisdiction": "New York City",
+              "sectionNumber": "307",
+              "referenceKind": "ancestor_scope",
+              "reason": "canonical_source_unavailable"
+            }
+          ]
+        }
+      },
+      {
+        "id": "user-condensate-2",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 1,
+        "answerText": "**No.** For a manifolded drain serving equipment with a combined capacity of 30 tons, the table\u2019s \u201cover 20 tons to 40 tons\u201d row requires a minimum **1-inch** pipe; a 3/4-inch internal diameter is undersized. (2022 NYC MC \u00a7 307.2.2, Table 307.2.2)",
+        "repairRetrieval": null
+      },
+      {
+        "id": "user-condensate-3",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 2,
+        "answerText": "No. With one unit remaining, the table rule for drains from more than one unit manifolded together no longer applies. The separate minimum is **3/4-inch internal diameter**. (2022 NYC MC \u00a7 307.2.2)",
+        "repairRetrieval": null
+      },
+      {
+        "id": "user-gas-test-1",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 1,
+        "answerText": "Under the 2022 NYC Fuel Gas Code, the ordinary test pressure is at least **1\u00bd times the proposed maximum working pressure, and never less than 3 psig**. If test pressure exceeds 125 psig, it also must not produce hoop stress above 50% of the pipe\u2019s specified minimum yield strength. The section\u2019s exceptions set special pressure and, in some cases, duration rules; the required test medium and test procedure are stated separately. (FGC \u00a7 406.4.1)\n\n- **Distribution pressure above 5 psig:** Test at **twice the maximum allowable operating pressure, but not less than 100 psig, for at least 1 hour**. (FGC \u00a7 406.4.1)\n- **Public corridors:** Gas piping installed **in accordance with \u00a7 404** must be tested and proven tight at **10 psig for at least 30 minutes**. Whether a particular installation meets the \u00a7 404 condition cannot be determined from the text provided. (FGC \u00a7 406.4.1)\n- **Meter piping:** Follow the serving utility\u2019s pressure-test requirements. Those requirements must either match the section\u2019s requirements for distribution piping or, if different, the utility must certify that the piping was tested in compliance with its requirements. (FGC \u00a7 406.4.1)\n- **Coated or wrapped pipe:** All field-applied or factory-applied coated and wrapped pipe must be tested at **at least 100 psig for at least 60 minutes**. Because this is a minimum, the text does not expressly say that it replaces a higher pressure requirement that may also apply; the interaction where categories overlap is not fully specified in the supplied passage. (FGC \u00a7 406.4.1)\n- **Medium and timing:** For testing, fill the piping with **air or an inert gas**, isolate the pressure source before taking pressure readings, and measure any required test duration **after the testing medium has stabilized**. The supplied section does not state a general duration for the ordinary test-pressure rule. (FGC \u00a7 406.4.1)",
+        "repairRetrieval": null
+      },
+      {
+        "id": "user-gas-test-2",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 3,
+        "answerText": "**No.** FGC \u00a7 406.4.1, Exception 4, says \u201cNotwithstanding the above\u201d and requires all field-applied or factory-applied coated and wrapped pipe to be tested at **at least 100 psig for at least 60 minutes**. The described pipe therefore does not meet either minimum at 3 psig for 30 minutes; the 60 minutes are measured after the testing medium stabilizes. (FGC \u00a7\u00a7 401.1, 406.4.1)\n\nThe separate factory-coating rule applies to coatings intended to protect against corrosion during shipping and storage; it sets a pressure minimum but no duration. Even if it applies here, it does not reduce the coated-and-wrapped minimum: where different sections specify different requirements, FGC \u00a7 102.1 requires the most restrictive. (FGC \u00a7\u00a7 406.4.1.1, 102.1)",
+        "repairRetrieval": {
+          "version": "20261005-grounded-parent-table-repair-v4",
+          "attemptedReads": 1,
+          "supplied": [
+            {
+              "sourceID": "research-permitext_cross_reference-id:8284-repair1",
+              "codePrefix": "FGC",
+              "corpusID": "nyc-2022-construction-codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeEdition": "2022 New York City Construction Codes",
+              "jurisdiction": "New York City",
+              "sectionNumber": "406.4",
+              "referenceKind": "ancestor_scope",
+              "textSHA256": "bc48bfa81f065cccdd6c3f4ee36f734de84485bc5671880697116c25e0835c52",
+              "replaced": false
+            }
+          ],
+          "unresolved": [
+            {
+              "codePrefix": "FGC",
+              "corpusID": "nyc-2022-construction-codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeEdition": "2022 New York City Construction Codes",
+              "jurisdiction": "New York City",
+              "sectionNumber": "401",
+              "referenceKind": "ancestor_scope",
+              "reason": "cross_reference_budget_exhausted"
+            }
+          ]
+        }
+      },
+      {
+        "id": "user-stair-nosing-1",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 1,
+        "answerText": "Under the 2022 NYC Building Code\u2019s ordinary stair rule, a nosing\u2019s curvature or bevel must be **at least 1/16 inch and no more than 9/16 inch**, measured from the tread\u2019s foremost projection. Risers must be solid and vertical, or may slope under the tread above from the underside of the nosing above at an angle **no greater than 30\u00b0 from vertical** (BC \u00a7 1011.5.5). These are separate from the projection rule: the leading edge may project no more than **1\u00bc inches beyond the tread below** (BC \u00a7 1011.5.5.1).\n\nThe solid-riser rule has stated exceptions, including certain non-exit or specified occupancies and stair types; the Group R-3 exception also sets a leading-edge radius limit of 9/16 inch. Whether an exception applies depends on the stair\u2019s applicable conditions. (BC \u00a7 1011.5.5.3)",
+        "repairRetrieval": null
+      },
+      {
+        "id": "user-stair-nosing-2",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 1,
+        "answerText": "No. Under the ordinary 2022 NYC Building Code rule, a riser sloped under the tread above may be no more than 30\u00b0 from vertical; 35\u00b0 exceeds that limit by 5\u00b0 (BC \u00a7 1011.5.5).",
+        "repairRetrieval": null
+      },
+      {
+        "id": "user-backwater-1",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 1,
+        "answerText": "Under the 2022 NYC Plumbing Code, accessible backwater valves are required where fixtures, floor drains, or area drains are subject to overflow from backwater from the public sewer. A building in a flood hazard area is deemed subject to that overflow and must have valves meeting the additional requirements of ASCE 24 \u00a7 7.3.3, as modified by NYC Building Code Appendix G; the supplied text does not establish those referenced requirements, so I cannot describe them further. (PC \u00a7 715.1)\n\nThe valve may be installed in the fixture drain from the affected fixture, in the branch drain to the affected area drain or group of fixtures, or in the building drain where it exits the building, downstream of the building trap. It must be accessible, with access to its working parts for service and repair. If the centerline of any drain line is 18 inches (457 mm) or more below a slab on grade, a masonry access manhole is required. (PC \u00a7\u00a7 715.1, 715.5)",
+        "repairRetrieval": null
+      },
+      {
+        "id": "user-backwater-2",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 1,
+        "answerText": "Yes. The 2022 NYC Plumbing Code requires a masonry access manhole when the centerline of any drain line is **18 inches (457 mm) or more** below a slab on grade; exactly 18 inches meets that threshold. (PC \u00a7 715.5)",
+        "repairRetrieval": null
+      },
+      {
+        "id": "user-ground-depth-1",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 3,
+        "answerText": "**No.** In the NYC Zoning Resolution text through August 13, 2026, \u00a7 37-32 says the minimum depth for required ground-floor non-residential uses, \u201cas applicable,\u201d is set forth in that section, subject to \u00a7 37-31; those uses along a designated frontage must extend to the \u201cminimum qualifying depth.\u201d The supplied \u00a7 37-32 text gives no universal feet value. (ZR \u00a7 37-32.)\n\nSection 37-31 says the provisions of \u00a7 37-30, inclusive\u2014including \u00a7 37-32\u2014address building frontages in certain areas **not otherwise governed by \u00a7 32-30**. It describes them as reference standards for certain streetscape elements applied in conjunction with area-specific requirements under underlying-district regulations, special geographies, or a Special Purpose District. Section 37-31 also excludes the \u00a7 37-32 depth requirements for Commercial District zoning lots under 20 feet wide along the street line, only if the lots existed both on March 22, 2016, and on the building-permit application date; and for any community-facility building used exclusively for either a school, or a house of worship, listed under Use Group III(B). The wording leaves unresolved whether \u201clisted under Use Group III(B)\u201d qualifies only the house of worship or both alternatives. (ZR \u00a7 37-31.)",
+        "repairRetrieval": null
+      },
+      {
+        "id": "user-ground-depth-2",
+        "mode": "openai",
+        "verificationPassed": true,
+        "attempts": 2,
+        "answerText": "For Chapter 6\u2019s covered water-supply systems\u2014those serving human occupancy or habitation and individual water-supply systems\u2014pressure **above 85 psi (586 kPa) static** triggers the requirement. An approved valve conforming to ASSE 1003 or CSA B356, with a strainer, must reduce pressure in the building water-distribution piping to no more than 85 psi static. The exception covers service lines to sill cocks and outside hydrants, and main supply risers where pressure from the mains is reduced to 85 psi or less at individual fixtures. (PC \u00a7\u00a7 601.1, 604.8)",
+        "repairRetrieval": {
+          "version": "20261005-grounded-parent-table-repair-v4",
+          "attemptedReads": 1,
+          "supplied": [],
+          "unresolved": [
+            {
+              "codePrefix": "PC",
+              "corpusID": "nyc-2022-construction-codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeEdition": "2022 New York City Construction Codes",
+              "jurisdiction": "New York City",
+              "sectionNumber": "601",
+              "referenceKind": "ancestor_scope",
+              "reason": "canonical_source_unavailable"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "repairFindings": [
+    {
+      "case": "user-condensate-1",
+      "finding": "Review caught a missing materials list and PC Chapter7 joint condition. Full rewrite supplied both; final review passed."
+    },
+    {
+      "case": "user-condensate-3",
+      "finding": "Review rejected an obsolete manifold-table basis after correction to one unit. Categorical application correctly required a full rewrite; final answer relies on the general3/4in minimum."
+    },
+    {
+      "case": "user-gas-test-2",
+      "finding": "Draft overqualified sufficiency by treating a lower factory-coating pressure minimum as a possible waiver of stricter coated-and-wrapped pressure/duration. Full repair established the stricter branch but introduced wrong citation relevance attributing test requirements to the Chapter4 scope provision. Fresh full review caught that drift; a narrow citation patch corrected it and final review passed. Exact FGC406.4 parent recovered with one canonical read before review. Separate FGC401 nomination remained explicitly cross-reference-budget exhausted; no budget widened."
+    },
+    {
+      "case": "user-ground-depth-1",
+      "finding": "Bounded source-explanation patch preserved citation/point source identities and the independently supported Section37-32 point while qualifying ambiguous exemption wording. Fresh review detected the already-missing Section32-30 applicability boundary. That condition was absent before the patch; this is progressive review detection, not removal by the patch. Full rewrite retained exemptions/uncertainty and added the boundary; final review passed."
+    },
+    {
+      "case": "false_evidence_limitation",
+      "finding": "No actual review in this run produced this issue type. The new all-supported false-limitation material route remains verified by offline guards/HTTP contracts, not organically validated by these native diagnostics."
+    }
+  ],
+  "scoresPreserved": {
+    "originalFrozen": {
+      "fullyCorrect": 35,
+      "total": 40
+    },
+    "separateExploratory": {
+      "fullyCorrect": 9,
+      "total": 10
+    },
+    "combined": false,
+    "general95PercentEstablished": false
+  },
+  "spending": {
+    "capUSD": 10.99,
+    "diagnosticCapUSD": 2.99,
+    "freshCapUSD": 8,
+    "prior334EntriesUnchanged": true,
+    "totalLedgerCalls": 381,
+    "statuses": {
+      "settled": 379,
+      "rejected": 2
+    },
+    "campaignEstimatedUSD": 1.933936815000002,
+    "diagnosticEstimatedUSD": 1.04822222,
+    "freshEstimatedUSD": 0.8857145949999999,
+    "actualBillingDeductionsVerified": false
+  },
+  "next": [
+    "Independent review of three disputed interpretations and the proposed forty-question source rubric. Existing failed grades remain unchanged.",
+    "Final code/source/rubric freeze only after that review and any necessary general fixes; then one new forty-turn acceptance run within the preserved cap.",
+    "Separate production browser/subscription/hosted native transport validation remains open. No deployment authorized or performed."
+  ],
+  "independentReviewPending": true,
+  "deploymentPerformed": false
+}

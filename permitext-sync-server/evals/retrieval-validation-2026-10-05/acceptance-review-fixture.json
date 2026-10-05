@@ -1,0 +1,292 @@
+{
+  "status": "pending_independent_rubric_review",
+  "scope": "proposed_new_40_turn_acceptance",
+  "providerCalls": 0,
+  "notReadyForGeneration": true,
+  "questionCount": 40,
+  "conversationCount": 20,
+  "pairedTurnsCorrelated": true,
+  "description": "Forty proposed new questions. Original35/40 and exploratory9/10 remain unchanged and separate. Review exact source snapshots and add needed dependencies before final freeze. No answer-key approval by implementing assistant.",
+  "conversations": [
+    {
+      "id": "acceptance-water-heater-valve",
+      "questions": [
+        "Explain the current 2022 NYC Plumbing Code cold-water branch valve requirements for a water heater: what it serves, its location and access.",
+        "In this hypothetical, the valve also shuts off the cold-water supply to another fixture. Is proximity to the heater enough to satisfy this valve rule?"
+      ],
+      "references": [
+        "PC 503.1"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-relief-discharge",
+      "questions": [
+        "Explain the 2022 NYC Plumbing Code requirements for water-heater relief-valve discharge piping, including termination height, connection, flow and permitted materials.",
+        "Correction: the discharge pipe is one inch in diameter and ends only one inch above the waste-receptor flood rim. Does being below six inches alone satisfy the termination-height rule?"
+      ],
+      "references": [
+        "PC 504.6"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-reserved-vent",
+      "questions": [
+        "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+        "An older drawing describes that same section number as a vent-connection requirement, without giving its edition. Does the supplied current section prove what that old drawing meant?"
+      ],
+      "references": [
+        "PC 905.4"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-grade-support",
+      "questions": [
+        "Explain the 2022 NYC Mechanical Code alternatives for supporting equipment installed at grade, including heights and installation conditions.",
+        "A level approved support slab extends exactly three inches above adjoining grade. Is that height alone below the stated slab-support minimum?"
+      ],
+      "references": [
+        "MC 304.10"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-environmental-exhaust",
+      "questions": [
+        "Explain the ordinary environmental-air exhaust separation rule in the 2022 NYC Mechanical Code and the conditions that can change intake separation. Keep other exhaust classes distinct.",
+        "For this hypothetical, an exhaust and intake serve the same dwelling, the exhaust is Class 2 at exactly four hundred cfm, and cross contamination plus re-entrainment is five percent. Does that qualify for the intake-separation exception on those facts?"
+      ],
+      "references": [
+        "MC 501.3.1"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-domestic-hood",
+      "questions": [
+        "Explain the 2022 NYC Mechanical Code domestic range-hood duct rule and the separate ductless and PVC downdraft alternatives. Preserve their conditions.",
+        "A listed ductless hood in a Group I-2 space follows the manufacturer instructions and otherwise has ventilation. Does that establish eligibility for the stated ductless exception?"
+      ],
+      "references": [
+        "MC 505.1"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-sediment-trap",
+      "questions": [
+        "Explain the 2022 NYC Fuel Gas Code sediment-trap rule, its installation location, accepted form and named appliance exclusions.",
+        "The appliance is an ordinary furnace with no incorporated sediment trap. Would placing the trap upstream of its shutoff valve meet the stated location rule?"
+      ],
+      "references": [
+        "FGC 408.4"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-test-isolation",
+      "questions": [
+        "Explain the 2022 NYC Fuel Gas Code procedure when connected equipment is designed for less than the piping test pressure. Include the later leak-check requirement.",
+        "For that same scenario, we will leave the equipment connected and rely on closing its valve, with no disconnection or outlet cap. Does that perform the procedure stated in this section?"
+      ],
+      "references": [
+        "FGC 406.3.3"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-mp-regulator",
+      "questions": [
+        "Explain the 2022 NYC Fuel Gas Code MP-regulator requirements, keeping access, pressure behavior, tees, downstream distance and union placement separate.",
+        "For a ten-pipe-diameter minimum, a downstream instrument tee is located eight pipe diameters from the regulator outlet. Does adding a pressure gauge cure that distance under this rule?"
+      ],
+      "references": [
+        "FGC 410.2"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-exit-sign-distance",
+      "questions": [
+        "Explain the 2022 NYC Building Code exit-sign visibility and spacing rule, including its listed exceptions and the listed-viewing-distance condition.",
+        "Assume no exit-sign exception applies. The sign has a listed viewing distance of seventy-five feet, and the farthest corridor point is ninety feet from the nearest visible sign. Is staying below one hundred feet sufficient?"
+      ],
+      "references": [
+        "BC 1013.1"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-handrail-height",
+      "questions": [
+        "Explain the 2022 NYC Building Code handrail-height ranges and the conditions of its fitting, transition and guard alternatives.",
+        "For an ordinary stair, the uniform handrail is exactly thirty-eight inches above the nosings and has no special device or fitting condition. Does this height exceed the ordinary maximum?"
+      ],
+      "references": [
+        "BC 1014.2"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-handrail-extension",
+      "questions": [
+        "Explain the 2022 NYC Building Code stair and ramp handrail extensions and returns, plus the section-specific exceptions.",
+        "Our ordinary noncontinuous stair handrail extends twelve inches horizontally beyond the top riser but terminates at the bottom riser. No listed exception applies. Does the top extension alone satisfy both ends?"
+      ],
+      "references": [
+        "BC 1014.6"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-exit-enclosure",
+      "questions": [
+        "Explain the 2022 NYC Building Code interior-exit enclosure rating, counting stories, floor-assembly comparison and the R-1/R-2 construction qualification.",
+        "For this hypothetical, an enclosure connects three above-grade stories and one basement, with no atrium or I-3 exception. Can it use the less-than-four-story rating solely because only three stories are above grade?"
+      ],
+      "references": [
+        "BC 1023.2"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-permit-basis",
+      "questions": [
+        "Explain the supplied current NYC Administrative Code general work-permit rule and its exception reference. Distinguish a reference to exceptions from approval for a particular job.",
+        "I need the original unamended text as it stood before the December 2025 amendment, rather than the current consolidated provision. Can you establish that earlier text solely from the supplied current wording and amendment dates?"
+      ],
+      "references": [
+        "AC 28-105.1"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-asbestos-certification",
+      "questions": [
+        "Explain the supplied current NYC Administrative Code asbestos certification condition for demolition or alteration permits, including its date and alternative.",
+        "For this hypothetical, the building plans were submitted exactly April 1, 1987, and no environmental-protection variance exists. Is that date outside the stated certification condition?"
+      ],
+      "references": [
+        "AC 28-106.1"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-vacant-protection",
+      "questions": [
+        "Explain the current NYC Fire Code fire-protection and security requirements for temporarily unoccupied premises, including tenant spaces. Keep unsafe-building status separate.",
+        "A tenant space is temporarily unoccupied, with no commissioner authorization to disable protection. Does vacancy itself allow its sprinkler system to be turned off?"
+      ],
+      "references": [
+        "FC 311"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-reserved-fire-section",
+      "questions": [
+        "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+        "An old note uses that section number for a fire command center but provides no dated source. Can the current reserved section establish the old note requirement or its historical edition?"
+      ],
+      "references": [
+        "FC 508"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-emergency-power",
+      "questions": [
+        "Explain current NYC Fire Code emergency-power inspection, maintenance records, transfer-switch testing and the conditional substitute for scheduled testing. Preserve the supervision requirement.",
+        "The generator has been used for peak-load shaving, but no records of that use were kept. Does the use alone satisfy the stated scheduled-testing substitute?"
+      ],
+      "references": [
+        "FC 604"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-plaza-bicycles",
+      "questions": [
+        "Explain the current NYC Zoning Resolution public-plaza bicycle-parking requirements, size threshold, location and agency condition.",
+        "For this hypothetical public plaza of exactly ten thousand square feet, does its size alone require the higher bicycle count? Do not treat the site as an independently verified public plaza."
+      ],
+      "references": [
+        "ZR 37-745"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    },
+    {
+      "id": "acceptance-plaza-fountain",
+      "questions": [
+        "Explain the current NYC Zoning Resolution public-plaza drinking-fountain minimum. Does the supplied section state a plaza-size exemption?",
+        "For this hypothetical only, the space is a public plaza and contains one drinking fountain. Does that count meet the stated numerical minimum, without claiming whole-plaza compliance?"
+      ],
+      "references": [
+        "ZR 37-746"
+      ],
+      "checks": [
+        "PENDING: independent reviewer must establish exact material conditions and bindings for the source explanation.",
+        "PENDING: independent reviewer must establish the scenario result, boundary, material conditions and required citations."
+      ]
+    }
+  ]
+}
