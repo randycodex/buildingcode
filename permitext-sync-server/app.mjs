@@ -21110,7 +21110,8 @@ async function handleResearchConversationMessage(request, response) {
               ? [...verificationAttempts.at(-1).issues, { type: "prior_review_correction",
                   detail: `The reviewer corrected its earlier instruction: ${verificationAttempts.at(-1).priorReviewCorrection}. Resolve the current findings against the enacted evidence and established facts; do not repeat the superseded instruction.` }]
               : attempt === 2 ? verificationAttempts.at(-1).issues : accumulatedResearchVerificationIssues(verificationAttempts),
-            previousInterpretation
+            previousInterpretation,
+            previousVerification: verificationAttempts.at(-1)
           }).catch((error) => {
             // A malformed revision must not erase the verifier's earlier result.
             error.verificationAttempts = [...verificationAttempts, ...(error.verificationAttempts || [])];
@@ -21272,6 +21273,7 @@ async function handleResearchConversationMessage(request, response) {
         }
         verificationAttempts.push({
           ...contextualVerification,
+          reviewedAnswerHash: createHash("sha256").update(JSON.stringify(result.interpretation)).digest("hex"),
           model: verification.model, reasoningEffort: verification.reasoningEffort,
           ...(verification.verificationEnvelopeRetryCount ? {
             verificationEnvelopeRetryCount: verification.verificationEnvelopeRetryCount,

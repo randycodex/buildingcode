@@ -1,0 +1,82 @@
+{
+  "description": "Ten new cross-family API questions frozen before first answer generation. Broad source explanations plus scenario follow-ups; implementing-assistant rubrics, not independent acceptance proof.",
+  "scope": "fresh-exploratory",
+  "originalFortyCaseScoreUnchanged": true,
+  "conversations": [
+    {
+      "id": "continuation-water-pressure",
+      "questions": [
+        "Under the 2022 NYC Plumbing Code, explain when building water pressure needs a reducing valve, what static-pressure limit applies, and what service-line or riser exceptions the rule contains. This is a source explanation, not approval of a particular installation.",
+        "For an ordinary indoor fixture branch with no service-line or riser exception, the static pressure is exactly eighty-five psi. Does that value alone exceed this pressure-reduction trigger?"
+      ],
+      "checks": [
+        "PC604.8 uses85psi static, not the common80psi model-memory value: trigger exceeds85, approved ASSE1003 or CSA B356 valve with strainer reduces to no greater85. Preserve sill-cock/outside-hydrant service-line exceptions and main-supply-riser condition that mains pressure is reduced to85orless at individual fixtures. No blanket installation approval.",
+        "No. Exactly85psi is not greater than85. Limit the result to this static-pressure trigger, without asserting complete fixture/system compliance."
+      ],
+      "references": [
+        "PC 604.8"
+      ]
+    },
+    {
+      "id": "continuation-grease-clearances",
+      "questions": [
+        "Explain the 2022 NYC Mechanical Code clearances from commercial kitchen grease ducts to combustible construction and to noncombustible construction. What conditions or listed systems can change the ordinary clearances?",
+        "For this scenario, the Type I hood grease duct requires no enclosure, has no applicable listed-system or insulation exception, and is three inches from combustible construction. Is that enough clearance?"
+      ],
+      "checks": [
+        "MC506.3.6 applies to TypeI-hood grease ducts/exhaust equipment where enclosures are not required:18in combustible;3in noncombustible and gypsum on noncombustible structures. Preserve UL1978-listed/labeled factory ducts listing/commissioner approval; listed exhaust equipment304.1; continuous all-sides ASTM E2336-listed field enclosure perlisting; and2in magnesium/calcium-silicate block protection with staggered joints, galvanized wire/equivalent grease-impenetrable assembly and commissioner approval for all indoor ducts. Do not invent a reduced clearance for unspecified wrapping.",
+        "No. On stipulated scope/no-exception facts combustible clearance is18in;3in is for the noncombustible branch and is insufficient here. No inferred shielding/listing approval."
+      ],
+      "references": [
+        "MC 506.3.6"
+      ]
+    },
+    {
+      "id": "continuation-appliance-shutoff",
+      "questions": [
+        "Explain the 2022 NYC Fuel Gas Code rules for an individual gas appliance shutoff valve: its room, distance, height and access, plus the fireplace and remote-location alternatives. Keep the conditions of each alternative separate.",
+        "Use the ordinary same-room option for this scenario, not the remote decorative-appliance option. The gas connection is seventy-two inches above the floor, and an accessible valve is also seventy-two inches high, five feet from the appliance and upstream of its connector. Does the usual valve-height limit prohibit this height? Answer only about height."
+      ],
+      "checks": [
+        "FGC409.5 gives409.5.1 or409.5.2 alternatives. Ordinary: same room, within6ft, upstream union/connector/quickdisconnect, access, atmost60in abovefinishedfloor. Firebox installation permanufacturer plusremotevalve. Height exception when appliance gasconnection above60in. Remote option only named vented decorative appliances/room heaters/decorative vented-fireplace appliances, readyaccess, permanentidentification, oneappliance, pipe throughwithin6ft meets401-408. Do not treat every appliance as eligible for remote valve.",
+        "No. With the gas connection above60in, the express height exception permits valve above60in; this is only the height result on the stipulated scenario, not approval of all other installation conditions."
+      ],
+      "references": [
+        "FGC 409.5",
+        "FGC 409.5.1",
+        "FGC 409.5.2"
+      ]
+    },
+    {
+      "id": "continuation-storage-clearance",
+      "questions": [
+        "Using the supplied current NYC Fire Code, explain ordinary indoor-storage clearance below ceilings and sprinkler head deflectors. Does the code contain a special route for noncombustible storage near a fire partition? Do not discuss construction-site storage.",
+        "The stored material is combustible, is twenty-four inches from a fire partition, and has no department authorization. Does proximity to that partition automatically allow storing it up to the ceiling?"
+      ],
+      "checks": [
+        "FC315.2.1: at least2ft belowceiling in nonsprinklered areas; at least18in belowheaddeflectors in sprinklered areas. Department MAY authorize noncombustible material toceiling within30in ofafirepartition. Preserve material/department/distance conditions; ordinary indoorstorage scope, notChapter33 construction/demolition exception. Do not imply automatic permission or generalwall-storage exception.",
+        "No. Proximity alone fails both noncombustible-material and department-authorization conditions. Do not substitute the wall for the specified fire partition or infer approval."
+      ],
+      "references": [
+        "FC 315"
+      ]
+    },
+    {
+      "id": "continuation-egress-ramp",
+      "questions": [
+        "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+        "For this scenario the means-of-egress ramp has exactly eighty-four inches of headroom in every part. Does that meet this code headroom minimum? Answer about headroom only."
+      ],
+      "checks": [
+        "BC1012.5.1: minwidth/requiredcapacity at leastcorridor1020.2;36in clearbetweenhandrails/permissibleprojections.1012.5.2 headroom84in throughout, not common80in.1012.5.3 no narrowingindirectionofegress, noprojectionsintorequiredramp/landingwidth; dooropeninglandings mustnotreduceclearbelow42in. Preserve capacity/clearwidth/doorwidth asdifferentconstraints.",
+        "Yes forheadroomonly: exactly84in throughout meets84in minimum. Do not claim all rampwidth,capacity,landing,slope,handrail or accessibility requirements met."
+      ],
+      "references": [
+        "BC 1012.5",
+        "BC 1012.5.1",
+        "BC 1012.5.2",
+        "BC 1012.5.3"
+      ]
+    }
+  ]
+}

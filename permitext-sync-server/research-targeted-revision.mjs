@@ -1,5 +1,7 @@
 // The application owns target identities, original text and source bindings.
 // Models select sentence IDs instead of retyping text or regenerating answers.
+import { createHash } from "node:crypto";
+export const researchRevisionAnswerHash = answer => createHash("sha256").update(JSON.stringify(answer)).digest("hex");
 export function researchRevisionTargets(answer) {
   const targets = [];
   const add = (path, text, removable = false, sentences = false) => {
@@ -13,7 +15,10 @@ export function researchRevisionTargets(answer) {
   for (const field of (answer.answerText ? ["answerText"] : ["conclusion", "explanation"])) add(field,answer[field],true,true);
   for (const field of ["missingFacts","followUpQuestions","assumptions","evidenceLimitations","additionalEvidenceNeeded"])
     (answer[field] || []).forEach((text,index) => add(`${field}/${index}`,text,true));
-  (answer.supportedPoints || []).forEach((point,index) => add(`supportedPoints/${index}/explanation`,point.explanation,true,true));
+  (answer.supportedPoints || []).forEach((point,index) => {
+    add(`supportedPoints/${index}/heading`,point.heading);
+    add(`supportedPoints/${index}/explanation`,point.explanation,true,true);
+  });
   // Relevance is model-authored explanatory prose, not authoritative citation
   // identity or selected text. A retained operative citation can still carry
   // the rejected ancillary claim here after its narrative has been repaired.
@@ -125,10 +130,30 @@ export const researchTargetedRevisionInstruction = "Return only edits to the lis
 export function researchTargetedRevisionEligible(options = {}) {
   const answer = options.previousInterpretation;
   if (!answer?.supportedPoints?.length || !answer?.citations?.length) return false;
-  // Numeric, applicability, and premise errors still require a full revision.
   // Narrow citation/qualification defects can be repaired without rewriting
   // independently supported text. Every patch still receives full review.
   const narrow = new Set(["incorrect_citation", "irrelevant_citation", "unnecessary_qualification", "repeated_established_fact"]);
-  return Array.isArray(options.revisionFeedback) && options.revisionFeedback.length > 0 &&
-    options.revisionFeedback.every(issue => narrow.has(issue.type));
+  const feedback = options.revisionFeedback;
+  if (!Array.isArray(feedback) || !feedback.length) return false;
+  if (feedback.every(issue => narrow.has(issue.type))) return true;
+  // Reuse the bounded patch for an erroneous conditional/source explanation,
+  // only after the actual completed review classified EVERY bound use as
+  // noncategorical. Bind that classification to this unchanged answer. A
+  // project decision, unresolved premise, absent/stale review or incomplete
+  // source coverage retains the full-revision path. This selects a repair
+  // format; it never certifies the revised claims or skips fresh verification.
+  const review = options.previousVerification;
+  const material = review?.materialScopeReview;
+  const explanationIssues = new Set([...narrow, "misstated_provision", "missed_material_conclusion", "fact_evidence_confusion"]);
+  if (!feedback.every(issue => explanationIssues.has(issue.type)) || review?.pass !== false ||
+      review.reviewedAnswerHash !== researchRevisionAnswerHash(answer) ||
+      material?.unboundCategoricalApplication !== false || !material.checks ||
+      typeof material.packetHash !== "string" || !/^[a-f0-9]{64}$/.test(material.packetHash)) return false;
+  const bound = new Set([...answer.citations, ...answer.supportedPoints].flatMap(item => item.sourceIDs || []));
+  const keys = Object.keys(material.checks);
+  if (!bound.size || keys.length !== bound.size || keys.some(id => !bound.has(id))) return false;
+  const rows = Object.values(material.checks);
+  return rows.every(row => row.categoricalApplication === false &&
+    ["supported", "evidence_gap_only", "unsupported"].includes(row.sourceResult)) &&
+    rows.some(row => row.sourceResult === "unsupported");
 }

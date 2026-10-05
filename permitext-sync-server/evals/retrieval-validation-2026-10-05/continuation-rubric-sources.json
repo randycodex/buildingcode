@@ -1,0 +1,93 @@
+{
+  "sources": [
+    {
+      "reference": "PC 604.8",
+      "sectionID": "12127",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "Where water pressure within a building exceeds 85 psi (586 kPa) static, an approved valve conforming to ASSE 1003 or CSA B356 with strainer shall be installed to reduce the pressure in the building water distribution piping to not greater than 85 psi (586 kPa) static. Exception: Service lines to sill cocks and outside hydrants, and main supply risers where pressure from the mains is reduced to 85 psi (586 kPa) or less at individual fixtures."
+    },
+    {
+      "reference": "MC 506.3.6",
+      "sectionID": "10626",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "Where enclosures are not required, grease duct systems and exhaust equipment serving a Type I hood shall have a clearance to combustible construction of not less than 18 inches (457.2 mm), and shall have a clearance to noncombustible construction and gypsum wallboard attached to noncombustible structures of not less than 3 inches (76.2 mm). Exceptions: 1. For factory-built commercial kitchen grease ducts listed and labeled in accordance with UL 1978, the required clearance shall be in accordance with the listing of such material and as approved by the commissioner. 2. Listed and labeled exhaust equipment installed in accordance with Section 304.1. 3. Where commercial kitchen grease ducts are continuously covered on all sides with a listed and labeled field-applied grease duct enclosure material, system, product or method of construction specifically evaluated for such purpose in accordance with ASTM E 2336, the required clearance shall be in accordance with the listing of such material, system, product or method. 4. Grease ducts protected with a minimum insulation covering of 2 inches (50.8 mm) of magnesium or calcium silicate block, with staggered joints, attached with galvanized steel wire or material assembly equivalent in insulating and fire-resistant qualities which cannot be penetrated by grease. Such protection shall be applied to all ducts inside of the building as approved by the commissioner."
+    },
+    {
+      "reference": "FGC 409.5",
+      "sectionID": "8335",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "Each appliance shall be provided with a shutoff valve in accordance with Section 409.5.1 or 409.5.2."
+    },
+    {
+      "reference": "FGC 409.5.1",
+      "sectionID": "8336",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "The shutoff valve shall be located in the same room as the appliance. The shutoff valve shall be within 6 feet (1828.8 mm) of the appliance, and shall be installed upstream of the union, connector or quick disconnect device it serves. Such shutoff valves shall be provided with access and located not more than 60 inches (1524 mm) above the finished floor. Appliance shutoff valves located in the firebox of a fireplace shall be installed in accordance with the appliance manufacturer's instructions. Where the shutoff valve is located in the firebox, a remote shutoff valve shall also be provided. Exception: Shutoff valves may be located more than 60 inches (1524 mm) above the finished floor where the gas connection to the appliance is more than 60 inches (1524 mm) above the finished floor."
+    },
+    {
+      "reference": "FC 315",
+      "sectionID": "31004696",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "corpusID": "nyc-2022-fire-code",
+      "text": "315.1 General.\n\nStorage of materials shall be in accordance with this section.\n\nException: Storage of materials during construction and demolition operations shall comply with the requirements of FC Chapter 33.\n\n315.2 Storage in buildings.\n\nStorage of materials in buildings shall be orderly and stacked materials shall be stable. Storage of combustible materials shall be separated from heaters or heating devices by distance or shielding so that ignition cannot occur.\n\n315.2.1 Ceiling clearance.\n\nStorage shall be maintained 2 feet (610 mm) or more below the ceiling in areas of buildings not protected by a sprinkler system, or a minimum of 18 inches (457 mm) below sprinkler head deflectors in areas protected by a sprinkler system, provided, however, that storage of noncombustible materials to the ceiling may be authorized by the department when such storage is within 30 inches (762 mm) of a fire partition.\n\n315.2.2 Means of egress.\n\nMaterials shall not be stored in a manner that obstructs egress from any building, structure or premises.\n\n315.2.3 Equipment rooms.\n\nCombustible material shall not be stored in boiler rooms, mechanical rooms or electrical equipment rooms.\n\n315.2.4 Attic, under-floor and concealed spaces.\n\nAttic, under-floor and concealed spaces used for storage of combustible materials shall be protected on the storage side as required for 1-hour fire-resistance-rated construction. Openings shall be protected by assemblies that are self-closing and are of noncombustible construction or solid wood core not less than 1.75 inches (44.5 mm) in thickness. Storage shall not be placed on exposed joists.\n\nExceptions:\n\n1.Areas protected throughout by sprinkler systems.\n\n2.Group R-3 and Group U occupancies.\n\n3.Groups S-1 and S-2 occupancies.\n\n315.3 Outdoor storage.\n\nOutdoor storage of combustible materials in quantities in excess of 32 cubic feet (0.91 m 3 ) shall comply with FC 315.3.1 through 315.3.6.\n\n315.3.1 Property line.\n\nExcept as otherwise provided in FC 315.3.5, outdoor storage of combustible materials shall not be located within 10 feet (3048 mm) of a property line.\n\n315.3.2 Adjoining properties.\n\nExcept as otherwise provided in FC 315.3.5, outdoor storage of combustible materials shall not be located within 50 feet (15 240 mm) of the nearest wall of a building occupied as a Group A occupancy, Group E educational occupancy, Group I-2 occupancy, or any building, structure or premises used for a public gathering.\n\n315.3.3 Building walls, openings and overhead projections.\n\nExcept as otherwise provided in FC 315.3.5, outdoor storage of combustible materials shall not be located:\n\n1.Within 10 feet (3048 mm) of any building wall that is constructed of a combustible material;\n\n2.Within 10 feet (3048 mm) of any building opening, regardless of the wall construction; and\n\n3.Under building eaves, canopies, awnings and other overhangs.\n\n315.3.4 Height.\n\nOutdoor storage shall not exceed 20 feet (6096 mm) in height or such lower maximum height allowed by the Building Code or Zoning Resolution.\n\n315.3.5 Reduced separation distance.\n\nThe separation distances set forth in FC 315 may be reduced when the combustible materials are:\n\n1.Stored in approved cabinets or containers as set forth in FC 315.7.2.2, or other approved cabinet or container suitable for the type or quantity of stored combustible material;\n\n2.Where appropriate to the type of stored combustible material, enclosed by a solid fence of an approved noncombustible material and an approved height. The combustible materials shall not be piled higher than 2 feet (610 mm) below the top of the fence; and/or\n\n3.One or more other approved fire protection measures are provided.\n\n315.3.6 Portable fire extinguishers.\n\nAt least one portable fire extinguisher with a rating of at least 4-A shall be provided for every 2,500 square feet (232.3 m 2 ) of storage area, or portion thereof, or in lieu thereof, a hose of at least 1 inch (25 mm) in diameter, equipped with a nozzle of at least 1/2 inch (12.7 mm) in diameter, sufficient in length to reach all parts of the enclosure, and connected to an adequate water supply may be provided.\n\n315.4 Space underneath grandstands and bleachers.\n\nExcept where enclosed in not less than 1-hour fire-resistance-rated construction in accordance with the Building Code, spaces underneath grandstand and bleacher seating shall not be occupied or utilized for purposes other than means of egress.\n\n315.5 Storage underneath high-voltage transmission lines.\n\nIt shall be unlawful to store hazardous materials or combustible materials outdoors within the utility easement underneath high-voltage transmission lines.\n\n315.6 Storage in plenums.\n\nIt shall be unlawful to use plenums for storage of combustible or other material, including equipment and cabling that has been taken out of service and abandoned, unless such equipment and cables have been tagged for future use in accordance with Electrical Code. The accessible portion of such abandoned equipment and cables shall be removed.\n\n315.7 Storage of solid fuel.\n\nStorage of wood, charcoal or other combustible material for use as solid fuel, including for use in commercial cooking appliances, fireplaces or solid fuel-burning equipment approved by the Department of Buildings, and in non-tobacco hookah establishments, shall be in accordance with FC 315.7.1 through 315.7.3, except that storage of solid fuel in Group R-2 occupancies shall be in accordance with FC 315.7.4.\n\nExceptions:\n\n1.Storage for sale of solid fuel in a mercantile establishment.\n\n2.Group R-3 occupancies.\n\n315.7.1 Supply for immediate use.\n\nNot more than a one-day supply of solid fuel may be kept in the same room as the solid fuel-burning equipment or in the room with the fuel loading or clean-out doors or other opening. Unless the solid fuel-burning equipment is designed for internal storage of solid fuel, the solid fuel stored in such room shall not be located:\n\n1.Within 3 feet (914 mm) of the solid-fuel burning equipment or any other heating or cooking appliance;\n\n2.Within 6 feet (1829 mm) of any solid fuel loading opening or door of the solid fuel-burning equipment; or\n\n3.Above any cooking or heating equipment, flue or vent.\n\n315.7.2 Additional solid fuel storage.\n\nSolid fuel in excess of a one-day supply shall be stored indoors and/or outdoors in accordance with FC 315.7.2.1 through 315.7.2.2.\n\n315.7.2.1 Indoor.\n\nSolid fuel may be stored indoors in:\n\n1.A room dedicated to the storage of not more than 150 cubic feet (4.3 m 3 ) of solid fuel, provided that such storage room is protected by a sprinkler system and enclosed by a minimum of 1-hour fire barriers and horizontal assemblies (walls, floor and ceiling) constructed in accordance with the Building Code; or\n\n2.A building or occupancy protected throughout by a sprinkler system, in metal cabinets dedicated to the storage of solid fuel that:\n\n2.1.Are designed and constructed in accordance with FC 5003.8.7 (for hazardous materials storage);\n\n2.2.Are placed on a stable, noncombustible surface; and\n\n2.3.Have a maximum aggregate capacity of 75 cubic feet (2.1 m 3 ); or\n\n3.Metal cabinets designed and installed in accordance with FC 315.7.2.1(2) that are located in a room that is protected by a sprinkler system and enclosed by a minimum of 1-hour fire barriers and horizontal assemblies (walls, floor, and ceiling) constructed in accordance with the Building Code, but such room is not required to be dedicated solely to the storage of solid fuel.\n\n315.7.2.2 Outdoor.\n\nSolid fuel shall be stored in well-constructed metal cabinets or containers (with welded seams) dedicated to the storage of solid fuel that:\n\n1.Have securely-closing, close-fitting metal door or lids;\n\n2.Are placed on a concrete or other stable, noncombustible surface;\n\n3.Have a maximum aggregate capacity of 75 cubic feet (2.1 m 3 ); and\n\n4.Are designed and constructed in accordance with FC 5003.8.7 (for hazardous materials storage) or, if not located within 6 feet (1829 mm) of a combustible surface, are designed and well-constructed of steel having a thickness of not less than 0.0478 inch (1.2 mm) (18 gauge).\n\n315.7.3. Protection of solid fuel.\n\nSolid fuel shall be protected by:\n\n1.Keeping the doors or lids to a solid fuel storage room, cabinet or container closed;\n\n2.Posting a durable sign or marking that reads \"SOLID FUEL – KEEP FIRE AWAY\" at the entrance to a solid fuel storage room or storage cabinet or container; and\n\n3.Storing charcoal and similar combustible materials in their original packaging, or in noncombustible containers with securely-closing lids and an internal vertical dimension of not more than 48 inches (1219 mm).\n\n315.7.4 Storage of solid fuel in Group R-2 occupancies.\n\nStorage of solid fuel in Group R-2 occupancies, including storage for use in fireplaces and solid fuel-burning equipment approved by the Department of Buildings, shall be in accordance with FC 315.7.4.1 and 315.7.4.2.\n\n315.7.4.1 Indoor storage.\n\nIndoor storage of solid fuel shall not exceed 4 cubic feet (0.11 m 3 ) of solid fuel in each dwelling unit, which shall be stored in a safe manner away from sources of ignition.\n\n315.7.4.2 Outdoor storage.\n\nOutdoor storage of solid fuel shall be in accordance with FC 315.7.2.2."
+    },
+    {
+      "reference": "BC 1012.5",
+      "sectionID": "2345",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "The minimum dimensions of means of egress ramps shall comply with Sections 1012.5.1 through 1012.5.3."
+    },
+    {
+      "reference": "BC 1012.6",
+      "sectionID": "2349",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "Ramps shall have landings at the bottom and top of each ramp, points of turning, entrance, exits and at doors. Landings shall comply with Sections 1012.6.1 through 1012.6.5."
+    },
+    {
+      "reference": "BC 1012.5.1",
+      "sectionID": "2346",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "The minimum width and required capacity of a means of egress ramp shall be not less than that required for corridors by Section 1020.2. The clear width of a ramp between handrails, if provided, or other permissible projections shall be 36 inches (914.4 mm) minimum."
+    },
+    {
+      "reference": "BC 1012.5.2",
+      "sectionID": "2347",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "The minimum headroom in all parts of the means of egress ramp shall be not less than 84 inches (2133.6 mm)."
+    },
+    {
+      "reference": "BC 1012.5.3",
+      "sectionID": "2348",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm)."
+    },
+    {
+      "reference": "FGC 409.5.2",
+      "sectionID": "8337",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "codeEdition": "2022 New York City Construction Codes",
+      "corpusID": "nyc-2022-construction-codes",
+      "text": "Shutoff valves for vented decorative appliances, room heaters and decorative appliances for installation in vented fireplaces shall be permitted to be installed in an area remote from the appliances where such valves are provided with ready access. Such valves shall be permanently identified and shall not serve another appliance. The piping from the shutoff valve to within 6 feet (1828.8 mm) of the appliance shall be designed, sized and installed in accordance with Sections 401 through 408 ."
+    }
+  ],
+  "origin": "Shipped canonical corpus, no independent external review"
+}
