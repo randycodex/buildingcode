@@ -305,7 +305,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20260929-notebook-security-v19";
+const notebookClientVersion = "20261005-notebook-dependencies-v20";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -5514,7 +5514,7 @@ async function deleteCapturedAccount(account, identity) {
 }
 
 function loadAccountVerification() {
-  return import("/web/account-verification-assets/account-verification.js?v=20260905-account-verification-v3");
+  return import("/web/account-verification-assets/account-verification.js?v=20261005-account-dependencies-v4");
 }
 
 async function prepareAccountDeletionIdentity(account, identity) {

@@ -18,7 +18,7 @@ const property = { bbl: "2028500003", retrievedAt: date, warnings: ["Synthetic C
 const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/styles.css"><style>
 body{display:block;overflow:auto;padding:24px}main{max-width:700px;margin:auto}#editor{padding:16px}h1{font-size:20px}#notice{white-space:pre-wrap;margin:16px 0}#state{font-size:12px}button,input{font-family:inherit}
 </style></head><body><main><h1>ZoLa structured facts — local verification</h1><p>Synthetic Project and transport; shipped field editor, styles and refresh handler.</p><section id="editor" class="saved-folder-context is-project"></section><p id="notice" role="status"></p><p id="state"></p></main><script type="module">
-import {nycMappedFactFields,mergeNYCPropertyFacts} from '/nyc-property-facts.js';
+import {nycMappedFactFields,previewNYCPropertyRefresh,applyNYCPropertyRefresh} from '/nyc-property-facts.js';
 const projectStructuredFactStatuses = new Set(['stated','confirmed','sourced','unknown','rejected']);
 ${helpers}
 ${motion}
