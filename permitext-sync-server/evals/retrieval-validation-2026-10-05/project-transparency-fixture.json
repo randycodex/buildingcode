@@ -1,0 +1,32 @@
+{
+  "description": "Known original transparency topic with a temporary linked project; current explanation, scenario continuity and unavailable historical basis. Diagnostic only, not fresh accuracy evidence.",
+  "scope": "diagnostic",
+  "project": {
+    "name": "Isolated1070Southern schematic scenario",
+    "address": "1070 Southern Boulevard, Bronx, New York",
+    "description": "Schematic design. Residential and ground-floor retail frontage under discussion. Zoning district, overlay, special district, approved plans and filing/vesting date have not been verified."
+  },
+  "conversations": [
+    {
+      "id": "diag-project-transparency",
+      "exposure": "Original topic from Diagnose transparency research, with source explanation and hypothetical follow-ups",
+      "questions": [
+        "Can you explain the transparency requirements for this project? It is in schematic design at 1070 Southern Boulevard in the Bronx. Please separate useful code guidance from what still needs verification.",
+        "For now, explain ZR 37-34 as a rule, without claiming that it applies to this property. What are its glazing percentage, measurement limits, and other transparency conditions?",
+        "For this hypothetical only, assume ZR 37-34 applies to the frontage. The sidewalk slopes, and a level window sill is two feet above the adjoining sidewalk at the high end and two feet six inches above it at the low end. Can I use the high-end sidewalk elevation as one datum for the entire 50 percent calculation?",
+        "An older drawing note says ZR 141-32(a) triggers ZR 37-34. Can you use today's 141-32 to confirm that this old note is the governing basis for our filing? We have not established the filing or vesting date."
+      ],
+      "checks": [
+        "Useful conditional source-backed guidance; do not fabricate zoning mapping, special district, filing date or uniform percentage for the whole mixed frontage. Address alone does not establish applicability. Identify the necessary trigger/source/fact boundaries.",
+        "ZR 37-34: at least50percent of applicable primary-frontage street-wall area between2ft and12ft or ground-floor ceiling whichever higher, measured from adjoining sidewalk; qualifying transparency begins no higher than2ft6in subject to transom/divider exceptions, minimum2ft width, maximum10ft uninterrupted opaque width; listed parking/loading/subway/emergency-egress exclusions and37-31 exceptions; no property application.",
+        "No to using one high-end datum. Adjoining sidewalk is the local reference; calculation boundary follows the slope. The stated sill meets the2ft6in start condition at the endpoints on the monotonic scenario, but not proof of50percent glazing or whole-facade compliance. Do not confuse start-height test with calculation zone.",
+        "No. Current supplied141-32 concerns special open-space provisions and cannot prove older ground-floor-use wording or which edition governs. Obtain historical enacted provision, effective/vesting/filing basis and geographic applicability. Do not invent historical text or declare current provision retroactive."
+      ],
+      "references": [
+        "ZR 37-31",
+        "ZR 37-34",
+        "ZR 141-32"
+      ]
+    }
+  ]
+}

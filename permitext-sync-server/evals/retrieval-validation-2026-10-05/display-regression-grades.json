@@ -1,0 +1,60 @@
+{
+  "recordedAt": "2026-10-05T16:21:57.763950+00:00",
+  "candidateCommit": "b02ad3f54bac334fed7224de1ae00860eff7d2d0",
+  "runDirectory": "/workspace/permitext-validation-20261005-regression-chat-g",
+  "sourceHashesUnchangedAtCompletion": true,
+  "knownRegression": true,
+  "freshAccuracyEvidence": false,
+  "accountAccess": {
+    "scope": "temporary isolated local account",
+    "signInHTTPStatus": 200,
+    "grantHTTPStatus": 200,
+    "activePro": true,
+    "researchMode": "included",
+    "grantType": "lifetimeGrant",
+    "productionSubscriptionTested": false
+  },
+  "grader": "Implementing assistant comparing delivered text, supported points, cited passages and frozen rubrics; no independent external review",
+  "summary": {
+    "attempted": 2,
+    "fullyCorrect": 0,
+    "correctWidthBoundary": 2,
+    "incompleteFrozenDiagnostic": 2
+  },
+  "grades": [
+    {
+      "id": "diag-covered-display-1",
+      "fullyCorrect": false,
+      "correctWidthBoundary": true,
+      "incompleteFrozenDiagnostic": true,
+      "reason": "Correct Building Code width boundary, but the answer omits the Fire Code314.5/314.5.1 qualifications and conditional NFPA13-compliant open-grid/drop-out provision required by the frozen check. The full FC314 source was present in the provider prompt. Its exception scope and interaction with BC903.3.3 require independent interpretation; do not relax the frozen check or assume the exception waives the BC requirement.",
+      "question": "In a sprinklered retail space under the 2022 NYC codes, we want a covered display that is five feet wide. Can we rely only on the ceiling sprinklers above its cover?",
+      "expected": "No. FC 314.5.1 requires sprinklers in or under covered displays exceeding four feet in width. The NFPA-13-compliant open-grid/drop-out ceiling exception is conditional; supplied facts do not establish it.",
+      "answerText": "No. Under the 2022 NYC Building Code, sprinklers must be installed \u201cin or under\u201d a covered display that exceeds 4 feet in width; at 5 feet, the display crosses that threshold, so ceiling sprinklers only above its cover do not satisfy this placement requirement (BC \u00a7 903.3.3).",
+      "httpStatus": 200,
+      "seconds": 37.137884864,
+      "authorityReferences": [
+        "BC 903.3.3"
+      ],
+      "liveCanonicalParentRecoveryDemonstrated": false
+    },
+    {
+      "id": "diag-covered-display-2",
+      "fullyCorrect": false,
+      "correctWidthBoundary": true,
+      "incompleteFrozenDiagnostic": true,
+      "reason": "Correct Building Code width boundary, but the answer omits the Fire Code314.5/314.5.1 qualifications and conditional NFPA13-compliant open-grid/drop-out provision required by the frozen check. The full FC314 source was present in the provider prompt. Its exception scope and interaction with BC903.3.3 require independent interpretation; do not relax the frozen check or assume the exception waives the BC requirement.",
+      "question": "We can reduce the covered display to exactly four feet wide. Does that automatically mean we can ignore sprinklers underneath it?",
+      "expected": "No automatic exemption. Exactly four feet is outside the exceeds-four-feet width trigger, but FC 314.5 prohibits obstruction and the clearance/qualifying NFPA13 exception must still be assessed. Do not invent a categorical four-foot exemption or a universal independent below-cover mandate.",
+      "answerText": "**No\u2014not automatically.** At exactly 4 feet, the display does not exceed the width threshold for BC \u00a7 903.3.3\u2019s specific requirement to install sprinklers \u201cin or under\u201d it. But the same section still requires sprinkler installation to account for obstructions that will delay activation or obstruct water distribution.",
+      "httpStatus": 200,
+      "seconds": 88.174453644,
+      "authorityReferences": [
+        "BC 903.3.3"
+      ],
+      "liveCanonicalParentRecoveryDemonstrated": false
+    }
+  ],
+  "liveCanonicalParentRecoveryDemonstrated": false,
+  "limitations": "No draft was revised in this run, so it did not exercise canonical recovery. That mechanism is verified with actual-corpus contract tests, not this live run."
+}

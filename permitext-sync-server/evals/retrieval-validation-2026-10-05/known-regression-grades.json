@@ -1,0 +1,213 @@
+{
+  "recordedAt": "2026-10-05T16:15:59.651961+00:00",
+  "runDirectory": "/workspace/permitext-validation-20261005-regression-chat-e",
+  "candidateCommit": "63a0298c2038e7c4689adcab049be42fa5007d6f",
+  "knownRegression": true,
+  "freshAccuracyEvidence": false,
+  "grader": "Implementing assistant comparing delivered text, supported points, cited passages and frozen rubrics; no independent external review",
+  "accountAccess": {
+    "scope": "temporary isolated local account",
+    "signInHTTPStatus": 200,
+    "grantHTTPStatus": 200,
+    "activePro": true,
+    "researchMode": "included",
+    "grantType": "lifetimeGrant",
+    "productionSubscriptionTested": false
+  },
+  "summary": {
+    "attempted": 12,
+    "fullyCorrect": 8,
+    "avoidableNonanswers": 2,
+    "materialDisputes": 2
+  },
+  "grades": [
+    {
+      "id": "mental-health-fixtures-1",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correctly rejects exposure and preserves the independent wall-bolting condition, supported by PC405.6 and PC1002.10.",
+      "question": "Under the 2022 NYC Plumbing Code, can fixtures in a mental health center have exposed supply pipes and traps if the fixtures are firmly attached?",
+      "expected": "No; pipes and traps must not be exposed, and fixtures must be bolted through walls. Firm attachment alone does not waive either requirement.",
+      "answerText": "**No.** In a mental health center, pipes and traps must not be exposed, and fixtures must be bolted through walls; firmly attaching a fixture in some other way does not meet that stated requirement. (2022 NYC Plumbing Code \u00a7\u00a7 405.6, 1002.10)\n\nSection 405.6 requires both that pipes or traps not be exposed and that fixtures be bolted through walls. Section 1002.10 separately prohibits exposed pipes and traps. Neither supplied provision makes concealment optional when a fixture is firmly attached. (2022 NYC Plumbing Code \u00a7\u00a7 405.6, 1002.10)",
+      "httpStatus": 200,
+      "seconds": 32.878291899999994,
+      "authorityReferences": [
+        "PC 405.6",
+        "PC 401.1",
+        "PC 1002.10",
+        "PC 1001.1"
+      ]
+    },
+    {
+      "id": "mental-health-fixtures-2",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correctly rejects floor attachment despite concealment, limited to the PC405.6 requirement.",
+      "question": "We will conceal the pipes and traps, but attach the fixtures to the floor rather than bolt them through the walls. Does that satisfy this fixture rule?",
+      "expected": "No; concealment does not waive the requirement to bolt fixtures through walls. Limit the conclusion to PC405.6.",
+      "answerText": "**No.** In a mental health center, concealing the pipes and traps meets the concealment requirement, but PC 405.6 separately requires fixtures to be bolted through walls. Attaching them to the floor instead does not satisfy that fixture-attachment requirement. (2022 NYC PC \u00a7\u00a7 405.6, 1002.10)",
+      "httpStatus": 200,
+      "seconds": 10.321201896999998,
+      "authorityReferences": [
+        "PC 405.6",
+        "PC 1002.10"
+      ]
+    },
+    {
+      "id": "cleanout-clearance-1",
+      "fullyCorrect": false,
+      "avoidableNonanswer": true,
+      "materialDispute": false,
+      "reason": "Withheld. Live review combined categorical=true with condition_preserved, causing a synthesized fact-evidence issue; final review also identified an overbroad citation relevance claim. No correctness credit.",
+      "question": "For a six-inch drainage pipe under the 2022 NYC Plumbing Code, does a cleanout need more than eighteen inches of clearance in front of its face?",
+      "expected": "No; pipes6in and smaller require at least18in measured perpendicular to the opening face. Exactly18 meets this condition.",
+      "answerText": "I couldn\u2019t consistently use the details you provided while checking your question about six-inch drainage-pipe cleanout clearance.\n\nUse Report this issue below to report this attempt.",
+      "httpStatus": 200,
+      "seconds": 78.945607151,
+      "authorityReferences": []
+    },
+    {
+      "id": "cleanout-clearance-2",
+      "fullyCorrect": false,
+      "avoidableNonanswer": true,
+      "materialDispute": false,
+      "reason": "Withheld. Repaired narrative still narrowed the PC1101.8 subsurface-storm exception to the second of two coordinated duties, and review classifications contradicted each other. No correctness credit.",
+      "question": "The pipe is actually eight inches. We still have eighteen inches in front of the cleanout. Is that sufficient?",
+      "expected": "No;8in and larger require36in perpendicular clearance. Correct earlier threshold for changed diameter.",
+      "answerText": "I couldn\u2019t consistently use the details you provided while checking your question.\n\nUse Report this issue below to report this attempt.",
+      "httpStatus": 200,
+      "seconds": 82.12189242899998,
+      "authorityReferences": []
+    },
+    {
+      "id": "hub-drain-height-1",
+      "fullyCorrect": false,
+      "avoidableNonanswer": false,
+      "materialDispute": true,
+      "reason": "Material interpretation dispute remains: answer no longer affirmatively permits a flush hub, but still confines the one-inch modifier to the pipe alternative. Frozen rubric requires one inch for both forms; independent interpretation required.",
+      "question": "Under the 2022 NYC Plumbing Code, can a hub drain finish flush with a water-impervious floor?",
+      "expected": "No; hub/pipe must extend at least1in above water-impervious floor.",
+      "answerText": "It depends on the form: a pipe-form hub drain cannot finish flush, but PC \u00a7 802.3.2 does not say whether its separate hub-form option may finish flush. The section requires either a hub or a pipe extending at least 1 inch (25 mm) above the water-impervious floor; the stated projection applies to the pipe option. Chapter 8\u2019s stated scope is matters concerning indirect waste piping and special wastes. (PC \u00a7\u00a7 801.1, 802.3.2)",
+      "httpStatus": 200,
+      "seconds": 72.984573997,
+      "authorityReferences": [
+        "PC 802.3.2",
+        "PC 801.1"
+      ]
+    },
+    {
+      "id": "hub-drain-height-2",
+      "fullyCorrect": false,
+      "avoidableNonanswer": false,
+      "materialDispute": true,
+      "reason": "Correct one-inch numerical result, but repeats disputed claim that hub-form projection minimum is unstated. Excluded from fully correct until the interpretation is resolved.",
+      "question": "What if the hub projects exactly one inch above that floor? Answer only about the projection requirement.",
+      "expected": "Exactly1in satisfies this minimum; no whole-system compliance claim.",
+      "answerText": "If this hub-drain matter falls within PC Chapter 8\u2019s scope, exactly 1 inch meets the stated minimum for the **pipe** form. For the **hub** form, PC \u00a7 802.3.2 states no projection minimum, so a hub projecting exactly 1 inch is not contrary to a projection minimum stated there. Chapter 8 governs indirect-waste piping and special wastes, and also specifies matters involving food-handling establishments, sterilizers, clear-water waste, swimming pools, air breaks or air gaps, and neutralizing devices for corrosive wastes. (PC \u00a7\u00a7 801.1, 802.3.2)",
+      "httpStatus": 200,
+      "seconds": 76.82682524399995,
+      "authorityReferences": [
+        "PC 802.3.2",
+        "PC 801.1"
+      ]
+    },
+    {
+      "id": "dryer-length-fitting-1",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correct 34+5=39ft exceeds35ft; table row, note and method preserved. Needed two answer revisions to retain chapter scope and bind the table basis.",
+      "question": "For a dryer using the specified-length method in the 2022 NYC Mechanical Code, the measured exhaust duct is thirty-four feet plus one four-inch-radius mitered ninety-degree elbow. Exclude the transition duct. Is it within the allowed length?",
+      "expected": "No;maximum35ft from transition connection to terminal/common duct, elbow adds5ft equivalent;34+5=39ft.",
+      "answerText": "No. The specified-length method allows a maximum of 35 feet, and the 4-inch-radius mitered 90-degree elbow adds 5 feet, so the calculated length is 34 + 5 = 39 feet\u20144 feet over the limit. The measurement begins at the transition-duct connection, so excluding the transition duct is consistent with this calculation. (MC \u00a7\u00a7 501.1, 504.8.4.1)",
+      "httpStatus": 200,
+      "seconds": 125.24304399799998,
+      "authorityReferences": [
+        "MC 501.1",
+        "MC 504.8.4.1"
+      ]
+    },
+    {
+      "id": "dryer-length-fitting-2",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correct 30+5=35ft meets this method exactly without switching methods or claiming complete installation approval.",
+      "question": "We can shorten the measured duct to thirty feet while retaining that elbow. Does that meet this method's length limit?",
+      "expected": "Yes;30+5=35ft meets limit for specified-length method. Do not switch to manufacturer method without facts.",
+      "answerText": "**Yes.** Under the specified-length method, the limit is 35 feet, and the retained 4-inch-radius mitered 90-degree elbow adds 5 feet. At 30 feet of measured duct, the total is 30 + 5 = 35 feet, so it meets the limit exactly. (MC \u00a7 504.8.4.1)",
+      "httpStatus": 200,
+      "seconds": 8.612291387000004,
+      "authorityReferences": [
+        "MC 504.8.4.1"
+      ]
+    },
+    {
+      "id": "guard-height-boundary-1",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correctly applies >30in drop at a point within36in horizontally, with stipulated exceptions excluded.",
+      "question": "Under the 2022 NYC Building Code, an ordinary open-sided walking surface is thirty-one inches above the grade at a point thirty-five inches horizontally from its edge. No guard exception applies. Does the drop trigger a guard?",
+      "expected": "Yes;drop more than30in at any point within36in horizontally triggers guard.",
+      "answerText": "Yes. BC 1015.2 requires a guard when the surface is more than 30 inches above the floor or grade at any point within 36 inches horizontally of its open edge. Here the 31-inch drop is measured 35 inches from the edge, so it meets both conditions and triggers a guard (BC \u00a7 1015.2).",
+      "httpStatus": 200,
+      "seconds": 6.960568380000011,
+      "authorityReferences": [
+        "BC 1015.2"
+      ]
+    },
+    {
+      "id": "guard-height-boundary-2",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Reviewer caught a contradictory Yes; repaired final correctly says No because exactly30in is not >30in.",
+      "question": "The survey was corrected: the drop is exactly thirty inches at every point within thirty-six inches of the edge. Does that same height trigger still apply?",
+      "expected": "No;more-than30 threshold excludes exactly30 on specified facts. Do not declare all other guard requirements inapplicable.",
+      "answerText": "No. The same BC 1015.2 height trigger is not met: it requires a drop of more than 30 inches at a point within 36 inches horizontally of the open-side edge, and the corrected drop is exactly 30 inches throughout that area (BC \u00a7 1015.2).",
+      "httpStatus": 200,
+      "seconds": 20.92041235300002,
+      "authorityReferences": [
+        "BC 1015.2"
+      ]
+    },
+    {
+      "id": "zoning-parking-stall-1",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correctly rejects8ft against8ft6in minimum and excludes stated side-ribbon exception. Supplied snapshot only; current status not independently verified.",
+      "question": "Under the current NYC Zoning Resolution, an accessory parking stall for a multifamily building in R6 is eighteen feet long and eight feet wide. The site does not qualify for the small side-lot-ribbon exception. Is that stall width sufficient?",
+      "expected": "No;standard minimum8ft6in wide and18ft long;explicitly excluded8ft side-ribbon exception must not be applied.",
+      "answerText": "**No.** ZR \u00a7 25-62 requires parking stalls to be at least 18 feet long and 8 feet 6 inches wide. The stated 8-foot width is 6 inches short. The only supplied width reduction is for stalls serving detached, semi-detached, or zero lot line buildings, with no more than four accessory spaces, located in a side lot ribbon and subject to \u00a7 25-621; you state the site does not qualify for the small side-lot-ribbon exception, so that reduction does not apply. (ZR \u00a7 25-62)",
+      "httpStatus": 200,
+      "seconds": 23.803206854999996,
+      "authorityReferences": [
+        "ZR 25-62",
+        "ZR 25-621"
+      ]
+    },
+    {
+      "id": "zoning-parking-stall-2",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correctly accepts minimum dimensions18ft by8ft6in. Supplied snapshot only; current status not independently verified.",
+      "question": "We will widen it to exactly eight feet six inches, keeping its eighteen-foot length. Does that satisfy these stall dimensions?",
+      "expected": "Yes for minimum stall dimensions only, no full parking-layout determination.",
+      "answerText": "**Yes.** ZR \u00a7 25-62 requires a stall to be at least 18 feet long and 8 feet 6 inches wide. At exactly those dimensions, the stall meets the stated minimum; the 8-foot width reduction is a conditional exception, not a lower general minimum. (ZR \u00a7 25-62)",
+      "httpStatus": 200,
+      "seconds": 7.58896325000003,
+      "authorityReferences": [
+        "ZR 25-62"
+      ]
+    }
+  ],
+  "limitations": [
+    "Repeat exposed questions cannot update the original fresh accuracy estimate.",
+    "ZR current status and deployed Pro/browser flow were not tested."
+  ]
+}

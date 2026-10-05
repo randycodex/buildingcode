@@ -1,71 +1,128 @@
 {
-  "status": "blocked_by_responses_authentication",
-  "recordedAt": "2026-10-05T14:37:58.728088+00:00",
+  "status": "completed_below_accuracy_gate",
+  "recordedAt": "2026-10-05T16:32:09.480341+00:00",
   "authorization": {
     "capUSD": 10.99,
     "diagnosticUSD": 2.99,
     "freshUSD": 8
   },
   "spending": {
-    "actualUSD": 7.8e-07,
-    "remainingUSD": 10.98999922,
-    "pendingOrUnknown": 0,
-    "embeddingCalls": 1,
-    "completedGenerationCalls": 0,
-    "authenticationRejectedGenerationCalls": 2
+    "settledEstimatedUSD": 1.2687786250000002,
+    "remainingAuthorizedUSD": 9.721221375,
+    "pending": 0,
+    "unknown": 0,
+    "pricingBasis": "Reported provider usage, saved rates, actual service tier, cache-write costs; not a billing-account balance.",
+    "unsettledReservationUSD": 0,
+    "byPhase": {
+      "diagnostic": 0.63458247,
+      "fresh": 0.6341961549999998
+    },
+    "providerRequests": 261,
+    "settledRequests": 259,
+    "definitivelyRejectedRequests": 2
   },
   "readiness": {
-    "checkedAt": "2026-10-05T14:37:56.932Z",
-    "keyPresent": true,
-    "billableRequests": 0,
-    "models": {
-      "status": 200,
-      "code": null,
-      "type": null,
-      "usagePresent": false,
-      "available": {
-        "gpt-6-luna": true,
-        "text-embedding-3-small": true
-      }
+    "initialNativeResponsesProbe": {
+      "checkedAt": "2026-10-05T14:37:56.932Z",
+      "keyPresent": true,
+      "billableRequests": 0,
+      "models": {
+        "status": 200,
+        "code": null,
+        "type": null,
+        "usagePresent": false,
+        "available": {
+          "gpt-6-luna": true,
+          "text-embedding-3-small": true
+        }
+      },
+      "responses": {
+        "status": 401,
+        "code": "invalid_api_key",
+        "type": "invalid_request_error",
+        "usagePresent": false,
+        "expectedValidationFailure": false
+      },
+      "embeddings": {
+        "status": 400,
+        "code": null,
+        "type": "invalid_request_error",
+        "usagePresent": false,
+        "expectedValidationFailure": true
+      },
+      "ready": false
     },
-    "responses": {
-      "status": 401,
-      "code": "invalid_api_key",
-      "type": "invalid_request_error",
-      "usagePresent": false,
-      "expectedValidationFailure": false
+    "evaluationTransportProbe": {
+      "checkedAt": "2026-10-05T16:18:18.029Z",
+      "keyPresent": true,
+      "billableRequests": 0,
+      "providerAPI": "chat-completions",
+      "generationEndpoint": "/v1/chat/completions",
+      "models": {
+        "status": 200,
+        "code": null,
+        "type": null,
+        "usagePresent": false,
+        "available": {
+          "gpt-6-luna": true,
+          "text-embedding-3-small": true
+        }
+      },
+      "responses": {
+        "status": 400,
+        "code": null,
+        "type": "invalid_request_error",
+        "usagePresent": false,
+        "expectedValidationFailure": true
+      },
+      "embeddings": {
+        "status": 400,
+        "code": null,
+        "type": "invalid_request_error",
+        "usagePresent": false,
+        "expectedValidationFailure": true
+      },
+      "ready": true
     },
-    "embeddings": {
-      "status": 400,
-      "code": null,
-      "type": "invalid_request_error",
-      "usagePresent": false,
-      "expectedValidationFailure": true
-    },
-    "ready": false
+    "authenticatedPaidGenerationAndEmbeddingCallsSucceeded": true,
+    "nativeProductionResponsesVerified": false,
+    "credentialValueExposed": false
   },
   "diagnostic": {
-    "answerAttempts": 1,
-    "nonanswers": 1,
-    "cause": "Responses API HTTP401 invalid_api_key; no token generation",
-    "writerEvidenceFinding": "Actual Luna request included FC314.5 non-obstruction requirement,314.5.1 width>4ft,18in clearance,and conditional NFPA13 exception. This does not prove answer quality or retrieval-repair benefit.",
-    "resultDirectory": "/workspace/permitext-validation-20261005-diagnostic-a",
-    "remainingDiagnosticTurns": 3
+    "reportFile": "evals/retrieval-validation-2026-10-05/diagnostic-report.json",
+    "attemptsBeforeFresh": 8,
+    "knownRegressionRetestsInProgress": false
   },
   "fresh": {
-    "plannedTurns": 40,
-    "answerAttempts": 0,
-    "correctnessRate": null,
-    "sourceGrounding": "Shipped enacted corpus snapshots frozen; author of questions/rubrics is the implementing assistant, not an external independent grader.",
-    "scope": "Local backend; six code families, threshold corrections and exceptions",
-    "uncovered": [
-      "Production UI/end-to-end delivery",
-      "Structured project association",
-      "Topic switches",
-      "Historical editions",
-      "Broad open-ended project application"
+    "summary": {
+      "attempted": 40,
+      "fullyCorrect": 35,
+      "fullyCorrectFraction": 0.875,
+      "avoidableNonanswers": 3,
+      "materialDisputes": 2,
+      "confirmedMaterialErrors": 0,
+      "modelVerificationPassed": 37,
+      "acceptanceGatePassed": false,
+      "currentZoningStatusIndependentlyVerified": false,
+      "gateDefinition": "At least38 fully correct delivered answers out of40, no confirmed material error accepted; unresolved material disputes and avoidable nonanswers excluded."
+    },
+    "candidateCommit": "91ab468a6e447d2330bf06546728c44102b4aad4",
+    "fixtureHash": "a21065c374d388082b65456de1cb2fcb6abbdeffa62be2cf907ccde0893bfead",
+    "gradeFile": "evals/retrieval-validation-2026-10-05/fresh-case-grades.json",
+    "resultDirectory": "/workspace/permitext-validation-20261005-fresh-chat-d",
+    "independentExternalReview": false,
+    "productionBrowserAcceptance": false,
+    "newCandidateFreshValidation": false,
+    "limitations": [
+      "20 two-turn conversations: observations are correlated.",
+      "Fixture and grading authored by the implementing assistant against shipped source text; no independent external review.",
+      "Focused rule questions do not establish broad project, historical, changing-edition, topic-switch or production browser reliability.",
+      "Latest local candidate has only known-case retests after fixes; original fresh score must not be recomputed from them."
     ],
-    "acceptanceGate": "At least38/40 fully correct; zero unresolved material safety/applicability errors. Correlated sample score is not proof of population accuracy."
+    "latencySeconds": {
+      "median": 13.742888194500004,
+      "maximum": 78.18846075099998
+    }
   },
   "modelHistory": [
     {
@@ -99,14 +156,22 @@
     "Offline lexical/passage retrieval preflights for3 diagnostic first turns and20 fresh first turns, no semantic/provider calls; not answer grading",
     "Selected Luna policy actual request envelopes: priority low drafts, priority medium reviews, default high feedback repairs; same schema/model/output allowance; zero provider calls",
     "Former existing-hybrid profile rejected before any network call; financial ledger unchanged",
-    "Non-billable readiness rechecked after model selection; Responses remains401invalid_api_key"
+    "Non-billable readiness rechecked after model selection; Responses remains401invalid_api_key",
+    "Material-scope identity/semantic-failure mechanics passed; contradictory categorical+conditional flags require a fresh bounded review.",
+    "Verifier envelope contract passed: same answer/evidence/schema/roles/caps/timeout, substantive rejection retained, repeated contradiction stops, all synthetic usage settled.",
+    "Citation reconciliation and certified-field repair HTTP contracts passed after scope-contract fix; provider responses synthetic, no semantic accuracy credit.",
+    "Actual-corpus canonical parent/table recovery and dependency-budget contracts passed; zero provider calls.",
+    "Readiness/credential-redaction/reservation/durable-budget control contract passed, zero provider calls.",
+    "Evidence assembly contract passed after reserved-capacity and consistent-scope changes.",
+    "Linked Project-context summary contract passed; full saved context remains separate from relevance-filtered search hints.",
+    "Latest scope and project diagnostic manifests/source hashes remained unchanged through completed runs."
   ],
-  "changes": "Evaluation policy is Luna-only. Added opt-in high-reasoning/default-tier Luna feedback repair, retaining prior medium default elsewhere. Bounded canonical retrieval remains implemented. Production environment unchanged; no push or deployment.",
+  "changes": "Canonical parent/table recovery, code-family table identities and yes/no consistency; after fresh results, bounded dependency capacity reservation, cross-field scope consistency, one first-appearing citation-only reconciliation with fresh review. Local commits only. Contradictory categorical/conditional review classifications now use the existing once-per-turn rereview of unchanged evidence and answer; no automatic pass.",
   "nextActions": [
-    "Repair managed Responses endpoint credential forwarding/authentication; model-list access alone is insufficient.",
-    "Run unresolved diagnostics within2.99 allocation, diagnose only observed application defects.",
-    "Freeze application candidate and model policy, then run source-graded fresh cohort within8 allocation.",
-    "Complete missing coverage and production acceptance before making a general95percent reliability claim."
+    "Preserve material conditions through revisions across all answer fields without introducing new omissions; validate this across code families.",
+    "Resolve hub-drain modifier and covered-display cross-code exception interpretation against independent authority before changing rubrics.",
+    "Freeze the final implementation and run a broader genuinely new cohort with independent source grading before any95percent claim.",
+    "Validate deployed browser/real subscription access and native production Responses transport."
   ],
   "selectedModelPolicy": "evals/retrieval-validation-2026-10-05/luna-model-policy.json",
   "modelRoles": {
@@ -125,5 +190,143 @@
       "reasoningEffort": "high",
       "serviceTier": "default"
     }
-  }
+  },
+  "providerTransport": {
+    "paidGenerationAPI": "chat-completions",
+    "paidEmbeddingAPI": "embeddings",
+    "nativeResponsesAPI": "HTTP401 invalid_api_key in managed credential-forwarding probes",
+    "scope": "Evaluation-only translation preserves actual backend prompt, strict schema, model, roles, effort and output bounds. Native production protocol not validated."
+  },
+  "accountSetup": {
+    "scope": "Temporary local account and storage, signed in via actual backend account route, granted lifetime Pro through local admin route. Normal Research entitlement gate runs.",
+    "productionAccountOrSubscriptionUsed": false,
+    "mockResearchGeneration": false,
+    "productionLoginOrBillingTested": false,
+    "activeProVerified": true,
+    "normalResearchModeVerified": "included",
+    "projectLinkedDiagnosticCompleted": true,
+    "temporaryStorageDeletedByRunner": true
+  },
+  "checkLimitations": [
+    {
+      "test": "tests/research-zoning-verification-instructions-contract.mjs",
+      "result": "Fails existing14000-character ceiling; baseline candidate91ab468a6 already has17709-character review and19155-character writer. Current adds634 characters through shared scope instructions.",
+      "classification": "Pre-existing prompt-size failure; full suite not reported green."
+    },
+    {
+      "test": "tests/research-general-rule-project-scope-contract.mjs",
+      "result": "Fails line12: expected projectFactsApplied=true for an explicit return with an unrelated LPC/MIH fact; relevance selection yields false. Retrieval selector and test are unchanged from initial frozen candidate.",
+      "classification": "Pre-existing assertion conflicts with current relevance filtering; project context remains supplied separately to generation. Full suite not reported green."
+    }
+  ],
+  "knownRegressionRuns": [
+    {
+      "resultDirectory": "/workspace/permitext-validation-20261005-regression-chat-e",
+      "candidateCommit": "63a0298c2038e7c4689adcab049be42fa5007d6f",
+      "summary": {
+        "attempted": 12,
+        "fullyCorrect": 8,
+        "avoidableNonanswers": 2,
+        "materialDisputes": 2
+      },
+      "gradeFile": "evals/retrieval-validation-2026-10-05/known-regression-grades.json",
+      "freshAccuracyEvidence": false
+    },
+    {
+      "resultDirectory": "/workspace/permitext-validation-20261005-regression-chat-f",
+      "candidateCommit": "b02ad3f54bac334fed7224de1ae00860eff7d2d0",
+      "status": "completed",
+      "freshAccuracyEvidence": false,
+      "gradeFile": "evals/retrieval-validation-2026-10-05/scope-regression-grades.json",
+      "summary": {
+        "attempted": 2,
+        "fullyCorrect": 2,
+        "avoidableNonanswers": 0,
+        "materialDisputes": 0
+      }
+    },
+    {
+      "resultDirectory": "/workspace/permitext-validation-20261005-regression-chat-g",
+      "candidateCommit": "b02ad3f54bac334fed7224de1ae00860eff7d2d0",
+      "status": "completed",
+      "gradeFile": "evals/retrieval-validation-2026-10-05/display-regression-grades.json",
+      "summary": {
+        "attempted": 2,
+        "fullyCorrect": 0,
+        "correctWidthBoundary": 2,
+        "incompleteFrozenDiagnostic": 2
+      },
+      "freshAccuracyEvidence": false
+    },
+    {
+      "resultDirectory": "/workspace/permitext-validation-20261005-project-chat-h",
+      "candidateCommit": "b02ad3f54bac334fed7224de1ae00860eff7d2d0",
+      "status": "completed",
+      "projectLinked": true,
+      "freshAccuracyEvidence": false,
+      "summary": {
+        "attempted": 4,
+        "fullyCorrect": 2,
+        "avoidableNonanswers": 1,
+        "incompleteInterpretations": 1
+      },
+      "gradeFile": "evals/retrieval-validation-2026-10-05/project-regression-grades.json"
+    }
+  ],
+  "remainingProblems": [
+    {
+      "kind": "avoided_nonanswers_retested",
+      "detail": "Both cleanout nonanswers delivered source-correct conditional thresholds in the latest known retest; no fresh-cohort score change."
+    },
+    {
+      "kind": "material_interpretation",
+      "detail": "Hub-drain modifier scope remains disputed against the frozen rubric; independent authoritative interpretation required."
+    },
+    {
+      "kind": "omitted_source_qualification",
+      "detail": "Covered-display retest delivers correct width boundaries but omits FC qualifications required by the frozen check. Full FC text was retrieved; this is not a missing-source demonstration."
+    },
+    {
+      "kind": "multi_source_repair_drift",
+      "detail": "Broad linked-project draft corrected two reviewer findings but its global rewrite dropped other exception qualifiers, causing a withheld answer. Additional retrieval alone does not resolve this composition failure."
+    },
+    {
+      "kind": "overcautious_source_interpretation",
+      "detail": "Sloping-sidewalk diagnostic does not grant an unsupported high-end datum, but fails to provide the useful local-sidewalk explanation expected by the frozen check. Independent grading is needed."
+    }
+  ],
+  "originalChatReferences": [
+    {
+      "title": "Diagnose transparency research",
+      "threadID": "01a0f3ca-1c80-7672-9691-f4faf06a0b3a"
+    },
+    {
+      "title": "Assess research retrieval",
+      "threadID": "01a10c28-b069-7550-80bc-cf0fb217c0c9"
+    }
+  ],
+  "latestCandidate": {
+    "commit": "b02ad3f54bac334fed7224de1ae00860eff7d2d0",
+    "freshAccuracyValidated": false,
+    "knownCleanoutRetest": {
+      "fullyCorrect": 2,
+      "attempted": 2
+    },
+    "knownDisplayRetest": {
+      "fullyCorrect": 0,
+      "correctWidthBoundary": 2,
+      "attempted": 2
+    },
+    "projectLinkedDiagnostic": {
+      "attempted": 4,
+      "fullyCorrect": 2,
+      "avoidableNonanswers": 1,
+      "incompleteInterpretations": 1
+    }
+  },
+  "deployment": {
+    "productionPublished": false,
+    "scope": "Local candidate commits, isolated API evaluations and saved reports only."
+  },
+  "campaignConclusion": "The frozen40-question evaluation delivered35 fully correct answers (87.5percent), below the38/40 acceptance gate. Subsequent exposed-case fixes cannot raise that score. Retrieval and review-contract repairs are useful, but broad multi-source synthesis still withholds answers or omits material conditions;95percent general reliability has not been established."
 }

@@ -1,0 +1,599 @@
+{
+  "status": "complete",
+  "runDirectory": "/workspace/permitext-validation-20261005-fresh-chat-d",
+  "grader": "Implementing assistant, manually comparing delivered answers, cited passages and frozen canonical rubrics; no external independent review",
+  "grades": [
+    {
+      "id": "mental-health-fixtures-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects exposed pipes/traps and states the separate wall-bolting requirement. PC405.6 and corroborating PC1002.10 passages support the answer.",
+      "question": "Under the 2022 NYC Plumbing Code, can fixtures in a mental health center have exposed supply pipes and traps if the fixtures are firmly attached?",
+      "expected": "No; pipes and traps must not be exposed, and fixtures must be bolted through walls. Firm attachment alone does not waive either requirement.",
+      "answerText": "**No.** In mental health centers, the 2022 NYC Plumbing Code says pipes or traps shall not be exposed, and fixtures shall be bolted through walls. Firmly attaching a fixture does not permit exposed supply pipes or traps; the two requirements address different things. (PC \u00a7\u00a7 405.6, 1002.10)",
+      "httpStatus": 200,
+      "seconds": 31.553725096,
+      "authorityReferences": [
+        "PC 405.6",
+        "PC 1002.10"
+      ]
+    },
+    {
+      "id": "mental-health-fixtures-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly preserves the independent wall-bolting condition after concealment is proposed; no whole-project approval.",
+      "question": "We will conceal the pipes and traps, but attach the fixtures to the floor rather than bolt them through the walls. Does that satisfy this fixture rule?",
+      "expected": "No; concealment does not waive the requirement to bolt fixtures through walls. Limit the conclusion to PC405.6.",
+      "answerText": "**No.** In mental health centers, the 2022 NYC Plumbing Code separately requires that pipes and traps not be exposed and that fixtures be bolted through walls. Concealing the pipes and traps addresses the first requirement, but attaching the fixtures to the floor instead does not satisfy the wall-bolting requirement (PC \u00a7 405.6).",
+      "httpStatus": 200,
+      "seconds": 9.433892297999998,
+      "authorityReferences": [
+        "PC 405.6"
+      ]
+    },
+    {
+      "id": "water-service-separation-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects four-foot separation at the same elevation with the other exceptions excluded. PC603.2 supplies the full rule and exceptions. The extra chapter-scope missing-fact question is unnecessary but does not change or withhold this decisive answer.",
+      "presentationFinding": "Unnecessary chapter-scope missing-fact question despite a decisive answer.",
+      "question": "Under the 2022 NYC Plumbing Code, our underground water service runs parallel to the building sewer four feet away, at the same elevation. Assume neither the same-trench building-drain exception nor a crossing applies. Is four feet enough?",
+      "expected": "No; ordinary separation is five feet of undisturbed or compacted earth. Same elevation does not satisfy the 12-inch vertical-offset exception.",
+      "answerText": "**No.** The 2022 NYC Plumbing Code requires at least 5 feet of separation between an underground water service pipe and a building sewer; four feet is one foot short. Since you\u2019ve excluded the same-trench and crossing exceptions, the stated same-elevation arrangement does not meet that separation requirement. (PC \u00a7 603.2)",
+      "httpStatus": 200,
+      "seconds": 23.370271234,
+      "authorityReferences": [
+        "PC 603.2"
+      ]
+    },
+    {
+      "id": "water-service-separation-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts exactly twelve inches above the highest sewer point on the stated material-conformity premise, preserving both conditions and limiting the conclusion to the separation exception.",
+      "question": "We will place the bottom of that water pipe exactly twelve inches above the highest top of the sewer, and the pipe materials conform to the required sewer-material provision. Does that satisfy the separation exception?",
+      "expected": "Yes on those stated premises: bottom of water pipe at least12in above highest top of sewer within5ft, and materials conform703.1. Do not claim whole-installation approval.",
+      "answerText": "**Yes\u2014provided the sewer material conforms to PC \u00a7 703.1.** The 12-inch elevation meets PC \u00a7 603.2\u2019s minimum: within 5 feet, the water-service pipe\u2019s bottom must be at least 12 inches above the highest point of the sewer or drain, and the pipe materials must conform to \u00a7 703.1. Because you state the materials conform to that provision, both conditions are met; the exception removes the 5-foot separation requirement for this arrangement. (PC \u00a7\u00a7 603.2, 703.1)",
+      "httpStatus": 200,
+      "seconds": 44.557954048,
+      "authorityReferences": [
+        "PC 603.2"
+      ]
+    },
+    {
+      "id": "water-crossing-sleeve-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly requires five feet horizontally from the sewer centerline on both sides and preserves the listed-material condition; four feet fails.",
+      "question": "For a water service crossing a sewer under the 2022 NYC Plumbing Code, we are using the crossing exception with an approved sleeve material. The sleeve extends four feet horizontally from the sewer centerline on each side. Is that length enough?",
+      "expected": "No; crossing exception requires at least5ft horizontally from sewer/drain centerline on BOTH sides, with listed material. Do not confuse centerline with outer edge.",
+      "answerText": "**No.** Under the 2022 NYC Plumbing Code crossing exception, the sleeve must extend at least **5 feet horizontally from the sewer centerline on each side**; four feet on each side is one foot short. The exception also requires sleeve pipe material listed in Table 605.3, Table 702.2, or Table 702.3. (PC \u00a7 603.2)",
+      "httpStatus": 200,
+      "seconds": 10.684358011000004,
+      "authorityReferences": [
+        "PC 603.2"
+      ]
+    },
+    {
+      "id": "water-crossing-sleeve-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts exactly five feet on each side for length alone, retaining the independent material condition.",
+      "question": "We will extend it to exactly five feet from the centerline on each side. Is the sleeve-length condition now met?",
+      "expected": "Yes as to length on stated material premise; both sides meet5ft. Do not assert complete installation compliance.",
+      "answerText": "Yes. Exactly 5 feet horizontally from the sewer or drain centerline on each side meets the sleeve-length minimum in 2022 NYC Plumbing Code \u00a7 603.2. That satisfies the length condition; the crossing exception separately requires pipe materials listed in Table 605.3, 702.2, or 702.3.",
+      "httpStatus": 200,
+      "seconds": 18.14563245199999,
+      "authorityReferences": [
+        "PC 603.2"
+      ]
+    },
+    {
+      "id": "cleanout-clearance-1",
+      "fullyCorrect": false,
+      "materialError": false,
+      "avoidableNonanswer": true,
+      "reason": "Delivered a withheld answer. The draft gave the correct numerical threshold; review required sanitary/storm scope qualification, then rejected a supported point that had not been narrowed along with the repaired narrative. The withheld answer counts as failure, despite correct underlying clearance retrieval.",
+      "sharedCause": "Scope qualifications were updated in answerText without updating the corresponding supported point and its source bindings.",
+      "question": "For a six-inch drainage pipe under the 2022 NYC Plumbing Code, does a cleanout need more than eighteen inches of clearance in front of its face?",
+      "expected": "No; pipes6in and smaller require at least18in measured perpendicular to the opening face. Exactly18 meets this condition.",
+      "answerText": "I couldn\u2019t finish the answer to your question about Six-inch drainage-pipe cleanout clearance because my explanation didn\u2019t match the cited text.\n\nUse Report this issue below to report this attempt.",
+      "httpStatus": 200,
+      "seconds": 75.85179766099999,
+      "authorityReferences": []
+    },
+    {
+      "id": "cleanout-clearance-2",
+      "fullyCorrect": false,
+      "materialError": false,
+      "avoidableNonanswer": true,
+      "reason": "Delivered a withheld answer. The reviewer caught the draft Yes/No contradiction, but the high repair dropped storm from the subsurface storm-drainage exception, and final review withheld it. Correct threshold was retrieved; exception scope was not preserved through repair.",
+      "sharedCause": "Exception subject qualifiers were dropped when restating scope.",
+      "question": "The pipe is actually eight inches. We still have eighteen inches in front of the cleanout. Is that sufficient?",
+      "expected": "No;8in and larger require36in perpendicular clearance. Correct earlier threshold for changed diameter.",
+      "answerText": "I couldn\u2019t consistently use the details you provided while checking your question.\n\nUse Report this issue below to report this attempt.",
+      "httpStatus": 200,
+      "seconds": 67.13298971700002,
+      "authorityReferences": []
+    },
+    {
+      "id": "hub-drain-height-1",
+      "fullyCorrect": false,
+      "materialError": null,
+      "materialDispute": true,
+      "reason": "Delivered affirmative permission for a flush hub, contrary to the frozen No rubric. PC802.3.2 wording permits more than one grammatical attachment of extending; the answer chooses one and grants permission without acknowledging uncertainty. Freeze retained; disputed result fails the strict gate pending independent interpretation.",
+      "question": "Under the 2022 NYC Plumbing Code, can a hub drain finish flush with a water-impervious floor?",
+      "expected": "No; hub/pipe must extend at least1in above water-impervious floor.",
+      "answerText": "**Yes, if the drain is formed as a hub.** PC \u00a7 802.3.2 allows a hub drain to be either \u201cin the form of a hub\u201d or a pipe extending at least 1 inch above the water-impervious floor. The 1-inch projection applies to the pipe alternative, not to the hub alternative. So a plain pipe ending flush does not meet that stated pipe requirement; a flush finish is allowed by this text only if it is actually in the form of a hub. (PC \u00a7\u00a7 801.1, 802.3.2)",
+      "httpStatus": 200,
+      "seconds": 26.390888508000003,
+      "authorityReferences": [
+        "PC 802.3.2",
+        "PC 801.1"
+      ]
+    },
+    {
+      "id": "hub-drain-height-2",
+      "fullyCorrect": false,
+      "materialError": null,
+      "materialDispute": true,
+      "reason": "The one-inch conclusion matches the frozen check, but the answer repeats the unresolved categorical claim that a hub alternative has no projection height. Conservative grading retains the material dispute instead of treating only the correct headline as a full pass.",
+      "question": "What if the hub projects exactly one inch above that floor? Answer only about the projection requirement.",
+      "expected": "Exactly1in satisfies this minimum; no whole-system compliance claim.",
+      "answerText": "**Yes.** The one-inch minimum applies to the pipe alternative; the separate hub alternative has no stated projection height. A hub projecting exactly one inch therefore meets the projection requirement, and the inch is not a maximum. (2022 NYC PC \u00a7 802.3.2)",
+      "httpStatus": 200,
+      "seconds": 23.20964078800002,
+      "authorityReferences": [
+        "PC 802.3.2"
+      ]
+    },
+    {
+      "id": "mechanical-room-access-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects thirty-inch ordinary commercial-room access against the thirty-six-inch width and eighty-inch height rule. The source-bound dwelling exception is not asserted to apply.",
+      "presentationFinding": "Unnecessary uncertainty about the dwelling exception in an ordinary commercial-room question.",
+      "question": "For an appliance room in a commercial building under the 2022 NYC Mechanical Code, we have an unobstructed doorway and passage thirty inches wide and eighty inches high. Does that meet the ordinary access dimensions?",
+      "expected": "No; ordinary door and unobstructed passage must be at least36in wide and80in high. Dwelling exception does not apply.",
+      "answerText": "**No.** The ordinary requirement is a door and an unobstructed passageway at least 36 inches wide and 80 inches high; your passage meets the height minimum but is 6 inches too narrow (2022 NYC MC \u00a7 306.2). The section\u2019s reduced-width exception is limited to an appliance in a compartment, alcove, basement or similar space **within a dwelling unit**, and has additional removal and service-space conditions; the facts given do not establish whether it applies.",
+      "httpStatus": 200,
+      "seconds": 32.376011329,
+      "authorityReferences": [
+        "MC 306.2"
+      ]
+    },
+    {
+      "id": "mechanical-room-access-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts exactly thirty-six inches and eighty inches for the stated dimensions only.",
+      "question": "We will make both the door and the passage exactly thirty-six inches wide, keeping eighty inches of clear height. Does that meet those dimensions?",
+      "expected": "Yes for specified dimensions; do not imply entire appliance-room approval.",
+      "answerText": "**Yes.** Under the 2022 NYC Mechanical Code, a room containing an appliance must have a door and an unobstructed passageway at least 36 inches wide and 80 inches high. Making both exactly 36 inches wide with 80 inches of clear height meets those dimensions (MC \u00a7 306.2).",
+      "httpStatus": 200,
+      "seconds": 12.303067947000033,
+      "authorityReferences": [
+        "MC 306.2"
+      ]
+    },
+    {
+      "id": "dwelling-appliance-exception-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects a twenty-four-inch opening when removal needs twenty-eight inches. Preserves the independent removal and level service-space conditions instead of treating the twenty-four-inch minimum as an automatic exemption.",
+      "question": "Under the 2022 NYC Mechanical Code, an appliance compartment inside a dwelling has a twenty-four-inch-wide clear access opening. The largest appliance needs twenty-eight inches to be removed. Can we use the dwelling access exception anyway?",
+      "expected": "No;24in is a minimum and access must also allow removal of largest appliance. State service-space conditions if explaining exception.",
+      "answerText": "**No.** Although the dwelling-unit exception permits a 24-inch-wide opening, it also requires the opening and passageway to be large enough to remove the largest appliance. A 24-inch opening does not meet that condition for an appliance requiring 28 inches. The exception also requires a qualifying compartment, alcove, basement or similar space and a level service space at the appliance\u2019s front or service side, with the door open (MC \u00a7 306.2).",
+      "httpStatus": 200,
+      "seconds": 15.312267883000022,
+      "authorityReferences": [
+        "MC 306.2"
+      ]
+    },
+    {
+      "id": "dwelling-appliance-exception-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts the stated dwelling compartment, removal width, open-door level service space, thirty-inch depth and appliance-height premises; no whole-installation approval.",
+      "question": "We have changed to appliances that fit through the twenty-four-inch passage. With the door open, the front service area is level, thirty inches deep and forty inches high; the tallest appliance is forty inches high. Are the stated conditions of that exception met?",
+      "expected": "Yes conditionally for stated exception:>=24in, largest removable, level service area>=30in deep and height>=appliance and>=30in, door open. No broader compliance conclusion.",
+      "answerText": "**Yes.** The appliances fit through the 24-inch passage, and with the door open the level service space is 30 inches deep and 40 inches high\u2014meeting the exception\u2019s minimum depth and the height of the tallest appliance. The exception also requires a qualifying space within a dwelling unit and a passage large enough to remove the largest appliance; on the facts described, those conditions are met (MC \u00a7 306.2).",
+      "httpStatus": 200,
+      "seconds": 22.00300632699998,
+      "authorityReferences": [
+        "MC 306.2"
+      ]
+    },
+    {
+      "id": "dryer-length-fitting-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly uses the specified-length method and table row: thirty-four feet plus five feet for the specified elbow equals thirty-nine, exceeding thirty-five.",
+      "question": "For a dryer using the specified-length method in the 2022 NYC Mechanical Code, the measured exhaust duct is thirty-four feet plus one four-inch-radius mitered ninety-degree elbow. Exclude the transition duct. Is it within the allowed length?",
+      "expected": "No;maximum35ft from transition connection to terminal/common duct, elbow adds5ft equivalent;34+5=39ft.",
+      "answerText": "**No.** Under the specified-length method, the 4-inch-radius mitered 90-degree elbow adds 5 feet, so the equivalent length is 34 + 5 = **39 feet**\u20144 feet over the 35-foot maximum. The transition duct is excluded; the measured length exceeds the limit (2022 NYC MC \u00a7 504.8.4.1).",
+      "httpStatus": 200,
+      "seconds": 35.58455093500001,
+      "authorityReferences": [
+        "MC 504.8.4.1"
+      ]
+    },
+    {
+      "id": "dryer-length-fitting-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly retains the same elbow and method and accepts thirty plus five equals thirty-five; no invented manufacturer alternative.",
+      "question": "We can shorten the measured duct to thirty feet while retaining that elbow. Does that meet this method's length limit?",
+      "expected": "Yes;30+5=35ft meets limit for specified-length method. Do not switch to manufacturer method without facts.",
+      "answerText": "**Yes.** Under the specified-length method, the 35-foot maximum is reduced by the elbow\u2019s 5-foot equivalent length, so the duct\u2019s measured straight length can be at most 30 feet. At 30 feet plus the retained elbow, the total is 35 feet, exactly the limit; the transition duct is excluded from the measurement origin (2022 NYC MC \u00a7 504.8.4.1).",
+      "httpStatus": 200,
+      "seconds": 9.38667197700002,
+      "authorityReferences": [
+        "MC 504.8.4.1"
+      ]
+    },
+    {
+      "id": "outdoor-intake-lot-line-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly states ten-foot ventilation-intake separation, rejects eight feet within that rule, and preserves the excluded narrow-lot, R3 and public-way exceptions. Actual application is explicitly bounded to the chapter scope.",
+      "presentationFinding": "Duplicated scope question and excessive qualification for the named distance check.",
+      "question": "Under the 2022 NYC Mechanical Code, an outdoor intake is eight feet from an ordinary side lot line. The lot is fifty feet wide, it is not Group R-3, and no public-way measurement exception applies. Does it satisfy the lot-line separation?",
+      "expected": "No;ordinary lot-line separation>=10ft. Supplied facts exclude narrow-lot andR3exceptions.",
+      "answerText": "If this intake serves ventilation for a space within a building intended to be occupied, **no**\u2014it is 2 feet short: MC \u00a7 401.4 requires at least 10 feet from a lot line. The centerline rule is only for lots less than 20 feet wide; the stated 50-foot width and non-Group R-3 status do not qualify for those exceptions, and the public-way measurement does not apply. The question does not say what the intake serves, so whether \u00a7 401.4 governs remains conditional under MC \u00a7 401.1. (MC \u00a7\u00a7 401.1, 401.4)",
+      "httpStatus": 200,
+      "seconds": 37.387539898000014,
+      "authorityReferences": [
+        "MC 401.1",
+        "MC 401.4"
+      ]
+    },
+    {
+      "id": "outdoor-intake-lot-line-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly changes the lot-width premise to eighteen feet and accepts centerline placement for the lot-line condition, retaining chapter scope and other independent conditions.",
+      "presentationFinding": "Duplicated ventilation scope questions.",
+      "question": "I gave the wrong lot width: it is eighteen feet wide, and the intake sits on the centerline between the two side lot lines. Does the narrow-lot alternative address the lot-line requirement?",
+      "expected": "Yes;lots less than20ft may use intake at centerline between side lot lines. Restrict conclusion to lot-line condition, not other contaminants/exhaust/flood rules.",
+      "answerText": "**Yes\u2014if MC Chapter 4 applies,** the 18-foot lot is under the 20-foot threshold, and an intake on its centerline satisfies the narrow-lot alternative for the lot-line location test (MC \u00a7\u00a7 401.1, 401.4). That does not remove the separate 10-foot clearance from buildings on the same lot (MC \u00a7 401.4). Chapter 4 governs ventilation of spaces within a building intended to be occupied; what this intake serves is not established.",
+      "httpStatus": 200,
+      "seconds": 62.26958149199997,
+      "authorityReferences": [
+        "MC 401.4",
+        "MC 401.1"
+      ]
+    },
+    {
+      "id": "gas-shutoff-access-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects an inaccessible concealed shutoff against FGC409.1.2 and409.1.3. The supplied valve-protection requirement remains a separate condition; lack of access decisively fails this proposal.",
+      "question": "Under the 2022 NYC Fuel Gas Code, can a gas shutoff valve be buried behind permanent cabinetry with no way to reach it for operation?",
+      "expected": "No;shutoff valves accessible for operation and protected from damage.",
+      "answerText": "**No.** Under the 2022 NYC Fuel Gas Code, a shutoff valve must be located to provide access for operation, and shutoff valves are prohibited in concealed locations. A valve behind permanent cabinetry that cannot be reached or operated therefore does not comply (FGC \u00a7\u00a7 409.1.2, 409.1.3).",
+      "httpStatus": 200,
+      "seconds": 14.455678080999991,
+      "authorityReferences": [
+        "FGC 401.1",
+        "FGC 409.1.3",
+        "FGC 409.1.2"
+      ]
+    },
+    {
+      "id": "gas-shutoff-access-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly limits Yes to operable valve access and damage protection, without approving the installation. FGC411.1.2 addresses connector/tubing protection and does not replace the valve rule.",
+      "question": "We will provide an operable access door and protection against damage. Does that address these two valve conditions?",
+      "expected": "Yes for operation access and damage protection on stated facts; no blanket acceptance of entire gas installation.",
+      "answerText": "**Yes\u2014if the door provides access for operating the valve, and the valve is protected from damage.** The 2022 NYC Fuel Gas Code requires shutoff valves to be located to provide access for operation and installed to be protected from damage (FGC \u00a7 409.1.3). The cited protection-against-damage rule separately concerns connectors and tubing, not the valve itself (FGC \u00a7 411.1.2).",
+      "httpStatus": 200,
+      "seconds": 17.513748107000023,
+      "authorityReferences": [
+        "FGC 409.1.3",
+        "FGC 411.1.2"
+      ]
+    },
+    {
+      "id": "concealed-gas-fittings-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects a concealed threaded union; the fitting list and accessible downstream-appliance union provision are preserved. No broader exception is invented.",
+      "question": "For concealed gas piping under the 2022 NYC Fuel Gas Code, may we put a threaded union inside a closed wall?",
+      "expected": "No;concealed fittings limited to threaded elbows,tees,couplings and welded fittings; ordinary threaded union not listed.",
+      "answerText": "**No.** A threaded union may not be installed as a concealed fitting inside a closed wall. FGC \u00a7 404.5 limits fittings in concealed locations to threaded elbows, tees and couplings, or welded fittings; FGC \u00a7 411.1.6 identifies a union as a fitting, and unions are not on that list. (FGC \u00a7\u00a7 404.5, 411.1.6)\n\nFGC \u00a7 403.10.1.1 separately prohibits unions, except downstream of the appliance valve in accordance with \u00a7 411.1.6. That exception does not permit concealment: \u00a7 411.1.6 requires the unions it addresses to be accessible and within 6 feet of the appliance, and \u00a7 102.1 directs that the most restrictive requirement governs when sections specify different requirements. (FGC \u00a7\u00a7 403.10.1.1, 411.1.6, 102.1)",
+      "httpStatus": 200,
+      "seconds": 72.5800735409999,
+      "authorityReferences": [
+        "FGC 404.5",
+        "FGC 411.1.6",
+        "FGC 403.10.1.1",
+        "FGC 102.1"
+      ]
+    },
+    {
+      "id": "concealed-gas-fittings-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts only the listed fitting types while explicitly preserving the separate solid-wall/chase restriction.",
+      "question": "Would using only threaded elbows, tees and couplings inside that wall address the concealed-fitting restriction?",
+      "expected": "Yes as to listed fitting types, with no whole-piping compliance assertion.",
+      "answerText": "**Yes\u2014as to the concealed-fitting restriction:** FGC \u00a7 404.5 limits fittings in concealed locations to \u201cthreaded elbows, tees and couplings\u201d or welded fittings, so using only the three threaded fitting types you listed satisfies that fitting-type restriction. It does **not**, by itself, establish that piping may be concealed inside the wall: FGC \u00a7 404.4 separately prohibits concealed piping in solid partitions and solid walls unless it is installed in a ventilated chase or casing.",
+      "httpStatus": 200,
+      "seconds": 12.492327899999916,
+      "authorityReferences": [
+        "FGC 404.5",
+        "FGC 404.4"
+      ]
+    },
+    {
+      "id": "gas-connector-exceptions-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects an ordinary connector through a wall where all listed exceptions are expressly excluded.",
+      "question": "Under the 2022 NYC Fuel Gas Code, may an ordinary flexible appliance connector run through a wall? Assume it does not qualify for any listed exception.",
+      "expected": "No;connectors must not be concealed within or extended through walls; premise excludes exceptions.",
+      "answerText": "**No.** Under the 2022 NYC Fuel Gas Code, a fuel connector may not be concealed within or extended through a wall; because you stipulate that no listed exception applies, an ordinary flexible appliance connector cannot run through one (FGC \u00a7\u00a7 411.1.3, 411.1.3.3).",
+      "httpStatus": 200,
+      "seconds": 12.838364653999918,
+      "authorityReferences": [
+        "FGC 411.1.3",
+        "FGC 411.1.3.3"
+      ]
+    },
+    {
+      "id": "gas-connector-exceptions-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly applies only the listed appliance-housing exception with damage protection; does not expand it into wall permission.",
+      "question": "Instead, a listed connector will pass only through an opening in the appliance housing and will be protected against damage. Is there an exception for that arrangement?",
+      "expected": "Yes;listed connector through appliance housing/cabinet/casing opening with tubing or connector protected against damage. Do not expand housing exception into general wall permission.",
+      "answerText": "**Yes.** FGC \u00a7 411.1.3.3 expressly permits a listed connector to pass through an opening in an appliance housing, cabinet, or casing if the connector is protected against damage. Your described arrangement fits that exception, provided the connector is listed and protected against damage.",
+      "httpStatus": 200,
+      "seconds": 16.254563501999947,
+      "authorityReferences": [
+        "FGC 411.1.3.3"
+      ]
+    },
+    {
+      "id": "guard-height-boundary-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly applies more-than-thirty inches within thirty-six horizontal inches; thirty-one at thirty-five triggers the guard on the stated no-exception facts.",
+      "question": "Under the 2022 NYC Building Code, an ordinary open-sided walking surface is thirty-one inches above the grade at a point thirty-five inches horizontally from its edge. No guard exception applies. Does the drop trigger a guard?",
+      "expected": "Yes;drop more than30in at any point within36in horizontally triggers guard.",
+      "answerText": "**Yes.** Under the 2022 NYC Building Code, guards are required when an open-sided walking surface is more than 30 inches above the floor or grade below at any point within 36 inches horizontally of the edge (BC \u00a7 1015.2). Here, 31 inches is more than 30, and the point is 35 inches from the edge\u2014within 36 inches\u2014so the drop triggers a guard. You stipulated that no exception applies.",
+      "httpStatus": 200,
+      "seconds": 7.253406551999971,
+      "authorityReferences": [
+        "BC 1015.2"
+      ]
+    },
+    {
+      "id": "guard-height-boundary-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly uses the corrected exactly-thirty-inch fact and rejects that trigger while preserving other independent requirements.",
+      "question": "The survey was corrected: the drop is exactly thirty inches at every point within thirty-six inches of the edge. Does that same height trigger still apply?",
+      "expected": "No;more-than30 threshold excludes exactly30 on specified facts. Do not declare all other guard requirements inapplicable.",
+      "answerText": "**No.** Under the 2022 NYC Building Code, the trigger is a drop **more than** 30 inches at any point within 36 inches horizontally of the edge; an exactly 30-inch drop does not meet that threshold, even though it is within 36 inches (BC \u00a7 1015.2). This answers the height-trigger question, not whether another independent requirement applies.",
+      "httpStatus": 200,
+      "seconds": 8.590545472999919,
+      "authorityReferences": [
+        "BC 1015.2"
+      ]
+    },
+    {
+      "id": "habitable-room-height-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects seven feet six inches for the stated habitable room with exceptions excluded; retains eight feet and the finished measurement endpoints.",
+      "question": "Under the 2022 NYC Building Code, a new commercial habitable room has a clear finished floor-to-ceiling height of seven feet six inches. None of the listed exceptions applies. Is that high enough for a habitable room?",
+      "expected": "No;habitable rooms>=8ft, distinct from7ft6 occupiable/corridor and7ft ancillary limits.",
+      "answerText": "**No.** A habitable room must have a ceiling height of at least 8 feet, measured from the finished floor to the finished underside of the ceiling or ceiling beams. Seven feet six inches is 6 inches short. Since you state that none of the listed exceptions applies, the room does not meet that minimum (2022 NYC BC \u00a7 1208.2).",
+      "httpStatus": 200,
+      "seconds": 8.43223655999999,
+      "authorityReferences": [
+        "BC 1208.2"
+      ]
+    },
+    {
+      "id": "habitable-room-height-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts exactly eight feet for the height minimum only.",
+      "question": "We will raise its clear finished floor-to-ceiling height to exactly eight feet. Does that meet this height minimum?",
+      "expected": "Yes as to height minimum only; equality counts.",
+      "answerText": "**Yes.** For the habitable room described, BC \u00a7 1208.2 requires at least 8 feet from the finished floor to the finished underside of the ceiling or ceiling beams. Exactly 8 feet meets that minimum. The exceptions supplied do not change this result on the stated facts.",
+      "httpStatus": 200,
+      "seconds": 8.480572716000024,
+      "authorityReferences": [
+        "BC 1208.2"
+      ]
+    },
+    {
+      "id": "exterior-assisted-rescue-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects eight-foot horizontal extensions and no return; rating alone does not replace the ten-foot or equivalent four-foot perpendicular geometry.",
+      "question": "For an exterior assisted-rescue landing under the 2022 NYC Building Code, the separating wall is rated one hour for fire from inside, but extends horizontally only eight feet on each side and has no perpendicular return. Does its horizontal extent meet the rule?",
+      "expected": "No;10ft horizontal beyond landing on either side OR equivalent rated construction4ft perpendicular on landing side. Include rating origin as provided, do not waive vertical/opening requirements.",
+      "answerText": "**No.** BC \u00a7 1009.7.2 requires the rated wall to extend horizontally 10 feet beyond the landing on each side, unless equivalent fire-resistance-rated construction extends at least 4 feet perpendicular to the exterior wall on the landing side. Eight feet on each side is short of the horizontal requirement, and there is no perpendicular return; the stated one-hour rating for fire exposure from inside does not make up for the missing extent. The extent therefore does not meet the rule.",
+      "httpStatus": 200,
+      "seconds": 10.685526085000019,
+      "authorityReferences": [
+        "BC 1009.7.2"
+      ]
+    },
+    {
+      "id": "exterior-assisted-rescue-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts the equivalent four-foot perpendicular alternative and retains the supplied fire-rating and vertical-extent requirements; no statement waives protected-opening requirements.",
+      "question": "We will instead provide equivalent fire-rated construction projecting four feet perpendicular to the wall on the landing side. Does that satisfy the stated horizontal alternative?",
+      "expected": "Yes as to alternative geometry. Preserve vertical ground-to10ft above assisted-rescue floor or roof lower, and protected-openings conditions if explaining remaining requirements.",
+      "answerText": "**Yes\u2014on the stated facts, the four-foot perpendicular projection satisfies the horizontal alternative**, provided it is equivalent fire-resistance-rated construction. BC \u00a7 1009.7.2 permits that construction to extend perpendicular to the exterior wall \u201c4 feet (1220 mm) minimum on the side of the landing\u201d; the 10-foot horizontal extension is the alternative, not an additional requirement. The wall must also meet the separately stated one-hour rating for fire exposure from inside, and the rated construction must extend vertically from the ground to 10 feet above the assisted-rescue floor or to the roof line, whichever is lower.",
+      "httpStatus": 200,
+      "seconds": 10.13958848399995,
+      "authorityReferences": [
+        "BC 1009.7.2"
+      ]
+    },
+    {
+      "id": "portable-heater-conditions-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects two-and-a-half feet from combustibles despite a direct receptacle connection; the three-foot location and direct-connection conditions are independent.",
+      "question": "Under the 2022 NYC Fire Code, a portable electric space heater in an ordinary staff office is plugged directly into a permanent receptacle but sits two and a half feet from combustible material. Is that placement allowed?",
+      "expected": "No;portable heaters prohibited within3ft of combustible material under605.10.3;direct receptacle does not waive distance.",
+      "answerText": "**No.** FC 605.10.3 prohibits using a portable electric space heater \u201cwithin 3 feet\u201d of combustible material in any occupancy; 2\u00bd feet is inside that limit. Plugging it directly into a permanent receptacle satisfies the separate power-supply rule in FC 605.10.2, but does not make the placement permissible (2022 NYC FC \u00a7\u00a7 605.10.2\u2013605.10.3).",
+      "httpStatus": 200,
+      "seconds": 8.607702307000057,
+      "authorityReferences": [
+        "FC 605"
+      ]
+    },
+    {
+      "id": "portable-heater-conditions-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects extension-cord use even after distance is corrected to four feet.",
+      "question": "We will move it four feet away, but use an extension cord to reach the outlet. Does fixing the distance make that connection allowed?",
+      "expected": "No;distance fixed but605.10.2 requires direct receptacle connection, prohibits extension cords. Do not assume whole installation accepted.",
+      "answerText": "**No.** Moving the portable electric space heater four feet from combustible material addresses the separate 3-foot clearance, but it does not make an extension-cord connection allowed: the Fire Code requires these heaters to be plugged directly into a receptacle and prohibits extension cords for their electrical connections (2022 NYC FC \u00a7\u00a7 605.10.2\u2013605.10.3). Use a receptacle connection without an extension cord.",
+      "httpStatus": 200,
+      "seconds": 8.368139057000052,
+      "authorityReferences": [
+        "FC 605"
+      ]
+    },
+    {
+      "id": "power-tap-connection-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects daisy chaining because the tap must connect directly to a permanent receptacle.",
+      "question": "Under the 2022 NYC Fire Code, may one relocatable power tap be plugged into another power tap to extend its reach?",
+      "expected": "No;605.4.2 requires power tap directly connected to permanently installed receptacle.",
+      "answerText": "**No.** The 2022 NYC Fire Code requires a portable power tap to be connected directly to a permanently installed receptacle; plugging one power tap into another does not meet that requirement (FC \u00a7 605.4.2).",
+      "httpStatus": 200,
+      "seconds": 9.857947713000001,
+      "authorityReferences": [
+        "FC 605"
+      ]
+    },
+    {
+      "id": "power-tap-connection-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts the corrected direct connection only; does not infer listing, loads or other power-tap conditions.",
+      "question": "We will connect the tap directly to a permanent receptacle, with no cord crossing doors, walls or covered flooring. Has the connection defect been addressed?",
+      "expected": "Yes as to direct-connection defect on stated facts; do not imply listing,load or all605.4 conditions established.",
+      "answerText": "Yes. Connecting the power tap directly to a permanently installed receptacle addresses the connection defect: portable power taps must be directly connected to a permanently installed receptacle (2022 NYC FC \u00a7 605.4.2).",
+      "httpStatus": 200,
+      "seconds": 41.969687491000045,
+      "authorityReferences": [
+        "FC 605"
+      ]
+    },
+    {
+      "id": "oily-rag-disposal-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects weekly disposal for spontaneous-ignition waste and requires daily removal even with a listed container.",
+      "question": "Under the 2022 NYC Fire Code, oily rags capable of spontaneous ignition will be kept in a listed disposal container. Is emptying that container once a week sufficient?",
+      "expected": "No;304.3.1 requires contents removed and disposed of daily;listed container does not waive removal.",
+      "answerText": "**No.** Under the 2022 NYC Fire Code, contents of a listed disposal container holding waste susceptible to spontaneous ignition, such as oily rags, must be removed and disposed of **daily**; emptying it weekly does not meet that requirement (FC \u00a7 304.3.1).",
+      "httpStatus": 200,
+      "seconds": 7.339526093999972,
+      "authorityReferences": [
+        "FC 304"
+      ]
+    },
+    {
+      "id": "oily-rag-disposal-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts daily disposal frequency on the continuing listed-container premise, without broader compliance approval.",
+      "question": "If we remove and properly dispose of the contents every day, does that address the disposal-frequency requirement?",
+      "expected": "Yes daily satisfies frequency on stated listed-container premise; no broad fire compliance approval.",
+      "answerText": "**Yes.** For rubbish or other combustible waste susceptible to spontaneous ignition, the Fire Code requires the contents of the listed disposal container to be removed and disposed of **daily**. Removing and properly disposing of the contents every day meets that frequency requirement (FC \u00a7 304.3.1).",
+      "httpStatus": 200,
+      "seconds": 8.195757427999983,
+      "authorityReferences": [
+        "FC 304"
+      ]
+    },
+    {
+      "id": "zoning-parking-stall-1",
+      "fullyCorrect": false,
+      "materialError": false,
+      "avoidableNonanswer": true,
+      "reason": "Delivered a withheld answer instead of resolving the eight-foot stall against the ordinary eight-foot-six-inch rule on the explicitly excluded exception premise. See raw review trace for the diagnosed cause.",
+      "question": "Under the current NYC Zoning Resolution, an accessory parking stall for a multifamily building in R6 is eighteen feet long and eight feet wide. The site does not qualify for the small side-lot-ribbon exception. Is that stall width sufficient?",
+      "expected": "No;standard minimum8ft6in wide and18ft long;explicitly excluded8ft side-ribbon exception must not be applied.",
+      "answerText": "I couldn\u2019t consistently use the details you provided while checking your question about R6 accessory parking stall width.\n\nUse Report this issue below to report this attempt.",
+      "httpStatus": 200,
+      "seconds": 78.18846075099998,
+      "authorityReferences": []
+    },
+    {
+      "id": "zoning-parking-stall-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts exactly eight feet six inches by eighteen feet, preserves the excluded side-ribbon exception, and limits the conclusion to stall dimensions.",
+      "question": "We will widen it to exactly eight feet six inches, keeping its eighteen-foot length. Does that satisfy these stall dimensions?",
+      "expected": "Yes for minimum stall dimensions only, no full parking-layout determination.",
+      "answerText": "**Yes.** ZR \u00a7 25-62 requires each parking stall to be at least 18 feet long and 8 feet 6 inches wide. Your proposed 18-foot-by-8-foot-6-inch stall meets those minimum dimensions exactly. The section\u2019s 8-foot-width reduction is limited to qualifying side-lot-ribbon parking; your prior statement that the site does not qualify for that exception does not affect the result, because the proposed width meets the ordinary minimum.",
+      "httpStatus": 200,
+      "seconds": 13.030098308000015,
+      "authorityReferences": [
+        "ZR 25-62"
+      ]
+    },
+    {
+      "id": "zoning-maneuvering-area-1",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly rejects 250 square feet against ordinary300 where all reduction routes are excluded; preserves the never-below200 exception boundary.",
+      "question": "For accessory parking at a multifamily R6 building under the current NYC Zoning Resolution, each space has 250 square feet of unobstructed standing or maneuvering area. It is not automated, lifted or single- or two-family parking; there is no qualifying Department of Buildings layout approval or fully attended certification. Is 250 enough under the ordinary rule?",
+      "expected": "No;ordinary300sqft per space. Reduced-area exception can use qualifying adequate DOB-regulation layout OR fully attended certification, never less200. Supplied facts exclude alternatives.",
+      "answerText": "**No.** Under the ordinary rule, each accessory parking space represents one space only at 300 square feet of unobstructed standing or maneuvering area. At 250 square feet, it falls 50 square feet short (ZR \u00a7 25-62). The rule allows an area below 300\u2014but never below 200\u2014only through a qualifying layout/design route or a certification that the spaces will be fully attended; the scenario says neither applies, so the 250-square-foot area does not qualify for that exception.",
+      "httpStatus": 200,
+      "seconds": 12.000680743000004,
+      "authorityReferences": [
+        "ZR 25-62"
+      ]
+    },
+    {
+      "id": "zoning-maneuvering-area-2",
+      "fullyCorrect": true,
+      "materialError": false,
+      "reason": "Correctly accepts250 under the stated fully attended certification and paid-attendant CO condition; preserves200 minimum and limits the answer to area.",
+      "question": "We will use the fully attended route with the required certification and certificate-of-occupancy condition that paid attendants handle parking at all times of use. Would 250 square feet satisfy the area minimum under that exception?",
+      "expected": "Yes conditionally for area:>=200 with qualifying attended certification and CO paid-attendant condition, preserving adequate layout/design and other requirements; do not require300 despite established exception.",
+      "answerText": "**Yes.** Under the fully attended exception, 250 square feet meets the area minimum: ZR \u00a7 25-62 permits an area under 300 square feet, but \u201cin no event less than 200 square feet,\u201d to count as one space when the applicant or developer certifies that the spaces will be fully attended. The provision also requires the certificate of occupancy to state that paid attendants will handle parking and moving automobiles whenever the spaces are in use; your hypothetical includes that condition.",
+      "httpStatus": 200,
+      "seconds": 10.188635713000084,
+      "authorityReferences": [
+        "ZR 25-62"
+      ]
+    }
+  ],
+  "gradedAt": "2026-10-05T15:46:19.358943+00:00",
+  "candidateCommit": "91ab468a6e447d2330bf06546728c44102b4aad4",
+  "fixtureHash": "a21065c374d388082b65456de1cb2fcb6abbdeffa62be2cf907ccde0893bfead",
+  "frozenFilesUnchangedAtCompletion": true,
+  "summary": {
+    "attempted": 40,
+    "fullyCorrect": 35,
+    "fullyCorrectFraction": 0.875,
+    "avoidableNonanswers": 3,
+    "materialDisputes": 2,
+    "confirmedMaterialErrors": 0,
+    "modelVerificationPassed": 37,
+    "acceptanceGatePassed": false,
+    "currentZoningStatusIndependentlyVerified": false
+  }
+}

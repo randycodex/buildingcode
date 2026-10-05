@@ -1,0 +1,213 @@
+{
+  "status": "completed_known_diagnostics",
+  "answerAttempts": 8,
+  "freshCohort": false,
+  "runs": [
+    {
+      "directory": "/workspace/permitext-validation-20261005-diagnostic-a",
+      "sourceHashes": {
+        "app.mjs": "0d62de3ae698e2559ac22c7474ed57545b541d8cfcf974a7b47e7842a7fd631a",
+        "research-rule-packets.mjs": "13ec375b15fdb2c0c29af105aa3702efe18102ba60608911f850bc9f945b27e7",
+        "research-evidence-assembly.mjs": "dd6130934ba32227472b1b96fff274531e0852a3719f53da6b0c46c24435c92f",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "65ce3f86c8a0b649c518f429460ddbf929dc73a3f3f4b2cc3497e62a3a5cdede",
+        "evidence-discovery.mjs": "c65be84aa1300cbe4f234e8fc14ae4967f7787489590f1315f82c36f04109f0c",
+        "research-evidence-priority.mjs": "3e60a26d5ae9ddfc37fbdc0209c810763e04050aa0b45d57aa0f44aa3f564f66",
+        "research-conversation-topic.mjs": "b1fec5576e50abb2b0c1c438d16b39902f187057c8c08fee55fac8ef90e01857",
+        "research-corpus-registry.mjs": "9280d3a084ebfc957eea97c1ab4cc58e95750eb3096c6e1df192d2ea26f039cd",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "6ea009514072fa697272bd0499725e50d2c40f8abdd5b093f85a1ac20116cea5",
+        "research-answer-presentation.mjs": "57cc913b266f2e17cfa844670726038861367e3b90f9fa7edef3c64aceb35b87",
+        "research-answer-quality.mjs": "9c9c8b96c68caaf2fbc2ba9d71e0ad2cbc71f350708ba3c73293a8e3b7c12f25",
+        "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "research-config.mjs": "6d5cd2cbd0db63fb3e0caa6b04cc0cdc1a1cf213718820ee4259ea72985e661e",
+        "research-zoning-safety.mjs": "832c6757ff40defce5ab943128d3715cd9de76cbedb5a2178349607ed0af307f",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "4dc994ffbb54840f6a5d77ccad1a3d107dbac70302ebb7e4efac945a0d298c42",
+        "scripts/research-evaluation-budget.mjs": "2005f7077e6ec02ef08bfff6466bb24def7dd8b2a909ce1b091bc16e565cc0bb",
+        "scripts/run-research-validation-20261005.mjs": "39a85aa118226edb2e1da1285735908bd872c54708422e24b24d730b7d7b2c92",
+        "scripts/research-validation-pricing-20261005.mjs": "8efee967f61ca986c730314aecb9d0ceaea389d7e707a2e34ddf2e907ad2fd82",
+        "research-passage-index.mjs": "4105851b5bc3621622f70b4c8f3d6610f9490eec7263f95438b9477d9a3904cc",
+        "research-semantic-passages.mjs": "a490a8309a08fa2c2395feddeb5a0a763eebeabb8d295f356c8448e56583e77d",
+        "research-retrieval-query-context.mjs": "237ca33f66cf97700199d1d9657571ab9a6057d6810a7f5fa15fb310a278da7b",
+        "research-interpretation-context.mjs": "f85aebe5fa45682b71cbd9e4d899a6e00658656112ef969f19120767a5826b7b"
+      },
+      "cases": [
+        {
+          "id": "diag-covered-display-1",
+          "httpStatus": 502,
+          "question": "In a sprinklered retail space under the 2022 NYC codes, we want a covered display that is five feet wide. Can we rely only on the ceiling sprinklers above its cover?",
+          "expected": "No. FC 314.5.1 requires sprinklers in or under covered displays exceeding four feet in width. The NFPA-13-compliant open-grid/drop-out ceiling exception is conditional; supplied facts do not establish it.",
+          "answerText": null,
+          "verificationPass": null,
+          "repairRetrieval": null,
+          "error": "I couldn\u2019t get a completed response while preparing the answer. You can try this request again."
+        }
+      ]
+    },
+    {
+      "directory": "/workspace/permitext-validation-20261005-diagnostic-chat-b",
+      "sourceHashes": {
+        "app.mjs": "b778a3dadce2eceb8539ee731977ae5dc9223c4a5ecb6e7b70a6bd4a303e50c1",
+        "research-rule-packets.mjs": "13ec375b15fdb2c0c29af105aa3702efe18102ba60608911f850bc9f945b27e7",
+        "research-evidence-assembly.mjs": "dd6130934ba32227472b1b96fff274531e0852a3719f53da6b0c46c24435c92f",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "65ce3f86c8a0b649c518f429460ddbf929dc73a3f3f4b2cc3497e62a3a5cdede",
+        "evidence-discovery.mjs": "c65be84aa1300cbe4f234e8fc14ae4967f7787489590f1315f82c36f04109f0c",
+        "research-evidence-priority.mjs": "3e60a26d5ae9ddfc37fbdc0209c810763e04050aa0b45d57aa0f44aa3f564f66",
+        "research-conversation-topic.mjs": "b1fec5576e50abb2b0c1c438d16b39902f187057c8c08fee55fac8ef90e01857",
+        "research-corpus-registry.mjs": "9280d3a084ebfc957eea97c1ab4cc58e95750eb3096c6e1df192d2ea26f039cd",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "6ea009514072fa697272bd0499725e50d2c40f8abdd5b093f85a1ac20116cea5",
+        "research-answer-presentation.mjs": "57cc913b266f2e17cfa844670726038861367e3b90f9fa7edef3c64aceb35b87",
+        "research-answer-quality.mjs": "9c9c8b96c68caaf2fbc2ba9d71e0ad2cbc71f350708ba3c73293a8e3b7c12f25",
+        "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "research-config.mjs": "e4b85c2466baae8862c4f320fa1b948e17c85312191d3fc630fbc61ec278f7cb",
+        "research-zoning-safety.mjs": "832c6757ff40defce5ab943128d3715cd9de76cbedb5a2178349607ed0af307f",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "4dc994ffbb54840f6a5d77ccad1a3d107dbac70302ebb7e4efac945a0d298c42",
+        "scripts/research-evaluation-budget.mjs": "2005f7077e6ec02ef08bfff6466bb24def7dd8b2a909ce1b091bc16e565cc0bb",
+        "scripts/run-research-validation-20261005.mjs": "ec36da0dddd6a510472ade6e10838071f7003fb5b51bbe55b48f18539d580eb8",
+        "scripts/research-validation-pricing-20261005.mjs": "8efee967f61ca986c730314aecb9d0ceaea389d7e707a2e34ddf2e907ad2fd82",
+        "scripts/research-provider-readiness-20261005.mjs": "1b277bf97e7edb06da072e8c8ab09da49f1b34656b1b514e26f12302357e1b66",
+        "scripts/research-chat-compatibility-transport.mjs": "b857f801841d8e8cc6d23810858b56fff43b27b835b2a8f165162f9b1c182f95",
+        "evals/retrieval-validation-2026-10-05/luna-model-policy.json": "c3cd006a380cbd3cc05ec19b9402180ca4893c8f3ab3d9bbf1db94184d49fb1e",
+        "research-passage-index.mjs": "4105851b5bc3621622f70b4c8f3d6610f9490eec7263f95438b9477d9a3904cc",
+        "research-semantic-passages.mjs": "a490a8309a08fa2c2395feddeb5a0a763eebeabb8d295f356c8448e56583e77d",
+        "research-retrieval-query-context.mjs": "237ca33f66cf97700199d1d9657571ab9a6057d6810a7f5fa15fb310a278da7b",
+        "research-interpretation-context.mjs": "f85aebe5fa45682b71cbd9e4d899a6e00658656112ef969f19120767a5826b7b"
+      },
+      "cases": [
+        {
+          "id": "diag-covered-display-1",
+          "httpStatus": 200,
+          "question": "In a sprinklered retail space under the 2022 NYC codes, we want a covered display that is five feet wide. Can we rely only on the ceiling sprinklers above its cover?",
+          "expected": "No. FC 314.5.1 requires sprinklers in or under covered displays exceeding four feet in width. The NFPA-13-compliant open-grid/drop-out ceiling exception is conditional; supplied facts do not establish it.",
+          "answerText": "**No.** A five-foot covered display exceeds the four-foot threshold, so a sprinkler system must be installed **in or under** it; ceiling sprinklers above its cover alone do not meet that location requirement (NYC FC \u00a7 314.5.1). The Fire Code also requires at least 18 inches between any sprinkler deflector installed above the display\u2019s top and that top. Its exception permits open-grid or drop-out ceilings beneath sprinklers only when they comply with NFPA 13, as modified by FC Appendix B; it does not state an exception to the in-or-under requirement (NYC FC \u00a7 314.5.1).",
+          "verificationPass": true,
+          "repairRetrieval": null,
+          "error": null
+        },
+        {
+          "id": "diag-covered-display-2",
+          "httpStatus": 200,
+          "question": "We can reduce the covered display to exactly four feet wide. Does that automatically mean we can ignore sprinklers underneath it?",
+          "expected": "No automatic exemption. Exactly four feet is outside the exceeds-four-feet width trigger, but FC 314.5 prohibits obstruction and the clearance/qualifying NFPA13 exception must still be assessed. Do not invent a categorical four-foot exemption or a universal independent below-cover mandate.",
+          "answerText": "**No\u2014not automatically.** At exactly four feet, the rule requiring sprinklers **in or under** a covered display does not apply because it is triggered only when the display **exceeds** four feet (FC \u00a7 314.5.1; BC \u00a7 903.3.3). But the Fire Code separately says sprinklers must not be obstructed by indoor displays (FC \u00a7 314.5). Whether the cover obstructs sprinkler operation\u2014and therefore whether sprinklers underneath are needed\u2014depends on the display and sprinkler arrangement; the width alone does not settle that.",
+          "verificationPass": true,
+          "repairRetrieval": null,
+          "error": null
+        },
+        {
+          "id": "diag-accessibility-counters-1",
+          "httpStatus": 200,
+          "question": "For a new NYC public retail space under the 2022 codes, we have a sales counter and a separate pickup counter of a different type, spread across the store. Is making only the sales counter accessible enough?",
+          "expected": "No. BC1109.12.3 requires at least one of each type of sales/service counter accessible; accessible counters must also be dispersed where counters are dispersed. Avoid claiming a specific counter height absent the referenced accessibility standard.",
+          "answerText": "**No.** Under the 2022 NYC Building Code, at least one counter of **each type** provided for sales or distribution must be accessible. Because the counters are spread across the store, accessible counters must also be dispersed. So one accessible sales counter is not enough if the pickup counter is a different type: at least one of each type must be accessible, with accessible counters distributed through the store (BC \u00a7 1109.12.3).",
+          "verificationPass": true,
+          "repairRetrieval": null,
+          "error": null
+        },
+        {
+          "id": "diag-accessibility-family-room-1",
+          "httpStatus": 200,
+          "question": "For a new NYC mercantile occupancy under the 2022 codes, the plumbing calculation requires three male and three female water closets. Do accessible stalls in those separate toilet rooms remove the need for a family or assisted-use toilet room?",
+          "expected": "No. BC1109.2.1 requires an accessible family/assisted-use toilet room when the aggregate required male/female water closets for assembly/mercantile is six or more. The bathing-room one-shower exception does not waive the toilet-room trigger. Count required fixtures, not merely proposed installed fixtures.",
+          "answerText": "**Yes.** For an assembly or mercantile occupancy, an accessible family or assisted-use toilet room is required when six or more male and female water closets are required in aggregate. Your stated three male plus three female water closets equals six; accessible stalls within the separate-sex rooms do not remove that separate-room requirement (BC \u00a7 1109.2.1). Fixtures in the required family or assisted-use room may count toward the required fixtures for either sex (PC \u00a7 403.1.2).",
+          "verificationPass": true,
+          "repairRetrieval": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "directory": "/workspace/permitext-validation-20261005-diagnostic-chat-c",
+      "sourceHashes": {
+        "app.mjs": "2b06fee358f48f2690d43d617261f392ec70706ae8d03c35936e018460978bc6",
+        "research-rule-packets.mjs": "13ec375b15fdb2c0c29af105aa3702efe18102ba60608911f850bc9f945b27e7",
+        "research-evidence-assembly.mjs": "6ca416852b91ac6aac5e43c3e9365b6ee80faf6961727f1a7fc619faec7557fa",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "65ce3f86c8a0b649c518f429460ddbf929dc73a3f3f4b2cc3497e62a3a5cdede",
+        "evidence-discovery.mjs": "c54dff9ca720d410e5556d81a2072302e2b3818cd1bd052d8b9a4852ab7616a4",
+        "research-evidence-priority.mjs": "3e60a26d5ae9ddfc37fbdc0209c810763e04050aa0b45d57aa0f44aa3f564f66",
+        "research-conversation-topic.mjs": "b1fec5576e50abb2b0c1c438d16b39902f187057c8c08fee55fac8ef90e01857",
+        "research-corpus-registry.mjs": "9280d3a084ebfc957eea97c1ab4cc58e95750eb3096c6e1df192d2ea26f039cd",
+        "research-question-intent.mjs": "d32e5777a480a0a86da20933be8ed81b8507878d646068c0ddb30075b36ece94",
+        "research-conversation-continuity.mjs": "6ea009514072fa697272bd0499725e50d2c40f8abdd5b093f85a1ac20116cea5",
+        "research-answer-presentation.mjs": "57cc913b266f2e17cfa844670726038861367e3b90f9fa7edef3c64aceb35b87",
+        "research-answer-quality.mjs": "9c9c8b96c68caaf2fbc2ba9d71e0ad2cbc71f350708ba3c73293a8e3b7c12f25",
+        "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "research-config.mjs": "e4b85c2466baae8862c4f320fa1b948e17c85312191d3fc630fbc61ec278f7cb",
+        "research-zoning-safety.mjs": "832c6757ff40defce5ab943128d3715cd9de76cbedb5a2178349607ed0af307f",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "4dc994ffbb54840f6a5d77ccad1a3d107dbac70302ebb7e4efac945a0d298c42",
+        "scripts/research-evaluation-budget.mjs": "2005f7077e6ec02ef08bfff6466bb24def7dd8b2a909ce1b091bc16e565cc0bb",
+        "scripts/run-research-validation-20261005.mjs": "ec36da0dddd6a510472ade6e10838071f7003fb5b51bbe55b48f18539d580eb8",
+        "scripts/research-validation-pricing-20261005.mjs": "8efee967f61ca986c730314aecb9d0ceaea389d7e707a2e34ddf2e907ad2fd82",
+        "scripts/research-provider-readiness-20261005.mjs": "1b277bf97e7edb06da072e8c8ab09da49f1b34656b1b514e26f12302357e1b66",
+        "scripts/research-chat-compatibility-transport.mjs": "b857f801841d8e8cc6d23810858b56fff43b27b835b2a8f165162f9b1c182f95",
+        "evals/retrieval-validation-2026-10-05/luna-model-policy.json": "c3cd006a380cbd3cc05ec19b9402180ca4893c8f3ab3d9bbf1db94184d49fb1e",
+        "research-passage-index.mjs": "4105851b5bc3621622f70b4c8f3d6610f9490eec7263f95438b9477d9a3904cc",
+        "research-semantic-passages.mjs": "a490a8309a08fa2c2395feddeb5a0a763eebeabb8d295f356c8448e56583e77d",
+        "research-retrieval-query-context.mjs": "237ca33f66cf97700199d1d9657571ab9a6057d6810a7f5fa15fb310a278da7b",
+        "research-interpretation-context.mjs": "f85aebe5fa45682b71cbd9e4d899a6e00658656112ef969f19120767a5826b7b"
+      },
+      "cases": [
+        {
+          "id": "diag-covered-display-1",
+          "httpStatus": 200,
+          "question": "In a sprinklered retail space under the 2022 NYC codes, we want a covered display that is five feet wide. Can we rely only on the ceiling sprinklers above its cover?",
+          "expected": "No. FC 314.5.1 requires sprinklers in or under covered displays exceeding four feet in width. The NFPA-13-compliant open-grid/drop-out ceiling exception is conditional; supplied facts do not establish it.",
+          "answerText": "No. Five feet exceeds the 4-foot threshold: sprinklers must be installed in or under a covered display that exceeds 4 feet in width, so sprinklers only above its cover do not meet that requirement (2022 NYC Fire Code \u00a7 314.5.1).",
+          "verificationPass": true,
+          "repairRetrieval": {
+            "version": "20261005-grounded-parent-table-repair-v2",
+            "attemptedReads": 0,
+            "supplied": [],
+            "unresolved": []
+          },
+          "error": null
+        },
+        {
+          "id": "diag-covered-display-2",
+          "httpStatus": 200,
+          "question": "We can reduce the covered display to exactly four feet wide. Does that automatically mean we can ignore sprinklers underneath it?",
+          "expected": "No automatic exemption. Exactly four feet is outside the exceeds-four-feet width trigger, but FC 314.5 prohibits obstruction and the clearance/qualifying NFPA13 exception must still be assessed. Do not invent a categorical four-foot exemption or a universal independent below-cover mandate.",
+          "answerText": "**No\u2014not based on width alone.** Exactly 4 feet does not exceed 4 feet, so the width-triggered requirement for sprinklers in or under the display is not triggered by either FC \u00a7 314.5.1 or BC \u00a7 903.3.3. But the Fire Code still prohibits indoor displays from obstructing sprinklers, and the Building Code requires sprinkler placement to account for obstructions that delay activation or obstruct water distribution. Whether those obstruction rules affect this layout depends on the cover\u2019s effect on the sprinklers above it (FC \u00a7\u00a7 314.5, 314.5.1; BC \u00a7 903.3.3).",
+          "verificationPass": true,
+          "repairRetrieval": null,
+          "error": null
+        },
+        {
+          "id": "diag-accessibility-family-room-1",
+          "httpStatus": 200,
+          "question": "For a new NYC mercantile occupancy under the 2022 codes, the plumbing calculation requires three male and three female water closets. Do accessible stalls in those separate toilet rooms remove the need for a family or assisted-use toilet room?",
+          "expected": "No. BC1109.2.1 requires an accessible family/assisted-use toilet room when the aggregate required male/female water closets for assembly/mercantile is six or more. The bathing-room one-shower exception does not waive the toilet-room trigger. Count required fixtures, not merely proposed installed fixtures.",
+          "answerText": "**No.** For a new mercantile occupancy, an aggregate of six required male and female water closets triggers an accessible family or assisted-use toilet room; accessible stalls in the separate-sex rooms do not replace that separately required room. (BC \u00a7 1109.2.1) The trigger is met by the stated three male plus three female closets. The room\u2019s fixtures may count toward either sex\u2019s required plumbing-fixture total, but that counting allowance does not waive the room requirement. (BC \u00a7 1109.2.1; PC \u00a7 403.1.2)",
+          "verificationPass": true,
+          "repairRetrieval": null,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "observedDefects": [
+    "One original native-Responses answer attempt failed authentication before generation.",
+    "Initial family-room answer said Yes while its explanation rejected the question; the Luna reviewer passed it.",
+    "Reviewer identified missing parent scope; recovery eligibility did not recognize the missing-source wording/ancestor.",
+    "Actual PC702.2 table metadata incorrectly carried a ZR reference.",
+    "Full evidence packages can exhaust the existing shared repair capacity; do not treat zero added sources as proof that no dependency was missing."
+  ],
+  "repairs": [
+    "Shared writer/reviewer question-polarity instructions; family-room live retest now opens No.",
+    "Canonical same-edition ancestor nominations and complete verified table recovery, covered by actual-corpus contracts.",
+    "Structured table references use the catalog code family; complete rows, footnotes and introduction preserved.",
+    "Capacity exclusions now recorded explicitly; optional interpretation context retains its separate counter."
+  ],
+  "remainingDiagnosticFindings": [
+    "Covered-display retest gives the correct width conclusion but omits the conditional NFPA13 exception required by the frozen diagnostic check; do not mark this diagnostic fully correct.",
+    "The earlier display answer characterized the NFPA13 exception as limited to clearance. Its reach should receive independent source/legal review before accepting that characterization.",
+    "The retest did not demonstrate successful live parent recovery: the full package had no remaining direct-reference capacity."
+  ],
+  "limitations": "Known diagnostics and retests of mixed candidates are not fresh accuracy evidence; frozen diagnostic checks are not relaxed after results."
+}

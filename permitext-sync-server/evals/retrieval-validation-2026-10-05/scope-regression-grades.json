@@ -1,0 +1,63 @@
+{
+  "recordedAt": "2026-10-05T16:18:53.042630+00:00",
+  "candidateCommit": "b02ad3f54bac334fed7224de1ae00860eff7d2d0",
+  "knownRegression": true,
+  "freshAccuracyEvidence": false,
+  "runDirectory": "/workspace/permitext-validation-20261005-regression-chat-f",
+  "sourceHashesUnchangedAtCompletion": true,
+  "grader": "Implementing assistant comparing delivered text, supported points, cited passages and frozen rubrics; no independent external review",
+  "accountAccess": {
+    "scope": "temporary isolated local account",
+    "signInHTTPStatus": 200,
+    "grantHTTPStatus": 200,
+    "activePro": true,
+    "researchMode": "included",
+    "grantType": "lifetimeGrant",
+    "productionSubscriptionTested": false
+  },
+  "summary": {
+    "attempted": 2,
+    "fullyCorrect": 2,
+    "avoidableNonanswers": 0,
+    "materialDisputes": 0
+  },
+  "grades": [
+    {
+      "id": "cleanout-clearance-1",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correct conditional No; six-inch-and-smaller minimum is18in, perpendicular to cleanout face; sanitary scope and storm extension/subsurface-storm exception preserved across narrative and supported points.",
+      "question": "For a six-inch drainage pipe under the 2022 NYC Plumbing Code, does a cleanout need more than eighteen inches of clearance in front of its face?",
+      "expected": "No; pipes6in and smaller require at least18in measured perpendicular to the opening face. Exactly18 meets this condition.",
+      "answerText": "No\u2014where this rule applies, 18 inches is the required minimum, not a requirement to provide more than 18 inches. For sanitary drainage, that distance is measured perpendicular from the cleanout opening\u2019s face to an obstruction (PC \u00a7 708.1.9; \u00a7 701.1). For storm drainage, the sanitary cleanout provisions apply except for subsurface drainage systems (PC \u00a7 1101.8; \u00a7 1101.1).",
+      "httpStatus": 200,
+      "seconds": 92.17821900199999,
+      "authorityReferences": [
+        "PC 708.1.9",
+        "PC 701.1",
+        "PC 1101.8",
+        "PC 1101.1"
+      ]
+    },
+    {
+      "id": "cleanout-clearance-2",
+      "fullyCorrect": true,
+      "avoidableNonanswer": false,
+      "materialDispute": false,
+      "reason": "Correct conditional No;8in-and-larger requires36in, so18in is insufficient. Correction of pipe size is retained; sanitary/storm scope and subsurface-storm exception preserved without claiming exception approves18in.",
+      "question": "The pipe is actually eight inches. We still have eighteen inches in front of the cleanout. Is that sufficient?",
+      "expected": "No;8in and larger require36in perpendicular clearance. Correct earlier threshold for changed diameter.",
+      "answerText": "If this is sanitary drainage, or storm drainage that is not a subsurface drainage system, **no**: 18 inches is 18 inches short. For cleanouts on 8-inch-and-larger piping, the 2022 NYC Plumbing Code requires at least 36 inches, measured perpendicular from the opening\u2019s face to an obstruction (PC \u00a7 708.1.9; sanitary-drainage scope at \u00a7 701.1). Storm cleanouts follow the sanitary cleanout provisions except for a subsurface drainage system (PC \u00a7 1101.8; storm-drainage scope at \u00a7 1101.1); that exception does not establish that 18 inches is sufficient.",
+      "httpStatus": 200,
+      "seconds": 89.755053254,
+      "authorityReferences": [
+        "PC 708.1.9",
+        "PC 701.1",
+        "PC 1101.8",
+        "PC 1101.1"
+      ]
+    }
+  ],
+  "causalLimit": "Single stochastic before/after retest, not a controlled estimate of improvement. Neither review used the envelope retry; clearer classification instructions yielded consistent final flags. The retry path is proven by synthetic contract tests only."
+}
