@@ -43,6 +43,15 @@ for (const [request, edition, ambiguous = false] of [
   ["The equipment was installed in 2014 under the 2022 codes. What calibration is required?", "2022"],
   ["Our 2014 building is under the codes. What calibration is required?", null],
   ["The cabinets were installed in 2014. What calibration does the code require?", null],
+  ["The 2014 building must meet the code. Under the 2022 code, what calibration is required?", "2022"],
+  ["The 2014 equipment follows the code. Under the 2022 code, what calibration is required?", "2022"],
+  ["The 2014 cabinet follows code and the 2022 code governs. What calibration is required?", "2022"],
+  ["Under the 2022 New York City Construction Codes, what calibration is required?", "2022"],
+  ["Under the 2014 NYC Mechanical Code, what calibration is required?", "2014"],
+  ["Under the 2014 Fuel Gas Code, what calibration is required?", "2014"],
+  ["Under the 2022 Existing Building Code, what calibration is required?", "2022"],
+  ["Under the 2014 MC, what calibration is required?", "2014"],
+  ["Under MC 2014, what calibration is required?", "2014"],
   ["Under the 2014 code, what calibration is required?", "2014"],
   ["Under the old 2014 code, what calibration should we perform?", "2014"],
   ["The old equipment was installed in 2014 and is reviewed under the 2022 code. What calibration should we perform?", "2022"],
@@ -108,7 +117,9 @@ for (const request of [affirmative, "Ignore the 2014 code. " + affirmative,
   "The previous 2014 code assumption was wrong. " + affirmative,
   'Ignore "under the 2014 code". ' + affirmative,
   "The building was constructed in 2014. " + affirmative,
-  "The cabinets were installed in 2014. " + affirmative]) {
+  "The cabinets were installed in 2014. " + affirmative,
+  "The 2014 building must meet the code. " + affirmative,
+  "The 2014 equipment follows the code. " + affirmative]) {
   const found = await run({ question: request });
   assert.equal(found.candidates.find(item => item.sectionID === target.id)?.signals.currentQuestionLexicalReservation?.kind,
     "current_requested_purpose", request);

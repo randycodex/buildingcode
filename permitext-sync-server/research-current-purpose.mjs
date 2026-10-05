@@ -1,7 +1,7 @@
 // English word-family overlap nominates current request detail, never a rule's
 // applicability. There are no topic, section, equipment or legal-answer maps.
 import { researchPositiveSearchText } from "./research-search-vocabulary.mjs";
-export const researchCurrentPurposeVersion = "20261004-current-purpose-recall-v2";
+export const researchCurrentPurposeVersion = "20261004-current-purpose-recall-v3";
 const generic = new Set(("a an the this that same each any all we i you they it them what which how can could may must should will would do does is are be have has put get make use need leave keep stay remain tell show required requirement requirements code codes section sections rule rules equipment unit units under on of for to from with about still now" ).split(" "));
 function family(word) {
   // Keep short/ambiguous stems literal. Nominal/action forms such as
@@ -56,6 +56,10 @@ export function researchCurrentPurposeMatches(sourceText, purposeTerms) {
   return purposeTerms.filter(term => words.has(term)).length;
 }
 
+// Identity vocabulary mirrors authorized code-family/jurisdiction names. It
+// cannot connect a project noun or action to a later mention of "code".
+const editionAuthorityName = String.raw`(?:(?:NYC|New\s+York\s+City)\s+)?(?:(?:(?:Construction|Existing\s+Building|Building|Mechanical|Plumbing|Fuel[-\s]+Gas|Fire|Administrative)\s+)?(?:Codes?|Edition|Version)|AC|BC68|BC|EBC|MC|PC|FGC|FC|ZR)`;
+
 // An edition must belong to an affirmative authority phrase, not an incidental
 // construction year or a quoted/retracted authority. Ambiguity disables the
 // additional recall privilege; it never chooses a law or overrides a pin.
@@ -70,10 +74,10 @@ export function researchCurrentEditionContext(question = "") {
     // does not negate its authority. Limit positive-search filtering to an
     // immediately negated authority phrase, not the whole proposed state.
     const positive = clause;
-    // Adjacent authority modifiers are allowed, but dates separated from the
-    // authority by a project/action/preposition cannot supply its edition.
-    const yearFirst = /\b((?:19|20)\d{2})\s+(?:(?!(?:built|constructed|opened|completed|renovated|installed|was|is|has|had|in|on|at|under|for|with|and|or|to)\b)[a-z][a-z-]*\s+){0,4}(?:codes?|edition|version)\b/gi;
-    const authorityFirst = /\b(?:codes?|edition|version)\s+(?:(?:of|for|from|the|year)\s+){0,3}((?:19|20)\d{2})\b/gi;
+    // Only known authority names may modify code/edition/version; arbitrary
+    // intervening project words cannot turn a date into an edition.
+    const yearFirst = new RegExp(String.raw`\b((?:19|20)\d{2})\s+${editionAuthorityName}\b`, "gi");
+    const authorityFirst = new RegExp(String.raw`\b${editionAuthorityName}\s+(?:(?:of|for|from|the|year)\s+){0,3}((?:19|20)\d{2})\b`, "gi");
     const found = [...positive.matchAll(yearFirst), ...positive.matchAll(authorityFirst)].filter(match => {
       if (comparison) return true;
       const prefix = positive.slice(0, match.index), suffix = positive.slice(match.index + match[0].length);
@@ -82,7 +86,7 @@ export function researchCurrentEditionContext(question = "") {
       const excludedPrefix = prefix.match(/\b(?:not|no|never|without|rather\s+than|instead\s+of)\s+(?:(?:under|from|the)\s+){0,3}$/i)?.[0] || "";
       return !excludedAuthority && researchPositiveSearchText(excludedPrefix + match[0]).includes(match[1]);
     }).map(match => match[1]);
-    const editionList = /\b(?:19|20)\d{2}(?:\s+(?:[a-z-]+\s+){0,3}(?:codes?|edition|version))?\s+(?:or|and)\s+(?:the\s+)?(?:19|20)\d{2}\b/i.test(positive);
+    const editionList = new RegExp(String.raw`\b(?:19|20)\d{2}(?:\s+${editionAuthorityName})?\s+(?:or|and)\s+(?:the\s+)?(?:19|20)\d{2}\b`, "i").test(positive);
     if (found.length && (comparison || editionList) && new Set(positive.match(/\b(?:19|20)\d{2}\b/g) || []).size > 1) ambiguous = true;
     found.forEach(year => editions.add(year));
   }
