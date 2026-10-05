@@ -1,0 +1,99 @@
+[
+  {
+    "query": "1007.1.1",
+    "code": "BC",
+    "targets": [
+      "1007.1.1"
+    ],
+    "kind": "exact"
+  },
+  {
+    "query": "403.1",
+    "code": "PC",
+    "targets": [
+      "403.1"
+    ],
+    "kind": "exact"
+  },
+  {
+    "query": "scissor stair",
+    "code": "BC",
+    "targets": [
+      "1007.1.1"
+    ],
+    "kind": "topic"
+  },
+  {
+    "query": "panic hardware",
+    "code": "BC",
+    "targets": [
+      "1010.1.10"
+    ],
+    "kind": "topic"
+  },
+  {
+    "query": "handrail height",
+    "code": "BC",
+    "targets": [
+      "1014.2"
+    ],
+    "kind": "topic"
+  },
+  {
+    "query": "ceiling height",
+    "code": "BC",
+    "targets": [
+      "1003.2",
+      "1208.2"
+    ],
+    "kind": "topic"
+  },
+  {
+    "query": "drinking fountains",
+    "code": "PC",
+    "targets": [
+      "410.3"
+    ],
+    "kind": "topic"
+  },
+  {
+    "query": "emergency escape windows",
+    "code": "BC",
+    "targets": [
+      "1030.2"
+    ],
+    "kind": "topic"
+  },
+  {
+    "query": "stairs that share an enclosure",
+    "code": "BC",
+    "targets": [
+      "1007.1.1"
+    ],
+    "kind": "plain-language"
+  },
+  {
+    "query": "how high should a handrail be",
+    "code": "BC",
+    "targets": [
+      "1014.2"
+    ],
+    "kind": "plain-language"
+  },
+  {
+    "query": "how tall must the ceiling be",
+    "code": "BC",
+    "targets": [
+      "1208.2"
+    ],
+    "kind": "plain-language"
+  },
+  {
+    "query": "toilets required for an office",
+    "code": "PC",
+    "targets": [
+      "403.1"
+    ],
+    "kind": "plain-language"
+  }
+]
