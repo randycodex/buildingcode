@@ -1,0 +1,272 @@
+{
+  "status": "local_fix_with_bounded_native_diagnostics",
+  "recordedAt": "2026-10-05T18:03:50.919060+00:00",
+  "checkout": {
+    "originalCheckout": "/Users/randy/Documents/X_CODING/Building Code",
+    "originalHead": "9fd88f21348c2e5cc3d3ebbeec6ad5bb8d0d9abf",
+    "mainBaseline": "78ba13e81",
+    "workingCheckout": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code",
+    "branch": "codex/research-repair-scope",
+    "AGENTS": "Absent from original checkout, checked ancestor paths, and fetched baseline tree.",
+    "unrelatedLocalChangesPreserved": true
+  },
+  "authorization": {
+    "initialPaidTestsPaused": true,
+    "resumedByUser": "you can use API for testing",
+    "userRecommendation": "in fact, i recommend you using both luna models to test as if a user was using permitext",
+    "capUSD": 10.99,
+    "diagnosticCapUSD": 2.99,
+    "freshCapUSD": 8,
+    "noSolFallback": true,
+    "deploymentAuthorizedOrPerformed": false
+  },
+  "diagnosis": [
+    "Before this fix, recovery ran only before repair and depended on reviewer prose naming missing authority. New material bindings in a rewrite could omit their canonical parent.",
+    "False evidence limitations with every source classified supported did not meet the bounded material-edit guard, so an otherwise reviewed source explanation could undergo a full rewrite.",
+    "The first new native diagnostic retained a failed ramp turn: BC1012.6.2 was already used before repair, its canonical BC1012.6 parent remained missing, and a model established verdict could not override that gap."
+  ],
+  "implementation": [
+    "Before fresh review, nominate up to two decimal ancestor levels from server-resolved enacted sources newly bound by repair. Recover exact same corpus/version/edition/jurisdiction, complete canonical bodies only.",
+    "Also recover an exact server-enumerated canonical parent gap on a retained bound source. No invented or unrelated ancestry, no changes to existing sources or citation identities.",
+    "Share the original two-read, 48000-character and six-cross-reference budgets across pre/post repair; never clip source conditions. Preserve cumulative supplied/unresolved diagnostics and fresh evidence snapshots/maps.",
+    "False-evidence-limitation patches with otherwise narrow feedback require exact reviewed-answer hash and complete all-supported noncategorical bound-source review. Existing unsupported-source explanation path retains its guards. Every patch receives full fresh verification."
+  ],
+  "offline": {
+    "passedCount": 18,
+    "passed": [
+      "research-repair-retrieval-contract.mjs",
+      "research-repair-retrieval-corpus-contract.mjs",
+      "research-repair-retrieval-dependencies-contract.mjs",
+      "research-repair-introduced-parent-contract.mjs",
+      "research-repair-introduced-parent-http-contract.mjs",
+      "research-source-explanation-revision-contract.mjs",
+      "research-source-explanation-revision-http-contract.mjs",
+      "research-targeted-revision-contract.mjs",
+      "research-targeted-revision-bindings-contract.mjs",
+      "research-material-scope-review-contract.mjs",
+      "research-verifier-envelope-repair-contract.mjs",
+      "research-evidence-assembly-contract.mjs",
+      "research-enclosing-operative-parent-contract.mjs",
+      "research-supplied-scope-gap-contract.mjs",
+      "research-citation-reconciliation-http-contract.mjs",
+      "research-certified-field-repair-http-contract.mjs",
+      "research-material-zoning-revision-http-contract.mjs",
+      "scripts/test-research-validation-controls-20261005.mjs"
+    ],
+    "providerCalls": 0,
+    "meaning": "Mechanics and canonical corpus checks; synthetic verdicts do not establish semantic accuracy.",
+    "preExistingFailuresReproduced": [
+      {
+        "file": "research-zoning-verification-instructions-contract.mjs",
+        "line": 41,
+        "reason": "Existing scoped prompt-size ceiling"
+      },
+      {
+        "file": "research-general-rule-project-scope-contract.mjs",
+        "line": 12,
+        "reason": "Existing projectFactsApplied assertion conflicts with relevance filtering"
+      }
+    ],
+    "fullSuiteGreen": false
+  },
+  "nativeDiagnostics": [
+    {
+      "directory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "resultFile": "permitext-sync-server/evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005/results.json",
+      "resultSHA256": "a69d422348c992bd814ed51dbe4a55ec6df3acd4c38c9146657f6df54ba2ccae",
+      "candidateCommit": "9caf3fe2fcc4775b5c792d01d1a3f9e2ac5bda89",
+      "sourceHashMismatches": [],
+      "scope": "Known-case diagnostic; do not combine with original or exploratory cohorts",
+      "cases": [
+        {
+          "id": "continuation-water-pressure-1",
+          "httpStatus": 200,
+          "deliveredMode": "openai",
+          "verificationPassed": true,
+          "fullyCorrectAgainstExistingAssistantRubric": true,
+          "gradingLimit": "Existing exposed rubric, implementing-assistant review; not independent accuracy evidence.",
+          "answerText": "Within Chapter 6\u2019s scope\u2014hot and cold water-supply systems for use in connection with human occupancy and habitation, and installation of individual water-supply systems\u2014if pressure within a building exceeds **85 psi (586 kPa) static**, an approved valve conforming to ASSE 1003 or CSA B356, with a strainer, must reduce pressure in the building water-distribution piping to **85 psi (586 kPa) static or less** (PC \u00a7\u00a7 601.1, 604.8).\n\nSection 604.8 excepts **service lines to sill cocks and outside hydrants**, and **main supply risers where pressure from the mains is reduced to 85 psi (586 kPa) or less at individual fixtures**. The fixture-pressure condition qualifies the main-supply-riser exception; it is not a blanket exception for all risers.",
+          "seconds": 47.979999709000005,
+          "repairRetrieval": null
+        },
+        {
+          "id": "continuation-water-pressure-2",
+          "httpStatus": 200,
+          "deliveredMode": "openai",
+          "verificationPassed": true,
+          "fullyCorrectAgainstExistingAssistantRubric": true,
+          "gradingLimit": "Existing exposed rubric, implementing-assistant review; not independent accuracy evidence.",
+          "answerText": "**No.** PC \u00a7 604.8 requires pressure reduction when pressure within a building **exceeds** 85 psi static; exactly 85 psi is the limit, not above it. On your stated facts, that pressure alone does not trigger the requirement. The section\u2019s exceptions are for service lines to sill cocks and outside hydrants, and for main supply risers where mains pressure is reduced to 85 psi or less at individual fixtures; neither is needed for this conclusion. Chapter 6 governs the covered hot- and cold-water supply systems described in PC \u00a7 601.1.",
+          "seconds": 18.822418916999997,
+          "repairRetrieval": null
+        },
+        {
+          "id": "continuation-grease-clearances-1",
+          "httpStatus": 200,
+          "deliveredMode": "openai",
+          "verificationPassed": true,
+          "fullyCorrectAgainstExistingAssistantRubric": true,
+          "gradingLimit": "Existing exposed rubric, implementing-assistant review; not independent accuracy evidence.",
+          "answerText": "Under the 2022 NYC Mechanical Code, **where an enclosure is not required**, grease-duct systems and exhaust equipment serving a Type I hood must be at least **18 in. (457.2 mm) from combustible construction** and **3 in. (76.2 mm) from noncombustible construction and gypsum wallboard attached to noncombustible structures** (MC \u00a7 506.3.6). Chapter 5 governs mechanical exhaust systems, including those serving cooking appliances (MC \u00a7 501.1). MC \u00a7 202 defines \u201cclearance\u201d as the minimum distance through air from the heat-producing surface of the appliance, device, or equipment to combustible material or an assembly.\n\nThe stated exceptions are:\n- **Factory-built grease duct:** If listed and labeled under UL 1978, its clearance is the one in its listing, subject to commissioner approval.\n- **Listed exhaust equipment:** Listed and labeled exhaust equipment installed under MC \u00a7 304.1 is excepted. Section 304.1 requires installation according to the terms of approval, listing conditions, manufacturer\u2019s instructions, and the code; \u00a7 506.3.6 does not give this exception a replacement numerical clearance.\n- **Field-applied enclosure:** If the grease duct is continuously covered on all sides by listed and labeled field-applied enclosure material, a system, product, or method specifically evaluated for this purpose under ASTM E 2336, clearance follows that listing.\n- **Specified insulation:** Grease ducts with at least 2 in. (50.8 mm) of magnesium- or calcium-silicate block insulation, staggered joints, and attachment by galvanized steel wire\u2014or by a material assembly equivalent in insulating and fire-resistant qualities and not penetrable by grease\u2014are excepted from the stated minima. This protection must be applied to all ducts inside the building and approved by the commissioner. This exception gives no alternate numerical clearance.\n\nA clearance exception does **not** itself waive a separate enclosure requirement. A commercial-kitchen grease duct serving a Type I hood that penetrates a ceiling, wall, floor, or concealed space must be enclosed from its first penetration to the outlet terminal; the stated exception is a duct that penetrates only a nonfire-resistance-rated roof/ceiling assembly (MC \u00a7 506.3.11). Although MC \u00a7 506.3.11.3 specifies UL 2221 for factory-built grease-duct enclosure assemblies, MC \u00a7 506.3.6\u2019s express factory-built clearance exception specifies UL 1978; UL 2221 alone is not identified there as a substitute clearance.",
+          "seconds": 132.55928275000002,
+          "repairRetrieval": null
+        },
+        {
+          "id": "continuation-grease-clearances-2",
+          "httpStatus": 200,
+          "deliveredMode": "openai",
+          "verificationPassed": true,
+          "fullyCorrectAgainstExistingAssistantRubric": true,
+          "gradingLimit": "Existing exposed rubric, implementing-assistant review; not independent accuracy evidence.",
+          "answerText": "**No.** Under the 2022 NYC Mechanical Code, where an enclosure is not required, a grease-duct system serving a Type I hood must be at least **18 inches from combustible construction**. At **3 inches**, the stated clearance is insufficient (MC \u00a7 506.3.6). You\u2019ve stipulated that no listed-system or insulation exception applies, so none changes that result.",
+          "seconds": 13.932134707999998,
+          "repairRetrieval": null
+        },
+        {
+          "id": "continuation-egress-ramp-1",
+          "httpStatus": 200,
+          "deliveredMode": "clarification",
+          "verificationPassed": false,
+          "fullyCorrectAgainstExistingAssistantRubric": false,
+          "gradingLimit": "Existing exposed rubric, implementing-assistant review; not independent accuracy evidence.",
+          "answerText": "I couldn\u2019t consistently use the details you provided while checking your question about Means-of-egress ramp dimensions.\n\nUse Report this issue below to report this attempt.",
+          "seconds": 103.26498016699998,
+          "repairRetrieval": null
+        }
+      ],
+      "verifiedDelivered": 4,
+      "attempted": 5,
+      "stoppedAfterFailure": "continuation-egress-ramp-1",
+      "providerRequests": 22,
+      "allNewRequestsSettled": true,
+      "roles": {
+        "embedding": 6,
+        "low": 5,
+        "medium": 8,
+        "high": 3
+      },
+      "estimatedUSD": 0.12850549,
+      "providerAPI": "responses",
+      "accountAccess": {
+        "scope": "temporary isolated local account",
+        "signInHTTPStatus": 200,
+        "grantHTTPStatus": 200,
+        "activePro": true,
+        "researchMode": "included",
+        "grantType": "lifetimeGrant",
+        "productionSubscriptionTested": false
+      },
+      "completedAt": "2026-10-05T17:57:44.153Z"
+    },
+    {
+      "directory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "resultFile": "permitext-sync-server/evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005/results.json",
+      "resultSHA256": "4c37bf645c20bb1e240ba6beafafb2ebfd4d36d2cadbc6e24a4df934d071be88",
+      "candidateCommit": "5ee773435415fa8c4c3760dc7a34172aa88b5025",
+      "sourceHashMismatches": [],
+      "scope": "Known-case diagnostic; do not combine with original or exploratory cohorts",
+      "cases": [
+        {
+          "id": "continuation-egress-ramp-1",
+          "httpStatus": 200,
+          "deliveredMode": "openai",
+          "verificationPassed": true,
+          "fullyCorrectAgainstExistingAssistantRubric": true,
+          "gradingLimit": "Existing exposed rubric, implementing-assistant review; not independent accuracy evidence.",
+          "answerText": "Under the 2022 NYC Building Code, a means-of-egress ramp must meet the corridor minimum width and required capacity, and must also have at least 36 inches (914.4 mm) of clear width between handrails, if provided, or other permissible projections. The referenced corridor-capacity calculation is in BC \u00a7 1005, so its method cannot be explained from the text available here. (BC \u00a7\u00a7 1012.5.1, 1020.2)\n\n- **Corridor minimum widths:** Table 1020.2 states values in inches: 44 for facilities not listed below; 24 for access to and utilization of mechanical, plumbing, or electrical systems or equipment; 36 for occupant loads of 50 or less, except as otherwise required by Chapter 11; 36 within dwelling units in Groups I-1 and R-1, except as otherwise required by \u00a7 1107; and 30 within dwelling units in Groups R-2 and R-3, except as otherwise required by \u00a7 1107. The other listed values are 66 for Group E corridors serving classrooms; 72 for corridors and areas serving stretcher traffic where outpatient medical care makes patients incapable of self-preservation; and 96 for Group I-2 areas where required for bed movement. For Group I-2, 96 inches of clear width is not required in areas without stretcher or bed movement for access to care or as part of the defend-in-place strategy. The ramp must satisfy the applicable corridor minimum as well as its separate 36-inch clear-width minimum. (BC \u00a7\u00a7 1012.5.1, 1020.2)\n- **Headroom:** At least 84 inches (2133.6 mm) in all parts of the ramp. (BC \u00a7 1012.5.2)\n- **Width reductions and doors:** A means-of-egress ramp must not reduce in width in the direction of egress travel; projections into required ramp or landing width are prohibited. A door opening onto a landing must not reduce clear width below 42 inches (1066.8 mm). (BC \u00a7 1012.5.3)\n- **Landing width:** At least the width of the widest adjoining ramp run. (BC \u00a7 1012.6.2)",
+          "seconds": 81.472250417,
+          "repairRetrieval": {
+            "version": "20261005-grounded-parent-table-repair-v4",
+            "attemptedReads": 1,
+            "supplied": [
+              {
+                "sourceID": "research-permitext_cross_reference-id:2349-repair1",
+                "codePrefix": "BC",
+                "corpusID": "nyc-2022-construction-codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeEdition": "2022 New York City Construction Codes",
+                "jurisdiction": "New York City",
+                "sectionNumber": "1012.6",
+                "referenceKind": "ancestor_scope",
+                "textSHA256": "b4ca9f0e871a1a41a4747baa4e9f5ea79f57bd9f666b2bd041067808f24b6837",
+                "replaced": false
+              }
+            ],
+            "unresolved": []
+          }
+        },
+        {
+          "id": "continuation-egress-ramp-2",
+          "httpStatus": 200,
+          "deliveredMode": "openai",
+          "verificationPassed": true,
+          "fullyCorrectAgainstExistingAssistantRubric": true,
+          "gradingLimit": "Existing exposed rubric, implementing-assistant review; not independent accuracy evidence.",
+          "answerText": "**Yes.** Exactly 84 inches meets the 2022 NYC Building Code minimum: headroom in all parts of a means-of-egress ramp must be at least 84 inches (BC \u00a7 1012.5.2).",
+          "seconds": 6.082749333,
+          "repairRetrieval": null
+        }
+      ],
+      "verifiedDelivered": 2,
+      "attempted": 2,
+      "stoppedAfterFailure": null,
+      "providerRequests": 8,
+      "allNewRequestsSettled": true,
+      "roles": {
+        "embedding": 2,
+        "low": 2,
+        "medium": 3,
+        "high": 1
+      },
+      "estimatedUSD": 0.03578186500000001,
+      "providerAPI": "responses",
+      "accountAccess": {
+        "scope": "temporary isolated local account",
+        "signInHTTPStatus": 200,
+        "grantHTTPStatus": 200,
+        "activePro": true,
+        "researchMode": "included",
+        "grantType": "lifetimeGrant",
+        "productionSubscriptionTested": false
+      },
+      "completedAt": "2026-10-05T18:02:24.922Z"
+    }
+  ],
+  "scoresPreserved": {
+    "originalFrozenFresh": {
+      "fullyCorrect": 35,
+      "total": 40
+    },
+    "separateExploratory": {
+      "fullyCorrect": 9,
+      "total": 10
+    },
+    "originalReportsAndRubricsUnchanged": true,
+    "doNotCombine": true,
+    "general95PercentEstablished": false
+  },
+  "spending": {
+    "ledger": "evals/retrieval-validation-2026-10-05/budget-ledger.json",
+    "original304EntriesUnchanged": true,
+    "totalRequests": 334,
+    "newRequests": 30,
+    "newEstimatedUSD": 0.16428735500000002,
+    "campaignEstimatedUSD": 1.684584420000001,
+    "diagnosticEstimatedUSD": 0.7988698249999999,
+    "freshEstimatedUSD": 0.8857145949999999,
+    "pending": 0,
+    "unknown": 0,
+    "actualBillingDeductionsVerified": false,
+    "basis": "Reported native provider usage and saved campaign rates; not billing-account deductions."
+  },
+  "remaining": [
+    "The new false-limitation patch path is covered by offline HTTP and guard contracts; these native diagnostic runs did not exercise that exact path. No live semantic improvement claim for it.",
+    "Full rewrite composition drift and categorical/noncategorical review classification variability remain. Do not relax the guard to obtain more targeted repairs.",
+    "Parent coverage remains bounded: more than two reads, exhausted reference/character capacity, genuinely absent authority, and pinned/selected evidence restrictions can leave explicit gaps.",
+    "Hub-drain scope, covered-display Fire Code qualifications and sidewalk measurement interpretations still need independent authority and grading.",
+    "No new independent forty-question acceptance cohort; original35/40 and exploratory9/10 remain separate.",
+    "Native Responses now verified in isolated local backend with this credential. Hosted production Responses, browser sign-in/subscription, device and deployment behavior remain unverified.",
+    "Two pre-existing offline contract failures remain."
+  ],
+  "next": "No more paid runs in this continuation. Independently review remaining interpretation cases and freeze a broad final cohort before a new acceptance run."
+}

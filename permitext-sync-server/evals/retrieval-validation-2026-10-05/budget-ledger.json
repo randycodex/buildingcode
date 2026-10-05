@@ -8695,6 +8695,774 @@
       },
       "httpStatus": 200,
       "endedAt": "2026-10-05T16:58:24.079Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "aeece242-b8a0-4b4f-965e-74167f3f861f",
+      "case": "continuation-water-pressure-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018801200000000004,
+      "startedAt": "2026-10-05T17:52:38.562Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.000001,
+      "usage": {
+        "prompt_tokens": 50,
+        "total_tokens": 50
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:52:38.943Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "81c1237a-0dad-4802-947e-f25513a57cd4",
+      "case": "continuation-water-pressure-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000188342,
+      "startedAt": "2026-10-05T17:52:40.235Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.00000106,
+      "usage": {
+        "prompt_tokens": 53,
+        "total_tokens": 53
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:52:40.816Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "0804c4f3-1a91-4226-800c-6e107d344d7e",
+      "case": "continuation-water-pressure-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11013365000000001,
+      "startedAt": "2026-10-05T17:52:42.100Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.007763600000000001,
+      "usage": {
+        "input_tokens": 29155,
+        "input_tokens_details": {
+          "cache_write_tokens": 29152,
+          "cached_tokens": 0
+        },
+        "output_tokens": 475,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 29630
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:52:45.064Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "b7201297-b137-42da-90d4-d2658384c178",
+      "case": "continuation-water-pressure-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0878185,
+      "startedAt": "2026-10-05T17:52:45.084Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.007932100000000001,
+      "usage": {
+        "input_tokens": 28293,
+        "input_tokens_details": {
+          "cache_write_tokens": 28290,
+          "cached_tokens": 0
+        },
+        "output_tokens": 859,
+        "output_tokens_details": {
+          "reasoning_tokens": 516
+        },
+        "total_tokens": 29152
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:52:50.838Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "34f294d5-9438-46db-9854-293ec0ecd38f",
+      "case": "continuation-water-pressure-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11554895000000001,
+      "startedAt": "2026-10-05T17:52:50.851Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.005079925,
+      "usage": {
+        "input_tokens": 31144,
+        "input_tokens_details": {
+          "cache_write_tokens": 31141,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2374,
+        "output_tokens_details": {
+          "reasoning_tokens": 1757
+        },
+        "total_tokens": 33518
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:53:10.924Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "14814a76-da64-46d2-a972-6168ebb05dc0",
+      "case": "continuation-water-pressure-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08899770000000001,
+      "startedAt": "2026-10-05T17:53:10.943Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.00793435,
+      "usage": {
+        "input_tokens": 28834,
+        "input_tokens_details": {
+          "cache_write_tokens": 28831,
+          "cached_tokens": 0
+        },
+        "output_tokens": 726,
+        "output_tokens_details": {
+          "reasoning_tokens": 439
+        },
+        "total_tokens": 29560
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:53:15.388Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "f53edc1a-f373-488b-8fc0-8e44e3721e1f",
+      "case": "continuation-water-pressure-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018768200000000002,
+      "startedAt": "2026-10-05T17:53:15.668Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 9.400000000000001e-7,
+      "usage": {
+        "prompt_tokens": 47,
+        "total_tokens": 47
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:53:17.830Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "49c15414-481c-42b5-b651-c519c4696480",
+      "case": "continuation-water-pressure-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1141481,
+      "startedAt": "2026-10-05T17:53:19.097Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.00839935,
+      "usage": {
+        "input_tokens": 30878,
+        "input_tokens_details": {
+          "cache_write_tokens": 30875,
+          "cached_tokens": 0
+        },
+        "output_tokens": 680,
+        "output_tokens_details": {
+          "reasoning_tokens": 209
+        },
+        "total_tokens": 31558
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:53:23.865Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "1a823096-c125-4659-9c7f-727b4416dc6c",
+      "case": "continuation-water-pressure-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0886721,
+      "startedAt": "2026-10-05T17:53:23.891Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.0087606,
+      "usage": {
+        "input_tokens": 28631,
+        "input_tokens_details": {
+          "cache_write_tokens": 28628,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1603,
+        "output_tokens_details": {
+          "reasoning_tokens": 1360
+        },
+        "total_tokens": 30234
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:53:34.184Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "00ab5c8c-ad72-41db-b1a0-b6bd0cba3239",
+      "case": "continuation-grease-clearances-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018700000000000002,
+      "startedAt": "2026-10-05T17:53:34.451Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 8.200000000000001e-7,
+      "usage": {
+        "prompt_tokens": 41,
+        "total_tokens": 41
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:53:34.642Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "f710a9cc-b9b8-4b14-80b2-ef7e96300e49",
+      "case": "continuation-grease-clearances-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09294615,
+      "startedAt": "2026-10-05T17:53:35.713Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.005997850000000001,
+      "usage": {
+        "input_tokens": 18996,
+        "input_tokens_details": {
+          "cache_write_tokens": 18993,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1249,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20245
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:53:41.787Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "9f374c71-62a2-43cb-9e87-eb70ac57a2b5",
+      "case": "continuation-grease-clearances-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.1020404,
+      "startedAt": "2026-10-05T17:53:41.803Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.01150785,
+      "usage": {
+        "input_tokens": 32724,
+        "input_tokens_details": {
+          "cache_write_tokens": 32721,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3327,
+        "output_tokens_details": {
+          "reasoning_tokens": 2538
+        },
+        "total_tokens": 36051
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:54:02.262Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "edec9b25-3ec3-455c-a2a7-7247c4f2cc8d",
+      "case": "continuation-grease-clearances-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10927015000000001,
+      "startedAt": "2026-10-05T17:54:02.285Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.0077674250000000005,
+      "usage": {
+        "input_tokens": 25432,
+        "input_tokens_details": {
+          "cache_write_tokens": 25429,
+          "cached_tokens": 0
+        },
+        "output_tokens": 9177,
+        "output_tokens_details": {
+          "reasoning_tokens": 7293
+        },
+        "total_tokens": 34609
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:55:31.454Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "88693683-37e5-4824-b549-55421f17a977",
+      "case": "continuation-grease-clearances-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.10263440000000001,
+      "startedAt": "2026-10-05T17:55:31.485Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.01112335,
+      "usage": {
+        "input_tokens": 33162,
+        "input_tokens_details": {
+          "cache_write_tokens": 33159,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2833,
+        "output_tokens_details": {
+          "reasoning_tokens": 2244
+        },
+        "total_tokens": 35995
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:55:46.773Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "18e64e6b-74d3-42c8-9f93-f604ed062a25",
+      "case": "continuation-grease-clearances-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018757200000000003,
+      "startedAt": "2026-10-05T17:55:47.169Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 9.200000000000001e-7,
+      "usage": {
+        "prompt_tokens": 46,
+        "total_tokens": 46
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:55:47.577Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "562d8efc-c851-469c-9681-c4f9a22d0f42",
+      "case": "continuation-grease-clearances-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08945090000000001,
+      "startedAt": "2026-10-05T17:55:48.617Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.0046471,
+      "usage": {
+        "input_tokens": 16829,
+        "input_tokens_details": {
+          "cache_write_tokens": 16826,
+          "cached_tokens": 0
+        },
+        "output_tokens": 440,
+        "output_tokens_details": {
+          "reasoning_tokens": 122
+        },
+        "total_tokens": 17269
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:55:51.754Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "e954b100-8701-4756-b831-1c880d820cd7",
+      "case": "continuation-grease-clearances-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08712605,
+      "startedAt": "2026-10-05T17:55:51.767Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.00821585,
+      "usage": {
+        "input_tokens": 26932,
+        "input_tokens_details": {
+          "cache_write_tokens": 26929,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1483,
+        "output_tokens_details": {
+          "reasoning_tokens": 1223
+        },
+        "total_tokens": 28415
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:56:00.704Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "b494947f-ea06-46a9-bccd-7f99136622fb",
+      "case": "continuation-egress-ramp-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000186186,
+      "startedAt": "2026-10-05T17:56:01.041Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 8.000000000000001e-7,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 40
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:56:01.322Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "3eacfa1f-e842-4422-ac82-384a4929049b",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0889999,
+      "startedAt": "2026-10-05T17:56:02.407Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.0058561,
+      "usage": {
+        "input_tokens": 17133,
+        "input_tokens_details": {
+          "cache_write_tokens": 17130,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1573,
+        "output_tokens_details": {
+          "reasoning_tokens": 352
+        },
+        "total_tokens": 18706
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:56:11.058Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "a3c24782-48e4-471c-82be-5170b6e446dc",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08720525,
+      "startedAt": "2026-10-05T17:56:11.086Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.01094635,
+      "usage": {
+        "input_tokens": 26806,
+        "input_tokens_details": {
+          "cache_write_tokens": 26803,
+          "cached_tokens": 0
+        },
+        "output_tokens": 4245,
+        "output_tokens_details": {
+          "reasoning_tokens": 3520
+        },
+        "total_tokens": 31051
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:56:33.932Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "7b752e83-4a53-4c5f-9f30-96fb6cb5d362",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09993225000000001,
+      "startedAt": "2026-10-05T17:56:33.942Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.00565355,
+      "usage": {
+        "input_tokens": 21537,
+        "input_tokens_details": {
+          "cache_write_tokens": 21534,
+          "cached_tokens": 0
+        },
+        "output_tokens": 5923,
+        "output_tokens_details": {
+          "reasoning_tokens": 4190
+        },
+        "total_tokens": 27460
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:57:22.624Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "34134430-8784-4e7c-b119-5558eb1cc107",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0894124,
+      "startedAt": "2026-10-05T17:57:22.653Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-repair-diagnostic-20261005",
+      "costUSD": 0.0109146,
+      "usage": {
+        "input_tokens": 27759,
+        "input_tokens_details": {
+          "cache_write_tokens": 27756,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3975,
+        "output_tokens_details": {
+          "reasoning_tokens": 3477
+        },
+        "total_tokens": 31734
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T17:57:43.989Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "c9f82fc0-74eb-4e66-b032-b021076e4298",
+      "case": "continuation-egress-ramp-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000186186,
+      "startedAt": "2026-10-05T18:01:07.702Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "costUSD": 8.000000000000001e-7,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 40
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T18:01:08.029Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "986765d5-fe2d-4ecb-b8a0-dffdf3b4fedb",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0889999,
+      "startedAt": "2026-10-05T18:01:09.131Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "costUSD": 0.0020012,
+      "usage": {
+        "input_tokens": 17133,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 17130
+        },
+        "output_tokens": 1658,
+        "output_tokens_details": {
+          "reasoning_tokens": 292
+        },
+        "total_tokens": 18791
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T18:01:18.142Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "be54e033-f93b-4e88-ba97-e54a2cede594",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0874533,
+      "startedAt": "2026-10-05T18:01:18.187Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "costUSD": 0.010058850000000001,
+      "usage": {
+        "input_tokens": 26860,
+        "input_tokens_details": {
+          "cache_write_tokens": 26857,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3344,
+        "output_tokens_details": {
+          "reasoning_tokens": 2632
+        },
+        "total_tokens": 30204
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T18:01:35.949Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "ad512b91-fcc1-40bf-90b2-d2a435573874",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09993665,
+      "startedAt": "2026-10-05T18:01:35.974Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "costUSD": 0.003766025,
+      "usage": {
+        "input_tokens": 21505,
+        "input_tokens_details": {
+          "cache_write_tokens": 14967,
+          "cached_tokens": 6535
+        },
+        "output_tokens": 3659,
+        "output_tokens_details": {
+          "reasoning_tokens": 2029
+        },
+        "total_tokens": 25164
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T18:02:07.784Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "74dd085a-9345-4493-bd95-c72fa778c903",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09026545000000001,
+      "startedAt": "2026-10-05T18:02:07.831Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "costUSD": 0.00873135,
+      "usage": {
+        "input_tokens": 28182,
+        "input_tokens_details": {
+          "cache_write_tokens": 28179,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1686,
+        "output_tokens_details": {
+          "reasoning_tokens": 1177
+        },
+        "total_tokens": 29868
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T18:02:18.752Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "04535860-d363-40fc-9371-882536334963",
+      "case": "continuation-egress-ramp-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000187022,
+      "startedAt": "2026-10-05T18:02:19.062Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "costUSD": 9.400000000000001e-7,
+      "usage": {
+        "prompt_tokens": 47,
+        "total_tokens": 47
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T18:02:19.412Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "72c33a28-8940-493e-9e6a-537bb5c4cae0",
+      "case": "continuation-egress-ramp-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09186540000000001,
+      "startedAt": "2026-10-05T18:02:20.526Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "costUSD": 0.0049151,
+      "usage": {
+        "input_tokens": 18757,
+        "input_tokens_details": {
+          "cache_write_tokens": 18754,
+          "cached_tokens": 0
+        },
+        "output_tokens": 226,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18983
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T18:02:22.353Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "7dd352fd-8e09-494f-a744-b33d815d9783",
+      "case": "continuation-egress-ramp-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0784553,
+      "startedAt": "2026-10-05T18:02:22.371Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/local-native-ramp-retest-20261005",
+      "costUSD": 0.0063076,
+      "usage": {
+        "input_tokens": 23655,
+        "input_tokens_details": {
+          "cache_write_tokens": 23652,
+          "cached_tokens": 0
+        },
+        "output_tokens": 394,
+        "output_tokens_details": {
+          "reasoning_tokens": 170
+        },
+        "total_tokens": 24049
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T18:02:24.826Z"
     }
   ]
 }

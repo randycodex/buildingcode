@@ -1,0 +1,2897 @@
+{
+  "fixturePath": "evals/retrieval-validation-2026-10-05/continuation-fixture.json",
+  "applicationRoot": "file:///Users/randy/.codex/worktrees/research-repair-scope/Building%20Code/permitext-sync-server/",
+  "fixtureHash": "755c2c60ccb87aece0f2ca57dacb13200b38d3df1e5118eacb36d99e559a6efd",
+  "sourceHashes": {
+    "app.mjs": "9e2e15c22872a4749e6c3320e857f481c6806d63db7c70247cf1357d9c42d6f1",
+    "research-rule-packets.mjs": "13ec375b15fdb2c0c29af105aa3702efe18102ba60608911f850bc9f945b27e7",
+    "research-evidence-assembly.mjs": "414788281ed5ab4c8d191194203ab4946d7506c2f6a000655a73a7f5d2e92804",
+    "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+    "research-targeted-revision.mjs": "044dd355b333df8a47f637a46d8f51f64b6777ba1ccdae45f0f56814f306ece3",
+    "evidence-discovery.mjs": "c54dff9ca720d410e5556d81a2072302e2b3818cd1bd052d8b9a4852ab7616a4",
+    "research-evidence-priority.mjs": "3e60a26d5ae9ddfc37fbdc0209c810763e04050aa0b45d57aa0f44aa3f564f66",
+    "research-conversation-topic.mjs": "b1fec5576e50abb2b0c1c438d16b39902f187057c8c08fee55fac8ef90e01857",
+    "research-corpus-registry.mjs": "9280d3a084ebfc957eea97c1ab4cc58e95750eb3096c6e1df192d2ea26f039cd",
+    "research-question-intent.mjs": "0dfb378bb46d33330f3c49d35e004dfe28607ffda09a802ae7d263e52ccb4fc2",
+    "research-conversation-continuity.mjs": "6ea009514072fa697272bd0499725e50d2c40f8abdd5b093f85a1ac20116cea5",
+    "research-answer-presentation.mjs": "57cc913b266f2e17cfa844670726038861367e3b90f9fa7edef3c64aceb35b87",
+    "research-answer-quality.mjs": "9c9c8b96c68caaf2fbc2ba9d71e0ad2cbc71f350708ba3c73293a8e3b7c12f25",
+    "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+    "research-config.mjs": "e4b85c2466baae8862c4f320fa1b948e17c85312191d3fc630fbc61ec278f7cb",
+    "research-material-scope-review.mjs": "0de9a247d5dc6e872dabd180a6f6a0eb67a26e692c52e501f2d3f4efa8adfe74",
+    "research-claim-applicability-review.mjs": "0eaf37998867870d47799ac4d8e013278bcff99c26753acb036ab4a137bd15e6",
+    "research-zoning-safety.mjs": "832c6757ff40defce5ab943128d3715cd9de76cbedb5a2178349607ed0af307f",
+    "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+    "entitlement-contract.mjs": "bebd96ae110ac3bcf6af0e89e182dd4f850758b9eb95a81b052443eac36023a7",
+    "research-technical-topic-routes.mjs": "4dc994ffbb54840f6a5d77ccad1a3d107dbac70302ebb7e4efac945a0d298c42",
+    "scripts/research-evaluation-budget.mjs": "2005f7077e6ec02ef08bfff6466bb24def7dd8b2a909ce1b091bc16e565cc0bb",
+    "scripts/run-research-validation-20261005.mjs": "a2b6bb6b926eda4b29eb72793bf1e03457a41ac420c5f5dd7c2fccac07788561",
+    "scripts/research-validation-pricing-20261005.mjs": "8efee967f61ca986c730314aecb9d0ceaea389d7e707a2e34ddf2e907ad2fd82",
+    "scripts/research-provider-readiness-20261005.mjs": "1b277bf97e7edb06da072e8c8ab09da49f1b34656b1b514e26f12302357e1b66",
+    "scripts/research-chat-compatibility-transport.mjs": "b857f801841d8e8cc6d23810858b56fff43b27b835b2a8f165162f9b1c182f95",
+    "evals/retrieval-validation-2026-10-05/luna-model-policy.json": "c3cd006a380cbd3cc05ec19b9402180ca4893c8f3ab3d9bbf1db94184d49fb1e",
+    "research-passage-index.mjs": "4105851b5bc3621622f70b4c8f3d6610f9490eec7263f95438b9477d9a3904cc",
+    "research-semantic-passages.mjs": "a490a8309a08fa2c2395feddeb5a0a763eebeabb8d295f356c8448e56583e77d",
+    "research-retrieval-query-context.mjs": "237ca33f66cf97700199d1d9657571ab9a6057d6810a7f5fa15fb310a278da7b",
+    "research-interpretation-context.mjs": "f85aebe5fa45682b71cbd9e4d899a6e00658656112ef969f19120767a5826b7b"
+  },
+  "selectedIDs": [
+    "continuation-egress-ramp"
+  ],
+  "live": true,
+  "retrievalLive": false,
+  "providerAPI": "responses",
+  "modelPolicy": "luna-only",
+  "modelRoles": {
+    "ordinaryDraft": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "low",
+      "serviceTier": "priority"
+    },
+    "sourceReview": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "serviceTier": "priority"
+    },
+    "feedbackRepair": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "high",
+      "serviceTier": "default"
+    }
+  },
+  "semanticVectorPath": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server/prepared/research-semantic/current-vectors.bin",
+  "advisoryRoutes": true,
+  "currentCorpusRecall": true,
+  "advisoryRanking": true,
+  "passageSearch": true,
+  "campaignCapUSD": 10.99,
+  "mode": "end-to-end",
+  "phaseBucket": "diagnostic",
+  "phaseLabel": "diagnostic",
+  "knownRegression": false,
+  "capUSD": 2.99,
+  "startedAt": "2026-10-05T18:00:57.144Z",
+  "provider": [
+    {
+      "phaseBucket": "diagnostic",
+      "id": "c9f82fc0-74eb-4e66-b032-b021076e4298",
+      "case": "continuation-egress-ramp-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000186186,
+      "startedAt": "2026-10-05T18:01:07.702Z",
+      "httpStatus": 200,
+      "seconds": 0.3248376669999998,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 40
+      },
+      "costUSD": 8.000000000000001e-7
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "986765d5-fe2d-4ecb-b8a0-dffdf3b4fedb",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0889999,
+      "startedAt": "2026-10-05T18:01:09.131Z",
+      "httpStatus": 200,
+      "seconds": 9.0083895,
+      "usage": {
+        "input_tokens": 17133,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 17130
+        },
+        "output_tokens": 1658,
+        "output_tokens_details": {
+          "reasoning_tokens": 292
+        },
+        "total_tokens": 18791
+      },
+      "costUSD": 0.0020012
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "be54e033-f93b-4e88-ba97-e54a2cede594",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0874533,
+      "startedAt": "2026-10-05T18:01:18.187Z",
+      "httpStatus": 200,
+      "seconds": 17.754960166999997,
+      "usage": {
+        "input_tokens": 26860,
+        "input_tokens_details": {
+          "cache_write_tokens": 26857,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3344,
+        "output_tokens_details": {
+          "reasoning_tokens": 2632
+        },
+        "total_tokens": 30204
+      },
+      "costUSD": 0.010058850000000001
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "ad512b91-fcc1-40bf-90b2-d2a435573874",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09993665,
+      "startedAt": "2026-10-05T18:01:35.974Z",
+      "httpStatus": 200,
+      "seconds": 31.806429125,
+      "usage": {
+        "input_tokens": 21505,
+        "input_tokens_details": {
+          "cache_write_tokens": 14967,
+          "cached_tokens": 6535
+        },
+        "output_tokens": 3659,
+        "output_tokens_details": {
+          "reasoning_tokens": 2029
+        },
+        "total_tokens": 25164
+      },
+      "costUSD": 0.003766025
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "74dd085a-9345-4493-bd95-c72fa778c903",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09026545000000001,
+      "startedAt": "2026-10-05T18:02:07.831Z",
+      "httpStatus": 200,
+      "seconds": 10.916027000000001,
+      "usage": {
+        "input_tokens": 28182,
+        "input_tokens_details": {
+          "cache_write_tokens": 28179,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1686,
+        "output_tokens_details": {
+          "reasoning_tokens": 1177
+        },
+        "total_tokens": 29868
+      },
+      "costUSD": 0.00873135
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "04535860-d363-40fc-9371-882536334963",
+      "case": "continuation-egress-ramp-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000187022,
+      "startedAt": "2026-10-05T18:02:19.062Z",
+      "httpStatus": 200,
+      "seconds": 0.34265099999999804,
+      "usage": {
+        "prompt_tokens": 47,
+        "total_tokens": 47
+      },
+      "costUSD": 9.400000000000001e-7
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "72c33a28-8940-493e-9e6a-537bb5c4cae0",
+      "case": "continuation-egress-ramp-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09186540000000001,
+      "startedAt": "2026-10-05T18:02:20.526Z",
+      "httpStatus": 200,
+      "seconds": 1.824386709000013,
+      "usage": {
+        "input_tokens": 18757,
+        "input_tokens_details": {
+          "cache_write_tokens": 18754,
+          "cached_tokens": 0
+        },
+        "output_tokens": 226,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18983
+      },
+      "costUSD": 0.0049151
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "7dd352fd-8e09-494f-a744-b33d815d9783",
+      "case": "continuation-egress-ramp-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0784553,
+      "startedAt": "2026-10-05T18:02:22.371Z",
+      "httpStatus": 200,
+      "seconds": 2.4508753750000034,
+      "usage": {
+        "input_tokens": 23655,
+        "input_tokens_details": {
+          "cache_write_tokens": 23652,
+          "cached_tokens": 0
+        },
+        "output_tokens": 394,
+        "output_tokens_details": {
+          "reasoning_tokens": 170
+        },
+        "total_tokens": 24049
+      },
+      "costUSD": 0.0063076
+    }
+  ],
+  "cases": [
+    {
+      "id": "continuation-egress-ramp-1",
+      "question": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+      "status": 200,
+      "seconds": 81.472250417,
+      "projectID": null,
+      "topicContext": {
+        "contextRevision": 0,
+        "version": "20261004-leading-modifier-topic-continuity-v13",
+        "originalTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+        "rootTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+        "currentTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+        "lastDecision": "topic_switch",
+        "factTopics": [
+          {
+            "rootTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+            "establishedFacts": [],
+            "unknownFacts": [],
+            "scenarioActive": false,
+            "hypotheticalFacts": []
+          }
+        ],
+        "updatedAt": "2026-10-05T18:01:09.120Z"
+      },
+      "projectInformation": null,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-6-luna",
+        "requestedModel": "gpt-6-luna",
+        "promptVersion": "20260930-project-investigation-v33:compact-v3:conversational-v4",
+        "evidenceVersion": "20261005-repaired-bound-parent-scope-v84:structured-v1",
+        "codeEdition": "Routed New York City enacted sources",
+        "codeVersion": "multiple-authorized-corpora",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "Routed New York City enacted sources",
+          "codeVersion": "multiple-authorized-corpora",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            },
+            {
+              "id": "nyc-2022-fire-code",
+              "label": "2022 NYC Fire Code",
+              "codeEdition": "2022 NYC Fire Code — current consolidated text",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-consolidation",
+              "routeReason": "authorized current-library recall; applicability unresolved",
+              "blockedReason": null,
+              "codePrefixes": [
+                "FC"
+              ]
+            },
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "authorized current-library recall; applicability unresolved",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · 2022 NYC Fire Code · NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-10-05T18:00:57.520Z"
+        },
+        "answerText": "Under the 2022 NYC Building Code, a means-of-egress ramp must meet the corridor minimum width and required capacity, and must also have at least 36 inches (914.4 mm) of clear width between handrails, if provided, or other permissible projections. The referenced corridor-capacity calculation is in BC § 1005, so its method cannot be explained from the text available here. (BC §§ 1012.5.1, 1020.2)\n\n- **Corridor minimum widths:** Table 1020.2 states values in inches: 44 for facilities not listed below; 24 for access to and utilization of mechanical, plumbing, or electrical systems or equipment; 36 for occupant loads of 50 or less, except as otherwise required by Chapter 11; 36 within dwelling units in Groups I-1 and R-1, except as otherwise required by § 1107; and 30 within dwelling units in Groups R-2 and R-3, except as otherwise required by § 1107. The other listed values are 66 for Group E corridors serving classrooms; 72 for corridors and areas serving stretcher traffic where outpatient medical care makes patients incapable of self-preservation; and 96 for Group I-2 areas where required for bed movement. For Group I-2, 96 inches of clear width is not required in areas without stretcher or bed movement for access to care or as part of the defend-in-place strategy. The ramp must satisfy the applicable corridor minimum as well as its separate 36-inch clear-width minimum. (BC §§ 1012.5.1, 1020.2)\n- **Headroom:** At least 84 inches (2133.6 mm) in all parts of the ramp. (BC § 1012.5.2)\n- **Width reductions and doors:** A means-of-egress ramp must not reduce in width in the direction of egress travel; projections into required ramp or landing width are prohibited. A door opening onto a landing must not reduce clear width below 42 inches (1066.8 mm). (BC § 1012.5.3)\n- **Landing width:** At least the width of the widest adjoining ramp run. (BC § 1012.6.2)",
+        "conclusion": "Under the 2022 NYC Building Code, a means-of-egress ramp must meet the corridor minimum width and required capacity, and must also have at least 36 inches (914.4 mm) of clear width between handrails, if provided, or other permissible projections. The referenced corridor-capacity calculation is in BC § 1005, so its method cannot be explained from the text available here. (BC §§ 1012.5.1, 1020.2)",
+        "supportedPoints": [
+          {
+            "heading": "Ramp width and capacity follow the corridor rules, with a separate 36-inch clear-width minimum",
+            "explanation": "The minimum width and required capacity of a means-of-egress ramp must be no less than the requirements for corridors under § 1020.2. Separately, clear ramp width between handrails, if provided, or other permissible projections must be at least 36 inches. Section 1020.2 directs corridor capacity to § 1005.",
+            "sectionID": "2346",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2346-1",
+              "research-permitext_cross_reference-id:2417-6"
+            ],
+            "evidenceRole": "supporting"
+          },
+          {
+            "heading": "Corridor-width table values and Group I-2 qualification",
+            "explanation": "Table 1020.2 gives minimum widths in inches: 44 for facilities not listed below; 24 for access to and utilization of mechanical, plumbing, or electrical systems or equipment; 36 for occupant load 50 or less except as otherwise required by Chapter 11; 36 within dwelling units in Groups I-1 and R-1 except as otherwise required by § 1107; 30 within dwelling units in Groups R-2 and R-3 except as otherwise required by § 1107; 66 in Group E corridors serving classrooms; 72 in corridors and areas serving stretcher traffic where outpatient medical care causes patients to be incapable of self-preservation; and 96 in Group I-2 areas where required for bed movement. In Group I-2, corridors need not have 96 inches of clear width in areas where there will not be stretcher or bed movement for access to care or as part of the defend-in-place strategy.",
+            "sectionID": "2417",
+            "sourceIDs": [
+              "research-permitext_cross_reference-id:2417-6"
+            ],
+            "evidenceRole": "supporting"
+          },
+          {
+            "heading": "Ramp headroom",
+            "explanation": "Headroom in all parts of a means-of-egress ramp must be at least 84 inches.",
+            "sectionID": "2347",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2347-6"
+            ],
+            "evidenceRole": "supporting"
+          },
+          {
+            "heading": "Ramp width reductions, projections, and doors onto landings",
+            "explanation": "Means-of-egress ramps must not reduce in width in the direction of egress travel. Projections into required ramp and landing width are prohibited. A door opening onto a landing must not reduce clear width below 42 inches.",
+            "sectionID": "2348",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2348-2"
+            ],
+            "evidenceRole": "supporting"
+          },
+          {
+            "heading": "Ramp landing width",
+            "explanation": "A ramp landing must be at least as wide as the widest adjoining ramp run.",
+            "sectionID": "2351",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2351-8"
+            ],
+            "evidenceRole": "supporting"
+          }
+        ],
+        "explanation": "- **Corridor minimum widths:** Table 1020.2 states values in inches: 44 for facilities not listed below; 24 for access to and utilization of mechanical, plumbing, or electrical systems or equipment; 36 for occupant loads of 50 or less, except as otherwise required by Chapter 11; 36 within dwelling units in Groups I-1 and R-1, except as otherwise required by § 1107; and 30 within dwelling units in Groups R-2 and R-3, except as otherwise required by § 1107. The other listed values are 66 for Group E corridors serving classrooms; 72 for corridors and areas serving stretcher traffic where outpatient medical care makes patients incapable of self-preservation; and 96 for Group I-2 areas where required for bed movement. For Group I-2, 96 inches of clear width is not required in areas without stretcher or bed movement for access to care or as part of the defend-in-place strategy. The ramp must satisfy the applicable corridor minimum as well as its separate 36-inch clear-width minimum. (BC §§ 1012.5.1, 1020.2)\n- **Headroom:** At least 84 inches (2133.6 mm) in all parts of the ramp. (BC § 1012.5.2)\n- **Width reductions and doors:** A means-of-egress ramp must not reduce in width in the direction of egress travel; projections into required ramp or landing width are prohibited. A door opening onto a landing must not reduce clear width below 42 inches (1066.8 mm). (BC § 1012.5.3)\n- **Landing width:** At least the width of the widest adjoining ramp run. (BC § 1012.6.2)",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "BC § 1020.2 directs corridor-capacity determination to BC § 1005, but § 1005's operative text is not included here. Accordingly, the capacity method and resulting required capacity cannot be explained or determined from this evidence."
+        ],
+        "additionalEvidenceNeeded": [
+          "The enacted 2022 NYC Building Code text of BC § 1005 is needed to explain the referenced corridor-capacity calculation."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "2346",
+            "sectionNumber": "1012.5.1",
+            "title": "1012.5.1 Width and capacity.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "chapterTitle": "Chapter 10: Means of Egress",
+            "canonicalApplicabilityContext": {
+              "version": "canonical-source-context-v1",
+              "metadataAvailable": true,
+              "chapter": {
+                "number": "10",
+                "title": "Chapter 10: Means of Egress"
+              },
+              "sectionGroup": {
+                "label": "SECTION BC 1012",
+                "title": "RAMPS"
+              },
+              "projectApplicability": "not_established_by_source_metadata"
+            },
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2346-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:2346-1",
+                "selectedText": "1012.5.1 1012.5.1 Width and capacity. The minimum width and required capacity of a means of egress ramp shall be not less than that required for corridors by Section 1020.2. The clear width of a ramp between handrails, if provided, or other permissible projections shall be 36 inches (914.4 mm) minimum.",
+                "canonicalApplicabilityContext": {
+                  "version": "canonical-source-context-v1",
+                  "metadataAvailable": true,
+                  "chapter": {
+                    "number": "10",
+                    "title": "Chapter 10: Means of Egress"
+                  },
+                  "sectionGroup": {
+                    "label": "SECTION BC 1012",
+                    "title": "RAMPS"
+                  },
+                  "projectApplicability": "not_established_by_source_metadata"
+                },
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the corridor-based width and capacity requirement for ramps, the separate 36-inch clear-width minimum, and the § 1005 capacity cross-reference."
+          },
+          {
+            "sectionID": "2417",
+            "sectionNumber": "1020.2",
+            "title": "1020.2 Width and capacity.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "chapterTitle": "Chapter 10: Means of Egress",
+            "canonicalApplicabilityContext": {
+              "version": "canonical-source-context-v1",
+              "metadataAvailable": true,
+              "chapter": {
+                "number": "10",
+                "title": "Chapter 10: Means of Egress"
+              },
+              "sectionGroup": {
+                "label": "SECTION BC 1020",
+                "title": "CORRIDORS"
+              },
+              "projectApplicability": "not_established_by_source_metadata"
+            },
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_cross_reference-id:2417-6"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_cross_reference-id:2417-6",
+                "selectedText": "1020.2 1020.2 Width and capacity. The required capacity of corridors shall be determined as specified in Section 1005 , but the minimum width shall be not less than that specified in Table 1020.2 . Exception: In Group I-2 occupancies, corridors are not required to have a clear width of 96 inches (2438.4 mm) in areas where there will not be stretcher or bed movement for access to care or as part of the defend-in-place strategy. Table 1020.2 Minimum Corridor Width Occupancy Minimum Width (inches) Occupancy Minimum Width (inches) Any facilities not listed below 44 Access to and utilization of mechanical, plumbing or electrical systems or equipment 24 With an occupant load of 50 or less, except as otherwise required by Chapter 11 36 Within a dwelling unit, in Occupancy Groups I-1 and R-1, except as otherwise required by Section 1107 36 Within a dwelling unit, in Occupancy Groups R-2 and R-3, except as otherwise required by Section 1107 30 In Group E serving classrooms 66 In corridors and areas serving stretcher traffic in occupancies where patients receive outpatient medical care that causes the patients to be incapable of self-preservation 72 Group I-2 in areas where required for bed movement 96 For SI: 1 inch = 25.4 mm.",
+                "canonicalApplicabilityContext": {
+                  "version": "canonical-source-context-v1",
+                  "metadataAvailable": true,
+                  "chapter": {
+                    "number": "10",
+                    "title": "Chapter 10: Means of Egress"
+                  },
+                  "sectionGroup": {
+                    "label": "SECTION BC 1020",
+                    "title": "CORRIDORS"
+                  },
+                  "projectApplicability": "not_established_by_source_metadata"
+                },
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the corridor-based width and capacity requirement for ramps, the separate 36-inch clear-width minimum, and the § 1005 capacity cross-reference."
+          },
+          {
+            "sectionID": "2347",
+            "sectionNumber": "1012.5.2",
+            "title": "1012.5.2 Headroom.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "chapterTitle": "Chapter 10: Means of Egress",
+            "canonicalApplicabilityContext": {
+              "version": "canonical-source-context-v1",
+              "metadataAvailable": true,
+              "chapter": {
+                "number": "10",
+                "title": "Chapter 10: Means of Egress"
+              },
+              "sectionGroup": {
+                "label": "SECTION BC 1012",
+                "title": "RAMPS"
+              },
+              "projectApplicability": "not_established_by_source_metadata"
+            },
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2347-6"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:2347-6",
+                "selectedText": "1012.5.2 1012.5.2 Headroom. The minimum headroom in all parts of the means of egress ramp shall be not less than 84 inches (2133.6 mm).",
+                "canonicalApplicabilityContext": {
+                  "version": "canonical-source-context-v1",
+                  "metadataAvailable": true,
+                  "chapter": {
+                    "number": "10",
+                    "title": "Chapter 10: Means of Egress"
+                  },
+                  "sectionGroup": {
+                    "label": "SECTION BC 1012",
+                    "title": "RAMPS"
+                  },
+                  "projectApplicability": "not_established_by_source_metadata"
+                },
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the 84-inch minimum headroom throughout the ramp."
+          },
+          {
+            "sectionID": "2348",
+            "sectionNumber": "1012.5.3",
+            "title": "1012.5.3 Restrictions.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "chapterTitle": "Chapter 10: Means of Egress",
+            "canonicalApplicabilityContext": {
+              "version": "canonical-source-context-v1",
+              "metadataAvailable": true,
+              "chapter": {
+                "number": "10",
+                "title": "Chapter 10: Means of Egress"
+              },
+              "sectionGroup": {
+                "label": "SECTION BC 1012",
+                "title": "RAMPS"
+              },
+              "projectApplicability": "not_established_by_source_metadata"
+            },
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2348-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:2348-2",
+                "selectedText": "1012.5.3 1012.5.3 Restrictions. Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm).",
+                "canonicalApplicabilityContext": {
+                  "version": "canonical-source-context-v1",
+                  "metadataAvailable": true,
+                  "chapter": {
+                    "number": "10",
+                    "title": "Chapter 10: Means of Egress"
+                  },
+                  "sectionGroup": {
+                    "label": "SECTION BC 1012",
+                    "title": "RAMPS"
+                  },
+                  "projectApplicability": "not_established_by_source_metadata"
+                },
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the prohibition on ramp-width reductions and projections into required ramp or landing width, and the 42-inch door-on-landing clear-width minimum."
+          },
+          {
+            "sectionID": "2351",
+            "sectionNumber": "1012.6.2",
+            "title": "1012.6.2 Width.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "chapterTitle": "Chapter 10: Means of Egress",
+            "canonicalApplicabilityContext": {
+              "version": "canonical-source-context-v1",
+              "metadataAvailable": true,
+              "chapter": {
+                "number": "10",
+                "title": "Chapter 10: Means of Egress"
+              },
+              "sectionGroup": {
+                "label": "SECTION BC 1012",
+                "title": "RAMPS"
+              },
+              "projectApplicability": "not_established_by_source_metadata"
+            },
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2351-8"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:2351-8",
+                "selectedText": "1012.6.2 1012.6.2 Width. The landing width shall be not less than the width of the widest ramp run adjoining the landing.",
+                "canonicalApplicabilityContext": {
+                  "version": "canonical-source-context-v1",
+                  "metadataAvailable": true,
+                  "chapter": {
+                    "number": "10",
+                    "title": "Chapter 10: Means of Egress"
+                  },
+                  "sectionGroup": {
+                    "label": "SECTION BC 1012",
+                    "title": "RAMPS"
+                  },
+                  "projectApplicability": "not_established_by_source_metadata"
+                },
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the minimum width of a landing adjoining ramp runs."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2346",
+          "2348",
+          "2320",
+          "2262",
+          "2345",
+          "2347",
+          "2498",
+          "2351",
+          "2503",
+          "2382",
+          "2417",
+          "2230",
+          "2306",
+          "2433",
+          "2439",
+          "11",
+          "113",
+          "2349"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:2346-1",
+          "research-permitext_discovered-id:2348-2",
+          "research-permitext_discovered-id:2320-3",
+          "research-permitext_discovered-id:2262-4",
+          "research-permitext_discovered-id:2345-5",
+          "research-permitext_discovered-id:2347-6",
+          "research-permitext_discovered-id:2498-7",
+          "research-permitext_discovered-id:2351-8",
+          "research-permitext_discovered-id:2503-9",
+          "research-permitext_discovered-id:2382-10",
+          "research-permitext_cross_reference-id:2417-6",
+          "research-permitext_cross_reference-id:2230-7",
+          "research-permitext_cross_reference-id:2306-9",
+          "research-permitext_cross_reference-id:2433-10",
+          "research-permitext_cross_reference-id:2439-11",
+          "research-permitext_cross_reference-id:11-interpretation-01",
+          "research-permitext_discovered-id:113-13",
+          "research-permitext_cross_reference-id:2349-repair1"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 18,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 5,
+          "governingCitationCount": 0,
+          "supportingCitationCount": 5,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 13,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 11,
+          "crossReferenceCount": 7,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 0,
+          "searchedCorpusCount": 3,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "BC 1011.6",
+              "summary": "BC 1011.6 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2320-3"
+              ]
+            },
+            {
+              "label": "BC 1010.1.6",
+              "summary": "BC 1010.1.6 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2262-4"
+              ]
+            },
+            {
+              "label": "BC 1027.6",
+              "summary": "BC 1027.6 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2503-9"
+              ]
+            },
+            {
+              "label": "BC 1014.8",
+              "summary": "BC 1014.8 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2382-10"
+              ]
+            },
+            {
+              "label": "BC 1020.2",
+              "summary": "BC 1020.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2417-6"
+              ]
+            },
+            {
+              "label": "BC 1011.2",
+              "summary": "BC 1011.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2306-9"
+              ]
+            },
+            {
+              "label": "BC 1023.2",
+              "summary": "BC 1023.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2433-10"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-13"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "BC 1020.2",
+              "summary": "BC 1020.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2417-6"
+              ]
+            },
+            {
+              "label": "BC 1009.6.3",
+              "summary": "BC 1009.6.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2230-7"
+              ]
+            },
+            {
+              "label": "BC 1011.2",
+              "summary": "BC 1011.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2306-9"
+              ]
+            },
+            {
+              "label": "BC 1023.2",
+              "summary": "BC 1023.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2433-10"
+              ]
+            },
+            {
+              "label": "BC 1023.7",
+              "summary": "BC 1023.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2439-11"
+              ]
+            },
+            {
+              "label": "BC 102.1",
+              "summary": "BC 102.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11-interpretation-01"
+              ]
+            },
+            {
+              "label": "BC 1012.6",
+              "summary": "BC 1012.6 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2349-repair1"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "BC 1020.2",
+              "summary": "BC 1020.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2417-6"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:2346-1",
+            "research-permitext_discovered-id:2348-2",
+            "research-permitext_discovered-id:2320-3",
+            "research-permitext_discovered-id:2262-4",
+            "research-permitext_discovered-id:2345-5",
+            "research-permitext_discovered-id:2347-6",
+            "research-permitext_discovered-id:2498-7",
+            "research-permitext_discovered-id:2351-8",
+            "research-permitext_discovered-id:2503-9",
+            "research-permitext_discovered-id:2382-10",
+            "research-permitext_cross_reference-id:2417-6",
+            "research-permitext_cross_reference-id:2230-7",
+            "research-permitext_cross_reference-id:2306-9",
+            "research-permitext_cross_reference-id:2433-10",
+            "research-permitext_cross_reference-id:2439-11",
+            "research-permitext_cross_reference-id:11-interpretation-01",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:2349-repair1"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20261001-corrected-scenario-continuity-v11",
+          "activeRootTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+              "establishedFacts": [],
+              "unknownFacts": [],
+              "scenarioActive": false,
+              "hypotheticalFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2346-1",
+            "research-permitext_cross_reference-id:2417-6",
+            "research-permitext_discovered-id:2347-6",
+            "research-permitext_discovered-id:2348-2",
+            "research-permitext_discovered-id:2351-8"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2346-1",
+            "research-permitext_cross_reference-id:2417-6",
+            "research-permitext_discovered-id:2347-6",
+            "research-permitext_discovered-id:2348-2",
+            "research-permitext_discovered-id:2351-8"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2346-1",
+            "research-permitext_discovered-id:2348-2",
+            "research-permitext_discovered-id:2320-3",
+            "research-permitext_discovered-id:2262-4",
+            "research-permitext_discovered-id:2345-5",
+            "research-permitext_discovered-id:2347-6",
+            "research-permitext_discovered-id:2498-7",
+            "research-permitext_discovered-id:2351-8",
+            "research-permitext_discovered-id:2503-9",
+            "research-permitext_discovered-id:2382-10",
+            "research-permitext_cross_reference-id:2417-6",
+            "research-permitext_cross_reference-id:2230-7",
+            "research-permitext_cross_reference-id:2306-9",
+            "research-permitext_cross_reference-id:2433-10",
+            "research-permitext_cross_reference-id:2439-11",
+            "research-permitext_cross_reference-id:11-interpretation-01",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:2349-repair1"
+          ],
+          "claims": []
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2346-1",
+            "research-permitext_cross_reference-id:2417-6",
+            "research-permitext_discovered-id:2347-6",
+            "research-permitext_discovered-id:2348-2",
+            "research-permitext_discovered-id:2351-8"
+          ],
+          "claims": []
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20261004-opening-applicability-consistency-v33",
+          "pass": true,
+          "contradictoryOpening": false,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:2346-1",
+            "research-permitext_cross_reference-id:2417-6",
+            "research-permitext_discovered-id:2347-6",
+            "research-permitext_discovered-id:2348-2",
+            "research-permitext_discovered-id:2351-8"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:2320-3",
+            "research-permitext_discovered-id:2262-4",
+            "research-permitext_discovered-id:2345-5",
+            "research-permitext_discovered-id:2498-7",
+            "research-permitext_discovered-id:2503-9",
+            "research-permitext_discovered-id:2382-10",
+            "research-permitext_cross_reference-id:2230-7",
+            "research-permitext_cross_reference-id:2306-9",
+            "research-permitext_cross_reference-id:2433-10",
+            "research-permitext_cross_reference-id:2439-11",
+            "research-permitext_cross_reference-id:11-interpretation-01",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:2349-repair1"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 5,
+            "citedProvisionCount": 5,
+            "governingCitationCount": 0,
+            "supportingCitationCount": 5,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 13,
+            "reviewedOnlyProvisionCount": 13,
+            "assembledSourceCount": 18,
+            "assembledProvisionCount": 18
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:2346-1",
+              "sectionID": "2346",
+              "reference": "BC 1012.5.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.5.1 1012.5.1 Width and capacity. The minimum width and required capacity of a means of egress ramp shall be not less than that required for corridors by Section 1020.2. The clear width of a ramp between handrails, if provided, or other permissible projections shall be 36 inches (914.4 mm) minimum."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2348-2",
+              "sectionID": "2348",
+              "reference": "BC 1012.5.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.5.3 1012.5.3 Restrictions. Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm)."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2320-3",
+              "sectionID": "2320",
+              "reference": "BC 1011.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1011.6 1011.6 Stairway landings. There shall be a floor or landing at the top and bottom of each stairway. The width of landings shall be not less than the width of stairways served. Every landing shall have a minimum width measured perpendicular to the direction of travel equal to the width of the stairway. Where the stairway has a straight run, the depth need not exceed 48 inches (1220 mm). Doors opening onto a landing shall not reduce the landing to less than one-half the required width. When fully open, the door shall not project more than 7 inches (177.8 mm) into a landing. When wheelchair spaces are required on the stairway landing in accordance with Section 1009.6.3, the wheelchair space shall not be located in the required width of the landing and doors shall not swing over the wheelchair spaces. Exception: Where stairways connect stepped aisles to cross aisles or concourses, stairway landings are not required at the transition between stairways and stepped aisles constructed in accordance with Section 1029 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2262-4",
+              "sectionID": "2262",
+              "reference": "BC 1010.1.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1010.1.6 1010.1.6 Landings at doors. Landings shall have a width not less than the width of the stairway or the door, whichever is greater. Doors in the fully open position shall not reduce a required dimension by more than 7 inches (177.8 mm). At any stairway landing, or when a door landing serves an occupant load of 50 or more, doors in any position shall not reduce the landing to less than 75 percent of its required width. Landings shall have a length measured in the direction of travel of not less than 44 inches (1117.6 mm). Exceptions: 1. Landing length in the direction of travel in Groups R-3 and U and within individual units of Group R-2 need not exceed 36 inches (914.4 mm). 2. In Group R-2 occupancies, where 36 inch wide stairways are permitted pursuant to Section 1011.2, Exception 1.2, such stairway landing length in the direction of travel shall be permitted to be not less than 36 inches (914.4 mm) or the width of the stairway, whichever is greater. Doors opening onto such stairway landings shall not reduce the landing width."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2345-5",
+              "sectionID": "2345",
+              "reference": "BC 1012.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.5 1012.5 Minimum dimensions. The minimum dimensions of means of egress ramps shall comply with Sections 1012.5.1 through 1012.5.3."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2347-6",
+              "sectionID": "2347",
+              "reference": "BC 1012.5.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.5.2 1012.5.2 Headroom. The minimum headroom in all parts of the means of egress ramp shall be not less than 84 inches (2133.6 mm)."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2498-7",
+              "sectionID": "2498",
+              "reference": "BC 1027.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1027.1 1027.1 Exterior exit stairways and ramps. Exterior exit stairways and ramps serving as an element of a required means of egress shall comply with this section."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2351-8",
+              "sectionID": "2351",
+              "reference": "BC 1012.6.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.6.2 1012.6.2 Width. The landing width shall be not less than the width of the widest ramp run adjoining the landing."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2503-9",
+              "sectionID": "2503",
+              "reference": "BC 1027.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1027.6 1027.6 Exterior exit stairway and ramp protection. Exterior exit stairways and ramps shall be separated from the interior of the building as required in Section 1023.2. Openings shall be limited to those necessary for egress from normally occupied spaces. Where a vertical plane projecting from the edge of an exterior exit stairway or ramp and landings is exposed by other parts of the building at an angle of less than 180 degrees (3.14 rad), the exterior wall shall be rated in accordance with Section 1023.7. Exceptions: 1. In all occupancies other than Group R-1 or R-2, separation from the interior of the building is not required in buildings that are not more than two stories above grade plane where a level of exit discharge serving such occupancies is the first story above grade plane. 2. Separation from the interior of the building is not required where the exterior exit stairway or ramp is served by an exterior exit ramp or balcony that connects two remote exterior exit stairways or other approved exits, with a perimeter that is not less than 50 percent open. To be considered open, the opening shall be not less than 50 percent of the height of the enclosing wall, with the top of the openings not less than 7 feet (2133.6 mm) above the top of the balcony. 3. Separation from the open-ended corridor of the building is not required for exterior exit stairways or ramps, provided that Items 3.1 through 3.5 are met. 3.1. The building, including open-ended corridors, and stairways and ramps, shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1 or 903.3.1.2. 3.2. The open-ended corridors comply with Section 1020 . 3.3. The open-ended corridors are connected on each end to an exterior exit stairway or ramp complying with Section 1027 . 3.4. The exterior walls and openings adjacent to the exterior exit stairway or ramp comply with Section 1023.7. 3.5. At any location in an open-ended corridor where a change of direction exceeding 45 degrees (0.79 rad) occurs, a clear opening of not less than 35 square feet (3.3 m 2 ) or an exterior stairway or ramp shall be provided. Where clear openings are provided, they shall be located so as to minimize the accumulation of smoke or toxic gases."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2382-10",
+              "sectionID": "2382",
+              "reference": "BC 1014.8",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1014.8 1014.8 Projections. On ramps and on ramped aisles that are part of an accessible route, the clear width between handrails shall be 36 inches (914.4 mm) minimum. Projections into the required width of aisles, stairways and ramps at each side shall not exceed 4 1/2 inches (114.3 mm) at or below the handrail height. Projections into the required width shall not be limited above the minimum headroom height required in Section 1011.3. Projections due to intermediate handrails shall not constitute a reduction in the egress width. Exception: The available egress width shall be reduced by the distance between the closest edges of a pair of intermediate handrails where: 1. Such pair of intermediate handrails are provided within the stairway width without a walking surface between the pair; and 2. The distance between the closest edges of such pair of intermediate handrails is greater than 6 inches (152.4 mm)."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2417-6",
+              "sectionID": "2417",
+              "reference": "BC 1020.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1020.2 1020.2 Width and capacity. The required capacity of corridors shall be determined as specified in Section 1005 , but the minimum width shall be not less than that specified in Table 1020.2 . Exception: In Group I-2 occupancies, corridors are not required to have a clear width of 96 inches (2438.4 mm) in areas where there will not be stretcher or bed movement for access to care or as part of the defend-in-place strategy. Table 1020.2 Minimum Corridor Width Occupancy Minimum Width (inches) Occupancy Minimum Width (inches) Any facilities not listed below 44 Access to and utilization of mechanical, plumbing or electrical systems or equipment 24 With an occupant load of 50 or less, except as otherwise required by Chapter 11 36 Within a dwelling unit, in Occupancy Groups I-1 and R-1, except as otherwise required by Section 1107 36 Within a dwelling unit, in Occupancy Groups R-2 and R-3, except as otherwise required by Section 1107 30 In Group E serving classrooms 66 In corridors and areas serving stretcher traffic in occupancies where patients receive outpatient medical care that causes the patients to be incapable of self-preservation 72 Group I-2 in areas where required for bed movement 96 For SI: 1 inch = 25.4 mm."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2230-7",
+              "sectionID": "2230",
+              "reference": "BC 1009.6.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1009.6.3 1009.6.3 Size. Each area of rescue assistance shall be sized to accommodate one wheelchair space of 30 inches by 48 inches (762 mm by 1220 mm) for each 200 occupants or portion thereof, based on the occupant load of the area of rescue assistance and areas served by the area of rescue assistance. Such wheelchair spaces shall not reduce the means of egress minimum width or required capacity. Access to any of the required wheelchair spaces in an area of rescue assistance shall not be obstructed by more than one adjoining wheelchair space."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2306-9",
+              "sectionID": "2306",
+              "reference": "BC 1011.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1011.2 1011.2 Width and capacity. The required capacity of stairways shall be determined as specified in Section 1005 , but the minimum width shall be not less than 44 inches (1117.6 mm). See Section 1009.3 for accessible means of egress stairways. Exceptions: 1. A width of not less than 36 inches (914.4 mm) shall be permitted in: 1.1. A stairway that serves an occupant load of 50 or less cumulative for all stories; or 1.2. A stairway that provides egress to the exit discharge solely for the use of Group R-2 occupancies, provided the building it serves is 125 feet (38 100 mm) or less in height, and provided such a stairway serves not more than 30 occupants per floor. 2. Spiral stairways as provided for in Section 1011.10. 3. Where an inclined platform lift or a stairway chairlift is installed on stairways serving occupancies in Group R-3, or within dwelling units in occupancies in Group R-2, a clear passage width not less than 20 inches (508 mm) shall be provided. Where the seat and platform can be folded when not in use, the distance shall be measured from the folded position."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2433-10",
+              "sectionID": "2433",
+              "reference": "BC 1023.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1023.2 1023.2 Construction. Enclosures for interior exit stairways and ramps shall be constructed as fire barriers in accordance with Section 707 or horizontal assemblies constructed in accordance with Section 711 , or both. Interior exit stairway and ramp enclosures shall have a fire-resistance rating of not less than 2 hours where connecting four stories or more and not less than 1 hour where connecting less than four stories. The number of stories connected by the interior exit stairways or ramps shall include any basements, but not any mezzanines. Interior exit stairways and ramps shall have a fire-resistance rating not less than the floor assembly penetrated, but need not exceed 2 hours. In Group R-1 and R-2 occupancies, where interior exit stairways and ramps are required to have a fire-resistance rating of 2 hours, such enclosures shall be constructed of masonry or masonry equivalent. Wall assemblies constituting masonry equivalent shall be constructed in accordance with department rules. Exceptions: 1. Interior exit stairways and ramps in Group I-3 occupancies in accordance with the provisions of Section 408.3.8. 2. Interior exit stairways within an atrium enclosed in accordance with Section 404.6."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2439-11",
+              "sectionID": "2439",
+              "reference": "BC 1023.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1023.7 1023.7 Interior exit stairway and ramp exterior walls. Exterior walls of the interior exit stairway or ramp shall comply with the requirements of Section 705 for exterior walls. Where nonrated walls or unprotected openings enclose the exterior of the stairway or ramps and the walls or openings are exposed by other parts of the building at an angle of less than 180 degrees (3.14 rad), the building exterior walls within 10 feet (3048 mm) horizontally of a nonrated wall or unprotected opening shall have a fire-resistance rating of not less than 1 hour. Openings within such exterior walls shall be protected by opening protectives having a fire protection rating of not less than 3/4 hour. This construction shall extend vertically from the ground to a point 10 feet (3048 mm) above the topmost landing of the stairway or ramp, or to the roof line, whichever is lower."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:11-interpretation-01",
+              "sectionID": "11",
+              "reference": "BC 102.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "102.1 102.1 General. Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in any specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-13",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ACCESSIBLE MEANS OF EGRESS. A continuous and unobstructed way of egress travel from any accessible point in a building or facility to a public way. Such way of egress travel may include an assisted rescue path. AUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing water to discharge over a specified area. DIMENSIONS. Nominal. The specified dimension plus an allowance for the joints with which the units are to be laid. Nominal dimensions are usually stated in whole numbers. Thickness is given first, followed by height and then length. Specified. Dimensions specified for the manufacture or construction of a unit, joint or element. EXTERIOR EXIT RAMP . An exit component that serves to meet one or more means of egress design requirements , such as required number of exits or exit access travel distance , and is open to yards , courts or public ways . EXTERIOR EXIT STAIRWAY. An exit component that serves to meet one or more means of egress design requirements, such as required number of exits or exit access travel distance, and is open to yards, courts or public ways. FIRE PROTECTION RATING. The period of time that an opening protective assembly will maintain the ability to confine a fire as determined by tests prescribed in Section 716 . Ratings are stated in hours or minutes. RAMP . A walking surface that has a running slope steeper than one unit vertical in 20 units horizontal ( 5 - percent slope ). STORY ABOVE GRADE PLANE . Any story having its finished floor surface entirely above grade plane , except that a basement shall also be considered a story above grade plane ( see \" Story \" and \" Basement \")."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2349-repair1",
+              "sectionID": "2349",
+              "reference": "BC 1012.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.6 1012.6 Landings. Ramps shall have landings at the bottom and top of each ramp, points of turning, entrance, exits and at doors. Landings shall comply with Sections 1012.6.1 through 1012.6.5."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20261003-technical-binding-scope-v28",
+          "pass": true,
+          "applies": false,
+          "scopeDecision": {
+            "schemaVersion": 1,
+            "kind": "zoning_answer_scope",
+            "nonZoningExemption": true,
+            "reasonCodes": [
+              "eligible_technical_bindings"
+            ],
+            "boundReferenceCount": 5,
+            "boundSourceCount": 5,
+            "eligibleTechnicalSourceCount": 5,
+            "missingBindingCount": 0,
+            "pinnedZoningSourceCount": 0,
+            "ancillaryBoundaryCount": 0,
+            "operativeZoningLimitationCount": 0,
+            "bindingRejections": {
+              "nonTechnical": 0,
+              "emptyText": 0,
+              "contextualRole": 0,
+              "contextualReference": 0,
+              "referenceOnly": 0,
+              "sectionReference": 0,
+              "incomplete": 0
+            }
+          },
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20261005-repaired-bound-parent-scope-v84",
+          "retrievalQuery": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20261004-leading-modifier-topic-continuity-v13",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "citedSubjectContinuation": false,
+              "causalSubjectContinuation": false,
+              "definiteSubjectContinuation": false,
+              "humanVocabularySubjectContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20261001-corrected-scenario-continuity-v11",
+          "conversationFactPromptVersion": "20260909-fact-context-v1",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "initialSupplementalCharacterCeiling": 45952,
+            "repairCharacterReservation": 2048,
+            "repairCrossReferenceReservation": 1,
+            "supplementalCharacterCount": 13663,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 6,
+            "topicDependencyCount": 0,
+            "interpretationContextCount": 1,
+            "chapterScopeContextCount": 0,
+            "characterCount": 13663,
+            "resolverFailureCount": 2,
+            "nonMaterialCandidateCount": 0,
+            "repairRetrievalReadCount": 1,
+            "repairRetrievalSourceCount": 1
+          },
+          "repairRetrieval": {
+            "version": "20261005-grounded-parent-table-repair-v4",
+            "attemptedReads": 1,
+            "supplied": [
+              {
+                "sourceID": "research-permitext_cross_reference-id:2349-repair1",
+                "codePrefix": "BC",
+                "corpusID": "nyc-2022-construction-codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeEdition": "2022 New York City Construction Codes",
+                "jurisdiction": "New York City",
+                "sectionNumber": "1012.6",
+                "referenceKind": "ancestor_scope",
+                "textSHA256": "b4ca9f0e871a1a41a4747baa4e9f5ea79f57bd9f666b2bd041067808f24b6837",
+                "replaced": false
+              }
+            ],
+            "unresolved": []
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 2,
+              "text": "2 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+            "semanticSearch": {
+              "version": "20261002-semantic-passage-search-v1",
+              "enabled": true,
+              "model": "text-embedding-3-small",
+              "dimensions": 256,
+              "queryCached": false,
+              "fallbackReason": null,
+              "hitCount": 100,
+              "elapsedMS": 753,
+              "costUSD": 8.000000000000001e-7,
+              "coveredPassages": 52945,
+              "totalPassages": 52962,
+              "usage": {
+                "prompt_tokens": 40,
+                "total_tokens": 40
+              }
+            },
+            "passageIndexFingerprint": "8b23b96bc2eeea92b32aee1f5ca198201556d517bd302cb6b98906556ed1130d",
+            "searchedSectionCount": 17374,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              },
+              {
+                "id": "nyc-2022-fire-code",
+                "label": "2022 NYC Fire Code",
+                "codeEdition": "2022 NYC Fire Code — current consolidated text",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codePrefixes": [
+                  "FC"
+                ],
+                "routeReason": "authorized current-library recall; applicability unresolved"
+              },
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "authorized current-library recall; applicability unresolved"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260921-supporting-web-v23",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "Routed New York City enacted sources",
+            "codeVersion": "multiple-authorized-corpora",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              },
+              {
+                "id": "nyc-2022-fire-code",
+                "label": "2022 NYC Fire Code",
+                "codeEdition": "2022 NYC Fire Code — current consolidated text",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-consolidation",
+                "routeReason": "authorized current-library recall; applicability unresolved",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "FC"
+                ]
+              },
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "authorized current-library recall; applicability unresolved",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · 2022 NYC Fire Code · NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-10-05T18:00:57.520Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 2,
+          "regenerated": true,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "missed_material_conclusion",
+                  "detail": "The corridor-width discussion omits the table’s 24-inch minimum for access to and utilization of mechanical, plumbing, or electrical systems or equipment. It also lists the 96-inch Group I-2 width without the adjoining exception: that width is not required in areas without stretcher or bed movement for access to care or as part of the defend-in-place strategy. Both are in the supplied BC 1020.2 passage and materially qualify the table summary."
+                },
+                {
+                  "type": "unnecessary_qualification",
+                  "detail": "The question asks for a general explanation of the code, not a project-specific determination. The two missingFacts entries request project inputs and BC § 1005 calculation inputs that are not needed to answer it. Keep the accurate evidence limitation about the absent § 1005 text in the narrative, but remove those entries from missingFacts."
+                }
+              ],
+              "missingFactsOnly": false,
+              "materialScopeReview": {
+                "packetHash": "6899d339a1093c79667f96ade197b17c17aff05df8f09dd9144aca8b99028ba2",
+                "unboundCategoricalApplication": false,
+                "checks": {
+                  "research-permitext_discovered-id:2346-1": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {
+                      "scope_1": "established"
+                    }
+                  },
+                  "research-permitext_discovered-id:2348-2": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {
+                      "scope_2": "established"
+                    }
+                  },
+                  "research-permitext_discovered-id:2347-6": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {}
+                  },
+                  "research-permitext_discovered-id:2351-8": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {
+                      "scope_3": "condition_preserved"
+                    }
+                  },
+                  "research-permitext_cross_reference-id:2417-6": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {}
+                  }
+                }
+              },
+              "reviewedAnswerHash": "d0609e631930d706a2700d182ec1d934fefd14e9689fd78b9b0bfa3ee035fadb",
+              "model": "gpt-6-luna",
+              "reasoningEffort": "medium"
+            },
+            {
+              "pass": true,
+              "issues": [],
+              "missingFactsOnly": false,
+              "materialScopeReview": {
+                "packetHash": "c717fd80d997115f2edec007c00792cf91b7888d00c90d01e7cfe5d556d1545a",
+                "unboundCategoricalApplication": false,
+                "checks": {
+                  "research-permitext_discovered-id:2346-1": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {
+                      "scope_1": "established"
+                    }
+                  },
+                  "research-permitext_discovered-id:2348-2": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {
+                      "scope_2": "established"
+                    }
+                  },
+                  "research-permitext_discovered-id:2347-6": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {}
+                  },
+                  "research-permitext_discovered-id:2351-8": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {
+                      "scope_3": "condition_preserved"
+                    }
+                  },
+                  "research-permitext_cross_reference-id:2417-6": {
+                    "categoricalApplication": false,
+                    "sourceResult": "supported",
+                    "relations": {}
+                  }
+                }
+              },
+              "reviewedAnswerHash": "e29181d2048ea4abeee42f88cb61aa6ffcc0a0701990dd3b84af083a31e33b63",
+              "model": "gpt-6-luna",
+              "reasoningEffort": "medium"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-10-05T18:00:57.520Z",
+        "routing": {
+          "version": "20261003-selective-complex-review-v7",
+          "mode": "single",
+          "answerTier": "accurate",
+          "reasons": [
+            "single_model_configuration"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-repair-evidence-map",
+          "requestedAnswerModel": "gpt-6-luna",
+          "actualAnswerModel": "gpt-6-luna",
+          "verificationModel": "gpt-6-luna",
+          "requestedVerificationModel": "gpt-6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 2,
+          "verificationIssueTypes": [
+            "missed_material_conclusion",
+            "unnecessary_qualification"
+          ]
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "expected": "BC1012.5.1: minwidth/requiredcapacity at leastcorridor1020.2;36in clearbetweenhandrails/permissibleprojections.1012.5.2 headroom84in throughout, not common80in.1012.5.3 no narrowingindirectionofegress, noprojectionsintorequiredramp/landingwidth; dooropeninglandings mustnotreduceclearbelow42in. Preserve capacity/clearwidth/doorwidth asdifferentconstraints."
+    },
+    {
+      "id": "continuation-egress-ramp-2",
+      "question": "For this scenario the means-of-egress ramp has exactly eighty-four inches of headroom in every part. Does that meet this code headroom minimum? Answer about headroom only.",
+      "status": 200,
+      "seconds": 6.082749333,
+      "projectID": null,
+      "topicContext": {
+        "contextRevision": 0,
+        "version": "20261004-leading-modifier-topic-continuity-v13",
+        "originalTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+        "rootTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+        "currentTopic": "For this scenario the means-of-egress ramp has exactly eighty-four inches of headroom in every part. Does that meet this code headroom minimum? Answer about headroom only.",
+        "lastDecision": "continuation",
+        "factTopics": [
+          {
+            "rootTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+            "establishedFacts": [],
+            "unknownFacts": [],
+            "scenarioActive": false,
+            "hypotheticalFacts": []
+          }
+        ],
+        "updatedAt": "2026-10-05T18:02:20.521Z"
+      },
+      "projectInformation": null,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-6-luna",
+        "requestedModel": "gpt-6-luna",
+        "promptVersion": "20260930-project-investigation-v33:compact-v3:conversational-v4",
+        "evidenceVersion": "20261005-repaired-bound-parent-scope-v84:structured-v1",
+        "codeEdition": "Routed New York City enacted sources",
+        "codeVersion": "multiple-authorized-corpora",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "Routed New York City enacted sources",
+          "codeVersion": "multiple-authorized-corpora",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            },
+            {
+              "id": "nyc-2022-fire-code",
+              "label": "2022 NYC Fire Code",
+              "codeEdition": "2022 NYC Fire Code — current consolidated text",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-consolidation",
+              "routeReason": "authorized current-library recall; applicability unresolved",
+              "blockedReason": null,
+              "codePrefixes": [
+                "FC"
+              ]
+            },
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "authorized current-library recall; applicability unresolved",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · 2022 NYC Fire Code · NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-10-05T18:02:18.874Z"
+        },
+        "answerText": "**Yes.** Exactly 84 inches meets the 2022 NYC Building Code minimum: headroom in all parts of a means-of-egress ramp must be at least 84 inches (BC § 1012.5.2).",
+        "conclusion": "**Yes.** Exactly 84 inches meets the 2022 NYC Building Code minimum: headroom in all parts of a means-of-egress ramp must be at least 84 inches (BC § 1012.5.2).",
+        "supportedPoints": [
+          {
+            "heading": "Ramp headroom minimum",
+            "explanation": "The minimum headroom in all parts of a means-of-egress ramp is 84 inches (2133.6 mm); therefore, the stated 84 inches meets that minimum.",
+            "sectionID": "2347",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2347-1"
+            ],
+            "evidenceRole": "supporting"
+          }
+        ],
+        "explanation": "",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "2347",
+            "sectionNumber": "1012.5.2",
+            "title": "1012.5.2 Headroom.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "chapterTitle": "Chapter 10: Means of Egress",
+            "canonicalApplicabilityContext": {
+              "version": "canonical-source-context-v1",
+              "metadataAvailable": true,
+              "chapter": {
+                "number": "10",
+                "title": "Chapter 10: Means of Egress"
+              },
+              "sectionGroup": {
+                "label": "SECTION BC 1012",
+                "title": "RAMPS"
+              },
+              "projectApplicability": "not_established_by_source_metadata"
+            },
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2347-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:2347-1",
+                "selectedText": "1012.5.2 1012.5.2 Headroom. The minimum headroom in all parts of the means of egress ramp shall be not less than 84 inches (2133.6 mm).",
+                "canonicalApplicabilityContext": {
+                  "version": "canonical-source-context-v1",
+                  "metadataAvailable": true,
+                  "chapter": {
+                    "number": "10",
+                    "title": "Chapter 10: Means of Egress"
+                  },
+                  "sectionGroup": {
+                    "label": "SECTION BC 1012",
+                    "title": "RAMPS"
+                  },
+                  "projectApplicability": "not_established_by_source_metadata"
+                },
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the minimum headroom throughout a means-of-egress ramp and supports that exactly 84 inches meets it."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2347",
+          "2346",
+          "2417",
+          "370",
+          "2382",
+          "2307",
+          "2129",
+          "2345",
+          "2163",
+          "2348",
+          "361",
+          "2535",
+          "2328",
+          "2127",
+          "2539",
+          "11",
+          "113"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:2347-1",
+          "research-permitext_discovered-id:2346-2",
+          "research-permitext_discovered-id:2417-3",
+          "research-permitext_discovered-id:370-4",
+          "research-permitext_discovered-id:2382-5",
+          "research-permitext_discovered-id:2307-6",
+          "research-permitext_discovered-id:2129-7",
+          "research-permitext_discovered-id:2345-8",
+          "research-permitext_discovered-id:2163-9",
+          "research-permitext_discovered-id:2348-10",
+          "research-permitext_cross_reference-id:361-2",
+          "research-permitext_cross_reference-id:2535-3",
+          "research-permitext_cross_reference-id:2328-4",
+          "research-permitext_cross_reference-id:2127-5",
+          "research-permitext_cross_reference-id:2539-14",
+          "research-permitext_cross_reference-id:11-interpretation-01",
+          "research-permitext_discovered-id:113-13"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 17,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 0,
+          "supportingCitationCount": 1,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 16,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 11,
+          "crossReferenceCount": 6,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 0,
+          "searchedCorpusCount": 3,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "BC 1020.2",
+              "summary": "BC 1020.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2417-3"
+              ]
+            },
+            {
+              "label": "BC 1014.8",
+              "summary": "BC 1014.8 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2382-5"
+              ]
+            },
+            {
+              "label": "BC 1011.3",
+              "summary": "BC 1011.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2307-6"
+              ]
+            },
+            {
+              "label": "BC 1003.3.1",
+              "summary": "BC 1003.3.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2129-7"
+              ]
+            },
+            {
+              "label": "BC 1005.3.2",
+              "summary": "BC 1005.3.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2163-9"
+              ]
+            },
+            {
+              "label": "BC 1029.6.2",
+              "summary": "BC 1029.6.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2535-3"
+              ]
+            },
+            {
+              "label": "BC 1003.2",
+              "summary": "BC 1003.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2127-5"
+              ]
+            },
+            {
+              "label": "BC 1029.6.3",
+              "summary": "BC 1029.6.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2539-14"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-13"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "BC 406.5",
+              "summary": "BC 406.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:361-2"
+              ]
+            },
+            {
+              "label": "BC 1029.6.2",
+              "summary": "BC 1029.6.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2535-3"
+              ]
+            },
+            {
+              "label": "BC 1011.10",
+              "summary": "BC 1011.10 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2328-4"
+              ]
+            },
+            {
+              "label": "BC 1003.2",
+              "summary": "BC 1003.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2127-5"
+              ]
+            },
+            {
+              "label": "BC 1029.6.3",
+              "summary": "BC 1029.6.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2539-14"
+              ]
+            },
+            {
+              "label": "BC 102.1",
+              "summary": "BC 102.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11-interpretation-01"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "BC 1020.2",
+              "summary": "BC 1020.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2417-3"
+              ]
+            },
+            {
+              "label": "BC 1005.3.2",
+              "summary": "BC 1005.3.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2163-9"
+              ]
+            },
+            {
+              "label": "BC 1029.6.2",
+              "summary": "BC 1029.6.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2535-3"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:2347-1",
+            "research-permitext_discovered-id:2346-2",
+            "research-permitext_discovered-id:2417-3",
+            "research-permitext_discovered-id:370-4",
+            "research-permitext_discovered-id:2382-5",
+            "research-permitext_discovered-id:2307-6",
+            "research-permitext_discovered-id:2129-7",
+            "research-permitext_discovered-id:2345-8",
+            "research-permitext_discovered-id:2163-9",
+            "research-permitext_discovered-id:2348-10",
+            "research-permitext_cross_reference-id:361-2",
+            "research-permitext_cross_reference-id:2535-3",
+            "research-permitext_cross_reference-id:2328-4",
+            "research-permitext_cross_reference-id:2127-5",
+            "research-permitext_cross_reference-id:2539-14",
+            "research-permitext_cross_reference-id:11-interpretation-01",
+            "research-permitext_discovered-id:113-13"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20261001-corrected-scenario-continuity-v11",
+          "activeRootTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+              "establishedFacts": [],
+              "unknownFacts": [],
+              "scenarioActive": false,
+              "hypotheticalFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2347-1"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2347-1"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2347-1",
+            "research-permitext_discovered-id:2346-2",
+            "research-permitext_discovered-id:2417-3",
+            "research-permitext_discovered-id:370-4",
+            "research-permitext_discovered-id:2382-5",
+            "research-permitext_discovered-id:2307-6",
+            "research-permitext_discovered-id:2129-7",
+            "research-permitext_discovered-id:2345-8",
+            "research-permitext_discovered-id:2163-9",
+            "research-permitext_discovered-id:2348-10",
+            "research-permitext_cross_reference-id:361-2",
+            "research-permitext_cross_reference-id:2535-3",
+            "research-permitext_cross_reference-id:2328-4",
+            "research-permitext_cross_reference-id:2127-5",
+            "research-permitext_cross_reference-id:2539-14",
+            "research-permitext_cross_reference-id:11-interpretation-01",
+            "research-permitext_discovered-id:113-13"
+          ],
+          "claims": []
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2347-1"
+          ],
+          "claims": []
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20261004-opening-applicability-consistency-v33",
+          "pass": true,
+          "contradictoryOpening": false,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:2347-1"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:2346-2",
+            "research-permitext_discovered-id:2417-3",
+            "research-permitext_discovered-id:370-4",
+            "research-permitext_discovered-id:2382-5",
+            "research-permitext_discovered-id:2307-6",
+            "research-permitext_discovered-id:2129-7",
+            "research-permitext_discovered-id:2345-8",
+            "research-permitext_discovered-id:2163-9",
+            "research-permitext_discovered-id:2348-10",
+            "research-permitext_cross_reference-id:361-2",
+            "research-permitext_cross_reference-id:2535-3",
+            "research-permitext_cross_reference-id:2328-4",
+            "research-permitext_cross_reference-id:2127-5",
+            "research-permitext_cross_reference-id:2539-14",
+            "research-permitext_cross_reference-id:11-interpretation-01",
+            "research-permitext_discovered-id:113-13"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 0,
+            "supportingCitationCount": 1,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 16,
+            "reviewedOnlyProvisionCount": 16,
+            "assembledSourceCount": 17,
+            "assembledProvisionCount": 17
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:2347-1",
+              "sectionID": "2347",
+              "reference": "BC 1012.5.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.5.2 1012.5.2 Headroom. The minimum headroom in all parts of the means of egress ramp shall be not less than 84 inches (2133.6 mm)."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2346-2",
+              "sectionID": "2346",
+              "reference": "BC 1012.5.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.5.1 1012.5.1 Width and capacity. The minimum width and required capacity of a means of egress ramp shall be not less than that required for corridors by Section 1020.2. The clear width of a ramp between handrails, if provided, or other permissible projections shall be 36 inches (914.4 mm) minimum."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2417-3",
+              "sectionID": "2417",
+              "reference": "BC 1020.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1020.2 1020.2 Width and capacity. The required capacity of corridors shall be determined as specified in Section 1005 , but the minimum width shall be not less than that specified in Table 1020.2 . Exception: In Group I-2 occupancies, corridors are not required to have a clear width of 96 inches (2438.4 mm) in areas where there will not be stretcher or bed movement for access to care or as part of the defend-in-place strategy. Table 1020.2 Minimum Corridor Width Occupancy Minimum Width (inches) Occupancy Minimum Width (inches) Any facilities not listed below 44 Access to and utilization of mechanical, plumbing or electrical systems or equipment 24 With an occupant load of 50 or less, except as otherwise required by Chapter 11 36 Within a dwelling unit, in Occupancy Groups I-1 and R-1, except as otherwise required by Section 1107 36 Within a dwelling unit, in Occupancy Groups R-2 and R-3, except as otherwise required by Section 1107 30 In Group E serving classrooms 66 In corridors and areas serving stretcher traffic in occupancies where patients receive outpatient medical care that causes the patients to be incapable of self-preservation 72 Group I-2 in areas where required for bed movement 96 For SI: 1 inch = 25.4 mm."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:370-4",
+              "sectionID": "370",
+              "reference": "BC 406.5.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "406.5.7 406.5.7 Means of egress. Open parking garages shall meet the means of egress requirements of Chapter 10 . However, where no persons other than parking attendants are permitted, required exit stairways shall not be less than 36 inches (914 mm) wide."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2382-5",
+              "sectionID": "2382",
+              "reference": "BC 1014.8",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1014.8 1014.8 Projections. On ramps and on ramped aisles that are part of an accessible route, the clear width between handrails shall be 36 inches (914.4 mm) minimum. Projections into the required width of aisles, stairways and ramps at each side shall not exceed 4 1/2 inches (114.3 mm) at or below the handrail height. Projections into the required width shall not be limited above the minimum headroom height required in Section 1011.3. Projections due to intermediate handrails shall not constitute a reduction in the egress width. Exception: The available egress width shall be reduced by the distance between the closest edges of a pair of intermediate handrails where: 1. Such pair of intermediate handrails are provided within the stairway width without a walking surface between the pair; and 2. The distance between the closest edges of such pair of intermediate handrails is greater than 6 inches (152.4 mm)."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2307-6",
+              "sectionID": "2307",
+              "reference": "BC 1011.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1011.3 1011.3 Headroom. Stairways shall have a headroom clearance of not less than 84 inches (2133.6 mm) measured vertically from a line connecting the edge of the nosings. Such headroom shall be continuous above the stairway to the point where the line intersects the landing below, one tread depth beyond the bottom riser. The minimum clearance shall be maintained the full width of the stairway and landing. Projections into the required width shall not be limited above the minimum headroom height. Exceptions: 1. In Group R-2 and R-3 occupancies stairways shall have a headroom clearance of not less than 80 inches (2032 mm). 2. Spiral stairways complying with Section 1011.10 are permitted a 78-inch (1981.2 mm) headroom clearance. 3. In Group R-3 occupancies; within dwelling units in Group R-2 occupancies; and in Group U occupancies that are accessory to a Group R-3 occupancy or accessory to individual dwelling units in Group R-2 occupancies; where the nosings of treads at the side of a flight extend under the edge of a floor opening through which the stair passes, the floor opening shall be allowed to project horizontally into the required headroom not more than 4 3/4 inches (120.7 mm)."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2129-7",
+              "sectionID": "2129",
+              "reference": "BC 1003.3.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1003.3.1 1003.3.1 Headroom. Protruding objects are permitted to extend below the minimum ceiling height required by Section 1003.2 where a minimum headroom of 84 inches (2133.6 mm) is provided over any walking surface, including walks, corridors, aisles and passageways. Not more than 50 percent of the ceiling area of a means of egress shall be reduced in height by protruding objects. Exception: Door closers and stops shall not reduce headroom to less than 78 inches (1981.2 mm). A barrier shall be provided where the vertical clearance is less than 80 inches (2032 mm) high. The leading edge of such a barrier shall be located 27 inches (685 mm) maximum above the floor."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2345-8",
+              "sectionID": "2345",
+              "reference": "BC 1012.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.5 1012.5 Minimum dimensions. The minimum dimensions of means of egress ramps shall comply with Sections 1012.5.1 through 1012.5.3."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2163-9",
+              "sectionID": "2163",
+              "reference": "BC 1005.3.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1005.3.2 1005.3.2 Other egress components. The capacity, in inches, of means of egress components other than stairways shall be calculated by multiplying the occupant load served by such component by a means of egress capacity factor of 0.2 inch (5.1 mm) per occupant. Exceptions: 1. Facilities with smoke-protected assembly seating shall be permitted to use the capacity factors in Table 1029.6.2 indicated for level or ramped aisles for means of egress components other than stairways where the entire path for means of egress from the seating to the exit discharge is provided with a smoke control system complying with Section 909 . 2. Facilities with outdoor smoke-protected assembly seating shall be permitted to the capacity factors in Section 1029.6.3 indicated for level or ramped aisles for means of egress components other than stairways where the entire path for means of egress from the seating to the exit discharge is open to the outdoors."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2348-10",
+              "sectionID": "2348",
+              "reference": "BC 1012.5.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1012.5.3 1012.5.3 Restrictions. Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm)."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:361-2",
+              "sectionID": "361",
+              "reference": "BC 406.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "406.5 406.5 Open parking garages. Open parking garages shall comply with Sections 406.5.1 through 406.5.11."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2535-3",
+              "sectionID": "2535",
+              "reference": "BC 1029.6.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1029.6.2 1029.6.2 Smoke-protected assembly seating. The required capacity in inches (mm) of the aisle for smoke-protected assembly seating shall be not less than the occupant load served by the egress element multiplied by the appropriate factor in Table 1029.6.2 of this code. The total number of seats specified shall be those within the space and exposed to the same smoke-protected environment. Interpolation is permitted between the specific values shown. A life safety evaluation, complying with NFPA 101, shall be done for a facility utilizing the reduced width requirements of Table 1029.6.2 of this code for smoke-protected assembly seating subject to the approval by the commissioner. Exception: For outdoor smoke-protected assembly seating with an occupant load not greater than 18,000, the required capacity in inches (mm) shall be determined using the factors in Section 1029.6.3. Table 1029.6.2 Capacity for Aisles for Smoke-Protected Assembly Total Number of Seats in the Smoke-Protected Assembly Seating Inches of Clear Width Per Seat Served Stepped aisles with handrails within 30 inches Stepped aisles without handrails within 30 inches Level aisles or ramped aisles not steeper than 1 in 10 in slope Ramped aisles steeper than 1 in 10 in slope Equal to or less than 5,000 0.200 0.250 0.150 0.165 10,000 0.130 0.163 0.100 0.110 15,000 0.096 0.120 0.070 0.077 20,000 0.076 0.095 0.056 0.062 Equal to or greater than 25,000 0.060 0.075 0.044 0.048 For SI: 1 inch = 25.4 mm."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2328-4",
+              "sectionID": "2328",
+              "reference": "BC 1011.10",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1011.10 1011.10 Spiral stairways. Spiral stairways are permitted to be used as a component in the means of egress only within dwelling units or from a space not more than 250 square feet (23.2 m 2 ) in area and serving not more than five occupants, or from technical production areas in accordance with Section 410.6. A spiral stairway shall have a 7 1/2-inch (190.5 mm) minimum clear tread depth at a point 12 inches (304.8 mm) from the narrow edge. The risers shall be sufficient to provide a headroom of 78 inches (1981.2 mm) minimum, but riser height shall not be more than 9 1/2 inches (241.3 mm). The minimum stairway clear width at and below the handrail shall be 26 inches (660.4 mm)."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2127-5",
+              "sectionID": "2127",
+              "reference": "BC 1003.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1003.2 1003.2 Ceiling height. The means of egress shall have a ceiling height of not less than 7 feet, 6 inches (2286 mm). Exceptions: 1. Ceilings that are permitted to be less than 7 feet, 6 inches (2286 mm) in accordance with Section 1208.2. 2. Ceilings of dwelling units and sleeping units within residential occupancies in accordance with Section 1208.2. 3. Allowable projections in accordance with Section 1003.3. 4. Stair headroom in accordance with Section 1011.3. 5. Door height in accordance with Section 1010.1.1.3. 6. Ramp headroom in accordance with Section 1012.5.2. 7. The clear height of floor levels in vehicular and pedestrian traffic areas in of public and private parking garages in accordance with Section 406.4.1. 8. Areas above and below mezzanine floors in accordance with Section 505.2."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2539-14",
+              "sectionID": "2539",
+              "reference": "BC 1029.6.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1029.6.3 1029.6.3 Outdoor smoke-protected assembly seating. The required capacity in inches (mm) of aisles shall be not less than the total occupant load served by the egress element multiplied by 0.08 (2.0 mm) where egress is by stepped aisle and multiplied by 0.06 (1.52 mm) where egress is by ramps, corridors, tunnels, vomitories, level aisles or ramped aisles. Exception: The required capacity in inches (mm) of aisles shall be permitted to comply with Section 1029.6.2 for the number of seats in the outdoor smoke-protected assembly seating where Section 1029.6.2 permits less capacity."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:11-interpretation-01",
+              "sectionID": "11",
+              "reference": "BC 102.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "102.1 102.1 General. Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in any specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-13",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "DIMENSIONS. Nominal. The specified dimension plus an allowance for the joints with which the units are to be laid. Nominal dimensions are usually stated in whole numbers. Thickness is given first, followed by height and then length. Specified. Dimensions specified for the manufacture or construction of a unit, joint or element. DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. EXIT DISCHARGE. That portion of a means of egress system between the termination of an exit and a public way. OCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed . OPEN PARKING GARAGE . A structure or portion of a structure with the openings as described in Section 406 . 5 . 2 that is used for the parking or storage of private motor vehicles as described in Section 406 . 5.3 . PARKING GARAGE. A structure or portion of a structure, other than a private garage or carport, used for the parking or storage of motor vehicles. RAMP . A walking surface that has a running slope steeper than one unit vertical in 20 units horizontal ( 5 - percent slope ). SMOKE-PROTECTED ASSEMBLY SEATING. Seating served by means of egress that is not subject to smoke accumulation within or under a structure."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20261003-technical-binding-scope-v28",
+          "pass": true,
+          "applies": false,
+          "scopeDecision": {
+            "schemaVersion": 1,
+            "kind": "zoning_answer_scope",
+            "nonZoningExemption": true,
+            "reasonCodes": [
+              "eligible_technical_bindings"
+            ],
+            "boundReferenceCount": 1,
+            "boundSourceCount": 1,
+            "eligibleTechnicalSourceCount": 1,
+            "missingBindingCount": 0,
+            "pinnedZoningSourceCount": 0,
+            "ancillaryBoundaryCount": 0,
+            "operativeZoningLimitationCount": 0,
+            "bindingRejections": {
+              "nonTechnical": 0,
+              "emptyText": 0,
+              "contextualRole": 0,
+              "contextualReference": 0,
+              "referenceOnly": 0,
+              "sectionReference": 0,
+              "incomplete": 0
+            }
+          },
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20261005-repaired-bound-parent-scope-v84",
+          "retrievalQuery": "Follow-up: For this scenario the means-of-egress ramp has exactly eighty-four inches of headroom in every part. Does that meet this code headroom minimum? Answer about headroom only.\nPrevious topic: Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.\nPreviously discussed provisions: BC § 1012.5.1, BC § 1020.2, BC § 1012.5.2",
+          "previousTopicApplied": true,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20261004-leading-modifier-topic-continuity-v13",
+            "decision": "continuation",
+            "question": {
+              "text": "For this scenario the means-of-egress ramp has exactly eighty-four inches of headroom in every part. Does that meet this code headroom minimum? Answer about headroom only.",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+              "source": "explicit_root",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+              "source": "explicit_current",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Explain the 2022 NYC Building Code minimum dimensions for a means-of-egress ramp: corridor-based capacity, clear width, headroom, width reductions and a door opening onto a landing.",
+              "source": "explicit_root",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "For this scenario the means-of-egress ramp has exactly eighty-four inches of headroom in every part. Does that meet this code headroom minimum? Answer about headroom only.",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": true,
+              "includeCurrentTopic": true,
+              "replaceRootTopic": false
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "citedSubjectContinuation": true,
+              "causalSubjectContinuation": false,
+              "definiteSubjectContinuation": true,
+              "humanVocabularySubjectContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0.35714285714285715,
+              "currentTokenOverlap": 0.35714285714285715
+            }
+          },
+          "conversationFactsVersion": "20261001-corrected-scenario-continuity-v11",
+          "conversationFactPromptVersion": "20260909-fact-context-v1",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "initialSupplementalCharacterCeiling": 45952,
+            "repairCharacterReservation": 2048,
+            "repairCrossReferenceReservation": 1,
+            "supplementalCharacterCount": 11462,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 5,
+            "topicDependencyCount": 0,
+            "interpretationContextCount": 1,
+            "chapterScopeContextCount": 0,
+            "characterCount": 11462,
+            "resolverFailureCount": 3,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 3,
+              "text": "3 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+            "semanticSearch": {
+              "version": "20261002-semantic-passage-search-v1",
+              "enabled": true,
+              "model": "text-embedding-3-small",
+              "dimensions": 256,
+              "queryCached": false,
+              "fallbackReason": null,
+              "hitCount": 100,
+              "elapsedMS": 481,
+              "costUSD": 9.400000000000001e-7,
+              "coveredPassages": 52945,
+              "totalPassages": 52962,
+              "usage": {
+                "prompt_tokens": 47,
+                "total_tokens": 47
+              }
+            },
+            "passageIndexFingerprint": "8b23b96bc2eeea92b32aee1f5ca198201556d517bd302cb6b98906556ed1130d",
+            "searchedSectionCount": 17374,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              },
+              {
+                "id": "nyc-2022-fire-code",
+                "label": "2022 NYC Fire Code",
+                "codeEdition": "2022 NYC Fire Code — current consolidated text",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codePrefixes": [
+                  "FC"
+                ],
+                "routeReason": "authorized current-library recall; applicability unresolved"
+              },
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "authorized current-library recall; applicability unresolved"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260921-supporting-web-v23",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "Routed New York City enacted sources",
+            "codeVersion": "multiple-authorized-corpora",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              },
+              {
+                "id": "nyc-2022-fire-code",
+                "label": "2022 NYC Fire Code",
+                "codeEdition": "2022 NYC Fire Code — current consolidated text",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-consolidation",
+                "routeReason": "authorized current-library recall; applicability unresolved",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "FC"
+                ]
+              },
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "authorized current-library recall; applicability unresolved",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · 2022 NYC Fire Code · NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-10-05T18:02:18.874Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "missingFactsOnly": false,
+              "materialScopeReview": {
+                "packetHash": "ef3a0a5c36e4a7de380fa92470841d45639b5322ee02627e624d73af052b952d",
+                "unboundCategoricalApplication": false,
+                "checks": {
+                  "research-permitext_discovered-id:2347-1": {
+                    "categoricalApplication": true,
+                    "sourceResult": "supported",
+                    "relations": {
+                      "scope_1": "established"
+                    }
+                  }
+                }
+              },
+              "reviewedAnswerHash": "f87a597c7d5006a8e3a0c6557ecb4892a7316419199c9de9a7d117d0e2e2b411",
+              "model": "gpt-6-luna",
+              "reasoningEffort": "medium"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-10-05T18:02:18.874Z",
+        "routing": {
+          "version": "20261003-selective-complex-review-v7",
+          "mode": "single",
+          "answerTier": "accurate",
+          "reasons": [
+            "single_model_configuration"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-6-luna",
+          "actualAnswerModel": "gpt-6-luna",
+          "verificationModel": "gpt-6-luna",
+          "requestedVerificationModel": "gpt-6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "expected": "Yes forheadroomonly: exactly84in throughout meets84in minimum. Do not claim all rampwidth,capacity,landing,slope,handrail or accessibility requirements met."
+    }
+  ],
+  "accountAccess": {
+    "scope": "temporary isolated local account",
+    "signInHTTPStatus": 200,
+    "grantHTTPStatus": 200,
+    "activePro": true,
+    "researchMode": "included",
+    "grantType": "lifetimeGrant",
+    "productionSubscriptionTested": false
+  },
+  "projectID": null,
+  "projectIDsByConversation": {},
+  "activeCase": "continuation-egress-ramp-2",
+  "finishedAt": "2026-10-05T18:02:24.922Z"
+}
