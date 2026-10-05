@@ -646,7 +646,8 @@ assert.doesNotMatch(clientSource, /notebook-add-to-report|reportButton\.textCont
 assert.match(clientSource, /headingTitle\.textContent = "Notebook"[\s\S]*?heading\.append\(headingTitle\)/, "Notebook does not render its title.");
 assert.doesNotMatch(clientSource, /projectOwnership/, "Notebook or Report still repeats its owning Project beneath the tool title.");
 assert.doesNotMatch(clientSource, /Professional analysis/, "Notebook still repeats Project context beneath its title.");
-assert.match(clientSource, /newButton\.title = "New Note"[\s\S]*?<span>New Note<\/span>[\s\S]*?welcomeCopy\.textContent = "Develop your reasoning in a Note, link enacted evidence or Research when useful, and add the finished analysis to the Report\."[\s\S]*?welcomeAction\.textContent = "Create first Note"/, "Notebook does not present Notes as its primary authored object.");
+assert.match(clientSource, /newButton\.title = "New Note"[\s\S]*?<span>New Note<\/span>[\s\S]*?welcomeAction\.textContent = "Create first Note"/, "Notebook does not present Notes as its primary authored object.");
+assert.doesNotMatch(clientSource, /Develop your reasoning in a Note/, "Notebook still renders the removed empty-state helper text.");
 assert.doesNotMatch(clientSource, /welcomeTitle\.textContent = "Write your professional analysis"/, "Notebook still renders the removed welcome heading.");
 assert.doesNotMatch(clientSource, /notebook-authorship|Work in any order/, "An active Notebook Note still presents persistent workflow instructions above the writing surface.");
 assert.match(clientSource, /referenceLabel\.textContent = "Insert evidence or Research"[\s\S]*?"Research answers"[\s\S]*?"Other Notes"/, "Notebook does not offer a clearly grouped insertion path for evidence and optional Research answers.");
