@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Real HTTP, retrieval, verification/revision and persistence. Provider doubles
 // exercise recovery and configured roles; they do not grade legal correctness.
 import assert from 'node:assert/strict';
@@ -57,7 +58,7 @@ globalThis.fetch=async(url,options)=>{
    if(pass){const answer=JSON.parse(input.split('PROPOSED ANSWER JSON\n')[1]);assert(!answer.answerText.includes('comparison'));assert.equal(answer.supportedPoints.length,2);assert.equal(answer.citations[0].relevance,'Tier B transparency rule.');assert(!JSON.stringify(answer).includes('unsupplied definition'));}
    output={pass,issues:pass?[]:[{type:'irrelevant_citation',detail:'Remove the unnecessary comparison sentence and supported point; correct the unsupported definition attribution in the retained citation relevance.'}],unnecessaryMissingFactIndices:[]};
   }
-  return Response.json({model:body.model,service_tier:'fast',status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(output)}]}]});
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, {model:body.model,service_tier:'fast',status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(output)}]}]}));
  } catch(error){doubleError=error;throw error;}
 };
 let server;

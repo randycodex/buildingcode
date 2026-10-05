@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
 // Real unassigned Research HTTP handler with intercepted provider calls.
 // The retained generated draft is supplemented only in explicitly handwritten
@@ -86,8 +87,8 @@ globalThis.fetch = async (url, options) => {
       if (mode === "unbound_review") review.units[0].sourceIDs = ["unbound-source"];
       lastReview = review;
     }
-    return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
-      output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
+      output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(value) }] }] }));
   } catch (error) { doubleError = error; throw error; }
 };
 let server;

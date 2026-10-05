@@ -1,4 +1,4 @@
-import { syntheticApplicabilityReview } from "./research-applicability-response-double.mjs";
+import { syntheticMaterialScopeReview } from "./research-applicability-response-double.mjs";
 // A recorded seed answer supplies conversation context; practical drafts and
 // verifier verdicts are offline doubles. Rejected guidance must never persist.
 import assert from "node:assert/strict";
@@ -53,7 +53,7 @@ globalThis.fetch = async (url, options) => {
     assert.equal(phase, 'permitext_research_verification');
     if (practical) assert(body.instructions.includes('PRACTICAL NEXT-STEP GUIDANCE ONLY'));
     const verdict = !practical || accept ? {pass:true,issues:[],missingFactsOnly:false,unnecessaryMissingFactIndices:[]} : {pass:false,issues:[{type:'unsupported_requirement',detail:'Synthetic rejection of unsafe guidance must prevent delivery.'}],missingFactsOnly:false,unnecessaryMissingFactIndices:[]};
-    verdict.claimApplicabilityReview=syntheticApplicabilityReview(body);
+    verdict.materialScopeReview=syntheticMaterialScopeReview(body);
     output = [{type:'message',content:[{type:'output_text',text:JSON.stringify(verdict)}]}];
   }
   return Response.json({model:body.model,status:'completed',usage:{input_tokens:100,output_tokens:100,total_tokens:200},output});

@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Actual request schemas, HTTP handler, source bindings, fresh review and
 // persistence. Handwritten provider doubles test the repair path, not accuracy.
 import assert from 'node:assert/strict';
@@ -126,8 +127,8 @@ globalThis.fetch = async (url, options) => {
         output = { pass: acceptRevision, issues: acceptRevision ? [] : [material], unnecessaryMissingFactIndices: [] };
       }
     }
-    return Response.json({ model: body.model, status: 'completed', usage: { input_tokens: 100, output_tokens: 100 },
-      output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify(output) }] }] });
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: 'completed', usage: { input_tokens: 100, output_tokens: 100 },
+      output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify(output) }] }] }));
   } catch (error) { doubleError = error; throw error; }
 };
 let server;

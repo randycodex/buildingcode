@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Removing a contradictory acknowledgement cannot approve the remaining answer.
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
@@ -31,7 +32,7 @@ globalThis.fetch=async(url,options)=>{
    assert.equal(answer.supportedPoints.length,1);assert.equal(answer.citations.length,1);
    value=accepted?{pass:true,issues:[]}:{pass:false,issues:[{type:'unsupported_requirement',detail:'Synthetic rejection: stripping an acknowledgement does not verify legal support.'}]};
   }
-  return Response.json({model:body.model,status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(value)}]}]});
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, {model:body.model,status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(value)}]}]}));
  }catch(error){providerError=error;throw error;}
 };
 let server;

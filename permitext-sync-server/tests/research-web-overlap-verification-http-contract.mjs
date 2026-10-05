@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Replay the actual GAP-04 web/draft outputs. Verifier responses are explicit
 // doubles: this proves the delivery gate, not a new live correctness result.
 import assert from "node:assert/strict";
@@ -66,7 +67,7 @@ globalThis.fetch = async (url, options) => {
     assert.equal(phase, recorded.phase);
     output = recorded.output;
   }
-  return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output });
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output }));
 };
 let server;
 try {

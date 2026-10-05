@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Recorded initial drafts/verdicts and usage with a synthetic full-answer revision.
 // Final-rejection controls prove that a revision cannot approve itself. No paid calls.
 import assert from "node:assert/strict";
@@ -86,7 +87,7 @@ globalThis.fetch = async (url, options) => {
       : [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(verdict) }] }];
   }
   // Preserve actual recorded token usage, including each live verifier phase.
-  return Response.json({ model: body.model, status: "completed", usage: call.usage, output });
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: call.usage, output }));
 };
 let server;
 try {

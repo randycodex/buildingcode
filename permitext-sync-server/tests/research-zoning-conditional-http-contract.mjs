@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Real HTTP handler, corpus, gates and persistence; every provider response is
 // a handwritten double. This is pipeline coverage, not live semantic grading.
 import assert from "node:assert/strict";
@@ -78,8 +79,8 @@ const respondWithDouble = async (url, options) => {
     const accepted = ["accept", "binding_accept"].includes(mode);
     output = JSON.stringify({ pass: accepted, issues: accepted ? [] : [{ type: "unsupported_requirement", detail: "Synthetic rejection of a cited rule; a boundary alone must not make the answer successful." }], unnecessaryMissingFactIndices: [] });
   }
-  return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
-    output: [{ type: "message", content: [{ type: "output_text", text: output }] }] });
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
+    output: [{ type: "message", content: [{ type: "output_text", text: output }] }] }));
 };
 globalThis.fetch = async (...args) => {
   try { return await respondWithDouble(...args); }

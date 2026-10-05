@@ -1,3 +1,4 @@
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Replay actual draft/revision records with explicit final-verifier doubles.
 // This verifies the delivery gate, not the legal correctness of the recorded answer.
 import assert from "node:assert/strict";
@@ -53,22 +54,22 @@ globalThis.fetch = async (url, options) => {
   if (recorded) {
     if (lateOmission && !repeatOmission && callIndex === 4) {
       const value = {pass:false,issues:[{type:"overstated_compliance",detail:"Preserve the unresolved work-scope condition."}]};
-      return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(value)}]}]});
+      return Response.json(withSyntheticMaterialScopeProviderResponse(body, {model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(value)}]}]}));
     }
     assert.equal(body.text.format.name, recorded.phase);
-    return Response.json({ model: recorded.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: recorded.output });
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: recorded.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: recorded.output }));
   }
   if (callIndex === 6) {
     assert.match(body.input, /PRIOR REVIEW HISTORY/);
     const value = lateOmission ? {pass:false,issues:[{type:"missed_material_conclusion",detail:"Explain the newly identified material exception."}]} : factQuestionRepair ? {pass:false,missingFactsOnly:true,unnecessaryMissingFactIndices:[0],issues:[{type:"unnecessary_qualification",detail:"Remove the unnecessary missing fact question."}]} : {pass:false,issues:[{type:"misstated_provision",detail:"Use the established mixed-use fact instead of leaving exclusive use unresolved."}],priorReviewCorrection:"Earlier review incorrectly asked to leave the exclusive-use exception unresolved despite established retail plus community-facility use."};
-    return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(value)}]}]});
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, {model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(value)}]}]}));
   }
   if (callIndex === 7) {
     assert.equal(body.text.format.name,"permitext_code_interpretation");
     if (lateOmission) assert.match(body.input,/newly identified material exception/);
     else if (factQuestionRepair) assert.match(body.input,/Remove the unnecessary missing fact question/);
     else assert.match(body.input,/reviewer corrected its earlier instruction/);
-    return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:run.providerCalls[4].output});
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, {model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:run.providerCalls[4].output}));
   }
   assert.equal(callIndex, 8, "Only one extra reconciliation is allowed.");
   assert.equal(body.text.format.name, "permitext_research_verification");
@@ -79,7 +80,7 @@ globalThis.fetch = async (url, options) => {
   const value = acceptRevision ? { pass: true, issues: [] } : {
     pass: false, priorReviewCorrection: "Another reviewer reversal must not extend the limit again.", issues: [{ type: "unsupported_requirement", detail: "Synthetic final-verifier rejection: the revised conclusion has not passed semantic review." }]
   };
-  return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }] }));
 };
 let server;
 try {
