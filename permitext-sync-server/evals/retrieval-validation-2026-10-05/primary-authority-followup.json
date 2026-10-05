@@ -1,0 +1,63 @@
+{
+  "status": "limited_primary_source_search_two_interpretations_still_unresolved",
+  "recordedDate": "2026-10-05",
+  "providerGenerationCalls": 0,
+  "providerEmbeddingCalls": 0,
+  "frozenGradesChanged": false,
+  "officialInterpretationEstablished": false,
+  "findings": [
+    {
+      "case": "PC802.3.2 flush hub modifier scope",
+      "sources": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022PC_Chapter8_IndirectWasteWBwm.pdf&section=conscode_2022",
+          "locator": "PC802.3, PC802.3.2",
+          "finding": "The current official text retains the hub-or-pipe construction followed by the projection modifier. The parent controls receptor placement, access and the conditional strainer requirement."
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022PC_Chapter2_DefinitionsWBwm.pdf",
+          "locator": "WASTE RECEPTOR, PDF page 13",
+          "finding": "The searchable definition text lists a hub drain among waste receptors. This limited Chapter 2 search did not find a separate hub-drain definition establishing projection height."
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/local_laws/ll14of2020.pdf",
+          "locator": "Part H, PC802.3.2, PDF page 149",
+          "finding": "The enacted amendment redline changes the provision's heading and subject but preserves the disputed grammatical construction. Legislative history is separate from current consolidated authority."
+        }
+      ],
+      "assessment": "No decisive DOB interpretation was located in this bounded search. These sources do not independently settle the modifier's reach. Do not treat the absence of a located interpretation as proof that none exists, or as affirmative permission for a flush hub.",
+      "remainingNeed": "A relevant official interpretation or other applicable authoritative context that expressly resolves the modifier's reach."
+    },
+    {
+      "case": "ZR37-34 sloping-sidewalk area and datum method",
+      "sources": [
+        {
+          "url": "https://zoningresolution.planning.nyc.gov/article-iii/chapter-7/37-34",
+          "locator": "Minimum Transparency Requirements",
+          "finding": "The official section separately sets the glazing-area band, window start-height condition, widths and excluded portions, using the adjoining sidewalk as the measurement reference."
+        },
+        {
+          "url": "https://zoningresolution.planning.nyc.gov/print/pdf/node/18184",
+          "locator": "Printed section, PDF page 2",
+          "finding": "The printed section repeats the adjoining-sidewalk reference without an express general sloping-frontage area or datum calculation procedure."
+        }
+      ],
+      "assessment": "No decisive general sloping-frontage measurement guidance was located. Special flood-resiliency alternatives and unrelated special-district provisions cannot establish a general ZR37-34 calculation method without their own applicability. This is a limit of the present source search, not an official determination that the method is unknowable.",
+      "remainingNeed": "Applicable official measurement guidance or interpretation for a sloping frontage, including the area band and sidewalk reference. Endpoint sill heights alone do not establish glazing percentage."
+    }
+  ],
+  "searchScope": "Official NYC and DCP pages, current Plumbing Code Chapters 2 and 8, enacted plumbing amendment text, current ZR37-34 and its printable section; targeted official-domain searches for hub-drain interpretations and sloping-sidewalk transparency measurement.",
+  "searchLimitations": [
+    "Search results and located pages do not exhaust agency records or establish that no interpretation exists.",
+    "A Council amendment attachment returned HTTP 410; its inaccessible contents were not used. The independently accessible DOB local-law PDF was read separately.",
+    "No outside person or agency was contacted.",
+    "The implementing assistant did not approve an answer key or revise the original disputed grades."
+  ],
+  "nextReviewArtifact": "final-test-review.md",
+  "nextAcceptanceFixture": "acceptance-model-reviewed-fixture.json",
+  "nextAcceptanceStatus": "prepared_with_verbatim_separate_model_rubric_pending_owner_approval_and_final_freeze",
+  "originalFrozenScore": { "correct": 35, "total": 40 },
+  "separateExploratoryScore": { "correct": 9, "total": 10 },
+  "general95PercentEstablished": false,
+  "deploymentPerformed": false
+}

@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "providerCalls": 0,
+  "outputCreated": false,
+  "ledgerUnchanged": true,
+  "ledgerSHA256": "6d9a2e95d1b5a7e998e2cb776582aaa0fb57760bf89f4b0cef6e7c0c173b673c",
+  "pendingOwnerApprovalGuardPreserved": true,
+  "initialInvocation": {
+    "status": "invalid_configuration_rejected_before_provider_calls",
+    "reason": "Live mode requires passage-search with the default semantic-vector path; corrected the test invocation, no guard was changed."
+  }
+}
