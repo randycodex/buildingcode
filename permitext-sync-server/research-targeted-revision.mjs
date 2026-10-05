@@ -144,7 +144,7 @@ export function researchTargetedRevisionEligible(options = {}) {
   // format; it never certifies the revised claims or skips fresh verification.
   const review = options.previousVerification;
   const material = review?.materialScopeReview;
-  const explanationIssues = new Set([...narrow, "misstated_provision", "missed_material_conclusion", "fact_evidence_confusion"]);
+  const explanationIssues = new Set([...narrow, "misstated_provision", "missed_material_conclusion", "fact_evidence_confusion", "false_evidence_limitation"]);
   if (!feedback.every(issue => explanationIssues.has(issue.type)) || review?.pass !== false ||
       review.reviewedAnswerHash !== researchRevisionAnswerHash(answer) ||
       material?.unboundCategoricalApplication !== false || !material.checks ||
@@ -155,5 +155,12 @@ export function researchTargetedRevisionEligible(options = {}) {
   const rows = Object.values(material.checks);
   return rows.every(row => row.categoricalApplication === false &&
     ["supported", "evidence_gap_only", "unsupported"].includes(row.sourceResult)) &&
-    rows.some(row => row.sourceResult === "unsupported");
+    // A false limitation can be erroneous prose even when every bound source
+    // use was supported. Do not treat evidence-gap classifications as proof
+    // that such a limitation can be removed. All material edits still require
+    // the exact answer hash and complete noncategorical review above.
+    (rows.some(row => row.sourceResult === "unsupported") ||
+      (feedback.some(issue => issue.type === "false_evidence_limitation") &&
+        feedback.every(issue => narrow.has(issue.type) || issue.type === "false_evidence_limitation") &&
+        rows.every(row => row.sourceResult === "supported")));
 }

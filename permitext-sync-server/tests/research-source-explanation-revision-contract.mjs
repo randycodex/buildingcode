@@ -32,6 +32,26 @@ for (const mutate of [
   const changed = structuredClone(options); mutate(changed);
   assert.equal(researchTargetedRevisionEligible(changed), false, "Unsafe, unbound or stale classifications keep full revision");
 }
+// False limitations can be repaired when bound uses are all supported; this
+// does not license removing a real evidence gap or a project premise.
+const limitation = structuredClone(options);
+limitation.revisionFeedback = [{ type: "false_evidence_limitation", detail: "The supplied interpretation clause resolves the stated conflict." },
+  { type: "unnecessary_qualification", detail: "No installation approval was requested." }];
+limitation.previousVerification.materialScopeReview.checks.rule.sourceResult = "supported";
+assert.equal(researchTargetedRevisionEligible(limitation), true);
+for (const mutate of [
+  o => { o.previousVerification.reviewedAnswerHash = "b".repeat(64); },
+  o => { o.previousVerification.materialScopeReview.checks.rule.sourceResult = "evidence_gap_only"; },
+  o => { o.previousVerification.materialScopeReview.checks.rule.categoricalApplication = true; },
+  o => { delete o.previousVerification.materialScopeReview.checks.rule; },
+  o => { o.previousVerification.materialScopeReview.unboundCategoricalApplication = true; },
+  o => { o.revisionFeedback.push({ type: "unsupported_requirement" }); },
+  o => { o.revisionFeedback.push({ type: "unresolved_project_fact" }); },
+  o => { o.revisionFeedback.push({ type: "misstated_provision" }); }
+]) {
+  const changed = structuredClone(limitation); mutate(changed);
+  assert.equal(researchTargetedRevisionEligible(changed), false);
+}
 const targets = researchRevisionTargets(answer);
 const replacements = new Map([
   ["answerText", "Only an exclusively qualifying building is excluded."],

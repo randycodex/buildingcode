@@ -21052,39 +21052,40 @@ async function handleResearchConversationMessage(request, response) {
         }
       }
     } else {
+      const recoverRepairEvidence = async recovery => {
+        if (suppliedText || practicalNextStep || conversationRecall || boundedCitationLookup || zoningPlan || pinnedEvidence.length) return;
+        const { catalog } = await researchCorpusResources(corpusPlan);
+        const recovered = await recoverResearchEvidenceBeforeRepair({
+          evidencePackage, ...recovery, signal: progressResponse.signal,
+          resolveSection: async request => {
+            const source = await resolveResearchAssemblySection(request, catalog);
+            return source ? { ...source, body: await researchBodyForCatalogSection({ ...source, id: source.sectionID }) } : null;
+          }
+        });
+        evidencePackage = recovered.evidencePackage;
+        if (recovered.diagnostic.supplied.length) {
+          assembledEvidence = evidencePackage.sources;
+          // Rebuild all evidence-derived maps and immutable snapshots before
+          // revision or fresh review. No extra model call or new spending reservation.
+          const snapshots = assembledEvidence.map(source => immutableEvidenceSnapshot({ source,
+            approvedAt: new Date().toISOString(), evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
+            sourceLibraryVersion: source.codeVersion || conversation.codeVersion }));
+          evidenceSnapshots.splice(0, evidenceSnapshots.length, ...snapshots);
+          requiredClaims.splice(0, requiredClaims.length, ...requiredResearchClaimsFromEvidence(assembledEvidence));
+          materialityClaims.splice(0, materialityClaims.length, ...requiredClaims.map(claim => ({ ...claim, claimRole: "governing" })));
+          evidenceAnalysisResult = { ...evidenceAnalysisResult,
+            model: "permitext-deterministic-repair-evidence-map",
+            analysis: deterministicResearchEvidenceAnalysisForTurn(assembledEvidence, validUserFacts, turnRetrievalLimitations) };
+          interpretationOptions.structuredEvidenceAnalysis = evidenceAnalysisResult.analysis;
+        }
+      };
       let verificationAttemptLimit = maximumResearchVerificationAttempts;
       for (let attempt = 0; attempt < verificationAttemptLimit; attempt += 1) {
         // Only an explicit certificate limited wholly to unnecessary missing
         // facts permits the field-only candidate. It still passes every gate
         // and a fresh review below; all other findings use bounded revision.
         if (attempt > 0 && !applyDecisionFactCandidate()) {
-          if (attempt === 1 && !suppliedText && !practicalNextStep && !conversationRecall &&
-              !boundedCitationLookup && !zoningPlan && !pinnedEvidence.length) {
-            const { catalog } = await researchCorpusResources(corpusPlan);
-            const recovered = await recoverResearchEvidenceBeforeRepair({
-              evidencePackage, issues: verificationAttempts.at(-1)?.issues || [], signal: progressResponse.signal,
-              resolveSection: async request => {
-                const source = await resolveResearchAssemblySection(request, catalog);
-                return source ? { ...source, body: await researchBodyForCatalogSection({ ...source, id: source.sectionID }) } : null;
-              }
-            });
-            evidencePackage = recovered.evidencePackage;
-            if (recovered.diagnostic.supplied.length) {
-              assembledEvidence = evidencePackage.sources;
-              // Rebuild all evidence-derived maps and immutable snapshots before
-              // revision. No extra model call or new spending reservation.
-              const snapshots = assembledEvidence.map(source => immutableEvidenceSnapshot({ source,
-                approvedAt: new Date().toISOString(), evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
-                sourceLibraryVersion: source.codeVersion || conversation.codeVersion }));
-              evidenceSnapshots.splice(0, evidenceSnapshots.length, ...snapshots);
-              requiredClaims.splice(0, requiredClaims.length, ...requiredResearchClaimsFromEvidence(assembledEvidence));
-              materialityClaims.splice(0, materialityClaims.length, ...requiredClaims.map(claim => ({ ...claim, claimRole: "governing" })));
-              evidenceAnalysisResult = { ...evidenceAnalysisResult,
-                model: "permitext-deterministic-repair-evidence-map",
-                analysis: deterministicResearchEvidenceAnalysisForTurn(assembledEvidence, validUserFacts, turnRetrievalLimitations) };
-              interpretationOptions.structuredEvidenceAnalysis = evidenceAnalysisResult.analysis;
-            }
-          }
+          if (attempt === 1) await recoverRepairEvidence({ issues: verificationAttempts.at(-1)?.issues || [] });
           if (result.requestedModel !== accurateModel) {
             answerEscalated = true;
             modelEscalationStages.push({
@@ -21137,6 +21138,11 @@ async function handleResearchConversationMessage(request, response) {
             : revised;
           result = preserveDeclaredProjectFactUncertainty(result);
           result = applyDeterministicAnswerRepairs(result);
+          // Supply the enclosing scope of sources newly used by the repair
+          // before evaluating or reviewing that answer. This shares the same
+          // two canonical reads and atomic character/reference budgets as the
+          // pre-repair recovery; it never widens discovery or certifies scope.
+          await recoverRepairEvidence({ previousInterpretation, repairedInterpretation: result.interpretation });
         }
         requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
           requiredClaims,

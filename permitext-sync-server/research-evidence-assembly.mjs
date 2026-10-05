@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261005-reserved-canonical-repair-capacity-v82";
+export const researchEvidenceAssemblyVersion = "20261005-repair-introduced-parent-scope-v83";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -50,9 +50,9 @@ export const researchEvidenceAssemblyLimits = Object.freeze({
 // supplied incomplete source, an explicit reference in supplied enacted text,
 // or the enclosing numbered scope of a canonically resolved source.
 // No discovery/embedding call, selection widening, or second evidence budget.
-export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, issues = [], resolveSection, signal } = {}) {
+export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, issues = [], previousInterpretation, repairedInterpretation, resolveSection, signal } = {}) {
   const sources = evidencePackage?.sources || [];
-  const diagnostic = { version: "20261005-grounded-parent-table-repair-v2", attemptedReads: 0, supplied: [], unresolved: [] };
+  const diagnostic = { version: "20261005-grounded-parent-table-repair-v3", attemptedReads: 0, supplied: [], unresolved: [] };
   const unchanged = () => ({ evidencePackage, diagnostic });
   if (evidencePackage?.strategy?.mode !== researchEvidenceStrategies.broad ||
       sources.some(source => source.origin === sourceOrigins.pinned) || typeof resolveSection !== "function") return unchanged();
@@ -95,6 +95,27 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
       }
     }
   }
+  // A repair may start using an already supplied child that the original
+  // answer never used. Its canonical decimal ancestry, not model-authored
+  // prose or a new citation identity, nominates scope for the fresh review.
+  const boundIDs = answer => new Set([...(answer?.citations || []), ...(answer?.supportedPoints || [])]
+    .flatMap(item => item.sourceIDs || []));
+  const previouslyBound = boundIDs(previousInterpretation);
+  const repairedBound = boundIDs(repairedInterpretation);
+  if (previousInterpretation && repairedInterpretation) for (const source of sources) {
+    if (!repairedBound.has(source.sourceID) || previouslyBound.has(source.sourceID) ||
+        source.authorityClass !== "enacted" || source.canonicalContextResolved !== true ||
+        !authorityFields.every(field => compactText(source[field])) ||
+        !/^\d+(?:\.\d+)+$/.test(source.sectionNumber)) continue;
+    const parts = source.sectionNumber.split(".");
+    for (let level = 0; level < 2 && parts.length > 1; level++) {
+      parts.pop();
+      const request = { ...Object.fromEntries(authorityFields.map(field => [field, source[field]])),
+        sectionNumber: parts.join("."), referenceKind: "ancestor_scope" };
+      const key = authorityFields.map(field => request[field]).concat(request.sectionNumber).join(":");
+      if (!nominations.has(key)) nominations.set(key, { request, parentSourceID: source.sourceID });
+    }
+  }
   if (!nominations.size) return unchanged();
   const next = [...sources];
   let characters = next.reduce((sum, source) => sum + String(source.text || "").length, 0);
@@ -105,11 +126,15 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
   let crossReferences = Math.max(Number(evidencePackage.usage?.crossReferenceCount) || 0,
     next.filter(source => source.origin === sourceOrigins.crossReference && !source.interpretationContext && !source.topicDependency).length);
   const comparable = value => compactText(value).replace(/\s+/g, " ");
+  const previousReads = Number(evidencePackage.usage?.repairRetrievalReadCount) || 0;
   for (const { request, parentSourceID } of nominations.values()) {
-    if (diagnostic.attemptedReads >= 2) break;
     const matchesAuthority = source => authorityFields.every(field => source[field] === request[field]);
     const existing = next.find(source => matchesAuthority(source) && source.sectionNumber === request.sectionNumber);
     if (existing?.canonicalContextComplete) continue;
+    if (previousReads + diagnostic.attemptedReads >= 2) {
+      diagnostic.unresolved.push({ ...request, reason: "canonical_read_budget_exhausted" });
+      continue;
+    }
     if (!existing && crossReferences >= limits.maximumCrossReferences) {
       diagnostic.unresolved.push({ ...request, reason: "cross_reference_budget_exhausted" });
       continue;
@@ -159,7 +184,7 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
     const record = sourceRecord(resolved, {
       origin: existing?.origin || sourceOrigins.crossReference,
       sourceID: existing?.sourceID || deterministicSourceID(sourceOrigins.crossReference, resolved, "repair"),
-      relationship: `Reviewer-requested canonical dependency of ${parentSourceID}; applicability requires review`,
+      relationship: `Canonical repair dependency of ${parentSourceID}; applicability requires review`,
       characterAllowance: fullText.length, canonicalResolved: true,
       retrievalReason: "Bounded canonical retrieval before answer repair",
       retrievalVersion: diagnostic.version, retrievalDepth: 1,
@@ -177,10 +202,14 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
       textSHA256: createHash("sha256").update(record.text).digest("hex"), replaced: Boolean(existing) });
   }
   return { diagnostic, evidencePackage: { ...evidencePackage, sources: next,
-    rulePackets: { ...evidencePackage.rulePackets, repairRetrieval: diagnostic },
+    rulePackets: { ...evidencePackage.rulePackets, repairRetrieval: { ...diagnostic,
+      attemptedReads: previousReads + diagnostic.attemptedReads,
+      supplied: [...(evidencePackage.rulePackets?.repairRetrieval?.supplied || []), ...diagnostic.supplied],
+      unresolved: [...(evidencePackage.rulePackets?.repairRetrieval?.unresolved || []), ...diagnostic.unresolved] } },
     usage: { ...evidencePackage.usage, characterCount: characters, supplementalCharacterCount: characters,
       crossReferenceCount: crossReferences,
-      repairRetrievalReadCount: diagnostic.attemptedReads, repairRetrievalSourceCount: diagnostic.supplied.length } } };
+      repairRetrievalReadCount: previousReads + diagnostic.attemptedReads,
+      repairRetrievalSourceCount: (Number(evidencePackage.usage?.repairRetrievalSourceCount) || 0) + diagnostic.supplied.length } } };
 }
 
 export const researchPinnedEvidenceAssemblyLimits = Object.freeze({
