@@ -1,0 +1,178 @@
+{
+  "providerCalls": 0,
+  "scope": "Post-run offline source diagnosis; frozen rubric unchanged",
+  "checks": [
+    {
+      "reference": "BC 1010.1",
+      "catalogEntryPresent": true,
+      "resolved": true,
+      "sectionID": "2244",
+      "bodyKeys": [
+        "schemaVersion",
+        "sectionID",
+        "chapterID",
+        "chapterNumber",
+        "sectionNumber",
+        "title",
+        "sourceHTMLPath",
+        "blocks"
+      ],
+      "body": {
+        "schemaVersion": 2,
+        "sectionID": 2244,
+        "chapterID": 10,
+        "chapterNumber": "10",
+        "sectionNumber": "1010.1",
+        "title": "1010.1 Doors.",
+        "sourceHTMLPath": "code-sections/building-code/chapters/10.html",
+        "blocks": [
+          {
+            "id": "2244-html-1",
+            "kind": "html",
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173309\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173309\"></AnnotationDrawer><div>Means of egress doors shall meet the requirements of this section. Doors serving a means of egress system shall meet the requirements of this section and Section 1022.2. Doors provided for egress purposes in numbers greater than required by this code shall meet the requirements of this section.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173310\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173310\"></AnnotationDrawer><div>Means of egress doors shall be readily distinguishable from the adjacent construction and finishes such that the doors are easily recognizable as doors. Mirrors or similar reflecting materials shall not be used on means of egress doors. Means of egress doors shall not be concealed by curtains, drapes, decorations or similar materials.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "plainText": "Means of egress doors shall meet the requirements of this section. Doors serving a means of egress system shall meet the requirements of this section and Section 1022.2. Doors provided for egress purposes in numbers greater than required by this code shall meet the requirements of this section. Means of egress doors shall be readily distinguishable from the adjacent construction and finishes such that the doors are easily recognizable as doors. Mirrors or similar reflecting materials shall not be used on means of egress doors. Means of egress doors shall not be concealed by curtains, drapes, decorations or similar materials."
+          }
+        ]
+      }
+    },
+    {
+      "reference": "BC 1010.1.6",
+      "catalogEntryPresent": true,
+      "resolved": true,
+      "sectionID": "2262",
+      "bodyKeys": [
+        "schemaVersion",
+        "sectionID",
+        "chapterID",
+        "chapterNumber",
+        "sectionNumber",
+        "title",
+        "sourceHTMLPath",
+        "blocks"
+      ],
+      "body": {
+        "schemaVersion": 2,
+        "sectionID": 2262,
+        "chapterID": 10,
+        "chapterNumber": "10",
+        "sectionNumber": "1010.1.6",
+        "title": "1010.1.6 Landings at doors.",
+        "sourceHTMLPath": "code-sections/building-code/chapters/10.html",
+        "blocks": [
+          {
+            "id": "2262-html-1",
+            "kind": "html",
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173422\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173422\"></AnnotationDrawer><div>Landings shall have a width not less than the width of the stairway or the door, whichever is greater. Doors in the fully open position shall not reduce a required dimension by more than 7 inches (177.8 mm). At any stairway landing, or when a door landing serves an occupant load of 50 or more, doors in any position shall not reduce the landing to less than 75 percent of its required width. Landings shall have a length measured in the direction of travel of not less than 44 inches (1117.6 mm).</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173423\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173423\"></AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:</span></div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173424\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173424\"></AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Landing length in the direction of travel in Groups R-3 and U and within individual units of Group R-2 need not exceed 36 inches (914.4 mm).</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173425\"></AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;In Group R-2 occupancies, where 36 inch wide stairways are permitted pursuant to Section 1011.2, Exception 1.2, such stairway landing length in the direction of travel shall be permitted to be not less than 36 inches (914.4 mm) or the width of the stairway, whichever is greater. Doors opening onto such stairway landings shall not reduce the landing width.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "plainText": "Landings shall have a width not less than the width of the stairway or the door, whichever is greater. Doors in the fully open position shall not reduce a required dimension by more than 7 inches (177.8 mm). At any stairway landing, or when a door landing serves an occupant load of 50 or more, doors in any position shall not reduce the landing to less than 75 percent of its required width. Landings shall have a length measured in the direction of travel of not less than 44 inches (1117.6 mm). Exceptions: 1. Landing length in the direction of travel in Groups R-3 and U and within individual units of Group R-2 need not exceed 36 inches (914.4 mm). 2. In Group R-2 occupancies, where 36 inch wide stairways are permitted pursuant to Section 1011.2, Exception 1.2, such stairway landing length in the direction of travel shall be permitted to be not less than 36 inches (914.4 mm) or the width of the stairway, whichever is greater. Doors opening onto such stairway landings shall not reduce the landing width."
+          }
+        ]
+      }
+    },
+    {
+      "reference": "BC 1005",
+      "catalogEntryPresent": false,
+      "resolved": false,
+      "bodyKeys": [],
+      "body": null
+    },
+    {
+      "reference": "BC 1012.5.1",
+      "catalogEntryPresent": true,
+      "resolved": true,
+      "sectionID": "2346",
+      "bodyKeys": [
+        "schemaVersion",
+        "sectionID",
+        "chapterID",
+        "chapterNumber",
+        "sectionNumber",
+        "title",
+        "sourceHTMLPath",
+        "blocks"
+      ],
+      "body": {
+        "schemaVersion": 2,
+        "sectionID": 2346,
+        "chapterID": 10,
+        "chapterNumber": "10",
+        "sectionNumber": "1012.5.1",
+        "title": "1012.5.1 Width and capacity.",
+        "sourceHTMLPath": "code-sections/building-code/chapters/10.html",
+        "blocks": [
+          {
+            "id": "2346-html-1",
+            "kind": "html",
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173748\"></AnnotationDrawer><div>The minimum width and required capacity of a means of egress ramp shall be not less than that required for corridors by Section 1020.2. The clear width of a ramp between handrails, if provided, or other permissible projections shall be 36 inches (914.4 mm) minimum.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "plainText": "The minimum width and required capacity of a means of egress ramp shall be not less than that required for corridors by Section 1020.2. The clear width of a ramp between handrails, if provided, or other permissible projections shall be 36 inches (914.4 mm) minimum."
+          }
+        ]
+      }
+    },
+    {
+      "reference": "BC 1012.5.2",
+      "catalogEntryPresent": true,
+      "resolved": true,
+      "sectionID": "2347",
+      "bodyKeys": [
+        "schemaVersion",
+        "sectionID",
+        "chapterID",
+        "chapterNumber",
+        "sectionNumber",
+        "title",
+        "sourceHTMLPath",
+        "blocks"
+      ],
+      "body": {
+        "schemaVersion": 2,
+        "sectionID": 2347,
+        "chapterID": 10,
+        "chapterNumber": "10",
+        "sectionNumber": "1012.5.2",
+        "title": "1012.5.2 Headroom.",
+        "sourceHTMLPath": "code-sections/building-code/chapters/10.html",
+        "blocks": [
+          {
+            "id": "2347-html-1",
+            "kind": "html",
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173750\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173750\"></AnnotationDrawer><div>The minimum headroom in all parts of the means of egress ramp shall be not less than 84 inches (2133.6 mm).</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "plainText": "The minimum headroom in all parts of the means of egress ramp shall be not less than 84 inches (2133.6 mm)."
+          }
+        ]
+      }
+    },
+    {
+      "reference": "BC 1012.5.3",
+      "catalogEntryPresent": true,
+      "resolved": true,
+      "sectionID": "2348",
+      "bodyKeys": [
+        "schemaVersion",
+        "sectionID",
+        "chapterID",
+        "chapterNumber",
+        "sectionNumber",
+        "title",
+        "sourceHTMLPath",
+        "blocks"
+      ],
+      "body": {
+        "schemaVersion": 2,
+        "sectionID": 2348,
+        "chapterID": 10,
+        "chapterNumber": "10",
+        "sectionNumber": "1012.5.3",
+        "title": "1012.5.3 Restrictions.",
+        "sourceHTMLPath": "code-sections/building-code/chapters/10.html",
+        "blocks": [
+          {
+            "id": "2348-html-1",
+            "kind": "html",
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-173752\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173752\"></AnnotationDrawer><div>Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm).</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "plainText": "Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm)."
+          }
+        ]
+      }
+    }
+  ]
+}

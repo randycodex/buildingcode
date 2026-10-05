@@ -1,24 +1,24 @@
 {
   "status": "completed_below_accuracy_gate",
-  "recordedAt": "2026-10-05T16:32:09.480341+00:00",
+  "recordedAt": "2026-10-05T17:03:42.119764+00:00",
   "authorization": {
     "capUSD": 10.99,
     "diagnosticUSD": 2.99,
     "freshUSD": 8
   },
   "spending": {
-    "settledEstimatedUSD": 1.2687786250000002,
-    "remainingAuthorizedUSD": 9.721221375,
+    "settledEstimatedUSD": 1.520297065,
+    "remainingAuthorizedUSD": 9.469702935,
     "pending": 0,
     "unknown": 0,
     "pricingBasis": "Reported provider usage, saved rates, actual service tier, cache-write costs; not a billing-account balance.",
     "unsettledReservationUSD": 0,
     "byPhase": {
       "diagnostic": 0.63458247,
-      "fresh": 0.6341961549999998
+      "fresh": 0.885714595
     },
-    "providerRequests": 261,
-    "settledRequests": 259,
+    "providerRequests": 304,
+    "settledRequests": 302,
     "definitivelyRejectedRequests": 2
   },
   "readiness": {
@@ -117,7 +117,7 @@
       "20 two-turn conversations: observations are correlated.",
       "Fixture and grading authored by the implementing assistant against shipped source text; no independent external review.",
       "Focused rule questions do not establish broad project, historical, changing-edition, topic-switch or production browser reliability.",
-      "Latest local candidate has only known-case retests after fixes; original fresh score must not be recomputed from them."
+      "Latest local candidate has a separate ten-question exploratory cohort (nine fully correct), plus earlier known-case retests; original fresh score remains35/40. Independent broad final validation remains outstanding."
     ],
     "latencySeconds": {
       "median": 13.742888194500004,
@@ -164,14 +164,17 @@
     "Readiness/credential-redaction/reservation/durable-budget control contract passed, zero provider calls.",
     "Evidence assembly contract passed after reserved-capacity and consistent-scope changes.",
     "Linked Project-context summary contract passed; full saved context remains separate from relevance-filtered search hints.",
-    "Latest scope and project diagnostic manifests/source hashes remained unchanged through completed runs."
+    "Latest scope and project diagnostic manifests/source hashes remained unchanged through completed runs.",
+    "Source-explanation revision and backend HTTP contracts passed: exact answer/scope guards, immutable source bindings, fresh-review rejection and categorical full fallback; synthetic providers only.",
+    "Ten-question real API continuation completed:9/10 source-correct,3 new material targeted repairs accepted after fresh review,1 full-rewrite ramp nonanswer retained; all43 requests settled, frozen code/fixture/rubric hashes unchanged."
   ],
-  "changes": "Canonical parent/table recovery, code-family table identities and yes/no consistency; after fresh results, bounded dependency capacity reservation, cross-field scope consistency, one first-appearing citation-only reconciliation with fresh review. Local commits only. Contradictory categorical/conditional review classifications now use the existing once-per-turn rereview of unchanged evidence and answer; no automatic pass.",
+  "changes": "Canonical parent/table recovery, code-family table identities and yes/no consistency; after fresh results, bounded dependency capacity reservation, cross-field scope consistency, one first-appearing citation-only reconciliation with fresh review. Local commits only. Contradictory categorical/conditional review classifications now use the existing once-per-turn rereview of unchanged evidence and answer; no automatic pass. Source-explanation wording repairs now reuse bounded edits only with an exact answer-bound complete noncategorical source review; full review remains mandatory.",
   "nextActions": [
-    "Preserve material conditions through revisions across all answer fields without introducing new omissions; validate this across code families.",
-    "Resolve hub-drain modifier and covered-display cross-code exception interpretation against independent authority before changing rubrics.",
-    "Freeze the final implementation and run a broader genuinely new cohort with independent source grading before any95percent claim.",
-    "Validate deployed browser/real subscription access and native production Responses transport."
+    "Supply parent scope for material source uses introduced during repair, within existing atomic evidence budgets. Keep the original source identities and fresh review.",
+    "Reduce full-rewrite drift for source explanations that have false evidence limitations or unnecessary qualifications without an unsupported source-scope row.",
+    "Resolve hub-drain modifier scope, covered-display Fire Code qualifications and sidewalk measurement interpretations against independent authority.",
+    "Freeze the final implementation and an independent source rubric, then perform one genuinely new forty-question acceptance cohort.",
+    "Validate deployed Pro access, browser-to-backend behavior and native production Responses transport."
   ],
   "selectedModelPolicy": "evals/retrieval-validation-2026-10-05/luna-model-policy.json",
   "modelRoles": {
@@ -293,6 +296,10 @@
     {
       "kind": "overcautious_source_interpretation",
       "detail": "Sloping-sidewalk diagnostic does not grant an unsupported high-end datum, but fails to provide the useful local-sidewalk explanation expected by the frozen check. Independent grading is needed."
+    },
+    {
+      "kind": "repair_introduced_missing_parent_scope",
+      "detail": "The new ramp case was withheld when a full rewrite introduced door-landing requirements without their available canonical parent; source exists, evidence package omitted it."
     }
   ],
   "originalChatReferences": [
@@ -306,27 +313,38 @@
     }
   ],
   "latestCandidate": {
-    "commit": "b02ad3f54bac334fed7224de1ae00860eff7d2d0",
+    "commit": "0c482e3dde50e69623de863b1f166c2c8cf212b9",
     "freshAccuracyValidated": false,
-    "knownCleanoutRetest": {
-      "fullyCorrect": 2,
-      "attempted": 2
-    },
-    "knownDisplayRetest": {
-      "fullyCorrect": 0,
-      "correctWidthBoundary": 2,
-      "attempted": 2
-    },
-    "projectLinkedDiagnostic": {
-      "attempted": 4,
-      "fullyCorrect": 2,
+    "exploratoryNewQuestions": {
+      "attempted": 10,
+      "fullyCorrect": 9,
+      "fullyCorrectFraction": 0.9,
       "avoidableNonanswers": 1,
-      "incompleteInterpretations": 1
-    }
+      "unresolvedMaterialDisputes": 0,
+      "confirmedAcceptedMaterialErrors": 0,
+      "acceptance95PercentEstablished": false
+    },
+    "reportFile": "evals/retrieval-validation-2026-10-05/continuation-report.json",
+    "productionAccepted": false
   },
   "deployment": {
     "productionPublished": false,
     "scope": "Local candidate commits, isolated API evaluations and saved reports only."
   },
-  "campaignConclusion": "The frozen40-question evaluation delivered35 fully correct answers (87.5percent), below the38/40 acceptance gate. Subsequent exposed-case fixes cannot raise that score. Retrieval and review-contract repairs are useful, but broad multi-source synthesis still withholds answers or omits material conditions;95percent general reliability has not been established."
+  "campaignConclusion": "General repair progress is demonstrated across code families: the new source-only targeted path corrected three real API cases with fresh review, and nine of ten new exploratory answers were fully correct. One ramp answer was withheld after full-rewrite scope expansion. Original frozen forty score remains35/40 (87.5percent); neither this small correlated sample nor known-case retests establish95percent general or production reliability.",
+  "continuationRun": {
+    "candidateCommit": "0c482e3dde50e69623de863b1f166c2c8cf212b9",
+    "summary": {
+      "attempted": 10,
+      "fullyCorrect": 9,
+      "fullyCorrectFraction": 0.9,
+      "avoidableNonanswers": 1,
+      "unresolvedMaterialDisputes": 0,
+      "confirmedAcceptedMaterialErrors": 0,
+      "acceptance95PercentEstablished": false
+    },
+    "resultDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+    "reportFile": "evals/retrieval-validation-2026-10-05/continuation-report.json",
+    "freshEvidenceScope": "First-time ten-question exploratory cohort, five correlated two-turn conversations, assistant-authored and graded; separate from original forty."
+  }
 }

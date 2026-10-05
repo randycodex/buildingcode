@@ -1,0 +1,120 @@
+{
+  "status": "completed_below_accuracy_gate",
+  "recordedAt": "2026-10-05T17:03:42.119764+00:00",
+  "candidateCommit": "0c482e3dde50e69623de863b1f166c2c8cf212b9",
+  "scope": "General source-explanation repairs across plumbing, mechanical, fuel gas, fire and building code. Transparency remains a known regression only.",
+  "implementation": {
+    "change": "Material wording defects in reviewed noncategorical source explanations can use bounded edits instead of regenerating the entire answer.",
+    "guard": "Exact reviewed-answer hash; complete bound-source coverage; valid source-scope envelope; no categorical or unbound project application; only eligible feedback types. Missing/stale/incomplete evidence or unsupported application keeps full revision.",
+    "safety": "Immutable authoritative citation identity/text and source IDs; supplied-source-only binding additions; explicit removals and required-coverage guards; existing output/attempt bounds; every patch undergoes fresh full-answer verification.",
+    "limit": "The model still selects which editable targets to change. Mechanical preservation of unselected text does not prove semantic completeness."
+  },
+  "validation": {
+    "gradeFile": "evals/retrieval-validation-2026-10-05/continuation-case-grades.json",
+    "summary": {
+      "attempted": 10,
+      "fullyCorrect": 9,
+      "fullyCorrectFraction": 0.9,
+      "avoidableNonanswers": 1,
+      "unresolvedMaterialDisputes": 0,
+      "confirmedAcceptedMaterialErrors": 0,
+      "acceptance95PercentEstablished": false
+    },
+    "fixtureHash": "755c2c60ccb87aece0f2ca57dacb13200b38d3df1e5118eacb36d99e559a6efd",
+    "frozenSourceAndFixtureMismatches": [],
+    "providerCalls": 43,
+    "providerModels": {
+      "text-embedding-3-small": 11,
+      "gpt-6-luna": 32
+    },
+    "providerPhases": {
+      "query_embeddings": 11,
+      "permitext_code_interpretation": 11,
+      "permitext_research_verification": 16,
+      "permitext_research_targeted_revision": 5
+    },
+    "providerStates": {
+      "settled": 43
+    },
+    "productionPublished": false,
+    "accountAccess": {
+      "scope": "temporary isolated local account",
+      "signInHTTPStatus": 200,
+      "grantHTTPStatus": 200,
+      "activePro": true,
+      "researchMode": "included",
+      "grantType": "lifetimeGrant",
+      "productionSubscriptionTested": false
+    },
+    "providerAPI": "chat-completions",
+    "productionNativeResponsesVerified": false,
+    "newMaterialTargetedRepairCases": [
+      "continuation-water-pressure-1",
+      "continuation-grease-clearances-1",
+      "continuation-appliance-shutoff-1"
+    ],
+    "existingNarrowTargetedRepairCases": [
+      "continuation-water-pressure-2",
+      "continuation-grease-clearances-2"
+    ],
+    "fullRevisionFallbackCases": [
+      "continuation-egress-ramp-1"
+    ],
+    "allSixRepairsReceivedFreshReview": true,
+    "originalFortyQuestionScore": {
+      "fullyCorrect": 35,
+      "attempted": 40,
+      "fraction": 0.875,
+      "unchanged": true
+    },
+    "latencySeconds": {
+      "median": 53.27334663349998,
+      "maximum": 220.20239313300002,
+      "slowestTargetedRepair": 177.86527512399996
+    },
+    "limitations": [
+      "Five two-turn conversations; observations are correlated.",
+      "Implementing assistant authored questions and grades against frozen shipped canonical sources. Independent external grading not performed.",
+      "First-time exploratory continuation on a new candidate; separate from original forty-question score, not a regrade or broad production acceptance.",
+      "Production native Responses protocol, browser sign-in and live subscription/billing remain unverified."
+    ]
+  },
+  "contracts": {
+    "passed": [
+      "research-source-explanation-revision-contract.mjs",
+      "research-source-explanation-revision-http-contract.mjs",
+      "research-targeted-revision-contract.mjs",
+      "research-targeted-revision-bindings-contract.mjs",
+      "research-material-zoning-revision-http-contract.mjs",
+      "research-citation-reconciliation-http-contract.mjs",
+      "research-certified-field-repair-http-contract.mjs"
+    ],
+    "meaning": "Synthetic provider responses verify backend/session/Pro, immutable patch guards, fresh-review rejection and full fallback. Semantic grades come from separate real API cases.",
+    "preExistingSuiteFailuresPreserved": "See campaign-report.json checkLimitations; full suite is not claimed green."
+  },
+  "remainingFailure": {
+    "case": "continuation-egress-ramp-1",
+    "delivered": "Withheld answer, counted as failure.",
+    "initialReview": "False unresolved-conflict claim despite supplied BC102.1, plus unnecessary project-fact request. Those feedback types/source classifications did not qualify for the new material edit guard.",
+    "repair": "Full rewrite fixed those findings but introduced BC1010.1.6 door-landing requirements without parent BC1010.1 in supplied evidence; final reviewer withheld.",
+    "offlineCanonicalDiagnosis": "evals/retrieval-validation-2026-10-05/continuation-ramp-canonical-diagnosis.json",
+    "parentExistsAndResolves": true,
+    "interpretationLimit": "Parent availability does not itself prove the added requirements apply. Independent interpretation remains necessary.",
+    "nextAction": "Ensure needed parent scopes accompany material provisions introduced during a bounded repair; avoid collateral rule expansion and retain fresh substantive review."
+  },
+  "spending": {
+    "runEstimatedUSD": 0.25151844,
+    "campaignEstimatedUSD": 1.520297065,
+    "remainingAuthorizedUSD": 9.469702935,
+    "byPhase": {
+      "diagnostic": 0.63458247,
+      "fresh": 0.885714595
+    },
+    "pending": 0,
+    "unknown": 0,
+    "billingBalanceVerified": false,
+    "basis": "Reported usage with saved model/service-tier/cache-write rates; not actual billing-account balance."
+  },
+  "resultDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+  "retrievalPlanFile": "evals/retrieval-validation-2026-10-05/retrieval-plan-next.json"
+}

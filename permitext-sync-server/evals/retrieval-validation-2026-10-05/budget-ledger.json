@@ -7462,6 +7462,1239 @@
       },
       "httpStatus": 200,
       "endedAt": "2026-10-05T16:30:06.415Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "adad3600-db7a-419d-8ee5-621aa858ecea",
+      "case": "continuation-water-pressure-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018801200000000004,
+      "startedAt": "2026-10-05T16:46:48.356Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.000001,
+      "usage": {
+        "prompt_tokens": 50,
+        "total_tokens": 50
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:46:48.990Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d204b915-00e1-447c-835e-f96d6546d8d8",
+      "case": "continuation-water-pressure-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000188342,
+      "startedAt": "2026-10-05T16:46:50.760Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00000106,
+      "usage": {
+        "prompt_tokens": 53,
+        "total_tokens": 53
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:46:51.104Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a2e2c020-d280-4637-8f21-3820916524d8",
+      "case": "continuation-water-pressure-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11013365000000001,
+      "startedAt": "2026-10-05T16:46:52.719Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.007752350000000001,
+      "usage": {
+        "input_tokens": 29158,
+        "output_tokens": 463,
+        "total_tokens": 29621,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 29155,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:46:55.860Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "982b370a-27df-419d-b302-193574382e78",
+      "case": "continuation-water-pressure-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08775140000000001,
+      "startedAt": "2026-10-05T16:46:55.901Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0107651,
+      "usage": {
+        "input_tokens": 28293,
+        "output_tokens": 3692,
+        "total_tokens": 31985,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 28290,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 3188,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:47:17.967Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "1d229dcd-f6b8-4886-9794-2be9efb7cfa4",
+      "case": "continuation-water-pressure-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.10240945000000001,
+      "startedAt": "2026-10-05T16:47:17.988Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.003888925,
+      "usage": {
+        "input_tokens": 27032,
+        "output_tokens": 1020,
+        "total_tokens": 28052,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 27029,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 512,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:47:29.004Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a2bbea81-4023-4bb0-b66d-bebe1dc24fdb",
+      "case": "continuation-water-pressure-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08900155,
+      "startedAt": "2026-10-05T16:47:29.024Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00782735,
+      "usage": {
+        "input_tokens": 28838,
+        "output_tokens": 618,
+        "total_tokens": 29456,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 28835,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 397,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:47:33.782Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d45b37ed-409e-4b79-af47-27d90cb061b6",
+      "case": "continuation-water-pressure-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018768200000000002,
+      "startedAt": "2026-10-05T16:47:34.034Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 9.400000000000001e-7,
+      "usage": {
+        "prompt_tokens": 47,
+        "total_tokens": 47
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:47:34.289Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "22c45076-781b-4358-bb25-585a7daf4d4c",
+      "case": "continuation-water-pressure-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11403700000000001,
+      "startedAt": "2026-10-05T16:47:36.046Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.008053600000000001,
+      "usage": {
+        "input_tokens": 30847,
+        "output_tokens": 342,
+        "total_tokens": 31189,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 30844,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:47:38.458Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "05874b2b-f787-43ed-ae5c-7bdf0f355649",
+      "case": "continuation-water-pressure-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08811385000000001,
+      "startedAt": "2026-10-05T16:47:38.481Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.01067335,
+      "usage": {
+        "input_tokens": 28426,
+        "output_tokens": 3567,
+        "total_tokens": 31993,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 28423,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 3240,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:48:00.319Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "9a61b0bb-e6ea-4369-98d2-1ecbd4ec43a2",
+      "case": "continuation-water-pressure-2",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.10488500000000002,
+      "startedAt": "2026-10-05T16:48:00.333Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.005080175,
+      "usage": {
+        "input_tokens": 28226,
+        "output_tokens": 3104,
+        "total_tokens": 31330,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 28223,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2782,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:48:31.591Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6ab4cef2-f83a-4bbb-96b1-6c6e3e8126c4",
+      "case": "continuation-water-pressure-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08880795000000001,
+      "startedAt": "2026-10-05T16:48:31.612Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0097316,
+      "usage": {
+        "input_tokens": 28731,
+        "output_tokens": 2549,
+        "total_tokens": 31280,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 28728,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2227,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:48:47.999Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "bfa22848-3c9d-4e1c-b872-97fff0d630af",
+      "case": "continuation-grease-clearances-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018700000000000002,
+      "startedAt": "2026-10-05T16:48:48.354Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 8.200000000000001e-7,
+      "usage": {
+        "prompt_tokens": 41,
+        "total_tokens": 41
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:48:48.569Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "cac8da74-91aa-4186-9b22-2ba377437c37",
+      "case": "continuation-grease-clearances-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09294615,
+      "startedAt": "2026-10-05T16:48:49.733Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0057816000000000005,
+      "usage": {
+        "input_tokens": 18999,
+        "output_tokens": 1032,
+        "total_tokens": 20031,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 18996,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:48:55.768Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d0af2704-1bf8-41f7-9b30-c8118847865d",
+      "case": "continuation-grease-clearances-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09368810000000001,
+      "startedAt": "2026-10-05T16:48:55.790Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0110011,
+      "usage": {
+        "input_tokens": 29337,
+        "output_tokens": 3667,
+        "total_tokens": 33004,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 29334,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 3059,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:49:17.104Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "50dd1629-742c-4397-89bc-48dcd533ffac",
+      "case": "continuation-grease-clearances-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.09205185,
+      "startedAt": "2026-10-05T16:49:17.121Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0048411750000000005,
+      "usage": {
+        "input_tokens": 19430,
+        "output_tokens": 4825,
+        "total_tokens": 24255,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 19427,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 3916,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:52:14.991Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "53c2dea0-b34f-492d-84d5-5b4d462827a9",
+      "case": "continuation-grease-clearances-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09338835000000001,
+      "startedAt": "2026-10-05T16:52:15.021Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00981185,
+      "usage": {
+        "input_tokens": 29340,
+        "output_tokens": 2477,
+        "total_tokens": 31817,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 29337,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2148,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:52:28.307Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6d519b83-eaad-4626-a382-5e0cadca4667",
+      "case": "continuation-grease-clearances-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018810000000000002,
+      "startedAt": "2026-10-05T16:52:28.877Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00000102,
+      "usage": {
+        "prompt_tokens": 51,
+        "total_tokens": 51
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:52:29.262Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "ce757590-6b22-4ed2-acf6-2865d1bbcc97",
+      "case": "continuation-grease-clearances-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09162835000000001,
+      "startedAt": "2026-10-05T16:52:30.730Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00509635,
+      "usage": {
+        "input_tokens": 17858,
+        "output_tokens": 632,
+        "total_tokens": 18490,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 17855,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:52:34.725Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "b07bd397-7877-4c60-8328-5627dc6c6c6c",
+      "case": "continuation-grease-clearances-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09094690000000001,
+      "startedAt": "2026-10-05T16:52:34.753Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.009592350000000001,
+      "usage": {
+        "input_tokens": 28134,
+        "output_tokens": 2559,
+        "total_tokens": 30693,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 28131,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2045,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:52:48.991Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "1496b9d6-cae2-4667-9db4-417df42a3753",
+      "case": "continuation-grease-clearances-2",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.08645615000000001,
+      "startedAt": "2026-10-05T16:52:49.008Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0029324250000000002,
+      "usage": {
+        "input_tokens": 16748,
+        "output_tokens": 1678,
+        "total_tokens": 18426,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 16745,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1536,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:53:07.049Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "607d9838-1b78-4072-b547-47eabf779aa8",
+      "case": "continuation-grease-clearances-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08698635,
+      "startedAt": "2026-10-05T16:53:07.071Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0078961,
+      "usage": {
+        "input_tokens": 26701,
+        "output_tokens": 1221,
+        "total_tokens": 27922,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 26698,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1024,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:53:14.985Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "c413db94-7f3d-46e0-b266-f2931322d435",
+      "case": "continuation-appliance-shutoff-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000187242,
+      "startedAt": "2026-10-05T16:53:15.632Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 9.000000000000001e-7,
+      "usage": {
+        "prompt_tokens": 45,
+        "total_tokens": 45
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:53:15.881Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "322cadfb-c61d-41d5-a7d1-9d7e82913925",
+      "case": "continuation-appliance-shutoff-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0948673,
+      "startedAt": "2026-10-05T16:53:17.338Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00653485,
+      "usage": {
+        "input_tokens": 20672,
+        "output_tokens": 1367,
+        "total_tokens": 22039,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 20669,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 273,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:53:25.044Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "b82497bc-043b-44cc-b488-29e710a055d7",
+      "case": "continuation-appliance-shutoff-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09464235,
+      "startedAt": "2026-10-05T16:53:25.070Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0104981,
+      "usage": {
+        "input_tokens": 30477,
+        "output_tokens": 2879,
+        "total_tokens": 33356,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 30474,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2333,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:53:41.633Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "de9f77a1-4d00-4e7c-b3d3-7b8e739808aa",
+      "case": "continuation-appliance-shutoff-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.09731755,
+      "startedAt": "2026-10-05T16:53:41.650Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0035718,
+      "usage": {
+        "input_tokens": 23075,
+        "output_tokens": 1375,
+        "total_tokens": 24450,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 23072,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1175,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:53:55.546Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4db4ab09-91d2-4eb0-a031-1033400f594e",
+      "case": "continuation-appliance-shutoff-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09051020000000001,
+      "startedAt": "2026-10-05T16:53:55.566Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0107496,
+      "usage": {
+        "input_tokens": 28539,
+        "output_tokens": 3615,
+        "total_tokens": 32154,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 28536,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 3065,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:15.002Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "2b79d80c-f9d9-4ae0-998f-a92e9a8e958b",
+      "case": "continuation-appliance-shutoff-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019157600000000002,
+      "startedAt": "2026-10-05T16:54:15.381Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0000016200000000000002,
+      "usage": {
+        "prompt_tokens": 81,
+        "total_tokens": 81
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:15.924Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f881df20-a40b-4f4c-8e9f-3a8cb33ab81b",
+      "case": "continuation-appliance-shutoff-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10822900000000002,
+      "startedAt": "2026-10-05T16:54:18.007Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.007760100000000001,
+      "usage": {
+        "input_tokens": 29917,
+        "output_tokens": 281,
+        "total_tokens": 30198,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 29914,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:20.504Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "e486ce7d-4356-4514-b4b6-2528f00d911b",
+      "case": "continuation-appliance-shutoff-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09621755,
+      "startedAt": "2026-10-05T16:54:20.525Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.009366600000000001,
+      "usage": {
+        "input_tokens": 35171,
+        "output_tokens": 574,
+        "total_tokens": 35745,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 35168,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 368,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:24.775Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "02f7a29a-9c95-4d14-ade7-e455f82a48d8",
+      "case": "continuation-storage-clearance-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018790200000000002,
+      "startedAt": "2026-10-05T16:54:25.287Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 9.400000000000001e-7,
+      "usage": {
+        "prompt_tokens": 47,
+        "total_tokens": 47
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:25.503Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "886ba123-f6fb-41c9-9584-4b52d19c47a9",
+      "case": "continuation-storage-clearance-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09975735000000001,
+      "startedAt": "2026-10-05T16:54:27.166Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.005837350000000001,
+      "usage": {
+        "input_tokens": 21430,
+        "output_tokens": 480,
+        "total_tokens": 21910,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 21427,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:29.975Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "1431de90-99e2-49ee-818e-b164035403f6",
+      "case": "continuation-storage-clearance-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09532765000000001,
+      "startedAt": "2026-10-05T16:54:30.015Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00824035,
+      "usage": {
+        "input_tokens": 29898,
+        "output_tokens": 766,
+        "total_tokens": 30664,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 29895,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 537,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:35.125Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "cb58e560-3074-4e16-9496-b366d5f88604",
+      "case": "continuation-storage-clearance-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018821000000000002,
+      "startedAt": "2026-10-05T16:54:35.787Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 9.8e-7,
+      "usage": {
+        "prompt_tokens": 49,
+        "total_tokens": 49
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:35.950Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6893ba58-c8c8-4343-a8a2-be94271b2f01",
+      "case": "continuation-storage-clearance-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1068969,
+      "startedAt": "2026-10-05T16:54:37.597Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00666235,
+      "usage": {
+        "input_tokens": 25022,
+        "output_tokens": 407,
+        "total_tokens": 25429,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 25019,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:40.290Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "0ab5384e-dc05-4c09-8ce7-1e5ce10dc5ee",
+      "case": "continuation-storage-clearance-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.10167740000000001,
+      "startedAt": "2026-10-05T16:54:40.315Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0089916,
+      "usage": {
+        "input_tokens": 33335,
+        "output_tokens": 658,
+        "total_tokens": 33993,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 33332,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 478,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:45.425Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "8b16ce29-398a-4763-843e-22970e8641e5",
+      "case": "continuation-egress-ramp-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000186186,
+      "startedAt": "2026-10-05T16:54:46.098Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 8.000000000000001e-7,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 40
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:46.291Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f099702b-def1-4c42-94d8-c37f0bc3695e",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0889999,
+      "startedAt": "2026-10-05T16:54:47.511Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00621685,
+      "usage": {
+        "input_tokens": 17136,
+        "output_tokens": 1933,
+        "total_tokens": 19069,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 17133,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 417,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:54:57.666Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a4cfc65f-6b6f-4a75-9939-2cc74122233e",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08998275,
+      "startedAt": "2026-10-05T16:54:57.695Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.01178235,
+      "usage": {
+        "input_tokens": 27758,
+        "output_tokens": 4843,
+        "total_tokens": 32601,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 27755,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 4187,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:55:26.779Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "7736fdc6-66ac-4a43-87cc-76e4389b6418",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10206625000000001,
+      "startedAt": "2026-10-05T16:55:26.799Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.01024655,
+      "usage": {
+        "input_tokens": 22285,
+        "output_tokens": 14922,
+        "total_tokens": 37207,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 22282,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 12424,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:57:42.224Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "7a9f7277-92b7-4c52-8b1e-06c0236aa036",
+      "case": "continuation-egress-ramp-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09627915000000001,
+      "startedAt": "2026-10-05T16:57:42.260Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.01376485,
+      "usage": {
+        "input_tokens": 30380,
+        "output_tokens": 6170,
+        "total_tokens": 36550,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 30377,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 5225,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:58:14.808Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a134db47-26dc-425b-b105-be0feb746605",
+      "case": "continuation-egress-ramp-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018983800000000003,
+      "startedAt": "2026-10-05T16:58:15.492Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.00000146,
+      "usage": {
+        "prompt_tokens": 73,
+        "total_tokens": 73
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:58:16.229Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "c3feb691-2f0d-457c-a3d1-43a3bcebbe3c",
+      "case": "continuation-egress-ramp-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08695610000000001,
+      "startedAt": "2026-10-05T16:58:18.043Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.004454850000000001,
+      "usage": {
+        "input_tokens": 16416,
+        "output_tokens": 351,
+        "total_tokens": 16767,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 16413,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 69,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:58:20.498Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "9f4bc6e1-f160-4021-aadd-7bd70b7ace6c",
+      "case": "continuation-egress-ramp-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "chat-completions",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07633340000000001,
+      "startedAt": "2026-10-05T16:58:20.519Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-continuation-chat-i",
+      "costUSD": 0.0061033500000000004,
+      "usage": {
+        "input_tokens": 22466,
+        "output_tokens": 487,
+        "total_tokens": 22953,
+        "input_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 22463,
+          "audio_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 259,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T16:58:24.079Z"
     }
   ]
 }

@@ -1,0 +1,93 @@
+{
+  "recordedAt": "2026-10-05T17:03:42.119764+00:00",
+  "objective": "Improve general Permitext research retrieval and interpretation using both original chats; achieve a defined, independently graded reliability gate before claiming at least95percent.",
+  "currentEvidence": {
+    "originalFrozenFresh": {
+      "correct": 35,
+      "total": 40
+    },
+    "newCandidateExploratory": {
+      "correct": 9,
+      "total": 10
+    },
+    "doNotCombineScores": true,
+    "general95PercentEstablished": false
+  },
+  "principles": [
+    "Measure fully correct delivered answers; avoidable nonanswers and unresolved material interpretations do not pass.",
+    "Diagnose retrieval absence, missing applicability scope, composition drift and review-envelope errors separately.",
+    "Preserve source conditions across narrative, supported points, headings and citation relevance.",
+    "Do not expand the research topic or repeatedly replay familiar cases to improve the reported score.",
+    "Use real backend and API semantics for acceptance; synthetic contracts prove mechanics only."
+  ],
+  "priorities": [
+    {
+      "order": 1,
+      "status": "next",
+      "work": "Supply parent scope for material source uses introduced during repair, within existing atomic evidence budgets. Keep the original source identities and fresh review.",
+      "evidence": "Ramp repair introduced a new application of BC1010.1.6 without its available BC1010.1 parent.",
+      "verifyBeforePaidRetest": "Actual-corpus contract for a newly used child with available parent; budget exhaustion and truly absent parent remain explicit; no inferred legal applicability."
+    },
+    {
+      "order": 2,
+      "status": "next",
+      "work": "Reduce full-rewrite drift for source explanations that have false evidence limitations or unnecessary qualifications without an unsupported source-scope row.",
+      "evidence": "Ramp initial draft passed source-scope checks but fell back to full rewrite due the false_evidence_limitation finding.",
+      "constraint": "Do not broaden the patch guard to unsupported project requirements, stale hashes or incomplete review envelopes. Establish mechanics and preserve all independently supported conditions before any new semantic run."
+    },
+    {
+      "order": 3,
+      "status": "requires_independent_interpretation",
+      "work": "Resolve hub-drain modifier scope, covered-display Fire Code qualifications and sidewalk measurement interpretations against independent authority.",
+      "constraint": "Keep existing failed/disputed grades and frozen rubrics; do not relax them to meet the target."
+    },
+    {
+      "order": 4,
+      "status": "planned_final_gate",
+      "work": "Freeze the final implementation and an independent source rubric, then perform one genuinely new forty-question acceptance cohort.",
+      "coverage": [
+        "Code-family rules and full exception qualifiers",
+        "Project facts and hypothetical applicability",
+        "Corrections and topic switching",
+        "Cross-code dependencies, definitions, tables and parent scopes",
+        "Historical editions, filing basis and unavailable evidence boundaries"
+      ],
+      "gate": "At least38/40 fully correct delivered answers, zero accepted confirmed material errors, unresolved disputes excluded. Treat this as scoped sample acceptance, not a statistical guarantee of95percent in all uses.",
+      "independence": "Sources and grades should be reviewed independently of the implementing assistant; paired turns must be identified as correlated.",
+      "stopRule": "Complete the single frozen cohort and report it unchanged. Further exposed-case retests are diagnostic only; no repeated holdout loops."
+    },
+    {
+      "order": 5,
+      "status": "unverified",
+      "work": "Validate deployed Pro access, browser-to-backend behavior and native production Responses transport.",
+      "constraint": "Current local lifetime grant and evaluation-only Chat transport do not establish production subscription, sign-in or native transport reliability."
+    }
+  ],
+  "budget": {
+    "capUSD": 10.99,
+    "diagnosticCapUSD": 2.99,
+    "freshCapUSD": 8,
+    "campaignEstimatedSpentUSD": 1.520297065,
+    "remainingAuthorizedUSD": 9.469702935,
+    "ledger": "evals/retrieval-validation-2026-10-05/budget-ledger.json",
+    "policy": "Reserve before each request, settle actual reported usage, block further spend on unknown or pending requests. Never reset the ledger or spend simply because funds remain."
+  },
+  "modelRoles": {
+    "ordinaryDraft": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "low",
+      "serviceTier": "priority"
+    },
+    "sourceReview": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "serviceTier": "priority"
+    },
+    "feedbackRepair": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "high",
+      "serviceTier": "default"
+    }
+  },
+  "deploymentStatus": "Local commits only; no production publication."
+}
