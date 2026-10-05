@@ -21138,8 +21138,8 @@ async function handleResearchConversationMessage(request, response) {
             : revised;
           result = preserveDeclaredProjectFactUncertainty(result);
           result = applyDeterministicAnswerRepairs(result);
-          // Supply the enclosing scope of sources newly used by the repair
-          // before evaluating or reviewing that answer. This shares the same
+          // Supply enclosing scopes for newly used sources and canonical
+          // parent gaps on retained uses before evaluating that answer. This shares the same
           // two canonical reads and atomic character/reference budgets as the
           // pre-repair recovery; it never widens discovery or certifies scope.
           await recoverRepairEvidence({ previousInterpretation, repairedInterpretation: result.interpretation });

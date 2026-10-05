@@ -75,4 +75,19 @@ for (const [family, number, parent, clause] of [
   assert.equal((await recoverResearchEvidenceBeforeRepair({ ...options, previousInterpretation: repairedInterpretation })).diagnostic.attemptedReads, 0);
   assert.equal((await recoverResearchEvidenceBeforeRepair({ ...options, repairedInterpretation: { citations: [{ sourceIDs: ["invented"] }] } })).diagnostic.attemptedReads, 0);
 }
+// A retained source use with a server-enumerated canonical gap also needs its
+// parent before fresh review. A foreign or unrelated gap cannot own a lookup.
+const landing = await sourceFor("BC", "1012.6.2");
+const identity = Object.fromEntries(["codePrefix", "corpusID", "codeVersion", "codeEdition"].map(k => [k, landing[k]]));
+identity.sectionNumber = "1012.6";
+const retained = { ...landing, parentScopeContextGaps: [{ identity, reason: "parent_scope_unavailable" }] };
+const options = { evidencePackage: { sources: [retained], strategy: { mode: "broad" }, limits },
+  previousInterpretation: bound([retained]), repairedInterpretation: bound([retained]), resolveSection: resolve };
+const filled = await recoverResearchEvidenceBeforeRepair(options);
+assert.equal(filled.diagnostic.attemptedReads, 1);
+assert(filled.evidencePackage.sources.some(s => s.sectionNumber === "1012.6" && s.canonicalContextComplete));
+for (const change of [{ codeEdition: "wrong" }, { sectionNumber: "1010.1" }]) {
+  const bad = { ...retained, parentScopeContextGaps: [{ identity: { ...identity, ...change } }] };
+  assert.equal((await recoverResearchEvidenceBeforeRepair({ ...options, evidencePackage: { ...options.evidencePackage, sources: [bad] } })).diagnostic.attemptedReads, 0);
+}
 console.log("Actual-corpus repair-introduced parents passed across BC/MC/FGC: immutable bindings, complete same-edition parents, shared budgets, explicit gaps; zero providers, no applicability acceptance.");

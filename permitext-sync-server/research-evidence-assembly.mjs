@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261005-repair-introduced-parent-scope-v83";
+export const researchEvidenceAssemblyVersion = "20261005-repaired-bound-parent-scope-v84";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -52,7 +52,7 @@ export const researchEvidenceAssemblyLimits = Object.freeze({
 // No discovery/embedding call, selection widening, or second evidence budget.
 export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, issues = [], previousInterpretation, repairedInterpretation, resolveSection, signal } = {}) {
   const sources = evidencePackage?.sources || [];
-  const diagnostic = { version: "20261005-grounded-parent-table-repair-v3", attemptedReads: 0, supplied: [], unresolved: [] };
+  const diagnostic = { version: "20261005-grounded-parent-table-repair-v4", attemptedReads: 0, supplied: [], unresolved: [] };
   const unchanged = () => ({ evidencePackage, diagnostic });
   if (evidencePackage?.strategy?.mode !== researchEvidenceStrategies.broad ||
       sources.some(source => source.origin === sourceOrigins.pinned) || typeof resolveSection !== "function") return unchanged();
@@ -98,20 +98,27 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
   // A repair may start using an already supplied child that the original
   // answer never used. Its canonical decimal ancestry, not model-authored
   // prose or a new citation identity, nominates scope for the fresh review.
+  // Exact canonical parent gaps on retained bound uses receive the same check.
   const boundIDs = answer => new Set([...(answer?.citations || []), ...(answer?.supportedPoints || [])]
     .flatMap(item => item.sourceIDs || []));
   const previouslyBound = boundIDs(previousInterpretation);
   const repairedBound = boundIDs(repairedInterpretation);
   if (previousInterpretation && repairedInterpretation) for (const source of sources) {
-    if (!repairedBound.has(source.sourceID) || previouslyBound.has(source.sourceID) ||
-        source.authorityClass !== "enacted" || source.canonicalContextResolved !== true ||
+    if (!repairedBound.has(source.sourceID) || source.authorityClass !== "enacted" || source.canonicalContextResolved !== true ||
         !authorityFields.every(field => compactText(source[field])) ||
         !/^\d+(?:\.\d+)+$/.test(source.sectionNumber)) continue;
     const parts = source.sectionNumber.split(".");
     for (let level = 0; level < 2 && parts.length > 1; level++) {
       parts.pop();
+      const sectionNumber = parts.join(".");
+      // Retained uses may still carry an unresolved server-enumerated parent
+      // gap. Recover that exact canonical identity too; do not trust a review
+      // declaring an absent scope established, or read unrelated ancestors.
+      if (previouslyBound.has(source.sourceID) && !(source.parentScopeContextGaps || []).some(gap =>
+          gap.identity?.sectionNumber === sectionNumber &&
+          ["codePrefix", "corpusID", "codeVersion", "codeEdition"].every(field => gap.identity[field] === source[field]))) continue;
       const request = { ...Object.fromEntries(authorityFields.map(field => [field, source[field]])),
-        sectionNumber: parts.join("."), referenceKind: "ancestor_scope" };
+        sectionNumber, referenceKind: "ancestor_scope" };
       const key = authorityFields.map(field => request[field]).concat(request.sectionNumber).join(":");
       if (!nominations.has(key)) nominations.set(key, { request, parentSourceID: source.sourceID });
     }
