@@ -98,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261005-zola-refresh-icon-v644";
+} from "./offline-storage.js?v=20261005-account-button-edges-v646";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
