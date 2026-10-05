@@ -4,6 +4,7 @@ import { applyResearchProjectFactCoverage } from "../research-project-fact-cover
 import { openAIResearchVerification } from "../app.mjs";
 import { beginResearchSpendReservation, endResearchSpendReservation } from "../research-config.mjs";
 import { researchRequestEnvelopeEnvironment } from "./research-request-envelope-preflight.mjs";
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 
 const answer = { answerText: "Unchanged decision, qualifications and citations.", missingFacts: ["Optional detail A", "Material applicability fact", "Optional detail B"],
   supportedPoints: [{ explanation: "Unchanged rule", sourceIDs: ["source-1"] }], citations: [{ sourceIDs: ["source-1"] }], followUpQuestions: ["Material follow-up"] };
@@ -34,14 +35,17 @@ Object.assign(process.env, researchRequestEnvelopeEnvironment, { OPENAI_API_KEY:
 delete process.env.PERMITEXT_RESEARCH_EVAL_MAX_USD;
 let reply;
 let calls = 0;
+const parserEvidence = [{ sourceID: "source-1", sectionID: "fictional-cabinet", sectionNumber: "915.1",
+  corpusID: "fictional-library", codePrefix: "LIB", codeEdition: "2041", codeVersion: "original", jurisdiction: "Fictional City",
+  text: "An installed cabinet shall have a latch.", canonicalContextResolved: true, canonicalContextComplete: true }];
 globalThis.fetch = async (url, options) => {
   assert.equal(String(url), "https://api.openai.com/v1/responses");
   calls++;
   const body = JSON.parse(options.body);
   assert(body.text.format.schema.required.includes("unnecessaryMissingFactIndices"));
   assert(body.text.format.schema.required.includes("missingFactsOnly"));
-  return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 20, output_tokens: 20 },
-    output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(reply) }] }] });
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: { input_tokens: 20, output_tokens: 20 },
+    output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(reply) }] }] }));
 };
 for (const [value, valid] of [
   [verification, true], [{...verification, missingFactsOnly: "true"}, false], [{ pass: true, issues: [] }, true], [{ pass: true, issues: [], unnecessaryMissingFactIndices: [] }, true],
@@ -51,7 +55,7 @@ for (const [value, valid] of [
   reply = value;
   beginResearchSpendReservation({ id: `synthetic-parser-${calls}` });
   try {
-    const request = openAIResearchVerification("Synthetic question.", [], answer, "synthetic-user", { model: "gpt-5.6-luna" });
+    const request = openAIResearchVerification("Synthetic question.", parserEvidence, answer, "synthetic-user", { model: "gpt-5.6-luna" });
     if (valid) assert.equal((await request).result.pass, value.pass);
     else await assert.rejects(request, { code: "INVALID_RESEARCH_VERIFICATION" });
   } finally {
