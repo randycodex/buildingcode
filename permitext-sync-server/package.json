@@ -212,6 +212,7 @@
     "test:offline-full-corpus:browser": "node tests/offline-full-corpus-browser.mjs",
     "test:offline-full-network:browser": "node tests/offline-full-network-browser.mjs",
     "test:research-project-investigation": "node tests/research-transparency-applicability-contract.mjs && node tests/research-project-fact-scope-contract.mjs && node tests/research-conversation-presentation-contract.mjs && node tests/research-project-workspace-contract.mjs && node tests/research-column-replacement-contract.mjs && node tests/research-fast-conversation-http-contract.mjs && node tests/research-zoning-verification-instructions-contract.mjs",
+    "test:research-repair-retrieval": "node tests/research-repair-retrieval-contract.mjs && node tests/research-repair-retrieval-corpus-contract.mjs",
     "test:research-accuracy": "node tests/research-rule-packets-contract.mjs && node tests/research-accuracy-retrieval-contract.mjs && node tests/research-scenario-continuity-contract.mjs && node tests/research-conversation-recall-contract.mjs && node tests/research-explicit-reference-binding-contract.mjs && node tests/research-clarification-copy-contract.mjs && node tests/research-opening-consistency-http-contract.mjs",
     "test:typesafe-intent": "node --test tests/typesafe-intent.test.mjs",
     "eval:typesafe-intent": "node scripts/eval-typesafe-intent.mjs"

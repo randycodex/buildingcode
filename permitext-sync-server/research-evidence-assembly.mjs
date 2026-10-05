@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261004-bound-immediate-child-detail-v79";
+export const researchEvidenceAssemblyVersion = "20261005-canonical-repair-retrieval-v80";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -45,6 +45,114 @@ export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumSupplementalCharacters: 48_000,
   maximumCharactersPerSource: 12_000
 });
+
+// Reviewer text nominates a lookup, never legal authority. Recover only a
+// supplied incomplete source or an explicit reference in supplied enacted text.
+// No discovery/embedding call, selection widening, or second evidence budget.
+export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, issues = [], resolveSection, signal } = {}) {
+  const sources = evidencePackage?.sources || [];
+  const diagnostic = { version: "20261005-canonical-repair-retrieval-v1", attemptedReads: 0, supplied: [], unresolved: [] };
+  const unchanged = () => ({ evidencePackage, diagnostic });
+  if (evidencePackage?.strategy?.mode !== researchEvidenceStrategies.broad ||
+      sources.some(source => source.origin === sourceOrigins.pinned) || typeof resolveSection !== "function") return unchanged();
+  const limits = appliedLimits(evidencePackage.limits);
+  const authorityFields = ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"];
+  const eligibleIssues = issues.slice(0, 12).filter(issue =>
+    ["missed_material_conclusion", "incorrect_citation", "unsupported_requirement", "false_evidence_limitation"].includes(issue?.type) &&
+    /\b(?:missing|absent|unavailable|incomplete|omitted|not supplied|not retrieved)\b/i.test(issue.detail || ""));
+  const nominations = new Map();
+  for (const issue of eligibleIssues) {
+    for (const source of sources) {
+      if (source.authorityClass !== "enacted" || !authorityFields.every(field => compactText(source[field]))) continue;
+      const mentioned = [...inlineCrossReferences(String(issue.detail || "").slice(0, 2_000), source.codePrefix),
+        ...extractResearchCodeReferences(String(issue.detail || "").slice(0, 2_000))];
+      const grounded = [
+        ...(!source.canonicalContextComplete ? [{ codePrefix: source.codePrefix, sectionNumber: source.sectionNumber }] : []),
+        ...inlineCrossReferences(source.text, source.codePrefix)
+      ];
+      for (const reference of grounded) {
+        // Cross-code references need a separately established edition; never
+        // guess one from the originating code's version or from review prose.
+        if (reference.codePrefix !== source.codePrefix || reference.referenceKind === "table" ||
+            !mentioned.some(item => item.codePrefix === reference.codePrefix && item.sectionNumber === reference.sectionNumber)) continue;
+        const request = { ...Object.fromEntries(authorityFields.map(field => [field, source[field]])),
+          sectionNumber: reference.sectionNumber };
+        const key = authorityFields.map(field => request[field]).concat(request.sectionNumber).join(":");
+        if (!nominations.has(key)) nominations.set(key, { request, parentSourceID: source.sourceID });
+      }
+    }
+  }
+  if (!nominations.size) return unchanged();
+  const next = [...sources];
+  let characters = next.reduce((sum, source) => sum + String(source.text || "").length, 0);
+  const ceiling = Math.min(limits.maximumCharacters, limits.maximumSupplementalCharacters,
+    Number(evidencePackage.usage?.supplementalCharacterCeiling) || limits.maximumCharacters);
+  let crossReferences = next.filter(source => source.origin === sourceOrigins.crossReference).length;
+  const comparable = value => compactText(value).replace(/\s+/g, " ");
+  for (const { request, parentSourceID } of nominations.values()) {
+    if (diagnostic.attemptedReads >= 2) break;
+    const matchesAuthority = source => authorityFields.every(field => source[field] === request[field]);
+    const existing = next.find(source => matchesAuthority(source) && source.sectionNumber === request.sectionNumber);
+    if (existing?.canonicalContextComplete) continue;
+    if (!existing && crossReferences >= limits.maximumCrossReferences) continue;
+    signal?.throwIfAborted();
+    diagnostic.attemptedReads++;
+    const unresolved = reason => diagnostic.unresolved.push({ ...request, reason });
+    let resolved, fresh;
+    try {
+      fresh = await resolveSection({ ...request, origin: sourceOrigins.crossReference });
+      resolved = await canonicalSection(async () => fresh, request, sourceOrigins.crossReference);
+    }
+    catch (error) {
+      if (signal?.aborted || error?.name === "AbortError" || error?.code === "RESEARCH_CANCELLED") throw error;
+      unresolved("canonical_source_unavailable"); continue;
+    }
+    signal?.throwIfAborted();
+    const body = resolved.body;
+    const bodyText = comparable(body?.blocks?.map(block => block.plainText).join("\n\n"));
+    const fullText = canonicalText(resolved);
+    if (!matchesAuthority(fresh) || fresh.sectionNumber !== request.sectionNumber ||
+        (fresh.authorityClass && fresh.authorityClass !== "enacted") ||
+        (fresh.authorityStatus && fresh.authorityStatus !== "enacted") ||
+        fresh.researchClaimEligible === false || fresh.referenceOnly || fresh.truncated ||
+        fresh.textComplete === false || fresh.canonicalContextComplete === false ||
+        body?.researchClaimEligible === false || body?.truncated || !body?.blocks?.length ||
+        body.blocks.some(block => !compactText(block.plainText) || block.truncated || block.researchClaimEligible === false) ||
+        ![bodyText, comparable([resolved.sectionNumber, resolved.title, bodyText].join(" "))].includes(comparable(fullText))) {
+      unresolved("complete_authority_not_verified"); continue;
+    }
+    // A replacement must preserve every already supplied clause, including
+    // discontiguous indexed context. Rebuild the record to remove old locators.
+    if (existing && !compactText(existing.text).split(/\n\n+/).every(block => comparable(fullText).includes(comparable(block)))) {
+      unresolved("existing_passage_not_contained"); continue;
+    }
+    if (fullText.length > limits.maximumCharactersPerSource ||
+        characters - (existing?.text.length || 0) + fullText.length > ceiling) {
+      unresolved("complete_source_exceeds_budget"); continue;
+    }
+    const record = sourceRecord(resolved, {
+      origin: sourceOrigins.crossReference,
+      sourceID: existing?.sourceID || deterministicSourceID(sourceOrigins.crossReference, resolved, "repair"),
+      relationship: `Reviewer-requested canonical dependency of ${parentSourceID}; applicability requires review`,
+      characterAllowance: fullText.length, canonicalResolved: true,
+      retrievalReason: "Bounded canonical retrieval before answer repair",
+      retrievalVersion: diagnostic.version, retrievalDepth: 1,
+      evidencePriority: existing?.evidencePriority || researchEvidencePriorityMetadata({
+        ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1
+      })
+    });
+    if (existing) next[next.indexOf(existing)] = record;
+    else { next.push(record); crossReferences++; }
+    characters += record.text.length - (existing?.text.length || 0);
+    diagnostic.supplied.push({ sourceID: record.sourceID, ...request,
+      textSHA256: createHash("sha256").update(record.text).digest("hex"), replaced: Boolean(existing) });
+  }
+  return { diagnostic, evidencePackage: { ...evidencePackage, sources: next,
+    rulePackets: { ...evidencePackage.rulePackets, repairRetrieval: diagnostic },
+    usage: { ...evidencePackage.usage, characterCount: characters, supplementalCharacterCount: characters,
+      crossReferenceCount: crossReferences,
+      repairRetrievalReadCount: diagnostic.attemptedReads, repairRetrievalSourceCount: diagnostic.supplied.length } } };
+}
 
 export const researchPinnedEvidenceAssemblyLimits = Object.freeze({
   maximumDiscovered: 4,

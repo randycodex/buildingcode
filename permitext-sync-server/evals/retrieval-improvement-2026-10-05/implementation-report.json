@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-05T13:45:59.522075+00:00",
+  "baselineCommit": "83d8c9386eda45fc12ae2938ac8cedbf804f93cf",
+  "branch": "codex/research-retrieval-continuation",
+  "contextChats": [
+    {
+      "title": "Diagnose transparency research",
+      "threadID": "01a0f3ca-1c80-7672-9691-f4faf06a0b3a"
+    },
+    {
+      "title": "Assess research retrieval",
+      "threadID": "01a10c28-b069-7550-80bc-cf0fb217c0c9"
+    }
+  ],
+  "readiness": {
+    "keyPresent": true,
+    "credentialValuePrinted": false,
+    "probe": "GET https://api.openai.com/v1/models",
+    "httpStatus": 200,
+    "modelsListReceived": true,
+    "nonBillable": true,
+    "controlPlaneSecretState": "unknown",
+    "controlPlaneNetworkState": "unknown",
+    "conclusion": "Authenticated runtime access confirmed by non-billable probe; control-plane readiness observations remain unknown."
+  },
+  "taskAuthorizedPaidTestBudgetUSD": 0,
+  "paidProviderCalls": 0,
+  "generationCalls": 0,
+  "embeddingCalls": 0,
+  "implementation": {
+    "change": "Canonical retrieval before the existing ordinary answer repair",
+    "maximumCanonicalReadsPerTurn": 2,
+    "nomination": "Missing-source review finding, grounded in already supplied enacted text or an existing incomplete source",
+    "sourceBoundary": "Exact originating family, corpus, version, edition and jurisdiction; canonical source and complete body must agree",
+    "budget": "Original total, supplemental, per-source and cross-reference ceilings; no exception clipping",
+    "protectedModes": [
+      "user-pinned or selected evidence",
+      "supplied-text interpretation",
+      "conversation recall",
+      "practical next step",
+      "bounded citation fast path",
+      "zoning planner"
+    ],
+    "refresh": [
+      "immutable evidence snapshots",
+      "required claims",
+      "materiality claims",
+      "deterministic evidence map",
+      "writer and verifier source context"
+    ],
+    "diagnostics": [
+      "read count",
+      "supplied and unresolved identities",
+      "text SHA256",
+      "replacement flag"
+    ],
+    "additionalModelCalls": 0
+  },
+  "checks": [
+    {
+      "command": "npm run test:research-repair-retrieval",
+      "result": "passed",
+      "scope": "Synthetic source boundaries plus real shipped BC canonical text; controlled omissions, not fresh accuracy evaluation"
+    },
+    {
+      "command": "node tests/research-indexed-reference-dependency-contract.mjs",
+      "result": "passed"
+    },
+    {
+      "command": "node tests/research-semantic-query-context-contract.mjs",
+      "result": "passed"
+    },
+    {
+      "command": "node tests/research-certified-field-repair-http-contract.mjs",
+      "result": "passed",
+      "scope": "HTTP, simulated provider responses, bounded requests and persistence; not live model accuracy"
+    },
+    {
+      "command": "node tests/research-decision-fact-repair-http-contract.mjs",
+      "result": "pre-existing failure",
+      "baselineReproduced": true,
+      "detail": "Synthetic verifier assertion fails before the first repair; same failure reproduced using the unchanged baseline app. Expects targeted revision after first review but stops in verifier response double."
+    },
+    {
+      "command": "node --check app.mjs; node --check research-evidence-assembly.mjs; git diff --check",
+      "result": "passed"
+    }
+  ],
+  "limitations": [
+    "No deployment or push",
+    "No live answer-quality claim",
+    "No general semantic search during repair, named-definition search, cross-code edition inference or agency-guidance retrieval",
+    "Existing incomplete sources too large for the original budget remain unresolved",
+    "The old decision-fact HTTP test remains failing independently of this change"
+  ],
+  "nextPaidValidation": [
+    "Previously failed sprinkler follow-up",
+    "Fresh accessibility questions",
+    "Current real-provider response format and failure wording",
+    "Freeze diverse fresh questions and source rubrics; compare decisive-text delivery, final correctness, latency and cost separately from repeated regressions"
+  ]
+}
