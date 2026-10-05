@@ -9,6 +9,7 @@ import { pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
 import { evaluationBudget } from "./research-evaluation-budget.mjs";
 import { researchProviderReadiness } from "./research-provider-readiness-20261005.mjs";
+import { researchChatRequest, researchResponseFromChat } from "./research-chat-compatibility-transport.mjs";
 import { validationReservation, validationCost, validationPricing } from "./research-validation-pricing-20261005.mjs";
 import { researchSemanticEmbeddingModel, researchSemanticEmbeddingReservation, researchSemanticEmbeddingCost } from "../research-semantic-passages.mjs";
 const live = process.argv.includes("--live");
@@ -23,13 +24,15 @@ const options = new Map();
 for (let index = 2; index < process.argv.length; index++) {
   const [name, ...suffix] = process.argv[index].split("=");
   if (["--live", "--retrieval-live", "--fixed-evidence", "--advisory-routes", "--current-corpus-recall", "--advisory-ranking", "--passage-search"].includes(name)) { assert(!suffix.length); continue; }
-  assert(["--fixture", "--only", "--budget-ledger", "--campaign-cap-usd", "--application-root", "--semantic-vectors", "--phase", "--model-policy"].includes(name), `Unknown option: ${name}`);
+  assert(["--fixture", "--only", "--budget-ledger", "--campaign-cap-usd", "--application-root", "--semantic-vectors", "--phase", "--model-policy", "--provider-api"].includes(name), `Unknown option: ${name}`);
   const value = suffix.length ? suffix.join("=") : process.argv[++index];
   assert(value && !value.startsWith("--"), `Missing value for ${name}`);
   options.set(name, value);
 }
 const argument = name => options.get(name);
 const modelPolicy = argument("--model-policy") || "luna-only";
+const providerAPI = argument("--provider-api") || "responses";
+assert(["responses", "chat-completions"].includes(providerAPI));
 assert.equal(modelPolicy, "luna-only", "This campaign is authorized for Luna roles only");
 const modelPolicyPath = "evals/retrieval-validation-2026-10-05/luna-model-policy.json";
 const lunaPolicy = JSON.parse(await readFile(new URL(modelPolicyPath, root), "utf8"));
@@ -56,7 +59,7 @@ await mkdir(directory); // Refuse an existing directory rather than overwrite it
 const inheritedAPIKey = process.env.OPENAI_API_KEY;
 assert(!live || campaignBudget, "Live testing requires the shared durable ledger");
 if (live || retrievalLive) {
-  const readiness = await researchProviderReadiness({ apiKey: inheritedAPIKey });
+  const readiness = await researchProviderReadiness({ apiKey: inheritedAPIKey, providerAPI });
   await writeFile(join(directory, "readiness.json"), JSON.stringify(readiness, null, 2));
   assert(readiness.ready, "Provider authentication is not ready; no billable evaluation calls were dispatched");
 }
@@ -93,7 +96,7 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-question-intent.mjs", "research-conversation-continuity.mjs", "research-answer-presentation.mjs", "research-answer-quality.mjs",
   "research-web-attribution.mjs", "research-config.mjs",
   "research-zoning-safety.mjs", "project-foundation-contract.mjs",
-  "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/run-research-validation-20261005.mjs", "scripts/research-validation-pricing-20261005.mjs", "scripts/research-provider-readiness-20261005.mjs", modelPolicyPath]) {
+  "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/run-research-validation-20261005.mjs", "scripts/research-validation-pricing-20261005.mjs", "scripts/research-provider-readiness-20261005.mjs", "scripts/research-chat-compatibility-transport.mjs", modelPolicyPath]) {
   sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex");
 }
 for (const name of ["research-passage-index.mjs", "research-semantic-passages.mjs",
@@ -102,7 +105,7 @@ for (const name of ["research-passage-index.mjs", "research-semantic-passages.mj
   catch (error) { if (error.code !== "ENOENT") throw error; }
 }
 const result = { fixturePath, applicationRoot: applicationRoot.href, fixtureHash: createHash("sha256").update(fixtureText).digest("hex"), sourceHashes, selectedIDs,
-  live, retrievalLive, modelPolicy, modelRoles: lunaPolicy.roles, semanticVectorPath, advisoryRoutes, currentCorpusRecall, advisoryRanking, passageSearch, campaignCapUSD,
+  live, retrievalLive, providerAPI, modelPolicy, modelRoles: lunaPolicy.roles, semanticVectorPath, advisoryRoutes, currentCorpusRecall, advisoryRanking, passageSearch, campaignCapUSD,
   mode: fixedEvidence ? "fixed-evidence-reasoning" : "end-to-end", phaseBucket, capUSD: phaseCapUSD, startedAt: new Date().toISOString(), provider: [], cases: [] };
 const persist = () => writeFile(join(directory, "results.json"), JSON.stringify(result, null, 2));
 globalThis.fetch = async (url, options = {}) => {
@@ -117,6 +120,7 @@ globalThis.fetch = async (url, options = {}) => {
   assert(!body.tools?.length && !body.previous_response_id && !body.conversation);
   assert(!body.service_tier || ["priority", "default"].includes(body.service_tier));
   const reserved = embedding ? researchSemanticEmbeddingReservation(body.input) : validationReservation(body);
+  const chatBody = !embedding && providerAPI === "chat-completions" ? researchChatRequest(body) : null;
   assert(!result.provider.some(call => call.status === "pending" || call.status === "unknown"), "Reconcile unsettled requests before spending more");
   assert(!result.provider.some(call => call.status === "rejected"), "Stop after provider rejection; do not dispatch a model fallback");
   const spent = result.provider.reduce((sum, call) => sum + (call.costUSD ?? call.reservedUSD), 0);
@@ -127,14 +131,26 @@ globalThis.fetch = async (url, options = {}) => {
     if (bucketSpent + reserved > phaseCapUSD) throw Object.assign(Error("Phase spending cap reached"), { code: "RESEARCH_EVAL_SPEND_CAP" });
   }
   const call = { phaseBucket, id: randomUUID(), case: result.activeCase, model: body.model, effort: body.reasoning?.effort,
+    providerAPI: embedding ? "embeddings" : providerAPI,
     phase: embedding ? "query_embeddings" : body.text?.format?.name, status: "pending", reservedUSD: reserved, startedAt: new Date().toISOString() };
   campaignBudget?.reserve({ ...call, runDirectory: directory });
   result.provider.push(call); await persist();
   await writeFile(join(directory, `${call.id}-request.json`), JSON.stringify(body));
+  if (chatBody) await writeFile(join(directory, `${call.id}-chat-request.json`), JSON.stringify(chatBody));
   const started = performance.now();
   try {
-    const response = await nativeFetch(url, options);
-    const payload = await response.clone().json();
+    let response = await nativeFetch(chatBody ? "https://api.openai.com/v1/chat/completions" : url,
+      chatBody ? { ...options, body: JSON.stringify(chatBody) } : options);
+    let payload = await response.clone().json();
+    if (chatBody) {
+      const raw = structuredClone(payload);
+      if (raw.error?.code === "invalid_api_key") raw.error.message = "Authentication rejected (credential-bearing message removed)";
+      await writeFile(join(directory, `${call.id}-chat-response.json`), JSON.stringify(raw));
+      payload = researchResponseFromChat(payload, chatBody);
+      const headers = new Headers(response.headers);
+      for (const name of ["content-length", "content-encoding", "transfer-encoding"]) headers.delete(name);
+      response = new Response(JSON.stringify(payload), { status: response.status, headers });
+    }
     const savedPayload = structuredClone(payload);
     if (savedPayload.error?.code === "invalid_api_key") savedPayload.error.message = "Authentication rejected (credential-bearing message removed)";
     await writeFile(join(directory, `${call.id}-response.json`), JSON.stringify(savedPayload));

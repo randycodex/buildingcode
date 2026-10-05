@@ -1,10 +1,11 @@
 // These requests cannot generate an answer or an embedding.
-export async function researchProviderReadiness({ apiKey, fetchImpl = globalThis.fetch }) {
-  const result = { checkedAt: new Date().toISOString(), keyPresent: Boolean(apiKey), billableRequests: 0 };
+export async function researchProviderReadiness({ apiKey, fetchImpl = globalThis.fetch, providerAPI = "responses" }) {
+  const generationEndpoint = providerAPI === "chat-completions" ? "/v1/chat/completions" : "/v1/responses";
+  const result = { checkedAt: new Date().toISOString(), keyPresent: Boolean(apiKey), billableRequests: 0, providerAPI, generationEndpoint };
   if (!apiKey) return { ...result, ready: false, reason: "missing_key" };
   for (const [name, path, method] of [
     ["models", "/v1/models", "GET"],
-    ["responses", "/v1/responses", "POST"],
+    ["responses", generationEndpoint, "POST"],
     ["embeddings", "/v1/embeddings", "POST"]
   ]) {
     try {
@@ -25,7 +26,7 @@ export async function researchProviderReadiness({ apiKey, fetchImpl = globalThis
         result[name].expectedValidationFailure = response.status === 400 && !payload.usage &&
           payload.error?.type === "invalid_request_error" &&
           /missing|must provide|required|you must specify/i.test(message) &&
-          /model|input/i.test(message);
+          /model|input|messages/i.test(message);
       }
     } catch (error) {
       result[name] = { status: null, error: error.name };

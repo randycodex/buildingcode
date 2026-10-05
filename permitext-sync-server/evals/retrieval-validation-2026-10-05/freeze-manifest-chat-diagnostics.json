@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-05T15:06:47.002861+00:00",
+  "providerAPI": "chat-completions",
+  "productionProviderAPI": "responses",
+  "transportScope": "Evaluation-only: real API generation through actual local backend using exact Responses prompt/schema translated to Chat Completions. Production Responses endpoint remains authentication-blocked.",
+  "files": {
+    "scripts/research-chat-compatibility-transport.mjs": "b857f801841d8e8cc6d23810858b56fff43b27b835b2a8f165162f9b1c182f95",
+    "scripts/run-research-validation-20261005.mjs": "ec36da0dddd6a510472ade6e10838071f7003fb5b51bbe55b48f18539d580eb8",
+    "scripts/research-provider-readiness-20261005.mjs": "1b277bf97e7edb06da072e8c8ab09da49f1b34656b1b514e26f12302357e1b66",
+    "scripts/test-research-chat-compatibility-transport.mjs": "cc307c594b6595269d105e612cacb5641a6717b1df497094f074cde7997e5b87",
+    "app.mjs": "b778a3dadce2eceb8539ee731977ae5dc9223c4a5ecb6e7b70a6bd4a303e50c1",
+    "research-evidence-assembly.mjs": "dd6130934ba32227472b1b96fff274531e0852a3719f53da6b0c46c24435c92f",
+    "research-config.mjs": "e4b85c2466baae8862c4f320fa1b948e17c85312191d3fc630fbc61ec278f7cb",
+    "evals/retrieval-validation-2026-10-05/diagnostic-fixture.json": "ef64e3a66ec113499d75021bb3cad725e1c48a2742f2b71618da09b7e92dc58d",
+    "evals/retrieval-validation-2026-10-05/fresh-fixture.json": "a21065c374d388082b65456de1cb2fcb6abbdeffa62be2cf907ccde0893bfead",
+    "evals/retrieval-validation-2026-10-05/luna-model-policy.json": "c3cd006a380cbd3cc05ec19b9402180ca4893c8f3ab3d9bbf1db94184d49fb1e"
+  }
+}
