@@ -1,8 +1,14 @@
 import assert from "node:assert/strict";
-import { buildModelReviewRequest, validateModelReview, modelReviewBatches } from "./run-research-model-review-20261005.mjs";
+import { buildModelReviewRequest, validateModelReview, modelReviewBatches, modelReviewCanonicalReferences } from "./run-research-model-review-20261005.mjs";
 import { validationReservation } from "./research-validation-pricing-20261005.mjs";
 globalThis.fetch = () => { throw Error("Model-review contracts forbid external calls"); };
 const { batches } = await modelReviewBatches();
+assert.deepEqual(modelReviewCanonicalReferences("2022 NYC Plumbing Code Section 605.4."), ["PC 605.4"]);
+assert.deepEqual(modelReviewCanonicalReferences("BC 1029.15, to determine handrail conditions."), ["BC 1029.15"]);
+assert.deepEqual(modelReviewCanonicalReferences("The pre-amendment version of AC 28-105.1."), []);
+assert.deepEqual(modelReviewCanonicalReferences("Authoritative commentary or interpretation on PC 802.3.2."), []);
+assert.deepEqual(modelReviewCanonicalReferences("ASME A112.4.1 provisions."), []);
+assert.deepEqual(modelReviewCanonicalReferences("MC Chapter 4."), []);
 assert.equal(batches.length, 8);
 assert.equal(batches.slice(3).flatMap(batch => batch.cases.flatMap(item => item.questions)).length, 40);
 for (const batch of batches) {
