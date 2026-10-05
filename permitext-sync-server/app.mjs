@@ -8631,7 +8631,7 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
       text,
       canonicalText,
       sectionTextHash: createHash("sha256").update(canonicalText).digest("hex"),
-      richSources: structuredRichSources(body),
+      richSources: structuredRichSources(body, { codePrefix: summary.codePrefix }),
       visualSourceReferenceCount: visualReferences.length,
       visualSources
     });
@@ -12320,7 +12320,7 @@ export function researchAssemblyCrossReferences(evidence, catalog) {
   return references;
 }
 
-async function resolveResearchAssemblySection(request, catalog) {
+export async function resolveResearchAssemblySection(request, catalog) {
   const requestedID = String(request?.sectionID || "").trim();
   const requestedPrefix = String(request?.codePrefix || "").trim().toUpperCase();
   const requestedNumber = String(request?.sectionNumber || "").trim().replace(/\.$/, "").toUpperCase();

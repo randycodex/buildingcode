@@ -1203,9 +1203,12 @@ export function visualSourceReferences(body) {
   return Array.from(references.values());
 }
 
-export function structuredRichSources(body) {
+export function structuredRichSources(body, options = {}) {
   const sources = [];
   const blocks = Array.isArray(body?.blocks) ? body.blocks : [];
+  // Prepared construction bodies can omit the code prefix. Bind table
+  // identity to their canonical catalog entry instead of assuming zoning.
+  const codePrefix = String(options.codePrefix || body?.codePrefix || (body?.zoning ? "ZR" : "")).trim().toUpperCase();
   const zoningTables = Array.isArray(body?.zoning?.tables) ? body.zoning.tables : [];
   let zoningTableOrdinal = 0;
   const continuationHTML = (blockIndex) => {
@@ -1302,7 +1305,7 @@ export function structuredRichSources(body) {
         .join("\n");
       const tableCount = Math.max(zoningTables.length, 1);
       const inferredReference = body?.sectionNumber
-        ? `ZR Table ${body.sectionNumber}${tableCount > 1 ? ` (${sourceOrdinal + 1} of ${tableCount})` : ""}`
+        ? `${codePrefix ? `${codePrefix} ` : ""}Table ${body.sectionNumber}${tableCount > 1 ? ` (${sourceOrdinal + 1} of ${tableCount})` : ""}`
         : "Official table";
       const detectedReference = tableReferenceFromHTML(sourceHTML);
       const reference = String(sourceTable?.caption || sourceTable?.sourceAnchor || "").trim() ||
@@ -2512,7 +2515,7 @@ export async function discoverRelevantEvidence({
       ? nominateNearestCompleteIndexedRuleGroup(item, passageIndex, currentQuestion, { maximumCharacters: 12000 }) : null;
     const indexedAlternatives = [...new Map([enclosingRule, ...(item.indexedPassage?.passages || [])]
       .filter(Boolean).map(value => [passageIdentity(value), value])).values()].slice(0, 6);
-    const richSources = structuredRichSources(body);
+    const richSources = structuredRichSources(body, { codePrefix: section.codePrefix });
     item.sourceReviewRequirements = sourceReviewRequirements(body, passage, richSources);
     item.visualSources = [];
     if (typeof resolveVisualSource === "function") {

@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261005-canonical-repair-retrieval-v80";
+export const researchEvidenceAssemblyVersion = "20261005-grounded-parent-table-repair-v81";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -47,19 +47,20 @@ export const researchEvidenceAssemblyLimits = Object.freeze({
 });
 
 // Reviewer text nominates a lookup, never legal authority. Recover only a
-// supplied incomplete source or an explicit reference in supplied enacted text.
+// supplied incomplete source, an explicit reference in supplied enacted text,
+// or the enclosing numbered scope of a canonically resolved source.
 // No discovery/embedding call, selection widening, or second evidence budget.
 export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, issues = [], resolveSection, signal } = {}) {
   const sources = evidencePackage?.sources || [];
-  const diagnostic = { version: "20261005-canonical-repair-retrieval-v1", attemptedReads: 0, supplied: [], unresolved: [] };
+  const diagnostic = { version: "20261005-grounded-parent-table-repair-v2", attemptedReads: 0, supplied: [], unresolved: [] };
   const unchanged = () => ({ evidencePackage, diagnostic });
   if (evidencePackage?.strategy?.mode !== researchEvidenceStrategies.broad ||
       sources.some(source => source.origin === sourceOrigins.pinned) || typeof resolveSection !== "function") return unchanged();
   const limits = appliedLimits(evidencePackage.limits);
   const authorityFields = ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"];
   const eligibleIssues = issues.slice(0, 12).filter(issue =>
-    ["missed_material_conclusion", "incorrect_citation", "unsupported_requirement", "false_evidence_limitation"].includes(issue?.type) &&
-    /\b(?:missing|absent|unavailable|incomplete|omitted|not supplied|not retrieved)\b/i.test(issue.detail || ""));
+    ["missed_material_conclusion", "incorrect_citation", "unsupported_requirement", "false_evidence_limitation", "fact_evidence_confusion"].includes(issue?.type) &&
+    /\b(?:missing|absent|unavailable|incomplete|omitted|lacks?|not supplied|not retrieved|not provided|not included)\b/i.test(issue.detail || ""));
   const nominations = new Map();
   for (const issue of eligibleIssues) {
     for (const source of sources) {
@@ -70,15 +71,27 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
         ...(!source.canonicalContextComplete ? [{ codePrefix: source.codePrefix, sectionNumber: source.sectionNumber }] : []),
         ...inlineCrossReferences(source.text, source.codePrefix)
       ];
+      // Decimal ancestry is an enclosing catalog scope, never an applicability
+      // conclusion. Limit it to two levels of a server-resolved numbered source;
+      // reviewer prose, search labels and unverified source metadata cannot own it.
+      if (source.canonicalContextResolved === true && /^\d+(?:\.\d+)+$/.test(source.sectionNumber)) {
+        const parts = source.sectionNumber.split(".");
+        for (let level = 0; level < 2 && parts.length > 1; level++) {
+          parts.pop();
+          grounded.push({ codePrefix: source.codePrefix, sectionNumber: parts.join("."), referenceKind: "ancestor_scope" });
+        }
+      }
       for (const reference of grounded) {
         // Cross-code references need a separately established edition; never
         // guess one from the originating code's version or from review prose.
-        if (reference.codePrefix !== source.codePrefix || reference.referenceKind === "table" ||
+        if (reference.codePrefix !== source.codePrefix ||
             !mentioned.some(item => item.codePrefix === reference.codePrefix && item.sectionNumber === reference.sectionNumber)) continue;
+        const tableRequested = reference.referenceKind === "table" || mentioned.some(item =>
+          item.referenceKind === "table" && item.codePrefix === reference.codePrefix && item.sectionNumber === reference.sectionNumber);
         const request = { ...Object.fromEntries(authorityFields.map(field => [field, source[field]])),
-          sectionNumber: reference.sectionNumber };
+          sectionNumber: reference.sectionNumber, referenceKind: tableRequested ? "table" : reference.referenceKind || "section" };
         const key = authorityFields.map(field => request[field]).concat(request.sectionNumber).join(":");
-        if (!nominations.has(key)) nominations.set(key, { request, parentSourceID: source.sourceID });
+        if (!nominations.has(key) || tableRequested) nominations.set(key, { request, parentSourceID: source.sourceID });
       }
     }
   }
@@ -87,14 +100,19 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
   let characters = next.reduce((sum, source) => sum + String(source.text || "").length, 0);
   const ceiling = Math.min(limits.maximumCharacters, limits.maximumSupplementalCharacters,
     Number(evidencePackage.usage?.supplementalCharacterCeiling) || limits.maximumCharacters);
-  let crossReferences = next.filter(source => source.origin === sourceOrigins.crossReference).length;
+  // Optional interpretation context has its own assembly counter and does not
+  // consume a direct cross-reference slot. Preserve that same accounting here.
+  let crossReferences = next.filter(source => source.origin === sourceOrigins.crossReference && !source.interpretationContext).length;
   const comparable = value => compactText(value).replace(/\s+/g, " ");
   for (const { request, parentSourceID } of nominations.values()) {
     if (diagnostic.attemptedReads >= 2) break;
     const matchesAuthority = source => authorityFields.every(field => source[field] === request[field]);
     const existing = next.find(source => matchesAuthority(source) && source.sectionNumber === request.sectionNumber);
     if (existing?.canonicalContextComplete) continue;
-    if (!existing && crossReferences >= limits.maximumCrossReferences) continue;
+    if (!existing && crossReferences >= limits.maximumCrossReferences) {
+      diagnostic.unresolved.push({ ...request, reason: "cross_reference_budget_exhausted" });
+      continue;
+    }
     signal?.throwIfAborted();
     diagnostic.attemptedReads++;
     const unresolved = reason => diagnostic.unresolved.push({ ...request, reason });
@@ -121,6 +139,13 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
         ![bodyText, comparable([resolved.sectionNumber, resolved.title, bodyText].join(" "))].includes(comparable(fullText))) {
       unresolved("complete_authority_not_verified"); continue;
     }
+    if (request.referenceKind === "table") {
+      const table = applicableStructuredTable(resolved);
+      const expected = `${request.codePrefix}:TABLE:${request.sectionNumber.toUpperCase()}`;
+      if (!table || comparableTableReference(table.canonicalReference || table.reference, request.codePrefix) !== expected) {
+        unresolved("referenced_table_not_verified"); continue;
+      }
+    }
     // A replacement must preserve every already supplied clause, including
     // discontiguous indexed context. Rebuild the record to remove old locators.
     if (existing && !compactText(existing.text).split(/\n\n+/).every(block => comparable(fullText).includes(comparable(block)))) {
@@ -131,7 +156,7 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
       unresolved("complete_source_exceeds_budget"); continue;
     }
     const record = sourceRecord(resolved, {
-      origin: sourceOrigins.crossReference,
+      origin: existing?.origin || sourceOrigins.crossReference,
       sourceID: existing?.sourceID || deterministicSourceID(sourceOrigins.crossReference, resolved, "repair"),
       relationship: `Reviewer-requested canonical dependency of ${parentSourceID}; applicability requires review`,
       characterAllowance: fullText.length, canonicalResolved: true,
@@ -141,6 +166,9 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
         ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1
       })
     });
+    if (!record.canonicalContextComplete || comparable(record.text) !== comparable(fullText)) {
+      unresolved("complete_source_context_not_preserved"); continue;
+    }
     if (existing) next[next.indexOf(existing)] = record;
     else { next.push(record); crossReferences++; }
     characters += record.text.length - (existing?.text.length || 0);

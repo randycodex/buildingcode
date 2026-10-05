@@ -82,6 +82,13 @@ assert.equal(lowerSupplement.diagnostic.supplied.length, 0);
 const fullCrossReferenceBudget = await recover({ ...packet, limits: { ...packet.limits, maximumCrossReferences: 1 },
   sources: [source, { ...third, origin: "permitext_cross_reference", authorityClass: "enacted", canonicalContextComplete: true }] });
 assert.equal(fullCrossReferenceBudget.diagnostic.attemptedReads, 0);
+assert.equal(fullCrossReferenceBudget.diagnostic.unresolved[0].reason, "cross_reference_budget_exhausted",
+  "Capacity limits must remain visible instead of looking like there was no missing-source request");
+const optionalContext = await recover({ ...packet, limits: { ...packet.limits, maximumCrossReferences: 1 },
+  sources: [source, { ...third, origin: "permitext_cross_reference", interpretationContext: true,
+    authorityClass: "enacted", canonicalContextComplete: true }] });
+assert.equal(optionalContext.diagnostic.supplied.length, 1, "Optional interpretation context retains its separate assembly counter");
+assert.equal(optionalContext.evidencePackage.usage.crossReferenceCount, 1);
 
 const incomplete = { ...second, text: "The equipment shall retain its guard.", origin: "permitext_discovered",
   sourceID: "existing-child", canonicalContextComplete: false, authorityClass: "enacted", indexedPassage: { stale: true } };
