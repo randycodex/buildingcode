@@ -1,0 +1,824 @@
+{
+  "method": "separate_Luna_model_review",
+  "externalExpertApproval": false,
+  "followUpFrom": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005/results.json",
+  "precedingReviewCostUSD": 0.039586800000000005,
+  "acceptanceApproved": false,
+  "acceptanceGenerated": false,
+  "startedAt": "2026-10-05T19:17:26.409Z",
+  "provider": [
+    {
+      "id": "f8120887-837c-418e-9f81-9e038cea3f38",
+      "phaseBucket": "diagnostic",
+      "case": "review-hub-projection",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.021313050000000004,
+      "startedAt": "2026-10-05T19:17:26.417Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 1274,
+        "input_tokens_details": {
+          "cache_write_tokens": 1271,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2241,
+        "output_tokens_details": {
+          "reasoning_tokens": 1401
+        },
+        "total_tokens": 3515
+      },
+      "endedAt": "2026-10-05T19:17:39.530Z",
+      "costUSD": 0.0025593499999999997
+    },
+    {
+      "id": "5d08d49f-6c8e-44ff-b8e5-ad4d41e46e6e",
+      "phaseBucket": "diagnostic",
+      "case": "review-covered-display",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.023403600000000004,
+      "startedAt": "2026-10-05T19:17:39.540Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2105,
+        "input_tokens_details": {
+          "cache_write_tokens": 2102,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3857,
+        "output_tokens_details": {
+          "reasoning_tokens": 2786
+        },
+        "total_tokens": 5962
+      },
+      "endedAt": "2026-10-05T19:18:00.480Z",
+      "costUSD": 0.0043831
+    },
+    {
+      "id": "bcf16c88-5139-4b9d-b4ad-64d2f088e389",
+      "phaseBucket": "diagnostic",
+      "case": "review-sloping-transparency",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.022885500000000003,
+      "startedAt": "2026-10-05T19:18:00.490Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 1894,
+        "input_tokens_details": {
+          "cache_write_tokens": 1891,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3145,
+        "output_tokens_details": {
+          "reasoning_tokens": 1727
+        },
+        "total_tokens": 5039
+      },
+      "endedAt": "2026-10-05T19:18:17.656Z",
+      "costUSD": 0.0036183499999999998
+    },
+    {
+      "id": "73ae9cb8-2883-4add-8f70-15d7cb7c4d41",
+      "phaseBucket": "diagnostic",
+      "case": "review-sloping-transparency",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.024030050000000004,
+      "startedAt": "2026-10-05T19:18:17.673Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 1,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2365,
+        "input_tokens_details": {
+          "cache_write_tokens": 2362,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2940,
+        "output_tokens_details": {
+          "reasoning_tokens": 1359
+        },
+        "total_tokens": 5305
+      },
+      "endedAt": "2026-10-05T19:18:33.902Z",
+      "costUSD": 0.0035311
+    },
+    {
+      "id": "d3716e3c-5720-45f5-865d-4293fa61fc73",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.023747350000000004,
+      "startedAt": "2026-10-05T19:18:33.912Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2401,
+        "input_tokens_details": {
+          "cache_write_tokens": 2398,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3698,
+        "output_tokens_details": {
+          "reasoning_tokens": 2173
+        },
+        "total_tokens": 6099
+      },
+      "endedAt": "2026-10-05T19:18:53.655Z",
+      "costUSD": 0.0042981
+    },
+    {
+      "id": "fe0d090b-f232-4260-a11d-85180bc1c2d4",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.026980250000000004,
+      "startedAt": "2026-10-05T19:18:53.668Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3707,
+        "input_tokens_details": {
+          "cache_write_tokens": 3704,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3566,
+        "output_tokens_details": {
+          "reasoning_tokens": 1738
+        },
+        "total_tokens": 7273
+      },
+      "endedAt": "2026-10-05T19:19:11.438Z",
+      "costUSD": 0.0044926
+    }
+  ],
+  "reviews": [
+    {
+      "batch": "review-hub-projection",
+      "round": 0,
+      "callID": "f8120887-837c-418e-9f81-9e038cea3f38",
+      "sourceHashes": {
+        "PC 802.3.2": "cff67b6c0fc594be981d4bdd6d4736bf9c2a2fc36b606dc4798659421959138b",
+        "PC 802.3": "2aed884c131f07cd7be49ca79816ee5bb6fc5119efec5fd1b2b213f976cb5a93"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "review-hub-projection",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "ambiguous",
+                "boundedConclusion": "PC 802.3.2 gives two forms: a hub, or a pipe extending at least 1 inch above the water-impervious floor. It expressly attaches the 1-inch projection to the pipe alternative, but the supplied text does not establish whether a flush installation qualifies as a hub. Thus it does not establish that a hub-form drain must project 1 inch, nor does it establish that a flush installation qualifies as a hub.",
+                "materialChecks": [
+                  {
+                    "criterion": "The provision states that a hub drain shall be in the form of a hub or a pipe extending not less than 1 inch above a water-impervious floor.",
+                    "sourceReferences": [
+                      "PC 802.3.2"
+                    ]
+                  },
+                  {
+                    "criterion": "The supplied text does not define whether a flush installation qualifies as a hub or otherwise specify the projection required for the hub-form alternative.",
+                    "sourceReferences": [
+                      "PC 802.3.2"
+                    ]
+                  },
+                  {
+                    "criterion": "PC 802.3 addresses strainer or basket coverage, certain receptor locations, and ready access; it supplies no hub-projection requirement.",
+                    "sourceReferences": [
+                      "PC 802.3"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "A flush installation is definitely permitted as a hub.",
+                  "Every hub-form drain is expressly required by this text to project at least 1 inch.",
+                  "PC 802.3 changes the projection requirement in PC 802.3.2."
+                ],
+                "genuineUnknowns": [
+                  "Whether a flush installation meets the meaning of 'a hub' in PC 802.3.2.",
+                  "Whether an authoritative interpretation applies the 1-inch modifier to the hub alternative."
+                ],
+                "neededReferences": [
+                  "The 2022 NYC Plumbing Code Chapter 2 definition provisions, if any, for 'hub' or 'hub drain'; provide the exact section reference if available.",
+                  "If those provisions do not resolve the issue, an authoritative NYC interpretation of the grammatical scope of PC 802.3.2."
+                ],
+                "reasoning": "The text gives a hub alternative and a pipe alternative whose stated minimum projection is 1 inch. It does not define 'hub' or explicitly state the projection required for that alternative. The supplied PC 802.3 text concerns other receptor requirements and does not resolve the elevation question."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "A projection of exactly 1 inch satisfies the stated 'not less than 1 inch' minimum projection. This conclusion is only about the projection requirement and does not establish whole-code or project compliance.",
+                "materialChecks": [
+                  {
+                    "criterion": "The stated minimum for the pipe alternative is not less than 1 inch above the water-impervious floor; exactly 1 inch meets that numerical minimum.",
+                    "sourceReferences": [
+                      "PC 802.3.2"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Meeting the 1-inch projection minimum by itself establishes whole-code or project compliance.",
+                  "The 1-inch minimum is a greater-than-1-inch requirement."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "The question specifies a projection exactly 1 inch above the floor and asks only about projection. The stated boundary is inclusive: 'not less than 1 inch.'"
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": [
+          "This review is limited to the supplied source text and does not establish external interpretation or project compliance."
+        ]
+      },
+      "addedReferences": [],
+      "unresolvedReferences": [
+        {
+          "reference": "The 2022 NYC Plumbing Code Chapter 2 definition provisions, if any, for 'hub' or 'hub drain'; provide the exact section reference if available.",
+          "reason": "not_a_current_canonical_section_request"
+        },
+        {
+          "reference": "If those provisions do not resolve the issue, an authoritative NYC interpretation of the grammatical scope of PC 802.3.2.",
+          "reason": "not_a_current_canonical_section_request"
+        }
+      ],
+      "supplementalRun": false
+    },
+    {
+      "batch": "review-covered-display",
+      "round": 0,
+      "callID": "5d08d49f-6c8e-44ff-b8e5-ad4d41e46e6e",
+      "sourceHashes": {
+        "BC 903.3.3": "47661bb3a8337c70056acb4b6b6ca714dfbeec36e9042a79a44b87d179017114",
+        "FC 314": "c0f9b21e20589541d1f096a536d884ce18811f6505e6375633288800cdc509e4"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "review-covered-display",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "No. A covered display five feet wide exceeds the stated four-foot threshold, so the supplied text requires sprinklers in or under it; ceiling sprinklers only above its cover do not satisfy that in-or-under requirement. This is a rule explanation, not a determination that a particular sprinkler layout complies.",
+                "materialChecks": [
+                  {
+                    "criterion": "A covered display exceeding four feet in width must have automatic sprinklers installed in or under it.",
+                    "sourceReferences": [
+                      "BC 903.3.3",
+                      "FC 314"
+                    ]
+                  },
+                  {
+                    "criterion": "For sprinkler deflectors installed above the top of a display, FC 314.5.1 requires at least 18 inches of clearance.",
+                    "sourceReferences": [
+                      "FC 314"
+                    ]
+                  },
+                  {
+                    "criterion": "BC 903.3.3 also requires sprinklers to be installed with due regard to obstructions that delay activation or obstruct water distribution. Its stated kitchen-equipment exception is limited to equipment under exhaust hoods protected by a qualifying fire-extinguishing system and does not describe the stated retail display.",
+                    "sourceReferences": [
+                      "BC 903.3.3"
+                    ]
+                  },
+                  {
+                    "criterion": "FC 314.5 provides that sprinklers and fire alarm systems shall not be obstructed by indoor displays.",
+                    "sourceReferences": [
+                      "FC 314"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "That ceiling sprinklers above the cover alone satisfy the stated in-or-under requirement.",
+                  "That the conclusion establishes compliance of the whole sprinkler system or project."
+                ],
+                "genuineUnknowns": [
+                  "The supplied facts do not establish whether the particular layout also meets obstruction, clearance, and other applicable system requirements."
+                ],
+                "neededReferences": [],
+                "reasoning": "Five feet is greater than four feet. Both supplied sections expressly require sprinklers in or under covered displays above that threshold, so the stated above-cover-only arrangement cannot be relied on to satisfy that requirement. The general obstruction provisions and FC's stated overhead-deflector clearance remain material; the text does not determine the compliance of an actual layout."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "No. Exactly four feet does not exceed four feet, so the width-based in-or-under requirement in these sections is not triggered by width alone. That does not automatically authorize ignoring sprinklers underneath: the general obstruction provisions still apply, and the supplied text does not establish whether this particular display obstructs sprinkler operation or what its layout requires.",
+                "materialChecks": [
+                  {
+                    "criterion": "The in-or-under requirement is triggered by a display that exceeds four feet; exactly four feet does not meet that stated threshold.",
+                    "sourceReferences": [
+                      "BC 903.3.3",
+                      "FC 314"
+                    ]
+                  },
+                  {
+                    "criterion": "The threshold does not remove BC 903.3.3's requirement to account for obstructions that delay sprinkler activation or obstruct water distribution.",
+                    "sourceReferences": [
+                      "BC 903.3.3"
+                    ]
+                  },
+                  {
+                    "criterion": "Indoor displays shall not obstruct sprinklers under FC 314.5; therefore, the absence of the width-triggered mandate is not itself permission to disregard the effect of the display on sprinklers.",
+                    "sourceReferences": [
+                      "FC 314"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "That exactly four feet triggers the provisions stated for displays that exceed four feet.",
+                  "That being exactly four feet automatically exempts the display from all sprinkler-related requirements or establishes that sprinklers underneath may be omitted.",
+                  "That the supplied text necessarily requires sprinklers underneath every display at or below four feet, regardless of its effect on sprinkler operation."
+                ],
+                "genuineUnknowns": [
+                  "Whether this display's actual shape, cover, placement, and sprinkler layout cause an obstruction or otherwise require measures beyond the width-triggered rule is not established by the supplied text or facts."
+                ],
+                "neededReferences": [],
+                "reasoning": "The numerical boundary is determinate: 'exceeds 4 feet' does not include exactly four feet. But BC 903.3.3's due-regard rule and FC 314.5's no-obstruction rule remain. They do not, on the supplied facts alone, establish either a universal under-sprinkler mandate at four feet or permission to omit under-display sprinklers in this specific layout."
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": [
+          "This is a bounded review of the supplied source text, not an official interpretation, project approval, or whole-project compliance determination."
+        ]
+      },
+      "addedReferences": [],
+      "unresolvedReferences": [],
+      "supplementalRun": false
+    },
+    {
+      "batch": "review-sloping-transparency",
+      "round": 0,
+      "callID": "bcf16c88-5139-4b9d-b4ad-64d2f088e389",
+      "sourceHashes": {
+        "ZR 37-34": "2d4a2ef7654ff4c4995f30b375dc3fa998aaea503cd993b383d7428b09c2cf16",
+        "ZR 37-31": "84a6883dde84eac277106c9fff41fc1fd2ffd1dcfbe41c3002660fd531125dc6",
+        "ZR 37-30": "9c566391c56fbe70bc961d23a6ece3c36935f602e434f24ba7ee456e4e73b9d3"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "review-sloping-transparency",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "ZR 37-34 requires the specified transparency on a ground-floor-level street wall along a primary frontage, subject to its stated exceptions and ZR 37-31. This explains the rule only; it does not establish that the rule applies to the property.",
+                "materialChecks": [
+                  {
+                    "criterion": "The rule concerns the ground-floor-level street wall along a primary frontage and requires glazing with transparent materials, which may include show windows, transom windows, or glazed portions of doors; this is subject to ZR 37-31.",
+                    "sourceReferences": [
+                      "ZR 37-34",
+                      "ZR 37-31"
+                    ]
+                  },
+                  {
+                    "criterion": "Transparent materials must occupy at least 50 percent of the street-wall surface area in the specified vertical band: from 2 feet to 12 feet, or to the ground-floor ceiling height if that is higher, measured from the adjoining sidewalk.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "Materials counted toward the 50-percent requirement generally may not begin higher than 2 feet 6 inches above the level of the adjoining sidewalk. The stated exception is for transom windows or portions of windows separated by mullions or other structural dividers.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "Transparent materials must have a minimum width of 2 feet, and no portion of the ground-floor-level street wall without transparency may exceed 10 feet in width.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "The transparency requirements do not apply to ground-floor portions occupied by entrances or exits to accessory off-street parking facilities and public parking garages, where permitted; entryways to required loading berths, where permitted; entryways to subway stations, as applicable; or doors accessing emergency egress stairwells and passageways.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "Under ZR 37-31, the minimum-transparency requirement does not apply to a commercial-district zoning lot less than 20 feet wide as measured along the street line, provided the lot existed both on March 22, 2016, and on the building-permit application date; it also does not apply to a community-facility building used exclusively as a school or a house of worship listed under Use Group III(B).",
+                    "sourceReferences": [
+                      "ZR 37-31"
+                    ]
+                  },
+                  {
+                    "criterion": "ZR 37-31 describes the provisions of ZR 37-30 as applying in certain areas not otherwise governed by ZR 32-30 and in conjunction with specified district, special-geography, or Special Purpose District requirements; these supplied provisions do not establish applicability to a particular property.",
+                    "sourceReferences": [
+                      "ZR 37-31"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not claim that ZR 37-34 applies to this property without the facts and authority needed to determine applicability.",
+                  "Do not omit the qualifications, exceptions, or ZR 37-31 exclusions stated above.",
+                  "Do not treat the title or text of ZR 37-30, which supplies no substantive rule here, as establishing any additional requirement."
+                ],
+                "genuineUnknowns": [
+                  "Whether the property is in an area where ZR 37-34 applies, including any interaction with ZR 32-30 or other area-specific requirements, is not established by the supplied text or facts."
+                ],
+                "neededReferences": [
+                  "For a property-specific applicability determination, the applicable area or district provisions and ZR 32-30, as relevant to the property, would be needed; no property facts are supplied."
+                ],
+                "reasoning": "ZR 37-34 supplies the percentage, vertical measurement band, start-height limit and its exception, minimum transparent-material width, maximum opaque-wall width, and listed exclusions. ZR 37-31 supplies relevant applicability context and two exclusions. The request is to explain the rule without deciding whether it governs a property."
+              },
+              {
+                "turn": 2,
+                "status": "ambiguous",
+                "boundedConclusion": "The supplied text does not establish that the high-end sidewalk elevation may be used as a single datum for the entire 50-percent calculation on a sloping sidewalk. ZR 37-34 requires measurement from the adjoining sidewalk but does not specify how to select or apply a sidewalk datum along a sloping frontage. The rule therefore does not support an affirmative permission to use the high-end elevation throughout.",
+                "materialChecks": [
+                  {
+                    "criterion": "The 50-percent surface-area requirement is measured within the specified vertical band from the adjoining sidewalk; the text does not say whether a single elevation, such as the high-end elevation, or varying local sidewalk elevations govern a sloping frontage.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "Separately, counted transparent materials may not begin higher than 2 feet 6 inches above the level of the adjoining sidewalk, subject to the stated transom-window and structurally divided-window exception. The supplied text does not resolve how that sidewalk level is determined along this slope.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not affirm that the high-end sidewalk elevation is authorized as the datum for the entire 50-percent calculation.",
+                  "Do not assert that ZR 37-34 expressly requires a local, point-by-point datum; that measurement method is not stated in the supplied text.",
+                  "Do not treat the sill heights alone as establishing compliance with the 50-percent surface-area requirement or with every other requirement of ZR 37-34."
+                ],
+                "genuineUnknowns": [
+                  "The governing datum or method for applying 'measured from the adjoining sidewalk' to a sloping sidewalk is unspecified.",
+                  "The actual 50-percent calculation cannot be determined from the stated sill heights alone; the relevant street-wall and transparent-material surface areas and the applicable measurement method are not supplied."
+                ],
+                "neededReferences": [
+                  "Any applicable NYC Zoning Resolution definition or measurement provision governing 'adjoining sidewalk' elevation and measurement on a sloping frontage, including the exact section if identifiable.",
+                  "If the Zoning Resolution does not specify the method, a controlling NYC Department of Buildings or City Planning interpretation addressing sidewalk datum selection and the 37-34 area calculation on sloping frontages."
+                ],
+                "reasoning": "ZR 37-34 identifies the adjoining sidewalk as the measurement reference but supplies no rule for converting a sloping sidewalk into one datum or for using a local datum. The bounded answer is therefore that the proposed single high-end datum is not established by this text, rather than that it is permitted or categorically prohibited. The distinct 2-foot-6-inch start-height condition also refers to the adjoining sidewalk and does not resolve the datum question."
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": [
+          "Review is confined to the supplied source records. ZR 37-30 contains only a heading in the supplied text and establishes no substantive rule.",
+          "This is a source-based rubric review, not external expert approval, an official interpretation, or a project compliance determination."
+        ]
+      },
+      "addedReferences": [
+        "ZR 32-30"
+      ],
+      "unresolvedReferences": [
+        {
+          "reference": "Any applicable NYC Zoning Resolution definition or measurement provision governing 'adjoining sidewalk' elevation and measurement on a sloping frontage, including the exact section if identifiable.",
+          "reason": "not_a_current_canonical_section_request"
+        },
+        {
+          "reference": "If the Zoning Resolution does not specify the method, a controlling NYC Department of Buildings or City Planning interpretation addressing sidewalk datum selection and the 37-34 area calculation on sloping frontages.",
+          "reason": "not_a_current_canonical_section_request"
+        }
+      ],
+      "supplementalRun": true
+    },
+    {
+      "batch": "review-sloping-transparency",
+      "round": 1,
+      "callID": "73ae9cb8-2883-4add-8f70-15d7cb7c4d41",
+      "sourceHashes": {
+        "ZR 37-34": "2d4a2ef7654ff4c4995f30b375dc3fa998aaea503cd993b383d7428b09c2cf16",
+        "ZR 37-31": "84a6883dde84eac277106c9fff41fc1fd2ffd1dcfbe41c3002660fd531125dc6",
+        "ZR 37-30": "9c566391c56fbe70bc961d23a6ece3c36935f602e434f24ba7ee456e4e73b9d3",
+        "ZR 32-30": "ec51a389c26ae09bebffb1a0a92b6b0ce80e75681123f67df1227f0e58f8f448"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "review-sloping-transparency",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "ZR 37-34 requires transparent materials to cover at least 50% of the specified ground-floor-level street-wall surface area. The counted area is between two feet and 12 feet above the adjoining sidewalk, or up to the ground-floor ceiling height if that is higher. The source does not establish whether these provisions apply to any particular property.",
+                "materialChecks": [
+                  {
+                    "criterion": "The rule concerns the ground-floor-level street wall along a primary frontage and requires glazing with transparent materials; examples include show windows, transom windows, and glazed portions of doors.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "Transparent materials must occupy at least 50% of the street-wall surface area in the stated measurement band: from two feet to 12 feet, or to the ground-floor ceiling height if higher, measured from the adjoining sidewalk.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "Materials counted toward the 50% requirement may not begin higher than two feet six inches above the adjoining sidewalk, except for transom windows or portions of windows separated by mullions or other structural dividers; they must have a minimum width of two feet.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "The maximum width of a portion of the ground-floor-level street wall without transparency is 10 feet.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "The transparency requirements do not apply to portions occupied by entrances or exits to accessory off-street parking facilities or public parking garages where permitted; entryways to required loading berths where permitted; entryways to subway stations as applicable; or doors accessing emergency egress stairwells and passageways.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "ZR 37-31 gives the broader context that these ground-floor provisions concern certain areas not otherwise governed by ZR 32-30, and states that ZR 37-34 does not apply to qualifying commercial zoning lots under 20 feet wide that existed on both specified dates, or to community-facility buildings used exclusively as a school or a Use Group III(B) house of worship. No property-specific applicability finding follows from that text alone.",
+                    "sourceReferences": [
+                      "ZR 37-31",
+                      "ZR 32-30",
+                      "ZR 37-30"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not claim that ZR 37-34 applies to the user's property.",
+                  "Do not omit the stated exceptions, width limits, or the sidewalk-based measurement language.",
+                  "Do not infer the complete area-specific applicability rules from the title or reserved text of ZR 37-30, or from ZR 32-30 alone."
+                ],
+                "genuineUnknowns": [
+                  "Whether the particular frontage is in an area where ZR 37-34 applies, or is otherwise governed by applicable provisions, is not supplied.",
+                  "Whether any stated ZR 37-31 exclusion applies to a particular property is not supplied."
+                ],
+                "neededReferences": [
+                  "For a property-specific applicability determination, the applicable area or underlying-district provisions and any relevant Special Purpose District provisions that establish whether ZR 37-34 governs the frontage."
+                ],
+                "reasoning": "ZR 37-34 states the glazing percentage, measurement band, sill/start-height condition, minimum glazing width, maximum opaque width, and listed exceptions. ZR 37-31 supplies relevant applicability context and exclusions, but the supplied record does not identify a property or establish its governing area."
+              },
+              {
+                "turn": 2,
+                "status": "ambiguous",
+                "boundedConclusion": "The supplied text does not authorize using the high-end sidewalk elevation as a single datum for the entire 50% calculation. It says the measurement is from the adjoining sidewalk but does not specify how to calculate the area band along a sloping sidewalk or whether one endpoint elevation may serve as a common datum. If the reported sill heights describe where glazing begins, both endpoint heights are no higher than two feet six inches above the sidewalk at their respective endpoints; that does not determine the full 50% calculation or establish compliance along the frontage.",
+                "materialChecks": [
+                  {
+                    "criterion": "For this hypothetical, treat ZR 37-34 as applicable to the frontage, as instructed; do not independently decide applicability.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "ZR 37-34 defines the 50% band by reference to the adjoining sidewalk, but does not state a slope-specific method or authorize a single high-end datum for the entire frontage calculation.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  },
+                  {
+                    "criterion": "If the sill marks the beginning of the transparent material, the stated two-foot and two-foot-six-inch endpoint heights are each no higher than the rule's two-foot-six-inch maximum relative to the adjoining sidewalk at those respective endpoints; endpoint facts alone do not establish conditions between the endpoints or the 50% surface-area result.",
+                    "sourceReferences": [
+                      "ZR 37-34"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not affirm that the high-end sidewalk elevation may be used as the datum for the entire 50% calculation.",
+                  "Do not claim that ZR 37-34 definitively prescribes a station-by-station or other specific slope-measurement protocol.",
+                  "Do not conclude that the 50% requirement is satisfied based only on the two reported sill heights.",
+                  "Do not treat the endpoint sill comparison as conclusive unless the sill is the beginning of the glazing being counted."
+                ],
+                "genuineUnknowns": [
+                  "The text does not resolve how to measure the 50% band or calculate its surface area where the adjoining sidewalk slopes.",
+                  "The supplied endpoint elevations do not establish the sill-to-sidewalk relationship or glazing area throughout the frontage."
+                ],
+                "neededReferences": [
+                  "Any applicable Zoning Resolution provision specifying sidewalk-datum or sloping-sidewalk measurement for ZR 37-34; if none supplies a method, an applicable official City Planning Commission or Department of Buildings interpretation addressing the sloping-sidewalk calculation."
+                ],
+                "reasoning": "The rule expressly uses the adjoining sidewalk as the measurement reference, but supplies no convention for applying that reference across a slope. Therefore the text cannot establish the proposed single-datum method or a full frontage calculation. The endpoint sill figures can be compared to the stated maximum only at those endpoints, assuming the sill marks the beginning of the glazing."
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": [
+          "This is a bounded review of the supplied source records, not an official interpretation or a project-compliance determination.",
+          "ZR 37-30 is supplied only as a heading, so it cannot establish area-specific applicability beyond the contextual statements in ZR 37-31."
+        ]
+      },
+      "addedReferences": [],
+      "unresolvedReferences": [],
+      "supplementalRun": false
+    },
+    {
+      "batch": "rubric-1",
+      "round": 0,
+      "callID": "d3716e3c-5720-45f5-865d-4293fa61fc73",
+      "sourceHashes": {
+        "PC 503.1": "18c7e658b77f376f94a29b62f3e04118483b5fb522dc1719d7f8c6acde31d611",
+        "PC 504.6": "441faeacb333ea9948b1512b362b1ce01f64b5727f0e886d892f09dd0ea7ffb1",
+        "PC 905.4": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13",
+        "PC 605.4": "5d0d73c044c3b239a606b0ccba745d6e3eeca2ffcd217d4cd2645c28b45dbe08"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "acceptance-relief-discharge",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "PC 504.6 gives the listed requirements for discharge piping serving a pressure relief valve, temperature relief valve, or combination. It specifies both a maximum and a minimum termination height. It allows materials listed in PC 605.4 or materials tested, rated, and approved for this use in accordance with ASME A112.4.1.",
+                "materialChecks": [
+                  {
+                    "criterion": "The requirements apply to discharge piping serving a pressure relief valve, temperature relief valve, or combination thereof.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "The piping must not be directly connected to the drainage system and must discharge through an air gap located in the same room as the water heater.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "The pipe must be at least as large as the valve outlet and discharge full size to the air gap.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "The piping must serve a single relief device and must not connect to piping serving another relief device or equipment.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Discharge must not cause personal injury or structural damage, and the termination point must be readily observable by building occupants.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "The piping must not be trapped and must be installed to flow by gravity.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "The termination must be no more than 6 inches above, and no less than two times the discharge-pipe diameter above, the floor or the waste receptor's flood-level rim. Preserve that stated reference wording; the source does not select a reference for a particular configuration.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "The end of the piping must not have a threaded connection; the piping must not have valves or tee fittings.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Permitted materials are those listed in PC 605.4, or materials tested, rated, and approved for such use in accordance with ASME A112.4.1.",
+                    "sourceReferences": [
+                      "PC 504.6",
+                      "PC 605.4"
+                    ]
+                  },
+                  {
+                    "criterion": "The supplied PC 605.4 text identifies water-distribution pipe standards and lists brass, copper or copper-alloy, ductile iron, and specified stainless-steel pipe or tubing standards. Do not imply that the source establishes qualification of an unlisted proposed material without applying the PC 504.6 alternative-material route.",
+                    "sourceReferences": [
+                      "PC 504.6",
+                      "PC 605.4"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not treat the 6-inch maximum as the only termination-height condition; PC 504.6 also states a minimum of twice the pipe diameter.",
+                  "Do not claim that any particular material qualifies under ASME A112.4.1 without that standard or other applicable qualification evidence.",
+                  "Do not claim that the listed rules establish whole-system or project compliance."
+                ],
+                "genuineUnknowns": [
+                  "Whether a particular proposed alternative material has been tested, rated, and approved for this use in accordance with ASME A112.4.1 is not established without facts about that material and the referenced standard."
+                ],
+                "neededReferences": [],
+                "reasoning": "The supplied PC 504.6 text states the discharge-piping conditions directly and incorporates PC 605.4 for one material route. The question asks for the rule, not a project-specific compliance determination."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "No. One inch above the waste receptor's flood-level rim is below the 6-inch maximum, but for a 1-inch-diameter pipe PC 504.6 also requires at least 2 inches above that rim. The stated 1-inch clearance does not satisfy the termination-height condition.",
+                "materialChecks": [
+                  {
+                    "criterion": "For a 1-inch-diameter discharge pipe, the minimum clearance under the stated two-times-diameter rule is 2 inches above the applicable reference.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  },
+                  {
+                    "criterion": "A termination 1 inch above the waste receptor flood-level rim is below the 6-inch maximum but below the 2-inch minimum; being below 6 inches alone does not satisfy the stated height rule.",
+                    "sourceReferences": [
+                      "PC 504.6"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not conclude the termination-height condition is satisfied solely because the clearance is less than 6 inches.",
+                  "Do not infer overall project compliance or noncompliance beyond the stated termination-height condition."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "The correction specifies both the pipe diameter and the measurement reference. Applying PC 504.6's minimum gives 2 inches, so the stated 1-inch clearance fails that height condition regardless of the maximum."
+              }
+            ]
+          },
+          {
+            "id": "acceptance-reserved-vent",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "The supplied PC 905.4 text is empty, so it states no substantive requirement that can be explained from this record. Its supplied title is metadata and cannot establish a requirement; do not reconstruct one from another code.",
+                "materialChecks": [
+                  {
+                    "criterion": "The supplied text for PC 905.4 is empty and therefore does not state a substantive requirement.",
+                    "sourceReferences": [
+                      "PC 905.4"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not state a vent-connection requirement or any other substantive rule as a requirement of the supplied PC 905.4 text.",
+                  "Do not reconstruct a requirement from another code or edition.",
+                  "Do not treat the section title metadata alone as substantive code text."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "The question is limited to what the supplied current section requires. The source record contains no section text; the bounded answer is that no substantive requirement is supplied."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "No. The supplied current PC 905.4 record does not establish what an older drawing meant by that section number. The drawing's applicable code, edition, and historical section wording are not supplied.",
+                "materialChecks": [
+                  {
+                    "criterion": "The current supplied PC 905.4 text is empty and cannot prove that an older drawing's section 905.4 meant a vent-connection requirement.",
+                    "sourceReferences": [
+                      "PC 905.4"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not affirm that the older drawing used the same code edition or wording as the supplied current record.",
+                  "Do not infer the historical requirement from another code, an unspecified edition, or the current section title metadata."
+                ],
+                "genuineUnknowns": [
+                  "The code and edition or historical version cited by the drawing are unknown, as is the text of section 905.4 in that source."
+                ],
+                "neededReferences": [
+                  "The drawing's cited code and edition, plus the corresponding historical Plumbing Code section 905.4 text; if the drawing does not identify an edition, the applicable historical code source or as-of date must first be established."
+                ],
+                "reasoning": "A current record with empty section text cannot establish historical wording for an older drawing whose edition is unspecified. The applicable historical code text is needed to determine what the drawing meant."
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": [
+          "This is a source-based rubric review, not external expert approval, an official interpretation, or a project compliance determination.",
+          "No generated answers or prior grades were supplied; no answer was graded."
+        ]
+      },
+      "addedReferences": [],
+      "unresolvedReferences": [
+        {
+          "reference": "The drawing's cited code and edition, plus the corresponding historical Plumbing Code section 905.4 text; if the drawing does not identify an edition, the applicable historical code source or as-of date must first be established.",
+          "reason": "not_a_current_canonical_section_request"
+        }
+      ],
+      "supplementalRun": false
+    }
+  ]
+}

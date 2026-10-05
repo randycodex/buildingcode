@@ -10680,6 +10680,528 @@
       },
       "httpStatus": 200,
       "endedAt": "2026-10-05T18:33:17.859Z"
+    },
+    {
+      "id": "b5214bd7-e973-4336-8f27-758f4f936e86",
+      "phaseBucket": "diagnostic",
+      "case": "review-hub-projection",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.020735550000000002,
+      "startedAt": "2026-10-05T19:11:03.672Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 1101,
+        "input_tokens_details": {
+          "cache_write_tokens": 1098,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1866,
+        "output_tokens_details": {
+          "reasoning_tokens": 1034
+        },
+        "total_tokens": 2967
+      },
+      "endedAt": "2026-10-05T19:11:16.309Z",
+      "costUSD": 0.0021411
+    },
+    {
+      "id": "0c8cb8b8-f3a0-4ca2-9e01-3c5af0039beb",
+      "phaseBucket": "diagnostic",
+      "case": "review-covered-display",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.022826100000000002,
+      "startedAt": "2026-10-05T19:11:16.321Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 1932,
+        "input_tokens_details": {
+          "cache_write_tokens": 1929,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3576,
+        "output_tokens_details": {
+          "reasoning_tokens": 2350
+        },
+        "total_tokens": 5508
+      },
+      "endedAt": "2026-10-05T19:11:37.130Z",
+      "costUSD": 0.00405885
+    },
+    {
+      "id": "0951e618-6f69-44c1-a8e5-7b881e5999d2",
+      "phaseBucket": "diagnostic",
+      "case": "review-sloping-transparency",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.02189715,
+      "startedAt": "2026-10-05T19:11:37.143Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 1503,
+        "input_tokens_details": {
+          "cache_write_tokens": 1500,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3021,
+        "output_tokens_details": {
+          "reasoning_tokens": 1516
+        },
+        "total_tokens": 4524
+      },
+      "endedAt": "2026-10-05T19:11:54.481Z",
+      "costUSD": 0.0033966
+    },
+    {
+      "id": "d7bea015-fba6-4d32-b4d4-112d458262f4",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.0230318,
+      "startedAt": "2026-10-05T19:11:54.495Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2056,
+        "input_tokens_details": {
+          "cache_write_tokens": 2053,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3621,
+        "output_tokens_details": {
+          "reasoning_tokens": 1034
+        },
+        "total_tokens": 5677
+      },
+      "endedAt": "2026-10-05T19:12:14.939Z",
+      "costUSD": 0.004134850000000001
+    },
+    {
+      "id": "40dd670d-a266-4d97-9281-aba4f52556a9",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.02589015,
+      "startedAt": "2026-10-05T19:12:14.950Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3274,
+        "input_tokens_details": {
+          "cache_write_tokens": 3271,
+          "cached_tokens": 0
+        },
+        "output_tokens": 6359,
+        "output_tokens_details": {
+          "reasoning_tokens": 2264
+        },
+        "total_tokens": 9633
+      },
+      "endedAt": "2026-10-05T19:12:51.157Z",
+      "costUSD": 0.007177350000000001
+    },
+    {
+      "id": "4c6d179c-61ca-44ad-93c6-d704f227b8ef",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.025055250000000005,
+      "startedAt": "2026-10-05T19:12:51.171Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2882,
+        "input_tokens_details": {
+          "cache_write_tokens": 2879,
+          "cached_tokens": 0
+        },
+        "output_tokens": 5748,
+        "output_tokens_details": {
+          "reasoning_tokens": 1374
+        },
+        "total_tokens": 8630
+      },
+      "endedAt": "2026-10-05T19:13:17.385Z",
+      "costUSD": 0.00646835
+    },
+    {
+      "id": "30350eea-6b63-46ba-861d-db0ba90a7a58",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-4",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.025616250000000004,
+      "startedAt": "2026-10-05T19:13:17.398Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3041,
+        "input_tokens_details": {
+          "cache_write_tokens": 3038,
+          "cached_tokens": 0
+        },
+        "output_tokens": 6303,
+        "output_tokens_details": {
+          "reasoning_tokens": 1695
+        },
+        "total_tokens": 9344
+      },
+      "endedAt": "2026-10-05T19:13:48.299Z",
+      "costUSD": 0.0070631
+    },
+    {
+      "id": "52049635-0622-4cf4-9235-f9c8fc1d740f",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-5",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.024246750000000004,
+      "startedAt": "2026-10-05T19:13:48.315Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2407,
+        "input_tokens_details": {
+          "cache_write_tokens": 2404,
+          "cached_tokens": 0
+        },
+        "output_tokens": 4545,
+        "output_tokens_details": {
+          "reasoning_tokens": 1147
+        },
+        "total_tokens": 6952
+      },
+      "endedAt": "2026-10-05T19:14:08.417Z",
+      "costUSD": 0.0051466
+    },
+    {
+      "id": "f8120887-837c-418e-9f81-9e038cea3f38",
+      "phaseBucket": "diagnostic",
+      "case": "review-hub-projection",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.021313050000000004,
+      "startedAt": "2026-10-05T19:17:26.417Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 1274,
+        "input_tokens_details": {
+          "cache_write_tokens": 1271,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2241,
+        "output_tokens_details": {
+          "reasoning_tokens": 1401
+        },
+        "total_tokens": 3515
+      },
+      "endedAt": "2026-10-05T19:17:39.530Z",
+      "costUSD": 0.0025593499999999997
+    },
+    {
+      "id": "5d08d49f-6c8e-44ff-b8e5-ad4d41e46e6e",
+      "phaseBucket": "diagnostic",
+      "case": "review-covered-display",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.023403600000000004,
+      "startedAt": "2026-10-05T19:17:39.540Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2105,
+        "input_tokens_details": {
+          "cache_write_tokens": 2102,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3857,
+        "output_tokens_details": {
+          "reasoning_tokens": 2786
+        },
+        "total_tokens": 5962
+      },
+      "endedAt": "2026-10-05T19:18:00.480Z",
+      "costUSD": 0.0043831
+    },
+    {
+      "id": "bcf16c88-5139-4b9d-b4ad-64d2f088e389",
+      "phaseBucket": "diagnostic",
+      "case": "review-sloping-transparency",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.022885500000000003,
+      "startedAt": "2026-10-05T19:18:00.490Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 1894,
+        "input_tokens_details": {
+          "cache_write_tokens": 1891,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3145,
+        "output_tokens_details": {
+          "reasoning_tokens": 1727
+        },
+        "total_tokens": 5039
+      },
+      "endedAt": "2026-10-05T19:18:17.656Z",
+      "costUSD": 0.0036183499999999998
+    },
+    {
+      "id": "73ae9cb8-2883-4add-8f70-15d7cb7c4d41",
+      "phaseBucket": "diagnostic",
+      "case": "review-sloping-transparency",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.024030050000000004,
+      "startedAt": "2026-10-05T19:18:17.673Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 1,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2365,
+        "input_tokens_details": {
+          "cache_write_tokens": 2362,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2940,
+        "output_tokens_details": {
+          "reasoning_tokens": 1359
+        },
+        "total_tokens": 5305
+      },
+      "endedAt": "2026-10-05T19:18:33.902Z",
+      "costUSD": 0.0035311
+    },
+    {
+      "id": "d3716e3c-5720-45f5-865d-4293fa61fc73",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.023747350000000004,
+      "startedAt": "2026-10-05T19:18:33.912Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2401,
+        "input_tokens_details": {
+          "cache_write_tokens": 2398,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3698,
+        "output_tokens_details": {
+          "reasoning_tokens": 2173
+        },
+        "total_tokens": 6099
+      },
+      "endedAt": "2026-10-05T19:18:53.655Z",
+      "costUSD": 0.0042981
+    },
+    {
+      "id": "fe0d090b-f232-4260-a11d-85180bc1c2d4",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.026980250000000004,
+      "startedAt": "2026-10-05T19:18:53.668Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3707,
+        "input_tokens_details": {
+          "cache_write_tokens": 3704,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3566,
+        "output_tokens_details": {
+          "reasoning_tokens": 1738
+        },
+        "total_tokens": 7273
+      },
+      "endedAt": "2026-10-05T19:19:11.438Z",
+      "costUSD": 0.0044926
+    },
+    {
+      "id": "35aa1977-1555-4dc6-b9aa-98b85b695da3",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.02700885,
+      "startedAt": "2026-10-05T19:21:30.848Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-continuation-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3707,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 3704
+        },
+        "output_tokens": 5560,
+        "output_tokens_details": {
+          "reasoning_tokens": 3390
+        },
+        "total_tokens": 9267
+      },
+      "endedAt": "2026-10-05T19:21:58.914Z",
+      "costUSD": 0.00563468
+    },
+    {
+      "id": "eefe6517-f4b2-4037-ab9c-0cb43b7a2249",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.02761495,
+      "startedAt": "2026-10-05T19:21:58.928Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-continuation-20261005",
+      "round": 1,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 4012,
+        "input_tokens_details": {
+          "cache_write_tokens": 4009,
+          "cached_tokens": 0
+        },
+        "output_tokens": 5122,
+        "output_tokens_details": {
+          "reasoning_tokens": 2942
+        },
+        "total_tokens": 9134
+      },
+      "endedAt": "2026-10-05T19:22:24.874Z",
+      "costUSD": 0.00612485
+    },
+    {
+      "id": "b33e58a3-423f-4dd0-be01-c5af9f4f37cc",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-4",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.02700115,
+      "startedAt": "2026-10-05T19:22:24.885Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-continuation-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3690,
+        "input_tokens_details": {
+          "cache_write_tokens": 3687,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1806,
+        "output_tokens_details": {
+          "reasoning_tokens": 910
+        },
+        "total_tokens": 5496
+      },
+      "endedAt": "2026-10-05T19:22:34.942Z",
+      "costUSD": 0.00272835
+    },
+    {
+      "id": "5f98af56-243c-44b1-b0bb-29ec561fb60f",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-5",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.024057550000000004,
+      "startedAt": "2026-10-05T19:22:34.954Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-continuation-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2305,
+        "input_tokens_details": {
+          "cache_write_tokens": 2302,
+          "cached_tokens": 0
+        },
+        "output_tokens": 882,
+        "output_tokens_details": {
+          "reasoning_tokens": 374
+        },
+        "total_tokens": 3187
+      },
+      "endedAt": "2026-10-05T19:22:40.544Z",
+      "costUSD": 0.0014581
     }
   ]
 }

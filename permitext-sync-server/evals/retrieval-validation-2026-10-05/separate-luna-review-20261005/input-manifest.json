@@ -1,0 +1,266 @@
+{
+  "method": "Separate Luna native Responses contexts; no prior answers, grades, target score or implementation history",
+  "externalExpertApproval": false,
+  "role": {
+    "model": "gpt-6-luna",
+    "reasoningEffort": "medium",
+    "serviceTier": "priority"
+  },
+  "sourceCharacterCeiling": 48000,
+  "maximumSupplementalRounds": 2,
+  "maximumRunUSD": 0.5,
+  "scriptSHA256": "8a13e58b7d19fd332207d3f25d644c454a36a3f78d71d2b9a340fc1958eb32b5",
+  "batches": [
+    {
+      "id": "review-hub-projection",
+      "cases": [
+        {
+          "id": "review-hub-projection",
+          "questions": [
+            "Under the 2022 NYC Plumbing Code, can a hub drain finish flush with a water-impervious floor?",
+            "What if the hub projects exactly one inch above that floor? Answer only about the projection requirement."
+          ]
+        }
+      ],
+      "sourceHashes": {
+        "PC 802.3.2": "cff67b6c0fc594be981d4bdd6d4736bf9c2a2fc36b606dc4798659421959138b",
+        "PC 802.3": "2aed884c131f07cd7be49ca79816ee5bb6fc5119efec5fd1b2b213f976cb5a93"
+      },
+      "requestSHA256": "ba9236afd21372e9995ee9fd31b88fadba2cf8b6e0477cf14f487639581be7bb"
+    },
+    {
+      "id": "review-covered-display",
+      "cases": [
+        {
+          "id": "review-covered-display",
+          "questions": [
+            "In a sprinklered retail space under the 2022 NYC codes, we want a covered display that is five feet wide. Can we rely only on the ceiling sprinklers above its cover?",
+            "We can reduce the covered display to exactly four feet wide. Does that automatically mean we can ignore sprinklers underneath it?"
+          ]
+        }
+      ],
+      "sourceHashes": {
+        "BC 903.3.3": "47661bb3a8337c70056acb4b6b6ca714dfbeec36e9042a79a44b87d179017114",
+        "FC 314": "c0f9b21e20589541d1f096a536d884ce18811f6505e6375633288800cdc509e4"
+      },
+      "requestSHA256": "c7ccfcd0b6fbd9d96c0373d63220d3e09f7b451a3288c423a302e12f3fa840f2"
+    },
+    {
+      "id": "review-sloping-transparency",
+      "cases": [
+        {
+          "id": "review-sloping-transparency",
+          "questions": [
+            "For now, explain ZR 37-34 as a rule, without claiming that it applies to this property. What are its glazing percentage, measurement limits, and other transparency conditions?",
+            "For this hypothetical only, assume ZR 37-34 applies to the frontage. The sidewalk slopes, and a level window sill is two feet above the adjoining sidewalk at the high end and two feet six inches above it at the low end. Can I use the high-end sidewalk elevation as one datum for the entire 50 percent calculation?"
+          ]
+        }
+      ],
+      "sourceHashes": {
+        "ZR 37-34": "2d4a2ef7654ff4c4995f30b375dc3fa998aaea503cd993b383d7428b09c2cf16",
+        "ZR 37-31": "84a6883dde84eac277106c9fff41fc1fd2ffd1dcfbe41c3002660fd531125dc6"
+      },
+      "requestSHA256": "269c289207197654fa608b30a33d194032c5a29f27b811d19eb6654e9ca6f9c6"
+    },
+    {
+      "id": "rubric-1",
+      "cases": [
+        {
+          "id": "acceptance-water-heater-valve",
+          "questions": [
+            "Explain the current 2022 NYC Plumbing Code cold-water branch valve requirements for a water heater: what it serves, its location and access.",
+            "In this hypothetical, the valve also shuts off the cold-water supply to another fixture. Is proximity to the heater enough to satisfy this valve rule?"
+          ]
+        },
+        {
+          "id": "acceptance-relief-discharge",
+          "questions": [
+            "Explain the 2022 NYC Plumbing Code requirements for water-heater relief-valve discharge piping, including termination height, connection, flow and permitted materials.",
+            "Correction: the discharge pipe is one inch in diameter and ends only one inch above the waste-receptor flood rim. Does being below six inches alone satisfy the termination-height rule?"
+          ]
+        },
+        {
+          "id": "acceptance-reserved-vent",
+          "questions": [
+            "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+            "An older drawing describes that same section number as a vent-connection requirement, without giving its edition. Does the supplied current section prove what that old drawing meant?"
+          ]
+        },
+        {
+          "id": "acceptance-grade-support",
+          "questions": [
+            "Explain the 2022 NYC Mechanical Code alternatives for supporting equipment installed at grade, including heights and installation conditions.",
+            "A level approved support slab extends exactly three inches above adjoining grade. Is that height alone below the stated slab-support minimum?"
+          ]
+        }
+      ],
+      "sourceHashes": {
+        "PC 503.1": "18c7e658b77f376f94a29b62f3e04118483b5fb522dc1719d7f8c6acde31d611",
+        "PC 504.6": "441faeacb333ea9948b1512b362b1ce01f64b5727f0e886d892f09dd0ea7ffb1",
+        "PC 905.4": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13"
+      },
+      "requestSHA256": "e8dcbf9052d45c96bacf642954bcc64bfc3f1e657585633d7316676616396dad"
+    },
+    {
+      "id": "rubric-2",
+      "cases": [
+        {
+          "id": "acceptance-environmental-exhaust",
+          "questions": [
+            "Explain the ordinary environmental-air exhaust separation rule in the 2022 NYC Mechanical Code and the conditions that can change intake separation. Keep other exhaust classes distinct.",
+            "For this hypothetical, an exhaust and intake serve the same dwelling, the exhaust is Class 2 at exactly four hundred cfm, and cross contamination plus re-entrainment is five percent. Does that qualify for the intake-separation exception on those facts?"
+          ]
+        },
+        {
+          "id": "acceptance-domestic-hood",
+          "questions": [
+            "Explain the 2022 NYC Mechanical Code domestic range-hood duct rule and the separate ductless and PVC downdraft alternatives. Preserve their conditions.",
+            "A listed ductless hood in a Group I-2 space follows the manufacturer instructions and otherwise has ventilation. Does that establish eligibility for the stated ductless exception?"
+          ]
+        },
+        {
+          "id": "acceptance-sediment-trap",
+          "questions": [
+            "Explain the 2022 NYC Fuel Gas Code sediment-trap rule, its installation location, accepted form and named appliance exclusions.",
+            "The appliance is an ordinary furnace with no incorporated sediment trap. Would placing the trap upstream of its shutoff valve meet the stated location rule?"
+          ]
+        },
+        {
+          "id": "acceptance-test-isolation",
+          "questions": [
+            "Explain the 2022 NYC Fuel Gas Code procedure when connected equipment is designed for less than the piping test pressure. Include the later leak-check requirement.",
+            "For that same scenario, we will leave the equipment connected and rely on closing its valve, with no disconnection or outlet cap. Does that perform the procedure stated in this section?"
+          ]
+        }
+      ],
+      "sourceHashes": {
+        "MC 501.3.1": "e818e378f393ae0d9850683d4a17d53b82861f33efb5bc013478490e33a7d393",
+        "MC 505.1": "19bb5461d87fb1807a9399ca7ed55f8e87efadefe0eabd21a7fb5d72b2a62d3e",
+        "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce",
+        "FGC 406.3.3": "75b00094b32af13a533e4a88ccba08836b49bbe2826a9b535ffbcbaa230f9c4d"
+      },
+      "requestSHA256": "ad8d36835fe8e353fcdee0268872e8354331d371c8c2bc693e3a5f731abddd32"
+    },
+    {
+      "id": "rubric-3",
+      "cases": [
+        {
+          "id": "acceptance-mp-regulator",
+          "questions": [
+            "Explain the 2022 NYC Fuel Gas Code MP-regulator requirements, keeping access, pressure behavior, tees, downstream distance and union placement separate.",
+            "For a ten-pipe-diameter minimum, a downstream instrument tee is located eight pipe diameters from the regulator outlet. Does adding a pressure gauge cure that distance under this rule?"
+          ]
+        },
+        {
+          "id": "acceptance-exit-sign-distance",
+          "questions": [
+            "Explain the 2022 NYC Building Code exit-sign visibility and spacing rule, including its listed exceptions and the listed-viewing-distance condition.",
+            "Assume no exit-sign exception applies. The sign has a listed viewing distance of seventy-five feet, and the farthest corridor point is ninety feet from the nearest visible sign. Is staying below one hundred feet sufficient?"
+          ]
+        },
+        {
+          "id": "acceptance-handrail-height",
+          "questions": [
+            "Explain the 2022 NYC Building Code handrail-height ranges and the conditions of its fitting, transition and guard alternatives.",
+            "For an ordinary stair, the uniform handrail is exactly thirty-eight inches above the nosings and has no special device or fitting condition. Does this height exceed the ordinary maximum?"
+          ]
+        },
+        {
+          "id": "acceptance-handrail-extension",
+          "questions": [
+            "Explain the 2022 NYC Building Code stair and ramp handrail extensions and returns, plus the section-specific exceptions.",
+            "Our ordinary noncontinuous stair handrail extends twelve inches horizontally beyond the top riser but terminates at the bottom riser. No listed exception applies. Does the top extension alone satisfy both ends?"
+          ]
+        }
+      ],
+      "sourceHashes": {
+        "FGC 410.2": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+        "BC 1013.1": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+        "BC 1014.2": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+        "BC 1014.6": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc"
+      },
+      "requestSHA256": "d4c92516123f682b453011defa2b07322ced28fdc8acf79790c2179b6e48caba"
+    },
+    {
+      "id": "rubric-4",
+      "cases": [
+        {
+          "id": "acceptance-exit-enclosure",
+          "questions": [
+            "Explain the 2022 NYC Building Code interior-exit enclosure rating, counting stories, floor-assembly comparison and the R-1/R-2 construction qualification.",
+            "For this hypothetical, an enclosure connects three above-grade stories and one basement, with no atrium or I-3 exception. Can it use the less-than-four-story rating solely because only three stories are above grade?"
+          ]
+        },
+        {
+          "id": "acceptance-permit-basis",
+          "questions": [
+            "Explain the supplied current NYC Administrative Code general work-permit rule and its exception reference. Distinguish a reference to exceptions from approval for a particular job.",
+            "I need the original unamended text as it stood before the December 2025 amendment, rather than the current consolidated provision. Can you establish that earlier text solely from the supplied current wording and amendment dates?"
+          ]
+        },
+        {
+          "id": "acceptance-asbestos-certification",
+          "questions": [
+            "Explain the supplied current NYC Administrative Code asbestos certification condition for demolition or alteration permits, including its date and alternative.",
+            "For this hypothetical, the building plans were submitted exactly April 1, 1987, and no environmental-protection variance exists. Is that date outside the stated certification condition?"
+          ]
+        },
+        {
+          "id": "acceptance-vacant-protection",
+          "questions": [
+            "Explain the current NYC Fire Code fire-protection and security requirements for temporarily unoccupied premises, including tenant spaces. Keep unsafe-building status separate.",
+            "A tenant space is temporarily unoccupied, with no commissioner authorization to disable protection. Does vacancy itself allow its sprinkler system to be turned off?"
+          ]
+        }
+      ],
+      "sourceHashes": {
+        "BC 1023.2": "c4de89a4305c373fd0b9eebe68666040acb58d162e0ff1c171bad8e379598008",
+        "AC 28-105.1": "11adc798ab9699efa69395ba0a219bf375106afa82391557b4f8039b9c75c3d9",
+        "AC 28-106.1": "6639a6814c6a89d15ce0cc23341d2d9e84434fa3ac416df991c6f804f80adc16",
+        "FC 311": "bd3f7fecb9f15e0266fbadf4eee89a8300772c893499639b4a72337415f4a30a"
+      },
+      "requestSHA256": "cdeedb39c73196168d9bb1800d11b0163d4597467fdbb60eb09e477fd51157d7"
+    },
+    {
+      "id": "rubric-5",
+      "cases": [
+        {
+          "id": "acceptance-reserved-fire-section",
+          "questions": [
+            "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+            "An old note uses that section number for a fire command center but provides no dated source. Can the current reserved section establish the old note requirement or its historical edition?"
+          ]
+        },
+        {
+          "id": "acceptance-emergency-power",
+          "questions": [
+            "Explain current NYC Fire Code emergency-power inspection, maintenance records, transfer-switch testing and the conditional substitute for scheduled testing. Preserve the supervision requirement.",
+            "The generator has been used for peak-load shaving, but no records of that use were kept. Does the use alone satisfy the stated scheduled-testing substitute?"
+          ]
+        },
+        {
+          "id": "acceptance-plaza-bicycles",
+          "questions": [
+            "Explain the current NYC Zoning Resolution public-plaza bicycle-parking requirements, size threshold, location and agency condition.",
+            "For this hypothetical public plaza of exactly ten thousand square feet, does its size alone require the higher bicycle count? Do not treat the site as an independently verified public plaza."
+          ]
+        },
+        {
+          "id": "acceptance-plaza-fountain",
+          "questions": [
+            "Explain the current NYC Zoning Resolution public-plaza drinking-fountain minimum. Does the supplied section state a plaza-size exemption?",
+            "For this hypothetical only, the space is a public plaza and contains one drinking fountain. Does that count meet the stated numerical minimum, without claiming whole-plaza compliance?"
+          ]
+        }
+      ],
+      "sourceHashes": {
+        "FC 508": "c2bd3b75aca8ed84efca7504d870e1b73f9fc8f9c42289c0ff8abdc03694b3a8",
+        "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+        "ZR 37-745": "40de877fdc811dfc3253e4d5377e785ae3d869dd473723448e272492bf9344af",
+        "ZR 37-746": "6e8d1120cc3a4f5b98fbd7a4dad995f2c25b8c8a1c3c03a36f8b591cf1c2ffc2"
+      },
+      "requestSHA256": "394ab8094f7ee10f4ce8e3f520c7483d116ad924e6c6ed2d4e2f149ce563473d"
+    }
+  ]
+}

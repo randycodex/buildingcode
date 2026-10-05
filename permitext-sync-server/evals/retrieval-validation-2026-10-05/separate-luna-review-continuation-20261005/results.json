@@ -1,0 +1,745 @@
+{
+  "method": "separate_Luna_model_review",
+  "externalExpertApproval": false,
+  "followUpFrom": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-20261005/results.json",
+  "continuedFrom": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-followup-20261005/results.json",
+  "precedingReviewCostUSD": 0.06246940000000001,
+  "acceptanceApproved": false,
+  "acceptanceGenerated": false,
+  "startedAt": "2026-10-05T19:21:30.837Z",
+  "provider": [
+    {
+      "id": "35aa1977-1555-4dc6-b9aa-98b85b695da3",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.02700885,
+      "startedAt": "2026-10-05T19:21:30.848Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-continuation-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3707,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 3704
+        },
+        "output_tokens": 5560,
+        "output_tokens_details": {
+          "reasoning_tokens": 3390
+        },
+        "total_tokens": 9267
+      },
+      "endedAt": "2026-10-05T19:21:58.914Z",
+      "costUSD": 0.00563468
+    },
+    {
+      "id": "eefe6517-f4b2-4037-ab9c-0cb43b7a2249",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.02761495,
+      "startedAt": "2026-10-05T19:21:58.928Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-continuation-20261005",
+      "round": 1,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 4012,
+        "input_tokens_details": {
+          "cache_write_tokens": 4009,
+          "cached_tokens": 0
+        },
+        "output_tokens": 5122,
+        "output_tokens_details": {
+          "reasoning_tokens": 2942
+        },
+        "total_tokens": 9134
+      },
+      "endedAt": "2026-10-05T19:22:24.874Z",
+      "costUSD": 0.00612485
+    },
+    {
+      "id": "b33e58a3-423f-4dd0-be01-c5af9f4f37cc",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-4",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.02700115,
+      "startedAt": "2026-10-05T19:22:24.885Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-continuation-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3690,
+        "input_tokens_details": {
+          "cache_write_tokens": 3687,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1806,
+        "output_tokens_details": {
+          "reasoning_tokens": 910
+        },
+        "total_tokens": 5496
+      },
+      "endedAt": "2026-10-05T19:22:34.942Z",
+      "costUSD": 0.00272835
+    },
+    {
+      "id": "5f98af56-243c-44b1-b0bb-29ec561fb60f",
+      "phaseBucket": "diagnostic",
+      "case": "rubric-5",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "separate_model_rubric_review",
+      "status": "settled",
+      "reservedUSD": 0.024057550000000004,
+      "startedAt": "2026-10-05T19:22:34.954Z",
+      "runDirectory": "permitext-sync-server/evals/retrieval-validation-2026-10-05/separate-luna-review-continuation-20261005",
+      "round": 0,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 2305,
+        "input_tokens_details": {
+          "cache_write_tokens": 2302,
+          "cached_tokens": 0
+        },
+        "output_tokens": 882,
+        "output_tokens_details": {
+          "reasoning_tokens": 374
+        },
+        "total_tokens": 3187
+      },
+      "endedAt": "2026-10-05T19:22:40.544Z",
+      "costUSD": 0.0014581
+    }
+  ],
+  "reviews": [
+    {
+      "batch": "rubric-3",
+      "round": 0,
+      "callID": "35aa1977-1555-4dc6-b9aa-98b85b695da3",
+      "sourceHashes": {
+        "FGC 410.2": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+        "BC 1013.1": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+        "BC 1014.2": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+        "BC 1014.6": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc",
+        "BC 1029.15": "d5ba50e5d03575642f94570cf882bb9eecb71e4fbac2ca5a99f6bb3b21c08d62",
+        "BC 1107.2.5": "0c7c0b74f62bbec2f1787faf6ffaf8c53398dfb874e499443997ff03fc0ffa89"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "acceptance-handrail-height",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "missing_authority",
+                "boundedConclusion": "BC 1014.2 sets a uniform ordinary handrail range of 34–38 inches, measured above stair-tread nosings or the finished ramp slope. Alternating tread devices and ships ladders have a separate uniform 30–34-inch range measured above tread nosings. The section permits specified fittings or bendings to exceed the maximum, and permits a guard’s top surface to be used as a handrail along stepped or ramped aisles where BC 1029.15 permits. The supplied text does not include BC 1014.3, needed to establish the referenced graspability requirements relevant to the guard alternative.",
+                "materialChecks": [
+                  {
+                    "criterion": "For ordinary stairs and ramps, handrail height is uniform, at least 34 inches and no more than 38 inches; measure above stair-tread nosings or the finished ramp slope, respectively.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "For alternating tread devices and ships ladders, handrail height is uniform, at least 30 inches and no more than 34 inches, measured above tread nosings.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "Fittings or bendings used to provide a continuous transition between flights may exceed the maximum height.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "In Group R-3 occupancies; within dwelling units in Group R-2; and in Group U occupancies associated with Group R-3 or with individual Group R-2 dwelling units, fittings or bendings may exceed the maximum at the fittings or bendings when used for a continuous transition between flights, a transition at winder treads, a transition from handrail to guard, or at the start of a flight.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "The top surface of a guard may be used as a handrail along stepped and ramped aisles only where permitted in accordance with BC 1029.15. That section covers stepped aisles and ramped aisles exceeding a 1:15 slope; it includes an alternative involving a side guard whose top surface meets the referenced handrail graspability requirements.",
+                    "sourceReferences": [
+                      "BC 1014.2",
+                      "BC 1029.15"
+                    ]
+                  },
+                  {
+                    "criterion": "Do not state the precise graspability requirements for the guard alternative from these records: BC 1029.15 refers to BC 1014.3, which is not supplied.",
+                    "sourceReferences": [
+                      "BC 1029.15"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not extend the fitting/bending exceptions beyond the listed uses or, for the occupancy-limited exception, beyond the listed occupancies and dwelling-unit contexts.",
+                  "Do not say that every guard top surface may serve as a handrail; the text conditions its use on permission under BC 1029.15.",
+                  "Do not supply the contents of BC 1014.3 or claim that the provided excerpts establish the specific graspability requirements.",
+                  "Do not treat explanation of these height rules as a determination that a particular project complies."
+                ],
+                "genuineUnknowns": [
+                  "The specific graspability requirements referenced by BC 1029.15 are not provided.",
+                  "The excerpts do not establish whether a particular project or guard is within the referenced aisle provisions."
+                ],
+                "neededReferences": [
+                  "BC 1014.3, for the graspability requirements referenced by BC 1029.15."
+                ],
+                "reasoning": "The numerical ranges, measurement bases, and fitting/bending exceptions are stated in BC 1014.2. The guard alternative is expressly conditional on BC 1029.15, which supplies aisle scope and refers to graspability requirements in BC 1014.3. The supplied records therefore support a bounded explanation but not a complete account of that guard condition."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "For an ordinary stair, 38 inches is the inclusive upper limit of the stated 34–38-inch uniform handrail-height range. The stated height does not exceed the ordinary maximum. This answers the numerical-height question, not whether the handrail or stair complies in all other respects.",
+                "materialChecks": [
+                  {
+                    "criterion": "For an ordinary stair, the handrail must be uniform and measure at least 34 inches and no more than 38 inches above stair-tread nosings; exactly 38 inches is at the maximum, not above it.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not say that exactly 38 inches exceeds the maximum.",
+                  "Do not infer whole-system or project compliance from the stated height alone."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "The supplied text states an inclusive upper bound of “not more than 38 inches.” The hypothetical identifies an ordinary stair and a uniform 38-inch height, so the comparison is determinate without resort to an exception."
+              }
+            ]
+          },
+          {
+            "id": "acceptance-handrail-extension",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "BC 1014.6 requires handrails to return to a wall, guard, or walking surface, or to continue to the handrail of an adjacent stair flight or ramp run. For noncontinuous stair handrails, it requires a horizontal extension of at least 12 inches beyond the top riser and a sloped continuation for one tread depth beyond the bottom riser. Noncontinuous ramp handrails must extend horizontally above the landing at least 12 inches beyond both the top and bottom of the ramp runs. The section also states direction requirements and four exceptions; assembly-aisle handrails may use the extension provisions of BC 1029.15, which dispenses with extensions at aisle tops and bottoms to permit crossovers. The stated exceptions remain conditional on their specified dwelling-unit, aisle, or stair-device contexts.",
+                "materialChecks": [
+                  {
+                    "criterion": "Handrails must return to a wall, guard, or walking surface, or be continuous to the handrail of an adjacent flight of stairs or ramp run.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Where stair handrails are not continuous between flights, they must extend horizontally at least 12 inches beyond the top riser and continue to slope for one tread depth beyond the bottom riser. Stair extensions must be in the direction of the stair flights.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Where ramp handrails are not continuous between runs, they must extend horizontally above the landing at least 12 inches beyond both the top and bottom of the ramp runs. Ramp extensions must be in the direction of the ramp runs.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "A handrail within a dwelling unit that is not an Accessible unit, Type B+NYC unit, or Type B unit need extend only from the top riser to the bottom riser.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "A handrail within a Type B+NYC multistory dwelling unit that complies with BC 1107.2.5, Items 1 through 3, need extend only from the top riser to the bottom riser.",
+                    "sourceReferences": [
+                      "BC 1014.6",
+                      "BC 1107.2.5"
+                    ]
+                  },
+                  {
+                    "criterion": "Handrails serving aisles in rooms or spaces used for assembly purposes are permitted to follow BC 1029.15 for extensions. Under BC 1029.15, extensions are not required at the top and bottom of stepped or ramped aisles to permit crossovers within the aisles.",
+                    "sourceReferences": [
+                      "BC 1014.6",
+                      "BC 1029.15"
+                    ]
+                  },
+                  {
+                    "criterion": "Handrails for alternating tread devices and ships ladders may terminate vertically above the top and bottom risers; they need not be continuous between flights or extend beyond the top or bottom risers.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not treat a top extension alone as satisfying the separate bottom-extension requirement for an ordinary noncontinuous stair handrail.",
+                  "Do not expand either dwelling-unit exception beyond its stated unit category and conditions.",
+                  "Do not apply the aisle crossover exception outside its stated purpose of permitting crossovers within stepped or ramped aisles.",
+                  "Do not claim that the alternating-tread-device or ships-ladder exception removes requirements beyond those stated in BC 1014.6.",
+                  "Do not treat an explanation of the extension rules as a determination of whole-project compliance."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "BC 1014.6 states the return/continuity rule, distinct stair and ramp extension dimensions, direction requirements, and four exceptions. For the assembly-aisle exception, BC 1029.15 supplies the crossover condition and identifies the relevant stepped and ramped aisles. BC 1107.2.5 is supplied for the expressly cross-referenced Type B+NYC multistory-unit exception."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "No. For an ordinary noncontinuous stair handrail, the stated 12-inch top extension meets the top-extension minimum if it is horizontal in the direction of the stair flight, but the rule separately requires the handrail to continue sloping for one tread depth beyond the bottom riser. Terminating at the bottom riser does not satisfy that bottom requirement; the top extension alone does not satisfy both ends.",
+                "materialChecks": [
+                  {
+                    "criterion": "A noncontinuous stair handrail must extend horizontally at least 12 inches beyond the top riser and continue to slope for one tread depth beyond the bottom riser; both extensions must be in the direction of the stair flights.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not say that the 12-inch top extension substitutes for the required sloped continuation beyond the bottom riser.",
+                  "Do not claim whole-system compliance or noncompliance beyond the specified bottom-extension failure.",
+                  "Do not overlook the stated direction requirement when describing the top extension."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "The hypothetical expressly excludes listed exceptions and describes a noncontinuous ordinary stair handrail. BC 1014.6 imposes separate top and bottom requirements, so termination at the bottom riser fails the bottom requirement regardless of whether the top measurement meets its minimum."
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": [
+          "This is a source-text and rubric review only, not external expert approval or an official interpretation.",
+          "Only the supplied authoritative records were used; no project-wide compliance determination is made."
+        ]
+      },
+      "addedReferences": [
+        "BC 1014.3"
+      ],
+      "unresolvedReferences": [],
+      "supplementalRun": true
+    },
+    {
+      "batch": "rubric-3",
+      "round": 1,
+      "callID": "eefe6517-f4b2-4037-ab9c-0cb43b7a2249",
+      "sourceHashes": {
+        "FGC 410.2": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+        "BC 1013.1": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+        "BC 1014.2": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+        "BC 1014.6": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc",
+        "BC 1029.15": "d5ba50e5d03575642f94570cf882bb9eecb71e4fbac2ca5a99f6bb3b21c08d62",
+        "BC 1107.2.5": "0c7c0b74f62bbec2f1787faf6ffaf8c53398dfb874e499443997ff03fc0ffa89",
+        "BC 1014.3": "7a7df6717b61d3be273bb6a0bb2b47d563085e2de300267b2b622f72d6f10e0c"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "acceptance-handrail-height",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "For ordinary stairs and ramps, handrail height must be uniform and 34–38 inches inclusive, measured above stair-tread nosings or the ramp slope’s finished surface, respectively. Alternating tread devices and ships ladders instead have a uniform 30–34-inch range measured above tread nosings. The stated fitting and bending exceptions permit exceeding the 38-inch maximum only in their specified circumstances; the guard-top alternative is limited to when permitted for stepped or ramped aisles under Section 1029.15.",
+                "materialChecks": [
+                  {
+                    "criterion": "State the ordinary 34-inch minimum and 38-inch maximum, the uniformity requirement, and the correct stair and ramp measurement surfaces.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "State the distinct 30–34-inch range for alternating tread devices and ships ladders, measured above tread nosings.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "Explain that fittings or bendings providing a continuous transition between flights may exceed the maximum height.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "Explain that, in Group R-3 occupancies, within Group R-2 dwelling units, and in the specified Group U occupancies associated with them, fittings or bendings may exceed the maximum when used for continuous transition between flights, transition at winder treads, transition from handrail to guard, or at the start of a flight.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "State that a guard’s top surface may be used as a handrail along stepped or ramped aisles only where permitted under Section 1029.15; the supplied text does not set a separate numerical height range for that alternative.",
+                    "sourceReferences": [
+                      "BC 1014.2",
+                      "BC 1029.15"
+                    ]
+                  },
+                  {
+                    "criterion": "When describing the Section 1029.15 guard condition, identify the supplied condition: a guard at the side of the aisle whose top surface complies with the handrail-graspability requirements referenced in Section 1014.3. Do not invent the details of those referenced requirements.",
+                    "sourceReferences": [
+                      "BC 1029.15",
+                      "BC 1014.3"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not treat 38 inches as exceeding the ordinary maximum; the ordinary range includes 38 inches.",
+                  "Do not extend the fitting or bending exceptions beyond exceeding the maximum height or beyond their stated uses and occupancy scope.",
+                  "Do not imply that Section 1029.15 permits the guard-top alternative without its stated aisle and graspability conditions.",
+                  "Do not supply unstated details of the referenced graspability provisions."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "BC 1014.2 supplies the measurement points, uniformity requirement, both numerical ranges, and the fitting, bending, and guard-top exceptions. BC 1029.15 supplies the aisle context and guard condition; BC 1014.3 identifies the graspability reference but does not provide its detailed criteria."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "No. Thirty-eight inches is exactly the ordinary maximum, not more than it. On the stated facts, the fitting and bending exceptions are unnecessary to reach that conclusion.",
+                "materialChecks": [
+                  {
+                    "criterion": "Compare the stated 38-inch height with the ordinary maximum of 38 inches and conclude it does not exceed that maximum.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  },
+                  {
+                    "criterion": "Do not apply an exception that permits exceeding the maximum where the stated ordinary handrail has no special fitting or bending condition.",
+                    "sourceReferences": [
+                      "BC 1014.2"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not say that an exactly 38-inch ordinary handrail exceeds the maximum.",
+                  "Do not make a conclusion about whole-project compliance from the height fact alone."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "The supplied rule says ordinary handrail height must be not more than 38 inches. The hypothetical gives exactly 38 inches, so it is within the stated numerical limit; that comparison alone is not a whole-system compliance determination."
+              }
+            ]
+          },
+          {
+            "id": "acceptance-handrail-extension",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "Handrails must return to a wall, guard, or walking surface, or be continuous to the handrail of an adjacent stair flight or ramp run. Where stair handrails are not continuous between flights, they must extend horizontally at least 12 inches beyond the top riser and continue sloping for one tread’s depth beyond the bottom riser. For ramp handrails not continuous between runs, the minimum horizontal extension above the landing is 12 inches beyond both the top and bottom of the runs. Extensions follow the direction of the stair flights or ramp runs. Section 1014.6 provides the listed exceptions, including limited dwelling-unit exceptions, assembly-aisle treatment under Section 1029.15, and alternating-tread-device/ships-ladder rules.",
+                "materialChecks": [
+                  {
+                    "criterion": "State the general return-or-continuity requirement: return to a wall, guard, or walking surface, or continue to the handrail of an adjacent stair flight or ramp run.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "For stair handrails not continuous between flights, state both the minimum 12-inch horizontal extension beyond the top riser and the sloping continuation for a depth of one tread beyond the bottom riser.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "For ramp handrails not continuous between runs, state the minimum 12-inch horizontal extension above the landing beyond both the top and bottom of the ramp runs.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "State that stair extensions follow the direction of the stair flights and ramp extensions follow the direction of the ramp runs.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Describe Exception 1 exactly: a handrail within a dwelling unit that is not an Accessible unit, Type B+NYC unit, or Type B unit need extend only from the top riser to the bottom riser.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Describe Exception 2 exactly: a handrail within a Type B+NYC multistory dwelling unit complying with Section 1107.2.5, Items 1 through 3, need extend only from the top riser to the bottom riser. Do not replace that cross-reference with unstated criteria.",
+                    "sourceReferences": [
+                      "BC 1014.6",
+                      "BC 1107.2.5"
+                    ]
+                  },
+                  {
+                    "criterion": "State that handrails serving assembly-purpose aisles may comply with Section 1029.15; its supplied text says extensions are not required at the top and bottom of stepped and ramped aisles to permit crossovers within the aisles.",
+                    "sourceReferences": [
+                      "BC 1014.6",
+                      "BC 1029.15"
+                    ]
+                  },
+                  {
+                    "criterion": "State the alternating-tread-device and ships-ladder exception: handrails may terminate vertically above the top and bottom risers, need not be continuous between flights, and need not extend beyond the risers.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "When explaining the assembly-aisle exception, preserve the supplied Section 1029.15 scope: it addresses stepped aisles and ramped aisles exceeding a 1:15 slope, and the stated no-extension condition is to permit crossovers within the aisles.",
+                    "sourceReferences": [
+                      "BC 1014.6",
+                      "BC 1029.15"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not say that a 12-inch top extension alone meets the stair rule for handrails that are not continuous between flights; the rule separately requires a sloping continuation beyond the bottom riser.",
+                  "Do not substitute the ramp extension rule for the stair extension rule, or vice versa.",
+                  "Do not apply a listed exception without its stated type, occupancy, or other condition.",
+                  "Do not describe the Section 1029.15 crossover exception as a general exception for all stairs, ramps, or handrails.",
+                  "Do not infer additional requirements from Section 1107.2.5 beyond the cross-reference and supplied text."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "BC 1014.6 states the general return/continuity rule, separate stair and ramp extension dimensions, direction, and four exceptions. The supplied BC 1029.15 and BC 1107.2.5 texts allow the referenced exception conditions to be described within those limits."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "No. For the stated ordinary noncontinuous-stair case, the 12-inch horizontal top extension meets the top-extension requirement only. The handrail must also continue to slope for a depth of one tread beyond the bottom riser; terminating at the bottom riser does not satisfy that requirement. The hypothetical excludes the listed exceptions.",
+                "materialChecks": [
+                  {
+                    "criterion": "Conclude that the top extension alone does not satisfy both ends under the stair rule for handrails not continuous between flights.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Recognize that the stated 12-inch horizontal extension beyond the top riser meets the top dimension only.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Identify the unmet bottom requirement: continue to slope for a depth of one tread beyond the bottom riser, rather than terminate at the bottom riser.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  },
+                  {
+                    "criterion": "Do not rely on a Section 1014.6 exception because the hypothetical says no listed exception applies.",
+                    "sourceReferences": [
+                      "BC 1014.6"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Do not conclude that the top extension alone satisfies both the top and bottom stair requirements.",
+                  "Do not apply the ramp rule requiring horizontal extensions beyond both ends of ramp runs to this stair.",
+                  "Do not claim a whole-project compliance result beyond the stated extension issue."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "For the stated ordinary noncontinuous stair, BC 1014.6 separately requires the top horizontal extension and the bottom sloping continuation. The hypothetical has the former but terminates at the bottom riser, and rules out the listed exceptions."
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": [
+          "This is an independent rubric derived only from the supplied 2022 NYC source records, not external expert approval or an official interpretation.",
+          "The rubric addresses the questions’ bounded handrail issues and does not determine whole-project compliance."
+        ]
+      },
+      "addedReferences": [],
+      "unresolvedReferences": [],
+      "supplementalRun": false
+    },
+    {
+      "batch": "rubric-4",
+      "round": 0,
+      "callID": "b33e58a3-423f-4dd0-be01-c5af9f4f37cc",
+      "sourceHashes": {
+        "BC 1023.2": "c4de89a4305c373fd0b9eebe68666040acb58d162e0ff1c171bad8e379598008",
+        "AC 28-105.1": "11adc798ab9699efa69395ba0a219bf375106afa82391557b4f8039b9c75c3d9",
+        "AC 28-106.1": "6639a6814c6a89d15ce0cc23341d2d9e84434fa3ac416df991c6f804f80adc16",
+        "FC 311": "bd3f7fecb9f15e0266fbadf4eee89a8300772c893499639b4a72337415f4a30a",
+        "AC 28-105.4": "3fd9a084b04b934e90ac1af2d8bacfb3f2cf06ecc024ed151055318d013dd168"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "acceptance-permit-basis",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "The supplied general rule makes the listed construction, alteration, repair, movement, demolition, removal, use/occupancy-change, sign, service-equipment, and specified system work unlawful unless and until the commissioner issues a written permit under the code. The rule is subject to exceptions and exemptions provided in AC 28-105.4. That cross-reference identifies possible permit exemptions; it does not itself establish that a particular job qualifies for one or constitute approval of that job. The supplied text does not provide facts to determine a project's exemption eligibility.",
+                "materialChecks": [
+                  {
+                    "criterion": "State the written-permit requirement, the commissioner as issuer, and the “unless and until” condition for the work described in AC 28-105.1.",
+                    "sourceReferences": [
+                      "AC 28-105.1"
+                    ]
+                  },
+                  {
+                    "criterion": "Explain that the general rule is subject to exceptions and exemptions provided in AC 28-105.4; do not treat the cross-reference alone as project-specific eligibility or approval.",
+                    "sourceReferences": [
+                      "AC 28-105.1",
+                      "AC 28-105.4"
+                    ]
+                  },
+                  {
+                    "criterion": "Preserve that AC 28-105.4 says exemptions do not authorize work violating applicable code, zoning, other laws, or departmental rules, and do not relieve obligations to comply with or file with other city agencies.",
+                    "sourceReferences": [
+                      "AC 28-105.4"
+                    ]
+                  },
+                  {
+                    "criterion": "Do not assert that a particular job is exempt or approved without facts establishing that an applicable exemption's conditions are met.",
+                    "sourceReferences": [
+                      "AC 28-105.4"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "Every job necessarily requires a permit without exception.",
+                  "The cross-reference to AC 28-105.4 itself grants a permit, approval, or exemption to a particular job.",
+                  "A permit exemption authorizes work in violation of other applicable requirements or eliminates obligations involving other city agencies."
+                ],
+                "genuineUnknowns": [
+                  "Whether any specific job falls within an exemption, including any applicable conditions not set out in the supplied text."
+                ],
+                "neededReferences": [],
+                "reasoning": "AC 28-105.1 states the broad written-permit rule and expressly makes it subject to AC 28-105.4. AC 28-105.4 lists categories for which permits are not required unless otherwise indicated, while expressly limiting the legal effect of exemptions. No project facts or claim of project-specific qualification are supplied."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "No. The supplied current consolidated wording and amendment dates do not establish the exact wording of AC 28-105.1 before the December 2025 amendment. They identify enactment/amendment and effective dates, but do not reproduce the earlier text.",
+                "materialChecks": [
+                  {
+                    "criterion": "Conclude that the exact pre-amendment wording cannot be established solely from the supplied current wording and amendment dates.",
+                    "sourceReferences": [
+                      "AC 28-105.1"
+                    ]
+                  },
+                  {
+                    "criterion": "Do not infer or reconstruct the earlier wording from the amendment citation, effective date, or current provision.",
+                    "sourceReferences": [
+                      "AC 28-105.1"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "The current text is necessarily identical to the text immediately before the December 2025 amendment.",
+                  "The amendment dates alone establish what language was added, deleted, or otherwise changed."
+                ],
+                "genuineUnknowns": [
+                  "The exact version of AC 28-105.1 in force immediately before the December 21, 2025 effective date of the cited amendment."
+                ],
+                "neededReferences": [
+                  "The historical text of AC 28-105.1 in force immediately before December 21, 2025, or the relevant original and amendatory enacted text, including L.L. 2024/128 and any referenced Appendix A material needed to identify the changes."
+                ],
+                "reasoning": "The supplied record gives the current consolidated provision and identifies L.L. 2021/126 and L.L. 2024/128 with dates, but supplies no prior version or text of the amendment. Those metadata do not establish the earlier wording."
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": [
+          "This is an independent rubric review of the supplied source records, not external expert approval or an official interpretation.",
+          "No project-specific permit determination or historical text beyond the supplied records is established."
+        ]
+      },
+      "addedReferences": [],
+      "unresolvedReferences": [
+        {
+          "reference": "The historical text of AC 28-105.1 in force immediately before December 21, 2025, or the relevant original and amendatory enacted text, including L.L. 2024/128 and any referenced Appendix A material needed to identify the changes.",
+          "reason": "not_a_current_canonical_section_request"
+        }
+      ],
+      "supplementalRun": false
+    },
+    {
+      "batch": "rubric-5",
+      "round": 0,
+      "callID": "5f98af56-243c-44b1-b0bb-29ec561fb60f",
+      "sourceHashes": {
+        "FC 508": "c2bd3b75aca8ed84efca7504d870e1b73f9fc8f9c42289c0ff8abdc03694b3a8",
+        "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+        "ZR 37-745": "40de877fdc811dfc3253e4d5377e785ae3d869dd473723448e272492bf9344af",
+        "ZR 37-746": "6e8d1120cc3a4f5b98fbd7a4dad995f2c25b8c8a1c3c03a36f8b591cf1c2ffc2"
+      },
+      "review": {
+        "cases": [
+          {
+            "id": "acceptance-reserved-fire-section",
+            "turns": [
+              {
+                "turn": 1,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "The supplied current text for FC 508 is expressly repealed or reserved and contains no operative text. It therefore establishes no substantive requirement. Its title is metadata, not an operative rule.",
+                "materialChecks": [
+                  {
+                    "criterion": "Identify FC 508 as repealed or reserved, with no operative text in the supplied current source.",
+                    "sourceReferences": [
+                      "FC 508"
+                    ]
+                  },
+                  {
+                    "criterion": "Do not attribute a substantive requirement to FC 508 based on its section number or title.",
+                    "sourceReferences": [
+                      "FC 508"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "That FC 508 currently imposes a fire command center requirement or any other substantive requirement.",
+                  "That a section title or number supplies operative requirements absent operative text."
+                ],
+                "genuineUnknowns": [],
+                "neededReferences": [],
+                "reasoning": "The supplied FC 508 text directly states that it is repealed or reserved and has no operative text. No further source is needed to answer what the supplied current section establishes."
+              },
+              {
+                "turn": 2,
+                "status": "clear_from_supplied_text",
+                "boundedConclusion": "The supplied current FC 508 cannot establish the requirement in the old note or determine what a historical edition of that section provided. It establishes only that the supplied current text has no operative text; the old note’s historical basis remains unverified.",
+                "materialChecks": [
+                  {
+                    "criterion": "Conclude that current FC 508, as supplied, does not establish the old note’s fire command center requirement.",
+                    "sourceReferences": [
+                      "FC 508"
+                    ]
+                  },
+                  {
+                    "criterion": "Do not infer the content or status of FC 508 in an earlier edition from its current reserved status.",
+                    "sourceReferences": [
+                      "FC 508"
+                    ]
+                  }
+                ],
+                "forbiddenClaims": [
+                  "That the old note accurately states a historical requirement based on the current section alone.",
+                  "That FC 508 was reserved, operative, or contained particular language in the note’s historical edition without a dated historical source."
+                ],
+                "genuineUnknowns": [
+                  "The date or edition of the old note and the text and applicability of FC 508 in that historical edition."
+                ],
+                "neededReferences": [
+                  "A dated authoritative historical NYC Fire Code source containing Section 508 for the edition relevant to the old note."
+                ],
+                "reasoning": "The supplied record identifies FC 508 as current consolidated text and provides no dated historical wording. Current text cannot establish the section’s historical content or validate the note."
+              }
+            ]
+          }
+        ],
+        "reviewLimitations": []
+      },
+      "addedReferences": [],
+      "unresolvedReferences": [
+        {
+          "reference": "A dated authoritative historical NYC Fire Code source containing Section 508 for the edition relevant to the old note.",
+          "reason": "not_a_current_canonical_section_request"
+        }
+      ],
+      "supplementalRun": false
+    }
+  ],
+  "finishedAt": "2026-10-05T19:22:40.551Z"
+}

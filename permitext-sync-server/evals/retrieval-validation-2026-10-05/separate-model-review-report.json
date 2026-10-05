@@ -1,0 +1,242 @@
+{
+  "status": "separate_model_review_complete_two_original_interpretations_unresolved",
+  "recordedAt": "2026-10-05T19:24:27.369046+00:00",
+  "reviewRuntimeCommit": "cf650a9ac366eb18eb303651c24fa9a547e5e76d",
+  "userAuthorization": "User selected a separate Luna review: do it.",
+  "externalExpertApproval": false,
+  "acceptanceApproved": false,
+  "acceptanceGenerated": false,
+  "method": {
+    "model": "gpt-6-luna",
+    "reasoningEffort": "medium",
+    "serviceTier": "priority",
+    "providerAPI": "responses",
+    "store": false,
+    "contexts": "Fresh per-request context; enacted sources and user questions only, no previous application answers, benchmark grades, target score or implementation history.",
+    "sourceCharacterCeiling": 48000,
+    "supplementalRoundLimit": 2,
+    "reviewCapUSD": 0.5
+  },
+  "coverage": {
+    "proposedConversations": 20,
+    "proposedTurns": 40,
+    "codeFamilies": [
+      "AC",
+      "BC",
+      "FC",
+      "FGC",
+      "MC",
+      "PC",
+      "ZR"
+    ],
+    "rubricStatuses": {
+      "clear_from_supplied_text": 40
+    },
+    "disputedTurns": 6,
+    "disputedStatuses": {
+      "ambiguous": 2,
+      "clear_from_supplied_text": 4
+    },
+    "pairedTurnsCorrelated": true,
+    "newAnswerAccuracyScore": null
+  },
+  "runs": [
+    {
+      "directory": "separate-luna-review-20261005",
+      "resultSHA256": "740958304ce7d8888a874f6c68b3d5f37f118cc20b97d96e6844c09313e538bd",
+      "providerCalls": 8,
+      "completed": true
+    },
+    {
+      "directory": "separate-luna-review-followup-20261005",
+      "resultSHA256": "9a1315ac1766e837366c77f8c25dbd4e3d3731a9ffc1cf414614e1d572d93392",
+      "providerCalls": 6,
+      "completed": false
+    },
+    {
+      "directory": "separate-luna-review-continuation-20261005",
+      "resultSHA256": "bdf70b41e4b9ba2ab25c8fe2aeabda43cb609386effb1b4ec3214a670b9ba203",
+      "providerCalls": 4,
+      "completed": true
+    }
+  ],
+  "reviewEnvelopeRejection": {
+    "callID": "fe0d090b-f232-4260-a11d-85180bc1c2d4",
+    "case": "rubric-3",
+    "reason": "Omitted the second handrail-height turn; paid usage settled, response rejected by complete-turn guard and never adopted.",
+    "resolution": "Strict schema now requires exact case and turn counts; a fresh reconciled continuation requested only unfinished batches."
+  },
+  "reviewScopeCorrections": [
+    "Named code references written as full code names now resolve through existing reference extraction to exact same-corpus/current-edition sections. Explicit historical or commentary requests are not substituted with current text.",
+    "Status evaluates the bounded requested conclusion, not unasked whole-project compliance; historical-evidence boundary questions can have a determinate rubric while historical law remains unavailable.",
+    "Ambiguity elsewhere does not block a numerical result agreed upon under every plausible reading. The initial exactly-one-inch overqualification was corrected by a fresh model review; the flush-hub ambiguity remains."
+  ],
+  "materialDependenciesSupplied": [
+    "PC 605.4",
+    "BC 1029.15",
+    "BC 1107.2.5",
+    "BC 1014.3"
+  ],
+  "otherNamedContextSupplied": [
+    "ZR 37-30",
+    "AC 28-105.4"
+  ],
+  "unresolved": [
+    "PC 802.3.2 flush-hub modifier scope: model review finds no definitive permission or prohibition from the supplied wording; authoritative interpretation remains missing.",
+    "ZR 37-34 sloping-sidewalk area/datum method: model review still cannot establish a precise local or single-datum calculation method from the supplied text."
+  ],
+  "limitations": [
+    "A model-derived rubric is not external expert approval or official interpretation; factual omissions remain possible.",
+    "No new acceptance answers were generated or scored. The original pending acceptance fixture and manifest remain unchanged; review proposals are saved separately.",
+    "Old frozen grades remain 35/40, and the exploratory 9/10 remains separate. No grades were changed to match this review.",
+    "Production browser/subscription behavior and hosted native Responses remain unverified; no deployment."
+  ],
+  "requestChecks": [
+    {
+      "id": "b5214bd7-e973-4336-8f27-758f4f936e86",
+      "requestSHA256": "ba9236afd21372e9995ee9fd31b88fadba2cf8b6e0477cf14f487639581be7bb",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "0c8cb8b8-f3a0-4ca2-9e01-3c5af0039beb",
+      "requestSHA256": "c7ccfcd0b6fbd9d96c0373d63220d3e09f7b451a3288c423a302e12f3fa840f2",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "0951e618-6f69-44c1-a8e5-7b881e5999d2",
+      "requestSHA256": "269c289207197654fa608b30a33d194032c5a29f27b811d19eb6654e9ca6f9c6",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "d7bea015-fba6-4d32-b4d4-112d458262f4",
+      "requestSHA256": "e8dcbf9052d45c96bacf642954bcc64bfc3f1e657585633d7316676616396dad",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "40dd670d-a266-4d97-9281-aba4f52556a9",
+      "requestSHA256": "ad8d36835fe8e353fcdee0268872e8354331d371c8c2bc693e3a5f731abddd32",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "4c6d179c-61ca-44ad-93c6-d704f227b8ef",
+      "requestSHA256": "d4c92516123f682b453011defa2b07322ced28fdc8acf79790c2179b6e48caba",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "30350eea-6b63-46ba-861d-db0ba90a7a58",
+      "requestSHA256": "cdeedb39c73196168d9bb1800d11b0163d4597467fdbb60eb09e477fd51157d7",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "52049635-0622-4cf4-9235-f9c8fc1d740f",
+      "requestSHA256": "394ab8094f7ee10f4ce8e3f520c7483d116ad924e6c6ed2d4e2f149ce563473d",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "f8120887-837c-418e-9f81-9e038cea3f38",
+      "requestSHA256": "a83530c8ae46a867cef4261c940bd423f075513aebd9d76794dd0635482d86e1",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "5d08d49f-6c8e-44ff-b8e5-ad4d41e46e6e",
+      "requestSHA256": "0ac8cbf8702b8f0c5b751f1a9376c42e8f771407ba2bccfe11361eded71ec889",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "bcf16c88-5139-4b9d-b4ad-64d2f088e389",
+      "requestSHA256": "d4a80416762d88b4eb36e2a8278c6a313ca39a82ca7c14b7f767a55aa34fc888",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "73ae9cb8-2883-4add-8f70-15d7cb7c4d41",
+      "requestSHA256": "cd176a9b6598eed3aad4b6004ea7c2713e03ede4dc075629f01291fb1fbfb1b4",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "d3716e3c-5720-45f5-865d-4293fa61fc73",
+      "requestSHA256": "babdb20bfbb1511fbf2f1056cdb3bf305ac922e90a7c6d128f3bd048ea8b9d0f",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "fe0d090b-f232-4260-a11d-85180bc1c2d4",
+      "requestSHA256": "f873a4385f8a1462811345922e331607f609bb891cd6bba95ee6b297a58da437",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "35aa1977-1555-4dc6-b9aa-98b85b695da3",
+      "requestSHA256": "6194da65497331045107bb33fc4e41cf2b88b3e20934df6b1f694814a038095b",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "eefe6517-f4b2-4037-ab9c-0cb43b7a2249",
+      "requestSHA256": "bea07370e25b79c3245bf47bda890f9fabc9c8e40119556242284561c7a553f7",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "b33e58a3-423f-4dd0-be01-c5af9f4f37cc",
+      "requestSHA256": "1b4359b40bddaf572a66d03069ba22824fa265bd9d1867a29b241342938843f0",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    },
+    {
+      "id": "5f98af56-243c-44b1-b0bb-29ec561fb60f",
+      "requestSHA256": "8179b96ea1989a7297e92ba1fceeba194259df739eea8ba229b3ca9bacbd2bbb",
+      "role": "Luna-medium-priority",
+      "sourceHashChecksPassed": true,
+      "priorAnswersAndGradesSupplied": false
+    }
+  ],
+  "budget": {
+    "newProviderCalls": 18,
+    "allNewCallsSettled": true,
+    "reviewEstimatedUSD": 0.07841538,
+    "campaignEstimatedUSD": 2.012352195,
+    "estimatedByBucketUSD": {
+      "diagnostic": 1.1266376,
+      "fresh": 0.885714595
+    },
+    "ledgerCalls": 399,
+    "ledgerStatuses": {
+      "settled": 397,
+      "rejected": 2
+    },
+    "existing381CallsUnchanged": true,
+    "capUSD": 10.99,
+    "pricingUnchanged": true,
+    "actualBillingDeductionsVerified": false
+  },
+  "general95PercentEstablished": false
+}

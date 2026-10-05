@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-05T19:11:00.703Z",
+  "keyPresent": true,
+  "billableRequests": 0,
+  "providerAPI": "responses",
+  "generationEndpoint": "/v1/responses",
+  "models": {
+    "status": 200,
+    "code": null,
+    "type": null,
+    "usagePresent": false,
+    "available": {
+      "gpt-6-luna": true,
+      "text-embedding-3-small": true
+    }
+  },
+  "responses": {
+    "status": 400,
+    "code": "missing_required_parameter",
+    "type": "invalid_request_error",
+    "usagePresent": false,
+    "expectedValidationFailure": true
+  },
+  "embeddings": {
+    "status": 400,
+    "code": null,
+    "type": "invalid_request_error",
+    "usagePresent": false,
+    "expectedValidationFailure": true
+  },
+  "ready": true
+}

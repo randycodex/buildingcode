@@ -1,0 +1,2197 @@
+{
+  "status": "model_reviewed_proposal_not_automatically_approved",
+  "method": "separately_prompted_Luna_native_Responses",
+  "externalExpertApproval": false,
+  "acceptanceApproved": false,
+  "acceptanceGenerated": false,
+  "fixtureSHA256": "bfa99691b3f2d3dc3d0f7cd5342d6739e789c0a4215366d2a6b8c34e2411e97c",
+  "pairedTurnsCorrelated": true,
+  "conversations": [
+    {
+      "id": "acceptance-water-heater-valve",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "The cold-water branch from the main supply to each hot-water storage tank or water heater must have a valve located near the equipment. The valve must serve only that tank or heater, must not interfere with or disrupt the remainder of the cold-water system, and must be accessible on the same floor level as the heater served.",
+          "materialChecks": [
+            {
+              "criterion": "A valve is required on the cold-water branch from the main supply to each hot-water storage tank or water heater.",
+              "sourceReferences": [
+                "PC 503.1"
+              ]
+            },
+            {
+              "criterion": "The valve must be located near the equipment.",
+              "sourceReferences": [
+                "PC 503.1"
+              ]
+            },
+            {
+              "criterion": "The valve must serve only the hot-water storage tank or water heater and must not interfere with or disrupt the remainder of the cold-water system.",
+              "sourceReferences": [
+                "PC 503.1"
+              ]
+            },
+            {
+              "criterion": "The valve must have access on the same floor level as the water heater served.",
+              "sourceReferences": [
+                "PC 503.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not replace the requirement that the valve serve only the tank or heater with a mere proximity test.",
+            "Do not assert a specific distance for \u201cnear\u201d or define access beyond the supplied text."
+          ],
+          "genuineUnknowns": [
+            "The provision does not quantify \u201cnear\u201d or further define access; a particular installation\u2019s satisfaction of those terms cannot be determined without relevant project facts or applicable interpretive authority."
+          ],
+          "neededReferences": [],
+          "reasoning": "PC 503.1 directly states the branch, valve function, location, system-protection condition, and same-floor-level access requirement. The question asks for the rule, not a project-specific determination."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. A valve that also shuts off another fixture does not serve only the water heater, so proximity to the heater is not enough to satisfy PC 503.1. The rule separately prohibits interference with or disruption of the remainder of the cold-water system.",
+          "materialChecks": [
+            {
+              "criterion": "The valve must serve only the hot-water storage tank or water heater; serving another fixture fails that condition.",
+              "sourceReferences": [
+                "PC 503.1"
+              ]
+            },
+            {
+              "criterion": "Near-equipment location does not replace the separate serve-only condition.",
+              "sourceReferences": [
+                "PC 503.1"
+              ]
+            },
+            {
+              "criterion": "The valve must not interfere with or disrupt the remainder of the cold-water system.",
+              "sourceReferences": [
+                "PC 503.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not treat proximity alone as sufficient.",
+            "Do not conclude that the hypothetical necessarily causes system disruption beyond the stated fact that the valve also serves another fixture."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The hypothetical expressly says the valve also shuts off another fixture, contrary to the requirement that it serve only the heater or tank. The rule\u2019s separate no-interference/no-disruption condition should also be retained without assuming additional facts."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "d7bea015-fba6-4d32-b4d4-112d458262f4",
+        "round": 0,
+        "sourceHashes": {
+          "PC 503.1": "18c7e658b77f376f94a29b62f3e04118483b5fb522dc1719d7f8c6acde31d611",
+          "PC 504.6": "441faeacb333ea9948b1512b362b1ce01f64b5727f0e886d892f09dd0ea7ffb1",
+          "PC 905.4": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13"
+        }
+      }
+    },
+    {
+      "id": "acceptance-relief-discharge",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "PC 504.6 gives the listed requirements for discharge piping serving a pressure relief valve, temperature relief valve, or combination. It specifies both a maximum and a minimum termination height. It allows materials listed in PC 605.4 or materials tested, rated, and approved for this use in accordance with ASME A112.4.1.",
+          "materialChecks": [
+            {
+              "criterion": "The requirements apply to discharge piping serving a pressure relief valve, temperature relief valve, or combination thereof.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "The piping must not be directly connected to the drainage system and must discharge through an air gap located in the same room as the water heater.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "The pipe must be at least as large as the valve outlet and discharge full size to the air gap.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "The piping must serve a single relief device and must not connect to piping serving another relief device or equipment.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "Discharge must not cause personal injury or structural damage, and the termination point must be readily observable by building occupants.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "The piping must not be trapped and must be installed to flow by gravity.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "The termination must be no more than 6 inches above, and no less than two times the discharge-pipe diameter above, the floor or the waste receptor's flood-level rim. Preserve that stated reference wording; the source does not select a reference for a particular configuration.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "The end of the piping must not have a threaded connection; the piping must not have valves or tee fittings.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "Permitted materials are those listed in PC 605.4, or materials tested, rated, and approved for such use in accordance with ASME A112.4.1.",
+              "sourceReferences": [
+                "PC 504.6",
+                "PC 605.4"
+              ]
+            },
+            {
+              "criterion": "The supplied PC 605.4 text identifies water-distribution pipe standards and lists brass, copper or copper-alloy, ductile iron, and specified stainless-steel pipe or tubing standards. Do not imply that the source establishes qualification of an unlisted proposed material without applying the PC 504.6 alternative-material route.",
+              "sourceReferences": [
+                "PC 504.6",
+                "PC 605.4"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not treat the 6-inch maximum as the only termination-height condition; PC 504.6 also states a minimum of twice the pipe diameter.",
+            "Do not claim that any particular material qualifies under ASME A112.4.1 without that standard or other applicable qualification evidence.",
+            "Do not claim that the listed rules establish whole-system or project compliance."
+          ],
+          "genuineUnknowns": [
+            "Whether a particular proposed alternative material has been tested, rated, and approved for this use in accordance with ASME A112.4.1 is not established without facts about that material and the referenced standard."
+          ],
+          "neededReferences": [],
+          "reasoning": "The supplied PC 504.6 text states the discharge-piping conditions directly and incorporates PC 605.4 for one material route. The question asks for the rule, not a project-specific compliance determination."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. One inch above the waste receptor's flood-level rim is below the 6-inch maximum, but for a 1-inch-diameter pipe PC 504.6 also requires at least 2 inches above that rim. The stated 1-inch clearance does not satisfy the termination-height condition.",
+          "materialChecks": [
+            {
+              "criterion": "For a 1-inch-diameter discharge pipe, the minimum clearance under the stated two-times-diameter rule is 2 inches above the applicable reference.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            },
+            {
+              "criterion": "A termination 1 inch above the waste receptor flood-level rim is below the 6-inch maximum but below the 2-inch minimum; being below 6 inches alone does not satisfy the stated height rule.",
+              "sourceReferences": [
+                "PC 504.6"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not conclude the termination-height condition is satisfied solely because the clearance is less than 6 inches.",
+            "Do not infer overall project compliance or noncompliance beyond the stated termination-height condition."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The correction specifies both the pipe diameter and the measurement reference. Applying PC 504.6's minimum gives 2 inches, so the stated 1-inch clearance fails that height condition regardless of the maximum."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-followup-20261005",
+        "callID": "d3716e3c-5720-45f5-865d-4293fa61fc73",
+        "round": 0,
+        "sourceHashes": {
+          "PC 503.1": "18c7e658b77f376f94a29b62f3e04118483b5fb522dc1719d7f8c6acde31d611",
+          "PC 504.6": "441faeacb333ea9948b1512b362b1ce01f64b5727f0e886d892f09dd0ea7ffb1",
+          "PC 905.4": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13",
+          "PC 605.4": "5d0d73c044c3b239a606b0ccba745d6e3eeca2ffcd217d4cd2645c28b45dbe08"
+        }
+      }
+    },
+    {
+      "id": "acceptance-reserved-vent",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "The supplied PC 905.4 text is empty, so it states no substantive requirement that can be explained from this record. Its supplied title is metadata and cannot establish a requirement; do not reconstruct one from another code.",
+          "materialChecks": [
+            {
+              "criterion": "The supplied text for PC 905.4 is empty and therefore does not state a substantive requirement.",
+              "sourceReferences": [
+                "PC 905.4"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not state a vent-connection requirement or any other substantive rule as a requirement of the supplied PC 905.4 text.",
+            "Do not reconstruct a requirement from another code or edition.",
+            "Do not treat the section title metadata alone as substantive code text."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The question is limited to what the supplied current section requires. The source record contains no section text; the bounded answer is that no substantive requirement is supplied."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. The supplied current PC 905.4 record does not establish what an older drawing meant by that section number. The drawing's applicable code, edition, and historical section wording are not supplied.",
+          "materialChecks": [
+            {
+              "criterion": "The current supplied PC 905.4 text is empty and cannot prove that an older drawing's section 905.4 meant a vent-connection requirement.",
+              "sourceReferences": [
+                "PC 905.4"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not affirm that the older drawing used the same code edition or wording as the supplied current record.",
+            "Do not infer the historical requirement from another code, an unspecified edition, or the current section title metadata."
+          ],
+          "genuineUnknowns": [
+            "The code and edition or historical version cited by the drawing are unknown, as is the text of section 905.4 in that source."
+          ],
+          "neededReferences": [
+            "The drawing's cited code and edition, plus the corresponding historical Plumbing Code section 905.4 text; if the drawing does not identify an edition, the applicable historical code source or as-of date must first be established."
+          ],
+          "reasoning": "A current record with empty section text cannot establish historical wording for an older drawing whose edition is unspecified. The applicable historical code text is needed to determine what the drawing meant."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-followup-20261005",
+        "callID": "d3716e3c-5720-45f5-865d-4293fa61fc73",
+        "round": 0,
+        "sourceHashes": {
+          "PC 503.1": "18c7e658b77f376f94a29b62f3e04118483b5fb522dc1719d7f8c6acde31d611",
+          "PC 504.6": "441faeacb333ea9948b1512b362b1ce01f64b5727f0e886d892f09dd0ea7ffb1",
+          "PC 905.4": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13",
+          "PC 605.4": "5d0d73c044c3b239a606b0ccba745d6e3eeca2ffcd217d4cd2645c28b45dbe08"
+        }
+      }
+    },
+    {
+      "id": "acceptance-grade-support",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "For equipment and appliances installed at grade, MC 304.10 permits either a level concrete slab or other approved material extending at least 3 inches above adjoining grade, or suspension at least 6 inches above adjoining grade. The support must be in accordance with the manufacturer\u2019s instructions.",
+          "materialChecks": [
+            {
+              "criterion": "The rule applies to equipment and appliances installed at grade level.",
+              "sourceReferences": [
+                "MC 304.10"
+              ]
+            },
+            {
+              "criterion": "One alternative is a level concrete slab or other approved material extending not less than 3 inches above adjoining grade.",
+              "sourceReferences": [
+                "MC 304.10"
+              ]
+            },
+            {
+              "criterion": "The other alternative is suspension not less than 6 inches above adjoining grade.",
+              "sourceReferences": [
+                "MC 304.10"
+              ]
+            },
+            {
+              "criterion": "The support must be in accordance with the manufacturer\u2019s instructions.",
+              "sourceReferences": [
+                "MC 304.10"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not change either minimum height or describe the alternatives as cumulative requirements.",
+            "Do not omit the level condition for the slab/material support or the manufacturer-instructions condition."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "MC 304.10 states two alternatives, each measured above adjoining grade, and requires the support to accord with the manufacturer\u2019s instructions."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. Exactly 3 inches is not below the slab/material-support minimum of 3 inches; it meets that numerical threshold. That height alone does not establish whole-installation compliance, including compliance with the manufacturer\u2019s instructions.",
+          "materialChecks": [
+            {
+              "criterion": "The slab/material-support alternative requires an extension of not less than 3 inches above adjoining grade, so exactly 3 inches meets the stated minimum.",
+              "sourceReferences": [
+                "MC 304.10"
+              ]
+            },
+            {
+              "criterion": "The support must be in accordance with the manufacturer\u2019s instructions; the stated height alone does not establish that condition.",
+              "sourceReferences": [
+                "MC 304.10"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not say the exact 3-inch height is below the stated minimum.",
+            "Do not conclude that the entire installation complies solely from the height."
+          ],
+          "genuineUnknowns": [
+            "Whether the support is in accordance with the manufacturer\u2019s instructions is not stated."
+          ],
+          "neededReferences": [
+            "Applicable manufacturer\u2019s instructions for the supported equipment or appliance, if a whole-installation compliance determination is requested."
+          ],
+          "reasoning": "The numeric condition is a minimum, not a requirement to exceed 3 inches. The hypothetical asks whether the height alone is below that minimum; the separate manufacturer-instructions condition remains relevant to full compliance."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "d7bea015-fba6-4d32-b4d4-112d458262f4",
+        "round": 0,
+        "sourceHashes": {
+          "PC 503.1": "18c7e658b77f376f94a29b62f3e04118483b5fb522dc1719d7f8c6acde31d611",
+          "PC 504.6": "441faeacb333ea9948b1512b362b1ce01f64b5727f0e886d892f09dd0ea7ffb1",
+          "PC 905.4": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13"
+        }
+      }
+    },
+    {
+      "id": "acceptance-environmental-exhaust",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "MC 501.3.1 item 3 sets the ordinary environmental-air exhaust distances: 3 feet from lot-separating property lines; 3 feet from operable building openings except in Group U; and 10 feet from mechanical air intakes. Environmental exhaust outlets are not considered hazardous or noxious. The intake-distance exception is limited to the stated same-room, dwelling, or sleeping-unit Class 1 or Class 2 situations and does not waive the property-line or operable-opening distances. Other exhaust categories have distinct requirements. For R-2 and R-3 individual dwelling-unit exhaust, item 6 supplies additional conditions.",
+          "materialChecks": [
+            {
+              "criterion": "State the item 3 environmental-air distances accurately, including the Group U exception for the operable-opening distance, and identify that the 10-foot distance is from mechanical air intakes.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            },
+            {
+              "criterion": "Preserve both intake-separation exception alternatives: a single room, dwelling, or sleeping unit with less than 750 cfm of Class 1 exhaust; or a single dwelling or sleeping unit with less than 400 cfm of Class 2 exhaust. For either alternative, the sum of energy-recovery-device cross contamination and exhaust re-entrainment through the intake must be less than 10% of intake airflow, as established by the manufacturer.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            },
+            {
+              "criterion": "Make clear that the exception removes only the 10-foot mechanical-intake separation; property-line and operable-opening distances remain applicable.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            },
+            {
+              "criterion": "Keep the other categories distinct: item 1 covers noxious, toxic, explosive, or flammable vapor, fume, or dust ducts and specifies its separate distances; item 2 covers other product-conveying outlets and specifies its separate distances. Do not apply either category's distances as the ordinary item 3 environmental-air rule.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            },
+            {
+              "criterion": "If mentioning non-evaporative heat-rejection or heat-absorption appliance discharge, explain that it is not exhaust and has no required intake separation under the stated rule, but its inlet and discharge must not reduce other exhaust-to-intake separation below required minimums.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            },
+            {
+              "criterion": "Preserve the item 6 scope if discussing R-2 or R-3 individual dwelling-unit exhaust: a dedicated fan may exhaust directly outdoors; kitchen and toilet/bath exhaust may combine at one fan only when serving one dwelling unit; the exhaust must be directed away from a window serving that unit and meet the listed distances to windows, doors, other intakes, and the public sidewalk, as well as items 1 through 5.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            },
+            {
+              "criterion": "Identify that Air Class is to be determined in accordance with ASHRAE Standard 62.1, rather than inventing a classification method from this section.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "The intake exception applies at exactly 400 cfm for Class 2 exhaust.",
+            "A cross-contamination and re-entrainment value below 10% alone qualifies for the exception, regardless of the applicable flow threshold or served-space condition.",
+            "The intake exception also waives the property-line or operable-opening distances.",
+            "Environmental-air outlets are subject to the item 1 or item 2 distances merely because those categories appear in the same section.",
+            "The section establishes an Air Class without reference to ASHRAE Standard 62.1."
+          ],
+          "genuineUnknowns": [
+            "The occupancy and configuration of any actual installation are not provided, so whether the special item 6 R-2/R-3 provisions apply to a particular project cannot be determined."
+          ],
+          "neededReferences": [
+            "ASHRAE Standard 62.1, if an Air Class must be determined rather than accepted as an already-established input."
+          ],
+          "reasoning": "The supplied text states the environmental-air distances and the narrow intake exception directly. The strict less-than thresholds and the separate requirement that the combined contamination and re-entrainment be less than 10% must both be preserved. Item 6 is a conditional special regime, not a basis for changing the ordinary item 3 rule."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. Exactly 400 cfm is not less than 400 cfm, so the stated Class 2 alternative is not met. The 5% contamination-plus-re-entrainment figure satisfies the separate less-than-10% condition, but does not cure failure of the flow threshold. The intake-separation exception therefore is not established on these facts.",
+          "materialChecks": [
+            {
+              "criterion": "Treat the Class 2 threshold as strictly less than 400 cfm; exactly 400 cfm does not qualify.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            },
+            {
+              "criterion": "Recognize that 5% is below the separate 10% combined cross-contamination and re-entrainment ceiling, while explaining that all exception conditions must be satisfied.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            },
+            {
+              "criterion": "Conclude that the exception is not established and that the normal mechanical-intake separation remains applicable; do not suggest the exception waives property-line or operable-opening distances.",
+              "sourceReferences": [
+                "MC 501.3.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Exactly 400 cfm satisfies the Class 2 exception threshold.",
+            "The 5% figure makes the hypothetical eligible despite the unmet flow threshold.",
+            "Failure of this exception establishes that every other aspect of a particular installation is noncompliant."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The hypothetical supplies the relevant served-dwelling context, exhaust class, flow, and combined percentage. The exact boundary fails the text's strict less-than-400-cfm condition, even though the percentage condition is met."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "40dd670d-a266-4d97-9281-aba4f52556a9",
+        "round": 0,
+        "sourceHashes": {
+          "MC 501.3.1": "e818e378f393ae0d9850683d4a17d53b82861f33efb5bc013478490e33a7d393",
+          "MC 505.1": "19bb5461d87fb1807a9399ca7ed55f8e87efadefe0eabd21a7fb5d72b2a62d3e",
+          "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce",
+          "FGC 406.3.3": "75b00094b32af13a533e4a88ccba08836b49bbe2826a9b535ffbcbaa230f9c4d"
+        }
+      }
+    },
+    {
+      "id": "acceptance-domestic-hood",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "MC 505.1 generally requires domestic range hoods and domestic appliances equipped with downdraft exhaust to discharge outdoors through galvanized steel, stainless steel, aluminum, or copper ducts. The ducts must have smooth inner walls, be airtight, have a backdraft damper, and be independent of other exhaust systems; installation must strictly comply with the manufacturer's instructions and the listing. The ductless exception is limited to locations other than Groups I-1 and I-2 and requires a listed and labeled hood, compliance with manufacturer instructions, and otherwise-provided mechanical or natural ventilation under Chapter 4. A separate exception permits Schedule 40 PVC for ducts serving domestic cooking appliances with downdraft exhaust, but only if all five listed installation conditions are met.",
+          "materialChecks": [
+            {
+              "criterion": "State the outdoor-discharge default and permitted duct materials: galvanized steel, stainless steel, aluminum, or copper.",
+              "sourceReferences": [
+                "MC 505.1"
+              ]
+            },
+            {
+              "criterion": "Preserve the duct requirements: smooth inner walls, airtight construction, a backdraft damper, independence from all other exhaust systems, and strict compliance with manufacturer instructions and the listing.",
+              "sourceReferences": [
+                "MC 505.1"
+              ]
+            },
+            {
+              "criterion": "Limit the ductless exception to locations other than Group I-1 and I-2, and retain all its conditions: listed and labeled ductless range hood, installation in accordance with manufacturer instructions, and mechanical or natural ventilation otherwise provided in accordance with Chapter 4.",
+              "sourceReferences": [
+                "MC 505.1"
+              ]
+            },
+            {
+              "criterion": "Limit the PVC alternative to ducts for domestic kitchen cooking appliances equipped with downdraft exhaust; specify Schedule 40 PVC pipe and fittings and preserve all conditions: installation under a concrete slab poured on grade; trench completely backfilled with sand or gravel; no more than 1 inch above the indoor concrete floor; no more than 1 inch above exterior grade; and solvent-cemented ducts.",
+              "sourceReferences": [
+                "MC 505.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "The ductless exception applies in Group I-1 or Group I-2.",
+            "Any ductless hood qualifies without being listed and labeled or without the specified instructions and ventilation conditions.",
+            "The PVC alternative applies to ordinary range-hood ducts generally, rather than the stated domestic downdraft appliances.",
+            "The PVC alternative is unconditional or permits omission of any listed installation condition."
+          ],
+          "genuineUnknowns": [
+            "The question does not identify a particular hood or duct installation, so project-specific compliance beyond the stated rule is not determined."
+          ],
+          "neededReferences": [
+            "MC Chapter 4, if determining whether particular mechanical or natural ventilation satisfies the ductless exception's ventilation condition."
+          ],
+          "reasoning": "The section gives a general outdoor-duct rule and two separate exceptions with distinct scopes. The ductless exception is occupancy-limited, while the PVC exception is limited to domestic downdraft cooking appliances and has five cumulative conditions."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. Group I-2 is expressly excluded from the ductless exception. Following the manufacturer's instructions and having otherwise-provided ventilation do not overcome that occupancy limitation.",
+          "materialChecks": [
+            {
+              "criterion": "Recognize that the ductless exception is available only in occupancies other than Group I-1 and I-2; therefore the stated Group I-2 facts do not establish eligibility.",
+              "sourceReferences": [
+                "MC 505.1"
+              ]
+            },
+            {
+              "criterion": "Do not treat compliance with manufacturer instructions and otherwise-provided ventilation as sufficient to override the Group I-2 exclusion.",
+              "sourceReferences": [
+                "MC 505.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "The hypothetical qualifies for the ductless exception because the hood is listed, instructions are followed, and ventilation is otherwise provided.",
+            "The Group I-2 exclusion is waived by manufacturer instructions or ventilation."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The occupancy limitation is explicit, and the hypothetical identifies the excluded occupancy. The other stated conditions do not displace that limitation."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "40dd670d-a266-4d97-9281-aba4f52556a9",
+        "round": 0,
+        "sourceHashes": {
+          "MC 501.3.1": "e818e378f393ae0d9850683d4a17d53b82861f33efb5bc013478490e33a7d393",
+          "MC 505.1": "19bb5461d87fb1807a9399ca7ed55f8e87efadefe0eabd21a7fb5d72b2a62d3e",
+          "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce",
+          "FGC 406.3.3": "75b00094b32af13a533e4a88ccba08836b49bbe2826a9b535ffbcbaa230f9c4d"
+        }
+      }
+    },
+    {
+      "id": "acceptance-sediment-trap",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "Under FGC 408.4, when a sediment trap is not incorporated into the appliance, one must be installed downstream of the appliance shutoff valve and as close to the appliance inlet as practical. It may be a tee fitting with a capped nipple of any length installed vertically in the tee's bottommost opening, or another device approved as an effective sediment trap. The named exclusions are illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces, and outdoor grills.",
+          "materialChecks": [
+            {
+              "criterion": "State the trigger: the requirement applies where a sediment trap is not incorporated as part of the appliance.",
+              "sourceReferences": [
+                "FGC 408.4"
+              ]
+            },
+            {
+              "criterion": "State the location as downstream of the appliance shutoff valve and as close to the appliance inlet as practical.",
+              "sourceReferences": [
+                "FGC 408.4"
+              ]
+            },
+            {
+              "criterion": "Describe the permitted tee form accurately: a capped nipple of any length installed vertically in the bottommost tee opening; alternatively, another device approved as an effective sediment trap is permitted.",
+              "sourceReferences": [
+                "FGC 408.4"
+              ]
+            },
+            {
+              "criterion": "List the stated exclusions without adding others: illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces, and outdoor grills.",
+              "sourceReferences": [
+                "FGC 408.4"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "The trap may be installed upstream of the appliance shutoff valve under the stated rule.",
+            "Any unapproved device automatically qualifies as an effective sediment trap.",
+            "A furnace is among the named exclusions.",
+            "A capped nipple of a specified minimum length is required."
+          ],
+          "genuineUnknowns": [
+            "No particular installation layout is provided, so what location is as close to a specific appliance inlet as practical cannot be evaluated."
+          ],
+          "neededReferences": [],
+          "reasoning": "The location, alternative forms, and exclusions are expressly given in the supplied section. No additional code source is necessary to state this rule."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. For an ordinary furnace with no incorporated sediment trap, the stated rule requires the trap downstream of the appliance shutoff valve. Placing it upstream does not meet that location requirement.",
+          "materialChecks": [
+            {
+              "criterion": "Apply the default rule because the hypothetical says the furnace has no incorporated sediment trap and does not identify it as one of the listed exclusions.",
+              "sourceReferences": [
+                "FGC 408.4"
+              ]
+            },
+            {
+              "criterion": "Conclude that an upstream-of-shutoff-valve trap fails the stated downstream location requirement.",
+              "sourceReferences": [
+                "FGC 408.4"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "An upstream trap meets the stated location rule.",
+            "An ordinary furnace is among the named exclusions.",
+            "The section alone establishes compliance with every other gas-appliance installation requirement."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The hypothetical supplies the relevant trigger and proposed location. The specified direction relative to the shutoff valve is unambiguous."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "40dd670d-a266-4d97-9281-aba4f52556a9",
+        "round": 0,
+        "sourceHashes": {
+          "MC 501.3.1": "e818e378f393ae0d9850683d4a17d53b82861f33efb5bc013478490e33a7d393",
+          "MC 505.1": "19bb5461d87fb1807a9399ca7ed55f8e87efadefe0eabd21a7fb5d72b2a62d3e",
+          "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce",
+          "FGC 406.3.3": "75b00094b32af13a533e4a88ccba08836b49bbe2826a9b535ffbcbaa230f9c4d"
+        }
+      }
+    },
+    {
+      "id": "acceptance-test-isolation",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "Under FGC 406.3.3, when the piping system is connected to appliances or equipment designed for operating pressures below the test pressure, those appliances or equipment must be isolated by disconnecting them and capping their outlets. When gas is energized, the affected piping and joints must be checked with noncorrosive leak-detecting fluid or another approved leak-detecting method.",
+          "materialChecks": [
+            {
+              "criterion": "Preserve the trigger: the piping is connected to appliances or equipment designed for operating pressures less than the piping test pressure.",
+              "sourceReferences": [
+                "FGC 406.3.3"
+              ]
+            },
+            {
+              "criterion": "State that isolation is performed by disconnecting the affected appliances or equipment and capping the outlet(s), not merely by leaving them connected and closing a valve.",
+              "sourceReferences": [
+                "FGC 406.3.3"
+              ]
+            },
+            {
+              "criterion": "Include the later check: affected piping and joints are checked when gas is energized, using noncorrosive leak-detecting fluid or another approved leak-detecting method.",
+              "sourceReferences": [
+                "FGC 406.3.3"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Closing an appliance valve while leaving the appliance connected substitutes for the stated disconnection-and-capping procedure.",
+            "The leak check is optional or must be performed only before gas is energized.",
+            "The section supplies a specific test pressure or a complete test protocol beyond the stated isolation and leak-check requirements."
+          ],
+          "genuineUnknowns": [
+            "The actual test pressure and equipment operating-pressure ratings are not provided, so whether this trigger applies to a particular installation cannot be determined without those facts."
+          ],
+          "neededReferences": [],
+          "reasoning": "The section directly states the pressure condition, required isolation method, and leak-check timing and methods. It does not state a numerical test pressure."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. Leaving the equipment connected and relying on its closed valve, without disconnection or an outlet cap, does not perform the isolation procedure stated in FGC 406.3.3. The affected piping and joints also remain subject to the stated leak check when gas is energized.",
+          "materialChecks": [
+            {
+              "criterion": "Conclude that leaving the equipment connected and closing its valve does not meet the stated requirement to disconnect the equipment and cap its outlet(s).",
+              "sourceReferences": [
+                "FGC 406.3.3"
+              ]
+            },
+            {
+              "criterion": "Retain the requirement to check affected piping and joints with a stated leak-detection method when gas is energized.",
+              "sourceReferences": [
+                "FGC 406.3.3"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "A closed valve alone performs the procedure stated in this section.",
+            "Omitting disconnection and outlet capping is acceptable under the supplied text."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The hypothetical expressly omits both required isolation steps. The section provides no alternative permitting a connected appliance to be protected solely by closing its valve."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "40dd670d-a266-4d97-9281-aba4f52556a9",
+        "round": 0,
+        "sourceHashes": {
+          "MC 501.3.1": "e818e378f393ae0d9850683d4a17d53b82861f33efb5bc013478490e33a7d393",
+          "MC 505.1": "19bb5461d87fb1807a9399ca7ed55f8e87efadefe0eabd21a7fb5d72b2a62d3e",
+          "FGC 408.4": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce",
+          "FGC 406.3.3": "75b00094b32af13a533e4a88ccba08836b49bbe2826a9b535ffbcbaa230f9c4d"
+        }
+      }
+    },
+    {
+      "id": "acceptance-mp-regulator",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "FGC 410.2 sets separate MP-regulator requirements for approval and pressure suitability, reduced outlet pressure under lockup, capacity, access and indoor venting or leak limitation, two instrument-capable tee fittings with different locations and purposes, and a union near the regulator. The stated text requires the downstream tee to be at least 10 pipe diameters from the outlet; it does not describe a gauge as a substitute for that tee or its location.",
+          "materialChecks": [
+            {
+              "criterion": "The regulator must be approved and suitable for the application's inlet and outlet gas pressures.",
+              "sourceReferences": [
+                "FGC 410.2"
+              ]
+            },
+            {
+              "criterion": "The regulator must maintain reduced outlet pressure under lockup (no-flow) conditions; its manufacturer-published capacity must be adequate for the appliances served.",
+              "sourceReferences": [
+                "FGC 410.2"
+              ]
+            },
+            {
+              "criterion": "The regulator must have access. If indoors, it must be vented outdoors or equipped with a leak-limiting device; either option must comply with Section 410.3.",
+              "sourceReferences": [
+                "FGC 410.2"
+              ]
+            },
+            {
+              "criterion": "A tee with one opening capped or plugged must be between the regulator and its upstream shutoff valve, positioned to permit connection of a pressure-measuring instrument and to serve as a sediment trap.",
+              "sourceReferences": [
+                "FGC 410.2"
+              ]
+            },
+            {
+              "criterion": "A separate tee with one opening capped or plugged must be at least 10 pipe diameters downstream of the regulator outlet and positioned to permit connection of a pressure-measuring instrument. A pressure gauge with an isolation valve may also be installed in addition to that fitting.",
+              "sourceReferences": [
+                "FGC 410.2"
+              ]
+            },
+            {
+              "criterion": "At least one union must be installed within 1 foot of either side of the regulator. Do not restate this as requiring a union on both sides.",
+              "sourceReferences": [
+                "FGC 410.2"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not treat the upstream sediment-trap tee and the downstream instrument tee as the same requirement.",
+            "Do not state that the downstream tee may be closer than 10 pipe diameters because a gauge is installed.",
+            "Do not say the indoor vent or leak-limiting option is unconditional; the text requires compliance with Section 410.3.",
+            "Do not claim that the supplied section establishes project-wide compliance."
+          ],
+          "genuineUnknowns": [
+            "The supplied text does not give the detailed requirements of Section 410.3.",
+            "The supplied text does not establish whether a particular installation satisfies the regulator, appliance-capacity, access, or other project-specific conditions."
+          ],
+          "neededReferences": [
+            "FGC 410.3, if the detailed requirements for indoor venting or leak-limiting devices are to be explained."
+          ],
+          "reasoning": "The supplied section expressly states each listed requirement and differentiates the upstream tee's sediment-trap purpose from the downstream tee's instrument-connection purpose. Its downstream minimum is 10 pipe diameters, and it describes the gauge as an additional installation."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. At eight pipe diameters, the downstream tee is short of the stated 10-pipe-diameter minimum. Adding a pressure gauge does not cure that distance; the text permits the gauge in addition to the fitting.",
+          "materialChecks": [
+            {
+              "criterion": "The required downstream tee must be not less than 10 pipe diameters downstream of the MP-regulator outlet.",
+              "sourceReferences": [
+                "FGC 410.2"
+              ]
+            },
+            {
+              "criterion": "A pressure gauge with an isolation valve may be installed in addition to the downstream tee; the text does not provide that gauge as an alternative to the tee or its minimum distance.",
+              "sourceReferences": [
+                "FGC 410.2"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not say the gauge makes an eight-diameter tee compliant with the stated location requirement.",
+            "Do not change the stated 10-pipe-diameter minimum."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The supplied text requires the tee itself at least 10 pipe diameters downstream and characterizes the gauge as an additional fitting."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "4c6d179c-61ca-44ad-93c6-d704f227b8ef",
+        "round": 0,
+        "sourceHashes": {
+          "FGC 410.2": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+          "BC 1013.1": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+          "BC 1014.2": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+          "BC 1014.6": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc"
+        }
+      }
+    },
+    {
+      "id": "acceptance-exit-sign-distance",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "BC 1013.1 requires approved exit signs readily visible from any direction of egress travel and sets additional marking requirements where exits or paths are not immediately visible, including marking intervening means-of-egress doors within exits. In exit access corridors and exit passageways, no point may be farther from the nearest visible sign than the lesser of 100 feet and the sign's listed viewing distance. The section lists four exceptions, with the qualifications stated in the text.",
+          "materialChecks": [
+            {
+              "criterion": "Exits and exit access doors must be marked by an approved exit sign readily visible from any direction of egress travel.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            },
+            {
+              "criterion": "Where an exit or egress path is not immediately visible to occupants, readily visible signs must mark the path to exits and within exits to clearly indicate direction of travel; intervening means-of-egress doors within exits must be marked.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            },
+            {
+              "criterion": "In an exit access corridor or exit passageway, the maximum distance to the nearest visible exit sign is the lesser of 100 feet and the sign's listed viewing distance.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            },
+            {
+              "criterion": "Exception 1: signs are not required in rooms or areas requiring only one exit or exit access.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            },
+            {
+              "criterion": "Exception 2: signs are not required in Group U occupancies or individual sleeping units or dwelling units in Group I-1 or R; however, congregate living units with occupancy exceeding four people must have signs.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            },
+            {
+              "criterion": "Exception 3: signs are not required in dayrooms, sleeping rooms, or dormitories in Group I-3 occupancies.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            },
+            {
+              "criterion": "Exception 4: in Groups A-4 and A-5, signs are not required on the seating side of vomitories or openings into seating areas when signs in the concourse are readily apparent from the vomitories; those vomitories must have emergency egress lighting identifying each vomitory or opening within the seating area.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not describe the spacing limit as always 100 feet; the listed viewing distance controls when it is shorter.",
+            "Do not omit the conditions or emergency-lighting requirement attached to the Group A-4 and A-5 exception.",
+            "Do not treat the listed exceptions as applying to situations beyond their stated categories and conditions."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "BC 1013.1 supplies both the general marking provisions and the full stated distance formula and exceptions. Applying an exception to a particular project would require facts about its occupancy and layout."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. With a listed viewing distance of 75 feet, the applicable maximum is the lesser of 100 feet and 75 feet: 75 feet. A point 90 feet from the nearest visible sign exceeds that limit, even though it is below 100 feet.",
+          "materialChecks": [
+            {
+              "criterion": "The corridor distance limit is the lesser of 100 feet and the sign's listed viewing distance.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            },
+            {
+              "criterion": "For a 75-foot listed viewing distance, a point 90 feet from the nearest visible sign exceeds the 75-foot limit.",
+              "sourceReferences": [
+                "BC 1013.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not conclude that being below 100 feet is sufficient when the listed viewing distance is 75 feet.",
+            "Do not apply an exception; the hypothetical states that none applies."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The stated formula yields a 75-foot maximum. The hypothetical 90-foot distance exceeds it."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "4c6d179c-61ca-44ad-93c6-d704f227b8ef",
+        "round": 0,
+        "sourceHashes": {
+          "FGC 410.2": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+          "BC 1013.1": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+          "BC 1014.2": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+          "BC 1014.6": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc"
+        }
+      }
+    },
+    {
+      "id": "acceptance-handrail-height",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "For ordinary stairs and ramps, handrail height must be uniform and 34\u201338 inches inclusive, measured above stair-tread nosings or the ramp slope\u2019s finished surface, respectively. Alternating tread devices and ships ladders instead have a uniform 30\u201334-inch range measured above tread nosings. The stated fitting and bending exceptions permit exceeding the 38-inch maximum only in their specified circumstances; the guard-top alternative is limited to when permitted for stepped or ramped aisles under Section 1029.15.",
+          "materialChecks": [
+            {
+              "criterion": "State the ordinary 34-inch minimum and 38-inch maximum, the uniformity requirement, and the correct stair and ramp measurement surfaces.",
+              "sourceReferences": [
+                "BC 1014.2"
+              ]
+            },
+            {
+              "criterion": "State the distinct 30\u201334-inch range for alternating tread devices and ships ladders, measured above tread nosings.",
+              "sourceReferences": [
+                "BC 1014.2"
+              ]
+            },
+            {
+              "criterion": "Explain that fittings or bendings providing a continuous transition between flights may exceed the maximum height.",
+              "sourceReferences": [
+                "BC 1014.2"
+              ]
+            },
+            {
+              "criterion": "Explain that, in Group R-3 occupancies, within Group R-2 dwelling units, and in the specified Group U occupancies associated with them, fittings or bendings may exceed the maximum when used for continuous transition between flights, transition at winder treads, transition from handrail to guard, or at the start of a flight.",
+              "sourceReferences": [
+                "BC 1014.2"
+              ]
+            },
+            {
+              "criterion": "State that a guard\u2019s top surface may be used as a handrail along stepped or ramped aisles only where permitted under Section 1029.15; the supplied text does not set a separate numerical height range for that alternative.",
+              "sourceReferences": [
+                "BC 1014.2",
+                "BC 1029.15"
+              ]
+            },
+            {
+              "criterion": "When describing the Section 1029.15 guard condition, identify the supplied condition: a guard at the side of the aisle whose top surface complies with the handrail-graspability requirements referenced in Section 1014.3. Do not invent the details of those referenced requirements.",
+              "sourceReferences": [
+                "BC 1029.15",
+                "BC 1014.3"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not treat 38 inches as exceeding the ordinary maximum; the ordinary range includes 38 inches.",
+            "Do not extend the fitting or bending exceptions beyond exceeding the maximum height or beyond their stated uses and occupancy scope.",
+            "Do not imply that Section 1029.15 permits the guard-top alternative without its stated aisle and graspability conditions.",
+            "Do not supply unstated details of the referenced graspability provisions."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "BC 1014.2 supplies the measurement points, uniformity requirement, both numerical ranges, and the fitting, bending, and guard-top exceptions. BC 1029.15 supplies the aisle context and guard condition; BC 1014.3 identifies the graspability reference but does not provide its detailed criteria."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. Thirty-eight inches is exactly the ordinary maximum, not more than it. On the stated facts, the fitting and bending exceptions are unnecessary to reach that conclusion.",
+          "materialChecks": [
+            {
+              "criterion": "Compare the stated 38-inch height with the ordinary maximum of 38 inches and conclude it does not exceed that maximum.",
+              "sourceReferences": [
+                "BC 1014.2"
+              ]
+            },
+            {
+              "criterion": "Do not apply an exception that permits exceeding the maximum where the stated ordinary handrail has no special fitting or bending condition.",
+              "sourceReferences": [
+                "BC 1014.2"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not say that an exactly 38-inch ordinary handrail exceeds the maximum.",
+            "Do not make a conclusion about whole-project compliance from the height fact alone."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The supplied rule says ordinary handrail height must be not more than 38 inches. The hypothetical gives exactly 38 inches, so it is within the stated numerical limit; that comparison alone is not a whole-system compliance determination."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-continuation-20261005",
+        "callID": "eefe6517-f4b2-4037-ab9c-0cb43b7a2249",
+        "round": 1,
+        "sourceHashes": {
+          "FGC 410.2": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+          "BC 1013.1": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+          "BC 1014.2": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+          "BC 1014.6": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc",
+          "BC 1029.15": "d5ba50e5d03575642f94570cf882bb9eecb71e4fbac2ca5a99f6bb3b21c08d62",
+          "BC 1107.2.5": "0c7c0b74f62bbec2f1787faf6ffaf8c53398dfb874e499443997ff03fc0ffa89",
+          "BC 1014.3": "7a7df6717b61d3be273bb6a0bb2b47d563085e2de300267b2b622f72d6f10e0c"
+        }
+      }
+    },
+    {
+      "id": "acceptance-handrail-extension",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "Handrails must return to a wall, guard, or walking surface, or be continuous to the handrail of an adjacent stair flight or ramp run. Where stair handrails are not continuous between flights, they must extend horizontally at least 12 inches beyond the top riser and continue sloping for one tread\u2019s depth beyond the bottom riser. For ramp handrails not continuous between runs, the minimum horizontal extension above the landing is 12 inches beyond both the top and bottom of the runs. Extensions follow the direction of the stair flights or ramp runs. Section 1014.6 provides the listed exceptions, including limited dwelling-unit exceptions, assembly-aisle treatment under Section 1029.15, and alternating-tread-device/ships-ladder rules.",
+          "materialChecks": [
+            {
+              "criterion": "State the general return-or-continuity requirement: return to a wall, guard, or walking surface, or continue to the handrail of an adjacent stair flight or ramp run.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "For stair handrails not continuous between flights, state both the minimum 12-inch horizontal extension beyond the top riser and the sloping continuation for a depth of one tread beyond the bottom riser.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "For ramp handrails not continuous between runs, state the minimum 12-inch horizontal extension above the landing beyond both the top and bottom of the ramp runs.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "State that stair extensions follow the direction of the stair flights and ramp extensions follow the direction of the ramp runs.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "Describe Exception 1 exactly: a handrail within a dwelling unit that is not an Accessible unit, Type B+NYC unit, or Type B unit need extend only from the top riser to the bottom riser.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "Describe Exception 2 exactly: a handrail within a Type B+NYC multistory dwelling unit complying with Section 1107.2.5, Items 1 through 3, need extend only from the top riser to the bottom riser. Do not replace that cross-reference with unstated criteria.",
+              "sourceReferences": [
+                "BC 1014.6",
+                "BC 1107.2.5"
+              ]
+            },
+            {
+              "criterion": "State that handrails serving assembly-purpose aisles may comply with Section 1029.15; its supplied text says extensions are not required at the top and bottom of stepped and ramped aisles to permit crossovers within the aisles.",
+              "sourceReferences": [
+                "BC 1014.6",
+                "BC 1029.15"
+              ]
+            },
+            {
+              "criterion": "State the alternating-tread-device and ships-ladder exception: handrails may terminate vertically above the top and bottom risers, need not be continuous between flights, and need not extend beyond the risers.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "When explaining the assembly-aisle exception, preserve the supplied Section 1029.15 scope: it addresses stepped aisles and ramped aisles exceeding a 1:15 slope, and the stated no-extension condition is to permit crossovers within the aisles.",
+              "sourceReferences": [
+                "BC 1014.6",
+                "BC 1029.15"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not say that a 12-inch top extension alone meets the stair rule for handrails that are not continuous between flights; the rule separately requires a sloping continuation beyond the bottom riser.",
+            "Do not substitute the ramp extension rule for the stair extension rule, or vice versa.",
+            "Do not apply a listed exception without its stated type, occupancy, or other condition.",
+            "Do not describe the Section 1029.15 crossover exception as a general exception for all stairs, ramps, or handrails.",
+            "Do not infer additional requirements from Section 1107.2.5 beyond the cross-reference and supplied text."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "BC 1014.6 states the general return/continuity rule, separate stair and ramp extension dimensions, direction, and four exceptions. The supplied BC 1029.15 and BC 1107.2.5 texts allow the referenced exception conditions to be described within those limits."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. For the stated ordinary noncontinuous-stair case, the 12-inch horizontal top extension meets the top-extension requirement only. The handrail must also continue to slope for a depth of one tread beyond the bottom riser; terminating at the bottom riser does not satisfy that requirement. The hypothetical excludes the listed exceptions.",
+          "materialChecks": [
+            {
+              "criterion": "Conclude that the top extension alone does not satisfy both ends under the stair rule for handrails not continuous between flights.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "Recognize that the stated 12-inch horizontal extension beyond the top riser meets the top dimension only.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "Identify the unmet bottom requirement: continue to slope for a depth of one tread beyond the bottom riser, rather than terminate at the bottom riser.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            },
+            {
+              "criterion": "Do not rely on a Section 1014.6 exception because the hypothetical says no listed exception applies.",
+              "sourceReferences": [
+                "BC 1014.6"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not conclude that the top extension alone satisfies both the top and bottom stair requirements.",
+            "Do not apply the ramp rule requiring horizontal extensions beyond both ends of ramp runs to this stair.",
+            "Do not claim a whole-project compliance result beyond the stated extension issue."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "For the stated ordinary noncontinuous stair, BC 1014.6 separately requires the top horizontal extension and the bottom sloping continuation. The hypothetical has the former but terminates at the bottom riser, and rules out the listed exceptions."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-continuation-20261005",
+        "callID": "eefe6517-f4b2-4037-ab9c-0cb43b7a2249",
+        "round": 1,
+        "sourceHashes": {
+          "FGC 410.2": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+          "BC 1013.1": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+          "BC 1014.2": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+          "BC 1014.6": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc",
+          "BC 1029.15": "d5ba50e5d03575642f94570cf882bb9eecb71e4fbac2ca5a99f6bb3b21c08d62",
+          "BC 1107.2.5": "0c7c0b74f62bbec2f1787faf6ffaf8c53398dfb874e499443997ff03fc0ffa89",
+          "BC 1014.3": "7a7df6717b61d3be273bb6a0bb2b47d563085e2de300267b2b622f72d6f10e0c"
+        }
+      }
+    },
+    {
+      "id": "acceptance-exit-enclosure",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "BC 1023.2 requires interior exit stairway and ramp enclosures to be fire barriers under Section 707, horizontal assemblies under Section 711, or both. The minimum rating is 2 hours when the enclosure connects four or more stories and 1 hour when it connects fewer than four. Count basements, but not mezzanines. The rating must also be at least that of the penetrated floor assembly, but need not exceed 2 hours. In Group R-1 and R-2 occupancies, an enclosure required to be rated 2 hours must be masonry or masonry equivalent, with masonry-equivalent wall assemblies constructed under department rules. The stated exceptions concern I-3 occupancies under Section 408.3.8 and interior exit stairs within atriums enclosed under Section 404.6.",
+          "materialChecks": [
+            {
+              "criterion": "Identifies the permitted enclosure construction as a fire barrier under Section 707, a horizontal assembly under Section 711, or both.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            },
+            {
+              "criterion": "States the minimum rating thresholds accurately: 2 hours for four or more connected stories and 1 hour for fewer than four.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            },
+            {
+              "criterion": "Counts basements among connected stories and excludes mezzanines.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            },
+            {
+              "criterion": "States that the enclosure rating must be no less than the penetrated floor assembly rating, subject to a maximum requirement of 2 hours.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            },
+            {
+              "criterion": "Preserves the R-1/R-2 qualification: masonry or masonry equivalent is required when the enclosure is required to have a 2-hour rating; masonry-equivalent walls must comply with department rules.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            },
+            {
+              "criterion": "Identifies both stated exceptions and their limits: I-3 under Section 408.3.8, and interior exit stairs within an atrium enclosed under Section 404.6.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not count only above-grade stories or exclude basements from the story count.",
+            "Do not say the less-than-four-story rating necessarily controls without also applying the penetrated-floor comparison.",
+            "Do not describe the 2-hour rating as an unqualified universal requirement or the floor comparison as permitting a rating above 2 hours.",
+            "Do not extend the R-1/R-2 masonry condition to enclosures not required to have a 2-hour rating."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The supplied text states the construction alternatives, rating thresholds, counting rule, floor-assembly comparison, occupancy-specific masonry condition, and exceptions directly."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "The enclosure connects four stories for BC 1023.2 purposes because the basement counts. It therefore requires at least a 2-hour rating; three above-grade stories alone do not justify using the less-than-four-story rating. The enclosure must also be rated at least as highly as the penetrated floor assembly, but need not exceed 2 hours. The hypothetical excludes the two stated exceptions.",
+          "materialChecks": [
+            {
+              "criterion": "Counts the one basement together with the three above-grade stories, giving four connected stories.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            },
+            {
+              "criterion": "Concludes that the stated story-count rule requires a minimum 2-hour rating, rather than the 1-hour less-than-four-story rating.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            },
+            {
+              "criterion": "Rejects above-grade-story counting as a basis for using the less-than-four-story rating, while retaining the penetrated-floor comparison and 2-hour cap.",
+              "sourceReferences": [
+                "BC 1023.2"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not approve the less-than-four-story rating solely because only three stories are above grade.",
+            "Do not claim a 2-hour rating necessarily satisfies the floor-assembly comparison without knowing the penetrated floor assembly rating.",
+            "Do not invoke either exception, which the hypothetical expressly excludes."
+          ],
+          "genuineUnknowns": [
+            "The penetrated floor assembly rating is not given, so the final rating required by the floor-assembly comparison cannot be determined beyond the 2-hour minimum and the provision's 2-hour cap."
+          ],
+          "neededReferences": [],
+          "reasoning": "The supplied counting rule expressly includes basements. Thus the four-story threshold applies; a separate floor-assembly comparison remains part of the stated rule."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "30350eea-6b63-46ba-861d-db0ba90a7a58",
+        "round": 0,
+        "sourceHashes": {
+          "BC 1023.2": "c4de89a4305c373fd0b9eebe68666040acb58d162e0ff1c171bad8e379598008",
+          "AC 28-105.1": "11adc798ab9699efa69395ba0a219bf375106afa82391557b4f8039b9c75c3d9",
+          "AC 28-106.1": "6639a6814c6a89d15ce0cc23341d2d9e84434fa3ac416df991c6f804f80adc16",
+          "FC 311": "bd3f7fecb9f15e0266fbadf4eee89a8300772c893499639b4a72337415f4a30a"
+        }
+      }
+    },
+    {
+      "id": "acceptance-permit-basis",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "The supplied general rule makes the listed construction, alteration, repair, movement, demolition, removal, use/occupancy-change, sign, service-equipment, and specified system work unlawful unless and until the commissioner issues a written permit under the code. The rule is subject to exceptions and exemptions provided in AC 28-105.4. That cross-reference identifies possible permit exemptions; it does not itself establish that a particular job qualifies for one or constitute approval of that job. The supplied text does not provide facts to determine a project's exemption eligibility.",
+          "materialChecks": [
+            {
+              "criterion": "State the written-permit requirement, the commissioner as issuer, and the \u201cunless and until\u201d condition for the work described in AC 28-105.1.",
+              "sourceReferences": [
+                "AC 28-105.1"
+              ]
+            },
+            {
+              "criterion": "Explain that the general rule is subject to exceptions and exemptions provided in AC 28-105.4; do not treat the cross-reference alone as project-specific eligibility or approval.",
+              "sourceReferences": [
+                "AC 28-105.1",
+                "AC 28-105.4"
+              ]
+            },
+            {
+              "criterion": "Preserve that AC 28-105.4 says exemptions do not authorize work violating applicable code, zoning, other laws, or departmental rules, and do not relieve obligations to comply with or file with other city agencies.",
+              "sourceReferences": [
+                "AC 28-105.4"
+              ]
+            },
+            {
+              "criterion": "Do not assert that a particular job is exempt or approved without facts establishing that an applicable exemption's conditions are met.",
+              "sourceReferences": [
+                "AC 28-105.4"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Every job necessarily requires a permit without exception.",
+            "The cross-reference to AC 28-105.4 itself grants a permit, approval, or exemption to a particular job.",
+            "A permit exemption authorizes work in violation of other applicable requirements or eliminates obligations involving other city agencies."
+          ],
+          "genuineUnknowns": [
+            "Whether any specific job falls within an exemption, including any applicable conditions not set out in the supplied text."
+          ],
+          "neededReferences": [],
+          "reasoning": "AC 28-105.1 states the broad written-permit rule and expressly makes it subject to AC 28-105.4. AC 28-105.4 lists categories for which permits are not required unless otherwise indicated, while expressly limiting the legal effect of exemptions. No project facts or claim of project-specific qualification are supplied."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. The supplied current consolidated wording and amendment dates do not establish the exact wording of AC 28-105.1 before the December 2025 amendment. They identify enactment/amendment and effective dates, but do not reproduce the earlier text.",
+          "materialChecks": [
+            {
+              "criterion": "Conclude that the exact pre-amendment wording cannot be established solely from the supplied current wording and amendment dates.",
+              "sourceReferences": [
+                "AC 28-105.1"
+              ]
+            },
+            {
+              "criterion": "Do not infer or reconstruct the earlier wording from the amendment citation, effective date, or current provision.",
+              "sourceReferences": [
+                "AC 28-105.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "The current text is necessarily identical to the text immediately before the December 2025 amendment.",
+            "The amendment dates alone establish what language was added, deleted, or otherwise changed."
+          ],
+          "genuineUnknowns": [
+            "The exact version of AC 28-105.1 in force immediately before the December 21, 2025 effective date of the cited amendment."
+          ],
+          "neededReferences": [
+            "The historical text of AC 28-105.1 in force immediately before December 21, 2025, or the relevant original and amendatory enacted text, including L.L. 2024/128 and any referenced Appendix A material needed to identify the changes."
+          ],
+          "reasoning": "The supplied record gives the current consolidated provision and identifies L.L. 2021/126 and L.L. 2024/128 with dates, but supplies no prior version or text of the amendment. Those metadata do not establish the earlier wording."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-continuation-20261005",
+        "callID": "b33e58a3-423f-4dd0-be01-c5af9f4f37cc",
+        "round": 0,
+        "sourceHashes": {
+          "BC 1023.2": "c4de89a4305c373fd0b9eebe68666040acb58d162e0ff1c171bad8e379598008",
+          "AC 28-105.1": "11adc798ab9699efa69395ba0a219bf375106afa82391557b4f8039b9c75c3d9",
+          "AC 28-106.1": "6639a6814c6a89d15ce0cc23341d2d9e84434fa3ac416df991c6f804f80adc16",
+          "FC 311": "bd3f7fecb9f15e0266fbadf4eee89a8300772c893499639b4a72337415f4a30a",
+          "AC 28-105.4": "3fd9a084b04b934e90ac1af2d8bacfb3f2cf06ecc024ed151055318d013dd168"
+        }
+      }
+    },
+    {
+      "id": "acceptance-asbestos-certification",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "For a demolition or alteration permit, AC 28-106.1 bars issuance when the building was constructed pursuant to plans submitted for approval on or before April 1, 1987, unless the applicant submits the asbestos-related certification required by Department of Environmental Protection rules or the commissioner of environmental protection has issued a variance. The supplied provision does not specify the certification's contents. Its amendment citation states an effective date of November 7, 2022.",
+          "materialChecks": [
+            {
+              "criterion": "Limits the described permit condition to demolition or alteration permits for a building constructed pursuant to plans submitted for approval on or before April 1, 1987.",
+              "sourceReferences": [
+                "AC 28-106.1"
+              ]
+            },
+            {
+              "criterion": "States the two alternatives accurately: submission by the applicant of asbestos-related certification as may be required by DEP rules, or a variance issued by the commissioner of environmental protection.",
+              "sourceReferences": [
+                "AC 28-106.1"
+              ]
+            },
+            {
+              "criterion": "States that the amendment citation gives an effective date of November 7, 2022.",
+              "sourceReferences": [
+                "AC 28-106.1"
+              ]
+            },
+            {
+              "criterion": "Does not represent the supplied provision as specifying the certification's content or as establishing that satisfying this condition alone guarantees permit issuance.",
+              "sourceReferences": [
+                "AC 28-106.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not change the threshold from plans submitted on or before April 1, 1987, to plans submitted before that date.",
+            "Do not omit either the certification alternative or the variance alternative.",
+            "Do not claim that the source specifies what the certification must contain, or that this condition is the only requirement for permit issuance."
+          ],
+          "genuineUnknowns": [
+            "The required certification's content is not stated; it depends on the referenced Department of Environmental Protection rules."
+          ],
+          "neededReferences": [
+            "The applicable Department of Environmental Protection rules specifying the asbestos-related certification."
+          ],
+          "reasoning": "The supplied text states the triggering plan-submission date, permit types, alternatives, and amendment effective date, but delegates certification requirements to DEP rules."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. April 1, 1987 is included by the phrase \u201con or before.\u201d On the stated facts, the certification condition applies; without a variance, the applicant must submit the certification required by DEP rules before the commissioner may issue the demolition or alteration permit. The text does not establish that satisfying this condition alone guarantees issuance.",
+          "materialChecks": [
+            {
+              "criterion": "Treats plans submitted exactly April 1, 1987 as within the stated \u201con or before\u201d threshold.",
+              "sourceReferences": [
+                "AC 28-106.1"
+              ]
+            },
+            {
+              "criterion": "Concludes that, with no variance, the asbestos-related certification alternative remains applicable before permit issuance.",
+              "sourceReferences": [
+                "AC 28-106.1"
+              ]
+            },
+            {
+              "criterion": "Limits the conclusion to this permit condition and does not equate satisfaction of it with guaranteed permit issuance.",
+              "sourceReferences": [
+                "AC 28-106.1"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not say that April 1, 1987 is outside the threshold.",
+            "Do not say that no certification is required merely because the plans were submitted on the threshold date.",
+            "Do not claim that the permit must issue once certification is submitted."
+          ],
+          "genuineUnknowns": [
+            "The certification required in the absence of a variance is not specified in the supplied text and depends on DEP rules."
+          ],
+          "neededReferences": [
+            "The applicable Department of Environmental Protection rules specifying the asbestos-related certification."
+          ],
+          "reasoning": "The threshold expressly includes the date itself. The hypothetical removes the variance alternative, leaving the certification alternative, whose specific requirements are delegated to DEP rules."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "30350eea-6b63-46ba-861d-db0ba90a7a58",
+        "round": 0,
+        "sourceHashes": {
+          "BC 1023.2": "c4de89a4305c373fd0b9eebe68666040acb58d162e0ff1c171bad8e379598008",
+          "AC 28-105.1": "11adc798ab9699efa69395ba0a219bf375106afa82391557b4f8039b9c75c3d9",
+          "AC 28-106.1": "6639a6814c6a89d15ce0cc23341d2d9e84434fa3ac416df991c6f804f80adc16",
+          "FC 311": "bd3f7fecb9f15e0266fbadf4eee89a8300772c893499639b4a72337415f4a30a"
+        }
+      }
+    },
+    {
+      "id": "acceptance-vacant-protection",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "FC 311.1 deems any vacant building, structure, premises, or part thereof temporarily unoccupied and generally requires safeguarding and maintenance under the section. It separately provides that if the property has been deemed unsafe under Article 216 of Title 28, it is to be safeguarded and maintained in accordance with applicable Department of Buildings and/or Department of Housing, Preservation and Development requirements. Temporarily unoccupied premises or parts, expressly including tenant spaces, must be secured and protected under the section. Accessible exterior and interior openings must be locked or otherwise protected against unauthorized entry, including entry by tenants. Fire alarm, sprinkler, and standpipe systems must remain operable at all times except as authorized by the commissioner. Fire-resistance-rated partitions, barriers, and walls, including those separating temporarily unoccupied tenant spaces, must be maintained, with openings, joints, and penetrations protected under Building Code Chapter 7. Owners must remove and prevent accumulations of rubbish and combustible waste by regular cleaning; the stated construction-or-repair exception applies when the work is in accordance with the Building Code and waste is controlled and removed under FC 304. FC 311.4 separately addresses hazardous materials: it specifies facility-closure requirements for unsafe vacant premises containing hazardous materials and for temporarily unoccupied premises containing materials regulated by FC Chapter 50, and thereafter requires the premises to be maintained free of hazardous materials, except as approved by the commissioner. Unoccupied tenant spaces in covered malls have additional requirements: no combustible-material storage; maintained fire separation; at least weekly inspection; secured doors; and no rubbish or other combustible waste.",
+          "materialChecks": [
+            {
+              "criterion": "States that vacant premises or parts are deemed temporarily unoccupied, subject to the separately stated unsafe-building direction to applicable DOB and/or HPD requirements under Article 216 of Title 28.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "States that the temporary-unoccupancy requirements cover premises or parts thereof, including tenant spaces.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "Describes the security requirement for exterior and interior openings accessible to unauthorized persons, including tenants.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "States that fire alarm, sprinkler, and standpipe systems must remain operable at all times except as authorized by the commissioner.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "States that rated partitions, barriers, and walls, including those separating temporarily unoccupied tenant spaces, must be maintained, and that openings, joints, and penetrations must be protected under Building Code Chapter 7.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "States the owner\u2019s rubbish and combustible-waste removal and prevention duty, including the limited construction-or-repair exception and its Building Code and FC 304 conditions.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "Distinguishes the hazardous-materials provisions for unsafe vacant premises from those for temporarily unoccupied premises containing materials regulated by FC Chapter 50, and preserves the subsequent free-of-hazardous-materials rule and commissioner-approval qualification.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "Identifies the additional listed requirements for unoccupied tenant spaces in covered malls, including weekly inspections and secured doors.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not treat unsafe-building status as a synonym for temporary unoccupancy or omit the separate DOB/HPD direction in FC 311.1.",
+            "Do not say that vacancy or temporary unoccupancy automatically authorizes fire-protection systems to be disabled.",
+            "Do not omit tenant spaces from the stated scope or limit the opening-security rule to exterior openings.",
+            "Do not state the rubbish exception without its Building Code and FC 304 conditions.",
+            "Do not conflate the distinct hazardous-materials triggers for unsafe vacant premises and temporarily unoccupied premises."
+          ],
+          "genuineUnknowns": [
+            "The specific DOB and/or HPD requirements applicable to premises deemed unsafe are not included in the supplied FC 311 text.",
+            "The text does not resolve every possible interaction between the unsafe-building direction in FC 311.1 and other FC 311 provisions for a property that is both unsafe and temporarily unoccupied."
+          ],
+          "neededReferences": [
+            "Article 216 of Title 28 of the Administrative Code and the specific applicable Department of Buildings and/or Department of Housing, Preservation and Development requirements, if determining the requirements for premises deemed unsafe."
+          ],
+          "reasoning": "FC 311 states general temporary-unoccupancy duties, expressly includes tenant spaces, separately addresses unsafe premises, and supplies additional waste, hazardous-materials, and covered-mall provisions."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. A temporarily unoccupied tenant space remains subject to FC 311.2.2, which requires sprinkler systems to be maintained in operable condition at all times except as authorized by the commissioner. The stated facts provide no such authorization, so vacancy alone does not permit the sprinkler system to be turned off.",
+          "materialChecks": [
+            {
+              "criterion": "Applies the temporary-unoccupancy fire-protection rule to a tenant space.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "Concludes that the sprinkler system must remain operable absent commissioner authorization.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            },
+            {
+              "criterion": "Rejects vacancy alone as an authorization to turn off the sprinkler system.",
+              "sourceReferences": [
+                "FC 311"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not treat vacancy or tenant-space status as an exception to the operability requirement.",
+            "Do not claim that the sprinkler may be turned off under these facts without commissioner authorization."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The supplied text expressly includes tenant spaces within temporary-unoccupancy requirements and permits an exception to operability only when authorized by the commissioner."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "30350eea-6b63-46ba-861d-db0ba90a7a58",
+        "round": 0,
+        "sourceHashes": {
+          "BC 1023.2": "c4de89a4305c373fd0b9eebe68666040acb58d162e0ff1c171bad8e379598008",
+          "AC 28-105.1": "11adc798ab9699efa69395ba0a219bf375106afa82391557b4f8039b9c75c3d9",
+          "AC 28-106.1": "6639a6814c6a89d15ce0cc23341d2d9e84434fa3ac416df991c6f804f80adc16",
+          "FC 311": "bd3f7fecb9f15e0266fbadf4eee89a8300772c893499639b4a72337415f4a30a"
+        }
+      }
+    },
+    {
+      "id": "acceptance-reserved-fire-section",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "The supplied current text for FC 508 is expressly repealed or reserved and contains no operative text. It therefore establishes no substantive requirement. Its title is metadata, not an operative rule.",
+          "materialChecks": [
+            {
+              "criterion": "Identify FC 508 as repealed or reserved, with no operative text in the supplied current source.",
+              "sourceReferences": [
+                "FC 508"
+              ]
+            },
+            {
+              "criterion": "Do not attribute a substantive requirement to FC 508 based on its section number or title.",
+              "sourceReferences": [
+                "FC 508"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "That FC 508 currently imposes a fire command center requirement or any other substantive requirement.",
+            "That a section title or number supplies operative requirements absent operative text."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The supplied FC 508 text directly states that it is repealed or reserved and has no operative text. No further source is needed to answer what the supplied current section establishes."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "The supplied current FC 508 cannot establish the requirement in the old note or determine what a historical edition of that section provided. It establishes only that the supplied current text has no operative text; the old note\u2019s historical basis remains unverified.",
+          "materialChecks": [
+            {
+              "criterion": "Conclude that current FC 508, as supplied, does not establish the old note\u2019s fire command center requirement.",
+              "sourceReferences": [
+                "FC 508"
+              ]
+            },
+            {
+              "criterion": "Do not infer the content or status of FC 508 in an earlier edition from its current reserved status.",
+              "sourceReferences": [
+                "FC 508"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "That the old note accurately states a historical requirement based on the current section alone.",
+            "That FC 508 was reserved, operative, or contained particular language in the note\u2019s historical edition without a dated historical source."
+          ],
+          "genuineUnknowns": [
+            "The date or edition of the old note and the text and applicability of FC 508 in that historical edition."
+          ],
+          "neededReferences": [
+            "A dated authoritative historical NYC Fire Code source containing Section 508 for the edition relevant to the old note."
+          ],
+          "reasoning": "The supplied record identifies FC 508 as current consolidated text and provides no dated historical wording. Current text cannot establish the section\u2019s historical content or validate the note."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-continuation-20261005",
+        "callID": "5f98af56-243c-44b1-b0bb-29ec561fb60f",
+        "round": 0,
+        "sourceHashes": {
+          "FC 508": "c2bd3b75aca8ed84efca7504d870e1b73f9fc8f9c42289c0ff8abdc03694b3a8",
+          "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+          "ZR 37-745": "40de877fdc811dfc3253e4d5377e785ae3d869dd473723448e272492bf9344af",
+          "ZR 37-746": "6e8d1120cc3a4f5b98fbd7a4dad995f2c25b8c8a1c3c03a36f8b591cf1c2ffc2"
+        }
+      }
+    },
+    {
+      "id": "acceptance-emergency-power",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "FC 604 requires emergency-power inspection, testing, and other maintenance under an approved schedule established upon completion and approval of installation, and requires written service records. Systems, including appurtenant components, must be periodically inspected and tested under load as directed by the cited NFPA provisions. Transfer switches must be on the maintenance schedule, kept free of dust and dirt, and inspected for contact deterioration; deteriorated contacts must be replaced per the manufacturer's instructions. A transfer-switch test operates it electrically from normal to alternate and back to normal. Recorded standby-power or peak-load-shaving use may substitute for scheduled testing only when appropriate records are maintained. All inspection, testing, and maintenance must be under the personal supervision of a knowledgeable, trained person with at least one of the listed qualifications.",
+          "materialChecks": [
+            {
+              "criterion": "State that emergency-power systems must be installed, operated, and maintained in accordance with the Electrical Code and construction codes, including the Building Code; maintenance must preserve service within the time specified for the required type and duration of power.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            },
+            {
+              "criterion": "Inspection, testing, and other maintenance follow an approved schedule established upon completion and approval of system installation.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            },
+            {
+              "criterion": "Written records must include service date, servicing technician's name, summary of conditions noted, and detailed description of conditions requiring correction and corrective action taken.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            },
+            {
+              "criterion": "Emergency-power systems, including appurtenant components, are periodically inspected and tested under load in accordance with NFPA 110 as modified by FC Appendix B and NFPA 111.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            },
+            {
+              "criterion": "The standby-power or peak-load-shaving exception is conditional: use must be recorded and appropriate records maintained; qualifying use may substitute for scheduled testing, not generally for inspection or other maintenance.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            },
+            {
+              "criterion": "Transfer switches must be included in the maintenance schedule, kept free from accumulated dust and dirt, and inspected for contact deterioration; deteriorated contacts must be replaced in accordance with the manufacturer's instructions.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            },
+            {
+              "criterion": "A transfer-switch test electrically operates the switch from normal to alternate and then returns it to normal.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            },
+            {
+              "criterion": "Inspection, testing, and other maintenance must be under personal supervision of a person with the required knowledge and training and at least one listed qualification: specified DOB-licensed or specially licensed electrician; specified stationary or high-pressure boiler operating engineer; certificate of qualification; FLS director or FEP coordinator certificate of fitness; or registered design professional.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "The supplied text establishes particular inspection or testing intervals, beyond saying periodically and referring to NFPA provisions.",
+            "The peak-load-shaving or standby-use exception eliminates inspection, maintenance, or all transfer-switch testing requirements.",
+            "The listed supervisory qualifications are optional or need not be held by the person providing personal supervision.",
+            "The supplied text gives the detailed NFPA procedures or the applicable service-time values."
+          ],
+          "genuineUnknowns": [
+            "The specific periodic intervals and additional procedures incorporated from NFPA 110, NFPA 111, and FC Appendix B are not included in the supplied text.",
+            "The exact service-time requirements depend on the applicable Electrical Code and construction-code provisions, which are not supplied."
+          ],
+          "neededReferences": [
+            "Applicable NFPA 110 provisions, including the NYC FC Appendix B modifications.",
+            "Applicable NFPA 111 provisions.",
+            "FC Appendix B.",
+            "Applicable NYC Electrical Code and construction-code provisions, including the relevant Building Code requirements for required emergency-power type, duration, and service time."
+          ],
+          "reasoning": "FC 604 supplies the schedule, record, transfer-switch, testing, exception, and supervision rules, while incorporating external standards and codes for additional procedures and performance details. Those incorporated details should not be invented."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. Peak-load-shaving use alone does not satisfy the stated substitute: the use must be recorded and appropriate records maintained. With no records, the stated condition for substituting that use for scheduled testing is not met.",
+          "materialChecks": [
+            {
+              "criterion": "Peak-load-shaving use may substitute for scheduled testing only if the use is recorded and appropriate records are maintained.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            },
+            {
+              "criterion": "Do not treat the exception as a substitute for inspection or other maintenance.",
+              "sourceReferences": [
+                "FC 604"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Peak-load-shaving use alone satisfies the scheduled-testing substitute despite the absence of records.",
+            "The exception waives all emergency-power inspection, testing, and maintenance."
+          ],
+          "genuineUnknowns": [
+            "The exact content required for the exception's 'appropriate records' is not specified in the supplied text."
+          ],
+          "neededReferences": [],
+          "reasoning": "The exception expressly conditions substitution on recorded use and appropriate records. The hypothetical states that no records were kept, so use alone cannot satisfy that condition."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "52049635-0622-4cf4-9235-f9c8fc1d740f",
+        "round": 0,
+        "sourceHashes": {
+          "FC 508": "c2bd3b75aca8ed84efca7504d870e1b73f9fc8f9c42289c0ff8abdc03694b3a8",
+          "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+          "ZR 37-745": "40de877fdc811dfc3253e4d5377e785ae3d869dd473723448e272492bf9344af",
+          "ZR 37-746": "6e8d1120cc3a4f5b98fbd7a4dad995f2c25b8c8a1c3c03a36f8b591cf1c2ffc2"
+        }
+      }
+    },
+    {
+      "id": "acceptance-plaza-bicycles",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "ZR 37-745 requires every public plaza to provide parking for at least two bicycles; a plaza greater than 10,000 square feet must provide at least four. Bike racks must be on the sidewalk directly adjacent to the plaza and comply with DOT standards, unless DOT has determined that the adjacent sidewalk cannot accommodate the required parking. The supplied text does not state where parking must then be placed.",
+          "materialChecks": [
+            {
+              "criterion": "All public plazas must provide parking for at least two bicycles.",
+              "sourceReferences": [
+                "ZR 37-745"
+              ]
+            },
+            {
+              "criterion": "The higher minimum is at least four bicycles only for a public plaza greater than 10,000 square feet; exactly 10,000 square feet does not meet that stated threshold.",
+              "sourceReferences": [
+                "ZR 37-745"
+              ]
+            },
+            {
+              "criterion": "Bike racks must be on the sidewalk directly adjacent to the plaza and accord with DOT standards, unless DOT determines that the adjacent sidewalk cannot accommodate the required parking.",
+              "sourceReferences": [
+                "ZR 37-745"
+              ]
+            },
+            {
+              "criterion": "Do not infer from this section an alternative rack location after the stated DOT determination.",
+              "sourceReferences": [
+                "ZR 37-745"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "A plaza exactly 10,000 square feet is subject to the at-least-four count based on the stated greater-than threshold.",
+            "The text permits a particular alternative location whenever DOT finds the adjacent sidewalk cannot accommodate the parking.",
+            "The section alone verifies that a particular site qualifies as a public plaza."
+          ],
+          "genuineUnknowns": [
+            "The supplied section does not define public plaza or provide a method for measuring plaza size.",
+            "The supplied section does not state the required parking location after DOT determines the adjacent sidewalk cannot accommodate it."
+          ],
+          "neededReferences": [
+            "If site classification or measurement is material, the applicable NYC Zoning Resolution definition and any governing measurement provisions.",
+            "If determining the location after a DOT inability determination, the applicable DOT standards or other governing NYC provision specifying the alternative."
+          ],
+          "reasoning": "The stated counts and location condition are explicit. The greater-than threshold excludes exactly 10,000 square feet from the higher minimum. The text does not establish plaza classification, measurement methodology, or a post-determination alternative location."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. If the hypothetical space is a public plaza, exactly 10,000 square feet does not by size alone trigger the at-least-four requirement; the stated minimum is at least two bicycles. This conclusion does not independently establish that the site is a public plaza.",
+          "materialChecks": [
+            {
+              "criterion": "The higher bicycle count applies only when the public plaza is greater than 10,000 square feet, not when it is exactly 10,000 square feet.",
+              "sourceReferences": [
+                "ZR 37-745"
+              ]
+            },
+            {
+              "criterion": "If the hypothetical space is a public plaza, the stated minimum at exactly 10,000 square feet is at least two bicycles.",
+              "sourceReferences": [
+                "ZR 37-745"
+              ]
+            },
+            {
+              "criterion": "Do not assert that the site is an independently verified public plaza or make a whole-project compliance determination.",
+              "sourceReferences": [
+                "ZR 37-745"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Exactly 10,000 square feet triggers the higher bicycle count.",
+            "The hypothetical site has been independently established to qualify as a public plaza.",
+            "The size conclusion alone establishes whole-site compliance."
+          ],
+          "genuineUnknowns": [
+            "The hypothetical expressly does not establish independent public-plaza status."
+          ],
+          "neededReferences": [],
+          "reasoning": "The threshold uses 'greater than 10,000 square feet,' so exactly 10,000 does not trigger the higher count. The conclusion is conditional on public-plaza status, as directed."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "52049635-0622-4cf4-9235-f9c8fc1d740f",
+        "round": 0,
+        "sourceHashes": {
+          "FC 508": "c2bd3b75aca8ed84efca7504d870e1b73f9fc8f9c42289c0ff8abdc03694b3a8",
+          "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+          "ZR 37-745": "40de877fdc811dfc3253e4d5377e785ae3d869dd473723448e272492bf9344af",
+          "ZR 37-746": "6e8d1120cc3a4f5b98fbd7a4dad995f2c25b8c8a1c3c03a36f8b591cf1c2ffc2"
+        }
+      }
+    },
+    {
+      "id": "acceptance-plaza-fountain",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "ZR 37-746 states that a minimum of one drinking fountain must be provided in all public plazas. The supplied section states no plaza-size exemption.",
+          "materialChecks": [
+            {
+              "criterion": "All public plazas must provide a minimum of one drinking fountain.",
+              "sourceReferences": [
+                "ZR 37-746"
+              ]
+            },
+            {
+              "criterion": "The supplied section states no plaza-size exemption; do not introduce one.",
+              "sourceReferences": [
+                "ZR 37-746"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "ZR 37-746 exempts plazas of a particular size from its stated minimum.",
+            "The one-fountain minimum alone establishes whole-plaza compliance."
+          ],
+          "genuineUnknowns": [
+            "The supplied section does not define public plaza or state other possible requirements outside this minimum."
+          ],
+          "neededReferences": [],
+          "reasoning": "The complete supplied text is a minimum of one drinking fountain in all public plazas and contains no size qualification."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "Yes. Given the hypothetical that the space is a public plaza, one drinking fountain meets the numerical minimum stated in ZR 37-746. That does not establish whole-plaza compliance.",
+          "materialChecks": [
+            {
+              "criterion": "One drinking fountain meets the stated numerical minimum of at least one for a public plaza.",
+              "sourceReferences": [
+                "ZR 37-746"
+              ]
+            },
+            {
+              "criterion": "Limit the conclusion to the stated numerical minimum and do not assert whole-plaza compliance.",
+              "sourceReferences": [
+                "ZR 37-746"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "One fountain proves compliance with every requirement applicable to the plaza.",
+            "The hypothetical's stated public-plaza status must be independently verified for this question."
+          ],
+          "genuineUnknowns": [
+            "Requirements beyond the supplied one-fountain minimum are not addressed by this source excerpt."
+          ],
+          "neededReferences": [],
+          "reasoning": "The hypothetical supplies public-plaza status and one fountain. That meets the section's stated numerical minimum, while the question expressly excludes a whole-plaza compliance conclusion."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-20261005",
+        "callID": "52049635-0622-4cf4-9235-f9c8fc1d740f",
+        "round": 0,
+        "sourceHashes": {
+          "FC 508": "c2bd3b75aca8ed84efca7504d870e1b73f9fc8f9c42289c0ff8abdc03694b3a8",
+          "FC 604": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+          "ZR 37-745": "40de877fdc811dfc3253e4d5377e785ae3d869dd473723448e272492bf9344af",
+          "ZR 37-746": "6e8d1120cc3a4f5b98fbd7a4dad995f2c25b8c8a1c3c03a36f8b591cf1c2ffc2"
+        }
+      }
+    }
+  ],
+  "disputedInterpretations": [
+    {
+      "id": "review-hub-projection",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "ambiguous",
+          "boundedConclusion": "PC 802.3.2 gives two forms: a hub, or a pipe extending at least 1 inch above the water-impervious floor. It expressly attaches the 1-inch projection to the pipe alternative, but the supplied text does not establish whether a flush installation qualifies as a hub. Thus it does not establish that a hub-form drain must project 1 inch, nor does it establish that a flush installation qualifies as a hub.",
+          "materialChecks": [
+            {
+              "criterion": "The provision states that a hub drain shall be in the form of a hub or a pipe extending not less than 1 inch above a water-impervious floor.",
+              "sourceReferences": [
+                "PC 802.3.2"
+              ]
+            },
+            {
+              "criterion": "The supplied text does not define whether a flush installation qualifies as a hub or otherwise specify the projection required for the hub-form alternative.",
+              "sourceReferences": [
+                "PC 802.3.2"
+              ]
+            },
+            {
+              "criterion": "PC 802.3 addresses strainer or basket coverage, certain receptor locations, and ready access; it supplies no hub-projection requirement.",
+              "sourceReferences": [
+                "PC 802.3"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "A flush installation is definitely permitted as a hub.",
+            "Every hub-form drain is expressly required by this text to project at least 1 inch.",
+            "PC 802.3 changes the projection requirement in PC 802.3.2."
+          ],
+          "genuineUnknowns": [
+            "Whether a flush installation meets the meaning of 'a hub' in PC 802.3.2.",
+            "Whether an authoritative interpretation applies the 1-inch modifier to the hub alternative."
+          ],
+          "neededReferences": [
+            "The 2022 NYC Plumbing Code Chapter 2 definition provisions, if any, for 'hub' or 'hub drain'; provide the exact section reference if available.",
+            "If those provisions do not resolve the issue, an authoritative NYC interpretation of the grammatical scope of PC 802.3.2."
+          ],
+          "reasoning": "The text gives a hub alternative and a pipe alternative whose stated minimum projection is 1 inch. It does not define 'hub' or explicitly state the projection required for that alternative. The supplied PC 802.3 text concerns other receptor requirements and does not resolve the elevation question."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "A projection of exactly 1 inch satisfies the stated 'not less than 1 inch' minimum projection. This conclusion is only about the projection requirement and does not establish whole-code or project compliance.",
+          "materialChecks": [
+            {
+              "criterion": "The stated minimum for the pipe alternative is not less than 1 inch above the water-impervious floor; exactly 1 inch meets that numerical minimum.",
+              "sourceReferences": [
+                "PC 802.3.2"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Meeting the 1-inch projection minimum by itself establishes whole-code or project compliance.",
+            "The 1-inch minimum is a greater-than-1-inch requirement."
+          ],
+          "genuineUnknowns": [],
+          "neededReferences": [],
+          "reasoning": "The question specifies a projection exactly 1 inch above the floor and asks only about projection. The stated boundary is inclusive: 'not less than 1 inch.'"
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-followup-20261005",
+        "callID": "f8120887-837c-418e-9f81-9e038cea3f38",
+        "round": 0,
+        "sourceHashes": {
+          "PC 802.3.2": "cff67b6c0fc594be981d4bdd6d4736bf9c2a2fc36b606dc4798659421959138b",
+          "PC 802.3": "2aed884c131f07cd7be49ca79816ee5bb6fc5119efec5fd1b2b213f976cb5a93"
+        }
+      }
+    },
+    {
+      "id": "review-covered-display",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. A covered display five feet wide exceeds the stated four-foot threshold, so the supplied text requires sprinklers in or under it; ceiling sprinklers only above its cover do not satisfy that in-or-under requirement. This is a rule explanation, not a determination that a particular sprinkler layout complies.",
+          "materialChecks": [
+            {
+              "criterion": "A covered display exceeding four feet in width must have automatic sprinklers installed in or under it.",
+              "sourceReferences": [
+                "BC 903.3.3",
+                "FC 314"
+              ]
+            },
+            {
+              "criterion": "For sprinkler deflectors installed above the top of a display, FC 314.5.1 requires at least 18 inches of clearance.",
+              "sourceReferences": [
+                "FC 314"
+              ]
+            },
+            {
+              "criterion": "BC 903.3.3 also requires sprinklers to be installed with due regard to obstructions that delay activation or obstruct water distribution. Its stated kitchen-equipment exception is limited to equipment under exhaust hoods protected by a qualifying fire-extinguishing system and does not describe the stated retail display.",
+              "sourceReferences": [
+                "BC 903.3.3"
+              ]
+            },
+            {
+              "criterion": "FC 314.5 provides that sprinklers and fire alarm systems shall not be obstructed by indoor displays.",
+              "sourceReferences": [
+                "FC 314"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "That ceiling sprinklers above the cover alone satisfy the stated in-or-under requirement.",
+            "That the conclusion establishes compliance of the whole sprinkler system or project."
+          ],
+          "genuineUnknowns": [
+            "The supplied facts do not establish whether the particular layout also meets obstruction, clearance, and other applicable system requirements."
+          ],
+          "neededReferences": [],
+          "reasoning": "Five feet is greater than four feet. Both supplied sections expressly require sprinklers in or under covered displays above that threshold, so the stated above-cover-only arrangement cannot be relied on to satisfy that requirement. The general obstruction provisions and FC's stated overhead-deflector clearance remain material; the text does not determine the compliance of an actual layout."
+        },
+        {
+          "turn": 2,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "No. Exactly four feet does not exceed four feet, so the width-based in-or-under requirement in these sections is not triggered by width alone. That does not automatically authorize ignoring sprinklers underneath: the general obstruction provisions still apply, and the supplied text does not establish whether this particular display obstructs sprinkler operation or what its layout requires.",
+          "materialChecks": [
+            {
+              "criterion": "The in-or-under requirement is triggered by a display that exceeds four feet; exactly four feet does not meet that stated threshold.",
+              "sourceReferences": [
+                "BC 903.3.3",
+                "FC 314"
+              ]
+            },
+            {
+              "criterion": "The threshold does not remove BC 903.3.3's requirement to account for obstructions that delay sprinkler activation or obstruct water distribution.",
+              "sourceReferences": [
+                "BC 903.3.3"
+              ]
+            },
+            {
+              "criterion": "Indoor displays shall not obstruct sprinklers under FC 314.5; therefore, the absence of the width-triggered mandate is not itself permission to disregard the effect of the display on sprinklers.",
+              "sourceReferences": [
+                "FC 314"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "That exactly four feet triggers the provisions stated for displays that exceed four feet.",
+            "That being exactly four feet automatically exempts the display from all sprinkler-related requirements or establishes that sprinklers underneath may be omitted.",
+            "That the supplied text necessarily requires sprinklers underneath every display at or below four feet, regardless of its effect on sprinkler operation."
+          ],
+          "genuineUnknowns": [
+            "Whether this display's actual shape, cover, placement, and sprinkler layout cause an obstruction or otherwise require measures beyond the width-triggered rule is not established by the supplied text or facts."
+          ],
+          "neededReferences": [],
+          "reasoning": "The numerical boundary is determinate: 'exceeds 4 feet' does not include exactly four feet. But BC 903.3.3's due-regard rule and FC 314.5's no-obstruction rule remain. They do not, on the supplied facts alone, establish either a universal under-sprinkler mandate at four feet or permission to omit under-display sprinklers in this specific layout."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-followup-20261005",
+        "callID": "5d08d49f-6c8e-44ff-b8e5-ad4d41e46e6e",
+        "round": 0,
+        "sourceHashes": {
+          "BC 903.3.3": "47661bb3a8337c70056acb4b6b6ca714dfbeec36e9042a79a44b87d179017114",
+          "FC 314": "c0f9b21e20589541d1f096a536d884ce18811f6505e6375633288800cdc509e4"
+        }
+      }
+    },
+    {
+      "id": "review-sloping-transparency",
+      "turns": [
+        {
+          "turn": 1,
+          "status": "clear_from_supplied_text",
+          "boundedConclusion": "ZR 37-34 requires transparent materials to cover at least 50% of the specified ground-floor-level street-wall surface area. The counted area is between two feet and 12 feet above the adjoining sidewalk, or up to the ground-floor ceiling height if that is higher. The source does not establish whether these provisions apply to any particular property.",
+          "materialChecks": [
+            {
+              "criterion": "The rule concerns the ground-floor-level street wall along a primary frontage and requires glazing with transparent materials; examples include show windows, transom windows, and glazed portions of doors.",
+              "sourceReferences": [
+                "ZR 37-34"
+              ]
+            },
+            {
+              "criterion": "Transparent materials must occupy at least 50% of the street-wall surface area in the stated measurement band: from two feet to 12 feet, or to the ground-floor ceiling height if higher, measured from the adjoining sidewalk.",
+              "sourceReferences": [
+                "ZR 37-34"
+              ]
+            },
+            {
+              "criterion": "Materials counted toward the 50% requirement may not begin higher than two feet six inches above the adjoining sidewalk, except for transom windows or portions of windows separated by mullions or other structural dividers; they must have a minimum width of two feet.",
+              "sourceReferences": [
+                "ZR 37-34"
+              ]
+            },
+            {
+              "criterion": "The maximum width of a portion of the ground-floor-level street wall without transparency is 10 feet.",
+              "sourceReferences": [
+                "ZR 37-34"
+              ]
+            },
+            {
+              "criterion": "The transparency requirements do not apply to portions occupied by entrances or exits to accessory off-street parking facilities or public parking garages where permitted; entryways to required loading berths where permitted; entryways to subway stations as applicable; or doors accessing emergency egress stairwells and passageways.",
+              "sourceReferences": [
+                "ZR 37-34"
+              ]
+            },
+            {
+              "criterion": "ZR 37-31 gives the broader context that these ground-floor provisions concern certain areas not otherwise governed by ZR 32-30, and states that ZR 37-34 does not apply to qualifying commercial zoning lots under 20 feet wide that existed on both specified dates, or to community-facility buildings used exclusively as a school or a Use Group III(B) house of worship. No property-specific applicability finding follows from that text alone.",
+              "sourceReferences": [
+                "ZR 37-31",
+                "ZR 32-30",
+                "ZR 37-30"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not claim that ZR 37-34 applies to the user's property.",
+            "Do not omit the stated exceptions, width limits, or the sidewalk-based measurement language.",
+            "Do not infer the complete area-specific applicability rules from the title or reserved text of ZR 37-30, or from ZR 32-30 alone."
+          ],
+          "genuineUnknowns": [
+            "Whether the particular frontage is in an area where ZR 37-34 applies, or is otherwise governed by applicable provisions, is not supplied.",
+            "Whether any stated ZR 37-31 exclusion applies to a particular property is not supplied."
+          ],
+          "neededReferences": [
+            "For a property-specific applicability determination, the applicable area or underlying-district provisions and any relevant Special Purpose District provisions that establish whether ZR 37-34 governs the frontage."
+          ],
+          "reasoning": "ZR 37-34 states the glazing percentage, measurement band, sill/start-height condition, minimum glazing width, maximum opaque width, and listed exceptions. ZR 37-31 supplies relevant applicability context and exclusions, but the supplied record does not identify a property or establish its governing area."
+        },
+        {
+          "turn": 2,
+          "status": "ambiguous",
+          "boundedConclusion": "The supplied text does not authorize using the high-end sidewalk elevation as a single datum for the entire 50% calculation. It says the measurement is from the adjoining sidewalk but does not specify how to calculate the area band along a sloping sidewalk or whether one endpoint elevation may serve as a common datum. If the reported sill heights describe where glazing begins, both endpoint heights are no higher than two feet six inches above the sidewalk at their respective endpoints; that does not determine the full 50% calculation or establish compliance along the frontage.",
+          "materialChecks": [
+            {
+              "criterion": "For this hypothetical, treat ZR 37-34 as applicable to the frontage, as instructed; do not independently decide applicability.",
+              "sourceReferences": [
+                "ZR 37-34"
+              ]
+            },
+            {
+              "criterion": "ZR 37-34 defines the 50% band by reference to the adjoining sidewalk, but does not state a slope-specific method or authorize a single high-end datum for the entire frontage calculation.",
+              "sourceReferences": [
+                "ZR 37-34"
+              ]
+            },
+            {
+              "criterion": "If the sill marks the beginning of the transparent material, the stated two-foot and two-foot-six-inch endpoint heights are each no higher than the rule's two-foot-six-inch maximum relative to the adjoining sidewalk at those respective endpoints; endpoint facts alone do not establish conditions between the endpoints or the 50% surface-area result.",
+              "sourceReferences": [
+                "ZR 37-34"
+              ]
+            }
+          ],
+          "forbiddenClaims": [
+            "Do not affirm that the high-end sidewalk elevation may be used as the datum for the entire 50% calculation.",
+            "Do not claim that ZR 37-34 definitively prescribes a station-by-station or other specific slope-measurement protocol.",
+            "Do not conclude that the 50% requirement is satisfied based only on the two reported sill heights.",
+            "Do not treat the endpoint sill comparison as conclusive unless the sill is the beginning of the glazing being counted."
+          ],
+          "genuineUnknowns": [
+            "The text does not resolve how to measure the 50% band or calculate its surface area where the adjoining sidewalk slopes.",
+            "The supplied endpoint elevations do not establish the sill-to-sidewalk relationship or glazing area throughout the frontage."
+          ],
+          "neededReferences": [
+            "Any applicable Zoning Resolution provision specifying sidewalk-datum or sloping-sidewalk measurement for ZR 37-34; if none supplies a method, an applicable official City Planning Commission or Department of Buildings interpretation addressing the sloping-sidewalk calculation."
+          ],
+          "reasoning": "The rule expressly uses the adjoining sidewalk as the measurement reference, but supplies no convention for applying that reference across a slope. Therefore the text cannot establish the proposed single-datum method or a full frontage calculation. The endpoint sill figures can be compared to the stated maximum only at those endpoints, assuming the sill marks the beginning of the glazing."
+        }
+      ],
+      "provenance": {
+        "runDirectory": "separate-luna-review-followup-20261005",
+        "callID": "73ae9cb8-2883-4add-8f70-15d7cb7c4d41",
+        "round": 1,
+        "sourceHashes": {
+          "ZR 37-34": "2d4a2ef7654ff4c4995f30b375dc3fa998aaea503cd993b383d7428b09c2cf16",
+          "ZR 37-31": "84a6883dde84eac277106c9fff41fc1fd2ffd1dcfbe41c3002660fd531125dc6",
+          "ZR 37-30": "9c566391c56fbe70bc961d23a6ece3c36935f602e434f24ba7ee456e4e73b9d3",
+          "ZR 32-30": "ec51a389c26ae09bebffb1a0a92b6b0ce80e75681123f67df1227f0e58f8f448"
+        }
+      }
+    }
+  ]
+}
