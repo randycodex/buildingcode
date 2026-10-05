@@ -77,13 +77,15 @@ globalThis.fetch = async (url, options) => {
         }
         assert.deepEqual(candidate.supportedPoints, firstReviewed.supportedPoints); assert.deepEqual(candidate.citations, firstReviewed.citations);
         value = active.reject ? { pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic fresh review still rejects the narrative despite the field certificate." }],
-          unnecessaryMissingFactIndices: [], missingFactsOnly: false } : { pass: true, issues: [], unnecessaryMissingFactIndices: [], missingFactsOnly: false };
+          unnecessaryMissingFactIndices: [], missingFactsOnly: false, requestDescription: "identification for installed equipment" } : { pass: true, issues: [], unnecessaryMissingFactIndices: [], missingFactsOnly: false };
       }
     }
     return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed",
       usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(value) }] }] }));
   } catch (error) { doubleError = error; throw error; }
 };
+const warningLines=[],originalWarn=console.warn;
+console.warn=(...values)=>{warningLines.push(values.join(" "));originalWarn(...values);};
 let server;
 try {
   const { handleRequest } = await import("../app.mjs");
@@ -111,7 +113,8 @@ try {
     }
     const created = await request("/research/conversations/create", { auth, ...(projectID ? { projectID } : {}) }, token);
     const conversationID = created.body.conversation.id;
-    const response = await request("/research/conversations/message", { auth, conversationID, requestID: randomUUID(),
+    const requestID=randomUUID();
+    const response = await request("/research/conversations/message", { auth, conversationID, requestID,
       question: "For our project under the 2022 NYC codes, what identification rule does MC 304.12 provide for installed equipment?" }, token);
     if (doubleError) throw doubleError;
     assert.equal(response.status, 200, JSON.stringify(response.body));
@@ -126,7 +129,15 @@ try {
     assert.equal(operation.charged, !active.reject); assert(operation.conservativeProviderCostUSD <= 1);
     if (active.reject) {
       assert.equal(delivered.mode, "clarification"); assert.equal(delivered.charged, false);
+      assert.equal(delivered.verification.pass,false);assert.equal(delivered.verification.reason,"verification_source");
+      assert.equal(delivered.recoveryPresentation.requestID,requestID);
+      assert.equal(delivered.recoveryPresentation.requestDescription,"identification for installed equipment");
+      assert.match(delivered.answerText,/identification for installed equipment.*didn’t match the cited text/);
+      for (const field of ["supportedPoints","citations","missingFacts","followUpQuestions"]) assert.deepEqual(delivered[field],[]);
+      assert(!JSON.stringify(operation).includes("requestDescription"));
+      assert(!warningLines.some(line=>line.includes("requestDescription")||line.includes("identification for installed equipment")),"Presentation metadata never enters recovery telemetry");
       const reopened = await request("/research/conversations/get", { auth, conversationID }, token);
+      assert.deepEqual(reopened.body.conversation.messages.at(-1).answer.recoveryPresentation,delivered.recoveryPresentation);
       assert.equal(reopened.body.conversation.messages.filter(message => message.role === "assistant").length, 1);
       assert.notEqual(reopened.body.conversation.messages.at(-1).answer.answerText, finalReviewed.answerText, "A rejected candidate is not persisted as the delivered answer.");
     }
@@ -139,8 +150,33 @@ try {
       assert.equal(reopened.body.conversation.messages.at(-1).answer.answerText, finalReviewed.answerText);
     }
   }
+  // Actual conversation shape: approved root user text resolves a pronoun,
+  // and its presentation context survives the canonical persistence path.
+  const created=await request("/research/conversations/create",{auth},token), conversationID=created.body.conversation.id;
+  const rootRequest=randomUUID();
+  active={certificate:true,fieldOnly:true};phases=[];firstReviewed=finalReviewed=undefined;doubleError=undefined;
+  const root=await request("/research/conversations/message",{auth,conversationID,requestID:rootRequest,
+    question:"For our project under the 2022 NYC codes, what identification rule does MC 304.12 provide for installed equipment?"},token);
+  if(doubleError)throw doubleError;assert.equal(root.status,200);assert.equal(root.body.conversation.messages.at(-1).answer.verification.pass,true);
+  const rootHuman=root.body.conversation.messages.find(message=>message.role==="user"&&message.requestID===rootRequest);assert(rootHuman);
+  active={certificate:true,fieldOnly:true,reject:true};phases=[];firstReviewed=finalReviewed=undefined;doubleError=undefined;
+  const followupRequest=randomUUID(), question="Does that meet the minimum?";
+  const followup=await request("/research/conversations/message",{auth,conversationID,requestID:followupRequest,question},token);
+  if(doubleError)throw doubleError;assert.equal(followup.status,200);
+  const recovery=followup.body.conversation.messages.at(-1).answer;
+  assert.equal(recovery.verification.pass,false);assert.equal(recovery.charged,false);
+  assert.equal(recovery.recoveryPresentation.requestID,followupRequest);assert.equal(recovery.recoveryPresentation.question,question);
+  assert.equal(recovery.recoveryPresentation.requestDescription,"identification for installed equipment");
+  assert(recovery.recoveryPresentation.humanContext.some(message=>message.id===rootHuman.id&&message.requestID===rootRequest&&message.question===rootHuman.question));
+  assert(recovery.recoveryPresentation.humanContext.every(message=>message.role==="user"));
+  assert.match(recovery.answerText,/identification for installed equipment/);assert.doesNotMatch(recovery.answerText,/so I couldn’t finish it|saved|retry|Which/i);
+  assert.deepEqual(phases,["permitext_code_interpretation","permitext_research_verification","permitext_research_verification"]);
+  const reopened=await request("/research/conversations/get",{auth,conversationID},token);
+  assert.deepEqual(reopened.body.conversation.messages.at(-1).answer,recovery);
+  assert(!warningLines.some(line=>line.includes("recoveryPresentation")||line.includes("requestDescription")||line.includes("identification for installed equipment")));
   console.log("Certified field repair HTTP mechanics passed: certified unchanged body/citations, fresh rejection, mixed/uncertified/legacy revision, protected unknown no-edit fallthrough, fresh hashes, configured roles/caps, bounded call counts and persistence. Provider responses synthetic; semantic accuracy unproved.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
+  console.warn=originalWarn;
   globalThis.fetch = nativeFetch; await rm(scratch, { recursive: true, force: true });
 }

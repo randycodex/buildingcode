@@ -21,12 +21,12 @@ for(const reason of ['verification','evidence']) {
 }
 const message=failure({code:'INVALID_RESEARCH_VERIFICATION'});
 for (const [error,expected] of [
- [{code:'INVALID_RESEARCH_RESPONSE'}, /I ran into a problem/],
- [{code:'INVALID_RESEARCH_CITATION'}, /mismatch between my explanation and its source references/],
- [{verificationAttempts:[{issues:[{type:'missed_premise_contradiction'}]}]}, /project details already provided/],
+ [{code:'INVALID_RESEARCH_RESPONSE'}, /couldn’t process the response/],
+ [{code:'INVALID_RESEARCH_CITATION'}, /explanation didn’t match the cited text/],
+ [{verificationAttempts:[{issues:[{type:'missed_premise_contradiction'}]}]}, /details you provided/],
  [{verificationAttempts:[{pass:false,issues:[{type:'missed_premise_contradiction'}]},
-   {pass:false,issues:[{type:'unnecessary_qualification'}]}]}, /source checks/],
- [{code:'RESEARCH_VERIFICATION_FAILED'}, /source checks/]
+   {pass:false,issues:[{type:'unnecessary_qualification'}]}]}, /source check for your question/],
+ [{code:'RESEARCH_VERIFICATION_FAILED'}, /source check for your question/]
 ]) {
  const answer=researchClarificationAnswer('The new building has retail space.',researchVerificationFailureReason(error));
  assert.match(answer.answerText,expected);
@@ -49,6 +49,7 @@ for(const [reason,conclusion] of Object.entries(historicalFailureCopy)) {
  const current=researchClarificationAnswer(question,reason);
  const explanation='Your question and earlier messages are saved. You can retry this question here without starting a new conversation.';
  const historical={...current,answerText:`${conclusion}\n\n${explanation}`,conclusion,explanation};
+ delete historical.recoveryPresentation;
  const original=JSON.stringify(historical);
  assert(isCanonicalResearchClarification(question,historical), 'Canonical stored failures must remain readable');
  assert.equal(narrative(historical,question),current.answerText, 'Historical failures display current copy');
@@ -58,7 +59,7 @@ for(const [reason,conclusion] of Object.entries(historicalFailureCopy)) {
   assert(!isCanonicalResearchClarification(question,forged),`Historical compatibility must remain strict for ${field}`);
  }
 }
-assert.match(message,/I ran into a problem/);
+assert.match(message,/couldn’t process the response/);
 assert.doesNotMatch(message,/Retry/i);
 assert.doesNotMatch(message,/could not complete its evidence check/);
 assert.equal(narrative({answerText:'A substantive answer.'}),'A substantive answer.');

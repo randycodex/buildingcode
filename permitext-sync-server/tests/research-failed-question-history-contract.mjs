@@ -1,3 +1,4 @@
+import { researchFailureRecovery } from "../public/research-failure-recovery.js";
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { createServer } from 'node:http';
@@ -22,7 +23,8 @@ try {
   assert.equal(fixture.messages.length, 0);
   assert.equal(failed.revision, 4);
   assert.equal(activeResearchMessages(failed).length, 0, 'Failed prompts cannot influence subsequent answers');
-  assert.match(failed.messages[0].failure.message, /complete answer/);
+  assert.equal(failed.messages[0].failure.message, researchFailureRecovery({code:"INVALID_RESEARCH_RESPONSE"}).text);
+  assert.doesNotMatch(failed.messages[0].failure.message,/saved|repeat|still here/i);
   assert.equal(researchConversationWithFailedQuestion({ ...fixture, contextRevision: 1 }, details), null);
   assert.equal(researchConversationWithFailedQuestion({ ...fixture, primaryProjectID: 'other' }, details), null);
   assert.equal(researchConversationWithFailedQuestion(null, details), null);
@@ -63,9 +65,9 @@ try {
   const webSource = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
   const copyStart = webSource.indexOf('function researchFailureMessage(');
   const copyEnd = webSource.indexOf('\n}', copyStart) + 2;
-  const copy = vm.runInNewContext('(' + webSource.slice(copyStart, copyEnd) + ')');
+  const copy = vm.runInNewContext('(' + webSource.slice(copyStart, copyEnd) + ')',{researchFailureRecovery});
   assert.equal(copy({ payload: { code: 'RESEARCH_INTERRUPTED', status: 502 }, message: 'Service unavailable' }),
-    'Research was interrupted before an answer was saved. Your question is still here.');
+    'I was interrupted before I could return the answer. You can try this request again.');
   const restoreStart = webSource.indexOf('function restoreResearchProgressSession(');
   const restoreEnd = webSource.indexOf('\n}', restoreStart) + 2;
   const web = vm.createContext({ Date, Map, AbortController, localStorage: {}, researchRecoveryFromFailedMessage,

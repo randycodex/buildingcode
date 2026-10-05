@@ -1,5 +1,5 @@
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
-import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261004-failure-recovery-v2";
+import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
@@ -43,7 +43,7 @@ import {
   researchProgressStages,
   researchProgressStage,
   writeResearchRequestRecovery
-} from "./research-progress.js?v=20261004-failure-recovery-v125";
+} from "./research-progress.js?v=20261005-natural-recovery-v127";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
@@ -18504,19 +18504,27 @@ function researchRecoveryQuestionForMessage({ message, conversation, conversatio
   if (positions.length !== 1) return "";
   const index = positions[0], stored = conversation.messages[index];
   if (String(stored.requestID || "") !== String(message.requestID || "")) return "";
+  if (stored.answer?.recoveryPresentation &&
+      stored.answer.recoveryPresentation.requestID !== String(stored.requestID || "")) return "";
   const preceding = conversation.messages.slice(0, index);
-  if (stored.requestID) {
-    const matching = preceding.filter(candidate => candidate.role === "user" && candidate.requestID === stored.requestID);
-    return matching.length === 1 ? String(matching[0].question || "") : "";
-  }
-  const previous = preceding.at(-1);
-  return previous?.role === "user" && !previous.requestID ? String(previous.question || "") : "";
+  const matching = stored.requestID
+    ? preceding.filter(candidate => candidate.role === "user" && candidate.requestID === stored.requestID)
+    : preceding.at(-1)?.role === "user" && !preceding.at(-1).requestID ? [preceding.at(-1)] : [];
+  if (matching.length !== 1) return "";
+  const earlier = preceding.slice(0, preceding.indexOf(matching[0]));
+  const humanContext = stored.answer?.recoveryPresentation?.humanContext;
+  if (humanContext && (!Array.isArray(humanContext) || humanContext.some(bound =>
+      bound.role !== "user" || earlier.filter(candidate => candidate.role === "user" && candidate.id === bound.id &&
+        String(candidate.requestID || "") === bound.requestID &&
+        String(candidate.question || "").replace(/\s+/g, " ").trim() === bound.question).length !== 1))) return "";
+  return String(matching[0].question || "");
 }
 
-function researchVerificationRecoveryText(answer, question = "") {
+function researchVerificationRecoveryText(answer, question = "", includeAction = true) {
   if (!researchAnswerHasVerificationRecovery(answer)) return "";
   // Presentation only: historical stored answers and verification stay intact.
-  return researchVerificationRecoveryTextForReason(answer.verification.reason, question);
+  const text = researchVerificationRecoveryTextForReason(answer.verification.reason, question, answer.recoveryPresentation);
+  return includeAction ? text : text.split("\n\n")[0];
 }
 
 function researchAnswerNarrativeText(result, question = "") {
@@ -18676,8 +18684,8 @@ function researchAnswerDisplayMarkdown(value) {
   }).join("");
 }
 
-function appendResearchAnswerNarrative(container, result, question = "") {
-  const recovery = researchVerificationRecoveryText(result, question);
+function appendResearchAnswerNarrative(container, result, question = "", includeRecoveryAction = true) {
+  const recovery = researchVerificationRecoveryText(result, question, includeRecoveryAction);
   const text = recovery || researchAnswerDisplayMarkdown(researchAnswerNarrativeText(result, question));
   if (!text) return;
   const narrative = document.createElement("div");
@@ -19111,7 +19119,8 @@ function renderResearchInterpretation(container, result, options = {}) {
       : result.authorityLabel;
     metadata.append(authority);
   }
-  appendResearchAnswerNarrative(card, result, recoveryQuestion);
+  const reportMessage = options.message || options.recordMessage;
+  appendResearchAnswerNarrative(card, result, recoveryQuestion, Boolean(reportMessage?.id && options.conversationID));
   const nextQuestion = researchDisplayList(result.followUpQuestions)[0];
   if (!researchAnswerHasVerificationRecovery(result) && nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
     const followUp = document.createElement("p");
@@ -19384,10 +19393,10 @@ function renderResearchInterpretation(container, result, options = {}) {
   nextStep.textContent = researchAnswerHasVerificationRecovery(result)
     ? "Use Report this issue to open the feedback form. Nothing is sent until you choose Send feedback."
     : "Review cited provisions and Project facts. Record your own conclusion in a Project Note before adding it to a Report.";
-  detailsBody.append(nextStep);
+  if (!researchAnswerHasVerificationRecovery(result) || reportMessage?.id && options.conversationID) detailsBody.append(nextStep);
   container.append(card);
   wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
-  if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
+  if (reportMessage) renderResearchFeedback(container, reportMessage, options.conversationID);
 }
 
 async function renderUtilityInstance(instance, options = {}) {
@@ -21289,11 +21298,11 @@ async function openResearchProgressIssueReport(progress) {
     const report = detailsID ? document.querySelector(`button[aria-controls="${CSS.escape(detailsID)}"]`) : null;
     if (report) { report.click(); return; }
     progress.reportUnavailable = true;
-    progress.error = "No saved issue-report form is available for this attempt. Open Account feedback to contact support. Your question is still here.";
+    progress.error = "I couldn’t open an issue-report form for this attempt. Open Account feedback to contact support.";
   } catch {
     if (!isCurrentAccountRequest(identity)) return;
     progress.reportUnavailable = true;
-    progress.error = "The saved attempt couldn’t be opened. Open Account feedback to contact support. Your question is still here.";
+    progress.error = "I couldn’t open this attempt. Open Account feedback to contact support.";
   }
   refreshResearchProgressCard(progress);
 }
@@ -21364,7 +21373,7 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
           requireCurrentAccountRequest(requestIdentity);
           if (!conversation) throw new Error("The current conversation is not available");
           progress.recoveryReviewed = true;
-          progress.error = "Current Research reloaded. Review its Project context and sources, then retry your preserved question.";
+          progress.error = "Research reloaded. Review its Project context and sources before continuing.";
           refreshResearchProgressCard(progress);
         } catch (error) {
           if (!isCurrentAccountRequest(requestIdentity)) return;
@@ -21580,7 +21589,7 @@ async function runResearchProgressSession(
       if (activeStage) progress.stages.set(activeStage.id, cancelled ? "cancelled" : "failed");
       progress.status = cancelled ? "cancelled" : "failed";
       progress.error = cancelled
-        ? "Research was cancelled before an answer was saved. Your question is still here."
+        ? researchFailureMessage({ code: "RESEARCH_CANCELLED" }, progress.question)
         : researchFailureMessage(error, progress.question);
       progress.errorCode = cancelled ? "RESEARCH_CANCELLED" : error.code || error.payload?.code || "";
       progress.errorStatus = Number(error.status || error.payload?.status || 0);
@@ -23090,7 +23099,8 @@ function renderHistoricalResearchRecord(container, answerRecord) {
 
   const exactAnswer = document.createElement("section");
   exactAnswer.className = "research-historical-answer";
-  renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true, recordQuestion: answerRecord.question });
+  renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true, recordQuestion: answerRecord.question,
+    recordMessage: researchAnswerHasVerificationRecovery(answerRecord.answer) ? { id: answerRecord.id, answer: answerRecord.answer } : null, conversationID: answerRecord.conversationID });
 
   const evidenceHeading = document.createElement("strong");
   evidenceHeading.textContent = "Cited evidence snapshots";
