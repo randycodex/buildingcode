@@ -18,7 +18,7 @@ export async function researchProviderReadiness({ apiKey, fetchImpl = globalThis
         type: payload.error?.type ?? null, usagePresent: Boolean(payload.usage) };
       if (name === "models") {
         const available = new Set((payload.data || []).map(model => model.id));
-        result.models.available = Object.fromEntries(["gpt-6-luna", "gpt-6.1-sol", "text-embedding-3-small"]
+        result.models.available = Object.fromEntries(["gpt-6-luna", "text-embedding-3-small"]
           .map(model => [model, available.has(model)]));
       } else {
         const message = String(payload.error?.message || "");

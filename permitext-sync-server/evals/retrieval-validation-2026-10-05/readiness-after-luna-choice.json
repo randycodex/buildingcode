@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-05T14:37:56.932Z",
+  "keyPresent": true,
+  "billableRequests": 0,
+  "models": {
+    "status": 200,
+    "code": null,
+    "type": null,
+    "usagePresent": false,
+    "available": {
+      "gpt-6-luna": true,
+      "text-embedding-3-small": true
+    }
+  },
+  "responses": {
+    "status": 401,
+    "code": "invalid_api_key",
+    "type": "invalid_request_error",
+    "usagePresent": false,
+    "expectedValidationFailure": false
+  },
+  "embeddings": {
+    "status": 400,
+    "code": null,
+    "type": "invalid_request_error",
+    "usagePresent": false,
+    "expectedValidationFailure": true
+  },
+  "ready": false
+}

@@ -1,0 +1,23 @@
+{
+  "frozenAt": "2026-10-05T14:37:58.728088+00:00",
+  "parentCommit": "51e8ced12734742a33751b0ae5028332e7d8d579",
+  "modelPolicy": "luna-only",
+  "userInstruction": "lets keep using the two luna models",
+  "freshAnswersGenerated": 0,
+  "files": {
+    "app.mjs": "b778a3dadce2eceb8539ee731977ae5dc9223c4a5ecb6e7b70a6bd4a303e50c1",
+    "research-config.mjs": "e4b85c2466baae8862c4f320fa1b948e17c85312191d3fc630fbc61ec278f7cb",
+    "research-evidence-assembly.mjs": "dd6130934ba32227472b1b96fff274531e0852a3719f53da6b0c46c24435c92f",
+    "scripts/run-research-validation-20261005.mjs": "d2db7dbcd68179c6077a1762df9568a33f694388ff1a759d621441cd7693a0d9",
+    "scripts/research-provider-readiness-20261005.mjs": "01e12f61a303162997e83b700627f33a89a64c9ee82cc5f3cc71541f213a5a2e",
+    "scripts/research-validation-pricing-20261005.mjs": "8efee967f61ca986c730314aecb9d0ceaea389d7e707a2e34ddf2e907ad2fd82",
+    "scripts/research-evaluation-budget.mjs": "2005f7077e6ec02ef08bfff6466bb24def7dd8b2a909ce1b091bc16e565cc0bb",
+    "tests/research-request-envelope-preflight.mjs": "620ac5f018ab04d9c9d6ec5e7a19917a310fb2dda2f33449687ff167d4094f45",
+    "tests/research-revision-reasoning-effort-contract.mjs": "402e94df4cde23e838c3c64db79716fd5cef2f9e3044ca42b17256872f7ecab7",
+    "scripts/test-research-validation-controls-20261005.mjs": "ace1d50147e0868c9ecd7c9d9f34fe1a83be41ed576c940b4258172d480a1f4d",
+    "evals/retrieval-validation-2026-10-05/luna-model-policy.json": "c3cd006a380cbd3cc05ec19b9402180ca4893c8f3ab3d9bbf1db94184d49fb1e",
+    "evals/retrieval-validation-2026-10-05/fresh-fixture.json": "a21065c374d388082b65456de1cb2fcb6abbdeffa62be2cf907ccde0893bfead",
+    "evals/retrieval-validation-2026-10-05/diagnostic-fixture.json": "ef64e3a66ec113499d75021bb3cad725e1c48a2742f2b71618da09b7e92dc58d",
+    "evals/retrieval-validation-2026-10-05/canonical-rubric-sources.json": "b7a8bba70b5b62bcae748e93283fca281a644ae649308cdca47a49a9032d20fb"
+  }
+}

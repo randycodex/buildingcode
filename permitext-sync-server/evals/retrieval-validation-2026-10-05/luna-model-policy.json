@@ -1,0 +1,31 @@
+{
+  "selectedBy": "User: lets keep using the two luna models",
+  "answerModel": "gpt-6-luna",
+  "roles": {
+    "ordinaryDraft": { "model": "gpt-6-luna", "reasoningEffort": "low", "serviceTier": "priority" },
+    "sourceReview": { "model": "gpt-6-luna", "reasoningEffort": "medium", "serviceTier": "priority" },
+    "feedbackRepair": { "model": "gpt-6-luna", "reasoningEffort": "high", "serviceTier": "default" }
+  },
+  "interpretation": "Fast Luna and high-reasoning Luna are configurations of the same API model. Use high only for the existing bounded feedback repair.",
+  "configuration": {
+    "PERMITEXT_RESEARCH_MODEL": "gpt-6-luna",
+    "PERMITEXT_RESEARCH_FAST_MODEL": "gpt-6-luna",
+    "PERMITEXT_RESEARCH_ACCURATE_MODEL": "",
+    "PERMITEXT_RESEARCH_ROUTING_MODE": "single",
+    "PERMITEXT_RESEARCH_COMPLEX_VERIFICATION": "0",
+    "PERMITEXT_RESEARCH_REASONING_EFFORT": "low",
+    "PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT": "medium",
+    "PERMITEXT_RESEARCH_SERVICE_TIER": "priority",
+    "PERMITEXT_RESEARCH_REVISION_REASONING_EFFORT": "high",
+    "PERMITEXT_RESEARCH_REVISION_SERVICE_TIER": "default",
+    "PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS": ".1",
+    "PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS": ".01",
+    "PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS": ".5",
+    "PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS": ".1",
+    "PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS": ".01",
+    "PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS": ".5"
+  },
+  "solDispatchAllowed": false,
+  "campaignCapUSD": 10.99,
+  "productionEnvironmentModified": false
+}

@@ -69,7 +69,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
   // Execute the actual builder with its actual prompt/schema/evidence helpers,
   // ending BEFORE provider dispatch. No source mutation or real API key needed.
   const dependencies = {
-    process: { env: { OPENAI_API_KEY: "offline-never-dispatched" } },
+    process: { env: { ...environment, OPENAI_API_KEY: "offline-never-dispatched" } },
     fetch: () => { throw new Error("Network is forbidden in the request preflight."); },
     requestResearchProvider: () => { throw new Error("Provider dispatch is forbidden in the request preflight."); },
     researchModelConfiguration: (_environment, modelOverride) => researchModelConfiguration(environment, modelOverride),

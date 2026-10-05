@@ -14,7 +14,7 @@ async function readinessWith(responseStatus) {
     const models = url.endsWith("/models");
     const rejected = url.endsWith("/responses") && responseStatus === 401;
     return new Response(JSON.stringify(models
-      ? { data: ["gpt-6-luna", "gpt-6.1-sol", "text-embedding-3-small"].map(id => ({ id })) }
+      ? { data: ["gpt-6-luna", "text-embedding-3-small"].map(id => ({ id })) }
       : { error: rejected ? { code: "invalid_api_key", type: "invalid_request_error", message: "Key test-only-secret rejected" }
         : { type: "invalid_request_error", message: "Missing required parameter: 'model'." } }),
       { status: models ? 200 : rejected ? 401 : 400 });

@@ -10519,7 +10519,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
   const baseConfiguration = researchAnswerConfigurationForRevision({
     ...researchModelConfiguration(process.env, options.model),
     ...(options.model ? { model: options.model } : {})
-  }, options);
+  }, options, process.env);
   const conversational = options.responseStyle === "conversational";
   const configuration = conversational
     ? {

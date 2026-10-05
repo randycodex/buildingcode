@@ -60,14 +60,20 @@ export function researchModelConfiguration(environment = process.env, modelOverr
   };
 }
 
-export function researchAnswerConfigurationForRevision(configuration, options = {}) {
+export function researchAnswerConfigurationForRevision(configuration, options = {}, environment = process.env) {
   if (!/^gpt-6-luna(?:-|$)/.test(configuration.model || "") ||
       configuration.reasoningEffort !== "low" ||
       !Array.isArray(options.revisionFeedback) || !options.revisionFeedback.length) {
     return configuration;
   }
-  // Use more reasoning within the existing bounded source-verification repair.
-  return { ...configuration, reasoningEffort: "medium" };
+  // Keep the existing repair default; a Luna-only policy may opt into high
+  // reasoning without changing the model, output allowance or review count.
+  const effort = environment.PERMITEXT_RESEARCH_REVISION_REASONING_EFFORT || "medium";
+  const tier = environment.PERMITEXT_RESEARCH_REVISION_SERVICE_TIER;
+  if (!["medium", "high"].includes(effort) || (tier && !["default", "priority"].includes(tier))) {
+    throw new Error("Unsupported Research revision reasoning effort or service tier.");
+  }
+  return { ...configuration, reasoningEffort: effort, ...(tier ? { serviceTier: tier } : {}) };
 }
 
 function nonnegativeNumber(value) {

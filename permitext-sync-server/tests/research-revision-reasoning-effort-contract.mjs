@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { researchModelConfiguration, researchAnswerConfigurationForRevision } from "../research-config.mjs";
+import { researchModelRoutingConfiguration } from "../research-model-routing.mjs";
 import { buildResearchRequestEnvelopeBuilders, researchRequestEnvelopeEnvironment } from "./research-request-envelope-preflight.mjs";
 
 let providerCalls = 0;
@@ -59,4 +61,36 @@ const override = buildAnswerRequest(question, [source], "offline-revision", { mo
 assert.equal(override.model, "gpt-5.6-terra");
 assert.equal(override.reasoning.effort, "low", "Per-request non-Luna override does not escalate.");
 assert.equal(providerCalls, 0);
+const lunaPolicy = JSON.parse(await readFile(new URL("../evals/retrieval-validation-2026-10-05/luna-model-policy.json", import.meta.url), "utf8"));
+const lunaEnvironment = { ...environment, ...lunaPolicy.configuration };
+const lunaRouting = researchModelRoutingConfiguration(lunaEnvironment);
+assert.equal(lunaRouting.mode, "single");
+assert.equal(lunaRouting.accurateModel, "gpt-6-luna");
+assert.equal(lunaRouting.verificationModel, "gpt-6-luna");
+const builders = await buildResearchRequestEnvelopeBuilders(lunaEnvironment);
+const lunaOptions = { model: lunaRouting.accurateModel, responseStyle: "conversational" };
+const fastDraft = builders.buildAnswerRequest(question, [source], "offline-luna-roles", lunaOptions);
+const highRepair = builders.buildAnswerRequest(question, [source], "offline-luna-roles", {
+  ...lunaOptions, previousInterpretation: previous, revisionFeedback: feedback
+});
+const parseOnly = builders.buildAnswerRequest(question, [source], "offline-luna-roles", {
+  ...lunaOptions, structuredResponseRetry: true
+});
+const lunaReview = builders.buildVerifierRequest(question, [source], previous, "offline-luna-roles", lunaOptions);
+for (const request of [fastDraft, highRepair, parseOnly, lunaReview]) assert.equal(request.model, "gpt-6-luna");
+assert.equal(fastDraft.reasoning.effort, "low");
+assert.equal(fastDraft.service_tier, "priority", "An accurate-model override must not accidentally change ordinary Luna to default service");
+assert.equal(highRepair.reasoning.effort, "high");
+assert.equal(highRepair.service_tier, "default");
+assert.equal(highRepair.max_output_tokens, fastDraft.max_output_tokens);
+assert.deepEqual(highRepair.text.format, fastDraft.text.format);
+assert.equal(parseOnly.reasoning.effort, "low");
+assert.equal(parseOnly.service_tier, "priority");
+assert.equal(lunaReview.reasoning.effort, "medium");
+assert.equal(lunaReview.service_tier, "priority");
+assert.throws(() => researchAnswerConfigurationForRevision(configuration, { revisionFeedback: feedback }, {
+  PERMITEXT_RESEARCH_REVISION_REASONING_EFFORT: "unsupported"
+}), /Unsupported/);
+assert.equal(providerCalls, 0);
 console.log(`Revision effort contract passed: ${requestCount} exact-source draft/revision/parse-retry/reviewer envelopes; Luna low→medium only for existing feedback repair, stronger/non-Luna settings preserved; provider calls ${providerCalls}.`);
+console.log("User-selected Luna roles passed: priority low draft, priority medium review, default high feedback repair; same model, schema and output allowance; zero provider calls.");

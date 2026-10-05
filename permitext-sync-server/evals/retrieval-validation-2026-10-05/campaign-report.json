@@ -1,6 +1,6 @@
 {
   "status": "blocked_by_responses_authentication",
-  "recordedAt": "2026-10-05T14:24:37.950153+00:00",
+  "recordedAt": "2026-10-05T14:37:58.728088+00:00",
   "authorization": {
     "capUSD": 10.99,
     "diagnosticUSD": 2.99,
@@ -15,7 +15,7 @@
     "authenticationRejectedGenerationCalls": 2
   },
   "readiness": {
-    "checkedAt": "2026-10-05T14:11:47.209Z",
+    "checkedAt": "2026-10-05T14:37:56.932Z",
     "keyPresent": true,
     "billableRequests": 0,
     "models": {
@@ -25,7 +25,6 @@
       "usagePresent": false,
       "available": {
         "gpt-6-luna": true,
-        "gpt-6.1-sol": true,
         "text-embedding-3-small": true
       }
     },
@@ -90,21 +89,41 @@
       "change": "Saved model-policy-v18 retained selective Sol"
     }
   ],
-  "modelPreference": "User recalls Luna high/Fast configuration. An explicit choice is pending; no further generation calls made. Earlier user agreement to Sol was not established from the available chat pages.",
+  "modelPreference": "User selected Luna-only: Fast Luna for ordinary work, Luna high for bounded feedback repairs. Both use gpt-6-luna; source review remains medium. Sol requests are forbidden by the evaluation runner.",
   "completedChecks": [
     "Readiness unit cases: models200 cannot mask Responses401; only invalid empty POST bodies; credential redaction",
     "Custom-model pricing reservations and fixed campaign pricing",
     "Pending/unknown budget blocks and cap cannot silently expand",
     "New canonical-retrieval contract and actual-corpus contract passed",
     "Live readiness guard stopped before any new billable call; ledger remained3calls/$0.00000078",
-    "Offline lexical/passage retrieval preflights for3 diagnostic first turns and20 fresh first turns, no semantic/provider calls; not answer grading"
+    "Offline lexical/passage retrieval preflights for3 diagnostic first turns and20 fresh first turns, no semantic/provider calls; not answer grading",
+    "Selected Luna policy actual request envelopes: priority low drafts, priority medium reviews, default high feedback repairs; same schema/model/output allowance; zero provider calls",
+    "Former existing-hybrid profile rejected before any network call; financial ledger unchanged",
+    "Non-billable readiness rechecked after model selection; Responses remains401invalid_api_key"
   ],
-  "changes": "Evaluation tooling only in this continuation; product retrieval implementation remains66c5659fb. No production model configuration modified. No push or deployment.",
+  "changes": "Evaluation policy is Luna-only. Added opt-in high-reasoning/default-tier Luna feedback repair, retaining prior medium default elsewhere. Bounded canonical retrieval remains implemented. Production environment unchanged; no push or deployment.",
   "nextActions": [
     "Repair managed Responses endpoint credential forwarding/authentication; model-list access alone is insufficient.",
-    "Select explicit Luna-only or existing-hybrid evaluation policy.",
     "Run unresolved diagnostics within2.99 allocation, diagnose only observed application defects.",
     "Freeze application candidate and model policy, then run source-graded fresh cohort within8 allocation.",
     "Complete missing coverage and production acceptance before making a general95percent reliability claim."
-  ]
+  ],
+  "selectedModelPolicy": "evals/retrieval-validation-2026-10-05/luna-model-policy.json",
+  "modelRoles": {
+    "ordinaryDraft": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "low",
+      "serviceTier": "priority"
+    },
+    "sourceReview": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "serviceTier": "priority"
+    },
+    "feedbackRepair": {
+      "model": "gpt-6-luna",
+      "reasoningEffort": "high",
+      "serviceTier": "default"
+    }
+  }
 }

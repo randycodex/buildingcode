@@ -1,5 +1,5 @@
 // Isolated acceptance runner. Default: retrieval only, zero provider calls.
-// --live requires an explicit model policy and the durable $10.99 campaign ledger.
+// --live uses the user-selected Luna roles and the durable $10.99 campaign ledger.
 import { readFile, writeFile, mkdir, mkdtemp, rm } from "node:fs/promises";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
@@ -29,9 +29,11 @@ for (let index = 2; index < process.argv.length; index++) {
   options.set(name, value);
 }
 const argument = name => options.get(name);
-const modelPolicy = argument("--model-policy") || "existing-hybrid";
-assert(["existing-hybrid", "luna-only"].includes(modelPolicy));
-assert(!live || argument("--model-policy"), "Answer evaluation requires an explicit model policy; never silently opt into Sol");
+const modelPolicy = argument("--model-policy") || "luna-only";
+assert.equal(modelPolicy, "luna-only", "This campaign is authorized for Luna roles only");
+const modelPolicyPath = "evals/retrieval-validation-2026-10-05/luna-model-policy.json";
+const lunaPolicy = JSON.parse(await readFile(new URL(modelPolicyPath, root), "utf8"));
+assert.equal(lunaPolicy.answerModel, "gpt-6-luna", "The saved policy must retain the user-selected Luna model");
 const applicationRoot = argument("--application-root") ? pathToFileURL(`${argument("--application-root").replace(/\/$/, "")}/`) : root;
 const campaignCapUSD = Number(argument("--campaign-cap-usd") || 10.99);
 assert.equal(campaignCapUSD, 10.99, "This authorization is fixed at $10.99");
@@ -76,29 +78,12 @@ Object.assign(process.env, {
   PERMITEXT_RESEARCH_PASSAGE_SEARCH: passageSearch ? "1" : "0",
   PERMITEXT_RESEARCH_SEMANTIC_SEARCH: semanticVectorPath ? "1" : "0",
   PERMITEXT_RESEARCH_SEMANTIC_VECTOR_PATH: semanticVectorPath || "",
-  PERMITEXT_RESEARCH_MODEL: "gpt-6-luna", PERMITEXT_RESEARCH_FAST_MODEL: "gpt-6-luna",
-  PERMITEXT_RESEARCH_ACCURATE_MODEL: "gpt-6.1-sol", PERMITEXT_RESEARCH_ROUTING_MODE: "hybrid",
-  PERMITEXT_RESEARCH_ROUTING_POLICY: "review_first", PERMITEXT_RESEARCH_COMPLEX_VERIFICATION: "1",
-  PERMITEXT_RESEARCH_REASONING_EFFORT: "low", PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT: "medium",
-  PERMITEXT_RESEARCH_SERVICE_TIER: "priority", PERMITEXT_RESEARCH_ACCURATE_SERVICE_TIER: "default",
-  PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "2",
-  PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS: ".1",
-  PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".01",
-  PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS: ".5",
+  ...lunaPolicy.configuration,
   PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "official-model-docs-2026-10-03",
-  PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".10",
-  PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "10",
   PERMITEXT_RESEARCH_PRICING_VERSION: "official-model-docs-2026-10-03",
   PERMITEXT_RESEARCH_MAX_REQUEST_USD: "1", PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "10.99",
   PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "10.99", PERMITEXT_RESEARCH_DAILY_CAP_USD: "10.99",
   PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "10.99"
-});
-if (modelPolicy === "luna-only") Object.assign(process.env, {
-  PERMITEXT_RESEARCH_ACCURATE_MODEL: "gpt-6-luna", PERMITEXT_RESEARCH_ROUTING_MODE: "fixed",
-  PERMITEXT_RESEARCH_COMPLEX_VERIFICATION: "0",
-  PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: ".1",
-  PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".01",
-  PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: ".5"
 });
 const nativeFetch = globalThis.fetch;
 const sourceHashes = {};
@@ -108,7 +93,7 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-question-intent.mjs", "research-conversation-continuity.mjs", "research-answer-presentation.mjs", "research-answer-quality.mjs",
   "research-web-attribution.mjs", "research-config.mjs",
   "research-zoning-safety.mjs", "project-foundation-contract.mjs",
-  "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/run-research-validation-20261005.mjs", "scripts/research-validation-pricing-20261005.mjs", "scripts/research-provider-readiness-20261005.mjs"]) {
+  "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/run-research-validation-20261005.mjs", "scripts/research-validation-pricing-20261005.mjs", "scripts/research-provider-readiness-20261005.mjs", modelPolicyPath]) {
   sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex");
 }
 for (const name of ["research-passage-index.mjs", "research-semantic-passages.mjs",
@@ -117,7 +102,7 @@ for (const name of ["research-passage-index.mjs", "research-semantic-passages.mj
   catch (error) { if (error.code !== "ENOENT") throw error; }
 }
 const result = { fixturePath, applicationRoot: applicationRoot.href, fixtureHash: createHash("sha256").update(fixtureText).digest("hex"), sourceHashes, selectedIDs,
-  live, retrievalLive, modelPolicy, semanticVectorPath, advisoryRoutes, currentCorpusRecall, advisoryRanking, passageSearch, campaignCapUSD,
+  live, retrievalLive, modelPolicy, modelRoles: lunaPolicy.roles, semanticVectorPath, advisoryRoutes, currentCorpusRecall, advisoryRanking, passageSearch, campaignCapUSD,
   mode: fixedEvidence ? "fixed-evidence-reasoning" : "end-to-end", phaseBucket, capUSD: phaseCapUSD, startedAt: new Date().toISOString(), provider: [], cases: [] };
 const persist = () => writeFile(join(directory, "results.json"), JSON.stringify(result, null, 2));
 globalThis.fetch = async (url, options = {}) => {
@@ -127,8 +112,8 @@ globalThis.fetch = async (url, options = {}) => {
   assert((live || (retrievalLive && embedding)) && target.hostname === "api.openai.com" &&
     (target.pathname === "/v1/responses" || (semanticVectorPath && embedding)), "External access is not allowed for this evaluation");
   const body = JSON.parse(options.body);
-  assert(embedding ? body.model === researchSemanticEmbeddingModel : ["gpt-6-luna", "gpt-6.1-sol"].includes(body.model), "Do not silently change the evaluated models");
-  assert(embedding || modelPolicy !== "luna-only" || body.model === "gpt-6-luna", "Sol dispatch is forbidden in Luna-only evaluation");
+  assert(embedding ? body.model === researchSemanticEmbeddingModel : body.model === lunaPolicy.answerModel,
+    "Only the user-selected Luna model may generate answers; Sol dispatch is forbidden");
   assert(!body.tools?.length && !body.previous_response_id && !body.conversation);
   assert(!body.service_tier || ["priority", "default"].includes(body.service_tier));
   const reserved = embedding ? researchSemanticEmbeddingReservation(body.input) : validationReservation(body);
