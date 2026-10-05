@@ -37565,12 +37565,7 @@ function renderEmptyWorkspaceGuidance() {
   const empty = document.createElement("section");
   empty.className = "workspace-empty-state workspace-empty-guidance";
   const content = document.createElement("div");
-  const heading = document.createElement("h2");
-  heading.id = `empty-workspace-heading-${crypto.randomUUID()}`;
-  heading.textContent = "No columns open";
-  empty.setAttribute("aria-labelledby", heading.id);
-  const description = document.createElement("p");
-  description.textContent = "Open a Reader to browse codes, or Search to find a passage.";
+  empty.setAttribute("aria-label", "Open workspace columns");
   const actions = document.createElement("div");
   actions.className = "workspace-empty-actions";
   for (const [label, trigger] of [["Open Reader", addReaderButton], ["Open Search", toggleSearchButton]]) {
@@ -37584,7 +37579,7 @@ function renderEmptyWorkspaceGuidance() {
     });
     actions.append(button);
   }
-  content.append(heading, description, actions);
+  content.append(actions);
   empty.append(content);
   return empty;
 }
