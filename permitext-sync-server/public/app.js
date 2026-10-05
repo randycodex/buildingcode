@@ -1,5 +1,5 @@
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
-import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v3";
+import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
@@ -43,7 +43,7 @@ import {
   researchProgressStages,
   researchProgressStage,
   writeResearchRequestRecovery
-} from "./research-progress.js?v=20261005-natural-recovery-v126";
+} from "./research-progress.js?v=20261005-natural-recovery-v127";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
@@ -19393,7 +19393,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   nextStep.textContent = researchAnswerHasVerificationRecovery(result)
     ? "Use Report this issue to open the feedback form. Nothing is sent until you choose Send feedback."
     : "Review cited provisions and Project facts. Record your own conclusion in a Project Note before adding it to a Report.";
-  detailsBody.append(nextStep);
+  if (!researchAnswerHasVerificationRecovery(result) || reportMessage?.id && options.conversationID) detailsBody.append(nextStep);
   container.append(card);
   wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
   if (reportMessage) renderResearchFeedback(container, reportMessage, options.conversationID);
@@ -21298,11 +21298,11 @@ async function openResearchProgressIssueReport(progress) {
     const report = detailsID ? document.querySelector(`button[aria-controls="${CSS.escape(detailsID)}"]`) : null;
     if (report) { report.click(); return; }
     progress.reportUnavailable = true;
-    progress.error = "No saved issue-report form is available for this attempt. Open Account feedback to contact support. Your question is still here.";
+    progress.error = "I couldn’t open an issue-report form for this attempt. Open Account feedback to contact support.";
   } catch {
     if (!isCurrentAccountRequest(identity)) return;
     progress.reportUnavailable = true;
-    progress.error = "The saved attempt couldn’t be opened. Open Account feedback to contact support. Your question is still here.";
+    progress.error = "I couldn’t open this attempt. Open Account feedback to contact support.";
   }
   refreshResearchProgressCard(progress);
 }
@@ -21373,7 +21373,7 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
           requireCurrentAccountRequest(requestIdentity);
           if (!conversation) throw new Error("The current conversation is not available");
           progress.recoveryReviewed = true;
-          progress.error = "Current Research reloaded. Review its Project context and sources, then retry your preserved question.";
+          progress.error = "Research reloaded. Review its Project context and sources before continuing.";
           refreshResearchProgressCard(progress);
         } catch (error) {
           if (!isCurrentAccountRequest(requestIdentity)) return;
@@ -21589,7 +21589,7 @@ async function runResearchProgressSession(
       if (activeStage) progress.stages.set(activeStage.id, cancelled ? "cancelled" : "failed");
       progress.status = cancelled ? "cancelled" : "failed";
       progress.error = cancelled
-        ? "Research was cancelled before an answer was saved. Your question is still here."
+        ? researchFailureMessage({ code: "RESEARCH_CANCELLED" }, progress.question)
         : researchFailureMessage(error, progress.question);
       progress.errorCode = cancelled ? "RESEARCH_CANCELLED" : error.code || error.payload?.code || "";
       progress.errorStatus = Number(error.status || error.payload?.status || 0);

@@ -167,7 +167,7 @@ for (const [question, description] of [
   assert.equal(standalone.querySelector(".research-answer-narrative").innerText,narrative.innerText);
   const noIdentity=document.createElement("section");context.renderResearchInterpretation(noIdentity,answer,{recordQuestion:question});
   assert(!noIdentity.querySelector(".research-feedback-report"));
-  assert.doesNotMatch(noIdentity.querySelector(".research-answer-narrative").innerText,/Report this issue below/);
+  assert.doesNotMatch(noIdentity.textContent,/Use Report this issue|Nothing is sent until/,"No identityless narrative or details can point to an unavailable Report action");
 }
 
 // Resolve a pronoun from the exact earlier human context used by the review,

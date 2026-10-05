@@ -104,6 +104,13 @@ try {
     assert.equal(checked.recoveryHumanContext.length,1);assert.equal(checked.recoveryHumanContext[0].id,"human-root");
     assert.equal(checked.result.pass,false);assert.equal(requests.length,1);
   });
+  for (const [question,description] of [["Is this equipment safe?","safe equipment"],["What identification do these fans need?","boiler controls"]]) {
+    setup([{value:{...validPass,requestDescription:description}}]);
+    await reservationTest(async()=>{
+      const checked=await openAIResearchVerification(question,evidence,answer,"offline-user",{model:"gpt-5.6-luna",messages:humanContext});
+      assert.equal(checked.requestDescription,null);assert.equal(checked.result.pass,true);assert.equal(requests.length,1);
+    });
+  }
   setup([{value:{...validFail,requestDescription:"installation compliance"}}]);
   await reservationTest(async()=>{
     const checked=await openAIResearchVerification("Can we omit it?",evidence,answer,"offline-user",{model:"gpt-5.6-luna",messages:humanContext});

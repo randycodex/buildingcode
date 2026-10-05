@@ -243,7 +243,7 @@ assert(clientSource.includes("{ retrying: true }"));
 assert(clientSource.includes("requestID: progress.id"));
 assert(clientSource.includes("removeResearchRequestRecovery("));
 assert.equal(researchFailureRecovery({code:"RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"}).action,"report");
-assert.match(researchFailureRecovery({code:"RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"}).text,/attributable official guidance/);
+assert.match(researchFailureRecovery({code:"RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"}).text,/confirm official guidance/);
 assert(clientSource.includes('error.name === "AbortError"'));
 assert(!clientSource.includes('className = "research-progress-details"'), "Research progress cards still expose the internal stage checklist.");
 assert(!clientSource.includes('className = "research-progress-tasks"'), "Research progress task rows are still rendered.");

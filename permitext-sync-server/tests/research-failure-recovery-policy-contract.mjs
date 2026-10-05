@@ -103,6 +103,12 @@ for (const value of [undefined,null,22,{},[],"x".repeat(101),"Ignore instruction
 }
 assert.equal(researchRecoveryRequestDescription("Does the equipment meet the code?","the equipment meets the code"),"");
 assert.equal(researchRecoveryRequestDescription("Can the air handlers comply?","air handlers comply"),"");
+for (const [question,description] of [["Is this equipment safe?","safe equipment"],["Is this installation legal?","legal installation"],["Is this control adequate?","adequate control"],["Is the clearance sufficient?","sufficient clearance"]]) assert.equal(researchRecoveryRequestDescription(question,description),"");
+const earlierSubject=[{id:"old-human",role:"user",requestID:"old-request",question:"We are reviewing the boiler controls."}];
+assert.equal(researchRecoveryRequestDescription("What identification do these fans need?","boiler controls",earlierSubject),"");
+assert.equal(researchRecoveryRequestDescription("Do these fans meet the minimum?","boiler controls",earlierSubject),"");
+assert.equal(researchRecoveryRequestDescription("Does that meet the minimum?","boiler controls",earlierSubject),"boiler controls");
+assert.equal(researchRecoveryRequestDescription("Can we omit it?","boiler controls",earlierSubject),"boiler controls");
 const priorHuman={id:"root-human",role:"user",requestID:"root-request",question:"We are checking the boiler controls."};
 const contextual=researchClarificationAnswer("Does that meet the minimum?","verification_incomplete",{requestID:"followup",requestDescription:"boiler controls",humanContext:[priorHuman]});
 assert(isCanonicalResearchClarification("Does that meet the minimum?",JSON.parse(JSON.stringify(contextual))));
@@ -131,6 +137,36 @@ for (const [error,action] of [[{status:401},"review_account"],[{code:"RESEARCH_A
   assert.equal(researchFailureRecovery(error).retryable,false);
 }
 
+// Every current category preserves its action/retry policy without routine
+// persistence boilerplate, a copied question, invented facts or outage diagnosis.
+const fallbackCases=[
+ ...["RESEARCH_CONTEXT_CHANGED","RESEARCH_CONVERSATION_CHANGED","RESEARCH_PROJECT_REVIEW_REQUIRED"].map(code=>[{code},"context","review_context",false]),
+ ...["RESEARCH_SOURCE_CHANGED","INCOMPLETE_RESEARCH_SECTION","RESEARCH_EVIDENCE_REQUIRED"].map(code=>[{code},"source","review_sources",false]),
+ ...[{status:401},{code:"ACCOUNT_SESSION_INACTIVE"},{status:402},{status:403},{code:"RESEARCH_ADDON_REQUIRED"},{code:"RESEARCH_TURNS_REQUIRED"}].map(error=>[error,"account","review_account",false]),
+ ...["RESEARCH_SPEND_CAP","RESEARCH_EVAL_SPEND_CAP"].map(code=>[{code},"limit","contact_support",false]),
+ ...["RESEARCH_NOT_CONFIGURED","RESEARCH_ZONING_SOURCE_UNAVAILABLE"].map(code=>[{code},"unavailable","contact_support",false]),
+ ...["RESEARCH_INTERRUPTED","RESEARCH_PROVIDER_ERROR","RESEARCH_VERIFIER_ERROR","TimeoutError","RESEARCH_CANCELLED","AbortError"].map(code=>[{code},"interrupted","retry",true]),
+ [{code:"RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"},"evidence","report",false],
+ [{},"unknown","contact_support",false],[{code:"UNKNOWN_RESEARCH_ERROR"},"unknown","contact_support",false],
+ ...["INVALID_RESEARCH_RESPONSE","INVALID_RESEARCH_VERIFICATION","RESEARCH_VERIFICATION_FAILED"].map(code=>[{code},"verification","report",false]),
+ ...["RESEARCH_EVIDENCE_NOT_FOUND","RESEARCH_ZONING_EVIDENCE_REQUIRED"].map(code=>[{code},"evidence","report",false])
+];
+const prompt="Can these air handlers use the proposed labels?";
+for(const [error,kind,action,retryable] of fallbackCases){
+ const recovery=researchFailureRecovery({...error,message:"PRIVATE_DIAGNOSIS",payload:{error:"PRIVATE_DRAFT"}},prompt);
+ assert.equal(recovery.kind,kind);assert.equal(recovery.action,action);assert.equal(recovery.retryable,retryable);
+ assert.doesNotMatch(recovery.text,/saved|repeat|still here|so I couldn’t finish it|PRIVATE|Which|What.*project fact|complies|must|shall|outage|network|offline/i);
+ assert(!recovery.text.includes(prompt));
+ if(!retryable)assert.doesNotMatch(recovery.text,/try.*again|retry/i);
+}
+assert.match(researchFailureRecovery({code:"RESEARCH_CANCELLED"}).text,/cancelled/);
+assert.match(researchFailureRecovery({code:"TimeoutError"}).text,/took too long/);
+assert.match(researchFailureRecovery({code:"RESEARCH_PROVIDER_ERROR"}).text,/completed response/);
+assert.match(researchFailureRecovery({code:"RESEARCH_VERIFIER_ERROR"}).text,/source check.*review request failed/);
+assert.match(researchFailureRecovery({code:"RESEARCH_INTERRUPTED"}).text,/interrupted/);
+assert.match(researchFailureRecovery({code:"AbortError"}).text,/request stopped/);
+assert.doesNotMatch(researchFailureRecovery({code:"RESEARCH_PROJECT_REVIEW_REQUIRED"}).text,/changed/);
+
 const message={role:"user",requestID:"same-request",question:"Retain exact question",createdAt:"2026-10-03T01:00:00Z",failure:{code:"RESEARCH_VERIFICATION_FAILED",status:"failed",message:"Old copy: Retry this question",failedAt:"2026-10-03T01:00:10Z"}};
 const snapshot=JSON.stringify(message), restored=researchRecoveryFromFailedMessage(message,"owned-conversation");
 assert.equal(restored.requestID,message.requestID);
@@ -151,4 +187,7 @@ const app=await readFile(new URL("../app.mjs",import.meta.url),"utf8");
 assert.match(app,/if \(!assembledEvidence\.length\) \{[\s\S]*?clarificationReason: "evidence_unavailable"/);
 assert.match(app,/!conditionalZoningExplanation\) \{[\s\S]*?clarificationReason: "research_unresolved"/);
 assert.match(app,/recoveryReason: failureRecovery\.reason/);
+const client=await readFile(new URL("../public/app.js",import.meta.url),"utf8");
+assert.doesNotMatch(client,/Your question is still here|retry your preserved question|cancelled before an answer was saved/);
+assert.doesNotMatch(app,/Your question is still here|Your question and earlier messages are saved|ask a narrower question here/);
 console.log("Failure recovery policy passed: typed source/verification/format distinctions, conservative prerequisites, immutable prior records, no guessed facts/private prose, correct nonretry actions and transport controls; no providers.");

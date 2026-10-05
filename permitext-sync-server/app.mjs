@@ -10490,7 +10490,7 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
       verification: { ...validateResearchVerification(checked.value), model: checked.model }
     });
     if (!verification.pass) {
-      throw Object.assign(new Error("The official guidance summary did not pass source verification. Your question is still here."), {
+      throw Object.assign(new Error("The official guidance summary did not pass source verification."), {
         code: "RESEARCH_VERIFICATION_FAILED", verificationAttempts: [verification]
       });
     }
@@ -19426,8 +19426,8 @@ export function researchConversationWithFailedQuestion(current, { userID, reques
     researchRequestID: requestID,
     failure: {
       code, status, failedAt, origin,
-      message: status === "cancelled" ? "Research was cancelled. Your question is still here."
-        : origin === "client-recovery" ? "Research was interrupted before an answer was saved. Your question is still here."
+      message: status === "cancelled" ? researchFailureRecovery({ code: "RESEARCH_CANCELLED" }).text
+        : origin === "client-recovery" ? researchFailureRecovery({ code: "RESEARCH_INTERRUPTED" }).text
         : researchFailureRecovery({ code }).text
     }
   };
@@ -19470,7 +19470,7 @@ async function handleRetainInterruptedResearchQuestion(request, response) {
   const requestID = normalizedResearchText(context.body.requestID, 100);
   const question = normalizedResearchText(context.body.question, 2_000);
   if (!requestID || question.length < 3 || !Number.isSafeInteger(context.body.contextRevision)) {
-    sendError(response, 400, "A preserved question, request identifier, and context revision are required.");
+    sendError(response, 400, "The original question, request identifier, and context revision are required.");
     return;
   }
   const prior = researchMessagesForRequest(conversation, requestID);
@@ -19975,7 +19975,7 @@ async function handleResearchConversationMessage(request, response) {
         context.authContext.entitlement
       );
       progressResponse.json(402, {
-        error: "You have used this month's included Research turns. Buy more turns to continue; your question is still here.",
+        error: "You have used this month's included Research turns. Review available turns in Account to continue.",
         code: "RESEARCH_TURNS_REQUIRED",
         usage
       });
@@ -20466,7 +20466,7 @@ async function handleResearchConversationMessage(request, response) {
     }
     if (allowOfficialGuidanceOnly && webSupport.sources.length === 0) {
       const error = new Error(
-        "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."
+        "I couldn’t confirm official guidance from the approved sources."
       );
       error.code = "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE";
       error.webSupport = {
@@ -21789,7 +21789,7 @@ async function handleResearchConversationMessage(request, response) {
     }
     if (error.code === "RESEARCH_SPEND_CAP") {
       progressResponse.failActive("failed");
-      progressResponse.error(503, "Research stopped at a spending limit before another model call. Your question and earlier messages are saved. You can ask a narrower question here.", {
+      progressResponse.error(503, researchFailureRecovery({ code: "RESEARCH_SPEND_CAP" }).text, {
         code: "RESEARCH_SPEND_CAP"
       });
       return;
