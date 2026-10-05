@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const researchMaterialScopeReviewVersion = "20261004-cited-source-scope-review-v1";
+export const researchMaterialScopeReviewVersion = "20261005-consistent-source-scope-review-v2";
 const hash = value => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const states = ["not_material", "condition_preserved", "established", "unsupported_application", "excluded_application"];
 const results = ["supported", "evidence_gap_only", "unsupported"];
@@ -34,7 +34,7 @@ export function researchMaterialScopeReviewSchema(baseSchema, packet) {
   const checkProperties = Object.fromEntries(packet.checks.map(check => [check.sourceID, {
     type: "object", additionalProperties: false,
     properties: {
-      categoricalApplication: { type: "boolean" },
+      categoricalApplication: { type: "boolean", description: "True only for an unqualified application to the current actual or stipulated scenario. False for conditional rules, source explanations and evidence boundaries. When true, assess relations for categorical uses only; condition_preserved contradicts true." },
       sourceResult: { type: "string", enum: results },
       relations: { type: "object", additionalProperties: false,
         properties: Object.fromEntries(check.relationIDs.map(id => [id, { type: "string", enum: states }])),
@@ -54,12 +54,12 @@ export function researchMaterialScopeReviewSchema(baseSchema, packet) {
 
 export const researchMaterialScopeReviewInstruction = [
   "MATERIAL SOURCE SCOPE ASSESSMENT: Complete every server-enumerated source and relation in MATERIAL SCOPE CHECKS within this SAME ordinary review. Assess the complete answer, including its opening and headings, not just the supported points. Mark unboundCategoricalApplication=true for any unsupported categorical legal/project result not grounded in the bound sources; accurate later explanation cannot cure that result.",
-  "For each source, categoricalApplication=true means any claim actually asserts that its rule governs or establishes a permission, prohibition, obligation or compliance result for the current scenario/project. A directly stipulated scenario result is valid when all material premises are established for that scenario; do not transfer it to actual-project facts. sourceResult=supported requires accurate responsive enacted support for the requested issue or a material qualification/independent useful action. A mere citation, true unrelated side rule or gap statement is not responsive support. Use evidence_gap_only for an inspected-source boundary without a responsive enacted conclusion; source descriptions and accurate conditional rules can be supported without actual-project findings. Use unsupported for false/ungrounded claims or unresponsive rules retained as support.",
-  "Review each listed parent/chapter relation or gap against the exact text and current human scenario/corrections. For every asserted categorical use, established means its material scope is established in THAT use's actual/scenario context; not_material requires the scope truly does not affect that claim. An unknown/excluded material categorical application is unsupported_application/excluded_application. condition_preserved is for uses that remain expressly conditional at the affected claim, never a cure for an earlier categorical use. Assess only asserted categorical uses when others of the SAME source remain expressly conditional; do not poison a valid stipulated scenario result or independent action with uncertainty about a separately conditional actual-project use. A gap cannot establish an unavailable scope. Keep one terse source-specific reason; no copied quotations, span offsets, fact indices or repeated legal summaries. Semantic classifications require the full source and human context, not keyword matching. Return genuine ordinary issues for every substantive failure."
+  "For each source, categoricalApplication=true means an unqualified claim actually asserts that its rule governs or establishes a permission, prohibition, obligation or compliance result for the current scenario/project. Set it false when all uses are conditional rules, source explanations or evidence boundaries. A directly stipulated scenario result is valid when all material premises are established for that scenario; do not transfer it to actual-project facts. sourceResult=supported requires accurate responsive enacted support for the requested issue or a material qualification/independent useful action. A mere citation, true unrelated side rule or gap statement is not responsive support. Use evidence_gap_only for an inspected-source boundary without a responsive enacted conclusion; source descriptions and accurate conditional rules can be supported without actual-project findings. Use unsupported for false/ungrounded claims or unresponsive rules retained as support.",
+  "Review each listed parent/chapter relation or gap against the exact text and current human scenario/corrections. For every asserted categorical use, established means its material scope is established in THAT use's actual/scenario context; not_material requires the scope truly does not affect that claim. An unknown/excluded material categorical application is unsupported_application/excluded_application. condition_preserved is for uses that remain expressly conditional at the affected claim, never a cure for an earlier categorical use. categoricalApplication=true and condition_preserved in the same row are inconsistent. When categoricalApplication=true, assess only asserted categorical uses when others of the SAME source remain expressly conditional; do not poison a valid stipulated scenario result or independent action with uncertainty about a separately conditional actual-project use. A gap cannot establish an unavailable scope. Keep one terse source-specific reason; no copied quotations, span offsets, fact indices or repeated legal summaries. Semantic classifications require the full source and human context, not keyword matching. Return genuine ordinary issues for every substantive failure."
 ].join(" ");
 
 function invalid(packet, value, invariant) {
-  const error = new Error("The Research material-scope assessment was not bound to its request.");
+  const error = new Error("The Research material-scope assessment was not bound to its request or was internally inconsistent.");
   error.code = "INVALID_RESEARCH_VERIFICATION";
   error.failureStage = "verification_envelope_validation";
   error.verificationInvariant = invariant;
@@ -83,11 +83,16 @@ export function validateResearchMaterialScopeReview({ packet, value, verificatio
         typeof row.reason !== "string" || !row.reason.trim() || row.reason.length > 320 ||
         !sameKeys(row.relations, check.relationIDs) || Object.values(row.relations).some(state => !states.includes(state)))
       invalid(packet, review, "material_scope_assessment_shape");
+    // Contradictory classifications do not establish a legal failure. The
+    // caller may use its existing once-per-turn envelope rereview, with the
+    // same answer and evidence; never silently convert this row to supported.
+    if (row.categoricalApplication && Object.values(row.relations).includes("condition_preserved"))
+      invalid(packet, review, "material_scope_categorical_condition_contradiction");
     let rowUnsupported = row.sourceResult === "unsupported" || row.categoricalApplication && row.sourceResult !== "supported";
     for (const [id, state] of Object.entries(row.relations)) {
       const edge = packet.graph.find(edge => edge.id === id);
       rowUnsupported ||= ["unsupported_application", "excluded_application"].includes(state) ||
-        row.categoricalApplication && state === "condition_preserved" || Boolean(edge.gap) && state === "established";
+        Boolean(edge.gap) && state === "established";
     }
     if (rowUnsupported) { unsupported = true; failures.push(`${check.sourceID}: ${row.reason.trim()}`); }
     // Persist classifications/identities only. Reasons feed ordinary issues;

@@ -41,13 +41,18 @@ const conditionalAnswer = { ...answer, answerText: "If the cabinet is in a share
 const conditionalPacket = make({ answer: conditionalAnswer }); conditional.packetHash = conditionalPacket.packetHash;
 assert.equal(check(conditional, undefined, conditionalPacket).pass, true,
   "Conditional rule needs preserved source conditions, not fabricated human facts; independent action survives.");
-for (const state of ["unsupported_application", "excluded_application", "condition_preserved"]) {
+for (const state of ["unsupported_application", "excluded_application"]) {
   const review = witness(); review.checks.rule.relations[relation] = state;
   const result = check(review, { pass: true, issues: [], missingFactsOnly: true, projectFactQuestions: ["An unrelated question?"] });
   assert.equal(result.pass, false); assert.equal(result.missingFactsOnly, false); assert.deepEqual(result.projectFactQuestions, []);
   assert(result.issues[0].detail.includes("rule:"));
   assert.equal(result.materialScopeReview.checks.action.sourceResult, "supported");
 }
+const contradictory = witness(); contradictory.checks.rule.relations[relation] = "condition_preserved";
+assert.throws(() => check(contradictory), error => error.code === "INVALID_RESEARCH_VERIFICATION" &&
+  error.failureStage === "verification_envelope_validation" &&
+  error.verificationInvariant === "material_scope_categorical_condition_contradiction",
+  "Contradictory flags require a fresh review; neither automatic support nor a fabricated legal issue.");
 const unboundPacket = make({ answer: { ...conditionalAnswer, answerText: "Your installation is allowed. " + conditionalAnswer.answerText } });
 const unbound = structuredClone(conditional); unbound.packetHash = unboundPacket.packetHash; unbound.unboundCategoricalApplication = true;
 assert.equal(check(unbound, undefined, unboundPacket).pass, false, "Unsupported opening is checked independently of source flags.");
@@ -96,7 +101,7 @@ for (const [sourceID, expectedPass] of [[suppliedScope.sourceID, true], ["foreig
     identity: { ...gapIdentity, sourceID } }] });
   assert.equal(result.verdict.pass, expectedPass, "An explicitly supplied source identity cannot redirect to another source.");
 }
-for (const state of ["unsupported_application", "excluded_application", "condition_preserved"]) {
+for (const state of ["unsupported_application", "excluded_application"]) {
   const review = structuredClone(available.currentReview);
   review.checks.rule.relations[available.current.checks[0].relationIDs[0]] = state;
   assert.equal(check(review, undefined, available.current).pass, false, "Supplied scope still requires a genuine semantic assessment.");

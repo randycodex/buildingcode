@@ -48,9 +48,10 @@ globalThis.fetch = async (url, options) => {
   if (currentSignal) assert(options.signal, "The existing guarded provider cancellation signal is retained.");
   if (requests.length === 1 && duringFirstRequest) duringFirstRequest();
   const originalReply = replies.shift();
-  const reply = originalReply && { ...originalReply, value: originalReply.value && typeof originalReply.value === "object"
-    ? { ...originalReply.value, materialScopeReview: Object.hasOwn(originalReply.value, "materialScopeReview")
-      ? originalReply.value.materialScopeReview : syntheticMaterialScopeReview(body) } : originalReply.value };
+  const replyValue = originalReply?.valueFromRequest ? originalReply.valueFromRequest(body) : originalReply?.value;
+  const reply = originalReply && { ...originalReply, value: replyValue && typeof replyValue === "object"
+    ? { ...replyValue, materialScopeReview: Object.hasOwn(replyValue, "materialScopeReview")
+      ? replyValue.materialScopeReview : syntheticMaterialScopeReview(body) } : replyValue };
   assert.notEqual(reply, undefined, "No extra provider request is authorized by this contract.");
   return Response.json({ model: body.model, status: reply.status || "completed",
     ...(reply.incomplete_details ? { incomplete_details: reply.incomplete_details } : {}),
@@ -265,6 +266,48 @@ try {
   // when fact extraction supplies no structured facts. No semantic pass claim.
   const scopedEvidence = [...evidence, { sourceID: "parent", sectionID: "parent", codePrefix: "ZR", codeVersion: "snapshot-A", text: "A material parent condition.",
     applicabilityScopeAnchors: [{ sourceID: "source-a" }] }];
+  // A live review classified one application as both categorical and
+  // conditional. Rereview the unchanged draft once; substantive rejections
+  // and repeated contradictions remain failures, with both calls accounted.
+  const scopeReply = (categoricalApplication, relationState, verdict = validPass) => ({ valueFromRequest(body) {
+    const materialScopeReview = syntheticMaterialScopeReview(body);
+    const row = materialScopeReview.checks["source-a"];
+    assert.equal(Object.keys(row.relations).length, 1);
+    row.categoricalApplication = categoricalApplication;
+    for (const id of Object.keys(row.relations)) row.relations[id] = relationState;
+    return { ...verdict, materialScopeReview };
+  } });
+  for (const verdict of [validPass, validFail]) {
+    setup([scopeReply(true, "condition_preserved"), scopeReply(false, "condition_preserved", verdict)]);
+    await reservationTest(async () => {
+      const result = await run({}, scopedEvidence);
+      assert.equal(result.result.pass, verdict.pass);
+      assert.deepEqual(result.result.issues, verdict.issues);
+      assert.equal(result.verificationEnvelopeDiagnostics.invariant, "material_scope_categorical_condition_contradiction");
+      assert.equal(result.verificationEnvelopeRetryCount, 1);
+      assert.equal(result.usage.providerRequestCount, 2);
+      assert.equal(requests.length, 2);
+      for (const field of ["model", "store", "service_tier", "reasoning", "max_output_tokens", "safety_identifier", "text"])
+        assert.deepEqual(requests[1][field], requests[0][field]);
+      assert(requests[1].input.startsWith(requests[0].input));
+      assert(requests[1].instructions.includes("Do not invent conditions or facts"));
+      assert.deepEqual(selectedTimeouts, [90_000, 90_000]);
+    });
+  }
+  setup([scopeReply(true, "condition_preserved"), scopeReply(true, "condition_preserved")]);
+  await reservationTest(async () => {
+    await assert.rejects(run({}, scopedEvidence), error => error.code === "INVALID_RESEARCH_VERIFICATION" &&
+      error.verificationInvariant === "material_scope_categorical_condition_contradiction" &&
+      error.verificationEnvelopeRetryCount === 1 && error.providerUsage.providerRequestCount === 2);
+    assert.equal(requests.length, 2, "No third review can repair a repeated contradiction.");
+  });
+  setup([scopeReply(true, "unsupported_application")]);
+  await reservationTest(async () => {
+    const result = await run({}, scopedEvidence);
+    assert.equal(result.result.pass, false);
+    assert.equal(result.result.issues[0].type, "fact_evidence_confusion");
+    assert.equal(requests.length, 1, "A consistent unsupported application remains a semantic failure.");
+  });
   const humanHistory = [{ role: "user", question: "Assume a violet widget has a required label." },
     { role: "assistant", answer: { answerText: "An assistant statement is not a human premise." } },
     { role: "user", question: "Correction: the widget is blue; the required label is unchanged." }];
