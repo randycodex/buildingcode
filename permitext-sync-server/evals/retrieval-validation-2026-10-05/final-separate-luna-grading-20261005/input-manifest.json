@@ -1,0 +1,97 @@
+{
+  "applicationResultSHA256": "ad172f0da4853d1666383e408ffaee0cb4745fdd494f84f309874994ca3e5235",
+  "fixtureSHA256": "55a96a3db8b270e76a563ed05a558c04c7ac33666744755b0ccbf5dc024470eb",
+  "frozenSourcesSHA256": "063632aae9808b7272327c3ed91d40e0262c5d7d224af766a1e45b522c2b9bdb",
+  "gradingSourcesSHA256": "b37467b0ce5b15f8e76b94b157ab1df6ccc074905e9cc6d952d5d57eea74d613",
+  "scriptSHA256": "b56caa49f3e7eaa842dc9ee618113aa92a1369cf841950f2e8c78da503319bca",
+  "canonicalCitationHelperSHA256": "cf3fe433d6993c9ccecff4912b5551b07b98dfc6dba6742175b7eb99f03f7e8a",
+  "definitionBinderSHA256": "94fb0c3d893ffcb55c2547f447539596aee6f066a86bf0bfe3ac9091a41d97b6",
+  "requests": [
+    {
+      "id": "acceptance-water-heater-valve",
+      "requestSHA256": "407e753ba10cd9fa9f823d638c7d70f3204d46faabd31a2686081cbacc82514b"
+    },
+    {
+      "id": "acceptance-relief-discharge",
+      "requestSHA256": "74bc521efba6b64df2e73a0cdbcb269fb25be00e05e444849b1adc697a208ebf"
+    },
+    {
+      "id": "acceptance-reserved-vent",
+      "requestSHA256": "cbc673a984bd02c4352035adf805bd8849aece1659538e05708f9a75271e97db"
+    },
+    {
+      "id": "acceptance-grade-support",
+      "requestSHA256": "46a404d76fafde2bf0563c57a8af11199dfe95df3133dfa430f6c7249278d280"
+    },
+    {
+      "id": "acceptance-environmental-exhaust",
+      "requestSHA256": "025a8f663992dc7607d422fdf51f3dbf727df9bd9930f0e49d8e8bd169bd743c"
+    },
+    {
+      "id": "acceptance-domestic-hood",
+      "requestSHA256": "58b337b1bdd9393e6dedb617ce553c56cb3ebfe01e4f70793ae48e4427c48093"
+    },
+    {
+      "id": "acceptance-sediment-trap",
+      "requestSHA256": "de508038c997ddd3d1d6364e8cf6b31cfe3f05c81e66c32a981929f5430b0466"
+    },
+    {
+      "id": "acceptance-test-isolation",
+      "requestSHA256": "ee3f2c5839f7fe04a561ee47cef5bca6bd61eda39ab580cd078ca169eec926fe"
+    },
+    {
+      "id": "acceptance-mp-regulator",
+      "requestSHA256": "59c668abb48ef704f8804887f5866e29263c953d28bb991ed9bce3fbfa7c0ac4"
+    },
+    {
+      "id": "acceptance-exit-sign-distance",
+      "requestSHA256": "32ccb45e43fa1130d97668586724794d221e920a0bc14ef4dedf7d675198d060"
+    },
+    {
+      "id": "acceptance-handrail-height",
+      "requestSHA256": "3ebd31f66f8ff08fbf039f34ffa5609b945bacd8de7ff66a18c1010a2577c2c0"
+    },
+    {
+      "id": "acceptance-handrail-extension",
+      "requestSHA256": "8919a17b16b9e52d04342c8d7fd988c09eaddade54b17e80dd395c8c02148d0a"
+    },
+    {
+      "id": "acceptance-exit-enclosure",
+      "requestSHA256": "bc2287cb2357a8a3b94eedb6617f99eb3eb6e6dd236146646f6527653ac7fb63"
+    },
+    {
+      "id": "acceptance-permit-basis",
+      "requestSHA256": "4761a609d010f1846686b2eaa6c49ccf76ea7d0675f26ba23221a98d28b13e77"
+    },
+    {
+      "id": "acceptance-asbestos-certification",
+      "requestSHA256": "2cf405a538b4e0ec290cbb416711ba44fee27051527cf68e10a2b2dfe09d6eb6"
+    },
+    {
+      "id": "acceptance-vacant-protection",
+      "requestSHA256": "7f6795f0ec91e6832a2ab3f90e04f5d555134318558b7b4018b06eea4f00b413"
+    },
+    {
+      "id": "acceptance-reserved-fire-section",
+      "requestSHA256": "95f3d28f6826b891628e4759619a562a81489bb099be1792e9a0fbf83ea4d625"
+    },
+    {
+      "id": "acceptance-emergency-power",
+      "requestSHA256": "1fc7d0a1d5a10aa878c21880f3355aae171fbcfc9525512eb398b8b087ca6d5c"
+    },
+    {
+      "id": "acceptance-plaza-bicycles",
+      "requestSHA256": "52d00ee2c28a612ca2d8912ee47748d97c11292f401322dd44d50458dbabf1b4"
+    },
+    {
+      "id": "acceptance-plaza-fountain",
+      "requestSHA256": "03cc323cd24e6aeab1f6dcf4dfac1ac23dd814cfcf18723c7569a188f2711e6c"
+    }
+  ],
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "externalExpertApproval": false,
+  "applicationReruns": 0,
+  "sourceCharacterCeiling": 48000,
+  "maximumGradingCostUSD": 0.5
+}

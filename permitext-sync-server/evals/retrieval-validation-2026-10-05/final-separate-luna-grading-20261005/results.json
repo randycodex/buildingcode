@@ -1,0 +1,2930 @@
+{
+  "startedAt": "2026-10-05T22:04:25.094Z",
+  "method": "separate_Luna_model_grading",
+  "applicationReruns": 0,
+  "externalExpertApproval": false,
+  "provider": [
+    {
+      "id": "19d76baf-d60e-478d-845c-1e24f21b72c8",
+      "case": "acceptance-water-heater-valve",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0399795,
+      "startedAt": "2026-10-05T22:04:25.103Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8927,
+        "input_tokens_details": {
+          "cache_write_tokens": 8924,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1963,
+        "output_tokens_details": {
+          "reasoning_tokens": 1026
+        },
+        "total_tokens": 10890
+      },
+      "endedAt": "2026-10-05T22:04:36.216Z",
+      "costUSD": 0.004194600000000001
+    },
+    {
+      "id": "695876f4-5301-40d5-aeff-6adb5c6e2bed",
+      "case": "acceptance-relief-discharge",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0641476,
+      "startedAt": "2026-10-05T22:04:36.231Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 22116,
+        "input_tokens_details": {
+          "cache_write_tokens": 22113,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2317,
+        "output_tokens_details": {
+          "reasoning_tokens": 881
+        },
+        "total_tokens": 24433
+      },
+      "endedAt": "2026-10-05T22:04:48.626Z",
+      "costUSD": 0.00784585
+    },
+    {
+      "id": "a727008d-c73b-47da-8ad2-cf1023abb329",
+      "case": "acceptance-reserved-vent",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.031381900000000004,
+      "startedAt": "2026-10-05T22:04:48.642Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 4952,
+        "input_tokens_details": {
+          "cache_write_tokens": 4949,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1927,
+        "output_tokens_details": {
+          "reasoning_tokens": 832
+        },
+        "total_tokens": 6879
+      },
+      "endedAt": "2026-10-05T22:04:58.301Z",
+      "costUSD": 0.00316485
+    },
+    {
+      "id": "ccca65b6-a50b-491a-9bf0-f011733b4b0f",
+      "case": "acceptance-grade-support",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0364639,
+      "startedAt": "2026-10-05T22:04:58.316Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 6907,
+        "input_tokens_details": {
+          "cache_write_tokens": 6904,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1904,
+        "output_tokens_details": {
+          "reasoning_tokens": 935
+        },
+        "total_tokens": 8811
+      },
+      "endedAt": "2026-10-05T22:05:08.824Z",
+      "costUSD": 0.0036306
+    },
+    {
+      "id": "2ca6bc14-ef35-4d6a-8281-936e81804218",
+      "case": "acceptance-environmental-exhaust",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.040120300000000005,
+      "startedAt": "2026-10-05T22:05:08.838Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8562,
+        "input_tokens_details": {
+          "cache_write_tokens": 8559,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1813,
+        "output_tokens_details": {
+          "reasoning_tokens": 467
+        },
+        "total_tokens": 10375
+      },
+      "endedAt": "2026-10-05T22:05:17.389Z",
+      "costUSD": 0.00395335
+    },
+    {
+      "id": "32ba6e56-7abf-44e4-9eee-0339e9ba332b",
+      "case": "acceptance-domestic-hood",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.045782550000000005,
+      "startedAt": "2026-10-05T22:05:17.404Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10441,
+        "input_tokens_details": {
+          "cache_write_tokens": 10438,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1904,
+        "output_tokens_details": {
+          "reasoning_tokens": 1052
+        },
+        "total_tokens": 12345
+      },
+      "endedAt": "2026-10-05T22:05:28.207Z",
+      "costUSD": 0.0045141
+    },
+    {
+      "id": "af3e634a-cdf1-4098-aa95-919dbeaa4ead",
+      "case": "acceptance-sediment-trap",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0367235,
+      "startedAt": "2026-10-05T22:05:28.220Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 6966,
+        "input_tokens_details": {
+          "cache_write_tokens": 6963,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1553,
+        "output_tokens_details": {
+          "reasoning_tokens": 463
+        },
+        "total_tokens": 8519
+      },
+      "endedAt": "2026-10-05T22:05:36.520Z",
+      "costUSD": 0.0032943499999999997
+    },
+    {
+      "id": "196bbe6f-e4ff-493c-8ec1-8f71b5149e4f",
+      "case": "acceptance-test-isolation",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.041441950000000005,
+      "startedAt": "2026-10-05T22:05:36.536Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8955,
+        "input_tokens_details": {
+          "cache_write_tokens": 8952,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1492,
+        "output_tokens_details": {
+          "reasoning_tokens": 642
+        },
+        "total_tokens": 10447
+      },
+      "endedAt": "2026-10-05T22:05:44.614Z",
+      "costUSD": 0.0037305999999999997
+    },
+    {
+      "id": "c2105834-9334-440a-a782-05da87536d82",
+      "case": "acceptance-mp-regulator",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0337348,
+      "startedAt": "2026-10-05T22:05:44.626Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 5871,
+        "input_tokens_details": {
+          "cache_write_tokens": 5868,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1816,
+        "output_tokens_details": {
+          "reasoning_tokens": 591
+        },
+        "total_tokens": 7687
+      },
+      "endedAt": "2026-10-05T22:05:54.092Z",
+      "costUSD": 0.0032836
+    },
+    {
+      "id": "5bf5ad61-217c-4717-ade3-2d0dbabf0cae",
+      "case": "acceptance-exit-sign-distance",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.03700125,
+      "startedAt": "2026-10-05T22:05:54.110Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 7335,
+        "input_tokens_details": {
+          "cache_write_tokens": 7332,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1418,
+        "output_tokens_details": {
+          "reasoning_tokens": 138
+        },
+        "total_tokens": 8753
+      },
+      "endedAt": "2026-10-05T22:06:01.291Z",
+      "costUSD": 0.0032516
+    },
+    {
+      "id": "47adf819-4f24-402d-9b18-c80cf8907e28",
+      "case": "acceptance-handrail-height",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0436029,
+      "startedAt": "2026-10-05T22:06:01.309Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10174,
+        "input_tokens_details": {
+          "cache_write_tokens": 10171,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2495,
+        "output_tokens_details": {
+          "reasoning_tokens": 1337
+        },
+        "total_tokens": 12669
+      },
+      "endedAt": "2026-10-05T22:06:14.937Z",
+      "costUSD": 0.0050383500000000005
+    },
+    {
+      "id": "5ea8ba8e-e0db-4730-aa33-0d666c8f19c4",
+      "case": "acceptance-handrail-extension",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.048354350000000004,
+      "startedAt": "2026-10-05T22:06:14.948Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 12102,
+        "input_tokens_details": {
+          "cache_write_tokens": 12099,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2972,
+        "output_tokens_details": {
+          "reasoning_tokens": 1087
+        },
+        "total_tokens": 15074
+      },
+      "endedAt": "2026-10-05T22:06:28.001Z",
+      "costUSD": 0.00599735
+    },
+    {
+      "id": "46cd9517-03f9-4f24-8e9e-f706cfedc94b",
+      "case": "acceptance-exit-enclosure",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0398816,
+      "startedAt": "2026-10-05T22:06:28.017Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8324,
+        "input_tokens_details": {
+          "cache_write_tokens": 8321,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2373,
+        "output_tokens_details": {
+          "reasoning_tokens": 737
+        },
+        "total_tokens": 10697
+      },
+      "endedAt": "2026-10-05T22:06:40.002Z",
+      "costUSD": 0.0044538500000000005
+    },
+    {
+      "id": "9af558f6-edeb-4ab5-b378-826609ddf9b1",
+      "case": "acceptance-permit-basis",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0342782,
+      "startedAt": "2026-10-05T22:06:40.013Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 6292,
+        "input_tokens_details": {
+          "cache_write_tokens": 6289,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2523,
+        "output_tokens_details": {
+          "reasoning_tokens": 1103
+        },
+        "total_tokens": 8815
+      },
+      "endedAt": "2026-10-05T22:06:53.776Z",
+      "costUSD": 0.00409585
+    },
+    {
+      "id": "9cf23e39-0de9-420e-85b2-7864327200ee",
+      "case": "acceptance-asbestos-certification",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.034188550000000005,
+      "startedAt": "2026-10-05T22:06:53.785Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 6059,
+        "input_tokens_details": {
+          "cache_write_tokens": 6056,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1560,
+        "output_tokens_details": {
+          "reasoning_tokens": 541
+        },
+        "total_tokens": 7619
+      },
+      "endedAt": "2026-10-05T22:07:02.272Z",
+      "costUSD": 0.0030746
+    },
+    {
+      "id": "b2122512-b1d0-4dc8-bb71-218f318c1f48",
+      "case": "acceptance-vacant-protection",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.059026550000000004,
+      "startedAt": "2026-10-05T22:07:02.290Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 14916,
+        "input_tokens_details": {
+          "cache_write_tokens": 14913,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3078,
+        "output_tokens_details": {
+          "reasoning_tokens": 1325
+        },
+        "total_tokens": 17994
+      },
+      "endedAt": "2026-10-05T22:07:17.535Z",
+      "costUSD": 0.006806850000000001
+    },
+    {
+      "id": "5f41cca8-c691-49e2-8213-f553d790b9bf",
+      "case": "acceptance-reserved-fire-section",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.03263535,
+      "startedAt": "2026-10-05T22:07:17.556Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 5452,
+        "input_tokens_details": {
+          "cache_write_tokens": 5449,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2489,
+        "output_tokens_details": {
+          "reasoning_tokens": 1481
+        },
+        "total_tokens": 7941
+      },
+      "endedAt": "2026-10-05T22:07:30.563Z",
+      "costUSD": 0.00385185
+    },
+    {
+      "id": "6f00fd03-8706-4cd7-84db-bdce80a7c230",
+      "case": "acceptance-emergency-power",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.05225495,
+      "startedAt": "2026-10-05T22:07:30.581Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11945,
+        "input_tokens_details": {
+          "cache_write_tokens": 11942,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3804,
+        "output_tokens_details": {
+          "reasoning_tokens": 2177
+        },
+        "total_tokens": 15749
+      },
+      "endedAt": "2026-10-05T22:07:50.485Z",
+      "costUSD": 0.0067901
+    },
+    {
+      "id": "561b9cd0-8397-481d-bd88-44ce1da547bc",
+      "case": "acceptance-plaza-bicycles",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.040049350000000004,
+      "startedAt": "2026-10-05T22:07:50.502Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8252,
+        "input_tokens_details": {
+          "cache_write_tokens": 8249,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1679,
+        "output_tokens_details": {
+          "reasoning_tokens": 256
+        },
+        "total_tokens": 9931
+      },
+      "endedAt": "2026-10-05T22:07:57.467Z",
+      "costUSD": 0.00374185
+    },
+    {
+      "id": "833cfb65-7f1e-4bba-a51b-f0fca98f5c2b",
+      "case": "acceptance-plaza-fountain",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.030652050000000004,
+      "startedAt": "2026-10-05T22:07:57.487Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 4645,
+        "input_tokens_details": {
+          "cache_write_tokens": 4642,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2227,
+        "output_tokens_details": {
+          "reasoning_tokens": 1464
+        },
+        "total_tokens": 6872
+      },
+      "endedAt": "2026-10-05T22:08:09.405Z",
+      "costUSD": 0.0033881
+    }
+  ],
+  "rows": [
+    {
+      "id": "acceptance-water-heater-valve-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer states that the cold-water branch from the main supply must have a valve for each hot-water storage tank or water heater.",
+            "answerExcerpt": "provide a valve on the cold-water branch from the main supply to each hot-water storage tank or water heater"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It says the valve must be near the equipment.",
+            "answerExcerpt": "be near the equipment"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It states both the exclusive-service requirement and that the valve must not disrupt the rest of the cold-water system.",
+            "answerExcerpt": "serve only that tank or heater, ... not interrupt cold-water supply to the rest of the system"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "It correctly states that access must be on the same floor as the heater served; the supporting explanation also says “same floor level.”",
+            "answerExcerpt": "have access on the same floor as the heater it serves"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly preserves the serve-only requirement rather than substituting proximity for it.",
+            "answerExcerpt": "serve only that tank or heater"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It gives no specific distance for “near.” Its access explanation is attributed to PC § 202 and accurately reflects the supplied definition, rather than inventing an access rule.",
+            "answerExcerpt": "The Code’s definition of “access” includes reaching equipment by ready access or by a means that first requires removing or moving a panel, door, or similar obstruction."
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The answer does not note that PC 503.1 gives no numerical meaning for “near” or say that a particular installation’s compliance cannot be determined without project facts or interpretive authority. Its cited access definition is accurate, but it does not resolve that installation-specific uncertainty.",
+            "answerExcerpt": "be near the equipment"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "Omits the caveat that “near” is unquantified and that whether a particular installation meets the location/access terms cannot be determined from the provision alone. The added PC § 202 definitions are supported and do not themselves establish a specific installation’s compliance."
+        ],
+        "rationale": "The answer accurately summarizes PC 503.1’s valve, service, location, continuity, and same-floor access requirements. Its additional branch and access definitions are supported by the cited PC § 202 snapshot. The material shortcoming is failure to preserve the rubric’s stated uncertainty about applying “near” and access to a particular installation."
+      }
+    },
+    {
+      "id": "acceptance-water-heater-valve-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer says that serving another fixture fails the requirement that the valve serve only the heater.",
+            "answerExcerpt": "A valve that also shuts off cold water to another fixture does not meet the “serving only” condition"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It explicitly says proximity does not cure the failure of the separate exclusive-service requirement.",
+            "answerExcerpt": "even if it is close to the heater"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It states the separate requirement that the valve must not disrupt cold-water supply to the rest of the system.",
+            "answerExcerpt": "it also must not disrupt cold-water supply to the rest of the system"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly rejects proximity as sufficient.",
+            "answerExcerpt": "proximity alone is insufficient"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It identifies the failure of the serve-only condition but does not claim that the stated shared shutoff necessarily causes additional disruption to the system.",
+            "answerExcerpt": "does not meet the “serving only” condition"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer directly resolves the hypothetical using the separate serve-only and system-continuity clauses of PC 503.1. Its citation supports the stated requirements, and it does not infer additional system disruption from the shared shutoff."
+      }
+    },
+    {
+      "id": "acceptance-relief-discharge-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Identifies the covered relief devices.",
+            "answerExcerpt": "serving a pressure relief valve, temperature relief valve, or combination"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "States that discharge must use an air gap in the water-heater room and must not connect directly to drainage.",
+            "answerExcerpt": "air gap in the water-heater room"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "Gives both the minimum pipe size and full-size discharge to the air gap.",
+            "answerExcerpt": "at least the valve-outlet diameter and remain full size to the air gap"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "States the single-device restriction and prohibits connection to piping serving other relief devices or equipment.",
+            "answerExcerpt": "serve one relief device only, remain separate from piping serving other relief devices or equipment"
+          },
+          "concept-5": {
+            "met": true,
+            "rationale": "Includes both safe discharge and an observable termination.",
+            "answerExcerpt": "without causing personal injury or structural damage; the termination must be readily observable"
+          },
+          "concept-6": {
+            "met": true,
+            "rationale": "States that piping must be untrapped and flow by gravity.",
+            "answerExcerpt": "be untrapped"
+          },
+          "concept-7": {
+            "met": true,
+            "rationale": "Preserves the two simultaneous height limits and the floor or flood-level-rim reference without selecting a particular one.",
+            "answerExcerpt": "not more than 6 inches and not less than twice the discharge-pipe diameter above"
+          },
+          "concept-8": {
+            "met": true,
+            "rationale": "Includes the terminal threaded-connection prohibition and the prohibitions on valves and tee fittings.",
+            "answerExcerpt": "no valves, tee fittings, or threaded connection at its end"
+          },
+          "concept-9": {
+            "met": true,
+            "rationale": "Correctly states the listed-materials route and the separate tested, rated, and approved ASME A112.4.1 route.",
+            "answerExcerpt": "materials listed in PC § 605.4, or materials tested, rated, and approved for this use"
+          },
+          "concept-10": {
+            "met": false,
+            "rationale": "It does not identify the PC 605.4 material categories and incorrectly says the supplied text lacks that list. The authoritative snapshot supplies the list, including brass, copper or copper-alloy pipe/tubing, ductile iron, and specified stainless-steel pipe.",
+            "answerExcerpt": "The text available here does not include § 605.4’s material list"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer states both the 6-inch maximum and the twice-the-diameter minimum.",
+            "answerExcerpt": "not more than 6 inches and not less than twice"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not claim that a particular material qualifies under ASME A112.4.1.",
+            "answerExcerpt": "I cannot ... further specify the standard-based option"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It does not claim that these requirements establish whole-system or project compliance.",
+            "answerExcerpt": ""
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "It does not declare that any particular alternative material qualifies and acknowledges that the standard-based option cannot be assessed from the described information. However, it incorrectly attributes part of the information gap to the missing PC 605.4 list.",
+            "answerExcerpt": "I cannot enumerate those materials or further specify the standard-based option"
+          }
+        },
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": false,
+        "noUnsupportedMaterialClaims": false,
+        "usefulAnswer": false,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The response says the available text does not include PC 605.4’s material list, although that list is present in the supplied authoritative snapshot.",
+          "It omits the material categories expressly requested and supplied in the rubric."
+        ],
+        "rationale": "The discharge-piping requirements are otherwise stated accurately and with the two height limits preserved. But the materials portion materially misdescribes the supplied evidence and omits the listed material categories. That omission and erroneous source-boundary statement make the bounded response incomplete and undermine its material-related citation support."
+      }
+    },
+    {
+      "id": "acceptance-relief-discharge-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly calculates twice a 1-inch pipe diameter as 2 inches.",
+            "answerExcerpt": "For a 1-inch pipe, the required minimum is 2 inches"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Correctly explains that 1 inch is below the minimum even though it is below the separate 6-inch maximum.",
+            "answerExcerpt": "fails that minimum even though it is below 6 inches"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly rejects treating the less-than-6-inch clearance as sufficient.",
+            "answerExcerpt": "a termination 1 inch above the rim fails that minimum"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It limits its conclusion to the termination-height rule and does not determine overall project compliance.",
+            "answerExcerpt": ""
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer directly applies both height limits to the supplied dimensions, reaches the correct conclusion about the stated termination-height condition, and cites PC 504.6. It does not extend the conclusion to other aspects of the system."
+      }
+    },
+    {
+      "id": "acceptance-reserved-vent-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": false,
+            "rationale": "The response does not address the supplied PC 905.4 record or explain that its empty body provides no operative requirement.",
+            "answerExcerpt": "I couldn’t process the response to your question."
+          },
+          "concept-2": {
+            "met": false,
+            "rationale": "The response does not distinguish an empty retrieved record from verified reserved status or state the resulting evidence limitation.",
+            "answerExcerpt": "Use Report this issue below to report this attempt."
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The response states no vent-connection rule or other substantive PC 905.4 requirement.",
+            "answerExcerpt": "I couldn’t process the response to your question."
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The response does not reconstruct a requirement from another code or edition.",
+            "answerExcerpt": "I couldn’t process the response to your question."
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The response makes no claim based on the section title metadata.",
+            "answerExcerpt": "I couldn’t process the response to your question."
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "The response does not claim that venting requirements do not apply elsewhere or that the section is legally reserved.",
+            "answerExcerpt": "I couldn’t process the response to your question."
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The response does not identify the unresolved source-status question: whether the empty body reflects publication status or missing retrieval/extraction content.",
+            "answerExcerpt": "I couldn’t process the response to your question."
+          }
+        },
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": false,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The delivered response is a processing-error message rather than an answer to the supplied PC 905.4 question."
+        ],
+        "rationale": "The response makes no substantive code claims, so it avoids the listed forbidden claims, but it supplies none of the required evidence-bound conclusion or uncertainty. As an unavailable answer, it fails the delivered-answer test."
+      }
+    },
+    {
+      "id": "acceptance-reserved-vent-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It states that the supplied current section record cannot establish what the older drawing meant, and notes that the current PC 905 text is not included.",
+            "answerExcerpt": "the supplied evidence cannot establish what that drawing’s section number meant."
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer does not claim that the drawing used the same edition or wording as the supplied current record; it explicitly notes that the drawing’s edition is unknown.",
+            "answerExcerpt": "the drawing’s edition is unknown"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The answer accurately describes supplied current PC 914.2 text but expressly says it does not establish the older drawing’s reference or the requirements of a differently dated PC 905.",
+            "answerExcerpt": "that does not establish that the drawing referred to § 914.2—or what a differently dated § 905 required."
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It does not infer legal status for either version solely from an empty body; it limits its conclusion to what the supplied evidence can establish.",
+            "answerExcerpt": "the supplied evidence cannot establish what that drawing’s section number meant."
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "It identifies the unknown drawing edition and says the applicable historical text is not supplied.",
+            "answerExcerpt": "The drawing does not identify its edition, and the supplied evidence does not include PC § 905 or the applicable historical text."
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer gives the bounded conclusion that the current supplied record cannot establish the historical meaning and identifies the missing edition and text. Its additional description of current PC 914.2 and PC 901.1 is supported by the cited supplied passages and is explicitly not used to resolve the older drawing’s meaning."
+      }
+    },
+    {
+      "id": "acceptance-grade-support-1",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer identifies the rule as applying to equipment or appliances installed at grade.",
+            "answerExcerpt": "For equipment or appliances installed at grade"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It gives the level slab or other approved material alternative and its minimum height above adjoining grade.",
+            "answerExcerpt": "a level concrete slab or other approved material extending at least 3 inches (76.2 mm) above adjoining grade"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It gives the alternative suspension height as at least 6 inches above adjoining grade.",
+            "answerExcerpt": "suspend them at least 6 inches (152.4 mm) above adjoining grade"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "It states that the support must follow the manufacturer’s instructions.",
+            "answerExcerpt": "the support must follow the manufacturer’s instructions"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer preserves both minimum heights and presents them as alternatives.",
+            "answerExcerpt": "or suspend them at least 6 inches"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The answer includes both the level condition for the slab/material support and the manufacturer-instructions condition.",
+            "answerExcerpt": "a level concrete slab ... In either case, the support must follow the manufacturer’s instructions"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer accurately explains both MC 304.10 alternatives, their respective heights, and the shared manufacturer-instructions condition. Its additional scope statement is supported by the cited scope provisions and does not alter the rule."
+      }
+    },
+    {
+      "id": "acceptance-grade-support-2",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It correctly says that exactly 3 inches meets, rather than falls below, the not-less-than-3-inch minimum.",
+            "answerExcerpt": "Exactly 3 inches meets—not falls below—the slab-support minimum"
+          },
+          "concept-2": {
+            "met": false,
+            "rationale": "It states the manufacturer-instructions requirement, but does not make explicit that the hypothetical supplies no information establishing whether that condition is met.",
+            "answerExcerpt": "the support must also follow the manufacturer’s instructions"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly says exactly 3 inches meets the stated minimum.",
+            "answerExcerpt": "Exactly 3 inches meets—not falls below"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not claim that the entire installation complies solely because of the height; it separately states the manufacturer-instructions requirement.",
+            "answerExcerpt": "the support must also follow the manufacturer’s instructions"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The answer states the manufacturer-instructions condition but does not identify whether compliance with it is unknown from the facts given.",
+            "answerExcerpt": "the support must also follow the manufacturer’s instructions"
+          }
+        },
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The answer does not explicitly bound the height finding by stating that the hypothetical does not establish compliance with the manufacturer-instructions condition."
+        ],
+        "rationale": "The threshold answer is correct and the cited MC 304.10 supports the height and manufacturer-instructions statements. However, the answer does not expressly preserve the supplied-facts uncertainty or clarify that meeting the height minimum alone does not establish the remaining condition."
+      }
+    },
+    {
+      "id": "acceptance-environmental-exhaust-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": false,
+            "rationale": "The delivered answer provides no environmental-air distances or Group U exception.",
+            "answerExcerpt": "I couldn’t finish the answer to your question about Environmental-air exhaust separation..."
+          },
+          "concept-2": {
+            "met": false,
+            "rationale": "Neither intake-separation exception alternative nor its flow and contamination conditions is provided.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "concept-3": {
+            "met": false,
+            "rationale": "The answer does not explain which separations the exception does or does not remove.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "concept-4": {
+            "met": false,
+            "rationale": "The answer does not distinguish item 1, item 2, and ordinary environmental-air exhaust.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "concept-5": {
+            "met": false,
+            "rationale": "The answer does not address non-evaporative appliance discharge.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "concept-6": {
+            "met": false,
+            "rationale": "The answer does not address the item 6 dwelling-unit provisions.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "concept-7": {
+            "met": false,
+            "rationale": "The answer does not state how Air Class is determined.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The response makes no claim about whether exactly 400 cfm qualifies.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The response makes no claim that contamination alone qualifies.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The response makes no claim that the exception waives other separations.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "The response does not assign item 1 or item 2 distances to environmental-air outlets.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          },
+          "forbidden-5": {
+            "violated": false,
+            "rationale": "The response does not state an Air Class classification method.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The response is unavailable and does not identify the missing occupancy or configuration facts.",
+            "answerExcerpt": "I couldn’t finish the answer..."
+          }
+        },
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": false,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The response withholds the requested explanation, so none of the required substantive guidance is delivered."
+        ],
+        "rationale": "The response is an explicit non-answer rather than a code explanation. It makes no substantive code claims or citations to assess, but fails every required concept and does not convey the specified uncertainty about a real installation."
+      }
+    },
+    {
+      "id": "acceptance-environmental-exhaust-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It correctly treats the threshold as strictly less than 400 cfm and says exactly 400 cfm fails.",
+            "answerExcerpt": "exactly 400 cfm fails"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It recognizes the separate below-10% condition and correctly conditions the 5% result on being measured on the required basis; it also says that result cannot cure the flow-limit failure.",
+            "answerExcerpt": "If the stated 5% is measured on that basis, it meets that condition, but it does not change the failed flow threshold."
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It concludes the exception fails and the 10-foot separation remains, without suggesting other separations are waived.",
+            "answerExcerpt": "so the 10-foot separation remains"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer explicitly says exactly 400 cfm fails.",
+            "answerExcerpt": "exactly 400 cfm fails"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The answer says the 5% condition does not change the failed flow threshold.",
+            "answerExcerpt": "it does not change the failed flow threshold"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The answer makes no claim that failure of the exception establishes overall installation noncompliance.",
+            "answerExcerpt": "so the 10-foot separation remains"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer gives the correct bounded conclusion for the stated hypothetical. MC 501.3.1 supports the strict Class 2 threshold, the separate manufacturer-based contamination limit, and the 10-foot intake separation; the reference to MC 501.1 is also consistent with its scope statement. The conditional treatment of the 5% figure avoids assuming a measurement basis not specified in the question."
+      }
+    },
+    {
+      "id": "acceptance-domestic-hood-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly states outdoor discharge as the default and names all four permitted duct materials.",
+            "answerExcerpt": "must discharge outdoors through galvanized steel, stainless steel, aluminum, or copper ducts"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Includes the smooth-wall, airtight, backdraft-damper, independence, and strict manufacturer-instructions/listing requirements.",
+            "answerExcerpt": "smooth inner walls, be airtight, have a backdraft damper, and be independent of other exhaust systems"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "Preserves the I-1/I-2 exclusion and all stated ductless-hood, installation, and ventilation conditions.",
+            "answerExcerpt": "only in occupancies other than Groups I-1 and I-2"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "Limits PVC to domestic downdraft ducts, specifies Schedule 40 PVC, and states all five installation conditions.",
+            "answerExcerpt": "only if all of these conditions are met"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly excludes Groups I-1 and I-2 from the ductless exception.",
+            "answerExcerpt": "only in occupancies other than Groups I-1 and I-2"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It retains the listing, labeling, manufacturer-instruction, and ventilation conditions.",
+            "answerExcerpt": "A listed and labeled ductless range hood"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It confines the PVC alternative to the specified domestic downdraft ducts.",
+            "answerExcerpt": "ducts serving domestic kitchen cooking appliances equipped with downdraft exhaust"
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "It makes the PVC alternative conditional on all five stated installation requirements.",
+            "answerExcerpt": "only if all of these conditions are met"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The response explains the rule but does not expressly say that compliance of any particular hood or duct installation cannot be determined without project-specific facts.",
+            "answerExcerpt": ""
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "Does not expressly reserve project-specific compliance because no particular hood or duct installation was described."
+        ],
+        "rationale": "The answer accurately explains the default rule and both exceptions, including their limitations and conditions. Its discussion of MC 501.3 and 102.1 is supported by the supplied text; the one rubric condition not met is the explicit project-specific uncertainty caveat."
+      }
+    },
+    {
+      "id": "acceptance-domestic-hood-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly identifies the Group I-2 exclusion and concludes the stated facts do not establish eligibility.",
+            "answerExcerpt": "the ductless exception in MC § 505.1 applies only “in other than Group I-1 and I-2.”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Clearly says the listed hood, instructions, and ventilation do not overcome the occupancy exclusion.",
+            "answerExcerpt": "do not overcome that Group I-2 exclusion"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer explicitly rejects eligibility for the stated Group I-2 space.",
+            "answerExcerpt": "No."
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It says manufacturer-instruction compliance and ventilation do not override the exclusion.",
+            "answerExcerpt": "do not overcome that Group I-2 exclusion"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer gives the correct bounded conclusion for Group I-2 and accurately explains why the other stated conditions do not cure the express exclusion. Its citations support the specific-versus-general discussion."
+      }
+    },
+    {
+      "id": "acceptance-sediment-trap-1",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly states that the requirement applies when the appliance does not incorporate a sediment trap.",
+            "answerExcerpt": "unless a sediment trap is already incorporated as part of the appliance"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Gives both required location elements: downstream of the appliance shutoff valve and as close to the appliance inlet as practical.",
+            "answerExcerpt": "downstream of the appliance shutoff valve, as close to the appliance inlet as practical"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "Accurately describes the tee, capped nipple of any length, vertical orientation, bottommost opening, and alternative approved device.",
+            "answerExcerpt": "a tee with a capped nipple of any length installed vertically in the tee’s bottommost opening, or another device approved as an effective sediment trap"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "Lists all named exclusions without adding any others.",
+            "answerExcerpt": "illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces, and outdoor grills"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer specifies downstream placement and does not permit an upstream location.",
+            "answerExcerpt": "downstream of the appliance shutoff valve"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The alternative device is conditioned on approval as an effective sediment trap.",
+            "answerExcerpt": "another device approved as an effective sediment trap"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The answer does not identify a furnace as an excluded appliance.",
+            "answerExcerpt": ""
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "It correctly says the capped nipple may be of any length and gives no minimum.",
+            "answerExcerpt": "a capped nipple of any length"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "The answer states the general practical-location rule without asserting a site-specific location; no installation layout was supplied to assess.",
+            "answerExcerpt": "as close to the appliance inlet as practical"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The response accurately explains the trigger, location, permitted forms, and complete exclusion list. FGC 408.4 directly supports these statements. The additional Chapter 4 scope reference is consistent with FGC 401.1 and does not broaden the conclusion."
+      }
+    },
+    {
+      "id": "acceptance-sediment-trap-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Applies the default requirement to the stated ordinary furnace because it has no incorporated trap; the answer does not treat it as an excluded appliance.",
+            "answerExcerpt": "For an ordinary furnace without an incorporated sediment trap"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Correctly concludes that upstream placement fails the downstream location requirement.",
+            "answerExcerpt": "placing it upstream does not meet that location rule"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly rejects upstream placement as meeting the rule.",
+            "answerExcerpt": "placing it upstream does not meet that location rule"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not identify an ordinary furnace as an exclusion.",
+            "answerExcerpt": ""
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The answer addresses only the sediment-trap location rule and does not claim compliance with other installation requirements.",
+            "answerExcerpt": ""
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The response gives the requested bounded answer: an ordinary furnace without an incorporated trap is subject to the stated rule, and an upstream trap fails its location requirement. FGC 408.4 directly supports the conclusion; the cited scope provision is consistent background and does not imply compliance with other requirements."
+      }
+    },
+    {
+      "id": "acceptance-test-isolation-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer states the trigger: equipment designed for an operating pressure below the piping test pressure.",
+            "answerExcerpt": "equipment designed for an operating pressure below the piping test pressure"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It specifies disconnecting the equipment and capping its outlet(s), rather than relying on a valve.",
+            "answerExcerpt": "must be disconnected from the piping and its outlet(s) capped"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It states that affected piping and joints are checked when gas is energized using either permitted method.",
+            "answerExcerpt": "When gas is energized, check the affected piping and joints with noncorrosive leak-detecting fluid or another approved leak-detection method"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer does not claim that a closed valve substitutes for disconnection and capping.",
+            "answerExcerpt": ""
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It places the 406.3.3 check when gas is energized, not only before energizing or as optional.",
+            "answerExcerpt": "When gas is energized"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It does not assign a test pressure or represent 406.3.3 as supplying a complete test protocol. The separate 406.6.3 leak-check description is supported by the supplied source.",
+            "answerExcerpt": "The later system leak check is separate"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The answer gives the trigger conditionally but does not note that actual test pressure and equipment ratings are absent, so applicability to a particular installation cannot be determined.",
+            "answerExcerpt": ""
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "It omits the requested uncertainty caveat about the missing actual test pressure and equipment ratings."
+        ],
+        "rationale": "The core 406.3.3 procedure and energized-gas check are accurately stated and supported. The additional 406.6.3 leak-check information is correctly presented as a separate requirement and supported by the supplied citation. The answer does not claim to establish a particular installation’s applicability, but it omits the rubric’s explicit uncertainty condition."
+      }
+    },
+    {
+      "id": "acceptance-test-isolation-2",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer directly rejects valve-only isolation for the stated below-test-pressure scenario and states the required disconnection and capping.",
+            "answerExcerpt": "closing a valve while leaving it connected and uncapped does not perform that procedure"
+          },
+          "concept-2": {
+            "met": false,
+            "rationale": "It does not retain the requirement to check affected piping and joints when gas is energized using an approved method.",
+            "answerExcerpt": ""
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly says a closed valve alone does not perform the procedure.",
+            "answerExcerpt": "does not perform that procedure"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not say omitting disconnection and capping is acceptable; it says the opposite.",
+            "answerExcerpt": "requires disconnecting it from the piping and capping its outlet(s)"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The answer omits the 406.3.3 requirement to check affected piping and joints when gas is energized using noncorrosive leak-detecting fluid or another approved method."
+        ],
+        "rationale": "The direct answer and distinction from the valve-isolation rule in 406.3.4 are supported by the supplied sources. However, the answer omits a required material element of the referenced 406.3.3 procedure: the energized-gas leak check."
+      }
+    },
+    {
+      "id": "acceptance-mp-regulator-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": false,
+            "rationale": "The response does not state the approval or inlet/outlet-pressure suitability requirements.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "concept-2": {
+            "met": false,
+            "rationale": "The response omits both lockup/no-flow pressure behavior and manufacturer-rated capacity.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "concept-3": {
+            "met": false,
+            "rationale": "The response does not explain access or the indoor vent/leak-limiting alternatives and their Section 410.3 condition.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "concept-4": {
+            "met": false,
+            "rationale": "The response omits the upstream tee’s location and its instrument-connection and sediment-trap functions.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "concept-5": {
+            "met": false,
+            "rationale": "The response omits the separate downstream tee, 10-diameter minimum, and the gauge’s additional—not substitute—role.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "concept-6": {
+            "met": false,
+            "rationale": "The response does not state the union requirement or clarify that one union within 1 foot of either side suffices.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The response makes no claim equating the two tees.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The response makes no claim about a gauge curing a short downstream distance.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The response makes no claim about the indoor vent or leak-limiting option.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "The response does not claim project-wide compliance.",
+            "answerExcerpt": "No code or project determination has been made"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The response does not identify that the supplied material lacks Section 410.3’s detailed requirements.",
+            "answerExcerpt": "I couldn’t finish the source check"
+          },
+          "uncertainty-2": {
+            "met": true,
+            "rationale": "It expressly withholds any project determination, although it does not explain the specific project facts or conditions left unresolved.",
+            "answerExcerpt": "No code or project determination has been made in this response."
+          }
+        },
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": false,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The response withholds the requested explanation rather than providing the supplied FGC 410.2 requirements."
+        ],
+        "rationale": "The response makes no substantive code claim, but it is unavailable as an answer to the question. It omits all six required concepts and does not identify the Section 410.3 information gap. Its generic statement that no project determination was made avoids asserting project compliance."
+      }
+    },
+    {
+      "id": "acceptance-mp-regulator-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It correctly states that the tee must be at least 10 pipe diameters downstream and that an eight-diameter location does not meet that minimum.",
+            "answerExcerpt": "the capped-or-plugged tee itself must be at least 10 pipe diameters downstream"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It correctly explains that the gauge may be installed in addition to the tee and does not cure the tee’s location.",
+            "answerExcerpt": "A pressure gauge with an isolation valve may be installed only in addition to the tee"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer explicitly rejects the claim that adding the gauge makes the eight-diameter tee compliant.",
+            "answerExcerpt": "it does not cure the tee’s location"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It preserves the stated 10-pipe-diameter minimum.",
+            "answerExcerpt": "at least 10 pipe diameters"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer directly and correctly resolves the stated scenario. FGC 410.2 supports the tee’s minimum distance and the gauge’s additional role. The FGC 401.1 scope citation is ancillary and does not undermine the supported conclusion."
+      }
+    },
+    {
+      "id": "acceptance-exit-sign-distance-1",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly states that exits and exit-access doors need approved signs readily visible from any direction of egress travel.",
+            "answerExcerpt": "exits and exit-access doors must be marked with approved exit signs readily visible from any direction of egress travel"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Includes directional signs when the exit or path is not immediately visible and marking for intervening means-of-egress doors within exits.",
+            "answerExcerpt": "The path to and within an exit must also be marked to show direction when the exit or path is not immediately visible; intervening means-of-egress doors within exits must be marked."
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "Accurately states the lesser-of-100-feet-or-listed-viewing-distance rule for the specified corridor or passageway.",
+            "answerExcerpt": "no point may be more than 100 feet or the sign’s listed viewing distance, whichever is less"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "Lists the exception for rooms or areas requiring only one exit or exit access.",
+            "answerExcerpt": "rooms or areas requiring only one exit or exit access"
+          },
+          "concept-5": {
+            "met": true,
+            "rationale": "Lists Group U and the specified individual units, and preserves the congregate-living-unit requirement when occupancy exceeds four people.",
+            "answerExcerpt": "Group U occupancies and individual sleeping or dwelling units in Group I-1 or R—but a congregate living unit occupied by more than four people must have exit signs"
+          },
+          "concept-6": {
+            "met": true,
+            "rationale": "Lists dayrooms, sleeping rooms, and dormitories in Group I-3.",
+            "answerExcerpt": "dayrooms, sleeping rooms, or dormitories in Group I-3"
+          },
+          "concept-7": {
+            "met": true,
+            "rationale": "States the A-4/A-5 seating-side exception, its readily-apparent concourse-sign condition, and the emergency-egress-lighting requirement.",
+            "answerExcerpt": "the seating side of vomitories or openings into seating areas in Groups A-4 and A-5, when signs in the concourse are readily apparent from the vomitories. For that last exception, emergency egress lighting must identify each vomitory or opening within the seating area."
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The response does not present 100 feet as an unconditional limit; it explicitly says the listed viewing distance controls when shorter.",
+            "answerExcerpt": "100 feet or the sign’s listed viewing distance, whichever is less"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It includes both the concourse-sign visibility condition and the emergency-lighting requirement for the A-4/A-5 exception.",
+            "answerExcerpt": "when signs in the concourse are readily apparent from the vomitories... emergency egress lighting must identify each vomitory or opening"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The exceptions are presented as their specified categories and conditions, without broadening their scope.",
+            "answerExcerpt": "The listed exceptions are: (1)... (2)... (3)... and (4)..."
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer accurately covers the visibility and directional-marking rules, the distance limit, and all four exceptions with their material qualifications. Its BC § 1013.1 citation is supported by the supplied authoritative text."
+      }
+    },
+    {
+      "id": "acceptance-exit-sign-distance-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly identifies the applicable limit as the lesser of 100 feet and the sign’s listed viewing distance.",
+            "answerExcerpt": "the maximum distance is the lesser of 100 feet and the sign’s listed viewing distance"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Calculates the limit as 75 feet and correctly concludes that a point 90 feet away exceeds it by 15 feet.",
+            "answerExcerpt": "min(100, 75) = 75 feet, so a point 90 feet from the nearest visible sign exceeds the limit by 15 feet"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The response expressly says being below 100 feet is not sufficient under these facts.",
+            "answerExcerpt": "staying below 100 feet is not sufficient"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It honors the hypothetical’s premise that no exception applies.",
+            "answerExcerpt": "You stipulated that no exception applies."
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The response applies BC 1013.1’s lesser-distance rule to the supplied figures and reaches the correct conclusion. The cited section and supplied passage support the rule."
+      }
+    },
+    {
+      "id": "acceptance-handrail-height-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly states the ordinary uniform 34–38-inch range and the proper stair and ramp measurement surfaces.",
+            "answerExcerpt": "ordinary handrails must be uniformly 34–38 inches high, measured above stair-tread nosings or the finished ramp slope"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Correctly gives the separate uniform 30–34-inch range for both device types and measures above tread nosings.",
+            "answerExcerpt": "alternating tread devices and ships’ ladders must instead be uniformly 30–34 inches above tread nosings"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "Correctly says fittings or bendings providing continuous transition between flights may exceed the maximum.",
+            "answerExcerpt": "Fittings or bendings used to provide a continuous transition may exceed the 38-inch maximum."
+          },
+          "concept-4": {
+            "met": false,
+            "rationale": "Lists the required occupancies and fitting/bending situations, but then leaves their application unresolved. The supplied rubric treats the listed situations as covered; the added ambiguity caveat makes the explanation noncategorical.",
+            "answerExcerpt": "whether that wording permits an exceedance at each listed situation independently ... is not resolved"
+          },
+          "concept-5": {
+            "met": false,
+            "rationale": "Identifies the guard-top alternative and its link to Section 1029.15, but omits that the supplied text gives no separate numerical height range for this alternative.",
+            "answerExcerpt": "The top surface of a guard may be used as a handrail along stepped and ramped aisles only where permitted by BC § 1029.15."
+          },
+          "concept-6": {
+            "met": false,
+            "rationale": "Does not state the supplied condition that the guard is at the side of the aisle and its top surface complies with the handrail-graspability requirements referenced in Section 1014.3. It incorrectly says those conditions were not supplied.",
+            "answerExcerpt": "That section’s applicable permission and conditions were not supplied"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer treats 38 inches as the ordinary maximum, not as exceeding it.",
+            "answerExcerpt": "may exceed the 38-inch maximum"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The answer confines the fitting/bending allowances to exceeding the maximum and describes the specified occupancy settings and uses; it does not claim a broader exception.",
+            "answerExcerpt": "fittings or bendings may exceed the maximum"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It conditions the guard-top alternative on permission under Section 1029.15; it does not say the alternative is unconditional. Its separate error is omitting the supplied specific condition.",
+            "answerExcerpt": "only where permitted by BC § 1029.15"
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "It does not invent details of the graspability requirements; it mistakenly says the applicable conditions were not supplied.",
+            "answerExcerpt": "the applicable permission and conditions were not supplied"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": false,
+        "noUnsupportedMaterialClaims": false,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "Incorrectly says Section 1029.15’s applicable permission and conditions were not supplied, despite the supplied text specifying the side-of-aisle guard and Section 1014.3 graspability condition.",
+          "Omits the specific Section 1029.15 guard condition and the rubric-required note that no separate numerical range is supplied for the guard-top alternative.",
+          "Introduces unsupported uncertainty about whether the listed fitting/bending situations are independently covered, contrary to the supplied rubric’s stated scope."
+        ],
+        "rationale": "The response accurately covers the ordinary and special-device height ranges and the basic fitting exception, and it gives the specified occupancy groups and listed situations. However, it materially understates the supplied evidence for the guard alternative and adds an unwarranted qualification to the residential fitting/bending exception. Most of the answer is useful, but the full explanation and its claim about missing source conditions are not correct."
+      }
+    },
+    {
+      "id": "acceptance-handrail-height-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly compares exactly 38 inches with the ordinary 38-inch maximum and concludes it is at, not above, the maximum.",
+            "answerExcerpt": "exactly 38 inches is at—not above—the maximum"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Does not rely on or apply a fitting or bending exception; it says the stated lack of a special fitting condition does not change the result.",
+            "answerExcerpt": "The stated lack of a special device or fitting condition does not change that result."
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly says exactly 38 inches is not above the maximum.",
+            "answerExcerpt": "at—not above—the maximum"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It answers only whether the height exceeds the maximum and makes no whole-project compliance claim.",
+            "answerExcerpt": "For an ordinary stair ... exactly 38 inches is at—not above—the maximum"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer directly and correctly resolves the stated height question using BC 1014.2, does not invoke an exception, and does not overstate the conclusion as whole-project compliance."
+      }
+    },
+    {
+      "id": "acceptance-handrail-extension-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "States both alternatives in BC 1014.6: return to a wall, guard, or walking surface, or continue to the handrail of an adjacent stair flight or ramp run.",
+            "answerExcerpt": "handrails must return to a wall, guard, or walking surface, or continue to the handrail of an adjacent stair flight or ramp run"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Gives the separate stair requirements: at least 12 inches horizontally beyond the top riser and a sloping continuation for one tread depth beyond the bottom riser.",
+            "answerExcerpt": "at least 12 inches beyond the top riser and continue sloping for one tread depth beyond the bottom riser"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "Correctly states the ramp rule as horizontal extensions above the landing beyond both ends of the ramp runs.",
+            "answerExcerpt": "at least 12 inches beyond both the top and bottom of the runs"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "Says extensions follow the direction of the stair flights or ramp runs.",
+            "answerExcerpt": "Extensions follow the direction of the stair flights or ramp runs."
+          },
+          "concept-5": {
+            "met": true,
+            "rationale": "Identifies the dwelling-unit exception and excludes Accessible, Type B+NYC, and Type B units, then gives the limited extent from top to bottom riser.",
+            "answerExcerpt": "a dwelling unit that is not an Accessible unit, Type B+NYC unit, or Type B unit"
+          },
+          "concept-6": {
+            "met": true,
+            "rationale": "Preserves the Type B+NYC multistory dwelling-unit condition and the exact cross-reference to Section 1107.2.5, Items 1 through 3, without inventing its criteria.",
+            "answerExcerpt": "only if it complies with BC § 1107.2.5, Items 1 through 3"
+          },
+          "concept-7": {
+            "met": true,
+            "rationale": "Identifies the assembly-aisle alternative under Section 1029.15 and explains that top and bottom extensions are dispensed with to permit crossovers.",
+            "answerExcerpt": "extensions are not required at the top and bottom to permit crossovers"
+          },
+          "concept-8": {
+            "met": true,
+            "rationale": "Correctly states that alternating tread device and ship-ladder handrails may terminate vertically above the risers and need not be continuous or extend beyond them.",
+            "answerExcerpt": "need not be continuous between flights or extend beyond those risers"
+          },
+          "concept-9": {
+            "met": false,
+            "rationale": "The answer says the crossover exception covers ramped aisles without preserving Section 1029.15's scope: ramped aisles must exceed a 1:15 slope. That omission makes the stated scope overbroad.",
+            "answerExcerpt": "For stepped aisles and ramped aisles, extensions are not required"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly includes the required sloping continuation beyond the bottom riser as well as the top extension.",
+            "answerExcerpt": "and continue sloping for one tread depth beyond the bottom riser"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It distinguishes the stair rule from the ramp rule and states each separately.",
+            "answerExcerpt": "If they are not continuous between stair flights ... If they are not continuous between ramp runs"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The dwelling-unit and Type B+NYC exceptions retain their specified unit types and conditions; the other exceptions are also framed by their stated contexts.",
+            "answerExcerpt": "only if it complies with BC § 1107.2.5, Items 1 through 3"
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "The crossover rule is described as an assembly-aisle provision, not as a general exception for all stairs, ramps, or handrails. Its ramped-aisle scope is nevertheless overbroad, as noted under concept-9.",
+            "answerExcerpt": "Handrails serving aisles in assembly rooms or spaces may follow"
+          },
+          "forbidden-5": {
+            "violated": false,
+            "rationale": "The answer does not supply unstated requirements for Section 1107.2.5 and expressly notes that the referenced criteria were not supplied.",
+            "answerExcerpt": "The supplied text does not give the criteria in § 1107.2.5, Items 1 through 3"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": false,
+        "noUnsupportedMaterialClaims": false,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The Section 1029.15 crossover discussion omits the supplied threshold that ramped aisles must exceed a 1:15 slope, making the described scope overbroad."
+        ],
+        "rationale": "The answer accurately explains the general return rule, stair and ramp extensions, the direction of extensions, and the listed exceptions. Its assembly-aisle discussion correctly identifies the crossover purpose but omits the material slope threshold for ramped aisles. The cited Section 1029.15 text supports the narrower rule, not the unqualified description of ramped aisles. The additional mid-aisle, stepped-aisle termination, and handrail-provision details are supported by the supplied sources and do not cure that scope omission."
+      }
+    },
+    {
+      "id": "acceptance-handrail-extension-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Directly concludes that the top extension alone does not satisfy both ends.",
+            "answerExcerpt": "The top extension alone does not satisfy the bottom-end requirement"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Recognizes the stated 12-inch extension as satisfying the top-end dimension, not the separate bottom requirement.",
+            "answerExcerpt": "requires at least 12 inches of horizontal extension beyond the top riser"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "States the bottom-end requirement and explains that terminating at the bottom riser falls short.",
+            "answerExcerpt": "a continuation sloping for one tread depth beyond the bottom riser"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "Accepts the hypothetical's no-exception condition and does not rely on an exception.",
+            "answerExcerpt": "With no listed exception applying"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer says the top extension alone fails to meet the bottom-end requirement.",
+            "answerExcerpt": "The top extension alone does not satisfy the bottom-end requirement"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It applies the stair rule's sloping bottom continuation and does not substitute the ramp rule.",
+            "answerExcerpt": "a continuation sloping for one tread depth beyond the bottom riser"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The conclusion is limited to the stated handrail extension issue and does not pronounce on whole-project compliance.",
+            "answerExcerpt": "terminating at the bottom riser falls short"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer correctly applies BC 1014.6 to the stated ordinary noncontinuous stair handrail: the top extension meets only the top dimension, while the handrail must also slope for one tread depth beyond the bottom riser. It respects the stated absence of an applicable exception, cites the relevant section, and makes no broader project-compliance claim."
+      }
+    },
+    {
+      "id": "acceptance-exit-enclosure-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": false,
+            "rationale": "The answer does not identify the permitted construction as a Section 707 fire barrier, a Section 711 horizontal assembly, or both.",
+            "answerExcerpt": ""
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It correctly states the 2-hour minimum for four or more connected stories and 1 hour for fewer than four.",
+            "answerExcerpt": "2 hours when it connects four or more stories, or 1 hour when it connects fewer than four"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It correctly includes basements and excludes mezzanines from the connected-story count.",
+            "answerExcerpt": "Count basements, but not mezzanines"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "It states both the floor-assembly comparison and the 2-hour cap. However, it then incorrectly presents their interaction as unresolved; the rubric treats the cap as limiting what this section requires.",
+            "answerExcerpt": "the enclosure’s rating must also be at least the rating of the floor assembly it penetrates, subject to a 2-hour cap"
+          },
+          "concept-5": {
+            "met": true,
+            "rationale": "It correctly limits the masonry or masonry-equivalent requirement to R-1/R-2 enclosures required to be 2 hours and notes the department-rules condition.",
+            "answerExcerpt": "where the enclosure is required to be 2 hours, it must be masonry or masonry equivalent; masonry-equivalent wall assemblies must follow department rules"
+          },
+          "concept-6": {
+            "met": true,
+            "rationale": "It identifies both stated exceptions and their referenced provisions, without claiming either applies to an unspecified project.",
+            "answerExcerpt": "I-3 stairways and ramps in accordance with § 408.3.8, and interior exit stairways within an atrium enclosed in accordance with § 404.6"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly counts basements and excludes mezzanines.",
+            "answerExcerpt": "Count basements, but not mezzanines"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not say the fewer-than-four-story rating controls without applying the penetrated-floor comparison; it expressly states that comparison.",
+            "answerExcerpt": "the enclosure’s rating must also be at least the rating of the floor assembly it penetrates"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It does not claim 2 hours is universal, that the clause requires more than 2 hours, or that voluntarily providing a higher-rated assembly is prohibited. Its separate claim that the clause interaction is unresolved is erroneous but is not one of these specific forbidden claims.",
+            "answerExcerpt": "subject to a 2-hour cap"
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "It keeps the R-1/R-2 masonry qualification conditional on a 2-hour rating being required.",
+            "answerExcerpt": "where the enclosure is required to be 2 hours"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": false,
+        "noUnsupportedMaterialClaims": false,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "Omits the permitted enclosure construction under Sections 707 and 711.",
+          "Incorrectly calls the interaction of the floor-rating comparison and the 2-hour cap unresolved. Under the supplied rubric, the cap limits what this section requires; it does not establish a requirement above 2 hours."
+        ],
+        "rationale": "The answer gives the story thresholds, counting rule, R-1/R-2 qualification, and both exceptions accurately. But it omits the required construction methods and introduces an unsupported material ambiguity about the floor comparison and cap. The cited section supports the quoted requirements, but not the asserted unresolved interpretation."
+      }
+    },
+    {
+      "id": "acceptance-exit-enclosure-2",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It adds the basement to the three above-grade stories and identifies four connected stories.",
+            "answerExcerpt": "four stories—three above grade plus the basement"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It correctly concludes that the four-story threshold requires at least a 2-hour rating.",
+            "answerExcerpt": "requires at least a 2-hour rating"
+          },
+          "concept-3": {
+            "met": false,
+            "rationale": "It rejects above-grade-only counting, but does not retain or state the penetrated-floor comparison and 2-hour cap.",
+            "answerExcerpt": "This enclosure connects four stories—three above grade plus the basement"
+          },
+          "concept-4": {
+            "met": false,
+            "rationale": "It gives the correct 2-hour result from the story count and does not manufacture uncertainty, but omits the required explanation that the floor-comparison clause need not require more than 2 hours.",
+            "answerExcerpt": "which requires at least a 2-hour rating"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer rejects using only above-grade stories and gives the 2-hour result.",
+            "answerExcerpt": "three above grade plus the basement"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not claim that an unknown floor rating prevents determining the 2-hour requirement.",
+            "answerExcerpt": "requires at least a 2-hour rating"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It acknowledges the stated absence of both exceptions and does not invoke either as applicable.",
+            "answerExcerpt": "The stated absence of the atrium and I-3 exceptions leaves neither of those exceptions applicable."
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "The answer determines the 2-hour requirement without suggesting that the missing floor-assembly rating leaves it uncertain. It stays within the rating question.",
+            "answerExcerpt": "so it falls in the “four stories or more” branch, which requires at least a 2-hour rating"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "Omits the floor-assembly comparison and 2-hour cap, including the rubric-required explanation that the missing floor rating does not prevent determining the section’s 2-hour requirement."
+        ],
+        "rationale": "The direct answer is correct and supported: the basement counts, giving four connected stories and a 2-hour minimum, with neither stated exception applicable. The answer is materially incomplete because it omits the floor-comparison rule and cap, but it does not assert a conflicting interpretation or withhold the requested conclusion."
+      }
+    },
+    {
+      "id": "acceptance-permit-basis-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": false,
+            "rationale": "The answer does not state the written-permit requirement, identify the commissioner as issuer, or describe the “unless and until” condition.",
+            "answerExcerpt": ""
+          },
+          "concept-2": {
+            "met": false,
+            "rationale": "It does not explain the AC 28-105.4 exception reference or distinguish that reference from project-specific eligibility.",
+            "answerExcerpt": ""
+          },
+          "concept-3": {
+            "met": false,
+            "rationale": "It omits the limits on exemptions concerning other applicable requirements and obligations involving other city agencies.",
+            "answerExcerpt": ""
+          },
+          "concept-4": {
+            "met": false,
+            "rationale": "It makes no project-specific exemption claim, but also does not address the required caution that eligibility depends on the applicable conditions and project facts.",
+            "answerExcerpt": ""
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer does not claim that every job requires a permit without exception.",
+            "answerExcerpt": ""
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The answer does not claim that the cross-reference grants approval or an exemption.",
+            "answerExcerpt": ""
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The answer makes no claim about what an exemption authorizes or about other-agency obligations.",
+            "answerExcerpt": ""
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The response withholds a determination but does not identify the unknown issue: whether a particular job meets an exemption’s conditions.",
+            "answerExcerpt": "“No code or project determination has been made in this response.”"
+          }
+        },
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": false,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The response is unavailable as a substantive answer and does not explain the supplied permit rule or its exception reference."
+        ],
+        "rationale": "The answer only says it could not use the provided details and directs the user to report the issue. It avoids making an incorrect legal determination, but does not answer the question or preserve the material qualifications the rubric requires."
+      }
+    },
+    {
+      "id": "acceptance-permit-basis-2",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It concludes that the supplied wording and amendment dates do not establish the exact earlier wording, though it then misidentifies the provision and dates at issue.",
+            "answerExcerpt": "“No—you cannot establish the exact earlier wording solely from the supplied current wording and amendment dates.”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It does not reconstruct the prior wording and says that the former text is not provided. This is a correct limitation in principle, despite the subsequent substitution of an unrelated provision.",
+            "answerExcerpt": "“It does not provide the provision’s pre-change wording.”"
+          },
+          "concept-3": {
+            "met": false,
+            "rationale": "The requested target is AC 28-105.1 immediately before its December 21, 2025 effective date. The answer instead identifies BC 106.8.2 and a January 12, 2026 cutoff.",
+            "answerExcerpt": "“If you mean the text before that change took effect, the relevant cutoff is immediately before January 12, 2026.”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer does not claim that the current AC 28-105.1 text is identical to its pre-amendment text.",
+            "answerExcerpt": ""
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not claim that amendment dates establish the language changed; it says the cited passage does not provide the former wording.",
+            "answerExcerpt": "“It does not provide the provision’s pre-change wording.”"
+          },
+          "forbidden-3": {
+            "violated": true,
+            "rationale": "The answer substitutes a different law and provision’s amendment notation for the supplied AC 28-105.1 notation, which identifies Local Law 2024/128, dated December 21, 2024, effective December 21, 2025.",
+            "answerExcerpt": "“The supplied passage does not identify a December 2025 amendment; it identifies Local Law 2025/048, enacted April 17, 2025, effective January 12, 2026.”"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "It does not assert the exact prior wording is known and states that the supplied material does not provide that wording. However, it attaches this limitation to an unrelated provision, materially weakening the answer.",
+            "answerExcerpt": "“It does not provide the provision’s pre-change wording.”"
+          }
+        },
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": false,
+        "noUnsupportedMaterialClaims": false,
+        "usefulAnswer": false,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The answer substitutes BC 106.8.2 for AC 28-105.1.",
+          "It gives an unrelated January 12, 2026 cutoff instead of the requested December 21, 2025 cutoff.",
+          "It attributes Local Law 2025/048 and its dates to the supplied passage, although the supplied AC 28-105.1 notation identifies Local Law 2024/128."
+        ],
+        "rationale": "The general conclusion that the former text cannot be established from current wording and dates alone is sound, and the answer appropriately avoids reconstructing prior wording. But it answers using an unrelated Construction Code provision and amendment, so its cutoff, description of the supplied passage, and citation do not support the requested historical question. The applicable AC 28-105.1 amendment notation in the supplied material is not in dispute."
+      }
+    },
+    {
+      "id": "acceptance-asbestos-certification-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly limits the condition to demolition or alteration permits for a building whose plans were submitted for approval on or before April 1, 1987.",
+            "answerExcerpt": "“demolition or alteration permit involving a building constructed under plans submitted for approval on or before April 1, 1987”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "States both alternatives: applicant submission of asbestos-related certification required by DEP rules, or a variance issued by the DEP commissioner.",
+            "answerExcerpt": "“unless the applicant submits asbestos-related certification required by DEP rules or the DEP commissioner has issued a variance”"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "Gives the amendment’s effective date as November 7, 2022.",
+            "answerExcerpt": "“The provision’s 2021 amendment took effect November 7, 2022.”"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "Does not specify the certification’s contents or suggest this condition alone guarantees permit issuance.",
+            "answerExcerpt": "“asbestos-related certification required by DEP rules”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer preserves the inclusive “on or before” threshold.",
+            "answerExcerpt": "“on or before April 1, 1987”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "Neither the certification nor variance alternative is omitted.",
+            "answerExcerpt": "“certification required by DEP rules or the DEP commissioner has issued a variance”"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The answer does not claim to state the certification’s contents or that this is the only permit requirement.",
+            "answerExcerpt": "“certification required by DEP rules”"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The answer refers to DEP rules but does not expressly preserve the uncertainty that the supplied provision itself does not state what the certification must contain.",
+            "answerExcerpt": "“certification required by DEP rules”"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "Does not expressly state that the supplied provision leaves the certification’s content to DEP rules."
+        ],
+        "rationale": "The answer accurately states the covered permit types, inclusive date, alternatives, and amendment effective date, and its cited AC 28-106.1 text supports those claims. Its only material shortcoming is not explicitly identifying the limit on what the supplied text says about certification contents."
+      }
+    },
+    {
+      "id": "acceptance-asbestos-certification-2",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly treats April 1, 1987 itself as included in “on or before.”",
+            "answerExcerpt": "“April 1, 1987 is included in the condition ‘on or before April 1, 1987.’”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "Given the hypothetical’s absence of a variance, correctly says the certification route remains applicable before the permit may issue.",
+            "answerExcerpt": "“With no environmental-protection variance … the applicant must submit the asbestos-related certification required by DEP rules”"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "Frames certification as a prerequisite to issuance, not as a guarantee that the permit will issue.",
+            "answerExcerpt": "“before the commissioner may issue the permit”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer explicitly says the date is included.",
+            "answerExcerpt": "“April 1, 1987 is included”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not suggest that the threshold date eliminates the certification requirement.",
+            "answerExcerpt": "“With no environmental-protection variance … the applicant must submit”"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It states a condition before issuance, not that submission compels issuance.",
+            "answerExcerpt": "“before the commissioner may issue the permit”"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "Although it refers to certification required by DEP rules, the answer does not expressly say that the supplied text leaves the certification’s content unspecified.",
+            "answerExcerpt": "“certification required by DEP rules”"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "Does not expressly state that the supplied text leaves the required certification’s content to DEP rules."
+        ],
+        "rationale": "The date and no-variance conclusions are accurate and supported by AC 28-106.1. The answer does not overstate the permit consequence, but it omits the stated uncertainty about the certification’s content."
+      }
+    },
+    {
+      "id": "acceptance-vacant-protection-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer treats vacancy as temporary unoccupancy and separately identifies the unsafe-premises direction to DOB and/or HPD under Article 216.",
+            "answerExcerpt": "“A vacant premises is treated as temporarily unoccupied unless it has been deemed unsafe under Administrative Code Article 216”; if unsafe, FC § 311.1 directs safeguarding and maintenance under the applicable DOB and/or HPD requirements."
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It expressly states that the rules cover temporarily unoccupied premises and parts, including tenant spaces.",
+            "answerExcerpt": "“including tenant spaces”"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It covers both exterior and interior openings accessible to unauthorized persons, including tenants, and says they must be protected against unauthorized entry.",
+            "answerExcerpt": "“Lock or otherwise protect exterior openings and interior openings accessible to unauthorized persons, including tenants”"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "It names all three systems and preserves the commissioner-authorization exception.",
+            "answerExcerpt": "“Keep fire alarm, sprinkler, and standpipe systems operable at all times, except as authorized by the Commissioner.”"
+          },
+          "concept-5": {
+            "met": true,
+            "rationale": "It covers rated partitions, barriers, and walls, including tenant-space separations, and protection of openings, joints, and penetrations under Building Code Chapter 7.",
+            "answerExcerpt": "“Maintain fire-resistance-rated partitions, barriers, and walls—including those separating unoccupied tenant spaces from the rest of the building—and protect openings, joints, and penetrations ... in accordance with Building Code Chapter 7.”"
+          },
+          "concept-6": {
+            "met": true,
+            "rationale": "It states the removal and prevention duty and limits the construction-or-repair exception to Building-Code-compliant work with waste controlled and removed under FC 304.",
+            "answerExcerpt": "“The exception applies to temporarily unoccupied premises undergoing Building-Code-compliant construction or repair, where waste is controlled and removed in accordance with FC § 304.”"
+          },
+          "concept-7": {
+            "met": true,
+            "rationale": "It distinguishes the unsafe-vacant-premises trigger from the temporarily-unoccupied premises trigger involving Chapter 50 materials, and states the subsequent free-of-hazardous-materials rule and commissioner-approval exception.",
+            "answerExcerpt": "“For a vacant premises containing hazardous materials that has been deemed unsafe ... Separately, the owner of temporarily unoccupied premises containing hazardous materials regulated by FC Chapter 50 ... Vacant and temporarily unoccupied premises ... thereafter [must] be maintained free of hazardous materials ... except as approved by the Commissioner.”"
+          },
+          "concept-8": {
+            "met": true,
+            "rationale": "It lists the covered-mall tenant-space conditions, including weekly inspections and locked doors.",
+            "answerExcerpt": "“inspected at least weekly; and kept locked whenever unoccupied.”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer distinguishes unsafe status from vacancy-based temporary unoccupancy and includes the separate DOB/HPD direction.",
+            "answerExcerpt": "“unsafe status is a separate route, not something established by vacancy alone.”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It states systems remain operable unless the Commissioner authorizes otherwise; it does not treat vacancy as authorization.",
+            "answerExcerpt": "“except as authorized by the Commissioner.”"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It includes tenant spaces and requires protection of both exterior and interior openings.",
+            "answerExcerpt": "“exterior openings and interior openings accessible to unauthorized persons, including tenants”"
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "The waste exception includes both Building Code compliance and FC 304 conditions.",
+            "answerExcerpt": "“Building-Code-compliant construction or repair” and “waste is controlled and removed in accordance with FC § 304.”"
+          },
+          "forbidden-5": {
+            "violated": false,
+            "rationale": "The answer describes the unsafe-vacant and temporarily-unoccupied hazardous-material triggers separately.",
+            "answerExcerpt": "“Separately, the owner of temporarily unoccupied premises containing hazardous materials regulated by FC Chapter 50”"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "It acknowledges that the supplied text does not provide the separate DOB/HPD requirements applicable to unsafe premises.",
+            "answerExcerpt": "“The applicable Department of Buildings and/or Department of Housing Preservation and Development requirements for premises deemed unsafe are not included.”"
+          },
+          "uncertainty-2": {
+            "met": false,
+            "rationale": "It does not say that the supplied text leaves unresolved every possible interaction between the unsafe-premises direction and other FC 311 provisions. Its specific statement about the waste rule is accurate, but does not preserve the broader stated uncertainty.",
+            "answerExcerpt": ""
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": true,
+        "materialErrors": [
+          "The answer omits the stated uncertainty that the supplied text does not resolve every possible interaction between unsafe status and the other FC 311 provisions."
+        ],
+        "rationale": "The substantive requirements and citations are well supported by the supplied FC 311 and FC 1027 text. The answer appropriately separates the unsafe-premises direction and correctly describes the specific waste rule applying to both unsafe and temporarily unoccupied premises. However, it does not preserve the rubric’s explicit uncertainty about other interactions between those provisions."
+      }
+    },
+    {
+      "id": "acceptance-vacant-protection-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It applies the rule to temporarily unoccupied premises, including tenant spaces.",
+            "answerExcerpt": "“For temporarily unoccupied premises, including tenant spaces”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It concludes that sprinklers must remain operable absent Commissioner authorization.",
+            "answerExcerpt": "“With no such authorization, the system must remain on.”"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It expressly rejects vacancy itself as permission to turn off the system.",
+            "answerExcerpt": "“Vacancy itself does not allow the sprinkler system to be turned off”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer does not treat vacancy or tenant-space status as an exception.",
+            "answerExcerpt": "“FC § 311.2.2 requires sprinkler systems to remain operable at all times”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It says the sprinkler must remain on because the hypothetical supplies no Commissioner authorization.",
+            "answerExcerpt": "“With no such authorization, the system must remain on.”"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The concise answer directly applies FC 311.2.2 to the stated tenant-space scenario, reaches the correct conclusion, and cites the controlling provision."
+      }
+    },
+    {
+      "id": "acceptance-reserved-fire-section-1",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "Correctly identifies the supplied current record as listing FC 508 as Reserved and supplying no operative text. It also avoids treating that status as proof of a historical repeal.",
+            "answerExcerpt": "“FC § 508 as ‘Reserved’ and provides no operative plain text”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "The response does not derive a substantive requirement from the section number or heading; it expressly says the supplied record establishes no substantive requirement in § 508.",
+            "answerExcerpt": "“this packet establishes no substantive requirement in § 508”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "It does not claim that current FC 508 imposes a fire command center requirement or another substantive requirement.",
+            "answerExcerpt": "“no substantive requirement in § 508”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It treats “Reserved” as a heading and does not claim that the heading or section number supplies an operative rule.",
+            "answerExcerpt": "“The ‘Reserved’ heading is supported by a source-extracted heading”"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It expressly limits its conclusion to the supplied record and does not infer repeal history or the absence of requirements elsewhere.",
+            "answerExcerpt": "“it does not establish that the section was repealed or prove that no related requirements exist elsewhere”"
+          }
+        },
+        "uncertaintyConditions": {},
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer is appropriately bounded to the supplied current-consolidated record. Its FC 508 citation supports the source-extracted Reserved heading and the absence of supplied operative text, and the answer accurately preserves the limits on historical and elsewhere-in-the-code conclusions."
+      }
+    },
+    {
+      "id": "acceptance-reserved-fire-section-2",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It correctly says the current reserved section cannot establish the undated note’s requirement.",
+            "answerExcerpt": "“it cannot establish what an undated old note required”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It does not project current reserved status backward; it distinguishes the current heading from historical enacted text and leaves the historical reference unresolved.",
+            "answerExcerpt": "“The supplied heading is not historical enacted text”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer does not use the current section to validate the old note’s alleged requirement.",
+            "answerExcerpt": "“cannot establish what an undated old note required”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It makes no claim about what FC 508 said or whether it was reserved in an earlier edition.",
+            "answerExcerpt": "“the note’s old requirement and edition remain unresolved”"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The answer preserves uncertainty about the note’s date or edition and historical text, but does not expressly preserve the historical provision’s applicability as an unresolved issue.",
+            "answerExcerpt": "“the note’s old requirement and edition remain unresolved”"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": false,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The delivered metadata labels the answer authorityStatus as “supported_by_enacted_text,” although the supplied source is an importer placeholder with a source-extracted heading and no operative plain text. That classification overstates the evidence."
+        ],
+        "rationale": "The prose conclusion is appropriately limited, and FC 508 supports the narrow claim about the current source’s Reserved heading. However, the delivered authorityStatus conflicts with the source’s stated status and is an unsupported material characterization. The answer also does not expressly identify applicability as unresolved."
+      }
+    },
+    {
+      "id": "acceptance-emergency-power-1",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": false,
+            "rationale": "The answer gives the required service capability but omits the requirement that systems be designed, installed, operated, and maintained under the Electrical Code and construction codes, including the Building Code.",
+            "answerExcerpt": "The system must be maintained so it can supply service within the required time for the required type and duration of emergency power."
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It says the approved schedule is established upon completion and approval of installation.",
+            "answerExcerpt": "Establish the approved inspection, testing and maintenance schedule upon completion and approval of the installation."
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It lists each required record element: date, technician, summary of conditions, and corrective conditions and action.",
+            "answerExcerpt": "Written inspection, testing and maintenance records must give the service date, servicing technician’s name, a summary of conditions noted, and a detailed description of conditions requiring correction and the corrective action taken."
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "It states that periodic inspection and under-load testing apply and identifies NFPA 110 as modified by Appendix B and NFPA 111.",
+            "answerExcerpt": "periodic inspection and under-load testing must follow those standards as well."
+          },
+          "concept-5": {
+            "met": true,
+            "rationale": "It makes the substitute conditional on recording use and maintaining appropriate records, limits it to scheduled testing, and says inspection and maintenance are not expressly waived.",
+            "answerExcerpt": "it may substitute for scheduled testing of the emergency-power system only if appropriate records of the use are maintained. The exception does not expressly waive scheduled inspection or maintenance."
+          },
+          "concept-6": {
+            "met": true,
+            "rationale": "It covers schedule inclusion, dust and dirt, contact deterioration, and manufacturer-directed replacement.",
+            "answerExcerpt": "Include them in the maintenance schedule; keep them free of accumulated dust and dirt; inspect contacts for deterioration; and replace deteriorated contacts per the manufacturer’s instructions."
+          },
+          "concept-7": {
+            "met": true,
+            "rationale": "It describes electrical operation from normal to alternate and back to normal.",
+            "answerExcerpt": "electrical operation from normal to alternate position and back to normal."
+          },
+          "concept-8": {
+            "met": true,
+            "rationale": "It preserves personal supervision, knowledge and training, and the listed qualification alternatives.",
+            "answerExcerpt": "under the personal supervision of someone with the required knowledge and training and at least one listed qualification"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer gives no specific testing or inspection intervals.",
+            "answerExcerpt": "periodic inspection and under-load testing"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It limits the exception to scheduled testing and says inspection or maintenance is not expressly waived.",
+            "answerExcerpt": "The exception does not expressly waive scheduled inspection or maintenance."
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It makes a listed qualification a requirement of the supervising person.",
+            "answerExcerpt": "under the personal supervision of someone with the required knowledge and training and at least one listed qualification"
+          },
+          "forbidden-4": {
+            "violated": false,
+            "rationale": "It does not provide detailed NFPA procedures or particular service-time values.",
+            "answerExcerpt": "within the required time for the required type and duration"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The answer refers to periodic testing under NFPA standards but does not disclose that the supplied text omits the specific intervals and additional procedures incorporated from those standards and Appendix B.",
+            "answerExcerpt": "periodic inspection and under-load testing must follow those standards as well."
+          },
+          "uncertainty-2": {
+            "met": false,
+            "rationale": "It avoids giving service-time values, but does not state that the exact requirements depend on Electrical Code and construction-code provisions not supplied here.",
+            "answerExcerpt": "within the required time for the required type and duration of emergency power"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": true,
+        "materialErrors": [
+          "Omits the requirement to follow the Electrical Code and construction codes, including the Building Code, for system design, installation, operation, and maintenance.",
+          "Does not explicitly identify the supplied-text limitations on detailed NFPA intervals/procedures or exact service-time values."
+        ],
+        "rationale": "The answer accurately covers the schedule, record contents, standards-based periodic under-load testing, transfer-switch duties and test procedure, conditional substitute, and supervisory qualifications. Its record-retention addition is supported by FC 107.7. It appropriately identifies uncertainty about whether the substitute reaches a scheduled transfer-switch test, but omits the broader code-compliance requirement and does not expressly state the two supplied-text limitations."
+      }
+    },
+    {
+      "id": "acceptance-emergency-power-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "It correctly says both recording the use and maintaining appropriate records are conditions, and concludes that use without records does not qualify.",
+            "answerExcerpt": "Since no records were kept, the use alone does not satisfy the stated substitute."
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It limits the exception to scheduled testing and does not suggest that it replaces inspection or other maintenance.",
+            "answerExcerpt": "Peak-load-shaving use can substitute for scheduled testing only if that use is recorded"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer expressly rejects use alone as sufficient when no records were kept.",
+            "answerExcerpt": "the use alone does not satisfy the stated substitute."
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It makes no claim that the exception waives inspection, testing generally, or maintenance.",
+            "answerExcerpt": "can substitute for scheduled testing only if"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "It does not invent or specify record-content requirements beyond the source’s condition that appropriate records of use be maintained.",
+            "answerExcerpt": "appropriate records of the use are maintained"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer directly and correctly applies FC 604.4 to the stated facts: without records, peak-load-shaving use does not satisfy the scheduled-testing substitute. The citation supports the stated condition, and the answer makes no broader waiver claim."
+      }
+    },
+    {
+      "id": "acceptance-plaza-bicycles-1",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer states that the minimum is two bicycle spaces for public plazas within § 37-745’s scope.",
+            "answerExcerpt": "“a minimum of 2 bicycle spaces”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It correctly makes the higher minimum apply only above 10,000 square feet; the stated strict threshold excludes a plaza exactly at 10,000 square feet.",
+            "answerExcerpt": "“at least 4 when the plaza is greater than 10,000 square feet”"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It gives the required adjacent-sidewalk location, DOT standards, and the DOT determination condition.",
+            "answerExcerpt": "“on the sidewalk directly adjacent to the plaza and comply with Department of Transportation standards, unless the Department determines that the adjacent sidewalk cannot accommodate the required parking”"
+          },
+          "concept-4": {
+            "met": true,
+            "rationale": "It does not prescribe an alternative location after the DOT determination and expressly says the section does not state one.",
+            "answerExcerpt": "“The section does not state an alternative location in that circumstance.”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer uses the strict “greater than 10,000 square feet” threshold and does not say exactly 10,000 square feet triggers four spaces.",
+            "answerExcerpt": "“greater than 10,000 square feet”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "No particular alternative location is approved or inferred.",
+            "answerExcerpt": "“The section does not state an alternative location in that circumstance.”"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "The answer expressly limits its conclusion to plazas within the provision’s scope and says applicability to a particular plaza is not established.",
+            "answerExcerpt": "“The supplied text does not resolve whether it governs a particular plaza.”"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "It appropriately says the supplied text does not establish whether § 37-745 governs a particular plaza, rather than claiming it verifies plaza status.",
+            "answerExcerpt": "“The supplied text does not resolve whether it governs a particular plaza.”"
+          },
+          "uncertainty-2": {
+            "met": true,
+            "rationale": "It expressly identifies that § 37-745 does not state the location to use if the adjacent sidewalk cannot accommodate the parking.",
+            "answerExcerpt": "“The section does not state an alternative location in that circumstance.”"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer accurately states the two-space baseline, the strictly greater-than-10,000-square-foot four-space threshold, and the adjacent-sidewalk/DOT condition. It also avoids resolving applicability to a specific plaza or inventing an alternative location. The cited § 37-745 passage supports these claims."
+      }
+    },
+    {
+      "id": "acceptance-plaza-bicycles-2",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer correctly says the four-space minimum applies only above 10,000 square feet, so exactly 10,000 does not trigger it.",
+            "answerExcerpt": "“applies only to public plazas greater than 10,000 square feet”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It states that the minimum at exactly 10,000 square feet is two, conditioned on the hypothetical space being within § 37-745’s scope.",
+            "answerExcerpt": "“at exactly 10,000 square feet, the stated minimum is two”"
+          },
+          "concept-3": {
+            "met": true,
+            "rationale": "It treats the conclusion as conditional and does not claim independent plaza verification or whole-site compliance.",
+            "answerExcerpt": "“assuming the hypothetical plaza is within § 37-745’s scope; the supplied text does not independently establish that status”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer explicitly says exactly 10,000 square feet does not meet the greater-than threshold.",
+            "answerExcerpt": "“at exactly 10,000 square feet, the stated minimum is two”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It expressly says the supplied text does not independently establish plaza status.",
+            "answerExcerpt": "“the supplied text does not independently establish that status”"
+          },
+          "forbidden-3": {
+            "violated": false,
+            "rationale": "It answers only the size-threshold question and does not declare whole-site compliance.",
+            "answerExcerpt": "“This answers the size-threshold question”"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "The answer preserves the stated uncertainty about whether the hypothetical site is legally within § 37-745’s scope.",
+            "answerExcerpt": "“the supplied text does not independently establish that status”"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The conditional count conclusion is correct: the four-space minimum is triggered only above 10,000 square feet, while the stated minimum at exactly 10,000 square feet is two, assuming the space is a public plaza within the provision’s scope. The cited § 37-745 text supports the count, and the cited § 37-70 and § 12-10 text supports the accompanying scope and definition discussion. The answer does not overstate site status or overall compliance."
+      }
+    },
+    {
+      "id": "acceptance-plaza-fountain-1",
+      "delivered": true,
+      "fullyCorrect": true,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": true,
+            "rationale": "The answer correctly states that §37-746 requires at least one drinking fountain in every public plaza.",
+            "answerExcerpt": "“at least one drinking fountain in every public plaza”"
+          },
+          "concept-2": {
+            "met": true,
+            "rationale": "It says §37-746 states no size-based exemption. Its separate discussion of a possible modification route does not claim that §37-746 itself contains a size exemption.",
+            "answerExcerpt": "“§37-746 states no plaza-size exemption”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The answer does not say that §37-746 exempts plazas of any particular size; it leaves the scope of a modification under §74-91 unresolved.",
+            "answerExcerpt": "“whether or how it could allow a size-based modification remains unresolved”"
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "The answer limits its conclusion to the stated fountain minimum and does not assert whole-plaza compliance.",
+            "answerExcerpt": "“requires at least one drinking fountain in every public plaza”"
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": true,
+            "rationale": "The answer identifies the §74-91 text as unavailable and leaves the scope of that modification route unresolved. It also accurately supplies the public-plaza definition from §37-70 rather than attributing it to §37-746.",
+            "answerExcerpt": "“Because §74-91’s text is not supplied, whether or how it could allow a size-based modification remains unresolved.”"
+          }
+        },
+        "boundedConclusionCorrect": true,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": true,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [],
+        "rationale": "The answer supports the minimum and no-size-exemption conclusion with §37-746 and accurately reports the relevant §37-70 text and its reference to §74-91. It does not overstate the unresolved modification route or claim comprehensive compliance."
+      }
+    },
+    {
+      "id": "acceptance-plaza-fountain-2",
+      "delivered": true,
+      "fullyCorrect": false,
+      "judgment": {
+        "requiredConcepts": {
+          "concept-1": {
+            "met": false,
+            "rationale": "The response gives no answer to whether one fountain meets the stated numerical minimum.",
+            "answerExcerpt": "“I couldn’t consistently use the details you provided”"
+          },
+          "concept-2": {
+            "met": false,
+            "rationale": "It does not provide the requested limited conclusion that one fountain meets the numerical minimum without establishing whole-plaza compliance.",
+            "answerExcerpt": "“No code or project determination has been made in this response.”"
+          }
+        },
+        "forbiddenClaims": {
+          "forbidden-1": {
+            "violated": false,
+            "rationale": "The response makes no claim that one fountain proves compliance with all plaza requirements.",
+            "answerExcerpt": ""
+          },
+          "forbidden-2": {
+            "violated": false,
+            "rationale": "It does not ask for independent verification of the hypothetical’s stipulated public-plaza status.",
+            "answerExcerpt": ""
+          }
+        },
+        "uncertaintyConditions": {
+          "uncertainty-1": {
+            "met": false,
+            "rationale": "The response does not explain that requirements beyond the stated one-fountain minimum are outside the supplied excerpt; it provides no substantive answer or limitation relevant to those requirements.",
+            "answerExcerpt": ""
+          }
+        },
+        "boundedConclusionCorrect": false,
+        "citationsSupportClaims": true,
+        "noUnsupportedMaterialClaims": true,
+        "usefulAnswer": false,
+        "unresolvedMaterialDispute": false,
+        "materialErrors": [
+          "The delivered response is an unavailable-answer notice and does not answer the hypothetical numerical-count question."
+        ],
+        "rationale": "The response withholds the requested determination despite the hypothetical expressly stipulating public-plaza status. It makes no contradictory or unsupported substantive code claim, but the missing answer fails the delivered-answer test."
+      }
+    }
+  ],
+  "rejectedEnvelopes": [],
+  "finishedAt": "2026-10-05T22:08:09.414Z",
+  "summary": {
+    "correct": 19,
+    "total": 40,
+    "pairedTurnsCorrelated": true,
+    "unresolved": [
+      "acceptance-vacant-protection-1",
+      "acceptance-emergency-power-1"
+    ],
+    "materialErrorTurns": [
+      "acceptance-water-heater-valve-1",
+      "acceptance-relief-discharge-1",
+      "acceptance-reserved-vent-1",
+      "acceptance-grade-support-2",
+      "acceptance-environmental-exhaust-1",
+      "acceptance-domestic-hood-1",
+      "acceptance-test-isolation-1",
+      "acceptance-test-isolation-2",
+      "acceptance-mp-regulator-1",
+      "acceptance-handrail-height-1",
+      "acceptance-handrail-extension-1",
+      "acceptance-exit-enclosure-1",
+      "acceptance-exit-enclosure-2",
+      "acceptance-permit-basis-1",
+      "acceptance-permit-basis-2",
+      "acceptance-asbestos-certification-1",
+      "acceptance-asbestos-certification-2",
+      "acceptance-vacant-protection-1",
+      "acceptance-reserved-fire-section-2",
+      "acceptance-emergency-power-1",
+      "acceptance-plaza-fountain-2"
+    ],
+    "scopedSampleGatePassed": false,
+    "general95PercentEstablished": false,
+    "externalExpertApproval": false
+  },
+  "estimatedCostUSD": 0.08810225000000003
+}

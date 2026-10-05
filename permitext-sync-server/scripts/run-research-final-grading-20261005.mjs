@@ -9,6 +9,7 @@ import { evaluationBudget } from "./research-evaluation-budget.mjs";
 import { validationPricing, validationReservation, validationCost } from "./research-validation-pricing-20261005.mjs";
 import { researchProviderReadiness } from "./research-provider-readiness-20261005.mjs";
 import { researchSourceBodyState } from "../research-source-body-state.mjs";
+import { gradingCanonicalCitation } from "./research-grading-canonical-citation-20261005.mjs";
 import { assertFrozenAcceptanceInputs, buildAcceptanceGradeRequest,
   validateAcceptanceGrade, acceptanceGradeSummary } from "./research-acceptance-grading-20261005.mjs";
 
@@ -56,12 +57,10 @@ try {
       catalogs.set(citation.codePrefix, (await researchCorpusResources(plan)).catalog);
     }
     const matches = catalogs.get(citation.codePrefix).filter(source => String(source.id) === citation.sectionID &&
-      fields.every(field => source[field] === citation[field]));
+      fields.every(field => source[field] === (field === "sectionNumber" ? citation.publishedCitationReference?.carrierSectionNumber || citation[field] : citation[field])));
     assert.equal(matches.length, 1, `${reference}: unique exact canonical citation required`);
     const section = matches[0], body = await researchBodyForCatalogSection(section);
-    const text = (body.blocks || []).map(block => String(block.plainText || "")).filter(Boolean).join("\n\n");
-    snapshot = { reference, sectionID: String(section.id), ...Object.fromEntries([...fields, "jurisdiction"].map(field => [field, section[field]])),
-      title: section.title, titleIsMetadata: true, text, textSHA256: hash(text) };
+    snapshot = gradingCanonicalCitation(section, body, citation);
     const state = researchSourceBodyState(section, body); if (state) snapshot.sourceBodyState = state;
     sources.push(snapshot);
   }
@@ -72,6 +71,8 @@ try {
   await writeFile(join(directory, "input-manifest.json"), JSON.stringify({ applicationResultSHA256: hash(resultText),
     fixtureSHA256: manifest.fixtureSHA256, frozenSourcesSHA256: manifest.sourcePacketSHA256,
     gradingSourcesSHA256: hash(JSON.stringify(sources)), scriptSHA256: hash(await readFile(new URL(import.meta.url))),
+    canonicalCitationHelperSHA256: hash(await readFile(new URL("./research-grading-canonical-citation-20261005.mjs", import.meta.url))),
+    definitionBinderSHA256: hash(await readFile(new URL("research-definition-excerpts.mjs", root))),
     requests: requests.map(({ id, body }) => ({ id, requestSHA256: hash(JSON.stringify(body)) })),
     model: "gpt-6-luna", effort: "medium", externalExpertApproval: false,
     applicationReruns: 0, sourceCharacterCeiling: 48000, maximumGradingCostUSD: .50 }, null, 2));

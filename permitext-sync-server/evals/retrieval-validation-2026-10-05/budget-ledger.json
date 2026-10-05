@@ -11202,6 +11202,4649 @@
       },
       "endedAt": "2026-10-05T19:22:40.544Z",
       "costUSD": 0.0014581
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "8739ffe6-7827-44b2-85cc-2e09abd35263",
+      "case": "acceptance-water-heater-valve-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018528400000000002,
+      "startedAt": "2026-10-05T21:38:15.764Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 5.8e-7,
+      "usage": {
+        "prompt_tokens": 29,
+        "total_tokens": 29
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:16.201Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "50cf1747-f76f-446e-8c45-18cd3293c3d2",
+      "case": "acceptance-water-heater-valve-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11160875000000002,
+      "startedAt": "2026-10-05T21:38:17.378Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.008161100000000001,
+      "usage": {
+        "input_tokens": 29829,
+        "input_tokens_details": {
+          "cache_write_tokens": 29826,
+          "cached_tokens": 0
+        },
+        "output_tokens": 704,
+        "output_tokens_details": {
+          "reasoning_tokens": 148
+        },
+        "total_tokens": 30533
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:21.516Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "58221166-d818-416a-96a0-3d705b487387",
+      "case": "acceptance-water-heater-valve-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09389545,
+      "startedAt": "2026-10-05T21:38:21.561Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00887435,
+      "usage": {
+        "input_tokens": 31118,
+        "input_tokens_details": {
+          "cache_write_tokens": 31115,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1095,
+        "output_tokens_details": {
+          "reasoning_tokens": 744
+        },
+        "total_tokens": 32213
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:28.567Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4fe09440-7ca6-4d42-9968-00d19b83674b",
+      "case": "acceptance-water-heater-valve-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018638400000000002,
+      "startedAt": "2026-10-05T21:38:28.824Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 7.4e-7,
+      "usage": {
+        "prompt_tokens": 37,
+        "total_tokens": 37
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:29.008Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "fa54e894-7d79-417f-9876-fb8b2b9f8cbb",
+      "case": "acceptance-water-heater-valve-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1015399,
+      "startedAt": "2026-10-05T21:38:30.147Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00616185,
+      "usage": {
+        "input_tokens": 23428,
+        "input_tokens_details": {
+          "cache_write_tokens": 23425,
+          "cached_tokens": 0
+        },
+        "output_tokens": 305,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 23733
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:32.921Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "27646156-8117-40d2-80f2-292aec4fd8ca",
+      "case": "acceptance-water-heater-valve-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0871794,
+      "startedAt": "2026-10-05T21:38:32.951Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.007618850000000001,
+      "usage": {
+        "input_tokens": 27476,
+        "input_tokens_details": {
+          "cache_write_tokens": 27473,
+          "cached_tokens": 0
+        },
+        "output_tokens": 750,
+        "output_tokens_details": {
+          "reasoning_tokens": 569
+        },
+        "total_tokens": 28226
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:37.415Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "0249571a-daff-419b-9ee4-46652c64ac04",
+      "case": "acceptance-relief-discharge-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018781400000000001,
+      "startedAt": "2026-10-05T21:38:37.698Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 9.200000000000001e-7,
+      "usage": {
+        "prompt_tokens": 46,
+        "total_tokens": 46
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:38.124Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6d2908af-d69f-4d79-bddf-0e7b9a76ccf8",
+      "case": "acceptance-relief-discharge-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1008744,
+      "startedAt": "2026-10-05T21:38:39.131Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.007249350000000001,
+      "usage": {
+        "input_tokens": 24026,
+        "input_tokens_details": {
+          "cache_write_tokens": 24023,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1243,
+        "output_tokens_details": {
+          "reasoning_tokens": 195
+        },
+        "total_tokens": 25269
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:46.061Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "ac6f044f-1e74-4241-be7e-19f82d1f2267",
+      "case": "acceptance-relief-discharge-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09221300000000002,
+      "startedAt": "2026-10-05T21:38:46.092Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0094546,
+      "usage": {
+        "input_tokens": 30263,
+        "input_tokens_details": {
+          "cache_write_tokens": 30260,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1889,
+        "output_tokens_details": {
+          "reasoning_tokens": 1407
+        },
+        "total_tokens": 32152
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:38:56.579Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "25bd7f11-fa54-41b8-b9c3-a203a1def667",
+      "case": "acceptance-relief-discharge-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.1004091,
+      "startedAt": "2026-10-05T21:38:56.602Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0034229250000000003,
+      "usage": {
+        "input_tokens": 25624,
+        "input_tokens_details": {
+          "cache_write_tokens": 25621,
+          "cached_tokens": 0
+        },
+        "output_tokens": 440,
+        "output_tokens_details": {
+          "reasoning_tokens": 329
+        },
+        "total_tokens": 26064
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:02.782Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6299aa93-9dcf-409e-bb7b-5d9a9939bd3a",
+      "case": "acceptance-relief-discharge-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0929379,
+      "startedAt": "2026-10-05T21:39:02.812Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.008738600000000001,
+      "usage": {
+        "input_tokens": 30607,
+        "input_tokens_details": {
+          "cache_write_tokens": 30604,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1087,
+        "output_tokens_details": {
+          "reasoning_tokens": 773
+        },
+        "total_tokens": 31694
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:09.572Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "349caf59-92fa-4894-980d-c56df044956e",
+      "case": "acceptance-relief-discharge-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000189332,
+      "startedAt": "2026-10-05T21:39:09.918Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00000116,
+      "usage": {
+        "prompt_tokens": 58,
+        "total_tokens": 58
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:10.113Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "44c1bc96-0e0b-4d88-8e1f-d240954eb7ac",
+      "case": "acceptance-relief-discharge-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09229770000000001,
+      "startedAt": "2026-10-05T21:39:11.290Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0049231000000000006,
+      "usage": {
+        "input_tokens": 18513,
+        "input_tokens_details": {
+          "cache_write_tokens": 18510,
+          "cached_tokens": 0
+        },
+        "output_tokens": 295,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18808
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:13.720Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "b06fd8ac-0a3b-4b35-9867-7202e25a7262",
+      "case": "acceptance-relief-discharge-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08683785000000001,
+      "startedAt": "2026-10-05T21:39:13.743Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00929285,
+      "usage": {
+        "input_tokens": 26980,
+        "input_tokens_details": {
+          "cache_write_tokens": 26977,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2548,
+        "output_tokens_details": {
+          "reasoning_tokens": 2323
+        },
+        "total_tokens": 29528
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:28.563Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "ed87b5c4-e995-4539-a5ab-7f17d6bbbd6c",
+      "case": "acceptance-reserved-vent-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018502000000000004,
+      "startedAt": "2026-10-05T21:39:28.903Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 5.4e-7,
+      "usage": {
+        "prompt_tokens": 27,
+        "total_tokens": 27
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:29.096Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "05085cea-2eb4-4430-806c-00a9afa352d0",
+      "case": "acceptance-reserved-vent-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10211520000000002,
+      "startedAt": "2026-10-05T21:39:30.066Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0066831,
+      "usage": {
+        "input_tokens": 24909,
+        "input_tokens_details": {
+          "cache_write_tokens": 24906,
+          "cached_tokens": 0
+        },
+        "output_tokens": 456,
+        "output_tokens_details": {
+          "reasoning_tokens": 158
+        },
+        "total_tokens": 25365
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:33.661Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f00934f2-16ab-4472-a4fd-4f0a96a4a7d0",
+      "case": "acceptance-reserved-vent-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08261770000000002,
+      "startedAt": "2026-10-05T21:39:33.682Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00744735,
+      "usage": {
+        "input_tokens": 25890,
+        "input_tokens_details": {
+          "cache_write_tokens": 25887,
+          "cached_tokens": 0
+        },
+        "output_tokens": 975,
+        "output_tokens_details": {
+          "reasoning_tokens": 615
+        },
+        "total_tokens": 26865
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:40.086Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "7798e7ca-777d-435e-9709-000f8b12085d",
+      "case": "acceptance-reserved-vent-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.09362485000000001,
+      "startedAt": "2026-10-05T21:39:40.109Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0036371750000000003,
+      "usage": {
+        "input_tokens": 22610,
+        "input_tokens_details": {
+          "cache_write_tokens": 22607,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1622,
+        "output_tokens_details": {
+          "reasoning_tokens": 1583
+        },
+        "total_tokens": 24232
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:39:59.116Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "c10b00be-3601-48f6-82e1-93d77765a4c4",
+      "case": "acceptance-reserved-vent-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.09362485000000001,
+      "startedAt": "2026-10-05T21:39:59.134Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00103787,
+      "usage": {
+        "input_tokens": 22610,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 22607
+        },
+        "output_tokens": 1623,
+        "output_tokens_details": {
+          "reasoning_tokens": 1584
+        },
+        "total_tokens": 24233
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:17.276Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6ea25eb0-deee-45f6-9134-29fabaea9068",
+      "case": "acceptance-reserved-vent-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018878200000000002,
+      "startedAt": "2026-10-05T21:40:17.632Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00000104,
+      "usage": {
+        "prompt_tokens": 52,
+        "total_tokens": 52
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:17.836Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "04c6545a-48c9-454e-82d6-387192c5d7e3",
+      "case": "acceptance-reserved-vent-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1020448,
+      "startedAt": "2026-10-05T21:40:19.159Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0066463500000000005,
+      "usage": {
+        "input_tokens": 24710,
+        "input_tokens_details": {
+          "cache_write_tokens": 24707,
+          "cached_tokens": 0
+        },
+        "output_tokens": 469,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 25179
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:22.007Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "acb79b8a-2eec-44b2-b396-078a244e9c46",
+      "case": "acceptance-reserved-vent-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08346415000000001,
+      "startedAt": "2026-10-05T21:40:22.030Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00792585,
+      "usage": {
+        "input_tokens": 25940,
+        "input_tokens_details": {
+          "cache_write_tokens": 25937,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1441,
+        "output_tokens_details": {
+          "reasoning_tokens": 1146
+        },
+        "total_tokens": 27381
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:31.516Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "ed0841bf-6d7b-47ae-8eb4-f5fdc3dbb0d6",
+      "case": "acceptance-grade-support-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018530600000000002,
+      "startedAt": "2026-10-05T21:40:31.834Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 4.6000000000000004e-7,
+      "usage": {
+        "prompt_tokens": 23,
+        "total_tokens": 23
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:32.058Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "0a3ded3c-781d-452d-9632-02027d08a4b5",
+      "case": "acceptance-grade-support-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08893170000000002,
+      "startedAt": "2026-10-05T21:40:33.289Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.004607600000000001,
+      "usage": {
+        "input_tokens": 16743,
+        "input_tokens_details": {
+          "cache_write_tokens": 16740,
+          "cached_tokens": 0
+        },
+        "output_tokens": 422,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17165
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:35.704Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f38b2f5e-c2a1-4f36-99d8-436d068bad43",
+      "case": "acceptance-grade-support-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08540620000000002,
+      "startedAt": "2026-10-05T21:40:35.728Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0074421,
+      "usage": {
+        "input_tokens": 25705,
+        "input_tokens_details": {
+          "cache_write_tokens": 25702,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1016,
+        "output_tokens_details": {
+          "reasoning_tokens": 658
+        },
+        "total_tokens": 26721
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:41.585Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "927f2a9b-7dee-491e-9fce-0c1521386d98",
+      "case": "acceptance-grade-support-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000186186,
+      "startedAt": "2026-10-05T21:40:41.861Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 6.4e-7,
+      "usage": {
+        "prompt_tokens": 32,
+        "total_tokens": 32
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:42.091Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "3c17a2cc-deda-4a22-aa49-4e4ad001abdc",
+      "case": "acceptance-grade-support-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10683970000000001,
+      "startedAt": "2026-10-05T21:40:43.453Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00721135,
+      "usage": {
+        "input_tokens": 27330,
+        "input_tokens_details": {
+          "cache_write_tokens": 27327,
+          "cached_tokens": 0
+        },
+        "output_tokens": 379,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 27709
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:45.922Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "2cde59cb-eae1-420f-b230-dfdc1a139d5d",
+      "case": "acceptance-grade-support-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0888096,
+      "startedAt": "2026-10-05T21:40:45.948Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0077751,
+      "usage": {
+        "input_tokens": 28773,
+        "input_tokens_details": {
+          "cache_write_tokens": 28770,
+          "cached_tokens": 0
+        },
+        "output_tokens": 582,
+        "output_tokens_details": {
+          "reasoning_tokens": 279
+        },
+        "total_tokens": 29355
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:49.914Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "0d1de03d-8158-4633-8c2c-40b2be967182",
+      "case": "acceptance-environmental-exhaust-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018627400000000003,
+      "startedAt": "2026-10-05T21:40:50.282Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 6.4e-7,
+      "usage": {
+        "prompt_tokens": 32,
+        "total_tokens": 32
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:50.456Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "b33d2ea8-3a57-44e5-86e3-f9884c52f8a5",
+      "case": "acceptance-environmental-exhaust-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09119055000000001,
+      "startedAt": "2026-10-05T21:40:51.556Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0058518500000000005,
+      "usage": {
+        "input_tokens": 18092,
+        "input_tokens_details": {
+          "cache_write_tokens": 18089,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1329,
+        "output_tokens_details": {
+          "reasoning_tokens": 396
+        },
+        "total_tokens": 19421
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:40:58.711Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "7e208f58-a637-4a28-a3b5-40b66d68281e",
+      "case": "acceptance-environmental-exhaust-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0896676,
+      "startedAt": "2026-10-05T21:40:58.739Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0095526,
+      "usage": {
+        "input_tokens": 27983,
+        "input_tokens_details": {
+          "cache_write_tokens": 27980,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2557,
+        "output_tokens_details": {
+          "reasoning_tokens": 2014
+        },
+        "total_tokens": 30540
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:41:13.010Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "5802d582-cbb2-4819-9b0c-56610a3c209d",
+      "case": "acceptance-environmental-exhaust-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10049985,
+      "startedAt": "2026-10-05T21:41:13.027Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0094983,
+      "usage": {
+        "input_tokens": 21715,
+        "input_tokens_details": {
+          "cache_write_tokens": 21712,
+          "cached_tokens": 0
+        },
+        "output_tokens": 13568,
+        "output_tokens_details": {
+          "reasoning_tokens": 11222
+        },
+        "total_tokens": 35283
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:43:00.392Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "98526055-3bd5-4f66-b448-d1be97fc46e1",
+      "case": "acceptance-environmental-exhaust-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0965701,
+      "startedAt": "2026-10-05T21:43:00.431Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.01145135,
+      "usage": {
+        "input_tokens": 30882,
+        "input_tokens_details": {
+          "cache_write_tokens": 30879,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3731,
+        "output_tokens_details": {
+          "reasoning_tokens": 3193
+        },
+        "total_tokens": 34613
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:43:19.803Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "dca26905-0418-4670-befe-822f69013fb9",
+      "case": "acceptance-environmental-exhaust-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019166400000000003,
+      "startedAt": "2026-10-05T21:43:20.197Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0000015800000000000001,
+      "usage": {
+        "prompt_tokens": 79,
+        "total_tokens": 79
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:43:20.388Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f0de0f49-a59c-467b-8c5d-c169fd3f8e2f",
+      "case": "acceptance-environmental-exhaust-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11874720000000001,
+      "startedAt": "2026-10-05T21:43:21.646Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00854535,
+      "usage": {
+        "input_tokens": 31694,
+        "input_tokens_details": {
+          "cache_write_tokens": 31691,
+          "cached_tokens": 0
+        },
+        "output_tokens": 622,
+        "output_tokens_details": {
+          "reasoning_tokens": 222
+        },
+        "total_tokens": 32316
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:43:25.896Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "eaef7132-b8b3-4aa3-987c-3a35eddb02a5",
+      "case": "acceptance-environmental-exhaust-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09576655,
+      "startedAt": "2026-10-05T21:43:25.926Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.01040185,
+      "usage": {
+        "input_tokens": 30704,
+        "input_tokens_details": {
+          "cache_write_tokens": 30701,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2726,
+        "output_tokens_details": {
+          "reasoning_tokens": 2325
+        },
+        "total_tokens": 33430
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:43:41.201Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "dd10e7b9-6dd6-44b9-a2f6-a07492ae9065",
+      "case": "acceptance-environmental-exhaust-2",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1257135,
+      "startedAt": "2026-10-05T21:43:41.222Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.005611425000000001,
+      "usage": {
+        "input_tokens": 34432,
+        "input_tokens_details": {
+          "cache_write_tokens": 34429,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2615,
+        "output_tokens_details": {
+          "reasoning_tokens": 2139
+        },
+        "total_tokens": 37047
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:44:05.904Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a55bd9b2-3af6-4bd4-b2a7-089af5aabd8c",
+      "case": "acceptance-environmental-exhaust-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09651290000000001,
+      "startedAt": "2026-10-05T21:44:05.932Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0090311,
+      "usage": {
+        "input_tokens": 31045,
+        "input_tokens_details": {
+          "cache_write_tokens": 31042,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1270,
+        "output_tokens_details": {
+          "reasoning_tokens": 987
+        },
+        "total_tokens": 32315
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:44:13.548Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4688a346-3ccf-467e-a123-7e1ad44ca2fa",
+      "case": "acceptance-domestic-hood-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000185526,
+      "startedAt": "2026-10-05T21:44:13.919Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 6.2e-7,
+      "usage": {
+        "prompt_tokens": 31,
+        "total_tokens": 31
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:44:14.065Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "bdcdda48-5fd7-4622-9507-43dea606bb81",
+      "case": "acceptance-domestic-hood-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08933925,
+      "startedAt": "2026-10-05T21:44:14.965Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.005490350000000001,
+      "usage": {
+        "input_tokens": 17018,
+        "input_tokens_details": {
+          "cache_write_tokens": 17015,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1236,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18254
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:44:21.484Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "e0dd5aa6-b7de-4b9a-a00f-1176254e6870",
+      "case": "acceptance-domestic-hood-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09129175000000002,
+      "startedAt": "2026-10-05T21:44:21.516Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00911835,
+      "usage": {
+        "input_tokens": 27974,
+        "input_tokens_details": {
+          "cache_write_tokens": 27971,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2125,
+        "output_tokens_details": {
+          "reasoning_tokens": 1435
+        },
+        "total_tokens": 30099
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:44:33.235Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "21ee6d62-e98e-405e-b76d-65eb28c804e1",
+      "case": "acceptance-domestic-hood-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10052735,
+      "startedAt": "2026-10-05T21:44:33.254Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.004677925,
+      "usage": {
+        "input_tokens": 21072,
+        "input_tokens_details": {
+          "cache_write_tokens": 21069,
+          "cached_tokens": 0
+        },
+        "output_tokens": 4088,
+        "output_tokens_details": {
+          "reasoning_tokens": 2999
+        },
+        "total_tokens": 25160
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:45:10.111Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f48b34bd-c3af-4ff4-a099-aff3a7be2ccf",
+      "case": "acceptance-domestic-hood-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08980125,
+      "startedAt": "2026-10-05T21:45:10.135Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0083126,
+      "usage": {
+        "input_tokens": 27583,
+        "input_tokens_details": {
+          "cache_write_tokens": 27580,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1417,
+        "output_tokens_details": {
+          "reasoning_tokens": 1029
+        },
+        "total_tokens": 29000
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:45:17.978Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "3897812c-f50e-4aa3-bc59-e1611607811c",
+      "case": "acceptance-domestic-hood-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000187352,
+      "startedAt": "2026-10-05T21:45:18.346Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 8.200000000000001e-7,
+      "usage": {
+        "prompt_tokens": 41,
+        "total_tokens": 41
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:45:18.535Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a0a25ef9-90f9-4cd1-a064-96a186b57af2",
+      "case": "acceptance-domestic-hood-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09157610000000001,
+      "startedAt": "2026-10-05T21:45:19.286Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0053156,
+      "usage": {
+        "input_tokens": 18019,
+        "input_tokens_details": {
+          "cache_write_tokens": 18016,
+          "cached_tokens": 0
+        },
+        "output_tokens": 811,
+        "output_tokens_details": {
+          "reasoning_tokens": 162
+        },
+        "total_tokens": 18830
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:45:23.982Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "683625fb-300c-4dbf-a601-b83fb8b9d801",
+      "case": "acceptance-domestic-hood-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08930735000000001,
+      "startedAt": "2026-10-05T21:45:24.006Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0094561,
+      "usage": {
+        "input_tokens": 27477,
+        "input_tokens_details": {
+          "cache_write_tokens": 27474,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2587,
+        "output_tokens_details": {
+          "reasoning_tokens": 2051
+        },
+        "total_tokens": 30064
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:45:38.456Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "16f47d24-f1f9-4096-951c-44d69bf64d90",
+      "case": "acceptance-domestic-hood-2",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.0868615,
+      "startedAt": "2026-10-05T21:45:38.477Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.002566425,
+      "usage": {
+        "input_tokens": 17072,
+        "input_tokens_details": {
+          "cache_write_tokens": 17069,
+          "cached_tokens": 0
+        },
+        "output_tokens": 865,
+        "output_tokens_details": {
+          "reasoning_tokens": 790
+        },
+        "total_tokens": 17937
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:45:47.220Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "1c04d840-f3de-4124-a8b3-439d1e491513",
+      "case": "acceptance-domestic-hood-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0901021,
+      "startedAt": "2026-10-05T21:45:47.253Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0084451,
+      "usage": {
+        "input_tokens": 27821,
+        "input_tokens_details": {
+          "cache_write_tokens": 27818,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1490,
+        "output_tokens_details": {
+          "reasoning_tokens": 1014
+        },
+        "total_tokens": 29311
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:45:55.384Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d50a3be0-a9a7-482a-92db-987091effa41",
+      "case": "acceptance-sediment-trap-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018499800000000002,
+      "startedAt": "2026-10-05T21:45:55.813Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 5.4e-7,
+      "usage": {
+        "prompt_tokens": 27,
+        "total_tokens": 27
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:45:55.970Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "07e4ad64-50b6-4edb-9432-20e18da6852c",
+      "case": "acceptance-sediment-trap-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09368150000000001,
+      "startedAt": "2026-10-05T21:45:56.698Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00554385,
+      "usage": {
+        "input_tokens": 20096,
+        "input_tokens_details": {
+          "cache_write_tokens": 20093,
+          "cached_tokens": 0
+        },
+        "output_tokens": 520,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20616
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:00.172Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "913a36d8-4d7d-4577-8749-d42f4194ce28",
+      "case": "acceptance-sediment-trap-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.084326,
+      "startedAt": "2026-10-05T21:46:00.196Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0073301,
+      "usage": {
+        "input_tokens": 26081,
+        "input_tokens_details": {
+          "cache_write_tokens": 26078,
+          "cached_tokens": 0
+        },
+        "output_tokens": 810,
+        "output_tokens_details": {
+          "reasoning_tokens": 516
+        },
+        "total_tokens": 26891
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:04.774Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "647d6c72-fcde-4ef3-b4e2-4af189fe72ab",
+      "case": "acceptance-sediment-trap-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018634000000000004,
+      "startedAt": "2026-10-05T21:46:05.157Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 7.000000000000001e-7,
+      "usage": {
+        "prompt_tokens": 35,
+        "total_tokens": 35
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:05.344Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "9b3319eb-2a4a-45e7-a2e7-164c53249ef8",
+      "case": "acceptance-sediment-trap-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08843175,
+      "startedAt": "2026-10-05T21:46:06.009Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0045201,
+      "usage": {
+        "input_tokens": 16893,
+        "input_tokens_details": {
+          "cache_write_tokens": 16890,
+          "cached_tokens": 0
+        },
+        "output_tokens": 297,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17190
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:07.990Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "8ba137ae-411c-48bd-a36a-4748eb17db91",
+      "case": "acceptance-sediment-trap-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08501790000000001,
+      "startedAt": "2026-10-05T21:46:08.014Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0071251000000000005,
+      "usage": {
+        "input_tokens": 26189,
+        "input_tokens_details": {
+          "cache_write_tokens": 26186,
+          "cached_tokens": 0
+        },
+        "output_tokens": 578,
+        "output_tokens_details": {
+          "reasoning_tokens": 262
+        },
+        "total_tokens": 26767
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:11.458Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "873e29dd-4f29-45bc-bcd7-305f7c7130ba",
+      "case": "acceptance-test-isolation-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018579000000000002,
+      "startedAt": "2026-10-05T21:46:11.976Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 6.2e-7,
+      "usage": {
+        "prompt_tokens": 31,
+        "total_tokens": 31
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:12.235Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "8dcc0d5d-18c8-4c7d-8ff6-f5d80c52b3bf",
+      "case": "acceptance-test-isolation-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08546890000000001,
+      "startedAt": "2026-10-05T21:46:12.993Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0048081,
+      "usage": {
+        "input_tokens": 15689,
+        "input_tokens_details": {
+          "cache_write_tokens": 15686,
+          "cached_tokens": 0
+        },
+        "output_tokens": 886,
+        "output_tokens_details": {
+          "reasoning_tokens": 200
+        },
+        "total_tokens": 16575
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:18.597Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "72c01237-55a2-4499-a696-fcc6251567a3",
+      "case": "acceptance-test-isolation-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0880165,
+      "startedAt": "2026-10-05T21:46:18.625Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0092396,
+      "usage": {
+        "input_tokens": 27263,
+        "input_tokens_details": {
+          "cache_write_tokens": 27260,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2424,
+        "output_tokens_details": {
+          "reasoning_tokens": 2046
+        },
+        "total_tokens": 29687
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:31.125Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "9c0005bb-a5e5-4804-b818-49162c5b06c9",
+      "case": "acceptance-test-isolation-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000187792,
+      "startedAt": "2026-10-05T21:46:31.576Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 9.8e-7,
+      "usage": {
+        "prompt_tokens": 49,
+        "total_tokens": 49
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:31.765Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "00719a0e-ef90-4171-9dd0-3a5d7ec772c8",
+      "case": "acceptance-test-isolation-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09542830000000001,
+      "startedAt": "2026-10-05T21:46:32.900Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0053931000000000005,
+      "usage": {
+        "input_tokens": 19557,
+        "input_tokens_details": {
+          "cache_write_tokens": 19554,
+          "cached_tokens": 0
+        },
+        "output_tokens": 504,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20061
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:35.761Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "b841cdec-b141-413c-8e4b-20407510c6d0",
+      "case": "acceptance-test-isolation-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09222400000000001,
+      "startedAt": "2026-10-05T21:46:35.793Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.008754350000000001,
+      "usage": {
+        "input_tokens": 28710,
+        "input_tokens_details": {
+          "cache_write_tokens": 28707,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1577,
+        "output_tokens_details": {
+          "reasoning_tokens": 1174
+        },
+        "total_tokens": 30287
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:44.149Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "51447bcd-91de-4737-a3d2-1a904fb8e5b4",
+      "case": "acceptance-mp-regulator-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018554800000000003,
+      "startedAt": "2026-10-05T21:46:44.702Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 6.2e-7,
+      "usage": {
+        "prompt_tokens": 31,
+        "total_tokens": 31
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:44.915Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "91399d77-3257-40c0-9ebd-a5c1acfe46af",
+      "case": "acceptance-mp-regulator-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09130935000000001,
+      "startedAt": "2026-10-05T21:46:46.052Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00600435,
+      "usage": {
+        "input_tokens": 18518,
+        "input_tokens_details": {
+          "cache_write_tokens": 18515,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1375,
+        "output_tokens_details": {
+          "reasoning_tokens": 176
+        },
+        "total_tokens": 19893
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:46:52.571Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "88ff0f38-8512-43e4-9d3b-767185597fff",
+      "case": "acceptance-mp-regulator-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09142485,
+      "startedAt": "2026-10-05T21:46:52.591Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.008908600000000001,
+      "usage": {
+        "input_tokens": 28635,
+        "input_tokens_details": {
+          "cache_write_tokens": 28632,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1750,
+        "output_tokens_details": {
+          "reasoning_tokens": 1157
+        },
+        "total_tokens": 30385
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:47:02.738Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6d79ee90-8fcf-4539-bda0-1394231507b3",
+      "case": "acceptance-mp-regulator-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10388510000000001,
+      "startedAt": "2026-10-05T21:47:02.766Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.005036925,
+      "usage": {
+        "input_tokens": 23548,
+        "input_tokens_details": {
+          "cache_write_tokens": 23545,
+          "cached_tokens": 0
+        },
+        "output_tokens": 4187,
+        "output_tokens_details": {
+          "reasoning_tokens": 3050
+        },
+        "total_tokens": 27735
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:47:37.583Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "32b2d4f4-48a5-4d5b-af7f-428373634c57",
+      "case": "acceptance-mp-regulator-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08839325,
+      "startedAt": "2026-10-05T21:47:37.610Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0084971,
+      "usage": {
+        "input_tokens": 27589,
+        "input_tokens_details": {
+          "cache_write_tokens": 27586,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1600,
+        "output_tokens_details": {
+          "reasoning_tokens": 1128
+        },
+        "total_tokens": 29189
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:47:46.921Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "60afe8b0-30ba-4c57-9f1c-502acfad0bae",
+      "case": "acceptance-mp-regulator-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10116315000000001,
+      "startedAt": "2026-10-05T21:47:46.946Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00516523,
+      "usage": {
+        "input_tokens": 22476,
+        "input_tokens_details": {
+          "cache_write_tokens": 15880,
+          "cached_tokens": 6593
+        },
+        "output_tokens": 6228,
+        "output_tokens_details": {
+          "reasoning_tokens": 4317
+        },
+        "total_tokens": 28704
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:48:37.860Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f6681337-183f-44b5-93ef-18d9adeb1d1e",
+      "case": "acceptance-mp-regulator-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09348900000000002,
+      "startedAt": "2026-10-05T21:48:37.899Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.009470850000000001,
+      "usage": {
+        "input_tokens": 29676,
+        "input_tokens_details": {
+          "cache_write_tokens": 29673,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2052,
+        "output_tokens_details": {
+          "reasoning_tokens": 1548
+        },
+        "total_tokens": 31728
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:48:48.408Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "3454fdd0-01a5-4f6f-9314-77a1f027428d",
+      "case": "acceptance-mp-regulator-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018948600000000002,
+      "startedAt": "2026-10-05T21:48:48.929Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00000124,
+      "usage": {
+        "prompt_tokens": 62,
+        "total_tokens": 62
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:48:49.120Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "981b6193-8e8f-4326-8015-047d5256591b",
+      "case": "acceptance-mp-regulator-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10142715000000001,
+      "startedAt": "2026-10-05T21:48:50.453Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0070131,
+      "usage": {
+        "input_tokens": 26509,
+        "input_tokens_details": {
+          "cache_write_tokens": 26506,
+          "cached_tokens": 0
+        },
+        "output_tokens": 386,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 26895
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:48:52.844Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "59b86e95-cc82-4b21-ba0e-5c1eab2f0622",
+      "case": "acceptance-mp-regulator-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09604925000000002,
+      "startedAt": "2026-10-05T21:48:52.874Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00977535,
+      "usage": {
+        "input_tokens": 34710,
+        "input_tokens_details": {
+          "cache_write_tokens": 34707,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1098,
+        "output_tokens_details": {
+          "reasoning_tokens": 686
+        },
+        "total_tokens": 35808
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:48:59.947Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "80b75d57-e920-458e-a4d2-e5acc985d150",
+      "case": "acceptance-mp-regulator-2",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10671595000000002,
+      "startedAt": "2026-10-05T21:48:59.971Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0041593,
+      "usage": {
+        "input_tokens": 28487,
+        "input_tokens_details": {
+          "cache_write_tokens": 28484,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1197,
+        "output_tokens_details": {
+          "reasoning_tokens": 696
+        },
+        "total_tokens": 29684
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:10.893Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a808c52a-33bc-477d-9370-dbdeea733478",
+      "case": "acceptance-mp-regulator-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09662345000000001,
+      "startedAt": "2026-10-05T21:49:10.921Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.009226100000000001,
+      "usage": {
+        "input_tokens": 35001,
+        "input_tokens_details": {
+          "cache_write_tokens": 34998,
+          "cached_tokens": 0
+        },
+        "output_tokens": 476,
+        "output_tokens_details": {
+          "reasoning_tokens": 197
+        },
+        "total_tokens": 35477
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:14.040Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "20ec6284-c727-4820-b207-7b5351d81f0b",
+      "case": "acceptance-exit-sign-distance-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018546,
+      "startedAt": "2026-10-05T21:49:14.645Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 5.6e-7,
+      "usage": {
+        "prompt_tokens": 28,
+        "total_tokens": 28
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:14.826Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "91fe5cb7-4c84-4510-b0b5-0d233e9f56d7",
+      "case": "acceptance-exit-sign-distance-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09208540000000001,
+      "startedAt": "2026-10-05T21:49:15.710Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.005492100000000001,
+      "usage": {
+        "input_tokens": 19281,
+        "input_tokens_details": {
+          "cache_write_tokens": 19278,
+          "cached_tokens": 0
+        },
+        "output_tokens": 672,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 19953
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:19.150Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "72018e82-37a2-4946-a14b-97206077480e",
+      "case": "acceptance-exit-sign-distance-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08047215,
+      "startedAt": "2026-10-05T21:49:19.180Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00679685,
+      "usage": {
+        "input_tokens": 24404,
+        "input_tokens_details": {
+          "cache_write_tokens": 24401,
+          "cached_tokens": 0
+        },
+        "output_tokens": 696,
+        "output_tokens_details": {
+          "reasoning_tokens": 481
+        },
+        "total_tokens": 25100
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:23.459Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d8acbae4-f097-4566-99d3-1b09b642662d",
+      "case": "acceptance-exit-sign-distance-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019025600000000003,
+      "startedAt": "2026-10-05T21:49:23.948Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00000134,
+      "usage": {
+        "prompt_tokens": 67,
+        "total_tokens": 67
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:24.218Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "13effaff-a38c-44f1-bd22-1a7c8d670565",
+      "case": "acceptance-exit-sign-distance-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09095295000000002,
+      "startedAt": "2026-10-05T21:49:25.211Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0047701,
+      "usage": {
+        "input_tokens": 17853,
+        "input_tokens_details": {
+          "cache_write_tokens": 17850,
+          "cached_tokens": 0
+        },
+        "output_tokens": 307,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18160
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:27.553Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "fa86cf58-c018-4315-a1be-1637ae2e8067",
+      "case": "acceptance-exit-sign-distance-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07971535,
+      "startedAt": "2026-10-05T21:49:27.581Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0062876,
+      "usage": {
+        "input_tokens": 23719,
+        "input_tokens_details": {
+          "cache_write_tokens": 23716,
+          "cached_tokens": 0
+        },
+        "output_tokens": 358,
+        "output_tokens_details": {
+          "reasoning_tokens": 172
+        },
+        "total_tokens": 24077
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:30.393Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "68a53ad4-c5fe-4c2a-9b54-b010678ead4f",
+      "case": "acceptance-handrail-height-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018499800000000002,
+      "startedAt": "2026-10-05T21:49:30.999Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 5e-7,
+      "usage": {
+        "prompt_tokens": 25,
+        "total_tokens": 25
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:31.212Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "235d380f-f2e8-4163-bdc3-bace69f5053b",
+      "case": "acceptance-handrail-height-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09202160000000001,
+      "startedAt": "2026-10-05T21:49:32.527Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.005927600000000001,
+      "usage": {
+        "input_tokens": 18919,
+        "input_tokens_details": {
+          "cache_write_tokens": 18916,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1198,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20117
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:40.004Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a100a9f8-6985-436b-89b1-33bd3db4730a",
+      "case": "acceptance-handrail-height-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08757320000000002,
+      "startedAt": "2026-10-05T21:49:40.042Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00996135,
+      "usage": {
+        "input_tokens": 27258,
+        "input_tokens_details": {
+          "cache_write_tokens": 27255,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3147,
+        "output_tokens_details": {
+          "reasoning_tokens": 2820
+        },
+        "total_tokens": 30405
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:57.822Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a36e2185-492e-44f0-8952-5ac0257e8455",
+      "case": "acceptance-handrail-height-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018854,
+      "startedAt": "2026-10-05T21:49:58.454Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00000104,
+      "usage": {
+        "prompt_tokens": 52,
+        "total_tokens": 52
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:49:58.649Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "c5b707a0-f98a-4354-95a8-b3b102c039be",
+      "case": "acceptance-handrail-height-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09497180000000001,
+      "startedAt": "2026-10-05T21:49:59.696Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0051906,
+      "usage": {
+        "input_tokens": 19795,
+        "input_tokens_details": {
+          "cache_write_tokens": 19792,
+          "cached_tokens": 0
+        },
+        "output_tokens": 242,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20037
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:01.737Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "bfa226e1-8f04-4670-9b80-08d92fdf988e",
+      "case": "acceptance-handrail-height-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0828707,
+      "startedAt": "2026-10-05T21:50:01.767Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0066871000000000005,
+      "usage": {
+        "input_tokens": 25405,
+        "input_tokens_details": {
+          "cache_write_tokens": 25402,
+          "cached_tokens": 0
+        },
+        "output_tokens": 336,
+        "output_tokens_details": {
+          "reasoning_tokens": 156
+        },
+        "total_tokens": 25741
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:04.534Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "89ee1d3b-eb71-44db-81fd-bdf6aada77da",
+      "case": "acceptance-handrail-extension-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018484399999999998,
+      "startedAt": "2026-10-05T21:50:05.186Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 4.8e-7,
+      "usage": {
+        "prompt_tokens": 24,
+        "total_tokens": 24
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:05.397Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a41f534f-f58c-4563-9b66-e705ebecd1df",
+      "case": "acceptance-handrail-extension-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08742635,
+      "startedAt": "2026-10-05T21:50:06.500Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0058926000000000004,
+      "usage": {
+        "input_tokens": 16455,
+        "input_tokens_details": {
+          "cache_write_tokens": 16452,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1779,
+        "output_tokens_details": {
+          "reasoning_tokens": 213
+        },
+        "total_tokens": 18234
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:14.544Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "8da6714a-9628-414d-a1a7-c5f4a4f2597a",
+      "case": "acceptance-handrail-extension-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08708095000000002,
+      "startedAt": "2026-10-05T21:50:14.585Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00853735,
+      "usage": {
+        "input_tokens": 26802,
+        "input_tokens_details": {
+          "cache_write_tokens": 26799,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1837,
+        "output_tokens_details": {
+          "reasoning_tokens": 1423
+        },
+        "total_tokens": 28639
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:24.644Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "35ec3f43-2853-4e04-be9e-4232d17daeca",
+      "case": "acceptance-handrail-extension-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000188452,
+      "startedAt": "2026-10-05T21:50:25.213Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00000108,
+      "usage": {
+        "prompt_tokens": 54,
+        "total_tokens": 54
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:25.379Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "91da0b93-4865-4fa7-8a6a-5b0e6424e839",
+      "case": "acceptance-handrail-extension-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09869915000000001,
+      "startedAt": "2026-10-05T21:50:26.585Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0057026,
+      "usage": {
+        "input_tokens": 21683,
+        "input_tokens_details": {
+          "cache_write_tokens": 21680,
+          "cached_tokens": 0
+        },
+        "output_tokens": 282,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 21965
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:28.727Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f44617fd-8163-4d89-9b0e-452c1e7a3c04",
+      "case": "acceptance-handrail-extension-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0827332,
+      "startedAt": "2026-10-05T21:50:28.762Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0067086,
+      "usage": {
+        "input_tokens": 25219,
+        "input_tokens_details": {
+          "cache_write_tokens": 25216,
+          "cached_tokens": 0
+        },
+        "output_tokens": 404,
+        "output_tokens_details": {
+          "reasoning_tokens": 186
+        },
+        "total_tokens": 25623
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:31.510Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6208d857-6a46-4ece-ba34-76cab11e34e7",
+      "case": "acceptance-exit-enclosure-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018559200000000002,
+      "startedAt": "2026-10-05T21:50:32.203Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 6.6e-7,
+      "usage": {
+        "prompt_tokens": 33,
+        "total_tokens": 33
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:32.376Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "52d71116-6747-4849-8b35-cd9061988689",
+      "case": "acceptance-exit-enclosure-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1049598,
+      "startedAt": "2026-10-05T21:50:33.384Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.007418350000000001,
+      "usage": {
+        "input_tokens": 25158,
+        "input_tokens_details": {
+          "cache_write_tokens": 25155,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1129,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 26287
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:39.112Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "990add1d-d35b-4245-b418-80286083b51a",
+      "case": "acceptance-exit-enclosure-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08972205,
+      "startedAt": "2026-10-05T21:50:39.153Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.008901850000000001,
+      "usage": {
+        "input_tokens": 28156,
+        "input_tokens_details": {
+          "cache_write_tokens": 28153,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1863,
+        "output_tokens_details": {
+          "reasoning_tokens": 1431
+        },
+        "total_tokens": 30019
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:50:49.509Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d7235774-8dad-4028-b331-0bcaa9c22446",
+      "case": "acceptance-exit-enclosure-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.1024023,
+      "startedAt": "2026-10-05T21:50:49.540Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00402355,
+      "usage": {
+        "input_tokens": 25145,
+        "input_tokens_details": {
+          "cache_write_tokens": 25142,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1761,
+        "output_tokens_details": {
+          "reasoning_tokens": 1418
+        },
+        "total_tokens": 26906
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:51:07.098Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "1e12bcd6-697c-4b02-9ee5-d08d6a6207fe",
+      "case": "acceptance-exit-enclosure-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08903345000000001,
+      "startedAt": "2026-10-05T21:51:07.132Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0080966,
+      "usage": {
+        "input_tokens": 28007,
+        "input_tokens_details": {
+          "cache_write_tokens": 28004,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1095,
+        "output_tokens_details": {
+          "reasoning_tokens": 870
+        },
+        "total_tokens": 29102
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:51:13.395Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "c5134e70-a7a2-4e17-81b1-209ecf990b63",
+      "case": "acceptance-exit-enclosure-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018761600000000001,
+      "startedAt": "2026-10-05T21:51:14.024Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 9.6e-7,
+      "usage": {
+        "prompt_tokens": 48,
+        "total_tokens": 48
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:51:14.222Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "2f672323-5a91-4d30-a619-ebb46b334de9",
+      "case": "acceptance-exit-enclosure-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.13559205000000002,
+      "startedAt": "2026-10-05T21:51:15.310Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0110976,
+      "usage": {
+        "input_tokens": 42315,
+        "input_tokens_details": {
+          "cache_write_tokens": 42312,
+          "cached_tokens": 0
+        },
+        "output_tokens": 519,
+        "output_tokens_details": {
+          "reasoning_tokens": 157
+        },
+        "total_tokens": 42834
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:51:18.982Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "ec9ace9a-4949-4296-b257-5e428e2d855e",
+      "case": "acceptance-exit-enclosure-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08917315,
+      "startedAt": "2026-10-05T21:51:19.019Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0079661,
+      "usage": {
+        "input_tokens": 29169,
+        "input_tokens_details": {
+          "cache_write_tokens": 29166,
+          "cached_tokens": 0
+        },
+        "output_tokens": 674,
+        "output_tokens_details": {
+          "reasoning_tokens": 457
+        },
+        "total_tokens": 29843
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:51:23.193Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4a4f4bcf-39ce-4a0e-8416-01cc7744ea33",
+      "case": "acceptance-permit-basis-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018616400000000003,
+      "startedAt": "2026-10-05T21:51:23.933Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 6.2e-7,
+      "usage": {
+        "prompt_tokens": 31,
+        "total_tokens": 31
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:51:24.233Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "0930767f-18d7-4ba6-a9ac-e76cbeee575a",
+      "case": "acceptance-permit-basis-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09589525000000002,
+      "startedAt": "2026-10-05T21:51:25.184Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0054576,
+      "usage": {
+        "input_tokens": 19407,
+        "input_tokens_details": {
+          "cache_write_tokens": 19404,
+          "cached_tokens": 0
+        },
+        "output_tokens": 606,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 20013
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:51:28.499Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4b5483ff-c39a-4f0e-a148-44cabf673b73",
+      "case": "acceptance-permit-basis-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0915453,
+      "startedAt": "2026-10-05T21:51:28.537Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00896535,
+      "usage": {
+        "input_tokens": 27934,
+        "input_tokens_details": {
+          "cache_write_tokens": 27931,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1982,
+        "output_tokens_details": {
+          "reasoning_tokens": 1514
+        },
+        "total_tokens": 29916
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:51:39.650Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "486e5635-ea96-4758-8ceb-5dc004e3373a",
+      "case": "acceptance-permit-basis-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10466775000000002,
+      "startedAt": "2026-10-05T21:51:39.682Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00465605,
+      "usage": {
+        "input_tokens": 22753,
+        "input_tokens_details": {
+          "cache_write_tokens": 22750,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3624,
+        "output_tokens_details": {
+          "reasoning_tokens": 2588
+        },
+        "total_tokens": 26377
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:52:10.975Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "655dd9b7-a81a-4538-a15e-892315b1483d",
+      "case": "acceptance-permit-basis-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09421005,
+      "startedAt": "2026-10-05T21:52:11.012Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0092411,
+      "usage": {
+        "input_tokens": 28945,
+        "input_tokens_details": {
+          "cache_write_tokens": 28942,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2005,
+        "output_tokens_details": {
+          "reasoning_tokens": 1627
+        },
+        "total_tokens": 30950
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:52:22.195Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d7a25244-f078-4604-a84c-9b955d868f06",
+      "case": "acceptance-permit-basis-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019148800000000002,
+      "startedAt": "2026-10-05T21:52:22.876Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00000148,
+      "usage": {
+        "prompt_tokens": 74,
+        "total_tokens": 74
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:52:23.050Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a115fe22-1af4-457b-a613-27f2719e9ea6",
+      "case": "acceptance-permit-basis-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10474695,
+      "startedAt": "2026-10-05T21:52:24.157Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0062376,
+      "usage": {
+        "input_tokens": 23267,
+        "input_tokens_details": {
+          "cache_write_tokens": 23264,
+          "cached_tokens": 0
+        },
+        "output_tokens": 421,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 23688
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:52:26.920Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "b58a45d2-1514-465f-9d64-9f1ff80a5ffe",
+      "case": "acceptance-permit-basis-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09459065000000001,
+      "startedAt": "2026-10-05T21:52:26.960Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00913485,
+      "usage": {
+        "input_tokens": 29536,
+        "input_tokens_details": {
+          "cache_write_tokens": 29533,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1751,
+        "output_tokens_details": {
+          "reasoning_tokens": 1425
+        },
+        "total_tokens": 31287
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:52:37.521Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a2fc82b6-2c39-4a2f-a048-c1444875bfaf",
+      "case": "acceptance-permit-basis-2",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.1090078,
+      "startedAt": "2026-10-05T21:52:37.554Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0038863,
+      "usage": {
+        "input_tokens": 24851,
+        "input_tokens_details": {
+          "cache_write_tokens": 24848,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1560,
+        "output_tokens_details": {
+          "reasoning_tokens": 1078
+        },
+        "total_tokens": 26411
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:52:50.412Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "10255529-597b-47df-b401-087e6a96b50a",
+      "case": "acceptance-permit-basis-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09524735000000001,
+      "startedAt": "2026-10-05T21:52:50.450Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00796535,
+      "usage": {
+        "input_tokens": 29830,
+        "input_tokens_details": {
+          "cache_write_tokens": 29827,
+          "cached_tokens": 0
+        },
+        "output_tokens": 508,
+        "output_tokens_details": {
+          "reasoning_tokens": 311
+        },
+        "total_tokens": 30338
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:52:53.846Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "6ffe2513-4a2a-482c-a37b-a09f41e7fb5a",
+      "case": "acceptance-asbestos-certification-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000185702,
+      "startedAt": "2026-10-05T21:52:54.681Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 4.6000000000000004e-7,
+      "usage": {
+        "prompt_tokens": 23,
+        "total_tokens": 23
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:52:54.888Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "25e46fd4-2bec-4c6f-b093-a12711da400c",
+      "case": "acceptance-asbestos-certification-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08927270000000001,
+      "startedAt": "2026-10-05T21:52:55.824Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0052341,
+      "usage": {
+        "input_tokens": 16849,
+        "input_tokens_details": {
+          "cache_write_tokens": 16846,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1022,
+        "output_tokens_details": {
+          "reasoning_tokens": 247
+        },
+        "total_tokens": 17871
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:00.619Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "c3525119-e94e-482f-8d9d-b3043471c072",
+      "case": "acceptance-asbestos-certification-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0832447,
+      "startedAt": "2026-10-05T21:53:00.654Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0084746,
+      "usage": {
+        "input_tokens": 24599,
+        "input_tokens_details": {
+          "cache_write_tokens": 24596,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2325,
+        "output_tokens_details": {
+          "reasoning_tokens": 1857
+        },
+        "total_tokens": 26924
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:14.465Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "da9f2bae-280c-4b20-962f-35c88d91c411",
+      "case": "acceptance-asbestos-certification-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09757275000000001,
+      "startedAt": "2026-10-05T21:53:14.499Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0028393000000000003,
+      "usage": {
+        "input_tokens": 19983,
+        "input_tokens_details": {
+          "cache_write_tokens": 19980,
+          "cached_tokens": 0
+        },
+        "output_tokens": 683,
+        "output_tokens_details": {
+          "reasoning_tokens": 383
+        },
+        "total_tokens": 20666
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:20.413Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "ef29d193-8381-4d17-893b-f1a58941548a",
+      "case": "acceptance-asbestos-certification-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07903555,
+      "startedAt": "2026-10-05T21:53:20.446Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00632085,
+      "usage": {
+        "input_tokens": 23028,
+        "input_tokens_details": {
+          "cache_write_tokens": 23025,
+          "cached_tokens": 0
+        },
+        "output_tokens": 564,
+        "output_tokens_details": {
+          "reasoning_tokens": 389
+        },
+        "total_tokens": 23592
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:24.322Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "64e5df92-d0b9-45b3-a981-53e3775334c5",
+      "case": "acceptance-asbestos-certification-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018763800000000004,
+      "startedAt": "2026-10-05T21:53:25.043Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.000001,
+      "usage": {
+        "prompt_tokens": 50,
+        "total_tokens": 50
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:25.230Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "1250d552-ea34-481f-8203-09fbfef0e749",
+      "case": "acceptance-asbestos-certification-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10675115,
+      "startedAt": "2026-10-05T21:53:26.308Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0060786,
+      "usage": {
+        "input_tokens": 23003,
+        "input_tokens_details": {
+          "cache_write_tokens": 23000,
+          "cached_tokens": 0
+        },
+        "output_tokens": 328,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 23331
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:28.551Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "7a056402-6602-4844-81a3-03fff638a852",
+      "case": "acceptance-asbestos-certification-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09461650000000002,
+      "startedAt": "2026-10-05T21:53:28.592Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.007724600000000001,
+      "usage": {
+        "input_tokens": 28431,
+        "input_tokens_details": {
+          "cache_write_tokens": 28428,
+          "cached_tokens": 0
+        },
+        "output_tokens": 617,
+        "output_tokens_details": {
+          "reasoning_tokens": 401
+        },
+        "total_tokens": 29048
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:32.335Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a92776d5-5b5c-43bf-bb47-bb7261abfaad",
+      "case": "acceptance-vacant-protection-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018605400000000003,
+      "startedAt": "2026-10-05T21:53:33.224Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 5.8e-7,
+      "usage": {
+        "prompt_tokens": 29,
+        "total_tokens": 29
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:33.409Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "0baee1c4-74ef-491a-8705-ee5e9690fe19",
+      "case": "acceptance-vacant-protection-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000182556,
+      "startedAt": "2026-10-05T21:53:34.437Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 1.6e-7,
+      "usage": {
+        "prompt_tokens": 8,
+        "total_tokens": 8
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:34.618Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "1f9ecbf3-60b3-40dd-b727-e6bf82fbc3e7",
+      "case": "acceptance-vacant-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09931075000000002,
+      "startedAt": "2026-10-05T21:53:35.191Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.006956100000000001,
+      "usage": {
+        "input_tokens": 19909,
+        "input_tokens_details": {
+          "cache_write_tokens": 19906,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1979,
+        "output_tokens_details": {
+          "reasoning_tokens": 295
+        },
+        "total_tokens": 21888
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:44.732Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "43f60e7e-9b82-416f-884d-24d804487682",
+      "case": "acceptance-vacant-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.10062470000000001,
+      "startedAt": "2026-10-05T21:53:44.778Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0097186,
+      "usage": {
+        "input_tokens": 30203,
+        "input_tokens_details": {
+          "cache_write_tokens": 30200,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2168,
+        "output_tokens_details": {
+          "reasoning_tokens": 1755
+        },
+        "total_tokens": 32371
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:53:57.307Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4d589c15-a62b-4921-9ec3-df86aca0e721",
+      "case": "acceptance-vacant-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11617595000000001,
+      "startedAt": "2026-10-05T21:53:57.340Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.005708175,
+      "usage": {
+        "input_tokens": 26034,
+        "input_tokens_details": {
+          "cache_write_tokens": 26031,
+          "cached_tokens": 0
+        },
+        "output_tokens": 4908,
+        "output_tokens_details": {
+          "reasoning_tokens": 3174
+        },
+        "total_tokens": 30942
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:54:35.240Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "256e2926-8b00-4e26-ad45-7c3c8931be8e",
+      "case": "acceptance-vacant-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.10150745000000001,
+      "startedAt": "2026-10-05T21:54:35.282Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0086256,
+      "usage": {
+        "input_tokens": 30531,
+        "input_tokens_details": {
+          "cache_write_tokens": 30528,
+          "cached_tokens": 0
+        },
+        "output_tokens": 993,
+        "output_tokens_details": {
+          "reasoning_tokens": 766
+        },
+        "total_tokens": 31524
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:54:41.250Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "289d16c3-8498-4106-83d6-d69908855680",
+      "case": "acceptance-vacant-protection-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018713200000000004,
+      "startedAt": "2026-10-05T21:54:41.985Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 8.200000000000001e-7,
+      "usage": {
+        "prompt_tokens": 41,
+        "total_tokens": 41
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:54:42.252Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "307136c3-f42e-45a1-99d3-8640c940084c",
+      "case": "acceptance-vacant-protection-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11110000000000002,
+      "startedAt": "2026-10-05T21:54:43.298Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.006589350000000001,
+      "usage": {
+        "input_tokens": 25234,
+        "input_tokens_details": {
+          "cache_write_tokens": 25231,
+          "cached_tokens": 0
+        },
+        "output_tokens": 281,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 25515
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:54:45.476Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "ff6a7b39-9d60-4801-831f-6bb4079afe54",
+      "case": "acceptance-vacant-protection-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09834055,
+      "startedAt": "2026-10-05T21:54:45.518Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.008305100000000001,
+      "usage": {
+        "input_tokens": 30241,
+        "input_tokens_details": {
+          "cache_write_tokens": 30238,
+          "cached_tokens": 0
+        },
+        "output_tokens": 745,
+        "output_tokens_details": {
+          "reasoning_tokens": 516
+        },
+        "total_tokens": 30986
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:54:49.995Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "542abbf1-71b1-48d8-9936-e60f784edd5a",
+      "case": "acceptance-reserved-fire-section-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018546,
+      "startedAt": "2026-10-05T21:54:50.870Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 4.8e-7,
+      "usage": {
+        "prompt_tokens": 24,
+        "total_tokens": 24
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:54:51.059Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "8878a07a-98d7-412d-8972-b78d0c3ede84",
+      "case": "acceptance-reserved-fire-section-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08312425,
+      "startedAt": "2026-10-05T21:54:51.978Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.004112350000000001,
+      "usage": {
+        "input_tokens": 14802,
+        "input_tokens_details": {
+          "cache_write_tokens": 14799,
+          "cached_tokens": 0
+        },
+        "output_tokens": 412,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15214
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:54:54.860Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "9e095a62-3963-4961-805e-0f6ee4f17079",
+      "case": "acceptance-reserved-fire-section-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07041705000000001,
+      "startedAt": "2026-10-05T21:54:54.901Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0060271000000000005,
+      "usage": {
+        "input_tokens": 19885,
+        "input_tokens_details": {
+          "cache_write_tokens": 19882,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1056,
+        "output_tokens_details": {
+          "reasoning_tokens": 879
+        },
+        "total_tokens": 20941
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:55:01.740Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "bd34c4b8-b2dd-49f5-8e1a-1b554839fab0",
+      "case": "acceptance-reserved-fire-section-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018957400000000003,
+      "startedAt": "2026-10-05T21:55:02.503Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0000011,
+      "usage": {
+        "prompt_tokens": 55,
+        "total_tokens": 55
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:55:02.711Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "baef8b8f-1646-4d3f-b6f4-bd8a8f64b554",
+      "case": "acceptance-reserved-fire-section-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08871775,
+      "startedAt": "2026-10-05T21:55:03.697Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0046533500000000005,
+      "usage": {
+        "input_tokens": 17274,
+        "input_tokens_details": {
+          "cache_write_tokens": 17271,
+          "cached_tokens": 0
+        },
+        "output_tokens": 335,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17609
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:55:08.040Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "536dab41-55d2-4dbb-b1b3-99465ce5a9bf",
+      "case": "acceptance-reserved-fire-section-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07528125,
+      "startedAt": "2026-10-05T21:55:08.082Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0060331000000000004,
+      "usage": {
+        "input_tokens": 22117,
+        "input_tokens_details": {
+          "cache_write_tokens": 22114,
+          "cached_tokens": 0
+        },
+        "output_tokens": 504,
+        "output_tokens_details": {
+          "reasoning_tokens": 338
+        },
+        "total_tokens": 22621
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:55:11.290Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f9513bd3-ed4b-48fa-bfc7-0c9a714b7453",
+      "case": "acceptance-emergency-power-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018647200000000003,
+      "startedAt": "2026-10-05T21:55:12.200Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 5.8e-7,
+      "usage": {
+        "prompt_tokens": 29,
+        "total_tokens": 29
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:55:12.390Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f8a9b334-f185-4ec2-a474-b4c77ae5e2f8",
+      "case": "acceptance-emergency-power-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10080455,
+      "startedAt": "2026-10-05T21:55:13.405Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00635985,
+      "usage": {
+        "input_tokens": 20528,
+        "input_tokens_details": {
+          "cache_write_tokens": 20525,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1228,
+        "output_tokens_details": {
+          "reasoning_tokens": 177
+        },
+        "total_tokens": 21756
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:55:19.558Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "8bad4430-5aec-44d0-a6b7-67feccb7aa91",
+      "case": "acceptance-emergency-power-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09726695,
+      "startedAt": "2026-10-05T21:55:19.603Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00953185,
+      "usage": {
+        "input_tokens": 28780,
+        "input_tokens_details": {
+          "cache_write_tokens": 28777,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2337,
+        "output_tokens_details": {
+          "reasoning_tokens": 1909
+        },
+        "total_tokens": 31117
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:55:32.771Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "9559b5d5-3150-4e2e-b0f1-5689e9aa71a5",
+      "case": "acceptance-emergency-power-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11301015,
+      "startedAt": "2026-10-05T21:55:32.814Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.005531675,
+      "usage": {
+        "input_tokens": 24750,
+        "input_tokens_details": {
+          "cache_write_tokens": 24747,
+          "cached_tokens": 0
+        },
+        "output_tokens": 4876,
+        "output_tokens_details": {
+          "reasoning_tokens": 3322
+        },
+        "total_tokens": 29626
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:56:09.392Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "5efe1283-103a-466d-b52c-5ad2d75024f4",
+      "case": "acceptance-emergency-power-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.09931790000000001,
+      "startedAt": "2026-10-05T21:56:09.442Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0086716,
+      "usage": {
+        "input_tokens": 29611,
+        "input_tokens_details": {
+          "cache_write_tokens": 29608,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1269,
+        "output_tokens_details": {
+          "reasoning_tokens": 978
+        },
+        "total_tokens": 30880
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:56:16.941Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "11cb3a1e-a873-4e40-a081-1c78a7bc5789",
+      "case": "acceptance-emergency-power-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000186824,
+      "startedAt": "2026-10-05T21:56:17.744Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 7.6e-7,
+      "usage": {
+        "prompt_tokens": 38,
+        "total_tokens": 38
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:56:17.955Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "88a00773-1a52-4674-ae91-a980fdcfc3a6",
+      "case": "acceptance-emergency-power-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09577150000000001,
+      "startedAt": "2026-10-05T21:56:19.092Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0050051,
+      "usage": {
+        "input_tokens": 18625,
+        "input_tokens_details": {
+          "cache_write_tokens": 18622,
+          "cached_tokens": 0
+        },
+        "output_tokens": 349,
+        "output_tokens_details": {
+          "reasoning_tokens": 104
+        },
+        "total_tokens": 18974
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:56:21.865Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "74bf5f1b-a560-48ad-9268-ae9f169d1d33",
+      "case": "acceptance-emergency-power-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.08379855,
+      "startedAt": "2026-10-05T21:56:21.903Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0063826,
+      "usage": {
+        "input_tokens": 24127,
+        "input_tokens_details": {
+          "cache_write_tokens": 24124,
+          "cached_tokens": 0
+        },
+        "output_tokens": 351,
+        "output_tokens_details": {
+          "reasoning_tokens": 170
+        },
+        "total_tokens": 24478
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:56:24.958Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4c0db5bd-0860-4e84-bbc8-bb468004c4ed",
+      "case": "acceptance-plaza-bicycles-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018508600000000002,
+      "startedAt": "2026-10-05T21:56:25.975Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 4.8e-7,
+      "usage": {
+        "prompt_tokens": 24,
+        "total_tokens": 24
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:56:26.207Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "503059aa-ebe7-43d0-90cd-db24f2eaf434",
+      "case": "acceptance-plaza-bicycles-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08244225,
+      "startedAt": "2026-10-05T21:56:26.976Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00413335,
+      "usage": {
+        "input_tokens": 13418,
+        "input_tokens_details": {
+          "cache_write_tokens": 13415,
+          "cached_tokens": 0
+        },
+        "output_tokens": 779,
+        "output_tokens_details": {
+          "reasoning_tokens": 256
+        },
+        "total_tokens": 14197
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:56:31.667Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "0055897c-e4ba-470d-834d-c0d0a6deacc2",
+      "case": "acceptance-plaza-bicycles-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0671781,
+      "startedAt": "2026-10-05T21:56:32.000Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00549235,
+      "usage": {
+        "input_tokens": 17758,
+        "input_tokens_details": {
+          "cache_write_tokens": 17755,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1053,
+        "output_tokens_details": {
+          "reasoning_tokens": 746
+        },
+        "total_tokens": 18811
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:56:38.539Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a2fbaf5a-ff9b-4cba-963f-35e4c045d2c6",
+      "case": "acceptance-plaza-bicycles-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08754625,
+      "startedAt": "2026-10-05T21:56:38.575Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.003219425,
+      "usage": {
+        "input_tokens": 15144,
+        "input_tokens_details": {
+          "cache_write_tokens": 15141,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2653,
+        "output_tokens_details": {
+          "reasoning_tokens": 2044
+        },
+        "total_tokens": 17797
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:57:02.910Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "b9da8e7f-eab5-4563-be8c-a81b03606d84",
+      "case": "acceptance-plaza-bicycles-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0679228,
+      "startedAt": "2026-10-05T21:57:02.960Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0054316,
+      "usage": {
+        "input_tokens": 18091,
+        "input_tokens_details": {
+          "cache_write_tokens": 18088,
+          "cached_tokens": 0
+        },
+        "output_tokens": 909,
+        "output_tokens_details": {
+          "reasoning_tokens": 688
+        },
+        "total_tokens": 19000
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:57:08.534Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d25ddf48-44ce-4070-b5b8-3d00ab4edaca",
+      "case": "acceptance-plaza-bicycles-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018711000000000002,
+      "startedAt": "2026-10-05T21:57:09.357Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 7.8e-7,
+      "usage": {
+        "prompt_tokens": 39,
+        "total_tokens": 39
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:57:09.517Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "523a7ac5-06fc-45cf-9a07-2d6ad086f332",
+      "case": "acceptance-plaza-bicycles-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08537320000000001,
+      "startedAt": "2026-10-05T21:57:10.570Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0045411,
+      "usage": {
+        "input_tokens": 14633,
+        "input_tokens_details": {
+          "cache_write_tokens": 14630,
+          "cached_tokens": 0
+        },
+        "output_tokens": 883,
+        "output_tokens_details": {
+          "reasoning_tokens": 300
+        },
+        "total_tokens": 15516
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:57:16.283Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4daa1bd9-dec6-4178-bca8-07f8e3e96028",
+      "case": "acceptance-plaza-bicycles-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07282275,
+      "startedAt": "2026-10-05T21:57:16.371Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.005730600000000001,
+      "usage": {
+        "input_tokens": 19995,
+        "input_tokens_details": {
+          "cache_write_tokens": 19992,
+          "cached_tokens": 0
+        },
+        "output_tokens": 732,
+        "output_tokens_details": {
+          "reasoning_tokens": 369
+        },
+        "total_tokens": 20727
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:57:21.073Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "52ca2417-ac14-474a-a8e9-8aac83661861",
+      "case": "acceptance-plaza-fountain-1",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018521800000000001,
+      "startedAt": "2026-10-05T21:57:22.097Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 5.2e-7,
+      "usage": {
+        "prompt_tokens": 26,
+        "total_tokens": 26
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:57:22.319Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "25a557cc-e5a1-498b-b982-81078403902c",
+      "case": "acceptance-plaza-fountain-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08558275,
+      "startedAt": "2026-10-05T21:57:23.214Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00471885,
+      "usage": {
+        "input_tokens": 15192,
+        "input_tokens_details": {
+          "cache_write_tokens": 15189,
+          "cached_tokens": 0
+        },
+        "output_tokens": 921,
+        "output_tokens_details": {
+          "reasoning_tokens": 269
+        },
+        "total_tokens": 16113
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:57:28.549Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a979479b-6dde-4680-9427-00e6b023cefa",
+      "case": "acceptance-plaza-fountain-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07180140000000002,
+      "startedAt": "2026-10-05T21:57:28.848Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00788085,
+      "usage": {
+        "input_tokens": 20080,
+        "input_tokens_details": {
+          "cache_write_tokens": 20077,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2861,
+        "output_tokens_details": {
+          "reasoning_tokens": 2287
+        },
+        "total_tokens": 22941
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:57:44.494Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "13dd823c-1e75-4714-986c-ca1f2754cf58",
+      "case": "acceptance-plaza-fountain-1",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09187640000000001,
+      "startedAt": "2026-10-05T21:57:44.534Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00325005,
+      "usage": {
+        "input_tokens": 17465,
+        "input_tokens_details": {
+          "cache_write_tokens": 17462,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2134,
+        "output_tokens_details": {
+          "reasoning_tokens": 1519
+        },
+        "total_tokens": 19599
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:58:04.698Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "d915a7b8-3db3-4273-93fb-ed848e859ada",
+      "case": "acceptance-plaza-fountain-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07255930000000001,
+      "startedAt": "2026-10-05T21:58:04.768Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00673085,
+      "usage": {
+        "input_tokens": 20512,
+        "input_tokens_details": {
+          "cache_write_tokens": 20509,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1603,
+        "output_tokens_details": {
+          "reasoning_tokens": 1318
+        },
+        "total_tokens": 22115
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:58:14.384Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "4e915e69-fdc7-4193-a580-aca2b05c3405",
+      "case": "acceptance-plaza-fountain-2",
+      "model": "text-embedding-3-small",
+      "providerAPI": "embeddings",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000187352,
+      "startedAt": "2026-10-05T21:58:15.364Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 8.8e-7,
+      "usage": {
+        "prompt_tokens": 44,
+        "total_tokens": 44
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:58:15.546Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "173d7fe0-74b3-427f-a858-51df91a5efd6",
+      "case": "acceptance-plaza-fountain-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08415055,
+      "startedAt": "2026-10-05T21:58:16.530Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.004601350000000001,
+      "usage": {
+        "input_tokens": 14522,
+        "input_tokens_details": {
+          "cache_write_tokens": 14519,
+          "cached_tokens": 0
+        },
+        "output_tokens": 971,
+        "output_tokens_details": {
+          "reasoning_tokens": 305
+        },
+        "total_tokens": 15493
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:58:22.360Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "a202316e-2dd4-430c-8fad-df02739d7455",
+      "case": "acceptance-plaza-fountain-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07329355,
+      "startedAt": "2026-10-05T21:58:22.660Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.0092316,
+      "usage": {
+        "input_tokens": 20531,
+        "input_tokens_details": {
+          "cache_write_tokens": 20528,
+          "cached_tokens": 0
+        },
+        "output_tokens": 4099,
+        "output_tokens_details": {
+          "reasoning_tokens": 3541
+        },
+        "total_tokens": 24630
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:58:46.837Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "b77a497d-2e1d-40c2-8f1e-ec566101f83b",
+      "case": "acceptance-plaza-fountain-2",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0925474,
+      "startedAt": "2026-10-05T21:58:46.877Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00413455,
+      "usage": {
+        "input_tokens": 17597,
+        "input_tokens_details": {
+          "cache_write_tokens": 17594,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3870,
+        "output_tokens_details": {
+          "reasoning_tokens": 3260
+        },
+        "total_tokens": 21467
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:59:20.446Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "29ff0210-aebd-4e08-ab22-c3e9273b3fdd",
+      "case": "acceptance-plaza-fountain-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07110235000000001,
+      "startedAt": "2026-10-05T21:59:20.513Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.007204100000000001,
+      "usage": {
+        "input_tokens": 19793,
+        "input_tokens_details": {
+          "cache_write_tokens": 19790,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2256,
+        "output_tokens_details": {
+          "reasoning_tokens": 1768
+        },
+        "total_tokens": 22049
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:59:33.275Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "91799f0d-5bdd-4f67-8c24-12abbb081f31",
+      "case": "acceptance-plaza-fountain-2",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "providerAPI": "responses",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09047170000000002,
+      "startedAt": "2026-10-05T21:59:33.311Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00256698,
+      "usage": {
+        "input_tokens": 16764,
+        "input_tokens_details": {
+          "cache_write_tokens": 9518,
+          "cached_tokens": 7243
+        },
+        "output_tokens": 2609,
+        "output_tokens_details": {
+          "reasoning_tokens": 2015
+        },
+        "total_tokens": 19373
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T21:59:55.869Z"
+    },
+    {
+      "phaseBucket": "fresh",
+      "id": "f29ccc63-44c7-45b5-800e-d7c7c90799e0",
+      "case": "acceptance-plaza-fountain-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.072116,
+      "startedAt": "2026-10-05T21:59:55.940Z",
+      "runDirectory": "/Users/randy/.codex/worktrees/research-repair-scope/Building Code/permitext-sync-server/evals/retrieval-validation-2026-10-05/final-local-native-cohort-20261005",
+      "costUSD": 0.00813885,
+      "usage": {
+        "input_tokens": 20240,
+        "input_tokens_details": {
+          "cache_write_tokens": 20237,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3079,
+        "output_tokens_details": {
+          "reasoning_tokens": 2568
+        },
+        "total_tokens": 23319
+      },
+      "httpStatus": 200,
+      "endedAt": "2026-10-05T22:00:13.204Z"
+    },
+    {
+      "id": "19d76baf-d60e-478d-845c-1e24f21b72c8",
+      "case": "acceptance-water-heater-valve",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0399795,
+      "startedAt": "2026-10-05T22:04:25.103Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8927,
+        "input_tokens_details": {
+          "cache_write_tokens": 8924,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1963,
+        "output_tokens_details": {
+          "reasoning_tokens": 1026
+        },
+        "total_tokens": 10890
+      },
+      "endedAt": "2026-10-05T22:04:36.216Z",
+      "costUSD": 0.004194600000000001
+    },
+    {
+      "id": "695876f4-5301-40d5-aeff-6adb5c6e2bed",
+      "case": "acceptance-relief-discharge",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0641476,
+      "startedAt": "2026-10-05T22:04:36.231Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 22116,
+        "input_tokens_details": {
+          "cache_write_tokens": 22113,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2317,
+        "output_tokens_details": {
+          "reasoning_tokens": 881
+        },
+        "total_tokens": 24433
+      },
+      "endedAt": "2026-10-05T22:04:48.626Z",
+      "costUSD": 0.00784585
+    },
+    {
+      "id": "a727008d-c73b-47da-8ad2-cf1023abb329",
+      "case": "acceptance-reserved-vent",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.031381900000000004,
+      "startedAt": "2026-10-05T22:04:48.642Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 4952,
+        "input_tokens_details": {
+          "cache_write_tokens": 4949,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1927,
+        "output_tokens_details": {
+          "reasoning_tokens": 832
+        },
+        "total_tokens": 6879
+      },
+      "endedAt": "2026-10-05T22:04:58.301Z",
+      "costUSD": 0.00316485
+    },
+    {
+      "id": "ccca65b6-a50b-491a-9bf0-f011733b4b0f",
+      "case": "acceptance-grade-support",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0364639,
+      "startedAt": "2026-10-05T22:04:58.316Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 6907,
+        "input_tokens_details": {
+          "cache_write_tokens": 6904,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1904,
+        "output_tokens_details": {
+          "reasoning_tokens": 935
+        },
+        "total_tokens": 8811
+      },
+      "endedAt": "2026-10-05T22:05:08.824Z",
+      "costUSD": 0.0036306
+    },
+    {
+      "id": "2ca6bc14-ef35-4d6a-8281-936e81804218",
+      "case": "acceptance-environmental-exhaust",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.040120300000000005,
+      "startedAt": "2026-10-05T22:05:08.838Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8562,
+        "input_tokens_details": {
+          "cache_write_tokens": 8559,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1813,
+        "output_tokens_details": {
+          "reasoning_tokens": 467
+        },
+        "total_tokens": 10375
+      },
+      "endedAt": "2026-10-05T22:05:17.389Z",
+      "costUSD": 0.00395335
+    },
+    {
+      "id": "32ba6e56-7abf-44e4-9eee-0339e9ba332b",
+      "case": "acceptance-domestic-hood",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.045782550000000005,
+      "startedAt": "2026-10-05T22:05:17.404Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10441,
+        "input_tokens_details": {
+          "cache_write_tokens": 10438,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1904,
+        "output_tokens_details": {
+          "reasoning_tokens": 1052
+        },
+        "total_tokens": 12345
+      },
+      "endedAt": "2026-10-05T22:05:28.207Z",
+      "costUSD": 0.0045141
+    },
+    {
+      "id": "af3e634a-cdf1-4098-aa95-919dbeaa4ead",
+      "case": "acceptance-sediment-trap",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0367235,
+      "startedAt": "2026-10-05T22:05:28.220Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 6966,
+        "input_tokens_details": {
+          "cache_write_tokens": 6963,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1553,
+        "output_tokens_details": {
+          "reasoning_tokens": 463
+        },
+        "total_tokens": 8519
+      },
+      "endedAt": "2026-10-05T22:05:36.520Z",
+      "costUSD": 0.0032943499999999997
+    },
+    {
+      "id": "196bbe6f-e4ff-493c-8ec1-8f71b5149e4f",
+      "case": "acceptance-test-isolation",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.041441950000000005,
+      "startedAt": "2026-10-05T22:05:36.536Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8955,
+        "input_tokens_details": {
+          "cache_write_tokens": 8952,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1492,
+        "output_tokens_details": {
+          "reasoning_tokens": 642
+        },
+        "total_tokens": 10447
+      },
+      "endedAt": "2026-10-05T22:05:44.614Z",
+      "costUSD": 0.0037305999999999997
+    },
+    {
+      "id": "c2105834-9334-440a-a782-05da87536d82",
+      "case": "acceptance-mp-regulator",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0337348,
+      "startedAt": "2026-10-05T22:05:44.626Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 5871,
+        "input_tokens_details": {
+          "cache_write_tokens": 5868,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1816,
+        "output_tokens_details": {
+          "reasoning_tokens": 591
+        },
+        "total_tokens": 7687
+      },
+      "endedAt": "2026-10-05T22:05:54.092Z",
+      "costUSD": 0.0032836
+    },
+    {
+      "id": "5bf5ad61-217c-4717-ade3-2d0dbabf0cae",
+      "case": "acceptance-exit-sign-distance",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.03700125,
+      "startedAt": "2026-10-05T22:05:54.110Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 7335,
+        "input_tokens_details": {
+          "cache_write_tokens": 7332,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1418,
+        "output_tokens_details": {
+          "reasoning_tokens": 138
+        },
+        "total_tokens": 8753
+      },
+      "endedAt": "2026-10-05T22:06:01.291Z",
+      "costUSD": 0.0032516
+    },
+    {
+      "id": "47adf819-4f24-402d-9b18-c80cf8907e28",
+      "case": "acceptance-handrail-height",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0436029,
+      "startedAt": "2026-10-05T22:06:01.309Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10174,
+        "input_tokens_details": {
+          "cache_write_tokens": 10171,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2495,
+        "output_tokens_details": {
+          "reasoning_tokens": 1337
+        },
+        "total_tokens": 12669
+      },
+      "endedAt": "2026-10-05T22:06:14.937Z",
+      "costUSD": 0.0050383500000000005
+    },
+    {
+      "id": "5ea8ba8e-e0db-4730-aa33-0d666c8f19c4",
+      "case": "acceptance-handrail-extension",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.048354350000000004,
+      "startedAt": "2026-10-05T22:06:14.948Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 12102,
+        "input_tokens_details": {
+          "cache_write_tokens": 12099,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2972,
+        "output_tokens_details": {
+          "reasoning_tokens": 1087
+        },
+        "total_tokens": 15074
+      },
+      "endedAt": "2026-10-05T22:06:28.001Z",
+      "costUSD": 0.00599735
+    },
+    {
+      "id": "46cd9517-03f9-4f24-8e9e-f706cfedc94b",
+      "case": "acceptance-exit-enclosure",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0398816,
+      "startedAt": "2026-10-05T22:06:28.017Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8324,
+        "input_tokens_details": {
+          "cache_write_tokens": 8321,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2373,
+        "output_tokens_details": {
+          "reasoning_tokens": 737
+        },
+        "total_tokens": 10697
+      },
+      "endedAt": "2026-10-05T22:06:40.002Z",
+      "costUSD": 0.0044538500000000005
+    },
+    {
+      "id": "9af558f6-edeb-4ab5-b378-826609ddf9b1",
+      "case": "acceptance-permit-basis",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.0342782,
+      "startedAt": "2026-10-05T22:06:40.013Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 6292,
+        "input_tokens_details": {
+          "cache_write_tokens": 6289,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2523,
+        "output_tokens_details": {
+          "reasoning_tokens": 1103
+        },
+        "total_tokens": 8815
+      },
+      "endedAt": "2026-10-05T22:06:53.776Z",
+      "costUSD": 0.00409585
+    },
+    {
+      "id": "9cf23e39-0de9-420e-85b2-7864327200ee",
+      "case": "acceptance-asbestos-certification",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.034188550000000005,
+      "startedAt": "2026-10-05T22:06:53.785Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 6059,
+        "input_tokens_details": {
+          "cache_write_tokens": 6056,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1560,
+        "output_tokens_details": {
+          "reasoning_tokens": 541
+        },
+        "total_tokens": 7619
+      },
+      "endedAt": "2026-10-05T22:07:02.272Z",
+      "costUSD": 0.0030746
+    },
+    {
+      "id": "b2122512-b1d0-4dc8-bb71-218f318c1f48",
+      "case": "acceptance-vacant-protection",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.059026550000000004,
+      "startedAt": "2026-10-05T22:07:02.290Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 14916,
+        "input_tokens_details": {
+          "cache_write_tokens": 14913,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3078,
+        "output_tokens_details": {
+          "reasoning_tokens": 1325
+        },
+        "total_tokens": 17994
+      },
+      "endedAt": "2026-10-05T22:07:17.535Z",
+      "costUSD": 0.006806850000000001
+    },
+    {
+      "id": "5f41cca8-c691-49e2-8213-f553d790b9bf",
+      "case": "acceptance-reserved-fire-section",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.03263535,
+      "startedAt": "2026-10-05T22:07:17.556Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 5452,
+        "input_tokens_details": {
+          "cache_write_tokens": 5449,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2489,
+        "output_tokens_details": {
+          "reasoning_tokens": 1481
+        },
+        "total_tokens": 7941
+      },
+      "endedAt": "2026-10-05T22:07:30.563Z",
+      "costUSD": 0.00385185
+    },
+    {
+      "id": "6f00fd03-8706-4cd7-84db-bdce80a7c230",
+      "case": "acceptance-emergency-power",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.05225495,
+      "startedAt": "2026-10-05T22:07:30.581Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11945,
+        "input_tokens_details": {
+          "cache_write_tokens": 11942,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3804,
+        "output_tokens_details": {
+          "reasoning_tokens": 2177
+        },
+        "total_tokens": 15749
+      },
+      "endedAt": "2026-10-05T22:07:50.485Z",
+      "costUSD": 0.0067901
+    },
+    {
+      "id": "561b9cd0-8397-481d-bd88-44ce1da547bc",
+      "case": "acceptance-plaza-bicycles",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.040049350000000004,
+      "startedAt": "2026-10-05T22:07:50.502Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8252,
+        "input_tokens_details": {
+          "cache_write_tokens": 8249,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1679,
+        "output_tokens_details": {
+          "reasoning_tokens": 256
+        },
+        "total_tokens": 9931
+      },
+      "endedAt": "2026-10-05T22:07:57.467Z",
+      "costUSD": 0.00374185
+    },
+    {
+      "id": "833cfb65-7f1e-4bba-a51b-f0fca98f5c2b",
+      "case": "acceptance-plaza-fountain",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "providerAPI": "responses",
+      "phaseBucket": "fresh",
+      "phase": "separate_final_acceptance_grade",
+      "status": "settled",
+      "reservedUSD": 0.030652050000000004,
+      "startedAt": "2026-10-05T22:07:57.487Z",
+      "runDirectory": "evals/retrieval-validation-2026-10-05/final-separate-luna-grading-20261005",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 4645,
+        "input_tokens_details": {
+          "cache_write_tokens": 4642,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2227,
+        "output_tokens_details": {
+          "reasoning_tokens": 1464
+        },
+        "total_tokens": 6872
+      },
+      "endedAt": "2026-10-05T22:08:09.405Z",
+      "costUSD": 0.0033881
     }
   ]
 }
