@@ -22,6 +22,13 @@ const fetchImpl = async (input) => {
     };
   }
   const sql = url.searchParams.get("q") || "";
+  if (sql.startsWith("WITH lot AS")) {
+    let records = [];
+    if (sql.includes("FROM dcp_transit_zones layer")) records = [{ transtzone: "Outer Transit Zone", covers_lot: true }];
+    if (sql.includes("FROM dcp_greater_transit_zone layer")) records = [{ gtz_qs: 1, covers_lot: true }];
+    if (sql.includes("FROM dcp_mandatory_inclusionary_housing layer")) records = [{ projectnam: "Jerome Avenue Rezoning", mih_option: "Option 1 and Option 3", zr_ulurpno: "180051AZMX", dateadopte: "2018-03-22", covers_lot: false }];
+    return { ok: true, json: async () => ({ rows: [{ records }] }) };
+  }
   if (sql.includes("FROM dcp_mappluto")) {
     return {
       ok: true,
@@ -89,8 +96,8 @@ const result = await lookupNYCPropertyContext("1760 Jerome Avenue, Bronx", {
 });
 assert.equal(result.bbl, "2028500003");
 assert.equal(result.normalizedAddress, "1760 JEROME AVENUE, Bronx, NY 10453");
-assert.equal(result.zolaURL, "https://zola.planninglabs.nyc/l/lot/2/2850/3");
-assert.equal(result.structuredFacts.length, 30);
+assert.equal(result.zolaURL, "https://zola.planning.nyc.gov/l/lot/2/2850/3");
+assert.equal(result.structuredFacts.length, 43);
 assert.ok(result.structuredFacts.every((fact) => fact.status === "sourced"));
 assert.ok(result.structuredFacts.every((fact) => fact.source === "nyc-planning"));
 assert.equal(result.structuredFacts.find((fact) => fact.key === "zoning-districts")?.value, "R8A");
@@ -99,9 +106,12 @@ assert.equal(result.structuredFacts.find((fact) => fact.key === "special-purpose
 assert.equal(result.structuredFacts.find((fact) => fact.key === "tax-lot-area")?.value, "14,000 sq ft");
 assert.equal(result.structuredFacts.some((fact) => fact.key === "zoning-lot-area"), false,
   "MapPLUTO tax-lot area must not be presented as legal zoning-lot area");
-assert.match(result.structuredFacts.find((fact) => fact.key === "mih-area-options")?.value || "", /Mandatory Inclusionary Housing/);
+assert.match(result.structuredFacts.find((fact) => fact.key === "mih-area-options")?.value || "", /Option 1 and Option 3/);
 assert.match(result.warnings.join(" "), /tax lot is not proof of zoning-lot composition/i);
-assert.equal(fetchCalls.length, 3);
+assert.equal(fetchCalls.length, 23);
+assert.equal(result.structuredFacts.find(fact => fact.key === "parking-geography").value, "Outer Transit Zone");
+assert.match(result.structuredFacts.find(fact => fact.key === "mih-area-options").value, /partial tax-lot/);
+assert.equal(result.structuredFacts.some(fact => fact.key === "transit-zone"), false, "Appendix I must not masquerade as parking geography.");
 assert.match(fetchCalls[1].searchParams.get("q") || "", /p\.bbl = '2028500003'/);
 
 const fallbackCalls = [];
@@ -119,7 +129,7 @@ const fallbackResult = await lookupNYCPropertyContext("1760 Jerome Avenue, Bronx
       return { ok: true, json: async () => [{
         address: "1760 JEROME AVENUE", bbl: "2028500003.00000000", borough: "BX", borocode: "2",
         block: "2850", lot: "3", zipcode: "10453", zonedist1: "R8A", spdist1: "J",
-        lotarea: "14000", numfloors: "14", transitzone: "Inner Transit Zone"
+        lotarea: "14000", numfloors: "14", trnstzone: "Inner Transit Zone"
       }] };
     }
     throw new Error(`Unexpected fallback request: ${url}`);
@@ -129,12 +139,12 @@ const fallbackResult = await lookupNYCPropertyContext("1760 Jerome Avenue, Bronx
 assert.equal(fallbackResult.bbl, "2028500003");
 assert.equal(fallbackResult.normalizedAddress, "1760 JEROME AVENUE, Bronx, NY 10453");
 assert.equal(fallbackResult.structuredFacts.find((fact) => fact.key === "zoning-districts")?.value, "R8A");
-assert.equal(fallbackResult.structuredFacts.find((fact) => fact.key === "transit-zone")?.value, "Inner Transit Zone");
-assert.equal(fallbackResult.structuredFacts.some((fact) => fact.key === "mih-area-options"), false,
-  "The fallback must omit unavailable mapped facts instead of asserting a false negative.");
+assert.equal(fallbackResult.structuredFacts.find((fact) => fact.key === "parking-geography")?.value, "Inner Transit Zone");
+assert.equal(fallbackResult.structuredFacts.find((fact) => fact.key === "mih-area-options")?.status, "unknown",
+  "Unavailable mapped facts must remain unknown instead of asserting a false negative.");
 assert.deepEqual(fallbackResult.source.datasets, ["NYC Planning address search", "NYC Open Data PLUTO"]);
-assert.match(fallbackResult.warnings.join(" "), /mapped-area facts were unavailable/i);
-assert.equal(fallbackCalls.at(-1).searchParams.get("bbl"), "2028500003");
+assert.match(fallbackResult.warnings.join(" "), /layers unavailable/i);
+assert.equal(fallbackCalls.find(url => url.hostname === "data.cityofnewyork.us").searchParams.get("bbl"), "2028500003");
 
 const [serverSource, clientSource] = await Promise.all([
   readFile(new URL("../app.mjs", import.meta.url), "utf8"),
@@ -153,6 +163,6 @@ assert.match(clientSource, /path === "\/research\/conversations\/create"[\s\S]*?
   "Assigned Research creation must wait for any pending web Project mutation.");
 assert.match(clientSource, /async function ensureResearchProjectSynced[\s\S]*?await pushMutation\(projectMutationForRecord\(pendingProject, account\)\)/,
   "The web sync gate must durably push the current Project, including its structured facts.");
-assert.match(clientSource, /Imported \$\{property\.structuredFacts\.length\} sourced facts from NYC Planning/);
+assert.match(clientSource, /property\.structuredFacts\.filter\(fact => fact\.status === "sourced"\)/);
 
 console.log("nyc-property-context contract passed");

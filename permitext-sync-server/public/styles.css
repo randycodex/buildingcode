@@ -10077,6 +10077,33 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-primary);
 }
 
+.saved-project-refresh-facts {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: calc(var(--chrome-font-size) * 0.85);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.saved-project-refresh-facts:hover,
+.saved-project-refresh-facts:focus-visible {
+  color: var(--text-primary);
+}
+
+.saved-project-refresh-facts:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.saved-project-structured-section:not(.is-open) > .saved-project-facts-heading > .saved-project-refresh-facts {
+  display: none;
+}
+
 .saved-project-facts-chevron {
   margin-left: var(--space-2);
 }
@@ -10115,6 +10142,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   max-height: none;
   overflow: hidden;
   resize: none;
+}
+
+html body .saved-project-summary textarea.saved-project-fact-input.saved-project-fact-description:focus,
+html body .saved-project-summary textarea.saved-project-fact-input.saved-project-fact-description:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .saved-project-structured-facts {
@@ -11194,6 +11227,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .project-color-swatch {
+  position: relative;
   width: var(--project-swatch-size);
   height: var(--project-swatch-size);
   padding: 0;
@@ -11202,9 +11236,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: var(--project-swatch);
 }
 
-.project-color-swatch[aria-pressed="true"] {
-  outline: 2px solid var(--text-primary);
-  outline-offset: 3px;
+.project-color-swatch[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 2px solid var(--text-primary);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .saved-section-row {
@@ -17797,3 +17835,39 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   color: var(--text-secondary);
 }
 .workspace-panel.is-collapsed > .pane-collapsed-tab { padding-top: 56px; }
+
+.project-refresh-dialog {
+  border: 1px solid var(--border);
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100dvh - 64px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 24px;
+  border-radius: var(--radius-panel);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font-size: var(--chrome-font-size);
+}
+.project-refresh-dialog::-webkit-scrollbar { display: none; }
+.project-refresh-dialog h2 { margin: 0 0 12px; }
+.project-refresh-dialog p, .project-refresh-status { color: var(--text-secondary); }
+.project-refresh-status { margin: 0 0 12px; font-size: 11px; }
+.project-refresh-dialog details { margin-block: 16px; }
+.project-refresh-dialog summary { cursor: pointer; font-weight: 600; }
+.project-refresh-choice { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.project-refresh-choice input { flex: 0 0 auto; margin-top: 3px; }
+.project-refresh-choice span { display: grid; gap: 5px; overflow-wrap: anywhere; }
+.project-refresh-choice small { color: var(--text-secondary); }
+.project-refresh-actions { display: flex; justify-content: flex-end; gap: 12px; position: sticky; bottom: -24px; background: var(--surface-raised); padding: 16px 0; }
+.project-refresh-actions button { padding: 8px 14px; border-radius: var(--radius-panel); }
+.project-refresh-overlay { position: fixed; z-index: 3000; }
+.project-refresh-dialog .project-refresh-choice {
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-primary);
+}
+.project-refresh-dialog .project-refresh-choice > span { flex: 1; min-width: 0; }
+.project-refresh-dialog .project-refresh-choice input { width: 16px; height: 16px; }
+.project-refresh-dialog .project-refresh-choice small { font-size: 11px; }
+.project-fact-review-status { grid-column: 1 / -1; color: var(--text-secondary); font-size: 11px; }

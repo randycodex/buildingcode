@@ -13427,7 +13427,7 @@ async function handleProjectPropertyLookup(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
   try {
-    const property = await lookupNYCPropertyContext(context.body.address);
+    const property = await lookupNYCPropertyContext(context.body.address, { bbl: context.body.bbl });
     sendJSON(response, 200, { property });
   } catch (error) {
     if (error instanceof NYCPropertyLookupError) {
@@ -25514,8 +25514,8 @@ function validateMutation(mutation, userID) {
     return validationError("Folder type must be project or reference.");
   }
   if (kind === "project" && record.structuredFacts !== undefined) {
-    if (!Array.isArray(record.structuredFacts) || record.structuredFacts.length > 50) {
-      return validationError("Project structured facts must be an array of no more than 50 records.");
+    if (!Array.isArray(record.structuredFacts) || record.structuredFacts.length > 100) {
+      return validationError("Project structured facts must be an array of no more than 100 records.");
     }
     const invalidStructuredFact = record.structuredFacts.some((fact) =>
       !fact ||

@@ -1,3 +1,5 @@
+import { lookupMappedAreaFacts } from "./nyc-property-layers.mjs";
+
 const nycPlanningSearchURL = "https://search-api-production.herokuapp.com/search/geosearch-v2";
 const nycPlanningCartoSQLURL = "https://carto.nycplanningdigital.com/api/v2/sql";
 const nycOpenDataPLUTOURL = "https://data.cityofnewyork.us/resource/64uk-42ks.json";
@@ -50,38 +52,11 @@ SELECT
   p.zonedist3,
   p.zonedist4,
   LOWER(p.zonemap) AS zonemap,
-  EXISTS(
-    SELECT 1 FROM dcp_inclusionary_housing layer
-    WHERE ST_Intersects(p.the_geom, layer.the_geom)
-  ) AS inclusionary_housing,
-  EXISTS(
-    SELECT 1 FROM dcp_mandatory_inclusionary_housing layer
-    WHERE ST_Intersects(p.the_geom, layer.the_geom)
-  ) AS mandatory_inclusionary_housing,
-  EXISTS(
-    SELECT 1 FROM dcp_appendixi_transit_zones layer
-    WHERE ST_Intersects(p.the_geom, layer.the_geom)
-  ) AS appendix_i_transit_zone,
-  EXISTS(
-    SELECT 1 FROM dcp_waterfront_access_plan layer
-    WHERE ST_Intersects(p.the_geom, layer.the_geom)
-  ) AS waterfront_access_plan,
-  EXISTS(
-    SELECT 1 FROM upland_waterfront_areas layer
-    WHERE ST_Intersects(p.the_geom, layer.the_geom)
-  ) AS upland_waterfront_area,
-  EXISTS(
-    SELECT 1 FROM dcp_lower_density_growth_management_areas layer
-    WHERE ST_Intersects(p.the_geom, layer.the_geom)
-  ) AS lower_density_growth_management_area,
-  EXISTS(
-    SELECT 1 FROM dcp_fresh_zones layer
-    WHERE ST_Intersects(p.the_geom, layer.the_geom)
-  ) AS fresh_zone,
-  EXISTS(
-    SELECT 1 FROM dcp_appendixj_designated_mdistricts layer
-    WHERE ST_Intersects(p.the_geom, layer.the_geom)
-  ) AS appendix_j_designated_mdistrict
+  p.trnstzone,
+  p.ltdheight,
+  p.histdist,
+  p.landmark,
+  p.version
 FROM dcp_mappluto p
 WHERE p.bbl = '__BBL__'
 LIMIT 1
@@ -167,14 +142,6 @@ function formattedNumber(value, maximumFractionDigits = 0) {
   return number === null ? "" : new Intl.NumberFormat("en-US", { maximumFractionDigits }).format(number);
 }
 
-function booleanValue(value) {
-  return value === true || value === "true" || value === 1 || value === "1";
-}
-
-function hasValue(object, key) {
-  return Object.prototype.hasOwnProperty.call(object || {}, key) && object[key] !== null && object[key] !== "";
-}
-
 function sourcedFact({ key, label, value, retrievedAt, bbl, dataset = "MapPLUTO" }) {
   const normalizedValue = String(value ?? "").trim();
   if (!normalizedValue) return null;
@@ -209,6 +176,17 @@ function specialDistrictValue(codes, namesByCode) {
   return codes.map((code) => namesByCode.get(code) ? `${code} — ${namesByCode.get(code)}` : code).join(", ");
 }
 
+function mapPLUTOAreaFacts(lot, context) {
+  const fields = [
+    ["parking-geography", "Transit Zones Parking Geography", lot.trnstzone || lot.transitzone],
+    ["limited-height-district", "Limited Height District", lot.ltdheight],
+    ["historic-district", "Historic District", lot.histdist],
+    ["landmark-status", "Landmark Designations", lot.landmark]
+  ];
+  return fields.flatMap(([key, label, value]) => value
+    ? [sourcedFact({ key, label, value, ...context })] : []);
+}
+
 export function structuredFactsFromNYCPropertyData({ lot, specialDistricts = [], searchMatch = null, retrievedAt }) {
   const bbl = validBBL(lot?.bbl || searchMatch?.bbl);
   if (!bbl) throw new NYCPropertyLookupError("NYC Planning returned an invalid property identifier.");
@@ -230,19 +208,13 @@ export function structuredFactsFromNYCPropertyData({ lot, specialDistricts = [],
     sourcedFact({ key: "zip-code", label: "ZIP Code", value: lot.zipcode, retrievedAt, bbl }),
     sourcedFact({ key: "zoning-districts", label: "Zoning District(s)", value: zoningDistricts.join(", "), retrievedAt, bbl }),
     sourcedFact({ key: "commercial-overlays", label: "Commercial Overlay(s)", value: overlays.join(", ") || "None mapped", retrievedAt, bbl }),
-    sourcedFact({ key: "special-purpose-district", label: "Special Purpose District / Subdistrict / Subarea", value: specialDistrictValue(specialCodes, namesByCode) || "None mapped", retrievedAt, bbl }),
+    sourcedFact({ key: "special-purpose-district", label: "Special Purpose District(s)", value: specialDistrictValue(specialCodes, namesByCode) || "None mapped", retrievedAt, bbl }),
     sourcedFact({ key: "zoning-map", label: "Zoning Map", value: lot.zonemap, retrievedAt, bbl }),
     sourcedFact({ key: "community-district", label: "Community District", value: communityDistrict(lot), retrievedAt, bbl }),
     sourcedFact({ key: "tax-lot-area", label: "Tax Lot Area", value: lotArea ? `${lotArea} sq ft` : "", retrievedAt, bbl }),
     sourcedFact({ key: "lot-width", label: "Lot Width", value: formattedNumber(lot.lotfront, 2) ? `${formattedNumber(lot.lotfront, 2)} ft` : "", retrievedAt, bbl }),
     sourcedFact({ key: "lot-depth", label: "Lot Depth", value: formattedNumber(lot.lotdepth, 2) ? `${formattedNumber(lot.lotdepth, 2)} ft` : "", retrievedAt, bbl }),
-    hasValue(lot, "mandatory_inclusionary_housing") && sourcedFact({ key: "mih-area-options", label: "MIH Area / Applicable Option(s)", value: booleanValue(lot.mandatory_inclusionary_housing) ? "Within a mapped Mandatory Inclusionary Housing area; applicable options require zoning-text review" : "Not within a mapped Mandatory Inclusionary Housing area", retrievedAt, bbl, dataset: "mapped zoning layers" }),
-    hasValue(lot, "inclusionary_housing") && sourcedFact({ key: "affordable-housing-zoning-status", label: "Affordable Housing Zoning Status", value: booleanValue(lot.inclusionary_housing) ? "Within a mapped Inclusionary Housing designated area" : "Not within a mapped Inclusionary Housing designated area", retrievedAt, bbl, dataset: "mapped zoning layers" }),
-    (hasValue(lot, "appendix_i_transit_zone") || hasValue(lot, "transitzone")) && sourcedFact({ key: "transit-zone", label: "Transit Zone", value: hasValue(lot, "transitzone") ? lot.transitzone : booleanValue(lot.appendix_i_transit_zone) ? "Within a mapped Appendix I transit zone" : "Not within a mapped Appendix I transit zone", retrievedAt, bbl, dataset: hasValue(lot, "transitzone") ? "MapPLUTO" : "mapped zoning layers" }),
-    (hasValue(lot, "waterfront_access_plan") || hasValue(lot, "upland_waterfront_area")) && sourcedFact({ key: "waterfront-status", label: "Waterfront Status / Waterfront Access Plan", value: booleanValue(lot.waterfront_access_plan) || booleanValue(lot.upland_waterfront_area) ? "Within a mapped waterfront area or Waterfront Access Plan" : "Not within a mapped waterfront area or Waterfront Access Plan", retrievedAt, bbl, dataset: "mapped zoning layers" }),
-    hasValue(lot, "lower_density_growth_management_area") && sourcedFact({ key: "lower-density-growth-management-area", label: "Lower Density Growth Management Area", value: booleanValue(lot.lower_density_growth_management_area) ? "Within a mapped lower-density growth management area" : "Not within a mapped lower-density growth management area", retrievedAt, bbl, dataset: "mapped zoning layers" }),
-    hasValue(lot, "fresh_zone") && sourcedFact({ key: "fresh-program-area", label: "FRESH Program Area", value: booleanValue(lot.fresh_zone) ? "Within a mapped FRESH program area" : "Not within a mapped FRESH program area", retrievedAt, bbl, dataset: "mapped zoning layers" }),
-    hasValue(lot, "appendix_j_designated_mdistrict") && sourcedFact({ key: "appendix-j-designated-m-district", label: "Appendix J Designated M District", value: booleanValue(lot.appendix_j_designated_mdistrict) ? "Within a mapped Appendix J designated M district" : "Not within a mapped Appendix J designated M district", retrievedAt, bbl, dataset: "mapped zoning layers" }),
+    ...mapPLUTOAreaFacts(lot, { retrievedAt, bbl }),
     sourcedFact({ key: "building-area", label: "Building Area", value: buildingArea ? `${buildingArea} sq ft` : "", retrievedAt, bbl }),
     sourcedFact({ key: "stories-above-grade", label: "Stories Above Grade", value: stories, retrievedAt, bbl }),
     sourcedFact({ key: "building-count", label: "Number of Buildings", value: lot.numbldgs, retrievedAt, bbl }),
@@ -253,14 +225,16 @@ export function structuredFactsFromNYCPropertyData({ lot, specialDistricts = [],
     sourcedFact({ key: "building-class", label: "Building Class", value: lot.bldgclass, retrievedAt, bbl }),
     sourcedFact({ key: "land-use-code", label: "Land Use Code", value: lot.landuse, retrievedAt, bbl })
   ].filter(Boolean);
-  return facts;
+  return facts.map(fact => ({ ...fact, sourceText: lot.version ? fact.sourceText.replace("MapPLUTO;", `MapPLUTO ${lot.version};`) : fact.sourceText }));
 }
 
-export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now = () => new Date() } = {}) {
-  const query = normalizedNYCPropertyAddress(address);
+export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now = () => new Date(), bbl: requestedBBL = "" } = {}) {
+  const savedBBL = validBBL(requestedBBL);
+  if (requestedBBL && !savedBBL) throw new NYCPropertyLookupError("Invalid saved BBL.", { status: 400 });
+  const query = savedBBL ? String(address || "").trim() : normalizedNYCPropertyAddress(address);
   const searchURL = new URL(nycPlanningSearchURL);
   searchURL.searchParams.set("q", query);
-  const searchPayload = await fetchJSON(searchURL, { fetchImpl });
+  const searchPayload = savedBBL ? [{ type: "lot", bbl: savedBBL }] : await fetchJSON(searchURL, { fetchImpl });
   const searchMatch = (Array.isArray(searchPayload) ? searchPayload : [])
     .find((item) => item?.type === "lot" && validBBL(item?.bbl));
   if (!searchMatch) {
@@ -296,38 +270,57 @@ export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now
 
   const specialDistrictCodes = distinctValues(lot.spdist1, lot.spdist2, lot.spdist3);
   let specialDistricts = [];
-  if (specialDistrictCodes.length && !usedOpenDataFallback) {
+  // A name-service failure must not discard the property or its district codes.
+  if (specialDistrictCodes.length) {
     const quotedCodes = specialDistrictCodes.map((code) => `'${code.replace(/'/g, "''")}'`).join(",");
-    const specialPayload = await fetchJSON(cartoSQLURL(
-      `SELECT DISTINCT sdname, sdlbl FROM dcp_special_purpose_districts WHERE sdlbl IN (${quotedCodes}) ORDER BY sdlbl`
-    ), { fetchImpl });
-    specialDistricts = Array.isArray(specialPayload?.rows) ? specialPayload.rows : [];
+    try {
+      const specialPayload = await fetchJSON(cartoSQLURL(
+        `SELECT DISTINCT sdname, sdlbl FROM dcp_special_purpose_districts WHERE sdlbl IN (${quotedCodes}) ORDER BY sdlbl`
+      ), { fetchImpl, timeoutMilliseconds: cartoLookupTimeoutMilliseconds });
+      specialDistricts = Array.isArray(specialPayload?.rows) ? specialPayload.rows : [];
+    } catch { /* MapPLUTO district codes remain available. */ }
   }
 
   const retrievedAt = now().toISOString();
-  const structuredFacts = structuredFactsFromNYCPropertyData({
+  const baseFacts = structuredFactsFromNYCPropertyData({
     lot,
     specialDistricts,
     searchMatch,
     retrievedAt
   });
+  const mapped = await lookupMappedAreaFacts(bbl, retrievedAt, async sql => {
+    const payload = await fetchJSON(cartoSQLURL(sql), { fetchImpl, timeoutMilliseconds: cartoLookupTimeoutMilliseconds });
+    if (!Array.isArray(payload?.rows)) throw new NYCPropertyLookupError("Mapped layer response unavailable.");
+    return payload.rows;
+  });
+  if (usedOpenDataFallback) {
+    for (const fact of baseFacts) fact.sourceText = fact.sourceText.replace("MapPLUTO", "NYC Open Data PLUTO");
+  }
+  const factsByKey = new Map(baseFacts.map(fact => [fact.key, fact]));
+  for (const fact of mapped.facts) {
+    // Retain explicit MapPLUTO values when an independent layer is unavailable.
+    if (fact.status !== "unknown" || !factsByKey.has(fact.key)) factsByKey.set(fact.key, fact);
+  }
+  const structuredFacts = [...factsByKey.values()];
   const normalizedAddress = structuredFacts.find((fact) => fact.key === "address")?.value || query;
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     query,
     normalizedAddress,
     bbl,
-    zolaURL: `https://zola.planninglabs.nyc/l/lot/${Number(bbl.slice(0, 1))}/${Number(bbl.slice(1, 6))}/${Number(bbl.slice(6))}`,
+    zolaURL: `https://zola.planning.nyc.gov/l/lot/${Number(bbl.slice(0, 1))}/${Number(bbl.slice(1, 6))}/${Number(bbl.slice(6))}`,
     retrievedAt,
     source: {
       agency: "NYC Department of City Planning",
       datasets: usedOpenDataFallback
-        ? ["NYC Planning address search", "NYC Open Data PLUTO"]
-        : ["NYC Planning address search", "MapPLUTO", "mapped zoning layers"]
+        ? ["NYC Planning address search", "NYC Open Data PLUTO", ...mapped.datasets]
+        : ["NYC Planning address search", "MapPLUTO", ...mapped.datasets]
     },
     structuredFacts,
     warnings: [
-      ...(usedOpenDataFallback ? ["Some mapped-area facts were unavailable from the primary zoning-layer service and were omitted."] : []),
+      ...(mapped.unavailable.length ? [`NYC Planning layers unavailable: ${mapped.unavailable.join(", ")}. Unverified facts remain unknown.`] : []),
+      "Mapped intersections can cover part of a tax lot. Verify boundaries and project applicability in official records.",
+      "Pending zoning map amendments are proposals under public review; they do not establish adopted zoning.",
       "The matched tax lot is not proof of zoning-lot composition.",
       "Mapped data can change. Confirm governing requirements in current official zoning text and records."
     ]
