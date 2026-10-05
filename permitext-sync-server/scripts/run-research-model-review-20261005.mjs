@@ -31,6 +31,8 @@ export function modelReviewCanonicalReferences(value) {
 
 export function buildModelReviewRequest(batch, sources) {
   assert(batch.cases.length && sources.length);
+  const turnCount = batch.cases[0].questions.length;
+  assert(batch.cases.every(item => item.questions.length === turnCount));
   const references = sources.map(source => source.reference);
   assert.equal(new Set(references).size, references.length);
   for (const source of sources) assert.equal(hash(source.text), source.textSHA256);
@@ -48,9 +50,10 @@ export function buildModelReviewRequest(batch, sources) {
     reasoning: { type: "string" }
   }, required: ["turn", "status", "boundedConclusion", "materialChecks", "forbiddenClaims", "genuineUnknowns", "neededReferences", "reasoning"] };
   const schema = { type: "object", additionalProperties: false, properties: {
-    cases: { type: "array", items: { type: "object", additionalProperties: false,
+    cases: { type: "array", minItems: batch.cases.length, maxItems: batch.cases.length,
+      items: { type: "object", additionalProperties: false,
       properties: { id: { type: "string", enum: batch.cases.map(item => item.id) },
-        turns: { type: "array", items: turn } }, required: ["id", "turns"] } },
+        turns: { type: "array", minItems: turnCount, maxItems: turnCount, items: turn } }, required: ["id", "turns"] } },
     reviewLimitations: stringArray
   }, required: ["cases", "reviewLimitations"] };
   const input = JSON.stringify({ task: batch.task,
@@ -116,7 +119,7 @@ async function main() {
   const options = new Map();
   for (let index = 2; index < process.argv.length; index++) {
     const name = process.argv[index]; if (name === "--live") continue;
-    assert(["--output", "--budget-ledger", "--follow-up-from"].includes(name));
+    assert(["--output", "--budget-ledger", "--follow-up-from", "--continue-from"].includes(name));
     const value = process.argv[++index]; assert(value && !value.startsWith("--")); options.set(name, value);
   }
   const directory = options.get("--output"); assert(directory, "Use a new explicit review directory");
@@ -125,6 +128,12 @@ async function main() {
   const knownSources = prepared.knownSources;
   const prior = options.get("--follow-up-from")
     ? JSON.parse(await readFile(options.get("--follow-up-from"), "utf8")) : null;
+  const continued = options.get("--continue-from")
+    ? JSON.parse(await readFile(options.get("--continue-from"), "utf8")) : null;
+  if (continued) {
+    assert(prior && !continued.finishedAt && continued.followUpFrom === options.get("--follow-up-from"));
+    assert(continued.provider.every(call => call.status === "settled"), "Reconcile all partial-run costs before continuation");
+  }
   if (prior) {
     assert(prior.finishedAt && prior.provider.every(call => call.status === "settled"), "Follow-up requires a completed, reconciled review");
     batches = batches.flatMap(batch => {
@@ -137,6 +146,11 @@ async function main() {
       return [{ ...batch, cases, requestedReferences, priorCallID: reviewed.callID }];
     });
     assert(batches.length, "No unresolved review cases require follow-up");
+  }
+  if (continued) {
+    batches = batches.filter(batch => !continued.reviews.filter(review => review.batch === batch.id).at(-1) ||
+      continued.reviews.filter(review => review.batch === batch.id).at(-1).supplementalRun === true);
+    assert(batches.length, "No incomplete batches require continuation");
   }
   delete process.env.PERMITEXT_RESEARCH_SEMANTIC_VECTOR_PATH;
   process.env.PERMITEXT_RESEARCH_SEMANTIC_SEARCH = "0";
@@ -196,6 +210,8 @@ async function main() {
     method: "Separate Luna native Responses contexts; no prior answers, grades, target score or implementation history",
     externalExpertApproval: false, followUpFrom: options.get("--follow-up-from") || null,
     priorResultSHA256: prior ? hash(await readFile(options.get("--follow-up-from"))) : null,
+    continuedFrom: options.get("--continue-from") || null,
+    continuedResultSHA256: continued ? hash(await readFile(options.get("--continue-from"))) : null,
     role: { model: "gpt-6-luna", reasoningEffort: "medium", serviceTier: "priority" },
     sourceCharacterCeiling: 48000, maximumSupplementalRounds: 2, maximumRunUSD: .50,
     scriptSHA256: hash(await readFile(fileURLToPath(import.meta.url))),
@@ -211,7 +227,10 @@ async function main() {
   await writeFile(join(directory, "readiness.json"), JSON.stringify(readiness, null, 2)); assert(readiness.ready);
   const result = { method: "separate_Luna_model_review", externalExpertApproval: false,
     followUpFrom: options.get("--follow-up-from") || null,
-    precedingReviewCostUSD: prior ? prior.provider.reduce((sum, call) => sum + call.costUSD, 0) : 0,
+    continuedFrom: options.get("--continue-from") || null,
+    precedingReviewCostUSD: continued
+      ? continued.precedingReviewCostUSD + continued.provider.reduce((sum, call) => sum + call.costUSD, 0)
+      : prior ? prior.provider.reduce((sum, call) => sum + call.costUSD, 0) : 0,
     acceptanceApproved: false, acceptanceGenerated: false, startedAt: new Date().toISOString(), provider: [], reviews: [] };
   const persist = () => writeFile(join(directory, "results.json"), JSON.stringify(result, null, 2));
   await persist();
@@ -255,7 +274,12 @@ async function main() {
       }
       assert.equal(payload.status, "completed", "Stop on incomplete output; do not automatically retry generation");
       const text = payload.output.flatMap(item => item.content || []).filter(item => item.type === "output_text").map(item => item.text).join("");
-      const review = validateModelReview(batch, sources, JSON.parse(text));
+      let review;
+      try { review = validateModelReview(batch, sources, JSON.parse(text)); }
+      catch (error) {
+        call.reviewRejected = true; call.reviewError = { name: error.name, reason: "Incomplete or invalid per-turn reviewer envelope" };
+        await persist(); throw error;
+      }
       const requested = [...new Set(review.cases.flatMap(item => item.turns.flatMap(turn => turn.neededReferences)))];
       const additions = [], unresolvedReferences = [];
       for (const reference of requested) {

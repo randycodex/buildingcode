@@ -18,6 +18,10 @@ for (const batch of batches) {
   assert.equal(body.model, "gpt-6-luna"); assert.equal(body.reasoning.effort, "medium");
   assert.equal(body.service_tier, "priority"); assert.equal(body.store, false);
   assert.equal(body.max_output_tokens, 8000);
+  assert.equal(body.text.format.schema.properties.cases.minItems, batch.cases.length);
+  assert.equal(body.text.format.schema.properties.cases.maxItems, batch.cases.length);
+  assert.equal(body.text.format.schema.properties.cases.items.properties.turns.minItems, 2);
+  assert.equal(body.text.format.schema.properties.cases.items.properties.turns.maxItems, 2);
   assert.equal(body.tools, undefined); assert.equal(body.previous_response_id, undefined);
   assert.doesNotMatch(body.input, /PRIOR_GRADE_LEAK|PREVIOUS_ANSWER_LEAK|PRIOR_RUBRIC_LEAK|"checks"/);
   assert(validationReservation(body) > 0);
