@@ -98,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261005-empty-workspace-clear-v643";
+} from "./offline-storage.js?v=20261005-zola-refresh-icon-v644";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -31259,8 +31259,9 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     const refreshFacts = document.createElement("button");
     refreshFacts.type = "button";
     refreshFacts.className = "saved-project-refresh-facts";
-    refreshFacts.textContent = "Refresh ZoLa data";
+    refreshFacts.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>';
     refreshFacts.setAttribute("aria-label", "Refresh ZoLa data");
+    refreshFacts.title = "Refresh ZoLa data";
     structuredHeading.append(refreshFacts);
     const refreshedStatus = document.createElement("p");
     refreshedStatus.className = "project-refresh-status";
@@ -31280,7 +31281,8 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       }
       const snapshot = JSON.stringify(structuredFacts);
       refreshFacts.disabled = true;
-      refreshFacts.textContent = "Fetching…";
+      refreshFacts.setAttribute("aria-busy", "true");
+      refreshFacts.setAttribute("aria-label", "Fetching ZoLa data");
       try {
         const property = (await postResearch("/projects/property/lookup", { address: lookupAddress, bbl: oldBBL }))?.property;
         requireCurrentAccountRequest(requestIdentity);
@@ -31387,7 +31389,8 @@ function appendSavedProjectFactEditor(container, folder, identity) {
         if (isCurrentAccountRequest(requestIdentity)) void showWebNotice("ZoLa data could not be fetched", error.message || "Try again.");
       } finally {
         refreshFacts.disabled = false;
-        refreshFacts.textContent = "Refresh ZoLa data";
+        refreshFacts.removeAttribute("aria-busy");
+        refreshFacts.setAttribute("aria-label", "Refresh ZoLa data");
       }
     });
   }
