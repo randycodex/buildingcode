@@ -105,7 +105,8 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/run-research-validation-20261005.mjs", "scripts/research-validation-pricing-20261005.mjs", "scripts/research-provider-readiness-20261005.mjs", "scripts/research-chat-compatibility-transport.mjs", modelPolicyPath]) {
   sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex");
 }
-for (const name of ["research-passage-index.mjs", "research-semantic-passages.mjs",
+  for (const name of ["research-passage-index.mjs", "research-semantic-passages.mjs",
+  "research-source-body-state.mjs", "research-search-vocabulary.mjs",
   "research-retrieval-query-context.mjs", "research-interpretation-context.mjs"]) {
   try { sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex"); }
   catch (error) { if (error.code !== "ENOENT") throw error; }
@@ -293,8 +294,9 @@ try {
         console.log(JSON.stringify({ id: item.id, status: item.status, seconds: item.seconds, mode: item.answer?.mode, costUSD: result.provider.filter(call=>call.case===item.id).reduce((sum,call)=>sum+(call.costUSD??call.reservedUSD),0) }));
         // Diagnostics pause at the first unresolved answer. The frozen fresh
         // cohort retains and counts withheld answers instead of dropping them.
-        if (response.status !== 200 || (phaseLabel === "diagnostic" &&
-            (item.answer?.mode === "clarification" || item.answer?.verification?.pass !== true))) {
+        const unsettledProvider = result.provider.some(call => ["pending", "unknown", "rejected"].includes(call.status));
+        if (unsettledProvider || (phaseLabel !== "fresh" && (response.status !== 200 ||
+            (phaseLabel === "diagnostic" && (item.answer?.mode === "clarification" || item.answer?.verification?.pass !== true))))) {
           result.stoppedAfterFailure = item.id; break;
         }
       }
