@@ -75,6 +75,64 @@ const gap = witness(); gap.packetHash = gapPacket.packetHash; gap.checks.rule.re
 assert.equal(check(gap, undefined, gapPacket).pass, false, "Unavailable parent scope cannot be established by assertion.");
 gap.checks.rule.categoricalApplication = false; gap.checks.rule.relations[gapRelation] = "condition_preserved";
 assert.equal(check(gap, undefined, gapPacket).pass, true);
+// An unavailable nomination is not an actual source gap when one complete,
+// exact-authority source is already supplied. Parent text need not name its
+// numbered child; availability never establishes its applicable conditions.
+const gapIdentity = { ...authority, jurisdiction: "New York City", sectionID: "scope-section", sectionNumber: "915.1" };
+const nominatedRule = { ...rule, jurisdiction: "New York City", parentScopeContextGaps: [{ reference: "FC 915.1", reason: "parent_scope_unavailable", identity: gapIdentity }] };
+const suppliedScope = { ...scope, jurisdiction: "New York City", chapterScopeContext: false, canonicalContextResolved: true, canonicalContextComplete: true };
+const availability = (extraEvidence = [suppliedScope], change = {}) => {
+  const current = make({ evidence: [{ ...nominatedRule, ...change }, ...extraEvidence, independent] });
+  const currentReview = witness(); currentReview.packetHash = current.packetHash;
+  currentReview.checks.rule.relations = Object.fromEntries(current.checks.find(row => row.sourceID === "rule").relationIDs.map(id => [id, "established"]));
+  return { current, currentReview, verdict: check(currentReview, undefined, current) };
+};
+const available = availability();
+assert.equal(available.verdict.pass, true);
+assert(available.current.graph.every(edge => !edge.gap));
+assert(available.current.graph.some(edge => edge.scopeSourceID === suppliedScope.sourceID));
+for (const [sourceID, expectedPass] of [[suppliedScope.sourceID, true], ["foreign-source", false]]) {
+  const result = availability(undefined, { parentScopeContextGaps: [{ ...nominatedRule.parentScopeContextGaps[0],
+    identity: { ...gapIdentity, sourceID } }] });
+  assert.equal(result.verdict.pass, expectedPass, "An explicitly supplied source identity cannot redirect to another source.");
+}
+for (const state of ["unsupported_application", "excluded_application", "condition_preserved"]) {
+  const review = structuredClone(available.currentReview);
+  review.checks.rule.relations[available.current.checks[0].relationIDs[0]] = state;
+  assert.equal(check(review, undefined, available.current).pass, false, "Supplied scope still requires a genuine semantic assessment.");
+}
+for (const changedScope of [null, { canonicalContextResolved: false }, { canonicalContextComplete: false }, { truncated: true },
+  { discoveryPassageOnly: true }, { referenceOnly: true }, { textComplete: false }, { researchClaimEligible: false },
+  { corpusID: "foreign" }, { codeEdition: "2014" }, { codeVersion: "stale" }, { jurisdiction: "Foreign City" },
+  { sectionID: "different-section" }, { authorityClass: "guidance" }, { authorityStatus: "draft" },
+  { body: { truncated: true } }, { body: { researchClaimEligible: false } },
+  { body: { blocks: [{ plainText: "Incomplete context", truncated: true }] } },
+  { pinnedSelectionExact: true }, { canonicalContextText: suppliedScope.text },
+  { ...gapIdentity, corpusID: undefined }]) {
+  const guarded = availability(changedScope === null ? [] : [{ ...suppliedScope, ...changedScope }]);
+  assert.equal(guarded.verdict.pass, false, JSON.stringify(changedScope));
+  assert(guarded.current.graph.some(edge => edge.gap));
+  assert.notEqual(guarded.current.packetHash, available.current.packetHash);
+  assert.throws(() => check(available.currentReview, undefined, guarded.current), /not bound/);
+}
+const duplicateScope = availability([suppliedScope, { ...suppliedScope, sourceID: "ambiguous-target" }]);
+assert.equal(duplicateScope.verdict.pass, false, "Ambiguous equivalent targets stay a gap.");
+for (const field of ["corpusID", "codePrefix", "codeEdition", "codeVersion"]) {
+  const identity = { ...gapIdentity }; delete identity[field];
+  assert.equal(availability(undefined, { parentScopeContextGaps: [{ ...nominatedRule.parentScopeContextGaps[0], identity }] }).verdict.pass, false);
+}
+const twoGaps = { ...nominatedRule, parentScopeContextGaps: [...nominatedRule.parentScopeContextGaps,
+  { reference: "FC 916.1", reason: "parent_scope_unavailable", identity: { ...gapIdentity, sectionID: "absent", sectionNumber: "916.1" } }] };
+const mixedAvailability = availability(undefined, twoGaps);
+assert.equal(mixedAvailability.current.graph.filter(edge => edge.gap).length, 1);
+assert.equal(mixedAvailability.verdict.pass, false, "Only the matching gap is reconciled; true missing scope cannot be established.");
+const immutableInput = [nominatedRule, suppliedScope, independent], inputSnapshot = JSON.stringify(immutableInput);
+const currentContext = buildResearchClaimScopeContext({ question: "Is a label required?", answer, evidence: immutableInput });
+assert.equal(JSON.stringify(immutableInput), inputSnapshot, "Graph reconciliation does not modify evidence.");
+const reconciledSource = currentContext.sources.find(source => source.sourceID === "rule");
+assert.deepEqual(reconciledSource.parentScopeContextGaps, []);
+assert.deepEqual(reconciledSource.reconciledScopeNominations[0].originalGap, nominatedRule.parentScopeContextGaps[0]);
+assert.equal(reconciledSource.reconciledScopeNominations[0].suppliedScopeIdentity.sourceID, "scope");
 const failed = witness(); failed.checks.rule.relations[relation] = "unsupported_application";
 const webNoise = Array.from({ length: 12 }, () => ({ type: "wrong_attribution", detail: "The answer relies on supporting web guidance." }));
 const processed = researchVerificationResultForWebContext(check(failed, { pass: false, issues: webNoise }),

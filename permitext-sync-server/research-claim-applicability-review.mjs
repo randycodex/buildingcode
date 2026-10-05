@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
 
-export const researchClaimApplicabilityVersion = "20261004-claim-applicability-v3";
+export const researchClaimApplicabilityVersion = "20261005-claim-applicability-v4";
 const hash = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const text = (value) => typeof value === "string" ? value : "";
 const ids = (value) => [...new Set((Array.isArray(value) ? value : []).map(String))];
@@ -12,13 +12,26 @@ const unknown = /\b(?:unknown|uncertain|unsure|unconfirmed|unverified|undetermin
 const authorityFields = ["corpusID", "codePrefix", "codeEdition", "codeVersion"];
 const sameAuthority = (left, right) => authorityFields.every((field) =>
   !left?.[field] && !right?.[field] || Boolean(left?.[field] && left[field] === right?.[field]));
-const identity = (source) => Object.fromEntries(["sourceID", "sectionID", "sectionNumber", ...authorityFields]
+const identity = (source) => Object.fromEntries(["sourceID", "sectionID", "sectionNumber", "jurisdiction", ...authorityFields]
   .map((field) => [field, source?.[field] ?? null]));
+
+const scopeAvailability = source => ({
+  canonicalContextResolved: source.canonicalContextResolved === true,
+  canonicalContextComplete: source.canonicalContextComplete === true,
+  truncated: source.truncated === true, discoveryPassageOnly: source.discoveryPassageOnly === true,
+  referenceOnly: source.referenceOnly === true, pinnedSelectionExact: source.pinnedSelectionExact === true,
+  textComplete: source.textComplete !== false, researchClaimEligible: source.researchClaimEligible !== false,
+  authorityClass: source.authorityClass || null, authorityStatus: source.authorityStatus || null,
+  bodyTruncated: source.body?.truncated === true, bodyClaimEligible: source.body?.researchClaimEligible !== false,
+  incompleteBodyBlocks: source.body?.blocks?.some(block => block.researchClaimEligible !== false && block.truncated) === true,
+  canonicalContextTextHash: source.canonicalContextText ? hash(source.canonicalContextText) : null
+});
 
 function evidenceIdentity(evidence) {
   return evidence.map((source) => ({ ...identity(source), textHash: hash(text(source.text)), textLength: text(source.text).length,
     // Explicit relations and gaps are immutable inputs too. Roles, titles and
     // proximity never manufacture an edge or a resolved project premise.
+    scopeAvailability: scopeAvailability(source),
     chapterScopeContext: source.chapterScopeContext === true,
     anchorSourceIDs: source.anchorSourceIDs || [], anchorSectionIDs: source.anchorSectionIDs || [],
     applicabilityScopeAnchors: source.applicabilityScopeAnchors || [],
@@ -160,6 +173,28 @@ function researchSourceScopeGraph(evidence) {
     const key = hash(body);
     if (!edgeKeys.has(key)) { edgeKeys.add(key); graph.push({ id: `scope_${graph.length}`, ...body }); }
   };
+  // A structural nomination can report a gap even though its complete scope
+  // is already in this immutable evidence package (for example, a parent that
+  // does not literally name its numbered child). Resolve availability only;
+  // the resulting advisory relation still needs semantic applicability review.
+  const suppliedGapScope = (anchor, gap) => {
+    const expected = gap?.identity;
+    if (!text(expected?.sectionNumber).trim() || !text(anchor.jurisdiction).trim() ||
+        !authorityFields.every(field => text(expected?.[field]).trim())) return null;
+    const matching = evidence.filter(scope => text(scope.sourceID).trim() && text(scope.sectionID).trim() &&
+      scope.sectionNumber === expected.sectionNumber && authorityFields.every(field => scope[field] === expected[field]) &&
+      (!expected.sourceID || scope.sourceID === expected.sourceID) &&
+      (!expected.sectionID || String(scope.sectionID) === String(expected.sectionID)) &&
+      (!expected.jurisdiction || scope.jurisdiction === expected.jurisdiction) &&
+      scope.jurisdiction === anchor.jurisdiction && sameAuthority(anchor, scope) &&
+      scope.canonicalContextResolved === true && scope.canonicalContextComplete === true &&
+      text(scope.text).trim() && !scope.truncated && !scope.discoveryPassageOnly && !scope.referenceOnly &&
+      !scope.pinnedSelectionExact && !scope.canonicalContextText && scope.textComplete !== false && scope.researchClaimEligible !== false &&
+      !scope.body?.truncated && scope.body?.researchClaimEligible !== false &&
+      !scope.body?.blocks?.some(block => block.researchClaimEligible !== false && block.truncated) &&
+      (!scope.authorityClass || scope.authorityClass === "enacted") && (!scope.authorityStatus || scope.authorityStatus === "enacted"));
+    return matching.length === 1 ? matching[0] : null;
+  };
   for (const source of evidence) {
     if (source.chapterScopeContext) {
       for (const sourceID of ids(source.anchorSourceIDs)) addEdge(byID.get(sourceID), source, "chapter_scope");
@@ -178,7 +213,18 @@ function researchSourceScopeGraph(evidence) {
       anchors.forEach((anchor) => addEdge(anchor, source, "parent_scope"));
     }
     for (const [field, kind] of [["chapterScopeContextGaps", "chapter_scope"], ["parentScopeContextGaps", "parent_scope"]]) {
-      for (const gap of source[field] || []) addEdge(source, null, kind, gap);
+      for (const gap of source[field] || []) {
+        const supplied = suppliedGapScope(source, gap);
+        if (supplied) {
+          const record = sources.find(item => item.sourceID === source.sourceID);
+          record[field] = record[field].filter(item => item !== gap);
+          record.reconciledScopeNominations ||= [];
+          record.reconciledScopeNominations.push({ kind, originalGap: gap,
+            availability: "complete_supplied_scope_not_established_applicability",
+            suppliedScopeIdentity: { ...identity(supplied), textHash: hash(text(supplied.text)) } });
+        }
+        addEdge(source, supplied, kind, supplied ? null : gap);
+      }
     }
   }
   return { sources, byID, graph, preflightReasons };
@@ -196,7 +242,7 @@ export function buildResearchClaimScopeContext({ question = "", answer = {}, evi
     propertyContextFacts: (context?.propertyFacts || []).map(statement => ({ origin: "property_record", status: "context_only_not_proposed_design", statement })),
     activeTopic: context?.topicContext || null,
     structuredFactHints: context?.conversationFactState || options.conversationFactContext || null };
-  const body = { version: "20261004-claim-scope-context-v1", answerHash: hash(answer), evidenceHash: hash(sources),
+  const body = { version: "20261005-supplied-scope-context-v2", answerHash: hash(answer), evidenceHash: hash(sources),
     factsHash: hash(facts), sources, graph, facts, sourceRelationWarnings: [...preflightReasons], answerUnitCount: answerUnits(answer).length };
   return { ...body, contextHash: hash(body) };
 }
