@@ -1,0 +1,110 @@
+{
+  "status": "blocked_by_responses_authentication",
+  "recordedAt": "2026-10-05T14:24:37.950153+00:00",
+  "authorization": {
+    "capUSD": 10.99,
+    "diagnosticUSD": 2.99,
+    "freshUSD": 8
+  },
+  "spending": {
+    "actualUSD": 7.8e-07,
+    "remainingUSD": 10.98999922,
+    "pendingOrUnknown": 0,
+    "embeddingCalls": 1,
+    "completedGenerationCalls": 0,
+    "authenticationRejectedGenerationCalls": 2
+  },
+  "readiness": {
+    "checkedAt": "2026-10-05T14:11:47.209Z",
+    "keyPresent": true,
+    "billableRequests": 0,
+    "models": {
+      "status": 200,
+      "code": null,
+      "type": null,
+      "usagePresent": false,
+      "available": {
+        "gpt-6-luna": true,
+        "gpt-6.1-sol": true,
+        "text-embedding-3-small": true
+      }
+    },
+    "responses": {
+      "status": 401,
+      "code": "invalid_api_key",
+      "type": "invalid_request_error",
+      "usagePresent": false,
+      "expectedValidationFailure": false
+    },
+    "embeddings": {
+      "status": 400,
+      "code": null,
+      "type": "invalid_request_error",
+      "usagePresent": false,
+      "expectedValidationFailure": true
+    },
+    "ready": false
+  },
+  "diagnostic": {
+    "answerAttempts": 1,
+    "nonanswers": 1,
+    "cause": "Responses API HTTP401 invalid_api_key; no token generation",
+    "writerEvidenceFinding": "Actual Luna request included FC314.5 non-obstruction requirement,314.5.1 width>4ft,18in clearance,and conditional NFPA13 exception. This does not prove answer quality or retrieval-repair benefit.",
+    "resultDirectory": "/workspace/permitext-validation-20261005-diagnostic-a",
+    "remainingDiagnosticTurns": 3
+  },
+  "fresh": {
+    "plannedTurns": 40,
+    "answerAttempts": 0,
+    "correctnessRate": null,
+    "sourceGrounding": "Shipped enacted corpus snapshots frozen; author of questions/rubrics is the implementing assistant, not an external independent grader.",
+    "scope": "Local backend; six code families, threshold corrections and exceptions",
+    "uncovered": [
+      "Production UI/end-to-end delivery",
+      "Structured project association",
+      "Topic switches",
+      "Historical editions",
+      "Broad open-ended project application"
+    ],
+    "acceptanceGate": "At least38/40 fully correct; zero unresolved material safety/applicability errors. Correlated sample score is not proof of population accuracy."
+  },
+  "modelHistory": [
+    {
+      "date": "2026-09-30",
+      "commit": "fcd00e4fd",
+      "change": "Default Luna high reasoning"
+    },
+    {
+      "date": "2026-09-30",
+      "commit": "6c3b2fd2e",
+      "change": "Fast Luna low writing, medium verification"
+    },
+    {
+      "date": "2026-10-03",
+      "commit": "d8be3da62",
+      "change": "Saved model-policy-v17 selective Sol complex review and repairs"
+    },
+    {
+      "date": "2026-10-03",
+      "commit": "50a0295ec",
+      "change": "Saved model-policy-v18 retained selective Sol"
+    }
+  ],
+  "modelPreference": "User recalls Luna high/Fast configuration. An explicit choice is pending; no further generation calls made. Earlier user agreement to Sol was not established from the available chat pages.",
+  "completedChecks": [
+    "Readiness unit cases: models200 cannot mask Responses401; only invalid empty POST bodies; credential redaction",
+    "Custom-model pricing reservations and fixed campaign pricing",
+    "Pending/unknown budget blocks and cap cannot silently expand",
+    "New canonical-retrieval contract and actual-corpus contract passed",
+    "Live readiness guard stopped before any new billable call; ledger remained3calls/$0.00000078",
+    "Offline lexical/passage retrieval preflights for3 diagnostic first turns and20 fresh first turns, no semantic/provider calls; not answer grading"
+  ],
+  "changes": "Evaluation tooling only in this continuation; product retrieval implementation remains66c5659fb. No production model configuration modified. No push or deployment.",
+  "nextActions": [
+    "Repair managed Responses endpoint credential forwarding/authentication; model-list access alone is insufficient.",
+    "Select explicit Luna-only or existing-hybrid evaluation policy.",
+    "Run unresolved diagnostics within2.99 allocation, diagnose only observed application defects.",
+    "Freeze application candidate and model policy, then run source-graded fresh cohort within8 allocation.",
+    "Complete missing coverage and production acceptance before making a general95percent reliability claim."
+  ]
+}

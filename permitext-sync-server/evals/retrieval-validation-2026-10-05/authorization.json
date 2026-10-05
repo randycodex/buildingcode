@@ -1,0 +1,13 @@
+{
+  "authorizedUSD": 10.99,
+  "diagnosticPhaseMaximumUSD": 2.99,
+  "freshPhaseReservedUSD": 8,
+  "authorization": "User: you have 10.99 dollars; then approved the discussed approach and instructed start.",
+  "priorChatAllowancesCarriedForward": false,
+  "freshAccuracyGate": {
+    "minimumFullyCorrectFraction": 0.95,
+    "materialSafetyOrApplicabilityErrorsAllowed": 0,
+    "avoidableNonanswersAreFailures": true
+  },
+  "scope": "Isolated backend testing; production/browser acceptance separate"
+}

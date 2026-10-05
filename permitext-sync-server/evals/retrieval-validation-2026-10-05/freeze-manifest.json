@@ -1,0 +1,19 @@
+{
+  "frozenAt": "2026-10-05T14:24:37.942387+00:00",
+  "candidateCommit": "66c5659fb9f047e1efafe0c55b3451940f881c06",
+  "files": {
+    "scripts/research-evaluation-budget.mjs": "2005f7077e6ec02ef08bfff6466bb24def7dd8b2a909ce1b091bc16e565cc0bb",
+    "scripts/research-provider-readiness-20261005.mjs": "a8e0f44cb049c6b9d97a3d19995c62ffcce22d101e0abe0b622910b398b42d5b",
+    "scripts/research-validation-pricing-20261005.mjs": "8efee967f61ca986c730314aecb9d0ceaea389d7e707a2e34ddf2e907ad2fd82",
+    "scripts/run-research-validation-20261005.mjs": "3c1feadaca912d881be2b39340e87b5a0681b2a33256be9bc0541f5b596e366a",
+    "scripts/test-research-validation-controls-20261005.mjs": "53c18e96c4b3779288734de061c57866207b9c05024c1c594d9b85a632e90f82",
+    "evals/retrieval-validation-2026-10-05/diagnostic-fixture.json": "ef64e3a66ec113499d75021bb3cad725e1c48a2742f2b71618da09b7e92dc58d",
+    "evals/retrieval-validation-2026-10-05/fresh-fixture.json": "a21065c374d388082b65456de1cb2fcb6abbdeffa62be2cf907ccde0893bfead",
+    "evals/retrieval-validation-2026-10-05/canonical-rubric-sources.json": "b7a8bba70b5b62bcae748e93283fca281a644ae649308cdca47a49a9032d20fb",
+    "app.mjs": "0d62de3ae698e2559ac22c7474ed57545b541d8cfcf974a7b47e7842a7fd631a",
+    "research-evidence-assembly.mjs": "dd6130934ba32227472b1b96fff274531e0852a3719f53da6b0c46c24435c92f"
+  },
+  "modelPolicy": "Unresolved user preference; all future live answer runs require an explicit profile",
+  "freshTurns": 40,
+  "sourceSnapshots": 19
+}

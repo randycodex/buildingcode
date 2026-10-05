@@ -1,0 +1,196 @@
+{
+  "frozenAt": "2026-10-05T14:17:22.521Z",
+  "origin": "Shipped enacted corpus; no external legal review performed",
+  "sources": [
+    {
+      "reference": "PC 405.6",
+      "sectionID": "11942",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "In mental health centers, pipes or traps shall not be exposed, and fixtures shall be bolted through walls.",
+      "textSHA256": "1ff259ceffdce1665653f1319dab95954b33cef3796d882de4318c361fb46a8c"
+    },
+    {
+      "reference": "PC 603.2",
+      "sectionID": "12112",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Underground water service pipe and the building sewer or the building drain shall be separated by not less than 5 feet (1524 mm) of undisturbed or compacted earth. Exceptions: 1. The required separation distance shall not apply where the bottom of the water service pipe within 5 feet (1524 mm) of the sewer or drain is a minimum of 12 inches (305 mm) above the top of the highest point of the sewer or drain and the pipe materials conform to Section 703.1. 2. Water service pipe is permitted to be located in the same trench with a building drain, provided such drain is constructed of materials listed in Table 702.2 . 3. The required separation distance shall not apply where a water service pipe crosses a sewer or drain pipe provided the water service pipe is sleeved to at least 5 feet (1524 mm) horizontally from the sewer or drain pipe centerline, on both sides of such crossing with pipe materials listed in Table 605.3 , Table 702.2 or Table 702.3 .",
+      "textSHA256": "32b324b5945512820669029b198e5182f8285a3a87869d78b7c960f2c637b05d"
+    },
+    {
+      "reference": "PC 708.1.9",
+      "sectionID": "12409",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Cleanouts for 6-inch (153 mm) and smaller piping shall be provided with a clearance of not less than 18 inches (457 mm) from, and perpendicular to, the face of the opening to any obstruction. Cleanouts for 8-inch (203 mm) and larger piping shall be provided with a clearance of not less than 36 inches (914 mm) from, and perpendicular to, the face of the opening to any obstruction.",
+      "textSHA256": "88fee8084e84aa1056d48678628777f130afdf53d93d70d9dba4a3d6bb32cfa7"
+    },
+    {
+      "reference": "PC 802.3.2",
+      "sectionID": "12489",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "A hub drain shall be in the form of a hub or a pipe extending not less than 1 inch (25 mm) above a water-impervious floor.",
+      "textSHA256": "cff67b6c0fc594be981d4bdd6d4736bf9c2a2fc36b606dc4798659421959138b"
+    },
+    {
+      "reference": "MC 306.2",
+      "sectionID": "10347",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Rooms containing appliances shall be provided with a door and an unobstructed passageway measuring not less than 36 inches (914.4 mm) wide and 80 inches (2032 mm) high. Exception: Within a dwelling unit, appliances installed in a compartment, alcove, basement or similar space shall be accessed by an opening or door and an unobstructed passageway measuring not less than 24 inches (609.6 mm) wide and large enough to allow removal of the largest appliance in the space, provided that a level service space of not less than 30 inches (762 mm) deep and the height of the appliance, but not less than 30 inches (762 mm), is present at the front or service side of the appliance with the door open.",
+      "textSHA256": "f8568f0b8ed4cae5c2ada2e36b25430846d7805c4f7ebee3625324ec3b4dda9b"
+    },
+    {
+      "reference": "MC 401.4",
+      "sectionID": "10406",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Ventilation air intake openings shall comply with all of the following: 1. Intake openings shall be located not less than 10 feet (3048 mm) from lot lines or buildings on the same lot. For buildings on lots measuring less than 20 feet (6096 mm) in width, intake openings shall be located at the centerline between lot lines. Where openings front on a street or public way, the distance shall be measured to the centerline of the street or public way. 2. Outdoor air intakes for office occupancies having occupied floors located more than 75 feet (22 860 mm) above the lowest level of fire department vehicle access serving spaces above the second story and serving spaces greater than 10,000 square feet (929 m 2 ) of floor area shall be located at least 20 feet (6096 mm) above ground level, at least 30 feet (9144 mm) from exhaust outlets and other exhaust discharges, and at least 20 feet (6096 mm) from areas that may collect vehicular exhaust, such as off street loading bays. 3. Mechanical and gravity outdoor air intake openings shall be located not less than 10 feet (3048 mm) horizontally from any hazardous or noxious contaminant source, such as vents, exhausts (including but not limited to exhaust from dry cleaning establishments, spray booths, and cooling towers), streets, alleys, parking lots and loading docks, except as specified in Item 3 of Section 501.3.1. Outdoor air intake openings shall be permitted to be located less than 10 feet (3048 mm) horizontally from streets, alleys, parking lots and loading docks provided that the openings are located not less than 25 feet (7620 mm) vertically above such locations. Where openings front on a street or public way, the distance shall be measured to the centerline of the street or public way. 4. Where the requirements of Item 3 above cannot be achieved, intake openings shall be located not less than 3 feet (914.4 mm) below contaminant sources where such sources are located within 10 feet (3048 mm) of the opening. 5. Intake openings in Group I occupancies shall comply with ANSI/ASHRAE/ASHE 170, as required. 6. Intake openings on structures in flood hazard areas shall comply with the additional requirements of Appendix G of the New York City Building Code . Exception: Group R-3 occupancies are not required to comply with Section 401.4. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+      "textSHA256": "a4b230aaaadbd5c7d80c1163504dd7291a1ab42a179262ff9463392c5bc40044"
+    },
+    {
+      "reference": "MC 504.8.4.1",
+      "sectionID": "10596",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "The maximum length of the exhaust duct shall be 35 feet (10 668 mm) from the connection to the transition duct from the dryer to the outlet terminal or to a common or central exhaust system. Where fittings are used, the maximum length of the exhaust duct shall be reduced in accordance with Table 504.8.4.1 . Table 504.8.4.1 Dryer Exhaust Duct Fitting Equivalent Length a Dryer Exhaust Duct Fitting Type Equivalent Length Dryer Exhaust Duct Fitting Type Equivalent Length 4\" radius mitered 45-degree elbow 2 feet 6 inches 4\" radius mitered 90-degree elbow 5 feet 6\" radius smooth 45-degree elbow 1 foot 6\" radius smooth 90-degree elbow 1 foot 9 inches 8\" radius smooth 45-degree elbow 1 foot 8\" radius smooth 90-degree elbow 1 foot 7 inches 10\" radius smooth 45-degree elbow 9 inches 10\" radius smooth 90-degree elbow 1 foot 6 inches For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 degree = 0.0175 rad. a. The equivalent length column of the table indicates how much length must be added to the exhaust duct total length for each fitting used.",
+      "textSHA256": "5d1e6d009a57e7798565454d59528f2f4539a46136888afcb5716e653d758665"
+    },
+    {
+      "reference": "FGC 409.1.3",
+      "sectionID": "8328",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Shutoff valves shall be located in places so as to provide access for operation and shall be installed so as to be protected from damage.",
+      "textSHA256": "28540566dcc8f3dca4a6721e873d6d69930025beb16223bf32fc8fee5eb1e61e"
+    },
+    {
+      "reference": "FGC 404.5",
+      "sectionID": "8233",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Fittings installed in concealed locations shall be limited to the following types: 1. Threaded elbows, tees and couplings. 2. Welded fittings.",
+      "textSHA256": "8a7d29721b62f7ea2f6df31690a932b38fb327a7b510767ea4a9568878a10ac5"
+    },
+    {
+      "reference": "FGC 411.1.3.3",
+      "sectionID": "8354",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Connectors shall not be concealed within, or extended through, walls, floors, partitions, ceilings or appliance housings. Exceptions: 1. Connectors constructed of materials allowed for piping systems in accordance with Section 403 shall be permitted to pass through walls, floors, partitions and ceilings where installed in accordance with Section 409.5.2. 2. Rigid steel pipe connectors shall be permitted to extend through openings in appliance housings. 3. Fireplace inserts that are factory equipped with grommets, sleeves or other means of protection in accordance with the listing of the appliance. 4. Listed connectors shall be permitted to extend through an opening in an appliance housing, cabinet or casing where the tubing or connector is protected against damage.",
+      "textSHA256": "9d865da536dec0651c4fcb7701a9e19d66d60e2a4cef1d9e7296ee99e6258132"
+    },
+    {
+      "reference": "BC 1015.2",
+      "sectionID": "2385",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Guards adequate in strength and attachment in accordance with Section 1607.8 shall be located along open-sided walking surfaces that are more than 30 inches (762 mm) measured vertically to the floor or grade below at any point within 36 inches (914.4 mm) horizontally to the edge of the open side. Such open-sided walking surfaces shall include, but not be limited to, the following: 1. Roofs and setback roofs such as terraces accessible by a stairway, including those required by Section 1011.12; 2. Where protective guards are required on building roofs pursuant to Section 1510.8; 3. Mezzanines; 4. Balconies; 5. Equipment platforms; 6. Aisles; 7. Stairs; 8. Ramps; and 9. Landings. Exception: Guards are not required for the following locations: 1. On the loading side of loading docks or piers. 2. On the audience side of stages and raised platforms, including stairs and ramps leading up to the stage and raised platforms. 3. On raised stage and platform floor areas, such as runways, ramps and side stages used for entertainment or presentations. 4. At vertical openings in the performance area of stages and platforms. 5. At elevated walking surfaces appurtenant to stages and platforms for access to and utilization of special lighting or equipment. 6. Along vehicle service pits not accessible to the public. 7. In assembly seating areas at cross aisles in accordance with Section 1029.16.2.",
+      "textSHA256": "a4c3321456d2c5e28ecbf229a8cafbe9993a3e70e6dc5dcc03b4181d7b502aaa"
+    },
+    {
+      "reference": "BC 1208.2",
+      "sectionID": "3021",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Habitable rooms and spaces shall have a ceiling height of not less than 8 feet (2438.4 mm). Occupiable spaces and corridors shall have a ceiling height of not less than 7 feet 6 inches (2286 mm). Bathrooms, toilet rooms, kitchens in other than Group I-1 and R occupancies, kitchenettes in Group I-1 or R occupancies, storage rooms and laundry rooms shall have a ceiling height of not less than 7 feet (2133.6 mm). All measurements shall be taken from the finished floor to the finished underside of the ceiling or ceiling beams. Exceptions: 1. In one- and two-family dwellings, beams or girders spaced not less than 4 feet (1220 mm) on center may project not more than 6 inches (152.4 mm) below the required ceiling height, provided that a clear height of 7 feet (2133.6 mm) is maintained. 2. Habitable rooms in basements of one- or two-family dwellings, including any projecting beams, shall have a ceiling height of not less than 7 feet (2133.6 mm). 3. Habitable rooms in basements of multiple dwellings may have as many as four beams crossing the ceiling if none of the beams exceeds 12 inches (304.8 mm) in width or extends below the ceiling more than 6 inches (152.4 mm). 4. Spaces above and below a mezzanine, other than habitable spaces, shall have a ceiling height of not less than 7 feet (2133.6 mm).",
+      "textSHA256": "71b96d728cede25628daea803e2e0bcee33791f2e13f1a9a8b03b29cee787cca"
+    },
+    {
+      "reference": "BC 1009.7.2",
+      "sectionID": "2235",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Exterior walls separating the exterior area of assisted rescue from the interior of the building shall have a minimum fire-resistance rating of 1 hour, rated for exposure to fire from the inside. The fire-resistance-rated exterior wall construction shall extend horizontally 10 feet (3048 mm) beyond the landing on either side of the landing or equivalent fire-resistance-rated construction is permitted to extend out perpendicular to the exterior wall 4 feet (1220 mm) minimum on the side of the landing. The fire-resistance-rated construction shall extend vertically from the ground to a point 10 feet (3048 mm) above the floor level of the area for assisted rescue or to the roof line, whichever is lower. Openings within such fire-resistance-rated exterior walls shall be protected in accordance with Section 716 .",
+      "textSHA256": "cd3af2c7eab514d9ca3e066f54e07c95cece2e75eaefe4e474fabe1bbac942d0"
+    },
+    {
+      "reference": "FC 605",
+      "sectionID": "31004739",
+      "corpusID": "nyc-2022-fire-code",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "605.1 Abatement of electrical hazards.\n\nDefective devices, equipment or systems shall not be used and the hazardous conditions shall be corrected or the device, equipment or system shall be removed from the premises. Electrical wiring, devices and other equipment that is damaged or otherwise constitutes an electrical or fire hazard shall not be used, and the hazardous condition shall be corrected or the equipment removed from the premises.\n\n605.2 Illumination.\n\nIllumination shall be provided for service equipment areas, motor control centers and electrical panelboards.\n\n605.3 Working space and clearance.\n\nA working space of not less than 30 inches (762 mm) in width, 36 inches (914 mm) in depth and 78 inches (1981 mm) in height shall be provided in front of electrical service equipment. Where the electrical service equipment is wider than 30 inches (762 mm), the working space shall not be less than the width of the equipment. No storage of any materials shall be located within the designated working space.\n\nExceptions:\n\n1.Where other dimensions are required or allowed by the Electrical Code.\n\n2.Access openings into attics or under-floor areas which provide a minimum clear opening of 22 inches (559 mm) by 30 inches (762 mm).\n\n605.3.1 Labeling.\n\nDoors into electrical control panel rooms shall be marked with a plainly visible and legible sign stating ELECTRICAL ROOM or similar approved wording. The disconnecting means for each service, feeder or branch circuit originating on a switchboard or panelboard shall be legibly and durably marked to indicate its purpose unless such purpose is clearly evident.\n\n605.4 Multiplug adapters.\n\nMultiplug adaptors, such as cube adaptors, unfused plug strips or any other device not complying with the requirements of the Electrical Code shall be prohibited.\n\n605.4.1 Power tap design.\n\nPortable power taps shall be of the polarized or grounded type, equipped with overcurrent protection, and shall be listed in accordance with UL 1363.\n\n605.4.2 Power supply.\n\nPortable power taps shall be directly connected to a permanently installed receptacle.\n\n605.4.3 Installation.\n\nPortable power tap cords shall not extend through walls, ceilings, floors, under doors or floor coverings, or be subject to environmental or physical damage.\n\n605.5 Extension cords.\n\nExtension cords and flexible cords shall not be a substitute for permanent wiring. Extension cords and flexible cords shall not be affixed to buildings or structures, extended through walls, ceilings or floors, or under doors or floor coverings, nor shall such cords be subject to environmental damage or physical impact. Extension cords shall be used only with portable devices.\n\n605.5.1 Power supply.\n\nExtension cords shall be plugged directly into an approved receptacle, power tap or multiplug adapter and, except for approved multiplug extension cords, shall serve only one portable device.\n\n605.5.2 Ampacity.\n\nThe ampacity of the extension cords shall not be less than the rated capacity of the portable appliance supplied by the cord.\n\n605.5.3 Maintenance.\n\nExtension cords shall be maintained in good condition without splices, deterioration or damage.\n\n605.5.4 Grounding.\n\nExtension cords shall be grounded when serving grounded portable devices.\n\n605.6 Unapproved conditions.\n\nOpen junction boxes and open-wiring splices shall be prohibited. Approved covers shall be provided for all switch and electrical outlet boxes.\n\n605.7 Electrical devices and equipment.\n\nElectrical devices and equipment shall be listed or labeled and installed in accordance with the construction codes and the Electrical Code.\n\n605.8 Electrical motors.\n\nElectrical motors shall be maintained free from excessive accumulations of oil, dirt, waste and debris.\n\n605.9 Temporary wiring.\n\nTemporary wiring for electrical power and lighting installations is allowed for a period not to exceed 90 calendar days. Temporary wiring methods shall meet the applicable provisions of the Electrical Code.\n\nException: Temporary wiring for electrical power and lighting installations is allowed during periods of construction, remodeling, repair or demolition of buildings, structures, equipment or similar activities.\n\n605.9.1 Attachment to structures.\n\nTemporary wiring attached to a building or structure shall be attached in an approved manner.\n\n605.10 Portable electric space heaters.\n\nThe use of portable electric space heaters shall be in accordance with this section.\n\n605.10.1 Listed and labeled.\n\nPortable electric space heaters shall be listed and labeled. Portable electric space heaters shall be operated only in locations for which they are listed.\n\n605.10.2 Power supply.\n\nPortable electric space heaters shall be plugged directly into a receptacle. Extension cords shall not be used for electrical connections for portable electric space heaters.\n\n605.10.3 Prohibited use.\n\nIt shall be unlawful to use portable electric space heaters in the following locations:\n\n1.In any building or occupancy, where the power requirements for the portable electric space heater exceed the rating of the electrical circuit or receptacle from which the heater will draw current.\n\n2.In any occupancy, within 3 feet (914 mm) of any combustible material.\n\n3.In Group I-2 occupancies, except that a portable electric space heater with a heating element designed not to exceed a temperature of 212°F (100°C) may be used in nonsleeping staff and employee areas.\n\n4.In Group R-1 college and university dormitories.\n\n5.In any location considered to be a hazardous location in accordance with the Electrical Code, unless listed for such use.\n\n605.11 Portable halogen floor lamps.\n\nPortable halogen floor lamps shall be designed, operated and maintained in compliance with the requirements of this section.\n\n605.11.1 Prohibitions.\n\nIt shall be unlawful to:\n\n1.store or use portable halogen floor lamps in Group I-2 occupancies and Group R-1 college and university dormitories.\n\n2.use portable halogen floor lamps for any purpose other than lighting.\n\n3.store or use portable halogen floor lamps that are not designed with an approved glass or wire bulb guard or when such guard is not in place.\n\n605.11.2 Manufacturer instructions.\n\nPortable halogen floor lamps shall be used in accordance with the manufacturer's instructions.\n\n605.11.3 Placement.\n\nPortable halogen floor lamps shall be placed in locations where the risk of the lamp being tipped over by occupant traffic or activities, or of igniting curtains, furnishings or other combustible materials, is minimized.\n\n605.11.4 Bulb replacement and disposal.\n\nPortable halogen floor lamp bulbs shall be replaced and discarded only when the bulb is cool to the touch.",
+      "textSHA256": "1a97f616e91a51cd927d778c9ed302ef996aa20448b371481edb6f20111b9c5f"
+    },
+    {
+      "reference": "FC 304",
+      "sectionID": "31004685",
+      "corpusID": "nyc-2022-fire-code",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "304.1 Accumulation of combustible waste.\n\nIt shall be unlawful to cause or allow rubbish and other combustible waste to accumulate in a building or structure or upon a premises.\n\n304.1.1 Maintenance.\n\nRoofs, courts, yards, vacant lots, alleys, parking lots, open spaces, and the space beneath a grandstand, bleacher, pier, wharf, or other similar structure, shall be regularly cleaned so as to prevent the accumulation of any rubbish, vegetation or other combustible waste.\n\n304.1.2 Vegetation.\n\nWeeds, grass, vines, brush or other vegetation that is capable of being ignited shall be regularly pruned, or cleared and removed for a distance of 10 feet (3048 mm) from any building or structure.\n\n304.2 Unsafe storage of combustible waste prohibited.\n\nIt shall be unlawful to store rubbish or other combustible waste in a manner that creates a fire hazard or public nuisance.\n\n304.3 Containers.\n\nRubbish and other combustible waste stored pending removal in a building or structure or upon a premises shall be stored in accordance with this section, and any other applicable law, rule or regulation.\n\n304.3.1 Spontaneous ignition.\n\nRubbish and other combustible waste susceptible to spontaneous ignition, such as oily rags, shall be stored in a listed disposal container. Contents of such containers shall be removed and disposed of daily.\n\n304.3.2 Capacity exceeding 40 gallons.\n\nDumpsters and other containers with a capacity exceeding 40 gallons (0.15 m 3 ) shall be provided with lids. Such containers and their lids shall be constructed of noncombustible materials or of materials having a peak rate of heat release not exceeding 300 kW/m 2 when tested in accordance with ASTM E 1354 at an incident heat flux of 50 kW/m 2 in the horizontal orientation, and listed and labeled as such.\n\n304.3.3 Capacity exceeding 200 gallons.\n\nDumpsters and other containers with an individual capacity exceeding 200 gallons (0.76 m 3 ) shall not be stored indoors, and shall not be stored outdoors within 5 feet (1524 mm) of combustible walls, openings or combustible roof eave lines.\n\nExceptions:\n\n1.Dumpsters or containers in areas protected throughout by a sprinkler system.\n\n2.Storage in a building or structure of Type I or Type IIA construction or other construction with an equivalent fire rating, where such building or structure is located not less than 10 feet (3048 mm) from other buildings or structures and used exclusively for container or dumpster storage.\n\n304.3.4 Wastebaskets in Group I-2 and I-3 occupancies.\n\nWastebaskets and other waste containers, including their lids, used in Group I-2 and I-3 occupancies shall be constructed of noncombustible materials or of materials having a peak rate of heat release not exceeding 300 kW/m 2 when tested in accordance with ASTM E 1354 at an incident heat flux of 50 kW/m 2 in the horizontal orientation. Metal wastebaskets and other metal waste containers with a capacity of 20 gallons (76 L) or more shall be listed in accordance with UL 1315 and shall be provided with a noncombustible lid.\n\n304.4 Outdoor storage.\n\nOutdoor storage of combustible waste at a transfer station, recycling facility, or other lawful outdoor combustible waste storage facility, shall comply with the requirements of FC 315.",
+      "textSHA256": "cb161e1c1bed0886314eeaddb281a3f5558f850c8554d5116dee97b3970e05c9"
+    },
+    {
+      "reference": "ZR 25-62",
+      "sectionID": "20017587",
+      "corpusID": "nyc-zoning-resolution",
+      "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12\n\nMinimum maneuvering space In all districts, as indicated, for all accessory off-street parking spaces, open or enclosed, each 300 square feet of unobstructed standing or maneuvering area shall be considered one parking space, except as follows: Standard attended facilities An area of less than 300 square feet, but in no event less than 200 square feet, may be considered as one space, where the layout and design of the parking area are adequate to permit convenient access and maneuvering in accordance with regulations promulgated by the Commissioner of Buildings, or where the developer or applicant for a building permit or certificate of occupancy certifies that such spaces will be fully attended. In any case where a reduction of the required area per parking space is permitted on the basis of the developer's certification that such spaces will be fully attended, it shall be set forth in the certificate of occupancy that paid attendants employed by the owners or operators of such spaces shall be available to handle the parking and moving of automobiles at all times when such spaces are in use. Attended facilities with parking lift systems For portions of an attended parking facility with parking lift systems, each individually lifted tray upon which a vehicle is stored shall be considered one parking space. Any other attended space not on a lifted tray shall be subject to the provisions of paragraph (a)(1) of this Section. Automated parking facilities For automated parking facilities, each tray upon which a vehicle is stored shall constitute one parking space. The term “tray” shall refer to the structural support for vehicle storage in both pallet and non-pallet vehicle storage systems. However, auxiliary parking trays in automated parking facilities may be exempted from constituting a parking space where the Commissioner of Buildings determines that such auxiliary parking trays are necessary to store and retrieve vehicles for the efficient operation of such automated parking facility. Single- and two-family residences For accessory off-street parking spaces serving single- or two-family residences, an area of less than 300 square feet may be considered as one space. Driveway access Driveways used to access parking spaces must be unobstructed for a width of at least eight feet and a height of eight feet above grade and, if connecting to a street, such driveway may only be accessed by a curb cut. Minimum size for each parking space In no event shall the dimensions of any parking stall be less than 18 feet long and 8 feet, 6 inches wide. However, the width of a parking stall may be reduced to eight feet for detached, semi-detached or zero lot line buildings on a zoning lot where not more than four accessory parking spaces are provided if such accessory parking spaces are located in a side lot ribbon and are subject to the provisions of Section 25-621 (Location of parking spaces in certain districts). Special rules for certain areas In the Borough of Staten Island and in lower density growth management areas in Community District 10, Borough of the Bronx, for community facility uses, each parking space in a parking area not within a building shall be within a parking stall accessed from a travel aisle, where each such stall and aisle complies with the maneuverability standards of paragraph (b) of Section 36-57 (Parking Lot Maneuverability and Curb Cut Regulations). The use of an attendant shall be permitted only where necessary to accommodate additional, permitted parking spaces within the travel aisles. For such open parking areas with 18 or more spaces, or greater than 6,000 square feet in area, the provisions of Section 37-90 (PARKING LOTS) shall also apply.",
+      "textSHA256": "72134a31f8910c987769b3b4cd1d8dcd1fa2e3110b1448f932bce81bb2cb168b"
+    },
+    {
+      "reference": "BC 1109.12.3",
+      "sectionID": "2880",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "Where counters are provided for sales or distribution of goods or services, at least one of each type provided shall be accessible. Where such counters are dispersed throughout the building or facility, accessible counters shall also be dispersed.",
+      "textSHA256": "64037d16ae5e5433eba5be6958e83920a054191413595d0f5108dd2fa3260997"
+    },
+    {
+      "reference": "BC 1109.2.1",
+      "sectionID": "2812",
+      "corpusID": "nyc-2022-construction-codes",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "In assembly and mercantile occupancies, an accessible family or assisted-use toilet room shall be provided where an aggregate of six or more male and female water closets is required. In buildings of mixed occupancy, only those water closets required for the assembly or mercantile occupancy shall be used to determine the family or assisted-use toilet room requirement. In recreational facilities where separate-sex bathing rooms are provided, an accessible family or assisted-use bathing room shall be provided. Fixtures located within family or assisted-use toilet and bathing rooms required by this section are permitted to be included in the number of fixtures required by the New York City Plumbing Code for either the male or the female occupants. Exception: Where each separate-sex bathing room has only one shower or bathtub fixture, a family or assisted-use bathing room is not required.",
+      "textSHA256": "39e4c3ce5f7d0cd6765f73b3684c1f3a865c5a1fb3baa760e12bf3883ee039f7"
+    },
+    {
+      "reference": "FC 314",
+      "sectionID": "31004695",
+      "corpusID": "nyc-2022-fire-code",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "text": "314.1 General.\n\nIndoor displays in any occupancy shall be designed and installed in accordance with FC 314.2 through 314.4.\n\n314.2 Fixtures and displays.\n\nFixtures and displays of goods for sale to the public shall be arranged so as to maintain free, immediate and unobstructed access to exits as required by FC Chapter 10 and the construction codes, including the Building Code.\n\n314.3 Highly combustible goods.\n\nIt shall be unlawful to display highly combustible goods, including flammable or combustible liquids, liquefied flammable gases, oxidizing materials, pyroxylin plastics and agricultural goods, in main exit access aisles, corridors, common areas of covered malls, or within 5 feet (1524 mm) of entrances to exits and exterior exit doors.\n\n314.4 Vehicles and watercraft.\n\nFueled and electric vehicles (including motor vehicles, motorcycles and mopeds) and watercraft that are displayed indoors shall comply with the following requirements:\n\n1.Vehicle and watercraft engines shall not be operated at any time when the display is open to the public. Liquid-fueled vehicle and watercraft engine batteries shall be disconnected or the engine otherwise disabled from starting by installation of an ignition lock, \"kill switch\" (relay) or other approved means. Battery or other electrical connections that are disconnected shall be adequately taped to prevent arcing. For electric and gaseous-fueled vehicles:\n\n1.1.Battery power necessary to preserve vehicle safety features shall be maintained.\n\n1.2.Appropriate safety measures shall be implemented to prevent the engine from being started and/or the vehicle from moving or other approved means, including securing the engine start key or fob and preventing remote engine start.\n\n2.Fuel in fuel tanks shall not exceed one-eighth tank or 2.5 gallons (9.5 L) (whichever is less). Gaseous-fueled vehicles or watercraft shall contain no more fuel than the energy equivalent of 2.5 gallons (9.5 L) of gasoline.\n\n3.Fuel tanks and fill openings shall be closed and secured with a locking gas cap.\n\n4.Fueling or defueling shall not be conducted indoors.\n\n5.No repairs or other work shall be conducted on a motor vehicle or watercraft in the display area.\n\n6.Where indoor display of motor vehicles and watercraft is in Group A occupancies and other public gathering places, aisles with an unobstructed minimum width of 3 feet (914 mm) shall be maintained.\n\n7.Such other requirements as the department may promulgate by rule.\n\n314.5 Required clearance from fire safety systems.\n\nSprinklers and fire alarm systems shall not be obstructed by indoor displays.\n\n314.5.1 Sprinkler systems.\n\nA sprinkler system shall be installed in or under covered kiosks, displays, booths, or concession stands that exceed 4 feet (1219 mm) in width. The clearance between any sprinkler head deflector installed above the top of the kiosks, displays, booths, or concession stands shall not be less than 18 inches (457 mm).\n\nException: Open-grid and drop-out ceilings complying with the requirements of NFPA 13, as modified by FC Appendix B, may be installed beneath sprinklers.\n\n314.5.2 Fire alarm systems.\n\nSufficient clearance shall be provided between kiosks, displays, booths, or concession stands and fire alarm and carbon monoxide systems equipment and devices including detectors and strobes, so as not to interfere with their operation.",
+      "textSHA256": "c0f9b21e20589541d1f096a536d884ce18811f6505e6375633288800cdc509e4"
+    }
+  ]
+}

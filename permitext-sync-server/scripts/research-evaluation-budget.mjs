@@ -34,7 +34,7 @@ export function evaluationCost(payload) {
     u.output_tokens * .5 * (long ? 1.5 : 1)) * multiplier / 1e6;
 }
 
-export function evaluationBudget(path, capUSD = 15.73) {
+export function evaluationBudget(path, capUSD = 15.73, pricing = evaluationPricing) {
   assert(path && Number.isFinite(capUSD) && capUSD > 0 && capUSD <= 15.73);
   const transaction = update => {
     const lock = `${path}.lock`;
@@ -42,8 +42,9 @@ export function evaluationBudget(path, capUSD = 15.73) {
     try {
       let ledger;
       try { ledger = JSON.parse(readFileSync(path, "utf8")); }
-      catch (e) { if (e.code !== "ENOENT") throw e; ledger = { version: 1, capUSD, pricing: evaluationPricing, calls: [] }; }
+      catch (e) { if (e.code !== "ENOENT") throw e; ledger = { version: 1, capUSD, pricing, calls: [] }; }
       assert.equal(ledger.capUSD, capUSD, "Never silently reset or expand a campaign budget");
+      assert.deepEqual(ledger.pricing, pricing, "Never silently change campaign pricing");
       const result = update(ledger);
       writeFileSync(`${path}.tmp`, JSON.stringify(ledger, null, 2), { mode: 0o600 });
       renameSync(`${path}.tmp`, path);

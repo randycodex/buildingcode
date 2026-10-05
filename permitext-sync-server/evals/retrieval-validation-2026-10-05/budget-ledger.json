@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "capUSD": 10.99,
+  "pricing": {
+    "source": "evals/retrieval-companions-2026-10-03/model-policy-v18.json",
+    "verified": "2026-10-03 America/New_York",
+    "models": {
+      "gpt-6-luna": {
+        "input": 0.1,
+        "cached": 0.01,
+        "write": 0.125,
+        "output": 0.5
+      },
+      "gpt-6.1-sol": {
+        "input": 2,
+        "cached": 0.1,
+        "write": 2.5,
+        "output": 10
+      }
+    },
+    "unknownOutcome": "Retain entire conservative reservation and block further spending"
+  },
+  "calls": [
+    {
+      "phaseBucket": "diagnostic",
+      "id": "2719f0b0-c54d-4c50-a678-5a843a162db5",
+      "case": "diag-covered-display-1",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000185834,
+      "startedAt": "2026-10-05T14:04:11.255Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-diagnostic-a",
+      "costUSD": 7.8e-07,
+      "usage": {
+        "prompt_tokens": 39,
+        "total_tokens": 39
+      },
+      "endedAt": "2026-10-05T14:04:14.181Z"
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "bb74ca3d-6517-4fc8-9976-0c0ea231f6ba",
+      "case": "diag-covered-display-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "rejected",
+      "reservedUSD": 0.11121990000000001,
+      "startedAt": "2026-10-05T14:04:16.259Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-diagnostic-a",
+      "endedAt": "2026-10-05T14:04:16.583Z",
+      "costUSD": 0,
+      "errorCode": "invalid_api_key",
+      "reconciliation": {
+        "at": "2026-10-05T14:13:59.044226+00:00",
+        "basis": "Definitive invalid_api_key rejection before generation; no usage. Both endpoint probes also confirmed HTTP 401.",
+        "evidence": "/workspace/permitext-validation-20261005-diagnostic-a/bb74ca3d-6517-4fc8-9976-0c0ea231f6ba-response.json"
+      }
+    },
+    {
+      "phaseBucket": "diagnostic",
+      "id": "0af8f138-648b-4ee0-b491-79a4dfd6b9ab",
+      "case": "diag-covered-display-1",
+      "model": "gpt-6.1-sol",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "rejected",
+      "reservedUSD": 1.6963870000000003,
+      "startedAt": "2026-10-05T14:04:16.591Z",
+      "runDirectory": "/workspace/permitext-validation-20261005-diagnostic-a",
+      "endedAt": "2026-10-05T14:04:16.817Z",
+      "costUSD": 0,
+      "errorCode": "invalid_api_key",
+      "reconciliation": {
+        "at": "2026-10-05T14:13:59.044657+00:00",
+        "basis": "Definitive invalid_api_key rejection before generation; no usage. Both endpoint probes also confirmed HTTP 401.",
+        "evidence": "/workspace/permitext-validation-20261005-diagnostic-a/0af8f138-648b-4ee0-b491-79a4dfd6b9ab-response.json"
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "description": "Known covered-display regression and replacement accessibility diagnostics. Isolated backend, actual provider; no production accuracy claim.",
+  "scope": "diagnostic",
+  "conversations": [
+    {
+      "id": "diag-covered-display",
+      "exposure": "Exact known V51 C1/C2 regression, repeated diagnostic",
+      "questions": [
+        "In a sprinklered retail space under the 2022 NYC codes, we want a covered display that is five feet wide. Can we rely only on the ceiling sprinklers above its cover?",
+        "We can reduce the covered display to exactly four feet wide. Does that automatically mean we can ignore sprinklers underneath it?"
+      ],
+      "checks": [
+        "No. FC 314.5.1 requires sprinklers in or under covered displays exceeding four feet in width. The NFPA-13-compliant open-grid/drop-out ceiling exception is conditional; supplied facts do not establish it.",
+        "No automatic exemption. Exactly four feet is outside the exceeds-four-feet width trigger, but FC 314.5 prohibits obstruction and the clearance/qualifying NFPA13 exception must still be assessed. Do not invent a categorical four-foot exemption or a universal independent below-cover mandate."
+      ],
+      "references": [
+        "FC 314"
+      ]
+    },
+    {
+      "id": "diag-accessibility-counters",
+      "exposure": "New accessibility diagnostic replacing unavailable prior unrun D1/D2 scenario artifacts",
+      "questions": [
+        "For a new NYC public retail space under the 2022 codes, we have a sales counter and a separate pickup counter of a different type, spread across the store. Is making only the sales counter accessible enough?"
+      ],
+      "checks": [
+        "No. BC1109.12.3 requires at least one of each type of sales/service counter accessible; accessible counters must also be dispersed where counters are dispersed. Avoid claiming a specific counter height absent the referenced accessibility standard."
+      ],
+      "references": [
+        "BC 1109.12.3"
+      ]
+    },
+    {
+      "id": "diag-accessibility-family-room",
+      "exposure": "New accessibility diagnostic, no exact match to unavailable earlier D1/D2",
+      "questions": [
+        "For a new NYC mercantile occupancy under the 2022 codes, the plumbing calculation requires three male and three female water closets. Do accessible stalls in those separate toilet rooms remove the need for a family or assisted-use toilet room?"
+      ],
+      "checks": [
+        "No. BC1109.2.1 requires an accessible family/assisted-use toilet room when the aggregate required male/female water closets for assembly/mercantile is six or more. The bathing-room one-shower exception does not waive the toilet-room trigger. Count required fixtures, not merely proposed installed fixtures."
+      ],
+      "references": [
+        "BC 1109.2.1"
+      ]
+    }
+  ]
+}
