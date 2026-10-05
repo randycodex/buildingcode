@@ -1,0 +1,356 @@
+{
+  "status": "handoff_imported_unchanged_evidence_freeze_still_pending",
+  "attachmentSHA256": "eb414cea12add6571f43dc392494555799e0844acc063156a9ae02274654bbb7",
+  "originalReviewMarkdownSHA256": "5e7faf90f6afff15b97a54d06ccddd6b5badfb20ea2613c381adf0484c392966",
+  "exactOriginalReviewMatch": true,
+  "questionsUnchanged": true,
+  "caseCount": 20,
+  "turnCount": 40,
+  "reviewerDispositionCounts": {
+    "APPROVE": 34,
+    "REVISE": 6
+  },
+  "revisions": [
+    {
+      "id": "acceptance-reserved-vent:turn-1",
+      "changes": [
+        "C02: Limit the conclusion to the empty supplied record; do not equate an empty payload with a legally reserved section or absence of all venting law."
+      ]
+    },
+    {
+      "id": "acceptance-reserved-vent:turn-2",
+      "changes": [
+        "C02: Preserve the historical-source limitation and the distinction between an empty current evidence record and verified historical law."
+      ]
+    },
+    {
+      "id": "acceptance-exit-enclosure:turn-1",
+      "changes": [
+        "C01: Clarify that the two-hour cap limits what the section requires, not what higher-rated construction is permitted to be provided."
+      ]
+    },
+    {
+      "id": "acceptance-exit-enclosure:turn-2",
+      "changes": [
+        "C01: Remove the incorrect forbidden claim and uncertainty requiring an unknown floor rating to prevent a definitive two-hour conclusion in this four-story hypothetical."
+      ]
+    },
+    {
+      "id": "acceptance-permit-basis:turn-2",
+      "changes": [
+        "C04: Distinguish the amendment’s December 21, 2024 notation from its December 21, 2025 effective date, and distinguish a prior consolidated version from an original never-amended enactment. Preserve the original question text."
+      ]
+    },
+    {
+      "id": "acceptance-reserved-fire-section:turn-1",
+      "changes": [
+        "C03: Replace the imprecise “repealed or reserved” characterization with the verified current Reserved status; do not assert a repeal history absent its source."
+      ]
+    }
+  ],
+  "reviewerIdentity": "not established by attachment",
+  "externalExpertApprovalEstablished": false,
+  "applicationEvaluationPerformed": false,
+  "newApplicationScore": null,
+  "sourceChecks": [
+    {
+      "reference": "PC 503.1",
+      "sectionID": "12078",
+      "textSHA256": "18c7e658b77f376f94a29b62f3e04118483b5fb522dc1719d7f8c6acde31d611",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "503.1 Cold water line valve."
+    },
+    {
+      "reference": "PC 504.6",
+      "sectionID": "12086",
+      "textSHA256": "441faeacb333ea9948b1512b362b1ce01f64b5727f0e886d892f09dd0ea7ffb1",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "504.6 Requirements for discharge piping."
+    },
+    {
+      "reference": "PC 905.4",
+      "sectionID": "12550",
+      "textSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": true,
+      "sourceTitle": "905.4 Reserved."
+    },
+    {
+      "reference": "MC 304.10",
+      "sectionID": "10336",
+      "textSHA256": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "304.10 Clearances from grade."
+    },
+    {
+      "reference": "MC 501.3.1",
+      "sectionID": "10455",
+      "textSHA256": "e818e378f393ae0d9850683d4a17d53b82861f33efb5bc013478490e33a7d393",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "501.3.1 Location of exhaust outlets."
+    },
+    {
+      "reference": "MC 505.1",
+      "sectionID": "10603",
+      "textSHA256": "19bb5461d87fb1807a9399ca7ed55f8e87efadefe0eabd21a7fb5d72b2a62d3e",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "505.1 Domestic systems."
+    },
+    {
+      "reference": "FGC 408.4",
+      "sectionID": "8324",
+      "textSHA256": "b911048c935bfc411cfe83865a23c8742d7d61a7d1278ab237d09294211f60ce",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "408.4 Sediment trap."
+    },
+    {
+      "reference": "FGC 406.3.3",
+      "sectionID": "8281",
+      "textSHA256": "75b00094b32af13a533e4a88ccba08836b49bbe2826a9b535ffbcbaa230f9c4d",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "406.3.3 Appliance and equipment disconnection."
+    },
+    {
+      "reference": "FGC 410.2",
+      "sectionID": "8343",
+      "textSHA256": "df837a771aa8016c1c83641cfe4eed07a1d16440033b17424bbc1e67496f53b8",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "410.2 MP regulators."
+    },
+    {
+      "reference": "BC 1013.1",
+      "sectionID": "2362",
+      "textSHA256": "1d1261baf73415108cde1dd7de8a47771bcd3474be7eaf64bdfaf11aa635f5c1",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "1013.1 Where required."
+    },
+    {
+      "reference": "BC 1014.2",
+      "sectionID": "2374",
+      "textSHA256": "df772ab9080287a1fb6bada326691ecee8ead3e93fc6aa2c47d643600dbdb32c",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "1014.2 Height."
+    },
+    {
+      "reference": "BC 1014.6",
+      "sectionID": "2380",
+      "textSHA256": "32cacc634a66ea08d43701a8e1ff69f5da84cd5bfeca1e29bcefb2f3030f5ddc",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "1014.6 Handrail extensions."
+    },
+    {
+      "reference": "BC 1023.2",
+      "sectionID": "2433",
+      "textSHA256": "c4de89a4305c373fd0b9eebe68666040acb58d162e0ff1c171bad8e379598008",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "1023.2 Construction."
+    },
+    {
+      "reference": "AC 28-105.1",
+      "sectionID": "8979",
+      "textSHA256": "11adc798ab9699efa69395ba0a219bf375106afa82391557b4f8039b9c75c3d9",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "§ 28-105.1 General."
+    },
+    {
+      "reference": "AC 28-106.1",
+      "sectionID": "9035",
+      "textSHA256": "6639a6814c6a89d15ce0cc23341d2d9e84434fa3ac416df991c6f804f80adc16",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "§ 28-106.1 Asbestos certification required."
+    },
+    {
+      "reference": "FC 311",
+      "sectionID": "31004692",
+      "textSHA256": "bd3f7fecb9f15e0266fbadf4eee89a8300772c893499639b4a72337415f4a30a",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "FC 311: Vacant and Temporarily Unoccupied Premises"
+    },
+    {
+      "reference": "FC 508",
+      "sectionID": "31004730",
+      "textSHA256": "c2bd3b75aca8ed84efca7504d870e1b73f9fc8f9c42289c0ff8abdc03694b3a8",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "FC 508: Reserved"
+    },
+    {
+      "reference": "FC 604",
+      "sectionID": "31004738",
+      "textSHA256": "aa5faf31f5e86246d590d27b7d08f48f8b77eb80fa582ce426af430af99063f8",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "FC 604: Emergency Power Systems"
+    },
+    {
+      "reference": "ZR 37-745",
+      "sectionID": "20018229",
+      "textSHA256": "40de877fdc811dfc3253e4d5377e785ae3d869dd473723448e272492bf9344af",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "Bicycle parking"
+    },
+    {
+      "reference": "ZR 37-746",
+      "sectionID": "20018230",
+      "textSHA256": "6e8d1120cc3a4f5b98fbd7a4dad995f2c25b8c8a1c3c03a36f8b591cf1c2ffc2",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "Drinking fountains"
+    },
+    {
+      "reference": "PC 605.4",
+      "sectionID": "12136",
+      "textSHA256": "5d0d73c044c3b239a606b0ccba745d6e3eeca2ffcd217d4cd2645c28b45dbe08",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "605.4 Water distribution pipe."
+    },
+    {
+      "reference": "BC 1029.15",
+      "sectionID": "2581",
+      "textSHA256": "d5ba50e5d03575642f94570cf882bb9eecb71e4fbac2ca5a99f6bb3b21c08d62",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "1029.15 Handrails."
+    },
+    {
+      "reference": "BC 1107.2.5",
+      "sectionID": "2734",
+      "textSHA256": "0c7c0b74f62bbec2f1787faf6ffaf8c53398dfb874e499443997ff03fc0ffa89",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "1107.2.5 Type B+NYC multistory units."
+    },
+    {
+      "reference": "BC 1014.3",
+      "sectionID": "2375",
+      "textSHA256": "7a7df6717b61d3be273bb6a0bb2b47d563085e2de300267b2b622f72d6f10e0c",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "1014.3 Handrail graspability."
+    },
+    {
+      "reference": "AC 28-105.4",
+      "sectionID": "8991",
+      "textSHA256": "3fd9a084b04b934e90ac1af2d8bacfb3f2cf06ecc024ed151055318d013dd168",
+      "exactCompleteCurrentBodyMatch": true,
+      "emptyBody": false,
+      "sourceTitle": "§ 28-105.4 Work exempt from permit."
+    }
+  ],
+  "sourceSnapshotsVerified": 25,
+  "retrieval": [
+    {
+      "id": "acceptance-reserved-vent",
+      "question": "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+      "sourceCount": 18,
+      "relevantSources": [],
+      "providerCalls": 0,
+      "semanticQueryEmbeddingsUsed": false
+    },
+    {
+      "id": "acceptance-reserved-fire-section",
+      "question": "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+      "sourceCount": 12,
+      "relevantSources": [
+        {
+          "sectionID": "31004730",
+          "sectionNumber": "508",
+          "codePrefix": "FC",
+          "title": "FC 508: Reserved",
+          "text": "508 FC 508: Reserved [Repealed or reserved; no operative text in source.]",
+          "sourceID": "research-permitext_discovered-id:31004730-1"
+        }
+      ],
+      "providerCalls": 0,
+      "semanticQueryEmbeddingsUsed": false
+    }
+  ],
+  "providerCalls": 0,
+  "budgetLedgerUnchanged": true,
+  "budgetLedgerSHA256": "6d9a2e95d1b5a7e998e2cb776582aaa0fb57760bf89f4b0cef6e7c0c173b673c",
+  "sourceStatusIssues": [
+    {
+      "reference": "PC 905.4",
+      "localBody": "empty",
+      "reviewConclusion": "empty payload does not prove publication status",
+      "remainingNeed": "Keep this source-limitation criterion distinct from a verified Reserved publication record; the supplied S04 link targets PC910.1.",
+      "actualRetrievalFinding": "The exact PC905.4 record is absent from the ordinary first-turn offline assembly, despite eighteen supplied sources. The expected empty-supplied-record premise is not yet demonstrated by the real evidence assembly."
+    },
+    {
+      "reference": "FC 508",
+      "localBody": "[Repealed or reserved; no operative text in source.]",
+      "reviewConclusion": "publication specifically says Reserved",
+      "remainingNeed": "Capture and bind the exact Reserved publication status before demanding that precise status from a locally ambiguous placeholder.",
+      "actualRetrievalFinding": "The ordinary FC508 source includes its Reserved catalog label and the generic repealed-or-reserved placeholder. A verified publication-status fact must be kept separate from that placeholder and from any historical repeal inference."
+    }
+  ],
+  "remaining": [
+    "The empty-supplied-record premise must match ordinary runtime evidence; do not silently inject an evaluator source into the application to make the test fit.",
+    "Publication status must be distinguished from absent or synthetic body text before final freeze.",
+    "This import is reviewed reference data, not approval to resume paused paid tests.",
+    "The grading helper saved before the pause remains unfinished and untested; it was not changed in this import."
+  ],
+  "oldFrozenScore": {
+    "correct": 35,
+    "total": 40
+  },
+  "separateExploratoryScore": {
+    "correct": 9,
+    "total": 10
+  },
+  "general95PercentEstablished": false,
+  "deploymentPerformed": false,
+  "sourceSupportedCorrectionsPendingFreeze": [
+    {
+      "change": "C01",
+      "support": "BC1023.2 includes the floor comparison and need-not-exceed-two-hours qualification; the four-story scenario has a determinate two-hour requirement under this provision."
+    },
+    {
+      "change": "C04",
+      "support": "Current AC28-105.1 snapshot includes both the December21,2024 amendment date and December21,2025 effective date. Metadata does not reproduce the earlier wording."
+    }
+  ],
+  "webCorroboration": [
+    {
+      "reference": "FC 508",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-142877",
+      "observedHeading": "Section FC 508: Reserved",
+      "scope": "Current publication heading only; no repeal history is established."
+    },
+    {
+      "reference": "AC 28-105.1",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-156206",
+      "observedNotation": "Am. L.L. 2024/128, 12/21/2024, eff. 12/21/2025",
+      "scope": "Notation corroborates the current local snapshot; does not reproduce historical wording."
+    },
+    {
+      "reference": "PC 905.4",
+      "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022PC_Chapter9_VentsWBwm.pdf&section=conscode_2022",
+      "observedIndexedLabel": "905.4 Reserved.",
+      "scope": "Official viewer indexed text corroborates publication status. Direct PDF URL was inaccessible to the browser tool in this pass; a complete external source snapshot was not captured."
+    }
+  ],
+  "scopeLimitations": [
+    "All twenty-five saved local source bodies were checked for exact complete-text and identity continuity. This is packet integrity evidence, not forty independently verified semantic answers.",
+    "Only two first-turn ordinary retrieval assemblies were inspected; no paid semantic-query embeddings, follow-up application turns, generated answers or independent grades were run.",
+    "External source links are corroboration and are not injected into the application evidence.",
+    "No reviewed criterion or owner approval was automatically adopted into a live-ready fixture. Existing pending guards remain unchanged."
+  ]
+}

@@ -1,0 +1,1110 @@
+{
+  "schemaVersion": 1,
+  "assemblyVersion": "20261005-repaired-bound-parent-scope-v84",
+  "question": "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+  "retrievalQuery": "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+  "previousTopicApplied": false,
+  "projectFactsApplied": false,
+  "topicDecision": {
+    "version": "20261004-leading-modifier-topic-continuity-v13",
+    "decision": "topic_switch",
+    "question": {
+      "text": "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+      "source": "current_question",
+      "codeReferences": [
+        {
+          "codePrefix": null,
+          "sectionNumber": "508",
+          "referenceKind": "section",
+          "reference": "§ 508"
+        }
+      ]
+    },
+    "rootTopic": {
+      "text": "",
+      "source": "none",
+      "codeReferences": []
+    },
+    "currentTopic": {
+      "text": "",
+      "source": "none",
+      "codeReferences": []
+    },
+    "nextRootTopic": {
+      "text": "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+      "source": "current_question",
+      "codeReferences": [
+        {
+          "codePrefix": null,
+          "sectionNumber": "508",
+          "referenceKind": "section",
+          "reference": "§ 508"
+        }
+      ]
+    },
+    "nextCurrentTopic": {
+      "text": "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+      "source": "current_question",
+      "codeReferences": [
+        {
+          "codePrefix": null,
+          "sectionNumber": "508",
+          "referenceKind": "section",
+          "reference": "§ 508"
+        }
+      ]
+    },
+    "contextPolicy": {
+      "includeRootTopic": false,
+      "includeCurrentTopic": false,
+      "replaceRootTopic": true
+    },
+    "signals": {
+      "returnToOriginal": false,
+      "correction": false,
+      "relevanceComparison": false,
+      "explicitSwitch": false,
+      "projectSubjectContinuation": false,
+      "hypotheticalContinuation": false,
+      "formatTransformation": false,
+      "contextualContinuation": false,
+      "citedSubjectContinuation": false,
+      "causalSubjectContinuation": false,
+      "definiteSubjectContinuation": false,
+      "humanVocabularySubjectContinuation": false,
+      "relatedReference": false,
+      "disjointExplicitReference": false,
+      "selfContained": true,
+      "rootTokenOverlap": 0,
+      "currentTokenOverlap": 0
+    }
+  },
+  "sourceScope": "authorized_enacted_text",
+  "sourceMode": "text_only",
+  "strategy": {
+    "mode": "broad",
+    "reason": "default_authorized_retrieval"
+  },
+  "rulePackets": {
+    "version": "20261003-published-reference-context-v7",
+    "strictBoundary": false,
+    "packets": [
+      {
+        "sourceID": "research-permitext_discovered-id:31004730-1",
+        "sectionNumber": "508",
+        "textComplete": true,
+        "missingReferences": []
+      },
+      {
+        "sourceID": "research-permitext_discovered-id:31004930-2",
+        "sectionNumber": "3508",
+        "textComplete": true,
+        "missingReferences": []
+      }
+    ],
+    "recoveryReferences": [],
+    "recoveryReads": 0,
+    "recoveredReferenceCount": 0,
+    "recoverySearchCount": 0
+  },
+  "limits": {
+    "maximumTopicDependencies": 14,
+    "maximumCandidates": 12,
+    "maximumDiscovered": 10,
+    "maximumTargetedDefinitions": 2,
+    "maximumCrossReferences": 6,
+    "maximumCharacters": 48000,
+    "maximumSupplementalCharacters": 48000,
+    "maximumCharactersPerSource": 12000
+  },
+  "sources": [
+    {
+      "sourceID": "research-permitext_discovered-id:31004730-1",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "The question names FC 508. It matches “operative”, “fire”, “code”, “508”, “reserved”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "The question names FC 508. It matches “operative”, “fire”, “code”, “508”, “reserved”.",
+      "retrievalRank": 1,
+      "retrievalScore": 128.42,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "controlling_rule",
+        "functions": [
+          "controlling_rule"
+        ],
+        "materialityRank": 0,
+        "evidenceRole": "governing",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": true,
+        "claimCoverageReason": "exact enacted reference requested by the user",
+        "reasons": [
+          "exact code reference in the question"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004730",
+      "codePrefix": "FC",
+      "sectionNumber": "508",
+      "title": "FC 508: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 5: Fire Operations Features",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 5: Fire Operations Features",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "508 FC 508: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "rulePacket": {
+        "sourceID": "research-permitext_discovered-id:31004730-1",
+        "sectionNumber": "508",
+        "textComplete": true,
+        "missingReferences": []
+      }
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004930-2",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 2,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004930",
+      "codePrefix": "FC",
+      "sectionNumber": "3508",
+      "title": "FC 3508: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 35: Welding and Other Hot Work",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 35: Welding and Other Hot Work",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "3508 FC 3508: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "rulePacket": {
+        "sourceID": "research-permitext_discovered-id:31004930-2",
+        "sectionNumber": "3508",
+        "textComplete": true,
+        "missingReferences": []
+      }
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004665-3",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 3,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004665",
+      "codePrefix": "FC",
+      "sectionNumber": "103",
+      "title": "FC 103: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 1: Administration",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 1: Administration",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "103 FC 103: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004670-4",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 4,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004670",
+      "codePrefix": "FC",
+      "sectionNumber": "108",
+      "title": "FC 108: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 1: Administration",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 1: Administration",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "108 FC 108: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004672-5",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 5,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004672",
+      "codePrefix": "FC",
+      "sectionNumber": "110",
+      "title": "FC 110: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 1: Administration",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 1: Administration",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "110 FC 110: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004700-6",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 6,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004700",
+      "codePrefix": "FC",
+      "sectionNumber": "319",
+      "title": "FC 319: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 3: General Precautions Against Fire",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 3: General Precautions Against Fire",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "319 FC 319: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004772-7",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 7,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004772",
+      "codePrefix": "FC",
+      "sectionNumber": "1003",
+      "title": "FC 1003: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 10: Means of Egress",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 10: Means of Egress",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "1003 FC 1003: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004773-8",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 8,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004773",
+      "codePrefix": "FC",
+      "sectionNumber": "1004",
+      "title": "FC 1004: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 10: Means of Egress",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 10: Means of Egress",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "1004 FC 1004: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004774-9",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 9,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004774",
+      "codePrefix": "FC",
+      "sectionNumber": "1005",
+      "title": "FC 1005: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 10: Means of Egress",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 10: Means of Egress",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "1005 FC 1005: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004775-10",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “operative”, “fire”, “code”, “reserved”, “text”.",
+      "retrievalRank": 10,
+      "retrievalScore": 10.303,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004775",
+      "codePrefix": "FC",
+      "sectionNumber": "1006",
+      "title": "FC 1006: Reserved",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 10: Means of Egress",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 10: Means of Egress",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "1006 FC 1006: Reserved [Repealed or reserved; no operative text in source.]",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004681-13",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “requirements”, “requirement”, “supplied”, “current”, “fire”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “requirements”, “requirement”, “supplied”, “current”, “fire”.",
+      "retrievalRank": 13,
+      "retrievalScore": 3.31,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "definition",
+        "functions": [
+          "definition"
+        ],
+        "materialityRank": 6,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": true,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "definition provision"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004681",
+      "codePrefix": "FC",
+      "sectionNumber": "202",
+      "title": "FC 202: Definitions",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 2: Definitions",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 2: Definitions",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "FIRE. A rapid, persistent chemical reaction that releases heat and light, especially the burning of a combustible substance in the presence of oxygen. For purposes of this code, a flame used in any lawful, properly operating device, equipment or system or other controlled setting shall not be considered a fire.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": false,
+      "truncated": false,
+      "targetedDefinition": {
+        "schemaVersion": 1,
+        "version": "20261004-active-human-definition-v9",
+        "sourceMode": "canonical_enacted_definition_entries",
+        "sectionID": "31004681",
+        "codePrefix": "FC",
+        "sectionNumber": "202",
+        "codeEdition": "2022 NYC Fire Code — current consolidated text",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "jurisdiction": "New York City",
+        "labels": [
+          "FIRE"
+        ],
+        "passages": [
+          "FIRE. A rapid, persistent chemical reaction that releases heat and light, especially the burning of a combustible substance in the presence of oxygen. For purposes of this code, a flame used in any lawful, properly operating device, equipment or system or other controlled setting shall not be considered a fire."
+        ],
+        "canonicalSectionCharacterCount": 141135,
+        "excerptCharacterCount": 312,
+        "canonicalContextComplete": false
+      }
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:31004683-14",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “fire”, “code”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “fire”, “code”.",
+      "retrievalRank": 14,
+      "retrievalScore": 0.71,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "definition",
+        "functions": [
+          "definition"
+        ],
+        "materialityRank": 6,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": true,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "definition provision"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:07.043Z",
+      "sectionID": "31004683",
+      "codePrefix": "FC",
+      "sectionNumber": "302",
+      "title": "FC 302: Definitions",
+      "codeEdition": "2022 NYC Fire Code — current consolidated text",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-fire-code",
+      "corpusLabel": "2022 NYC Fire Code",
+      "applicabilityStatus": "current-consolidation",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: New York City Fire Code",
+      "sectionGroupLabel": "Chapter 3: General Precautions Against Fire",
+      "sectionGroupTitle": "Chapter 2: New York City Fire Code",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "sectionGroup": {
+          "label": "Chapter 3: General Precautions Against Fire",
+          "title": "Chapter 2: New York City Fire Code"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "FIRES. OPEN",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": false,
+      "truncated": false,
+      "targetedDefinition": {
+        "schemaVersion": 1,
+        "version": "20261004-active-human-definition-v9",
+        "sourceMode": "canonical_enacted_definition_entries",
+        "sectionID": "31004683",
+        "codePrefix": "FC",
+        "sectionNumber": "302",
+        "codeEdition": "2022 NYC Fire Code — current consolidated text",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "jurisdiction": "New York City",
+        "labels": [
+          "FIRES"
+        ],
+        "passages": [
+          "FIRES. OPEN"
+        ],
+        "canonicalSectionCharacterCount": 593,
+        "excerptCharacterCount": 11,
+        "canonicalContextComplete": false
+      }
+    }
+  ],
+  "usage": {
+    "pinnedCount": 0,
+    "pinnedCharacterCount": 0,
+    "pinnedCanonicalContextCharacterCount": 0,
+    "pinnedSelectionExactCount": 0,
+    "pinnedSelectionTruncatedCount": 0,
+    "pinnedSelectionExcerptedCount": 0,
+    "structuredPinnedCount": 0,
+    "supplementalCharacterCeiling": 48000,
+    "initialSupplementalCharacterCeiling": 45952,
+    "repairCharacterReservation": 2048,
+    "repairCrossReferenceReservation": 1,
+    "supplementalCharacterCount": 1063,
+    "candidateCount": 12,
+    "discoveredCount": 10,
+    "targetedDefinitionCount": 2,
+    "crossReferenceCount": 0,
+    "topicDependencyCount": 0,
+    "interpretationContextCount": 0,
+    "chapterScopeContextCount": 0,
+    "characterCount": 1063,
+    "resolverFailureCount": 0,
+    "nonMaterialCandidateCount": 0
+  },
+  "limitations": [
+    {
+      "kind": "targeted-definition-excerpt",
+      "count": 2,
+      "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+    },
+    {
+      "kind": "retrieval-completeness",
+      "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+    }
+  ],
+  "discovery": {
+    "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+    "searchedSectionCount": 415,
+    "outsideCurrentLibrary": [],
+    "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+    "searchedCorpora": [
+      {
+        "id": "nyc-2022-fire-code",
+        "label": "2022 NYC Fire Code",
+        "codeEdition": "2022 NYC Fire Code — current consolidated text",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "codePrefixes": [
+          "FC"
+        ],
+        "routeReason": "Fire Code or FDNY cue"
+      }
+    ],
+    "pinnedCorpora": [],
+    "unavailableCorpora": [],
+    "excludedCorpora": [
+      {
+        "id": "nyc-existing-building-code-2027",
+        "label": "NYC Existing Building Code",
+        "applicabilityStatus": "future-effective",
+        "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+        "routeReason": "excluded from ordinary Research"
+      },
+      {
+        "id": "nyc-1968-building-code",
+        "label": "1968 NYC Building Code",
+        "applicabilityStatus": "historical",
+        "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+        "routeReason": "excluded from ordinary Research"
+      }
+    ]
+  },
+  "corpusPlan": {
+    "schemaVersion": 1,
+    "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+    "routingMode": "question-and-conversation-topic",
+    "selected": [
+      {
+        "jurisdiction": "New York City",
+        "authorityClass": "enacted",
+        "id": "nyc-2022-fire-code",
+        "label": "2022 NYC Fire Code",
+        "codeEdition": "2022 NYC Fire Code — current consolidated text",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "codeYear": 2022,
+        "codePrefixes": [
+          "FC"
+        ],
+        "applicabilityStatus": "current-consolidation",
+        "automaticResearchEligible": true,
+        "optInRequired": false,
+        "aliases": [
+          "nyc-fire-code",
+          "2022 fire code",
+          "fire code"
+        ],
+        "retrievalRole": "requested",
+        "routeReason": "Fire Code or FDNY cue",
+        "blockedReason": null
+      }
+    ],
+    "unavailable": [],
+    "excluded": [
+      {
+        "jurisdiction": "New York City",
+        "authorityClass": "enacted",
+        "id": "nyc-existing-building-code-2027",
+        "label": "NYC Existing Building Code",
+        "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+        "codeYear": 2026,
+        "codePrefixes": [
+          "EBC"
+        ],
+        "applicabilityStatus": "future-effective",
+        "automaticResearchEligible": false,
+        "optInRequired": true,
+        "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+        "aliases": [
+          "existing building code",
+          "ebc"
+        ],
+        "retrievalRole": "requested",
+        "routeReason": "excluded from ordinary Research"
+      },
+      {
+        "jurisdiction": "New York City",
+        "authorityClass": "enacted",
+        "id": "nyc-1968-building-code",
+        "label": "1968 NYC Building Code",
+        "codeEdition": "1968 NYC Building Code — historical",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "codeYear": 1968,
+        "codePrefixes": [
+          "BC68"
+        ],
+        "applicabilityStatus": "historical",
+        "automaticResearchEligible": false,
+        "optInRequired": true,
+        "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+        "aliases": [
+          "1968 building code",
+          "bc68"
+        ],
+        "retrievalRole": "requested",
+        "routeReason": "excluded from ordinary Research"
+      }
+    ],
+    "requestedCorpusIDs": [
+      "nyc-2022-fire-code"
+    ],
+    "pinnedCorpora": []
+  }
+}

@@ -1,0 +1,1445 @@
+{
+  "schema_version": "permitext-review-data-v1",
+  "review_version": "permitext-final-40-reviewed-v1",
+  "prepared_date": "2026-10-05",
+  "status": "reference_answers_complete_preflight_and_owner_freeze_pending",
+  "original_file": "final-test-review.md",
+  "original_sha256": "5e7faf90f6afff15b97a54d06ccddd6b5badfb20ea2613c381adf0484c392966",
+  "case_count": 20,
+  "turn_count": 40,
+  "review_disposition_counts": {
+    "APPROVE": 34,
+    "REVISE": 6
+  },
+  "application_evaluation_performed": false,
+  "new_application_score": null,
+  "paid_run_authorized_by_this_handoff": false,
+  "production_deployment_authorized": false,
+  "original_reported_test_settings": {
+    "route": "native Responses through local backend",
+    "draft": "Luna low",
+    "review": "Luna medium",
+    "repair": "Luna high",
+    "verified_against_repository": false,
+    "campaign_ledger_reported_usd": 10.99,
+    "fresh_evaluation_cap_usd": 8.0,
+    "counted_turns": 40,
+    "minimum_fully_correct": 38,
+    "maximum_accepted_confirmed_material_errors": 0,
+    "paid_run_count": 1,
+    "approval_status": "owner approval and final evidence freeze pending"
+  },
+  "evaluation_only": true,
+  "warning": "Do not send expected answers, evaluator criteria, or reviewer commentary to application draft/review/repair model contexts. This portable structure is not an assumed repository harness schema.",
+  "cases": [
+    {
+      "case_id": "acceptance-water-heater-valve",
+      "original_start_line": 11,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the current 2022 NYC Plumbing Code cold-water branch valve requirements for a water heater: what it serves, its location and access.",
+          "must_include": [
+            "A valve is required on the cold-water branch from the main supply to each hot-water storage tank or water heater. [PC 503.1]",
+            "The valve must be located near the equipment. [PC 503.1]",
+            "The valve must serve only the hot-water storage tank or water heater and must not interfere with or disrupt the remainder of the cold-water system. [PC 503.1]",
+            "The valve must have access on the same floor level as the water heater served. [PC 503.1]"
+          ],
+          "forbidden_claims": [
+            "Do not replace the requirement that the valve serve only the tank or heater with a mere proximity test.",
+            "Do not assert a specific distance for “near” or define access beyond the supplied text."
+          ],
+          "uncertainty_boundaries": [
+            "The provision does not quantify “near” or further define access; a particular installation’s satisfaction of those terms cannot be determined without relevant project facts or applicable interpretive authority."
+          ],
+          "review_changes": [],
+          "expected_answer": "PC 503.1 requires a valve on the cold-water branch from the main supply to each hot-water storage tank or water heater. The valve must be near the equipment, serve only that tank or heater, and not interfere with or disrupt the rest of the cold-water system. It must be accessible on the same floor level as the water heater it serves.\n\nThese are separate conditions: proximity does not replace the dedicated-service or access requirements. The supplied provision does not assign a numerical distance to “near” or further explain access, so those installation-specific questions cannot be resolved from this text alone. [PC 503.1]",
+          "turn_id": "acceptance-water-heater-valve:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "In this hypothetical, the valve also shuts off the cold-water supply to another fixture. Is proximity to the heater enough to satisfy this valve rule?",
+          "must_include": [
+            "The valve must serve only the hot-water storage tank or water heater; serving another fixture fails that condition. [PC 503.1]",
+            "Near-equipment location does not replace the separate serve-only condition. [PC 503.1]",
+            "The valve must not interfere with or disrupt the remainder of the cold-water system. [PC 503.1]"
+          ],
+          "forbidden_claims": [
+            "Do not treat proximity alone as sufficient.",
+            "Do not conclude that the hypothetical necessarily causes system disruption beyond the stated fact that the valve also serves another fixture."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. A valve that also shuts off another fixture does not serve only the water heater, so being near the heater does not satisfy PC 503.1. The section also separately prohibits interference with or disruption of the rest of the cold-water system. No additional disruption beyond the stated shared shutoff needs to be assumed to identify the failure of the serve-only condition. [PC 503.1]",
+          "turn_id": "acceptance-water-heater-valve:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC PC 503.1"
+      ],
+      "verification_sources": [
+        "S01"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-relief-discharge",
+      "original_start_line": 44,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Plumbing Code requirements for water-heater relief-valve discharge piping, including termination height, connection, flow and permitted materials.",
+          "must_include": [
+            "The requirements apply to discharge piping serving a pressure relief valve, temperature relief valve, or combination thereof. [PC 504.6]",
+            "The piping must not be directly connected to the drainage system and must discharge through an air gap located in the same room as the water heater. [PC 504.6]",
+            "The pipe must be at least as large as the valve outlet and discharge full size to the air gap. [PC 504.6]",
+            "The piping must serve a single relief device and must not connect to piping serving another relief device or equipment. [PC 504.6]",
+            "Discharge must not cause personal injury or structural damage, and the termination point must be readily observable by building occupants. [PC 504.6]",
+            "The piping must not be trapped and must be installed to flow by gravity. [PC 504.6]",
+            "The termination must be no more than 6 inches above, and no less than two times the discharge-pipe diameter above, the floor or the waste receptor's flood-level rim. Preserve that stated reference wording; the source does not select a reference for a particular configuration. [PC 504.6]",
+            "The end of the piping must not have a threaded connection; the piping must not have valves or tee fittings. [PC 504.6]",
+            "Permitted materials are those listed in PC 605.4, or materials tested, rated, and approved for such use in accordance with ASME A112.4.1. [PC 504.6, PC 605.4]",
+            "The supplied PC 605.4 text identifies water-distribution pipe standards and lists brass, copper or copper-alloy, ductile iron, and specified stainless-steel pipe or tubing standards. Do not imply that the source establishes qualification of an unlisted proposed material without applying the PC 504.6 alternative-material route. [PC 504.6, PC 605.4]"
+          ],
+          "forbidden_claims": [
+            "Do not treat the 6-inch maximum as the only termination-height condition; PC 504.6 also states a minimum of twice the pipe diameter.",
+            "Do not claim that any particular material qualifies under ASME A112.4.1 without that standard or other applicable qualification evidence.",
+            "Do not claim that the listed rules establish whole-system or project compliance."
+          ],
+          "uncertainty_boundaries": [
+            "Whether a particular proposed alternative material has been tested, rated, and approved for this use in accordance with ASME A112.4.1 is not established without facts about that material and the referenced standard."
+          ],
+          "review_changes": [],
+          "expected_answer": "PC 504.6 applies to discharge piping serving a pressure-relief valve, temperature-relief valve, or combination valve. The requirements operate together:\n\n- Do not connect the discharge directly to the drainage system. Provide an air gap in the same room as the water heater. The pipe must be at least the size of the valve outlet and remain full size to the air gap.\n- Serve only one relief device; do not connect to piping serving another relief device or equipment. Route the discharge to avoid personal injury and structural damage, with a termination readily observable by occupants.\n- Do not trap the piping; arrange it to drain by gravity. Terminate no more than 6 inches above, and no less than twice the discharge-pipe diameter above, the floor or the waste receptor’s flood-level rim. That is both a maximum and a minimum; the quoted alternative reference does not itself select the reference for an unspecified installation.\n- Do not provide a threaded connection at the discharge end, valves, or tee fittings.\n- Use materials listed in PC 605.4, or materials tested, rated, and approved for this use under ASME A112.4.1. The PC 605.4 material categories identified in the supplied criteria include brass, copper or copper-alloy pipe/tubing, ductile iron, and specified stainless-steel pipe standards. A material name alone is not proof that a proposed product meets the applicable standards or the alternative approval route.\n\nA proposed alternative material cannot be approved from this excerpt without the relevant product and qualification evidence. These provisions do not, by themselves, establish complete system compliance. [PC 504.6; PC 605.4]",
+          "turn_id": "acceptance-relief-discharge:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "Correction: the discharge pipe is one inch in diameter and ends only one inch above the waste-receptor flood rim. Does being below six inches alone satisfy the termination-height rule?",
+          "must_include": [
+            "For a 1-inch-diameter discharge pipe, the minimum clearance under the stated two-times-diameter rule is 2 inches above the applicable reference. [PC 504.6]",
+            "A termination 1 inch above the waste receptor flood-level rim is below the 6-inch maximum but below the 2-inch minimum; being below 6 inches alone does not satisfy the stated height rule. [PC 504.6]"
+          ],
+          "forbidden_claims": [
+            "Do not conclude the termination-height condition is satisfied solely because the clearance is less than 6 inches.",
+            "Do not infer overall project compliance or noncompliance beyond the stated termination-height condition."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. Twice the stated 1-inch pipe diameter is 2 inches. A termination only 1 inch above the waste receptor’s flood-level rim is below that 2-inch minimum, even though it is below the separate 6-inch maximum. The stated termination-height condition is therefore not met; this is not a determination about every other aspect of the system. [PC 504.6]",
+          "turn_id": "acceptance-relief-discharge:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC PC 504.6",
+        "2022 NYC PC 605.4 and Table 605.4"
+      ],
+      "verification_sources": [
+        "S02",
+        "S03"
+      ],
+      "evidence_preflight_note": "Freeze PC 504.6 together with PC 605.4 and its material table if the material-category criterion is scored. The referenced ASME standard and product qualification data are not supplied by this review. Do not add detailed product approvals to the golden answer."
+    },
+    {
+      "case_id": "acceptance-reserved-vent",
+      "original_start_line": 83,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+          "must_include": [
+            "The supplied PC 905.4 record has no substantive body text, so no operative requirement can be established from that record. [Supplied PC 905.4 record]",
+            "Distinguish missing/empty retrieved text from an independently verified reserved legal section; neither a substantive rule nor legal reserved status follows from the blank body alone."
+          ],
+          "forbidden_claims": [
+            "Do not state a vent-connection requirement or any other substantive rule as a requirement of the supplied PC 905.4 text.",
+            "Do not reconstruct a requirement from another code or edition.",
+            "Do not treat the section title metadata alone as substantive code text.",
+            "Do not infer that no venting requirements apply elsewhere, or that a blank extraction proves legal reserved status."
+          ],
+          "uncertainty_boundaries": [
+            "Without a verified source-status record, the empty payload alone does not resolve whether its absence of text reflects publication status or missing retrieval/extraction content."
+          ],
+          "review_changes": [
+            "C02: Limit the conclusion to the empty supplied record; do not equate an empty payload with a legally reserved section or absence of all venting law."
+          ],
+          "expected_answer": "The supplied PC 905.4 record has no substantive body text, so it provides no operative requirement that I can explain from that record. Its title alone does not establish a vent-connection rule. I will not reconstruct one from another code or edition.\n\nAn empty retrieved record is not, by itself, proof that the legal section is reserved or that no venting requirements apply elsewhere; it establishes an evidence limitation. [Supplied PC 905.4 record]",
+          "turn_id": "acceptance-reserved-vent:turn-1",
+          "original_rubric_disposition": "REVISE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "An older drawing describes that same section number as a vent-connection requirement, without giving its edition. Does the supplied current section prove what that old drawing meant?",
+          "must_include": [
+            "The current supplied PC 905.4 record has no substantive body text and cannot establish what the older drawing’s section 905.4 meant. [Supplied PC 905.4 record]"
+          ],
+          "forbidden_claims": [
+            "Do not affirm that the older drawing used the same code edition or wording as the supplied current record.",
+            "Do not infer the historical requirement from another code, an unspecified edition, or the current section title metadata.",
+            "Do not infer the legal status of either the current or historical section solely from the empty body of the retrieved record."
+          ],
+          "uncertainty_boundaries": [
+            "The code and edition or historical version cited by the drawing are unknown, as is the text of section 905.4 in that source."
+          ],
+          "review_changes": [
+            "C02: Preserve the historical-source limitation and the distinction between an empty current evidence record and verified historical law."
+          ],
+          "expected_answer": "No. The supplied current, empty PC 905.4 record cannot establish what the older drawing meant. The drawing’s code, edition or historical version, and the wording applicable at that time have not been supplied. Neither the current title nor an empty current text can establish the historical vent-connection requirement. A dated historical source would be needed. [Supplied PC 905.4 record]",
+          "turn_id": "acceptance-reserved-vent:turn-2",
+          "original_rubric_disposition": "REVISE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "Supplied PC 905.4 evidence record; 2022 NYC PC 905.4 publication status"
+      ],
+      "verification_sources": [
+        "S04"
+      ],
+      "evidence_preflight_note": "The external publication check identifies PC 905.4 as Reserved, but the original case deliberately describes an empty body. Preserve that evidence-limitation test unless an explicit, versioned fixture change is approved. Do not infer reserved status from an extraction failure; do not inject this reviewer-only external finding into a supposedly unchanged model evidence payload."
+    },
+    {
+      "case_id": "acceptance-grade-support",
+      "original_start_line": 112,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Mechanical Code alternatives for supporting equipment installed at grade, including heights and installation conditions.",
+          "must_include": [
+            "The rule applies to equipment and appliances installed at grade level. [MC 304.10]",
+            "One alternative is a level concrete slab or other approved material extending not less than 3 inches above adjoining grade. [MC 304.10]",
+            "The other alternative is suspension not less than 6 inches above adjoining grade. [MC 304.10]",
+            "The support must be in accordance with the manufacturer’s instructions. [MC 304.10]"
+          ],
+          "forbidden_claims": [
+            "Do not change either minimum height or describe the alternatives as cumulative requirements.",
+            "Do not omit the level condition for the slab/material support or the manufacturer-instructions condition."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "For equipment and appliances installed at grade, MC 304.10 provides two alternatives: support on a level concrete slab or other approved material extending at least 3 inches above adjoining grade, or suspension at least 6 inches above adjoining grade. These are alternatives, not two heights that must both be satisfied. The support must also follow the manufacturer’s instructions. [MC 304.10]",
+          "turn_id": "acceptance-grade-support:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "A level approved support slab extends exactly three inches above adjoining grade. Is that height alone below the stated slab-support minimum?",
+          "must_include": [
+            "The slab/material-support alternative requires an extension of not less than 3 inches above adjoining grade, so exactly 3 inches meets the stated minimum. [MC 304.10]",
+            "The support must be in accordance with the manufacturer’s instructions; the stated height alone does not establish that condition. [MC 304.10]"
+          ],
+          "forbidden_claims": [
+            "Do not say the exact 3-inch height is below the stated minimum.",
+            "Do not conclude that the entire installation complies solely from the height."
+          ],
+          "uncertainty_boundaries": [
+            "Whether the support is in accordance with the manufacturer’s instructions is not stated."
+          ],
+          "review_changes": [],
+          "expected_answer": "No. Exactly 3 inches is not below a minimum of 3 inches; it meets the stated slab-support height threshold. The hypothetical also identifies a level, approved support. It does not establish compliance with the manufacturer’s instructions or all other installation requirements, so the height finding is not a whole-installation approval. [MC 304.10]",
+          "turn_id": "acceptance-grade-support:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC MC 304.10"
+      ],
+      "verification_sources": [
+        "S05"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-environmental-exhaust",
+      "original_start_line": 144,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the ordinary environmental-air exhaust separation rule in the 2022 NYC Mechanical Code and the conditions that can change intake separation. Keep other exhaust classes distinct.",
+          "must_include": [
+            "State the item 3 environmental-air distances accurately, including the Group U exception for the operable-opening distance, and identify that the 10-foot distance is from mechanical air intakes. [MC 501.3.1]",
+            "Preserve both intake-separation exception alternatives: a single room, dwelling, or sleeping unit with less than 750 cfm of Class 1 exhaust; or a single dwelling or sleeping unit with less than 400 cfm of Class 2 exhaust. For either alternative, the sum of energy-recovery-device cross contamination and exhaust re-entrainment through the intake must be less than 10% of intake airflow, as established by the manufacturer. [MC 501.3.1]",
+            "Make clear that the exception removes only the 10-foot mechanical-intake separation; property-line and operable-opening distances remain applicable. [MC 501.3.1]",
+            "Keep the other categories distinct: item 1 covers noxious, toxic, explosive, or flammable vapor, fume, or dust ducts and specifies its separate distances; item 2 covers other product-conveying outlets and specifies its separate distances. Do not apply either category's distances as the ordinary item 3 environmental-air rule. [MC 501.3.1]",
+            "If mentioning non-evaporative heat-rejection or heat-absorption appliance discharge, explain that it is not exhaust and has no required intake separation under the stated rule, but its inlet and discharge must not reduce other exhaust-to-intake separation below required minimums. [MC 501.3.1]",
+            "Preserve the item 6 scope if discussing R-2 or R-3 individual dwelling-unit exhaust: a dedicated fan may exhaust directly outdoors; kitchen and toilet/bath exhaust may combine at one fan only when serving one dwelling unit; the exhaust must be directed away from a window serving that unit and meet the listed distances to windows, doors, other intakes, and the public sidewalk, as well as items 1 through 5. [MC 501.3.1]",
+            "Identify that Air Class is to be determined in accordance with ASHRAE Standard 62.1, rather than inventing a classification method from this section. [MC 501.3.1]"
+          ],
+          "forbidden_claims": [
+            "The intake exception applies at exactly 400 cfm for Class 2 exhaust.",
+            "A cross-contamination and re-entrainment value below 10% alone qualifies for the exception, regardless of the applicable flow threshold or served-space condition.",
+            "The intake exception also waives the property-line or operable-opening distances.",
+            "Environmental-air outlets are subject to the item 1 or item 2 distances merely because those categories appear in the same section.",
+            "The section establishes an Air Class without reference to ASHRAE Standard 62.1."
+          ],
+          "uncertainty_boundaries": [
+            "The occupancy and configuration of any actual installation are not provided, so whether the special item 6 R-2/R-3 provisions apply to a particular project cannot be determined."
+          ],
+          "review_changes": [],
+          "expected_answer": "For ordinary environmental-air exhaust, MC 501.3.1 item 3 requires separation of 3 feet from property lines separating lots, 3 feet from operable building openings except in Group U, and 10 feet from mechanical air intakes. Environmental-air exhaust outlets are not classified as hazardous or noxious under that item.\n\nThe stated exception removes the 10-foot mechanical-intake separation only for the qualifying same-space arrangement: less than 750 cfm of Class 1 exhaust serving a single room, dwelling unit, or sleeping unit; or less than 400 cfm of Class 2 exhaust serving a single dwelling unit or sleeping unit. For either alternative, the combined energy-recovery-device cross contamination and exhaust re-entrainment through the intake must be less than 10 percent of intake airflow, as established by the manufacturer. The flow, served-space, and contamination conditions all matter. The exception does not waive the property-line or operable-opening separations. Air Class is determined under ASHRAE 62.1, not by inventing a classification from this section.\n\nItem 1 addresses the separately specified noxious, toxic, explosive, or flammable exhaust category; item 2 addresses other product-conveying outlets. Their different distances are not the ordinary environmental-air rule. Discharge from a non-evaporative heat-rejection or heat-absorption appliance is not exhaust for the stated rule and has no intake-separation requirement of its own, but its inlet/discharge must not reduce required separation between other exhausts and intakes.\n\nItem 6 additionally addresses individual dwelling-unit exhaust in R-2 and R-3. A dedicated fan may exhaust directly outdoors; kitchen and toilet/bath exhaust may join one fan only when serving one dwelling unit. Exhaust must be directed away from a window serving that unit. The listed distances are 2 feet from an operational window or door serving that unit; 3 feet from such an opening of an adjoining dwelling unit; 3 feet from such an opening serving another occupancy group in the same building; 10 feet from outdoor-air intakes except those serving the same dwelling unit; and 10 feet above the adjoining public sidewalk. Item 6 also retains applicable items 1 through 5; its distances must not be described as a blanket waiver of those provisions.\n\nNo actual occupancy, layout, or manufacturer’s data have been supplied to qualify a real installation for these alternatives. [MC 501.3.1]",
+          "turn_id": "acceptance-environmental-exhaust:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "For this hypothetical, an exhaust and intake serve the same dwelling, the exhaust is Class 2 at exactly four hundred cfm, and cross contamination plus re-entrainment is five percent. Does that qualify for the intake-separation exception on those facts?",
+          "must_include": [
+            "Treat the Class 2 threshold as strictly less than 400 cfm; exactly 400 cfm does not qualify. [MC 501.3.1]",
+            "Recognize that 5% is below the separate 10% combined cross-contamination and re-entrainment ceiling, while explaining that all exception conditions must be satisfied. [MC 501.3.1]",
+            "Conclude that the exception is not established and that the normal mechanical-intake separation remains applicable; do not suggest the exception waives property-line or operable-opening distances. [MC 501.3.1]"
+          ],
+          "forbidden_claims": [
+            "Exactly 400 cfm satisfies the Class 2 exception threshold.",
+            "The 5% figure makes the hypothetical eligible despite the unmet flow threshold.",
+            "Failure of this exception establishes that every other aspect of a particular installation is noncompliant."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. The Class 2 alternative requires a rate strictly below 400 cfm. Exactly 400 cfm fails that condition. The stated 5 percent is numerically below the separate 10 percent combined-contamination limit, but satisfying that number cannot cure the unmet flow limit. This exception therefore does not remove the ordinary 10-foot mechanical-intake separation on these facts; it also does not waive the property-line or operable-opening requirements. Failure to qualify for an exception is not a finding that every aspect of an installation is noncompliant. [MC 501.3.1]",
+          "turn_id": "acceptance-environmental-exhaust:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC MC 501.3.1, especially items 3 and 6"
+      ],
+      "verification_sources": [
+        "S06"
+      ],
+      "evidence_preflight_note": "Freeze the complete relevant item 3 exception and item 6, not just the three headline distances. The item 6 distances in the expected answer were checked against the external publication; include that text in approved evidence before grading those details. ASHRAE air-class criteria and actual manufacturer data are not reproduced here."
+    },
+    {
+      "case_id": "acceptance-domestic-hood",
+      "original_start_line": 184,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Mechanical Code domestic range-hood duct rule and the separate ductless and PVC downdraft alternatives. Preserve their conditions.",
+          "must_include": [
+            "State the outdoor-discharge default and permitted duct materials: galvanized steel, stainless steel, aluminum, or copper. [MC 505.1]",
+            "Preserve the duct requirements: smooth inner walls, airtight construction, a backdraft damper, independence from all other exhaust systems, and strict compliance with manufacturer instructions and the listing. [MC 505.1]",
+            "Limit the ductless exception to locations other than Group I-1 and I-2, and retain all its conditions: listed and labeled ductless range hood, installation in accordance with manufacturer instructions, and mechanical or natural ventilation otherwise provided in accordance with Chapter 4. [MC 505.1]",
+            "Limit the PVC alternative to ducts for domestic kitchen cooking appliances equipped with downdraft exhaust; specify Schedule 40 PVC pipe and fittings and preserve all conditions: installation under a concrete slab poured on grade; trench completely backfilled with sand or gravel; no more than 1 inch above the indoor concrete floor; no more than 1 inch above exterior grade; and solvent-cemented ducts. [MC 505.1]"
+          ],
+          "forbidden_claims": [
+            "The ductless exception applies in Group I-1 or Group I-2.",
+            "Any ductless hood qualifies without being listed and labeled or without the specified instructions and ventilation conditions.",
+            "The PVC alternative applies to ordinary range-hood ducts generally, rather than the stated domestic downdraft appliances.",
+            "The PVC alternative is unconditional or permits omission of any listed installation condition."
+          ],
+          "uncertainty_boundaries": [
+            "The question does not identify a particular hood or duct installation, so project-specific compliance beyond the stated rule is not determined."
+          ],
+          "review_changes": [],
+          "expected_answer": "Where a domestic range hood or domestic appliance with downdraft exhaust is provided, MC 505.1 generally requires discharge outdoors through galvanized-steel, stainless-steel, aluminum, or copper ducts. The ducts must have smooth inner walls, be airtight, have a backdraft damper, and be independent of other exhaust systems. Installation must strictly comply with the manufacturer’s instructions and the listing.\n\nThe ductless exception is available only outside Groups I-1 and I-2. It requires a listed and labeled ductless range hood, installation under the manufacturer’s instructions, and mechanical or natural ventilation otherwise provided under Chapter 4. Meeting just one of those conditions is insufficient.\n\nA separate alternative permits Schedule 40 PVC pipe and fittings for domestic cooking appliances with downdraft exhaust—not ordinary hood ducts generally. All five conditions must be met: installation beneath a concrete slab poured on grade; a trench completely backfilled with sand or gravel; no more than 1 inch of PVC above the indoor concrete floor; no more than 1 inch above exterior grade; and solvent-cemented ducts. These provisions do not establish that a particular product or installation qualifies without its facts. [MC 505.1]",
+          "turn_id": "acceptance-domestic-hood:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "A listed ductless hood in a Group I-2 space follows the manufacturer instructions and otherwise has ventilation. Does that establish eligibility for the stated ductless exception?",
+          "must_include": [
+            "Recognize that the ductless exception is available only in occupancies other than Group I-1 and I-2; therefore the stated Group I-2 facts do not establish eligibility. [MC 505.1]",
+            "Do not treat compliance with manufacturer instructions and otherwise-provided ventilation as sufficient to override the Group I-2 exclusion. [MC 505.1]"
+          ],
+          "forbidden_claims": [
+            "The hypothetical qualifies for the ductless exception because the hood is listed, instructions are followed, and ventilation is otherwise provided.",
+            "The Group I-2 exclusion is waived by manufacturer instructions or ventilation."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. Group I-2 is expressly outside the stated ductless exception. A listed hood, installation under manufacturer instructions, and otherwise-provided ventilation do not override that occupancy exclusion. The stated facts therefore do not establish eligibility for this exception. [MC 505.1]",
+          "turn_id": "acceptance-domestic-hood:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC MC 505.1"
+      ],
+      "verification_sources": [
+        "S07"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-sediment-trap",
+      "original_start_line": 218,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Fuel Gas Code sediment-trap rule, its installation location, accepted form and named appliance exclusions.",
+          "must_include": [
+            "State the trigger: the requirement applies where a sediment trap is not incorporated as part of the appliance. [FGC 408.4]",
+            "State the location as downstream of the appliance shutoff valve and as close to the appliance inlet as practical. [FGC 408.4]",
+            "Describe the permitted tee form accurately: a capped nipple of any length installed vertically in the bottommost tee opening; alternatively, another device approved as an effective sediment trap is permitted. [FGC 408.4]",
+            "List the stated exclusions without adding others: illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces, and outdoor grills. [FGC 408.4]"
+          ],
+          "forbidden_claims": [
+            "The trap may be installed upstream of the appliance shutoff valve under the stated rule.",
+            "Any unapproved device automatically qualifies as an effective sediment trap.",
+            "A furnace is among the named exclusions.",
+            "A capped nipple of a specified minimum length is required."
+          ],
+          "uncertainty_boundaries": [
+            "No particular installation layout is provided, so what location is as close to a specific appliance inlet as practical cannot be evaluated."
+          ],
+          "review_changes": [],
+          "expected_answer": "When the appliance does not already incorporate a sediment trap, FGC 408.4 requires one downstream of the appliance shutoff valve and as close to the appliance inlet as practical. The stated tee arrangement uses a capped nipple of any length installed vertically in the tee’s bottommost opening. Another device is permitted only if approved as an effective sediment trap.\n\nThe named appliance exclusions are illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces, and outdoor grills. An ordinary furnace is not on that list. The provision does not impose a particular minimum nipple length, and the most practical location for a specific installation requires its actual layout. [FGC 408.4]",
+          "turn_id": "acceptance-sediment-trap:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "The appliance is an ordinary furnace with no incorporated sediment trap. Would placing the trap upstream of its shutoff valve meet the stated location rule?",
+          "must_include": [
+            "Apply the default rule because the hypothetical says the furnace has no incorporated sediment trap and does not identify it as one of the listed exclusions. [FGC 408.4]",
+            "Conclude that an upstream-of-shutoff-valve trap fails the stated downstream location requirement. [FGC 408.4]"
+          ],
+          "forbidden_claims": [
+            "An upstream trap meets the stated location rule.",
+            "An ordinary furnace is among the named exclusions.",
+            "The section alone establishes compliance with every other gas-appliance installation requirement."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. An ordinary furnace without an incorporated sediment trap is subject to the stated rule and is not a named exclusion. Its trap must be downstream of the appliance shutoff valve; a trap upstream of that valve does not meet the location requirement. This does not resolve the appliance’s other installation requirements. [FGC 408.4]",
+          "turn_id": "acceptance-sediment-trap:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC FGC 408.4"
+      ],
+      "verification_sources": [
+        "S08"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-test-isolation",
+      "original_start_line": 253,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Fuel Gas Code procedure when connected equipment is designed for less than the piping test pressure. Include the later leak-check requirement.",
+          "must_include": [
+            "Preserve the trigger: the piping is connected to appliances or equipment designed for operating pressures less than the piping test pressure. [FGC 406.3.3]",
+            "State that isolation is performed by disconnecting the affected appliances or equipment and capping the outlet(s), not merely by leaving them connected and closing a valve. [FGC 406.3.3]",
+            "Include the later check: affected piping and joints are checked when gas is energized, using noncorrosive leak-detecting fluid or another approved leak-detecting method. [FGC 406.3.3]"
+          ],
+          "forbidden_claims": [
+            "Closing an appliance valve while leaving the appliance connected substitutes for the stated disconnection-and-capping procedure.",
+            "The leak check is optional or must be performed only before gas is energized.",
+            "The section supplies a specific test pressure or a complete test protocol beyond the stated isolation and leak-check requirements."
+          ],
+          "uncertainty_boundaries": [
+            "The actual test pressure and equipment operating-pressure ratings are not provided, so whether this trigger applies to a particular installation cannot be determined without those facts."
+          ],
+          "review_changes": [],
+          "expected_answer": "FGC 406.3.3 applies when the piping is connected to appliances or equipment designed for operating pressures lower than the piping test pressure. The specified isolation procedure is to disconnect the affected appliances or equipment and cap the outlets. Merely closing a valve while leaving the equipment connected is not that procedure.\n\nWhen gas is energized, the affected piping and joints must also be checked using noncorrosive leak-detecting fluid or another approved leak-detection method. The section does not, by itself, give the test pressure or a complete testing protocol. Actual test pressure and equipment ratings would be needed to establish the trigger for an unspecified installation. [FGC 406.3.3]",
+          "turn_id": "acceptance-test-isolation:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "For that same scenario, we will leave the equipment connected and rely on closing its valve, with no disconnection or outlet cap. Does that perform the procedure stated in this section?",
+          "must_include": [
+            "Conclude that leaving the equipment connected and closing its valve does not meet the stated requirement to disconnect the equipment and cap its outlet(s). [FGC 406.3.3]",
+            "Retain the requirement to check affected piping and joints with a stated leak-detection method when gas is energized. [FGC 406.3.3]"
+          ],
+          "forbidden_claims": [
+            "A closed valve alone performs the procedure stated in this section.",
+            "Omitting disconnection and outlet capping is acceptable under the supplied text."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. Leaving the equipment connected and relying only on its closed valve, without disconnecting and capping the outlet, does not perform the stated isolation procedure. The affected piping and joints must also undergo the specified noncorrosive-fluid or other approved leak check when gas is energized. [FGC 406.3.3]",
+          "turn_id": "acceptance-test-isolation:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC FGC 406.3.3"
+      ],
+      "verification_sources": [
+        "S09"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-mp-regulator",
+      "original_start_line": 285,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Fuel Gas Code MP-regulator requirements, keeping access, pressure behavior, tees, downstream distance and union placement separate.",
+          "must_include": [
+            "The regulator must be approved and suitable for the application's inlet and outlet gas pressures. [FGC 410.2]",
+            "The regulator must maintain reduced outlet pressure under lockup (no-flow) conditions; its manufacturer-published capacity must be adequate for the appliances served. [FGC 410.2]",
+            "The regulator must have access. If indoors, it must be vented outdoors or equipped with a leak-limiting device; either option must comply with Section 410.3. [FGC 410.2]",
+            "A tee with one opening capped or plugged must be between the regulator and its upstream shutoff valve, positioned to permit connection of a pressure-measuring instrument and to serve as a sediment trap. [FGC 410.2]",
+            "A separate tee with one opening capped or plugged must be at least 10 pipe diameters downstream of the regulator outlet and positioned to permit connection of a pressure-measuring instrument. A pressure gauge with an isolation valve may also be installed in addition to that fitting. [FGC 410.2]",
+            "At least one union must be installed within 1 foot of either side of the regulator. Do not restate this as requiring a union on both sides. [FGC 410.2]"
+          ],
+          "forbidden_claims": [
+            "Do not treat the upstream sediment-trap tee and the downstream instrument tee as the same requirement.",
+            "Do not state that the downstream tee may be closer than 10 pipe diameters because a gauge is installed.",
+            "Do not say the indoor vent or leak-limiting option is unconditional; the text requires compliance with Section 410.3.",
+            "Do not claim that the supplied section establishes project-wide compliance."
+          ],
+          "uncertainty_boundaries": [
+            "The supplied text does not give the detailed requirements of Section 410.3.",
+            "The supplied text does not establish whether a particular installation satisfies the regulator, appliance-capacity, access, or other project-specific conditions."
+          ],
+          "review_changes": [],
+          "expected_answer": "FGC 410.2 imposes separate requirements for an MP regulator:\n\n- It must be approved and suitable for the application’s inlet and outlet pressures, maintain reduced outlet pressure under lockup/no-flow conditions, and have manufacturer-published capacity adequate for the appliances served.\n- It must have access. Indoors, it must either vent outdoors or have a leak-limiting device, with either arrangement complying with FGC 410.3. The supplied excerpt does not provide that section’s detailed conditions.\n- Between the regulator and its upstream shutoff valve, provide a tee with a capped or plugged opening, positioned both to connect a pressure-measuring instrument and to function as a sediment trap.\n- Separately, provide a capped or plugged instrument-capable tee at least 10 pipe diameters downstream of the regulator outlet. A pressure gauge with an isolation valve may be added; it is not a substitute for this tee or its location.\n- Install at least one union within 1 foot of either side of the regulator. The wording does not require a union on both sides.\n\nThe excerpt does not establish whether a proposed regulator, capacity, access arrangement, or installation complies. [FGC 410.2; FGC 410.3 cross-reference]",
+          "turn_id": "acceptance-mp-regulator:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "For a ten-pipe-diameter minimum, a downstream instrument tee is located eight pipe diameters from the regulator outlet. Does adding a pressure gauge cure that distance under this rule?",
+          "must_include": [
+            "The required downstream tee must be not less than 10 pipe diameters downstream of the MP-regulator outlet. [FGC 410.2]",
+            "A pressure gauge with an isolation valve may be installed in addition to the downstream tee; the text does not provide that gauge as an alternative to the tee or its minimum distance. [FGC 410.2]"
+          ],
+          "forbidden_claims": [
+            "Do not say the gauge makes an eight-diameter tee compliant with the stated location requirement.",
+            "Do not change the stated 10-pipe-diameter minimum."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. Eight pipe diameters is less than the required minimum of ten. The section allows a pressure gauge with an isolation valve in addition to the required downstream tee, not instead of that tee or its minimum separation. Adding the gauge therefore does not cure the stated distance deficiency. [FGC 410.2]",
+          "turn_id": "acceptance-mp-regulator:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC FGC 410.2; cross-reference to FGC 410.3"
+      ],
+      "verification_sources": [
+        "S10"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-exit-sign-distance",
+      "original_start_line": 322,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Building Code exit-sign visibility and spacing rule, including its listed exceptions and the listed-viewing-distance condition.",
+          "must_include": [
+            "Exits and exit access doors must be marked by an approved exit sign readily visible from any direction of egress travel. [BC 1013.1]",
+            "Where an exit or egress path is not immediately visible to occupants, readily visible signs must mark the path to exits and within exits to clearly indicate direction of travel; intervening means-of-egress doors within exits must be marked. [BC 1013.1]",
+            "In an exit access corridor or exit passageway, the maximum distance to the nearest visible exit sign is the lesser of 100 feet and the sign's listed viewing distance. [BC 1013.1]",
+            "Exception 1: signs are not required in rooms or areas requiring only one exit or exit access. [BC 1013.1]",
+            "Exception 2: signs are not required in Group U occupancies or individual sleeping units or dwelling units in Group I-1 or R; however, congregate living units with occupancy exceeding four people must have signs. [BC 1013.1]",
+            "Exception 3: signs are not required in dayrooms, sleeping rooms, or dormitories in Group I-3 occupancies. [BC 1013.1]",
+            "Exception 4: in Groups A-4 and A-5, signs are not required on the seating side of vomitories or openings into seating areas when signs in the concourse are readily apparent from the vomitories; those vomitories must have emergency egress lighting identifying each vomitory or opening within the seating area. [BC 1013.1]"
+          ],
+          "forbidden_claims": [
+            "Do not describe the spacing limit as always 100 feet; the listed viewing distance controls when it is shorter.",
+            "Do not omit the conditions or emergency-lighting requirement attached to the Group A-4 and A-5 exception.",
+            "Do not treat the listed exceptions as applying to situations beyond their stated categories and conditions."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "BC 1013.1 requires approved exit signs at exits and exit-access doors, readily visible from any direction of egress travel. Where an exit or egress path is not immediately visible, signs must show the direction of travel to exits and within exits. Intervening means-of-egress doors within exits must also be marked.\n\nIn an exit-access corridor or exit passageway, no point may be farther from the nearest visible exit sign than the lesser of 100 feet and the sign’s listed viewing distance.\n\nThe four exceptions are: rooms or areas requiring only one exit or exit access; Group U occupancies and individual sleeping/dwelling units in Group I-1 or R, except that congregate living units occupied by more than four people still require signs; dayrooms, sleeping rooms, and dormitories in Group I-3; and the seating side of vomitories or openings into Group A-4/A-5 seating areas where the concourse signs are readily apparent from the vomitories. That last exception also requires emergency egress lighting identifying each vomitory or opening within the seating area. These exceptions apply only within their stated scope. [BC 1013.1]",
+          "turn_id": "acceptance-exit-sign-distance:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "Assume no exit-sign exception applies. The sign has a listed viewing distance of seventy-five feet, and the farthest corridor point is ninety feet from the nearest visible sign. Is staying below one hundred feet sufficient?",
+          "must_include": [
+            "The corridor distance limit is the lesser of 100 feet and the sign's listed viewing distance. [BC 1013.1]",
+            "For a 75-foot listed viewing distance, a point 90 feet from the nearest visible sign exceeds the 75-foot limit. [BC 1013.1]"
+          ],
+          "forbidden_claims": [
+            "Do not conclude that being below 100 feet is sufficient when the listed viewing distance is 75 feet.",
+            "Do not apply an exception; the hypothetical states that none applies."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. The applicable distance is the lesser of 100 feet and the listed 75 feet, which is 75 feet. A corridor point 90 feet from the nearest visible sign exceeds that limit. Being below 100 feet is insufficient, and the hypothetical expressly excludes an exception. [BC 1013.1]",
+          "turn_id": "acceptance-exit-sign-distance:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC BC 1013.1"
+      ],
+      "verification_sources": [
+        "S11"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-handrail-height",
+      "original_start_line": 354,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Building Code handrail-height ranges and the conditions of its fitting, transition and guard alternatives.",
+          "must_include": [
+            "State the ordinary 34-inch minimum and 38-inch maximum, the uniformity requirement, and the correct stair and ramp measurement surfaces. [BC 1014.2]",
+            "State the distinct 30–34-inch range for alternating tread devices and ships ladders, measured above tread nosings. [BC 1014.2]",
+            "Explain that fittings or bendings providing a continuous transition between flights may exceed the maximum height. [BC 1014.2]",
+            "Explain that, in Group R-3 occupancies, within Group R-2 dwelling units, and in the specified Group U occupancies associated with them, fittings or bendings may exceed the maximum when used for continuous transition between flights, transition at winder treads, transition from handrail to guard, or at the start of a flight. [BC 1014.2]",
+            "State that a guard’s top surface may be used as a handrail along stepped or ramped aisles only where permitted under Section 1029.15; the supplied text does not set a separate numerical height range for that alternative. [BC 1014.2, BC 1029.15]",
+            "When describing the Section 1029.15 guard condition, identify the supplied condition: a guard at the side of the aisle whose top surface complies with the handrail-graspability requirements referenced in Section 1014.3. Do not invent the details of those referenced requirements. [BC 1029.15, BC 1014.3]"
+          ],
+          "forbidden_claims": [
+            "Do not treat 38 inches as exceeding the ordinary maximum; the ordinary range includes 38 inches.",
+            "Do not extend the fitting or bending exceptions beyond exceeding the maximum height or beyond their stated uses and occupancy scope.",
+            "Do not imply that Section 1029.15 permits the guard-top alternative without its stated aisle and graspability conditions.",
+            "Do not supply unstated details of the referenced graspability provisions."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "For ordinary stairs and ramps, BC 1014.2 requires a uniform handrail height from 34 through 38 inches, inclusive. Measure above stair-tread nosings for stairs and above the finished ramp-slope surface for ramps. Alternating tread devices and ships ladders have a separate uniform range of 30 through 34 inches above the tread nosings.\n\nFittings or bendings used for continuous transitions between flights may exceed the ordinary maximum. In Group R-3, within Group R-2 dwelling units, and in the specified associated Group U occupancies, the stated fitting/bending allowance also covers transitions at winders, transitions from handrails to guards, and the start of a flight, in addition to transitions between flights. These are limited exceptions to the maximum height, not permission to ignore all handrail requirements.\n\nA guard’s top may serve as the handrail along stepped or ramped aisles where permitted by BC 1029.15. The supplied aisle provision requires the side guard’s top to meet the referenced handrail-graspability provisions of BC 1014.3. The supplied excerpts do not set out those detailed graspability rules or an additional numerical height range for this alternative. [BC 1014.2; BC 1029.15; BC 1014.3 cross-reference]",
+          "turn_id": "acceptance-handrail-height:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "For an ordinary stair, the uniform handrail is exactly thirty-eight inches above the nosings and has no special device or fitting condition. Does this height exceed the ordinary maximum?",
+          "must_include": [
+            "Compare the stated 38-inch height with the ordinary maximum of 38 inches and conclude it does not exceed that maximum. [BC 1014.2]",
+            "Do not apply an exception that permits exceeding the maximum where the stated ordinary handrail has no special fitting or bending condition. [BC 1014.2]"
+          ],
+          "forbidden_claims": [
+            "Do not say that an exactly 38-inch ordinary handrail exceeds the maximum.",
+            "Do not make a conclusion about whole-project compliance from the height fact alone."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. A uniform height of exactly 38 inches above the nosings equals the ordinary maximum; it does not exceed it. No special fitting or transition exception is needed for that height conclusion. Other handrail and project requirements are not established by the height alone. [BC 1014.2]",
+          "turn_id": "acceptance-handrail-height:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC BC 1014.2",
+        "BC 1029.15; cross-reference to BC 1014.3"
+      ],
+      "verification_sources": [
+        "S12",
+        "S14"
+      ],
+      "evidence_preflight_note": "Provide BC 1029.15 when scoring the guard-top/aisle conditions. Do not require detailed BC 1014.3 graspability dimensions that are not in approved evidence."
+    },
+    {
+      "case_id": "acceptance-handrail-extension",
+      "original_start_line": 386,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Building Code stair and ramp handrail extensions and returns, plus the section-specific exceptions.",
+          "must_include": [
+            "State the general return-or-continuity requirement: return to a wall, guard, or walking surface, or continue to the handrail of an adjacent stair flight or ramp run. [BC 1014.6]",
+            "For stair handrails not continuous between flights, state both the minimum 12-inch horizontal extension beyond the top riser and the sloping continuation for a depth of one tread beyond the bottom riser. [BC 1014.6]",
+            "For ramp handrails not continuous between runs, state the minimum 12-inch horizontal extension above the landing beyond both the top and bottom of the ramp runs. [BC 1014.6]",
+            "State that stair extensions follow the direction of the stair flights and ramp extensions follow the direction of the ramp runs. [BC 1014.6]",
+            "Describe Exception 1 exactly: a handrail within a dwelling unit that is not an Accessible unit, Type B+NYC unit, or Type B unit need extend only from the top riser to the bottom riser. [BC 1014.6]",
+            "Describe Exception 2 exactly: a handrail within a Type B+NYC multistory dwelling unit complying with Section 1107.2.5, Items 1 through 3, need extend only from the top riser to the bottom riser. Do not replace that cross-reference with unstated criteria. [BC 1014.6, BC 1107.2.5]",
+            "State that handrails serving assembly-purpose aisles may comply with Section 1029.15; its supplied text says extensions are not required at the top and bottom of stepped and ramped aisles to permit crossovers within the aisles. [BC 1014.6, BC 1029.15]",
+            "State the alternating-tread-device and ships-ladder exception: handrails may terminate vertically above the top and bottom risers, need not be continuous between flights, and need not extend beyond the risers. [BC 1014.6]",
+            "When explaining the assembly-aisle exception, preserve the supplied Section 1029.15 scope: it addresses stepped aisles and ramped aisles exceeding a 1:15 slope, and the stated no-extension condition is to permit crossovers within the aisles. [BC 1014.6, BC 1029.15]"
+          ],
+          "forbidden_claims": [
+            "Do not say that a 12-inch top extension alone meets the stair rule for handrails that are not continuous between flights; the rule separately requires a sloping continuation beyond the bottom riser.",
+            "Do not substitute the ramp extension rule for the stair extension rule, or vice versa.",
+            "Do not apply a listed exception without its stated type, occupancy, or other condition.",
+            "Do not describe the Section 1029.15 crossover exception as a general exception for all stairs, ramps, or handrails.",
+            "Do not infer additional requirements from Section 1107.2.5 beyond the cross-reference and supplied text."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "BC 1014.6 generally requires a handrail to return to a wall, guard, or walking surface, or to continue to the handrail of an adjacent stair flight or ramp run.\n\nFor a stair handrail that is not continuous between flights, provide at least 12 inches of horizontal extension beyond the top riser and continue the rail on its slope for one tread’s depth beyond the bottom riser. For a ramp handrail that is not continuous between runs, provide at least 12 inches of horizontal extension above the landing beyond both the top and bottom of the run. Extensions follow the direction of the stair flight or ramp run; the ramp’s two horizontal extensions are not the stair rule.\n\nThe listed exceptions are limited. A handrail within a dwelling unit that is not an Accessible unit, Type B+NYC unit, or Type B unit need extend only from the top to the bottom riser. The same limited extent is permitted within a Type B+NYC multistory dwelling unit complying with BC 1107.2.5 items 1 through 3; those conditions cannot be invented from the cross-reference alone. Handrails serving assembly-purpose aisles may instead comply with BC 1029.15, whose supplied text addresses stepped aisles and ramped aisles steeper than 1:15 and permits omitting top/bottom extensions to allow aisle crossovers. Finally, alternating tread devices and ships ladders may have handrails terminate vertically above the top and bottom risers, without continuity between flights or extensions beyond the risers. [BC 1014.6; BC 1029.15; BC 1107.2.5 cross-reference]",
+          "turn_id": "acceptance-handrail-extension:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "Our ordinary noncontinuous stair handrail extends twelve inches horizontally beyond the top riser but terminates at the bottom riser. No listed exception applies. Does the top extension alone satisfy both ends?",
+          "must_include": [
+            "Conclude that the top extension alone does not satisfy both ends under the stair rule for handrails not continuous between flights. [BC 1014.6]",
+            "Recognize that the stated 12-inch horizontal extension beyond the top riser meets the top dimension only. [BC 1014.6]",
+            "Identify the unmet bottom requirement: continue to slope for a depth of one tread beyond the bottom riser, rather than terminate at the bottom riser. [BC 1014.6]",
+            "Do not rely on a Section 1014.6 exception because the hypothetical says no listed exception applies. [BC 1014.6]"
+          ],
+          "forbidden_claims": [
+            "Do not conclude that the top extension alone satisfies both the top and bottom stair requirements.",
+            "Do not apply the ramp rule requiring horizontal extensions beyond both ends of ramp runs to this stair.",
+            "Do not claim a whole-project compliance result beyond the stated extension issue."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. The 12-inch horizontal extension beyond the top riser satisfies the top dimension only. This noncontinuous stair handrail must also continue sloping for a depth of one tread beyond the bottom riser. Terminating at the bottom riser fails that separate bottom-extension requirement. No listed exception applies on the stated facts. [BC 1014.6]",
+          "turn_id": "acceptance-handrail-extension:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC BC 1014.6",
+        "BC 1029.15; cross-reference to BC 1107.2.5 items 1–3"
+      ],
+      "verification_sources": [
+        "S13",
+        "S14"
+      ],
+      "evidence_preflight_note": "Include the cited BC 1029.15 excerpt if the assembly-aisle explanation is scored. BC 1107.2.5 items 1–3 remain a cross-reference limitation unless their actual text is approved and supplied."
+    },
+    {
+      "case_id": "acceptance-exit-enclosure",
+      "original_start_line": 425,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the 2022 NYC Building Code interior-exit enclosure rating, counting stories, floor-assembly comparison and the R-1/R-2 construction qualification.",
+          "must_include": [
+            "Identifies the permitted enclosure construction as a fire barrier under Section 707, a horizontal assembly under Section 711, or both. [BC 1023.2]",
+            "States the minimum rating thresholds accurately: 2 hours for four or more connected stories and 1 hour for fewer than four. [BC 1023.2]",
+            "Counts basements among connected stories and excludes mezzanines. [BC 1023.2]",
+            "States that the enclosure rating must be no less than the penetrated floor assembly rating, subject to a maximum requirement of 2 hours. [BC 1023.2]",
+            "Preserves the R-1/R-2 qualification: masonry or masonry equivalent is required when the enclosure is required to have a 2-hour rating; masonry-equivalent walls must comply with department rules. [BC 1023.2]",
+            "Identifies both stated exceptions and their limits: I-3 under Section 408.3.8, and interior exit stairs within an atrium enclosed under Section 404.6. [BC 1023.2]"
+          ],
+          "forbidden_claims": [
+            "Do not count only above-grade stories or exclude basements from the story count.",
+            "Do not say the less-than-four-story rating necessarily controls without also applying the penetrated-floor comparison.",
+            "Do not describe 2 hours as a universal requirement for every enclosure, claim the floor-comparison clause requires more than 2 hours, or characterize the clause as prohibiting a voluntarily higher-rated enclosure.",
+            "Do not extend the R-1/R-2 masonry condition to enclosures not required to have a 2-hour rating."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [
+            "C01: Clarify that the two-hour cap limits what the section requires, not what higher-rated construction is permitted to be provided."
+          ],
+          "expected_answer": "BC 1023.2 requires an interior-exit stairway or ramp enclosure to use fire barriers complying with BC 707, horizontal assemblies complying with BC 711, or both. The ordinary minimum is 2 hours when the enclosure connects four or more stories and 1 hour when it connects fewer than four. Basements count; mezzanines do not.\n\nThe enclosure must also account for the rating of the penetrated floor assembly, but this clause does not require more than 2 hours. Thus a fewer-than-four-story enclosure is not automatically limited to a 1-hour requirement, while the floor comparison cannot raise the requirement of this section above 2 hours. This is a cap on what the clause requires, not a prohibition on voluntarily providing a higher-rated assembly.\n\nIn Group R-1 and R-2, an enclosure required to be 2-hour rated must be masonry or masonry equivalent; masonry-equivalent wall assemblies must follow department rules. The two stated exceptions concern Group I-3 under BC 408.3.8 and interior exit stairways within an atrium enclosed under BC 404.6. Their cross-references do not establish eligibility for an unspecified project. [BC 1023.2]",
+          "turn_id": "acceptance-exit-enclosure:turn-1",
+          "original_rubric_disposition": "REVISE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "For this hypothetical, an enclosure connects three above-grade stories and one basement, with no atrium or I-3 exception. Can it use the less-than-four-story rating solely because only three stories are above grade?",
+          "must_include": [
+            "Counts the one basement together with the three above-grade stories, giving four connected stories. [BC 1023.2]",
+            "Concludes that the stated story-count rule requires a minimum 2-hour rating, rather than the 1-hour less-than-four-story rating. [BC 1023.2]",
+            "Rejects above-grade-story counting as a basis for using the less-than-four-story rating, while retaining the penetrated-floor comparison and 2-hour cap. [BC 1023.2]",
+            "Explain that two hours is determinable under this section on the stated facts: the story-count minimum reaches two hours and the floor-comparison clause need not require more than two hours. Do not manufacture unresolved rating uncertainty. [BC 1023.2]"
+          ],
+          "forbidden_claims": [
+            "Do not approve the less-than-four-story rating solely because only three stories are above grade.",
+            "Do not claim that the unknown penetrated-floor rating prevents determining the two-hour requirement of BC 1023.2 in this four-story, no-exception hypothetical; the floor-comparison clause need not require more than two hours.",
+            "Do not invoke either exception, which the hypothetical expressly excludes."
+          ],
+          "uncertainty_boundaries": [
+            "No uncertainty about the rating required by BC 1023.2 remains from the missing floor-assembly rating in this hypothetical. Other construction and occupancy-dependent requirements are not fully established; that separate limitation must not be used to withhold the two-hour answer."
+          ],
+          "review_changes": [
+            "C01: Remove the incorrect forbidden claim and uncertainty requiring an unknown floor rating to prevent a definitive two-hour conclusion in this four-story hypothetical."
+          ],
+          "expected_answer": "No. Three above-grade stories plus one basement equals four connected stories because the basement counts. With the stated exceptions excluded, BC 1023.2 requires a 2-hour enclosure; counting only the above-grade stories does not justify the 1-hour, fewer-than-four-story rating.\n\nThe missing floor-assembly rating does not leave this scoped rating unresolved: the story-count requirement already reaches 2 hours, and the floor-comparison clause need not require more than 2 hours. This determines the rating required by this section on the stated facts, not compliance with every assembly, opening, or occupancy requirement. In particular, any applicable R-1/R-2 masonry or masonry-equivalent condition is a separate construction qualification. [BC 1023.2]",
+          "turn_id": "acceptance-exit-enclosure:turn-2",
+          "original_rubric_disposition": "REVISE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC BC 1023.2; referenced BC 707, 711, 408.3.8 and 404.6"
+      ],
+      "verification_sources": [
+        "S15"
+      ],
+      "evidence_preflight_note": "C01 is a substantive correction to the original rubric. Freeze the full sentence containing the penetrated-floor comparison and the “need not exceed 2 hours” qualification; do not omit the cap or score unresolved floor-rating uncertainty as mandatory in Turn 2."
+    },
+    {
+      "case_id": "acceptance-permit-basis",
+      "original_start_line": 463,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the supplied current NYC Administrative Code general work-permit rule and its exception reference. Distinguish a reference to exceptions from approval for a particular job.",
+          "must_include": [
+            "State the written-permit requirement, the commissioner as issuer, and the “unless and until” condition for the work described in AC 28-105.1. [AC 28-105.1]",
+            "Explain that the general rule is subject to exceptions and exemptions provided in AC 28-105.4; do not treat the cross-reference alone as project-specific eligibility or approval. [AC 28-105.1, AC 28-105.4]",
+            "Preserve that AC 28-105.4 says exemptions do not authorize work violating applicable code, zoning, other laws, or departmental rules, and do not relieve obligations to comply with or file with other city agencies. [AC 28-105.4]",
+            "Do not assert that a particular job is exempt or approved without facts establishing that an applicable exemption's conditions are met. [AC 28-105.4]"
+          ],
+          "forbidden_claims": [
+            "Every job necessarily requires a permit without exception.",
+            "The cross-reference to AC 28-105.4 itself grants a permit, approval, or exemption to a particular job.",
+            "A permit exemption authorizes work in violation of other applicable requirements or eliminates obligations involving other city agencies."
+          ],
+          "uncertainty_boundaries": [
+            "Whether any specific job falls within an exemption, including any applicable conditions not set out in the supplied text."
+          ],
+          "review_changes": [],
+          "expected_answer": "AC 28-105.1 generally makes the described work unlawful unless and until the commissioner issues the required written permit. Its scope includes the listed construction, alteration, repair, movement, demolition/removal, use or occupancy changes, signs, service equipment, and specified electrical, gas, mechanical, plumbing, and fire-protection system work, subject to the provision’s wording.\n\nThe general rule is subject to the exceptions and exemptions in AC 28-105.4. Referring to that section does not establish that a particular job qualifies, issue a permit, or approve the job. An exemption also does not authorize violations of applicable codes, zoning, other law, or departmental rules, and does not remove applicable compliance or filing obligations with other city agencies. A specific job’s eligibility requires the relevant exemption conditions and project facts, which are not supplied here. [AC 28-105.1; AC 28-105.4]",
+          "turn_id": "acceptance-permit-basis:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "I need the original unamended text as it stood before the December 2025 amendment, rather than the current consolidated provision. Can you establish that earlier text solely from the supplied current wording and amendment dates?",
+          "must_include": [
+            "Conclude that the exact pre-amendment wording cannot be established solely from the supplied current wording and amendment dates. [AC 28-105.1]",
+            "Do not infer or reconstruct the earlier wording from the amendment citation, effective date, or current provision. [AC 28-105.1]",
+            "Identify the requested historical target as the provision in force immediately before the amendment effective December 21, 2025. Do not describe the prior consolidated text as necessarily the original unamended enactment. [AC 28-105.1 amendment notation]"
+          ],
+          "forbidden_claims": [
+            "The current text is necessarily identical to the text immediately before the December 2025 amendment.",
+            "The amendment dates alone establish what language was added, deleted, or otherwise changed.",
+            "Do not treat the December 2025 effective date as proof of enactment in December 2025; where the supplied notation is used, preserve its December 21, 2024 amendment date and December 21, 2025 effective date."
+          ],
+          "uncertainty_boundaries": [
+            "The exact wording of AC 28-105.1 in force immediately before December 21, 2025 is not established solely by the supplied current text and amendment notation."
+          ],
+          "review_changes": [
+            "C04: Distinguish the amendment’s December 21, 2024 notation from its December 21, 2025 effective date, and distinguish a prior consolidated version from an original never-amended enactment. Preserve the original question text."
+          ],
+          "expected_answer": "No. The supplied current consolidated wording and amendment dates do not reproduce the version in force immediately before the referenced amendment became effective. They cannot, by themselves, establish the exact earlier wording or what language was inserted, removed, or changed. A dated pre-amendment text or the relevant enacted amending text with its baseline would be needed.\n\nThe target should be described as the version in force immediately before the December 21, 2025 effective date—not necessarily the provision’s original, never-amended enactment. Where the supplied amendment notation is included, it identifies Local Law 2024/128 dated December 21, 2024, with an effective date of December 21, 2025; those are different dates. This metadata still does not supply the earlier wording. [AC 28-105.1 and its amendment notation]",
+          "turn_id": "acceptance-permit-basis:turn-2",
+          "original_rubric_disposition": "REVISE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "NYC AC 28-105.1 and 28-105.4, supplied consolidated version"
+      ],
+      "verification_sources": [
+        "S16",
+        "S17"
+      ],
+      "evidence_preflight_note": "Keep the original Turn 2 question unchanged in this version, but apply C04 to its expected answer and rubric. Capture the amendment notation if dates are scored. Do not reconstruct historical text or substitute a newly researched historical provision into this evidence-limitation test."
+    },
+    {
+      "case_id": "acceptance-asbestos-certification",
+      "original_start_line": 500,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the supplied current NYC Administrative Code asbestos certification condition for demolition or alteration permits, including its date and alternative.",
+          "must_include": [
+            "Limits the described permit condition to demolition or alteration permits for a building constructed pursuant to plans submitted for approval on or before April 1, 1987. [AC 28-106.1]",
+            "States the two alternatives accurately: submission by the applicant of asbestos-related certification as may be required by DEP rules, or a variance issued by the commissioner of environmental protection. [AC 28-106.1]",
+            "States that the amendment citation gives an effective date of November 7, 2022. [AC 28-106.1]",
+            "Does not represent the supplied provision as specifying the certification's content or as establishing that satisfying this condition alone guarantees permit issuance. [AC 28-106.1]"
+          ],
+          "forbidden_claims": [
+            "Do not change the threshold from plans submitted on or before April 1, 1987, to plans submitted before that date.",
+            "Do not omit either the certification alternative or the variance alternative.",
+            "Do not claim that the source specifies what the certification must contain, or that this condition is the only requirement for permit issuance."
+          ],
+          "uncertainty_boundaries": [
+            "The required certification's content is not stated; it depends on the referenced Department of Environmental Protection rules."
+          ],
+          "review_changes": [],
+          "expected_answer": "AC 28-106.1 conditions issuance of a demolition or alteration permit for a building constructed pursuant to plans submitted for approval on or before April 1, 1987. The applicant must submit the asbestos-related certification required by Department of Environmental Protection rules, unless the commissioner of environmental protection has issued a variance.\n\nThe date is inclusive: it includes plans submitted on April 1, 1987. The supplied amendment notation gives November 7, 2022 as the effective date of the cited amendment; that date is distinct from the 1987 plans-submission threshold. The provision does not set out the certification’s contents, and satisfying this condition alone does not guarantee permit issuance. [AC 28-106.1]",
+          "turn_id": "acceptance-asbestos-certification:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "For this hypothetical, the building plans were submitted exactly April 1, 1987, and no environmental-protection variance exists. Is that date outside the stated certification condition?",
+          "must_include": [
+            "Treats plans submitted exactly April 1, 1987 as within the stated “on or before” threshold. [AC 28-106.1]",
+            "Concludes that, with no variance, the asbestos-related certification alternative remains applicable before permit issuance. [AC 28-106.1]",
+            "Limits the conclusion to this permit condition and does not equate satisfaction of it with guaranteed permit issuance. [AC 28-106.1]"
+          ],
+          "forbidden_claims": [
+            "Do not say that April 1, 1987 is outside the threshold.",
+            "Do not say that no certification is required merely because the plans were submitted on the threshold date.",
+            "Do not claim that the permit must issue once certification is submitted."
+          ],
+          "uncertainty_boundaries": [
+            "The certification required in the absence of a variance is not specified in the supplied text and depends on DEP rules."
+          ],
+          "review_changes": [],
+          "expected_answer": "No. Exactly April 1, 1987 is included in “on or before April 1, 1987.” In this demolition-or-alteration-permit scenario, with no environmental-protection variance, the applicant must submit the asbestos-related certification required by DEP rules before the permit may issue. Those rules are needed to determine the certification’s content. Submission is not a guarantee that all other permit requirements have been satisfied. [AC 28-106.1]",
+          "turn_id": "acceptance-asbestos-certification:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "NYC AC 28-106.1, supplied consolidated version and amendment notation"
+      ],
+      "verification_sources": [
+        "S18"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-vacant-protection",
+      "original_start_line": 539,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the current NYC Fire Code fire-protection and security requirements for temporarily unoccupied premises, including tenant spaces. Keep unsafe-building status separate.",
+          "must_include": [
+            "States that vacant premises or parts are deemed temporarily unoccupied, subject to the separately stated unsafe-building direction to applicable DOB and/or HPD requirements under Article 216 of Title 28. [FC 311]",
+            "States that the temporary-unoccupancy requirements cover premises or parts thereof, including tenant spaces. [FC 311]",
+            "Describes the security requirement for exterior and interior openings accessible to unauthorized persons, including tenants. [FC 311]",
+            "States that fire alarm, sprinkler, and standpipe systems must remain operable at all times except as authorized by the commissioner. [FC 311]",
+            "States that rated partitions, barriers, and walls, including those separating temporarily unoccupied tenant spaces, must be maintained, and that openings, joints, and penetrations must be protected under Building Code Chapter 7. [FC 311]",
+            "States the owner’s rubbish and combustible-waste removal and prevention duty, including the limited construction-or-repair exception and its Building Code and FC 304 conditions. [FC 311]",
+            "Distinguishes the hazardous-materials provisions for unsafe vacant premises from those for temporarily unoccupied premises containing materials regulated by FC Chapter 50, and preserves the subsequent free-of-hazardous-materials rule and commissioner-approval qualification. [FC 311]",
+            "Identifies the additional listed requirements for unoccupied tenant spaces in covered malls, including weekly inspections and secured doors. [FC 311]"
+          ],
+          "forbidden_claims": [
+            "Do not treat unsafe-building status as a synonym for temporary unoccupancy or omit the separate DOB/HPD direction in FC 311.1.",
+            "Do not say that vacancy or temporary unoccupancy automatically authorizes fire-protection systems to be disabled.",
+            "Do not omit tenant spaces from the stated scope or limit the opening-security rule to exterior openings.",
+            "Do not state the rubbish exception without its Building Code and FC 304 conditions.",
+            "Do not conflate the distinct hazardous-materials triggers for unsafe vacant premises and temporarily unoccupied premises."
+          ],
+          "uncertainty_boundaries": [
+            "The specific DOB and/or HPD requirements applicable to premises deemed unsafe are not included in the supplied FC 311 text.",
+            "The text does not resolve every possible interaction between the unsafe-building direction in FC 311.1 and other FC 311 provisions for a property that is both unsafe and temporarily unoccupied."
+          ],
+          "review_changes": [],
+          "expected_answer": "Under FC 311.1, a vacant building, structure, premises, or part is treated as temporarily unoccupied. A separate direction applies when premises have been deemed unsafe under Title 28 Article 216: safeguarding and maintenance must follow the applicable DOB and/or HPD requirements. Unsafe status and temporary unoccupancy are not synonyms.\n\nThe temporary-unoccupancy provisions expressly include tenant spaces. Exterior and interior openings accessible to unauthorized persons, including tenants, must be locked or otherwise protected against unauthorized entry. Fire alarm, sprinkler, and standpipe systems must remain operable at all times unless the commissioner authorizes otherwise. Rated partitions, barriers, and walls—including separations around temporarily unoccupied tenant spaces—must be maintained; their openings, joints, and penetrations must be protected under Building Code Chapter 7.\n\nOwners must regularly remove rubbish and combustible waste and prevent new accumulation. The stated construction/repair exception is limited to work complying with the Building Code and waste controlled and removed under FC 304; it is not a general permission to accumulate debris.\n\nFC 311.4 distinguishes facility-closure requirements for unsafe vacant premises containing hazardous materials from those for temporarily unoccupied premises containing materials regulated by FC Chapter 50. It also requires premises thereafter to remain free of hazardous materials except as approved by the commissioner. Those separate triggers should not be merged.\n\nUnoccupied tenant spaces in covered malls have additional conditions: no combustible-material storage, maintained fire separation, inspection at least weekly, secured doors, and no rubbish or other combustible waste. The specific DOB/HPD requirements for an unsafe property and every possible interaction of unsafe and temporarily unoccupied status are not resolved by the supplied FC 311 excerpt. [FC 311.1–311.5]",
+          "turn_id": "acceptance-vacant-protection:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "A tenant space is temporarily unoccupied, with no commissioner authorization to disable protection. Does vacancy itself allow its sprinkler system to be turned off?",
+          "must_include": [
+            "Applies the temporary-unoccupancy fire-protection rule to a tenant space. [FC 311]",
+            "Concludes that the sprinkler system must remain operable absent commissioner authorization. [FC 311]",
+            "Rejects vacancy alone as an authorization to turn off the sprinkler system. [FC 311]"
+          ],
+          "forbidden_claims": [
+            "Do not treat vacancy or tenant-space status as an exception to the operability requirement.",
+            "Do not claim that the sprinkler may be turned off under these facts without commissioner authorization."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [],
+          "expected_answer": "No. FC 311.2.2 applies to temporarily unoccupied premises, including tenant spaces, and requires sprinkler systems to remain operable unless the commissioner authorizes otherwise. The hypothetical gives no such authorization. Vacancy by itself therefore does not allow the sprinkler system to be turned off. [FC 311.2; FC 311.2.2]",
+          "turn_id": "acceptance-vacant-protection:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC FC 311.1–311.5; referenced BC Chapter 7, AC Title 28 Article 216, FC 304 and FC Chapter 50"
+      ],
+      "verification_sources": [
+        "S19"
+      ],
+      "evidence_preflight_note": "Freeze all of FC 311.1–311.5 if the broad Turn 1 criteria are retained. The publication result used here includes the surrounding section text; verify each subsection in the actual evidence payload rather than relying on a parent heading or search-result title alone."
+    },
+    {
+      "case_id": "acceptance-reserved-fire-section",
+      "original_start_line": 580,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "What operative requirements does the supplied current NYC Fire Code Section 508 establish? Distinguish reserved text from a substantive requirement.",
+          "must_include": [
+            "Identify current FC 508 as Reserved, with no operative requirements in the supplied current record. Reserved status alone does not establish a historical repeal event. [FC 508]",
+            "Do not attribute a substantive requirement to FC 508 based on its section number or title. [FC 508]"
+          ],
+          "forbidden_claims": [
+            "That FC 508 currently imposes a fire command center requirement or any other substantive requirement.",
+            "That a section title or number supplies operative requirements absent operative text.",
+            "That reserved status alone proves a repeal date or historical sequence, or proves the absence of fire command center requirements elsewhere."
+          ],
+          "uncertainty_boundaries": [],
+          "review_changes": [
+            "C03: Replace the imprecise “repealed or reserved” characterization with the verified current Reserved status; do not assert a repeal history absent its source."
+          ],
+          "expected_answer": "The supplied current FC 508 is reserved and contains no operative requirements. A section number or an old title does not create substantive obligations where no operative text is supplied. In particular, this current section does not itself establish a fire command center requirement.\n\nThat statement is limited to FC 508 as supplied. It does not establish that no fire command center requirement exists elsewhere, nor prove the section’s repeal history or the content of an earlier edition. [FC 508]",
+          "turn_id": "acceptance-reserved-fire-section:turn-1",
+          "original_rubric_disposition": "REVISE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "An old note uses that section number for a fire command center but provides no dated source. Can the current reserved section establish the old note requirement or its historical edition?",
+          "must_include": [
+            "Conclude that current FC 508, as supplied, does not establish the old note’s fire command center requirement. [FC 508]",
+            "Do not infer the content or status of FC 508 in an earlier edition from its current reserved status. [FC 508]"
+          ],
+          "forbidden_claims": [
+            "That the old note accurately states a historical requirement based on the current section alone.",
+            "That FC 508 was reserved, operative, or contained particular language in the note’s historical edition without a dated historical source."
+          ],
+          "uncertainty_boundaries": [
+            "The date or edition of the old note and the text and applicability of FC 508 in that historical edition."
+          ],
+          "review_changes": [],
+          "expected_answer": "No. The current reserved FC 508 establishes neither the requirement referred to in the old note nor the note’s historical edition. The note’s date, code version, actual historical section text, and applicability remain unverified. Current reserved status cannot be projected backward to conclude that the old section was reserved, operative, or worded in a particular way. [FC 508]",
+          "turn_id": "acceptance-reserved-fire-section:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC FC 508, current reserved-status record"
+      ],
+      "verification_sources": [
+        "S20"
+      ],
+      "evidence_preflight_note": "C03: Freeze the actual Reserved status from the publication. A stale title such as “Fire Command Center” must remain metadata, not an operative requirement. Do not represent reserved status alone as proof of a particular repeal event."
+    },
+    {
+      "case_id": "acceptance-emergency-power",
+      "original_start_line": 610,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain current NYC Fire Code emergency-power inspection, maintenance records, transfer-switch testing and the conditional substitute for scheduled testing. Preserve the supervision requirement.",
+          "must_include": [
+            "State that emergency-power systems must be installed, operated, and maintained in accordance with the Electrical Code and construction codes, including the Building Code; maintenance must preserve service within the time specified for the required type and duration of power. [FC 604]",
+            "Inspection, testing, and other maintenance follow an approved schedule established upon completion and approval of system installation. [FC 604]",
+            "Written records must include service date, servicing technician's name, summary of conditions noted, and detailed description of conditions requiring correction and corrective action taken. [FC 604]",
+            "Emergency-power systems, including appurtenant components, are periodically inspected and tested under load in accordance with NFPA 110 as modified by FC Appendix B and NFPA 111. [FC 604]",
+            "The standby-power or peak-load-shaving exception is conditional: use must be recorded and appropriate records maintained; qualifying use may substitute for scheduled testing, not generally for inspection or other maintenance. [FC 604]",
+            "Transfer switches must be included in the maintenance schedule, kept free from accumulated dust and dirt, and inspected for contact deterioration; deteriorated contacts must be replaced in accordance with the manufacturer's instructions. [FC 604]",
+            "A transfer-switch test electrically operates the switch from normal to alternate and then returns it to normal. [FC 604]",
+            "Inspection, testing, and other maintenance must be under personal supervision of a person with the required knowledge and training and at least one listed qualification: specified DOB-licensed or specially licensed electrician; specified stationary or high-pressure boiler operating engineer; certificate of qualification; FLS director or FEP coordinator certificate of fitness; or registered design professional. [FC 604]"
+          ],
+          "forbidden_claims": [
+            "The supplied text establishes particular inspection or testing intervals, beyond saying periodically and referring to NFPA provisions.",
+            "The peak-load-shaving or standby-use exception eliminates inspection, maintenance, or all transfer-switch testing requirements.",
+            "The listed supervisory qualifications are optional or need not be held by the person providing personal supervision.",
+            "The supplied text gives the detailed NFPA procedures or the applicable service-time values."
+          ],
+          "uncertainty_boundaries": [
+            "The specific periodic intervals and additional procedures incorporated from NFPA 110, NFPA 111, and FC Appendix B are not included in the supplied text.",
+            "The exact service-time requirements depend on the applicable Electrical Code and construction-code provisions, which are not supplied."
+          ],
+          "review_changes": [],
+          "expected_answer": "FC 604 requires emergency-power systems to be installed, operated, and maintained under the applicable Electrical Code and construction codes, including the Building Code. Maintenance must preserve the required availability of power within the applicable time and for the required duration; those specific values are not supplied here.\n\nInspection, testing, and other maintenance must follow an approved schedule established after completion and approval of the installation. Written service records must identify the service date, technician, conditions observed, and the detailed conditions requiring correction and corrective action taken. Systems and appurtenant components must be periodically inspected and tested under load under NFPA 110 as modified by Fire Code Appendix B and NFPA 111. The supplied excerpt does not reproduce those standards’ detailed intervals or procedures.\n\nTransfer switches belong on the maintenance schedule. They must be kept free of accumulated dust and dirt, inspected for deteriorated contacts, and have deteriorated contacts replaced following manufacturer instructions. Testing electrically transfers the switch from normal to alternate power and then back to normal.\n\nRecorded standby-power or peak-load-shaving operation may substitute for scheduled testing only when appropriate records are maintained. This is not a general waiver of inspection, maintenance, or all transfer-switch obligations.\n\nAll inspection, testing, and other maintenance must be under the personal supervision of a person with the necessary knowledge and training and at least one listed qualification: DOB-licensed electrician; DOB specially licensed electrician; the specified stationary or high-pressure boiler operating engineer; certificate of qualification; certificate of fitness as a fire and life safety director; certificate of fitness as a fire and emergency preparedness coordinator; or registered design professional. The qualification must belong to the supervising person. [FC 604.3–604.5]",
+          "turn_id": "acceptance-emergency-power:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "The generator has been used for peak-load shaving, but no records of that use were kept. Does the use alone satisfy the stated scheduled-testing substitute?",
+          "must_include": [
+            "Peak-load-shaving use may substitute for scheduled testing only if the use is recorded and appropriate records are maintained. [FC 604]",
+            "Do not treat the exception as a substitute for inspection or other maintenance. [FC 604]"
+          ],
+          "forbidden_claims": [
+            "Peak-load-shaving use alone satisfies the scheduled-testing substitute despite the absence of records.",
+            "The exception waives all emergency-power inspection, testing, and maintenance."
+          ],
+          "uncertainty_boundaries": [
+            "The exact content required for the exception's 'appropriate records' is not specified in the supplied text."
+          ],
+          "review_changes": [],
+          "expected_answer": "No. The substitute depends on recorded use and appropriate records being maintained. Peak-load-shaving operation with no records does not satisfy that condition and therefore cannot serve as the stated substitute for scheduled testing. The exception does not waive inspection or other maintenance. The excerpt’s exception does not specify all details of what constitutes appropriate operating records, but that does not make having no records acceptable. [FC 604.4]",
+          "turn_id": "acceptance-emergency-power:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "2022 NYC FC 604, particularly 604.3.1–604.3.3, 604.4–604.4.1 and 604.5"
+      ],
+      "verification_sources": [
+        "S21",
+        "S22",
+        "S23",
+        "S24"
+      ],
+      "evidence_preflight_note": "The actual approved payload must include the named subsections, not just the FC 604 heading. Full NFPA 110/111 procedures, Appendix B modifications, and Electrical/Building Code service-time values were not supplied or comprehensively verified. Keep them as explicit cross-reference limits."
+    },
+    {
+      "case_id": "acceptance-plaza-bicycles",
+      "original_start_line": 653,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the current NYC Zoning Resolution public-plaza bicycle-parking requirements, size threshold, location and agency condition.",
+          "must_include": [
+            "All public plazas must provide parking for at least two bicycles. [ZR 37-745]",
+            "The higher minimum is at least four bicycles only for a public plaza greater than 10,000 square feet; exactly 10,000 square feet does not meet that stated threshold. [ZR 37-745]",
+            "Bike racks must be on the sidewalk directly adjacent to the plaza and accord with DOT standards, unless DOT determines that the adjacent sidewalk cannot accommodate the required parking. [ZR 37-745]",
+            "Do not infer from this section an alternative rack location after the stated DOT determination. [ZR 37-745]"
+          ],
+          "forbidden_claims": [
+            "A plaza exactly 10,000 square feet is subject to the at-least-four count based on the stated greater-than threshold.",
+            "The text permits a particular alternative location whenever DOT finds the adjacent sidewalk cannot accommodate the parking.",
+            "The section alone verifies that a particular site qualifies as a public plaza."
+          ],
+          "uncertainty_boundaries": [
+            "The supplied section does not define public plaza or provide a method for measuring plaza size.",
+            "The supplied section does not state the required parking location after DOT determines the adjacent sidewalk cannot accommodate it."
+          ],
+          "review_changes": [],
+          "expected_answer": "ZR 37-745 requires at least two bicycle parking spaces for every public plaza. A public plaza greater than 10,000 square feet must provide at least four; exactly 10,000 square feet does not meet that higher-count trigger.\n\nThe racks must be on the sidewalk directly adjacent to the plaza and conform to DOT standards, unless DOT determines that the adjacent sidewalk cannot accommodate the required parking. The supplied section does not identify an alternative location after that determination; it should not be read as approving a particular alternative or as independently verifying public-plaza status. The section also does not supply the definition of a public plaza or a method of measuring its area. [ZR 37-745]",
+          "turn_id": "acceptance-plaza-bicycles:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "For this hypothetical public plaza of exactly ten thousand square feet, does its size alone require the higher bicycle count? Do not treat the site as an independently verified public plaza.",
+          "must_include": [
+            "The higher bicycle count applies only when the public plaza is greater than 10,000 square feet, not when it is exactly 10,000 square feet. [ZR 37-745]",
+            "If the hypothetical space is a public plaza, the stated minimum at exactly 10,000 square feet is at least two bicycles. [ZR 37-745]",
+            "Do not assert that the site is an independently verified public plaza or make a whole-project compliance determination. [ZR 37-745]"
+          ],
+          "forbidden_claims": [
+            "Exactly 10,000 square feet triggers the higher bicycle count.",
+            "The hypothetical site has been independently established to qualify as a public plaza.",
+            "The size conclusion alone establishes whole-site compliance."
+          ],
+          "uncertainty_boundaries": [
+            "The hypothetical expressly does not establish independent public-plaza status."
+          ],
+          "review_changes": [],
+          "expected_answer": "No. On the hypothetical assumption that the space is a public plaza, exactly 10,000 square feet does not exceed 10,000 square feet. Its size alone therefore does not trigger the four-bicycle minimum; the stated minimum remains two. This is a conditional count determination, not independent verification that the site legally qualifies as a public plaza or that the entire site complies. [ZR 37-745]",
+          "turn_id": "acceptance-plaza-bicycles:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "NYC ZR 37-745; displayed last-amended date October 17, 2007"
+      ],
+      "verification_sources": [
+        "S25"
+      ],
+      "evidence_preflight_note": ""
+    },
+    {
+      "case_id": "acceptance-plaza-fountain",
+      "original_start_line": 693,
+      "turns": [
+        {
+          "turn": 1,
+          "question": "Explain the current NYC Zoning Resolution public-plaza drinking-fountain minimum. Does the supplied section state a plaza-size exemption?",
+          "must_include": [
+            "All public plazas must provide a minimum of one drinking fountain. [ZR 37-746]",
+            "The supplied section states no plaza-size exemption; do not introduce one. [ZR 37-746]"
+          ],
+          "forbidden_claims": [
+            "ZR 37-746 exempts plazas of a particular size from its stated minimum.",
+            "The one-fountain minimum alone establishes whole-plaza compliance."
+          ],
+          "uncertainty_boundaries": [
+            "The supplied section does not define public plaza or state other possible requirements outside this minimum."
+          ],
+          "review_changes": [],
+          "expected_answer": "ZR 37-746 requires at least one drinking fountain in all public plazas. The supplied section states no exemption based on plaza size. It does not supply the definition of a public plaza or resolve other requirements that may apply beyond this numerical minimum. [ZR 37-746]",
+          "turn_id": "acceptance-plaza-fountain:turn-1",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        },
+        {
+          "turn": 2,
+          "question": "For this hypothetical only, the space is a public plaza and contains one drinking fountain. Does that count meet the stated numerical minimum, without claiming whole-plaza compliance?",
+          "must_include": [
+            "One drinking fountain meets the stated numerical minimum of at least one for a public plaza. [ZR 37-746]",
+            "Limit the conclusion to the stated numerical minimum and do not assert whole-plaza compliance. [ZR 37-746]"
+          ],
+          "forbidden_claims": [
+            "One fountain proves compliance with every requirement applicable to the plaza.",
+            "The hypothetical's stated public-plaza status must be independently verified for this question."
+          ],
+          "uncertainty_boundaries": [
+            "Requirements beyond the supplied one-fountain minimum are not addressed by this source excerpt."
+          ],
+          "review_changes": [],
+          "expected_answer": "Yes. Accepting the question’s express hypothetical that the space is a public plaza, one drinking fountain meets the stated minimum of one. That answers the numerical-count question only; it does not establish whole-plaza compliance. Independent verification of public-plaza status is not needed to answer a condition expressly stipulated for this hypothetical. [ZR 37-746]",
+          "turn_id": "acceptance-plaza-fountain:turn-2",
+          "original_rubric_disposition": "APPROVE",
+          "reviewed_answer_status": "COMPLETE",
+          "reviewed_criteria_status": "READY_FOR_EVIDENCE_PREFLIGHT"
+        }
+      ],
+      "authorities": [
+        "NYC ZR 37-746; displayed last-amended date October 17, 2007"
+      ],
+      "verification_sources": [
+        "S26"
+      ],
+      "evidence_preflight_note": ""
+    }
+  ],
+  "verification_sources": [
+    {
+      "id": "S01",
+      "title": "2022 NYC PC 503.1",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-161859",
+      "verification_note": "Published HTML section text checked; dedicated valve, location, access.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S02",
+      "title": "2022 NYC PC 504.6",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-161876",
+      "verification_note": "Published HTML discharge-piping requirements checked, including both height limits and the materials cross-reference.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S03",
+      "title": "2022 NYC PC 605.4 / Table 605.4",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-162024",
+      "verification_note": "Published HTML material-table text checked. No product or alternative-material qualification is certified.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S04",
+      "title": "2022 NYC PC 905.4 status",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-163118",
+      "verification_note": "The publication’s indexed surrounding PC 905 text identifies 905.4 as Reserved. This URL is titled PC 910.1 and is not a reliable direct deep link to 905.4; capture the actual 905.4 section/status before freezing. The golden empty-record case remains source-limited.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S05",
+      "title": "2022 NYC MC 304.10",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-192985",
+      "verification_note": "Published HTML support-height and manufacturer-instructions text checked.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S06",
+      "title": "2022 NYC MC 501.3.1",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-193376",
+      "verification_note": "Published HTML items 1–6 checked, including strict flow thresholds, contamination condition, and individual-dwelling distances.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S07",
+      "title": "2022 NYC MC 505.1",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-193747",
+      "verification_note": "Published HTML domestic-hood rule and both exceptions checked.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S08",
+      "title": "2022 NYC FGC 408.4",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-198198",
+      "verification_note": "Published HTML sediment-trap text and named exclusions checked.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S09",
+      "title": "2022 NYC FGC 406.3.3",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-198078",
+      "verification_note": "Published HTML disconnection/capping and subsequent leak-check text checked.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S10",
+      "title": "2022 NYC FGC 410.2",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-198246",
+      "verification_note": "Published HTML MP-regulator conditions checked; FGC 410.3 details are outside the supplied-answer scope.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S11",
+      "title": "2022 NYC BC 1013.1",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-173791",
+      "verification_note": "Published HTML visibility, spacing, and four exceptions checked.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S12",
+      "title": "2022 NYC BC 1014.2",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-173824",
+      "verification_note": "Published HTML height ranges and fitting/guard exceptions checked.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S13",
+      "title": "2022 NYC BC 1014.6",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-173847",
+      "verification_note": "Published HTML return, extension, and exception text checked.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S14",
+      "title": "2022 NYC BC 1029.15",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-174608",
+      "verification_note": "Published HTML aisle and guard-top/graspability cross-reference checked. Detailed BC 1014.3 and 1107.2.5 criteria are not added to this packet.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S15",
+      "title": "2022 NYC BC 1023.2",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-174102",
+      "verification_note": "Published HTML construction text checked, including basement counting, the two-hour qualification, R-1/R-2 construction, and both exceptions; basis for C01.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S16",
+      "title": "NYC AC 28-105.1",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-156206",
+      "verification_note": "Published consolidated HTML and amendment notation checked. L.L. 2024/128 is dated December 21, 2024 and effective December 21, 2025. Exact historical wording was not reconstructed.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S17",
+      "title": "NYC AC 28-105.4",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-156291",
+      "verification_note": "Published HTML exemption framework and continuing compliance/other-agency obligations checked; no specific job is classified as exempt.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S18",
+      "title": "NYC AC 28-106.1",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-206113",
+      "verification_note": "Published HTML inclusive plans date, certification/variance alternatives, and amendment effective date checked; detailed DEP rules not supplied.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S19",
+      "title": "2022 NYC FC 311",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-141657",
+      "verification_note": "Publication-indexed surrounding text includes FC 311.1–311.5; the direct page is FC 311.2. Capture each needed subsection in the actual evidence manifest.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S20",
+      "title": "2022 NYC FC 508",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-142877",
+      "verification_note": "Published HTML explicitly labels Section FC 508 Reserved; no historical repeal event or former requirement inferred.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S21",
+      "title": "2022 NYC FC 604.3",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-143076",
+      "verification_note": "Published section reference checked; schedule, service-record and transfer-switch details also corroborated by the official chapter source S24.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S22",
+      "title": "2022 NYC FC 604.4",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-143084",
+      "verification_note": "Publication-indexed periodic-testing and recorded-use exception text checked. Capture the subsection itself for reproducible evaluation.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S23",
+      "title": "2022 NYC FC 604.5",
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-143089",
+      "verification_note": "Published HTML personal-supervision requirement and qualification list checked.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S24",
+      "title": "FDNY 2022 Fire Code, Chapter 6",
+      "url": "https://www.nyc.gov/assets/fdny/pdfviewer/viewer.html?file=chapter-6-2022.pdf&section=firecode_2022",
+      "verification_note": "Official chapter publication’s indexed text corroborated FC 604 schedule, written records, switch maintenance and normal–alternate–normal test. This review did not create a complete source snapshot or visually certify a rendered PDF.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S25",
+      "title": "NYC ZR 37-745",
+      "url": "https://zr.planning.nyc.gov/article-iii/chapter-7/37-745",
+      "verification_note": "Official DCP section text checked; displayed last-amended date October 17, 2007; bicycle thresholds, sidewalk and DOT condition.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S26",
+      "title": "NYC ZR 37-746",
+      "url": "https://zr.planning.nyc.gov/article-iii/chapter-7/37-746",
+      "verification_note": "Official DCP section text checked; displayed last-amended date October 17, 2007; minimum one drinking fountain.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S27",
+      "title": "DOB 2022 Construction Codes publication index",
+      "url": "https://www.nyc.gov/site/buildings/codes/2022-construction-codes.page",
+      "verification_note": "Publication/edition context. Do not substitute a generic model code for NYC text or apply one common effective date to all code families.",
+      "access_date": "2026-10-05"
+    },
+    {
+      "id": "S28",
+      "title": "FDNY Fire Code publication index",
+      "url": "https://www.nyc.gov/site/fdny/codes/fire-code/fire-code.page",
+      "verification_note": "Publication/edition context for the Fire Code, which is separate from DOB construction-code editions.",
+      "access_date": "2026-10-05"
+    }
+  ],
+  "limitations": [
+    "Actual application evidence payloads, source snapshots, backend, and model configuration were not supplied or inspected.",
+    "External source checks are not an immutable evidence manifest or exhaustive current-law/project compliance certification.",
+    "All original questions remain unchanged; C01-C04 modify reference answers/rubric or evidence-status handling.",
+    "Prior 35/40 and separate 9/10 results unchanged; no new application answers or accuracy score produced.",
+    "Flush-hub and sloping-sidewalk disputes excluded and unresolved.",
+    "A passing correlated local sample does not establish general 95% accuracy or production readiness."
+  ]
+}

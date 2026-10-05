@@ -1,0 +1,3113 @@
+{
+  "schemaVersion": 1,
+  "assemblyVersion": "20261005-repaired-bound-parent-scope-v84",
+  "question": "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+  "retrievalQuery": "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+  "previousTopicApplied": false,
+  "projectFactsApplied": false,
+  "topicDecision": {
+    "version": "20261004-leading-modifier-topic-continuity-v13",
+    "decision": "topic_switch",
+    "question": {
+      "text": "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+      "source": "current_question",
+      "codeReferences": [
+        {
+          "codePrefix": null,
+          "sectionNumber": "905.4",
+          "referenceKind": "section",
+          "reference": "§ 905.4"
+        }
+      ]
+    },
+    "rootTopic": {
+      "text": "",
+      "source": "none",
+      "codeReferences": []
+    },
+    "currentTopic": {
+      "text": "",
+      "source": "none",
+      "codeReferences": []
+    },
+    "nextRootTopic": {
+      "text": "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+      "source": "current_question",
+      "codeReferences": [
+        {
+          "codePrefix": null,
+          "sectionNumber": "905.4",
+          "referenceKind": "section",
+          "reference": "§ 905.4"
+        }
+      ]
+    },
+    "nextCurrentTopic": {
+      "text": "What does the supplied current 2022 NYC Plumbing Code Section 905.4 require? Do not reconstruct a requirement from another code.",
+      "source": "current_question",
+      "codeReferences": [
+        {
+          "codePrefix": null,
+          "sectionNumber": "905.4",
+          "referenceKind": "section",
+          "reference": "§ 905.4"
+        }
+      ]
+    },
+    "contextPolicy": {
+      "includeRootTopic": false,
+      "includeCurrentTopic": false,
+      "replaceRootTopic": true
+    },
+    "signals": {
+      "returnToOriginal": false,
+      "correction": false,
+      "relevanceComparison": false,
+      "explicitSwitch": false,
+      "projectSubjectContinuation": false,
+      "hypotheticalContinuation": false,
+      "formatTransformation": false,
+      "contextualContinuation": false,
+      "citedSubjectContinuation": false,
+      "causalSubjectContinuation": false,
+      "definiteSubjectContinuation": false,
+      "humanVocabularySubjectContinuation": false,
+      "relatedReference": false,
+      "disjointExplicitReference": false,
+      "selfContained": true,
+      "rootTokenOverlap": 0,
+      "currentTokenOverlap": 0
+    }
+  },
+  "sourceScope": "authorized_enacted_text",
+  "sourceMode": "text_only",
+  "strategy": {
+    "mode": "broad",
+    "reason": "default_authorized_retrieval"
+  },
+  "rulePackets": {
+    "version": "20261003-published-reference-context-v7",
+    "strictBoundary": false,
+    "packets": [
+      {
+        "sourceID": "research-permitext_discovered-id:11075-1",
+        "sectionNumber": "905.4",
+        "textComplete": true,
+        "missingReferences": []
+      },
+      {
+        "sourceID": "research-permitext_discovered-id:1723-2",
+        "sectionNumber": "905.4",
+        "textComplete": true,
+        "missingReferences": [
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "905.3.3.2",
+            "referenceKind": "section"
+          }
+        ]
+      },
+      {
+        "sourceID": "research-permitext_discovered-id:11909-3",
+        "sectionNumber": "403.1",
+        "textComplete": true,
+        "missingReferences": [
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "403.1.1",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "410",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "411",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "403.2.1",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "614",
+            "referenceKind": "section"
+          }
+        ]
+      },
+      {
+        "sourceID": "research-permitext_cross_reference-id:11913-1",
+        "sectionNumber": "403.2",
+        "textComplete": true,
+        "missingReferences": [
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "403.3",
+            "referenceKind": "section"
+          }
+        ]
+      },
+      {
+        "sourceID": "research-permitext_cross_reference-id:12002-10",
+        "sectionNumber": "419.2",
+        "textComplete": true,
+        "missingReferences": []
+      },
+      {
+        "sourceID": "research-permitext_cross_reference-id:11821-13",
+        "sectionNumber": "303.1",
+        "textComplete": true,
+        "missingReferences": []
+      },
+      {
+        "sourceID": "research-permitext_cross_reference-id:11825-15",
+        "sectionNumber": "304.1",
+        "textComplete": true,
+        "missingReferences": [
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "304.2",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "304.4",
+            "referenceKind": "section"
+          }
+        ]
+      }
+    ],
+    "recoveryReferences": [
+      {
+        "codePrefix": "BC",
+        "sectionNumber": "905.3.3.2",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_discovered-id:1723-2",
+        "parentDepth": 0
+      },
+      {
+        "codePrefix": "PC",
+        "sectionNumber": "403.1.1",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_discovered-id:11909-3",
+        "parentDepth": 0
+      },
+      {
+        "codePrefix": "PC",
+        "sectionNumber": "410",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_discovered-id:11909-3",
+        "parentDepth": 0
+      },
+      {
+        "codePrefix": "PC",
+        "sectionNumber": "411",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_discovered-id:11909-3",
+        "parentDepth": 0
+      },
+      {
+        "codePrefix": "PC",
+        "sectionNumber": "403.2.1",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_discovered-id:11909-3",
+        "parentDepth": 0
+      },
+      {
+        "codePrefix": "PC",
+        "sectionNumber": "614",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_discovered-id:11909-3",
+        "parentDepth": 0
+      },
+      {
+        "codePrefix": "PC",
+        "sectionNumber": "403.3",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_cross_reference-id:11913-1",
+        "parentDepth": 1
+      },
+      {
+        "codePrefix": "PC",
+        "sectionNumber": "304.2",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_cross_reference-id:11825-15",
+        "parentDepth": 1
+      },
+      {
+        "sectionID": "11828",
+        "codePrefix": "PC",
+        "sectionNumber": "304.4",
+        "referenceKind": "section",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "parentSourceID": "research-permitext_cross_reference-id:11825-15",
+        "parentDepth": 1
+      }
+    ],
+    "recoveryReads": 0,
+    "recoveredReferenceCount": 0,
+    "recoverySearchCount": 0
+  },
+  "limits": {
+    "maximumTopicDependencies": 14,
+    "maximumCandidates": 12,
+    "maximumDiscovered": 10,
+    "maximumTargetedDefinitions": 2,
+    "maximumCrossReferences": 6,
+    "maximumCharacters": 48000,
+    "maximumSupplementalCharacters": 48000,
+    "maximumCharactersPerSource": 12000
+  },
+  "sources": [
+    {
+      "sourceID": "research-permitext_discovered-id:11811-requested-definition-01",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "Complete canonical definitions requested by the current question or related human topic. Definition heading in this canonical source: Section PC 202: General Definitions. The registered carrier PC 201.4 identifies storage, not the embedded definition's published section number.",
+      "authorityClass": "enacted",
+      "retrievalReason": "Human-requested canonical definition entries reserved before incidental expansion",
+      "retrievalRank": 13,
+      "retrievalScore": 47.821,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": null,
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11811",
+      "codePrefix": "PC",
+      "sectionNumber": "201.4",
+      "title": "201.4 Terms not defined.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "2",
+      "sourceChapterNumber": "2",
+      "chapterTitle": "Chapter 2: Definitions",
+      "sectionGroupLabel": "SECTION PC 201",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "2",
+          "title": "Chapter 2: Definitions"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 201",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "Section PC 202: General Definitions\n\nPLUMBING. The practice, materials and fixtures utilized in the installation, maintenance, extension and alteration of all piping, fixtures, plumbing appliances, plumbing appurtenances, gas piping and limited fire protection as defined in Section 28-401.3 of the Administrative Code , within or adjacent to any structure, in connection with sanitary drainage or storm drainage facilities; venting systems; and public or private water supply systems.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": false,
+      "truncated": false,
+      "targetedDefinition": {
+        "schemaVersion": 1,
+        "version": "20261004-active-human-definition-v9",
+        "sourceMode": "canonical_enacted_definition_entries",
+        "sectionID": "11811",
+        "codePrefix": "PC",
+        "sectionNumber": "201.4",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "jurisdiction": "New York City",
+        "labels": [
+          "PLUMBING"
+        ],
+        "passages": [
+          "PLUMBING. The practice, materials and fixtures utilized in the installation, maintenance, extension and alteration of all piping, fixtures, plumbing appliances, plumbing appurtenances, gas piping and limited fire protection as defined in Section 28-401.3 of the Administrative Code , within or adjacent to any structure, in connection with sanitary drainage or storm drainage facilities; venting systems; and public or private water supply systems."
+        ],
+        "canonicalSectionCharacterCount": 38264,
+        "excerptCharacterCount": 485,
+        "canonicalContextComplete": false,
+        "embeddedDefinitionSection": {
+          "codePrefix": "PC",
+          "sectionNumber": "202",
+          "heading": "Section PC 202: General Definitions",
+          "carrierSectionID": "11811",
+          "carrierSectionNumber": "201.4",
+          "sourceTextHash": "4418c011ebf5c7eb62c3013ff33584a73a4776990d69556bd12cd16b6bb611b6",
+          "definitionRange": {
+            "start": 191,
+            "end": 38233
+          },
+          "sourceOffsets": {
+            "blockIndex": 0,
+            "blockID": "11811-html-1",
+            "start": 156,
+            "end": 191
+          }
+        },
+        "canonicalEntryBindings": [
+          {
+            "label": "PLUMBING",
+            "sourceTextHash": "4418c011ebf5c7eb62c3013ff33584a73a4776990d69556bd12cd16b6bb611b6",
+            "sourceOffsets": {
+              "blockIndex": 0,
+              "blockID": "11811-html-1",
+              "start": 21915,
+              "end": 22363
+            }
+          }
+        ]
+      },
+      "publishedCitationReference": {
+        "version": "canonical-published-definition-reference-v1",
+        "basis": "hash_bound_embedded_definition_entries",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City",
+        "sectionNumber": "202",
+        "title": "General Definitions",
+        "heading": "Section PC 202: General Definitions",
+        "carrierSectionID": "11811",
+        "carrierSectionNumber": "201.4",
+        "carrierTitle": "201.4 Terms not defined.",
+        "sourceTextHash": "4418c011ebf5c7eb62c3013ff33584a73a4776990d69556bd12cd16b6bb611b6",
+        "sourceOffsets": {
+          "blockIndex": 0,
+          "blockID": "11811-html-1",
+          "start": 156,
+          "end": 191
+        },
+        "canonicalEntryBindings": [
+          {
+            "label": "PLUMBING",
+            "sourceTextHash": "4418c011ebf5c7eb62c3013ff33584a73a4776990d69556bd12cd16b6bb611b6",
+            "sourceOffsets": {
+              "blockIndex": 0,
+              "blockID": "11811-html-1",
+              "start": 21915,
+              "end": 22363
+            }
+          }
+        ],
+        "selectedTextHash": "18edcb8fd0fd700c26b8504913979760c5f5ba78912abcdb689319633e1e503e"
+      },
+      "requestedDefinitionReservation": true
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:11075-1",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "The question names MC 905.4. It matches “code”, “905.4”, “requirement”, “section”, “require”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "The question names MC 905.4. It matches “code”, “905.4”, “requirement”, “section”, “require”.",
+      "retrievalRank": 1,
+      "retrievalScore": 121.752,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "controlling_rule",
+        "functions": [
+          "controlling_rule"
+        ],
+        "materialityRank": 0,
+        "evidenceRole": "governing",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": true,
+        "claimCoverageReason": "exact enacted reference requested by the user",
+        "reasons": [
+          "exact code reference in the question"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11075",
+      "codePrefix": "MC",
+      "sectionNumber": "905.4",
+      "title": "905.4 Air pollution.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "9",
+      "sourceChapterNumber": "9",
+      "chapterTitle": "Chapter 9: Specific Appliances and Equipment",
+      "sectionGroupLabel": "SECTION MC 901",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "9",
+          "title": "Chapter 9: Specific Appliances and Equipment"
+        },
+        "sectionGroup": {
+          "label": "SECTION MC 901",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "905.4 905.4 Air pollution. All fireplace stoves and room heaters shall comply with the requirements of the New York City Air Pollution Control Code.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "rulePacket": {
+        "sourceID": "research-permitext_discovered-id:11075-1",
+        "sectionNumber": "905.4",
+        "textComplete": true,
+        "missingReferences": []
+      }
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:1723-2",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "The question names BC 905.4. It matches “section”, “905.4”, “require”. The proposed passage contains exception language that needs professional review. The proposed passage includes a cross-reference that may require additional evidence.",
+      "authorityClass": "enacted",
+      "retrievalReason": "The question names BC 905.4. It matches “section”, “905.4”, “require”. The proposed passage contains exception language that needs professional review. The proposed passage includes a cross-reference that may require additional evidence.",
+      "retrievalRank": 2,
+      "retrievalScore": 117.396,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "controlling_rule",
+        "functions": [
+          "controlling_rule",
+          "exception"
+        ],
+        "materialityRank": 0,
+        "evidenceRole": "governing",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": true,
+        "claimCoverageReason": "exact enacted reference requested by the user",
+        "reasons": [
+          "exact code reference in the question",
+          "exception or permitted reduction"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "1723",
+      "codePrefix": "BC",
+      "sectionNumber": "905.4",
+      "title": "905.4 Location of Class I standpipe hose connections.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "9",
+      "sourceChapterNumber": "9",
+      "chapterTitle": "Chapter 9: Fire Protection Systems",
+      "sectionGroupLabel": "SECTION BC 905",
+      "sectionGroupTitle": "STANDPIPE SYSTEMS",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "9",
+          "title": "Chapter 9: Fire Protection Systems"
+        },
+        "sectionGroup": {
+          "label": "SECTION BC 905",
+          "title": "STANDPIPE SYSTEMS"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "905.4 905.4 Location of Class I standpipe hose connections. Class I standpipe hose connections shall be provided in all of the following locations: 1. In every required stairway, a hose connection shall be provided for each floor level above or below grade. Hose connections shall be readily accessible and located at the riser on each floor-level landing and on the entrance floor above the standpipe riser control valve. Nonrequired enclosed stairways that do not serve as a means of egress are not required to have hose connections. Stairways without hose connections shall have a sign on the door to the stairway stating, \"No standpipe connections in stairway.\" 2. On each side of the wall adjacent to the exit opening of a horizontal exit. Exception: Where floor areas adjacent to a horizontal exit are reachable from exit stairway hose connections by a 30-foot (9144 mm) hose stream from a nozzle attached to 100 feet (30 480 mm) of hose, a hose connection shall not be required at the horizontal exit. 3. In every exit passageway at the entrance from the exit passageway to the other areas of a building. Exception: Where floor areas adjacent to an exit passageway are reachable from exit stairway hose connections by a 30-foot (9144 mm) hose stream from a nozzle attached to 100 feet (30 480 mm) of hose, a hose connection shall not be required at the entrance from the exit passageway to other areas of the building. 4. In covered mall buildings, in accordance with Section 905.3.3.2. 5. Where the roof has a slope of less than four units vertical in 12 units horizontal (33.3-percent slope), each standpipe shall be provided with a hose connection located either on the roof or at the highest landing of a stairway with stair access to the roof. An additional hose connection shall be provided at the top of the most hydraulically remote standpipe for testing purposes. This additional hose connection shall not be required when a roof manifold is installed in accordance with NFPA 14. 6. Where the most remote portion of a floor or story is more than 150 feet (45 720 mm) from a hose connection, additional hose connections shall be provided in approved locations. For the purposes of this section, a penthouse with an occupant load greater than 10 shall be considered a story. 7. In any staircase where the change in elevation between floor landings is more than 25 feet (7620 mm), in addition to the hose connections required by Item 1, a hose connection shall be installed at the first intermediate stair landing below the higher floor level.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "rulePacket": {
+        "sourceID": "research-permitext_discovered-id:1723-2",
+        "sectionNumber": "905.4",
+        "textComplete": true,
+        "missingReferences": [
+          {
+            "codePrefix": "BC",
+            "sectionNumber": "905.3.3.2",
+            "referenceKind": "section"
+          }
+        ]
+      }
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:11909-3",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “plumbing”, “code”, “section”, “require”, “requirement”. The proposed passage includes a cross-reference that may require additional evidence.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “plumbing”, “code”, “section”, “require”, “requirement”. The proposed passage includes a cross-reference that may require additional evidence.",
+      "retrievalRank": 3,
+      "retrievalScore": 71.507,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "calculation_table",
+        "functions": [
+          "calculation_table"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "calculation or table provision"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11909",
+      "codePrefix": "PC",
+      "sectionNumber": "403.1",
+      "title": "403.1 Minimum number of fixtures.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "4",
+      "sourceChapterNumber": "4",
+      "chapterTitle": "Chapter 4: Fixtures, Faucets and Fixture Fittings",
+      "sectionGroupLabel": "SECTION PC 401",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "4",
+          "title": "Chapter 4: Fixtures, Faucets and Fixture Fittings"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 401",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "403.1 403.1 Minimum number of fixtures. Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1 . Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code . Occupancy classification shall be determined in accordance with the New York City Building Code . Table 403.1 Minimum Number of Required Plumbing Fixtures a (See Sections 403.1.1 and 403.2) No. Classification Occupancy i Description Water Closets (Urinals: See Section 419.2) Lavatories Bathtubs/ Showers Drinking Fountain (See Section 410 ) e Other Male Female Male Female No. Classification Occupancy i Description Water Closets (Urinals: See Section 419.2) Lavatories Bathtubs/ Showers Drinking Fountain (See Section 410 ) e Other Male Female Male Female 1 Assembly A-1 d Theaters and other buildings for the performing arts and motion pictures 1 per 70 for the first 210 and 1 per 125 for the remainder 1 per 35 for the first 210 and 1 per 65 for the remainder 1 per 200 — 1 per 500 1 service sink A-2 d Nightclubs, bars f , taverns, dance halls and buildings for similar purposes 1 per 75 i 1 per 40 i 1 per 75 — 1 per 500 1 service sink Restaurants g , banquet halls and food courts 1 per 75 1 per 75 1 per 200 — 1 per 500 1 service sink A-3 d Auditoriums without permanent seating, art galleries, exhibition halls, museums, lecture halls, arcades and gymnasiums 1 per 70 for the first 210 and 1 per 125 for the remainder 1 per 35 for the first 210 and 1 per 65 for the remainder 1 per 200 — 1 per 500 1 service sink Passenger terminals and transportation facilities 1 per 500 1 per 500 1 per 750 — 1 per 1,000 1 service sink Places of worship and other religious services 1 per 150 1 per 75 1 per 200 — 1 per 1,000 1 service sink A-4 Coliseums, arenas, skating rinks, pools and tennis courts for indoor sporting events and activities 1 per 75 for the first 1,500 and 1 per 120 for the remainder exceeding 1,500 1 per 40 for the first 1,520 and 1 per 60 for the remainder exceeding 1,520 1 per 200 1 per 150 — 1 per 1,000 1 service sink A-5 Stadiums, amusement parks, bleachers and grandstands for outdoor sporting events and activities 1 per 75 for the first 1,500 and 1 per 120 for the remainder exceeding 1,500 1 per 40 for the first 1,520 and 1 per 60 for the remainder exceeding 1,520 1 per 200 1 per 150 — 1 per 1,000 1 service sink 2 Business B j, n Buildings for the transaction of business, professional services, other services including merchandise, office buildings, banks, light industrial and similar uses No. of persons for each sex 1 - 20 21 - 45 46 - 70 71 - 100 101 - 140 141 - 190 1 fixture for each additional 50 persons No. of fixtures 1 2 3 4 5 6 No. of persons for each sex 1 - 25 26 - 50 51 - 75 76 - 115 116 - 160 1 fixture for each additional 60 persons No. of fixtures 1 2 3 4 5 — 1 per 100 1 service sink m 3 Educational E Educational facilities, including libraries accessory to Group E 1 per 50 1 per 50 — 1 per 100 1 service sink 4 Factory and industrial F-1 and F-2 Structures in which occupants are engaged in work fabricating, assembly or processing of products or materials 1 per 100 1 per 100 (see Section 411) 1 per 400 1 service sink 5 Institutional I-1 k Residential care 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink I-2 Hospitals, ambulatory nursing home care recipient 1 per room c 1 per room c 1 per 15 1 per 100 1 service sink per floor Employees, other than residential care b 1 per 25 1 per 35 — 1 per 100 — Visitors, other than residential care 1 per 75 1 per 100 — 1 per 500 — I-3 Prisons b 1 per cell 1 per cell 1 per 15 1 per 100 1 service sink Reformatories, detention centers, and correctional centers 1 per 15 1 per 15 1 per 15 1 per 100 1 service sink Employees b 1 per 25 1 per 35 — 1 per 100 — I-4 Adult day care and child day care b 1 per 15 1 per 15 1 per 15 1 per 100 1 service sink 6 Mercantile M Retail stores, service stations, shops, salesrooms, markets and shopping centers 1 per 500 1 per 750 — 1 per 1,000 1 service sink 7 Residential R-1 k Hotels, motels, boarding houses (transient) 1 per guestroom 1 per guestroom 1 per guestroom — 1 service sink Dormitories, fraternities, sororities and boarding houses (not transient 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink R-2 k Apartment house 1 per dwelling unit 1 per dwelling unit 1 per dwelling unit — 1 kitchen sink per dwelling; 1 automatic clothes washer connection per 20 dwelling units e R-3 One- and two-family dwellings and lodging houses with five or fewer guestrooms 1 per dwelling unit 1 per dwelling unit 1 per dwelling unit — 1 kitchen sink per dwelling; 1 automatic clothes washer connection per dwelling unit e R-3 k Congregate living facilities with 16 or fewer persons 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink 8 Storage S-1 S-2 Structures for the storage of goods, warehouses, storehouse and freight depots. Low and Moderate Hazard. 1 per 100 1 per 100 See Section 411 1 per 1,000 1 service sink a. The fixtures shown are based on one fixture being the minimum required for the number of persons indicated. Any fraction of the number of persons requires an additional fixture. The number of occupants shall be determined by the New York City Building Code . b. Toilet facilities for employees shall be separate from facilities for incarcerated individuals or care recipients. c. A single-occupant toilet room with one water closet and one lavatory serving not more than two adjacent patient sleeping units shall be permitted where such room is provided with direct access from each patient sleeping unit and with provisions for privacy. d. The occupant load for seasonal outdoor seating and entertainment areas shall be included when determining the minimum number of facilities required. e. The minimum number of required drinking foundations shall comply with Table 403.1 and Chapter 11 of the New York City Building Code. f. For the purposes of this table only, \"Bar\" shall mean a business establishment or a portion of a nonprofit entity devoted primarily to the selling and serving of alcoholic beverages for consumption by the public, guests, patrons, or members on the premises and in which the serving of food is only incidental. g. The total number of occupants for a single establishment comprising of a restaurant with an accessory bar shall be considered as a restaurant for the purposes of determining the minimum number of plumbing fixtures. h. As per the New York City Building Code. i. The requirements for the number of water closets for a total occupancy of 150 persons or fewer shall not apply to bars except that, subject to the requirements of Section 403.2.1, there shall be at least one water closet for men and at least one water closet for women or at least two single-occupant toilet rooms. j. The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies. k. In addition to the requirements of Table 403.1 , residential occupancies I-1, R-1, R-2, and R-3 shall provide fixtures in compliance with the requirements of Section 614 for emergency drinking water access. l. [Reserved.] m. For business and mercantile occupancies with an occupant load of 15 or fewer, service sinks shall not be required. n. Libraries that are not classified as accessory to Group E per Section 304.1 of the New York City Building Code shall comply with fixture counts for Group B occupancies. (Am. L.L. 2016/079, 6/28/2016, eff. 10/26/2016; Am. 2021 N.Y. Laws Ch. 322, 8/2/2021, eff. 8/2/2021) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/051 .",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "richSourceID": "rich-source-82823cc15d16b3be63cbb48b",
+      "richSourceKind": "table",
+      "richSourceReference": "PC Table 403.1",
+      "richSourceCanonicalReference": "PC Table 403.1",
+      "richSourceContentHash": "136d45563f4e3e8fba486b3f796b524c5d8b989f0706b70325eb08449a644ee3",
+      "richSourceText": "Table 403.1 Minimum Number of Required Plumbing Fixtures a (See Sections 403.1.1 and 403.2) No. Classification Occupancy i Description Water Closets (Urinals: See Section 419.2) Lavatories Bathtubs/ Showers Drinking Fountain (See Section 410 ) e Other Male Female Male Female No. Classification Occupancy i Description Water Closets (Urinals: See Section 419.2) Lavatories Bathtubs/ Showers Drinking Fountain (See Section 410 ) e Other Male Female Male Female 1 Assembly A-1 d Theaters and other buildings for the performing arts and motion pictures 1 per 70 for the first 210 and 1 per 125 for the remainder 1 per 35 for the first 210 and 1 per 65 for the remainder 1 per 200 - 1 per 500 1 service sink A-2 d Nightclubs, bars f , taverns, dance halls and buildings for similar purposes 1 per 75 i 1 per 40 i 1 per 75 - 1 per 500 1 service sink Restaurants g , banquet halls and food courts 1 per 75 1 per 75 1 per 200 - 1 per 500 1 service sink A-3 d Auditoriums without permanent seating, art galleries, exhibition halls, museums, lecture halls, arcades and gymnasiums 1 per 70 for the first 210 and 1 per 125 for the remainder 1 per 35 for the first 210 and 1 per 65 for the remainder 1 per 200 - 1 per 500 1 service sink Passenger terminals and transportation facilities 1 per 500 1 per 500 1 per 750 - 1 per 1,000 1 service sink Places of worship and other religious services 1 per 150 1 per 75 1 per 200 - 1 per 1,000 1 service sink A-4 Coliseums, arenas, skating rinks, pools and tennis courts for indoor sporting events and activities 1 per 75 for the first 1,500 and 1 per 120 for the remainder exceeding 1,500 1 per 40 for the first 1,520 and 1 per 60 for the remainder exceeding 1,520 1 per 200 1 per 150 - 1 per 1,000 1 service sink A-5 Stadiums, amusement parks, bleachers and grandstands for outdoor sporting events and activities 1 per 75 for the first 1,500 and 1 per 120 for the remainder exceeding 1,500 1 per 40 for the first 1,520 and 1 per 60 for the remainder exceeding 1,520 1 per 200 1 per 150 - 1 per 1,000 1 service sink 2 Business B j, n Buildings for the transaction of business, professional services, other services including merchandise, office buildings, banks, light industrial and similar uses No. of persons for each sex 1 - 20 21 - 45 46 - 70 71 - 100 101 - 140 141 - 190 1 fixture for each additional 50 persons No. of fixtures 1 2 3 4 5 6 No. of persons for each sex 1 - 25 26 - 50 51 - 75 76 - 115 116 - 160 1 fixture for each additional 60 persons No. of fixtures 1 2 3 4 5 - 1 per 100 1 service sink m 3 Educational E Educational facilities, including libraries accessory to Group E 1 per 50 1 per 50 - 1 per 100 1 service sink 4 Factory and industrial F-1 and F-2 Structures in which occupants are engaged in work fabricating, assembly or processing of products or materials 1 per 100 1 per 100 (see Section 411) 1 per 400 1 service sink 5 Institutional I-1 k Residential care 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink I-2 Hospitals, ambulatory nursing home care recipient 1 per room c 1 per room c 1 per 15 1 per 100 1 service sink per floor Employees, other than residential care b 1 per 25 1 per 35 - 1 per 100 - Visitors, other than residential care 1 per 75 1 per 100 - 1 per 500 - I-3 Prisons b 1 per cell 1 per cell 1 per 15 1 per 100 1 service sink Reformatories, detention centers, and correctional centers 1 per 15 1 per 15 1 per 15 1 per 100 1 service sink Employees b 1 per 25 1 per 35 - 1 per 100 - I-4 Adult day care and child day care b 1 per 15 1 per 15 1 per 15 1 per 100 1 service sink 6 Mercantile M Retail stores, service stations, shops, salesrooms, markets and shopping centers 1 per 500 1 per 750 - 1 per 1,000 1 service sink 7 Residential R-1 k Hotels, motels, boarding houses (transient) 1 per guestroom 1 per guestroom 1 per guestroom - 1 service sink Dormitories, fraternities, sororities and boarding houses (not transient 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink R-2 k Apartment house 1 per dwelling unit 1 per dwelling unit 1 per dwelling unit - 1 kitchen sink per dwelling; 1 automatic clothes washer connection per 20 dwelling units e R-3 One- and two-family dwellings and lodging houses with five or fewer guestrooms 1 per dwelling unit 1 per dwelling unit 1 per dwelling unit - 1 kitchen sink per dwelling; 1 automatic clothes washer connection per dwelling unit e R-3 k Congregate living facilities with 16 or fewer persons 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink 8 Storage S-1 S-2 Structures for the storage of goods, warehouses, storehouse and freight depots. Low and Moderate Hazard. 1 per 100 1 per 100 See Section 411 1 per 1,000 1 service sink a. The fixtures shown are based on one fixture being the minimum required for the number of persons indicated. Any fraction of the number of persons requires an additional fixture. The number of occupants shall be determined by the New York City Building Code . b. Toilet facilities for employees shall be separate from facilities for incarcerated individuals or care recipients. c. A single-occupant toilet room with one water closet and one lavatory serving not more than two adjacent patient sleeping units shall be permitted where such room is provided with direct access from each patient sleeping unit and with provisions for privacy. d. The occupant load for seasonal outdoor seating and entertainment areas shall be included when determining the minimum number of facilities required. e. The minimum number of required drinking foundations shall comply with Table 403.1 and Chapter 11 of the New York City Building Code. f. For the purposes of this table only, \"Bar\" shall mean a business establishment or a portion of a nonprofit entity devoted primarily to the selling and serving of alcoholic beverages for consumption by the public, guests, patrons, or members on the premises and in which the serving of food is only incidental. g. The total number of occupants for a single establishment comprising of a restaurant with an accessory bar shall be considered as a restaurant for the purposes of determining the minimum number of plumbing fixtures. h. As per the New York City Building Code. i. The requirements for the number of water closets for a total occupancy of 150 persons or fewer shall not apply to bars except that, subject to the requirements of Section 403.2.1, there shall be at least one water closet for men and at least one water closet for women or at least two single-occupant toilet rooms. j. The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies. k. In addition to the requirements of Table 403.1 , residential occupancies I-1, R-1, R-2, and R-3 shall provide fixtures in compliance with the requirements of Section 614 for emergency drinking water access. l. [Reserved.] m. For business and mercantile occupancies with an occupant load of 15 or fewer, service sinks shall not be required. n. Libraries that are not classified as accessory to Group E per Section 304.1 of the New York City Building Code shall comply with fixture counts for Group B occupancies. (Am. L.L. 2016/079, 6/28/2016, eff. 10/26/2016; Am. 2021 N.Y. Laws Ch. 322, 8/2/2021, eff. 8/2/2021) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/051 .",
+      "richSourceRowCount": 30,
+      "richSourceGrids": [
+        {
+          "rows": [
+            {
+              "cells": [
+                {
+                  "text": "No.",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Classification",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Occupancy i",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Description",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Water Closets (Urinals: See Section 419.2)",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "Lavatories",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "Bathtubs/ Showers",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Drinking Fountain (See Section 410 ) e",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Other",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Male",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Female",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Male",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Female",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rows": [
+            {
+              "cells": [
+                {
+                  "text": "No.",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Classification",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Occupancy i",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Description",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Water Closets (Urinals: See Section 419.2)",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "Lavatories",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "Bathtubs/ Showers",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Drinking Fountain (See Section 410 ) e",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Other",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Male",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Female",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Male",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Female",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "1",
+                  "rowSpan": 8,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Assembly",
+                  "rowSpan": 8,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "A-1 d",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Theaters and other buildings for the performing arts and motion pictures",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 70 for the first 210 and 1 per 125 for the remainder",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 35 for the first 210 and 1 per 65 for the remainder",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 200",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "A-2 d",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Nightclubs, bars f , taverns, dance halls and buildings for similar purposes",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 75 i",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 40 i",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 75",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Restaurants g , banquet halls and food courts",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 75",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 75",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 200",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "A-3 d",
+                  "rowSpan": 3,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Auditoriums without permanent seating, art galleries, exhibition halls, museums, lecture halls, arcades and gymnasiums",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 70 for the first 210 and 1 per 125 for the remainder",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 35 for the first 210 and 1 per 65 for the remainder",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 200",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Passenger terminals and transportation facilities",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 750",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 1,000",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Places of worship and other religious services",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 150",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 75",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 200",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 1,000",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "A-4",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Coliseums, arenas, skating rinks, pools and tennis courts for indoor sporting events and activities",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 75 for the first 1,500 and 1 per 120 for the remainder exceeding 1,500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 40 for the first 1,520 and 1 per 60 for the remainder exceeding 1,520",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 200",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 150",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 1,000",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "A-5",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Stadiums, amusement parks, bleachers and grandstands for outdoor sporting events and activities",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 75 for the first 1,500 and 1 per 120 for the remainder exceeding 1,500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 40 for the first 1,520 and 1 per 60 for the remainder exceeding 1,520",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 200",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 150",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 1,000",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "2",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Business",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "B j, n",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Buildings for the transaction of business, professional services, other services including merchandise, office buildings, banks, light industrial and similar uses",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "No. of persons for each sex 1 - 20 21 - 45 46 - 70 71 - 100 101 - 140 141 - 190 1 fixture for each additional 50 persons",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "No. of fixtures 1 2 3 4 5 6",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "No. of persons for each sex 1 - 25 26 - 50 51 - 75 76 - 115 116 - 160 1 fixture for each additional 60 persons",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "No. of fixtures 1 2 3 4 5",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink m",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "3",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Educational",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "E",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Educational facilities, including libraries accessory to Group E",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 50",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 50",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "4",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Factory and industrial",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "F-1 and F-2",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Structures in which occupants are engaged in work fabricating, assembly or processing of products or materials",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "(see Section 411)",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 400",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "5",
+                  "rowSpan": 8,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Institutional",
+                  "rowSpan": 8,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "I-1 k",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Residential care",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 10",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 10",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 8",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "I-2",
+                  "rowSpan": 3,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Hospitals, ambulatory nursing home care recipient",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per room c",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per room c",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 15",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink per floor",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Employees, other than residential care b",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 25",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 35",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Visitors, other than residential care",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 75",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 500",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "I-3",
+                  "rowSpan": 3,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Prisons b",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per cell",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per cell",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 15",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Reformatories, detention centers, and correctional centers",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 15",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 15",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 15",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Employees b",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 25",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 35",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "I-4",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Adult day care and child day care b",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 15",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 15",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 15",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "6",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Mercantile",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "M",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Retail stores, service stations, shops, salesrooms, markets and shopping centers",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 500",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 750",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 1,000",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "7",
+                  "rowSpan": 5,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Residential",
+                  "rowSpan": 5,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "R-1 k",
+                  "rowSpan": 2,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Hotels, motels, boarding houses (transient)",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per guestroom",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per guestroom",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per guestroom",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "Dormitories, fraternities, sororities and boarding houses (not transient",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 10",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 10",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 8",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "R-2 k",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Apartment house",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per dwelling unit",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per dwelling unit",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per dwelling unit",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 kitchen sink per dwelling; 1 automatic clothes washer connection per 20 dwelling units e",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "R-3",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "One- and two-family dwellings and lodging houses with five or fewer guestrooms",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per dwelling unit",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per dwelling unit",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per dwelling unit",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "-",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 kitchen sink per dwelling; 1 automatic clothes washer connection per dwelling unit e",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "R-3 k",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Congregate living facilities with 16 or fewer persons",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 10",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 10",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 8",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "8",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Storage",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "S-1 S-2",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "Structures for the storage of goods, warehouses, storehouse and freight depots. Low and Moderate Hazard.",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "1 per 100",
+                  "rowSpan": 1,
+                  "columnSpan": 2
+                },
+                {
+                  "text": "See Section 411",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 per 1,000",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                },
+                {
+                  "text": "1 service sink",
+                  "rowSpan": 1,
+                  "columnSpan": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "currentRulePacketAnchor": true,
+      "rulePacket": {
+        "sourceID": "research-permitext_discovered-id:11909-3",
+        "sectionNumber": "403.1",
+        "textComplete": true,
+        "missingReferences": [
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "403.1.1",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "410",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "411",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "403.2.1",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "614",
+            "referenceKind": "section"
+          }
+        ]
+      }
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:11946-4",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “plumbing”, “section”, “requirement”, “fixture”, “fixtures”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “plumbing”, “section”, “requirement”, “fixture”, “fixtures”.",
+      "retrievalRank": 4,
+      "retrievalScore": 69.202,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11946",
+      "codePrefix": "PC",
+      "sectionNumber": "405.9",
+      "title": "405.9 Design and installation of plumbing fixtures.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "4",
+      "sourceChapterNumber": "4",
+      "chapterTitle": "Chapter 4: Fixtures, Faucets and Fixture Fittings",
+      "sectionGroupLabel": "SECTION PC 401",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "4",
+          "title": "Chapter 4: Fixtures, Faucets and Fixture Fittings"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 401",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "405.9 405.9 Design and installation of plumbing fixtures. Integral fixture fitting mounting surfaces on manufactured plumbing fixtures or plumbing fixtures constructed on site shall meet the design requirements of ASME A112.19.2/CSA B45.1 or ASME A112.19.3/CSA B45.4. Section PC 406: Automatic Clothes Washers",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:12299-5",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “code”, “section”, “require”, “fixture”, “fixtures”. The proposed passage contains exception language that needs professional review. The proposed passage includes a cross-reference that may require additional evidence.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “code”, “section”, “require”, “fixture”, “fixtures”. The proposed passage contains exception language that needs professional review. The proposed passage includes a cross-reference that may require additional evidence.",
+      "retrievalRank": 5,
+      "retrievalScore": 64.973,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "exception",
+        "functions": [
+          "exception"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "exception or permitted reduction"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "12299",
+      "codePrefix": "PC",
+      "sectionNumber": "614.1.3",
+      "title": "614.1.3 Access to emergency water fixtures.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "6",
+      "sourceChapterNumber": "6",
+      "chapterTitle": "Chapter 6: Water Supply and Distribution",
+      "sectionGroupLabel": "SECTION PC 601",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "6",
+          "title": "Chapter 6: Water Supply and Distribution"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 601",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "614.1.3 614.1.3 Access to emergency water fixtures. Fixtures capable of supplying an emergency source of potable water in accordance with this section shall be located indoors in one or more common areas of the building. Such area shall be on an accessible route that complies with Section 1104.3 of the New York City Building Code . Where such area requires users to pass through a doorway to access the emergency water fixture, such area shall further comply with Section 1107.3 of the New York City Building Code . Emergency fixtures shall comply with Section 1109.12 of the New York City Building Code . Exception: Such fixtures shall not be located in a bathroom or toilet room. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:11742-6",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “plumbing”, “code”, “fixture”, “fixtures”, “fixtur”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “plumbing”, “code”, “fixture”, “fixtures”, “fixtur”.",
+      "retrievalRank": 6,
+      "retrievalScore": 63.897,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11742",
+      "codePrefix": "PC",
+      "sectionNumber": "102.4.2.1",
+      "title": "102.4.2.1 Number of plumbing fixtures.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "1",
+      "sourceChapterNumber": "1",
+      "chapterTitle": "Chapter 1: Administration",
+      "sectionGroupLabel": "SECTION PC 101",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "1",
+          "title": "Chapter 1: Administration"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 101",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "102.4.2.1 102.4.2.1 Number of plumbing fixtures. For prior code buildings, the number of required plumbing fixtures shall be permitted to be calculated based on the 1968 Building Code utilizing the occupant load figures for the 1968 Building Code , or shall be permitted to be calculated based on the New York City Plumbing Code utilizing the occupant load figures from the New York City Plumbing Code.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:11912-7",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “code”, “section”, “fixture”, “fixtures”, “fixtur”. The proposed passage contains exception language that needs professional review. The proposed passage includes a cross-reference that may require additional evidence.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “code”, “section”, “fixture”, “fixtures”, “fixtur”. The proposed passage contains exception language that needs professional review. The proposed passage includes a cross-reference that may require additional evidence.",
+      "retrievalRank": 7,
+      "retrievalScore": 62.925,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "exception",
+        "functions": [
+          "exception"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "exception or permitted reduction"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11912",
+      "codePrefix": "PC",
+      "sectionNumber": "403.1.3",
+      "title": "403.1.3 Single-occupant toilet fixtures.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "4",
+      "sourceChapterNumber": "4",
+      "chapterTitle": "Chapter 4: Fixtures, Faucets and Fixture Fittings",
+      "sectionGroupLabel": "SECTION PC 401",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "4",
+          "title": "Chapter 4: Fixtures, Faucets and Fixture Fittings"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 401",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "403.1.3 403.1.3 Single-occupant toilet fixtures. Fixtures located within single-occupant toilet rooms are permitted to be included in the number of fixtures required by Section 403 , or where applicable the 1968 Building Code , for either the male or the female occupants. Fixtures located within toilet rooms subject to the exception of Section 403.2.1 are permitted to be included in the number of fixtures required by Section 403 , or where applicable the 1968 Building Code , only for that sex. (L.L. 2016/079, 6/28/2016, eff. 10/26/2016)",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:12103-8",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “supplied”, “plumbing”, “code”, “fixture”, “fixtures”.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “supplied”, “plumbing”, “code”, “fixture”, “fixtures”.",
+      "retrievalRank": 8,
+      "retrievalScore": 62.438,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "12103",
+      "codePrefix": "PC",
+      "sectionNumber": "602.2",
+      "title": "602.2 Potable water required.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "6",
+      "sourceChapterNumber": "6",
+      "chapterTitle": "Chapter 6: Water Supply and Distribution",
+      "sectionGroupLabel": "SECTION PC 601",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "6",
+          "title": "Chapter 6: Water Supply and Distribution"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 601",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "602.2 602.2 Potable water required. Only potable water shall be supplied to plumbing fixtures that provide water for drinking, bathing or culinary purposes, or for the processing of food, medical or pharmaceutical products. Unless otherwise provided in this code, potable water shall be supplied to all plumbing fixtures.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:11911-9",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “code”, “section”, “fixture”, “fixtures”, “fixtur”. The proposed passage includes a cross-reference that may require additional evidence.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “code”, “section”, “fixture”, “fixtures”, “fixtur”. The proposed passage includes a cross-reference that may require additional evidence.",
+      "retrievalRank": 9,
+      "retrievalScore": 58.168,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11911",
+      "codePrefix": "PC",
+      "sectionNumber": "403.1.2",
+      "title": "403.1.2 Family or assisted-use toilet and bath fixtures.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "4",
+      "sourceChapterNumber": "4",
+      "chapterTitle": "Chapter 4: Fixtures, Faucets and Fixture Fittings",
+      "sectionGroupLabel": "SECTION PC 401",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "4",
+          "title": "Chapter 4: Fixtures, Faucets and Fixture Fittings"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 401",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "403.1.2 403.1.2 Family or assisted-use toilet and bath fixtures. Fixtures located within family or assisted-use toilet and bathing rooms required by Section 1109.2.1 of the New York City Building Code are permitted to be included in the number of required fixtures for either the male or female occupants in assembly and mercantile occupancies.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_discovered-id:11869-10",
+      "origin": "permitext_discovered",
+      "sourceType": "enacted_text",
+      "relationship": "It matches “plumbing”, “section”, “requirement”, “fixture”, “fixtures”. The proposed passage includes a cross-reference that may require additional evidence.",
+      "authorityClass": "enacted",
+      "retrievalReason": "It matches “plumbing”, “section”, “requirement”, “fixture”, “fixtures”. The proposed passage includes a cross-reference that may require additional evidence.",
+      "retrievalRank": 10,
+      "retrievalScore": 56.987,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 0,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "candidate",
+        "functions": [
+          "candidate"
+        ],
+        "materialityRank": 9,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": []
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11869",
+      "codePrefix": "PC",
+      "sectionNumber": "310.2",
+      "title": "310.2 Location of fixtures and compartments",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "3",
+      "sourceChapterNumber": "3",
+      "chapterTitle": "Chapter 3: General Regulations",
+      "sectionGroupLabel": "SECTION PC 301",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "3",
+          "title": "Chapter 3: General Regulations"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 301",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "310.2 310.2 Location of fixtures and compartments The location of plumbing fixtures and the requirements for compartments and partitions shall be in accordance with Section 405 .",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:11913-1",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+      "authorityClass": "enacted",
+      "retrievalReason": "Direct cross-reference to PC 403.2",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "exception",
+        "functions": [
+          "exception",
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "exception or permitted reduction",
+          "supporting cross-reference"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11913",
+      "codePrefix": "PC",
+      "sectionNumber": "403.2",
+      "title": "403.2 Separate facilities.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "4",
+      "sourceChapterNumber": "4",
+      "chapterTitle": "Chapter 4: Fixtures, Faucets and Fixture Fittings",
+      "sectionGroupLabel": "SECTION PC 401",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "4",
+          "title": "Chapter 4: Fixtures, Faucets and Fixture Fittings"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 401",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "403.2 403.2 Separate facilities. Where plumbing fixtures are required, separate facilities shall be provided for each sex. Exceptions: 1. Separate facilities shall not be required for dwelling units and sleeping units. 2. In structures or tenant spaces where combined employee and public toilet facilities are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of employees, customers, patrons and visitors is 30 or fewer. 3. In structures or tenant spaces where required toilet facilities for only employee use are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of employees is 30 or fewer. 4. In structures or tenant spaces where required toilet facilities for only public use are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of customers, patrons and visitors is 30 or fewer.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "rulePacket": {
+        "sourceID": "research-permitext_cross_reference-id:11913-1",
+        "sectionNumber": "403.2",
+        "textComplete": true,
+        "missingReferences": [
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "403.3",
+            "referenceKind": "section"
+          }
+        ]
+      }
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:12002-10",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+      "authorityClass": "enacted",
+      "retrievalReason": "Direct cross-reference to PC 419.2",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "12002",
+      "codePrefix": "PC",
+      "sectionNumber": "419.2",
+      "title": "419.2 Substitution for water closets.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "4",
+      "sourceChapterNumber": "4",
+      "chapterTitle": "Chapter 4: Fixtures, Faucets and Fixture Fittings",
+      "sectionGroupLabel": "SECTION PC 401",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "4",
+          "title": "Chapter 4: Fixtures, Faucets and Fixture Fittings"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 401",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "419.2 419.2 Substitution for water closets. In each bathroom or toilet room, urinals shall not be substituted for more than 50 percent of the required water closets.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "rulePacket": {
+        "sourceID": "research-permitext_cross_reference-id:12002-10",
+        "sectionNumber": "419.2",
+        "textComplete": true,
+        "missingReferences": []
+      }
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:11821-13",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+      "authorityClass": "enacted",
+      "retrievalReason": "Direct cross-reference to PC 303.1",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11821",
+      "codePrefix": "PC",
+      "sectionNumber": "303.1",
+      "title": "303.1 Identification.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "3",
+      "sourceChapterNumber": "3",
+      "chapterTitle": "Chapter 3: General Regulations",
+      "sectionGroupLabel": "SECTION PC 301",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "3",
+          "title": "Chapter 3: General Regulations"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 301",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "303.1 303.1 Identification. Each length of pipe and each pipe fitting, trap, fixture, material and device utilized in a plumbing system shall bear the identification of the manufacturer and any markings required by the applicable referenced standards.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "rulePacket": {
+        "sourceID": "research-permitext_cross_reference-id:11821-13",
+        "sectionNumber": "303.1",
+        "textComplete": true,
+        "missingReferences": []
+      }
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:11825-15",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+      "authorityClass": "enacted",
+      "retrievalReason": "Direct cross-reference to PC 304.1",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11825",
+      "codePrefix": "PC",
+      "sectionNumber": "304.1",
+      "title": "304.1 General.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "3",
+      "sourceChapterNumber": "3",
+      "chapterTitle": "Chapter 3: General Regulations",
+      "sectionGroupLabel": "SECTION PC 301",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "3",
+          "title": "Chapter 3: General Regulations"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 301",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "304.1 304.1 General. Plumbing systems shall be designed and installed in accordance with Sections 304.2 and 304.4 to prevent rodents from entering structures.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "rulePacket": {
+        "sourceID": "research-permitext_cross_reference-id:11825-15",
+        "sectionNumber": "304.1",
+        "textComplete": true,
+        "missingReferences": [
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "304.2",
+            "referenceKind": "section"
+          },
+          {
+            "codePrefix": "PC",
+            "sectionNumber": "304.4",
+            "referenceKind": "section"
+          }
+        ]
+      }
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:12677-20",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+      "authorityClass": "enacted",
+      "retrievalReason": "Direct cross-reference to PC 1104.3",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "12677",
+      "codePrefix": "PC",
+      "sectionNumber": "1104.3",
+      "title": "1104.3 Combining storm with sanitary drainage.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "11",
+      "sourceChapterNumber": "11",
+      "chapterTitle": "Chapter 11: Storm Drainage",
+      "sectionGroupLabel": "SECTION PC 1101",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "11",
+          "title": "Chapter 11: Storm Drainage"
+        },
+        "sectionGroup": {
+          "label": "SECTION PC 1101",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "1104.3 1104.3 Combining storm with sanitary drainage. The sanitary and storm drainage systems of a structure shall be entirely separate except for minor modifications to existing buildings having combined systems. Where a combined building drain is utilized, the building storm drain shall be connected in the same horizontal plane through a single-wye fitting to the building drain at least 10 feet (3048 mm) downstream from any soil stack. If a separate city storm sewer is not available, building sanitary drains shall be separate and shall only be permitted to connect to a common building combined drain downstream of building (house) trap.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:10215-interpretation-01",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Same-edition interpretation context for operative MC evidence",
+      "authorityClass": "enacted",
+      "retrievalReason": "Optional same-authority enacted interpretation context",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20261003-same-authority-interpretation-context-v1",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "10215",
+      "codePrefix": "MC",
+      "sectionNumber": "102.1",
+      "title": "102.1 General.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "1",
+      "sourceChapterNumber": "1",
+      "chapterTitle": "Chapter 1: Administration",
+      "sectionGroupLabel": "SECTION MC 101",
+      "sectionGroupTitle": "General",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "1",
+          "title": "Chapter 1: Administration"
+        },
+        "sectionGroup": {
+          "label": "SECTION MC 101",
+          "title": "General"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "102.1 102.1 General. Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in a specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "interpretationContext": true,
+      "optional": true,
+      "referencePurpose": "canonical_interpretation_context",
+      "anchorSourceIDs": [
+        "research-permitext_discovered-id:11075-1"
+      ],
+      "anchorSectionIDs": [
+        "11075"
+      ]
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:11-interpretation-11",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Same-edition interpretation context for operative BC evidence",
+      "authorityClass": "enacted",
+      "retrievalReason": "Optional same-authority enacted interpretation context",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20261003-same-authority-interpretation-context-v1",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20261003-embedded-definition-role-v8",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ]
+      },
+      "retrievedAt": "2026-10-05T20:10:06.582Z",
+      "sectionID": "11",
+      "codePrefix": "BC",
+      "sectionNumber": "102.1",
+      "title": "102.1 General.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "chapterNumber": "1",
+      "sourceChapterNumber": "1",
+      "chapterTitle": "Chapter 1: Administration",
+      "sectionGroupLabel": "SECTION BC 102",
+      "sectionGroupTitle": "APPLICABILITY",
+      "canonicalApplicabilityContext": {
+        "version": "canonical-source-context-v1",
+        "metadataAvailable": true,
+        "chapter": {
+          "number": "1",
+          "title": "Chapter 1: Administration"
+        },
+        "sectionGroup": {
+          "label": "SECTION BC 102",
+          "title": "APPLICABILITY"
+        },
+        "projectApplicability": "not_established_by_source_metadata"
+      },
+      "text": "102.1 102.1 General. Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in any specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern.",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null,
+      "interpretationContext": true,
+      "optional": true,
+      "referencePurpose": "canonical_interpretation_context",
+      "anchorSourceIDs": [
+        "research-permitext_discovered-id:1723-2"
+      ],
+      "anchorSectionIDs": [
+        "1723"
+      ]
+    }
+  ],
+  "usage": {
+    "pinnedCount": 0,
+    "pinnedCharacterCount": 0,
+    "pinnedCanonicalContextCharacterCount": 0,
+    "pinnedSelectionExactCount": 0,
+    "pinnedSelectionTruncatedCount": 0,
+    "pinnedSelectionExcerptedCount": 0,
+    "structuredPinnedCount": 0,
+    "supplementalCharacterCeiling": 48000,
+    "initialSupplementalCharacterCeiling": 45952,
+    "repairCharacterReservation": 2048,
+    "repairCrossReferenceReservation": 1,
+    "supplementalCharacterCount": 16855,
+    "candidateCount": 12,
+    "discoveredCount": 10,
+    "targetedDefinitionCount": 1,
+    "crossReferenceCount": 5,
+    "topicDependencyCount": 0,
+    "interpretationContextCount": 2,
+    "chapterScopeContextCount": 0,
+    "characterCount": 16855,
+    "resolverFailureCount": 5,
+    "nonMaterialCandidateCount": 0
+  },
+  "limitations": [
+    {
+      "kind": "canonical-section-unavailable",
+      "count": 5,
+      "text": "5 enacted sections were not available from the canonical resolver."
+    },
+    {
+      "kind": "targeted-definition-excerpt",
+      "count": 1,
+      "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+    },
+    {
+      "kind": "cross-reference-limit",
+      "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+    },
+    {
+      "kind": "retrieval-completeness",
+      "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+    }
+  ],
+  "discovery": {
+    "retrievalVersion": "20261004-current-purpose-edition-recall-v67",
+    "searchedSectionCount": 12891,
+    "outsideCurrentLibrary": [],
+    "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+    "searchedCorpora": [
+      {
+        "id": "nyc-2022-construction-codes",
+        "label": "2022 NYC Construction Codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codePrefixes": [
+          "AC",
+          "BC",
+          "FGC",
+          "MC",
+          "PC"
+        ],
+        "routeReason": "construction-code cue"
+      }
+    ],
+    "pinnedCorpora": [],
+    "unavailableCorpora": [],
+    "excludedCorpora": [
+      {
+        "id": "nyc-existing-building-code-2027",
+        "label": "NYC Existing Building Code",
+        "applicabilityStatus": "future-effective",
+        "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+        "routeReason": "excluded from ordinary Research"
+      },
+      {
+        "id": "nyc-1968-building-code",
+        "label": "1968 NYC Building Code",
+        "applicabilityStatus": "historical",
+        "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+        "routeReason": "excluded from ordinary Research"
+      }
+    ]
+  },
+  "corpusPlan": {
+    "schemaVersion": 1,
+    "registryVersion": "20261003-explicit-issue-corpus-boundary-v20",
+    "routingMode": "question-and-conversation-topic",
+    "selected": [
+      {
+        "jurisdiction": "New York City",
+        "authorityClass": "enacted",
+        "id": "nyc-2022-construction-codes",
+        "label": "2022 NYC Construction Codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeYear": 2022,
+        "codePrefixes": [
+          "AC",
+          "BC",
+          "FGC",
+          "MC",
+          "PC"
+        ],
+        "applicabilityStatus": "current-enacted-edition",
+        "automaticResearchEligible": true,
+        "optInRequired": false,
+        "aliases": [
+          "nyc-2022",
+          "2022 construction codes"
+        ],
+        "retrievalRole": "requested",
+        "routeReason": "construction-code cue",
+        "blockedReason": null
+      }
+    ],
+    "unavailable": [],
+    "excluded": [
+      {
+        "jurisdiction": "New York City",
+        "authorityClass": "enacted",
+        "id": "nyc-existing-building-code-2027",
+        "label": "NYC Existing Building Code",
+        "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+        "codeYear": 2026,
+        "codePrefixes": [
+          "EBC"
+        ],
+        "applicabilityStatus": "future-effective",
+        "automaticResearchEligible": false,
+        "optInRequired": true,
+        "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+        "aliases": [
+          "existing building code",
+          "ebc"
+        ],
+        "retrievalRole": "requested",
+        "routeReason": "excluded from ordinary Research"
+      },
+      {
+        "jurisdiction": "New York City",
+        "authorityClass": "enacted",
+        "id": "nyc-1968-building-code",
+        "label": "1968 NYC Building Code",
+        "codeEdition": "1968 NYC Building Code — historical",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "codeYear": 1968,
+        "codePrefixes": [
+          "BC68"
+        ],
+        "applicabilityStatus": "historical",
+        "automaticResearchEligible": false,
+        "optInRequired": true,
+        "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+        "aliases": [
+          "1968 building code",
+          "bc68"
+        ],
+        "retrievalRole": "requested",
+        "routeReason": "excluded from ordinary Research"
+      }
+    ],
+    "requestedCorpusIDs": [
+      "nyc-2022-construction-codes"
+    ],
+    "pinnedCorpora": []
+  }
+}
