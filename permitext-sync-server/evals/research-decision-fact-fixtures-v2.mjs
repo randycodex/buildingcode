@@ -12,7 +12,21 @@ export async function researchDecisionFactFixturesV2() {
   laundry.answer = applyResearchPlumbingSourceRepairs(laundry.answer, laundry.evidence, { question: laundry.question });
   laundry.answer = JSON.parse(JSON.stringify(laundry.answer)); // Match the delivered/provider JSON, omitting undefined fields.
   const delivered = deliveredRun.results.find((item) => item.id === "PC-04").answer;
-  for (const key of Object.keys(laundry.answer)) assert.deepEqual(laundry.answer[key], delivered[key],
+  // Current validation adds explicit non-entitlement metadata to citations.
+  // Retain that boundary in today's diagnostic input while comparing every
+  // historical identity, passage and answer field exactly with the saved run.
+  const historicalCitationFields = citation => {
+    const { canonicalApplicabilityContext, supportingPassages, ...fields } = citation;
+    assert.deepEqual(canonicalApplicabilityContext, { version: "canonical-source-context-v1",
+      metadataAvailable: false, projectApplicability: "not_established_by_source_metadata" });
+    return { ...fields, supportingPassages: supportingPassages.map(passage => {
+      const { canonicalApplicabilityContext: context, ...savedFields } = passage;
+      assert.deepEqual(context, canonicalApplicabilityContext);
+      return savedFields;
+    }) };
+  };
+  for (const key of Object.keys(laundry.answer)) assert.deepEqual(
+    key === "citations" ? laundry.answer.citations.map(historicalCitationFields) : laundry.answer[key], delivered[key],
     `The diagnostic must reproduce the delivered ${key}, including pre-verification source repairs.`);
   Object.assign(laundry, { id: "PC-04-delivered-decision-facts", expectedIssueTypes: ["unnecessary_qualification"],
     expectedRepairApplied: true, purpose: "Actual delivered answer with all source bindings preserved; only unnecessary missing facts should fail." });

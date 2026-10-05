@@ -1,17 +1,49 @@
 // Verifier-only challenge cases. Expected outcomes never enter provider input.
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { assembledResearchEvidenceForTurn, deterministicResearchEvidenceAnalysisForTurn,
+import { deterministicResearchEvidenceAnalysisForTurn,
   normalizeResearchInterpretationEvidenceBindings, validateResearchInterpretation } from "../app.mjs";
 import { requiredResearchClaimsFromEvidence } from "../research-required-claim-coverage.mjs";
+
+// This historical verifier diagnostic must keep the supplied passage identities
+// and text with its recorded draft. Fresh retrieval assigns different passage
+// IDs and is not a reconstruction of the old input. The saved citation passages
+// are server-owned evidence snapshots, not authority inferred from model prose.
+// They preserve cited evidence only, not the entire historical retrieval packet.
+export function recordedDecisionFactEvidence(answer) {
+  const sources = new Map();
+  for (const citation of answer.citations) {
+    assert(citation.sectionID && citation.codePrefix && citation.codeVersion && citation.codeEdition && citation.corpusID);
+    assert.deepEqual(citation.supportingPassages.map(passage => passage.sourceID), citation.sourceIDs);
+    for (const passage of citation.supportingPassages) {
+      assert.equal(typeof passage.selectedText, "string");
+      assert(passage.selectedText.trim(), "A historical binding requires its actual saved source text");
+      const source = {
+        sectionID: citation.sectionID, sourceID: passage.sourceID,
+        codePrefix: citation.codePrefix, sectionNumber: citation.sectionNumber, title: citation.title,
+        codeVersion: citation.codeVersion, codeEdition: citation.codeEdition,
+        corpusID: citation.corpusID, corpusLabel: citation.corpusLabel,
+        jurisdiction: answer.codeBasis.jurisdiction, applicabilityStatus: citation.applicabilityStatus,
+        authorityClass: "enacted", origin: "permitext_discovered", text: passage.selectedText,
+        visualSources: structuredClone(passage.visualSources || []),
+        evidencePriority: { evidenceRole: citation.evidenceRole, claimCoverageRequired: false },
+        canonicalContextComplete: false,
+        provenance: { historicalCitedPassageSnapshot: true, canonicalContextComplete: false }
+      };
+      if (sources.has(source.sourceID)) assert.deepEqual(sources.get(source.sourceID), source,
+        "A saved passage ID cannot acquire different authority or text");
+      else sources.set(source.sourceID, source);
+    }
+  }
+  return [...sources.values()];
+}
 
 export async function researchDecisionFactFixtures() {
   const recorded = JSON.parse(await readFile(new URL("./results/research-owner-live-compact-confirmation-2026-09-08.json", import.meta.url)));
   const fixtures = [];
   for (const id of ["PC-04", "PC-10"]) {
     const result = recorded.results.find((item) => item.id === id);
-    const assembled = await assembledResearchEvidenceForTurn({ question: result.question, messages: [], pinnedEvidence: [], projectFacts: [] });
-    const evidence = assembled.sources;
+    const evidence = recordedDecisionFactEvidence(result.answer);
     const call = recorded.providerCalls.find((item) => item.caseID === id && item.phase === "permitext_code_interpretation");
     const draft = JSON.parse(call.output.flatMap((item) => item.content || []).filter((item) => item.type === "output_text").map((item) => item.text).join(""));
     const answer = validateResearchInterpretation(normalizeResearchInterpretationEvidenceBindings(draft, evidence), evidence);

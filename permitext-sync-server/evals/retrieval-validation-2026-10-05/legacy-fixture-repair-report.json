@@ -1,0 +1,63 @@
+{
+  "status": "legacy_offline_fixture_failures_resolved_independent_acceptance_review_pending",
+  "recordedAt": "2026-10-05T18:50:47.178344+00:00",
+  "baseCommit": "fb729e359fd79f07e452a7fb9d71617821e02719",
+  "productionRuntimeChanged": false,
+  "changes": [
+    "Historical verifier fixtures use exact server-saved cited passage snapshots with original IDs and enacted text; explicitly do not reconstruct the entire historical retrieval packet or assert complete canonical context.",
+    "Current canonical applicability metadata is retained and checked separately from the exact historical citation fields. Metadata cannot establish project applicability.",
+    "Current HTTP fixture rebinding requires the exact section, code, edition, version and saved enacted text in the request. The preserved narrative, supported points and citations are compared exactly after that fixture-only rebinding.",
+    "Certified unnecessary-missing-fact candidates use the existing field-only edit followed by fresh full-answer verification. Final rejection remains persisted only as an uncharged clarification. Recorded usage is preserved, with no extra synthetic generation phase.",
+    "Unsupported requirements and unsafe categorical zoning answers are expected to take the existing full-rewrite path. Rejection, charging and persistence guards remain asserted."
+  ],
+  "offline": {
+    "externalProviderCalls": 0,
+    "passed": [
+      "research-decision-fact-contract.mjs",
+      "research-decision-fact-fixtures-v2-contract.mjs",
+      "research-decision-fact-fixtures-v3-contract.mjs",
+      "research-decision-fact-repair-contract.mjs",
+      "research-decision-fact-repair-http-contract.mjs",
+      "research-zoning-conditional-http-contract.mjs"
+    ],
+    "historicalSnapshotNegativeControls": [
+      "Conflicting text for the same saved passage identity rejected.",
+      "Empty saved enacted text rejected."
+    ],
+    "httpFlows": {
+      "decisionFacts": 4,
+      "conditionalZoning": 30,
+      "additionalLongConversationTurns": 101
+    },
+    "fullSuiteGreenClaimed": false,
+    "limitation": "Contracts establish fixture integrity, routing, verification and accounting mechanics; provider verdicts are recorded or synthetic, not fresh model accuracy evidence."
+  },
+  "preserved": {
+    "historicalRecordedProviderRunsUnchanged": true,
+    "previousFailureReportUnchanged": true,
+    "originalFrozenGrade": "35/40",
+    "separateExploratoryGrade": "9/10",
+    "scoresCombined": false,
+    "ledgerUnchanged": true,
+    "ledgerSHA256": "14e3088150b3d1402b1c02b2b86b857098735d256f723dcba128fa6e555ebe67"
+  },
+  "budget": {
+    "capUSD": 10.99,
+    "estimatedUsageCostUSD": 1.933936815,
+    "calls": 381,
+    "statuses": {
+      "settled": 379,
+      "rejected": 2
+    },
+    "newPaidCalls": 0,
+    "actualBillingDeductionsVerified": false
+  },
+  "unresolved": [
+    "Independent interpretation of hub-drain modifier scope, covered-display cross-code qualifications and sloping-sidewalk transparency measurement.",
+    "Independent review and final freeze of the new forty-turn acceptance rubric; no acceptance generation performed.",
+    "The exact all-supported false_evidence_limitation source-explanation route has offline coverage but did not occur organically in the local native diagnostic runs.",
+    "Production browser sign-in, actual subscription access and hosted native Responses behavior remain unverified."
+  ],
+  "deploymentPerformed": false,
+  "general95PercentEstablished": false
+}

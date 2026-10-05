@@ -171,9 +171,11 @@ try {
         if (answers.length) { assert.equal(answers[0].answer.mode, "clarification"); assert.equal(answers[0].answer.charged, false); }
       }
       assert.deepEqual(phases, ["verification_reject", "binding_reject"].includes(mode)
-        ? ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_targeted_revision", "permitext_research_verification"]
+        // An unsupported requirement cannot use an unconditional zoning patch.
+        // It receives a full rewrite and a second substantive rejection here.
+        ? ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]
         : ["accept", "binding_accept"].includes(mode) ? ["permitext_code_interpretation", "permitext_research_verification"]
-        : mode === "unsafe" ? ["permitext_code_interpretation", "permitext_research_targeted_revision"] : ["permitext_code_interpretation"]);
+        : mode === "unsafe" ? ["permitext_code_interpretation", "permitext_code_interpretation"] : ["permitext_code_interpretation"]);
       const telemetry = await request("/internal/evaluations/data", { auth }, token);
       const operations = telemetry.body.researchSpend.operationMetrics.filter((operation) => !seen.has(operation.id));
       assert.equal(operations.length, 1);

@@ -1,5 +1,5 @@
 import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
-// Recorded initial drafts/verdicts and usage with a synthetic full-answer revision.
+// Recorded initial drafts/verdicts and usage with a certified field-only candidate.
 // Final-rejection controls prove that a revision cannot approve itself. No paid calls.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
@@ -30,64 +30,107 @@ let accept;
 let phases;
 let firstProposed;
 let secondProposed;
-globalThis.fetch = async (url, options) => {
-  assert.equal(String(url), "https://api.openai.com/v1/responses");
-  const body = JSON.parse(options.body);
-  const phase = body.text.format.name;
-  phases.push(phase);
-  let call;
-  let output;
-  if (phase === "permitext_code_interpretation") {
-    assert(phases.length === 1 || phases.length === 3);
-    call = recorded.providerCalls.find((item) => item.caseID === active.id && item.phase === phase);
-    output = call.output;
-    if (phases.length === 3) {
-      assert(body.input.includes("Review the whole answer"));
-      output = [{ type: "message", content: [{ type: "output_text", text: JSON.stringify({ ...active.answer, missingFacts: [] }) }] }];
-    }
-  } else if (phase === "permitext_research_targeted_revision") {
-    assert.equal(phases.length, 3);
-    call = recorded.providerCalls.find(item => item.caseID === active.id && item.phase === "permitext_code_interpretation");
-    const targets = JSON.parse(body.input.split("EDITABLE TEXT TARGETS\n")[1]);
-    const patch = { edits: targets.filter(t => t.path.startsWith("missingFacts/")).map(t => ({targetID:t.id, after:"", remove:true})), bindingAdditions:[], pointRemovals:[], citationRemovals:[] };
-    assert.equal(patch.edits.length, firstProposed.missingFacts.length);
-    output = [{type:"message",content:[{type:"output_text",text:JSON.stringify(patch)}]}];
-  } else {
-    assert.equal(phase, "permitext_research_verification");
-    assert(phases.length === 2 || phases.length === 4);
-    const proposed = JSON.parse(body.input.split("PROPOSED ANSWER JSON\n")[1]);
-    const verificationRun = active.id === "PC-04" ? laundryVerification : panVerification;
-    const verificationCaseID = active.id === "PC-04"
-      ? (phases.length === 2 ? "PC-04-delivered-decision-facts" : "PC-04-delivered-facts-corrected")
-      : (phases.length === 2 ? "PC-10-recorded" : "PC-10-decision-facts-only");
-    call = verificationRun.providerCalls.find((item) => item.caseID === verificationCaseID && item.phase === phase);
-    const recordedVerdict = verificationRun.results.find((item) => item.id === verificationCaseID).verification;
-    let verdict;
-    if (phases.length === 2) {
-      firstProposed = proposed;
-      assert.deepEqual(proposed.missingFacts, active.answer.missingFacts);
-      for (const key of ["answerText", "supportedPoints", "citations"]) {
-        assert.deepEqual(proposed[key], active.answer[key], `The verifier must receive the delivered ${key}, including source repairs.`);
-      }
-      // Explicit synthetic scope annotation for the new field; historical verdicts
-      // predate it. Keep the recorded issues, indices, draft, and usage unchanged.
-      verdict = {...recordedVerdict, missingFactsOnly: true};
-      assert.equal(verdict.pass, false);
-      assert.deepEqual(verdict.unnecessaryMissingFactIndices, proposed.missingFacts.map((_, index) => index));
-    } else {
-      secondProposed = proposed;
-      assert.deepEqual(secondProposed, { ...firstProposed, missingFacts: [] },
-        "The final verifier must receive the full revised candidate, not approve it from the first verdict.");
-      assert.equal(recordedVerdict.pass, true);
-      verdict = accept ? recordedVerdict : {
-        pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final rejection: removing facts never approves an answer by itself." }], unnecessaryMissingFactIndices: []
-      };
-    }
-    output = phases.length !== 2 && accept ? call.output
-      : [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(verdict) }] }];
+let providerDoubleError;
+let reboundHistoricalAnswer;
+// Current retrieval may assign new passage IDs. Rebind this provider double
+// only when the supplied section, code, edition, version and exact saved text
+// all match. This is fixture compatibility, never a production binding bypass.
+function rebindRecordedDraft(body, draft) {
+  const passages = body.input.split("\n\n---\n\n").map(block => {
+    const sourceID = block.match(/PASSAGE_ID: ([^\n]+)/)?.[1];
+    return { sourceID, block };
+  }).filter(passage => passage.sourceID);
+  const bindings = new Map();
+  for (const citation of active.answer.citations) for (const passage of citation.supportingPassages) {
+    const matches = passages.filter(({ block }) =>
+      block.includes(`SECTION_ID: ${citation.sectionID}\nCODE: ${citation.codePrefix}\nSECTION: ${citation.sectionNumber}\n`) &&
+      block.includes(`CODE_EDITION: ${citation.codeEdition}\nCODE_VERSION: ${citation.codeVersion}\n`) &&
+      block.match(/(?:^|\n)ENACTED_TEXT: ([^\n]+)/)?.[1] === passage.selectedText);
+    assert.equal(matches.length, 1, "Rebinding requires one exact enacted passage in the current request.");
+    bindings.set(passage.sourceID, matches[0].sourceID);
   }
-  // Preserve actual recorded token usage, including each live verifier phase.
-  return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: call.usage, output }));
+  const rebind = answer => {
+    const copy = structuredClone(answer);
+    for (const item of [...copy.supportedPoints, ...copy.citations]) {
+      item.sourceIDs = item.sourceIDs.map(id => { assert(bindings.has(id)); return bindings.get(id); });
+      for (const passage of item.supportingPassages || []) passage.sourceID = bindings.get(passage.sourceID);
+    }
+    return copy;
+  };
+  reboundHistoricalAnswer = rebind(active.answer);
+  return rebind(draft);
+}
+// The recorded run predates canonical chapter/scope metadata. Compare every
+// historical citation field exactly, and separately require today's metadata
+// to remain present and explicitly avoid establishing project applicability.
+const historicalCitationFields = citation => {
+  const { canonicalApplicabilityContext: context, chapterNumber, chapterTitle, supportingPassages, ...fields } = citation;
+  assert.equal(context.version, "canonical-source-context-v1");
+  assert.equal(context.metadataAvailable, true);
+  assert.equal(context.projectApplicability, "not_established_by_source_metadata");
+  assert.equal(context.chapter.number, chapterNumber);
+  assert.equal(context.chapter.title, chapterTitle);
+  assert(context.sectionGroup.label && context.sectionGroup.title);
+  return { ...fields, supportingPassages: supportingPassages.map(passage => {
+    const { canonicalApplicabilityContext, ...savedFields } = passage;
+    assert.deepEqual(canonicalApplicabilityContext, context);
+    return savedFields;
+  }) };
+};
+globalThis.fetch = async (url, options) => {
+  try {
+    assert.equal(String(url), "https://api.openai.com/v1/responses");
+    const body = JSON.parse(options.body);
+    const phase = body.text.format.name;
+    phases.push(phase);
+    let call;
+    let output;
+    if (phase === "permitext_code_interpretation") {
+      assert.equal(phases.length, 1);
+      call = recorded.providerCalls.find((item) => item.caseID === active.id && item.phase === phase);
+      const draft = JSON.parse(call.output.flatMap(item => item.content || []).filter(item => item.type === "output_text").map(item => item.text).join(""));
+      output = [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(rebindRecordedDraft(body, draft)) }] }];
+    } else {
+      assert.equal(phase, "permitext_research_verification");
+      assert(phases.length === 2 || phases.length === 3);
+      const proposed = JSON.parse(body.input.split("PROPOSED ANSWER JSON\n")[1]);
+      const verificationRun = active.id === "PC-04" ? laundryVerification : panVerification;
+      const verificationCaseID = active.id === "PC-04"
+        ? (phases.length === 2 ? "PC-04-delivered-decision-facts" : "PC-04-delivered-facts-corrected")
+        : (phases.length === 2 ? "PC-10-recorded" : "PC-10-decision-facts-only");
+      call = verificationRun.providerCalls.find((item) => item.caseID === verificationCaseID && item.phase === phase);
+      const recordedVerdict = verificationRun.results.find((item) => item.id === verificationCaseID).verification;
+      let verdict;
+      if (phases.length === 2) {
+        firstProposed = proposed;
+        assert.deepEqual(proposed.missingFacts, active.answer.missingFacts);
+        for (const key of ["answerText", "supportedPoints", "citations"]) {
+          assert.deepEqual(key === "citations" ? proposed.citations.map(historicalCitationFields) : proposed[key],
+            reboundHistoricalAnswer[key], `The verifier must receive the delivered ${key}, including source repairs.`);
+        }
+        // Explicit synthetic scope annotation for the new field; historical verdicts
+        // predate it. Keep the recorded issues, indices, draft, and usage unchanged.
+        verdict = {...recordedVerdict, missingFactsOnly: true};
+        assert.equal(verdict.pass, false);
+        assert.deepEqual(verdict.unnecessaryMissingFactIndices, proposed.missingFacts.map((_, index) => index));
+      } else {
+        secondProposed = proposed;
+        assert.deepEqual(secondProposed, { ...firstProposed, missingFacts: [] },
+          "The final verifier must receive the full revised candidate, not approve it from the first verdict.");
+        assert.equal(recordedVerdict.pass, true);
+        verdict = accept ? recordedVerdict : {
+          pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final rejection: removing facts never approves an answer by itself." }], unnecessaryMissingFactIndices: []
+        };
+      }
+      output = phases.length !== 2 && accept ? call.output
+        : [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(verdict) }] }];
+    }
+    // Preserve actual recorded token usage, including each live verifier phase.
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: call.usage, output }));
+  } catch (error) {
+    providerDoubleError = error;
+    throw error;
+  }
 };
 let server;
 try {
@@ -110,17 +153,19 @@ try {
     active = record;
     accept = accepted;
     phases = [];
+    providerDoubleError = undefined;
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
     const response = await request("/research/conversations/message", { auth, conversationID, question: active.question, requestID: randomUUID() }, token);
-    assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_targeted_revision", "permitext_research_verification"]);
+    if (providerDoubleError) throw providerDoubleError;
+    assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_verification"]);
     if (accept) {
       assert.equal(response.status, 200, JSON.stringify(response.body));
       const answer = response.body.conversation.messages.findLast((message) => message.role === "assistant").answer;
       assert.equal(answer.answerText, active.answer.answerText);
       assert.deepEqual(answer.missingFacts, []);
-      assert.notEqual(answer.verification.decisionFactRepairApplied, true);
-      assert.equal(answer.verification.regenerated, true);
+      assert.equal(answer.verification.decisionFactRepairApplied, true);
+      assert.equal(answer.verification.regenerated, false);
       assert.equal(answer.verification.attempts, 2);
     } else {
       assert.equal(response.status, 200, JSON.stringify(response.body));
@@ -135,12 +180,12 @@ try {
     const operation = operations[0];
     seen.add(operation.id);
     assert.equal(operation.charged, accept);
-    assert.equal(operation.providerRequestCount, 4);
+    assert.equal(operation.providerRequestCount, 3);
     assert.equal(operation.pendingProviderRequestCount, 0);
-    // Includes the additional full-generation fixture usage on the revision.
+    // Only the draft and two fresh verifier envelopes incur provider usage.
     const expectedAccounting = active.id === "PC-04"
-      ? { cacheWrites: 35250 + 15176, costUSD: .095319 }
-      : { cacheWrites: 18696 + 9020, costUSD: .063473 };
+      ? { cacheWrites: 35250, costUSD: .050629 }
+      : { cacheWrites: 18696, costUSD: .033381 };
     assert.equal(operation.cacheWriteInputTokens, expectedAccounting.cacheWrites);
     assert.equal(operation.actualProviderCostUSD, expectedAccounting.costUSD);
     if (accept) assert(Math.abs(operation.estimatedCostUSD - operation.actualProviderCostUSD) <= .000001);
@@ -151,4 +196,4 @@ try {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   await rm(scratch, { recursive: true, force: true });
 }
-console.log("Decision-fact HTTP replays passed: four flows, recorded verdict fixtures and synthetic full revisions, preserved answer/citations, synthetic final rejection blocks saving/charging, one bounded full rewrite, recorded usage under the local $1.50 turn cap.");
+console.log("Decision-fact HTTP replays passed: four flows, recorded verdict fixtures and certified field-only candidates, preserved answer/citations, synthetic final rejection blocks saving/charging, fresh full-answer verification, recorded usage under the local $1.50 turn cap.");

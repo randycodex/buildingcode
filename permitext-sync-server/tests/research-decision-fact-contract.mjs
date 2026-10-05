@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { researchDecisionFactInstruction, researchAnswerPresentationContract } from "../research-answer-presentation.mjs";
-import { researchDecisionFactFixtures, decisionFactVerifierInput } from "../evals/research-decision-fact-fixtures.mjs";
+import { researchDecisionFactFixtures, decisionFactVerifierInput, recordedDecisionFactEvidence } from "../evals/research-decision-fact-fixtures.mjs";
+import { readFile } from "node:fs/promises";
 import { buildResearchRequestEnvelopeBuilders, researchRequestEnvelopeEnvironment } from "./research-request-envelope-preflight.mjs";
 import { beginResearchSpendReservation, reserveResearchProviderSpend, endResearchSpendReservation } from "../research-config.mjs";
 
@@ -8,6 +9,26 @@ process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = "1";
 globalThis.fetch = async () => { throw new Error("Network forbidden in decision-fact contract."); };
 const fixtures = await researchDecisionFactFixtures();
 assert.equal(fixtures.length, 7);
+const saved = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-compact-confirmation-2026-09-08.json", import.meta.url)));
+for (const result of saved.results) {
+  const evidence = recordedDecisionFactEvidence(result.answer);
+  for (const citation of result.answer.citations) for (const passage of citation.supportingPassages) {
+    const source = evidence.find(item => item.sourceID === passage.sourceID);
+    assert.equal(source.sectionID, citation.sectionID);
+    assert.equal(source.codeVersion, citation.codeVersion);
+    assert.equal(source.codeEdition, citation.codeEdition);
+    assert.equal(source.corpusID, citation.corpusID);
+    assert.equal(source.text, passage.selectedText);
+    assert.equal(source.canonicalContextComplete, false, "Cited snapshots cannot establish full historical retrieval coverage.");
+  }
+}
+const conflicting = structuredClone(saved.results[0].answer);
+conflicting.citations.push(structuredClone(conflicting.citations[0]));
+conflicting.citations.at(-1).supportingPassages[0].selectedText += " Invented exception.";
+assert.throws(() => recordedDecisionFactEvidence(conflicting), /cannot acquire different authority or text/);
+const missingPassage = structuredClone(saved.results[0].answer);
+missingPassage.citations[0].supportingPassages[0].selectedText = "";
+assert.throws(() => recordedDecisionFactEvidence(missingPassage), /requires its actual saved source text/);
 // This retained diagnostic's $0.24 authorization covers the older low-effort
 // verifier. Production role defaults are checked by the Fast HTTP contract.
 const environment = { ...researchRequestEnvelopeEnvironment, PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.24",
