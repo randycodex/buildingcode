@@ -184,6 +184,28 @@ try {
     await request(path, { projectID: "handoff-a" }, 401, "invalid-session");
     await request(path, { projectID: "unowned-project" }, 404);
   }
+  // Old conversations may arrive after the completed foundation checkpoint.
+  // The bounded migration must preserve the answer and question, once per ID.
+  let previousCount = 0;
+  for (const suffix of ["first", "later-delta"]) {
+    const legacyID = `legacy-handoff-${suffix}`;
+    const legacyMessageID = `${legacyID}-answer`;
+    await adapter.saveResearchConversation(userID, {
+      ...first.conversation, id: legacyID, revision: 0,
+      messages: [...first.conversation.messages.slice(0, -1), { ...firstMessage, id: legacyMessageID }]
+    });
+    const foundation = await request("/projects/foundation/state", { projectID: "handoff-a" });
+    const migrated = (await adapter.listResearchAnswers(userID)).find(answer => answer.id === legacyMessageID);
+    assert.ok(migrated?.migratedFromConversation);
+    assert.equal(migrated.question, question);
+    assert.deepEqual(migrated.answer, answerA.answer);
+    assert.equal(foundation.researchAnswers.find(answer => answer.id === legacyMessageID).conclusion, answerA.answer.conclusion);
+    assert.equal(foundation.migrationCheckpoint.migratedResearchAnswers, previousCount + 1);
+    previousCount++;
+    const steady = await request("/projects/hub/bootstrap", { projectID: "handoff-a" });
+    assert.equal(steady.foundation.migrationCheckpoint.completedAt, foundation.migrationCheckpoint.completedAt);
+    assert.equal((await adapter.listResearchAnswers(userID)).filter(answer => answer.id === legacyMessageID).length, 1);
+  }
   const finalStore = await adapter.read();
   assert.deepEqual(finalStore.researchUsageByUserID?.[userID] || [], [], "Saved-Project summaries must not consume Research turns.");
   assert.equal(externalAttempts, 0);
