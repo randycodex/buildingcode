@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
-import { researchZoningVerificationInstructions, researchZoningWriterInstructions } from "../research-zoning-verification-instructions.mjs";
-import { researchZoningExplanationScopeInstruction } from "../research-claim-scope.mjs";
-import { researchGuidedNextStepInstruction } from "../research-answer-presentation.mjs";
+import { researchZoningVerificationInstructions, researchZoningWriterInstructions, researchStreetscapeScopeInstruction, researchStreetscapeNextStepInstruction } from "../research-zoning-verification-instructions.mjs";
+import { researchAnswerPresentationContract } from "../research-answer-presentation.mjs";
 import { zoningMappedReviewInstruction } from "../research-zoning-mapped-review.mjs";
 
 const question = "can you explain the transparency requirements for this project?";
@@ -12,8 +11,8 @@ for (const builder of [researchZoningVerificationInstructions, researchZoningWri
   assert.equal(builder({ question, evidence, options: { zoningPlan: { questionSignals: {} } } }), null, "Other zoning flows retain their existing instructions.");
 }
 const review = researchZoningVerificationInstructions({ question, evidence, options });
-assert(review.includes(researchZoningExplanationScopeInstruction));
-assert(review.includes(researchGuidedNextStepInstruction));
+assert(review.includes(researchStreetscapeScopeInstruction));
+assert(review.includes(researchStreetscapeNextStepInstruction));
 for (const boundary of ["point's exact supplied sourceIDs", "Historical or future-effective", "Unknowns remain unknown", "tax-lot records", "DETERMINISTIC REQUIRED CLAIM CHECKLIST", "PRIOR REVIEW HISTORY", "priorReviewCorrection", "projectFactQuestions=[] on a failed answer", "missingFactsOnly=true only", "zero-based indices", "fresh verification"]) assert(review.includes(boundary), boundary);
 assert(review.includes("not required prose"));
 for (const boundary of [
@@ -30,6 +29,19 @@ const mapped = researchZoningVerificationInstructions({ question, evidence, opti
 assert(mapped.includes(zoningMappedReviewInstruction), "Mapped review cannot be dropped by prompt specialization.");
 const writer = researchZoningWriterInstructions({ question, evidence, options });
 assert(writer.includes('"mode":"requirements-checklist"'));
+assert(writer.includes(researchStreetscapeScopeInstruction));
+assert(writer.includes(researchStreetscapeNextStepInstruction));
+const suppliedPresentation = researchAnswerPresentationContract({ question, evidence, zoningPlan: options.zoningPlan });
+const customRule = "Preserve the supplied custom presentation constraint.";
+const custom = researchZoningWriterInstructions({ question, evidence, options,
+  answerPresentation: { ...suppliedPresentation, universalRules: [...suppliedPresentation.universalRules, customRule] } });
+assert(custom.includes(customRule), "Caller-added rules cannot be removed with shared duplicates");
+const payload = JSON.parse(writer.split("QUESTION-SPECIFIC ANSWER PRESENTATION CONTRACT\n")[1].split(" Match completeness")[0]);
+const { universalRules, ...details } = suppliedPresentation;
+assert.deepEqual(payload, details, "Mode, sequence, required elements and other presentation data remain exact");
+for (const control of ["nominal recipient", "local exception", "different dated snapshot", "derived values", "later caveat", "existing-property inventory", "ONE optional", "unperformed lookup", "shutdown/alarm/interlock", "optional advice"]) {
+  assert((writer + review).toLowerCase().includes(control.toLowerCase()), control);
+}
 assert(writer.includes("a useful baseline under an explicit work/applicability condition"));
 assert(writer.includes("Preserve numerical limits"));
 assert(writer.includes("exact supplied sourceIDs"));

@@ -1,0 +1,84 @@
+{
+  "scope": "diagnostic-only",
+  "description": "Frozen new user-style exploratory questions; draft checks by implementing assistant, not independent accuracy acceptance. Stop at first withheld turn.",
+  "originalCohortsUnchanged": true,
+  "conversations": [
+    {
+      "id": "user-condensate",
+      "questions": [
+        "Under the 2022 NYC Mechanical Code, explain cooling-coil condensate disposal: destination, slope, allowed materials, pipe size and how combined drains are sized. Include conditions on any short tubing alternative.",
+        "Consider two cooling units manifolded together, with a combined capacity of thirty tons. Their drain has a three-quarter-inch internal diameter. On this capacity alone, is the pipe size sufficient?",
+        "Correction: one of those units was removed. The remaining unit is fifteen tons. Does the former combined-capacity pipe-size conclusion still apply? Answer only about the minimum diameter."
+      ],
+      "references": [
+        "MC 307.2.1",
+        "MC 307.2.2"
+      ],
+      "checks": [
+        "Approved disposal; minimum slope1/8in12 (1%); no street/alley nuisance. Preserve material list, polypropylene only<=12in individual drain, ratings and PC Chapter7 joints. Minimum3/4in internal diameter, no decrease. Manifold table up to20tons3/4in, >20to40 onein, >40to90 1.25in, >90to1251.5in, >125to2502in; no extrapolation.",
+        "No:30tons manifolded requires1in, no fullinstallationapproval.",
+        "Recompute derived capacity after removal; single15ton unit no longer30, minimum3/4in with no decrease. Diameter-only finding; no obsolete1in conclusion."
+      ]
+    },
+    {
+      "id": "user-gas-test",
+      "questions": [
+        "Explain the 2022 NYC Fuel Gas Code gas-piping pressure-test rule and its exceptions for high-pressure distribution, public corridors, meter piping, and coated or wrapped piping. Separate pressure, duration and testing-medium requirements.",
+        "For this scenario the piping is factory coated and wrapped, has no meter or public-corridor branch, and operates at two psig. Is a three-psig pressure test for thirty minutes sufficient under that coated-pipe rule?"
+      ],
+      "references": [
+        "FGC 406.4",
+        "FGC 406.4.1"
+      ],
+      "checks": [
+        "Ordinary>=1.5times proposedmaximumworkingpressure and>=3psig. >125psig hoopstress<=50%SMYS. >5psig distribution twiceMAOP but>=100psig1hour; publiccorridor10psig30min; meterutilitytesting same distribution or utilitycertifieddifferent. ALL field/factory coated/wrapped>=100psig60min notwithstandingabove, air/inertgas, pressureisolation, durationafterstabilization. Preserve gauge/beforeappliances conditions if retained.",
+        "No:coated/wrapped minimum100psig60min afterstabilization, air/inertgas and isolatedsource; ordinary3psig doesnotwaivethis."
+      ]
+    },
+    {
+      "id": "user-stair-nosing",
+      "questions": [
+        "Under the 2022 NYC Building Code, explain the ordinary stair tread nosing curvature or bevel and solid-riser slope requirements. Keep any separate projection rule distinct.",
+        "An ordinary solid riser is sloped at thirty-five degrees from vertical under the tread. Does that meet this riser-slope limit?"
+      ],
+      "references": [
+        "BC 1011.5.5"
+      ],
+      "checks": [
+        "Curvature/bevel>=1/16in<=9/16in fromforemostprojection; solidriserverticalorslopedundertreadfromundersidenosing<=30degreesvertical. Preserve branchconditions on additionalprojectionrules if retained. No overallapproval.",
+        "No:35deg exceeds30deg ordinarysolidriserlimit; distinguish bevel/projectiondimensions."
+      ]
+    },
+    {
+      "id": "user-backwater",
+      "questions": [
+        "Explain when the 2022 NYC Plumbing Code requires sanitary backwater valves, where they can be placed, and what accessibility condition applies to a drain below a slab on grade. Include the flood-hazard branch without inventing its referenced standard.",
+        "For this scenario, the drain centerline is exactly eighteen inches below a slab on grade. Does the masonry access-manhole condition apply at exactly that depth?"
+      ],
+      "references": [
+        "PC 715.1",
+        "PC 715.5"
+      ],
+      "checks": [
+        "Publicsewerbackwateroverflow requiresaccessiblevalves fixturepipe,brancharea/group,orbuildingdrainatexitsdownstreambuildingtrap. Floodhazarddeemedsubject, additionalASCE24 7.3.3 modifiedBCAppendixG, no inventedmissingstandard. Service/repairworkingpartsaccess; masonrymanhole>=18incenterline belowgrade slab.",
+        "Yes:18inormore inclusive. Limitfindingtoaccessmanhole, notfullinstallationapproval."
+      ]
+    },
+    {
+      "id": "user-ground-depth",
+      "questions": [
+        "Explain the current NYC Zoning Resolution ground-floor depth reference rule in Section 37-32 and how Section 37-31 limits its applicability. This is a source explanation, not a determination for a project. Does that reference section itself give a universal number of feet?",
+        "New topic: what static water pressure triggers pressure reduction under the 2022 NYC Plumbing Code? Treat this as a general rule, without using the zoning assumptions."
+      ],
+      "references": [
+        "ZR 37-31",
+        "ZR 37-32",
+        "PC 604.8"
+      ],
+      "checks": [
+        "37-32 designatedfrontagegroundfloor nonresidentialuse extendsminimumqualifyingdepth, no universalfixedfeet. 37-31 linkedstandards outside32-30; narrowcommerciallot<20ftstreetline existingMarch22,2016andpermitapplication; wholecommunityfacilitybuilding exclusivelyschoolorhouseofworshipUGIII(B), notportions. Actualregulatingdistrict/geographyneededfornumber; no inventeduniversaldepth.",
+        "Explicit switch excludes zoning authority. PC604.8 exceeds85psistatic not80, approvedASSE1003/CSAB356 valvewithstrainerreduces<=85; preserve exceptions ifretained. Knownpressuretopicusedsolelyforswitchdiagnostic, notfreshcohortscore."
+      ]
+    }
+  ]
+}

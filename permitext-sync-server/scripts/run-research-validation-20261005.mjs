@@ -97,6 +97,8 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-question-intent.mjs", "research-conversation-continuity.mjs", "research-answer-presentation.mjs", "research-answer-quality.mjs",
   "research-web-attribution.mjs", "research-config.mjs",
   "research-material-scope-review.mjs", "research-claim-applicability-review.mjs",
+  "research-zoning-verification-instructions.mjs", "research-claim-scope.mjs",
+  "research-supplied-text.mjs", "research-practical-next-step.mjs", "research-zoning-mapped-review.mjs",
   "research-zoning-safety.mjs", "project-foundation-contract.mjs", "entitlement-contract.mjs",
   "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/run-research-validation-20261005.mjs", "scripts/research-validation-pricing-20261005.mjs", "scripts/research-provider-readiness-20261005.mjs", "scripts/research-chat-compatibility-transport.mjs", modelPolicyPath]) {
   sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex");
