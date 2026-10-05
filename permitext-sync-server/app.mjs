@@ -21041,10 +21041,10 @@ async function handleResearchConversationMessage(request, response) {
     } else {
       let verificationAttemptLimit = maximumResearchVerificationAttempts;
       for (let attempt = 0; attempt < verificationAttemptLimit; attempt += 1) {
-        // A field-only deletion can spend the final verification attempt while
-        // leaving related prose qualifications untouched. Use the one bounded
-        // full-answer revision so the model can reconcile the entire response.
-        if (attempt > 0) {
+        // Only an explicit certificate limited wholly to unnecessary missing
+        // facts permits the field-only candidate. It still passes every gate
+        // and a fresh review below; all other findings use bounded revision.
+        if (attempt > 0 && !applyDecisionFactCandidate()) {
           if (result.requestedModel !== accurateModel) {
             answerEscalated = true;
             modelEscalationStages.push({
