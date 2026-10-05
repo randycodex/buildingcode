@@ -1,4 +1,5 @@
 import { researchRecoveryHumanContext } from "../public/research-failure-recovery.js";
+import { researchSourceBodyStatePrompt, researchSourceAvailabilityPrompt, researchSourceBodyStateInstruction } from "../research-source-body-state.mjs";
 import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "../research-claim-applicability-review.mjs";
 import { buildResearchMaterialScopeReviewPacket, researchMaterialScopeReviewSchema,
   researchMaterialScopeReviewInstruction } from "../research-material-scope-review.mjs";
@@ -93,7 +94,8 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
   const schemaStart = source.indexOf("const researchVerificationIssueTypes =");
   const schemaEnd = source.indexOf("function validateResearchVerification(", schemaStart);
   assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
-  const verificationDependencies = { ...dependencies, researchRecoveryHumanContext, earlierResearchUserContext, zoningResearchSafetyPromptContext, zoningResearchPromptContext, zoningContextExcerptPrompt,
+  const verificationDependencies = { ...dependencies, researchRecoveryHumanContext, researchSourceBodyStatePrompt, researchSourceAvailabilityPrompt, researchSourceBodyStateInstruction,
+    earlierResearchUserContext, zoningResearchSafetyPromptContext, zoningResearchPromptContext, zoningContextExcerptPrompt,
     isZoningConditionalExplanation, zoningMappedReviewInstruction, zoningMappedReviewSchema, evaluateResearchWebAttribution,
     buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction,
     buildResearchMaterialScopeReviewPacket, researchMaterialScopeReviewSchema, researchMaterialScopeReviewInstruction };

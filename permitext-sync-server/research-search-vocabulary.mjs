@@ -111,6 +111,10 @@ function namedPrefixes(value) {
     .map(([prefix]) => prefix);
 }
 
+export function researchNamedCodePrefixes(value) {
+  return namedPrefixes(researchPositiveSearchText(currentText(String(value || ""))));
+}
+
 const gasEquipmentNoun = '(?:equipment|appliances?|(?:space[-\\s]+|water[-\\s]*)?heaters?|furnaces?|boilers?|ranges?|stoves?)';
 const gasEquipmentAlias = new RegExp(`\\b(?:(?:natural[-\\s]+)?gas(?:[-\\s]+(?:fired|burning|fuelled|fueled))?[-\\s]+${gasEquipmentNoun}|${gasEquipmentNoun}[-\\s]+(?:fired|burning|fuelled|fueled|running|operating|runs|operates)(?:[-\\s]+(?:on|by|with))?[-\\s]+(?:natural[-\\s]+)?gas)\\b`, 'gi');
 function hasGasEquipment(value) { gasEquipmentAlias.lastIndex = 0; return gasEquipmentAlias.test(value); }

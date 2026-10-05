@@ -12,7 +12,7 @@ import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearest
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 import { researchCurrentPurposeTerms, researchCurrentPurposeMatches, researchCurrentEditionContext } from "./research-current-purpose.mjs";
 
-export const evidenceDiscoveryVersion = "20261004-current-purpose-edition-recall-v67";
+export const evidenceDiscoveryVersion = "20261005-exact-empty-source-nomination-v68";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1088,8 +1088,9 @@ function codeReferences(question) {
     add("*", match[1]);
   }
   const bareSectionPattern = /\bSections?\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
+  const namedDisciplines = explicitQuestionDisciplinePrefixes(question);
   for (const match of String(question || "").matchAll(bareSectionPattern)) {
-    add("*", match[1]);
+    add(namedDisciplines.size === 1 ? [...namedDisciplines][0] : "*", match[1]);
   }
   return references;
 }
@@ -2170,11 +2171,26 @@ export async function discoverRelevantEvidence({
     if (!preliminaryIDs.has(id)) preliminary.push({ id, score: scores.get(id) || 0 });
   }
   const detailed = [];
+  const unavailableSourceCandidates = [];
   for (const entry of preliminary) {
     const section = catalogByID.get(entry.id);
     const body = await readSectionBody(section);
     const fullText = sectionText(section, body);
-    if (!fullText.trim()) continue;
+    const bodyPlainText = (body?.blocks || []).map(block => String(block?.plainText || "")).join("\n\n").trim();
+    if (!bodyPlainText) {
+      // A current exact request still deserves a canonical availability check.
+      // This is only a nomination: assembly must freshly resolve the record;
+      // neither an empty search read nor its title becomes enacted evidence.
+      if (exactReferenceIDs.has(entry.id) &&
+          (directReferenceKeys.has(`${section.codePrefix}:${section.sectionNumber}`) ||
+            directReferenceKeys.has(`*:${section.sectionNumber}`)) &&
+          (!explicitDisciplinePrefixes.size || explicitDisciplinePrefixes.has(section.codePrefix))) {
+        unavailableSourceCandidates.push({ sectionID: comparableSectionID(section.id),
+          ...Object.fromEntries(["codePrefix", "sectionNumber", "title", "corpusID", "codeVersion", "codeEdition", "jurisdiction"]
+            .map(field => [field, String(section[field] || "")])) });
+      }
+      continue;
+    }
     const normalizedFullText = normalizedText(fullText);
     const matchedTerms = Array.from(matchedTermsByID.get(entry.id) || [])
       .filter((term) => normalizedFullText.includes(term));
@@ -2701,6 +2717,7 @@ export async function discoverRelevantEvidence({
     question: normalizedQuestion,
     candidateState: "unreviewed",
     candidates: candidates.slice(0, candidateLimit),
+    unavailableSourceCandidates: unavailableSourceCandidates.slice(0, candidateLimit),
     supplementalDefinitionCandidates: candidates.slice(candidateLimit),
     chapterScopeCandidates: nominateResearchChapterScopeCandidates(candidates.slice(0, candidateLimit), sections, passageIndex),
     delegatingRuleGroups: nominateDelegatedRuleGroups(selectedCandidates.filter(item =>

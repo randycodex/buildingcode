@@ -1,0 +1,137 @@
+{
+  "recordedAt": "2026-10-05T21:01:34.620Z",
+  "status": "offline_contracts_passed",
+  "testCount": 15,
+  "results": [
+    {
+      "file": "research-source-body-state-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "8bb2d430961081e91fdf3c30a07fa159259b6af010d2574519831a5ff00719ad",
+      "summary": "{\"status\":\"passed\",\"cases\":\"body provenance, authority identity, failure transport, no extra reads, atomic budgets, placeholder scope\"}"
+    },
+    {
+      "file": "evidence-discovery-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "93e5a64e15b629486354d99c10c0de369c31296abe092a8c55e26dabfc37c101",
+      "summary": "Permitext evidence discovery contract passed."
+    },
+    {
+      "file": "research-source-body-state-runtime-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "5b0d8b8d241a45d25a3d5dcb9319ecbaa733182b50d6ae4a0ca2fdb3ae9718f8",
+      "summary": "{\"status\":\"passed\",\"offlineRetrievalCases\":2,\"completeBodies\":25,\"canonicalIdentitiesPreserved\":true,\"firePassageIDsPreserved\":true,\"draftReviewEnvelopes\":4,\"networkAttempts\":0,\"ledgerUnchanged\":true}"
+    },
+    {
+      "file": "research-evidence-assembly-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "08f2ff9768a0fc752e0220e315aab5a558fec8153c5f2ef5c1b9929ec85eca4f",
+      "summary": "Permitext Research evidence assembly contract passed."
+    },
+    {
+      "file": "research-repair-introduced-parent-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "67390c9acca17fdabe6818415a238b70b3b0d2f00f8162cf7a5c163987f60de7",
+      "summary": "Actual-corpus repair-introduced parents passed across BC/MC/FGC: immutable bindings, complete same-edition parents, shared budgets, explicit gaps; zero providers, no applicability acceptance."
+    },
+    {
+      "file": "research-repair-introduced-parent-http-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "ea2e68737dc60e9b6f95d1b4ea3cc1d77af274af12d1ad3e96600147809a3ad0",
+      "summary": "Repair-introduced parent HTTP contract passed: canonical scope supplied before fresh review, immutable original citation/point, snapshots/persistence, substantive rejection and Luna roles; synthetic providers only."
+    },
+    {
+      "file": "research-narrative-source-bindings-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "b81d03db8f6fe249e4e85c38eaac13223708855c51de3ef9f0d75d16946fc6a0",
+      "summary": "Narrative reference resolved from retained evidence; absent/ambiguous/collateral/mismatched references remain unchanged. No API calls or semantic acceptance."
+    },
+    {
+      "file": "research-targeted-revision-bindings-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "68b99d70a807df0eee3dba729926312105a868b0803c88d045a792c4f2078440",
+      "summary": "Retained citation relevance can be repaired while source identity, authoritative text and required prose remain protected."
+    },
+    {
+      "file": "research-evidence-boundary-fallback-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "d96f6802d31454fee59754268f4ff04f5ab8aa65df5eee3d3b05efe3a62461c7",
+      "summary": "Document-specific boundary persists; altered claims and mismatched question scope are rejected."
+    },
+    {
+      "file": "research-search-vocabulary-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "6f8b81fb9f6be052732368e48cdd75a2bc9cf02508265ebddd5929d4b97b3230",
+      "summary": "Ordinary vocabulary nomination, negative controls, and human-only continuity passed."
+    },
+    {
+      "file": "research-verifier-envelope-repair-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "0f3931a1abd0bbe98039fbe2b52fcee716fc1db9c1197f488940723311c8d091",
+      "summary": "Verifier envelope contracts passed: immutable draft/evidence/schema, one repair per turn, no semantic pass coercion, mapped validation, usage/caps/cancellation, typed private diagnostics and uncharged canonical recovery; synthetic responses only."
+    },
+    {
+      "file": "research-conversation-topic-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "5f6d13bcbfc8bbf34e3800bef13bf839833e79db711d9b91bd4adaf23387fedd",
+      "summary": "Bounded causal-topic continuation passed: ordinary blocked-drain follow-up, canonical source/title hints, saved-example scope, explicit topic/family/edition boundaries, missing or malformed sources, and immutable history; no provider calls."
+    },
+    {
+      "file": "research-explicit-reference-binding-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "3ccdf748136429c56e63253c60c8b71ed6110033e5144550c99977fee4121f9a",
+      "summary": "Explicit reference binding passed: exact unique supplied sources only; ambiguous, unknown and inferred sources excluded. Semantic verification remains required."
+    },
+    {
+      "file": "research-repair-retrieval-corpus-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "1b999e61f41fdd0ea6d83fefe809c62b1324d91b64627436028db1416232afc7",
+      "summary": "Actual-corpus repair retrieval passed: exact current BC authority, both interpretation clauses, unchanged source ID and atomic budget rejection; no API calls."
+    },
+    {
+      "file": "research-product-example-runtime-contract.mjs",
+      "exitCode": 0,
+      "status": "passed",
+      "outputSHA256": "0c6c55e4f0e0a532997bb84e8d677794bf8941159fa61264aef72874e151b7f3",
+      "summary": "Permitext owner-example runtime contract passed: 7 conversations, 9 ordered turns, 0 network attempts, 0 paid provider calls."
+    }
+  ],
+  "codeHashes": {
+    "app.mjs": "3e2f8a01f81a46d1c1ba025499476e1c34ba0cc3271a49747350b81f17e42669",
+    "evidence-discovery.mjs": "88e2a986adcfe33d5530b3750ba4b068dbe2332a18d32b4a8bb0023241d98e88",
+    "research-evidence-assembly.mjs": "797ef1490d115d34b2c629913d8f3b0c290eebbe71c1ad89aa971af1a87ef358",
+    "research-search-vocabulary.mjs": "7bdcb96dcb286c767df9b56b3fd209383a6afc8b19df870329e4588359b95c50",
+    "research-source-body-state.mjs": "df7c66321401a8bb971ff5c7d2d84f85c7a0e57bf94c9bc53a94d7ec416b23c6"
+  },
+  "ledgerBeforeSHA256": "6d9a2e95d1b5a7e998e2cb776582aaa0fb57760bf89f4b0cef6e7c0c173b673c",
+  "ledgerAfterSHA256": "6d9a2e95d1b5a7e998e2cb776582aaa0fb57760bf89f4b0cef6e7c0c173b673c",
+  "ledgerUnchanged": true,
+  "paidProviderCalls": 0,
+  "embeddingCalls": 0,
+  "providerMechanicsUseSyntheticDoubles": true,
+  "completeCanonicalBodiesChecked": 25,
+  "applicationAccuracyEstablished": false,
+  "newApplicationScore": null,
+  "originalFrozenScore": "35/40",
+  "separateExploratoryScore": "9/10",
+  "productionDeploymentPerformed": false,
+  "unresolved": [
+    "Fresh model behavior with the new source-state input remains untested.",
+    "Final reviewed rubric adaptation, evaluator contracts and owner freeze remain pending.",
+    "PC802.3.2 flush-hub and ZR37-34 sloped-sidewalk original disputes remain unresolved.",
+    "Hosted native Responses, production browser/subscription behavior and actual billing deductions remain unverified."
+  ]
+}

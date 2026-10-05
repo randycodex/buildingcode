@@ -21,10 +21,12 @@ import {
 } from "./research-rule-packets.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 import { createHash } from "node:crypto";
+import { matchingResearchSourceBodyState } from "./research-source-body-state.mjs";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
 import { researchQuestionSubject } from "./research-question-subject.mjs";
-import { researchSearchVocabulary, researchPositiveSearchText, researchSearchVocabularyMatches } from "./research-search-vocabulary.mjs";
+import { researchSearchVocabulary, researchPositiveSearchText, researchSearchVocabularyMatches,
+  researchNamedCodePrefixes } from "./research-search-vocabulary.mjs";
 import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage, researchOperativeParentLink, researchParentChildReferenceLink, researchImmediateChildDetailGain } from "./research-rule-groups.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import { researchChapterScopeContextPlan, resolveResearchChapterScopeContext } from "./research-chapter-scope-context.mjs";
@@ -33,7 +35,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261005-repaired-bound-parent-scope-v84";
+export const researchEvidenceAssemblyVersion = "20261005-canonical-source-availability-v85";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -636,6 +638,7 @@ function candidateValues(discovery) {
 function freshWholeCanonicalSource(value) {
   const fields = ['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'];
   if (!compactText(value?.sectionID || value?.id) || !fields.every(field => compactText(value?.[field])) ||
+      value.sourceBodyState?.operativePlainTextSupplied === false ||
       value.researchClaimEligible === false || value.referenceOnly || value.selectionMode === 'section_reference' ||
       value.truncated || value.textComplete === false || value.canonicalContextComplete === false ||
       value.authorityClass && value.authorityClass !== 'enacted' || value.authorityStatus && value.authorityStatus !== 'enacted' ||
@@ -676,6 +679,8 @@ async function canonicalSection(resolveSection, value, origin, { includeAmendmen
     sectionGroupTitle: compactText(resolved.sectionGroupTitle || resolved.headingLine),
     canonicalApplicabilityContext: researchCanonicalApplicabilityContext(resolved),
     text,
+    ...(matchingResearchSourceBodyState(resolved.sourceBodyState, resolved)
+      ? { sourceBodyState: matchingResearchSourceBodyState(resolved.sourceBodyState, resolved) } : {}),
     body: resolved.body,
     crossReferences: Array.isArray(resolved.crossReferences) ? resolved.crossReferences : [],
     richSources: (Array.isArray(resolved.richSources) ? resolved.richSources : [])
@@ -1046,10 +1051,11 @@ function sourceRecord(value, {
       canonicalApplicabilityContext: researchCanonicalApplicabilityContext()
     }),
     text,
+    ...(canonicalResolved && value.sourceBodyState ? { sourceBodyState: structuredClone(value.sourceBodyState) } : {}),
     canonicalContextResolved: Boolean(canonicalResolved),
     canonicalContextComplete: Boolean(
       canonicalResolved && !targetedDefinition && !value.questionSpecificPassage &&
-      !value.targetedZoningContext && text.length === rawText.length
+      !value.targetedZoningContext && text.length === rawText.length && !value.sourceBodyState
     ),
     truncated: targetedDefinition ? false : Boolean(value.questionSpecificPassage) || text.length < rawText.length,
     targetedDefinition: targetedDefinition ? structuredClone(targetedDefinition) : null,
@@ -1252,6 +1258,26 @@ export async function assembleResearchEvidence({
     throw new Error("Pinned Research evidence must be an array.");
   }
 
+  // Keep a failed body's exact canonical identity instead of reducing an
+  // explicitly requested empty record to an anonymous resolver failure. This
+  // observes canonical reads within the ordinary candidate budget; it never
+  // turns a search nomination or an error message into enacted authority.
+  const unavailableBodies = new Map();
+  const freshAvailabilityResolutions = new Map();
+  const canonicalResolver = resolveSection;
+  resolveSection = async request => {
+    const cached = freshAvailabilityResolutions.get(String(request.sectionID || ""));
+    if (cached && ["codePrefix", "sectionNumber", "corpusID", "codeVersion", "codeEdition", "jurisdiction"]
+      .every(field => !request[field] || request[field] === cached[field])) return cached;
+    try { return await canonicalResolver(request); }
+    catch (error) {
+      const state = error?.code === "INCOMPLETE_RESEARCH_SECTION"
+        ? matchingResearchSourceBodyState(error.sourceBodyState, request) : null;
+      if (state) unavailableBodies.set(JSON.stringify([state.sectionID, state.corpusID, state.codeVersion]), state);
+      throw error;
+    }
+  };
+
   const query = researchEvidenceRetrievalQuery({
     question,
     previousTopic,
@@ -1319,14 +1345,36 @@ export async function assembleResearchEvidence({
         }
       });
   const currentReferences = extractResearchCodeReferences(query.question);
-  const discoveryCandidates = candidateValues(discovery).map(candidate => {
+  const namedAuthorityPrefixes = researchNamedCodePrefixes(query.question);
+  const matchesCurrentReference = value => currentReferences.some(reference =>
+    (reference.codePrefix === value.codePrefix || !reference.codePrefix && namedAuthorityPrefixes.length === 1 &&
+      namedAuthorityPrefixes[0] === value.codePrefix) && reference.sectionNumber === value.sectionNumber);
+  const availabilityCandidates = (Array.isArray(discovery?.unavailableSourceCandidates) ? discovery.unavailableSourceCandidates : [])
+    .filter(value => ["sectionID", "codePrefix", "sectionNumber", "corpusID", "codeVersion", "codeEdition", "jurisdiction"]
+      .every(field => compactText(value[field])) && matchesCurrentReference(value))
+    .filter((value, index, values) => values.findIndex(other => sectionIdentity(other) === sectionIdentity(value)) === index)
+    .slice(0, limits.maximumCandidates);
+  const changedAvailabilityCandidates = [];
+  let availabilityResolverFailureCount = 0;
+  for (const candidate of availabilityCandidates) {
+    try {
+      const resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered);
+      // A nomination may be stale. If the fresh body is now available, admit
+      // that real text normally instead of maintaining a false evidence gap.
+      freshAvailabilityResolutions.set(String(resolved.sectionID), resolved);
+      changedAvailabilityCandidates.push({ ...candidate, selectedText: resolved.text,
+        signals: { exactReference: true }, whyRelevant: "Current explicit reference freshly resolved." });
+    } catch { availabilityResolverFailureCount += 1; }
+  }
+  const discoveryCandidates = [...changedAvailabilityCandidates, ...candidateValues(discovery)].map(candidate => {
     const historicalReference = query.contextDependentFollowUp && candidate?.signals?.exactReference === true &&
       !currentReferences.some(reference => reference.codePrefix === candidate.codePrefix &&
         reference.sectionNumber === candidate.sectionNumber);
     return historicalReference ? { ...candidate, signals: { ...candidate.signals, historicalReference: true } } : candidate;
   });
   const prioritizedCandidates = prioritizeResearchEvidence(discoveryCandidates, {
-    limit: limits.maximumCandidates,
+    // Availability reads consume ordinary candidate slots, not a new budget.
+    limit: Math.max(0, limits.maximumCandidates - availabilityCandidates.length + changedAvailabilityCandidates.length),
     // Selected enacted passages define the primary answer scope. Discovery is
     // still assembled for review, but it must not become mandatory coverage
     // before the pins and candidates are merged into one package.
@@ -1379,7 +1427,7 @@ export async function assembleResearchEvidence({
   const limitations = [];
   let characterCount = 0;
   let pinnedCanonicalContextCharacterCount = 0;
-  let resolverFailureCount = 0;
+  let resolverFailureCount = availabilityResolverFailureCount;
   let targetedDefinitionCount = 0;
   const retrievedAt = new Date().toISOString();
 
@@ -2936,6 +2984,24 @@ export async function assembleResearchEvidence({
       }
     }
   }
+  const sourceAvailability = [];
+  let sourceAvailabilityCharacterCount = 0;
+  for (const state of unavailableBodies.values()) {
+    const explicitlyRequested = matchesCurrentReference(state) || pinnedEvidence.some(pin =>
+      String(pin.sectionID || pin.id) === state.sectionID);
+    if (!explicitlyRequested || sourceAvailability.length >= limits.maximumCandidates) continue;
+    const length = JSON.stringify(state).length;
+    if (length > supplementalCharacterCeiling - characterCount) {
+      limitations.push({ kind: "source-availability-budget-limit", reference: `${state.codePrefix} ${state.sectionNumber}`,
+        text: "An inspected record's availability metadata did not fit the existing evidence character budget." });
+      continue;
+    }
+    sourceAvailability.push(state);
+    sourceAvailabilityCharacterCount += length;
+    characterCount += length;
+    limitations.push({ kind: "requested-source-body-unavailable", reference: `${state.codePrefix} ${state.sectionNumber}`,
+      text: `The freshly inspected ${state.codePrefix} ${state.sectionNumber} local record supplies no operative plain text. Its catalog label does not establish a legal requirement, Reserved status, repeal history or historical wording.` });
+  }
   return {
     schemaVersion: 1,
     assemblyVersion: researchEvidenceAssemblyVersion,
@@ -2951,6 +3017,7 @@ export async function assembleResearchEvidence({
       recoveryReads, recoveredReferenceCount, recoverySearchCount },
     limits,
     sources,
+    sourceAvailability,
     usage: {
       pinnedCount: pinnedEvidence.length,
       pinnedCharacterCount,
@@ -2965,6 +3032,9 @@ export async function assembleResearchEvidence({
       repairCrossReferenceReservation,
       supplementalCharacterCount: Math.max(0, characterCount - pinnedCharacterCount),
       candidateCount: candidates.length,
+      availabilityCandidateCount: availabilityCandidates.length - changedAvailabilityCandidates.length,
+      availabilityLookupCount: availabilityCandidates.length,
+      cachedAvailabilitySourceCount: changedAvailabilityCandidates.length,
       discoveredCount,
       targetedDefinitionCount,
       crossReferenceCount,
@@ -2972,6 +3042,7 @@ export async function assembleResearchEvidence({
       interpretationContextCount,
       chapterScopeContextCount,
       characterCount,
+      sourceAvailabilityCharacterCount,
       resolverFailureCount,
       nonMaterialCandidateCount
     },
