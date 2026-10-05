@@ -40,8 +40,9 @@ assert.equal(lunaPolicy.answerModel, "gpt-6-luna", "The saved policy must retain
 const applicationRoot = argument("--application-root") ? pathToFileURL(`${argument("--application-root").replace(/\/$/, "")}/`) : root;
 const campaignCapUSD = Number(argument("--campaign-cap-usd") || 10.99);
 assert.equal(campaignCapUSD, 10.99, "This authorization is fixed at $10.99");
-const phaseBucket = argument("--phase") || "diagnostic";
-assert(["diagnostic", "fresh"].includes(phaseBucket));
+const phaseLabel = argument("--phase") || "diagnostic";
+assert(["diagnostic", "fresh", "regression"].includes(phaseLabel));
+const phaseBucket = phaseLabel === "fresh" ? "fresh" : "diagnostic";
 const phaseCapUSD = phaseBucket === "diagnostic" ? 2.99 : 8;
 assert(Number.isFinite(campaignCapUSD) && campaignCapUSD > 0 && campaignCapUSD <= 15.73);
 const campaignBudget = argument("--budget-ledger") ? evaluationBudget(argument("--budget-ledger"), campaignCapUSD, validationPricing) : null;
@@ -95,7 +96,7 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-evidence-priority.mjs", "research-conversation-topic.mjs", "research-corpus-registry.mjs",
   "research-question-intent.mjs", "research-conversation-continuity.mjs", "research-answer-presentation.mjs", "research-answer-quality.mjs",
   "research-web-attribution.mjs", "research-config.mjs",
-  "research-zoning-safety.mjs", "project-foundation-contract.mjs",
+  "research-zoning-safety.mjs", "project-foundation-contract.mjs", "entitlement-contract.mjs",
   "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/run-research-validation-20261005.mjs", "scripts/research-validation-pricing-20261005.mjs", "scripts/research-provider-readiness-20261005.mjs", "scripts/research-chat-compatibility-transport.mjs", modelPolicyPath]) {
   sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex");
 }
@@ -106,7 +107,8 @@ for (const name of ["research-passage-index.mjs", "research-semantic-passages.mj
 }
 const result = { fixturePath, applicationRoot: applicationRoot.href, fixtureHash: createHash("sha256").update(fixtureText).digest("hex"), sourceHashes, selectedIDs,
   live, retrievalLive, providerAPI, modelPolicy, modelRoles: lunaPolicy.roles, semanticVectorPath, advisoryRoutes, currentCorpusRecall, advisoryRanking, passageSearch, campaignCapUSD,
-  mode: fixedEvidence ? "fixed-evidence-reasoning" : "end-to-end", phaseBucket, capUSD: phaseCapUSD, startedAt: new Date().toISOString(), provider: [], cases: [] };
+  mode: fixedEvidence ? "fixed-evidence-reasoning" : "end-to-end", phaseBucket, phaseLabel,
+  knownRegression: phaseLabel === "regression", capUSD: phaseCapUSD, startedAt: new Date().toISOString(), provider: [], cases: [] };
 const persist = () => writeFile(join(directory, "results.json"), JSON.stringify(result, null, 2));
 globalThis.fetch = async (url, options = {}) => {
   const target = new URL(String(url));
@@ -212,6 +214,12 @@ try {
     const account = signed.body.account, token = account.backendSessionToken, auth = { accountUserID: account.appUserID };
     const grant = await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
     assert.equal(grant.status, 200);
+    const { hasActiveProEntitlement, hasActiveResearchEntitlement, researchEntitlementMode } = await import(new URL("entitlement-contract.mjs", applicationRoot));
+    assert(hasActiveProEntitlement(grant.body.entitlement), "The local test account must hold active Pro access");
+    assert(hasActiveResearchEntitlement(grant.body.entitlement), "Normal Research entitlement must authorize the local test account");
+    result.accountAccess = { scope: "temporary isolated local account", signInHTTPStatus: signed.status,
+      grantHTTPStatus: grant.status, activePro: true, researchMode: researchEntitlementMode(grant.body.entitlement),
+      grantType: "lifetimeGrant", productionSubscriptionTested: false };
     const createProject = async project => {
       const projectID = randomUUID();
       const pushed = await request("/sync/push", { batch: { user: { id: account.appUserID }, mutations: [{ project: {
@@ -280,7 +288,7 @@ try {
         console.log(JSON.stringify({ id: item.id, status: item.status, seconds: item.seconds, mode: item.answer?.mode, costUSD: result.provider.filter(call=>call.case===item.id).reduce((sum,call)=>sum+(call.costUSD??call.reservedUSD),0) }));
         // Diagnostics pause at the first unresolved answer. The frozen fresh
         // cohort retains and counts withheld answers instead of dropping them.
-        if (response.status !== 200 || (phaseBucket === "diagnostic" &&
+        if (response.status !== 200 || (phaseLabel === "diagnostic" &&
             (item.answer?.mode === "clarification" || item.answer?.verification?.pass !== true))) {
           result.stoppedAfterFailure = item.id; break;
         }

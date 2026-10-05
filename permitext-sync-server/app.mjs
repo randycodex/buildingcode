@@ -10701,7 +10701,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
   }) || requestBody.instructions;
   const targetedRevision = researchTargetedRevisionEligible(options);
   if (targetedRevision) {
-    requestBody.instructions = `${researchTargetedRevisionInstruction} ${researchZoningExplanationScopeInstruction}`;
+    requestBody.instructions = `${researchTargetedRevisionInstruction} ${researchQuestionIntentInstruction(question)} ${researchZoningExplanationScopeInstruction}`;
     const input = `EDITABLE TEXT TARGETS\n${JSON.stringify(researchRevisionTargets(options.previousInterpretation).map(({ id, path, text, removable }) => ({ id, path, text, removable })))}`;
     if (typeof requestBody.input === "string") requestBody.input += `\n\n${input}`;
     else requestBody.input.push({ role: "user", content: [{ type: "input_text", text: input }] });
@@ -12425,6 +12425,7 @@ export async function assembledResearchEvidenceForTurn({
     questionPlan: zoningPlan,
     onStage,
     limits: assemblyLimits,
+    reserveRepairCapacity: !zoningPlan && !pinnedEvidence?.length && strategy.mode === researchEvidenceStrategies.broad,
     discover: ({ question: retrievalQuestion, limit, retrievalContext }) => discoverRelevantEvidence({
       question: retrievalQuestion,
       retrievalContext,
@@ -21277,7 +21278,12 @@ async function handleResearchConversationMessage(request, response) {
             verificationEnvelopeDiagnostics: verification.verificationEnvelopeDiagnostics
           } : {})
         });
-        if (!contextualVerification.pass && (contextualVerification.priorReviewCorrection ||
+        const newCitationOnlyRepair = contextualVerification.issues?.length &&
+          contextualVerification.issues.every(issue => ["incorrect_citation", "irrelevant_citation"].includes(issue.type)) &&
+          researchTargetedRevisionEligible({ previousInterpretation: result.interpretation, revisionFeedback: contextualVerification.issues }) &&
+          !verificationAttempts.slice(0, -1).some(review => review.issues?.some(issue =>
+            ["incorrect_citation", "irrelevant_citation"].includes(issue.type)));
+        if (!contextualVerification.pass && (newCitationOnlyRepair || contextualVerification.priorReviewCorrection ||
             (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length) ||
             (contextualVerification.issues?.length && contextualVerification.issues.every(issue => issue.type === "unnecessary_qualification")) ||
             (contextualVerification.issues?.some(issue => issue.type === "missed_material_conclusion") ||

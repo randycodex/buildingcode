@@ -2,8 +2,13 @@ import assert from "node:assert/strict";
 import { recoverResearchEvidenceBeforeRepair, researchEvidenceAssemblyLimits } from "../research-evidence-assembly.mjs";
 delete process.env.OPENAI_API_KEY;
 process.env.PERMITEXT_RESEARCH_SEMANTIC_SEARCH = "0";
+process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH = "1";
+process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = "1";
+process.env.PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES = "1";
+process.env.PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL = "1";
+process.env.PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING = "1";
 globalThis.fetch = () => { throw Error("Dependency recovery must make no provider calls"); };
-const { researchCorpusPlanForTurn, researchCorpusResources, researchBodyForCatalogSection, resolveResearchAssemblySection } = await import("../app.mjs");
+const { researchCorpusPlanForTurn, researchCorpusResources, researchBodyForCatalogSection, resolveResearchAssemblySection, assembledResearchEvidenceForTurn } = await import("../app.mjs");
 const plan = await researchCorpusPlanForTurn({ question: "Explain the 2022 NYC Construction Codes." });
 const { catalog } = await researchCorpusResources(plan);
 const resolve = async request => {
@@ -63,4 +68,21 @@ assert.equal(restored.evidencePackage.sources[0].origin, "permitext_discovered")
 assert.equal(restored.evidencePackage.usage.crossReferenceCount, 0, "Replacing discovery text must not silently consume a new cross-reference slot");
 assert.equal(restored.evidencePackage.sources[0].sourceID, excerpt.sourceID);
 assert.match(restored.evidencePackage.sources[0].text, /removal of the largest appliance/);
+
+const question = "Explain the sprinkler obstruction and covered-display requirements in BC 903.3.3 under the 2022 NYC codes.";
+const corpusPlan = await researchCorpusPlanForTurn({ question });
+const assembled = await assembledResearchEvidenceForTurn({ question, messages: [], projectFacts: [], pinnedEvidence: [], corpusPlan });
+assert.equal(assembled.usage.repairCharacterReservation, 2048);
+assert.equal(assembled.usage.repairCrossReferenceReservation, 1);
+assert.equal(assembled.usage.supplementalCharacterCeiling, 48000, "The complete initial-plus-repair budget remains unchanged");
+assert(assembled.usage.characterCount <= assembled.usage.initialSupplementalCharacterCeiling);
+assert(assembled.usage.crossReferenceCount <= assembled.limits.maximumCrossReferences - 1);
+assert(assembled.sources.some(source => source.codePrefix === "BC" && source.sectionNumber === "903.3.3"));
+const missingParentPacket = { ...assembled, sources: assembled.sources.filter(source => !(source.codePrefix === "BC" && source.sectionNumber === "903.3")) };
+const capacity = await recoverResearchEvidenceBeforeRepair({ evidencePackage: missingParentPacket, issues: [parentIssue], resolveSection: resolve });
+assert.equal(capacity.diagnostic.supplied.length, 1);
+assert(capacity.evidencePackage.sources.some(source => source.codePrefix === "BC" && source.sectionNumber === "903.3" && source.canonicalContextComplete),
+  "The ordinary actual-corpus packet must retain capacity to supply the reviewed parent scope");
+assert(capacity.evidencePackage.usage.characterCount <= 48000);
+assert(capacity.evidencePackage.usage.crossReferenceCount <= assembled.limits.maximumCrossReferences);
 console.log("Actual dependency recovery passed: canonical parent scope, verified table grids and complete footnotes, immutable source identity and atomic shared budgets; zero provider calls.");

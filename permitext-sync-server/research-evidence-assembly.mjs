@@ -33,7 +33,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261005-grounded-parent-table-repair-v81";
+export const researchEvidenceAssemblyVersion = "20261005-reserved-canonical-repair-capacity-v82";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -102,7 +102,8 @@ export async function recoverResearchEvidenceBeforeRepair({ evidencePackage, iss
     Number(evidencePackage.usage?.supplementalCharacterCeiling) || limits.maximumCharacters);
   // Optional interpretation context has its own assembly counter and does not
   // consume a direct cross-reference slot. Preserve that same accounting here.
-  let crossReferences = next.filter(source => source.origin === sourceOrigins.crossReference && !source.interpretationContext).length;
+  let crossReferences = Math.max(Number(evidencePackage.usage?.crossReferenceCount) || 0,
+    next.filter(source => source.origin === sourceOrigins.crossReference && !source.interpretationContext && !source.topicDependency).length);
   const comparable = value => compactText(value).replace(/\s+/g, " ");
   for (const { request, parentSourceID } of nominations.values()) {
     if (diagnostic.attemptedReads >= 2) break;
@@ -1202,6 +1203,7 @@ export async function assembleResearchEvidence({
   resolveSection,
   onStage,
   recoveryAttempted = false,
+  reserveRepairCapacity = false,
   limits: requestedLimits = {}
 } = {}) {
   if (typeof discover !== "function") {
@@ -1552,9 +1554,19 @@ export async function assembleResearchEvidence({
     return pinnedTableReferences.has(identity) && !sources.some((source) => source.richSourceGrids &&
       comparableTableReference(source.richSourceCanonicalReference || source.richSourceReference, source.codePrefix) === identity);
   };
-  const supplementalCharacterCeiling = pinnedEvidence.length
+  const totalSupplementalCharacterCeiling = pinnedEvidence.length
     ? Math.min(limits.maximumCharacters, pinnedCharacterCount + limits.maximumSupplementalCharacters)
     : limits.maximumCharacters;
+  // Leave room inside the original envelope for reviewer-identified complete
+  // dependencies. Exact selections and specialized planners retain their own
+  // budgets. This does not add sources, reads or provider calls by itself.
+  const repairCapacityEligible = reserveRepairCapacity === true && !pinnedEvidence.length &&
+    !questionPlan && appliedStrategy.mode === researchEvidenceStrategies.broad;
+  const repairCharacterReservation = repairCapacityEligible
+    ? Math.min(2048, Math.floor(totalSupplementalCharacterCeiling / 10)) : 0;
+  const repairCrossReferenceReservation = repairCapacityEligible
+    ? Math.min(1, Math.max(0, limits.maximumCrossReferences - 1)) : 0;
+  const supplementalCharacterCeiling = totalSupplementalCharacterCeiling - repairCharacterReservation;
 
   // A requested definition may contain the operative conditions themselves.
   // Reserve its complete canonical entries before incidental expansion can
@@ -2380,8 +2392,8 @@ export async function assembleResearchEvidence({
   // The reviewed design dependencies replace most opportunistic expansion;
   // do not append a second broad reference package and crowd out the cost budget.
   const maximumCrossReferencesForTurn = dependencyPlan && !dependencyPlan.preserveGenericExpansion
-    ? Math.min(limits.maximumCrossReferences, dependencyPlan.maximumGenericCrossReferences ?? 2)
-    : limits.maximumCrossReferences;
+    ? Math.min(limits.maximumCrossReferences - repairCrossReferenceReservation, dependencyPlan.maximumGenericCrossReferences ?? 2)
+    : limits.maximumCrossReferences - repairCrossReferenceReservation;
   for (const [index, reference] of crossReferenceQueue.entries()) {
     if (crossReferenceCount >= maximumCrossReferencesForTurn) break;
     const scopeReference = reference.chapterScopeReference || (reference.chapterScopeContext ? reference : null);
@@ -2911,7 +2923,10 @@ export async function assembleResearchEvidence({
       pinnedSelectionTruncatedCount,
       pinnedSelectionExcerptedCount,
       structuredPinnedCount,
-      supplementalCharacterCeiling,
+      supplementalCharacterCeiling: totalSupplementalCharacterCeiling,
+      initialSupplementalCharacterCeiling: supplementalCharacterCeiling,
+      repairCharacterReservation,
+      repairCrossReferenceReservation,
       supplementalCharacterCount: Math.max(0, characterCount - pinnedCharacterCount),
       candidateCount: candidates.length,
       discoveredCount,
