@@ -929,18 +929,26 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
         var positions: [CGFloat] = []
+        var controlPositions: [CGFloat] = []
         for (tab, title) in [("main-tab-saved", "Saved"), ("main-tab-research", "Research"),
                              ("main-tab-reader-1", "reader-main-title"), ("main-tab-reader-2", "reader-main-title")] {
             app.buttons[tab].tap()
             let heading = title == "reader-main-title"
-                ? app.buttons["reader-code-picker"].firstMatch
+                ? app.staticTexts["screen-title-Chapters"].firstMatch
                 : app.staticTexts["screen-title-\(title)"].firstMatch
             XCTAssertTrue(heading.waitForExistence(timeout: 15), app.debugDescription)
             positions.append(heading.frame.midY)
+            let controlLabel = title == "reader-main-title" ? "reader-code-picker"
+                : title == "Saved" ? "New project" : "New Research"
+            let control = app.buttons[controlLabel].firstMatch
+            XCTAssertTrue(control.isHittable, app.debugDescription)
+            controlPositions.append(control.frame.midY)
             print("TITLE_POSITION \(tab) \(heading.frame)")
             keepScreenshot(named: "Title alignment \(tab)", from: app)
         }
         XCTAssertLessThanOrEqual((positions.max() ?? 0) - (positions.min() ?? 0), 1)
+        XCTAssertLessThanOrEqual((controlPositions.max() ?? 0) - (controlPositions.min() ?? 0), 1,
+                                 "Top controls must share the native navigation row across screens.")
     }
 
     func testUnifiedReaderSwitchingSearchReturnAndRelaunch() {

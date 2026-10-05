@@ -545,7 +545,10 @@ private struct ResearchSessionView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.visible, for: .navigationBar)
+            .toolbar {
+                researchNavigationControls
+            }
             .sheet(item: $pendingVisualReview) { pending in
                 ResearchVisualReviewSheet(
                     review: pending.review,
@@ -738,9 +741,10 @@ private struct ResearchSessionView: View {
         return "Your selected Reader passage is kept. \(fallback)"
     }
 
-    private var researchHeaderButtons: some View {
-        HStack(spacing: 0) {
-            if conversation != nil {
+    @ToolbarContentBuilder
+    private var researchNavigationControls: some ToolbarContent {
+        if conversation != nil {
+            ToolbarItem(placement: .topBarLeading) {
                 Button {
                     library.activeResearchConversationID = nil
                     self.conversation = nil
@@ -753,9 +757,12 @@ private struct ResearchSessionView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .tint(Color.appChrome)
                 .accessibilityLabel("Research history")
             }
+        }
 
+        ToolbarItemGroup(placement: .topBarTrailing) {
             if conversation == nil,
                library.signedInAccount != nil,
                library.hasResearchAccess {
@@ -768,6 +775,7 @@ private struct ResearchSessionView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .tint(Color.appChrome)
                 .disabled(isCreatingConversation)
                 .accessibilityLabel("New Research")
             }
@@ -788,25 +796,9 @@ private struct ResearchSessionView: View {
                         .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                         .contentShape(Rectangle())
                 }
+                .tint(Color.appChrome)
                 .accessibilityLabel("Research actions")
             }
-        }
-        .foregroundStyle(Color.appChrome)
-        .padding(.horizontal, conversation == nil ? 0 : 4)
-    }
-
-    @ViewBuilder
-    private var researchHeaderActions: some View {
-        if conversation == nil {
-            researchHeaderButtons
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                .codeLiquidGlassCircle()
-        } else if #available(iOS 26.0, *) {
-            researchHeaderButtons
-                .glassEffect(.regular.interactive(), in: Capsule())
-        } else {
-            researchHeaderButtons
-                .background(.regularMaterial, in: Capsule())
         }
     }
 
@@ -843,8 +835,6 @@ private struct ResearchSessionView: View {
                     .accessibilityIdentifier("research-project-context-menu")
 
                     Spacer(minLength: 0)
-                    researchHeaderActions
-                        .frame(height: 44, alignment: .center)
                 }
                 .frame(height: 44, alignment: .leading)
 
@@ -855,9 +845,7 @@ private struct ResearchSessionView: View {
             .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         } else {
-            CodeScreenTitleRow(title: "Research", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
-                researchHeaderActions
-            }
+            CodeScreenTitleRow(title: "Research", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)

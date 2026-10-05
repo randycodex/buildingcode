@@ -410,20 +410,23 @@ struct SettingsView: View {
                 .padding(.bottom, tabBarClearance)
             }
             .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
-            .toolbar(.hidden, for: .navigationBar)
-            .contentMargins(.top, CodeScreenMetrics.mainHeaderHeight + CodeScreenMetrics.mainHeaderTopPadding + CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
-            .overlay(alignment: .top) {
-                CodeScreenTitleRow(title: "Account", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
-                            .frame(width: 44, height: 44)
-                            .contentShape(Circle())
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                     }
                     .buttonStyle(.plain)
-                    .codeLiquidGlassCircle()
                     .accessibilityLabel("Close Account")
                     .accessibilityIdentifier("account-close")
                 }
+            }
+            .contentMargins(.top, CodeScreenMetrics.mainHeaderHeight + CodeScreenMetrics.mainHeaderTopPadding + CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
+            .overlay(alignment: .top) {
+                CodeScreenTitleRow(title: "Account", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
@@ -1998,22 +2001,25 @@ struct ProSubscriptionStoreView: View {
                 .padding(.vertical, CodeScreenMetrics.contentSpacingBelowTitle)
             }
             .background(CodeAppBackdrop(accent: .secondary).ignoresSafeArea())
-            .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: 0) {
-                CodeScreenTitleRow(title: "Pro", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         library.dismissProSubscriptionStore()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .frame(width: 44, height: 44)
-                            .contentShape(Circle())
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                     }
                     .buttonStyle(.plain)
-                    .codeLiquidGlassCircle()
                     .disabled(library.isStoreKitBusy)
                     .accessibilityLabel("Close Pro")
                 }
+            }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                CodeScreenTitleRow(title: "Pro", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)

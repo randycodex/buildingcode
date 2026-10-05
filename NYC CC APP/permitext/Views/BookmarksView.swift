@@ -228,6 +228,12 @@ struct BookmarksView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.visible, for: .navigationBar)
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                savedHeaderActionButtons
+            }
+        }
         .onAppear {
             // Reader bookmark actions publish the updated bookmark list
             // synchronously. Rebuild from that state instead of reading
@@ -343,23 +349,10 @@ struct BookmarksView: View {
         .padding(.horizontal, 4)
     }
 
-    @ViewBuilder
-    private var savedHeaderActions: some View {
-        if #available(iOS 26.0, *) {
-            savedHeaderActionButtons
-                .glassEffect(.regular, in: Capsule())
-        } else {
-            savedHeaderActionButtons
-                .background(.regularMaterial, in: Capsule())
-        }
-    }
-
     private var savedScreenHeader: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
             if collectionOnly {
-                CodeScreenTitleRow(title: screenTitle, collapseProgress: collapseProgress, minimumHeight: 44) {
-                    savedHeaderActions
-                }
+                CodeScreenTitleRow(title: screenTitle, collapseProgress: collapseProgress, minimumHeight: 44)
             } else {
                 pinnedSavedHeader
                     .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
@@ -406,9 +399,7 @@ struct BookmarksView: View {
     }
 
     private var pinnedSavedHeader: some View {
-        CodeScreenTitleRow(title: screenTitle, minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
-            savedHeaderActions
-        }
+        CodeScreenTitleRow(title: screenTitle, minimumHeight: CodeScreenMetrics.mainHeaderHeight)
     }
 
     private var allSavedLink: some View {

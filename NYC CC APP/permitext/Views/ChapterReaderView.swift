@@ -1279,15 +1279,21 @@ private struct SourceProblemReportSheet: View {
                     Text("You can review the draft before sending. Reports do not change enacted code text.")
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: 0) {
-                CodeScreenTitleRow(title: "Report a problem", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button { dismiss() } label: {
-                        Image(systemName: "xmark").frame(width: 44, height: 44)
+                        Image(systemName: "xmark")
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                     }
-                    .buttonStyle(.plain).codeLiquidGlassCircle()
+                    .buttonStyle(.plain)
                     .accessibilityLabel("Close report")
                 }
+            }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                CodeScreenTitleRow(title: "Report a problem", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)

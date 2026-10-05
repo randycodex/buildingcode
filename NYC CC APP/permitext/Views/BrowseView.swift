@@ -89,6 +89,11 @@ struct BrowseView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    readerCodePicker
+                }
+            }
             .navigationDestination(item: $openedChapter) { chapter in
                 chapterDestination(chapter: chapter,
                     rememberedSectionID: rememberedSectionBinding(for: chapter.id),
@@ -393,96 +398,99 @@ struct BrowseView: View {
             Text("Chapters")
                 .font(CodeTypography.screenTitle)
                 .foregroundStyle(.primary)
+                .accessibilityIdentifier("screen-title-Chapters")
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 0)
-            Menu {
-                Section(ReaderCodeMenuSectionTitle.construction2022) {
-                    ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
-                        readerCodePickerButton(
-                            version: constructionCodeVersion,
-                            codeSectionName: codeSectionName
-                        )
-                    }
-                }
-
-                Section(ReaderCodeMenuSectionTitle.construction2014) {
-                    ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
-                        readerCodePickerButton(
-                            version: historicalConstructionCodeVersion,
-                            codeSectionName: codeSectionName
-                        )
-                    }
-                }
-
-                Section(ReaderCodeMenuSectionTitle.codes2025) {
-                    readerCodePickerButton(
-                        version: specialtyCodeVersion,
-                        codeSectionName: "2025 Energy Conservation Code"
-                    )
-                    readerCodePickerButton(
-                        version: specialtyCodeVersion,
-                        codeSectionName: "2025 Electrical Code — NYC Amendments"
-                    )
-                }
-
-                Section(ReaderCodeMenuSectionTitle.existingAndHistorical) {
-                    readerCodePickerButton(
-                        version: existingBuildingCodeVersion,
-                        codeSectionName: "Existing Building Code"
-                    )
-                    readerCodePickerButton(
-                        version: enactedAdministrativeCodeVersion,
-                        codeSectionName: "1968 Building Code"
-                    )
-                }
-
-                Section(ReaderCodeMenuSectionTitle.fireAndHousing) {
-                    readerCodePickerButton(
-                        version: enactedAdministrativeCodeVersion,
-                        codeSectionName: "Fire Code"
-                    )
-                    readerCodePickerButton(
-                        version: enactedAdministrativeCodeVersion,
-                        codeSectionName: "Housing Maintenance Code"
-                    )
-                }
-
-                Section(ReaderCodeMenuSectionTitle.administrative) {
-                    ForEach(enactedAdministrativeCodeSectionNames, id: \.self) { codeSectionName in
-                        readerCodePickerButton(
-                            version: enactedAdministrativeCodeVersion,
-                            codeSectionName: codeSectionName
-                        )
-                    }
-                }
-
-                Section(ReaderCodeMenuSectionTitle.localLaws) {
-                    readerCodePickerButton(
-                        version: enactedAdministrativeCodeVersion,
-                        codeSectionName: "Construction-Related Local Laws"
-                    )
-                }
-
-                Section(ReaderCodeMenuSectionTitle.landUseAndZoning) {
-                    readerCodePickerButton(
-                        version: zoningResolutionVersion,
-                        codeSectionName: "Zoning Resolution"
-                    )
-                }
-            } label: {
-                Image(systemName: "line.3.horizontal")
-                    .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                    .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                    .codeLiquidGlassCircle()
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityHidden(!isBrowserTabActive)
-            .accessibilityLabel(selectedCodeSectionName + " · " + selectedVersionName)
-            .accessibilityHint("Change code or version")
-            .accessibilityIdentifier("reader-code-picker")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var readerCodePicker: some View {
+        Menu {
+            Section(ReaderCodeMenuSectionTitle.construction2022) {
+                ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
+                    readerCodePickerButton(
+                        version: constructionCodeVersion,
+                        codeSectionName: codeSectionName
+                    )
+                }
+            }
+
+            Section(ReaderCodeMenuSectionTitle.construction2014) {
+                ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
+                    readerCodePickerButton(
+                        version: historicalConstructionCodeVersion,
+                        codeSectionName: codeSectionName
+                    )
+                }
+            }
+
+            Section(ReaderCodeMenuSectionTitle.codes2025) {
+                readerCodePickerButton(
+                    version: specialtyCodeVersion,
+                    codeSectionName: "2025 Energy Conservation Code"
+                )
+                readerCodePickerButton(
+                    version: specialtyCodeVersion,
+                    codeSectionName: "2025 Electrical Code — NYC Amendments"
+                )
+            }
+
+            Section(ReaderCodeMenuSectionTitle.existingAndHistorical) {
+                readerCodePickerButton(
+                    version: existingBuildingCodeVersion,
+                    codeSectionName: "Existing Building Code"
+                )
+                readerCodePickerButton(
+                    version: enactedAdministrativeCodeVersion,
+                    codeSectionName: "1968 Building Code"
+                )
+            }
+
+            Section(ReaderCodeMenuSectionTitle.fireAndHousing) {
+                readerCodePickerButton(
+                    version: enactedAdministrativeCodeVersion,
+                    codeSectionName: "Fire Code"
+                )
+                readerCodePickerButton(
+                    version: enactedAdministrativeCodeVersion,
+                    codeSectionName: "Housing Maintenance Code"
+                )
+            }
+
+            Section(ReaderCodeMenuSectionTitle.administrative) {
+                ForEach(enactedAdministrativeCodeSectionNames, id: \.self) { codeSectionName in
+                    readerCodePickerButton(
+                        version: enactedAdministrativeCodeVersion,
+                        codeSectionName: codeSectionName
+                    )
+                }
+            }
+
+            Section(ReaderCodeMenuSectionTitle.localLaws) {
+                readerCodePickerButton(
+                    version: enactedAdministrativeCodeVersion,
+                    codeSectionName: "Construction-Related Local Laws"
+                )
+            }
+
+            Section(ReaderCodeMenuSectionTitle.landUseAndZoning) {
+                readerCodePickerButton(
+                    version: zoningResolutionVersion,
+                    codeSectionName: "Zoning Resolution"
+                )
+            }
+        } label: {
+            Image(systemName: "line.3.horizontal")
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHidden(!isBrowserTabActive)
+        .accessibilityLabel(selectedCodeSectionName + " · " + selectedVersionName)
+        .accessibilityHint("Change code or version")
+        .accessibilityIdentifier("reader-code-picker")
     }
 
     private var constructionCodeSectionNames: [String] {
