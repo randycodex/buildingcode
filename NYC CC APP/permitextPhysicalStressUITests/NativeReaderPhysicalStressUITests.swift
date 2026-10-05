@@ -67,6 +67,32 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         project.tap()
         XCTAssertTrue(app.staticTexts["Acceptance Project"].waitForExistence(timeout: 10))
         keepScreenshot(named: "Existing project contents", from: app)
+        let projectRoot = app.scrollViews["project-folder-root"]
+        XCTAssertTrue(projectRoot.exists)
+        XCTAssertFalse(app.staticTexts["Phase 3 entitled Research acceptance"].exists,
+                       "Project Context should open on its own screen.")
+        XCTAssertFalse(app.staticTexts["No Notes yet."].exists,
+                       "Notebook previews should not remain inline in the Project.")
+        for (identifier, title) in [
+            ("project-section-context", "Project Context"),
+            ("project-section-structured-facts", "Structured Facts"),
+            ("project-section-notebook", "Notebook"),
+            ("project-section-research-history", "Research History")
+        ] {
+            let section = element(in: app, identifier: identifier)
+            reveal(section, in: app)
+            XCTAssertTrue(section.isHittable, "\(title) must be reachable in the Project.")
+            section.tap()
+            XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10),
+                          "\(title) should push a titled destination onto the navigation stack.")
+            XCTAssertFalse(projectRoot.isHittable, "The Project page must be behind the destination.")
+            if title == "Project Context" {
+                XCTAssertTrue(app.staticTexts["Phase 3 entitled Research acceptance"].exists)
+            }
+            keepScreenshot(named: "Project section: \(title)", from: app)
+            app.navigationBars[title].buttons.element(boundBy: 0).tap()
+            XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
+        }
         app.navigationBars.buttons.element(boundBy: 0).tap()
         let allSaved = element(in: app, identifier: "all-saved-link")
         reveal(allSaved, in: app)
