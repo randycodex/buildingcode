@@ -1,11 +1,11 @@
-// Typed recovery copy and the original question only. Private review prose and
-// legal drafts never enter this policy. Shared by server and history presentation.
+// Typed recovery and a bounded description of the human request only. Private
+// review prose and rejected drafts never enter this shared presentation policy.
 export const researchSystemRecoveryReasons = Object.freeze([
   "verification_source", "verification_context", "verification_format", "verification_incomplete",
   "evidence_unavailable", "research_unresolved"
 ]);
 
-const explanations = Object.freeze({
+const priorQuestionExplanations = Object.freeze({
   verification_source: ["I found a mismatch between my explanation and its source references", "while preparing the answer to"],
   verification_context: ["I couldn’t consistently use the project details already provided", "while preparing the answer to"],
   verification_format: ["I ran into a problem", "while preparing the answer to"],
@@ -14,18 +14,80 @@ const explanations = Object.freeze({
   research_unresolved: ["I couldn’t resolve the conditions needed", "to answer"]
 });
 
-function recoveryExplanation(reason, question = "") {
-  const wording = explanations[reason];
+export function researchPriorQuestionRecoveryTextForReason(reason, question = "") {
+  const wording = priorQuestionExplanations[reason];
   if (!wording) return "";
   const originalQuestion = typeof question === "string" ? question.replace(/\s+/g, " ").trim() : "";
-  return originalQuestion
+  const lead = originalQuestion
     ? `${wording[0]} ${wording[1]} “${originalQuestion}”, so I couldn’t finish it.`
     : `${wording[0]} ${wording[1]} this question, so I couldn’t finish it.`;
+  return `${lead}\n\nUse Report this issue below to report this attempt.`;
 }
 
-export function researchVerificationRecoveryTextForReason(reason, question = "") {
+const normalizedQuestion = value => typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
+const phraseWords = value => value.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+const wordIdentity = word => word.length > 3 ? word.replace(/s$/, "") : word;
+const phraseJoiners = new Set("a an the your our my of for in on at to from with and or about".split(" "));
+
+// This is optional display metadata, never a verdict or a fact extractor.
+// Require request vocabulary and reject clauses, instructions and markup.
+// Semantic paraphrase fidelity remains a reviewer obligation; invalid metadata
+// is discarded without rejecting/retrying an otherwise valid review.
+export function researchRecoveryHumanContext(messages = []) {
+  if (!Array.isArray(messages)) return [];
+  return messages.slice(-8).filter(message => message?.role === "user" &&
+    typeof message.id === "string" && message.id.length > 0 && message.id.length <= 256 &&
+    typeof message.question === "string" && message.question.length <= 2000 &&
+    (message.requestID == null || typeof message.requestID === "string") &&
+    (message.researchRequestID == null || typeof message.researchRequestID === "string"))
+    .map(message => ({ role: "user", id: message.id,
+      requestID: message.requestID || message.researchRequestID || "", question: normalizedQuestion(message.question) }));
+}
+
+export function researchRecoveryRequestDescription(question, value, humanContext = []) {
+  if (typeof value !== "string" || value.length > 100 || /[^\p{L}\p{N} '\u2019-]/u.test(value)) return "";
+  const phrase = value.replace(/\s+/g, " ").trim(), words = phraseWords(phrase);
+  if (!phrase || words.length > 12 ||
+      /\b(?:is|are|was|were|be|been|being|can|could|will|would|may|might|must|shall|should|do|does|did|not|need|needs|needed|require|requires|required|comply|complies|compliant|meet|meets|satisfy|satisfies|pass|passes|fail|fails|allow|allows|allowed|permit|permits|permitted|prohibit|prohibits|prohibited|approve|approves|approved|missing|unknown|verify|verified|failed|failure|checker|retry|report|please|ignore|return|write|say)\b/i.test(phrase)) return "";
+  const asked = new Set(phraseWords([normalizedQuestion(question),
+    ...researchRecoveryHumanContext(humanContext).map(message => message.question)].join(" ")).map(wordIdentity));
+  const content = words.filter(word => !phraseJoiners.has(word));
+  if (!content.length || content.some(word => !asked.has(wordIdentity(word))) ||
+      words.join(" ") === phraseWords(normalizedQuestion(question)).join(" ")) return "";
+  return phrase;
+}
+
+export function researchRecoveryPresentation(question, requestID = "", requestDescription = null, humanContext = []) {
+  const description = researchRecoveryRequestDescription(question, requestDescription, humanContext) || null;
+  return { version: 1, requestID: typeof requestID === "string" && requestID.length <= 256 ? requestID : "",
+    question: normalizedQuestion(question),
+    requestDescription: description,
+    humanContext: description && !researchRecoveryRequestDescription(question, description)
+      ? researchRecoveryHumanContext(humanContext) : [] };
+}
+
+export function researchRecoveryDescriptionForPresentation(question, presentation) {
+  if (!presentation || presentation.version !== 1 || typeof presentation.requestID !== "string" ||
+      presentation.question !== normalizedQuestion(question)) return "";
+  return researchRecoveryRequestDescription(question, presentation.requestDescription, presentation.humanContext);
+}
+
+function recoveryExplanation(reason, question = "", presentation = null) {
+  const description = researchRecoveryDescriptionForPresentation(question, presentation);
+  const topic = description ? `your question about ${description}` : "your question";
+  return ({
+    verification_source: `I couldn’t finish the answer to ${topic} because my explanation didn’t match the cited text.`,
+    verification_context: `I couldn’t consistently use the details you provided while checking ${topic}.`,
+    verification_format: `I couldn’t process the response to ${topic}.`,
+    verification_incomplete: `I couldn’t finish the source check for ${topic}.`,
+    evidence_unavailable: `I couldn’t prepare the evidence needed to answer ${topic}.`,
+    research_unresolved: `I couldn’t resolve ${topic} on this attempt.`
+  })[reason] || "";
+}
+
+export function researchVerificationRecoveryTextForReason(reason, question = "", presentation = null) {
   if (!researchSystemRecoveryReasons.includes(reason)) return "";
-  return `${recoveryExplanation(reason, question)}\n\nUse Report this issue below to report this attempt.`;
+  return `${recoveryExplanation(reason, question, presentation)}\n\nUse Report this issue below to report this attempt.`;
 }
 
 export function researchFailureReason(error = {}) {
@@ -40,7 +102,7 @@ export function researchFailureReason(error = {}) {
   const last = attempts.findLast(attempt => attempt?.pass !== true);
   const types = new Set((Array.isArray(last?.issues) ? last.issues : []).map(issue => issue?.type));
   if (["missed_premise_contradiction", "repeated_established_fact", "fact_evidence_confusion"].some(type => types.has(type))) return "verification_context";
-  if (["incorrect_citation", "wrong_attribution", "irrelevant_citation", "unsupported_requirement"].some(type => types.has(type))) return "verification_source";
+  if (["misstated_provision", "incorrect_citation", "wrong_attribution", "irrelevant_citation", "unsupported_requirement", "overstated_compliance"].some(type => types.has(type))) return "verification_source";
   return "verification_incomplete";
 }
 

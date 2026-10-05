@@ -1,5 +1,5 @@
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
-import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261004-failure-recovery-v2";
+import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v3";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
@@ -43,7 +43,7 @@ import {
   researchProgressStages,
   researchProgressStage,
   writeResearchRequestRecovery
-} from "./research-progress.js?v=20261004-failure-recovery-v125";
+} from "./research-progress.js?v=20261005-natural-recovery-v126";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
@@ -18504,19 +18504,27 @@ function researchRecoveryQuestionForMessage({ message, conversation, conversatio
   if (positions.length !== 1) return "";
   const index = positions[0], stored = conversation.messages[index];
   if (String(stored.requestID || "") !== String(message.requestID || "")) return "";
+  if (stored.answer?.recoveryPresentation &&
+      stored.answer.recoveryPresentation.requestID !== String(stored.requestID || "")) return "";
   const preceding = conversation.messages.slice(0, index);
-  if (stored.requestID) {
-    const matching = preceding.filter(candidate => candidate.role === "user" && candidate.requestID === stored.requestID);
-    return matching.length === 1 ? String(matching[0].question || "") : "";
-  }
-  const previous = preceding.at(-1);
-  return previous?.role === "user" && !previous.requestID ? String(previous.question || "") : "";
+  const matching = stored.requestID
+    ? preceding.filter(candidate => candidate.role === "user" && candidate.requestID === stored.requestID)
+    : preceding.at(-1)?.role === "user" && !preceding.at(-1).requestID ? [preceding.at(-1)] : [];
+  if (matching.length !== 1) return "";
+  const earlier = preceding.slice(0, preceding.indexOf(matching[0]));
+  const humanContext = stored.answer?.recoveryPresentation?.humanContext;
+  if (humanContext && (!Array.isArray(humanContext) || humanContext.some(bound =>
+      bound.role !== "user" || earlier.filter(candidate => candidate.role === "user" && candidate.id === bound.id &&
+        String(candidate.requestID || "") === bound.requestID &&
+        String(candidate.question || "").replace(/\s+/g, " ").trim() === bound.question).length !== 1))) return "";
+  return String(matching[0].question || "");
 }
 
-function researchVerificationRecoveryText(answer, question = "") {
+function researchVerificationRecoveryText(answer, question = "", includeAction = true) {
   if (!researchAnswerHasVerificationRecovery(answer)) return "";
   // Presentation only: historical stored answers and verification stay intact.
-  return researchVerificationRecoveryTextForReason(answer.verification.reason, question);
+  const text = researchVerificationRecoveryTextForReason(answer.verification.reason, question, answer.recoveryPresentation);
+  return includeAction ? text : text.split("\n\n")[0];
 }
 
 function researchAnswerNarrativeText(result, question = "") {
@@ -18676,8 +18684,8 @@ function researchAnswerDisplayMarkdown(value) {
   }).join("");
 }
 
-function appendResearchAnswerNarrative(container, result, question = "") {
-  const recovery = researchVerificationRecoveryText(result, question);
+function appendResearchAnswerNarrative(container, result, question = "", includeRecoveryAction = true) {
+  const recovery = researchVerificationRecoveryText(result, question, includeRecoveryAction);
   const text = recovery || researchAnswerDisplayMarkdown(researchAnswerNarrativeText(result, question));
   if (!text) return;
   const narrative = document.createElement("div");
@@ -19111,7 +19119,8 @@ function renderResearchInterpretation(container, result, options = {}) {
       : result.authorityLabel;
     metadata.append(authority);
   }
-  appendResearchAnswerNarrative(card, result, recoveryQuestion);
+  const reportMessage = options.message || options.recordMessage;
+  appendResearchAnswerNarrative(card, result, recoveryQuestion, Boolean(reportMessage?.id && options.conversationID));
   const nextQuestion = researchDisplayList(result.followUpQuestions)[0];
   if (!researchAnswerHasVerificationRecovery(result) && nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
     const followUp = document.createElement("p");
@@ -19387,7 +19396,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   detailsBody.append(nextStep);
   container.append(card);
   wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
-  if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
+  if (reportMessage) renderResearchFeedback(container, reportMessage, options.conversationID);
 }
 
 async function renderUtilityInstance(instance, options = {}) {
@@ -23090,7 +23099,8 @@ function renderHistoricalResearchRecord(container, answerRecord) {
 
   const exactAnswer = document.createElement("section");
   exactAnswer.className = "research-historical-answer";
-  renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true, recordQuestion: answerRecord.question });
+  renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true, recordQuestion: answerRecord.question,
+    recordMessage: researchAnswerHasVerificationRecovery(answerRecord.answer) ? { id: answerRecord.id, answer: answerRecord.answer } : null, conversationID: answerRecord.conversationID });
 
   const evidenceHeading = document.createElement("strong");
   evidenceHeading.textContent = "Cited evidence snapshots";

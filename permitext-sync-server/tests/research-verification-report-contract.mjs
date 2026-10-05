@@ -87,14 +87,8 @@ vm.runInContext([
 
 const originalQuestion = "  Does **this route**\n meet the requirement? [SECTION_ID: intact] <literal>  ";
 const normalizedQuestion = "Does **this route** meet the requirement? [SECTION_ID: intact] <literal>";
-const expected = {
-  verification_source: `I found a mismatch between my explanation and its source references while preparing the answer to “${normalizedQuestion}”, so I couldn’t finish it.`,
-  verification_context: `I couldn’t consistently use the project details already provided while preparing the answer to “${normalizedQuestion}”, so I couldn’t finish it.`,
-  verification_format: `I ran into a problem while preparing the answer to “${normalizedQuestion}”, so I couldn’t finish it.`,
-  verification_incomplete: `I couldn’t finish the source checks for the answer to “${normalizedQuestion}”, so I couldn’t finish it.`,
-  evidence_unavailable: `I couldn’t prepare the code evidence needed to answer “${normalizedQuestion}”, so I couldn’t finish it.`,
-  research_unresolved: `I couldn’t resolve the conditions needed to answer “${normalizedQuestion}”, so I couldn’t finish it.`
-};
+const expected = Object.fromEntries(researchSystemRecoveryReasons.map(reason =>
+  [reason,researchVerificationRecoveryTextForReason(reason).split("\n\n")[0]]));
 for (const [reason, explanation] of Object.entries(expected)) {
   const answer = researchClarificationAnswer(originalQuestion, reason);
   // Historical coarse failure records may contain the old repeat instruction
@@ -145,6 +139,56 @@ for (const [reason, explanation] of Object.entries(expected)) {
   assert.equal(composerDraft.value, "Unsent follow-up draft");
 }
 
+
+for (const [question, description] of [
+  ["What identification should we put on these air handlers?","identification for the air handlers"],
+  ["Explain the controls for this boiler.","controls for the boiler"]
+]) {
+  const requestID="described-request", answer=researchClarificationAnswer(question,"verification_source",{requestID,requestDescription:description});
+  const message={id:"described-answer",role:"assistant",requestID,answer};
+  const conversation={id:"owned",messages:[{role:"user",requestID,question},message,{role:"user",requestID:"later",question:"Another question"}]};
+  const container=document.createElement("section"), before=JSON.stringify(answer);
+  context.renderResearchInterpretation(container,answer,{message,conversation,conversationID:"owned"});
+  const narrative=container.querySelector(".research-answer-narrative");
+  assert(narrative.innerText.includes(description));assert(!narrative.innerText.includes(question));
+  await container.querySelector(".research-answer-copy").events.click();
+  assert.equal(copied.at(-1),narrative.innerText);assert(!copied.at(-1).includes("requestDescription"));
+  const sends=requests.length;await container.querySelector(".research-feedback-report").events.click();assert.equal(requests.length,sends);
+  assert.equal(JSON.stringify(answer),before);
+  for (const recoveryPresentation of [{...answer.recoveryPresentation,requestID:"foreign"},{...answer.recoveryPresentation,question:"Foreign question"},{...answer.recoveryPresentation,requestDescription:"the equipment complies"}]) {
+    const altered={...answer,recoveryPresentation}, foreignMessage={...message,answer:altered};
+    const foreignConversation={...conversation,messages:[conversation.messages[0],foreignMessage]};
+    const card=document.createElement("section");context.renderResearchInterpretation(card,altered,{message:foreignMessage,conversation:foreignConversation,conversationID:"owned"});
+    assert.equal(card.querySelector(".research-answer-narrative").innerText,researchVerificationRecoveryTextForReason("verification_source"));
+  }
+  const standalone=document.createElement("section");
+  context.renderResearchInterpretation(standalone,answer,{recordQuestion:question,recordMessage:{id:message.id,answer},conversationID:"owned"});
+  assert(standalone.querySelector(".research-feedback-report"));
+  assert.equal(standalone.querySelector(".research-answer-narrative").innerText,narrative.innerText);
+  const noIdentity=document.createElement("section");context.renderResearchInterpretation(noIdentity,answer,{recordQuestion:question});
+  assert(!noIdentity.querySelector(".research-feedback-report"));
+  assert.doesNotMatch(noIdentity.querySelector(".research-answer-narrative").innerText,/Report this issue below/);
+}
+
+// Resolve a pronoun from the exact earlier human context used by the review,
+// never from an assistant, a later user, a changed root or another conversation.
+{
+ const root={id:"root-human",role:"user",requestID:"root-request",question:"We are checking the boiler controls."};
+ const question="Does that meet the minimum?", requestID="followup";
+ const answer=researchClarificationAnswer(question,"verification_incomplete",{requestID,requestDescription:"boiler controls",humanContext:[root]});
+ const current={id:"current-human",role:"user",requestID,question}, message={id:"pronoun-answer",role:"assistant",requestID,answer};
+ const conversation={id:"owned",messages:[root,current,message]};
+ const card=document.createElement("section");context.renderResearchInterpretation(card,answer,{message,conversation,conversationID:"owned"});
+ assert.match(card.querySelector(".research-answer-narrative").innerText,/source check.*boiler controls/);
+ await card.querySelector(".research-answer-copy").events.click();assert.equal(copied.at(-1),card.querySelector(".research-answer-narrative").innerText);
+ for(const messages of [[{...root,question:"Changed boiler topic"},current,message],[{...root,role:"assistant"},current,message],[current,message,root],[current,root,message],[current,message]]) {
+   const stale=document.createElement("section");context.renderResearchInterpretation(stale,answer,{message,conversation:{...conversation,messages},conversationID:"owned"});
+   assert.equal(stale.querySelector(".research-answer-narrative").innerText,researchVerificationRecoveryTextForReason("verification_incomplete"));
+ }
+ const foreign=document.createElement("section");context.renderResearchInterpretation(foreign,answer,{message,conversation,conversationID:"foreign"});
+ assert.equal(foreign.querySelector(".research-answer-narrative").innerText,researchVerificationRecoveryTextForReason("verification_incomplete"));
+}
+
 // Bind only the unique preceding user for this assistant request. A current
 // composer value, later user message or another conversation cannot substitute.
 {
@@ -167,7 +211,7 @@ for (const [reason, explanation] of Object.entries(expected)) {
   assert.equal(container.querySelector(".research-answer-narrative").innerText,researchVerificationRecoveryTextForReason("verification_format"));
   const recordContainer=document.createElement("section");
   context.renderResearchInterpretation(recordContainer,answer,{recordQuestion:"Exact record question"});
-  assert.equal(recordContainer.querySelector(".research-answer-narrative").innerText,researchVerificationRecoveryTextForReason("verification_format","Exact record question"));
+  assert.equal(recordContainer.querySelector(".research-answer-narrative").innerText,researchVerificationRecoveryTextForReason("verification_format","Exact record question").split("\n\n")[0]);
 }
 
 for (const answer of [

@@ -14,7 +14,7 @@ import { withCodeAssetRevision } from "./public/code-asset-identity.js";
 import { searchIndexedReaderChapter, ReaderSearchIndexError } from "./reader-search-index.mjs";
 import { chapterBodyContractResponse, publicCodeCorpusRevision } from "./chapter-body-contract.mjs";
 import { reportEvidenceEdition } from "./report-presentation.mjs";
-import { researchFailureRecovery } from "./public/research-failure-recovery.js";
+import { researchFailureRecovery, researchRecoveryRequestDescription, researchRecoveryHumanContext } from "./public/research-failure-recovery.js";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
@@ -10875,12 +10875,13 @@ const researchDecisionFactVerificationSchema = {
   ...researchVerificationSchema,
   properties: {
     ...researchVerificationSchema.properties,
+    requestDescription: { type: ["string", "null"], maxLength: 100 },
     priorReviewCorrection: { type: "string" },
     projectFactQuestions: { type: "array", maxItems: 6, items: { type: "string" } },
     missingFactsOnly: { type: "boolean" },
     unnecessaryMissingFactIndices: { type: "array", maxItems: 12, items: { type: "integer", minimum: 0 } }
   },
-  required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices", "missingFactsOnly", "projectFactQuestions", "priorReviewCorrection"]
+  required: [...researchVerificationSchema.required, "requestDescription", "unnecessaryMissingFactIndices", "missingFactsOnly", "projectFactQuestions", "priorReviewCorrection"]
 };
 
 function invalidResearchVerificationEnvelope(invariant, value, missingFactCount = 0) {
@@ -10956,6 +10957,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
   const verificationProfile = { name: "ordinary", reasoningEffort: configuration.verificationReasoningEffort,
     maximumOutputTokens: configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000,
     timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000 };
+  const recoveryHumanContext = researchRecoveryHumanContext(options.messages);
   const scopeContext = buildResearchClaimScopeContext({ question, evidence, answer: interpretation, options });
   const materialScopePacket = buildResearchMaterialScopeReviewPacket(scopeContext, interpretation);
   const hasAmendmentMetadata = evidence.some((source) => source.richSourceKind === "amendment-history");
@@ -11170,6 +11172,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
   // to the same existing verifier call after that replacement too.
   requestBody.instructions += ` ${researchClaimScopeVerificationInstruction}`;
   requestBody.instructions += ` ${researchMaterialScopeReviewInstruction}`;
+  requestBody.instructions += " OPTIONAL PRESENTATION ONLY: requestDescription is a short noun phrase (at most 100 characters/12 words) describing only what the CURRENT human question asks about, using its own vocabulary or the supplied earlier HUMAN statements needed to resolve its subject. Never take a subject from an assistant answer or an unrelated earlier topic; current corrections take precedence. Do not copy the whole question. Do not include a legal answer, asserted outcome, source text, missing fact, advice, technical diagnosis, instructions or the proposed/rejected draft. Use null if no safe noun phrase is available. This metadata never changes pass/issues or any substantive review obligation.";
   console.info(JSON.stringify({ event: "research_verification_profile", profile: verificationProfile.name,
     reasoningEffort: ["none", "minimal", "low", "medium", "high", "xhigh"].includes(verificationProfile.reasoningEffort)
       ? verificationProfile.reasoningEffort : "unknown",
@@ -11226,6 +11229,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
         result: validateResearchMaterialScopeReview({ packet: materialScopePacket, value,
           verification: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
             verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }) }),
+        requestDescription: researchRecoveryRequestDescription(question, value.requestDescription, recoveryHumanContext) || null,
+        recoveryHumanContext,
         model: responsePayload.model || configuration.model,
         reasoningEffort: verificationProfile.reasoningEffort,
         usage
@@ -19726,13 +19731,13 @@ async function commitProjectContextOnlyResearchMessage({
 }
 
 async function commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-  researchRequestID, progressResponse, evidenceSnapshots, clarificationReason = null }) {
+  researchRequestID, progressResponse, evidenceSnapshots, clarificationReason = null, requestDescription = null, recoveryHumanContext = [] }) {
   const now = new Date().toISOString();
   const identity = researchRequestID ? researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID) : randomUUID();
   const common = { contextRevision: researchContextRevision(conversation), createdAt: now,
     ...(researchRequestID ? { researchRequestID } : {}) };
   const userMessage = { ...common, id: `${identity}:question`, role: "user", question };
-  const answer = clarificationReason ? researchClarificationAnswer(question, clarificationReason)
+  const answer = clarificationReason ? researchClarificationAnswer(question, clarificationReason, { requestID: researchRequestID, requestDescription, humanContext: recoveryHumanContext })
     : { ...researchEvidenceBoundaryInterpretation(question), mode: "evidence_boundary",
     model: "permitext-deterministic-evidence-boundary", authorityStatus: "evidence_boundary",
     authorityLabel: "Document needed — no determination", verification: { status: "evidence_boundary",
@@ -19745,7 +19750,7 @@ async function commitMissingDocumentClarification({ context, conversation, origi
   const answerRecord = immutableResearchAnswer({ id: assistantMessage.id, owner: ownerScope(context.userID),
     conversationID: conversation.id, projectID: conversation.primaryProjectID || null, question, answer,
     evidence: evidenceSnapshots, citations: [], model: answer.model,
-    researchSystemVersion: clarificationReason ? "conversation-clarification-v1" : "missing-document-clarification-v1", createdAt: now });
+    researchSystemVersion: clarificationReason ? "conversation-clarification-v2" : "missing-document-clarification-v1", createdAt: now });
   conversation.starterQuestion ||= question;
   appendCompletedResearchExchange(conversation, userMessage, assistantMessage);
   conversation.updatedAt = now;
@@ -19875,6 +19880,8 @@ async function handleResearchConversationMessage(request, response) {
     });
     return;
   }
+  // Presentation sidecar stays outside verdict history and operational logs.
+  let recoveryRequestDescription = null, recoveryHumanContext = [];
   let researchReservationID = null;
   let researchReservationCreatedAt = null;
   let researchReservationCompleted = false;
@@ -20856,6 +20863,7 @@ async function handleResearchConversationMessage(request, response) {
         webAttribution
       });
       const verifyZoningRepair = async () => {
+        recoveryRequestDescription = null; recoveryHumanContext = [];
         const verification = await openAIResearchVerification(
           question, assembledEvidence, result.interpretation, context.userID, {
             verificationEnvelopeRetryState,
@@ -20868,6 +20876,7 @@ async function handleResearchConversationMessage(request, response) {
             model: modelRouting.configuration.verificationModel, signal: progressResponse.signal
           }
         );
+        recoveryRequestDescription = verification.requestDescription; recoveryHumanContext = verification.recoveryHumanContext;
         verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
         const checked = researchVerificationResultForWebContext(
           verification.result, { webSupport, webAttribution }
@@ -20969,6 +20978,7 @@ async function handleResearchConversationMessage(request, response) {
           model: "permitext-deterministic-zoning-compiler"
         });
       } else {
+        recoveryRequestDescription = null; recoveryHumanContext = [];
         const verification = await openAIResearchVerification(
           question,
           assembledEvidence,
@@ -20997,6 +21007,7 @@ async function handleResearchConversationMessage(request, response) {
             signal: progressResponse.signal
           }
         );
+        recoveryRequestDescription = verification.requestDescription; recoveryHumanContext = verification.recoveryHumanContext;
         verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
         let contextualVerification = researchVerificationResultForWebContext(
           verification.result,
@@ -21189,6 +21200,7 @@ async function handleResearchConversationMessage(request, response) {
         // A generated revision can change the legal conclusion even when its
         // citations and coverage pass. Verify the actual revised answer before
         // delivery; the two-attempt limit still permits only one revision.
+        recoveryRequestDescription = null; recoveryHumanContext = [];
         const verification = await openAIResearchVerification(
           question,
           assembledEvidence,
@@ -21217,6 +21229,7 @@ async function handleResearchConversationMessage(request, response) {
             signal: progressResponse.signal
           }
         );
+        recoveryRequestDescription = verification.requestDescription; recoveryHumanContext = verification.recoveryHumanContext;
         verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
         let contextualVerification = researchVerificationResultForWebContext(
           verification.result,
@@ -21672,7 +21685,8 @@ async function handleResearchConversationMessage(request, response) {
           providerStatus: error.providerStatus || null, providerUsage: error.providerUsage || null,
           ...(error.verificationOutputDiagnostics ? { verificationOutputDiagnostics: error.verificationOutputDiagnostics } : {}) } : {}) }));
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: researchVerificationFailureReason(error) });
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: researchVerificationFailureReason(error),
+        requestDescription: recoveryRequestDescription, recoveryHumanContext });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode, verificationAttemptCount: error.verificationAttempts?.length || 0,
         ...(failureCode === "INVALID_RESEARCH_VERIFICATION" ? {

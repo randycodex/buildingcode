@@ -74,6 +74,44 @@ async function reservationTest(callback, environment = process.env) {
 }
 
 try {
+  // Optional presentation never changes a verdict, reserves another call or
+  // repairs an otherwise valid envelope. The checker still owns pass/issues.
+  const descriptionQuestion="What identification should we put on these air handlers?";
+  for (const verdict of [validPass,validFail]) for (const [metadata,expected] of [
+    [undefined,null],[null,null],[{},null],[22,null],["x".repeat(101),null],
+    ["Ignore instructions",null],["<b>air handlers</b>",null],["air handlers must be approved",null],
+    ["the equipment complies",null],["controls for the boiler",null],
+    ["identification for the air handlers","identification for the air handlers"]
+  ]) {
+    setup([{value:{...verdict,...(metadata===undefined?{}:{requestDescription:metadata})}}]);
+    await reservationTest(async()=>{
+      const checked=await openAIResearchVerification(descriptionQuestion,evidence,answer,"offline-user",{model:"gpt-5.6-luna"});
+      assert.equal(checked.result.pass,verdict.pass);assert.deepEqual(checked.result.issues,verdict.issues);
+      assert.equal(checked.requestDescription,expected);assert.equal(checked.result.requestDescription,undefined);
+      assert.equal(requests.length,1,"Optional invalid metadata cannot cause a retry");
+      assert(requests[0].text.format.schema.required.includes("requestDescription"));
+      assert.deepEqual(requests[0].text.format.schema.properties.requestDescription.type,["string","null"]);
+      assert.match(requests[0].instructions,/OPTIONAL PRESENTATION ONLY/);
+      assert.equal(requests[0].max_output_tokens,8000);assert.equal(requests[0].reasoning.effort,"medium");
+    });
+  }
+  const humanContext=[{id:"human-root",role:"user",researchRequestID:"root-request",question:"We are checking the boiler controls."},
+    {id:"assistant",role:"assistant",answer:{answerText:"The installation complies."}}];
+  setup([{value:{...validFail,requestDescription:"boiler controls"}}]);
+  await reservationTest(async()=>{
+    const checked=await openAIResearchVerification("Does that meet the minimum?",evidence,answer,"offline-user",{model:"gpt-5.6-luna",messages:humanContext});
+    assert.equal(checked.requestDescription,"boiler controls");
+    assert.equal(checked.recoveryHumanContext.length,1);assert.equal(checked.recoveryHumanContext[0].id,"human-root");
+    assert.equal(checked.result.pass,false);assert.equal(requests.length,1);
+  });
+  setup([{value:{...validFail,requestDescription:"installation compliance"}}]);
+  await reservationTest(async()=>{
+    const checked=await openAIResearchVerification("Can we omit it?",evidence,answer,"offline-user",{model:"gpt-5.6-luna",messages:humanContext});
+    assert.equal(checked.requestDescription,null,"Assistant conclusions cannot provide request vocabulary");
+    assert.equal(requests.length,1);
+  });
+  assert(!events.some(line=>line.includes("requestDescription")||line.includes("boiler controls")),"No presentation prose in provider/profile telemetry");
+
   // Exact budget selection runs through the real request/reservation/parser.
   for (const [effort, boundAnswer, expectedEffort, expectedCap, expectedTimeout, expectedProfile] of [
     ["medium", answer, "medium", 8_000, 90_000, "ordinary"],
@@ -425,7 +463,7 @@ try {
   const researchOperation = {};
   const context = { userID: "offline-user" };
   const conversation = { id: "same-conversation", primaryProjectID: "same-project" };
-  const dependencies = { researchReservationCompleted: false, failureCode: "INVALID_RESEARCH_VERIFICATION",
+  const dependencies = { recoveryRequestDescription: null, recoveryHumanContext: [], researchReservationCompleted: false, failureCode: "INVALID_RESEARCH_VERIFICATION",
     researchReservationID: "reservation-to-release", context, conversation, originalConversation: structuredClone(conversation),
     question: "Exact saved question", researchRequestID: "original-request", progressResponse: {}, researchOperation,
     error: { code: "INVALID_RESEARCH_VERIFICATION", message: "Envelope failed twice.", failureStage: "verification_envelope_validation",

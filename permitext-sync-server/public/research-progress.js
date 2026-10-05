@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20261004-failure-recovery-v125";
+export const researchProgressVersion = "20261005-natural-recovery-v126";
 
 export const researchRequestRecoveryStorageKey = "permitext:research-request-recovery:v1";
 export const researchRequestRecoveryMaxAgeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
@@ -222,4 +222,4 @@ export function researchRecoveryFromFailedMessage(message, conversationID) {
     stages: [{ id: "preparing_question", state: message.failure.status }]
   };
 }
-import { researchFailureRecovery, researchSystemRecoveryReasons } from "./research-failure-recovery.js?v=20261004-failure-recovery-v2";
+import { researchFailureRecovery, researchSystemRecoveryReasons } from "./research-failure-recovery.js?v=20261005-natural-recovery-v3";
