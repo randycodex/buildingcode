@@ -1224,8 +1224,12 @@ struct ProjectView: View {
         )
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                sortMenu
-                exportButton
+                if isProjectFolder {
+                    folderEditButton
+                } else {
+                    sortMenu
+                    exportButton
+                }
             }
         }
         .sheet(item: $folderEditorTarget) { target in
@@ -1703,18 +1707,9 @@ struct ProjectView: View {
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
-                Button {
-                    if let folder {
-                        folderEditorTarget = .edit(folder)
-                    }
-                } label: {
-                    Image(systemName: "pencil")
-                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                        .foregroundStyle(Color.appChrome)
-                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                if !isProjectFolder {
+                    folderEditButton
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Edit \(isProjectFolder ? "project" : "reference")")
             }
 
             if isProjectFolder {
@@ -1854,6 +1849,21 @@ struct ProjectView: View {
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
+    }
+
+    private var folderEditButton: some View {
+        Button {
+            if let folder {
+                folderEditorTarget = .edit(folder)
+            }
+        } label: {
+            Image(systemName: "pencil")
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                .foregroundStyle(Color.appChrome)
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Edit \(isProjectFolder ? "project" : "reference")")
     }
 
     private var sortMenu: some View {
