@@ -311,144 +311,152 @@ struct SearchView: View {
         _searchFilterCodeSectionIDs = State(initialValue: [])
     }
 
+    private var searchPresentation: some View {
+        ScrollView {
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("searchScroll")).minY)
+            }
+            .frame(height: 0)
+
+            VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
+
+                if showsGlobalOpeningProgress, let openingRoute {
+                    readerOpeningProgress(for: openingRoute)
+                }
+                if let deepLinkError {
+                    Text(deepLinkError).font(.callout).foregroundStyle(.secondary)
+                        .accessibilityIdentifier("search-deep-link-error")
+                }
+                if let openingError, let failedOpeningRoute {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(openingError).font(.callout).foregroundStyle(.secondary)
+                        Button("Retry opening section") { openReader(failedOpeningRoute, globalProgress: true) }
+                    }
+                    .accessibilityIdentifier("search-reader-opening-error")
+                }
+
+                HStack {
+                    Text(library.activeCodeSources == nil ? "Code source preferences unavailable" : (allInstalledSourcesDisabled == true ? "No code sources enabled" : (hasDisabledCodeSources ? "Searching enabled code sources" : "All installed code sources")))
+                        .font(.footnote).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Manage code sources") { showsCodeSources = true }
+                        .font(.footnote)
+                }
+                .accessibilityIdentifier("search-manage-code-sources")
+                if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    searchResultSummary
+                    if !library.allEditionSearchWarnings.isEmpty {
+                        Text("Some editions could not be searched. Results from available editions are shown.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                        ForEach(library.allEditionSearchWarnings, id: \.self) { Text($0).font(.caption) }
+                        Button("Retry unavailable editions") { library.searchAllEditions(query: query) }
+                    }
+                }
+                if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    emptyQueryHistorySection
+                } else if isSearchRequestPending || (library.isSearchInProgress && cachedFilteredResults.isEmpty) {
+                    searchLoadingState
+                } else if let error = library.allEditionSearchError {
+                    VStack(spacing: 12) {
+                        ContentUnavailableView("Search unavailable", systemImage: "magnifyingglass",
+                            description: Text(error))
+                        Button("Try Again") { library.searchAllEditions(query: query) }
+                    }
+                } else if cachedFilteredResults.isEmpty {
+                    noResultsState
+                } else {
+                    // Each header/result is a direct lazy-stack child. A family-wide
+                    // VStack would eagerly build every expanded result and its preview task.
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(searchFamilies) { family in
+                            Text(family.id)
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(.primary)
+                                .padding(.bottom, 4)
+                                .accessibilityAddTraits(.isHeader)
+                                .accessibilityIdentifier("search-family-\(family.id)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                                .background(Color(uiColor: .secondarySystemGroupedBackground),
+                                    in: UnevenRoundedRectangle(topLeadingRadius: 22, topTrailingRadius: 22, style: .continuous))
+                                .id("family:\(family.id)")
+                            ForEach(family.groups) { group in
+                                VStack(spacing: 0) {
+                                    sectionGroupHeader(group)
+                                    Divider()
+                                }
+                                .padding(.horizontal, 16)
+                                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                                if expandedSearchGroups.contains(group.id) {
+                                    ForEach(group.results, id: \.searchIdentity) { result in
+                                        searchResultLink(result, groupID: group.id)
+                                            .padding(.horizontal, 16)
+                                            .background(Color(uiColor: .secondarySystemGroupedBackground))
+                                    }
+                                }
+                            }
+                            Color(uiColor: .secondarySystemGroupedBackground)
+                                .frame(height: 16)
+                                .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 22, bottomTrailingRadius: 22, style: .continuous))
+                                .padding(.bottom, 12)
+                        }
+                        if library.isSearchInProgress {
+                            HStack(spacing: 8) {
+                                ProgressView().controlSize(.small)
+                                Text("Searching more editions…").font(.caption).foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 12)
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .padding(.horizontal, contentHorizontalInset)
+            .padding(.top, 8)
+            .padding(.bottom, 16)
+        }
+        .accessibilityIdentifier("search-results-scroll")
+        .scrollPosition(id: scrollPositionBinding, anchor: .top)
+        .task(id: "\(positionReady):\(pendingScrollTargetID ?? ""):\(needsPositionReset)") {
+            guard positionReady else { return }
+            let target = needsPositionReset
+                ? (isHistoryVisible ? historyPositionID : cachedGroupedResults.first.map { "family:\($0.familyName)" })
+                : pendingScrollTargetID
+            guard let target else { needsPositionReset = false; return }
+            await Task.yield()
+            guard !Task.isCancelled, positionReady else { return }
+            scrollTargetID = target
+            pendingScrollTargetID = nil
+            needsPositionReset = false
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            dismissKeyboard()
+        }
+        .contentMargins(.bottom, CodeScreenMetrics.bottomSearchContentClearance, for: .scrollContent)
+        .overlay(alignment: .bottom) {
+            searchField
+                .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+                .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+        }
+        .scrollDismissesKeyboard(.immediately)
+        .scrollIndicators(.hidden)
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.visible, for: .navigationBar)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar {
+            CodeMainScreenToolbarTitle(title: "Search")
+        }
+    }
+
     var body: some View {
         NavigationStack(path: $searchNavigationPath) {
-            ScrollView {
-                GeometryReader { proxy in
-                    Color.clear
-                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("searchScroll")).minY)
-                }
-                .frame(height: 0)
-
-                VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-
-                    if showsGlobalOpeningProgress, let openingRoute {
-                        readerOpeningProgress(for: openingRoute)
-                    }
-                    if let deepLinkError {
-                        Text(deepLinkError).font(.callout).foregroundStyle(.secondary)
-                            .accessibilityIdentifier("search-deep-link-error")
-                    }
-                    if let openingError, let failedOpeningRoute {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(openingError).font(.callout).foregroundStyle(.secondary)
-                            Button("Retry opening section") { openReader(failedOpeningRoute, globalProgress: true) }
-                        }
-                        .accessibilityIdentifier("search-reader-opening-error")
-                    }
-
-                    HStack {
-                        Text(library.activeCodeSources == nil ? "Code source preferences unavailable" : (allInstalledSourcesDisabled == true ? "No code sources enabled" : (hasDisabledCodeSources ? "Searching enabled code sources" : "All installed code sources")))
-                            .font(.footnote).foregroundStyle(.secondary)
-                        Spacer()
-                        Button("Manage code sources") { showsCodeSources = true }
-                            .font(.footnote)
-                    }
-                    .accessibilityIdentifier("search-manage-code-sources")
-                    if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        searchResultSummary
-                        if !library.allEditionSearchWarnings.isEmpty {
-                            Text("Some editions could not be searched. Results from available editions are shown.")
-                                .font(.footnote).foregroundStyle(.secondary)
-                            ForEach(library.allEditionSearchWarnings, id: \.self) { Text($0).font(.caption) }
-                            Button("Retry unavailable editions") { library.searchAllEditions(query: query) }
-                        }
-                    }
-                    if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        emptyQueryHistorySection
-                    } else if isSearchRequestPending || (library.isSearchInProgress && cachedFilteredResults.isEmpty) {
-                        searchLoadingState
-                    } else if let error = library.allEditionSearchError {
-                        VStack(spacing: 12) {
-                            ContentUnavailableView("Search unavailable", systemImage: "magnifyingglass",
-                                description: Text(error))
-                            Button("Try Again") { library.searchAllEditions(query: query) }
-                        }
-                    } else if cachedFilteredResults.isEmpty {
-                        noResultsState
-                    } else {
-                        // Each header/result is a direct lazy-stack child. A family-wide
-                        // VStack would eagerly build every expanded result and its preview task.
-                        LazyVStack(alignment: .leading, spacing: 0) {
-                            ForEach(searchFamilies) { family in
-                                Text(family.id)
-                                    .font(.body.weight(.semibold))
-                                    .foregroundStyle(.primary)
-                                    .padding(.bottom, 4)
-                                    .accessibilityAddTraits(.isHeader)
-                                    .accessibilityIdentifier("search-family-\(family.id)")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.horizontal, 16)
-                                    .padding(.top, 16)
-                                    .background(Color(uiColor: .secondarySystemGroupedBackground),
-                                        in: UnevenRoundedRectangle(topLeadingRadius: 22, topTrailingRadius: 22, style: .continuous))
-                                    .id("family:\(family.id)")
-                                ForEach(family.groups) { group in
-                                    VStack(spacing: 0) {
-                                        sectionGroupHeader(group)
-                                        Divider()
-                                    }
-                                    .padding(.horizontal, 16)
-                                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                                    if expandedSearchGroups.contains(group.id) {
-                                        ForEach(group.results, id: \.searchIdentity) { result in
-                                            searchResultLink(result, groupID: group.id)
-                                                .padding(.horizontal, 16)
-                                                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                                        }
-                                    }
-                                }
-                                Color(uiColor: .secondarySystemGroupedBackground)
-                                    .frame(height: 16)
-                                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 22, bottomTrailingRadius: 22, style: .continuous))
-                                    .padding(.bottom, 12)
-                            }
-                            if library.isSearchInProgress {
-                                HStack(spacing: 8) {
-                                    ProgressView().controlSize(.small)
-                                    Text("Searching more editions…").font(.caption).foregroundStyle(.secondary)
-                                }
-                                .padding(.vertical, 12)
-                            }
-                        }
-                        .scrollTargetLayout()
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, 8)
-                .padding(.bottom, 16)
-            }
-            .accessibilityIdentifier("search-results-scroll")
-            .scrollPosition(id: scrollPositionBinding, anchor: .top)
-            .task(id: "\(positionReady):\(pendingScrollTargetID ?? ""):\(needsPositionReset)") {
-                guard positionReady else { return }
-                let target = needsPositionReset
-                    ? (isHistoryVisible ? historyPositionID : cachedGroupedResults.first.map { "family:\($0.familyName)" })
-                    : pendingScrollTargetID
-                guard let target else { needsPositionReset = false; return }
-                await Task.yield()
-                guard !Task.isCancelled, positionReady else { return }
-                scrollTargetID = target
-                pendingScrollTargetID = nil
-                needsPositionReset = false
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                dismissKeyboard()
-            }
-            .contentMargins(.bottom, CodeScreenMetrics.bottomSearchContentClearance, for: .scrollContent)
-            .overlay(alignment: .bottom) {
-                searchField
-                    .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
-                    .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-            }
-            .scrollDismissesKeyboard(.immediately)
-            .scrollIndicators(.hidden)
-            .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar(.hidden, for: .navigationBar)
+            searchPresentation
             .onAppear {
                 rebuildSearchCaches()
                 rebuildJumpBackInCache()

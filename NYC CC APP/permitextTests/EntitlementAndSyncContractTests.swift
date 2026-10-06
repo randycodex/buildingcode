@@ -11174,6 +11174,42 @@ final class PublishedHTMLSourceAnchorTests: XCTestCase {
     }
 }
 
+final class ReaderBrowseHeaderSelectionTests: XCTestCase {
+    func testAppendixReplacesChaptersAtTheViewportBoundaryAndRestoresOnScrollBack() {
+        func boundaries(appendixY: CGFloat) -> [ReaderBrowseHeadingBoundary] {
+            [
+                .init(order: 0, heading: .chapters, minY: -600),
+                .init(order: 1, heading: .appendix, minY: appendixY)
+            ]
+        }
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries(appendixY: 1)), .chapters)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries(appendixY: 0)), .appendix)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries(appendixY: -40)), .appendix)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries(appendixY: 1)), .chapters)
+    }
+
+    func testNextCodeGroupRestoresChaptersRegardlessOfPreferenceDeliveryOrder() {
+        let boundaries: [ReaderBrowseHeadingBoundary] = [
+            .init(order: 3, heading: .appendix, minY: 900),
+            .init(order: 1, heading: .appendix, minY: -350),
+            .init(order: 2, heading: .chapters, minY: 0),
+            .init(order: 0, heading: .chapters, minY: -1000)
+        ]
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries), .chapters)
+    }
+
+    func testAppendixOnlyAndNewSourceHaveNoStaleChapterHeading() {
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: [
+            .init(order: 1, heading: .appendix, minY: 16)
+        ]), .appendix)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: []), .chapters)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: [
+            .init(order: 0, heading: .chapters, minY: 16),
+            .init(order: 1, heading: .appendix, minY: 1000)
+        ]), .chapters)
+    }
+}
+
 final class NativeNotebookRefreshDecisionTests: XCTestCase {
     func testProgrammaticPendingDraftRestoreDoesNotBecomeAnAutosaveEdit() {
         let saved = NativeNotebookEditableContent(title: "Saved", document: .empty, evidenceLinks: [])

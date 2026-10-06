@@ -177,7 +177,7 @@ struct BookmarksView: View {
         }
     }
 
-    private var savedContent: some View {
+    private var savedPresentation: some View {
         ScrollView {
             GeometryReader { proxy in
                 Color.clear
@@ -205,19 +205,12 @@ struct BookmarksView: View {
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(.horizontal, contentHorizontalInset)
-            .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
+            .padding(.top, collectionOnly ? CodeScreenMetrics.scrollMeasuredTitleTopPadding : CodeScreenMetrics.contentSpacingBelowTitle)
             .padding(.bottom, tabBarClearance)
         }
         .accessibilityIdentifier(collectionOnly ? "all-saved-root" : "projects-root")
         .overlay(alignment: .top) {
             CodeTopContentFade(title: screenTitle, progress: collapseProgress)
-        }
-        .overlay(alignment: .top) {
-            if !collectionOnly {
-                pinnedSavedHeader
-                    .padding(.horizontal, contentHorizontalInset)
-                    .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-            }
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .overlay(alignment: .bottom) {
@@ -231,11 +224,14 @@ struct BookmarksView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                savedHeaderActionButtons
-            }
+            savedNavigationControls
         }
+    }
+
+    private var savedContent: some View {
+        savedPresentation
         .onAppear {
             // Reader bookmark actions publish the updated bookmark list
             // synchronously. Rebuild from that state instead of reading
@@ -327,6 +323,16 @@ struct BookmarksView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
+    @ToolbarContentBuilder
+    private var savedNavigationControls: some ToolbarContent {
+        if !collectionOnly {
+            CodeMainScreenToolbarTitle(title: screenTitle)
+        }
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            savedHeaderActionButtons
+        }
+    }
+
     private var savedHeaderActionButtons: some View {
         HStack(spacing: 0) {
             if collectionOnly {
@@ -355,11 +361,6 @@ struct BookmarksView: View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
             if collectionOnly {
                 CodeScreenTitleRow(title: screenTitle, collapseProgress: collapseProgress, minimumHeight: 44)
-            } else {
-                pinnedSavedHeader
-                    .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-                    .hidden()
-                    .accessibilityHidden(true)
             }
 
             if collectionOnly {
@@ -398,10 +399,6 @@ struct BookmarksView: View {
                 }
             }
         }
-    }
-
-    private var pinnedSavedHeader: some View {
-        CodeScreenTitleRow(title: screenTitle, minimumHeight: CodeScreenMetrics.mainHeaderHeight)
     }
 
     private var allSavedLink: some View {

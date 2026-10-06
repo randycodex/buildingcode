@@ -25,6 +25,34 @@ enum ReaderCodePickerIdentity {
     }
 }
 
+enum ReaderBrowseHeading: String {
+    case chapters = "Chapters"
+    case appendix = "Appendix"
+}
+
+struct ReaderBrowseHeadingBoundary: Equatable {
+    let order: Int
+    let heading: ReaderBrowseHeading
+    let minY: CGFloat
+}
+
+enum ReaderBrowseHeaderSelection {
+    static func heading(at boundaries: [ReaderBrowseHeadingBoundary]) -> ReaderBrowseHeading {
+        let ordered = boundaries.sorted { $0.order < $1.order }
+        return ordered.last(where: { $0.minY <= 0 })?.heading
+            ?? ordered.first?.heading
+            ?? .chapters
+    }
+}
+
+private struct ReaderBrowseHeadingPreferenceKey: PreferenceKey {
+    static var defaultValue: [ReaderBrowseHeadingBoundary] = []
+
+    static func reduce(value: inout [ReaderBrowseHeadingBoundary], nextValue: () -> [ReaderBrowseHeadingBoundary]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
 struct BrowseView: View {
     var browserContext: BrowserContextID = .primary
 
@@ -36,6 +64,7 @@ struct BrowseView: View {
     @State private var showsCodeSources = false
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollRestingOffset: CGFloat?
+    @State private var browseHeading: ReaderBrowseHeading = .chapters
     @State private var openedChapter: CodeChapter?
     @State private var preparedNativeOpening: NativeReaderPreparedOpening?
     @State private var preparingChapter: CodeChapter?
@@ -90,6 +119,7 @@ struct BrowseView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
+                CodeMainScreenToolbarTitle(title: browseHeading.rawValue, animatesChanges: true)
                 ToolbarItem(placement: .topBarTrailing) {
                     readerCodePicker
                 }
@@ -103,11 +133,10 @@ struct BrowseView: View {
         }
         .preference(key: ReaderSessionSummaryKey.self, value: [browserContext: ReaderSessionSummary(
             source: selectedCodeSectionName + " · " + selectedVersionName,
-            location: openedChapter?.displayLabel ?? "Chapters",
+            location: openedChapter?.displayLabel ?? browseHeading.rawValue,
             versionFileName: hasSeededBrowseSection && library.isInitialContentLoaded ? library.selectedVersionFileName : nil,
             codeSectionID: browseCodeSectionID
         )])
-        .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
             DispatchQueue.main.async {
                 guard let restingOffset = scrollRestingOffset else {
@@ -177,12 +206,6 @@ struct BrowseView: View {
                 }
                 .frame(height: 0)
 
-                libraryHeader
-                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                    .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-                    .padding(.bottom, 12)
-                    .zIndex(1)
-
                 if let preparationError, let failedChapter {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(preparationError).font(.callout).foregroundStyle(.secondary)
@@ -218,22 +241,26 @@ struct BrowseView: View {
                         selectedCodeSectionName: codeSectionName
                     )
 
-                    LazyVStack(alignment: .leading, spacing: 12) {
+                    // Keep section boundaries in the layout even when their cards
+                    // are offscreen, so scrolling back restores the right heading.
+                    VStack(alignment: .leading, spacing: 12) {
                         ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
-                            if codeSectionName == "All Sections" {
-                                codeSectionGroupHeader(
-                                    title: group.title,
-                                    color: group.palette.chapterTitleColor
-                                )
-                                .padding(.top, index == 0 ? 0 : 8)
-                            }
-
                             if !group.chapterItems.isEmpty {
-                                LazyVGrid(columns: columns, spacing: 12) {
-                                    ForEach(group.chapterItems) { chapter in
-                                        chapterOpeningButton(chapter, kind: .chapter)
+                                VStack(alignment: .leading, spacing: 12) {
+                                    if codeSectionName == "All Sections" {
+                                        codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
+                                            .padding(.top, index == 0 ? 0 : 8)
+                                    }
+                                    LazyVGrid(columns: columns, spacing: 12) {
+                                        ForEach(group.chapterItems) { chapter in
+                                            chapterOpeningButton(chapter, kind: .chapter)
+                                        }
                                     }
                                 }
+                                .background(headingBoundary(.chapters, order: index * 2))
+                            } else if codeSectionName == "All Sections" {
+                                codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
+                                    .padding(.top, index == 0 ? 0 : 8)
                             }
 
                             if !group.appendixItems.isEmpty {
@@ -242,6 +269,7 @@ struct BrowseView: View {
                                     .foregroundStyle(.primary)
                                     .padding(.top, 8)
                                     .accessibilityAddTraits(.isHeader)
+                                    .background(headingBoundary(.appendix, order: index * 2 + 1))
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
                                         chapterOpeningButton(chapter, kind: .appendix)
@@ -254,17 +282,17 @@ struct BrowseView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
+            .padding(.top, CodeScreenMetrics.contentSpacingBelowTitle)
+        }
+        .coordinateSpace(name: "browseScroll")
+        .onPreferenceChange(ReaderBrowseHeadingPreferenceKey.self) { boundaries in
+            let heading = ReaderBrowseHeaderSelection.heading(at: boundaries)
+            if heading != browseHeading { browseHeading = heading }
         }
         .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
         .overlay(alignment: .top) {
             CodeTopContentFade(title: selectedCodeSectionName, progress: collapseProgress)
-        }
-        .overlay(alignment: .top) {
-            pinnedReaderHeader
-                .frame(minHeight: CodeScreenMetrics.mainHeaderHeight, alignment: .center)
-                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
         }
         .background(
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
@@ -388,21 +416,17 @@ struct BrowseView: View {
         }
     }
 
-    private var libraryHeader: some View {
-        Color.clear.frame(height: 44)
-            .accessibilityHidden(true)
-    }
-
-    private var pinnedReaderHeader: some View {
-        HStack(spacing: 12) {
-            Text("Chapters")
-                .font(CodeTypography.screenTitle)
-                .foregroundStyle(.primary)
-                .accessibilityIdentifier("screen-title-Chapters")
-                .accessibilityAddTraits(.isHeader)
-            Spacer(minLength: 0)
+    private func headingBoundary(_ heading: ReaderBrowseHeading, order: Int) -> some View {
+        GeometryReader { proxy in
+            Color.clear.preference(
+                key: ReaderBrowseHeadingPreferenceKey.self,
+                value: [ReaderBrowseHeadingBoundary(
+                    order: order,
+                    heading: heading,
+                    minY: proxy.frame(in: .named("browseScroll")).minY
+                )]
+            )
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var readerCodePicker: some View {
@@ -1558,6 +1582,52 @@ enum CodeTypography {
     static let mutedPreview = Font.footnote
     static let codeSectionNumber = Font.subheadline.weight(.semibold)
     static let codeSectionTitle = Font.title3.weight(.semibold)
+}
+
+/// Main screen titles occupy the same native toolbar row as its action buttons.
+struct CodeMainScreenToolbarTitle: ToolbarContent {
+    let title: String
+    var animatesChanges = false
+
+    @ToolbarContentBuilder
+    var body: some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            titleItem.sharedBackgroundVisibility(.hidden)
+        } else {
+            titleItem
+        }
+    }
+
+    private var titleItem: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            CodeMainScreenTitleLabel(title: title, animatesChanges: animatesChanges)
+        }
+    }
+}
+
+private struct CodeMainScreenTitleLabel: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let title: String
+    let animatesChanges: Bool
+
+    var body: some View {
+        ZStack(alignment: .leading) {
+            Text(title)
+                .font(CodeTypography.screenTitle)
+                .foregroundStyle(.primary)
+                .accessibilityIdentifier("screen-title-\(title)")
+                .accessibilityAddTraits(.isHeader)
+                .id(title)
+                .transition(.asymmetric(
+                    insertion: .move(edge: title == ReaderBrowseHeading.appendix.rawValue ? .bottom : .top).combined(with: .opacity),
+                    removal: .move(edge: title == ReaderBrowseHeading.appendix.rawValue ? .bottom : .top).combined(with: .opacity)
+                ))
+        }
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(height: CodeScreenMetrics.toolbarButtonSize, alignment: .bottom)
+        .clipped()
+        .animation(animatesChanges && !reduceMotion ? .easeInOut(duration: 0.2) : nil, value: title)
+    }
 }
 
 struct CodeScreenSectionEyebrow: View {

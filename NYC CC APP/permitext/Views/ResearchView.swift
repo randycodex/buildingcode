@@ -538,14 +538,10 @@ private struct ResearchSessionView: View {
             }
             .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
             .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
-            .overlay(alignment: .top) {
-                if conversation == nil || conversation?.id != library.activeResearchConversationID {
-                    researchScreenHeader
-                }
-            }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.visible, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 researchNavigationControls
             }
@@ -743,7 +739,9 @@ private struct ResearchSessionView: View {
 
     @ToolbarContentBuilder
     private var researchNavigationControls: some ToolbarContent {
-        if conversation != nil {
+        if conversation == nil {
+            CodeMainScreenToolbarTitle(title: "Research")
+        } else {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     library.activeResearchConversationID = nil
@@ -844,11 +842,6 @@ private struct ResearchSessionView: View {
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
             .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
-        } else {
-            CodeScreenTitleRow(title: "Research", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
-            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-            .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-            .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         }
     }
 
@@ -876,12 +869,6 @@ private struct ResearchSessionView: View {
     private var historyView: some View {
         let orderedSummaries = ResearchHistoryPresentation.ordered(summaries)
         return List {
-            Color.clear
-                .frame(height: 76)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-
             if let errorMessage {
                 statusMessage(errorMessage)
                     .listRowBackground(Color.clear)
@@ -953,6 +940,7 @@ private struct ResearchSessionView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .contentMargins(.top, CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
         .contentMargins(.bottom, floatingNavigationClearance, for: .scrollContent)
         .refreshable { await loadHistory(forceNetwork: true) }
     }
