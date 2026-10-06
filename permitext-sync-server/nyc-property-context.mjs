@@ -1,4 +1,5 @@
 import { lookupMappedAreaFacts } from "./nyc-property-layers.mjs";
+import { lookupNYCTaxLotGeometry } from "./nyc-tax-lot-geometry.mjs";
 
 const nycPlanningSearchURL = "https://search-api-production.herokuapp.com/search/geosearch-v2";
 const nycPlanningCartoSQLURL = "https://carto.nycplanningdigital.com/api/v2/sql";
@@ -32,6 +33,7 @@ SELECT
   p.lotarea,
   p.lotfront,
   p.lotdepth,
+  p.lottype,
   p.bldgarea,
   p.numbldgs,
   p.numfloors,
@@ -120,6 +122,17 @@ async function fetchJSON(url, { fetchImpl = fetch, timeoutMilliseconds = lookupT
 function validBBL(value) {
   const bbl = String(value ?? "").replace(/\.0+$/, "").trim();
   return /^\d{10}$/.test(bbl) ? bbl : "";
+}
+
+function addressSearchKey(value) {
+  return String(value || "").split(",")[0].toUpperCase()
+    .replace(/\b(\d+)(?:ST|ND|RD|TH)\b/g, "$1")
+    .replace(/\bE\b/g, "EAST").replace(/\bW\b/g, "WEST")
+    .replace(/\bN\b/g, "NORTH").replace(/\bS\b/g, "SOUTH")
+    .replace(/\bST\b/g, "STREET").replace(/\bAVE\b/g, "AVENUE")
+    .replace(/\bBLVD\b/g, "BOULEVARD").replace(/\bRD\b/g, "ROAD")
+    .replace(/\b(?:BRONX|BROOKLYN|MANHATTAN|QUEENS|STATEN ISLAND)(?:\s+NY)?(?:\s+\d{5})?\s*$/g, "")
+    .replace(/[.]/g, "").replace(/\s+/g, " ").trim();
 }
 
 function cartoSQLURL(sql) {
@@ -228,17 +241,22 @@ export function structuredFactsFromNYCPropertyData({ lot, specialDistricts = [],
   return facts.map(fact => ({ ...fact, sourceText: lot.version ? fact.sourceText.replace("MapPLUTO;", `MapPLUTO ${lot.version};`) : fact.sourceText }));
 }
 
-export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now = () => new Date(), bbl: requestedBBL = "" } = {}) {
+export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now = () => new Date(), bbl: requestedBBL = "", includeLotGeometry = false } = {}) {
   const savedBBL = validBBL(requestedBBL);
   if (requestedBBL && !savedBBL) throw new NYCPropertyLookupError("Invalid saved BBL.", { status: 400 });
   const query = savedBBL ? String(address || "").trim() : normalizedNYCPropertyAddress(address);
   const searchURL = new URL(nycPlanningSearchURL);
   searchURL.searchParams.set("q", query);
   const searchPayload = savedBBL ? [{ type: "lot", bbl: savedBBL }] : await fetchJSON(searchURL, { fetchImpl });
-  const searchMatch = (Array.isArray(searchPayload) ? searchPayload : [])
-    .find((item) => item?.type === "lot" && validBBL(item?.bbl));
+  const borough = query.match(/\b(Bronx|Brooklyn|Manhattan|Queens|Staten Island)\b/i)?.[1];
+  const matches = (Array.isArray(searchPayload) ? searchPayload : [])
+    .filter(item => item?.type === "lot" && validBBL(item?.bbl) && (savedBBL ||
+      (addressSearchKey(item.label) === addressSearchKey(query) &&
+       (!borough || String(item.label).toLowerCase().includes(borough.toLowerCase())))));
+  const distinctMatches = [...new Map(matches.map(item => [validBBL(item.bbl), item])).values()];
+  const searchMatch = distinctMatches.length === 1 ? distinctMatches[0] : null;
   if (!searchMatch) {
-    throw new NYCPropertyLookupError("No New York City tax lot matched this address.", {
+    throw new NYCPropertyLookupError("No unambiguous New York City tax lot matched this address.", {
       code: "NYC_PROPERTY_NOT_FOUND",
       status: 404
     });
@@ -266,6 +284,9 @@ export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now
       code: "NYC_PROPERTY_DATA_NOT_FOUND",
       status: 404
     });
+  }
+  if (validBBL(lot.bbl) !== bbl) {
+    throw new NYCPropertyLookupError("NYC Planning returned a different tax lot than the matched address.");
   }
 
   const specialDistrictCodes = distinctValues(lot.spdist1, lot.spdist2, lot.spdist3);
@@ -303,6 +324,18 @@ export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now
   }
   const structuredFacts = [...factsByKey.values()];
   const normalizedAddress = structuredFacts.find((fact) => fact.key === "address")?.value || query;
+  const lotTypes = { "1": "Block assemblage", "2": "Waterfront", "3": "Corner", "4": "Through",
+    "5": "Inside", "6": "Interior lot", "7": "Island lot", "8": "Alley lot", "9": "Submerged land lot" };
+  const lotTypeCode = String(lot.lottype ?? "").trim();
+  const taxLot = {
+    lotTypeCode: lotTypes[lotTypeCode] ? lotTypeCode : null,
+    lotType: lotTypes[lotTypeCode] || "Unknown",
+    dataVersion: String(lot.version || "").trim() || null,
+    recordURL: `${nycOpenDataPLUTOURL}?bbl=${bbl}`,
+    dictionaryURL: "https://s-media.nyc.gov/agencies/dcp/assets/files/pdf/data-tools/bytes/pluto_datadictionary.pdf",
+    ...(includeLotGeometry ? { geometry: await lookupNYCTaxLotGeometry(bbl,
+      url => fetchJSON(url, { fetchImpl, timeoutMilliseconds: 5_000 })) } : {})
+  };
   return {
     schemaVersion: 2,
     query,
@@ -317,6 +350,7 @@ export async function lookupNYCPropertyContext(address, { fetchImpl = fetch, now
         : ["NYC Planning address search", "MapPLUTO", ...mapped.datasets]
     },
     structuredFacts,
+    taxLot,
     warnings: [
       ...(mapped.unavailable.length ? [`NYC Planning layers unavailable: ${mapped.unavailable.join(", ")}. Unverified facts remain unknown.`] : []),
       "Mapped intersections can cover part of a tax lot. Verify boundaries and project applicability in official records.",

@@ -1,6 +1,6 @@
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
 import { applyVerifiedProjectFollowups } from "./research-verification-followups.mjs";
-import { researchPropertyContext, researchPropertyContextFacts } from "./research-property-context.mjs";
+import { researchPropertyContext, researchPropertyContextFacts, researchPropertyInvestigationInstruction } from "./research-property-context.mjs";
 import { earlierResearchUserContext, researchClarificationAnswer, researchVerificationFailureReason } from "./research-conversation-continuity.mjs";
 import { researchHistoryContentFacts } from "./research-history-content.mjs";
 import { buildResearchPassageIndex, mergeResearchPassageIndexes } from "./research-passage-index.mjs";
@@ -8845,6 +8845,7 @@ function researchPrompt(question, evidence, options = {}) {
   return [
     `QUESTION\n${question}`,
     researchRulePacketInstruction,
+    researchPropertyInvestigationInstruction(options.propertyResearch),
     codeBasis,
     projectFacts
       ? [
@@ -11139,6 +11140,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       options.messages?.length
         ? `UNTRUSTED CONVERSATION CONTEXT — resolve follow-ups and supplied facts; prior assistant claims are not authority.\n${JSON.stringify(options.messages.slice(-8).map(message => ({ role: message.role, question: message.question, answerText: message.answer?.answerText }))).slice(0, 20_000)}`
         : "",
+      researchPropertyInvestigationInstruction(options.propertyResearch),
       options.projectContextFacts?.length
         ? `PROJECT FACTS\n${options.projectContextFacts.join("\n")}`
         : "",
@@ -20048,7 +20050,7 @@ async function handleResearchConversationMessage(request, response) {
       conversation.primaryProjectID
     );
     const manualProjectFacts = conversation.projectContext?.facts || [];
-    const propertyResearch = mockMode ? null : await researchPropertyContext({ question, messages: activeMessages });
+    const propertyResearch = mockMode ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
     if (researchProjectContextOnlyEligibility({ question, projectInformation })) {
       await commitProjectContextOnlyResearchMessage({
@@ -20372,6 +20374,7 @@ async function handleResearchConversationMessage(request, response) {
         projectContextFacts: combinedProjectFacts,
         conversationFactContext,
         validUserFacts,
+        propertyResearch,
         retrievalLimitations: turnRetrievalLimitations,
         codeBasis: answerCodeBasis,
         requiredClaims,
@@ -20518,6 +20521,7 @@ async function handleResearchConversationMessage(request, response) {
       projectContextFacts: combinedProjectFacts,
       conversationFactContext,
       responseStyle: "conversational",
+      propertyResearch,
       structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
       webSupport,
       allowOfficialGuidanceOnly,
@@ -20893,6 +20897,7 @@ async function handleResearchConversationMessage(request, response) {
         const verification = await openAIResearchVerification(
           question, assembledEvidence, result.interpretation, context.userID, {
             verificationEnvelopeRetryState,
+            propertyResearch,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts, conversationFactContext,
             webSupport, allowOfficialGuidanceOnly, codeBasis: answerCodeBasis,
@@ -21009,6 +21014,7 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             verificationEnvelopeRetryState,
+            propertyResearch,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
@@ -21228,6 +21234,7 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             verificationEnvelopeRetryState,
+            propertyResearch,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,

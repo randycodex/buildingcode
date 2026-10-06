@@ -6,7 +6,7 @@ import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplic
 import { zoningExplicitAttributionIssues, zoningAttributionPrompt } from "./research-zoning-attribution.mjs";
 import { zoningStorageBranchObligations } from "./research-zoning-storage-branches.mjs";
 
-export const zoningResearchPlannerVersion = "20260930-applicability-investigation-v9";
+export const zoningResearchPlannerVersion = "20261006-lot-classification-investigation-v10";
 
 export const zoningResearchCompilerVersion = "20260909-storage-branch-coverage-v29";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
@@ -182,6 +182,11 @@ function asksForHistoricalSubstantiveText(question) {
 
 function questionPath(question) {
   const value = compactText(question);
+  // Classifying lot geometry invokes a definition. An address identifies the
+  // subject; it does not make district/map-dependent regulations the question.
+  const lotClassification = /\b(?:corner|interior|through)\s+lots?\b|\b(?:front|side|rear)\s+lot\s+lines?\b/i.test(value) &&
+    /\b(?:is|are|classif\w*|consider\w*|qualif\w*|count|which|what)\b/i.test(value) &&
+    !/\b(?:district|Appendix|mapped|map|transit|requirements?|required|setbacks?|yards?|coverage|FAR)\b/i.test(value);
   const propertyOrMap = /\b(?:address|BBL|mapped zoning district|mapped district|Appendix [A-Z].*(?:map|location)|map and location|specific property|broker says .*subway|unverified transit zone|MIH.*(?:established|historical zoning lot|tax lots? were combined))\b/i.test(value);
   const effectiveOrHistory = asksForHistoricalSubstantiveText(value) || /\b(?:amendment history|historical|text in force|effective date|transition|continuation|grandfather|vested|certificate of occupancy|issued (?:before|after)|filed .*\b(?:before|after|on)\b|existed on|December \d|November \d|City of Yes)\b/i.test(value);
   const table = /\b(?:selected table|height-and-setback table|table symbols?|table footnotes?|legend|blank cell|asterisk|dagger)\b/i.test(value) &&
@@ -190,6 +195,7 @@ function questionPath(question) {
   const calculation = /\b(?:calculate|calculation|how many|how much|FAR|floor area ratio|lot[- ]coverage|percent|percentage|weighted|combine them|fit the .*maximum|maximum permitted|open area enough|rear yard equivalent|enlargement|units allowed|recreation space)\b/i.test(value) &&
     /\d/.test(value);
 
+  if (lotClassification) return zoningResearchPaths.definitionCrossReference;
   if (propertyOrMap) return zoningResearchPaths.propertyMapApplicability;
   if (effectiveOrHistory) return zoningResearchPaths.effectiveDateHistory;
   if (table) return zoningResearchPaths.structuredTableSymbol;

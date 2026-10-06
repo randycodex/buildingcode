@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const researchDefinitionExcerptVersion = "20261003-operative-definition-context-v5";
+export const researchDefinitionExcerptVersion = "20261006-definition-alias-context-v6";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -283,6 +283,27 @@ function comparableText(value) {
   return compactText(value).normalize("NFKC").toLocaleLowerCase("en-US");
 }
 
+function resolvedDefinitionEntry(entry, entries, visited = new Set()) {
+  if (visited.has(entry.order)) return null;
+  const targetLabel = entry.text.match(/\bsee\s+([^\n.]+)\.?\s*$/i)?.[1];
+  if (!targetLabel) return entry;
+  const matches = entries.filter(candidate => comparableText(candidate.label) === comparableText(targetLabel));
+  // A dangling or ambiguous alias is not a substantive definition.
+  if (matches.length !== 1) return null;
+  return resolvedDefinitionEntry(matches[0], entries, new Set([...visited, entry.order]));
+}
+
+function resolveDefinitionAliases(selected, entries) {
+  const resolved = selected.map(entry => {
+    const target = resolvedDefinitionEntry(entry, entries);
+    return target && { ...target, ...(entry.requiredTextTerms ? {
+      requiredTextTerms: entry.requiredTextTerms, aliasResolved: target.order !== entry.order
+    } : {}) };
+  });
+  if (resolved.some(entry => !entry)) return null;
+  return [...new Map(resolved.map(entry => [entry.order, entry])).values()];
+}
+
 function requiredTermSelection(entries, requiredTextTerms) {
   const requiredTerms = Array.from(new Set((requiredTextTerms || [])
     .map((term) => compactText(term))
@@ -386,7 +407,9 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     const labels = [...new Set(options.completeDefinitionLabels.map(comparableText))];
     const selected = labels.map(label => entries.filter(entry => comparableText(entry.label) === label));
     if (selected.some(matches => matches.length !== 1) || labels.length > maximumDefinitions) return null;
-    const complete = selected.map(matches => matches[0]).sort((left, right) => left.order - right.order);
+    const resolved = resolveDefinitionAliases(selected.map(matches => matches[0]), entries);
+    if (!resolved) return null;
+    const complete = resolved.sort((left, right) => left.order - right.order);
     const text = [carrier?.heading, ...complete.map(entry => entry.text)].filter(Boolean).join("\n\n");
     if (text.length > maximumCharacters) return null;
     const bindings = definitionBindings(section, complete, carrier);
@@ -421,9 +444,15 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     );
   const selected = [];
   let characterCount = carrier ? carrier.heading.length + 2 : 0;
+  const resolvedRanked = requiredEntries ? resolveDefinitionAliases(ranked, entries)
+    : [...new Map(ranked.flatMap(entry => {
+        const target = resolvedDefinitionEntry(entry, entries);
+        return target ? [[target.order, target]] : [];
+      })).values()];
+  if (!resolvedRanked) return null;
   const candidates = requiredEntries
-    ? ranked.slice(0, maximumDefinitions).sort((left, right) => left.text.length - right.text.length)
-    : ranked;
+    ? resolvedRanked.slice(0, maximumDefinitions).sort((left, right) => left.text.length - right.text.length)
+    : resolvedRanked;
   for (const [index, entry] of candidates.entries()) {
     if (selected.length >= maximumDefinitions) break;
     const separatorLength = selected.length ? 2 : 0;
@@ -432,7 +461,7 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     const entryBudget = requiredEntries
       ? Math.max(800, remainingCharacters - Math.max(0, remainingEntries - 1) * 800)
       : remainingCharacters;
-    const selectedText = requiredEntries
+    const selectedText = entry.aliasResolved ? (entry.text.length <= entryBudget ? entry.text : null) : requiredEntries
       ? boundedRequiredTermEntry(entry, Math.min(remainingCharacters, entryBudget))
       : entry.text;
     if (!selectedText || selectedText.length > remainingCharacters) continue;

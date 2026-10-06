@@ -2,7 +2,7 @@ import { researchQuestionSubject, researchFloorAreaRatioRequested } from "./rese
 import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
 import { researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 
-export const researchCorpusRegistryVersion = "20261003-shared-subject-corpus-v19";
+export const researchCorpusRegistryVersion = "20261006-lot-classification-corpus-v20";
 const currentLibraryRecallReason = "authorized current-library recall; applicability unresolved";
 
 const constructionCodeVersion =
@@ -25,7 +25,10 @@ const projectDependentZoningCuePattern = /\b(?:parking|floor\s+area|permitted\s+
 // Preserve lowercase FAR when its surrounding words establish ratio intent.
 const floorAreaRatioCue = researchFloorAreaRatioRequested;
 const independentlyNamedZoningCue = /\b(?:and|plus|as\s+well\s+as|under)\s+(?:the\s+)?zoning\b|\bzoning\s+(?:and|plus|as\s+well\s+as)\b/i;
-const zoningCue = { test: value => zoningCuePattern.test(value) || independentlyNamedZoningCue.test(value) || floorAreaRatioCue(value) };
+const lotClassificationCue = /\b(?:corner|interior|through)\s+lots?\b|\b(?:front|side|rear)\s+lot\s+lines?\b/i;
+const zoningCue = { test: value => zoningCuePattern.test(value) ||
+  (lotClassificationCue.test(value) && !constructionCue.test(value) && !fireCue.test(value)) ||
+  independentlyNamedZoningCue.test(value) || floorAreaRatioCue(value) };
 const projectDependentZoningCue = { test: value => projectDependentZoningCuePattern.test(value) || floorAreaRatioCue(value) };
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\b/i;
 const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas|Administrative)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b|\b(?:BC|AC|PC|MC|FGC)14\b|\b2014\s+code\b|\b(?:BC|AC|PC|MC|FGC|Building\s+Code|Construction\s+Codes?)\s*2014\b/i;
