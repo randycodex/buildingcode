@@ -178,6 +178,9 @@ struct SettingsView: View {
         self.initialSection = initialSection
     }
 
+    private var isSourcesScreen: Bool { initialSection == .sources }
+    private var screenTitle: String { isSourcesScreen ? "Active Code Sources" : "Account" }
+
     private var sourceOptionsCatalogID: String {
         let versions = library.availableVersions.map {
             "\($0.fileName):\($0.codeVersion):\($0.authoredCodeID ?? -1):\($0.jurisdictionID ?? -1)"
@@ -191,7 +194,6 @@ struct SettingsView: View {
 
     private var activeSourcesCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Active code sources").font(.headline)
             Text(library.signedInAccount == nil
                 ? "Choose what appears in Search and chapter browsing. Guest choices stay on this device."
                 : "Choose what appears in Search and chapter browsing. These choices apply to this account on this device.")
@@ -326,6 +328,72 @@ struct SettingsView: View {
         min(max(-scrollOffset / 64, 0), 1)
     }
 
+    private var accountSettingsSections: some View {
+        Group {
+            CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                planCard
+            }
+            .id(SettingsSection.plan)
+
+            CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                accountCard
+            }
+            .id(SettingsSection.account)
+
+            CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                themePreviewCard
+
+                CodeHairline()
+
+                fontSizeSlider
+
+                CodeHairline()
+
+                lineSpacingSlider
+            }
+
+            CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                dataAndStorageCard
+            }
+
+            Text("permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 6)
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Link("Privacy", destination: privacyPolicyURL)
+                    Text("·")
+                    Link("Terms", destination: termsURL)
+                    Text("·")
+                    Link("Subscriptions & Refunds", destination: refundsURL)
+                }
+                HStack(spacing: 8) {
+                    Link("Support", destination: supportURL)
+                    Text("·")
+                    Link("Send feedback / Report a problem", destination: feedbackURL)
+                }
+            }
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(Color.appChrome)
+            .padding(.horizontal, 6)
+
+            if let statusMessage = library.statusMessage {
+                Text(statusMessage)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 6)
+            }
+
+            Text(appVersionLabel)
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 4)
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ScrollViewReader { scrollProxy in
@@ -337,72 +405,14 @@ struct SettingsView: View {
                 .frame(height: 0)
 
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        planCard
-                    }
-                    .id(SettingsSection.plan)
-
-                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        accountCard
-                    }
-                    .id(SettingsSection.account)
-
-                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        activeSourcesCard
-                    }
-                    .id(SettingsSection.sources)
-
-                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        themePreviewCard
-
-                        CodeHairline()
-
-                        fontSizeSlider
-
-                        CodeHairline()
-
-                        lineSpacingSlider
-                    }
-
-                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        dataAndStorageCard
-                    }
-
-                    Text("permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 6)
-
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(spacing: 8) {
-                            Link("Privacy", destination: privacyPolicyURL)
-                            Text("·")
-                            Link("Terms", destination: termsURL)
-                            Text("·")
-                            Link("Subscriptions & Refunds", destination: refundsURL)
+                    if isSourcesScreen {
+                        CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                            activeSourcesCard
                         }
-                        HStack(spacing: 8) {
-                            Link("Support", destination: supportURL)
-                            Text("·")
-                            Link("Send feedback / Report a problem", destination: feedbackURL)
-                        }
+                        .id(SettingsSection.sources)
+                    } else {
+                        accountSettingsSections
                     }
-                    .font(.footnote.weight(.medium))
-                    .foregroundStyle(Color.appChrome)
-                    .padding(.horizontal, 6)
-
-                    if let statusMessage = library.statusMessage {
-                        Text(statusMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 6)
-                    }
-
-                    Text(appVersionLabel)
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 4)
 
                 }
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
@@ -413,27 +423,23 @@ struct SettingsView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.visible, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
+                CodeMainScreenToolbarTitle(title: screenTitle)
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
                             .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Close Account")
-                    .accessibilityIdentifier("account-close")
+                    .accessibilityLabel("Close \(screenTitle)")
+                    .accessibilityIdentifier(isSourcesScreen ? "active-sources-close" : "account-close")
                 }
             }
-            .contentMargins(.top, CodeScreenMetrics.mainHeaderHeight + CodeScreenMetrics.mainHeaderTopPadding + CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
-            .overlay(alignment: .top) {
-                CodeScreenTitleRow(title: "Account", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
-                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
-                .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
-            }
+            .contentMargins(.top, CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
             .tint(Color.appChrome)
             .task(id: initialSection) {
-                guard let initialSection, !didScrollToInitialSection else { return }
+                guard !isSourcesScreen, let initialSection, !didScrollToInitialSection else { return }
                 didScrollToInitialSection = true
                 await Task.yield()
                 scrollProxy.scrollTo(initialSection, anchor: .top)
@@ -441,6 +447,7 @@ struct SettingsView: View {
             }
         }
         .task(id: sourceOptionsTaskID) {
+            guard isSourcesScreen else { return }
             await loadSourceOptions()
         }
         .coordinateSpace(name: "settingsScroll")

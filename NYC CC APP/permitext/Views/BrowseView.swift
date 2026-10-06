@@ -61,7 +61,6 @@ struct BrowseView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @Namespace private var chapterTileNamespace
-    @State private var showsCodeSources = false
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollRestingOffset: CGFloat?
     @State private var browseHeading: ReaderBrowseHeading = .chapters
@@ -147,10 +146,6 @@ struct BrowseView: View {
                 scrollOffset = min(0, newOffset - restingOffset)
             }
         }
-        .sheet(isPresented: $showsCodeSources) {
-            SettingsView(initialSection: .sources)
-                .environmentObject(library.codeSourceSettingsLibrary)
-        }
         .onAppear {
             restoreReaderVersionIfNeeded()
         }
@@ -220,19 +215,13 @@ struct BrowseView: View {
                         title: library.activeCodeSources == nil ? "Code Sources Unavailable" : (selectedBrowseSourceIsDisabled ? "Code Source Turned Off" : "No Chapters"),
                         systemImage: "text.book.closed",
                         description: library.activeCodeSources == nil
-                            ? "Your code source preferences could not be read. Review them in Settings."
+                            ? "Your code source preferences could not be read. Open Active Code Sources from Search’s top-right menu to retry."
                             : (selectedBrowseSourceIsDisabled
-                                ? "Enable this source in Settings to browse its chapters. Your saved passages and open Readers are preserved."
+                                ? "Enable this source in Active Code Sources from Search’s top-right menu. Your saved passages and open Readers are preserved."
                                 : "The selected code section does not have any chapters yet."),
                         accent: Color(uiColor: library.accentColor(for: browseCodeSectionID))
                     )
                     .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                    if selectedBrowseSourceIsDisabled || library.activeCodeSources == nil {
-                        Button("Manage code sources") { showsCodeSources = true }
-                            .buttonStyle(.bordered)
-                            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                            .accessibilityIdentifier("browse-manage-code-sources")
-                    }
                 } else {
                     let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
                     let codeSectionName = selectedCodeSectionName

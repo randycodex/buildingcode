@@ -336,14 +336,12 @@ struct SearchView: View {
                     .accessibilityIdentifier("search-reader-opening-error")
                 }
 
-                HStack {
-                    Text(library.activeCodeSources == nil ? "Code source preferences unavailable" : (allInstalledSourcesDisabled == true ? "No code sources enabled" : (hasDisabledCodeSources ? "Searching enabled code sources" : "All installed code sources")))
-                        .font(.footnote).foregroundStyle(.secondary)
-                    Spacer()
-                    Button("Manage code sources") { showsCodeSources = true }
+                if library.activeCodeSources == nil {
+                    Text("Code source preferences unavailable. Open Active Code Sources from the menu to retry.")
                         .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("search-source-preferences-unavailable")
                 }
-                .accessibilityIdentifier("search-manage-code-sources")
                 if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     searchResultSummary
                     if !library.allEditionSearchWarnings.isEmpty {
@@ -451,7 +449,27 @@ struct SearchView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             CodeMainScreenToolbarTitle(title: "Search")
+            ToolbarItem(placement: .topBarTrailing) {
+                searchOptionsMenu
+            }
         }
+    }
+
+    private var searchOptionsMenu: some View {
+        Menu {
+            Button("Active Code Sources", systemImage: "books.vertical") {
+                showsCodeSources = true
+            }
+            .accessibilityIdentifier("search-active-code-sources")
+        } label: {
+            Image(systemName: "ellipsis")
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                .contentShape(Rectangle())
+        }
+        .tint(Color.appChrome)
+        .accessibilityLabel("Search options")
+        .accessibilityIdentifier("search-options-menu")
     }
 
     var body: some View {
@@ -898,7 +916,7 @@ struct SearchView: View {
 
     private var noResultsGuidance: String {
         if allInstalledSourcesDisabled == true {
-            return "Enable a code source in Settings to search it. Your saved passages and search history are preserved."
+            return "Open Active Code Sources from the top-right menu to enable a source. Your saved passages and search history are preserved."
         }
         if !library.allEditionSearchWarnings.isEmpty {
             return "Nothing matched in the editions that could be searched. Some editions were unavailable."
