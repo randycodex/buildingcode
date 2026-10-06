@@ -233,6 +233,7 @@ struct SettingsView: View {
                             Text(option.editionLabel).font(.caption).foregroundStyle(.secondary)
                         }
                     }
+                    .tint(Color(uiColor: .systemGreen))
                     .accessibilityIdentifier("settings-source-\(option.id.canonicalEdition)-\(option.id.categoryID)")
                 }
                 if let preferences = library.activeCodeSources,
