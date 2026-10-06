@@ -1181,10 +1181,7 @@ struct ProjectView: View {
                 projectHeader
 
                 if isProjectFolder {
-                    projectHub
-
-                    CodeHairline()
-                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                    projectShortcuts
                 }
 
                 if !projectBookmarks.isEmpty {
@@ -1206,6 +1203,10 @@ struct ProjectView: View {
                             }
                         }
                     }
+                }
+                if isProjectFolder {
+                    projectDetails
+                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -1349,13 +1350,24 @@ struct ProjectView: View {
     }
 
     @ViewBuilder
-    private var projectHub: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            projectHubStatus
-
-            if !projectCodeQuestions.isEmpty {
-                projectCodeQuestionSummary
+    private var projectShortcuts: some View {
+        HStack(alignment: .top, spacing: CodeScreenMetrics.controlSpacing) {
+            NavigationLink {
+                ProjectContextView(folderID: folderID, accentColor: accentColor)
+            } label: {
+                projectShortcutLabel(systemImage: "text.alignleft")
             }
+            .accessibilityLabel("Project Context")
+            .accessibilityIdentifier("project-section-context")
+
+            NavigationLink {
+                projectStructuredFactsDestination
+            } label: {
+                projectShortcutLabel(systemImage: "building.2")
+            }
+            .accessibilityLabel("Structured Facts")
+            .accessibilityIdentifier("project-section-structured-facts")
+
             NavigationLink {
                 if let projectID = library.backendProjectID(for: folderID) {
                     projectNotebookDestination(projectID: projectID)
@@ -1365,9 +1377,9 @@ struct ProjectView: View {
                     }
                 }
             } label: {
-                projectSectionLabel("Notebook")
+                projectShortcutLabel(systemImage: "note.text")
             }
-            .buttonStyle(.plain)
+            .accessibilityLabel("Notebook")
             .accessibilityIdentifier("project-section-notebook")
 
             NavigationLink {
@@ -1383,31 +1395,62 @@ struct ProjectView: View {
                     }
                 }
             } label: {
-                projectSectionLabel("Research History")
+                projectShortcutLabel(systemImage: "clock.arrow.circlepath")
             }
-            .buttonStyle(.plain)
+            .accessibilityLabel("Research History")
             .accessibilityIdentifier("project-section-research-history")
-            if !(projectHubSnapshot?.reports.isEmpty ?? true) {
-                projectReportSummary
-            }
-
-            DisclosureGroup("More Project details") {
-                VStack(alignment: .leading, spacing: 16) {
-                    if projectCodeQuestions.isEmpty {
-                        projectCodeQuestionSummary
-                    }
-                    if projectHubSnapshot?.reports.isEmpty ?? true {
-                        projectReportSummary
-                    }
-                    Text("Review saved Project work here. Create and manage Code Questions and Reports on Permitext Web.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.top, 8)
-            }
-            .font(.subheadline.weight(.semibold))
-            .tint(.primary)
         }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("project-shortcuts")
+    }
+
+    private func projectShortcutLabel(systemImage: String) -> some View {
+        Image(systemName: systemImage)
+            .font(.title3.weight(.semibold))
+            .foregroundStyle(accentColor)
+            .frame(width: CodeScreenMetrics.detachedNavigationButtonSize,
+                   height: CodeScreenMetrics.detachedNavigationButtonSize)
+            .background(
+                Color(uiColor: .secondarySystemGroupedBackground),
+                in: RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
+            )
+            .frame(maxWidth: .infinity, alignment: .top)
+            .contentShape(Rectangle())
+    }
+
+    private var projectStructuredFactsDestination: some View {
+        projectSectionScreen(title: "Structured Facts") {
+            let facts = folder?.structuredFacts ?? []
+            if facts.isEmpty {
+                projectHubEmpty("No Structured facts yet.")
+            } else {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(facts) { fact in
+                        ProjectStructuredFactRow(fact: fact)
+                        if fact.id != facts.last?.id {
+                            Divider()
+                        }
+                    }
+                    ProjectStructuredFactsSources(facts: facts)
+                }
+            }
+        }
+    }
+
+    private var projectDetails: some View {
+        DisclosureGroup("More Project details") {
+            VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
+                projectHubStatus
+                projectCodeQuestionSummary
+                projectReportSummary
+                Text("Review saved Project work here. Create and manage Code Questions and Reports on Permitext Web.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+        }
+        .font(.subheadline.weight(.semibold))
+        .tint(.primary)
     }
 
     @ViewBuilder
@@ -1712,38 +1755,7 @@ struct ProjectView: View {
                 }
             }
 
-            if isProjectFolder {
-                NavigationLink {
-                    ProjectContextView(folderID: folderID, accentColor: accentColor)
-                } label: {
-                    projectSectionLabel("Project Context")
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("project-section-context")
-
-                NavigationLink {
-                    projectSectionScreen(title: "Structured Facts") {
-                        let facts = folder?.structuredFacts ?? []
-                        if facts.isEmpty {
-                            projectHubEmpty("No Structured facts yet.")
-                        } else {
-                            VStack(alignment: .leading, spacing: 0) {
-                                ForEach(facts) { fact in
-                                    ProjectStructuredFactRow(fact: fact)
-                                    if fact.id != facts.last?.id {
-                                        Divider()
-                                    }
-                                }
-                                ProjectStructuredFactsSources(facts: facts)
-                            }
-                        }
-                    }
-                } label: {
-                    projectSectionLabel("Structured Facts")
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("project-section-structured-facts")
-            } else {
+            if !isProjectFolder {
                 if let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),
                    !description.isEmpty {
                     DisclosureGroup("Reference context", isExpanded: $isProjectDescriptionExpanded) {
@@ -1781,20 +1793,6 @@ struct ProjectView: View {
                 projectActionRow
             }
         }
-    }
-
-    private func projectSectionLabel(_ title: String) -> some View {
-        HStack(spacing: 12) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
-            Spacer(minLength: 8)
-            Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-        .contentShape(Rectangle())
     }
 
     private func projectSectionScreen<Content: View>(
