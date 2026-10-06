@@ -1084,12 +1084,21 @@ private struct BookmarkExportPreviewSheet: View {
     }
 }
 
+private struct ProjectTitleBottomPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = .infinity
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = min(value, nextValue())
+    }
+}
+
 struct ProjectView: View {
     let folderID: Int64
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var sortMode: BookmarkSortMode = .codeOrder
     @State private var removedProjectSections: [BookmarkedSection] = []
     @State private var removalSessionID: UUID?
@@ -1112,6 +1121,7 @@ struct ProjectView: View {
     @State private var evidenceSearchQuery = ""
     @FocusState private var isEvidenceSearchFocused: Bool
     @State private var isStructuredFactsExpanded = false
+    @State private var projectTitleFadeProgress: CGFloat = 0
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let automaticProjectHubRefreshInterval: TimeInterval = 30
@@ -1122,6 +1132,10 @@ struct ProjectView: View {
 
     private var isProjectFolder: Bool {
         folder?.folderType == .project
+    }
+
+    private var scrolledProjectTitleOpacity: CGFloat {
+        reduceMotion ? (projectTitleFadeProgress > 0 ? 1 : 0) : projectTitleFadeProgress
     }
 
     private var projectBookmarks: [BookmarkedSection] {
@@ -1227,6 +1241,11 @@ struct ProjectView: View {
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         }
+        .coordinateSpace(name: "projectFolderScroll")
+        .onPreferenceChange(ProjectTitleBottomPreferenceKey.self) { titleBottom in
+            let progress = min(max(-titleBottom / CodeScreenMetrics.screenTitleLineHeight, 0), 1)
+            if progress != projectTitleFadeProgress { projectTitleFadeProgress = progress }
+        }
         .accessibilityIdentifier("project-folder-root")
         .contentShape(Rectangle())
         .onTapGesture { isEvidenceSearchFocused = false }
@@ -1247,14 +1266,7 @@ struct ProjectView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                if isProjectFolder {
-                    folderEditButton
-                } else {
-                    sortMenu
-                    exportButton
-                }
-            }
+            projectNavigationControls
         }
         .sheet(item: $folderEditorTarget) { target in
             FolderEditorSheet(
@@ -1757,6 +1769,41 @@ struct ProjectView: View {
         await loadProjectHub()
     }
 
+    @ToolbarContentBuilder
+    private var projectNavigationControls: some ToolbarContent {
+        if isProjectFolder {
+            if #available(iOS 26.0, *) {
+                projectTitleToolbarItem.sharedBackgroundVisibility(.hidden)
+            } else {
+                projectTitleToolbarItem
+            }
+        }
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            if isProjectFolder {
+                folderEditButton
+            } else {
+                sortMenu
+                exportButton
+            }
+        }
+    }
+
+    private var projectTitleToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            Text(folder?.name ?? "Project")
+                .font(CodeTypography.screenTitle)
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(height: CodeScreenMetrics.toolbarButtonSize)
+                .opacity(scrolledProjectTitleOpacity)
+                .accessibilityIdentifier("project-scrolled-title")
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityHidden(scrolledProjectTitleOpacity == 0)
+                .allowsHitTesting(false)
+        }
+    }
+
     private var projectHeader: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
             HStack(alignment: .top, spacing: 10) {
@@ -1769,6 +1816,16 @@ struct ProjectView: View {
                     .font(.title2.weight(.bold))
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .background {
+                        if isProjectFolder {
+                            GeometryReader { proxy in
+                                Color.clear.preference(
+                                    key: ProjectTitleBottomPreferenceKey.self,
+                                    value: proxy.frame(in: .named("projectFolderScroll")).maxY
+                                )
+                            }
+                        }
+                    }
                 Spacer(minLength: 0)
                 if !isProjectFolder {
                     folderEditButton
