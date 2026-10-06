@@ -98,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261005-saved-research-removal-v648";
+} from "./offline-storage.js?v=20261005-research-header-alignment-v651";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -32545,22 +32545,33 @@ function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 
 }
 
 function renderProLockedPane(paneID, title) {
-  const panel = document.createElement("section");
+  const panel = document.createElement("article");
   panel.className = "workspace-panel pro-locked-panel";
   applyPaneWeight(panel, paneID);
   const header = document.createElement("header");
+  header.className = "panel-header";
+  const headingWrap = document.createElement("div");
+  const kind = document.createElement("p");
+  kind.className = "eyebrow panel-kind";
+  kind.textContent = title;
   const heading = document.createElement("h2");
+  heading.className = "panel-title";
   heading.textContent = title;
-  header.append(heading);
+  headingWrap.append(kind, heading);
+  const actions = document.createElement("div");
+  actions.className = "panel-actions";
+  header.append(headingWrap, actions);
   const instance = (state.utilityInstances || []).find(item => paneIDForUtilityInstance(item) === paneID);
   if (instance || paneID === "utility:analysis") {
     const close = document.createElement("button");
     close.type = "button";
-    close.className = "icon-button";
-    close.textContent = "×";
+    close.className = "icon-button utility-close";
+    close.title = "Close column";
+    close.innerHTML = circleXIconSVG();
     close.setAttribute("aria-label", "Close column");
+    if (instance) close.dataset.utilityCloseBound = instance.id;
     close.addEventListener("click", () => void (instance ? closeUtilityInstance(instance) : closeResearchWorkspace()));
-    header.append(close);
+    actions.append(close);
   }
   const content = document.createElement("div");
   content.className = "pro-locked-content";
@@ -41546,6 +41557,8 @@ function createWorkspacePaneLoadingShell(descriptor) {
     panel.append(root);
   }
   const header = document.createElement("header");
+  header.className = "panel-header";
+  const headingWrap = document.createElement("div");
   const heading = document.createElement("h2");
   heading.className = "eyebrow panel-kind";
   heading.textContent = descriptor.label;
@@ -41555,7 +41568,11 @@ function createWorkspacePaneLoadingShell(descriptor) {
   close.setAttribute("aria-label", `Close ${descriptor.label}`);
   close.innerHTML = circleXIconSVG();
   close.addEventListener("click", () => { void descriptor.close(); });
-  header.append(heading, close);
+  const actions = document.createElement("div");
+  actions.className = "panel-actions";
+  headingWrap.append(heading);
+  actions.append(close);
+  header.append(headingWrap, actions);
   const status = document.createElement("p");
   status.className = "empty-state workspace-pane-load-status";
   status.setAttribute("role", "status");
