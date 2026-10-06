@@ -1454,6 +1454,7 @@ enum CodeScreenMetrics {
     /// tab bar's visible outer edge rather than the wider content grid.
     static let bottomControlHorizontalPadding: CGFloat = 20
     static let bottomControlHeight: CGFloat = 52
+    static let searchFieldHorizontalPadding: CGFloat = 14
     /// Detached circular actions beside the floating bottom navigation.
     static let detachedNavigationButtonSize: CGFloat = 60
     static let readerHorizontalPadding: CGFloat = 20
@@ -1469,6 +1470,7 @@ enum CodeScreenMetrics {
     static let sectionSpacingBelowEyebrow: CGFloat = 8
     static let groupedSectionTopPadding: CGFloat = 22
     static let rowVerticalPadding: CGFloat = 12
+    static let bottomSearchContentClearance: CGFloat = bottomControlHeight + (rowVerticalPadding * 2)
     /// Matching compact rows for the Saved Evidence heading and its code groups.
     static let projectEvidenceHeadingHeight: CGFloat = 36
     static let controlSpacing: CGFloat = 10

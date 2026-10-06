@@ -437,7 +437,7 @@ struct SearchView: View {
             .onTapGesture {
                 dismissKeyboard()
             }
-            .contentMargins(.bottom, 76, for: .scrollContent)
+            .contentMargins(.bottom, CodeScreenMetrics.bottomSearchContentClearance, for: .scrollContent)
             .overlay(alignment: .bottom) {
                 searchField
                     .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
@@ -925,42 +925,11 @@ struct SearchView: View {
     }
 
     private var searchField: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "magnifyingglass")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-
-            TextField("Search codes", text: $query)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .submitLabel(.search)
-                .focused($isSearchFieldFocused)
-                .accessibilityLabel("Search codes")
-                .onSubmit {
-                    library.recordRecentSearch(query)
-                    isSearchFieldFocused = false
-                }
-
-            if !query.isEmpty {
-                Button {
-                    query = ""
-                    library.searchAllEditions(query: "")
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.tertiary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Clear search")
-            }
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-        .frame(height: CodeScreenMetrics.bottomControlHeight)
-        .codeLiquidGlassCapsule()
-        // The TextField handles focus natively. An extra .onTapGesture here
-        // can interfere with cursor-position taps inside the field on iOS 17+.
-        .accessibilityElement(children: .contain)
+        CodeSearchField(
+            placeholder: "Search codes", text: $query, isFocused: $isSearchFieldFocused,
+            onSubmit: { library.recordRecentSearch(query) },
+            onClear: { library.searchAllEditions(query: "") }
+        )
     }
 
     @ViewBuilder
@@ -1629,6 +1598,53 @@ private struct SearchChapterReaderDestination: View {
 }
 #endif
 
+
+/// The bottom search control shared by code Search and saved Project evidence.
+struct CodeSearchField: View {
+    let placeholder: String
+    @Binding var text: String
+    let isFocused: FocusState<Bool>.Binding
+    var onSubmit: () -> Void = {}
+    var onClear: () -> Void = {}
+
+    var body: some View {
+        HStack(spacing: CodeScreenMetrics.controlSpacing) {
+            Image(systemName: "magnifyingglass")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            TextField(placeholder, text: $text)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.search)
+                .focused(isFocused)
+                .accessibilityLabel(placeholder)
+                .onSubmit {
+                    onSubmit()
+                    isFocused.wrappedValue = false
+                }
+
+            if !text.isEmpty {
+                Button {
+                    text = ""
+                    onClear()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+            }
+        }
+        .padding(.horizontal, CodeScreenMetrics.searchFieldHorizontalPadding)
+        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
+        .frame(height: CodeScreenMetrics.bottomControlHeight)
+        .codeLiquidGlassCapsule()
+        // Let the native field position the cursor without an outer tap gesture.
+        .accessibilityElement(children: .contain)
+    }
+}
 
 private struct IsGlobalSearchPresentedKey: EnvironmentKey {
     static let defaultValue = false

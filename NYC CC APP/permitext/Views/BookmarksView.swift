@@ -1113,7 +1113,7 @@ struct ProjectView: View {
     @State private var projectReportBuildError: String?
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
     @State private var evidenceSearchQuery = ""
-    @State private var isEvidenceSearchPresented = false
+    @FocusState private var isEvidenceSearchFocused: Bool
     @State private var isStructuredFactsExpanded = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
@@ -1228,17 +1228,27 @@ struct ProjectView: View {
             .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(.horizontal, contentHorizontalInset)
             .padding(.top, CodeScreenMetrics.topTitlePadding)
-            .padding(.bottom, 40)
+            .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         }
         .accessibilityIdentifier("project-folder-root")
+        .contentShape(Rectangle())
+        .onTapGesture { isEvidenceSearchFocused = false }
+        .contentMargins(.bottom, CodeScreenMetrics.bottomSearchContentClearance, for: .scrollContent)
+        .overlay(alignment: .bottom) {
+            if !projectBookmarks.isEmpty {
+                CodeSearchField(
+                    placeholder: "Search saved evidence", text: $evidenceSearchQuery,
+                    isFocused: $isEvidenceSearchFocused
+                )
+                .accessibilityIdentifier("project-evidence-search-field")
+                .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+                .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+            }
+        }
+        .scrollDismissesKeyboard(.immediately)
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(
-            text: $evidenceSearchQuery,
-            isPresented: $isEvidenceSearchPresented,
-            prompt: "Search saved evidence"
-        )
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if isProjectFolder {
@@ -1328,6 +1338,7 @@ struct ProjectView: View {
         }
         .onDisappear {
             isProjectHubVisible = false
+            isEvidenceSearchFocused = false
         }
         .task(id: "\(library.privateSessionID):\(folder?.clientID ?? "missing")") {
             projectHubSnapshot = nil
@@ -1927,18 +1938,6 @@ struct ProjectView: View {
         HStack(spacing: 4) {
             CodeEyebrow(text: "Saved Evidence", accent: .primary)
             Spacer(minLength: 12)
-            Button {
-                isEvidenceSearchPresented = true
-            } label: {
-                Image(systemName: "magnifyingglass")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .frame(width: CodeScreenMetrics.projectEvidenceHeadingHeight,
-                           height: CodeScreenMetrics.projectEvidenceHeadingHeight)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Search saved evidence")
-
             if !isProjectFolder {
                 savedEvidenceSelectionButton
             }
