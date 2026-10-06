@@ -7,6 +7,7 @@ import {
 } from "./research-semantic-passages.mjs";
 
 export const supportedResearchPromptVersions = [
+  "20261006-site-investigation-v34",
   "20260930-project-investigation-v33",
   "20260930-conversational-fast-v32",
   "20260827-material-completeness-v31",

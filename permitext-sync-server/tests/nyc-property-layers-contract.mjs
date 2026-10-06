@@ -87,7 +87,7 @@ const recovered = await lookupNYCPropertyContext("1760 Jerome Avenue", {
   now: () => new Date(retrievedAt),
   fetchImpl: async input => {
     const url = new URL(input);
-    if (url.hostname === "search-api-production.herokuapp.com") return { ok: true, json: async () => [{ bbl: "2028500003", type: "lot" }] };
+    if (url.hostname === "search-api-production.herokuapp.com") return { ok: true, json: async () => [{ bbl: "2028500003", type: "lot", label: "1760 JEROME AVENUE, Bronx, NY, USA" }] };
     if (url.hostname === "data.cityofnewyork.us") return { ok: true, json: async () => [{ bbl: "2028500003", address: "1760 JEROME AVENUE", borocode: 2, spdist1: "J", trnstzone: "Outer Transit Zone" }] };
     const sql = url.searchParams.get("q");
     if (!sql.startsWith("WITH lot AS")) throw new Error("Base/name service unavailable");

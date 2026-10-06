@@ -19,7 +19,7 @@ const userID = "apple:synthetic-nyc-facts-owner";
 globalThis.fetch = (input, options) => {
   const url = new URL(input);
   if (url.origin === base) return originalFetch(input, options);
-  if (url.hostname === "search-api-production.herokuapp.com") return Promise.resolve({ ok: true, json: async () => [{ bbl: "2028500003", type: "lot" }] });
+  if (url.hostname === "search-api-production.herokuapp.com") return Promise.resolve({ ok: true, json: async () => [{ bbl: "2028500003", type: "lot", label: "1760 JEROME AVENUE, Bronx, NY, USA" }] });
   assert.equal(url.hostname, "carto.nycplanningdigital.com", "No paid provider requests allowed");
   const sql = url.searchParams.get("q");
   if (sql.startsWith("WITH lot AS")) {
