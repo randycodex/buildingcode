@@ -1273,7 +1273,19 @@ textarea:focus-visible {
 .first-use-actions button { min-height: 44px; padding: 10px 20px; }
 .first-use-actions .primary { background: var(--text-primary); color: var(--surface); }
 .pro-locked-content { padding: 24px; color: var(--text-secondary); }
-.pro-locked-content button { min-height: 44px; margin-top: 16px; }
+.pro-locked-content button {
+  display: block;
+  width: fit-content;
+  min-height: 44px;
+  margin: 16px auto 0;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--toolbar-active);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+}
 
 .first-use-content h1 {
   max-width: none;

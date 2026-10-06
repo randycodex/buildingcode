@@ -98,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261005-project-context-editor-v652";
+} from "./offline-storage.js?v=20261005-pro-pill-v653";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
