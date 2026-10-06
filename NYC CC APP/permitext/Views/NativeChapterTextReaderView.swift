@@ -234,9 +234,6 @@ struct NativeChapterTextReaderView: View {
                 .sourceProblemReporting(sectionID: currentBookmarkSectionID)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                ReaderCurrentSectionBookmarkButton(sectionID: currentBookmarkSectionID, accentColor: accentColor)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isSearchPresented = true
                 } label: {
@@ -2187,6 +2184,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
     let isBookmarked: Bool
     let onResearchSelection: (String) -> Void
 
+    @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var passageSwipe = ReaderPassageSwipeState(revealWidth: CodeScreenMetrics.readerPassageRevealWidth)
 
@@ -2221,7 +2219,8 @@ private struct NativeReaderTextBlockView: View, Equatable {
                     baseURL: route.sourceURL.deletingLastPathComponent(),
                     onOpenLink: onOpenLink,
                     searchQuery: searchQuery,
-                    onResearchSelection: onResearchSelection
+                    onResearchSelection: onResearchSelection,
+                    isBookmarked: isBookmarked
                 )
             case .caption:
                 selectableText(role: .caption)
@@ -2297,16 +2296,6 @@ private struct NativeReaderTextBlockView: View, Equatable {
             )
             .offset(x: passageSwipe.offset)
             .clipped()
-            .overlay(alignment: .leading) {
-                if isBookmarked {
-                    RoundedRectangle(cornerRadius: 1)
-                        .fill(Color(uiColor: accentColor))
-                        .frame(width: 2)
-                        .offset(x: passageSwipe.offset - 8)
-                        .accessibilityHidden(true)
-                        .allowsHitTesting(false)
-                }
-            }
             .overlay(alignment: .trailing) {
                 if passageSwipe.isOpen {
                     // Keep the save confirmation and its Project action outside the tray bounds.
@@ -2336,6 +2325,8 @@ private struct NativeReaderTextBlockView: View, Equatable {
                 accentColor: Color(uiColor: accentColor),
                 accessibilityID: "reader-passage-bookmark-\(sectionID)"
             )
+            .scaleEffect(passageSwipe.isSaveArmed && !isBookmarked ? 1.15 : 1)
+            .animation(reduceMotion ? nil : .smooth(duration: 0.15), value: passageSwipe.isSaveArmed)
             .background(Color(uiColor: accentColor).opacity(0.18), in: RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius))
 
             Button {
@@ -2359,6 +2350,13 @@ private struct NativeReaderTextBlockView: View, Equatable {
     }
 
     private func handlePassageSwipe(_ event: ReaderPassageSwipeEvent) {
+        if passageSwipe.shouldSave(on: event), let sectionID = bookmarkSectionID,
+           !library.isBookmarked(sectionID: sectionID),
+           library.saveSection(sectionID: sectionID, toFolderIDs: [], allowsUnassigned: true) {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            withAnimation(reduceMotion ? nil : .smooth(duration: 0.24)) { passageSwipe.close() }
+            return
+        }
         switch event {
         case .began, .changed:
             // Follow the finger directly; animate only the final settling motion.
@@ -2382,16 +2380,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             selectableText(role: .majorHeading(level: presentation.level))
                 .accessibilityAddTraits(.isHeader)
         case .provision:
-            HStack(alignment: .top, spacing: 8) {
-                selectableText(role: .heading(level: presentation.level))
-                if isBookmarked {
-                    Image(systemName: "bookmark.fill")
-                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                        .foregroundStyle(Color(uiColor: accentColor))
-                        .padding(.top, 4)
-                        .accessibilityLabel("Saved section")
-                }
-            }
+            selectableText(role: .heading(level: presentation.level))
                 .padding(.leading, 12)
                 .overlay(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 1.5, style: .continuous)
@@ -2425,7 +2414,8 @@ private struct NativeReaderTextBlockView: View, Equatable {
             onOpenLink: onOpenLink,
             onResearchSelection: onResearchSelection,
             onPassageSwipe: onPassageSwipe,
-            onSelectionChange: onSelectionChange
+            onSelectionChange: onSelectionChange,
+            isBookmarked: isBookmarked
         )
     }
 
@@ -2757,6 +2747,7 @@ private struct NativeReaderListBlockView: View {
     let onOpenLink: (URL) -> Void
     let searchQuery: String
     let onResearchSelection: (String) -> Void
+    var isBookmarked = false
 
     private var rows: [NativeReaderListRow] {
         items.flatMap { NativeReaderListRow.flatten($0) }
@@ -2840,7 +2831,8 @@ private struct NativeReaderListBlockView: View {
                     in: plainText
                 ),
                 onOpenLink: onOpenLink,
-                onResearchSelection: onResearchSelection
+                onResearchSelection: onResearchSelection,
+                isBookmarked: isBookmarked
             )
         }
     }
@@ -3157,6 +3149,8 @@ private struct NativeReaderPreparedAttributedTextView: View {
     var onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
     var onSelectionChange: ((Bool) -> Void)? = nil
 
+    var isBookmarked = false
+
     @Environment(\.readerDefinitionContext) private var definitionContext
     @State private var attributedText: NSAttributedString?
 
@@ -3164,7 +3158,7 @@ private struct NativeReaderPreparedAttributedTextView: View {
         Group {
             if let attributedText {
                 AttributedTextView(
-                    attributedText: attributedText,
+                    attributedText: savedText(attributedText),
                     onSelectionChange: onSelectionChange,
                     onOpenLink: onOpenLink,
                     onResearchSelection: onResearchSelection,
@@ -3172,7 +3166,7 @@ private struct NativeReaderPreparedAttributedTextView: View {
                 )
             } else {
                 AttributedTextView(
-                    attributedText: baseAttributedText,
+                    attributedText: savedText(baseAttributedText),
                     onSelectionChange: onSelectionChange,
                     onOpenLink: onOpenLink,
                     onResearchSelection: onResearchSelection,
@@ -3205,6 +3199,19 @@ private struct NativeReaderPreparedAttributedTextView: View {
                 attributedText = nil
             }
         }
+    }
+
+    // Color a presentation copy, never the shared text/definition cache.
+    // Preserve search contrast, typography, links and definition metadata.
+    private func savedText(_ source: NSAttributedString) -> NSAttributedString {
+        guard isBookmarked else { return source }
+        let result = NSMutableAttributedString(attributedString: source)
+        source.enumerateAttributes(in: NSRange(location: 0, length: source.length)) { attributes, range, _ in
+            if attributes[.backgroundColor] == nil {
+                result.addAttribute(.foregroundColor, value: accentColor, range: range)
+            }
+        }
+        return result
     }
 
     private var allowsDefinitionLinks: Bool {

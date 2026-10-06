@@ -685,7 +685,8 @@ struct ReaderCurrentSectionBookmarkButton: View {
             guard let sectionID, let version = library.selectedVersion?.codeVersion else { return }
             let target = ReaderPassageSaveTarget(sectionID: sectionID, codeVersion: version, sessionID: library.privateSessionID)
             if isSaved {
-                saveTarget = target
+                let remainsSaved = library.toggleBookmark(sectionID: sectionID)
+                showConfirmation(remainsSaved ? "Couldn’t remove" : "Removed from Saved", target: target)
             } else if library.saveSection(sectionID: sectionID, toFolderIDs: [], allowsUnassigned: true) {
                 showConfirmation("Saved", target: target)
             } else {
@@ -701,7 +702,7 @@ struct ReaderCurrentSectionBookmarkButton: View {
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
         .accessibilityIdentifier(accessibilityID)
-        .accessibilityLabel(isSaved ? "Edit saved passage" : "Save passage")
+        .accessibilityLabel(isSaved ? "Remove saved passage" : "Save passage")
         .accessibilityValue(isSaved ? "Saved" : "Not saved")
         .sheet(item: $saveTarget) { target in
             ReaderPassageSaveSheet(target: target) { message in
@@ -751,7 +752,7 @@ struct ReaderCurrentSectionBookmarkButton: View {
         confirmationTask?.cancel()
         confirmationTarget = target
         confirmation = message
-        if message != "Couldn’t save" { UINotificationFeedbackGenerator().notificationOccurred(.success) }
+        if !message.hasPrefix("Couldn’t") { UINotificationFeedbackGenerator().notificationOccurred(.success) }
         confirmationTask = Task {
             try? await Task.sleep(for: .seconds(5))
             guard !Task.isCancelled else { return }

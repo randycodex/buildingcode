@@ -3439,10 +3439,18 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func sendToResearch(_ selection: ResearchSelectionRequest) {
+        // A secondary or Search Reader must route through the account owner,
+        // whose open conversation is authoritative, rather than its own tab state.
+        if let owner = sharedAccountLibrary, owner !== self {
+            owner.sendToResearch(selection)
+            return
+        }
         if !pendingResearchSelections.contains(selection) {
             pendingResearchSelections.append(selection)
         }
-        selectedTab = .research
+        if activeResearchConversationID == nil {
+            selectedTab = .research
+        }
     }
 
     func acknowledgePendingResearchSelections(_ selections: [ResearchSelectionRequest]) {

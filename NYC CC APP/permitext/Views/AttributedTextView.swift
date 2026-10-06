@@ -14,6 +14,7 @@ struct ReaderPassageSwipeState {
     private(set) var offset: CGFloat = 0
     private(set) var isDragging = false
     private var startingOffset: CGFloat = 0
+    private(set) var isSaveArmed = false
 
     var revealProgress: CGFloat { -offset / revealWidth }
     var isOpen: Bool { !isDragging && offset == -revealWidth }
@@ -24,26 +25,36 @@ struct ReaderPassageSwipeState {
         !hasSelection && abs(horizontalVelocity) > abs(verticalVelocity) * 1.25
     }
 
+    // A full swipe is deliberate travel from a closed tray, never a fast flick.
+    func shouldSave(on event: ReaderPassageSwipeEvent) -> Bool {
+        guard case .ended(let translation, _) = event else { return false }
+        return isDragging && startingOffset == 0 && translation <= -max(revealWidth * 2, 200)
+    }
+
     mutating func apply(_ event: ReaderPassageSwipeEvent) {
         switch event {
         case .began:
             startingOffset = offset
             isDragging = true
+            isSaveArmed = false
         case .changed(let translation):
+            isSaveArmed = startingOffset == 0 && translation <= -max(revealWidth * 2, 200)
             offset = min(0, max(-revealWidth, startingOffset + translation))
         case .ended(let translation, let velocity):
             offset = min(0, max(-revealWidth, startingOffset + translation))
             let projectedOffset = offset + velocity * 0.12
             offset = projectedOffset < -revealWidth * 0.5 ? -revealWidth : 0
             isDragging = false
+            isSaveArmed = false
         case .cancelled:
             offset = startingOffset
             isDragging = false
+            isSaveArmed = false
         }
     }
 
-    mutating func open() { offset = -revealWidth; startingOffset = offset; isDragging = false }
-    mutating func close() { offset = 0; startingOffset = 0; isDragging = false }
+    mutating func open() { isSaveArmed = false; offset = -revealWidth; startingOffset = offset; isDragging = false }
+    mutating func close() { isSaveArmed = false; offset = 0; startingOffset = 0; isDragging = false }
 }
 
 extension Notification.Name {
