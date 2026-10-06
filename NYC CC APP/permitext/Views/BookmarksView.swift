@@ -1165,6 +1165,10 @@ struct ProjectView: View {
         )
     }
 
+    private var hasSavedProjectWork: Bool {
+        !projectCodeQuestions.isEmpty || !(projectHubSnapshot?.reports.isEmpty ?? true)
+    }
+
     private var nativeNotebookReferenceCandidates: [NativeNotebookReferenceCandidate] {
         let evidence = projectBookmarks.map { bookmark in
             NativeNotebookReferenceCandidate(
@@ -1214,8 +1218,8 @@ struct ProjectView: View {
                         }
                     }
                 }
-                if isProjectFolder {
-                    projectDetails
+                if isProjectFolder && hasSavedProjectWork {
+                    projectSavedWork
                         .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 }
             }
@@ -1447,20 +1451,16 @@ struct ProjectView: View {
         }
     }
 
-    private var projectDetails: some View {
-        DisclosureGroup("More Project details") {
-            VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-                projectHubStatus
+    private var projectSavedWork: some View {
+        VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
+            projectHubStatus
+            if !projectCodeQuestions.isEmpty {
                 projectCodeQuestionSummary
-                projectReportSummary
-                Text("Review saved Project work here. Create and manage Code Questions and Reports on Permitext Web.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
             }
-            .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+            if !(projectHubSnapshot?.reports.isEmpty ?? true) {
+                projectReportSummary
+            }
         }
-        .font(.subheadline.weight(.semibold))
-        .tint(.primary)
     }
 
     @ViewBuilder
@@ -1915,7 +1915,7 @@ struct ProjectView: View {
 
     private var savedEvidenceHeader: some View {
         HStack(spacing: 4) {
-            CodeEyebrow(text: "Saved Evidence", accent: accentColor)
+            CodeEyebrow(text: "Saved Evidence", accent: .primary)
             Spacer(minLength: 12)
             Button {
                 isEvidenceSearchPresented = true
@@ -1928,7 +1928,9 @@ struct ProjectView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Search saved evidence")
 
-            savedEvidenceSelectionButton
+            if !isProjectFolder {
+                savedEvidenceSelectionButton
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
