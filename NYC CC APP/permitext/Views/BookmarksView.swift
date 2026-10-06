@@ -5,6 +5,8 @@ struct BookmarksView: View {
     @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var folderTileNamespace
     @State private var savedFilterCodeSectionIDs: Set<String>
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var folderEditorTarget: FolderEditorTarget?
@@ -616,10 +618,18 @@ private var filteredSavedEmptyState: some View {
             NavigationLink {
                 ProjectView(folderID: folder.id)
                     .id(library.privateSessionID)
+                    .codeCardZoomDestination(
+                        id: folder.id, in: folderTileNamespace, reduceMotion: reduceMotion,
+                        enabled: folder.folderType == .project
+                    )
             } label: {
                 projectTile(folder, tileHeight: tileHeight)
             }
             .buttonStyle(.plain)
+            .codeCardZoomSource(
+                id: folder.id, in: folderTileNamespace, reduceMotion: reduceMotion,
+                enabled: folder.folderType == .project
+            )
             .accessibilityIdentifier("saved-folder-\(folder.id)")
             .contextMenu {
                 Button {

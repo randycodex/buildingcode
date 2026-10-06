@@ -292,7 +292,7 @@ struct BrowseView: View {
             ChapterTile(chapter: chapter, palette: tilePalette(for: chapter), kind: kind)
         }
         .buttonStyle(.plain)
-        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
+        .codeCardZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         .onAppear { library.prewarmChapterForBrowsing(chapter) }
     }
 
@@ -378,13 +378,13 @@ struct BrowseView: View {
                 rememberedScrollOffset: rememberedScrollOffset,
                 preparedNativeOpening: preparedNativeOpening
             )
-            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
+            .codeCardZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         } else {
             ChapterLaunchView(
                 chapter: chapter,
                 rememberedSectionID: rememberedSectionID
             )
-            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
+            .codeCardZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         }
     }
 
@@ -1300,10 +1300,11 @@ private extension UIColor {
     }
 }
 
-private extension View {
+extension View {
+    /// Reader and Project cards share the system zoom; nested screens use normal pushes.
     @ViewBuilder
-    func chapterZoomSource<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool) -> some View {
-        if #available(iOS 18.0, *), !reduceMotion {
+    func codeCardZoomSource<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool, enabled: Bool = true) -> some View {
+        if #available(iOS 18.0, *), !reduceMotion, enabled {
             self.matchedTransitionSource(id: id, in: namespace)
         } else {
             self
@@ -1311,8 +1312,8 @@ private extension View {
     }
 
     @ViewBuilder
-    func chapterZoomDestination<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool) -> some View {
-        if #available(iOS 18.0, *), !reduceMotion {
+    func codeCardZoomDestination<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool, enabled: Bool = true) -> some View {
+        if #available(iOS 18.0, *), !reduceMotion, enabled {
             self.navigationTransition(.zoom(sourceID: id, in: namespace))
         } else {
             self
