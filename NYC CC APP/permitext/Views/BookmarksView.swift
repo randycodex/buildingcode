@@ -1470,14 +1470,6 @@ struct ProjectView: View {
             )
         }
 
-        if isProjectHubLoading && projectHubSnapshot == nil {
-            HStack(spacing: 8) {
-                ProgressView()
-                    .accessibilityLabel("Loading Project")
-            }
-            .padding(.vertical, 8)
-        }
-
         if let projectHubError {
             Text(projectHubError)
                 .font(.footnote)
