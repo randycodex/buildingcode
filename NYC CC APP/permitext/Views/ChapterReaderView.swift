@@ -670,18 +670,27 @@ struct ChapterReaderView: View {
 struct ReaderCurrentSectionBookmarkButton: View {
     let sectionID: Int64?
     let accentColor: Color
+    var accessibilityID = "reader-current-section-bookmark"
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var saveTarget: ReaderPassageSaveTarget?
     @State private var confirmation: String?
     @State private var confirmationTask: Task<Void, Never>?
+    @State private var confirmationTarget: ReaderPassageSaveTarget?
 
     private var isSaved: Bool { sectionID.map { library.isBookmarked(sectionID: $0) } ?? false }
 
     var body: some View {
         Button {
             guard let sectionID, let version = library.selectedVersion?.codeVersion else { return }
-            saveTarget = ReaderPassageSaveTarget(sectionID: sectionID, codeVersion: version, sessionID: library.privateSessionID)
+            let target = ReaderPassageSaveTarget(sectionID: sectionID, codeVersion: version, sessionID: library.privateSessionID)
+            if isSaved {
+                saveTarget = target
+            } else if library.saveSection(sectionID: sectionID, toFolderIDs: [], allowsUnassigned: true) {
+                showConfirmation("Saved", target: target)
+            } else {
+                showConfirmation("Couldn’t save", target: target)
+            }
         } label: {
             Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
@@ -691,25 +700,33 @@ struct ReaderCurrentSectionBookmarkButton: View {
         }
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
-        .accessibilityIdentifier("reader-current-section-bookmark")
+        .accessibilityIdentifier(accessibilityID)
         .accessibilityLabel(isSaved ? "Edit saved passage" : "Save passage")
         .accessibilityValue(isSaved ? "Saved" : "Not saved")
         .sheet(item: $saveTarget) { target in
             ReaderPassageSaveSheet(target: target) { message in
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                confirmationTask?.cancel()
-                confirmation = message
-                confirmationTask = Task {
-                    try? await Task.sleep(for: .seconds(3))
-                    guard !Task.isCancelled else { return }
-                    confirmation = nil
-                }
+                showConfirmation(message, target: target)
+            }
+        }
+        .contextMenu {
+            Button("Choose Project…", systemImage: "folder") {
+                guard let sectionID, let version = library.selectedVersion?.codeVersion else { return }
+                saveTarget = ReaderPassageSaveTarget(sectionID: sectionID, codeVersion: version, sessionID: library.privateSessionID)
             }
         }
         .overlay(alignment: .topTrailing) {
             if let confirmation {
                 HStack(spacing: 8) {
                     Text(confirmation).font(.caption.weight(.semibold))
+                    if confirmation == "Saved", let target = confirmationTarget {
+                        Button("Project") {
+                            guard target.sessionID == library.privateSessionID,
+                                  target.codeVersion == library.selectedVersion?.codeVersion else { return }
+                            saveTarget = target
+                            self.confirmation = nil
+                        }
+                        .font(.caption.weight(.semibold))
+                    }
                     if confirmation == "Removed from Saved" {
                         Button("Undo") { library.undoSavedPassageRemovals(); self.confirmation = nil }
                             .font(.caption.weight(.semibold))
@@ -722,7 +739,25 @@ struct ReaderCurrentSectionBookmarkButton: View {
                 .offset(y: -44)
             }
         }
-        .onDisappear { confirmationTask?.cancel(); confirmationTask = nil; confirmation = nil }
+        .onDisappear {
+            confirmationTask?.cancel()
+            confirmationTask = nil
+            confirmation = nil
+            confirmationTarget = nil
+        }
+    }
+
+    private func showConfirmation(_ message: String, target: ReaderPassageSaveTarget) {
+        confirmationTask?.cancel()
+        confirmationTarget = target
+        confirmation = message
+        if message != "Couldn’t save" { UINotificationFeedbackGenerator().notificationOccurred(.success) }
+        confirmationTask = Task {
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled else { return }
+            confirmation = nil
+            confirmationTarget = nil
+        }
     }
 }
 

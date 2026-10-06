@@ -400,6 +400,11 @@ struct NativeChapterTextReaderView: View {
                 searchQuery: searchQuery,
                 searchMatches: searchMatches.filter { $0.blockID == displayBlock.id },
                 activeSearchMatchID: activeSearchMatchID,
+                bookmarkSectionID: NativeReaderSectionNavigator.target(
+                    forSourceBlockID: displayBlock.sourceBlockID,
+                    in: document,
+                    targets: sectionTargets
+                ).flatMap(sectionSummary(for:))?.id,
                 onResearchSelection: { selectedText in
                     sendSelectionToResearch(
                         selectedText,
@@ -2176,7 +2181,11 @@ private struct NativeReaderTextBlockView: View, Equatable {
     let searchQuery: String
     let searchMatches: [NativeReaderSearchMatch]
     let activeSearchMatchID: String?
+    let bookmarkSectionID: Int64?
     let onResearchSelection: (String) -> Void
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var showsBookmarkAction = false
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.block == rhs.block
@@ -2188,6 +2197,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             && lhs.searchQuery == rhs.searchQuery
             && lhs.searchMatches == rhs.searchMatches
             && lhs.activeSearchMatchID == rhs.activeSearchMatchID
+            && lhs.bookmarkSectionID == rhs.bookmarkSectionID
     }
 
     var body: some View {
@@ -2196,7 +2206,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
             case .heading:
                 heading
             case .paragraph:
-                selectableText(role: .body)
+                bookmarkableParagraph
             case .orderedList, .unorderedList:
                 NativeReaderListBlockView(
                     cachePrefix: route.id,
@@ -2265,6 +2275,44 @@ private struct NativeReaderTextBlockView: View, Equatable {
             }
         }
         .accessibilityValue(searchMatches.isEmpty ? "" : "\(searchMatches.count) search matches")
+        .onDisappear { showsBookmarkAction = false }
+    }
+
+    @ViewBuilder
+    private var bookmarkableParagraph: some View {
+        if let bookmarkSectionID {
+            ZStack(alignment: .trailing) {
+                selectableText(
+                    role: .body,
+                    onPassageSwipe: { direction in
+                        withAnimation(reduceMotion ? nil : .smooth(duration: 0.22)) {
+                            showsBookmarkAction = direction == .left
+                        }
+                    },
+                    onSelectionChange: { hasSelection in
+                        if hasSelection { showsBookmarkAction = false }
+                    }
+                )
+                .offset(x: showsBookmarkAction ? -72 : 0)
+                .clipped()
+
+                if showsBookmarkAction {
+                    ReaderCurrentSectionBookmarkButton(
+                        sectionID: bookmarkSectionID,
+                        accentColor: Color(uiColor: accentColor),
+                        accessibilityID: "reader-passage-bookmark-\(bookmarkSectionID)"
+                    )
+                    .frame(width: 56, height: 48)
+                    .background(Color(uiColor: accentColor).opacity(0.18), in: RoundedRectangle(cornerRadius: 14))
+                    .transition(.opacity)
+                }
+            }
+            .accessibilityAction(named: "Show bookmark action") {
+                showsBookmarkAction = true
+            }
+        } else {
+            selectableText(role: .body)
+        }
     }
 
     @ViewBuilder
@@ -2291,7 +2339,11 @@ private struct NativeReaderTextBlockView: View, Equatable {
         }
     }
 
-    private func selectableText(role: NativeReaderTypographyRole) -> some View {
+    private func selectableText(
+        role: NativeReaderTypographyRole,
+        onPassageSwipe: ((ReaderPassageSwipeDirection) -> Void)? = nil,
+        onSelectionChange: ((Bool) -> Void)? = nil
+    ) -> some View {
         let cacheID = NativeReaderAttributedTextCacheKey.block(
             routeID: route.id,
             blockID: block.id,
@@ -2307,7 +2359,9 @@ private struct NativeReaderTextBlockView: View, Equatable {
             highlightRanges: searchMatches.map(\.range),
             activeHighlightRange: searchMatches.first(where: { $0.id == activeSearchMatchID })?.range,
             onOpenLink: onOpenLink,
-            onResearchSelection: onResearchSelection
+            onResearchSelection: onResearchSelection,
+            onPassageSwipe: onPassageSwipe,
+            onSelectionChange: onSelectionChange
         )
     }
 
@@ -2457,6 +2511,7 @@ struct NativeReaderPhase9SnapshotHarness: View {
                         searchQuery: configuration.searchQuery,
                         searchMatches: NativeReaderSearchIndex.matches(query: configuration.searchQuery, in: [displayBlock]),
                         activeSearchMatchID: nil,
+                        bookmarkSectionID: nil,
                         onResearchSelection: { _ in }
                     )
                 }
@@ -3034,6 +3089,8 @@ private struct NativeReaderPreparedAttributedTextView: View {
     var activeHighlightRange: NSRange? = nil
     let onOpenLink: (URL) -> Void
     let onResearchSelection: (String) -> Void
+    var onPassageSwipe: ((ReaderPassageSwipeDirection) -> Void)? = nil
+    var onSelectionChange: ((Bool) -> Void)? = nil
 
     @Environment(\.readerDefinitionContext) private var definitionContext
     @State private var attributedText: NSAttributedString?
@@ -3043,14 +3100,18 @@ private struct NativeReaderPreparedAttributedTextView: View {
             if let attributedText {
                 AttributedTextView(
                     attributedText: attributedText,
+                    onSelectionChange: onSelectionChange,
                     onOpenLink: onOpenLink,
-                    onResearchSelection: onResearchSelection
+                    onResearchSelection: onResearchSelection,
+                    onPassageSwipe: onPassageSwipe
                 )
             } else {
                 AttributedTextView(
                     attributedText: baseAttributedText,
+                    onSelectionChange: onSelectionChange,
                     onOpenLink: onOpenLink,
-                    onResearchSelection: onResearchSelection
+                    onResearchSelection: onResearchSelection,
+                    onPassageSwipe: onPassageSwipe
                 )
             }
         }

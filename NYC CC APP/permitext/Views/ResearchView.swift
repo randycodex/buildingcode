@@ -186,6 +186,39 @@ enum ResearchConversationDeletionRoute {
     }
 }
 
+struct ResearchDeletionBatchResult: Equatable {
+    var deletedIDs: [String] = []
+    var failedIDs: [String] = []
+}
+
+enum ResearchDeletionBatch {
+    /// Keep deletions serial and stop when the owning private session changes.
+    /// Each success is published separately so a later failure can be retried.
+    @MainActor
+    static func run(
+        conversationIDs: [String],
+        canContinue: () -> Bool,
+        delete: (String) async throws -> Void,
+        didDelete: (String) -> Void
+    ) async -> ResearchDeletionBatchResult {
+        var result = ResearchDeletionBatchResult()
+        var attempted: Set<String> = []
+        for id in conversationIDs where !id.isEmpty && attempted.insert(id).inserted {
+            guard canContinue(), !Task.isCancelled else { break }
+            do {
+                try await delete(id)
+                guard canContinue(), !Task.isCancelled else { break }
+                result.deletedIDs.append(id)
+                didDelete(id)
+            } catch {
+                guard canContinue(), !Task.isCancelled else { break }
+                result.failedIDs.append(id)
+            }
+        }
+        return result
+    }
+}
+
 struct ResearchProjectContextDisclosure: Equatable {
     let isAssigned: Bool
     let facts: [String]
@@ -250,8 +283,10 @@ private struct PendingResearchVisualReview: Identifiable, Equatable {
 }
 
 private struct PendingResearchDeletion: Identifiable, Equatable {
-    let id: String
+    let conversationIDs: [String]
     let title: String
+    var id: String { conversationIDs.joined(separator: "|") }
+    var isMultiple: Bool { conversationIDs.count > 1 }
 }
 
 private struct PendingResearchFeedbackReport: Identifiable, Equatable {
@@ -488,6 +523,9 @@ private struct ResearchSessionView: View {
     @State private var showingProjectCreator = false
     @State private var pendingDeletion: PendingResearchDeletion?
     @State private var deletingConversationID: String?
+    @State private var isSelectingHistory = false
+    @State private var selectedHistoryIDs: Set<String> = []
+    @State private var isDeletingHistoryBatch = false
     @State private var showingSettings = false
     @State private var recoverySettingsSection: SettingsSection = .account
     @State private var isRefreshingSources = false
@@ -629,22 +667,30 @@ private struct ResearchSessionView: View {
                 Text("Permitext Research will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
             }
             .alert(
-                "Delete Research conversation?",
+                pendingDeletion?.isMultiple == true ? "Delete selected Research conversations?" : "Delete Research conversation?",
                 isPresented: Binding(
                     get: { pendingDeletion != nil },
                     set: { if !$0 { pendingDeletion = nil } }
                 ),
                 presenting: pendingDeletion
             ) { pending in
-                Button("Delete Conversation", role: .destructive) {
+                Button(pending.isMultiple ? "Delete \(pending.conversationIDs.count) Conversations" : "Delete Conversation", role: .destructive) {
                     pendingDeletion = nil
-                    Task { await deleteConversation(id: pending.id) }
+                    Task {
+                        if isSelectingHistory {
+                            await deleteSelectedConversations(ids: pending.conversationIDs)
+                        } else if let id = pending.conversationIDs.first {
+                            await deleteConversation(id: id)
+                        }
+                    }
                 }
                 Button("Cancel", role: .cancel) {
                     pendingDeletion = nil
                 }
             } message: { pending in
-                Text("\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
+                Text(pending.isMultiple
+                     ? "\(pending.conversationIDs.count) conversations and their answers will be permanently deleted from Permitext. This cannot be undone."
+                     : "\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
             }
             .task(id: "\(library.privateSessionID):\(library.hasResearchAccess)") {
                 guard isCurrentOwner else { return }
@@ -774,18 +820,58 @@ private struct ResearchSessionView: View {
         ToolbarItemGroup(placement: .topBarTrailing) {
             if library.signedInAccount != nil,
                library.hasResearchAccess {
-                Button {
-                    Task { await createConversation(selections: []) }
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                        .contentShape(Rectangle())
+                if isSelectingHistory {
+                    Button("Done") {
+                        isSelectingHistory = false
+                        selectedHistoryIDs = []
+                    }
+                    .disabled(isDeletingHistoryBatch)
+                    Menu {
+                        Button("Select All", systemImage: "checkmark.circle") {
+                            selectedHistoryIDs = Set(summaries.map(\.id))
+                        }
+                        Button("Deselect All", systemImage: "circle") { selectedHistoryIDs = [] }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                    }
+                    .disabled(isDeletingHistoryBatch)
+                    .accessibilityLabel("Research selection actions")
+                    Button(role: .destructive) {
+                        requestSelectedDeletion()
+                    } label: {
+                        Image(systemName: "trash")
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                    }
+                    .tint(.red)
+                    .disabled(selectedHistoryIDs.isEmpty || isDeletingHistoryBatch)
+                    .accessibilityLabel("Delete \(selectedHistoryIDs.count) selected conversations")
+                } else {
+                    Menu {
+                        Button("Select Conversations", systemImage: "checkmark.circle") {
+                            selectedHistoryIDs = []
+                            isSelectingHistory = true
+                        }
+                        .disabled(summaries.isEmpty || deletingConversationID != nil)
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                    }
+                    .accessibilityLabel("Research history actions")
+                    Button {
+                        Task { await createConversation(selections: []) }
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .tint(Color.appChrome)
+                    .disabled(isCreatingConversation)
+                    .accessibilityLabel("New Research")
                 }
-                .buttonStyle(.plain)
-                .tint(Color.appChrome)
-                .disabled(isCreatingConversation)
-                .accessibilityLabel("New Research")
             }
 
         }
@@ -918,34 +1004,48 @@ private struct ResearchSessionView: View {
                         .listRowSeparator(.hidden)
                 }
                 Button {
-                    library.activeResearchConversationID = item.id
-                } label: {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(researchTitle(for: item))
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(2)
-                        if let preview = (historyPreviews[item.id] ?? item.starterQuestion)?.trimmingCharacters(in: .whitespacesAndNewlines),
-                           !preview.isEmpty, preview != researchTitle(for: item) {
-                            Text(plainHistoryPreview(preview))
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(3)
-                                .multilineTextAlignment(.leading)
-                        }
-                        if let projectID = item.primaryProjectID,
-                           let project = library.folder(forBackendProjectID: projectID) {
-                            Text(project.name)
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(project.color)
-                        }
+                    if isSelectingHistory {
+                        if selectedHistoryIDs.contains(item.id) { selectedHistoryIDs.remove(item.id) }
+                        else { selectedHistoryIDs.insert(item.id) }
+                    } else {
+                        library.activeResearchConversationID = item.id
                     }
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                } label: {
+                    HStack(alignment: .top, spacing: 12) {
+                        if isSelectingHistory {
+                            Image(systemName: selectedHistoryIDs.contains(item.id) ? "checkmark.circle.fill" : "circle")
+                                .font(.title3)
+                                .foregroundStyle(Color.appChrome)
+                                .padding(.top, 7)
+                        }
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(researchTitle(for: item))
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(.primary)
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(2)
+                            if let preview = (historyPreviews[item.id] ?? item.starterQuestion)?.trimmingCharacters(in: .whitespacesAndNewlines),
+                               !preview.isEmpty, preview != researchTitle(for: item) {
+                                Text(plainHistoryPreview(preview))
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(3)
+                                    .multilineTextAlignment(.leading)
+                            }
+                            if let projectID = item.primaryProjectID,
+                               let project = library.folder(forBackendProjectID: projectID) {
+                                Text(project.name)
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(project.color)
+                            }
+                        }
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
                 .buttonStyle(.plain)
-                .disabled(deletingConversationID == item.id)
+                .disabled(deletingConversationID == item.id || isDeletingHistoryBatch)
+                .accessibilityValue(isSelectingHistory ? (selectedHistoryIDs.contains(item.id) ? "Selected" : "Not selected") : "")
                 .accessibilityIdentifier("research-history-row")
                 .listRowInsets(EdgeInsets(top: 12, leading: 18, bottom: 12, trailing: 18))
                 .listRowBackground(Color.clear)
@@ -965,14 +1065,17 @@ private struct ResearchSessionView: View {
         .refreshable { await loadHistory(forceNetwork: true) }
     }
 
+    @ViewBuilder
     private func historyDeleteAction(_ item: ResearchConversationSummary) -> some View {
-        Button(role: .destructive) {
-            requestDeletion(id: item.id, title: researchTitle(for: item))
-        } label: {
-            Image(systemName: "trash")
+        if !isSelectingHistory {
+            Button(role: .destructive) {
+                requestDeletion(id: item.id, title: researchTitle(for: item))
+            } label: {
+                Image(systemName: "trash")
+            }
+            .tint(.red)
+            .accessibilityLabel("Delete Research conversation")
         }
-        .tint(.red)
-        .accessibilityLabel("Delete Research conversation")
     }
 
     private func conversationView(_ conversation: ResearchConversation) -> some View {
@@ -1453,9 +1556,19 @@ private struct ResearchSessionView: View {
             ? "\(displayTitle.prefix(79))…"
             : displayTitle
         pendingDeletion = PendingResearchDeletion(
-            id: id,
+            conversationIDs: [id],
             title: confirmationTitle
         )
+    }
+
+    private func requestSelectedDeletion() {
+        guard !isDeletingHistoryBatch, deletingConversationID == nil else { return }
+        let ids = summaries.filter { selectedHistoryIDs.contains($0.id) }.map(\.id)
+        guard !ids.isEmpty else { return }
+        let title = ids.count == 1
+            ? summaries.first(where: { $0.id == ids[0] }).map { researchTitle(for: $0) } ?? "Research conversation"
+            : "Selected Research"
+        pendingDeletion = PendingResearchDeletion(conversationIDs: ids, title: title)
     }
 
     private var isCurrentOwner: Bool {
@@ -1483,8 +1596,8 @@ private struct ResearchSessionView: View {
         questionErrorMessage = nil
     }
 
-    private func loadHistory(forceNetwork: Bool = false) async {
-        guard isCurrentOwner, let owner else { return }
+    private func loadHistory(forceNetwork: Bool = false, allowDuringDeletion: Bool = false) async {
+        guard isCurrentOwner, let owner, !isDeletingHistoryBatch || allowDuringDeletion else { return }
         let loadID = UUID()
         historyLoadID = loadID
         isLoading = true
@@ -2027,6 +2140,7 @@ private struct ResearchSessionView: View {
                 cache: cache, accountID: identity.account.accountID, conversationID: id
             )
             summaries.removeAll { $0.id == id }
+            selectedHistoryIDs.remove(id)
             cacheHistory(summaries, accountID: identity.account.accountID)
             if library.activeResearchConversationID == id { library.activeResearchConversationID = nil }
             await loadHistory(forceNetwork: true)
@@ -2035,6 +2149,39 @@ private struct ResearchSessionView: View {
             await loadHistory(forceNetwork: true)
             guard isCurrentOwner else { return }
             errorMessage = "Couldn’t delete that Research conversation. Try again."
+        }
+    }
+
+    private func deleteSelectedConversations(ids: [String]) async {
+        guard isCurrentOwner, let owner, !isDeletingHistoryBatch, deletingConversationID == nil else { return }
+        isDeletingHistoryBatch = true
+        defer { isDeletingHistoryBatch = false }
+        // A list refresh started before deletion must not restore deleted rows.
+        historyLoadID = nil
+        isLoading = false
+        let result = await ResearchDeletionBatch.run(
+            conversationIDs: ids,
+            canContinue: { isCurrentOwner },
+            delete: { id in try await library.deleteResearchConversation(id: id) },
+            didDelete: { id in
+                try? ResearchConversationCacheLifecycle.removeDeletedConversation(
+                    cache: cache, accountID: owner.accountID, conversationID: id
+                )
+                summaries.removeAll { $0.id == id }
+                selectedHistoryIDs.remove(id)
+                historyPreviews.removeValue(forKey: id)
+                cacheHistory(summaries, accountID: owner.accountID)
+            }
+        )
+        guard isCurrentOwner, !Task.isCancelled else { return }
+        await loadHistory(forceNetwork: true, allowDuringDeletion: true)
+        guard isCurrentOwner else { return }
+        selectedHistoryIDs.formIntersection(Set(summaries.map(\.id)))
+        if result.failedIDs.isEmpty {
+            isSelectingHistory = false
+            selectedHistoryIDs = []
+        } else {
+            errorMessage = "Deleted \(result.deletedIDs.count) of \(ids.count) conversations. \(result.failedIDs.count) couldn’t be deleted and remain selected. Try again."
         }
     }
 

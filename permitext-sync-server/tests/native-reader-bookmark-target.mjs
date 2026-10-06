@@ -14,6 +14,7 @@ function between(start, end) {
 }
 const target = between('struct NativeReaderSectionTarget:', '\nenum NativeReaderSectionNavigator');
 const parser = between('enum NativeReaderSectionNavigator {', '    static func targets(')
+ + between('    static func target(\n        forSourceBlockID', '    static func sectionNumber(from heading:')
  + between('    static func sectionNumber(from heading:', '\nstruct NativeReaderSearchMatch:');
 const resolver = between('enum NativeReaderBookmarkTargetResolver {', '\nenum NativeReaderSearchIndex');
 const property = between('    private var currentBookmarkSectionID:', '\n    private func jumpPicker(');
@@ -28,6 +29,8 @@ enum NativeReaderLinkResolver {
  static func reference(for url: URL) -> Reference? { nil }
 }
 struct Summary { let id: Int64 }
+struct NativeReaderRuntimeBlock { let id: String; let sourceOrder: Int }
+struct NativeReaderRuntimeDocument { let blocks: [NativeReaderRuntimeBlock] }
 struct Remembered { var wrappedValue: Int64? }
 struct Reader {
  var sectionTargets: [NativeReaderSectionTarget]
@@ -66,6 +69,10 @@ let count = bytes.withUnsafeMutableBytes { destination in
 }
 check(count == size, "Actual native chapter must decompress completely")
 let document = try JSONSerialization.jsonObject(with: Data(bytes)) as! [String: Any]
+let sourceBlocks = document["blocks"] as! [[String: Any]]
+let runtime = NativeReaderRuntimeDocument(blocks: sourceBlocks.map {
+ NativeReaderRuntimeBlock(id: $0["id"] as! String, sourceOrder: $0["sourceOrder"] as! Int)
+})
 let metadata = document["metadata"] as! [String: Any]
 check(metadata["codeSectionID"] as? Int == 1, "Fixture must be 2022 Building")
 let targets = (document["blocks"] as! [[String: Any]]).filter { $0["kind"] as? String == "heading" }.map { block in
@@ -91,6 +98,15 @@ reader.currentSectionTarget = group
 check(reader.bookmark == 1, "Group101 must resolve descendant101.1 despite equal heading levels")
 reader.currentSectionTarget = targets.first { $0.sectionNumber == "102.3" }
 check(reader.bookmark == 13, "Ordinary102.3 must keep exact section identity")
+for (number, expectedID) in [("101.1", Int64(1)), ("101.2", Int64(2)), ("102.3", Int64(13))] {
+ let heading = targets.first { $0.sectionNumber == number }!
+ let paragraph = sourceBlocks.first { ($0["kind"] as? String) == "paragraph" && ($0["sourceOrder"] as! Int) > heading.sourceOrder }!
+ let target = NativeReaderSectionNavigator.target(forSourceBlockID: paragraph["id"] as! String, in: runtime, targets: targets)
+ check(target?.sectionNumber == number, "Swipe must resolve the paragraph's own provision")
+ check(target.flatMap(reader.sectionSummary(for:))?.id == expectedID, "Swipe must save the exact database section, not the currently visible or remembered section")
+}
+check(NativeReaderSectionNavigator.target(forSourceBlockID: "missing", in: runtime, targets: targets) == nil,
+ "Unknown paragraph must not guess a bookmark target")
 reader.currentSectionTarget = group
 reader.summaries = ["1:102.3": 13, "2:101.1": 90001]
 check(reader.bookmark == nil, "Unresolved101 must not cross sibling102 or code scope")
