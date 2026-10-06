@@ -2151,8 +2151,9 @@ struct ProjectView: View {
             Button(role: .destructive) {
                 removeProjectEvidence([bookmark])
             } label: {
-                Label("Remove from project", systemImage: "minus.circle")
+                Image(systemName: "trash")
             }
+            .accessibilityLabel("Remove from project")
         }
     }
 
