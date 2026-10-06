@@ -98,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261005-notebook-empty-copy-v647";
+} from "./offline-storage.js?v=20261005-saved-research-removal-v648";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -20193,7 +20193,7 @@ async function clearResearchConversationHistory(button, selectedConversations = 
   if (!conversations.length) return;
   const confirmed = await confirmWebWarning(
     "Remove selected Research history?",
-    `${conversations.length} selected ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from Research history and the Project’s Saved conversation list. Unassigned chats will be deleted. Project-linked conversations, saved Research answers, and professional analysis records will be preserved.`,
+    `${conversations.length} selected ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from Research history. Unassigned chats will be deleted. Project-linked conversations, saved Research answers, and professional analysis records will be preserved.`,
     {
       confirmLabel: conversations.length === 1 ? "Remove conversation" : `Remove ${conversations.length}`,
       container: button.closest(".workspace-panel")
@@ -31535,73 +31535,6 @@ function loadInitialProjectFoundation(project) {
   return request;
 }
 
-async function appendSavedProjectResearchConversations(container, identity, options = {}) {
-  if (!activeAccount()) return;
-  const projectID = projectDetailKey(identity);
-  let foundation;
-  try {
-    const hubPayload = await projectTransitionHubPayload(projectID);
-    foundation = hubPayload?.foundation || await (options.foundationScope ? options.foundationScope.read(identity) : loadInitialProjectFoundation(identity));
-  } catch {
-    return;
-  }
-  const conversations = [...(foundation?.researchConversations || [])]
-    .filter((conversation) => !conversation.historyHiddenAt && String(conversation.title || conversation.starterQuestion || "").trim())
-    .sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")));
-  if (!conversations.length) return;
-
-  const section = document.createElement("section");
-  section.className = "project-studio-section saved-project-research-answers";
-  const heading = document.createElement("div");
-  heading.className = "project-studio-section-heading";
-  const title = document.createElement("button");
-  title.type = "button";
-  title.className = "section-label saved-project-research-toggle";
-  title.textContent = "Research";
-  const headingActions = document.createElement("div");
-  headingActions.className = "project-section-heading-actions";
-  const toggle = document.createElement("button");
-  toggle.type = "button";
-  toggle.className = "project-section-toggle-chevron saved-project-research-chevron";
-  toggle.innerHTML = researchChevronIconsSVG();
-  headingActions.append(toggle);
-  heading.append(title, headingActions);
-  const body = document.createElement("section");
-  body.className = "project-studio-collapsible-body saved-project-research-body";
-  section.append(heading, body);
-
-  conversations.slice(0, 12).forEach((conversation, index) => {
-    const card = document.createElement("button");
-    card.className = "project-research-history-card";
-    card.type = "button";
-    card.dataset.researchConversationId = conversation.id;
-    const itemNumber = document.createElement("span");
-    itemNumber.className = "project-research-history-index";
-    itemNumber.textContent = String(index + 1);
-    const question = document.createElement("strong");
-    question.textContent = researchConversationTitle(conversation);
-    card.append(itemNumber, question);
-    card.addEventListener("click", () => {
-      researchConversationPaneOpened = true;
-      void openResearchConversation(conversation.id);
-    });
-    body.append(card);
-  });
-  wireProjectSectionMotion(
-    section,
-    body,
-    [title, toggle],
-    "Research",
-    projectSectionExpanded(identity, "research", false),
-    {
-      onChange(expanded) {
-        persistProjectSectionExpansion(identity, "research", expanded);
-      }
-    }
-  );
-  container.append(section);
-}
-
 async function renderSavedFolderContext(panel, savedInstance, paneID, folders, options = {}) {
   const previousContext = panel.querySelector(".saved-folder-context");
   const inlineFilters = panel.querySelector(".saved-inline-filters");
@@ -31706,10 +31639,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders, o
       savedContent
     );
     context.append(savedSection);
-    if (!options.skipResearch) {
-      await appendSavedProjectResearchConversations(context, identity, options);
-    }
-
   } else {
     const controls = document.createElement("div");
     controls.className = "saved-folder-controls";
@@ -32481,9 +32410,7 @@ function renderProjectSelectionImmediately(controller, savedInstance, intent) {
   });
 
   const folders = intent.kind === "project" && intent.project ? [intent.project] : [];
-  void renderSavedFolderContext(panel, savedInstance, controller.paneID, folders, {
-    skipResearch: true
-  });
+  void renderSavedFolderContext(panel, savedInstance, controller.paneID, folders);
   return true;
 }
 

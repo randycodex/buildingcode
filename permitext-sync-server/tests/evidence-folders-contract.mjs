@@ -404,8 +404,8 @@ assert.match(applyProjectSelectionSource, /liveInstance\.selectedFolderID = inte
 assert.match(applyProjectSelectionSource, /renderProjectSelectionImmediately\(controller, liveInstance, intent\)[\s\S]*?saveWorkspaceState\(\)/);
 const immediateProjectSelectionSource = functionSource(appSource, "renderProjectSelectionImmediately");
 assert.match(immediateProjectSelectionSource, /\.saved-project-tile[\s\S]*?classList\.toggle\("is-selected", selected\)/);
-assert.match(immediateProjectSelectionSource, /renderSavedFolderContext\(panel, savedInstance, controller\.paneID, folders, \{[\s\S]*?skipResearch: true/);
-assert.match(savedFolderContextSource, /if \(!options\.skipResearch\) \{[\s\S]*?appendSavedProjectResearchConversations/);
+assert.match(immediateProjectSelectionSource, /renderSavedFolderContext\(panel, savedInstance, controller\.paneID, folders\)/);
+assert.doesNotMatch(savedFolderContextSource, /skipResearch|loadInitialProjectFoundation|appendSavedProjectResearchConversations/, "Saved still loads conversations for the removed Research list.");
 assert.match(
   functionSource(appSource, "settleSavedPanelAfterProjectTransition"),
   /refreshSavedPanelInPlace/
@@ -780,8 +780,8 @@ assert.match(stylesSource, /\.report-draft-shell \{[^}]*display: flex;[^}]*flex-
 assert.match(stylesSource, /\.report-draft-shell > \* \{[^}]*flex: 0 0 auto;/, "Expanded Report sources must scroll instead of collapsing earlier Report sections.");
 assert.match(stylesSource, /\.report-draft-primary-actions \{[^}]*position: static;/, "Save Report and Export Report must scroll with the Report content.");
 assert.match(stylesSource, /\.report-draft-panel :is\([^}]*\.project-section-motion \{[^}]*gap: 0;/, "Collapsed Report sections must not retain a grid gap that jumps away after motion settles.");
-assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading,[\s\S]*?\.saved-project-research-answers > \.project-studio-section-heading \{[^}]*height: 40px;[^}]*min-height: 40px;/);
-assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading[\s\S]*?\.saved-project-research-toggle \{[^}]*height: 40px;[^}]*min-height: 40px;/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading,[\s\S]*?\.saved-project-evidence-section > \.saved-evidence-heading \{[^}]*height: 40px;[^}]*min-height: 40px;/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading[\s\S]*?\.saved-project-facts-toggle \{[^}]*height: 40px;[^}]*min-height: 40px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-section-motion >[^}]*\.project-section-toggle-chevron \{[^}]*width: 40px;[^}]*height: 40px;[^}]*flex-basis: 40px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project > \.project-studio-section > \.project-studio-section-heading \{[^}]*min-height: 30px;/);
 assert.doesNotMatch(stylesSource, /\.reader-chapter-select-menu \[role="treeitem"\]\[aria-selected="true"\]/);
@@ -798,7 +798,7 @@ assert.match(stylesSource, /\.section-detail-note-resize-handle::after \{[\s\S]*
 assert.doesNotMatch(functionSource(appSource, "renderReaderChapterSection"), /reader-section-project-context|renderReaderSectionProjectContext/);
 assert.doesNotMatch(appSource, /description\.addEventListener\("input", resizeDescription\)/);
 assert.doesNotMatch(appSource, /saved-project-facts-status/);
-assert.doesNotMatch(appSource.match(/function appendSavedProjectFactEditor[\s\S]*?async function appendSavedProjectResearchConversations/)?.[0] || "", /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
+assert.doesNotMatch(projectFactEditorSource, /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
 assert.match(appSource, /showWebNotice\("Project context not saved", error\.message \|\| "Could not save Project context"\)/);
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
 assert.match(stylesSource, /\.project-research-history-card:hover,[\s\S]*?\.project-research-history-card:focus-visible \{[\s\S]*?background: transparent;[\s\S]*?color: var\(--project-color\);/, "Project Research history hover should color the text without filling the row.");
@@ -806,14 +806,8 @@ assert.match(stylesSource, /\.project-research-history-card:hover :is\(strong, p
 assert.match(appSource, /function animateSavedMembershipUpdate\(content, previousHeight\)[\s\S]*?duration: 420,[\s\S]*?cubic-bezier\(0\.22, 1, 0\.36, 1\)/, "Saved Evidence membership updates do not animate their height with the standard disclosure motion.");
 assert.match(appSource, /const preserveProjectChrome = options\.preserveProjectChrome === true;[\s\S]*?if \(preserveProjectChrome\) \{[\s\S]*?\.saved-project-count[\s\S]*?renderSavedProjects/, "Saved Evidence membership updates still rebuild the Project card instead of updating its count in place.");
 assert.match(appSource, /panel\.__refreshProjectMembership = \(\) => refreshSavedPanelInPlace\(paneID, \{[\s\S]*?preserveProjectChrome: true,[\s\S]*?animateContentUpdate: true/, "Project-chip changes do not use the non-blinking Saved Evidence refresh path.");
-const projectResearchSource = functionSource(appSource, "appendSavedProjectResearchConversations");
-assert.match(projectResearchSource, /title\.className = "section-label saved-project-research-toggle"/);
-assert.match(projectResearchSource, /body\.className = "project-studio-collapsible-body saved-project-research-body"/);
-assert.doesNotMatch(projectResearchSource, /projectSectionCount\(conversations\.length/);
-assert.match(projectResearchSource, /itemNumber\.className = "project-research-history-index"[\s\S]*?itemNumber\.textContent = String\(index \+ 1\)[\s\S]*?card\.append\(itemNumber, question\)/);
+assert.doesNotMatch(appSource, /appendSavedProjectResearchConversations|saved-project-research-answers/, "Saved still renders the removed Project Research list.");
 assert.match(appSource, /let savedSearchContentMinHeight = 0;[\s\S]*?const preservedScrollTop = scrollContainer\?\.scrollTop \|\| 0;[\s\S]*?content\.style\.minHeight = `\$\{savedSearchContentMinHeight\}px`;[\s\S]*?scrollContainer\.scrollTop = preservedScrollTop;/);
-assert.match(projectResearchSource, /projectSectionExpanded\(identity, "research", false\)/);
-assert.match(stylesSource, /\.project-studio-section-heading > \.saved-project-research-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/);
 assert.match(stylesSource, /\.saved-project-structured-group \{[\s\S]*?gap: 0;[\s\S]*?\.saved-project-structured-group\.project-section-motion\.is-open > \.saved-project-structured-group-body \{[\s\S]*?padding-top: 2px;/);
 assert.match(stylesSource, /\.saved-project-structured-facts-list \{[^}]*width: calc\(100% \+ \(2 \* var\(--space-3\)\)\);[^}]*margin-inline: calc\(-1 \* var\(--space-3\)\);/);
 assert.match(stylesSource, /\.saved-project-structured-fact \{[^}]*padding: var\(--space-2\) var\(--space-3\);/);
