@@ -131,10 +131,12 @@ struct FolderEditorSheet: View {
                     }
                 }
 
-                Section("Description (optional)") {
-                    TextField("Short description", text: $description, axis: .vertical)
-                        .accessibilityIdentifier("project-editor-description")
-                        .lineLimit(2...4)
+                if folderType == .reference {
+                    Section("Description (optional)") {
+                        TextField("Short description", text: $description, axis: .vertical)
+                            .accessibilityIdentifier("project-editor-description")
+                            .lineLimit(2...4)
+                    }
                 }
 
                 if folderType == .project {
@@ -259,7 +261,10 @@ struct FolderEditorSheet: View {
         let addressChanged = savedAddress.trimmingCharacters(in: .whitespacesAndNewlines) !=
             (existing?.address.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
         let savedFacts = property?.structuredFacts ?? (addressChanged ? [] : existing?.structuredFacts ?? [])
-        onSave(trimmedName, savedAddress, description, savedFacts, colorHex, folderType)
+        let savedDescription = folderType == .project
+            ? existing.flatMap { library.folder(id: $0.id) }?.description ?? existing?.description ?? ""
+            : description
+        onSave(trimmedName, savedAddress, savedDescription, savedFacts, colorHex, folderType)
         dismiss()
     }
 
@@ -423,48 +428,35 @@ struct ProjectContextView: View {
     @State private var editingSessionID: UUID?
     @State private var draft = ""
     @State private var saveError: String?
-    @FocusState private var isFocused: Bool
 
     private var folder: CodeFolder? { library.folder(id: folderID) }
     private var isEditing: Bool { editingFolder != nil }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                if isEditing {
-                    TextEditor(text: $draft)
+        VStack(alignment: .leading, spacing: 12) {
+            ZStack(alignment: .topLeading) {
+                ProjectContextTextView(
+                    text: isEditing ? draft : folder?.description ?? "",
+                    isEditing: isEditing,
+                    onBeginEditing: beginEditing,
+                    onTextChange: { draft = $0 }
+                )
+                if !isEditing && (folder?.description.isEmpty ?? true) {
+                    Text("Tap to add Project context.")
                         .font(.subheadline)
-                        .scrollContentBackground(.hidden)
-                        .frame(minHeight: 240)
-                        .focused($isFocused)
-                        .onAppear { isFocused = true }
-                        .accessibilityLabel("Project context")
-                        .accessibilityIdentifier("project-context-editor")
-                } else {
-                    Button(action: beginEditing) {
-                        let text = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                        Text(text.isEmpty ? "Tap to add Project context." : text)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityHint("Edit Project context")
-                    .accessibilityIdentifier("project-context-text")
-                }
-                if let saveError {
-                    Text(saveError)
-                        .font(.footnote)
                         .foregroundStyle(.secondary)
+                        .allowsHitTesting(false)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-            .padding(.top, CodeScreenMetrics.topTitlePadding)
-            .padding(.bottom, CodeScreenMetrics.tabBarClearance)
+            if let saveError {
+                Text(saveError)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+        .padding(.top, CodeScreenMetrics.topTitlePadding)
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("Project Context")
         .navigationBarTitleDisplayMode(.inline)
@@ -492,12 +484,13 @@ struct ProjectContextView: View {
         }
     }
 
-    private func beginEditing() {
-        guard let folder, library.requireProjectAccess() else { return }
+    private func beginEditing() -> Bool {
+        guard let folder, library.requireProjectAccess() else { return false }
         draft = folder.description
         editingFolder = folder
         editingSessionID = library.privateSessionID
         saveError = nil
+        return true
     }
 
     private func save() {
@@ -515,11 +508,68 @@ struct ProjectContextView: View {
     }
 
     private func finishEditing() {
-        isFocused = false
         editingFolder = nil
         editingSessionID = nil
         draft = ""
         saveError = nil
+    }
+}
+
+/// Keep the same text surface and native tap-to-caret behavior in both modes.
+private struct ProjectContextTextView: UIViewRepresentable {
+    let text: String
+    let isEditing: Bool
+    let onBeginEditing: () -> Bool
+    let onTextChange: (String) -> Void
+
+    func makeUIView(context: Context) -> UITextView {
+        let view = UITextView()
+        view.backgroundColor = .clear
+        view.font = .preferredFont(forTextStyle: .subheadline)
+        view.adjustsFontForContentSizeCategory = true
+        view.textColor = .secondaryLabel
+        view.tintColor = UIColor(Color.appChrome)
+        view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
+        view.textContainer.lineFragmentPadding = 0
+        view.contentInsetAdjustmentBehavior = .never
+        view.keyboardDismissMode = .interactive
+        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        view.delegate = context.coordinator
+        return view
+    }
+
+    func updateUIView(_ view: UITextView, context: Context) {
+        context.coordinator.parent = self
+        if !isEditing && view.isFirstResponder { view.resignFirstResponder() }
+        // Reassigning text on every SwiftUI update would reset native selection
+        // and scroll position as the keyboard appears or the user types.
+        if view.text != text {
+            let selection = view.selectedRange
+            view.text = text
+            let length = (text as NSString).length
+            let location = min(selection.location, length)
+            view.selectedRange = NSRange(location: location, length: min(selection.length, length - location))
+        }
+        view.accessibilityLabel = "Project context"
+        view.accessibilityHint = "Edit Project context"
+        view.accessibilityIdentifier = isEditing ? "project-context-editor" : "project-context-text"
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
+
+    final class Coordinator: NSObject, UITextViewDelegate {
+        var parent: ProjectContextTextView
+
+        init(parent: ProjectContextTextView) { self.parent = parent }
+
+        func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+            parent.isEditing || parent.onBeginEditing()
+        }
+
+        func textViewDidChange(_ textView: UITextView) {
+            parent.onTextChange(textView.text)
+        }
     }
 }
 

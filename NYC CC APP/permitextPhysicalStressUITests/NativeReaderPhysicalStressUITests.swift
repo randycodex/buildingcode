@@ -90,22 +90,25 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                           "\(title) should push a titled destination onto the navigation stack.")
             XCTAssertFalse(projectRoot.isHittable, "The Project page must be behind the destination.")
             if title == "Project Context" {
-                let context = app.buttons["project-context-text"]
+                let context = app.textViews["project-context-text"]
                 XCTAssertTrue(context.exists)
-                XCTAssertEqual(context.label, "Phase 3 entitled Research acceptance")
-                context.tap()
+                XCTAssertEqual(context.value as? String, "Phase 3 entitled Research acceptance")
+                context.coordinate(withNormalizedOffset: .zero)
+                    .withOffset(CGVector(dx: 12, dy: 12)).tap()
                 let editor = app.textViews["project-context-editor"]
                 XCTAssertTrue(editor.waitForExistence(timeout: 5))
-                editor.tap()
                 editor.typeText(" Updated on iPhone.")
                 app.buttons["project-context-save"].tap()
                 XCTAssertTrue(context.waitForExistence(timeout: 5))
-                XCTAssertTrue(context.label.contains("Updated on iPhone."))
+                let savedContext = context.value as? String ?? ""
+                XCTAssertTrue(savedContext.contains("Updated on iPhone."))
+                XCTAssertFalse(savedContext.hasSuffix(" Updated on iPhone."),
+                               "Editing must begin at the tapped text, rather than at the end.")
                 context.tap()
                 XCTAssertTrue(editor.waitForExistence(timeout: 5))
                 editor.typeText(" Discard this draft.")
                 app.navigationBars[title].buttons["Cancel"].tap()
-                XCTAssertFalse(context.label.contains("Discard this draft."))
+                XCTAssertEqual(context.value as? String, savedContext)
             }
             keepScreenshot(named: "Project section: \(title)", from: app)
             app.navigationBars[title].buttons.element(boundBy: 0).tap()
@@ -114,9 +117,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let contextLink = element(in: app, identifier: "project-section-context")
         reveal(contextLink, in: app)
         contextLink.tap()
-        let reopenedContext = app.buttons["project-context-text"]
+        let reopenedContext = app.textViews["project-context-text"]
         XCTAssertTrue(reopenedContext.waitForExistence(timeout: 5))
-        XCTAssertTrue(reopenedContext.label.contains("Updated on iPhone."),
+        XCTAssertTrue((reopenedContext.value as? String ?? "").contains("Updated on iPhone."),
                       "Saved context must survive leaving and reopening the screen.")
         app.navigationBars["Project Context"].buttons.element(boundBy: 0).tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()

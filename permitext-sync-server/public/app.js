@@ -98,7 +98,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261005-research-header-alignment-v651";
+} from "./offline-storage.js?v=20261005-project-context-editor-v652";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -30453,10 +30453,8 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       button.setAttribute("aria-pressed", String(button.dataset.folderType === selectedFolderType));
     });
     addressLabel.hidden = selectedFolderType === "reference";
+    descriptionLabel.hidden = selectedFolderType === "project";
     nameInput.placeholder = selectedFolderType === "reference" ? "Saved collection name" : "Project Name";
-    descriptionInput.placeholder = selectedFolderType === "reference"
-      ? "Saved collection notes: purpose, topic, or how this collection should be used"
-      : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
   };
   [
     ["project", "Project", "A job, property, address, or professional matter"],
@@ -30533,7 +30531,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   descriptionLabel.className = "project-sheet-field";
   const descriptionInput = document.createElement("textarea");
   descriptionInput.className = "project-description-input";
-  descriptionInput.placeholder = "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
+  descriptionInput.placeholder = "Saved collection notes: purpose, topic, or how this collection should be used";
   descriptionInput.setAttribute("aria-label", "Description");
   descriptionInput.autocomplete = "off";
   descriptionInput.rows = 3;
@@ -30652,9 +30650,9 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         name: nameInput.value,
         address: selectedFolderType === "reference" ? "" : property?.normalizedAddress || addressInput.value,
         color: selectedColor,
-        description: descriptionInput.value,
         folderType: selectedFolderType
       };
+      if (selectedFolderType === "reference") details.description = descriptionInput.value;
       if (selectedFolderType === "reference" || !isEditing || addressChanged) {
         // Facts from the previous address must never survive an address change,
         // while ordinary name/description edits must preserve them.
