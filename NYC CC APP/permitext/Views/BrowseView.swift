@@ -1469,6 +1469,8 @@ enum CodeScreenMetrics {
     static let sectionSpacingBelowEyebrow: CGFloat = 8
     static let groupedSectionTopPadding: CGFloat = 22
     static let rowVerticalPadding: CGFloat = 12
+    /// Matching compact rows for the Saved Evidence heading and its code groups.
+    static let projectEvidenceHeadingHeight: CGFloat = 36
     static let controlSpacing: CGFloat = 10
     static let savedChapterHeaderTopPadding: CGFloat = 12
     static let savedChapterHeaderBottomPadding: CGFloat = 6

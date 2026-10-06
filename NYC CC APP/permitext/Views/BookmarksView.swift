@@ -1199,24 +1199,26 @@ struct ProjectView: View {
                 }
 
                 if !projectBookmarks.isEmpty {
-                    savedEvidenceHeader
-                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                    VStack(alignment: .leading, spacing: 0) {
+                        savedEvidenceHeader
 
-                    if visibleProjectBookmarks.isEmpty {
-                        ContentUnavailableView(
-                            "No matching evidence",
-                            systemImage: "bookmark.slash",
-                            description: Text("Change the search to see saved evidence.")
-                        )
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 28)
-                    } else {
-                        LazyVStack(alignment: .leading, spacing: 0) {
-                            ForEach(projectEvidenceGroups) { group in
-                                projectEvidenceGroup(group)
+                        if visibleProjectBookmarks.isEmpty {
+                            ContentUnavailableView(
+                                "No matching evidence",
+                                systemImage: "bookmark.slash",
+                                description: Text("Change the search to see saved evidence.")
+                            )
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 28)
+                        } else {
+                            LazyVStack(alignment: .leading, spacing: 0) {
+                                ForEach(projectEvidenceGroups) { group in
+                                    projectEvidenceGroup(group)
+                                }
                             }
                         }
                     }
+                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 }
                 if isProjectFolder && hasSavedProjectWork {
                     projectSavedWork
@@ -1369,7 +1371,7 @@ struct ProjectView: View {
             NavigationLink {
                 ProjectContextView(folderID: folderID, accentColor: accentColor)
             } label: {
-                projectShortcutLabel(systemImage: "text.alignleft")
+                projectShortcutLabel(title: "Context", systemImage: "text.alignleft")
             }
             .accessibilityLabel("Project Context")
             .accessibilityIdentifier("project-section-context")
@@ -1377,7 +1379,7 @@ struct ProjectView: View {
             NavigationLink {
                 projectStructuredFactsDestination
             } label: {
-                projectShortcutLabel(systemImage: "building.2")
+                projectShortcutLabel(title: "Facts", systemImage: "building.2")
             }
             .accessibilityLabel("Structured Facts")
             .accessibilityIdentifier("project-section-structured-facts")
@@ -1391,7 +1393,7 @@ struct ProjectView: View {
                     }
                 }
             } label: {
-                projectShortcutLabel(systemImage: "note.text")
+                projectShortcutLabel(title: "Notebook", systemImage: "note.text")
             }
             .accessibilityLabel("Notebook")
             .accessibilityIdentifier("project-section-notebook")
@@ -1409,7 +1411,7 @@ struct ProjectView: View {
                     }
                 }
             } label: {
-                projectShortcutLabel(systemImage: "clock.arrow.circlepath")
+                projectShortcutLabel(title: "History", systemImage: "clock.arrow.circlepath")
             }
             .accessibilityLabel("Research History")
             .accessibilityIdentifier("project-section-research-history")
@@ -1418,18 +1420,26 @@ struct ProjectView: View {
         .accessibilityIdentifier("project-shortcuts")
     }
 
-    private func projectShortcutLabel(systemImage: String) -> some View {
-        Image(systemName: systemImage)
-            .font(.title3.weight(.semibold))
-            .foregroundStyle(accentColor)
-            .frame(width: CodeScreenMetrics.detachedNavigationButtonSize,
-                   height: CodeScreenMetrics.detachedNavigationButtonSize)
-            .background(
-                Color(uiColor: .secondarySystemGroupedBackground),
-                in: RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
-            )
-            .frame(maxWidth: .infinity, alignment: .top)
-            .contentShape(Rectangle())
+    private func projectShortcutLabel(title: String, systemImage: String) -> some View {
+        VStack(spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
+            Image(systemName: systemImage)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(accentColor)
+                .frame(width: CodeScreenMetrics.detachedNavigationButtonSize,
+                       height: CodeScreenMetrics.detachedNavigationButtonSize)
+                .background(
+                    Color(uiColor: .secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
+                )
+
+            Text(title)
+                .font(CodeTypography.cardMetadata)
+                .foregroundStyle(.primary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .top)
+        .contentShape(Rectangle())
     }
 
     private var projectStructuredFactsDestination: some View {
@@ -1922,8 +1932,9 @@ struct ProjectView: View {
             } label: {
                 Image(systemName: "magnifyingglass")
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(accentColor)
-                    .frame(width: 36, height: 36)
+                    .foregroundStyle(.primary)
+                    .frame(width: CodeScreenMetrics.projectEvidenceHeadingHeight,
+                           height: CodeScreenMetrics.projectEvidenceHeadingHeight)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Search saved evidence")
@@ -1932,7 +1943,7 @@ struct ProjectView: View {
                 savedEvidenceSelectionButton
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.projectEvidenceHeadingHeight, alignment: .leading)
     }
 
     @ViewBuilder
@@ -1963,7 +1974,7 @@ struct ProjectView: View {
                         .foregroundStyle(groupAccent)
                         .rotationEffect(.degrees(isCollapsed ? -90 : 0))
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.projectEvidenceHeadingHeight, alignment: .leading)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -1977,8 +1988,8 @@ struct ProjectView: View {
                         .foregroundStyle(groupAccent)
                         .textCase(.uppercase)
                         .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 24)
-                        .padding(.bottom, 8)
+                        .padding(.top, CodeScreenMetrics.savedChapterHeaderTopPadding)
+                        .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
 
                     ForEach(chapter.items, id: \.rowID) { bookmark in
                         projectBookmarkRow(bookmark)
@@ -1988,7 +1999,6 @@ struct ProjectView: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .padding(.top, 28)
     }
 
     @ViewBuilder
