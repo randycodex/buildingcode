@@ -3275,8 +3275,8 @@ final class CodeLibraryViewModel: ObservableObject {
     /// Saves one section to one or more destinations without ever exposing an
     /// intermediate unassigned bookmark to the UI or sync queue.
     @discardableResult
-    func saveSection(sectionID: Int64, toFolderIDs folderIDs: Set<Int64>) -> Bool {
-        guard !folderIDs.isEmpty, let selectedVersion, let userContentRepository else {
+    func saveSection(sectionID: Int64, toFolderIDs folderIDs: Set<Int64>, allowsUnassigned: Bool = false) -> Bool {
+        guard allowsUnassigned || !folderIDs.isEmpty, let selectedVersion, let userContentRepository else {
             statusMessage = "Choose at least one folder before saving."
             return false
         }
@@ -3293,7 +3293,7 @@ final class CodeLibraryViewModel: ObservableObject {
             requireProjectAccess()
             return false
         }
-        if currentPlan != .pro {
+        if currentPlan != .pro && !isBookmarked(sectionID: sectionID) {
             do {
                 let bookmarkCount = try bookmarkCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
@@ -3319,11 +3319,15 @@ final class CodeLibraryViewModel: ObservableObject {
         applyOptimisticFolderMembership(sectionID: sectionID, folderIDs: folderIDs)
 
         do {
-            try userContentRepository.saveSection(
-                sectionID,
-                toFolderIDs: folderIDs,
-                codeVersion: selectedVersion.codeVersion
-            )
+            if allowsUnassigned && folderIDs.isEmpty {
+                try userContentRepository.saveUnassignedSection(sectionID, codeVersion: selectedVersion.codeVersion)
+            } else {
+                try userContentRepository.saveSection(
+                    sectionID,
+                    toFolderIDs: folderIDs,
+                    codeVersion: selectedVersion.codeVersion
+                )
+            }
             scheduleProjectPresentationRefresh()
             scheduleUserContentAutoSync()
             NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
@@ -6225,6 +6229,33 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshFolders()
         scheduleUserContentAutoSync()
         NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+    }
+
+    /// Removes the exact saved edition without changing the Reader's active edition.
+    @discardableResult
+    func removeSavedPassage(_ section: BookmarkedSection) -> Bool {
+        guard let userContentRepository else { return false }
+        do {
+            guard try userContentRepository.isBookmarked(sectionID: section.id, codeVersion: section.codeVersion) else { return false }
+            let removal = SavedPassageRemoval(
+                sectionID: section.id, codeVersion: section.codeVersion,
+                folderIDs: Set(try userContentRepository.folderMembership(codeVersion: section.codeVersion)[section.id] ?? []),
+                sessionID: privateSessionID
+            )
+            try userContentRepository.toggleBookmark(sectionID: section.id, codeVersion: section.codeVersion)
+            if !removedSavedPassages.contains(where: { $0.sectionID == section.id && $0.codeVersion == section.codeVersion }) {
+                removedSavedPassages.append(removal)
+            }
+            savedRemovalUndoFailed = false
+            refreshBookmarks()
+            refreshFolders()
+            scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+            return true
+        } catch {
+            statusMessage = error.localizedDescription
+            return false
+        }
     }
 
     func toggleBookmark(sectionID: Int64) -> Bool {

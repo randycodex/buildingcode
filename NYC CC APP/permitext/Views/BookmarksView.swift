@@ -178,35 +178,12 @@ struct BookmarksView: View {
     }
 
     private var savedPresentation: some View {
-        ScrollView {
-            GeometryReader { proxy in
-                Color.clear
-                    .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("savedScroll")).minY)
+        Group {
+            if collectionOnly {
+                unassignedSavesList
+            } else {
+                savedProjectsScroll
             }
-            .frame(height: 0)
-
-            VStack(alignment: .leading, spacing: 0) {
-                savedScreenHeader
-
-                if collectionOnly {
-                    if unassignedBookmarks.isEmpty {
-                        CodeEmptyStateCard(
-                            title: "No Unassigned Saves",
-                            systemImage: "bookmark",
-                            description: "Saves outside Projects appear here. Assigned evidence stays inside its Project.",
-                            accent: accentColor
-                        )
-                    } else if cachedFilteredBookmarks.isEmpty {
-                        filteredSavedEmptyState
-                    } else {
-                        savedBookmarkList
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .padding(.horizontal, contentHorizontalInset)
-            .padding(.top, collectionOnly ? CodeScreenMetrics.scrollMeasuredTitleTopPadding : CodeScreenMetrics.contentSpacingBelowTitle)
-            .padding(.bottom, tabBarClearance)
         }
         .accessibilityIdentifier(collectionOnly ? "all-saved-root" : "projects-root")
         .overlay(alignment: .top) {
@@ -225,8 +202,24 @@ struct BookmarksView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
         .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbar {
-            savedNavigationControls
+        .toolbar { savedNavigationControls }
+    }
+
+    private var savedProjectsScroll: some View {
+        ScrollView {
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("savedScroll")).minY)
+            }
+            .frame(height: 0)
+
+            VStack(alignment: .leading, spacing: 0) {
+                savedScreenHeader
+            }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .padding(.horizontal, contentHorizontalInset)
+            .padding(.top, CodeScreenMetrics.contentSpacingBelowTitle)
+            .padding(.bottom, tabBarClearance)
         }
     }
 
@@ -327,18 +320,15 @@ struct BookmarksView: View {
     private var savedNavigationControls: some ToolbarContent {
         if !collectionOnly {
             CodeMainScreenToolbarTitle(title: screenTitle)
-        }
-        ToolbarItemGroup(placement: .topBarTrailing) {
-            savedHeaderActionButtons
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                savedHeaderActionButtons
+            }
         }
     }
 
     private var savedHeaderActionButtons: some View {
         HStack(spacing: 0) {
-            if collectionOnly {
-                sortButton
-                if !library.bookmarks.isEmpty { exportButton }
-            } else {
+            if !collectionOnly {
                 Button {
                     if library.hasProjectAccess { folderEditorTarget = .new }
                     else { library.requireProjectAccess() }
@@ -423,31 +413,84 @@ struct BookmarksView: View {
         .accessibilityIdentifier("all-saved-link")
     }
 
-private var savedBookmarkList: some View {
-    VStack(alignment: .leading, spacing: 0) {
-        ForEach(Array(cachedBookmarkCodeGroups.enumerated()), id: \.element.id) { index, codeGroup in
-            codeSectionHeader(
-                codeGroup,
-                isFirst: index == 0,
-                followsSavedHeader: hasSavedHeaderContentBelowTitle,
-                hasFiltersAbove: showsSavedInlineFilters
-            )
+private var unassignedSavesList: some View {
+    List {
+        Group {
+            savedScreenHeader
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
 
-            ForEach(codeGroup.chapterGroups) { group in
-                chapterHeader(group)
+            if unassignedBookmarks.isEmpty {
+                CodeEmptyStateCard(title: "No Unassigned Saves", systemImage: "bookmark",
+                    description: "Saves outside Projects appear here. Assigned evidence stays inside its Project.", accent: accentColor)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+            } else if cachedFilteredBookmarks.isEmpty {
+                filteredSavedEmptyState
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+            }
+            ForEach(Array(cachedBookmarkCodeGroups.enumerated()), id: \.element.id) { index, codeGroup in
+                codeSectionHeader(
+                    codeGroup,
+                    isFirst: index == 0,
+                    followsSavedHeader: hasSavedHeaderContentBelowTitle,
+                    hasFiltersAbove: showsSavedInlineFilters
+                )
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
 
-                ForEach(group.items, id: \.rowID) { bookmark in
-                    NavigationLink {
-                        bookmarkDestination(for: bookmark)
-                    } label: {
-                        bookmarkRow(bookmark)
+                ForEach(codeGroup.chapterGroups) { group in
+                    chapterHeader(group)
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+
+                    ForEach(group.items, id: \.rowID) { bookmark in
+                        NavigationLink {
+                            bookmarkDestination(for: bookmark)
+                        } label: {
+                            bookmarkRow(bookmark)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("projects-bookmark-\(bookmark.id)")
+                        .listRowBackground(Color.clear)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            if bookmark.isBookmarked {
+                                Button(role: .destructive) {
+                                    library.removeSavedPassage(bookmark)
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
+                                .tint(.red)
+                                .accessibilityLabel("Remove from Saved")
+                            }
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("projects-bookmark-\(bookmark.id)")
-
-                    CodeHairline()
                 }
             }
+        }
+        .listRowInsets(EdgeInsets(top: 0, leading: contentHorizontalInset, bottom: 0, trailing: contentHorizontalInset))
+    }
+    .listStyle(.plain)
+    .scrollContentBackground(.hidden)
+    .contentMargins(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding, for: .scrollContent)
+    .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
+    .safeAreaInset(edge: .bottom) {
+        if !library.removedSavedPassages.isEmpty {
+            HStack {
+                Text(library.savedRemovalUndoFailed ? "Could not restore. Try Undo again." : "Removed from Saved.")
+                    .font(.subheadline)
+                Spacer()
+                Button("Undo") { library.undoSavedPassageRemovals() }
+                    .frame(minWidth: 44, minHeight: 44)
+                Button { library.dismissSavedRemovalUndo() } label: { Image(systemName: "xmark") }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .accessibilityLabel("Dismiss Undo")
+            }
+            .padding(.horizontal)
+            .codeLiquidGlassCapsule()
+            .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+            .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
         }
     }
 }
@@ -1122,6 +1165,7 @@ struct ProjectView: View {
     @FocusState private var isEvidenceSearchFocused: Bool
     @State private var isStructuredFactsExpanded = false
     @State private var projectTitleFadeProgress: CGFloat = 0
+    @State private var openedEvidence: BookmarkedSection?
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let automaticProjectHubRefreshInterval: TimeInterval = 30
@@ -1267,6 +1311,23 @@ struct ProjectView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             projectNavigationControls
+        }
+        .sheet(item: $openedEvidence) { bookmark in
+            NavigationStack {
+                ReaderView(sectionID: bookmark.id, codeVersion: bookmark.codeVersion,
+                    codeSectionID: bookmark.codeSectionID, returnsToProjectsAfterRemoval: true,
+                    usesCompactSourceHeader: true)
+                    .id(bookmark.rowID)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button("Close") { openedEvidence = nil }
+                                .accessibilityLabel("Close passage")
+                        }
+                    }
+            }
+            .environment(\.codeTopFadeEnabled, false)
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
         }
         .sheet(item: $folderEditorTarget) { target in
             FolderEditorSheet(
@@ -2153,13 +2214,8 @@ struct ProjectView: View {
                 .accessibilityLabel(isSelected ? "Deselect section" : "Select section")
             }
 
-            NavigationLink {
-                ReaderView(
-                    sectionID: bookmark.id,
-                    codeVersion: bookmark.codeVersion,
-                    codeSectionID: bookmark.codeSectionID,
-                    returnsToProjectsAfterRemoval: true
-                )
+            Button {
+                openedEvidence = bookmark
             } label: {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {

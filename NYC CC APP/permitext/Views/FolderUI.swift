@@ -292,6 +292,126 @@ struct FolderEditorSheet: View {
 
 // MARK: - Picker sheet (assign current section to folders)
 
+struct ReaderPassageSaveTarget: Identifiable {
+    let sectionID: Int64
+    let codeVersion: String
+    let sessionID: UUID
+    var id: String { "\(codeVersion)|\(sectionID)" }
+}
+
+struct ReaderPassageSaveSheet: View {
+    let target: ReaderPassageSaveTarget
+    let onComplete: (String) -> Void
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedFolderIDs: Set<Int64> = []
+    @State private var detail: ReaderSectionDetail?
+    @State private var errorMessage: String?
+    @State private var showingProjectCreator = false
+
+    private var isCurrent: Bool {
+        target.sessionID == library.privateSessionID && target.codeVersion == library.selectedVersion?.codeVersion
+    }
+    private var isSaved: Bool { isCurrent && library.isBookmarked(sectionID: target.sectionID) }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if let detail {
+                    Section {
+                        Text("§ \(detail.sectionNumber) · \(detail.displayTitle)")
+                            .font(.body.weight(.semibold))
+                        Text(NativeReaderEditionLabel.label(for: target.codeVersion))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                if let errorMessage {
+                    Text(errorMessage).foregroundStyle(.red).font(.footnote)
+                }
+                Section("Destination") {
+                    Button { selectedFolderIDs = [] } label: {
+                        destinationLabel("Unassigned", color: Color.appChrome, selected: selectedFolderIDs.isEmpty)
+                    }
+                    ForEach(library.folders) { folder in
+                        Button {
+                            if folder.folderType == .project && !library.hasProjectAccess && !selectedFolderIDs.contains(folder.id) {
+                                library.requireProjectAccess()
+                            } else if selectedFolderIDs.contains(folder.id) {
+                                selectedFolderIDs.remove(folder.id)
+                            } else {
+                                selectedFolderIDs.insert(folder.id)
+                            }
+                        } label: {
+                            destinationLabel(folder.name, color: folder.color, selected: selectedFolderIDs.contains(folder.id))
+                        }
+                    }
+                    Button("New Project…", systemImage: "folder.badge.plus") {
+                        if library.hasProjectAccess { showingProjectCreator = true }
+                        else { library.requireProjectAccess() }
+                    }
+                }
+                if isSaved {
+                    Section {
+                        Button("Remove from Saved", systemImage: "trash", role: .destructive) {
+                            guard isCurrent else { return }
+                            if !library.toggleBookmark(sectionID: target.sectionID) {
+                                onComplete("Removed from Saved")
+                                dismiss()
+                            } else { errorMessage = library.statusMessage }
+                        }
+                    }
+                }
+            }
+            .navigationTitle(isSaved ? "Saved passage" : "Save passage")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        guard isCurrent else { return }
+                        if library.saveSection(sectionID: target.sectionID, toFolderIDs: selectedFolderIDs, allowsUnassigned: true) {
+                            onComplete("Saved")
+                            dismiss()
+                        } else { errorMessage = library.statusMessage }
+                    }
+                    .disabled(!isCurrent)
+                }
+            }
+            .task {
+                selectedFolderIDs = Set(library.folderMembership[target.sectionID] ?? [])
+                let loaded = await library.loadSectionDetailAsync(sectionID: target.sectionID)
+                guard isCurrent, !Task.isCancelled else { return }
+                detail = loaded
+            }
+            .onChange(of: isCurrent) { _, current in if !current { dismiss() } }
+            .sheet(isPresented: $showingProjectCreator) {
+                FolderEditorSheet(existing: nil, defaultFolderType: .project,
+                    onSave: { name, address, description, facts, colorHex, folderType in
+                        guard isCurrent else { return }
+                        if let folder = library.createFolder(name: name, address: address, description: description,
+                            structuredFacts: facts, colorHex: colorHex, folderType: folderType) {
+                            selectedFolderIDs.insert(folder.id)
+                        }
+                    }, onDelete: {})
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func destinationLabel(_ title: String, color: Color, selected: Bool) -> some View {
+        HStack {
+            Text(title).foregroundStyle(color)
+            Spacer()
+            if selected { Image(systemName: "checkmark").foregroundStyle(color) }
+        }
+        .frame(maxWidth: .infinity, minHeight: 32, alignment: .leading)
+        .contentShape(Rectangle())
+        .accessibilityValue(selected ? "Selected" : "Not selected")
+    }
+}
+
 struct FolderPickerSheet: View {
     let folders: [CodeFolder]
     let memberFolderIDs: Set<Int64>

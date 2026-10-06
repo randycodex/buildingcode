@@ -503,7 +503,7 @@ private struct ResearchSessionView: View {
         cache = ProjectHubOfflineCache(directoryURL: cacheDirectoryURL)
     }
 
-    var body: some View {
+    private var researchPresentation: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 Group {
@@ -525,8 +525,6 @@ private struct ResearchSessionView: View {
                             buttonTitle: "View Plans",
                             section: .plan
                         )
-                    } else if let conversation, conversation.id == library.activeResearchConversationID {
-                        conversationView(conversation)
                     } else if isLoading && summaries.isEmpty {
                         ProgressView("Loading Research…")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -543,8 +541,16 @@ private struct ResearchSessionView: View {
             .toolbar(.visible, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                researchNavigationControls
+                researchHistoryControls
             }
+            .navigationDestination(isPresented: conversationIsPresented) {
+                conversationDestination
+            }
+        }
+    }
+
+    var body: some View {
+        researchPresentation
             .sheet(item: $pendingVisualReview) { pending in
                 ResearchVisualReviewSheet(
                     review: pending.review,
@@ -685,9 +691,34 @@ private struct ResearchSessionView: View {
                 guard phase == .active, isVisible else { return }
                 Task { await refreshFromWeb() }
             }
-            .onAppear { isVisible = true }
-            .onDisappear { isVisible = false }
+        .onAppear { isVisible = true }
+        .onDisappear { isVisible = false }
+    }
+
+    private var conversationIsPresented: Binding<Bool> {
+        Binding(
+            get: { library.activeResearchConversationID != nil && library.hasResearchAccess },
+            set: { if !$0 { library.activeResearchConversationID = nil } }
+        )
+    }
+
+    private var conversationDestination: some View {
+        Group {
+            if let conversation, conversation.id == library.activeResearchConversationID {
+                conversationView(conversation)
+            } else if let errorMessage {
+                statusMessage(errorMessage)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ProgressView("Opening Research…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
+        .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar { researchConversationControls }
     }
 
     private func researchAccessRecovery(
@@ -738,31 +769,10 @@ private struct ResearchSessionView: View {
     }
 
     @ToolbarContentBuilder
-    private var researchNavigationControls: some ToolbarContent {
-        if conversation == nil {
-            CodeMainScreenToolbarTitle(title: "Research")
-        } else {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    library.activeResearchConversationID = nil
-                    self.conversation = nil
-                    failedQuestionAttempt = nil
-                    questionErrorMessage = nil
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .tint(Color.appChrome)
-                .accessibilityLabel("Research history")
-            }
-        }
-
+    private var researchHistoryControls: some ToolbarContent {
+        CodeMainScreenToolbarTitle(title: "Research")
         ToolbarItemGroup(placement: .topBarTrailing) {
-            if conversation == nil,
-               library.signedInAccount != nil,
+            if library.signedInAccount != nil,
                library.hasResearchAccess {
                 Button {
                     Task { await createConversation(selections: []) }
@@ -778,8 +788,17 @@ private struct ResearchSessionView: View {
                 .accessibilityLabel("New Research")
             }
 
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var researchConversationControls: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
             if let conversation {
                 Menu {
+                    Menu("Project", systemImage: "folder") {
+                        projectAssignmentActions
+                    }
                     Button("Rename", systemImage: "pencil") {
                         draftTitle = conversation.title
                         showingRename = true
@@ -800,37 +819,39 @@ private struct ResearchSessionView: View {
         }
     }
 
+    private var projectAssignmentActions: some View {
+        Group {
+            Button("Unassigned", systemImage: conversation?.primaryProjectID == nil ? "checkmark" : "folder") {
+                requestAssignment(nil)
+            }
+            ForEach(library.folders.filter { $0.folderType == .project }) { folder in
+                if let projectID = library.backendProjectID(for: folder.id) {
+                    Button(folder.name, systemImage: conversation?.primaryProjectID == projectID ? "checkmark" : "folder") {
+                        requestAssignment(projectID)
+                    }
+                }
+            }
+            Divider()
+            Button("New Project…", systemImage: "folder.badge.plus") {
+                if library.hasProjectAccess { showingProjectCreator = true }
+                else { library.requireProjectAccess() }
+            }
+        }
+    }
+
     @ViewBuilder
     private var researchScreenHeader: some View {
         if let conversation {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center, spacing: 6) {
-                    Menu {
-                        Button("Unassigned") { requestAssignment(nil) }
-                        ForEach(library.folders.filter { $0.folderType == .project }) { folder in
-                            if let projectID = library.backendProjectID(for: folder.id) {
-                                Button(folder.name) { requestAssignment(projectID) }
-                            }
-                        }
-                        Divider()
-                        Button("New Project…", systemImage: "folder.badge.plus") {
-                            if library.hasProjectAccess {
-                                showingProjectCreator = true
-                            } else {
-                                library.requireProjectAccess()
-                            }
-                        }
-                    } label: {
                         Text(projectName(for: conversation.primaryProjectID))
                             .font(CodeTypography.screenTitle)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(library.folder(forBackendProjectID: conversation.primaryProjectID ?? "")?.color ?? Color.primary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
                             .frame(height: 44, alignment: .leading)
-                    }
-                    .buttonStyle(.plain)
                     .accessibilityLabel("Project context: \(projectName(for: conversation.primaryProjectID))")
-                    .accessibilityIdentifier("research-project-context-menu")
+                    .accessibilityIdentifier("research-project-context-title")
 
                     Spacer(minLength: 0)
                 }
@@ -917,7 +938,7 @@ private struct ResearchSessionView: View {
                            let project = library.folder(forBackendProjectID: projectID) {
                             Text(project.name)
                                 .font(.caption.weight(.medium))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(project.color)
                         }
                     }
                     .padding(.vertical, 7)
@@ -930,11 +951,10 @@ private struct ResearchSessionView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.visible, edges: .bottom)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive) {
-                        requestDeletion(id: item.id, title: researchTitle(for: item))
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
+                    historyDeleteAction(item)
+                }
+                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                    historyDeleteAction(item)
                 }
             }
         }
@@ -943,6 +963,16 @@ private struct ResearchSessionView: View {
         .contentMargins(.top, CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
         .contentMargins(.bottom, floatingNavigationClearance, for: .scrollContent)
         .refreshable { await loadHistory(forceNetwork: true) }
+    }
+
+    private func historyDeleteAction(_ item: ResearchConversationSummary) -> some View {
+        Button(role: .destructive) {
+            requestDeletion(id: item.id, title: researchTitle(for: item))
+        } label: {
+            Image(systemName: "trash")
+        }
+        .tint(.red)
+        .accessibilityLabel("Delete Research conversation")
     }
 
     private func conversationView(_ conversation: ResearchConversation) -> some View {
@@ -1682,7 +1712,7 @@ private struct ResearchSessionView: View {
         do {
             let created = try await library.createResearchConversation(
                 selections: selections,
-                projectID: library.activeBackendProjectID
+                projectID: nil
             )
             guard isCurrent(identity) else { return false }
             conversation = created

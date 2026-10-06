@@ -243,6 +243,7 @@ struct SearchView: View {
         let globalProgress: Bool
     }
     @State private var showsCodeSources = false
+    @AppStorage("SearchView.recentlyOpenedOrder") private var recentlyOpenedOrderRaw = RecentlyOpenedOrder.date.rawValue
     @State private var allInstalledSourcesDisabled: Bool?
     @State private var sourceEnablePrompt: SourceEnablePrompt?
     @State private var deepLinkError: String?
@@ -457,6 +458,14 @@ struct SearchView: View {
 
     private var searchOptionsMenu: some View {
         Menu {
+            Picker("Recently opened", selection: $recentlyOpenedOrderRaw) {
+                ForEach(RecentlyOpenedOrder.allCases) { order in
+                    Text(order.label).tag(order.rawValue)
+                }
+            }
+            .pickerStyle(.menu)
+            .accessibilityIdentifier("search-recently-opened-order")
+            Divider()
             Button("Active Code Sources", systemImage: "books.vertical") {
                 showsCodeSources = true
             }
@@ -483,6 +492,9 @@ struct SearchView: View {
                     openPendingDeepLinkedSectionIfNeeded()
                     return
                 }
+            }
+            .onChange(of: recentlyOpenedOrderRaw) { _, _ in
+                rebuildJumpBackInCache()
             }
             .onChange(of: searchFilterCodeSectionIDs) { _, _ in
                 cancelReaderOpeningIfSearchChanged()
@@ -804,7 +816,19 @@ struct SearchView: View {
     }
 
     private func rebuildJumpBackInCache() {
-        cachedRecentEntries = library.recentlyViewedSections
+        cachedRecentEntries = recentlyOpenedOrder.ordered(library.recentlyViewedSections)
+    }
+
+    private var recentlyOpenedOrder: RecentlyOpenedOrder {
+        RecentlyOpenedOrder(rawValue: recentlyOpenedOrderRaw) ?? .date
+    }
+
+    private func recentlyOpenedGroup(_ entry: RecentlyViewedEntry) -> String? {
+        switch recentlyOpenedOrder {
+        case .recent: return nil
+        case .date: return viewedDateGroup(entry.viewedAt)
+        case .code: return "\(entry.codeSectionName) · \(NativeReaderEditionLabel.label(for: entry.sourceVersion))"
+        }
     }
 
     private var searchResultSummary: some View {
@@ -1024,8 +1048,8 @@ struct SearchView: View {
         let entries = Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count))
         return LazyVStack(alignment: .leading, spacing: 0) {
             ForEach(Array(entries.enumerated()), id: \.element.historyIdentity) { index, entry in
-                if index == 0 || viewedDateGroup(entry.viewedAt) != viewedDateGroup(entries[index - 1].viewedAt) {
-                    Text(viewedDateGroup(entry.viewedAt))
+                if let group = recentlyOpenedGroup(entry), index == 0 || group != recentlyOpenedGroup(entries[index - 1]) {
+                    Text(group)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.secondary)
                         .padding(.top, index == 0 ? 8 : 28)

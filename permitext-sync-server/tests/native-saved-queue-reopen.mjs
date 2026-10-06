@@ -21,7 +21,7 @@ function block(text, start, indent = '') {
 const methods = [...source.matchAll(/^    (?:private )?(?:func (\w+)|init\(databaseURL:)/gm)].map(match => ({
   name: match[1] || 'init', source: (source.slice(Math.max(0, match.index - 23), match.index).endsWith('    @discardableResult\n') ? '    @discardableResult\n' : '') + block(source.slice(match.index), match[0], '    ')
 }));
-const chosen = new Set(['init', 'saveSection', 'pendingSyncQueueItems', 'failedSyncQueueItems', 'markSyncQueueItemsInFlight', 'markSyncQueueItemSynced', 'markSyncQueueItemFailed', 'prepareSyncQueueForProcessing']);
+const chosen = new Set(['init', 'saveSection', 'saveUnassignedSection', 'toggleBookmark', 'pendingSyncQueueItems', 'failedSyncQueueItems', 'markSyncQueueItemsInFlight', 'markSyncQueueItemSynced', 'markSyncQueueItemFailed', 'prepareSyncQueueForProcessing']);
 let changed;
 do {
  changed = false;

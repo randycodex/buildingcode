@@ -10,6 +10,7 @@ protocol UserContentRepository {
     func isBookmarked(sectionID: Int64, codeVersion: String) throws -> Bool
     func toggleBookmark(sectionID: Int64, codeVersion: String) throws
     func saveSection(_ sectionID: Int64, toFolderIDs folderIDs: Set<Int64>, codeVersion: String) throws
+    func saveUnassignedSection(_ sectionID: Int64, codeVersion: String) throws
     func noteBody(sectionID: Int64, codeVersion: String) throws -> String
     func noteBody(sectionID: Int64, blockID: String, codeVersion: String) throws -> String
     func noteBlockIDs(sectionID: Int64, codeVersion: String) throws -> [String]
@@ -514,7 +515,15 @@ final class UserDataStore: UserContentRepository {
     /// local transaction. A new saved record can never be left unassigned if
     /// one of the destination writes fails.
     func saveSection(_ sectionID: Int64, toFolderIDs folderIDs: Set<Int64>, codeVersion: String) throws {
-        guard !folderIDs.isEmpty else {
+        try saveSection(sectionID, toFolderIDs: folderIDs, codeVersion: codeVersion, allowsUnassigned: false)
+    }
+
+    func saveUnassignedSection(_ sectionID: Int64, codeVersion: String) throws {
+        try saveSection(sectionID, toFolderIDs: [], codeVersion: codeVersion, allowsUnassigned: true)
+    }
+
+    private func saveSection(_ sectionID: Int64, toFolderIDs folderIDs: Set<Int64>, codeVersion: String, allowsUnassigned: Bool) throws {
+        guard allowsUnassigned || !folderIDs.isEmpty else {
             throw NSError(
                 domain: "UserDataStore",
                 code: 3,

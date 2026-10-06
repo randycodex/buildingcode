@@ -60,8 +60,6 @@ struct ReaderView: View {
     @State private var pendingFolderIDs: Set<Int64> = []
     @State private var pendingFinalFolderRemoval: CodeFolder?
     @State private var folderEditorTarget: ReaderFolderEditorTarget?
-    @State private var showsSavedFollowUp = false
-    @State private var saveToastTask: Task<Void, Never>?
 
 
     /// Same shape as BookmarksView.FolderEditorTarget but scoped to this view
@@ -175,16 +173,7 @@ struct ReaderView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button {
-                    if isBookmarked {
-                        removeBookmarkAndFolderLinks()
-                    } else {
-                        saveBookmarkImmediately()
-                    }
-                } label: {
-                    Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                }
-                .accessibilityLabel(isBookmarked ? "Remove from Saved" : "Save passage")
+                ReaderCurrentSectionBookmarkButton(sectionID: detail == nil ? nil : sectionID, accentColor: accentColor)
             }
         }
         .fullScreenCover(
@@ -310,30 +299,9 @@ struct ReaderView: View {
         } message: {
             Text("Every saved section needs a folder. Removing this final destination will delete the saved record. You can choose another folder instead.")
         }
-        .overlay(alignment: .bottom) {
-            if showsSavedFollowUp {
-                HStack(spacing: 16) {
-                    Label("Section saved", systemImage: "checkmark.circle.fill")
-                    Spacer(minLength: 8)
-                    Button("Add to Project") {
-                        showsSavedFollowUp = false
-                        saveToastTask?.cancel()
-                        openFolderPicker()
-                    }
-                }
-                .font(.subheadline)
-                .padding(16)
-                .codeLiquidGlassCapsule()
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-                .accessibilityIdentifier("passage-saved-toast")
-            }
-        }
         .onDisappear {
             openingGeneration = UUID()
             referenceLoadState.invalidate()
-            saveToastTask?.cancel()
-            showsSavedFollowUp = false
         }
     }
 
@@ -589,19 +557,6 @@ struct ReaderView: View {
     private func openFolderPicker() {
         pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
         isFolderPickerOpen = true
-    }
-
-    private func saveBookmarkImmediately() {
-        guard !isBookmarked else { return }
-        isBookmarked = library.toggleBookmark(sectionID: sectionID)
-        guard isBookmarked else { return }
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
-        showsSavedFollowUp = true
-        saveToastTask?.cancel()
-        saveToastTask = Task { @MainActor in
-            do { try await Task.sleep(for: .seconds(3)) } catch { return }
-            showsSavedFollowUp = false
-        }
     }
 
     private func removeBookmarkAndFolderLinks() {

@@ -4393,6 +4393,33 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
     static let defaultColorHex: String = presetColorHexes[0]
 }
 
+enum RecentlyOpenedOrder: String, CaseIterable, Identifiable {
+    case recent, date, code
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .recent: return "Recent first"
+        case .date: return "By date"
+        case .code: return "By code"
+        }
+    }
+
+    func ordered(_ entries: [RecentlyViewedEntry]) -> [RecentlyViewedEntry] {
+        entries.sorted { lhs, rhs in
+            if self == .code {
+                let left = Self.codeGroupID(lhs), right = Self.codeGroupID(rhs)
+                if left != right { return left.localizedStandardCompare(right) == .orderedAscending }
+            }
+            if lhs.viewedAt != rhs.viewedAt { return lhs.viewedAt > rhs.viewedAt }
+            return lhs.historyIdentity < rhs.historyIdentity
+        }
+    }
+
+    static func codeGroupID(_ entry: RecentlyViewedEntry) -> String {
+        "\(entry.codeSectionName)|\(entry.sourceVersion ?? "legacy")"
+    }
+}
+
 struct RecentlyViewedEntry: Identifiable, Codable, Hashable, Sendable {
     let sectionID: Int64
     let sectionNumber: String

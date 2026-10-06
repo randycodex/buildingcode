@@ -667,179 +667,63 @@ struct ChapterReaderView: View {
     }
 }
 
-enum ReaderBookmarkButtonStyle {
-    case standard
-    case compact
-}
-
 struct ReaderCurrentSectionBookmarkButton: View {
     let sectionID: Int64?
     let accentColor: Color
-    var style: ReaderBookmarkButtonStyle = .standard
 
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @State private var displayedIsBookmarked = false
-    @State private var bookmarkConfirmation: String?
-    @State private var bookmarkConfirmationTask: Task<Void, Never>?
-    @State private var showsSavedFollowUp = false
-    @State private var isFolderPickerOpen = false
-    @State private var pendingFolderIDs: Set<Int64> = []
-    @State private var folderCreationRequest: ReaderBookmarkFolderCreation?
+    @State private var saveTarget: ReaderPassageSaveTarget?
+    @State private var confirmation: String?
+    @State private var confirmationTask: Task<Void, Never>?
+
+    private var isSaved: Bool { sectionID.map { library.isBookmarked(sectionID: $0) } ?? false }
 
     var body: some View {
         Button {
-            guard let sectionID else { return }
-            let desiredBookmarkState = !displayedIsBookmarked
-            displayedIsBookmarked = desiredBookmarkState
-            displayedIsBookmarked = library.toggleBookmark(sectionID: sectionID)
-            if displayedIsBookmarked == desiredBookmarkState {
-                if displayedIsBookmarked {
-                    showBookmarkConfirmation("Saved")
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    showsSavedFollowUp = true
-                } else {
-                    bookmarkConfirmationTask?.cancel()
-                    bookmarkConfirmationTask = nil
-                    bookmarkConfirmation = nil
-                }
-            }
+            guard let sectionID, let version = library.selectedVersion?.codeVersion else { return }
+            saveTarget = ReaderPassageSaveTarget(sectionID: sectionID, codeVersion: version, sessionID: library.privateSessionID)
         } label: {
-            Image(systemName: displayedIsBookmarked ? "bookmark.fill" : "bookmark")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(displayedIsBookmarked ? accentColor : Color.secondary)
-                .frame(width: style == .standard ? 44 : 28, height: style == .standard ? 44 : 28)
-                .background(
-                    style == .standard
-                        ? Color(uiColor: .secondarySystemGroupedBackground)
-                        : Color.clear
-                )
-                .clipShape(RoundedRectangle(cornerRadius: style == .standard ? 12 : 6, style: .continuous))
-                .frame(width: 44, height: 44)
+            Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                .foregroundStyle(isSaved ? accentColor : Color.secondary)
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
         .accessibilityIdentifier("reader-current-section-bookmark")
-        .accessibilityLabel(displayedIsBookmarked ? "Remove from Saved" : "Save passage")
-        .accessibilityValue(displayedIsBookmarked ? "Saved" : "Not saved")
-        .onAppear { synchronizeState() }
-        .onChange(of: sectionID) { _, _ in synchronizeState() }
-        .onChange(of: library.bookmarkRevision) { _, _ in synchronizeState() }
-        .alert(
-            "Saved",
-            isPresented: $showsSavedFollowUp
-        ) {
-            Button("Add to Project") {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    openFolderPicker()
+        .accessibilityLabel(isSaved ? "Edit saved passage" : "Save passage")
+        .accessibilityValue(isSaved ? "Saved" : "Not saved")
+        .sheet(item: $saveTarget) { target in
+            ReaderPassageSaveSheet(target: target) { message in
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                confirmationTask?.cancel()
+                confirmation = message
+                confirmationTask = Task {
+                    try? await Task.sleep(for: .seconds(3))
+                    guard !Task.isCancelled else { return }
+                    confirmation = nil
                 }
             }
-            Button("Done", role: .cancel) { }
-        } message: {
-            Text("The section is saved now. Project assignment is optional and can be added next.")
-        }
-        .sheet(isPresented: $isFolderPickerOpen) {
-            if let sectionID {
-                FolderPickerSheet(
-                    folders: library.folders,
-                    memberFolderIDs: Set(library.folderMembership[sectionID] ?? []),
-                    selectedFolderIDs: $pendingFolderIDs,
-                    canUseProjects: library.hasProjectAccess,
-                    onSave: { folderIDs in
-                        if library.replaceFolderMembership(sectionID: sectionID, folderIDs: folderIDs) {
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        }
-                    },
-                    onCreateNew: { folderType in
-                        isFolderPickerOpen = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                            folderCreationRequest = ReaderBookmarkFolderCreation(folderType: folderType)
-                        }
-                    },
-                    onRequireProjectAccess: {
-                        library.requireProjectAccess()
-                    }
-                )
-            }
-        }
-        .sheet(item: $folderCreationRequest) { request in
-            FolderEditorSheet(
-                existing: nil,
-                defaultFolderType: request.folderType,
-                onSave: { name, address, description, structuredFacts, colorHex, folderType in
-                    if let folder = library.createFolder(
-                        name: name,
-                        address: address,
-                        description: description,
-                        structuredFacts: structuredFacts,
-                        colorHex: colorHex,
-                        folderType: folderType
-                    ) {
-                        pendingFolderIDs.insert(folder.id)
-                        if let sectionID, library.replaceFolderMembership(sectionID: sectionID, folderIDs: pendingFolderIDs) {
-                            showBookmarkConfirmation("Saved to \(folder.name)")
-                        } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                isFolderPickerOpen = true
-                            }
-                        }
-                    }
-                },
-                onDelete: { }
-            )
         }
         .overlay(alignment: .topTrailing) {
-            if let bookmarkConfirmation {
-                Text(bookmarkConfirmation)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.primary)
-                    .lineLimit(1)
-                    .fixedSize()
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.regularMaterial, in: Capsule())
-                    .offset(y: -34)
-                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                    .allowsHitTesting(false)
-                    .accessibilityHidden(true)
+            if let confirmation {
+                HStack(spacing: 8) {
+                    Text(confirmation).font(.caption.weight(.semibold))
+                    if confirmation == "Removed from Saved" {
+                        Button("Undo") { library.undoSavedPassageRemovals(); self.confirmation = nil }
+                            .font(.caption.weight(.semibold))
+                    }
+                }
+                .foregroundStyle(Color.primary)
+                .fixedSize()
+                .padding(10)
+                .background(.regularMaterial, in: Capsule())
+                .offset(y: -44)
             }
         }
-        .onDisappear {
-            bookmarkConfirmationTask?.cancel()
-            bookmarkConfirmationTask = nil
-            bookmarkConfirmation = nil
-        }
+        .onDisappear { confirmationTask?.cancel(); confirmationTask = nil; confirmation = nil }
     }
-
-    private func synchronizeState() {
-        displayedIsBookmarked = sectionID.map { library.isBookmarked(sectionID: $0) } ?? false
-    }
-
-    private func openFolderPicker() {
-        guard let sectionID else { return }
-        pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
-        isFolderPickerOpen = true
-    }
-
-    private func showBookmarkConfirmation(_ message: String) {
-        bookmarkConfirmationTask?.cancel()
-        withAnimation(.easeOut(duration: 0.15)) {
-            bookmarkConfirmation = message
-        }
-        bookmarkConfirmationTask = Task {
-            try? await Task.sleep(for: .milliseconds(1_200))
-            guard !Task.isCancelled else { return }
-            withAnimation(.easeIn(duration: 0.15)) {
-                bookmarkConfirmation = nil
-            }
-            bookmarkConfirmationTask = nil
-        }
-    }
-}
-
-private struct ReaderBookmarkFolderCreation: Identifiable {
-    let id = UUID()
-    let folderType: CodeFolderType
 }
 
 struct ChapterNoteSheet: View {

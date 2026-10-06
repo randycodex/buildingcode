@@ -11,6 +11,49 @@
     try setup.execute("INSERT INTO folders(id,client_id,code_version,name,color_hex,created_at) VALUES(\(id),'synthetic-\(id)','\(version)','Fixture \(id)','#000000','2026-01-01T00:00:00Z');")
    }
   }
+  // The Reader's explicit Unassigned destination must retain the canonical
+  // Saved record, its comments/tags and its original save time.
+  func scalar(_ sql: String) throws -> String {
+   let db = try SQLiteConnection(path:url.path,readOnly:true)
+   let query = try db.prepare(sql)
+   defer { db.finalize(query) }
+   check(try db.step(query) == SQLITE_ROW,"Expected fixture row: \(sql)")
+   return db.string(at:0,in:query)
+  }
+  let otherVersion = UserContentSyncCodeVersion.localNYC2014
+  try store!.saveSection(900,toFolderIDs:[1],codeVersion:version)
+  try store!.saveUnassignedSection(900,codeVersion:otherVersion)
+  let savedIdentity = try scalar("SELECT client_id || '|' || created_at FROM bookmarks WHERE section_id=900 AND code_version='\(version)';")
+  do {
+   let db = try SQLiteConnection(path:url.path,readOnly:false)
+   try db.execute("INSERT INTO notes(code_version,section_id,body,updated_at) VALUES('\(version)',900,'Keep my comment','2026-01-01T00:00:00Z');")
+   try db.execute("INSERT INTO bookmark_tags(code_version,section_id,tag,created_at) VALUES('\(version)',900,'review','2026-01-01T00:00:00Z');")
+  }
+  try store!.saveUnassignedSection(900,codeVersion:version)
+  check(try scalar("SELECT client_id || '|' || created_at FROM bookmarks WHERE section_id=900 AND code_version='\(version)';") == savedIdentity,"Moving to Unassigned preserves save identity and time")
+  check(try scalar("SELECT COUNT(*) FROM folder_sections WHERE section_id=900;") == "0","Unassigned removes only memberships")
+  check(try scalar("SELECT COUNT(*) FROM bookmarks WHERE section_id=900;") == "2","Identical section IDs in different editions remain separate")
+  check(try scalar("SELECT body FROM notes WHERE section_id=900;") == "Keep my comment","Moving retains comments")
+  check(try scalar("SELECT tag FROM bookmark_tags WHERE section_id=900;") == "review","Moving retains tags")
+  check(try store!.pendingSyncQueueItems(limit:100).contains { $0.entityType == .folderSection && $0.operationType == .delete && $0.payload.sectionID == 900 },"Moving queues membership deletion")
+  // A swipe delete addresses one edition even if its ID exists in another.
+  try store!.toggleBookmark(sectionID:900,codeVersion:version)
+  check(try !store!.isBookmarked(sectionID:900,codeVersion:version),"Swipe removal removes the selected edition")
+  check(try store!.isBookmarked(sectionID:900,codeVersion:otherVersion),"Swipe removal retains the other edition")
+  try store!.saveUnassignedSection(900,codeVersion:version)
+  try store!.saveUnassignedSection(901,codeVersion:version)
+  check(try store!.isBookmarked(sectionID:901,codeVersion:version),"New Unassigned choice creates a bookmark")
+  do {
+   try store!.saveSection(902,toFolderIDs:[],codeVersion:version)
+   check(false,"Existing folder-save API must still reject an accidental empty destination")
+  } catch { }
+  store = nil
+  store = try UserDataStore(databaseURL:url)
+  check(try store!.isBookmarked(sectionID:901,codeVersion:version),"Unassigned save survives SQLite reopen")
+  check(try scalar("SELECT body FROM notes WHERE section_id=900;") == "Keep my comment","Comment survives remove/resave and reopen")
+  for item in try store!.pendingSyncQueueItems(limit:100) { try store!.markSyncQueueItemSynced(id:item.id) }
+  print("PASS: explicit Unassigned save and project move retain edition identity, save time, comments and tags; exact-edition removal and queued unlink survive reopen")
+
   try store!.saveSection(705,toFolderIDs:[1],codeVersion:version)
   let old = try store!.pendingSyncQueueItems(limit:100)
   check(old.count == 2,"Initial save must queue bookmark and membership")
