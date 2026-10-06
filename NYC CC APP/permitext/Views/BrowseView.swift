@@ -1513,6 +1513,11 @@ enum CodeScreenMetrics {
     static let screenHeaderActionPointSize: CGFloat = 13
     static let toolbarButtonSize: CGFloat = 44
     static let toolbarIconPointSize: CGFloat = 17
+    static let readerPassageActionSpacing: CGFloat = 8
+    static let readerPassageActionGap: CGFloat = 12
+    static var readerPassageActionTrayWidth: CGFloat { toolbarButtonSize * 2 + readerPassageActionSpacing }
+    static var readerPassageRevealWidth: CGFloat { readerPassageActionTrayWidth + readerPassageActionGap }
+    static let readerPassageLeadingEdgeExclusion: CGFloat = 32
     /// Trailing padding below a recents/projects tile block (matches Search jump-back-in).
     static let tileGridSectionBottomPadding: CGFloat = 2
     static let tileGridRowSpacing: CGFloat = 8
