@@ -1031,12 +1031,12 @@ private struct ResearchSessionView: View {
                     }
                     .padding(.top, 76)
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 132 + floatingNavigationClearance)
+                    .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
                 }
 
                 researchScreenHeader
             }
-            .overlay(alignment: .bottom) {
+            .safeAreaInset(edge: .bottom, spacing: 0) {
                 researchComposer
                     .padding(.bottom, floatingNavigationClearance)
             }
@@ -1055,7 +1055,7 @@ private struct ResearchSessionView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            HStack(alignment: .bottom, spacing: 0) {
+            VStack(alignment: .trailing, spacing: CodeScreenMetrics.researchComposerRowSpacing) {
                 TextField("Ask", text: Binding(
                     get: { question },
                     set: { text in
@@ -1064,54 +1064,55 @@ private struct ResearchSessionView: View {
                     }
                 ), axis: .vertical)
                     .textFieldStyle(.plain)
+                    .font(.body)
                     .lineLimit(1...6)
-                    .padding(.leading, 14)
-                    .padding(.trailing, 6)
-                    .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-                    .frame(
-                        minHeight: CodeScreenMetrics.bottomControlHeight,
-                        alignment: .center
-                    )
+                    .padding(.horizontal, CodeScreenMetrics.cardPadding)
+                    .padding(.top, CodeScreenMetrics.rowVerticalPadding)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
-                if isSending {
-                    Button {
-                        cancelActiveResearchRequest()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.title3.weight(.semibold))
-                            .frame(
-                                width: CodeScreenMetrics.bottomControlHeight,
-                                height: CodeScreenMetrics.bottomControlHeight
-                            )
-                            .contentShape(Rectangle())
+                HStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    if isSending {
+                        Button {
+                            cancelActiveResearchRequest()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.title3.weight(.semibold))
+                                .frame(
+                                    width: CodeScreenMetrics.toolbarButtonSize,
+                                    height: CodeScreenMetrics.toolbarButtonSize
+                                )
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Cancel Research request")
+                        .accessibilityIdentifier("research-cancel-request")
+                    } else {
+                        Button {
+                            startQuestionRequest()
+                        } label: {
+                            Image(systemName: "arrow.up")
+                                .font(.title3.weight(.bold))
+                                .foregroundStyle(.primary)
+                                .frame(
+                                    width: CodeScreenMetrics.toolbarButtonSize,
+                                    height: CodeScreenMetrics.toolbarButtonSize
+                                )
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(
+                            question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
+                            researchSendIsBlocked
+                        )
+                        .accessibilityLabel("Send Research question")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Cancel Research request")
-                    .accessibilityIdentifier("research-cancel-request")
-                } else {
-                    Button {
-                        startQuestionRequest()
-                    } label: {
-                        Image(systemName: "arrow.up")
-                            .font(.title3.weight(.bold))
-                            .foregroundStyle(.primary)
-                            .frame(
-                                width: CodeScreenMetrics.bottomControlHeight,
-                                height: CodeScreenMetrics.bottomControlHeight
-                            )
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(
-                        question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
-                        researchSendIsBlocked
-                    )
-                    .accessibilityLabel("Send Research question")
                 }
+                .padding(.trailing, 8)
+                .padding(.bottom, 8)
             }
-            .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
-            .codeLiquidGlassCapsule()
+            .codeLiquidGlassRoundedRectangle(cornerRadius: CodeScreenMetrics.researchComposerCornerRadius)
         }
         .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
         .padding(.bottom, 8)
@@ -2560,7 +2561,7 @@ private struct ResearchAnswerView: View {
                 .accessibilityValue(showsSourcesAndDetails ? "Expanded" : "Collapsed")
                 .accessibilityIdentifier("research-answer-details-toggle")
                 Button(didCopy ? "Copied" : ResearchTrustCopy.copyAnswerAction, systemImage: didCopy ? "checkmark" : "doc.on.doc") {
-                    UIPasteboard.general.string = answer.structuredCopyText(sourceStatus: sourceStatus)
+                    UIPasteboard.general.string = primaryNarrative
                     didCopy = true
                 }
                 Button("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup") {
@@ -2684,14 +2685,7 @@ private struct ResearchAnswerView: View {
     }
 
     private var primaryNarrative: String {
-        if let answerText = answer.answerText?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !answerText.isEmpty {
-            return answerText
-        }
-        return [answer.conclusion, answer.explanation]
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-            .joined(separator: "\n\n")
+        answer.narrativeText
     }
 
     private var basisText: String? {

@@ -431,6 +431,18 @@ struct ResearchSupportingSource: Codable, Hashable, Sendable {
 }
 
 extension ResearchAnswer {
+    /// The answer shown in the conversation and copied by Copy Answer.
+    /// Separate source details, prompts and disclosure copy stay outside it.
+    var narrativeText: String {
+        if let text = answerText?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty {
+            return text
+        }
+        return [conclusion, explanation]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n\n")
+    }
+
     var researchAuthorityLabel: String? {
         if let supplied = authorityLabel?.trimmingCharacters(in: .whitespacesAndNewlines), !supplied.isEmpty {
             return supplied
@@ -464,8 +476,7 @@ extension ResearchAnswer {
         var sections: [String] = ["Permitext Research"]
         if let label = researchAuthorityLabel { sections.append(label) }
 
-        let narrative = (answerText?.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 }
-            ?? [conclusion, explanation].filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.joined(separator: "\n\n")
+        let narrative = narrativeText
         if !narrative.isEmpty { sections.append(narrative) }
 
         let metadata = researchMetadataText(sourceStatus: sourceStatus)

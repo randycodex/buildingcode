@@ -1421,6 +1421,17 @@ extension View {
         }
     }
 
+    /// Growing text controls keep fixed corners instead of becoming an oval.
+    @ViewBuilder
+    func codeLiquidGlassRoundedRectangle(cornerRadius: CGFloat) -> some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        if #available(iOS 26.0, *) {
+            glassEffect(.regular, in: shape)
+        } else {
+            background(.regularMaterial, in: shape)
+        }
+    }
+
     /// A circular floating action that lets iOS control the Liquid Glass
     /// translucency and interaction response.
     @ViewBuilder
@@ -1468,6 +1479,9 @@ enum CodeScreenMetrics {
     static let bottomControlHorizontalPadding: CGFloat = 20
     static let bottomControlHeight: CGFloat = 52
     static let searchFieldHorizontalPadding: CGFloat = 14
+    /// Matches the expanding Research composer on the web.
+    static let researchComposerCornerRadius: CGFloat = 24
+    static let researchComposerRowSpacing: CGFloat = 4
     /// Detached circular actions beside the floating bottom navigation.
     static let detachedNavigationButtonSize: CGFloat = 60
     static let readerHorizontalPadding: CGFloat = 20
