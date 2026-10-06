@@ -73,6 +73,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                        "Project Context should open on its own screen.")
         XCTAssertFalse(app.staticTexts["No Notes yet."].exists,
                        "Notebook previews should not remain inline in the Project.")
+        XCTAssertFalse(app.buttons["Select"].exists)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Project Hub")).firstMatch.exists)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Structured Facts (")).firstMatch.exists)
         for (identifier, title) in [
             ("project-section-context", "Project Context"),
             ("project-section-structured-facts", "Structured Facts"),
@@ -87,12 +90,35 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                           "\(title) should push a titled destination onto the navigation stack.")
             XCTAssertFalse(projectRoot.isHittable, "The Project page must be behind the destination.")
             if title == "Project Context" {
-                XCTAssertTrue(app.staticTexts["Phase 3 entitled Research acceptance"].exists)
+                let context = app.buttons["project-context-text"]
+                XCTAssertTrue(context.exists)
+                XCTAssertEqual(context.label, "Phase 3 entitled Research acceptance")
+                context.tap()
+                let editor = app.textViews["project-context-editor"]
+                XCTAssertTrue(editor.waitForExistence(timeout: 5))
+                editor.tap()
+                editor.typeText(" Updated on iPhone.")
+                app.buttons["project-context-save"].tap()
+                XCTAssertTrue(context.waitForExistence(timeout: 5))
+                XCTAssertTrue(context.label.contains("Updated on iPhone."))
+                context.tap()
+                XCTAssertTrue(editor.waitForExistence(timeout: 5))
+                editor.typeText(" Discard this draft.")
+                app.navigationBars[title].buttons["Cancel"].tap()
+                XCTAssertFalse(context.label.contains("Discard this draft."))
             }
             keepScreenshot(named: "Project section: \(title)", from: app)
             app.navigationBars[title].buttons.element(boundBy: 0).tap()
             XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
         }
+        let contextLink = element(in: app, identifier: "project-section-context")
+        reveal(contextLink, in: app)
+        contextLink.tap()
+        let reopenedContext = app.buttons["project-context-text"]
+        XCTAssertTrue(reopenedContext.waitForExistence(timeout: 5))
+        XCTAssertTrue(reopenedContext.label.contains("Updated on iPhone."),
+                      "Saved context must survive leaving and reopening the screen.")
+        app.navigationBars["Project Context"].buttons.element(boundBy: 0).tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()
         let allSaved = element(in: app, identifier: "all-saved-link")
         reveal(allSaved, in: app)

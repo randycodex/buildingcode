@@ -412,7 +412,154 @@ extension CodeFolder {
 }
 
 
-/// Keeps provenance inspectable without expanding every imported fact by default.
+/// Edits the Project's context without replacing its other saved fields.
+struct ProjectContextView: View {
+    let folderID: Int64
+    let accentColor: Color
+
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var editingFolder: CodeFolder?
+    @State private var editingSessionID: UUID?
+    @State private var draft = ""
+    @State private var saveError: String?
+    @FocusState private var isFocused: Bool
+
+    private var folder: CodeFolder? { library.folder(id: folderID) }
+    private var isEditing: Bool { editingFolder != nil }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if isEditing {
+                    TextEditor(text: $draft)
+                        .font(.subheadline)
+                        .scrollContentBackground(.hidden)
+                        .frame(minHeight: 240)
+                        .focused($isFocused)
+                        .onAppear { isFocused = true }
+                        .accessibilityLabel("Project context")
+                        .accessibilityIdentifier("project-context-editor")
+                } else {
+                    Button(action: beginEditing) {
+                        let text = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        Text(text.isEmpty ? "Tap to add Project context." : text)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Edit Project context")
+                    .accessibilityIdentifier("project-context-text")
+                }
+                if let saveError {
+                    Text(saveError)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.top, CodeScreenMetrics.topTitlePadding)
+            .padding(.bottom, CodeScreenMetrics.tabBarClearance)
+        }
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle("Project Context")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(isEditing)
+        .tint(Color.appChrome)
+        .toolbar {
+            if isEditing {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel", action: finishEditing)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save", action: save)
+                        .fontWeight(.semibold)
+                        .accessibilityIdentifier("project-context-save")
+                }
+            }
+        }
+        .onChange(of: library.privateSessionID) { _, _ in
+            finishEditing()
+            dismiss()
+        }
+        .onChange(of: folder?.clientID) { _, _ in
+            finishEditing()
+            dismiss()
+        }
+    }
+
+    private func beginEditing() {
+        guard let folder, library.requireProjectAccess() else { return }
+        draft = folder.description
+        editingFolder = folder
+        editingSessionID = library.privateSessionID
+        saveError = nil
+    }
+
+    private func save() {
+        guard let editingFolder, let editingSessionID else { return }
+        if library.updateProjectContext(
+            folderID: folderID, description: draft,
+            expectedClientID: editingFolder.clientID,
+            expectedDescription: editingFolder.description,
+            sessionID: editingSessionID
+        ) {
+            finishEditing()
+        } else {
+            saveError = library.statusMessage ?? "Project context could not be saved. Try again."
+        }
+    }
+
+    private func finishEditing() {
+        isFocused = false
+        editingFolder = nil
+        editingSessionID = nil
+        draft = ""
+        saveError = nil
+    }
+}
+
+/// Shows shared provenance once, beneath the fact list.
+struct ProjectStructuredFactsSources: View {
+    let facts: [ProjectStructuredFact]
+
+    var body: some View {
+        let notes = ProjectFactSourceNote.grouped(from: facts)
+        if !notes.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Source information")
+                    .font(.caption.weight(.semibold))
+                ForEach(notes) { note in
+                    VStack(alignment: .leading, spacing: 4) {
+                        if notes.count > 1 {
+                            Text(note.factLabels.joined(separator: ", "))
+                                .fontWeight(.semibold)
+                        }
+                        Text(note.message)
+                            .textSelection(.enabled)
+                        let dates = note.updatedDates.reduce(into: [String]()) { result, date in
+                            let text = date.formatted(date: .abbreviated, time: .omitted)
+                            if !result.contains(text) { result.append(text) }
+                        }
+                        if !dates.isEmpty {
+                            Text("Updated \(dates.joined(separator: "; "))")
+                        }
+                    }
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.top, 16)
+            .accessibilityIdentifier("project-facts-sources")
+        }
+    }
+}
+
 struct ProjectStructuredFactRow: View {
     let fact: ProjectStructuredFact
 
@@ -437,26 +584,6 @@ struct ProjectStructuredFactRow: View {
             Text(statusLabel)
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            if !fact.sourceText.isEmpty || !fact.source.isEmpty || fact.updatedAt != nil {
-                DisclosureGroup("Source details") {
-                    VStack(alignment: .leading, spacing: 6) {
-                        if !fact.sourceText.isEmpty {
-                            Text(fact.sourceText)
-                                .textSelection(.enabled)
-                        } else if !fact.source.isEmpty {
-                            Text(fact.source == "nyc-planning" ? "NYC Department of City Planning" : fact.source)
-                        }
-                        if let updatedAt = fact.updatedAt {
-                            Text("Updated \(updatedAt.formatted(date: .abbreviated, time: .omitted))")
-                        }
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 4)
-                }
-                .font(.caption)
-            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 8)

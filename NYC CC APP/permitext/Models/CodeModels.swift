@@ -683,6 +683,40 @@ struct ProjectStructuredFact: Codable, Hashable, Identifiable, Sendable {
     let updatedAt: Date?
 }
 
+struct ProjectFactSourceNote: Identifiable, Equatable {
+    var id: String { message }
+    let message: String
+    var factLabels: [String]
+    var updatedDates: [Date]
+
+    static func grouped(from facts: [ProjectStructuredFact]) -> [Self] {
+        var notes: [Self] = []
+        for fact in facts {
+            let sourceText = fact.sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let source = fact.source.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !sourceText.isEmpty || !source.isEmpty || fact.updatedAt != nil else { continue }
+            let message = !sourceText.isEmpty ? sourceText :
+                (source == "nyc-planning" ? "NYC Department of City Planning" :
+                    (source.isEmpty ? "Source not recorded." : source))
+            let index: Int
+            if let existing = notes.firstIndex(where: { $0.message == message }) {
+                index = existing
+            } else {
+                notes.append(Self(message: message, factLabels: [], updatedDates: []))
+                index = notes.count - 1
+            }
+            if !notes[index].factLabels.contains(fact.label) {
+                notes[index].factLabels.append(fact.label)
+            }
+            if let date = fact.updatedAt, !notes[index].updatedDates.contains(date) {
+                notes[index].updatedDates.append(date)
+                notes[index].updatedDates.sort()
+            }
+        }
+        return notes
+    }
+}
+
 struct ServerProjectRecord: Codable, Hashable, Sendable {
     let id: String
     let userID: String

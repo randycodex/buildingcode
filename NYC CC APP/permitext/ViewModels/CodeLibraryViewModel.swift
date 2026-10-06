@@ -3167,6 +3167,7 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    @discardableResult
     func updateFolder(
         _ folder: CodeFolder,
         name: String,
@@ -3174,8 +3175,8 @@ final class CodeLibraryViewModel: ObservableObject {
         description: String,
         structuredFacts: [ProjectStructuredFact]? = nil,
         colorHex: String
-    ) {
-        guard requireProjectAccess(), let userContentRepository else { return }
+    ) -> Bool {
+        guard requireProjectAccess(), let userContentRepository else { return false }
         do {
             try userContentRepository.updateFolder(
                 id: folder.id,
@@ -3190,9 +3191,34 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshFolders()
             scheduleUserContentAutoSync()
             NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+            return true
         } catch {
             statusMessage = error.localizedDescription
+            return false
         }
+    }
+
+    @discardableResult
+    func updateProjectContext(
+        folderID: Int64,
+        description: String,
+        expectedClientID: String,
+        expectedDescription: String,
+        sessionID: UUID
+    ) -> Bool {
+        guard privateSessionID == sessionID,
+              let folder = folder(id: folderID),
+              folder.clientID == expectedClientID,
+              folder.folderType == .project else {
+            statusMessage = "This Project is no longer available in this account."
+            return false
+        }
+        guard folder.description == expectedDescription else {
+            statusMessage = "Project context changed while you were editing. Cancel to view the latest text before trying again."
+            return false
+        }
+        return updateFolder(folder, name: folder.name, address: folder.address,
+                            description: description, colorHex: folder.colorHex)
     }
 
     func projectPropertyContext(address: String) async throws -> BackendProjectPropertyContext {

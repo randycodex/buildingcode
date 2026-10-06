@@ -1347,8 +1347,6 @@ struct ProjectView: View {
     @ViewBuilder
     private var projectHub: some View {
         VStack(alignment: .leading, spacing: 12) {
-            CodeEyebrow(text: "Project Hub", accent: accentColor)
-
             projectHubStatus
 
             if !projectCodeQuestions.isEmpty {
@@ -1721,18 +1719,7 @@ struct ProjectView: View {
 
             if isProjectFolder {
                 NavigationLink {
-                    projectSectionScreen(title: "Project Context") {
-                        if let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),
-                           !description.isEmpty {
-                            Text(description)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .textSelection(.enabled)
-                        } else {
-                            projectHubEmpty("No Project context yet.")
-                        }
-                    }
+                    ProjectContextView(folderID: folderID, accentColor: accentColor)
                 } label: {
                     projectSectionLabel("Project Context")
                 }
@@ -1752,11 +1739,12 @@ struct ProjectView: View {
                                         Divider()
                                     }
                                 }
+                                ProjectStructuredFactsSources(facts: facts)
                             }
                         }
                     }
                 } label: {
-                    projectSectionLabel("Structured Facts (\(folder?.structuredFacts.count ?? 0))")
+                    projectSectionLabel("Structured Facts")
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("project-section-structured-facts")
@@ -1783,6 +1771,7 @@ struct ProjectView: View {
                                     Divider()
                                 }
                             }
+                            ProjectStructuredFactsSources(facts: facts)
                         }
                         .padding(.top, 6)
                     } label: {
@@ -1793,7 +1782,9 @@ struct ProjectView: View {
                 }
             }
 
-            projectActionRow
+            if !isProjectFolder {
+                projectActionRow
+            }
         }
     }
 
