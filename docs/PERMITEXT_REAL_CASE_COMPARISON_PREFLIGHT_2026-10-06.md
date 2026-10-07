@@ -1,5 +1,7 @@
 # Real-case instruction comparison: preparation
 
+**Historical preparation record.** The `v2` writer preparation below was superseded by `20261006-v3`: it incorrectly forced practical-next-step guidance mode for substantive first-turn questions. This was caught during generation before any grading. The corrected preparation uses normal first-turn intent routing and has a regression guard against guidance-only/recall schemas. Discarded calls and their charges are retained under the same user-authorized $10 cumulative cap. See the comparison results report for the completed run; this document records the earlier free preflight.
+
 The supplied collection contains 80 unique public-question URLs and 80 unique case IDs, with ten cases in each of eight code families. The dataset and 240 candidate writer requests are prepared. No model answers or correctness scores have been generated, and no Permitext behavior has been changed.
 
 ## Frozen materials

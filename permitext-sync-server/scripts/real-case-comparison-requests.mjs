@@ -1,4 +1,5 @@
 import { sha256 } from "./real-case-comparison-dataset.mjs";
+import { researchPracticalNextStepInstruction } from "../research-practical-next-step.mjs";
 
 export const comparisonInstructions = Object.freeze({
   minimal: "Answer the user's question. Return the required JSON format and use the supplied identifiers for any citations to supplied sources.",
@@ -11,6 +12,10 @@ export const comparisonInstructions = Object.freeze({
 });
 
 export function writerComparisonRequests({ currentRequest, question, sourceBlock, sharedContext = null }) {
+  if (currentRequest.instructions.includes(researchPracticalNextStepInstruction) ||
+      ["supportedPoints", "citations", "followUpQuestions"].some(field => currentRequest.text?.format?.schema?.properties?.[field]?.maxItems === 0)) {
+    throw Error("Substantive code comparison cannot force guidance-only or recall mode.");
+  }
   if (typeof currentRequest.input !== "string" || !currentRequest.input.startsWith(`QUESTION\n${question}\n\n`)) throw Error("Unexpected current writer input layout.");
   const first = currentRequest.input.indexOf(sourceBlock);
   if (first < 0 || currentRequest.input.indexOf(sourceBlock, first + 1) >= 0) throw Error("Enacted evidence block must appear exactly once.");

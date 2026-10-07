@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { prepareRealCaseDataset } from "../scripts/real-case-comparison-dataset.mjs";
 import { writerComparisonRequests, assertWriterControls } from "../scripts/real-case-comparison-requests.mjs";
+import { researchPracticalNextStepInstruction } from "../research-practical-next-step.mjs";
 
 const entry = {
   id: "TEST-01", category: "Mechanical Code", target_jurisdiction: "New York City",
@@ -45,4 +46,6 @@ assert.equal(variants.minimal.input, variants.current.input);
 const changed = structuredClone(variants); changed.minimal.reasoning.effort = "medium";
 assert.throws(() => assertWriterControls(changed));
 assert.throws(() => writerComparisonRequests({ currentRequest: request, question: "Different?", sourceBlock }));
+assert.throws(() => writerComparisonRequests({ currentRequest: { ...request, instructions: researchPracticalNextStepInstruction }, question: "Example?", sourceBlock }), /guidance-only/);
+assert.throws(() => writerComparisonRequests({ currentRequest: { ...request, text: { format: { schema: { properties: { citations: { maxItems: 0 } } } } } }, question: "Example?", sourceBlock }), /guidance-only/);
 console.log("Three-arm writer controls passed; provider calls: 0.");

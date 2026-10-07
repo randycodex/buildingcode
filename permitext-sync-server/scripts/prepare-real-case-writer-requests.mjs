@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir, access } from "node:fs/promises";
 import { resolve, join } from "node:path";
 import { writerComparisonRequests, assertWriterControls } from "./real-case-comparison-requests.mjs";
 import { sha256 } from "./real-case-comparison-dataset.mjs";
+import { isResearchPracticalNextStep } from "../research-practical-next-step.mjs";
 
 const index = process.argv.indexOf("--directory");
 if (index < 0 || !process.argv[index + 1]) throw Error("Required: --directory PATH");
@@ -36,9 +37,12 @@ for (const packet of packets.cases) {
   captured = null;
   const question = packet.input.prompt;
   const codeBasis = resolveResearchCodeBasis({ corpusPlan: packet.corpusPlan });
+  const messages = [];
+  const practicalNextStep = !packet.zoningPlan && isResearchPracticalNextStep(question, messages);
+  if (practicalNextStep) throw Error("This frozen cohort compares substantive first-turn code questions.");
   try {
     await openAIResearchInterpretation(question, packet.sources, "isolated-real-case-comparison", {
-      responseStyle: "conversational", practicalNextStep: true, messages: [],
+      responseStyle: "conversational", practicalNextStep, messages,
       zoningPlan: packet.zoningPlan,
       codeBasis
     });
