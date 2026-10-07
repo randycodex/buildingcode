@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { investigateResearchEvidence, mergeInvestigationEvidence, openInvestigationEnabled } from '../research-open-investigation.mjs';
+import { investigateResearchEvidence, mergeInvestigationEvidence, openInvestigationEnabled, validateOpenInvestigationValue, openReviewRevisionFeedback } from '../research-open-investigation.mjs';
 const a={sourceID:'a',text:'A scope paragraph'}, b={sourceID:'b',text:'A governing requirement'};
 const searches=[]; const observations=[];
 const result=await investigateResearchEvidence({question:'Original question',facts:['Known user fact'],messages:[],evidencePackage:{sources:[a]},
@@ -23,4 +23,10 @@ assert(!openInvestigationEnabled({environment:env,suppliedText:'quote'}));
 assert(!openInvestigationEnabled({environment:{}}));
 const controller=new AbortController();controller.abort();
 await assert.rejects(investigateResearchEvidence({signal:controller.signal,evidencePackage:{sources:[]}}),{name:'AbortError'});
+const review={pass:false,issues:[{type:'incorrect_citation',message:'Keep this complete finding.'}]};
+assert.equal(validateOpenInvestigationValue(review,'permitext_research_open_review'),review);
+assert.deepEqual(openReviewRevisionFeedback(review.issues),[{type:'incorrect_citation',detail:'Keep this complete finding.'}]);
+for(const value of [{pass:false,issues:[]},{pass:true,issues:review.issues},{pass:false,issues:[{type:'invented',message:'Bad'}]}])
+  assert.throws(()=>validateOpenInvestigationValue(value,'permitext_research_open_review'),{code:'INVALID_RESEARCH_VERIFICATION'});
+assert.throws(()=>validateOpenInvestigationValue({ready:true,queries:[],reason:'Missing retained IDs'},'permitext_research_investigation'),{code:'INVALID_RESEARCH_RESPONSE'});
 console.log('Open investigation discovery, scope, cancellation, and budget contracts passed.');

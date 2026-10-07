@@ -2,7 +2,7 @@ import { researchQuestionIsConversationRecall, researchConversationRecallInstruc
 import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchPracticalNextStepPrompt } from "./research-practical-next-step.mjs";
 
-export const researchWriterPolicyVersion = "20261006-direct-writer-v1";
+export const researchWriterPolicyVersion = "20261007-direct-writer-recovery-v4";
 
 // The writer has one general policy. Retrieval, citation validation, factual
 // qualification, semantic review and freshly verified repairs remain in code.
@@ -28,6 +28,8 @@ export function researchWriterInstructions({ question, options = {} } = {}) {
     options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
     options.allowOfficialGuidanceOnly
       ? "For an expressly requested official-guidance-only answer, select the supplied exact web claims without manufacturing enacted points or citations." : "",
+    options.allowEvidenceGapOnly
+      ? "If investigation did not supply the law needed to answer, give a truthful evidence-gap answer with the specific missing legal text in evidenceLimitations and additionalEvidenceNeeded. You may leave supportedPoints, citations and supportingSourceUses empty for that answer. A citation-free gap answer must identify missing evidence and dependencies, without positive technical instructions, permissions or requirements from model memory; calling them technical rather than code rules does not supply evidence. Do not manufacture an unrelated citation, state an unsourced technical rule, or infer prohibition from missing law. If the only relevant supplied rule covers a special occupancy or installation whose applicability is unestablished, it cannot resolve the user's general case: put that condition in the opening conclusion and every affected supportedPoint, and identify the missing general rule. A later caveat cannot cure an unconditional yes/no or an overextended point. Preserve the distinct conditions of alternative installations; do not transfer sizing or other conditions from one alternative to another. Recompute arithmetic and match numerical table ranges before applying exceptions. When the requested design or calculation method is absent from the sources, identify the missing rule and input needed instead of choosing a method from model memory, even if a separate supplied point establishes a referral to another code. Elementary deductions from supplied facts and suggestions to obtain missing evidence remain appropriate. A supplied directly supported main answer must still be given and cited." : "",
     options.structuredResponseRetry
       ? "The previous structured response failed. Return complete valid JSON with exact supplied identifiers and all material qualifications." : ""
   ].filter(Boolean).join(" ");
@@ -53,6 +55,7 @@ export function researchWriterContext({ question, sources, options = {}, earlier
     propertyResearch: options.propertyResearch,
     webSupport: options.webSupport,
     revisionFeedback: options.revisionFeedback,
+    structuredResponseFailure: options.structuredResponseFailure,
     previousInterpretation: options.previousInterpretation
   };
   return [

@@ -18,6 +18,7 @@ import {
   researchSourcePolicyConfiguration
 } from "./research-source-policy.mjs";
 import { hasVerifiedResearchOfficialGuidanceSummary } from "./research-official-guidance-summary.mjs";
+import { hasReviewedEvidenceGapEngine } from "./research-open-investigation.mjs";
 
 export const projectFoundationSchemaVersion = 1;
 export const syncSchemaVersion = 2;
@@ -625,6 +626,24 @@ export function immutableResearchAnswer({
 }) {
   const researchEvidence = Array.isArray(evidence) ? evidence : [];
   const researchCitations = Array.isArray(citations) ? citations : [];
+  const investigatedEvidenceGapAnswer = answer?.mode === "openai" &&
+    hasReviewedEvidenceGapEngine(answer?.researchEngine) &&
+    answer?.investigation?.version === answer?.researchEngine &&
+    Array.isArray(answer?.investigation?.trace) && answer.investigation.trace.length > 0 &&
+    answer?.authorityStatus === "insufficient_evidence" &&
+    answer?.verification?.scope === "investigated_evidence_gap" &&
+    answer?.verification?.status === "passed" && answer?.verification?.pass === true &&
+    answer?.verification?.history?.at(-1)?.pass === true &&
+    answer?.verification?.history?.at(-1)?.model === "gpt-6-luna" &&
+    Array.isArray(answer?.verification?.history?.at(-1)?.issues) &&
+    answer.verification.history.at(-1).issues.length === 0 &&
+    /^gpt-6-luna(?:-|$)/.test(model || "") &&
+    answer?.model === model &&
+    researchCitations.length === 0 &&
+    ["supportedPoints", "citations", "supportingSources", "supportingSourceUses"].every(key =>
+      Array.isArray(answer?.[key]) && answer[key].length === 0) &&
+    ["evidenceLimitations", "additionalEvidenceNeeded"].every(key =>
+      Array.isArray(answer?.[key]) && answer[key].some(value => typeof value === "string" && value.trim()));
   const canonicalSuppliedText = researchSuppliedText(question, [{role:"assistant",answer:{suppliedText:answer?.suppliedText}}]);
   const suppliedTextAnswer = answer?.mode === "openai" && Boolean(canonicalSuppliedText) &&
     JSON.stringify(answer?.suppliedText) === JSON.stringify(canonicalSuppliedText) &&
@@ -767,7 +786,8 @@ export function immutableResearchAnswer({
     !officialSupportingGuidanceAnswer &&
     !practicalGuidanceAnswer &&
     !conversationRecallAnswer &&
-    !suppliedTextAnswer
+    !suppliedTextAnswer &&
+    !investigatedEvidenceGapAnswer
   ) {
     throw new Error("Research answers require citations.");
   }

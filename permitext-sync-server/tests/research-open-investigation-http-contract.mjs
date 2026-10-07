@@ -33,7 +33,7 @@ globalThis.fetch=async(url,options)=>{
   let value;
   if(phase==='permitext_research_investigation') {
    assert.equal(body.service_tier,'default');
-   value={ready:calls.length>1,queries:calls.length===1?['MC 304.12 identification of equipment']:[],reason:'Find the actual requirement'};
+   value={ready:calls.length>1,queries:calls.length===1?['MC 304.12 identification of equipment']:[],retainSourceIDs:[],reason:'Find the actual requirement'};
   } else if(phase==='permitext_code_interpretation') {
    const isRepair=Boolean(draft);assert.equal(body.service_tier,isRepair?'default':'priority');
    const match=[...body.input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)\nCODE: MC\nSECTION: ([^\n]+)/g)].find(m=>m[3]==='304.12');assert(match);
@@ -67,7 +67,7 @@ try {
   assert.deepEqual(calls,['permitext_research_investigation','permitext_research_investigation','permitext_code_interpretation','permitext_research_open_review','permitext_code_interpretation','permitext_research_open_review']);
   const answer=response.body.conversation.messages.at(-1).answer;
   assert.equal(answer.mode,scenario==='accepted'?'openai':'clarification');
-  if(scenario==='accepted'){assert.equal(answer.researchEngine,'20261006-open-investigation-v1');assert.equal(answer.investigation.trace[0].queries.length,1);assert(answer.citations.length);}
+  if(scenario==='accepted'){assert.equal(answer.researchEngine,'20261007-open-investigation-recovery-v4');assert.equal(answer.investigation.trace[0].queries.length,1);assert(answer.citations.length);}
   else assert.deepEqual(answer.citations,[]);
   const reopened=await request('/research/conversations/get',{auth,conversationID},token);
   assert.equal(reopened.body.conversation.messages.at(-1).answer.answerText,answer.answerText);

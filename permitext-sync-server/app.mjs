@@ -274,7 +274,7 @@ import {
   researchEconomicsReport
 } from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
-import { openInvestigationEnabled, investigateResearchEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion } from "./research-open-investigation.mjs";
+import { openInvestigationEnabled, investigateResearchEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion, validateOpenInvestigationValue, openReviewRevisionFeedback } from "./research-open-investigation.mjs";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 import { researchDecisionFactRepair } from "./research-decision-fact-repair.mjs";
 import {
@@ -739,6 +739,13 @@ const researchInterpretationSchema = {
 
 export function researchInterpretationSchemaForEvidence(evidence, supportingSources = [], options = {}) {
   const schema = structuredClone(researchInterpretationSchema);
+  if (options.allowEvidenceGapOnly === true) {
+    // Open investigation may exhaust the available law. A truthful gap must
+    // not manufacture an unrelated positive rule to satisfy a JSON minimum.
+    // The full substantive reviewer still decides whether a gap is warranted.
+    schema.properties.supportedPoints.minItems = 0;
+    schema.properties.citations.minItems = 0;
+  }
   if (options.practicalNextStep === true || options.conversationRecall === true || options.suppliedText) {
     for (const field of ["supportedPoints", "citations", "supportingSourceUses", "followUpQuestions"]) {
       schema.properties[field].minItems = 0;
@@ -10105,6 +10112,11 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     Array.isArray(supportingSources) && supportingSources.length > 0 &&
     options.allowOfficialGuidanceOnly === true &&
     !researchEvidenceRequiresEnactedBindings(evidence);
+  const hasEvidenceGapOnlyBindings = options.allowEvidenceGapOnly === true &&
+    ["supportedPoints", "citations", "supportingSourceUses"].every(key =>
+      Array.isArray(value?.[key]) && value[key].length === 0) &&
+    ["evidenceLimitations", "additionalEvidenceNeeded"].every(key =>
+      Array.isArray(value?.[key]) && value[key].some(item => typeof item === "string" && item.trim()));
   if (!value || typeof value !== "object" ||
       (!hasAdaptiveAnswer && !hasLegacyAnswer) ||
       ((options.practicalNextStep === true || options.conversationRecall === true || options.suppliedText) && !hasPracticalGuidance) ||
@@ -10117,7 +10129,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       !Array.isArray(value.additionalEvidenceNeeded) || !value.additionalEvidenceNeeded.every((item) => typeof item === "string") ||
       !Array.isArray(value.supportingSourceUses) ||
       !Array.isArray(value.citations) ||
-      (!hasEnactedBindings && !hasSupportingOnlyBindings && !hasPracticalGuidance)) {
+      (!hasEnactedBindings && !hasSupportingOnlyBindings && !hasPracticalGuidance && !hasEvidenceGapOnlyBindings)) {
     const error = new Error("The model returned an invalid interpretation.");
     error.code = "INVALID_RESEARCH_RESPONSE";
     throw error;
@@ -10151,6 +10163,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
         declaredSectionID: sectionID || null,
         declaredSectionKnown: allowedSections.has(sectionID),
         sourceIDCount: sourceIDs.length,
+        unknownSourceIDs: sourceIDs.filter(sourceID => !allowedSources.has(sourceID)).slice(0, 16),
         duplicateSourceIDs: new Set(sourceIDs).size !== sourceIDs.length,
         sourceSectionIDs: Array.from(new Set(
           sourceIDs.map((sourceID) => allowedSources.get(sourceID)?.sectionID || "unknown")
@@ -10195,6 +10208,17 @@ export function validateResearchInterpretation(value, evidence, supportingSource
         !relevance) {
       const error = new Error("The model cited evidence outside the selected code sections.");
       error.code = "INVALID_RESEARCH_CITATION";
+      error.bindingIssue = {
+        collection: "citations",
+        index: value.citations.indexOf(citation),
+        declaredSectionID: sectionID || null,
+        declaredSectionKnown: allowedSections.has(sectionID),
+        sourceIDCount: sourceIDs.length,
+        unknownSourceIDs: sourceIDs.filter(sourceID => !allowedSources.has(sourceID)).slice(0, 16),
+        sourceSectionIDs: Array.from(new Set(
+          sourceIDs.map(sourceID => allowedSources.get(sourceID)?.sectionID || "unknown")
+        ))
+      };
       throw error;
     }
     const citationKey = `${sectionID}:${sourceIDs.slice().sort().join(",")}`;
@@ -10244,7 +10268,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       relevance
     });
   }
-  if (!citations.length && !hasSupportingOnlyBindings && !hasPracticalGuidance) {
+  if (!citations.length && !hasSupportingOnlyBindings && !hasPracticalGuidance && !hasEvidenceGapOnlyBindings) {
     const error = new Error("The model returned no valid citations.");
     error.code = "INVALID_RESEARCH_CITATION";
     throw error;
@@ -10594,21 +10618,59 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
 
 async function openAIResearchInvestigationDecision(name, instructions, schema, input, userID, signal) {
   const model = "gpt-6-luna";
-  const { payload } = await requestResearchProvider({
-    apiKey: process.env.OPENAI_API_KEY,
-    requestBody: { model, store: false, service_tier: "default", reasoning: { effort: "medium" },
-      max_output_tokens: 6000, safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
-      instructions, input: JSON.stringify(input), text: { format: {type:"json_schema", name, strict:true, schema} } },
-    signal, timeoutMilliseconds: 180_000, maximumAttempts: 1,
-    failureMessage: "The Research investigation request failed.",
-    reserveEvaluationSpend: reserveResearchEvaluationSpend,
-    reserveProviderSpend: reserveResearchProviderSpend,
-    settleProviderSpend: settleResearchProviderSpend
-  });
-  let value;
-  try { value = JSON.parse(outputTextFromResponse(payload)); }
-  catch { throw Object.assign(new Error("Research investigation returned invalid output."), {code:"INVALID_RESEARCH_RESPONSE"}); }
-  return { value, model, usage: researchUsageFromProviderPayload(payload, model) };
+  let usage = combinedResearchUsage();
+  let retryAfterTruncation = false;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let payload;
+    try {
+      ({ payload } = await requestResearchProvider({
+        apiKey: process.env.OPENAI_API_KEY,
+        requestBody: {
+          model, store: false, service_tier: "default", reasoning: { effort: "medium" },
+          max_output_tokens: retryAfterTruncation ? 12000 : 6000,
+          safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+          instructions: instructions + (attempt
+            ? " The previous result was incomplete or had an invalid envelope. Return complete schema-valid JSON; for review, pass must be true exactly when issues is empty." : ""),
+          input: JSON.stringify(input), text: { format: {type:"json_schema", name, strict:true, schema} }
+        },
+        signal, timeoutMilliseconds: 180_000, maximumAttempts: 1,
+        failureMessage: "The Research investigation request failed.",
+        reserveEvaluationSpend: reserveResearchEvaluationSpend,
+        reserveProviderSpend: reserveResearchProviderSpend,
+        settleProviderSpend: settleResearchProviderSpend
+      }));
+    } catch (error) {
+      if (attempt) error.providerUsage = combinedResearchUsage(usage,
+        researchUsageFromProviderPayload({
+          usage: error.providerUsage,
+          permitext_provider_accounting: {
+            attempts: error.providerAttempts || 0,
+            unreconciled_cost_usd: error.providerUsage?.permitext_unreconciled_cost_usd || 0
+          }
+        }, model));
+      throw error;
+    }
+    usage = combinedResearchUsage(usage, researchUsageFromProviderPayload(payload, model));
+    try {
+      if (payload?.status === "incomplete") throw Object.assign(new Error("Incomplete investigation output."), {
+        code: "INVALID_RESEARCH_RESPONSE", failureStage: "provider_incomplete"
+      });
+      const value = validateOpenInvestigationValue(JSON.parse(outputTextFromResponse(payload)), name);
+      return { value, model, usage, structuredResponseRetryCount:attempt };
+    } catch (error) {
+      // Refusals, cancellation, transport failures and spending limits do not
+      // authorize another format attempt. Every dispatched result stays billed.
+      error.providerUsage = usage;
+      if (error.code === "RESEARCH_REFUSAL") throw error;
+      error.code ||= "INVALID_RESEARCH_RESPONSE";
+      error.failureStage ||= "structured_output_parse";
+      error.providerStatus = payload?.status || null;
+      error.incompleteReason = payload?.incomplete_details?.reason || null;
+      error.structuredResponseRetryCount = attempt;
+      if (attempt === 1) throw error;
+      retryAfterTruncation = payload?.status === "incomplete" && error.incompleteReason === "max_output_tokens";
+    }
+  }
 }
 
 export async function openAIResearchInterpretation(question, evidence, userID, options = {}) {
@@ -10662,7 +10724,8 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
           strict: true,
           schema: researchInterpretationSchemaForEvidence(passageEvidence, supportingSources, {
             suppliedText: options.suppliedText, conversationRecall: options.conversationRecall === true, practicalNextStep: options.practicalNextStep === true,
-            allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true
+            allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true,
+            allowEvidenceGapOnly: options.allowEvidenceGapOnly === true
           })
         }
       }
@@ -10711,7 +10774,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
         normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
         passageEvidence,
         supportingSources,
-        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText }
+        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, allowEvidenceGapOnly: options.allowEvidenceGapOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText }
       ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
@@ -10774,6 +10837,10 @@ async function openAIResearchInterpretationWithStructuredRetry(
       const retried = await openAIResearchInterpretation(question, evidence, userID, {
         ...options,
         structuredResponseRetry: true,
+        structuredResponseFailure: {
+          code: error.code, failureStage: firstFailureStage,
+          bindingIssue: error.bindingIssue || null
+        },
         retryAfterOutputTruncation: firstFailureStage === "provider_incomplete" &&
           firstProviderIncompleteReason === "max_output_tokens"
       });
@@ -20534,6 +20601,7 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_conclusion", "active");
     let answerEscalated = false;
     const interpretationOptions = {
+      allowEvidenceGapOnly: openInvestigation,
       sourceAvailability: evidencePackage.sourceAvailability,
       priorSuppliedText,
       suppliedText,
@@ -20867,6 +20935,8 @@ async function handleResearchConversationMessage(request, response) {
       for (let attempt=0; attempt<2; attempt++) {
         const review = await openAIResearchInvestigationDecision("permitext_research_open_review", reviewInstructions,
           reviewSchema, { question, evidence:assembledEvidence, answer:result.interpretation,
+            evidenceGapOnly: ["supportedPoints", "citations", "supportingSourceUses"].every(key =>
+              Array.isArray(result.interpretation[key]) && result.interpretation[key].length === 0),
             facts:validUserFacts, propertyResearch, codeBasis:answerCodeBasis,
             supportingSources:webSupport.sources }, context.userID, progressResponse.signal);
         verifierUsage = combinedResearchUsage(verifierUsage, review.usage);
@@ -20874,12 +20944,13 @@ async function handleResearchConversationMessage(request, response) {
             review.value.pass !== (review.value.issues.length === 0)) {
           throw Object.assign(new Error("Invalid investigation review."), {code:"INVALID_RESEARCH_VERIFICATION"});
         }
-        verificationAttempts.push({...review.value, model:review.model});
+        verificationAttempts.push({...review.value, model:review.model,
+          ...(review.structuredResponseRetryCount ? {structuredResponseRetryCount:review.structuredResponseRetryCount} : {})});
         if (review.value.pass) break;
         if (attempt === 1) throw Object.assign(new Error("The investigated answer still has a substantive accuracy issue."),
           {code:"RESEARCH_VERIFICATION_FAILED",verificationAttempts});
-        const repaired = await openAIResearchInterpretation(question, assembledEvidence, context.userID,
-          {...interpretationOptions, model:"gpt-6-luna", revisionFeedback:review.value.issues,
+        const repaired = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID,
+          {...interpretationOptions, model:"gpt-6-luna", revisionFeedback:openReviewRevisionFeedback(review.value.issues),
             previousInterpretation:result.interpretation, disableTargetedRevision:true});
         result = repaired; answerRegenerated = true;
         answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, repaired.usage);
@@ -21441,6 +21512,9 @@ async function handleResearchConversationMessage(request, response) {
     });
     const authorityStatus = authority.status;
     const authorityLabel = authority.label;
+    const investigatedEvidenceGapOnly = openInvestigation &&
+      ["supportedPoints", "citations", "supportingSourceUses"].every(key =>
+        Array.isArray(result.interpretation[key]) && result.interpretation[key].length === 0);
     const disclaimer = "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.";
     const materialAssembledEvidence = assembledEvidence.filter((section) =>
       !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole)
@@ -21579,6 +21653,7 @@ async function handleResearchConversationMessage(request, response) {
         verification: {
           status: evidenceBoundaryFallback ? "evidence_boundary" : "passed",
           pass: !evidenceBoundaryFallback,
+          ...(investigatedEvidenceGapOnly ? { scope: "investigated_evidence_gap" } : {}),
           ...(conversationRecall ? { scope: "conversation_recall" } : suppliedText ? { scope: "user_supplied_text" } : practicalNextStep ? { scope: "practical_next_step" } : {}),
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,

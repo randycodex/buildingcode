@@ -1,0 +1,1274 @@
+{
+  "auditedAt": "2026-10-07",
+  "baseCommit": "6ab611802939819dd13868be1e60dc44f488e637",
+  "finalEngineVersion": "20261007-open-investigation-recovery-v4",
+  "scope": "Fresh report question headings, not the exact private original request/history manifest. Real local HTTP; lexical retrieval; web/embeddings disabled. Later cohorts are targeted follow-ups and never replace the original 80 outcomes.",
+  "assessmentScope": "Independent provisional Luna assessment against evidence supplied to the final application review. No prior answer key or reported grade supplied. Strict provenance flags can include nonbinding practical suggestions; these are not proof of incorrect law. EC-04 v2 opening/point overextension was separately observed despite a provisional useful_conditional grade.",
+  "transport": "Existing evaluation-only Chat Completions compatibility transport; Responses endpoint rejected the execution credential with HTTP 401. Production transport unchanged.",
+  "model": "gpt-6-luna",
+  "budget": {
+    "capUSD": 11.9,
+    "settledEstimatedUSD": 3.717757925,
+    "unreconciledUpperBoundUSD": 0.18313790000000002,
+    "totalAccountedUSD": 3.900895825,
+    "dispatchCount": 612,
+    "statusCounts": {
+      "rejected": 1,
+      "settled": 609,
+      "unreconciled": 2
+    },
+    "note": "Usage-priced estimate, not an invoice. Two uncollected calls after fixture rate-limit interruption remain counted at their full reserved upper bounds; no refund assumed."
+  },
+  "rollback": {
+    "tag": "permitext-simplified-luna-checkpoint-2026-10-06",
+    "commit": "6fdb37522d18a7b814cf79d82dd867aae32dc736",
+    "rollbackProfileSHA256": "e70b2b950c686ebe1f9a2db2ff479bbc812346c77597a6f2b31bb64f6afa598b",
+    "openProfileSHA256": "0dc0b8bc929c7b4c735d635db7b3892596ecbe672a04ba081d8fa4715a8071be"
+  },
+  "reportHeadingManifestSHA256": "8d5a5db62cc4e630e969ae5e97f4e460087d65dcef88778eb9b11320e58843b4",
+  "privateLedgerSHA256": "be9ab02773740061319413379d9d9197630e2fa87c4cc3524865e3000201f371",
+  "acquisitionPlan": "config/research-electrical-energy-acquisition.json",
+  "sourceStatus": "Electrical and energy technical corpora identified but not ingested. Complete incorporated standards, edition-specific chapters/tables and provenance remain necessary.",
+  "mechanicsValidation": {
+    "openInvestigationSuite": "passed",
+    "foundation": "passed",
+    "writer": "passed",
+    "lunaOnlyRouting": "passed",
+    "providerClient": "passed",
+    "costGuardrail": "passed",
+    "modelRouting": "passed",
+    "scopedSourceExplanationHTTP": "passed",
+    "answerSanitization": "passed",
+    "evidenceBoundary": "passed",
+    "preExistingFailure": "research-trust-boundary-contract.mjs native privacy-disclosure marker assertion fails identically on untouched 6ab6118 and the branch."
+  },
+  "cohorts": [
+    {
+      "name": "candidate",
+      "engineVersion": "20261007-open-investigation-recovery-v2",
+      "caseCount": 80,
+      "applicationOutcomes": {
+        "openai": 68,
+        "clarification": 12
+      },
+      "provisionalAssessmentCounts": {
+        "useful_conditional": 43,
+        "incomplete": 12,
+        "evidence_gap": 15,
+        "direct": 4,
+        "unsupported": 6
+      },
+      "cases": [
+        {
+          "id": "BC-01",
+          "questionSHA256": "d59964dd789a30a01fdd40962b71714e50c2e365cf2859ed4f5a1865c2084ac7",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 4,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "BC-02",
+          "questionSHA256": "c66d5c90f67e7f7cde966ab019e6f2537af6282b05a9a144a61904e515298b3a",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 7,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "BC-03",
+          "questionSHA256": "b91a51e7514d1767185ab1206c5b09038acca507d1dcad1f8a8e222b5cec05f1",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives a supported, appropriately qualified response: the supplied provisions do not establish that a second stair or elevator extension is automatically required, but an occupied roof\u2019s exit count, required roof-stair access, and any applicable accessible-route obligation depend on project facts. It accurately treats the 200-gross-square-foot occupant-load factor as conditional on the specific R-2/R-3 rooftop use and identifies the single-exit provisions rather than assuming they apply. Its discussion distinguishes a required accessible route from a requirement to use this elevator to provide it.",
+            "materialIssues": [],
+            "missingSources": [
+              "The applicable alteration-code basis for work on the converted loft is not established by the supplied sources.",
+              "The supplied provisions do not establish which means of providing an accessible route, if one is required for this deck, would be necessary for this project."
+            ]
+          }
+        },
+        {
+          "id": "BC-04",
+          "questionSHA256": "a577df476241c76e165aa15ed04cd5381068a4e2dfce74e28a7ee1a824b3040d",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "BC-05",
+          "questionSHA256": "0dc21cffa4840919fe3f4a7ca0252dbfed3bf23d5be11e5d90d40d4b7151046a",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "BC-06",
+          "questionSHA256": "255e2e7f8d2c39ba47de8db07d4ce28742b1f554c470f340497c3c4b1b7a4719",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 4,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "BC-07",
+          "questionSHA256": "c963a57ba202207f73cea904a441da0bb0066c3dbabc7eb3d25ad00231e68d74",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer directly addresses the layer-count question: BC \u00a7 1207.2 specifies sound-transmission performance and treatment of penetrations or openings, not a required number of drywall layers. It appropriately distinguishes that conclusion from the conditional one-hour fire-barrier requirement in BC \u00a7 420.2 and does not infer that one observed layer proves compliance. Its applicability and renovation-code caveats are explicit and consistent with the supplied evidence.",
+            "materialIssues": [],
+            "missingSources": [
+              "BC \u00a7 707 assembly details and the provisions establishing which code requirements governed the prewar building\u2019s renovation are not supplied; the answer correctly identifies these limits rather than asserting a specific fire-rated wall assembly."
+            ]
+          }
+        },
+        {
+          "id": "BC-08",
+          "questionSHA256": "f85cea476950431e8b99bed31ebbb5bbf7e20573f5692903f82b050eff742191",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives a supported, conditional rating: BC \u00a7 420.2 requires a 1-hour fire barrier between separate dwelling units, and BC Table 716.5 calls for a \u00be-hour door assembly for other 1-hour fire barriers, or 1 hour where the opening is in a required exit-access-stairway enclosure. It also appropriately treats the permit question as unresolved by the supplied passages and flags uncertainty about applying these provisions to this existing house.",
+            "materialIssues": [],
+            "missingSources": [
+              "The applicable NYC existing-building or alteration provisions needed to determine how these fire-separation and door-rating rules apply to this existing house.",
+              "The applicable permit rule for replacement work if it does not qualify as minor alteration or ordinary repair."
+            ]
+          }
+        },
+        {
+          "id": "BC-09",
+          "questionSHA256": "13c13b0bf022ce87751f047b1059667f416c7d2a580db38a38c888f3d43a04cd",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 10,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "BC-10",
+          "questionSHA256": "af68fb145404ff7c0cbca6b0b4ebfbbb9a4a27701de0df05fe06d3acb4680bca",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-01",
+          "questionSHA256": "e5196b41c43af98abb4ffce2b686cfcd8b7c4e36ca92917f6de11eac763dcd0e",
+          "mode": "openai",
+          "authorityStatus": "insufficient_evidence",
+          "verificationAttempts": 1,
+          "citationCount": 0,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-02",
+          "questionSHA256": "e09ffa9440f3b4b1369f89d8dffac809fe0f1580bc80fc4a5c0a17f07aae71fa",
+          "mode": "openai",
+          "authorityStatus": "insufficient_evidence",
+          "verificationAttempts": 1,
+          "citationCount": 0,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-03",
+          "questionSHA256": "82ccbdf5730ebba6a667be668aa42332a0be97d186bad0366a2c269b37210a6a",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-04",
+          "questionSHA256": "b02f8e0a3241e7f3031339b3031563b9c79022faedde4d01be3fb43f79e9787f",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-05",
+          "questionSHA256": "a32a120d233ede6c76a108cf09ffe4c3cde05dd755c6c64b21257d335857f8e0",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 2,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-06",
+          "questionSHA256": "5a3525144d4701de5e5a522f414d6b6f5502a38135d0e0daf6ad167fd6bda6f1",
+          "mode": "openai",
+          "authorityStatus": "insufficient_evidence",
+          "verificationAttempts": 1,
+          "citationCount": 0,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-07",
+          "questionSHA256": "91c140afc92cffdbda90352f55ca8d21cc86097a6dcd9a6a96c4ef788b9048cd",
+          "mode": "openai",
+          "authorityStatus": "insufficient_evidence",
+          "verificationAttempts": 1,
+          "citationCount": 0,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-08",
+          "questionSHA256": "aed147943fdd03450360f71a48737cef932351f200966d56ca9fdf164e84825b",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "unsupported",
+          "provisionalMaterialIssues": [
+            "The claim that spare breaker spaces do not establish service capacity, and the proposed nameplate/service-load assessment as the way to determine capacity, are not supported by the supplied text. PC \u00a7 502.1 (sourceID research-permitext_discovered-id:12072-4) refers electrical requirements to the NYC Electrical Code but provides no service-capacity test or calculation. These claims are practical guidance, not claims of mandatory law, but remain unsupported by the supplied evidence."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-09",
+          "questionSHA256": "163ec6acc5214e465ba913c73dafd40e9e51e547ae52e640535eaccdb5ae6286",
+          "mode": "openai",
+          "authorityStatus": "insufficient_evidence",
+          "verificationAttempts": 1,
+          "citationCount": 0,
+          "provisionalAssessment": "unsupported",
+          "provisionalMaterialIssues": [
+            "The recommendation to use 208 V is unsupported by the supplied sources. BC 2702.1.7 (sourceID research-permitext_discovered-id:5370-3) concerns emergency and standby power feeders, not voltage-drop calculations; BC 2702.1.7.1 (sourceID research-permitext_cross_reference-id:5371-1) concerns feeder location.",
+            "The advice to use 120 V and account for neutral and load distribution for particular loads is also not established by any supplied source. No cited source addresses voltage-drop formulas or their application to a four-wire 120/208 V feeder."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-10",
+          "questionSHA256": "bd38e0af8cb29d8e79b2660cfc4e52db69544acae3b667a9acf15af67e8e95bb",
+          "mode": "openai",
+          "authorityStatus": "insufficient_evidence",
+          "verificationAttempts": 1,
+          "citationCount": 0,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-01",
+          "questionSHA256": "2019b5c83c0cde6e1ed3d728fbbad40b12902397b6022e050988b438c54038e9",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "evidence_gap",
+            "supported": true,
+            "reason": "The answer accurately distinguishes the permit exemption in AC \u00a7 28-105.4.2 from energy-code compliance and correctly identifies AC \u00a7 28-316.1 as a specific piping-insulation duty during an alteration or repair. It also correctly notes that PC \u00a7 903.5.2 concerns opening locations relative to plumbing vents, not an energy-code exemption for a new window opening. But the supplied text does not establish the requested energy-code treatment of minor repairs versus permitted alterations in historic buildings, so the central comparison remains unanswered.",
+            "materialIssues": [],
+            "missingSources": [
+              "The applicable NYC Energy Conservation Code provisions governing existing-building alterations and repairs, including any distinction for minor repairs, historic buildings, and new window openings.",
+              "Applicable definitions, exceptions, and scope or applicability provisions needed to determine which energy-code edition and historic-building rules govern."
+            ]
+          }
+        },
+        {
+          "id": "ECC-02",
+          "questionSHA256": "3c37afb33f8e68851932cf1b8f634ab54a27268c9506708285cd38e45a600f92",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 3,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-03",
+          "questionSHA256": "805aef8b8d05f55d2fdb8782115f7c2d2fabfd09a597b43cf5b4732736c0bea7",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 2,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-04",
+          "questionSHA256": "55b285be607dc510029b9ed74c429b4fe5e9c8a563e4f1a933a544b817d83e48",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives a supported conditional answer for interior-side foam plastic in an exterior wall: BC 2603.4 directs exterior-wall thermal barriers to BC 2603.5.2, which specifies 5/8-inch Type X gypsum board or an equivalent meeting the stated criteria and identifies a one-story exception. It also accurately distinguishes the furred-space fireblocking rule in BC 718.2.2 from the conditional interior-finish alternatives in BC 803.13.1.1. For the sill gap, it avoids inventing a special detail and makes its suggested treatment depend on whether the gap connects to the furred cavity. The answer appropriately does not claim the cited exception applies.",
+            "materialIssues": [],
+            "missingSources": [
+              "BC 2603.9 and BC 2603.4.1.4, if the thermal-barrier exception is to be evaluated.",
+              "BC 718.2.1, if a specific fireblocking material or installation detail for the sill gap is needed."
+            ]
+          }
+        },
+        {
+          "id": "ECC-05",
+          "questionSHA256": "c90722769aec14b06932cd688b4cc4f040995917255936eed5ac03590161f6c6",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-06",
+          "questionSHA256": "72dcb5b9b66ee1a3f944a8a4f0eb3a4fe81d2649aaca4a4440e4055eb1839021",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-07",
+          "questionSHA256": "35c2845389502661a2110494b4ad963c4ad2ec06f5f4e550c718c2ddbb6c5b54",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "unsupported",
+          "provisionalMaterialIssues": [
+            "The claim that double glazing, foam inside the tubing, or added insulation may improve thermal performance is not supported by source research-permitext_discovered-id:3070-2 (BC \u00a7 1403.7), which states a performance requirement but does not address the effect of those measures.",
+            "The recommendation to evaluate the steel frame's thermal bridging introduces a technical characterization absent from the supplied sources; source research-permitext_discovered-id:3070-2 does not address steel frames or thermal bridging."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-08",
+          "questionSHA256": "e5311fe6289f8d226b3d4c4404001c9964b4190e161b7b8de7be0549e2b3f1ed",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-09",
+          "questionSHA256": "a33fde3fc370cfa52fc1fe7b1d9cf57b14f54f9d6f77a00a85dfb7ea835c2504",
+          "mode": "openai",
+          "authorityStatus": "insufficient_evidence",
+          "verificationAttempts": 1,
+          "citationCount": 0,
+          "provisionalAssessment": "unsupported",
+          "provisionalMaterialIssues": [
+            "The proposed thermal-boundary, room/HVAC-zone, adjacency, and surface-construction checks are presented as applicable troubleshooting guidance without support in the supplied source text.",
+            "No supplied source establishes the required NYC 2016 compliance path, the role of the selected ASHRAE 90.1 edition or method, or the cause or interpretation of an EnergyPlus envelope-simulation error."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-10",
+          "questionSHA256": "ccf53d60642137613b0713ecb7a982d2f27e86c1b65dab0a4268faa05f536f1c",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 6,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-01",
+          "questionSHA256": "6fdd150fb6f80d336c4ccbf1e9e41b23ea4b26063461827b20d9e82d9de6807d",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 6,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-02",
+          "questionSHA256": "ba078d6056af9511c9aff7d460dcb110cded84dcaa8e0ddec2d09096609673db",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "direct",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-03",
+          "questionSHA256": "174a949e7983ad735d2623ace500619fb33778076a563df4f50ecbbc1be4fb47",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives a supported conditional conclusion: a cabinet in front of the hookup is not automatically disqualifying if the listed connector passes through a cabinet opening and is protected from damage; the shutoff must remain accessible and not concealed; and the connector must meet the applicable length and installation requirements. It also correctly avoids treating the stove\u2019s stated movements alone as proof of the connector\u2019s routed length.",
+            "materialIssues": [],
+            "missingSources": []
+          }
+        },
+        {
+          "id": "FGC-04",
+          "questionSHA256": "014ae870e5abe3968bfb9106603270359bf25bc5c1d14cf2efe39736b9757a23",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 9,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-05",
+          "questionSHA256": "1783f10f382b76a6646ec43318b17595f618e4a2bc0ae017b00d31bc6c5cc837",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 6,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-06",
+          "questionSHA256": "08301e1979c27332125c50ce7bfd918a682994b5fdea35df1e9e08b9de370ad1",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 9,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-07",
+          "questionSHA256": "f15e2ce6671cbd6a46a5ba3acf500fd3948d7ddd84ca176c4ccfffce2e0a4ee9",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 8,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-08",
+          "questionSHA256": "616ab9db88006fca889e98e6e8ff21e88d229c347d4d7811248a36cc5302fe71",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-09",
+          "questionSHA256": "b66c8ee40d67eb1da141109c0e7bf1163909fe1ad9e91862bd057a3571b202b5",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 7,
+          "provisionalAssessment": "unsupported",
+          "provisionalMaterialIssues": [
+            "FGC \u00a7 406.6.2.1 provides that gas authorization is not required when gas is reestablished by a utility as permitted under Administrative Code \u00a7 28-105.4.3. The answer says that previously energized piping shut down requires a certificate before gas is reestablished and identifies only the appliance-replacement exception. That omits a potentially applicable exception and overstates the requirement without establishing whether \u00a7 28-105.4.3 applies."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-10",
+          "questionSHA256": "0c3828a250c36246c44da80fb5944db0b662769f8e52d6917766795a58ef19a2",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 3,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-01",
+          "questionSHA256": "18e8ede672cd3dbaf0298e36fbcc6138530106ce6f40a8cb8af8d2972b365768",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 9,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-02",
+          "questionSHA256": "671f558f241549ab820b5e5ad67929e1f21c4a33bcb4a52d2ba6a61b7fac2be3",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 7,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-03",
+          "questionSHA256": "c7a2945d1f0475042aeb3f93183d69dab7e7912ba3de0b27f899e2c101caac77",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer correctly makes the CO-consistency rule in AC \u00a7 28-118.3.2 the key condition: an alteration inconsistent with the last-issued CO requires a new or amended CO. It also correctly distinguishes that rule from the occupancy-group and major-exit-alteration triggers in \u00a7\u00a7 28-118.3.1 and 28-118.3.4, and identifies the unknown CO terms as decisive. The source also mentions a separate trigger where a change would bring the building under a special provision; the answer does not rule that out, and appropriately says the stated facts alone do not establish the outcome if the CO is consistent.",
+            "materialIssues": [],
+            "missingSources": []
+          }
+        },
+        {
+          "id": "GAC-04",
+          "questionSHA256": "434a11a14d6c617cae6e056dd31e770585ce6f7296c42e2cfc0dda4b3d827bde",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-05",
+          "questionSHA256": "e33d32b01ccadfddeab1e9357f903a2b211dd37a1ba9a50a5a0dc16132e47893",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-06",
+          "questionSHA256": "4881f4ec07922db73d79d002e0d0159a8f3cd96e6fce82db1845c1e2d18ffc4f",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 2,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-07",
+          "questionSHA256": "7af3763f5a89d11b5ae6fefe942b6c5de48e9a646842e2a6c3975387458f75eb",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-08",
+          "questionSHA256": "05acd28d77da199812626fbf221d197b360de196f2f14103d3f2f2fdc57baf4b",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 3,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [
+            "The answer presents its list of conditions for continued use as exhaustive, but AC \u00a7 28-118.3.5 also makes the rule subject to \u00a7 28-102.4. The answer does not mention that qualification, and the supplied sources do not show whether its summary fully accounts for it."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-09",
+          "questionSHA256": "9ab77cfe2a8bd05116da10637bb0dc94ddea237c902bd99ca979e91ef4da92c2",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 2,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "GAC-10",
+          "questionSHA256": "49f3e8eab8ff2b62706b1de17011877bd5cec0d88b3cef335b8209b8f6d2f929",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-01",
+          "questionSHA256": "be7ea7ca726151196b99b9a1b1f8cc7ddb1bed5ee01892b564da80ec44bf9db3",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 8,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-02",
+          "questionSHA256": "b9523a0efc58802e4f8c566ee8037b6938562d73db2dde877aa6ae2f713377aa",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 2,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-03",
+          "questionSHA256": "8668c6fcc92b78d40275b504dfb14d1fca37f810d928c7befa9d3e5cf6414f92",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "direct",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-04",
+          "questionSHA256": "1b3770d40bfbc4de8dd07009e6bfda945624618878944ee1e4fcbfd10ff7dddf",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 3,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-05",
+          "questionSHA256": "25e96aa3ae95f6561d61e8dacbbf35f4074800cb9de8f17219a5413b9d7b7763",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives a supported conditional route: MC 501.3, Exception 3 allows a listed and labeled domestic ductless hood not to discharge outdoors if installed as instructed and other ventilation is provided under Chapter 4. FGC 623.2\u2013623.3 support the stated domestic-listing conditions for the range, and FGC 623.7 supports the ventilation-design and clearance discussion. The answer does not treat the range\u2019s \u201cprofessional-style\u201d label or width as proof of compliance and makes its conclusion depend on the relevant model listings and installation conditions.",
+            "materialIssues": [],
+            "missingSources": [
+              "The applicable NYC Mechanical Code Chapter 4 provisions and project ventilation details, needed to verify the ventilation condition in MC 501.3, Exception 3.",
+              "The applicable NYC Fuel Gas Code Chapter 5 and any relevant Mechanical Code provisions needed to assess the ventilation-system design requirement referenced in FGC 623.7."
+            ]
+          }
+        },
+        {
+          "id": "MC-06",
+          "questionSHA256": "edafed586ae76766223309d798f192bb275a44204079aa0347f37cf9848857dc",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "unsupported",
+            "supported": false,
+            "reason": "The answer gives a useful, appropriately qualified ventilation approach: MC 401.2 supports natural-plus-exhaust or mechanical ventilation pathways, and the cited outdoor-air provisions support designing for required outdoor air. But it also applies Fuel Gas Code makeup-air provisions to the home's existing exhaust fans without establishing that those fans fall within the Fuel Gas Code's scope. The supplied scope provision, FGC 301.1, limits that chapter to equipment and appliances that are part of installations regulated by that code; FGC 304.4.1 specifically addresses exhaust fans in the context of fuel-burning devices. That leaves the answer's project-specific claim about replacement air for all existing fans unsupported as stated.",
+            "materialIssues": [
+              "The statement that the existing kitchen and bath exhaust fans require replacement air under FGC 304.9.1 is presented as applicable to this house without establishing the provision's applicability to those fans. FGC 301.1 (sourceID research-permitext_cross_reference-id:8022-chapter-scope-01) supplies a scope limitation, while FGC 304.4.1 (sourceID research-permitext_discovered-id:8085-4) expressly addresses makeup air and calculations for fuel-burning devices. The answer should limit this conclusion to fans covered by the Fuel Gas Code or identify the applicability question."
+            ],
+            "missingSources": [
+              "Project-specific information establishing whether FGC 304.9.1 applies to the existing kitchen and bath exhaust fans, including their relationship to the fuel-burning-device installation.",
+              "MC Section 402, for the detailed natural-ventilation opening requirements, and MC Section 403.1, referenced by the R-2 table footnote for the airflow relationship."
+            ]
+          }
+        },
+        {
+          "id": "MC-07",
+          "questionSHA256": "92b45e1059b7ca2bb95dec81f33828f76620dedd70d6b416903133c5a8ccf367",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 5,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-08",
+          "questionSHA256": "45835055e3c9abf4d4cdb29269e1f529ef9d2c0f9702ed2d397b45d60202ba10",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 8,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-09",
+          "questionSHA256": "098ead7ce51ff8f1c88c959df81487017ce877d0968ea4ef0b41585759726031",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 8,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-10",
+          "questionSHA256": "619dc4b2f0bbe7169b67254a4395368a0c5ec36e0682ff35b9337ed6e09509ba",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 7,
+          "provisionalAssessment": "unsupported",
+          "provisionalMaterialIssues": [
+            "The Type II requirement is stated without its express no-grease-or-smoke condition. Source ID research-permitext_discovered-id:10677-9 (MC \u00a7 507.3) limits that requirement to appliances producing heat or moisture without producing grease or smoke. The answer says the emissions are not established, so it cannot conclude that the Type II rule applies to this installation on the stated facts.",
+            "The answer understates the alternative Type I trigger by saying Type I rules \u201cmay\u201d apply if the appliance produces grease or smoke. Source ID research-permitext_discovered-id:10665-1 (MC \u00a7 507.2) says Type I hoods shall be installed where cooking appliances produce grease or smoke. This matters because the answer presents Type II as the general requirement without clearly making it conditional on the absence of those emissions."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-01",
+          "questionSHA256": "82d555d842796faec53af2f79f60cd8245f844edc70be026636454c2f7ee7bfb",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 3,
+          "provisionalAssessment": "direct",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-02",
+          "questionSHA256": "e4a705de09585076136d9edc86607f0b4f6eb2f7efa1f649fb992ad95ccb7410",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 3,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-03",
+          "questionSHA256": "87cd9d0f870d55863bc72e8f282ce386f515ed953638db25ac20d62a3d8e7518",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-04",
+          "questionSHA256": "7a8cfeca8d95b64760420d09da506f8b186c7f19580e9003296527e121291f1f",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-05",
+          "questionSHA256": "ce8ee6d2209ac0043d2ef0f03ba91e7d406d60055a744cb5dd3b5ef57378402f",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-06",
+          "questionSHA256": "f2dd6dd48c2f1194d9e44a5bee8eca3dcb0e36ba5f379e2db22a3ee19acb2577",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives supported, conditional requirements for the washer drain and water supply (PC \u00a7\u00a7 406.2 and 406.1), accurately limits the sink-relocation permit exemption to its stated conditions (AC \u00a7 28-105.4.4), and makes the R-2 fixture-count point conditional on occupancy classification (PC Table 403.1). It does not claim the existing hookups comply or give an unsupported yes; it explains that the proposed layout and dryer cannot be assessed from the supplied facts and sources.",
+            "materialIssues": [],
+            "missingSources": [
+              "PC \u00a7 802 and PC \u00a7 406.3, referenced for washer standpipe and drainage requirements, plus applicable vent-system provisions to assess the proposed drain and vent layout.",
+              "Applicable dryer-specific mechanical, fuel-gas, electrical, and venting provisions to assess the proposed dryer and reuse of existing services."
+            ]
+          }
+        },
+        {
+          "id": "PC-07",
+          "questionSHA256": "cf34c81ce5f10277838b7bbdac0f4690dfebe37a3b09b28e2472b78b83940d74",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives a supported ordinary-rule conclusion: PC Table 709.1 lists a 2-inch minimum trap for a shower and 1\u00bd inches for a bathtub, so the stated trap is undersized for a shower under the ordinary new-installation rule. It appropriately makes the alteration exception conditional on the requirements in PC 102.4.1 and does not treat the bubbling or the distance to the stack as proof of a particular violation. Its vent discussion accurately identifies the measurement and limits in PC 909.1 and the connection location required by PC 909.2.",
+            "materialIssues": [],
+            "missingSources": []
+          }
+        },
+        {
+          "id": "PC-08",
+          "questionSHA256": "c1f4fbb4db85d71a083869b6a47d33caeb08c519c68279277b3d586d4e8d8568",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 2,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-09",
+          "questionSHA256": "bb2aadfe18f71b45e8df639888956d9c1ddfb3f0f48b0110537856b1911ab881",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 5,
+          "provisionalAssessment": "direct",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-10",
+          "questionSHA256": "70c91590ff8b8777c755bc8e7d8a9aa2c6635e3e3d0657d4b6d7af50525aed5d",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-01",
+          "questionSHA256": "49a3e0fc4747e04360a36712edb413a54dbbd84d295cb585a7013226354854f1",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 3,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-02",
+          "questionSHA256": "f97e8934da5b5e1a843dcc7cc68e22a198bc477e553a92f514a36dd8f9251494",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 3,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-03",
+          "questionSHA256": "bdf352c2afa109033dc7afd5df613fd28ac39353e6e680f7dd0789e562f28a91",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 3,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-04",
+          "questionSHA256": "653c4e8bb15b70ca87018a623a438ff424352051a6731596b639bbe926e66c85",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 2,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-05",
+          "questionSHA256": "2869aeb11414b9745e88b0d2832a3c1870931e00c4e86f295a9d756cfb84d340",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-06",
+          "questionSHA256": "526368a117ec3e3a0a33341290a019847f4c606a85ae0cbf4ba80f7a26e1f453",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-07",
+          "questionSHA256": "79995cbe555c5c09f3d0859bd9083cf95418a44b5d6de92aaf659db3cc79d252",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 6,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-08",
+          "questionSHA256": "065f7f1720639d4d8c5a9c30775c956bb987112f685b816538375e6ed1cad826",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 5,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-09",
+          "questionSHA256": "fbfb23d5497b7e331348891d872c4a605858a13590929ccbd90d8399a68d6719",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ZR-10",
+          "questionSHA256": "f65334270a2c1594f3ad06a42bc2806c5d709908dd08123d5b3d8615024b3d63",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives a supported, conditional account of the main potential barriers: rear-yard or rear-yard-equivalent requirements and lot coverage. It distinguishes the building\u2019s width from zoning-lot width, identifies facts needed to apply the rules, and does not claim the proposed enlargement is prohibited. It also expressly flags that some potentially relevant operative provisions are not supplied, so this is not a definitive compliance determination.",
+            "materialIssues": [],
+            "missingSources": [
+              "Complete operative text of ZR \u00a7 23-34. Source research-permitext_cross_reference-id:20022761-2 supplies only the section heading, although \u00a7\u00a7 23-342 and 23-343 refer to \u00a7 23-34 exceptions or modifications.",
+              "Complete operative text of ZR \u00a7 54-30, if the existing building or extension is non-complying and that enlargement regime must be assessed. Source research-permitext_discovered-id:20018612-2 supplies only the section heading."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "candidate-v3",
+      "engineVersion": "20261007-open-investigation-recovery-v3",
+      "caseCount": 11,
+      "applicationOutcomes": {
+        "openai": 11
+      },
+      "provisionalAssessmentCounts": {
+        "useful_conditional": 6,
+        "evidence_gap": 2,
+        "unsupported": 2,
+        "direct": 1
+      },
+      "cases": [
+        {
+          "id": "BC-03",
+          "questionSHA256": "b91a51e7514d1767185ab1206c5b09038acca507d1dcad1f8a8e222b5cec05f1",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 5,
+          "provisionalAssessment": "unsupported",
+          "provisionalMaterialIssues": [
+            "The answer says that an occupant load of 4 is \u201cbelow the table\u2019s 1\u2013500 band.\u201d BC Table 1006.3.1 (sourceID research-permitext_discovered-id:2184-3) places 4 within the 1\u2013500 band, which requires 2 exits or access to exits unless a BC 1006.3.2 single-exit provision applies. The answer should not describe 4 as below that band."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "BC-07",
+          "questionSHA256": "c963a57ba202207f73cea904a441da0bb0066c3dbabc7eb3d25ad00231e68d74",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 3,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "BC-08",
+          "questionSHA256": "f85cea476950431e8b99bed31ebbb5bbf7e20573f5692903f82b050eff742191",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-02",
+          "questionSHA256": "e09ffa9440f3b4b1369f89d8dffac809fe0f1580bc80fc4a5c0a17f07aae71fa",
+          "mode": "openai",
+          "authorityStatus": "insufficient_evidence",
+          "verificationAttempts": 1,
+          "citationCount": 0,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-04",
+          "questionSHA256": "b02f8e0a3241e7f3031339b3031563b9c79022faedde4d01be3fb43f79e9787f",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "EC-09",
+          "questionSHA256": "163ec6acc5214e465ba913c73dafd40e9e51e547ae52e640535eaccdb5ae6286",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 1,
+          "provisionalAssessment": "unsupported",
+          "provisionalMaterialIssues": [
+            "The claim to use 120 V for voltage drop expressed relative to 120 V phase-to-neutral loads, and 208 V for line-to-line three-phase voltage drop, is not supported by any supplied technical rule or source. MC \u00a7 301.10 (sourceID research-permitext_discovered-id:10290-4) only directs covered electrical work to the NYC Electrical Code."
+          ],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "ECC-01",
+          "questionSHA256": "2019b5c83c0cde6e1ed3d728fbbad40b12902397b6022e050988b438c54038e9",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 3,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-05",
+          "questionSHA256": "25e96aa3ae95f6561d61e8dacbbf35f4074800cb9de8f17219a5413b9d7b7763",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 10,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-06",
+          "questionSHA256": "edafed586ae76766223309d798f192bb275a44204079aa0347f37cf9848857dc",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 11,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-06",
+          "questionSHA256": "f2dd6dd48c2f1194d9e44a5bee8eca3dcb0e36ba5f379e2db22a3ee19acb2577",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 8,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "PC-07",
+          "questionSHA256": "cf34c81ce5f10277838b7bbdac0f4690dfebe37a3b09b28e2472b78b83940d74",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 1,
+          "citationCount": 4,
+          "provisionalAssessment": "direct",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        }
+      ]
+    },
+    {
+      "name": "candidate-v4",
+      "engineVersion": "20261007-open-investigation-recovery-v4",
+      "caseCount": 4,
+      "applicationOutcomes": {
+        "clarification": 1,
+        "openai": 3
+      },
+      "provisionalAssessmentCounts": {
+        "evidence_gap": 1,
+        "useful_conditional": 2,
+        "incomplete": 1
+      },
+      "cases": [
+        {
+          "id": "BC-03",
+          "questionSHA256": "b91a51e7514d1767185ab1206c5b09038acca507d1dcad1f8a8e222b5cec05f1",
+          "mode": "clarification",
+          "authorityStatus": "evidence_boundary",
+          "verificationAttempts": null,
+          "citationCount": 0,
+          "provisionalAssessment": "incomplete",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": {
+            "classification": "useful_conditional",
+            "supported": true,
+            "reason": "The answer gives a supported, conditional response rather than a categorical yes or no. BC \u00a7\u00a7 1006.3 and 1006.3.1 establish an occupied-roof egress framework, and \u00a7 1006.3.2 allows a single exit only when a listed condition applies. The answer correctly identifies the missing occupant-load, story, stair-access, and exception facts and does not claim that a second exit must specifically be a stair. BC \u00a7 1107.4 supports an accessible-route requirement for applicable unit-serving spaces and limits its cited roof-deck exception to specified spaces that are not for public or common use; the answer does not overstate that this route must be provided by an elevator. Its qualifications matter for this converted-loft project.",
+            "materialIssues": [],
+            "missingSources": [
+              "Applicable existing-building code provisions and project facts needed to determine which requirements govern this converted loft and proposed alteration.",
+              "Project code analysis establishing the deck's occupant load and the facts needed to evaluate any single-exit allowance."
+            ]
+          }
+        },
+        {
+          "id": "EC-09",
+          "questionSHA256": "163ec6acc5214e465ba913c73dafd40e9e51e547ae52e640535eaccdb5ae6286",
+          "mode": "openai",
+          "authorityStatus": "supported_by_enacted_text",
+          "verificationAttempts": 1,
+          "citationCount": 1,
+          "provisionalAssessment": "evidence_gap",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "FGC-09",
+          "questionSHA256": "b66c8ee40d67eb1da141109c0e7bf1163909fe1ad9e91862bd057a3571b202b5",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 9,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        },
+        {
+          "id": "MC-10",
+          "questionSHA256": "619dc4b2f0bbe7169b67254a4395368a0c5ec36e0682ff35b9337ed6e09509ba",
+          "mode": "openai",
+          "authorityStatus": "conditional",
+          "verificationAttempts": 2,
+          "citationCount": 10,
+          "provisionalAssessment": "useful_conditional",
+          "provisionalMaterialIssues": [],
+          "rejectedDraftAssessment": null
+        }
+      ]
+    }
+  ],
+  "remainingReviewIssue": "Final BC-03 stays incomplete. The first review demands a conditional shared-roof accessibility finding; the fresh review rejects the repaired finding because Accessible/Type B unit applicability is unestablished. The independent rejected-draft grade is provisional and does not authorize persistence."
+}

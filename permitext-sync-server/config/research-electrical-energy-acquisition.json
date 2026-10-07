@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-10-07",
+  "purpose": "Acquisition plan only. These entries do not register searchable sources or establish legal requirements.",
+  "localStatus": "Electrical and energy technical-code corpora are absent from the Research registry. Existing BC referrals, Fire Code text and construction administrative provisions are not substitutes.",
+  "admissionRequirements": [
+    "Fetch the authoritative complete source; preserve its URL, retrieval date, edition, effective date, content hash and published section identifiers.",
+    "Retain tables with headings, row labels, footnotes, exceptions, definitions and cross-references. Check extracted text against the original pages.",
+    "Keep base standards and local amendments separately attributable; resolve additions, deletions and substitutions before describing consolidated requirements.",
+    "Register current and historical editions separately. Select applicability from filing/completeness/transition facts rather than the current date alone.",
+    "Do not promote an amendment-only PDF, browser search excerpt or guidance page into a complete enacted-code corpus. Confirm lawful source access for incorporated standards."
+  ],
+  "sources": [
+    {
+      "id": "nyc-electrical-2025",
+      "status": "identified-not-ingested",
+      "effectiveDate": "2025-12-21",
+      "primaryURL": "https://www.nyc.gov/site/buildings/codes/electrical-code.page",
+      "amendmentsURL": "https://www.nyc.gov/assets/buildings/codes-pdf/2025electrical_code.pdf",
+      "components": ["2020 NFPA 70 / NEC base text", "2025 NYC electrical technical amendments", "Title 28 Article 1101 and transition provisions"],
+      "limitation": "The 67-page city PDF contains amendments; unchanged NEC requirements are still needed. Full effect does not decide an earlier filing's edition."
+    },
+    {
+      "id": "nyc-electrical-historical",
+      "status": "identified-not-ingested",
+      "primaryURL": "https://www.nyc.gov/site/buildings/codes/old-electrical-codes.page",
+      "components": ["2011 NYC electrical amendments", "2008 NEC base text", "Earlier editions and applicable transition rules when requested"]
+    },
+    {
+      "id": "nyc-energy-2025",
+      "status": "identified-not-ingested",
+      "effectiveDate": "2026-03-30",
+      "primaryURL": "https://www.nyc.gov/site/buildings/codes/2025-energy-conservation-code.page",
+      "applicabilityURL": "https://www.nyc.gov/site/buildings/codes/energy-conservation-code.page",
+      "transitionNoticeURL": "https://www.nyc.gov/assets/buildings/pdf/nycecc-sn.pdf",
+      "residentialExistingBuildingsURL": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2025nycecc_r5.pdf&section=energy_code_2025",
+      "commercialExistingBuildingsURL": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2025nycecc_c5.pdf&section=energy_code_2025",
+      "components": ["Title 28 Article 1001 and administration", "Residential R2-R6 and Appendix RF", "Commercial C2-C6", "2025 NYC ASHRAE 90.1 and its incorporated base standard", "Applicable energy inspection rules and forms"],
+      "editionSelection": "New completed filings on/after March 30, 2026 use 2025; complete filings on/before March 29 may remain under 2020. Check incomplete filings and material changes against the transition notice.",
+      "limitation": "Residential/commercial scope and historic-building provisions need the actual edition's definitions and existing-building chapters. Historic status alone is not a current blanket exemption."
+    },
+    {
+      "id": "nyc-energy-historical",
+      "status": "identified-not-ingested",
+      "primaryURL": "https://www.nyc.gov/site/buildings/codes/energy-conservation-code.page",
+      "edition2020URL": "https://www.nyc.gov/site/buildings/codes/2020-energy-conservation-code.page",
+      "filingRulesURL": "https://www.nyc.gov/site/buildings/codes/what-codes-rules-and-forms-apply-when.page",
+      "components": ["2020 NYCECC", "2016 NYCECC and NYC-modified ASHRAE alternative", "2014 and 2011 NYCECC", "2010/2011 transition rules, TR8 and contemporaneous inspection/agency rules"],
+      "limitation": "ECC-09 expressly asks about NYC 2016; ECC-10 supplies a 2010 filing and 2011 approval. A current-code answer cannot resolve those historical questions."
+    }
+  ],
+  "questionTargets": [
+    {"id":"EC-01","targets":["NEC 210.8", "210.11", "210.23"],"needed":"Separate GFCI protection from branch-circuit requirements; acquire base NEC and edition-specific city changes."},
+    {"id":"EC-02","targets":["NEC 210.8", "device listing and manufacturer instructions"],"needed":"Establish downstream protection and the applicable kitchen rule. Button absence alone does not prove protection or its absence; technical testing advice needs its own source."},
+    {"id":"EC-03","targets":["NEC 250.146", "250.148"],"needed":"Device/box grounding, continuity and exceptions for the actual wiring arrangement."},
+    {"id":"EC-04","targets":["NEC 240.24(B)", "NYC electrical amendments"],"needed":"Occupant access to overcurrent devices and exceptions. An ADU-only building-code provision does not establish the rule for an ordinary apartment."},
+    {"id":"EC-05","targets":["NYC amendments 334.10 and 334.12", "NEC Article 334"],"needed":"NM cable uses, height/occupancy/concealment conditions and remaining base-standard limits."},
+    {"id":"EC-06","targets":["NYC additions 210.11(C)(5) and 210.52(J)"],"needed":"Exact room list, branch/receptacle requirements and central-air exception. Do not replace the room list with a window test."},
+    {"id":"EC-07","targets":["NYC 210.12(A) and exceptions", "NEC 210.8 and 210.12"],"needed":"Distinguish AFCI from GFCI scope and preserve the city multifamily equipment exception versus convenience outlets."},
+    {"id":"EC-08","targets":["NEC Article 220", "NYC amendment 220.87", "Utility service specifications", "Heater nameplate"],"needed":"Service/load calculation and existing-demand conditions. Spare breaker spaces do not establish electrical capacity."},
+    {"id":"EC-09","targets":["NYC amendments 210.19(A) and 215.2(A)(1)", "Sourced three-phase voltage-drop method", "Actual load configuration"],"needed":"Percentage limits and calculation basis are separate questions. FC electrical-safety language does not establish use of 120 versus 208 volts."},
+    {"id":"EC-10","targets":["NYC amendment 330.12(4)", "NEC Article 330", "Cable wet-location/direct-burial listing"],"needed":"Separate city height restriction and concealment exception from cable listing. Do not substitute apartment count for floors above grade."},
+    {"id":"ECC-01","targets":["R/C scope and definitions", "R501.5", "R503/R504", "Commercial counterparts"],"needed":"Repair versus alteration, opening work and the actual historic-building exception/report in the governing edition."},
+    {"id":"ECC-02","targets":["2025 R503.1.1.2", "2025 C503.3.1", "Roof definitions and earlier-edition counterparts"],"needed":"Recover versus replacement, exposed cavity/sheathing and insulation exceptions. Roof age and contractor opinions do not decide the rule."},
+    {"id":"ECC-03","targets":["Applicable R402/C402 tables with footnotes", "Appendix RF", "Existing-building chapter", "BC foam-plastic/fire requirements"],"needed":"Assembly-specific ceiling performance and permitted alternatives, rather than a claim that one product is mandatory."},
+    {"id":"ECC-04","targets":["2025 R503.1.1.3", "R/C402 assembly requirements", "BC foam-plastic/fire requirements"],"needed":"Mass-wall and cavity conditions, continuity and the proposed assembly. A gap dimension alone does not establish a compliant detail."},
+    {"id":"ECC-05","targets":["Historic-building definition/report and R501.5", "Applicable fenestration tables", "LPC window guidance/approval"],"needed":"Energy and landmarks requirements separately; historical photographs and nonoriginal windows do not establish an energy exemption."},
+    {"id":"ECC-06","targets":["Edition-specific opaque-door/fenestration tables", "Table headings and footnotes", "Air-leakage provisions"],"needed":"Separate opaque-door criteria from glazing/SHGC criteria and verify the old schedule's units and applicable edition."},
+    {"id":"ECC-07","targets":["Whole-assembly U-factor requirements", "Approved rating/calculation methods", "Sourced condensation analysis"],"needed":"Frame and edge thermal bridging, glazing and actual assembly data. Insulation inside tubing is not evidence of compliant whole-assembly performance."},
+    {"id":"ECC-08","targets":["R403 HVAC sizing/distribution", "R503 alterations", "Mechanical Code", "Manufacturer design data"],"needed":"Room loads, distribution and duct compatibility; code evidence alone cannot size the proposed equipment from this description."},
+    {"id":"ECC-09","targets":["2016 NYCECC and NYC ASHRAE alternative", "DOE COMcheck documentation", "EnergyPlus error/log documentation"],"needed":"Historical code path, software/version error and conditioned-space boundaries. Do not silently switch to the 2025 standard."},
+    {"id":"ECC-10","targets":["2010/2011 filing-transition table", "Contemporaneous 1 RCNY 5000-01 and 101-07(c)(3)", "TR8 requirements"],"needed":"Filing/completeness and inspection obligations versus inspector qualifications and private contract price. Approval date alone does not settle the governing edition."}
+  ],
+  "targetStatus": "Section numbers are acquisition leads, not complete verified determinations. Reconcile each with the governing edition, base text and city amendments before registration.",
+  "executionLimit": "NYC pages and selected PDF text were inspected through the web tool. Execution-network policy did not allow direct NYC downloads, so no byte-hashed complete electrical/energy corpus was admitted."
+}
