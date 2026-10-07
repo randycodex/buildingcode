@@ -51,6 +51,7 @@ const sandbox = vm.createContext({
   createWorkspacePaneHydrator, Map, Set, JSON, Promise, track,
   get workspaceRenderGeneration() { return generation; },
   activeWorkspaceID: "workspace", captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
+  pendingWorkspacePaneRevealID: null, scrollPaneIntoView() {},
   workspacePaneDescriptors: () => descriptors.map(item => ({...item})), hasCapability: () => capability,
   document: { createElement: element }, circleXIconSVG: () => "",
   appendPaneSequence(panes) {

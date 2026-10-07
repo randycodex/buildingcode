@@ -6,9 +6,10 @@ import { readFile, writeFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseEnv } from "node:util";
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 
 const live = process.argv.includes("--live");
-const local = live ? parseEnv(await readFile(new URL("../.env.local", import.meta.url), "utf8")) : {};
+const local = live && !process.env.OPENAI_API_KEY ? parseEnv(await readFile(new URL("../.env.local", import.meta.url), "utf8")) : {};
 const key = process.env.OPENAI_API_KEY || local.OPENAI_API_KEY;
 if (live && !key) throw Error("A configured local API key is required.");
 const temporary = await mkdtemp(join(tmpdir(), "permitext-site-investigation-"));
@@ -56,7 +57,15 @@ globalThis.fetch = async (url, options) => {
     assert.match(input, /90 degrees/);
     assert.match(input, /135 degrees or less/);
     assert.match(input, /100 feet from each intersecting street line/);
-    assert.match(input, /OFFICIAL PROPERTY INVESTIGATION/);
+    assert.match(input, /official property investigation/i);
+    if (phase === "permitext_code_interpretation") {
+      const context = JSON.parse(input.split("RESEARCH CONTEXT DATA — FACTS, PLANS AND PRIOR ANSWERS; NOT LEGAL AUTHORITY\n")[1].split("\n\nAUTHORIZED ENACTED EVIDENCE")[0]);
+      assert.equal(context.propertyResearch.status, "retrieved");
+      assert.equal(context.propertyResearch.bbl, fixture.provenance.bbl);
+      assert.equal(context.propertyResearch.taxLot.geometry.intersections[0].approximateInteriorAngleDegrees, 90);
+      assert.equal(body.text.format.schema.properties.supportingSourceUses.maxItems, 0);
+      assert(body.instructions.length < 5_000, "The actual HTTP writer must use the compact core policy.");
+    }
     if (live) {
       const response = await nativeFetch(url, options);
       const payload = await response.clone().json();
@@ -81,8 +90,10 @@ globalThis.fetch = async (url, options) => {
       assert.equal(body.reasoning.effort, "medium");
       output = { pass: true, issues: [], unnecessaryMissingFactIndices: [] };
     }
-    return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 },
-      output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(output) }] }] });
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body, {
+      model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 },
+      output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(output) }] }]
+    }));
   } catch (error) { providerError = error; throw error; }
 };
 let server;

@@ -33,7 +33,12 @@ assert(actual.sources.find((source) => reference(source) === "MC 401.2").canonic
 assert.match(actual.sources.find((source) => reference(source) === "MC 401.2").text, /Every habitable space shall be naturally ventilated/);
 assert.match(actual.sources.find((source) => reference(source) === "MC 403.1").text, /shall not prevent doors from closing/);
 assert(actual.sources.find((source) => reference(source) === "MC 403.3.1.1").richSourceGrids.length);
-const definitions = actual.sources.find((source) => reference(source) === "BC 202");
+assert(actual.sources.find((source) => reference(source) === "BC 202").targetedDefinition.labels.includes("VENTILATION"));
+// Explicit definition requests exercise all three complete entries. The original
+// office question no longer implicitly selects every related defined term.
+const definitionResult = await assembledResearchEvidenceForTurn({ ...input,
+  question: `${baseline.question} Define habitable space, occupiable space and ventilation.` });
+const definitions = definitionResult.sources.find((source) => reference(source) === "BC 202");
 for (const label of ["HABITABLE SPACE", "OCCUPIABLE SPACE", "VENTILATION"]) {
   assert(definitions.targetedDefinition.labels.includes(label), label);
 }

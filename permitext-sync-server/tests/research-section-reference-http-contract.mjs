@@ -146,10 +146,9 @@ try {
     assert.doesNotMatch(prompt, /USER_SELECTED_EXCERPT:/);
     if (id === "ZR-19") {
       assert.match(prompt, /contiguous for a minimum of 10 linear feet/);
-      assert.match(prompt, /Do not reopen/);
-      const contextLine = prompt.split("\n").find((line) => line.startsWith("DETERMINISTIC_CONTEXT: "));
-      assert(contextLine, "The actual HTTP request must carry the premise-aware context.");
-      const context = JSON.parse(contextLine.slice("DETERMINISTIC_CONTEXT: ".length));
+      assert.match(requests.at(-1).instructions, /without re-asking established facts/);
+      const context = JSON.parse(prompt.split("RESEARCH CONTEXT DATA — FACTS, PLANS AND PRIOR ANSWERS; NOT LEGAL AUTHORITY\n")[1].split("\n\nAUTHORIZED ENACTED EVIDENCE")[0]).zoningDeterministicContext;
+      assert(context, "The actual HTTP request must carry the premise-aware context.");
       const history = context.answerObligations.find((item) => item.id === "definition_historical_branches");
       assert.equal(history.lotHistoryPremise.exclusion, "stated");
       assert.deepEqual(history.values, []);
@@ -167,10 +166,9 @@ try {
     }
     if (id === "ZR-06") {
       assert.match(prompt, /documentation satisfactory to the Department of Buildings/);
-      assert.match(prompt, /Each supported point must include the supplied source IDs for every provision it explicitly credits with a rule/);
-      const contextLine = prompt.split("\n").find((line) => line.startsWith("DETERMINISTIC_CONTEXT: "));
-      assert(contextLine, "The actual HTTP request must carry source-attribution identities.");
-      const context = JSON.parse(contextLine.slice("DETERMINISTIC_CONTEXT: ".length));
+      assert.match(requests.at(-1).instructions, /Bind every legal claim and supportedPoint to exact supplied SECTION_ID and PASSAGE_ID/);
+      const context = JSON.parse(prompt.split("RESEARCH CONTEXT DATA — FACTS, PLANS AND PRIOR ANSWERS; NOT LEGAL AUTHORITY\n")[1].split("\n\nAUTHORIZED ENACTED EVIDENCE")[0]).zoningDeterministicContext;
+      assert(context, "The actual HTTP request must carry source-attribution identities.");
       for (const number of ["42-192", "42-193"]) {
         assert(context.passages.some((source) => source.codePrefix === "ZR" && source.sectionNumber === number && source.sourceID));
       }
@@ -187,10 +185,11 @@ try {
   // rules, while withholding a parcel determination. A reference must keep it.
   assert(mapAnswer.status >= 400);
   assert.equal(requests.length, 1);
-  assert.match(requests[0].input, /ANSWER_SCOPE: conditional_source_explanation; PROPERTY_DETERMINATION: unresolved/);
+  const mappedContext = JSON.parse(requests[0].input.split("RESEARCH CONTEXT DATA — FACTS, PLANS AND PRIOR ANSWERS; NOT LEGAL AUTHORITY\n")[1].split("\n\nAUTHORIZED ENACTED EVIDENCE")[0]);
+  assert.equal(mappedContext.zoningPlan.conditionalExplanation.determinationStatus, "unresolved");
   assert.match(requests[0].input, /property_identifier/);
   assert.match(requests[0].input, /official_mapped_status/);
-  assert.match(requests[0].input, /Do not assign a district, map area/);
+  assert.match(requests[0].instructions, /Do not invent facts, requirements, citations or source contents/);
   requests = [];
   const historicalAnswer = await ask(mapReference.body.conversation.id,
     "For this specific property, what did ZR Section 42-192 require in 2010?");

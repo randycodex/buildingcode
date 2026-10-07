@@ -7,7 +7,7 @@ import { randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { applicabilityPacketFromRequest } from "./research-applicability-response-double.mjs";
+import { applicabilityPacketFromRequest, withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 const scratch = await mkdtemp(join(tmpdir(), "permitext-claim-applicability-"));
 for (const name of Object.keys(process.env)) if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(name)) delete process.env[name];
 Object.assign(process.env, {
@@ -62,8 +62,9 @@ globalThis.fetch = async (url, options) => {
         detail: writerCount === 1 ? "Unsupported actual project determination: the fictional supplied clause does not establish project compliance." : "The ordinary verifier still found an unsupported claim or source binding." }],
         projectFactQuestions: [], missingFactsOnly: false, unnecessaryMissingFactIndices: [], priorReviewCorrection: "" };
     }
-    return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100, total_tokens: 200 },
-      output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
+    return Response.json(withSyntheticMaterialScopeProviderResponse(body,
+      { model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100, total_tokens: 200 },
+        output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(value) }] }] }));
   } catch (error) { providerError = error; throw error; }
 };
 let server;

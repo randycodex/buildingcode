@@ -36,11 +36,21 @@ for (const result of retained.results) {
   for (const phrase of ["Preserve exact table symbols, dates, arithmetic inputs", "supported point bound to its supplied source", "Do not invent unsupplied property or mapped facts"])
     assert(prompt.includes(phrase));
   const options = { model: "gpt-5.6-luna", responseStyle: "conversational", zoningPlan: plan, zoningDeterministicContext: context };
+  // The historical answer uses its old passage IDs. This envelope-only check
+  // supplies explicit current fixture bindings, without claiming a semantic pass.
+  const proposed = { answerText: "Retained evidence for offline context coverage.", supportedPoints: [],
+    citations: evidence.map(source => ({ sectionID: source.sectionID, sourceIDs: [source.sourceID], relevance: "Envelope fixture." })), missingFacts: [] };
   const bodies = [buildAnswerRequest(question, evidence, "offline-prompt-compaction", options),
-    buildVerifierRequest(question, evidence, result.answer || { answerText: "Retained unavailable-answer fixture." }, "offline-prompt-compaction", options)];
+    buildVerifierRequest(question, evidence, proposed, "offline-prompt-compaction", options)];
   for (const body of bodies) {
     assert.equal(typeof body.input, "string");
-    assert.equal(body.input.split(prompt).length, 2, "The actual draft/verifier must each contain the execution plan once.");
+    if (body.text.format.name === "permitext_code_interpretation") {
+      const data = JSON.parse(body.input.split("RESEARCH CONTEXT DATA — FACTS, PLANS AND PRIOR ANSWERS; NOT LEGAL AUTHORITY\n")[1].split("\n\nAUTHORIZED ENACTED EVIDENCE")[0]);
+      assert.deepEqual(data.zoningPlan, plan);
+      assert.deepEqual(data.zoningDeterministicContext, original, "The compact writer retains the complete deterministic plan as data.");
+    } else {
+      assert.equal(body.input.split(prompt).length, 2, "The verifier retains the complete execution plan once.");
+    }
     assert.equal(body.model, "gpt-5.6-luna");
     assert(body.max_output_tokens > 0 && body.text.format.strict);
     assert(body.input.includes(question));

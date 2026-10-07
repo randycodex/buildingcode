@@ -11,22 +11,16 @@ const instructions = (question, evidence) => buildAnswerRequest(question, eviden
 const ordinary = instructions("Can this proposal comply?", [source("PC", "412.4")]);
 assert.doesNotMatch(ordinary, /BC 303\.1\.3 is the direct authority|When discussing Type B\+NYC|When BC 901\.9\.3/,
   "Unrelated specialized hints must not occupy an ordinary laundry request.");
-for (const [code, section, expected] of [
-  ["BC", "303.1.3", /Do not turn this option into a prohibition/],
-  ["PC", "403.1.1", /add the resulting fractional requirements, and only then round up/],
-  ["BC", "901.9.3", /distinguish the enlarged-portion rule/],
-  ["BC", "1107.2.2.7", /keep lavatory and vanity as distinct terms/],
-  ["BC", "1101.3.1", /preserve that ancestor condition/]
-]) assert.match(instructions("Apply the selected provision.", [source(code, section)]), expected);
-assert.match(instructions("Apply the whole selected section.", [source("PC", "403.1")]), /add the resulting fractional requirements, and only then round up/,
-  "A selected parent may contain the calculation subsection; retain its conditional hint.");
-assert.doesNotMatch(instructions("Apply the selected provision.", [source("PC", "403.10")]), /When supplied PC 403.1 text/,
-  "Similar section-number prefixes must not be treated as parent scope.");
-for (const question of ["May we share facilities?", "Are shared facilities permitted?", "Does this space share facilities?", "What about sharing facilities?"])
-  assert.match(instructions(question, [source("BC", "303.1.3")]), /selected evidence does not establish that permission/);
-assert.match(instructions("What about sharing facilities?", [source("BC", "1007.1.1")]), /selected evidence does not establish that permission/);
-assert.match(instructions("Does the Type B+NYC provision apply?", []), /make the Building Code discussion conditional/);
-assert.match(instructions("Does the agency require a vanity?", []), /keep lavatory and vanity as distinct terms/);
+// One general writer policy replaces provision-specific drafting hints.
+for (const [code, section] of [["BC", "303.1.3"], ["PC", "403.1.1"], ["BC", "901.9.3"],
+  ["BC", "1107.2.2.7"], ["BC", "1101.3.1"], ["PC", "403.1"], ["PC", "403.10"]])
+  assert.equal(instructions("Apply the selected provision.", [source(code, section)]), ordinary);
+for (const question of ["May we share facilities?", "What about sharing facilities?", "Does the Type B+NYC provision apply?", "Does the agency require a vanity?"])
+  assert.equal(instructions(question, [source("BC", "303.1.3")]), ordinary);
+assert.match(ordinary, /calculation order, table headers and footnotes/);
+assert.match(ordinary, /governing ancestor conditions/);
+assert.match(ordinary, /every exception material to the conclusion/);
+assert.match(ordinary, /conditional conclusions/);
 
 const evidence = [source("BC", "1007.1.1")];
 const verifierInstructions = (question, selected) => buildVerifierRequest(question, selected, { answerText: 'Offline draft.' }, 'offline', {}).instructions;
@@ -53,26 +47,33 @@ assert.equal(body.text.format.strict, true);
 const serializedInput = JSON.stringify(body.input);
 for (const sentinel of ["Current question sentinel.", evidence[0].text, "fixture-prior-edition", "Earlier active-topic user fact sentinel.",
   "Established fact sentinel.", "Hypothetical sentinel.", "Unknown sentinel.", "No change of occupancy sentinel.", "Owner representation: prior-code status is unverified.", "Official document unavailable sentinel.",
-  "WEB_SOURCE_ID: synthetic-web-source", "WEB_CLAIM_ID: synthetic-web-claim", "Guidance claim sentinel."])
+  "synthetic-web-source", "synthetic-web-claim", "Guidance claim sentinel."])
   assert(serializedInput.includes(sentinel), `Lost input: ${sentinel}`);
 for (const request of [body, buildVerifierRequest("Current question sentinel.", evidence, { answerText: "Synthetic answer." }, "offline-contract", options)]) {
   const input = typeof request.input === "string" ? request.input : JSON.stringify(request.input);
-  assert.match(input, /QUALIFIED USER STATEMENTS/);
+  if (request === body) {
+    const text = request.input[0].content[0].text;
+    const context = JSON.parse(text.split("RESEARCH CONTEXT DATA — FACTS, PLANS AND PRIOR ANSWERS; NOT LEGAL AUTHORITY\n")[1].split("\n\nAUTHORIZED ENACTED EVIDENCE")[0]);
+    assert.deepEqual(context.conversationFacts, options.conversationFactContext);
+    assert.deepEqual(context.webSupport, options.webSupport);
+  } else {
+    assert.match(input, /QUALIFIED USER STATEMENTS/);
+    assert.match(input, /on the stated facts/);
+    assert.match(input, /USER-STATED UNKNOWNS/);
+  }
   assert.match(input, /No change of occupancy sentinel/);
-  assert.match(input, /on the stated facts/);
-  assert.match(input, /USER-STATED UNKNOWNS/);
   assert.match(input, /Unknown sentinel/);
 }
 assert.deepEqual(body.input[0].content.at(-1), { type: "input_image", image_url: "data:image/png;base64,AA==", detail: "original" });
-for (const policy of [/exact supplied identifiers/, /not independently verified facts/, /Label illustrations hypothetical; never use them to introduce unsupported law/,
-  /Never promote an earlier assistant conclusion/, /REQUIRED_CLAIM_COVERAGE/, /USER_SELECTED_TEXT/, /Never cite irrelevant/,
-  /historical, prior-edition case-specific, or future-effective/, /noncontrolling/, /WEB_SOURCE_ID and WEB_CLAIM_ID/])
+for (const policy of [/exact supplied SECTION_ID and PASSAGE_ID/, /discussion premises/, /scope of hypotheticals/,
+  /prior assistant answers are organizational context, not authority/, /each required claim/, /exact selection boundaries/,
+  /not automatically current law/, /noncontrolling/, /WEB_SOURCE_ID\/WEB_CLAIM_ID/])
   assert.match(body.instructions, policy);
-assert.match(body.instructions, /cannot be parsed|could not be parsed/);
+assert.match(body.instructions, /previous structured response failed/);
 const ordinaryGuidance = instructions("Explain this filing step.", []);
-assert.match(ordinaryGuidance, /Do not return a guidance-only answer without enacted bindings/);
+assert.match(ordinaryGuidance, /Bind every legal claim and supportedPoint/);
 const authorizedGuidance = buildAnswerRequest("Summarize this official guidance.", [], "offline-contract", { allowOfficialGuidanceOnly: true });
-assert.match(authorizedGuidance.instructions, /return supportedPoints and citations as empty arrays/);
+assert.match(authorizedGuidance.instructions, /without manufacturing enacted points or citations/);
 assert.equal(authorizedGuidance.max_output_tokens, 1500);
 const malformed = structuredClone(evidence);
 malformed[0].visualSources[0].dataBase64 = "not valid base64!";
@@ -100,4 +101,4 @@ for (const [label, selection] of [
   }
   assert.deepEqual(selection, before, "Rendering must not alter selected-text provenance or source metadata.");
 }
-console.log("Research instruction contract passed: scoped hints, preserved inputs and authority boundaries, strict schema and visual rejection.");
+console.log("Research instruction contract passed: general writer policy, scoped review, preserved inputs and authority boundaries, strict schema and visual rejection.");

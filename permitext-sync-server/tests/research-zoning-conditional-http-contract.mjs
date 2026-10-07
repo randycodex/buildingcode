@@ -38,8 +38,14 @@ const respondWithDouble = async (url, options) => {
   phases.push(phase);
   assert(phases.length <= 4, "Conditional path permits one verified revision.");
   const input = typeof body.input === "string" ? body.input : body.input.flatMap((item) => item.content.map((part) => part.text || "")).join("\n");
-  assert.match(input, /ANSWER_SCOPE: conditional_source_explanation; PROPERTY_DETERMINATION: unresolved/);
-  assert.match(input, /MISSING_PROJECT_FACTS/);
+  if (phase === "permitext_code_interpretation" || phase === "permitext_research_targeted_revision") {
+    const context = JSON.parse(input.split("RESEARCH CONTEXT DATA — FACTS, PLANS AND PRIOR ANSWERS; NOT LEGAL AUTHORITY\n")[1].split("\n\nAUTHORIZED ENACTED EVIDENCE")[0]);
+    assert.equal(context.zoningPlan.conditionalExplanation.determinationStatus, "unresolved");
+    assert.match(body.instructions, /conditional conclusions/);
+  } else {
+    assert.match(input, /ANSWER_SCOPE: conditional_source_explanation; PROPERTY_DETERMINATION: unresolved/);
+    assert.match(input, /MISSING_PROJECT_FACTS/);
+  }
   if (activeID === "ZR-06") {
     assert(input.includes("documentation satisfactory to the Department of Buildings"), "Storage closing conditions must reach both draft and verifier.");
     assert.match(input, /SOURCE_SCOPE_LIMITATION:.*provisions are omitted/);

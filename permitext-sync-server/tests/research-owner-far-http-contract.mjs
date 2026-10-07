@@ -1,11 +1,12 @@
-// Replay the recorded provider responses to isolate HTTP persistence from model
-// behavior. This is not a fresh answer-quality evaluation and makes no API calls.
+// Replay recorded prose under current passage bindings to isolate HTTP
+// persistence. This is not an answer-quality evaluation and makes no API calls.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { createHash, randomUUID } from "node:crypto";
 import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 
 const run = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json", import.meta.url)));
 const question = run.cases.find((item) => item.id === "ZR-08").question;
@@ -42,14 +43,32 @@ Object.assign(process.env, {
 });
 const nativeFetch = globalThis.fetch;
 let providerDoubles = 0;
+let providerError;
 globalThis.fetch = async (url, options) => {
+  try {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request in offline test.");
   const body = JSON.parse(options.body);
   const call = recorded[providerDoubles++];
   assert(call, "Unexpected extra provider request.");
   assert.equal(body.text.format.name, call.phase);
   assert.match(options.body, /total floor area on a zoning lot, divided by the lot area/);
-  return Response.json({ model: call.model, status: "completed", usage: call.usage, output: call.output });
+  const output = structuredClone(call.output);
+  if (call.phase === "permitext_code_interpretation") {
+    const input = typeof body.input === "string" ? body.input : body.input.flatMap(item => item.content.map(part => part.text || "")).join("\n");
+    const bySection = new Map([...input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)/g)].map(match => [match[2], match[1]]));
+    for (const item of output) for (const content of item.content || []) {
+      if (content.type !== "output_text") continue;
+      const value = JSON.parse(content.text);
+      for (const binding of [...value.supportedPoints, ...value.citations]) {
+        assert(bySection.has(binding.sectionID), "The recorded provision must remain in the actual evidence.");
+        binding.sourceIDs = [bySection.get(binding.sectionID)];
+      }
+      content.text = JSON.stringify(value);
+    }
+  }
+  return Response.json(withSyntheticMaterialScopeProviderResponse(body,
+    { model: call.model, status: "completed", usage: call.usage, output }));
+  } catch (error) { providerError = error; throw error; }
 };
 const sha = (text) => createHash("sha256").update(text).digest("hex");
 let server;
@@ -63,6 +82,7 @@ try {
       body: JSON.stringify(body)
     });
     const payload = await response.json();
+    if (!response.ok && providerError) throw providerError;
     assert(response.ok, `${response.status}: ${JSON.stringify(payload)}`);
     return payload;
   };

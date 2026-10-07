@@ -26,7 +26,7 @@
     "test:trash": "node tests/trash-recovery.mjs && node tests/trash-recovery-http.mjs && node tests/trash-web-contract.mjs && node tests/project-trash-confirmation.mjs && node tests/project-delete-retired-workboard.mjs",
     "test:trash:postgres": "node tests/trash-postgres.mjs",
     "test:notebook-historical-references": "node tests/notebook-historical-reference-http.mjs",
-    "test:research-site-investigation": "node tests/research-site-investigation-contract.mjs && node tests/research-site-investigation-http-contract.mjs",
+    "test:research-site-investigation": "node tests/research-site-investigation-contract.mjs && node tests/research-site-investigation-http-contract.mjs && node tests/research-writer-policy-contract.mjs",
     "test:property-context": "node --check nyc-property-context.mjs && node --check nyc-property-layers.mjs && node --check public/nyc-property-facts.js && node tests/nyc-property-context-contract.mjs && node tests/nyc-property-layers-contract.mjs && node tests/nyc-property-facts-http.mjs",
     "test:project-context-research": "node --check tests/research-project-context-summary-contract.mjs && node tests/research-project-context-summary-contract.mjs",
     "prestart": "npm run build:clients",

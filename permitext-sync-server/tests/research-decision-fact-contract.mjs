@@ -51,7 +51,8 @@ for (const fixture of fixtures) {
   assert.match(body.instructions, /Fail with unnecessary_qualification if missingFacts or followUpQuestions/);
   assert.match(body.instructions, /even when the opening gives the correct direct answer/);
   const generated = buildAnswerRequest(question, evidence, "decision-fact-verifier", { ...options, responseStyle: "conversational" });
-  assert(generated.instructions.includes(researchDecisionFactInstruction));
+  assert.match(generated.instructions, /ask only for facts that could change this answer/);
+  assert.match(generated.instructions, /without re-asking established facts/);
   assert(researchAnswerPresentationContract({ question, evidence }).universalRules.includes(researchDecisionFactInstruction));
   initialRequests.push(body);
   beginResearchSpendReservation({ id: fixture.id }, environment);

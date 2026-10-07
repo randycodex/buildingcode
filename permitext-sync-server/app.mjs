@@ -1,3 +1,4 @@
+import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
 import { researchSourceBodyState, researchSourceBodyStatePrompt, researchSourceAvailabilityPrompt,
   researchSourceBodyStateInstruction } from "./research-source-body-state.mjs";
@@ -777,6 +778,9 @@ export function researchInterpretationSchemaForEvidence(evidence, supportingSour
   }
   if (supportingClaimIDs.length) {
     schema.properties.supportingSourceUses.items.properties.claimID.enum = supportingClaimIDs;
+  }
+  if (!supportingSourceIDs.length || !supportingClaimIDs.length) {
+    schema.properties.supportingSourceUses.maxItems = 0;
   }
   return schema;
 }
@@ -8761,6 +8765,10 @@ function researchPrompt(question, evidence, options = {}) {
     }
     return lines.join("\n");
   }).join("\n\n---\n\n");
+  if (options.compactWriterPolicy) {
+    return researchWriterContext({ question, sources, options,
+      earlierUserStatements: earlierResearchUserContext(options.messages) });
+  }
   const history = (options.messages || []).slice(-8).map((message) => {
     if (message.role === "user") return `USER: ${message.question || ""}`;
     const supportedPoints = (message.answer?.supportedPoints || [])
@@ -10598,10 +10606,10 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
   const configuration = conversational
     ? {
         ...baseConfiguration,
-        promptVersion: `${baseConfiguration.promptVersion}:compact-v3:conversational-v4`,
+        promptVersion: `${researchWriterPolicyVersion}:compact-v3:conversational-v4`,
         evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
       }
-    : { ...baseConfiguration, promptVersion: `${baseConfiguration.promptVersion}:compact-v3` };
+    : { ...baseConfiguration, promptVersion: `${researchWriterPolicyVersion}:compact-v3` };
   const model = configuration.model;
   const luna6 = /^gpt-6-luna(?:-|$)/.test(model);
   const passageEvidence = evidence.map((section) => ({
@@ -10609,19 +10617,6 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
     sourceID: section.sourceID || `section-${section.sectionID}`,
     codeVersion: section.codeVersion || defaultSyncCodeVersion
   }));
-  const hasSourceScope = (codePrefix, root) => passageEvidence.some((source) => {
-    const number = String(source.sectionNumber || "");
-    // A selected parent can contain the pertinent descendant rule. Retain the
-    // conditional hint for either scope, including whole-section selections.
-    return source.codePrefix === codePrefix && number &&
-      (number === root || number.startsWith(`${root}.`) || root.startsWith(`${number}.`));
-  });
-  const answerPresentation = researchAnswerPresentationContract({
-    question,
-    evidence: passageEvidence,
-    messages: options.messages,
-    zoningPlan: options.zoningPlan
-  });
   const supportingSources = options.webSupport?.sources || [];
   const requestBody = {
       model,
@@ -10638,126 +10633,8 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
           ? (conversational ? 6_000 : 3_000)
           : (conversational ? 3_000 : 1_500),
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
-      instructions: [
-        researchQuestionIntentInstruction(question),
-        "You are a building-code research assistant, not an authority having jurisdiction.",
-        zoningResearchSafetyInstruction(passageEvidence),
-        options.structuredResponseRetry
-          ? "A prior response could not be parsed or bound to the supplied evidence. Return one complete schema-valid answer using only the exact supplied identifiers; do not add commentary outside the JSON object. Keep every explanation, citation relevance, limitation, missing fact, and follow-up concise; combine overlapping points and do not repeat the same rule so the complete JSON fits within the response limit."
-          : "",
-        "Make governing code conclusions only from the authorized enacted evidence supplied in the request.",
-        researchSourceApplicabilityInstruction,
-        evidence.some((source) => source.richSourceKind === "amendment-history")
-          ? "Official amendment-history metadata may substantiate only the events and report links it lists. Bind those observations to its own PASSAGE_ID, label them as supplied snapshot metadata, and do not claim a live refresh or use them as historical enacted requirements. Describe historical-source verification steps as research needed to resolve the stated evidence gap, not as requirements imposed by the Zoning Resolution."
-          : "",
-        "Evidence marked user_pinned must be considered, but Permitext-discovered enacted evidence may identify a different controlling provision.",
-        "Supporting web context may explain or contextualize an answer but is noncontrolling and must never create or override an enacted requirement.",
-        "Never use web support to guess the identity of an unexplained acronym, agency, or program, or to substitute a similarly named authority. Request the exact authority when its identity is unresolved.",
-        "Examine only attached official images; cite each exact visual source through its PASSAGE_ID. Never infer an unselected map or image.",
-        "Disclose illegible map/figure labels, uncertain boundaries, missing lot locations and visual ambiguities; never guess.",
-        "Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements.",
-        "Use current-question and established active-topic Project/conversation facts as factual context, never as cited code authority. Treat unsupplied occupancy, construction type, location, existing conditions, height and occupant load as unknown.",
-        "Accept facts supplied in the current question or established by the user earlier in the active topic as premises. Do not list them as missing or request reconfirmation. Distinguish later professional document verification from whether a fact is established for this discussion.",
-        "Owner claims, owner positions, applicant assertions and representations are discussion premises, not independently verified facts. Keep material verification in missingFacts and dependent conclusions conditional.",
-        "Preserve the factual content of an established user shorthand such as fully sprinklered. If a code benefit separately depends on compliance with a named installation standard, request records establishing that standard without asking again whether the building is fully sprinklered or the system is installed throughout.",
-        "Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact.",
-        "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
-        "Treat unresolvedProjectFacts in the structured evidence analysis as user-declared unknowns, not assumptions or established facts. Carry each one into missingFacts only when it can materially affect the requested conclusion.",
-        "Identify unresolved inputs only when they can change the decision requested in this turn. Name each material fact specifically rather than saying full design or applicable approvals. If the user asks whether a few facts settle a broader determination, answer that sufficiency question directly and explain the decisive gap; do not expand it into a complete compliance analysis or enumerate every downstream trigger. Source gaps belong in evidenceLimitations, not missingFacts. Never invent an outside authority requirement.",
-        "Governing evidence may establish the answer; supporting evidence supports only its supplied rule. Contextual evidence may enter a supportedPoint only to explain its limited, non-governing relationship, never to establish the result. Never cite irrelevant evidence.",
-        "With user-selected enacted passages, automatically discovered supporting evidence is optional; cite or discuss it only when materially necessary to answer the exact question or qualify the selected-source conclusion.",
-        "Evidence labeled historical, prior-edition case-specific, or future-effective is available only because the user explicitly selected that edition or evidence. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence. For the 2014 Construction Codes, identify the prior edition and say that applicability is project-specific and may depend on the application filing date.",
-        "When the question names a code edition or year, use only evidence from that exact edition for legal claims and human-readable section references. Never borrow a similarly numbered current-edition provision or silently substitute another edition. If the requested edition is unavailable, identify that boundary and do not present current text as the historical rule. A named edition includes supplied enacted amendments to that edition; it is not an as-of date. Do not invent a request for original unamended text unless the user asks for it or specifies a historical date.",
-        "Evidence labeled with a collateral topic route is normally reviewed internally. Cite it only when its supplied text materially answers or qualifies the current question in its active conversation context; a route label alone does not make a relevant conditional comparison forbidden. Omit unrelated project inventory topics.",
-        "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not replace it with, or import a sibling table row, exception, or rule from, broader section context.",
-        "Honor governing-ancestor RELATIONSHIP scope when its enacted applicability category or condition is needed to interpret a pinned descendant. Do not add generic headings or redundant parent restatements. Identify unresolved material ancestor applicability without weakening an independently supported conclusion.",
-        "supportedPoints are exclusively for rules established by the assembled enacted evidence. Never put a bulletin, agency-guidance, or other supporting-web claim in supportedPoints, and never attach an enacted SECTION_ID or PASSAGE_ID to such a claim.",
-        options.allowOfficialGuidanceOnly
-          ? "Because the user expressly requested official guidance, when that guidance is responsive but the assembled enacted evidence does not establish a responsive rule, do not manufacture an enacted point or citation: return supportedPoints and citations as empty arrays and select the exact supportingSourceUses. Permitext will render the immutable selected claims with the noncontrolling authority boundary."
-          : "Do not return a guidance-only answer without enacted bindings. Supporting web material may supplement an enacted answer but cannot replace its required supportedPoints and citations.",
-        "Write answerText as the shortest complete, reliable user-facing answer. Do not target a fixed number of paragraphs or sentences.",
-        `QUESTION-SPECIFIC ANSWER PRESENTATION CONTRACT\n${JSON.stringify(answerPresentation)}`,
-        "Presentation never permits unsupported claims or omitted material qualifications.",
-        "Use checklists for parallel requirements, tables for genuine side-by-side comparisons, and headings when they help navigate a longer answer. Avoid fixed report templates.",
-        "Lead with a direct answer in one short paragraph. For several distinct requirements, use a compact bulleted list with short bold labels instead of a dense paragraph. For two or more alternatives compared on the same criteria, prefer a small Markdown table. Keep simple yes/no follow-ups brief; do not add headings or repeat the full prior answer. Separate the governing rule, its application to the user's example, and any material exception so they are easy to scan.",
-        "Use Markdown bold sparingly for the controlling result, key dimensions, or short labels. Place a compact human-readable code reference such as (BC § 1012.2) next to the sentence, bullet, or table value it supports, using only section numbers present in the supplied enacted evidence. The structured sourceIDs remain the binding citation map.",
-        "Label calculations, design implications, corrections and drawing notes after the governing rule; introduce no outside requirements. Honor requested brevity without dropping material qualifications.",
-        "Never omit a material qualification, applicability issue, conflicting provision or evidence limitation for brevity. If describing the consequences of a permission, preserve the supplied exceptions to those consequences. Do not lengthen a complete answer for visual consistency.",
-        "Separate paragraphs with blank lines; use headings and lists only when helpful.",
-        conversational
-          ? "Use professional, conversational language without boilerplate, process narration or repeated question text."
-          : "Use a formal governed-analysis tone in answerText.",
-        "Do not print SECTION_ID or PASSAGE_ID markers in answerText or supported-point prose; those identifiers belong only in the structured mapping fields.",
-        "Break the material enacted claims actually made in answerText into ordered supportedPoints. Each point must preserve that narrative claim's subject, branch and qualifications, with a short plain-language heading, a complete explanation and the exact supplied sectionID and sourceIDs that support it. Do not turn these points into broader standalone summaries of the retrieved provisions or introduce additional subjects, permissions or methods that are unnecessary to the requested result. Keep every material required selected-passage claim.",
-        "Examples, consequences, code categories and practical requirements must be grounded in assembled evidence or supplied Project facts. When a point derives a classification from a definition, bind the definition passage to that same point as well as the operative rule. Label illustrations hypothetical; never use them to introduce unsupported law.",
-        "Stay within the current question. For a narrow yes/no trigger, omit optional downstream design rates and collateral permissions unless needed to resolve or qualify that decision. Silence about an existing component does not establish permission to retain it. Discuss or cite another code topic only if it materially qualifies the requested conclusion or the user requests it; a fact merely mattering elsewhere is insufficient.",
-        "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
-        options.zoningPlan ? "Continue the user's investigation across turns. Explain a supported rule even when its applicability to this property remains unresolved; keep that distinction explicit. Answer short follow-ups using the active conversation, without asking the user to repeat known facts. For a narrow measurement question, explain that dimension without requiring whole-project applicability to be settled again. State reasonable geometric assumptions explicitly (for example, a level sill); do not invent a worse condition that contradicts the user’s stated highest or lowest point. Bind every rule mentioned in each supported point to all of its supporting passages, even when two provisions state the same measurement. Ask at most one focused next question unless multiple independent facts are essential. A newly mentioned section is a candidate to check, not proof it governs this project. Do not invent a drawing, district, flood condition, historical text, or vesting basis." : "",
-        options.zoningPlan?.questionSignals?.streetscapeExplanation ? "For an initial project-wide transparency explanation, choose the next missing fact in this order: proposed work scope (new building/development, ground-floor enlargement, or change of use), proposed street-facing ground-floor uses, then the unresolved frontage classification. Skip facts already established in the project or conversation; schematic design is a phase, not a work type, and existing property records do not describe proposed work. Ask about plain project facts before asking the user to supply a legal Tier classification. Do not apply this intake sequence to narrow measurement or section-explanation follow-ups. Start from the project’s recorded district and mapped-area facts, then apply the supplied applicability provisions and frontage definitions to narrow the governing candidate. Explain a usable baseline for an explicitly stated work-type condition when proposed work is still unknown, without claiming to exhaust every possible route. Explain surviving or genuinely unresolved branches; do not force both frameworks into an answer when supplied evidence excludes one. A retrieved provision does not establish applicability. Derive a legal frontage category when the supplied definition and facts suffice; otherwise ask for the specific observable fact needed by that definition, such as the street frontage, street width, or street-facing use, instead of asking the user to perform the legal classification. Do not equate no special-purpose district with outside a special streetscape area. Evaluate each named geographic predicate against the supplied definition and mapped project facts; use a fact that directly establishes that predicate as a discussion premise without claiming that you independently rechecked the map. Do not invent a missing distinction that the supplied definition does not make. When stating development/enlargement applicability, cite and bind the applicability passage (32-30) alongside the dimensional rule (32-321); likewise bind 37-31 for any of its applicability exceptions rather than attributing them to 37-34. Apply these bindings to each supported point and place the corresponding human-readable citations next to the narrative claim. Unrelated property inventory fields are not reasons to discuss unrelated code topics." : "",
-        "For an open-ended request for design requirements, when the assembled evidence supplies multiple directly responsive dimensional or configuration rules, summarize those usable baseline rules before asking for project facts. Do not let a narrow exception, a specialized ramp or equipment type, or an unavailable referenced standard erase responsive requirements that the supplied enacted evidence does establish.",
-        "For every required selected passage, preserve each material qualifier contained in that exact passage—including a proviso, exception, deeming rule, definition, second-sentence clarification, or stated limit. Merely citing the passage or summarizing a broader rule is not enough.",
-        "Quote specialized, unusual or awkward enacted phrases exactly before paraphrasing; never silently correct or normalize them.",
-        "For design, control-sequence, installation or project compliance, distinguish the selected rule from missing material compliance inputs, including quantities, rates, capacities, locations, assemblies and approvals; name each precisely.",
-        "Do not infer a room's legal function from furniture or users alone. If occupant load, occupancy or classification depends on actual use, keep unsupplied activities or function unresolved.",
-        "For a numeric limit or table comparison, compare the stated project value with every directly applicable supplied limit, retaining each dimension, measured object and datum. Satisfying or mitigating one constraint does not replace another unless the bound exception actually modifies that other requirement. Traversing an obstruction does not establish unobstructed clearance beneath it. When supplied facts fail an unchanged constraint, state that failure before discussing or asking about an alternative arrangement. If the value complies with a stricter baseline limit, state that direct conclusion and do not make it conditional on qualifying for a more generous allowance. Preserve every express alternative or exception within its actual scope.",
-        "When enacted text states a percentage of an overall total and separately requires a minimum for each type, preserve those as two distinct rules in answerText and supportedPoints. In particular, never restate 10 percent of the total seating and standing spaces plus at least one of each dining-surface type as 10 percent of each type.",
-        "Preserve cumulative and alternative conditions exactly. When enacted text requires A and B, never restate it as A or B; when it permits alternatives, do not turn or into and.",
-        "When the same supplied table row places the user's stated category beside a materially different conditional category, briefly identify the alternate value and its qualifying condition when that contrast explains the result. Never apply the alternate value without the qualifying fact.",
-        hasSourceScope("BC", "303.1.3") || hasSourceScope("PC", "403.1")
-          ? "Preserve express subject-scope restrictions before using a special permission. For an accessory assembly-room fixture question, BC 303.1.3 is the direct authority for the Assembly fixture option; a selected PC 403.1 permission limited to a building or nonaccessory tenant assembly space must be identified as separately limited and must not be presented as independent authority for the accessory room."
-          : "",
-        evidence.some((source) => source.codePrefix === "BC" && source.sectionNumber === "303.1.3")
-          ? "For an accessory assembly-room fixture question, distinguish permission from a numerical calculation. Supplied PC 403.1 occupancy-based fixture text supports the Group B baseline when lawful Group B classification is established or expressly assumed; BC 303.1.3 additionally permits the qualifying accessory room to use Assembly requirements. Do not turn this option into a prohibition or make Assembly mandatory. Cite the general framework separately from the accessory-room option. Missing table rates prevent an unsupported numerical count, not the general permission conclusion. If the occupancy-based framework is absent, identify that evidence gap without inventing a prohibition. Preserve unresolved classification facts only when the question has not established or stipulated them."
-          : "",
-        hasSourceScope("BC", "303.1.3")
-          ? "Do not infer that a room is legally accessory merely because it is used by residents or serves a principal occupancy. Unless the user expressly established the accessory relationship, make any BC 303.1.3 classification conclusion conditional on that relationship and include it in missingFacts."
-          : "",
-        hasSourceScope("PC", "403.1.1")
-          ? "When a calculation rule permits a non-50/50 sex distribution only when approved statistical data supports it, identify whether that approved data exists as a missing project fact whenever the final fixture calculation remains unresolved."
-          : "",
-        hasSourceScope("PC", "403.1.1")
-          ? "When supplied PC 403.1.1 text governs multiple occupancies, state its full calculation order: apply the applicable ratio to each occupancy, add the resulting fractional requirements, and only then round up."
-          : "",
-        hasSourceScope("PC", "403.1")
-          ? "When supplied PC 403.1 text states that the Building Code determines occupancy classification and occupant load, preserve that division of authority. Table 403.1 supplies fixture minimums; it does not itself determine the occupancy classification or occupant load."
-          : "",
-        hasSourceScope("PC", "403") || hasSourceScope("BC", "303.1.3") || /\bshar(?:e|ed|es|ing)\b/i.test(question)
-          ? "For a plumbing-fixture calculation in which shared facilities are proposed or unresolved, state explicitly whether the assembled evidence establishes permission for those facilities to serve the identified occupancies. If no supplied passage governs sharing, say that the selected evidence does not establish that permission; do not merely list the arrangement as an unresolved fact."
-          : "",
-        hasSourceScope("BC", "901.9.3")
-          ? "When BC 901.9.3 and a building- or occupancy-wide Chapter 9 trigger are supplied together, distinguish the enlarged-portion rule from the separate new-construction trigger. If the latter applies to the qualifying building or occupancy, do not imply that its required system can automatically be confined to only the enlarged portion."
-          : "",
-        hasSourceScope("BC", "1107") || /Type B\+NYC/i.test(question)
-          ? "When discussing Type B+NYC provisions, do not assume the subject unit and bathroom are within that scope merely because the provision was selected. Unless the user established applicability, make the Building Code discussion conditional on Type B+NYC applicability and include that applicability in missingFacts."
-          : "",
-        hasSourceScope("BC", "1101.3")
-          ? "When BC 1101.3 supplies prior-code-building scope for BC 1101.3.1, preserve that ancestor condition in every project-specific accessibility conclusion. If prior-code-building status is only represented or otherwise unresolved, make the BC 1101.3.1 consequence conditional on confirming the prior-code-building and alteration/change context and retain that fact in missingFacts; do not state that accessible features must presently be provided merely because the proposed occupancy classification changes."
-          : "",
-        hasSourceScope("BC", "1107.2.2.7") || /\b(?:vanit(?:y|ies)|lavator(?:y|ies))\b/i.test(question)
-          ? "When a question compares a Building Code lavatory provision with an alleged vanity requirement, keep lavatory and vanity as distinct terms. Never write lavatory/vanity, vanity/lavatory, vanity (lavatory), or lavatory (vanity). State separately what the enacted text establishes about a lavatory and what it does not establish about a vanity."
-          : "",
-        "Treat a corpus or evidence limitation as a boundary on what Permitext evaluated, not as proof that another provision imposes a requirement. Do not say an outside or unsupplied provision requires verification or might change the result unless supplied enacted evidence establishes that consequence.",
-        "Every passage marked REQUIRED_CLAIM_COVERAGE must be cited with that exact PASSAGE_ID and its material rule or limitation addressed in answerText. Use a supportedPoint when the passage establishes an affirmative rule; a passage cited solely to explain that it does not establish the requested proposition need not be duplicated as a positive supportedPoint.",
-        options.zoningPlan ? researchZoningExplanationScopeInstruction : "",
-        "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
-        "Answer the specific question first. Omit rules for other uses, systems or locations unless they materially qualify a conclusion you make or the user asks for the comparison. Any retained side explanation needs its own exact numerical limit, subject, conditions and source binding; do not group different limits under one number.",
-        "Write answerText as a conversation with the user. Explain an open-ended requirements question with a short opening and compact bullets when several design checks matter; give a narrow follow-up a direct answer and only its necessary qualifications. Use clear references to the code text you found instead of internal terms such as packet, supplied evidence, retrieval or PASSAGE_ID. Name a genuinely missing project fact precisely, and distinguish it from code text you could not find. Do not ask the user to repeat an established fact or suggest that simply repeating the question resolves a source gap.",
-          "Return evidenceLimitations=[] when no material evidence gap affects the requested conclusion. Include a specific limitation when one matters; do not invent a caveat or generic uncertainty merely to populate the field.",
-          "evidenceLimitations must state only the material legal-evidence boundary, never internal retrieval diagnostics, corpus routing, shortened-section or omitted-cross-reference notices.",
-          "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
-          "Use the assembled document structure, including exception headings, when it is supplied. If an exception and its conditions are present, state the conditional result instead of demanding additional text merely to acknowledge that conditional rule.",
-          "When a needed category, table row, shared-facility condition or calculation input is unresolved, name it specifically. Select use categories from the actual use; explain what the supplied evidence establishes instead of merely saying a table or category must be checked.",
-          "When assembled evidence supplies a calculation procedure, briefly explain every material step and exception in that procedure even when missing inputs prevent a final numeric result.",
-          "If the question attributes a requirement to an agency, funding program, or other authority not represented in the assembled evidence, explicitly request that authority's applicable design standard, funding or program requirements, or official guidance. Do not substitute additional Building Code text for the missing outside authority.",
-          "If the question cannot be answered from the assembled enacted evidence, say so directly.",
-        "Generate only the minimum high-value followUpQuestions needed to materially advance the answer; do not ask for facts that cannot change the result.",
-        "Every major code conclusion and every supportedPoint must be covered by enacted citations using the supplied SECTION_ID and PASSAGE_ID values.",
-        "For every material web-guidance statement, select only the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair from SOURCE-SPECIFIC ATTRIBUTED CLAIMS in supportingSourceUses; never write a new claim for that pair. In answerText label it noncontrolling and separate it from enacted rules. Leave supportingSourceUses empty when no web source materially improves the answer. Show any WEB SUPPORT LIMITATION in evidenceLimitations; never infer the unavailable document's contents.",
-        options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
-        researchSuppliedTextPrompt(options.suppliedText),
-        researchPriorSuppliedTextPrompt(options.priorSuppliedText),
-      ].join(" "),
-      input: researchInputForEvidence(question, passageEvidence, options),
+      instructions: researchWriterInstructions({ question, options }),
+      input: researchInputForEvidence(question, passageEvidence, { ...options, compactWriterPolicy: true }),
       text: {
         format: {
           type: "json_schema",
@@ -10770,12 +10647,9 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
         }
       }
   };
-  requestBody.instructions = researchZoningWriterInstructions({
-    question, evidence: passageEvidence, options, answerPresentation
-  }) || requestBody.instructions;
   const targetedRevision = researchTargetedRevisionEligible(options);
   if (targetedRevision) {
-    requestBody.instructions = `${researchTargetedRevisionInstruction} ${researchQuestionIntentInstruction(question)} ${researchZoningExplanationScopeInstruction}`;
+    requestBody.instructions = `${researchWriterInstructions({ question, options })} ${researchTargetedRevisionInstruction}`;
     const input = `EDITABLE TEXT TARGETS\n${JSON.stringify(researchRevisionTargets(options.previousInterpretation).map(({ id, path, text, removable }) => ({ id, path, text, removable })))}`;
     if (typeof requestBody.input === "string") requestBody.input += `\n\n${input}`;
     else requestBody.input.push({ role: "user", content: [{ type: "input_text", text: input }] });
@@ -20132,7 +20006,6 @@ async function handleResearchConversationMessage(request, response) {
       conversation.primaryProjectID
     );
     const manualProjectFacts = conversation.projectContext?.facts || [];
-    const propertyResearch = mockMode ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
     if (researchProjectContextOnlyEligibility({ question, projectInformation })) {
       await commitProjectContextOnlyResearchMessage({
@@ -20157,6 +20030,7 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
+    const propertyResearch = mockMode ? null : await researchPropertyContext({ question, messages: activeMessages, projectInformation });
     const corpusPlan = await researchCorpusPlanForTurn({
       question,
       messages: activeMessages,

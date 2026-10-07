@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { researchClaimScopeInstruction } from "../research-claim-scope.mjs";
+import { researchWriterInstructions } from "../research-writer-policy.mjs";
 import { guidanceSourceRelationships } from "../research-guidance-source-relationships.mjs";
 import { researchOfficialGuidanceSummaryRequest } from "../research-official-guidance-summary.mjs";
 import { buildResearchRequestEnvelopeBuilders } from "./research-request-envelope-preflight.mjs";
@@ -21,7 +22,11 @@ for (const item of inventory.cases) {
     buildAnswerRequest(question, [source], "offline-scope", { responseStyle: "conversational" }),
     buildVerifierRequest(question, [source], answer, "offline-scope", { responseStyle: "conversational" })
   ]) {
-    assert(request.instructions.includes(researchClaimScopeInstruction), `${item.id}: missing claim-scope instruction`);
+    if (request.text.format.name === "permitext_code_interpretation") {
+      assert.equal(request.instructions, researchWriterInstructions({ question, options: { responseStyle: "conversational" } }));
+      assert.match(request.instructions, /every exception material to the conclusion/);
+      assert.match(request.instructions, /never expand a partial finding into overall compliance/);
+    } else assert(request.instructions.includes(researchClaimScopeInstruction), `${item.id}: missing claim-scope instruction`);
     assert(request.input.includes(question), `${item.id}: question changed`);
     assert(request.input.includes(source.text), `${item.id}: source changed`);
     assert.equal(request.text.format.strict, true);
