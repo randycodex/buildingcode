@@ -1,5 +1,7 @@
 # Research experiment and recovery — 2026-10-06
 
+**Superseded for the new research experiment:** use [Open investigation recovery](PERMITEXT_OPEN_INVESTIGATION_2026-10-06.md). The user now requires Luna only. Do not promote the historical deployments below with their old hybrid model settings; retain the Luna-only runtime profile. The remainder records the earlier writer rollout.
+
 The user authorized the simpler Research writer on main and the shared hosted backend, so web and the existing phone app use it for new questions. There is no user-facing switch. Source bindings, authoritative evidence, material conditions, semantic review and fresh review after repairs remain enforced. Models, billing settings, runtime environment and database schema are unchanged by this release.
 
 ## Return points

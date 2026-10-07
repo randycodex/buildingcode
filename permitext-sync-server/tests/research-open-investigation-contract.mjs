@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import { investigateResearchEvidence, mergeInvestigationEvidence, openInvestigationEnabled } from '../research-open-investigation.mjs';
+const a={sourceID:'a',text:'A scope paragraph'}, b={sourceID:'b',text:'A governing requirement'};
+const searches=[]; const observations=[];
+const result=await investigateResearchEvidence({question:'Original question',facts:['Known user fact'],messages:[],evidencePackage:{sources:[a]},
+ decide:async input=>{observations.push(structuredClone(input));return input.sources.some(s=>s.sourceID==='b')?{ready:true,queries:[],reason:'Found rule'}:{ready:false,queries:['BC governing requirement'],reason:'Missing rule'};},
+ search:async query=>{searches.push(query);return {sources:[b]};}});
+assert.deepEqual(searches,['BC governing requirement']);
+assert.deepEqual(result.sources,[b,a]);
+assert.equal(observations.length,2);
+assert(observations.every(i=>i.question==='Original question'&&i.facts[0]==='Known user fact'));
+assert.equal(result.investigation.trace[0].addedSources,1);
+let calls=0;
+await investigateResearchEvidence({evidencePackage:{sources:[]},decide:async()=>({ready:false,queries:['same'],reason:'Missing'}),search:async()=>{calls++;return {sources:[]}}});
+assert.equal(calls,1,'Repeated unsuccessful query must not loop');
+assert.deepEqual(mergeInvestigationEvidence([a],[b],{maximumCharacters:24}),[b],'New requested source survives a full initial budget');
+assert.deepEqual(mergeInvestigationEvidence([a],[b],{maximumSources:1,retainedSourceIDs:['a']}),[a],'Investigator-selected evidence survives later broad search results');
+const env={PERMITEXT_RESEARCH_ENGINE:'open'};
+assert(openInvestigationEnabled({environment:env}));
+assert(!openInvestigationEnabled({environment:env,pinnedEvidence:[a]}));
+assert(!openInvestigationEnabled({environment:env,decisionLink:{}}));
+assert(!openInvestigationEnabled({environment:env,suppliedText:'quote'}));
+assert(!openInvestigationEnabled({environment:{}}));
+const controller=new AbortController();controller.abort();
+await assert.rejects(investigateResearchEvidence({signal:controller.signal,evidencePackage:{sources:[]}}),{name:'AbortError'});
+console.log('Open investigation discovery, scope, cancellation, and budget contracts passed.');
