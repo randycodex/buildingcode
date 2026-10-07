@@ -17845,7 +17845,7 @@ async function handleResearchAnswerList(request, response) {
   await migrateLegacyProjectFoundation(context.userID);
   const conversationID = String(context.body.conversationID || "").trim();
   const projectID = String(context.body.projectID || "").trim();
-  const answers = (await listStoredResearchAnswers(context.userID))
+  const answers = (await listStoredResearchAnswers(context.userID, { projectID, summaryOnly: true }))
     .filter((answer) => !conversationID || answer.conversationID === conversationID)
     .filter((answer) => !projectID || answer.projectID === projectID)
     .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)))
@@ -17855,12 +17855,8 @@ async function handleResearchAnswerList(request, response) {
       projectID: answer.projectID || null,
       question: answer.question,
       conclusion: answer.answer?.conclusion || "",
-      evidenceCount: answer.evidence?.length || 0,
-      sectionIDs: Array.from(new Set(
-        (answer.evidence || [])
-          .map((evidence) => String(evidence.sectionID || "").trim())
-          .filter(Boolean)
-      )),
+      evidenceCount: answer.evidenceCount,
+      sectionIDs: answer.sectionIDs,
       reviewStatus: answer.reviewStatus,
       createdAt: answer.createdAt
     }));
@@ -17872,7 +17868,7 @@ async function handleResearchAnswerGet(request, response) {
   if (!context) return;
   await migrateLegacyProjectFoundation(context.userID);
   const answerID = String(context.body.answerID || "").trim();
-  const answer = (await listStoredResearchAnswers(context.userID))
+  const answer = (await listStoredResearchAnswers(context.userID, { ids: [answerID] }))
     .find((item) => item.id === answerID);
   if (!answer) {
     sendError(response, 404, "Historical Research answer not found.");

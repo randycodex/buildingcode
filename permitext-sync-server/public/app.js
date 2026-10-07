@@ -18587,9 +18587,10 @@ function appendResearchInlineFormatting(container, value) {
     if (index > cursor) container.append(document.createTextNode(text.slice(cursor, index)));
     let element;
     if (match[1]) {
-      // Only make the maintained records destination clickable here. Code
-      // sources retain their separate citation controls and verification.
-      if (match[2] === "https://www.nyc.gov/site/buildings/dob/find-building-data.page") {
+      // Maintained DOB navigation and the official site-investigation datasets
+      // can be opened here. Code citations retain their separate verification.
+      const officialPropertyRecord = /^https:\/\/data\.cityofnewyork\.us\/resource\/(?:64uk-42ks|i38t-6if2|sif6-3bej)\.json\?bbl=[1-5]\d{9}(?:&(?:%24|\$)limit=100)?$/.test(match[2]);
+      if (match[2] === "https://www.nyc.gov/site/buildings/dob/find-building-data.page" || officialPropertyRecord) {
         element = document.createElement("a");
         element.href = match[2];
         element.target = "_blank";
