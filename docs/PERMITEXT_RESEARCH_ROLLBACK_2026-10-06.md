@@ -9,6 +9,7 @@ The user authorized the simpler Research writer on main and the shared hosted ba
 | Hosted Production immediately before adoption | `permitext-research-production-baseline-2026-10-06` | `f4644bdfe8e89c4ef4014097350b4aa2cb859320` |
 | Original local Research checkout before simplification | `permitext-research-baseline-2026-10-06` | `e74bef9c9b8bc4a39421decb82d9c13309b1ca2b` |
 | Adopted simplified writer | `permitext-research-simplified-2026-10-06` | Resolve the tag after the release commit |
+| Simplified writer with populated-project retrieval repair | `permitext-research-simplified-retrieval-fix-2026-10-06` | Resolve the tag after the repair commit |
 
 The baseline branches are `codex/research-production-baseline-2026-10-06` and `codex/research-baseline-2026-10-06`. Keep the annotated tags fixed. The local snapshot differs from the previously hosted release; use the Production snapshot for restoring the hosted service.
 
@@ -23,12 +24,14 @@ Redeploy/promote that saved Production deployment to restore the exact previousl
 Also revert the experiment's source commits on main so later deployments do not inadvertently re-enable it. From a clean, up-to-date main checkout, preserve later work and review conflicts before committing:
 
 ```sh
-git revert --no-commit permitext-research-production-baseline-2026-10-06..permitext-research-simplified-2026-10-06
+git revert --no-commit permitext-research-production-baseline-2026-10-06..permitext-research-simplified-retrieval-fix-2026-10-06
 git diff --cached --stat
 git commit -m "Restore Research behavior before simplified-writer experiment"
 ```
 
 Test, push and deploy that revert. Do not reset shared main, force-push, or overwrite the original dirty checkout. Vercel rollback can suspend automatic Production alias assignment; verify alias assignment and the actual serving SHA after any return.
+
+The repair tag includes the follow-up retrieval fix as well as the original experiment commits. The older simplified-writer tag remains fixed for historical comparison.
 
 ## Independent local backup
 

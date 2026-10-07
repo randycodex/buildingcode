@@ -9,6 +9,7 @@ import { parseEnv } from "node:util";
 import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 
 const live = process.argv.includes("--live");
+const richProject = process.argv.includes("--rich-project");
 const local = live && !process.env.OPENAI_API_KEY ? parseEnv(await readFile(new URL("../.env.local", import.meta.url), "utf8")) : {};
 const key = process.env.OPENAI_API_KEY || local.OPENAI_API_KEY;
 if (live && !key) throw Error("A configured local API key is required.");
@@ -19,6 +20,7 @@ Object.assign(process.env, {
   PERMITEXT_SYNC_DATA_PATH: join(temporary, "store.json"), PERMITEXT_LOCAL_PRIVATE_ASSET_PATH: join(temporary, "assets"),
   PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN: "1", PERMITEXT_SYNC_GRANT_ADMIN_TOKEN: randomUUID(),
   PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RESEARCH_WEB_SUPPORT: "0",
+  ...(richProject ? { PERMITEXT_RESEARCH_PASSAGE_SEARCH: "1" } : {}),
   PERMITEXT_RESEARCH_MODEL: "gpt-6-luna", PERMITEXT_RESEARCH_FAST_MODEL: "gpt-6-luna", PERMITEXT_RESEARCH_ROUTING_MODE: "single",
   PERMITEXT_RESEARCH_REASONING_EFFORT: "low", PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT: "medium",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: ".1", PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".01",
@@ -112,7 +114,18 @@ try {
   assert.equal((await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN)).status, 200);
   const projectID = randomUUID();
   assert.equal((await request("/sync/push", { batch: { user: { id: account.appUserID }, mutations: [{ project: {
-    id: projectID, clientID: projectID, userID: account.appUserID, name: "Corner site acceptance", address: "155 E 182nd Street, Bronx", updatedAt: new Date().toISOString()
+    id: projectID, clientID: projectID, userID: account.appUserID, name: "Corner site acceptance", address: "155 E 182nd Street, Bronx", updatedAt: new Date().toISOString(),
+    ...(richProject ? { structuredFacts: [
+      ["zoning-districts", "Zoning District(s)", "R8"],
+      ["special-purpose-district", "Special Purpose District(s)", "C — Special Grand Concourse Preservation District"],
+      ["special-purpose-subdistrict", "Special Purpose Subdistrict / Subarea", "Limited Commercial Area; Residential Preservation Area. Includes partial tax-lot intersections; verify boundaries"],
+      ["lot-width", "Lot Width", "47 ft"], ["lot-depth", "Lot Depth", "120 ft"],
+      ["tax-lot-area", "Tax Lot Area", "5,640 sq ft"], ["building-area", "Building Area", "28,745 sq ft"],
+      ["stories-above-grade", "Stories Above Grade", "6"], ["year-built", "Year Built", "1923"],
+      ["residential-units", "Residential Units", "37"], ["land-use-code", "Land Use Code", "02"],
+      ["waterfront-status", "Waterfront Status", "No mapped intersection found"],
+      ["parking-geography", "Transit Zones Parking Geography", "Outer Transit Zone"]
+    ].map(([key, label, value]) => ({ key, label, value, source: "nyc-planning", status: "sourced" })) } : {})
   } }] } }, token)).status, 200);
   const created = await request("/research/conversations/create", { auth, projectID }, token);
   assert.equal(created.status, 201);

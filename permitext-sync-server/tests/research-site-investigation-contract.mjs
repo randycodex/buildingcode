@@ -111,6 +111,12 @@ const exactAlias = targetedDefinitionExcerpt(definitions, "corner lot", { comple
 assert.deepEqual(exactAlias.labels, ["lot, corner"]);
 assert.equal(exactAlias.sectionID, String(definitions.sectionID));
 assert.equal(exactAlias.text, definition.text);
+const requestedAlias = targetedDefinitionExcerpt(definitions, question, {
+  allowShortSection: true, requestedOnly: true, preferredQuery: question
+});
+assert.deepEqual(requestedAlias.labels, ["lot, corner"]);
+assert.equal(requestedAlias.requestedDefinitionPriority, 2,
+  "A complete alias target must retain its current-question priority.");
 function aliasSection(entries) {
   return { codePrefix: "ZR", sectionID: "synthetic-alias", sectionNumber: "12-10", title: "Definitions",
     blocks: entries.map(([label, text]) => ({ html: `<article class="defined-term"><h2 class="definition__title">${label}</h2><p>${text}</p></article>` })) };

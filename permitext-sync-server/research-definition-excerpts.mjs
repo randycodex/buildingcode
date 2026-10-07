@@ -581,11 +581,19 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     );
   const selected = [];
   let characterCount = carrier ? carrier.heading.length + 2 : 0;
+  const resolvedByOrder = new Map();
+  for (const entry of ranked) {
+    const target = resolvedDefinitionEntry(entry, entries);
+    // Alias resolution changes the canonical entry, not the human request's
+    // priority. Keep the first (highest-ranked) nomination when an alias and
+    // its target both match; incidental later matches cannot demote it.
+    if (target && !resolvedByOrder.has(target.order)) resolvedByOrder.set(target.order, {
+      ...target, requestedPriority: entry.requestedPriority, aliasResolved: target.order !== entry.order,
+      score: entry.score, phraseIndex: entry.phraseIndex
+    });
+  }
   const resolvedRanked = requiredEntries ? resolveDefinitionAliases(ranked, entries)
-    : [...new Map(ranked.flatMap(entry => {
-        const target = resolvedDefinitionEntry(entry, entries);
-        return target ? [[target.order, target]] : [];
-      })).values()];
+    : [...resolvedByOrder.values()];
   if (!resolvedRanked) return null;
   const candidates = requiredEntries
     ? resolvedRanked.slice(0, maximumDefinitions).sort((left, right) => left.text.length - right.text.length)
@@ -629,6 +637,7 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     canonicalSectionCharacterCount: canonicalText.length,
     excerptCharacterCount: text.length,
     canonicalContextComplete: false,
+    ...(selected.some(entry => entry.aliasResolved) ? { aliasResolved: true } : {}),
     ...(options.requestedOnly ? { requestedDefinitionPriority: Math.max(...selected.map(entry => entry.requestedPriority)) } : {}),
     ...bindings
   };
@@ -659,6 +668,7 @@ export function researchRequestedDefinitionMatch(section, {
   if (!excerpt || !excerpt.passages.every(passage => exactWhitespaceLocation(text, passage))) return null;
   return { origin: excerpt.requestedDefinitionPriority === 2 ? "current" : "human_context",
     priority: excerpt.requestedDefinitionPriority, labels: excerpt.labels,
+    ...(excerpt.aliasResolved ? { aliasResolved: true } : {}),
     excerptCharacterCount: excerpt.excerptCharacterCount };
 }
 

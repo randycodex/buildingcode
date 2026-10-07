@@ -298,6 +298,13 @@ function shadowedDescriptionStatements(facts, topics) {
 export function relevantResearchRetrievalFactContext({ question, contextualTopics = [], projectFacts = [],
   maximumCharacters = 640, queryMode = "semantic" } = {}) {
   const subject = currentTopics(question, contextualTopics).join(" ");
+  // Lot classification uses a geometry definition, independent of district,
+  // use and existing-building inventory. Keep all project facts downstream
+  // for application, but do not turn them into requests for unrelated rules.
+  const lotClassification = /\b(?:corner|interior|through)\s+lots?\b|\b(?:front|side|rear)\s+lot\s+lines?\b/i.test(subject) &&
+    /\b(?:is|are|classif\w*|consider\w*|qualif\w*|count|which|what)\b/i.test(question) &&
+    !/\b(?:district|Appendix|mapped|map|transit|requirements?|required|setbacks?|yards?|coverage|FAR)\b/i.test(question);
+  if (lotClassification) return "";
   const intent = researchQuestionSubject(subject);
   const currentTerms = contextTerms(question);
   const questionTerms = currentTerms.size >= 3 ? currentTerms : contextTerms(subject);

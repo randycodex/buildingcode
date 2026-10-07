@@ -1659,8 +1659,14 @@ export async function assembleResearchEvidence({
   if (!pinnedEvidence.length && appliedStrategy.mode === researchEvidenceStrategies.broad) {
     const humanDefinitionQuery = [query.definitionQuery, query.definitionHumanContext]
       .map(researchPositiveSearchText).filter(Boolean).join("\n");
-    const requestedDefinitionCandidates = [...candidates,
-      ...(Array.isArray(discovery.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [])]
+    const supplementalDefinitions = (Array.isArray(discovery.supplementalDefinitionCandidates)
+      ? discovery.supplementalDefinitionCandidates : []).map(candidate =>
+      candidate.signals?.requestedDefinitionCarrier?.origin === "current" &&
+      candidate.signals.requestedDefinitionCarrier.priority === 2 &&
+      candidate.signals.requestedDefinitionCarrier.aliasResolved === true
+        ? { ...candidate, evidencePriority: candidate.evidencePriority || researchEvidencePriorityMetadata(candidate) }
+        : candidate);
+    const requestedDefinitionCandidates = [...candidates, ...supplementalDefinitions]
       .filter(candidate => (isDefinitionCandidate(candidate) || candidate.signals?.activeHumanDefinitionReservation) &&
         !candidate.signals?.useSelectedPassageOnly &&
         (!selectedBuildingCodePassageBoundary || !routedTopicPresent || candidate.codePrefix === "BC"));
