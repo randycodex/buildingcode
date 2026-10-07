@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261005-notebook-report-fix-v645";
+} from "./offline-storage.js?v=20261006-property-record-links-v646";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261005-notebook-report-fix-v645";
+} from "./research-intent-state.js?v=20261006-property-record-links-v646";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

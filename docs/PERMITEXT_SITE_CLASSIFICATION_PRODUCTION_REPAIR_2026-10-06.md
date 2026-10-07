@@ -27,3 +27,5 @@ The browser check also exposed a separate saved-answer detail failure: the route
 The answer renderer now makes the three maintained official NYC property-record dataset URLs clickable instead of showing raw Markdown. It retains the existing DOB navigation link and code-citation controls. Narrow URL matching and rendering tests exclude alternate hosts, datasets, schemes and extra parameters.
 
 The saved pre-experiment Production tag remains the rollback destination. The final verified experiment tag includes these follow-up repairs as well as the original simplification. The private release evidence records the final serving SHA and post-deployment saved-source browser check.
+
+On follow-up release `f07c4a8eb`, the saved answer survived a browser reload and Sources & details loaded the ZR 12-10 binding without the database error. The browser still held the previous immutable JavaScript version, so the release also advances the shared app asset identifiers and offline shell generation before final rendered acceptance.

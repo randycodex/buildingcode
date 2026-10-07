@@ -10,7 +10,8 @@ The user authorized the simpler Research writer on main and the shared hosted ba
 | Original local Research checkout before simplification | `permitext-research-baseline-2026-10-06` | `e74bef9c9b8bc4a39421decb82d9c13309b1ca2b` |
 | Adopted simplified writer | `permitext-research-simplified-2026-10-06` | Resolve the tag after the release commit |
 | Simplified writer with populated-project retrieval repair | `permitext-research-simplified-retrieval-fix-2026-10-06` | Resolve the tag after the repair commit |
-| Experiment with saved-answer and property-link repairs | `permitext-research-simplified-verified-2026-10-06` | Resolve the tag after the final repair commit |
+| Experiment with saved-answer and property-link repairs | `permitext-research-simplified-verified-2026-10-06` | Resolve the tag after the repair commit |
+| Experiment with updated browser asset generation | `permitext-research-simplified-web-verified-2026-10-06` | Resolve the tag after the browser release commit |
 
 The baseline branches are `codex/research-production-baseline-2026-10-06` and `codex/research-baseline-2026-10-06`. Keep the annotated tags fixed. The local snapshot differs from the previously hosted release; use the Production snapshot for restoring the hosted service.
 
@@ -25,14 +26,14 @@ Redeploy/promote that saved Production deployment to restore the exact previousl
 Also revert the experiment's source commits on main so later deployments do not inadvertently re-enable it. From a clean, up-to-date main checkout, preserve later work and review conflicts before committing:
 
 ```sh
-git revert --no-commit permitext-research-production-baseline-2026-10-06..permitext-research-simplified-verified-2026-10-06
+git revert --no-commit permitext-research-production-baseline-2026-10-06..permitext-research-simplified-web-verified-2026-10-06
 git diff --cached --stat
 git commit -m "Restore Research behavior before simplified-writer experiment"
 ```
 
 Test, push and deploy that revert. Do not reset shared main, force-push, or overwrite the original dirty checkout. Vercel rollback can suspend automatic Production alias assignment; verify alias assignment and the actual serving SHA after any return.
 
-The final tag includes the retrieval, saved-answer and property-link repairs as well as the original experiment commits. The older experiment tags remain fixed for historical comparison.
+The final tag includes the retrieval, saved-answer, property-link and browser asset repairs as well as the original experiment commits. The older experiment tags remain fixed for historical comparison.
 
 ## Independent local backup
 
