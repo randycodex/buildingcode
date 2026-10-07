@@ -8,6 +8,11 @@ function normalized(value) {
 }
 
 export function researchModelRoutingConfiguration(environment = process.env) {
+  if (environment.PERMITEXT_RESEARCH_LUNA_ONLY === "1") return {
+    mode: "single", fastModel: "gpt-6-luna", accurateModel: "gpt-6-luna",
+    evidenceAnalysisModel: "gpt-6-luna", webSupportModel: "gpt-6-luna",
+    verificationModel: "gpt-6-luna", version: researchModelRoutingVersion
+  };
   const accurateModel = normalized(
     environment.PERMITEXT_RESEARCH_ACCURATE_MODEL ||
     environment.PERMITEXT_RESEARCH_MODEL ||

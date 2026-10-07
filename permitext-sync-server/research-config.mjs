@@ -50,6 +50,7 @@ let evaluationSpendReservation = {
 const productionSpendContext = new AsyncLocalStorage();
 
 export function researchModelConfiguration(environment = process.env, modelOverride = null) {
+  if (environment.PERMITEXT_RESEARCH_LUNA_ONLY === "1") modelOverride = "gpt-6-luna";
   return {
     model: modelOverride || environment.PERMITEXT_RESEARCH_MODEL || "gpt-6-luna",
     reasoningEffort: environment.PERMITEXT_RESEARCH_REASONING_EFFORT || "low",

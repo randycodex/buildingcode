@@ -10902,7 +10902,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
     sourceAvailability: structuredClone(options.sourceAvailability) };
   const configuration = researchVerificationConfigurationForEvidence({
     ...researchModelConfiguration(process.env, options.model),
-    ...(options.model ? { model: options.model } : {})
+    ...(options.model ? { model: options.model } : {}),
+    serviceTier: process.env.PERMITEXT_RESEARCH_VERIFICATION_SERVICE_TIER || "default"
   }, evidence, options);
   const verificationProfile = { name: "ordinary", reasoningEffort: configuration.verificationReasoningEffort,
     maximumOutputTokens: configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000,
@@ -11336,7 +11337,8 @@ async function openAIResearchZoningRepair(
   }
   const configuration = {
     ...researchModelConfiguration(),
-    ...(options.model ? { model: options.model } : {})
+    ...(options.model ? { model: options.model } : {}),
+    serviceTier: process.env.PERMITEXT_RESEARCH_REVISION_SERVICE_TIER || "default"
   };
   const repairPacket = zoningResearchRepairPacket({
     question,

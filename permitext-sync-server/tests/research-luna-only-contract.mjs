@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { researchModelRoutingConfiguration } from '../research-model-routing.mjs';
+import { researchModelConfiguration, researchAnswerConfigurationForRevision } from '../research-config.mjs';
+import { requestResearchProvider } from '../research-provider-client.mjs';
+const env = { PERMITEXT_RESEARCH_LUNA_ONLY: '1', PERMITEXT_RESEARCH_MODEL: 'unapproved-model', PERMITEXT_RESEARCH_ACCURATE_MODEL: 'unapproved-model', PERMITEXT_RESEARCH_ROUTING_MODE: 'hybrid', PERMITEXT_RESEARCH_SERVICE_TIER: 'priority', PERMITEXT_RESEARCH_REVISION_SERVICE_TIER: 'default', PERMITEXT_RESEARCH_REVISION_REASONING_EFFORT: 'high' };
+assert.equal(researchModelRoutingConfiguration(env).accurateModel, 'gpt-6-luna');
+const draft = researchModelConfiguration(env, 'unapproved-model');
+assert.equal(draft.model, 'gpt-6-luna');
+assert.equal(draft.serviceTier, 'priority');
+const repair = researchAnswerConfigurationForRevision(draft, {revisionFeedback: ['Repair']}, env);
+assert.equal(repair.serviceTier, 'default');
+assert.equal(repair.reasoningEffort, 'high');
+process.env.PERMITEXT_RESEARCH_LUNA_ONLY = '1';
+await assert.rejects(requestResearchProvider({requestBody:{model:'unapproved-model'}}), {code:'RESEARCH_MODEL_NOT_ALLOWED'});
+console.log('Luna-only routing, repair tier, and pre-dispatch rejection passed.');

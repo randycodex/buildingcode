@@ -169,6 +169,9 @@ export function researchProviderFailure({
 }
 
 export async function requestResearchProvider(options) {
+  if (process.env.PERMITEXT_RESEARCH_LUNA_ONLY === "1" && options.requestBody?.model !== "gpt-6-luna") {
+    throw Object.assign(new Error("Research is restricted to GPT-6 Luna."), { code: "RESEARCH_MODEL_NOT_ALLOWED" });
+  }
   const startedAt = performance.now();
   const attemptTimings = [];
   let result;
