@@ -268,7 +268,7 @@ const broaderEvidenceCuePattern = /\b(?:applicab(?:le|ility)|comply|compliance|e
 
 function explicitCodeReferences(value) {
   return Array.from(String(value || "").matchAll(
-    /\b(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z-]+)*)/gi
+    /\b(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s+(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z-]+)*)/gi
   )).map((match) => `${String(match[1]).toUpperCase()}:${String(match[2]).toUpperCase()}`);
 }
 
@@ -621,6 +621,8 @@ function sectionDescriptor(value = {}) {
     corpusID: compactText(value.corpusID),
     corpusLabel: compactText(value.corpusLabel),
     applicabilityStatus: compactText(value.applicabilityStatus),
+    ...(value.sourceCoverage ? { sourceCoverage: structuredClone(value.sourceCoverage) } : {}),
+    ...(value.sourceProvenance ? { sourceProvenance: structuredClone(value.sourceProvenance) } : {}),
     chapterNumber: compactText(value.chapterNumber),
     sourceChapterNumber: compactText(value.sourceChapterNumber || value.chapterNumber),
     chapterTitle: compactText(value.chapterTitle || value.zoning?.chapter?.title),
@@ -692,7 +694,7 @@ async function canonicalSection(resolveSection, value, origin, { includeAmendmen
 
 function comparableTableReference(value, fallbackCodePrefix = "") {
   const normalized = compactText(value).toUpperCase();
-  const match = normalized.match(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?TABLE\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z-]+)*)/i);
+  const match = normalized.match(/\b(?:(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s+)?TABLE\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z-]+)*)/i);
   if (!match) return "";
   const codePrefix = String(match[1] || fallbackCodePrefix || "").toUpperCase();
   return codePrefix ? `${codePrefix}:TABLE:${match[2].toUpperCase()}` : `TABLE:${match[2].toUpperCase()}`;
@@ -700,7 +702,7 @@ function comparableTableReference(value, fallbackCodePrefix = "") {
 
 function tableReferences(value, fallbackCodePrefix = "") {
   const references = new Set();
-  for (const match of compactText(value).matchAll(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?Table\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi)) {
+  for (const match of compactText(value).matchAll(/\b(?:(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s+)?Table\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi)) {
     const identity = comparableTableReference(match[0], match[1] || fallbackCodePrefix);
     if (identity) references.add(identity);
   }
@@ -790,7 +792,7 @@ function attachStructuredTable(record, value, characterAllowance) {
 function inlineCrossReferences(text, fallbackCodePrefix) {
   const source = compactText(text);
   const references = [];
-  const rangePattern = /\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?(?:Sections?|§{1,2})\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\s+(?:through|to|[-–])\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
+  const rangePattern = /\b(?:(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s+)?(?:Sections?|§{1,2})\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\s+(?:through|to|[-–])\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
   for (const match of source.matchAll(rangePattern)) {
     const start = String(match[2] || "").replace(/\.$/, "");
     const end = String(match[3] || "").replace(/\.$/, "");
@@ -834,7 +836,7 @@ function inlineCrossReferences(text, fallbackCodePrefix) {
       }
     }
   }
-  const pattern = /\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?(?:Sections?|§{1,2}|Table)\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
+  const pattern = /\b(?:(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s+)?(?:Sections?|§{1,2}|Table)\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
   for (const match of source.matchAll(pattern)) {
     references.push({
       codePrefix: String(match[1] || fallbackCodePrefix || "").toUpperCase(),

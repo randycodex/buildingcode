@@ -25,13 +25,13 @@ Permitext now bundles:
 - Construction-related Local Laws and unconsolidated enactment, transition,
   applicability, and effective-date provisions
 
-The expanded enacted corpus contains 5,660 sections in 156 reader chapters:
+The expanded enacted corpus contains 5,661 sections in 156 reader chapters:
 
 - Administrative Code Titles 24, 25, 26, and 28: 3,499 sections
 - 1968 Building Code and Housing Maintenance Code: 1,160 sections
 - Fire Code: 415 sections
 - Construction-related Appendix A Local Laws: 225 sections
-- Energy Conservation and NYC Electrical amendments: 361 sections
+- Energy Conservation and NYC Electrical amendments: 362 sections
 
 These collections use the same prepared chapter catalog, section catalog,
 chapter body, section body, and search-index organization as the construction
@@ -64,8 +64,9 @@ The specialty-code importer at
 `permitext-sync-server/scripts/import-nyc-specialty-codes.py` extracts the
 official integrated 2025 Energy Conservation Code and the NYC-enacted
 Electrical Code amendments. It does not reproduce the referenced 2020 NFPA 70
-text. The Existing Building Code remains clearly marked with its July 17, 2027
-effective date.
+text. The AFCI amendment at 210.12(A) is separately indexed without changing
+existing section identifiers. The Existing Building Code remains clearly
+marked with its July 17, 2027 effective date.
 
 ## Explicit exclusions
 

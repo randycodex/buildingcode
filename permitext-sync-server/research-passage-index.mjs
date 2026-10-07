@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const researchPassageIndexVersion = "20261002-numbered-passage-context-v2";
+export const researchPassageIndexVersion = "20261007-published-text-context-v7";
 
 // This is a retrieval index, not an applicability classifier. Every hit keeps
 // its canonical section identity; a subsection inside a monolithic source is
@@ -72,11 +72,20 @@ function cleanHTML(value) {
 function numberedHeadings(text, rootNumber) {
   if (!rootNumber || !/[0-9]/.test(rootNumber)) return [];
   const pattern = new RegExp(
-    `^(${escapeRegex(rootNumber)}(?:\\.[0-9A-Za-z-]+)*)(?:\\.)?[ \\t]+([^\\r\\n]{1,180})$`, "gm"
+    `^(${escapeRegex(rootNumber)}(?:\\.[0-9A-Za-z-]+)*)(?:\\.)?[ \\t]+([^\\r\\n]{1,600})$`, "gm"
   );
   const headings = [];
   for (const match of text.matchAll(pattern)) {
-    const title = match[2].trim();
+    // A PDF line break after "Section" or "Table" does not turn the
+    // continued reference into a new published heading.
+    if (/\b(?:Sections?|Tables?)\s*$/i.test(text.slice(Math.max(0, match.index - 80), match.index).trimEnd())) continue;
+    const line = match[2].trim();
+    // PDF text can join a published short heading and its first sentence on
+    // one line. Recognize only a short, punctuated heading before that prose;
+    // a cross-reference sentence containing "shall" is still not a heading.
+    const inline = line.match(/^(.{1,120}?\.)[ \t]+[A-Z(“"]/);
+    const title = inline ? inline[1] : line;
+    if (!inline && title.length > 180) continue;
     // Numbered list items, measurements, and cross-reference sentences are
     // not subsection headings. Published headings are short standalone lines.
     if (!/[A-Za-z]/.test(title) || /\b(?:shall|must|may|means|provided|requires?)\b/i.test(title)) continue;
@@ -141,7 +150,7 @@ function referencedDescriptorNumbers(text, metadata, descriptors) {
   const pattern = new RegExp(`${prefix}${number}(?:\\s+(?:through|to)\\s+${number})?`, "gi");
   for (const match of text.matchAll(pattern)) {
     const before = text.slice(Math.max(0, match.index - 70), match.index);
-    const precedingCode = before.match(/\b(AC|BC|BC68|EBC|FC|FGC|MC|PC|ZR)\s*$/i)?.[1]?.toUpperCase();
+    const precedingCode = before.match(/\b(AC|BC|BC68|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s*$/i)?.[1]?.toUpperCase();
     if (precedingCode && precedingCode !== metadata.codePrefix) continue;
     const labels = { building: "BC", mechanical: "MC", plumbing: "PC", "fuel gas": "FGC", fire: "FC", administrative: "AC" };
     const precedingLabel = before.match(/\b(Building|Mechanical|Plumbing|Fuel\s+Gas|Fire|Administrative)\s+Code\s*$/i)?.[1];
@@ -284,7 +293,7 @@ export function researchPassagesForSection(section, body, { maximumCharacters = 
     const original = String(block.plainText);
     const text = original.slice(start, end);
     if (!text.trim()) return;
-    const id = `${metadata.sectionID}:b${blockIndex}:${start}-${end}${kind === "table_row" ? `:r${passages.length}` : ""}`;
+    const id = `${metadata.sectionID}:b${blockIndex}:${start}-${end}${kind === "table_row" ? `:r${passages.length}` : kind === "plain_text_table" ? ":table" : ""}`;
     const contexts = [...blockContexts(blockIndex), ...parentDescriptors.map(descriptor => descriptor.text)]
       .filter(value => value?.trim() && value !== text);
     // Tables are resolved in full, with their section's prose and footnotes.
@@ -378,6 +387,32 @@ export function researchPassagesForSection(section, body, { maximumCharacters = 
       }
     }
 
+    // PDF imports can retain complete published tables inside a monolithic
+    // plain-text block. Index the whole table, including its caption, units
+    // and notes; never fabricate cell associations from the flattened text.
+    // Exact source offsets and the governing lead-in survive evidence assembly.
+    if (!isTable && metadata.sectionNumber) {
+      const markers = [...text.matchAll(/^TABLE ([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)[^\r\n]*$/gm)];
+      const rules = headings.map(heading => ({index:heading.start}));
+      for (const [position, marker] of markers.entries()) {
+        const nextRule = rules.find(rule => rule.index > marker.index);
+        const end = Math.min(nextRule?.index ?? text.length, markers[position + 1]?.index ?? text.length);
+        // An unbounded/ambiguous extraction remains ordinary text rather than
+        // masquerading as a complete table source.
+        if (end - marker.index > 16000) continue;
+        const precedingRule = rules.filter(rule => rule.index < marker.index).at(-1);
+        const leadIn = precedingRule ? text.slice(precedingRule.index, marker.index) : "";
+        const general = headings.find(heading => heading.number === `${metadata.sectionNumber}.1` && /^general\b/i.test(heading.title));
+        const generalEnd = general ? headings.find(heading => heading.start > general.start)?.start ?? text.length : 0;
+        const contexts = [leadIn, general ? text.slice(general.start, generalEnd) : ""]
+          .filter(value => value.trim() && value.length <= 12000);
+        push({ block, blockIndex, start: marker.index, end, kind: "plain_text_table",
+          subsectionNumber: marker[1], passageTitle: `Table ${marker[1]} ${text.slice(marker.index + marker[0].length, end).trim().split("\n")[0]}`,
+          completeText: text.slice(marker.index, end), scopeComplete: false,
+          parentDescriptors: contexts.map(text => ({ text })) });
+      }
+    }
+
     if (isTable) {
       for (const tableMatch of String(block.html).matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/gi)) {
         const rows = [...tableMatch[0].matchAll(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi)];
@@ -390,6 +425,17 @@ export function researchPassagesForSection(section, body, { maximumCharacters = 
             searchText: `${headerText}\n${cleanHTML(row[0])}`, sourceHTML: row[0] });
         }
       }
+    }
+  }
+  const publishedTables = passages.filter(passage => passage.kind === 'plain_text_table');
+  for (const passage of passages) {
+    if (passage.kind === 'plain_text_table') continue;
+    for (const table of publishedTables) {
+      const reference = new RegExp(`\\b(?:Table|Section)\\s+${escapeRegex(table.subsectionNumber)}(?![\\w-]|\\.[\\w-])`, 'i');
+      if (!reference.test(passage.text) || passage.text.includes(table.text)) continue;
+      // A source that delegates a numerical requirement to its published
+      // table must retain that table's full scope, units and footnotes.
+      passage.contextTexts = [...new Set([...passage.contextTexts, ...table.contextTexts, table.text])];
     }
   }
   return passages;
@@ -546,7 +592,7 @@ function queryWeights(query, suppliedWeights) {
 }
 
 function explicitReferences(query) {
-  return [...String(query || "").matchAll(/\b(AC|BC|BC68|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi)]
+  return [...String(query || "").matchAll(/\b(AC|BC|BC68|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi)]
     .map(match => ({ codePrefix: match[1].toUpperCase(), number: match[2].replace(/\.$/, "") }));
 }
 

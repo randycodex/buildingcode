@@ -11,7 +11,7 @@ export const researchConversationTopicDecisions = Object.freeze({
   topicSwitch: "topic_switch"
 });
 
-const codePrefixes = "AC|BC|EBC|FC|FGC|MC|PC|ZR";
+const codePrefixes = "AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR";
 const directReferenceNumber = String.raw`(?:[A-Z]?\d+-\d+(?:\.[0-9A-Za-z-]+)*|[A-Z]?\d+(?:\.[0-9A-Za-z-]+)+)`;
 const stopWords = new Set([
   "a", "about", "after", "all", "also", "an", "and", "any", "are", "as", "at",
@@ -152,7 +152,7 @@ function subjectTokens(value) {
 }
 
 function sourceMatchesNamedAuthority(question, source) {
-  const families = new Set((question.match(/\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\b/gi) || []).map(value => value.toUpperCase()));
+  const families = new Set((question.match(/\b(?:AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\b/gi) || []).map(value => value.toUpperCase()));
   const existingBuilding = /\bexisting\s+building\s+code\b/i.test(question);
   if (existingBuilding) families.add("EBC");
   if (/\bzoning\s+resolution\b/i.test(question)) families.add("ZR");

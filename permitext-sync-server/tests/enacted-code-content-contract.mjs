@@ -24,7 +24,7 @@ const expectedSectionCounts = {
   FC: 415,
   LL: 225,
   ECC: 68,
-  EC: 293
+  EC: 294
 };
 
 const metadata = await enactedContentMetadata();
@@ -57,7 +57,7 @@ assert(chapters.every((chapter) => isEnactedCodeChapterID(chapter.id)));
 assert.equal((await enactedChapter(chapters[0].id)).groups.length > 0, true);
 
 const catalog = await enactedSectionCatalog();
-assert.equal(catalog.length, 5660);
+assert.equal(catalog.length, 5661);
 for (const [prefix, expectedCount] of Object.entries(expectedSectionCounts)) {
   assert.equal(
     catalog.filter((section) => section.codePrefix === prefix).length,

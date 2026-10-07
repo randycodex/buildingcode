@@ -274,7 +274,7 @@ import {
   researchEconomicsReport
 } from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
-import { openInvestigationEnabled, investigateResearchEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion, validateOpenInvestigationValue, openReviewRevisionFeedback } from "./research-open-investigation.mjs";
+import { openInvestigationEnabled, investigateResearchEvidence, mergeInvestigationEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion, validateOpenInvestigationValue, openReviewRevisionFeedback, openCitationOnlyRepairAllowed, assertOpenCitationOnlyRepair } from "./research-open-investigation.mjs";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 import { researchDecisionFactRepair } from "./research-decision-fact-repair.mjs";
 import {
@@ -345,6 +345,7 @@ import {
   routeResearchCorpora,
   unapprovedZoningDiagnosticEnabled
 } from "./research-corpus-registry.mjs";
+import { specialtySourceMetadata, constrainSpecialtySearchPlan, missingEnergyReferenceLookups } from "./research-specialty-codes.mjs";
 import {
   applyZoningResearchDeterministicRepairs,
   evaluateZoningResearchSafety,
@@ -812,7 +813,7 @@ export function normalizeResearchInterpretationEvidenceBindings(value, evidence)
       // establish support from the bound text. Never infer sources by topic,
       // inherit a parent section, or choose between multiple editions/passages.
       for (const [, prefix, number] of String(item.explanation || "").matchAll(
-        /\b(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*|Section\s+)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z]+)*)\b/g
+        /\b(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s*(?:§\s*|Section\s+)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z]+)*)\b/g
       )) {
         const matches = (evidence || []).filter(source =>
           source.codePrefix === prefix && source.sectionNumber === number);
@@ -8275,7 +8276,8 @@ function researchCatalogEntry(section, corpus) {
     codeVersion: corpus.codeVersion,
     corpusID: corpus.id,
     corpusLabel: corpus.label,
-    applicabilityStatus: corpus.applicabilityStatus
+    applicabilityStatus: corpus.applicabilityStatus,
+    ...(corpus.sourceCoverage ? { sourceCoverage: structuredClone(corpus.sourceCoverage) } : {})
   };
 }
 
@@ -8328,6 +8330,10 @@ export async function researchCorpusResources(corpusPlan) {
           } else if (corpus.id === "nyc-2022-fire-code") {
             catalog = (await enactedSectionCatalog()).filter((section) => section.codePrefix === "FC")
               .map((section) => researchCatalogEntry(section, corpus));
+            invertedIndex = await enactedSearchIndex();
+          } else if (["nyc-2025-energy-code", "nyc-2025-electrical-amendments"].includes(corpus.id)) {
+            catalog = (await enactedSectionCatalog()).filter(section => corpus.codePrefixes.includes(section.codePrefix))
+              .map(section => researchCatalogEntry(section, corpus));
             invertedIndex = await enactedSearchIndex();
           } else if (corpus.id === "nyc-zoning-resolution") {
             catalog = (await zoningSectionCatalog()).map((section) => researchCatalogEntry(section, corpus));
@@ -8708,6 +8714,7 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
       corpusID: corpus.id,
       corpusLabel: corpus.label,
       applicabilityStatus: corpus.applicabilityStatus,
+      ...specialtySourceMetadata(body, corpus),
       text,
       canonicalText,
       sectionTextHash: createHash("sha256").update(canonicalText).digest("hex"),
@@ -8734,6 +8741,8 @@ function researchPrompt(question, evidence, options = {}) {
       `APPLICABILITY_STATUS: ${section.applicabilityStatus || "current"}`,
       `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
       `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
+      ...(section.sourceCoverage ? [`SOURCE_COVERAGE: ${JSON.stringify(section.sourceCoverage)}`] : []),
+      ...(section.sourceProvenance ? [`SOURCE_PROVENANCE: ${JSON.stringify(section.sourceProvenance)}`] : []),
       researchSourceApplicabilityPrompt(section),
       metadata ? "SOURCE_CLASS: official_metadata; supplied corpus snapshot; not refreshed in this turn; not historical enacted text" : "",
       `PASSAGE_TEXT_SHA256: ${section.sectionTextHash || "unavailable"}`,
@@ -20216,6 +20225,7 @@ async function handleResearchConversationMessage(request, response) {
     evidencePackage = await refreshZoningContextEvidence(evidencePackage, zoningPlan, assembleForZoningPlan);
     if (openInvestigation) {
       if (!(await ensureResearchTurnReservation())) return;
+      const investigationCorpusBoundary = structuredClone(corpusPlan);
       evidencePackage = await investigateResearchEvidence({ question,
         facts: [...combinedProjectFacts, ...conversationFactContext.established, ...conversationFactContext.hypothetical,
           ...researchPropertyContextFacts(propertyResearch)],
@@ -20223,12 +20233,14 @@ async function handleResearchConversationMessage(request, response) {
         evidencePackage, signal: progressResponse.signal,
         decide: async input => {
           const response = await openAIResearchInvestigationDecision("permitext_research_investigation", investigationInstructions,
-            investigationSchema, {...input, codeBasis:answerCodeBasis}, context.userID, progressResponse.signal);
+            investigationSchema, {...input, codeBasis:answerCodeBasis, corpusPlan}, context.userID, progressResponse.signal);
           investigationUsage.push(response.usage); return response.value;
         },
         search: async query => {
-          const searchPlan = await researchCorpusPlanForTurn({question:query,
-            projectCodeVersion:projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null});
+          const searchPlan = constrainSpecialtySearchPlan(await researchCorpusPlanForTurn({question:query,
+            messages: [...activeMessages, { role:"user", question }],
+            projectCodeVersion:projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null}),
+            investigationCorpusBoundary);
           // Discovery may cross into a relevant historical or other available
           // code book. Searching it is not a finding that it governs this site.
           for (const field of ["selected", "unavailable", "requestedCorpusIDs"]) {
@@ -20330,7 +20342,7 @@ async function handleResearchConversationMessage(request, response) {
         failureCode: "RESEARCH_ZONING_PREREQUISITES_REQUIRED" });
       return;
     }
-    if (!assembledEvidence.length) {
+    if (!assembledEvidence.length && !openInvestigation) {
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence_unavailable" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
@@ -20602,6 +20614,7 @@ async function handleResearchConversationMessage(request, response) {
     let answerEscalated = false;
     const interpretationOptions = {
       allowEvidenceGapOnly: openInvestigation,
+      corpusPlan,
       sourceAvailability: evidencePackage.sourceAvailability,
       priorSuppliedText,
       suppliedText,
@@ -20930,14 +20943,45 @@ async function handleResearchConversationMessage(request, response) {
         throw error;
       }
     } else if (openInvestigation) {
-      // One substantive review; at most one full repair and a fresh review of
-      // the final answer. No stylistic gates or deterministic fact insertion.
-      for (let attempt=0; attempt<2; attempt++) {
+      // A draft can name an operative subsection missing from the selected
+      // packet even though it exists in a loaded monolithic energy section.
+      // Look up at most two exact references before review; do not insert law
+      // or rewrite the answer. The ordinary reviewer decides whether repair is
+      // required against the newly supplied, edition-matched source text.
+      const gapLookupStartedAt = performance.now();
+      const retainedSourceIDs = [...new Set([...result.interpretation.supportedPoints, ...result.interpretation.citations]
+        .flatMap(point => point.sourceIDs || []))];
+      const gapLookups = [];
+      for (const lookup of missingEnergyReferenceLookups(result.interpretation, corpusPlan, assembledEvidence, {question})) {
+        const found = await assembledResearchEvidenceForTurn({question:lookup.query,messages:[],pinnedEvidence:[],
+          originSurface:conversation.origin?.surface || '',projectFacts:[],topicContext:null,corpusPlan,zoningPlan:null,
+          beforeSemanticRequest:async () => { await ensureResearchTurnReservation(); },onStage:progressResponse.progress});
+        const heading = new RegExp(`(?:^|\\n)(?:TABLE )?${lookup.number.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[ \\t]+`, 'i');
+        const additions = found.sources.filter(source => source.corpusID === 'nyc-2025-energy-code' &&
+          !source.truncated && heading.test(source.text || '')).map(source => ({...source,
+            sourceID:`${source.sourceID}-gap-${lookup.number}`}));
+        assembledEvidence = mergeInvestigationEvidence(assembledEvidence, additions, {retainedSourceIDs});
+        gapLookups.push({query:lookup.query,addedSources:additions.filter(source => assembledEvidence.includes(source)).length});
+      }
+      if (gapLookups.length) {
+        evidencePackage.sources = assembledEvidence;
+        evidencePackage.investigation.localGapLookups = gapLookups;
+        const snapshots = assembledEvidence.map(source => immutableEvidenceSnapshot({source,
+          approvedAt:new Date().toISOString(),evidenceSetVersion:Number(conversation.evidenceSetVersion || 1),
+          sourceLibraryVersion:source.codeVersion || conversation.codeVersion}));
+        evidenceSnapshots.splice(0,evidenceSnapshots.length,...snapshots);
+        researchOperation.retrievalMilliseconds += Math.round(performance.now() - gapLookupStartedAt);
+        researchOperation.evidenceReferences = [...new Set(assembledEvidence.map(source => `${source.codePrefix} ${source.sectionNumber}`))];
+        researchOperation.evidenceCharacterCount = assembledEvidence.reduce((total, source) => total + String(source.text || '').length, 0);
+      }
+      // Two bounded substantive repairs, then one citation-only correction if
+      // all remaining issues are binding errors. Every result gets fresh review.
+      for (let attempt=0; attempt<4; attempt++) {
         const review = await openAIResearchInvestigationDecision("permitext_research_open_review", reviewInstructions,
           reviewSchema, { question, evidence:assembledEvidence, answer:result.interpretation,
             evidenceGapOnly: ["supportedPoints", "citations", "supportingSourceUses"].every(key =>
               Array.isArray(result.interpretation[key]) && result.interpretation[key].length === 0),
-            facts:validUserFacts, propertyResearch, codeBasis:answerCodeBasis,
+            facts:validUserFacts, propertyResearch, codeBasis:answerCodeBasis, corpusPlan,
             supportingSources:webSupport.sources }, context.userID, progressResponse.signal);
         verifierUsage = combinedResearchUsage(verifierUsage, review.usage);
         if (typeof review.value.pass !== "boolean" || !Array.isArray(review.value.issues) ||
@@ -20947,13 +20991,15 @@ async function handleResearchConversationMessage(request, response) {
         verificationAttempts.push({...review.value, model:review.model,
           ...(review.structuredResponseRetryCount ? {structuredResponseRetryCount:review.structuredResponseRetryCount} : {})});
         if (review.value.pass) break;
-        if (attempt === 1) throw Object.assign(new Error("The investigated answer still has a substantive accuracy issue."),
+        const citationOnlyRepair = openCitationOnlyRepairAllowed(attempt, review.value.issues);
+        if (attempt > 1 && !citationOnlyRepair) throw Object.assign(new Error("The investigated answer still has a substantive accuracy issue."),
           {code:"RESEARCH_VERIFICATION_FAILED",verificationAttempts});
         const repaired = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID,
           {...interpretationOptions, model:"gpt-6-luna", revisionFeedback:openReviewRevisionFeedback(review.value.issues),
-            previousInterpretation:result.interpretation, disableTargetedRevision:true});
-        result = repaired; answerRegenerated = true;
+            previousInterpretation:result.interpretation, disableTargetedRevision:true, citationOnlyRepair});
         answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, repaired.usage);
+        if (citationOnlyRepair) assertOpenCitationOnlyRepair(result.interpretation, repaired.interpretation);
+        result = repaired; answerRegenerated = true;
       }
       requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({requiredClaims,evidence:assembledEvidence,answer:result.interpretation});
       claimMateriality = evaluateResearchClaimMateriality({claims:materialityClaims,evidence:assembledEvidence,answer:result.interpretation});

@@ -599,6 +599,8 @@ export function immutableEvidenceSnapshot({
     }
   }
   snapshot.provenance = provenance;
+  if (source?.sourceProvenance) snapshot.provenance.publication = structuredClone(source.sourceProvenance);
+  if (source?.sourceCoverage) snapshot.sourceCoverage = structuredClone(source.sourceCoverage);
   const structuredSource = immutableStructuredEvidenceSource(source, passageText);
   if (structuredSource) snapshot.structuredSource = structuredSource;
   const visualSources = immutableVisualEvidenceSources(source);
@@ -761,7 +763,7 @@ export function immutableResearchAnswer({
     emptyGuidanceFactUsage;
   const clarificationAnswer = model === "permitext-conversation-clarification" &&
     researchCitations.length === 0 && isCanonicalResearchClarification(question, answer);
-  if (researchEvidence.length < 1 && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer) {
+  if (researchEvidence.length < 1 && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer) {
     throw new Error("Research answers require evidence.");
   }
   const canonicalBoundary = researchEvidenceBoundaryInterpretation(question);

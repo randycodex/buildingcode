@@ -137,7 +137,7 @@ if (enactedAdministrativeChapterFiles !== 134 || enactedAdministrativeSectionFil
       `${enactedAdministrativeSectionFiles} sections.`
   );
 }
-if (specialtyChapterFiles !== 22 || specialtySectionFiles !== 361) {
+if (specialtyChapterFiles !== 22 || specialtySectionFiles !== 362) {
   throw new Error(
     "Deploy content has an incomplete specialty-code package: " +
       `${specialtyChapterFiles} chapters, ${specialtySectionFiles} sections.`

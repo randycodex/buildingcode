@@ -27,7 +27,7 @@ const answer={...validateResearchInterpretation(gap,evidence,[],options),mode:'o
 const persist=a=>immutableResearchAnswer({owner:ownerScope('user-1'),conversationID:'conversation-1',question:'GFCI?',
  answer:a,evidence:[{...evidence[0],id:'snapshot-1',evidenceSetVersion:1}],citations:[],model:'gpt-6-luna',researchSystemVersion:'offline-contract'});
 assert.deepEqual(persist(answer).citations,[]);
-for(const version of ['20261007-open-investigation-recovery-v2','20261007-open-investigation-recovery-v3'])
+for(const version of ['20261007-open-investigation-recovery-v2','20261007-open-investigation-recovery-v3','20261007-open-investigation-recovery-v4','20261007-open-investigation-recovery-v5'])
  assert.deepEqual(persist({...answer,researchEngine:version,
  investigation:{version,trace:answer.investigation.trace}}).citations,[],
  'Previously reviewed saved gaps remain valid after a policy revision');

@@ -225,7 +225,7 @@ def split_electrical(path: Path) -> list[SourceSection]:
             following = lines[index + 1] if index + 1 < len(lines) else ""
             active_chapter_title = f"CHAPTER {active_chapter_number} — {following}"
             continue
-        marker = re.fullmatch(r"SECTION\s+(?:EC\s+)?([0-9.]+)", line)
+        marker = re.fullmatch(r"SECTION\s+(?:EC\s+)?([0-9.]+(?:\([A-Za-z0-9]+\))*)", line)
         article = re.fullmatch(r"ARTICLE\s+(\d+)", line)
         if marker:
             boundaries.append(
@@ -325,6 +325,12 @@ def build_package(energy_dir: Path, electrical_pdf: Path, output: Path) -> dict:
         }
     )
 
+    # Re-extraction must not renumber saved canonical citations when a newly
+    # recognized subsection is inserted before existing sections.
+    map_path = output / "prepared" / "section-map.json"
+    existing_ids = json.loads(map_path.read_text()) if map_path.exists() else {}
+    assert all(isinstance(identifier, int) and identifier >= SECTION_ID_BASE for identifier in existing_ids.values())
+    assert len(set(existing_ids.values())) == len(existing_ids)
     if output.exists():
         shutil.rmtree(output)
     (output / "prepared" / "chapters").mkdir(parents=True)
@@ -344,7 +350,7 @@ def build_package(energy_dir: Path, electrical_pdf: Path, output: Path) -> dict:
     catalog = []
     section_map = {}
     token_index: dict[str, set[int]] = {}
-    next_section_id = SECTION_ID_BASE
+    next_section_id = max([SECTION_ID_BASE - 1, *existing_ids.values()]) + 1
 
     for chapter_offset, ((prefix, number, title), chapter_sections) in enumerate(
         chapters.items(), start=1
@@ -353,8 +359,12 @@ def build_package(energy_dir: Path, electrical_pdf: Path, output: Path) -> dict:
         groups = []
         html_parts = []
         for group_offset, section in enumerate(chapter_sections, start=1):
-            section_id = next_section_id
-            next_section_id += 1
+            section_key = f"{prefix}:{number}:{section.section_number}"
+            if section_key in existing_ids:
+                section_id = existing_ids[section_key]
+            else:
+                section_id = next_section_id
+                next_section_id += 1
             block = {
                 "id": f"specialty-{section_id}-block-001",
                 "kind": "html",
@@ -420,7 +430,8 @@ def build_package(energy_dir: Path, electrical_pdf: Path, output: Path) -> dict:
                 "headingLine": title,
             }
             catalog.append(row)
-            section_map[f"{prefix}:{number}:{section.section_number}"] = section_id
+            assert section_key not in section_map, f"Duplicate source section: {section_key}"
+            section_map[section_key] = section_id
             for token in search_tokens(
                 f"{prefix} {number} {title} {section.section_number} "
                 f"{section.title} {section.text}"

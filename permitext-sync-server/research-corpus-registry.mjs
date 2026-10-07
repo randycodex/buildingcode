@@ -1,8 +1,9 @@
 import { researchQuestionSubject, researchFloorAreaRatioRequested } from "./research-question-subject.mjs";
 import { decideResearchConversationTopic, researchQuestionExplicitlySwitchesTopic } from "./research-conversation-topic.mjs";
 import { researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
+import { energyResearchCue, electricalResearchCue, specialtyResearchCorpora, specialtyResearchRequests, unavailableSpecialtyCorpus } from "./research-specialty-codes.mjs";
 
-export const researchCorpusRegistryVersion = "20261006-explicit-issue-lot-classification-v21";
+export const researchCorpusRegistryVersion = "20261007-specialty-source-routing-v22";
 const currentLibraryRecallReason = "authorized current-library recall; applicability unresolved";
 
 const constructionCodeVersion =
@@ -131,6 +132,7 @@ export function createResearchCorpusRegistry({
       optInRequired: false,
       aliases: ["nyc-2014", "2014 construction codes", "2014 building code"]
     }),
+    ...specialtyResearchCorpora().map(immutableCorpus),
     immutableCorpus({
       id: "nyc-zoning-resolution",
       label: "NYC Zoning Resolution",
@@ -208,16 +210,20 @@ export function routeResearchCorpora({
   const currentQuestion = compactText(question);
   if (!currentQuestion) throw new Error("Research corpus routing requires a question.");
   const conversationContext = recentUserContext(previousMessages);
+  const topicDecision = decideResearchConversationTopic({ question: currentQuestion, previousMessages,
+    rootTopic: topicContext?.rootTopic, currentTopic: topicContext?.currentTopic });
+  const specialtyRequests = specialtyResearchRequests({ question: currentQuestion, previousMessages,
+    inheritTopic: topicDecision.contextPolicy.includeRootTopic, projectCodeVersion, projectFacts });
   const followsConstructionConversation = (/\bcompar(?:e|ison)\b/i.test(currentQuestion) && constructionCue.test(currentQuestion)) ||
     constructionCue.test(conversationContext) || historicalBuildingCue.test(conversationContext) ||
     historical2014ConstructionCue.test(conversationContext);
   const editionQuestion = currentQuestion.replace(/\b(?:built|constructed|erected|completed)\s+(?:(?:in|around|before|after)\s+)?(?:1968|2014|2022)\b/gi, "");
-  const shorthand2008Requested = followsConstructionConversation && /\b(?:what|how)\s+about\s+(?:the\s+)?2008\b/i.test(currentQuestion);
-  const shorthand1968Requested = followsConstructionConversation &&
+  const shorthand2008Requested = !specialtyRequests.length && followsConstructionConversation && /\b(?:what|how)\s+about\s+(?:the\s+)?2008\b/i.test(currentQuestion);
+  const shorthand1968Requested = !specialtyRequests.length && followsConstructionConversation &&
     historical1968FollowUpCue.test(editionQuestion);
-  const shorthand2014Requested = followsConstructionConversation &&
+  const shorthand2014Requested = !specialtyRequests.length && followsConstructionConversation &&
     historical2014FollowUpCue.test(editionQuestion);
-  const shorthand2022Requested = followsConstructionConversation &&
+  const shorthand2022Requested = !specialtyRequests.length && followsConstructionConversation &&
     current2022FollowUpCue.test(editionQuestion);
   const projectHasZoningContext = (Array.isArray(projectFacts) ? projectFacts : [])
     .some((fact) => /^(?:Zoning Fact|NYC Planning Fact)\s+—\s+(?:Zoning District|Zoning Map|BBL|Block|Tax Lot)/i.test(compactText(fact)));
@@ -239,6 +245,8 @@ export function routeResearchCorpora({
     current2022ConstructionCue,
     historicalBuildingCue,
     unsupported2008ConstructionCue,
+    electricalResearchCue,
+    energyResearchCue,
     appendixPCrossEditionCue
   ].some((pattern) => pattern.test(currentQuestion)) ||
     shorthand2008Requested ||
@@ -249,9 +257,9 @@ export function routeResearchCorpora({
   const latestEditionContext = (Array.isArray(previousMessages) ? previousMessages : [])
     .filter(message => !message?.role || message.role === "user")
     .map(message => compactText(message?.question || message?.content || message?.text))
-    .reverse().find(text => historicalBuildingCue.test(text) || historical2014ConstructionCue.test(text) ||
+    .reverse().find(text => (!specialtyRequests.length || explicitConstructionAuthorityCue.test(text)) && (historicalBuildingCue.test(text) || historical2014ConstructionCue.test(text) ||
       current2022ConstructionCue.test(text) || unsupported2008ConstructionCue.test(text) || futureExistingBuildingCue.test(text) ||
-      /\b(?:what|how)\s+about\s+(?:the\s+)?(?:1968|2008|2014|2022)\b/i.test(text));
+      /\b(?:what|how)\s+about\s+(?:the\s+)?(?:1968|2008|2014|2022)\b/i.test(text)));
   const currentHasEditionCue = historicalBuildingCue.test(currentQuestion) || historical2014ConstructionCue.test(currentQuestion) ||
     current2022ConstructionCue.test(currentQuestion) || unsupported2008ConstructionCue.test(currentQuestion) ||
     futureExistingBuildingCue.test(currentQuestion) || shorthand1968Requested || shorthand2014Requested || shorthand2022Requested || shorthand2008Requested;
@@ -262,10 +270,8 @@ export function routeResearchCorpora({
     ? currentQuestion.replace(/\b27-\d{3,4}\b/g, "") : currentQuestion;
   const changesDomain = fireCue.test(currentQuestion) || zoningCue.test(domainQuestion) || appendixPCrossEditionCue.test(currentQuestion) || projectZoningRequested;
   const inheritsEditionContext = Boolean(latestEditionContext && !currentHasEditionCue && !changesDomain);
-  const explicitCurrentAuthority = /\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas|fire)\s+code\b|\bzoning\b/i.test(currentQuestion) ||
+  const explicitCurrentAuthority = /\b(?:AC|BC|EBC|EC|ECC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas|fire|electrical|energy)\s+code\b|\bzoning\b/i.test(currentQuestion) ||
     researchQuestionExplicitlySwitchesTopic(currentQuestion);
-  const topicDecision = decideResearchConversationTopic({ question: currentQuestion, previousMessages,
-    rootTopic: topicContext?.rootTopic, currentTopic: topicContext?.currentTopic });
   const routingEditionContext = topicDecision.contextPolicy.includeRootTopic
     ? latestEditionContext : editionOnlyRoutingContext(latestEditionContext);
   // Generic terms such as travel distance occur in several codes. A follow-up
@@ -318,6 +324,7 @@ export function routeResearchCorpora({
   const fireRequested = fireCue.test(context);
   const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(researchZoningQuestionText(historicalRequested ? context.replace(/\b27-\d{3,4}\b/g, "") : context)) || projectZoningRequested);
   const requestedIDs = new Map();
+  for (const request of specialtyRequests) requestedIDs.set(request.id, request.reason);
   if (unsupported2008Requested) requestedIDs.set("nyc-2008-construction-codes", "explicit unavailable 2008 code edition");
   if (constructionRequested) requestedIDs.set("nyc-2022-construction-codes", "construction-code cue");
   if (priorCodeTechnicalApplicability) {
@@ -411,6 +418,7 @@ export function routeResearchCorpora({
     codeVersion: null, codePrefixes: [], applicabilityStatus: "unavailable-edition", automaticResearchEligible: false,
     routeReason: "explicit unavailable 2008 code edition", blockedReason: "The 2008 Construction Codes are not available in the authorized Research library."
   });
+  unavailable.push(...specialtyRequests.filter(request => !request.available).map(unavailableSpecialtyCorpus));
   return {
     schemaVersion: 1,
     registryVersion: researchCorpusRegistryVersion,

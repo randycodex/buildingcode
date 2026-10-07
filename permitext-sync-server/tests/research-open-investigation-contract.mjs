@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { investigateResearchEvidence, mergeInvestigationEvidence, openInvestigationEnabled, validateOpenInvestigationValue, openReviewRevisionFeedback } from '../research-open-investigation.mjs';
+import { investigateResearchEvidence, mergeInvestigationEvidence, openInvestigationEnabled, validateOpenInvestigationValue, openReviewRevisionFeedback, openCitationOnlyRepairAllowed, assertOpenCitationOnlyRepair } from '../research-open-investigation.mjs';
 const a={sourceID:'a',text:'A scope paragraph'}, b={sourceID:'b',text:'A governing requirement'};
 const searches=[]; const observations=[];
 const result=await investigateResearchEvidence({question:'Original question',facts:['Known user fact'],messages:[],evidencePackage:{sources:[a]},
@@ -26,6 +26,20 @@ await assert.rejects(investigateResearchEvidence({signal:controller.signal,evide
 const review={pass:false,issues:[{type:'incorrect_citation',message:'Keep this complete finding.'}]};
 assert.equal(validateOpenInvestigationValue(review,'permitext_research_open_review'),review);
 assert.deepEqual(openReviewRevisionFeedback(review.issues),[{type:'incorrect_citation',detail:'Keep this complete finding.'}]);
+assert(openCitationOnlyRepairAllowed(2, review.issues));
+assert(!openCitationOnlyRepairAllowed(0, review.issues));
+assert(!openCitationOnlyRepairAllowed(1, review.issues));
+assert(!openCitationOnlyRepairAllowed(3, review.issues));
+assert(!openCitationOnlyRepairAllowed(2, [{type:'wrong_attribution',message:'Scope must change.'}]));
+assert(!openCitationOnlyRepairAllowed(2, []));
+const draft = {answerText:'Conditional finding.',supportedPoints:[{heading:'Rule',explanation:'Only in this scope.',sectionID:'a',sourceIDs:['old']}],
+  assumptions:[],missingFacts:[],followUpQuestions:[],evidenceLimitations:[],additionalEvidenceNeeded:[],supportingSourceUses:[],citations:[]};
+const rebound = structuredClone(draft); rebound.supportedPoints[0].sourceIDs=['correct']; rebound.citations=[{sectionID:'a',sourceIDs:['correct']}];
+assert.doesNotThrow(()=>assertOpenCitationOnlyRepair(draft,rebound));
+for (const change of [answer=>answer.answerText='Changed conclusion.',answer=>answer.supportedPoints[0].explanation='Changed condition.',answer=>answer.evidenceLimitations=['New gap.']]) {
+  const changed=structuredClone(rebound);change(changed);
+  assert.throws(()=>assertOpenCitationOnlyRepair(draft,changed),{code:'INVALID_RESEARCH_RESPONSE'});
+}
 for(const value of [{pass:false,issues:[]},{pass:true,issues:review.issues},{pass:false,issues:[{type:'invented',message:'Bad'}]}])
   assert.throws(()=>validateOpenInvestigationValue(value,'permitext_research_open_review'),{code:'INVALID_RESEARCH_VERIFICATION'});
 assert.throws(()=>validateOpenInvestigationValue({ready:true,queries:[],reason:'Missing retained IDs'},'permitext_research_investigation'),{code:'INVALID_RESEARCH_RESPONSE'});

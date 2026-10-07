@@ -136,7 +136,7 @@ const outsideLibraryRequestPattern =
 const selectedEvidenceBoundaryPattern =
   /(?:\b(?:current|selected|supplied|assembled|available)\b[^?\n]{0,120}\b(?:evidence|text|passages?|provisions?|library|corpus)\b[^?\n]{0,180}\b(?:prove|establish|confirm|support|show|demonstrate|sufficient|enough)\b|\bbased only on (?:the )?(?:current|selected|supplied|assembled|available)\b)/i;
 const namedProvisionBoundaryPattern =
-  /\bbased on\b[^?\n]{0,260}\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:(?:Sections?|Table)\s+|§\s*)?[A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*/i;
+  /\bbased on\b[^?\n]{0,260}\b(?:AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s*(?:(?:Sections?|Table)\s+|§\s*)?[A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*/i;
 // Summarizing selected enacted text has the same source boundary as asking
 // what that text establishes. A discovery suggestion is not a request to
 // investigate a separate authority. Explicit outside lookups still override it.

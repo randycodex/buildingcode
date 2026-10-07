@@ -977,6 +977,7 @@ function normalizedSearchIndex(index) {
 function explicitQuestionDisciplinePrefixes(question) {
   const prefixes = new Set();
   const names = { AC: "Administrative\\s+Code", BC: "Building\\s+(?:Code|Rules|Regulations)", EBC: "Existing\\s+Building\\s+(?:Code|Rules|Regulations)",
+    EC: "Electrical\\s+(?:Code|Rules|Regulations)", ECC: "Energy(?:\\s+Conservation)?\\s+(?:Code|Rules|Regulations)",
     FC: "Fire\\s+(?:Code|Rules|Regulations)", FGC: "Fuel[- ]Gas\\s+(?:Code|Rules|Regulations)", MC: "Mechanical\\s+(?:Code|Rules|Regulations)", PC: "Plumbing\\s+(?:Code|Rules|Regulations)", ZR: "Zoning\\s+(?:Resolution|Rules|Regulations)" };
   for (const [prefix, name] of Object.entries(names)) {
     if (new RegExp(`\\b(?:${name}|${prefix})\\b`, "i").test(question)) prefixes.add(prefix);
@@ -1076,11 +1077,11 @@ function codeReferences(question) {
     seen.add(key);
     references.push(reference);
   };
-  const pattern = /\b(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:(?:Sections?|Table)\s+|§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
+  const pattern = /\b(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s*(?:(?:Sections?|Table)\s+|§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
   for (const match of String(question || "").matchAll(pattern)) {
     add(match[1], match[2]);
   }
-  const headingPattern = /\bSECTION\s+(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+[A-Z]?\d+(?:-\d+)?\s*:[^\n]{0,120}?\b([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
+  const headingPattern = /\bSECTION\s+(AC|BC|EBC|ECC|EC|FC|FGC|MC|PC|ZR)\s+[A-Z]?\d+(?:-\d+)?\s*:[^\n]{0,120}?\b([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
   for (const match of String(question || "").matchAll(headingPattern)) {
     add(match[1], match[2]);
   }

@@ -38,6 +38,20 @@ function currentText(value) {
 }
 
 const definitions = Object.freeze([
+  { subject: 'energy_fenestration', codePrefixes: ['ECC'],
+    terms: ['fenestration', 'window', 'glazing', 'replacement', 'historic'],
+    foregroundTerms: () => ['fenestration', 'window', 'replacement', 'historic'],
+    identity: /\b(?:windows?|glazing|fenestration|sashes?)\b/i,
+    aspect: /\b(?:energy|U[- ]factor|SHGC|thermal\w*|condensation|single[- ]pane|double[- ]glazing)\b/i,
+    competing: /\b(?:fire[- ]rated|fire[- ]resistance|opening[- ]protectives?)\b/i,
+    canonical: /\b(?:fenestration|windows?|historic\s+buildings?)\b/i },
+  { subject: 'energy_opaque_door', codePrefixes: ['ECC'],
+    terms: ['opaque door', 'U-factor', 'air leakage', 'fenestration'],
+    foregroundTerms: () => ['door', 'U-factor', 'air', 'leakage'],
+    identity: /\b(?:opaque\s+doors?|exterior\s+(?:entrance\s+)?doors?|wood\s+exterior\s+(?:entrance\s+)?doors?)\b/i,
+    aspect: /\b(?:energy|U[- ]factor|SHGC|air\s+leakage)\b/i,
+    competing: /\b(?:fire[- ]rated|fire[- ]resistance|egress)\b/i,
+    canonical: /\b(?:doors?|fenestration)\b/i },
   { subject: 'relief_discharge', codePrefixes: ['PC'],
     terms: ['water heater', 'relief valve', 'discharge piping', 'air gap'],
     identity: /\b(?:water[-\s]+heaters?|(?:hot[-\s]+water|domestic[-\s]+hot[-\s]+water)[-\s]+(?:tanks?|cylinders?))\b/i,
@@ -261,7 +275,7 @@ export function researchSearchVocabulary(question = '', options = {}) {
       const detail = definition.continuation || definition.detail;
       const edition = current.match(/\b(?:19|20)\d{2}\b(?=[^.!?]{0,35}\b(?:codes?|edition|version)\b)/i)?.[0];
       if (definition.guardedContinuation && (/\b(?:compar\w*|versus|vs|both|difference)\b/i.test(current) ||
-          /\b(?:BC|PC|MC|FC|FGC|AC|EBC|ZR)\s*\d|§/i.test(positive))) continue;
+          /\b(?:ECC|EC|BC|PC|MC|FC|FGC|AC|EBC|ZR)\s*\d|§/i.test(positive))) continue;
       const detailMatches = detail?.test(positive) || definition.continuationCorrection?.(positive);
       if (!detailMatches || definition.continuationExclusion?.test(positive) || !topics.some(topic => (!definition.guardedContinuation || !edition ||
           !/\b(?:19|20)\d{2}\b/.test(topic) || topic.includes(edition)) && matched(definition, topic))) continue;

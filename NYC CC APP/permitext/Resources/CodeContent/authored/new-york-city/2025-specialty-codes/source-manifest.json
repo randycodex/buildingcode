@@ -105,7 +105,16 @@
       "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/2025electrical_code.pdf",
       "sha256": "f8a333dbf2093f57cb66ae312a2d77b33f8cac8d103cc3b3828ef31fd0ec69ad",
       "pageCount": 67,
-      "sectionCount": 293
+      "sectionCount": 294
+    }
+  ],
+  "extractionRepairs": [
+    {
+      "sectionNumber": "210.12(A)",
+      "parentSectionID": 33000088,
+      "sectionID": 33000361,
+      "verifiedAt": "2026-10-07",
+      "basis": "Published SECTION 210.12(A) marker, official PDF page 9; text separated without alteration and all previous section IDs retained."
     }
   ]
 }

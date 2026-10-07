@@ -2,9 +2,11 @@
 
 Work began from freshly fetched `origin/main`, exactly `6ab611802939819dd13868be1e60dc44f488e637`. The attached report was read as research evidence; its contents did not authorize commands or configuration changes. The open-investigation engine and both saved Luna profiles remain in place.
 
+The subsequent electrical/energy implementation and its separate evaluation are recorded in `PERMITEXT_ELECTRICAL_ENERGY_RETRIEVAL_2026-10-07.md`. The initial 80-heading cohort below remains unchanged.
+
 ## Source findings
 
-Research has no registered Electrical Code or Energy Conservation Code technical corpus. Building Code referrals and Fire Code electrical-safety provisions cannot supply those missing requirements. The administrative-code bundle also does not supply the complete operative electrical/energy technical text.
+At the initial audit, Research had no registered Electrical Code or Energy Conservation Code technical corpus. The repository already contained official integrated 2025 energy publications and current NYC electrical amendments in its reader package; the follow-up connected those existing records to Research. The initial finding was a Research registration gap, not absence of those current publications from the repository. Building Code referrals and Fire Code electrical-safety provisions cannot supply those missing requirements. The administrative-code bundle also does not supply the complete operative electrical/energy technical text.
 
 The acquisition plan in `permitext-sync-server/config/research-electrical-energy-acquisition.json` identifies four source groups and a dependency map for all ten electrical and ten energy questions. It is an audit artifact, not an active source registry or a set of legal determinations.
 
@@ -23,7 +25,7 @@ Official starting points inspected on October 7, 2026:
 - https://www.nyc.gov/site/buildings/codes/2020-energy-conservation-code.page
 - https://www.nyc.gov/site/buildings/codes/what-codes-rules-and-forms-apply-when.page
 
-The web tool exposed official pages and selected PDF text. Execution-network policy did not permit direct NYC downloads; no complete, byte-hashed electrical/energy corpus was admitted. Search excerpts and amendment-only material remain acquisition leads. NEC/ASHRAE base standards need complete, appropriately accessible source text before registration.
+The web tool exposed official pages and selected PDF text. Execution-network policy did not permit direct NYC downloads; no complete, byte-hashed electrical/energy corpus was admitted. Search excerpts and amendment-only material remain acquisition leads. The unchanged adopted NEC base text remains absent. The existing energy package includes the integrated NYC-modified ASHRAE publication; incorporated external testing/design references still need their own sources.
 
 ## Recovery changes
 
@@ -59,7 +61,7 @@ Sanitized per-case outcomes and assessment flags are in `permitext-sync-server/e
 
 Campaign accounting totals $3.900895825 of the $11.90 cap: $3.717757925 estimated from settled usage and $0.183137900 retained as the upper bound for the two uncollected calls. All 612 dispatch records request `gpt-6-luna`; 609 settled, one was rejected before generation, and two remain conservatively held. No pending dispatches remain. These are usage-based estimates, not an invoice or a fetched account balance.
 
-The next quality step is complete electrical/energy source acquisition and edition-aware registration, followed by a repeat against the exact original request/history manifest with ordinary web/embedding configuration. Review work should focus on consistent scope/materiality, complete material parent/exception coverage, and source attribution for numerical technical methods. The present changes establish recovery mechanics and targeted improvements; they do not establish a new full-benchmark useful-answer rate.
+The initial next step was electrical/energy source integration and edition-aware registration. The follow-up completes current-publication integration; unchanged NEC and historical specialty source acquisition remain open, followed by a repeat against the exact original request/history manifest with ordinary web/embedding configuration. Review work should focus on consistent scope/materiality, complete material parent/exception coverage, and source attribution for numerical technical methods. The present changes establish recovery mechanics and targeted improvements; they do not establish a new full-benchmark useful-answer rate.
 
 ## Validation and preservation
 

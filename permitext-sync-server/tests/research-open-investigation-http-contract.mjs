@@ -47,7 +47,7 @@ globalThis.fetch=async(url,options)=>{
    const fail=reviews===1||scenario==='rejected';
    value={pass:!fail,issues:fail?[{type:'unsupported_requirement',message:'Correct the identification wording.'}]:[]};
   }
-  assert(calls.length<=6);
+  assert(calls.length<=8);
   return Response.json({model:body.model,status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(value)}]}]});
  }catch(error){doubleError=error;throw error;}
 };
@@ -64,13 +64,15 @@ try {
   const response=await request('/research/conversations/message',{auth,conversationID,requestID:randomUUID(),question:'For our project under the 2022 NYC codes, what identification rule does MC 304.12 provide for installed equipment?'},token);
   if(doubleError)throw doubleError;
   assert.equal(response.status,200,JSON.stringify(response.body));
-  assert.deepEqual(calls,['permitext_research_investigation','permitext_research_investigation','permitext_code_interpretation','permitext_research_open_review','permitext_code_interpretation','permitext_research_open_review']);
+  const expected=['permitext_research_investigation','permitext_research_investigation','permitext_code_interpretation','permitext_research_open_review','permitext_code_interpretation','permitext_research_open_review'];
+  if(scenario==='rejected')expected.push('permitext_code_interpretation','permitext_research_open_review');
+  assert.deepEqual(calls,expected);
   const answer=response.body.conversation.messages.at(-1).answer;
   assert.equal(answer.mode,scenario==='accepted'?'openai':'clarification');
-  if(scenario==='accepted'){assert.equal(answer.researchEngine,'20261007-open-investigation-recovery-v4');assert.equal(answer.investigation.trace[0].queries.length,1);assert(answer.citations.length);}
+  if(scenario==='accepted'){assert.equal(answer.researchEngine,'20261007-open-investigation-recovery-v6');assert.equal(answer.investigation.trace[0].queries.length,1);assert(answer.citations.length);}
   else assert.deepEqual(answer.citations,[]);
   const reopened=await request('/research/conversations/get',{auth,conversationID},token);
   assert.equal(reopened.body.conversation.messages.at(-1).answer.answerText,answer.answerText);
  }
- console.log('Open investigation HTTP passed: discovery, draft, one repair, fresh review, Luna tiers, persistence, rejected answer exclusion.');
+ console.log('Open investigation HTTP passed: discovery, draft, bounded repairs, fresh review, Luna tiers, persistence, rejected answer exclusion.');
 } finally {if(server){server.closeAllConnections();await new Promise(r=>server.close(r));}globalThis.fetch=nativeFetch;await rm(scratch,{recursive:true,force:true});}

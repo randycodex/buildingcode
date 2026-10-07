@@ -2,6 +2,7 @@
 // never a governing provision, code edition or legal/project conclusion.
 import { researchEquipmentSearchIntent } from "./research-equipment-search-intent.mjs";
 import { researchSearchVocabulary, researchGasEquipmentVocabulary, researchPositiveSearchText } from "./research-search-vocabulary.mjs";
+import { electricalResearchCue, energyResearchCue } from "./research-specialty-codes.mjs";
 export const researchQuestionSubjectVersion = "20261004-ordinary-language-question-subject-v5";
 export function researchFloorAreaRatioRequested(text = "") {
   return /\bFAR\b/.test(text) || /\b(?:permitted|maximum|allowable|calculate)\s+far\b|\bfar\s*(?:of|=|\d)/i.test(text);
@@ -9,6 +10,8 @@ export function researchFloorAreaRatioRequested(text = "") {
 export function researchQuestionSubject(question = "") {
   const text = String(question || "");
   const prefixes = new Set();
+  if (electricalResearchCue.test(text)) prefixes.add("EC");
+  if (energyResearchCue.test(text)) prefixes.add("ECC");
   const equipmentIntent = researchEquipmentSearchIntent(text);
   const nonphysicalCeiling = /\bceiling\s+(?:on|for|of)\s+(?:the\s+)?(?:floor[- ]area|FAR|density|cost|price|budget|rent|capacity)\b/i.test(text);
   const roomDimensions = !nonphysicalCeiling && /\b(?:ceilings?|headroom|clear[- ]height|room[- ]height|room[- ]dimensions?)\b/i.test(text);
