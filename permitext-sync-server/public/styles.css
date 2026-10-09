@@ -17915,3 +17915,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   color: var(--text-secondary);
   font-size: 0.85em;
 }
+
+/* Keep column options quiet; keyboard focus uses an underline instead of a box. */
+html body .column-group-menu-button:focus-visible {
+  outline: none !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

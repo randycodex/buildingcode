@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261008-pinned-resize-v648";
+} from "./offline-storage.js?v=20261008-column-menu-focus-v649";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261008-pinned-resize-v648";
+} from "./research-intent-state.js?v=20261008-column-menu-focus-v649";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
