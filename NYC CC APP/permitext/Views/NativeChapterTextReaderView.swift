@@ -216,6 +216,7 @@ struct NativeChapterTextReaderView: View {
             VStack(spacing: 0) {
                 if !searchMatches.isEmpty {
                     searchNavigator(proxy: proxy, document: document)
+                        .padding(.bottom, readerControlsClearance)
                 }
             }
             .opacity(pendingInitialBlockID == nil ? 1 : 0)
