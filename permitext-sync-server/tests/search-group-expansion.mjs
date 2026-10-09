@@ -25,25 +25,33 @@ const make = (query = 'concrete', expanded = []) => context.newUtilityInstance('
 const keys = (instance) => Array.from(new Set([...instance.expandedResultSources, ...(instance.defaultExpandedResultSource ? [instance.defaultExpandedResultSource] : [])]));
 const reload = (instance) => context.normalizeUtilityInstances(JSON.parse(JSON.stringify({ utilityInstances: [instance] })))[0];
 
-// Narrow section-number lookup takes the exact section's source, not the first edition.
+// A section-number match does not silently select an edition from mixed results.
 const exact = make('403.2.3.3');
 assert.equal(apply(exact, [current, historical], all), true);
-assert.deepEqual(keys(exact), ['BC|2014']);
-// Broad lookup follows existing server result ranking without silently filtering results.
+assert.deepEqual(keys(exact), []);
+// Broad mixed-edition lookup leaves the choice to the user.
 const broad = make();
 const matches = [mechanical, historical, current];
 const original = JSON.stringify(matches);
 apply(broad, matches, all);
-assert.deepEqual(keys(broad), ['MC|2022']);
+assert.deepEqual(keys(broad), []);
 assert.equal(JSON.stringify(matches), original);
+// An explicit edition or a complete single-source result can expand automatically.
+const edition = make(); edition.searchEdition = '2022';
+apply(edition, [current], all, {hasMore: true});
+assert.deepEqual(keys(edition), ['BC|2022']);
+const partial = make();
+apply(partial, [current], all, {hasMore: true});
+assert.deepEqual(keys(partial), [], 'A truncated first page cannot establish a single edition');
+assert.equal(apply(partial, [historical], all, {hasMore: true}), false);
 // Remembered represented choices take precedence, including multiple explicit expansions.
 const remembered = make('concrete', ['BC|2014', 'MC|2022']);
 apply(remembered, [current, historical, mechanical], all);
 assert.deepEqual(keys(remembered), ['BC|2014', 'MC|2022']);
-// Unrepresented remembered choices remain available; one useful fallback opens now.
+// Unrepresented remembered choices remain available without guessing a fallback.
 const absent = make('concrete', ['PC|2014']);
 apply(absent, [current, historical], all);
-assert.deepEqual(keys(absent), ['PC|2014', 'BC|2022']);
+assert.deepEqual(keys(absent), ['PC|2014']);
 // User closes every group; same-query pagination, retry and persisted reload stay closed.
 broad.expandedResultSources = [];
 broad.defaultExpandedResultSource = "";
@@ -83,6 +91,9 @@ apply(legacy, [current, historical], all);
 assert.deepEqual(keys(legacy), ['BC|2014']);
 assert.equal(reload(legacy).searchExpansionDecisionKey, legacy.searchExpansionDecisionKey);
 // Both actual renderer entry points make the decision before group construction.
-assert.match(source, /applyInitialSearchGroupExpansion\(searchInstance, filteredResults, sourceScope\)[\s\S]{0,100}appendSearchResultGroups\(results, filteredResults/);
-assert.match(extract('appendSearchLoadMore'), /applyInitialSearchGroupExpansion\(options.searchInstance, nextResults, options.sourceScope\)[\s\S]{0,100}appendSearchResultGroups\(results, nextResults/);
-console.log('Search group defaults: exact/broad, remembered sources, empty-page continuation, collapse/reload, pagination, retry, scope changes and legacy persistence passed.');
+assert.match(source, /applyInitialSearchGroupExpansion\(searchInstance, filteredResults, sourceScope, \{ hasMore: Boolean\(payload.hasMore\) \}\)[\s\S]{0,100}appendSearchResultGroups\(results, filteredResults/);
+assert.match(extract('appendSearchLoadMore'), /applyInitialSearchGroupExpansion\(options.searchInstance, nextResults, options.sourceScope, \{ hasMore: true \}\)[\s\S]{0,100}appendSearchResultGroups\(results, nextResults/);
+// Previously guessed defaults are reevaluated under the new source-choice policy.
+const old = make();old.searchExpansionDecisionKey=JSON.stringify(['concrete', [], 'all', '']);old.defaultExpandedResultSource='BC|2022';
+apply(old, [current, historical], all);assert.deepEqual(keys(old), []);
+console.log('Search group defaults: explicit edition and complete single-source only, mixed/partial pages, remembered sources, collapse/reload, pagination, retry, scope changes and legacy persistence passed.');

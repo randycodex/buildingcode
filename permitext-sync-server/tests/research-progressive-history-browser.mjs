@@ -14,8 +14,10 @@ try{
  const researchDraftPaneIDs=new Set(),analysisTemplate=document.querySelector('#research'),requests=[],transitions=[];
  const releaseSurfaceVisibility={researchHistoryManagement:false};
  function activeAccount(){return {userID:identity,sessionToken:identity};}function captureAccountRequest(){return identity;}function isCurrentAccountRequest(value){return value===identity;}function codeQuestionContextChangedError(){return Error('Context changed');}
- function postResearch(path){return new Promise((resolve,reject)=>requests.push({path,resolve,reject}));}
+ function postResearch(path,values){return new Promise((resolve,reject)=>requests.push({path,values,resolve,reject}));}
  function paneIDForUtilityInstance(instance){return 'utility:analysis:'+instance.id;}
+ function researchProjectChoices(){return [{value:"project-a",label:"Project A"},{value:"project-b",label:"Project B"}];}function scheduleResearchDraftPersistence(){}
+ async function clearResearchConversationHistory(button,conversations,options){for(const row of options.rows)row.remove();options.onCleared();return true;}
  function hasCapability(){return true;}function activeProjectIDForCodeQuestions(){return '';}
  function researchConversationPaneIsOpen(){return false;}function renderUtility(template,id){const p=template.content.firstElementChild.cloneNode(true);p.dataset.paneId=id;return p;}
  function selectionModeIconSVG(){return '';}function trashIconSVG(){return '';}function clear(node){node.replaceChildren();}
@@ -29,7 +31,7 @@ try{
  assert.equal(await page.getByRole('button',{name:'+ New chat',exact:true}).count(),2,'Both composers are actionable while all requests are held');
  await page.waitForFunction(()=>requests.length===2);
  assert.deepEqual(await page.evaluate(()=>requests.map(x=>x.path).sort()),['/research/conversations/list','/research/usage']);
- await page.evaluate(()=>requests.find(x=>x.path.endsWith('/list')).resolve({conversations:[{id:'saved',title:'Saved history',createdAt:'2026-10-08T12:00:00Z'}]}));
+ await page.evaluate(()=>requests.find(x=>x.path.endsWith('/list')).resolve({conversations:[{id:'saved',title:'Saved history',createdAt:'2026-10-08T12:00:00Z'}],hasMore:true,nextCursor:'page-2'}));
  await page.waitForFunction(()=>document.querySelectorAll('.research-conversation-row').length===2);
  assert.equal(await page.getByRole('button',{name:'+ New chat',exact:true}).count(),2);
  await page.evaluate(()=>requests.find(x=>x.path.endsWith('/usage')).reject(Error('Allowance unavailable')));
@@ -38,14 +40,43 @@ try{
  await page.getByRole('button',{name:'Retry allowance',exact:true}).first().click();
  await page.waitForFunction(()=>requests.length===3);assert.equal(await page.evaluate(()=>requests[2].path),'/research/usage');
  await page.evaluate(()=>requests[2].resolve({usage:{remaining:42}}));await page.getByText('42 turns left').waitFor();
+ // Loading an older page retains the first page and sends the same filter scope.
+ await page.getByRole('button',{name:'Load older conversations',exact:true}).first().click();
+ await page.waitForFunction(()=>requests.length===4);
+ assert.deepEqual(await page.evaluate(()=>requests[3].values),{limit:30,q:'',cursor:'page-2'});
+ await page.evaluate(()=>requests[3].resolve({conversations:[{id:'older',title:'Older saved history',createdAt:'2025-10-01T12:00:00Z'}],hasMore:false,nextCursor:null}));
+ await page.waitForFunction(()=>document.querySelectorAll('.research-conversation-row').length===3);
+ // A later filter wins even if the earlier search finishes last.
+ const search=page.getByRole('searchbox',{name:'Search Research history'}).first();
+ await search.fill('stairs');await page.waitForFunction(()=>requests.length===5);
+ await page.getByLabel('Filter Research history by Project').first().selectOption('project-b');
+ await page.waitForFunction(()=>requests.length===6);
+ assert.deepEqual(await page.evaluate(()=>requests[5].values),{limit:30,q:'stairs',projectID:'project-b'});
+ await page.evaluate(()=>{requests[5].resolve({conversations:[{id:'filtered',title:'Project B stairs'}],hasMore:true,nextCursor:'filtered-2'});requests[4].resolve({conversations:[{id:'obsolete',title:'Obsolete search'}],hasMore:false});});
+ await page.getByText('Project B stairs',{exact:true}).waitFor();
+ assert.equal(await page.getByText('Obsolete search',{exact:true}).count(),0);
+ assert.equal(await page.getByText('Older saved history',{exact:true}).count(),0);
+ assert.equal(await search.getAttribute('maxlength'),'200');
+ // Removing a row invalidates a pending page and starts a fresh cursor chain.
+ await page.getByRole('button',{name:'Load older conversations',exact:true}).first().click();await page.waitForFunction(()=>requests.length===7);
+ await page.getByRole('button',{name:'Select Research conversations',exact:true}).first().click();
+ await page.getByRole('button',{name:/Project B stairs/}).click();
+ await page.getByRole('button',{name:'Remove 1 selected conversation from history',exact:true}).click();
+ await page.waitForFunction(()=>requests.length===8);
+ assert.deepEqual(await page.evaluate(()=>requests[7].values),{limit:30,q:'stairs',projectID:'project-b'});
+ await page.evaluate(()=>{requests[7].resolve({conversations:[{id:'remaining',title:'Remaining stairs'}],hasMore:true,nextCursor:'fresh-2'});requests[6].resolve({conversations:[{id:'filtered',title:'Project B stairs'},{id:'stale-older',title:'Stale older page'}],hasMore:true,nextCursor:'stale-3'});});
+ await page.getByText('Remaining stairs',{exact:true}).waitFor();assert.equal(await page.getByText('Project B stairs',{exact:true}).count(),0);assert.equal(await page.getByText('Stale older page',{exact:true}).count(),0);
+ await page.getByRole('button',{name:'Load older conversations',exact:true}).first().click();await page.waitForFunction(()=>requests.length===9);
+ assert.equal(await page.evaluate(()=>requests[8].values.cursor),'fresh-2');
+ await page.evaluate(()=>requests[8].resolve({conversations:[{id:'fresh-older',title:'Fresh older page'}],hasMore:false}));await page.getByText('Fresh older page',{exact:true}).waitFor();assert.equal(await page.getByText('Project B stairs',{exact:true}).count(),0);
  await page.getByRole('button',{name:'+ New chat',exact:true}).first().click();
  assert.equal(await page.evaluate(()=>researchDraftPaneIDs.has('utility:analysis:one')),true,'New chat works independently of usage/history metadata');
  assert.equal(await page.evaluate(()=>transitions.length),1);
  // A pending pane removed from the workspace cannot publish private content later.
  await page.evaluate(async()=>{identity='B';researchDraftPaneIDs.clear();const pane=await renderResearch('utility:analysis:one');document.querySelector('#track').replaceChildren(pane);});
- await page.waitForFunction(()=>requests.length===5);
- await page.evaluate(()=>{document.querySelector('#track').replaceChildren();requests[3].resolve({conversations:[{id:'secret',title:'Late private history'}]});requests[4].resolve({usage:{remaining:1}});});
+ await page.waitForFunction(()=>requests.length===11);
+ await page.evaluate(()=>{document.querySelector('#track').replaceChildren();requests[9].resolve({conversations:[{id:'secret',title:'Late private history'}]});requests[10].resolve({usage:{remaining:1}});});
  await page.waitForTimeout(30);assert.equal(await page.locator('.research-conversation-row').count(),0);
  assert.deepEqual(errors,[]);
- console.log('Progressive Research browser passed: immediate New chat, two panes share list/usage reads, history precedes usage, usage failure/retry isolates history, closed-pane publication suppressed.');
+ console.log('Progressive Research browser passed: immediate New chat, shared reads, usage failure/retry isolation, older paging, query/Project stale races, removal cannot resurrect through pending pages, closed-pane publication suppressed.');
 }finally{await browser.close();}

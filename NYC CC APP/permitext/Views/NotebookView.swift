@@ -12,6 +12,127 @@ struct NativeNotebookReferenceCandidate: Identifiable, Hashable, Sendable {
     var id: String { "\(kind):\(referenceID)" }
 }
 
+struct ResearchNotebookHandoff: Identifiable {
+    let id: String
+    let question: String
+    let projectID: String?
+}
+
+/// Review the destination before creating a Note. The immutable answer stays a
+/// linked source; it is never copied into the user's professional conclusion.
+struct ResearchNotebookHandoffSheet: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    let handoff: ResearchNotebookHandoff
+    let owner: NativePrivateRequestIdentity?
+    @State private var projectID: String
+    @State private var isSaving = false
+    @State private var errorMessage: String?
+    @State private var savedCardID: String?
+    @State private var mutationID = UUID().uuidString.lowercased()
+    @State private var pendingDocument: NotebookDocument
+
+    init(handoff: ResearchNotebookHandoff, owner: NativePrivateRequestIdentity?) {
+        self.handoff = handoff
+        self.owner = owner
+        _projectID = State(initialValue: handoff.projectID ?? "")
+        _pendingDocument = State(initialValue: NotebookDocument(document: [
+            .reference(kind: "researchAnswer", id: handoff.id, label: ResearchNotebookHandoffPresentation.referenceLabel(question: handoff.question)),
+            .paragraph()
+        ]))
+    }
+
+    private var isCurrentOwner: Bool { owner != nil && owner == library.privateRequestIdentity }
+    private var projectName: String { library.folder(forBackendProjectID: projectID)?.name ?? "Project" }
+    private var hasProject: Bool {
+        library.folders.contains { $0.folderType == .project && library.backendProjectID(for: $0.id) == projectID }
+    }
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if let savedCardID {
+                    ProjectNotebookView(
+                        projectID: projectID, projectName: projectName, accentColor: .appChrome,
+                        referenceCandidates: [NativeNotebookReferenceCandidate(
+                            kind: "researchAnswer", referenceID: handoff.id,
+                            label: ResearchNotebookHandoffPresentation.referenceLabel(question: handoff.question), detail: "Linked Research answer"
+                        )], initialCardID: savedCardID
+                    )
+                } else {
+                    Form {
+                        Section("Destination") {
+                            Picker("Project", selection: $projectID) {
+                                Text("Choose a Project").tag("")
+                                ForEach(library.folders.filter { $0.folderType == .project }) { folder in
+                                    if let id = library.backendProjectID(for: folder.id) {
+                                        Text(folder.name).tag(id)
+                                    }
+                                }
+                            }
+                            .disabled(isSaving)
+                        }
+                        Section("Research reference") {
+                            Text(handoff.question)
+                            Text("A new Note will link to this answer and its evidence. Add your own conclusion in the Note after reviewing the cited provisions.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                        if let errorMessage {
+                            Section { Text(errorMessage).foregroundStyle(.secondary) }
+                        }
+                        Section {
+                            Button {
+                                Task { await addToNotebook() }
+                            } label: {
+                                HStack {
+                                    Text(isSaving ? "Adding…" : "Add to Notebook")
+                                    if isSaving { ProgressView() }
+                                }
+                            }
+                            .disabled(!isCurrentOwner || !hasProject || isSaving)
+                            .accessibilityIdentifier("research-add-to-notebook-confirm")
+                        }
+                    }
+                }
+            }
+            .navigationTitle(savedCardID == nil ? "Add to Notebook" : "Notebook")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(savedCardID == nil ? "Cancel" : "Done") { dismiss() }
+                        .disabled(isSaving)
+                }
+            }
+            .interactiveDismissDisabled(isSaving)
+            .onChange(of: projectID) { _, _ in
+                // A retry for the same payload retains its mutation identity.
+                mutationID = UUID().uuidString.lowercased()
+                errorMessage = nil
+            }
+            .onChange(of: library.privateSessionID) { _, _ in dismiss() }
+        }
+    }
+
+    private func addToNotebook() async {
+        guard isCurrentOwner, hasProject, !isSaving else { return }
+        isSaving = true
+        defer { if isCurrentOwner { isSaving = false } }
+        do {
+            let card = try await library.saveNotebookCard(
+                projectID: projectID, cardID: nil, expectedVersion: 0,
+                title: ResearchNotebookHandoffPresentation.boundedText(handoff.question, maximumUTF16Count: 160), document: pendingDocument,
+                evidenceLinks: [], clientMutationID: mutationID
+            )
+            guard isCurrentOwner, !Task.isCancelled else { return }
+            savedCardID = card.id
+            errorMessage = nil
+        } catch {
+            guard isCurrentOwner, !Task.isCancelled else { return }
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+
 private struct NativeNotebookEditorRoute: Identifiable, Hashable {
     let id: String
     let cardID: String?

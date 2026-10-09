@@ -4,6 +4,10 @@ import Foundation
 
 struct ResearchConversationListRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
+    var limit: Int? = nil
+    var cursor: String? = nil
+    var q: String? = nil
+    var projectID: String? = nil
 }
 
 struct ResearchRetainInterruptedRequest: Codable, Hashable, Sendable {
@@ -141,6 +145,27 @@ struct ResearchConversationAssignProjectRequest: Codable, Hashable, Sendable {
 
 struct ResearchConversationListResponse: Codable, Hashable, Sendable {
     let conversations: [ResearchConversationSummary]
+    var nextCursor: String? = nil
+    var hasMore: Bool? = nil
+}
+
+enum NativeResearchHistory {
+    static let pageSize = 30
+
+    static func filtered(_ summaries: [ResearchConversationSummary], query: String, projectID: String?) -> [ResearchConversationSummary] {
+        let needle = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return summaries.filter { summary in
+            let matchesProject = projectID == nil || (summary.primaryProjectID ?? "") == projectID
+            let matchesText = needle.isEmpty || summary.title.lowercased().contains(needle)
+                || (summary.starterQuestion ?? "").lowercased().contains(needle)
+            return matchesProject && matchesText
+        }
+    }
+
+    static func appending(_ page: [ResearchConversationSummary], to existing: [ResearchConversationSummary]) -> [ResearchConversationSummary] {
+        var seen = Set(existing.map(\.id))
+        return existing + page.filter { seen.insert($0.id).inserted }
+    }
 }
 
 struct ResearchConversationResponse: Codable, Hashable, Sendable {
@@ -774,6 +799,25 @@ struct NotebookCard: Codable, Hashable, Identifiable, Sendable {
     var document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink] = []
     var plainText: String = ""
+}
+
+enum ResearchNotebookHandoffPresentation {
+    static func boundedText(_ text: String, maximumUTF16Count: Int) -> String {
+        guard text.utf16.count > maximumUTF16Count else { return text }
+        var result = ""
+        var count = 0
+        for character in text {
+            let length = String(character).utf16.count
+            guard count + length < maximumUTF16Count else { break }
+            result.append(character)
+            count += length
+        }
+        return result + "…"
+    }
+
+    static func referenceLabel(question: String) -> String {
+        boundedText("Research: \(question)", maximumUTF16Count: 500)
+    }
 }
 
 struct NotebookDocument: Codable, Hashable, Sendable {

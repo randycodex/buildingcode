@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E2AFA493235141069CA1CED8 /* NativeReaderHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD97A073895149C4A92A2EF2 /* NativeReaderHandoff.swift */; };
+		998DDA75A03141C4BA29C743 /* NativeSearchResultPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F968FCF8C04003981E2D28 /* NativeSearchResultPresentation.swift */; };
+		2B73DE9956AC45248BDDBB04 /* NativeReaderSaveDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC26C4595F114485B422F3BA /* NativeReaderSaveDestination.swift */; };
 		AF1817000000000000000001 /* LocalPerformanceRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1817000000000000000002 /* LocalPerformanceRecorder.swift */; };
 		AF1800000000000000000001 /* ActiveCodeSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1800000000000000000002 /* ActiveCodeSources.swift */; };
 		AF04000000000000000000E2 /* CompletedSearchCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF04000000000000000001E2 /* CompletedSearchCache.swift */; };
@@ -84,6 +87,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DD97A073895149C4A92A2EF2 /* NativeReaderHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeReaderHandoff.swift; sourceTree = "<group>"; };
+		12F968FCF8C04003981E2D28 /* NativeSearchResultPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSearchResultPresentation.swift; sourceTree = "<group>"; };
+		DC26C4595F114485B422F3BA /* NativeReaderSaveDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeReaderSaveDestination.swift; sourceTree = "<group>"; };
 		AF1817000000000000000002 /* LocalPerformanceRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPerformanceRecorder.swift; sourceTree = "<group>"; };
 		AF1800000000000000000002 /* ActiveCodeSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveCodeSources.swift; sourceTree = "<group>"; };
 		AF04000000000000000001E2 /* CompletedSearchCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedSearchCache.swift; sourceTree = "<group>"; };
@@ -219,6 +225,9 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000002 /* CodeModels.swift */,
+				DD97A073895149C4A92A2EF2 /* NativeReaderHandoff.swift */,
+				12F968FCF8C04003981E2D28 /* NativeSearchResultPresentation.swift */,
+				DC26C4595F114485B422F3BA /* NativeReaderSaveDestination.swift */,
 				AF1800000000000000000002 /* ActiveCodeSources.swift */,
 				A20000000000000000000013 /* ReaderTheme.swift */,
 				A20000000000000000000020 /* BrowserContext.swift */,
@@ -494,6 +503,9 @@
 			files = (
 				A10000000000000000000001 /* PermitextApp.swift in Sources */,
 				A10000000000000000000002 /* CodeModels.swift in Sources */,
+				E2AFA493235141069CA1CED8 /* NativeReaderHandoff.swift in Sources */,
+				998DDA75A03141C4BA29C743 /* NativeSearchResultPresentation.swift in Sources */,
+				2B73DE9956AC45248BDDBB04 /* NativeReaderSaveDestination.swift in Sources */,
 				A1000000000000000000002F /* ResearchNotebookModels.swift in Sources */,
 				A10000000000000000000012 /* ReaderTheme.swift in Sources */,
 				A10000000000000000000003 /* SQLiteSupport.swift in Sources */,

@@ -6,17 +6,16 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 const source = await readFile(new URL('../../NYC CC APP/permitext/Views/NativeChapterTextReaderView.swift',import.meta.url),'utf8');
 const baseline = await readFile(new URL('./fixtures/native-chapter-search-before-smooth.swift',import.meta.url),'utf8');
-const current = source.slice(source.indexOf('enum NativeReaderSearchIndex {'),source.indexOf('\nprivate struct NativeReaderSearchSheet:'));
+const current = source.slice(source.indexOf('enum NativeReaderSearchIndex {'),source.indexOf('\nenum NativeReaderReferenceKind:'));
 const matchStart = source.indexOf('struct NativeReaderSearchMatch:');
 const match = source.slice(matchStart,source.indexOf('\n}',matchStart)+2);
 assert.ok(current.startsWith('enum '));
-const updateStart = source.indexOf('    private func updateChapterSearch(presentedInSearchSheet:');
+const updateStart = source.indexOf('    private func updateChapterSearch(');
 assert.ok(updateStart >= 0);
 const updateMethod = source.slice(updateStart, source.indexOf('\n    }', updateStart) + 6).replace('private func', 'func');
-assert.match(source, /\.task\(id: "[^"\n]*isSearchPresented[^"\n]*"\) \{\s*guard !isSearchPresented else \{ return \}\s*await updateChapterSearch\(presentedInSearchSheet: false\)/, 'Reader must relinquish search ownership while its cover is presented');
-assert.match(source, /onUpdateSearch: \{ await updateChapterSearch\(presentedInSearchSheet: true\) \}/);
-assert.match(source, /\.task\(id: searchTaskID\) \{ await onUpdateSearch\(\) \}/, 'Visible sheet must own the structured task');
-assert.ok(source.includes('searchTaskID: "\\(route.id)|\\(searchQuery)|\\(isBrowserTabActive)"'), 'Sheet must restart on route, query, and active-tab changes');
+assert.match(source, /\.task\(id: "[^"\n]*route.id[^"\n]*searchQuery[^"\n]*isBrowserTabActive[^"\n]*"\) \{\s*await updateChapterSearch\(\)/, 'Visible Reader owns cancellable query work');
+assert.match(source, /\.safeAreaInset\(edge: \.top, spacing: 0\) \{\s*if isSearchPresented \{\s*ChapterFindControls/, 'Find controls sit near passage header');
+assert.doesNotMatch(source, /NativeReaderSearchSheet|presentedInSearchSheet/, 'Find must not depend on a covered Reader task');
 const fixture = `import Foundation
 struct NativeReaderRuntimeListItem: Sendable { var plainText: String; var children: [Self] = [] }
 struct Cell: Sendable { var plainText: String }
@@ -75,56 +74,43 @@ ${current}
   let expected = NativeReaderSearchIndex.matches(query: "concrete", in: blocks)
   let sheet = SearchHarness(blocks)
   sheet.isSearchPresented = true
-  await sheet.updateChapterSearch(presentedInSearchSheet: false)
-  precondition(sheet.searchMatches.isEmpty && !sheet.isChapterSearchInProgress, "Hidden Reader must not own sheet search")
-  await sheet.updateChapterSearch(presentedInSearchSheet: true)
-  precondition(sheet.searchMatches == expected && !sheet.isChapterSearchInProgress, "Sheet must publish matches independently of hidden Reader")
+  await sheet.updateChapterSearch()
+  precondition(sheet.searchMatches == expected && !sheet.isChapterSearchInProgress, "Visible Reader publishes chapter-scoped matches")
+  precondition(sheet.activeSearchMatchID == nil, "Typing must not claim a passage was visited before navigation")
   sheet.displayBlocks = []
-  await sheet.updateChapterSearch(presentedInSearchSheet: true)
   sheet.isSearchPresented = false
-  await sheet.updateChapterSearch(presentedInSearchSheet: false)
-  precondition(sheet.searchMatches == expected, "Completed matches must survive presentation handoff without another scan")
+  await sheet.updateChapterSearch()
+  precondition(sheet.searchMatches == expected, "Closing controls must not rescan completed query")
   sheet.searchQuery = " "
-  await sheet.updateChapterSearch(presentedInSearchSheet: false)
+  await sheet.updateChapterSearch()
   precondition(sheet.searchMatches.isEmpty && sheet.searchMatchesByBlock.isEmpty && sheet.activeSearchMatchID == nil && !sheet.isChapterSearchInProgress, "Empty query resets all display state")
 
-  for startsInSheet in [false, true] {
-   let h = SearchHarness(blocks)
-   h.isSearchPresented = startsInSheet
-   let oldOwner = Task { await h.updateChapterSearch(presentedInSearchSheet: startsInSheet) }
-   while !h.isChapterSearchInProgress { await Task.yield() }
-   h.isSearchPresented = !startsInSheet
-   await oldOwner.value
-   precondition(h.searchMatches.isEmpty && h.appliedSearchQuery == nil, "Obsolete presentation owner must not publish even before cancellation arrives")
-   await h.updateChapterSearch(presentedInSearchSheet: !startsInSheet)
-   precondition(h.searchMatches == expected && !h.isChapterSearchInProgress, "New visible owner must resume unfinished search")
-  }
   let rapid = SearchHarness(blocks)
-  await rapid.updateChapterSearch(presentedInSearchSheet: false)
+  await rapid.updateChapterSearch()
   rapid.searchQuery = "cafe"
-  let abandoned = Task { await rapid.updateChapterSearch(presentedInSearchSheet: false) }
+  let abandoned = Task { await rapid.updateChapterSearch() }
   while !rapid.isChapterSearchInProgress { await Task.yield() }
   rapid.searchQuery = "concrete"
   abandoned.cancel(); await abandoned.value
-  await rapid.updateChapterSearch(presentedInSearchSheet: false)
+  await rapid.updateChapterSearch()
   precondition(rapid.searchMatches == expected, "A to B to A must restore A after B cleared the applied cache")
 
   for changesRoute in [true, false] {
    let h = SearchHarness(blocks)
-   let obsolete = Task { await h.updateChapterSearch(presentedInSearchSheet: false) }
+   let obsolete = Task { await h.updateChapterSearch() }
    while !h.isChapterSearchInProgress { await Task.yield() }
    if changesRoute { h.route.id = "chapter-b" } else { h.isBrowserTabActive = false }
    await obsolete.value
    precondition(h.searchMatches.isEmpty && h.appliedSearchQuery == nil, "Obsolete route/inactive tab must not publish")
    if !changesRoute {
-    await h.updateChapterSearch(presentedInSearchSheet: false)
+    await h.updateChapterSearch()
     precondition(!h.isChapterSearchInProgress, "Inactive tab releases progress")
     h.isBrowserTabActive = true
    }
-   await h.updateChapterSearch(presentedInSearchSheet: false)
+   await h.updateChapterSearch()
    precondition(h.searchMatches == expected && h.appliedSearchRouteID == h.route.id && !h.isChapterSearchInProgress)
   }
-  print("PASS: frozen exact/fuzzy/Unicode/list/table/media/duplicate-ID parity, background matching and cancellation; actual update method covers sheet ownership, handoff, applied-cache reuse, empty reset, A-B-A, route and tab changes")
+  print("PASS: frozen exact/fuzzy/Unicode/list/table/media/duplicate-ID parity, background matching and cancellation; actual update method covers inline ownership, first navigation, applied-cache reuse, empty reset, A-B-A, route and tab changes")
  }
 }
 `;

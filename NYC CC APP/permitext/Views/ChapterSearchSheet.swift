@@ -56,6 +56,9 @@ struct ChapterSearchSheet: View {
     let entries: [ChapterSearchSourceEntry]
     @Binding var query: String
     let onSelect: (ChapterSearchSourceEntry) -> Void
+    var isInline = false
+    var onClose: (() -> Void)? = nil
+    @State private var activeResultID: String?
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -98,18 +101,39 @@ struct ChapterSearchSheet: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            searchHeader
-            Divider()
-            searchContent
+        Group {
+            if isInline {
+                ChapterFindControls(
+                    query: $query, matchCount: results.count,
+                    activeIndex: results.firstIndex(where: { $0.id == activeResultID }),
+                    isSearching: isLoading,
+                    onPrevious: { navigateResult(offset: -1) },
+                    onNext: { navigateResult(offset: activeResultID == nil ? 0 : 1) },
+                    onSubmit: { navigateResult(offset: 0) },
+                    onClose: { query = ""; onClose?() }
+                )
+            } else {
+                VStack(spacing: 0) {
+                    searchHeader
+                    Divider()
+                    searchContent
+                }
+                .background(Color(uiColor: .systemBackground))
+                .onAppear { isSearchFocused = true }
+            }
         }
-        .background(Color(uiColor: .systemBackground))
-        .task(id: entries) {
-            await loadIndexIfNeeded()
-        }
-        .onAppear {
-            isSearchFocused = true
-        }
+        .task(id: entries) { await loadIndexIfNeeded() }
+        .onChange(of: query) { _, _ in activeResultID = nil }
+    }
+
+    private func navigateResult(offset: Int) {
+        let matches = results
+        guard !matches.isEmpty else { return }
+        let index = matches.firstIndex(where: { $0.id == activeResultID }) ?? 0
+        let result = matches[(index + offset + matches.count) % matches.count]
+        activeResultID = result.id
+        onSelect(ChapterSearchSourceEntry(sectionID: result.sectionID, sectionNumber: result.sectionNumber,
+            title: result.title, anchorID: result.anchorID))
     }
 
     private var searchHeader: some View {
@@ -368,5 +392,62 @@ struct ChapterSearchSheet: View {
         }
 
         return attributed
+    }
+}
+
+/// Chapter-scoped find stays beside the passage; the permanent Reader switches
+/// and main navigation remain in their existing bottom positions.
+struct ChapterFindControls: View {
+    @Binding var query: String
+    let matchCount: Int
+    let activeIndex: Int?
+    let isSearching: Bool
+    let onPrevious: () -> Void
+    let onNext: () -> Void
+    let onSubmit: () -> Void
+    let onClose: () -> Void
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        HStack(spacing: 0) {
+            TextField("Find in chapter", text: $query)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.search)
+                .focused($isFocused)
+                .accessibilityLabel("Find in this chapter")
+                .onSubmit { isFocused = false; onSubmit() }
+                .padding(.leading, 12)
+                .frame(minWidth: 60)
+            if isSearching && !query.isEmpty {
+                ProgressView().controlSize(.small).padding(.horizontal, 4)
+                    .accessibilityLabel("Searching this chapter")
+            } else if !query.isEmpty {
+                Text(activeIndex.map { "\($0 + 1) of \(matchCount)" } ?? "\(matchCount) matches")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .fixedSize()
+                    .padding(.horizontal, 4)
+            }
+            findButton("Previous match", icon: "chevron.up", disabled: matchCount == 0 || isSearching) { onPrevious() }
+            findButton("Next match", icon: "chevron.down", disabled: matchCount == 0 || isSearching) { onNext() }
+            findButton("Close chapter find", icon: "xmark") { onClose() }
+        }
+        .font(.subheadline)
+        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+        .padding(.vertical, 6)
+        .background(Color(uiColor: .systemBackground))
+        .accessibilityIdentifier("chapter-find-controls")
+        .onAppear { isFocused = true }
+    }
+
+    private func findButton(_ title: String, icon: String, disabled: Bool = false, action: @escaping () -> Void) -> some View {
+        Button { isFocused = false; action() } label: {
+            Image(systemName: icon).frame(width: 44, height: 44).contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(disabled)
+        .accessibilityLabel(title)
     }
 }

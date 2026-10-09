@@ -1355,11 +1355,11 @@ struct ProjectView: View {
     @ViewBuilder
     private var projectHub: some View {
         VStack(alignment: .leading, spacing: 12) {
-            CodeEyebrow(text: "Project Hub", accent: accentColor)
+            CodeEyebrow(text: "Project overview", accent: accentColor)
 
             if let snapshot = projectHubSnapshot, snapshot.loadedFromCache {
                 Label(
-                    "Offline snapshot from \(projectHubDate(snapshot.cachedAt ?? "")) — IDs, citations, hashes, and version lineage are preserved.",
+                    "Saved offline copy from \(projectHubDate(snapshot.cachedAt ?? "")). Connect to check for updates.",
                     systemImage: "icloud.slash"
                 )
                 .font(.caption.weight(.semibold))
@@ -1453,10 +1453,9 @@ struct ProjectView: View {
                         projectNotebookDestination(projectID: projectID, startNewNote: true)
                     } label: { Label("New Note", systemImage: "plus") }
                         .font(.subheadline)
-                    if cards.count > 5 {
-                        NavigationLink("View All") { projectNotebookDestination(projectID: projectID) }
-                            .font(.subheadline)
-                    }
+                    NavigationLink("Open") { projectNotebookDestination(projectID: projectID) }
+                        .font(.subheadline)
+                        .accessibilityLabel("Open Project Notebook")
                 }
                 .frame(minHeight: 44)
             } else {
@@ -1536,7 +1535,7 @@ struct ProjectView: View {
         let answers = projectHubSnapshot?.researchAnswers ?? []
         projectHubSection(title: "Research History", systemImage: "text.magnifyingglass") {
             if answers.isEmpty {
-                projectHubEmpty("No immutable Research answers are linked to this Project yet.")
+                projectHubEmpty("No Research answers are linked to this Project yet.")
             } else {
                 ForEach(answers.prefix(5)) { answer in
                     VStack(alignment: .leading, spacing: 6) {
@@ -1561,6 +1560,13 @@ struct ProjectView: View {
                         Text("\(answer.evidenceCount) approved \(answer.evidenceCount == 1 ? "source" : "sources") · \(projectReviewStatus(answer.reviewStatus))")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.secondary)
+                        Button {
+                            library.activeResearchConversationID = answer.conversationID
+                            library.selectedTab = .research
+                        } label: {
+                            Label("Open Research", systemImage: "arrow.up.right")
+                                .font(.subheadline)
+                        }
                     }
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)

@@ -202,16 +202,20 @@ struct ChapterReaderView: View {
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet(proxy: proxy)
         }
-        .fullScreenCover(isPresented: $isChapterSearchPresented) {
-            ChapterSearchSheet(
-                title: chapter.displayLabel,
-                entries: chapterSearchEntries,
-                query: $chapterSearchQuery,
-                onSelect: { entry in
-                    jumpToSection(id: entry.sectionID, with: proxy)
-                }
-            )
-            .environmentObject(library)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if isChapterSearchPresented {
+                ChapterSearchSheet(
+                    title: chapter.displayLabel,
+                    entries: chapterSearchEntries,
+                    query: $chapterSearchQuery,
+                    onSelect: { entry in
+                        jumpToSection(id: entry.sectionID, with: proxy)
+                    },
+                    isInline: true,
+                    onClose: { isChapterSearchPresented = false }
+                )
+                .environmentObject(library)
+            }
         }
         .task(id: chapter.id) {
             library.noteChapterOpened(chapter: chapter)
@@ -234,7 +238,7 @@ struct ChapterReaderView: View {
             chapterSearchQuery = ""
         }
         .overlay(alignment: .top) {
-            CodeTopContentFade(alwaysVisible: true)
+            CodeTopContentFade(alwaysVisible: !isChapterSearchPresented)
         }
     }
 
@@ -681,7 +685,6 @@ struct ReaderCurrentSectionBookmarkButton: View {
     @State private var displayedIsBookmarked = false
     @State private var bookmarkConfirmation: String?
     @State private var bookmarkConfirmationTask: Task<Void, Never>?
-    @State private var showsSavedFollowUp = false
     @State private var isFolderPickerOpen = false
     @State private var pendingFolderIDs: Set<Int64> = []
     @State private var folderCreationRequest: ReaderBookmarkFolderCreation?
@@ -691,16 +694,14 @@ struct ReaderCurrentSectionBookmarkButton: View {
             guard let sectionID else { return }
             let desiredBookmarkState = !displayedIsBookmarked
             displayedIsBookmarked = desiredBookmarkState
-            displayedIsBookmarked = library.toggleBookmark(sectionID: sectionID)
+            displayedIsBookmarked = library.toggleReaderDestinationSave(sectionID: sectionID)
             if displayedIsBookmarked == desiredBookmarkState {
                 if displayedIsBookmarked {
-                    showBookmarkConfirmation("Saved")
+                    showBookmarkConfirmation("Saved to \(library.readerSaveDestinationName)")
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    showsSavedFollowUp = true
                 } else {
-                    bookmarkConfirmationTask?.cancel()
-                    bookmarkConfirmationTask = nil
-                    bookmarkConfirmation = nil
+                    showBookmarkConfirmation(library.readerSaveDestinationProject == nil
+                        ? "Removed from Saved" : "Removed from Project")
                 }
             }
         } label: {
@@ -720,24 +721,20 @@ struct ReaderCurrentSectionBookmarkButton: View {
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
         .accessibilityIdentifier("reader-current-section-bookmark")
-        .accessibilityLabel(displayedIsBookmarked ? "Remove from Saved" : "Save passage")
-        .accessibilityValue(displayedIsBookmarked ? "Saved" : "Not saved")
+        .accessibilityLabel(sectionID.map { library.readerSaveActionLabel(sectionID: $0) } ?? "Save passage")
+        .accessibilityValue("\(displayedIsBookmarked ? "Saved" : "Not saved") · \(library.readerSaveDestinationName)")
+        .contextMenu {
+            ReaderSaveDestinationMenuContent()
+            if let sectionID, library.isBookmarked(sectionID: sectionID) {
+                Divider()
+                Button("Add to Projects") { openFolderPicker() }
+            }
+        }
         .onAppear { synchronizeState() }
         .onChange(of: sectionID) { _, _ in synchronizeState() }
         .onChange(of: library.bookmarkRevision) { _, _ in synchronizeState() }
-        .alert(
-            "Saved",
-            isPresented: $showsSavedFollowUp
-        ) {
-            Button("Add to Project") {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    openFolderPicker()
-                }
-            }
-            Button("Done", role: .cancel) { }
-        } message: {
-            Text("The section is saved now. Project assignment is optional and can be added next.")
-        }
+        .onChange(of: sectionID.map { library.folderMembership[$0] ?? [] }) { _, _ in synchronizeState() }
+        .onChange(of: library.readerSaveDestination) { _, _ in synchronizeState() }
         .sheet(isPresented: $isFolderPickerOpen) {
             if let sectionID {
                 FolderPickerSheet(
@@ -812,7 +809,7 @@ struct ReaderCurrentSectionBookmarkButton: View {
     }
 
     private func synchronizeState() {
-        displayedIsBookmarked = sectionID.map { library.isBookmarked(sectionID: $0) } ?? false
+        displayedIsBookmarked = sectionID.map { library.isSavedToReaderDestination(sectionID: $0) } ?? false
     }
 
     private func openFolderPicker() {
@@ -1331,5 +1328,23 @@ struct ReaderChapterJumpHeader: View {
             .accessibilityIdentifier("reader-jump-header")
         }
         .frame(maxWidth: 250, minHeight: CodeScreenMetrics.toolbarButtonSize)
+    }
+}
+
+/// Reused in the existing Reader source menu and passage bookmark context menu.
+struct ReaderSaveDestinationMenuContent: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+
+    var body: some View {
+        Picker("Save destination", selection: Binding(
+            get: { library.readerSaveDestination },
+            set: { library.selectReaderSaveDestination($0) }
+        )) {
+            Text("Unassigned").tag(NativeReaderSaveDestination.unassigned)
+            ForEach(library.readerSaveDestinationProjects) { project in
+                Text(project.name).tag(NativeReaderSaveDestination.project(project.clientID))
+            }
+        }
+        .accessibilityIdentifier("reader-save-destination")
     }
 }

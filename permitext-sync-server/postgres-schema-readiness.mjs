@@ -1,4 +1,4 @@
-export const postgresNormalizedSchemaReadinessVersion = "normalized-v4-20260904-lifecycle";
+export const postgresNormalizedSchemaReadinessVersion = "normalized-v4-20261009-research-history";
 
 export const postgresNormalizedSchemaRequiredTables = Object.freeze([
   "permitext_account_lifecycle",
@@ -95,6 +95,8 @@ export const postgresNormalizedSchemaRequiredIndexes = Object.freeze([
   "permitext_rate_limit_buckets_reset_idx",
   "permitext_research_answers_conversation_idx",
   "permitext_research_conversations_user_updated_idx",
+  "permitext_research_conversations_visible_history_idx",
+  "permitext_research_conversations_visible_project_history_idx",
   "permitext_research_credits_user_created_idx",
   "permitext_research_feedback_user_answer_idx",
   "permitext_research_operations_created_idx",

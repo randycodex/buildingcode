@@ -16,6 +16,7 @@ const context = vm.createContext({
   researchConversationList: [{ id: 'a', primaryProjectID: 'project-a' }, { id: 'b', primaryProjectID: 'project-b' }, { id: 'legacy', primaryProjectID: null }],
   activeAccount: () => ({ userID: 'owner', sessionToken: 'synthetic' }),
   captureAccountRequest: () => ({}), requireCurrentAccountRequest() {},
+  researchHistoryPageReaders: new Map(),
   readResearchConversationList: {invalidate() {}}, refreshResearchUsage: {invalidate() {}},
   ensureResearchProjectSynced: async id => synced.push(id),
   postJSON: async (path, body) => { requests.push({ path, body }); return {}; },
@@ -45,7 +46,7 @@ const count = requests.length;
 await assert.rejects(context.postResearch('/research/conversations/create', {}), /Workspace changed/);
 assert.equal(requests.length, count, 'Switching workspaces during sync must not create a chat.');
 const render = source.slice(source.indexOf('async function renderResearch(paneID'), source.indexOf('function visualEvidenceDataURL'));
-assert(render.includes('researchConversationHistoryGroups(workspaceResearchConversations())'));
-assert(render.includes('workspaceResearchConversations().forEach((conversation) => selectedConversationIDs.add(conversation.id))'));
+assert(render.includes('researchConversationHistoryGroups(visibleHistoryConversations())'));
+assert(render.includes('visibleHistoryConversations().forEach((conversation) => selectedConversationIDs.add(conversation.id))'));
 assert(!render.includes('researchConversationList.filter('), 'Bulk actions must use the scoped list.');
 console.log('Web Research project scope passed: all creation origins, per-project history, unassigned isolation, scoped bulk actions, and workspace-switch race.');

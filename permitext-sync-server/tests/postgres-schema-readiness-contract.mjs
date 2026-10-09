@@ -85,6 +85,36 @@ await ensurePostgresNormalizedSchema(schemaSQL([readyCounts]), async () => {
 });
 assert.equal(initializeCalls, 0, "a ready cold isolate must avoid the DDL initializer");
 
+// A pre-history deployment already has every table/column and all older indexes.
+// Use the actual queried index names, so omitting a history index from the
+// readiness signature would incorrectly skip initialization and fail this test.
+const historyIndexes = [
+  "permitext_research_conversations_visible_history_idx",
+  "permitext_research_conversations_visible_project_history_idx"
+];
+for (const missingIndexes of [[historyIndexes[0]], [historyIndexes[1]], historyIndexes]) {
+  const installedIndexes = new Set(postgresNormalizedSchemaRequiredIndexes.filter(
+    (name) => !missingIndexes.includes(name)
+  ));
+  const catalogSQL = async (_strings, tables, columns, indexes) => [{
+    table_count: tables.length,
+    column_count: columns.length,
+    index_count: indexes.filter((name) => installedIndexes.has(name)).length
+  }];
+  let historyInitializeCalls = 0;
+  const initializeHistoryIndexes = async () => {
+    historyInitializeCalls += 1;
+    for (const name of missingIndexes) installedIndexes.add(name);
+  };
+  await ensurePostgresNormalizedSchema(catalogSQL, initializeHistoryIndexes);
+  assert.equal(historyInitializeCalls, 1,
+    `an otherwise ready schema missing ${missingIndexes.join(", ")} must install indexes`);
+  assert.equal(await postgresNormalizedSchemaIsReady(catalogSQL), true);
+  await ensurePostgresNormalizedSchema(catalogSQL, initializeHistoryIndexes);
+  assert.equal(historyInitializeCalls, 1,
+    "subsequent cold isolates should use the readiness fast path after the indexes exist");
+}
+
 await ensurePostgresNormalizedSchema(
   schemaSQL([
     { ...readyCounts, table_count: readyCounts.table_count - 1 },

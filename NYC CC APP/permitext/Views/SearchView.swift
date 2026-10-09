@@ -223,6 +223,8 @@ struct SearchView: View {
     @State private var query = ""
     @State private var previewLimiter = SearchPreviewLimiter(limit: 2)
     @State private var resultPreviews: [String: String] = [:]
+    @State private var resultParentLabels: [String: [String]] = [:]
+    @State private var didResolveAutomaticExpansion = false
     @State private var expandedSearchGroups: Set<String> = []
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
@@ -467,6 +469,8 @@ struct SearchView: View {
             .onChange(of: query) { _, _ in
                 queryEditGeneration &+= 1
                 expandedSearchGroups.removeAll()
+                didResolveAutomaticExpansion = false
+                resultParentLabels.removeAll()
                 resultPreviews.removeAll()
                 cancelReaderOpeningIfSearchChanged()
                 isSearchRequestPending = !isHistoryVisible
@@ -475,6 +479,9 @@ struct SearchView: View {
             }
             .onChange(of: library.searchResults) { _, _ in
                 rebuildSearchCaches()
+            }
+            .onChange(of: library.isSearchInProgress) { _, searching in
+                if !searching { resolveAutomaticSearchExpansion() }
             }
             .onChange(of: library.allEditionSearchSections) { _, _ in
                 rebuildSearchCaches()
@@ -601,6 +608,15 @@ struct SearchView: View {
                                     Button("Close") { showsPassageDetail = false }
                                         .accessibilityLabel("Close passage")
                                 }
+                                ToolbarItem(placement: .topBarTrailing) {
+                                    Menu {
+                                        Button("Open in Reader 1") { handoffSearchPreview(prepared, to: .primary) }
+                                        Button("Open in Reader 2") { handoffSearchPreview(prepared, to: .secondary) }
+                                    } label: {
+                                        Image(systemName: "book").frame(width: 44, height: 44)
+                                    }
+                                    .accessibilityLabel("Open passage in a permanent Reader")
+                                }
                             }
                     }
                     // A new explicit destination must replace the sheet's
@@ -627,6 +643,13 @@ struct SearchView: View {
 
     private var showsGroupedSearchResults: Bool {
         true
+    }
+
+    private func handoffSearchPreview(_ prepared: PreparedSearchReaderDestination, to destination: BrowserContextID) {
+        guard let source = prepared.library.selectedVersion?.codeVersion else { return }
+        let route = SearchReaderRoute(sectionID: prepared.section.id, sourceVersion: source)
+        showsPassageDetail = false
+        NativeReaderHandoff.shared.open(route, in: destination, library: library)
     }
 
     private func scheduleSearch() {
@@ -747,6 +770,17 @@ struct SearchView: View {
             filtered,
             codeSections: library.allEditionSearchSections
         )
+        resolveAutomaticSearchExpansion()
+    }
+
+    private func resolveAutomaticSearchExpansion() {
+        guard !didResolveAutomaticExpansion, !library.isSearchInProgress, !isSearchRequestPending,
+              !cachedGroupedResults.isEmpty else { return }
+        didResolveAutomaticExpansion = true
+        if let id = NativeSearchGroupExpansion.automaticGroup(groupIDs: cachedGroupedResults.map(\.id),
+            isSearching: library.isSearchInProgress, isPending: isSearchRequestPending) {
+            expandedSearchGroups = [id]
+        }
     }
 
     private static func makeGroupedResults(
@@ -1227,17 +1261,21 @@ struct SearchView: View {
             let requestedQuery = query
             let requestedContext = previewRequestID
             guard previewsEnabled, expandedSearchGroups.contains(groupID),
-                  result.snippet.isEmpty, resultPreviews[result.searchIdentity] == nil else { return }
+                  resultParentLabels[result.searchIdentity] == nil || (result.snippet.isEmpty && resultPreviews[result.searchIdentity] == nil) else { return }
             guard await previewLimiter.acquire() else { return }
             guard !Task.isCancelled, previewRequestID == requestedContext else {
                 await previewLimiter.release()
                 return
             }
-            let preview = await library.searchPreview(for: result, query: requestedQuery)
+            let preview = result.snippet.isEmpty
+                ? await library.searchPreview(for: result, query: requestedQuery)
+                : result.snippet
+            let parents = await library.searchParentLabels(for: result)
             await previewLimiter.release()
             guard !Task.isCancelled, previewRequestID == requestedContext,
                   previewsEnabled, expandedSearchGroups.contains(groupID) else { return }
             resultPreviews[result.searchIdentity] = preview
+            resultParentLabels[result.searchIdentity] = parents
         }
     }
 
@@ -1455,6 +1493,7 @@ struct SearchView: View {
         let expanded = expandedSearchGroups.contains(group.id)
         let title = compactGroupTitle(group)
         return Button {
+            didResolveAutomaticExpansion = true
             expandedSearchGroups = expanded ? [] : [group.id]
             scrollTargetID = "family:\(group.familyName)"
         } label: {
@@ -1496,20 +1535,30 @@ struct SearchView: View {
 
     private func resultRow(_ result: CodeSearchResult) -> some View {
         let accent = Color(uiColor: library.accentColor(for: result.codeSectionID))
-        let preview = resultPreviews[result.searchIdentity] ?? result.snippet
-        return HStack(alignment: .top, spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(result.sectionNumber + " " + result.displayTitle.displayTitle(for: result.sectionNumber))
-                    .font(.body.weight(.semibold)).foregroundStyle(.primary).lineLimit(2)
-                if !preview.isEmpty {
-                    Text(highlightedSearchText(preview, query: query, accent: accent.opacity(0.24)))
-                        .font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
-                }
+        let presentation = NativeSearchResultPresentation(
+            sectionNumber: result.sectionNumber,
+            title: result.displayTitle.displayTitle(for: result.sectionNumber),
+            isParagraph: result.kind == .textBlock,
+            codeName: result.sourceCodeName ?? "Code",
+            edition: result.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) } ?? "",
+            chapterNumber: result.chapterNumber,
+            parentLabels: resultParentLabels[result.searchIdentity] ?? [],
+            snippet: resultPreviews[result.searchIdentity] ?? result.snippet)
+        return VStack(alignment: .leading, spacing: 5) {
+            Text(presentation.source)
+                .font(.caption.weight(.medium)).foregroundStyle(.secondary)
+            Text(presentation.heading)
+                .font(.body.weight(.semibold)).foregroundStyle(.primary).lineLimit(2)
+            if !presentation.context.isEmpty {
+                Text(presentation.context).font(.caption).foregroundStyle(.secondary).lineLimit(2)
             }
-            Spacer(minLength: 0)
+            if !presentation.excerpt.isEmpty {
+                Text(highlightedSearchText(presentation.excerpt, query: query, accent: accent.opacity(0.24)))
+                    .font(.subheadline).foregroundStyle(.secondary).lineLimit(3)
+            }
         }
-        .padding(.vertical, 10)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
         .contentShape(Rectangle())
     }
 

@@ -18,6 +18,7 @@ function fixture(options = {}) {
   const calls = [], rendered = [], notices = [], pending = new Map();
   let mounted;
   const c = {
+    confirmWebWarning: async () => options.confirmed !== false,
     structuredClone, crypto: { randomUUID: () => "new-block" }, Date,
     captureAccountRequest: () => generation,
     requireCurrentAccountRequest: g => { if (g !== generation) throw Object.assign(new Error("Account changed"), { name: "AbortError" }); },
@@ -46,7 +47,7 @@ function fixture(options = {}) {
     flushNotebookAutosave: async () => true, reportStatus: {}, existingReportBlock: old.blocks[0],
     drafts: [], sources: [], sourceWarnings: [], history: [], activeDraft: structuredClone(options.otherSelected ? other : old),
     panel: { querySelector: () => ({ replaceChildren() {} }) },
-    renderSourcePalette() {}, renderHistory() {},
+    renderSourcePalette() {}, renderHistory() {}, clearStatus() {},
     renderWorkspaceContent() { rendered.push(structuredClone(c.activeDraft)); }
   };
   Object.defineProperty(c, "dirty", { get: () => unsaved });
@@ -63,10 +64,12 @@ for (const otherSelected of [false, true]) {
   const h = fixture({ otherSelected }); await h.run();
   assert.equal(h.rendered.at(-1).id, "report-a");
   assert.equal(h.rendered.at(-1).version, 3);
-  assert.equal(h.rendered.at(-1).blocks[0].text, card.plainText, "An open Report must display the committed snapshot");
+  assert.equal(h.rendered.at(-1).blocks[0].kind, "notebookCard");
+  assert.equal(h.rendered.at(-1).blocks[0].sourceID, card.id, "An open Report must retain the Note source and its inline references");
   assert.equal(h.rendered.at(-1).blocks[0].id, "block-a");
   assert.equal(h.pending.size, 0);
 }
+const declined = fixture({ confirmed: false }); await declined.run(); assert.deepEqual(declined.calls, [], "Review cancellation performs no reads or writes");
 const dirty = fixture({ dirty: true });
 await assert.rejects(dirty.run(), /Save your open Report edits/); assert.deepEqual(dirty.calls, []);
 for (const action of ["setDirty", "switchAccount"]) {
@@ -77,15 +80,14 @@ const gate = defer(), duringSave = fixture({ saveGate: gate });
 const saving = duringSave.run();
 for (let i = 0; i < 20 && !duringSave.calls.includes("/reports/drafts/save"); i++) await Promise.resolve();
 duringSave.setDirty(); gate.resolve(); await saving;
-assert.equal(duringSave.server().blocks[0].text, card.plainText);
+assert.equal(duringSave.server().blocks[0].sourceID, card.id);
 assert.equal(duringSave.rendered.length, 0, "In-flight local edits must not be replaced by refresh");
 assert.equal(duringSave.notices.length, 1, "The preserved unsaved view must be disclosed");
 const accountGate = defer(), changed = fixture({ saveGate: accountGate }); const changing = changed.run();
 for (let i = 0; i < 20 && !changed.calls.includes("/reports/drafts/save"); i++) await Promise.resolve();
 changed.switchAccount(); accountGate.resolve(); await assert.rejects(changing, { name: "AbortError" });
 assert.equal(changed.rendered.length, 0); assert.equal(changed.pending.size, 0);
-// The old Notebook reportButton listener was removed. Exercise the surviving
-// promotion function's asynchronous pane-ready boundary directly instead.
+// Exercise the reviewed handoff’s asynchronous pane-ready boundary directly.
 for (const switchAccount of [false, true]) {
   const readyGate = defer(), waiting = fixture({ readyGate });
   const promotion = waiting.run();

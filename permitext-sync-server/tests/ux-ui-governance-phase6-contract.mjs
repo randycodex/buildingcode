@@ -97,15 +97,21 @@ assert.doesNotMatch(webIndex, /Clear All Bookmarks/);
 
 assert.match(permitextApp, /\.accessibilityLabel\("Saved"\)/);
 assert.doesNotMatch(permitextApp, /Text\("Projects"\)/);
-assert.match(chapterReader, /displayedIsBookmarked \? "Remove from Saved" : "Save passage"/);
-assert.match(chapterReader, /displayedIsBookmarked = library\.toggleBookmark\(sectionID: sectionID\)/);
-assert.match(chapterReader, /Image\(systemName: displayedIsBookmarked \? "bookmark.fill" : "bookmark"\)/,
-  "Removing a save must visibly switch the filled bookmark to its outline.");
+const library = await readFile(new URL("NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", repositoryRoot), "utf8");
+assert.match(chapterReader, /library\.readerSaveActionLabel\(sectionID:/);
+assert.match(chapterReader, /displayedIsBookmarked = library\.toggleReaderDestinationSave\(sectionID: sectionID\)/);
+assert.match(library, /saved \? "Remove from Project: /);
+assert.match(library, /saved \? "Remove from Saved" : "Save passage"/);
+assert.match(chapterReader, /Image\(systemName: displayedIsBookmarked \? "bookmark.fill" : "bookmark"\)/);
 assert.match(chapterReader, /\.foregroundStyle\(displayedIsBookmarked \? accentColor : Color\.secondary\)/);
-assert.match(chapterReader, /\.accessibilityValue\(displayedIsBookmarked \? "Saved" : "Not saved"\)/);
-assert.match(chapterReader, /if displayedIsBookmarked == desiredBookmarkState \{\s*if displayedIsBookmarked \{\s*showBookmarkConfirmation\("Saved"\)\s*UINotificationFeedbackGenerator\(\)\.notificationOccurred\(\.success\)\s*showsSavedFollowUp = true\s*\} else \{\s*bookmarkConfirmationTask\?\.cancel\(\)\s*bookmarkConfirmationTask = nil\s*bookmarkConfirmation = nil/,
-  "Successful saves retain confirmation, haptic and follow-up; successful removals clear a prior Saved toast.");
-assert.match(sectionReader, /isBookmarked \? "Remove from Saved" : "Save passage"/);
+assert.match(chapterReader, /\.accessibilityValue\([^\n]*displayedIsBookmarked[^\n]*readerSaveDestinationName/);
+assert.match(chapterReader, /showBookmarkConfirmation\("Saved to /);
+assert.match(chapterReader, /UINotificationFeedbackGenerator\(\)\.notificationOccurred\(\.success\)/);
+assert.doesNotMatch(chapterReader, /showsSavedFollowUp/, "Saving keeps reading uninterrupted with transient destination confirmation.");
+assert.match(chapterReader, /\.contextMenu \{\s*ReaderSaveDestinationMenuContent\(\)[\s\S]*?Button\("Add to Projects"\) \{ openFolderPicker\(\) \}/);
+assert.match(chapterReader, /"Removed from Saved" : "Removed from Project"/);
+assert.match(sectionReader, /ReaderCurrentSectionBookmarkButton\(sectionID: sectionID, accentColor: accentColor\)/,
+  "Search preview and Reader share the same explicit destination action.");
 assert.match(settingsView, /Clear All Saved Passages/);
 assert.doesNotMatch(settingsView, /Clear All Bookmarks/);
 assert.match(organizationHub, /projectSection\(title: "Reports"/);

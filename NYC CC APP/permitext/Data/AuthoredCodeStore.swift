@@ -821,6 +821,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return Self.snippet(in: searchOfficialText(for: indexed), query: query)
     }
 
+    /// Metadata only: no chapter body decoding for a visible Search row.
+    func searchParentLabels(sectionID: Int64) -> [String] {
+        guard let indexed = sectionIndex[sectionID] else { return [] }
+        return parentSectionLabels(for: indexed)
+    }
+
     private func parentSectionLabels(for indexed: IndexedSection) -> [String] {
         let sections = groupsByChapterID[indexed.chapter.id]?.first(where: {
             $0.id == indexed.group.id || ($0.headerLine == indexed.group.headerLine && $0.headingLine == indexed.group.headingLine)

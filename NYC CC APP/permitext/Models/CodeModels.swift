@@ -5333,6 +5333,7 @@ protocol AccountBackendClient {
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot
     func projectPropertyContext(account: SignedInAccount, address: String) async throws -> BackendProjectPropertyContext
     func researchConversations(account: SignedInAccount) async throws -> [ResearchConversationSummary]
+    func researchConversationPage(account: SignedInAccount, limit: Int, cursor: String?, query: String, projectID: String?) async throws -> ResearchConversationListResponse
     func researchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
     func retainInterruptedResearch(account: SignedInAccount, conversationID: String, attempt: ResearchQuestionAttempt, contextRevision: Int) async throws -> ResearchConversation
     func refreshResearchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
@@ -6571,6 +6572,12 @@ extension PermitextBackendTransport {
     func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse { throw URLError(.unsupportedURL) }
 }
 extension AccountBackendClient {
+    func researchConversationPage(account: SignedInAccount, limit: Int, cursor: String?, query: String, projectID: String?) async throws -> ResearchConversationListResponse {
+        // Local/demo clients retain the legacy full-list contract. The live
+        // backend overrides this with a bounded server request.
+        ResearchConversationListResponse(conversations: try await researchConversations(account: account))
+    }
+
     func readProfile(account: SignedInAccount) async throws -> AccountProfile { throw URLError(.unsupportedURL) }
     func saveProfile(account: SignedInAccount, profile: AccountProfile) async throws -> SignedInAccount { throw URLError(.unsupportedURL) }
     func retainInterruptedResearch(account: SignedInAccount, conversationID: String, attempt: ResearchQuestionAttempt, contextRevision: Int) async throws -> ResearchConversation { throw URLError(.unsupportedURL) }

@@ -1,4 +1,5 @@
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
+import { researchHistoryOptions, researchHistoryCursor, researchHistoryFileRows, researchHistoryPageQuery } from "./research-history-pagination.mjs";
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
 import { researchSourceBodyState, researchSourceBodyStatePrompt, researchSourceAvailabilityPrompt,
   researchSourceBodyStateInstruction } from "./research-source-body-state.mjs";
@@ -1438,6 +1439,10 @@ export function createFileStoreAdapter() {
       }
       return conversations;
     },
+    async listResearchConversationPage(userID, options) {
+      const store = await this.read();
+      return researchHistoryFileRows(store.researchConversationsByUserID?.[userID] || [], options, projectResearchConversationForList);
+    },
     async saveResearchConversation(userID, conversation, expectedRevision = null) {
       return this.withMutation((store) => {
         store.researchConversationsByUserID ||= {};
@@ -1622,10 +1627,12 @@ export function createFileStoreAdapter() {
       const store = await this.read();
       const projectID = String(options.projectID || "").trim();
       const targetKind = String(options.targetKind || "").trim();
+      const targetIDs = Array.isArray(options.targetIDs) ? new Set(options.targetIDs) : null;
       return (store.projectLinksByUserID?.[userID] || [])
         .filter((item) =>
           (!projectID || item.projectID === projectID) &&
-          (!targetKind || item.targetKind === targetKind)
+          (!targetKind || item.targetKind === targetKind) &&
+          (!targetIDs || targetIDs.has(item.targetID))
         )
         .slice();
     },
@@ -2836,6 +2843,16 @@ async function createPostgresStoreAdapter() {
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_research_conversations_user_updated_idx
       ON permitext_research_conversations (user_id, updated_at DESC)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_conversations_visible_history_idx
+      ON permitext_research_conversations (user_id, created_at DESC, id COLLATE "C" ASC)
+      WHERE COALESCE(conversation->>'historyHiddenAt', '') = ''
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_conversations_visible_project_history_idx
+      ON permitext_research_conversations (user_id, (COALESCE(conversation->>'primaryProjectID', '')), created_at DESC, id COLLATE "C" ASC)
+      WHERE COALESCE(conversation->>'historyHiddenAt', '') = ''
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_foundation_artifacts (
@@ -4161,6 +4178,12 @@ async function createPostgresStoreAdapter() {
       `;
       return rows.length ? safeJSON(rows[0].conversation, null) : null;
     },
+    async listResearchConversationPage(userID, options) {
+      await ensureSchema();
+      const query = researchHistoryPageQuery(userID, options);
+      const rows = await sql.query(query.text, query.values);
+      return rows.map(row => ({ conversation: safeJSON(row.conversation, {}), sortDate: row.sort_date }));
+    },
     async listResearchConversations(userID, options = {}) {
       await ensureSchema();
       const projectID = String(options.projectID || "").trim();
@@ -4829,6 +4852,17 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       const projectID = String(options.projectID || "").trim();
       const targetKind = String(options.targetKind || "").trim();
+      if (Array.isArray(options.targetIDs)) {
+        if (!options.targetIDs.length) return [];
+        const rows = await sql`
+          SELECT link FROM permitext_project_links
+          WHERE user_id = ${userID} AND target_id = ANY(${options.targetIDs})
+            AND (${!projectID} OR project_id = ${projectID})
+            AND (${!targetKind} OR target_kind = ${targetKind})
+          ORDER BY updated_at DESC
+        `;
+        return rows.map(row => safeJSON(row.link, {}));
+      }
       const rows = projectID && targetKind
         ? await sql`
             SELECT link
@@ -17838,6 +17872,30 @@ async function requiredResearchConversation(response, userID, conversationID) {
 async function handleResearchConversationList(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
+  let pageOptions;
+  try {
+    pageOptions = researchHistoryOptions(context.body, context.userID);
+  } catch (error) {
+    sendJSON(response, 400, { error: error.message, code: error.code });
+    return;
+  }
+  if (pageOptions) {
+    const rows = await (await storeAdapter()).listResearchConversationPage(context.userID, pageOptions);
+    const hasMore = rows.length > pageOptions.limit;
+    const page = rows.slice(0, pageOptions.limit);
+    const links = await listStoredProjectLinks(context.userID, {
+      targetKind: "researchConversation", targetIDs: page.map(row => row.conversation.id)
+    });
+    const linkByConversationID = new Map(links
+      .filter(link => !link.deletedAt && link.targetKind === "researchConversation")
+      .map(link => [link.targetID, link]));
+    sendJSON(response, 200, {
+      conversations: page.map(row => researchConversationSummary(row.conversation, linkByConversationID.get(row.conversation.id))),
+      nextCursor: hasMore ? researchHistoryCursor(pageOptions, page.at(-1)) : null,
+      hasMore
+    });
+    return;
+  }
   const [conversations, links] = await Promise.all([
     listStoredResearchConversations(context.userID, { summaryOnly: true, visibleOnly: true }),
     listStoredProjectLinks(context.userID, { targetKind: "researchConversation" })

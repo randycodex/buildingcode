@@ -616,10 +616,11 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("async function openNewSearchColumn()") &&
-        workspaceScript.text.includes('toggleSearchButton.addEventListener("click", () => {\n      void openNewSearchColumn();') &&
+        workspaceScript.text.includes('toggleSearchButton.addEventListener("click", () => {\n      void focusRecentUtilityColumn("search");') &&
+        workspaceScript.text.includes('add("New search column", () => void openNewSearchColumn())') &&
         workspaceScript.text.includes('run: () => openNewSearchColumn()') &&
         !workspaceScript.text.match(/async function openNewSearchColumn\(\)[\s\S]*?\.search-input[`"]\)\s*\?\.focus/),
-      "Search should create a new Search column from both the toolbar and command palette."
+      "Search should focus an existing column from the toolbar and retain explicit new-column actions."
     );
     assert(
       workspaceScript.text.includes("async function toggleProjectsColumns()") &&
@@ -1048,7 +1049,7 @@ async function main() {
         iosLibraryViewModelSource.includes("func bookmarks(inFolder folderID: Int64)") &&
         iosLibraryViewModelSource.includes("repository.evidenceReferences(inFolder: folder.id)") &&
         iosUserDataStoreSource.includes("func evidenceReferences(inFolder folderID: Int64)") &&
-        iosBookmarksSource.includes('CodeEyebrow(text: "Project Hub"') &&
+        iosBookmarksSource.includes('CodeEyebrow(text: "Project overview"') &&
         iosBookmarksSource.includes('Label("Notebook", systemImage: "note.text")') &&
         iosBookmarksSource.includes("projectNotebookDestination(projectID: projectID, cardID: card.id)") &&
         iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&

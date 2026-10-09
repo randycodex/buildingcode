@@ -37,6 +37,8 @@ struct BrowseView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollRestingOffset: CGFloat?
     @State private var openedChapter: CodeChapter?
+    @State private var handoffInitialSection: CodeSectionSummary?
+    @ObservedObject private var readerHandoff = NativeReaderHandoff.shared
     @State private var preparedNativeOpening: NativeReaderPreparedOpening?
     @State private var preparingChapter: CodeChapter?
     @State private var preparationTask: Task<Void, Never>?
@@ -120,6 +122,10 @@ struct BrowseView: View {
         .onAppear {
             restoreReaderVersionIfNeeded()
         }
+        .task(id: "\(readerHandoff.requests[browserContext]?.id.uuidString ?? "none"):\(isBrowserTabActive)") {
+            guard isBrowserTabActive, let request = readerHandoff.requests[browserContext] else { return }
+            await acceptReaderHandoff(request)
+        }
         .task(id: chapterWarmupScope) {
             guard canResumeChapterWarmups else { return }
             // Let the return-to-cards transition settle. Changing category,
@@ -178,10 +184,10 @@ struct BrowseView: View {
                     .padding(.bottom, 12)
                     .zIndex(1)
 
-                if let preparationError, let failedChapter {
+                if let preparationError {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(preparationError).font(.callout).foregroundStyle(.secondary)
-                        Button("Retry opening chapter") { prepareAndOpenChapter(failedChapter) }
+                        if let failedChapter { Button("Retry opening chapter") { prepareAndOpenChapter(failedChapter) } }
                     }
                     .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                     .accessibilityIdentifier("reader-chapter-opening-error")
@@ -305,6 +311,8 @@ struct BrowseView: View {
 
     private func prepareAndOpenChapter(_ chapter: CodeChapter) {
         guard library.isChapterEnabledForBrowsing(chapter) else { return }
+        readerHandoff.cancel(in: browserContext)
+        handoffInitialSection = nil
         cancelChapterPreparation()
         #if PERMITEXT_LOCAL_PERFORMANCE
         LocalPerformanceRecorder.record(.chapterOpenRequested)
@@ -361,11 +369,11 @@ struct BrowseView: View {
         rememberedScrollOffset: Binding<Double?>,
         initialSection overrideInitialSection: CodeSectionSummary? = nil
     ) -> some View {
-        if let initialSection = overrideInitialSection ?? library.firstSection(for: chapter) {
+        if let initialSection = overrideInitialSection ?? handoffInitialSection ?? library.firstSection(for: chapter) {
             ChapterHTMLReaderView(
                 chapter: chapter,
                 initialSection: initialSection,
-                opensAtChapterTop: true,
+                opensAtChapterTop: handoffInitialSection == nil,
                 rememberedNativeSectionID: rememberedSectionID,
                 rememberedNativeBlockID: rememberedNativeBlockBinding(for: chapter.id),
                 rememberedNativeViewport: BrowserContextID.nativePositionBinding(for: chapter.id, context: browserContext),
@@ -396,6 +404,8 @@ struct BrowseView: View {
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 0)
             Menu {
+                ReaderSaveDestinationMenuContent()
+                Divider()
                 Section(ReaderCodeMenuSectionTitle.construction2022) {
                     ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
                         readerCodePickerButton(
@@ -576,6 +586,7 @@ struct BrowseView: View {
         codeSectionName: String
     ) {
         guard let version, library.isBrowseSourceEnabled(version: version, categoryName: codeSectionName) else { return }
+        readerHandoff.cancel(in: browserContext)
         pendingReaderCodeSectionName = codeSectionName
         BrowserContextID.persistVersionFileName(version.fileName, for: browserContext)
         if library.selectReaderPickerVersion(fileName: version.fileName) {
@@ -600,6 +611,9 @@ struct BrowseView: View {
     }
 
     private func restoreReaderVersionIfNeeded() {
+        // A deliberate passage handoff takes precedence over the last edition.
+        // In particular, a cold second Reader must not start two corpus loads.
+        guard readerHandoff.shouldRestoreVersion(in: browserContext) else { return }
         guard let storedVersion = BrowserContextID.storedVersionFileName(for: browserContext),
               storedVersion != library.selectedVersionFileName,
               library.availableVersions.contains(where: { $0.fileName == storedVersion })
@@ -657,6 +671,54 @@ struct BrowseView: View {
 
     private var selectedCodeSectionName: String {
         library.codeSectionName(id: browseCodeSectionID)
+    }
+
+    @MainActor
+    private func acceptReaderHandoff(_ request: NativeReaderHandoffRequest) async {
+        guard request.permits(library.captureCodeSourceNavigationContext()),
+              let source = request.route.sourceVersion else {
+            readerHandoff.finish(request, in: browserContext)
+            return
+        }
+        cancelChapterPreparation()
+        openedChapter = nil
+        handoffInitialSection = nil
+        preparationError = nil
+        do {
+            guard let version = library.availableVersions.first(where: {
+                UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.server(source)
+            }) else { throw PreparedSearchReaderDestination.PreparationError.unavailable }
+            if version.contentKind == .authored {
+                let access = await library.authoredSourceNavigationAccess(sectionID: request.route.sectionID,
+                    canonicalEdition: source, categoryID: request.route.codeSectionID)
+                guard case .allowed = access else { throw PreparedSearchReaderDestination.PreparationError.unavailable }
+            }
+            guard !Task.isCancelled, request.permits(library.captureCodeSourceNavigationContext()),
+                  readerHandoff.requests[browserContext]?.id == request.id else { return }
+            guard await library.prepareCodeVersionForEvidence(source),
+                  let target = library.searchReaderTarget(sectionID: request.route.sectionID) else {
+                throw PreparedSearchReaderDestination.PreparationError.unavailable
+            }
+            let opening = try await library.prepareChapterForOpening(target.chapter)
+            guard !Task.isCancelled, request.permits(library.captureCodeSourceNavigationContext()),
+                  readerHandoff.requests[browserContext]?.id == request.id else { return }
+            updateCodeSection(target.chapter.codeSectionID)
+            BrowserContextID.persistVersionFileName(library.selectedVersionFileName, for: browserContext)
+            rememberedSectionBinding(for: target.chapter.id).wrappedValue = target.section.id
+            rememberedNativeBlockBinding(for: target.chapter.id).wrappedValue = nil
+            BrowserContextID.nativePositionBinding(for: target.chapter.id, context: browserContext).wrappedValue = nil
+            rememberedAnchorBinding(for: target.chapter.id).wrappedValue = nil
+            rememberedScrollOffsetBinding(for: target.chapter.id).wrappedValue = nil
+            handoffInitialSection = target.section
+            preparedNativeOpening = opening
+            openedChapter = target.chapter
+            readerHandoff.finish(request, in: browserContext)
+        } catch {
+            guard !Task.isCancelled, request.permits(library.captureCodeSourceNavigationContext()),
+                  readerHandoff.requests[browserContext]?.id == request.id else { return }
+            preparationError = "This passage could not be opened in this Reader. Your other Reader is unchanged."
+            readerHandoff.finish(request, in: browserContext)
+        }
     }
 
     private func updateCodeSection(_ id: Int64?) {

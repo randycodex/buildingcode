@@ -175,16 +175,7 @@ struct ReaderView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button {
-                    if isBookmarked {
-                        removeBookmarkAndFolderLinks()
-                    } else {
-                        saveBookmarkImmediately()
-                    }
-                } label: {
-                    Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                }
-                .accessibilityLabel(isBookmarked ? "Remove from Saved" : "Save passage")
+                ReaderCurrentSectionBookmarkButton(sectionID: sectionID, accentColor: accentColor)
             }
         }
         .fullScreenCover(

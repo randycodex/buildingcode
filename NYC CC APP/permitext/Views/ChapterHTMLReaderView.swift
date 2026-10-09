@@ -504,29 +504,33 @@ struct ChapterHTMLReaderView: View {
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet
         }
-        .fullScreenCover(isPresented: $isChapterSearchPresented) {
-            ChapterSearchSheet(
-                title: chapter.displayLabel,
-                entries: chapterSearchEntries,
-                query: $chapterSearchQuery,
-                onSelect: { entry in
-                    chapterSearchScrollQuery = chapterSearchQuery
-                    chapterSearchScrollRequestID &+= 1
-                    if let anchorID = entry.anchorID {
-                        targetAnchorID = anchorID
-                        selectedAnchor = anchors.first(where: { $0.anchorID == anchorID })
-                        rememberedAnchorID.wrappedValue = anchorID
-                    } else {
-                        let normalized = normalizedSectionNumber(entry.sectionNumber)
-                        let anchor = anchors.first { normalizedSectionNumber($0.sectionNumber) == normalized }
-                        targetAnchorID = anchor?.anchorID
-                        selectedAnchor = anchor
-                        rememberedAnchorID.wrappedValue = anchor?.anchorID
-                    }
-                    rememberedNativeSectionID.wrappedValue = entry.sectionID
-                }
-            )
-            .environmentObject(library)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if isChapterSearchPresented {
+                ChapterSearchSheet(
+                    title: chapter.displayLabel,
+                    entries: chapterSearchEntries,
+                    query: $chapterSearchQuery,
+                    onSelect: { entry in
+                        chapterSearchScrollQuery = chapterSearchQuery
+                        chapterSearchScrollRequestID &+= 1
+                        if let anchorID = entry.anchorID {
+                            targetAnchorID = anchorID
+                            selectedAnchor = anchors.first(where: { $0.anchorID == anchorID })
+                            rememberedAnchorID.wrappedValue = anchorID
+                        } else {
+                            let normalized = normalizedSectionNumber(entry.sectionNumber)
+                            let anchor = anchors.first { normalizedSectionNumber($0.sectionNumber) == normalized }
+                            targetAnchorID = anchor?.anchorID
+                            selectedAnchor = anchor
+                            rememberedAnchorID.wrappedValue = anchor?.anchorID
+                        }
+                        rememberedNativeSectionID.wrappedValue = entry.sectionID
+                    },
+                    isInline: true,
+                    onClose: { isChapterSearchPresented = false }
+                )
+                .environmentObject(library)
+            }
         }
         .navigationDestination(item: $openedSection) { section in
             ReaderView(sectionID: section.id)
@@ -538,7 +542,7 @@ struct ChapterHTMLReaderView: View {
                isRolloutRouteResolved,
                hasActivatedHTMLReader,
                !usesNativeRolloutReader {
-                CodeTopContentFade(alwaysVisible: true)
+                CodeTopContentFade(alwaysVisible: !isChapterSearchPresented)
             }
         }
         .onDisappear {

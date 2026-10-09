@@ -467,6 +467,13 @@ private struct ResearchSessionView: View {
     @State private var summaries: [ResearchConversationSummary] = []
     @State private var historyPreviews: [String: String] = [:]
     @State private var historyPreviewRevisions: [String: String] = [:]
+    @State private var historyQuery = ""
+    @State private var historyProjectFilter = "all"
+    @State private var historyNextCursor: String?
+    @State private var historyHasMore = false
+    @State private var historyLegacySummaries: [ResearchConversationSummary]?
+    @State private var isLoadingMoreHistory = false
+    @State private var historyLoadedFilterKey: String?
     @State private var conversation: ResearchConversation?
     @State private var question = ""
     @State private var isLoadingHistory = true
@@ -498,6 +505,7 @@ private struct ResearchSessionView: View {
     @State private var isRefreshingSources = false
     @State private var isConfirmingProjectContext = false
     @State private var pendingFeedbackReport: PendingResearchFeedbackReport?
+    @State private var pendingNotebookHandoff: ResearchNotebookHandoff?
     @State private var feedbackMessageID: String?
     @State private var isVisible = false
     private let cache: ProjectHubOfflineCache
@@ -532,9 +540,6 @@ private struct ResearchSessionView: View {
                         )
                     } else if let conversation, conversation.id == library.activeResearchConversationID {
                         conversationView(conversation)
-                    } else if isLoading && summaries.isEmpty {
-                        ProgressView("Loading Research…")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
                         historyView
                     }
@@ -586,6 +591,10 @@ private struct ResearchSessionView: View {
             }
             .sheet(isPresented: $showingSettings) {
                 PermitextAccountEntryView(initialSection: recoverySettingsSection)
+                    .environmentObject(library)
+            }
+            .sheet(item: $pendingNotebookHandoff) { handoff in
+                ResearchNotebookHandoffSheet(handoff: handoff, owner: owner)
                     .environmentObject(library)
             }
             .sheet(isPresented: $showingProjectCreator) {
@@ -654,12 +663,18 @@ private struct ResearchSessionView: View {
                     recoverUnfinishedPurchases: true,
                     showsErrors: false
                 )
-                async let history: Void = loadHistory()
                 await openActiveConversationIfNeeded()
                 await allowance
                 guard isCurrentOwner, !Task.isCancelled else { return }
                 await consumePendingSelectionIfNeeded()
-                await history
+            }
+            .task(id: "\(library.hasResearchAccess):\(historyFilterKey)") {
+                guard isCurrentOwner, library.hasResearchAccess else { return }
+                if !historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    try? await Task.sleep(for: .milliseconds(250))
+                }
+                guard !Task.isCancelled else { return }
+                await loadHistory()
             }
             .onChange(of: library.activeResearchConversationID) { previousID, id in
                 guard isCurrentOwner else { return }
@@ -672,6 +687,7 @@ private struct ResearchSessionView: View {
                 pendingDisclosureAttempt = nil
                 failedQuestionAttempt = nil
                 pendingFeedbackReport = nil
+                pendingNotebookHandoff = nil
                 pendingVisualReview = nil
                 pendingDeletion = nil
                 showingRename = false
@@ -904,7 +920,7 @@ private struct ResearchSessionView: View {
     private func historyDateGroup(_ item: ResearchConversationSummary) -> String {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let date = formatter.date(from: item.updatedAt) ?? ISO8601DateFormatter().date(from: item.updatedAt)
+        let date = formatter.date(from: item.createdAt) ?? ISO8601DateFormatter().date(from: item.createdAt)
         guard let date else { return "Earlier" }
         let calendar = Calendar.current
         if calendar.isDateInToday(date) { return "Today" }
@@ -918,7 +934,7 @@ private struct ResearchSessionView: View {
     }
 
     private var historyView: some View {
-        let orderedSummaries = ResearchHistoryPresentation.ordered(summaries)
+        let orderedSummaries = ResearchHistoryPresentation.ordered(NativeResearchHistory.filtered(summaries, query: historyQuery, projectID: historyProjectID))
         return List {
             Color.clear
                 .frame(height: 76)
@@ -926,21 +942,36 @@ private struct ResearchSessionView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
 
+            historyFilters
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+
+            if isLoadingHistory {
+                ProgressView("Loading Research…")
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            }
+
             if let message = errorMessage ?? historyErrorMessage {
                 statusMessage(message)
                     .listRowBackground(Color.clear)
+                if historyErrorMessage != nil {
+                    Button("Retry history") { Task { await loadHistory(forceNetwork: true) } }
+                        .listRowBackground(Color.clear)
+                }
             }
 
-            if summaries.isEmpty && !isLoading && errorMessage == nil && historyErrorMessage == nil {
+            if orderedSummaries.isEmpty && !isLoading && errorMessage == nil && historyErrorMessage == nil {
                 ContentUnavailableView(
-                    "No Research yet",
+                    historyIsFiltered ? "No matching Research" : "No Research yet",
                     image: "Astroid",
-                    description: Text("Tap the plus button to start Research.")
+                    description: Text(historyIsFiltered ? "Try a different question or Project." : "Tap the plus button to start Research.")
                 )
                 .padding(.top, 70)
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
             }
+
 
             ForEach(Array(orderedSummaries.enumerated()), id: \.element.id) { index, item in
                 let isDraft = item.messageCount == 0
@@ -995,11 +1026,83 @@ private struct ResearchSessionView: View {
                     }
                 }
             }
+            if historyHasMore && historyLoadedFilterKey == historyFilterKey {
+                Button {
+                    Task { await loadMoreHistory() }
+                } label: {
+                    HStack {
+                        Text("Load older Research")
+                        if isLoadingMoreHistory { ProgressView() }
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .disabled(isLoadingHistory || isLoadingMoreHistory)
+                .listRowBackground(Color.clear)
+                .accessibilityIdentifier("research-history-load-more")
+            }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .contentMargins(.bottom, floatingNavigationClearance, for: .scrollContent)
         .refreshable { await loadHistory(forceNetwork: true) }
+    }
+
+    private var historyProjectID: String? {
+        historyProjectFilter == "all" ? nil : historyProjectFilter == "unassigned" ? "" : historyProjectFilter
+    }
+
+    private var historyIsFiltered: Bool {
+        historyProjectID != nil || !historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var historyFilterKey: String {
+        "\(historyProjectFilter.utf8.count):\(historyProjectFilter):\(historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
+    }
+
+    private func boundedHistoryQuery(_ value: String) -> String {
+        guard value.utf16.count > 200 else { return value }
+        // Keep the API's UTF-16 bound and whole graphemes. The presentation
+        // helper's trailing ellipsis is not part of a literal search query.
+        return String(ResearchNotebookHandoffPresentation.boundedText(value, maximumUTF16Count: 201).dropLast())
+    }
+
+    private var historyFilters: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                TextField("Find a previous question", text: $historyQuery)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .onChange(of: historyQuery) { _, value in
+                        let bounded = boundedHistoryQuery(value)
+                        if value != bounded { historyQuery = bounded }
+                    }
+                    .submitLabel(.search)
+                    .accessibilityIdentifier("research-history-search")
+                if !historyQuery.isEmpty {
+                    Button { historyQuery = "" } label: { Image(systemName: "xmark.circle.fill") }
+                        .accessibilityLabel("Clear history search")
+                }
+            }
+            .padding(12)
+            .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+            Menu {
+                Picker("Project", selection: $historyProjectFilter) {
+                    Text("All Projects").tag("all")
+                    Text("Unassigned").tag("unassigned")
+                    ForEach(library.folders.filter { $0.folderType == .project }) { project in
+                        if let id = library.backendProjectID(for: project.id) {
+                            Text(project.name).tag(id)
+                        }
+                    }
+                }
+            } label: {
+                Label(historyProjectID == nil ? "All Projects" : historyProjectID == "" ? "Unassigned" : library.folder(forBackendProjectID: historyProjectID ?? "")?.name ?? "Project", systemImage: "line.3.horizontal.decrease")
+                    .font(.subheadline)
+                    .frame(minHeight: 44)
+            }
+            .accessibilityIdentifier("research-history-project-filter")
+        }
     }
 
     private func conversationView(_ conversation: ResearchConversation) -> some View {
@@ -1344,6 +1447,19 @@ private struct ResearchSessionView: View {
             ) { citation in
                 openCitation(citation, sources: sources)
             }
+            Button {
+                guard isCurrentOwner, let current = conversation,
+                      let index = current.messages.firstIndex(where: { $0.id == message.id }) else { return }
+                let question = current.messages[..<index].last(where: { $0.role == "user" })?.question
+                    ?? current.title
+                pendingNotebookHandoff = ResearchNotebookHandoff(
+                    id: message.id, question: question, projectID: current.primaryProjectID
+                )
+            } label: {
+                Label("Add to Notebook", systemImage: "note.text.badge.plus")
+                    .font(.subheadline)
+            }
+            .accessibilityIdentifier("research-add-to-notebook-\(message.id)")
         }
     }
 
@@ -1502,8 +1618,11 @@ private struct ResearchSessionView: View {
     private func invalidateConversationIfRequired(_ error: Error, id: String) {
         guard NativePrivateCachePolicy.requiresInvalidation(after: error), let owner, isCurrentOwner else { return }
         try? ResearchConversationCacheLifecycle.invalidateServerCopy(cache: cache, accountID: owner.accountID, conversationID: id, error: error)
-        summaries.removeAll { $0.id == id }
-        cacheHistory(summaries, accountID: owner.accountID)
+        if let status = (error as? PermitextBackendHTTPError)?.statusCode, [401, 403].contains(status) {
+            invalidateHistoryCache(accountID: owner.accountID)
+        } else {
+            removeHistoryConversation(id: id, accountID: owner.accountID)
+        }
         if conversation?.id == id { conversation = nil }
         failedQuestionAttempt = nil
         pendingQuestionAttempt = nil
@@ -1514,8 +1633,14 @@ private struct ResearchSessionView: View {
     private func loadHistory(forceNetwork: Bool = false) async {
         guard isCurrentOwner, let owner else { return }
         let loadID = UUID()
+        let filterKey = historyFilterKey
         historyLoadID = loadID
         isLoadingHistory = true
+        isLoadingMoreHistory = false
+        historyNextCursor = nil
+        historyHasMore = false
+        historyLegacySummaries = nil
+        if historyLoadedFilterKey != filterKey { summaries = [] }
         defer {
             if isCurrentOwner && historyLoadID == loadID {
                 isLoadingHistory = false
@@ -1527,20 +1652,76 @@ private struct ResearchSessionView: View {
         if !forceNetwork, let cached = try? cache.load(
             [ResearchConversationSummary].self, accountID: owner.accountID,
             projectID: "all-research", scope: "research-history"
-        ) { summaries = cached.value }
+        ) {
+            let cachedMatches = NativeResearchHistory.filtered(cached.value, query: historyQuery, projectID: historyProjectID)
+            summaries = Array(cachedMatches.prefix(NativeResearchHistory.pageSize))
+            historyLegacySummaries = cachedMatches
+            historyHasMore = cachedMatches.count > summaries.count
+            historyLoadedFilterKey = filterKey
+        }
         do {
-            let loaded = try await library.researchConversations()
-            guard isCurrentOwner, historyLoadID == loadID, !Task.isCancelled else { return }
-            summaries = loaded
-            cacheHistory(loaded, accountID: owner.accountID)
+            let page = try await library.researchConversationPage(limit: NativeResearchHistory.pageSize, cursor: nil, query: historyQuery, projectID: historyProjectID)
+            guard isCurrentOwner, historyLoadID == loadID, historyFilterKey == filterKey, !Task.isCancelled else { return }
+            let loaded = NativeResearchHistory.filtered(page.conversations, query: historyQuery, projectID: historyProjectID)
+            if page.hasMore == nil {
+                // Older servers return the full list; keep filtering and paging
+                // useful locally until the matching backend is deployed.
+                historyLegacySummaries = loaded
+                summaries = Array(loaded.prefix(NativeResearchHistory.pageSize))
+                historyHasMore = loaded.count > summaries.count
+                cacheHistory(loaded, accountID: owner.accountID, replacingAll: true)
+            } else {
+                historyLegacySummaries = nil
+                summaries = loaded
+                historyNextCursor = page.nextCursor
+                historyHasMore = page.hasMore == true && page.nextCursor != nil
+                cacheHistory(loaded, accountID: owner.accountID, replacingAll: page.hasMore == false)
+            }
+            historyLoadedFilterKey = filterKey
             historyErrorMessage = nil
         } catch {
-            guard isCurrentOwner, historyLoadID == loadID, !Task.isCancelled else { return }
-            if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) { summaries = [] }
+            guard isCurrentOwner, historyLoadID == loadID, historyFilterKey == filterKey, !Task.isCancelled else { return }
+            if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) {
+                summaries = []
+                historyLegacySummaries = nil
+                historyHasMore = false
+            }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
-                try? cache.remove(accountID: owner.accountID, projectID: "all-research", scope: "research-history")
+                invalidateHistoryCache(accountID: owner.accountID)
             }
             historyErrorMessage = summaries.isEmpty ? error.localizedDescription : "Showing saved Research history. Could not refresh: \(error.localizedDescription)"
+        }
+    }
+
+    private func loadMoreHistory() async {
+        guard isCurrentOwner, let owner, let loadID = historyLoadID,
+              historyHasMore, !isLoadingHistory, !isLoadingMoreHistory,
+              historyLoadedFilterKey == historyFilterKey else { return }
+        if let legacy = historyLegacySummaries {
+            summaries = Array(legacy.prefix(summaries.count + NativeResearchHistory.pageSize))
+            historyHasMore = legacy.count > summaries.count
+            cacheHistory(summaries, accountID: owner.accountID)
+            return
+        }
+        guard let cursor = historyNextCursor else { return }
+        let filterKey = historyFilterKey
+        isLoadingMoreHistory = true
+        defer { if historyLoadID == loadID { isLoadingMoreHistory = false } }
+        do {
+            let page = try await library.researchConversationPage(limit: NativeResearchHistory.pageSize, cursor: cursor, query: historyQuery, projectID: historyProjectID)
+            guard isCurrentOwner, historyLoadID == loadID, historyFilterKey == filterKey, !Task.isCancelled else { return }
+            summaries = NativeResearchHistory.appending(page.conversations, to: summaries)
+            historyNextCursor = page.nextCursor
+            historyHasMore = page.hasMore == true && page.nextCursor != nil && page.nextCursor != cursor
+            cacheHistory(summaries, accountID: owner.accountID, replacingAll: page.hasMore == false)
+            historyErrorMessage = nil
+        } catch {
+            guard isCurrentOwner, historyLoadID == loadID, historyFilterKey == filterKey, !Task.isCancelled else { return }
+            if NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                invalidateHistoryCache(accountID: owner.accountID)
+            }
+            historyErrorMessage = summaries.isEmpty ? error.localizedDescription
+                : "Could not load older Research. Your current results are still here. \(error.localizedDescription)"
         }
     }
 
@@ -2054,8 +2235,7 @@ private struct ResearchSessionView: View {
             try? ResearchConversationCacheLifecycle.removeDeletedConversation(
                 cache: cache, accountID: identity.account.accountID, conversationID: id
             )
-            summaries.removeAll { $0.id == id }
-            cacheHistory(summaries, accountID: identity.account.accountID)
+            removeHistoryConversation(id: id, accountID: identity.account.accountID)
             if library.activeResearchConversationID == id { library.activeResearchConversationID = nil }
             await loadHistory(forceNetwork: true)
         } catch {
@@ -2066,14 +2246,57 @@ private struct ResearchSessionView: View {
         }
     }
 
-    private func cacheHistory(_ history: [ResearchConversationSummary], accountID: String) {
-        guard isCurrentOwner, owner?.accountID == accountID else { return }
+    private func cacheHistory(_ history: [ResearchConversationSummary], accountID: String, replacingAll: Bool = false) {
+        guard isCurrentOwner, owner?.accountID == accountID, !historyIsFiltered else { return }
+        let existing = (try? cache.load(
+            [ResearchConversationSummary].self, accountID: accountID,
+            projectID: "all-research", scope: "research-history"
+        ))?.value ?? []
+        // A first page is not a complete account snapshot. Keep older offline
+        // rows until a complete list or an explicit deletion supersedes them.
+        let retained = replacingAll ? history : NativeResearchHistory.appending(existing, to: history)
         try? cache.store(
-            history,
+            retained,
             accountID: accountID,
             projectID: "all-research",
             scope: "research-history"
         )
+    }
+
+    private func removeHistoryConversation(id: String, accountID: String) {
+        guard isCurrentOwner, owner?.accountID == accountID else { return }
+        historyLoadID = UUID()
+        isLoadingHistory = false
+        isLoadingMoreHistory = false
+        summaries.removeAll { $0.id == id }
+        historyLegacySummaries?.removeAll { $0.id == id }
+        historyPreviews.removeValue(forKey: id)
+        historyPreviewRevisions.removeValue(forKey: id)
+        if let legacy = historyLegacySummaries { historyHasMore = legacy.count > summaries.count }
+        // Deletion must update the account cache even while a Project/search
+        // filter is active; saving the visible subset would discard other rows.
+        if let cached = try? cache.load(
+            [ResearchConversationSummary].self, accountID: accountID,
+            projectID: "all-research", scope: "research-history"
+        ) {
+            try? cache.store(cached.value.filter { $0.id != id }, accountID: accountID,
+                             projectID: "all-research", scope: "research-history")
+        }
+    }
+
+    private func invalidateHistoryCache(accountID: String) {
+        guard isCurrentOwner, owner?.accountID == accountID else { return }
+        historyLoadID = UUID()
+        isLoadingHistory = false
+        isLoadingMoreHistory = false
+        summaries = []
+        historyLegacySummaries = nil
+        historyNextCursor = nil
+        historyHasMore = false
+        historyLoadedFilterKey = nil
+        historyPreviews = [:]
+        historyPreviewRevisions = [:]
+        try? cache.remove(accountID: accountID, projectID: "all-research", scope: "research-history")
     }
 
     private func cacheConversation(_ conversation: ResearchConversation) {

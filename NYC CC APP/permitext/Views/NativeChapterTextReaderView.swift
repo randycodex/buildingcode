@@ -204,27 +204,26 @@ struct NativeChapterTextReaderView: View {
                 openingPassage(document: document, proxy: proxy)
             }
         }
-        .task(id: "\(route.id)|\(searchQuery)|\(isBrowserTabActive)|\(isSearchPresented)") {
-            guard !isSearchPresented else { return }
-            await updateChapterSearch(presentedInSearchSheet: false)
+        .task(id: "\(route.id)|\(searchQuery)|\(isBrowserTabActive)") {
+            await updateChapterSearch()
         }
         .task(id: "\(route.id)|\(pendingInitialBlockID ?? "")|\(isBrowserTabActive)") {
             guard isBrowserTabActive else { return }
             await restoreInitialPosition(document: document, proxy: proxy)
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            VStack(spacing: 0) {
-                if !searchMatches.isEmpty {
-                    searchNavigator(proxy: proxy, document: document)
-                        .padding(.bottom, readerControlsClearance)
-                }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if isSearchPresented {
+                ChapterFindControls(
+                    query: $searchQuery,
+                    matchCount: searchMatches.count,
+                    activeIndex: searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }),
+                    isSearching: isChapterSearchInProgress || appliedSearchQuery != searchQuery,
+                    onPrevious: { navigateSearchMatch(offset: -1, proxy: proxy, document: document) },
+                    onNext: { navigateSearchMatch(offset: activeSearchMatchID == nil ? 0 : 1, proxy: proxy, document: document) },
+                    onSubmit: { navigateSearchMatch(offset: 0, proxy: proxy, document: document) },
+                    onClose: { searchQuery = ""; isSearchPresented = false }
+                )
             }
-            .opacity(pendingInitialBlockID == nil ? 1 : 0)
-            .accessibilityHidden(pendingInitialBlockID != nil)
-            .transaction { transaction in
-                transaction.animation = nil
-            }
-            .padding(.bottom, floatingNavigationClearance)
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -241,7 +240,7 @@ struct NativeChapterTextReaderView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    isSearchPresented = true
+                    isSearchPresented.toggle()
                 } label: {
                     Image(systemName: "text.page.badge.magnifyingglass")
                         .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
@@ -255,28 +254,14 @@ struct NativeChapterTextReaderView: View {
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPicker(proxy: proxy, document: document)
         }
-        .fullScreenCover(isPresented: $isSearchPresented) {
-            NativeReaderSearchSheet(
-                title: chapter.displayLabel,
-                query: $searchQuery,
-                matches: searchMatches,
-                isSearching: isChapterSearchInProgress || appliedSearchQuery != searchQuery || appliedSearchRouteID != route.id,
-                activeMatchID: activeSearchMatchID,
-                searchTaskID: "\(route.id)|\(searchQuery)|\(isBrowserTabActive)",
-                onUpdateSearch: { await updateChapterSearch(presentedInSearchSheet: true) },
-                onSelect: { match in
-                    activateSearchMatch(match, proxy: proxy, document: document)
-                }
-            )
-        }
         .overlay(alignment: .top) {
-            CodeTopContentFade(alwaysVisible: true)
+            if !isSearchPresented { CodeTopContentFade(alwaysVisible: true) }
         }
     }
 
     @MainActor
-    private func updateChapterSearch(presentedInSearchSheet: Bool) async {
-        guard !Task.isCancelled, isSearchPresented == presentedInSearchSheet else { return }
+    private func updateChapterSearch() async {
+        guard !Task.isCancelled else { return }
         guard isBrowserTabActive else { isChapterSearchInProgress = false; return }
         let requestedQuery = searchQuery
         let requestedRoute = route.id
@@ -296,11 +281,9 @@ struct NativeChapterTextReaderView: View {
         // The visible owner coalesces typing and shares its results with Reader rows.
         do { try await Task.sleep(for: .milliseconds(120)) } catch { return }
         guard !Task.isCancelled, isBrowserTabActive,
-              isSearchPresented == presentedInSearchSheet,
               searchQuery == requestedQuery, route.id == requestedRoute else { return }
         let matches = await NativeReaderSearchIndex.matchesAsync(query: requestedQuery, in: displayBlocks)
         guard !Task.isCancelled, isBrowserTabActive,
-              isSearchPresented == presentedInSearchSheet,
               searchQuery == requestedQuery, route.id == requestedRoute else { return }
         searchMatches = matches
         searchMatchesByBlock = Dictionary(grouping: matches, by: \.blockID)
@@ -308,7 +291,7 @@ struct NativeChapterTextReaderView: View {
         appliedSearchRouteID = requestedRoute
         isChapterSearchInProgress = false
         if !matches.contains(where: { $0.id == activeSearchMatchID }) {
-            activeSearchMatchID = matches.first?.id
+            activeSearchMatchID = nil
         }
     }
 
@@ -1085,54 +1068,11 @@ struct NativeChapterTextReaderView: View {
         .presentationDragIndicator(.visible)
     }
 
-    private func searchNavigator(
-        proxy: ScrollViewProxy,
-        document: NativeReaderRuntimeDocument
-    ) -> some View {
-        let activeIndex = searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }) ?? 0
-        return HStack(spacing: 14) {
-            Button {
-                activateSearchMatch(
-                    searchMatches[(activeIndex - 1 + searchMatches.count) % searchMatches.count],
-                    proxy: proxy,
-                    document: document
-                )
-            } label: {
-                Image(systemName: "chevron.up")
-            }
-            .accessibilityLabel("Previous match")
-
-            Text("\(activeIndex + 1) of \(searchMatches.count)")
-                .font(.subheadline.monospacedDigit().weight(.semibold))
-                .frame(maxWidth: .infinity)
-                .accessibilityLabel("Search match \(activeIndex + 1) of \(searchMatches.count)")
-
-            Button {
-                activateSearchMatch(
-                    searchMatches[(activeIndex + 1) % searchMatches.count],
-                    proxy: proxy,
-                    document: document
-                )
-            } label: {
-                Image(systemName: "chevron.down")
-            }
-            .accessibilityLabel("Next match")
-
-            Button {
-                searchQuery = ""
-                searchMatches = []
-                searchMatchesByBlock = [:]
-                activeSearchMatchID = nil
-            } label: {
-                Image(systemName: "xmark")
-            }
-            .accessibilityLabel("Clear chapter search")
-        }
-        .font(.body.weight(.semibold))
-        .foregroundStyle(accentColor)
-        .padding(.horizontal, 22)
-        .padding(.vertical, 10)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
+    private func navigateSearchMatch(offset: Int, proxy: ScrollViewProxy, document: NativeReaderRuntimeDocument) {
+        guard !searchMatches.isEmpty else { return }
+        let current = searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }) ?? 0
+        let next = (current + offset + searchMatches.count) % searchMatches.count
+        activateSearchMatch(searchMatches[next], proxy: proxy, document: document)
     }
 
     private func activateSearchMatch(
@@ -1787,94 +1727,6 @@ enum NativeReaderSearchIndex {
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return "\(start > 0 ? "…" : "")\(fragment)\(end < source.length ? "…" : "")"
-    }
-}
-
-private struct NativeReaderSearchSheet: View {
-    let title: String
-    @Binding var query: String
-    let matches: [NativeReaderSearchMatch]
-    let isSearching: Bool
-    let activeMatchID: String?
-    let searchTaskID: String
-    let onUpdateSearch: () async -> Void
-    let onSelect: (NativeReaderSearchMatch) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-    @FocusState private var isSearchFocused: Bool
-
-    var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                HStack(spacing: 10) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    TextField("Search this chapter", text: $query)
-                        .font(.title3)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .submitLabel(.search)
-                        .focused($isSearchFocused)
-                }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
-                .background(Color(uiColor: .secondarySystemBackground))
-                .clipShape(Capsule(style: .continuous))
-
-                Button { dismiss() } label: {
-                    Image(systemName: "xmark")
-                        .font(.title2.weight(.medium))
-                        .frame(width: 54, height: 54)
-                        .background(Color(uiColor: .secondarySystemBackground))
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Close search")
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 14)
-
-            Divider()
-
-            if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                ContentUnavailableView(
-                    "Search \(title)",
-                    systemImage: "text.page.badge.magnifyingglass",
-                    description: Text("Enter enacted text, a section number, or a phrase.")
-                )
-            } else if isSearching {
-                ProgressView("Searching chapter…")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if matches.isEmpty {
-                ContentUnavailableView.search(text: query)
-            } else {
-                List(matches) { match in
-                    Button {
-                        onSelect(match)
-                        dismiss()
-                    } label: {
-                        HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: match.id == activeMatchID ? "checkmark.circle.fill" : "text.magnifyingglass")
-                                .foregroundStyle(match.id == activeMatchID ? Color.accentColor : Color.secondary)
-                            Text(match.snippet)
-                                .font(.body)
-                                .foregroundStyle(.primary)
-                                .multilineTextAlignment(.leading)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(match.snippet)
-                    .accessibilityValue(match.id == activeMatchID ? "Current match" : "")
-                }
-                .listStyle(.plain)
-            }
-        }
-        .background(Color(uiColor: .systemBackground))
-        .onAppear { isSearchFocused = true }
-        .task(id: searchTaskID) { await onUpdateSearch() }
     }
 }
 
@@ -3227,7 +3079,8 @@ enum NativeReaderAttributedTextBuilder {
             result.addAttributes(
                 [
                     .underlineColor: UIColor.label,
-                    .underlineStyle: NSUnderlineStyle.single.rawValue
+                    .underlineStyle: NSUnderlineStyle.single.rawValue,
+                    .backgroundColor: accentColor.withAlphaComponent(0.20)
                 ],
                 range: activeHighlightRange
             )

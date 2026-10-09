@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261008-smooth-performance-v650";
+} from "./offline-storage.js?v=20261009-workflow-ux-v652";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261008-smooth-performance-v650";
+} from "./research-intent-state.js?v=20261009-workflow-ux-v652";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1125,6 +1125,8 @@ function newUtilityInstance(key, overrides = {}) {
     instance.conversationID = String(overrides.conversationID || "");
     instance.historyShowing = overrides.historyShowing ?? !instance.conversationID;
     instance.draft = String(overrides.draft || "");
+    instance.historyQuery = String(overrides.historyQuery || "");
+    instance.historyProjectID = overrides.historyProjectID === undefined ? null : overrides.historyProjectID;
   } else if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
     instance.searchEdition = typeof overrides.searchEdition === "string" ? overrides.searchEdition : "all";
@@ -1176,6 +1178,8 @@ function normalizeUtilityInstances(saved = {}) {
       conversationID: pane?.conversationID,
       historyShowing: pane?.historyShowing,
       draft: pane?.draft,
+      historyQuery: pane?.historyQuery,
+      historyProjectID: pane?.historyProjectID,
       query: typeof pane?.query === "string" ? pane.query : "",
       searchPosition: pane?.searchPosition,
       searchExpansionDecisionKey: pane?.searchExpansionDecisionKey,
@@ -4723,7 +4727,7 @@ function setUtilityButtonStates() {
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(hasCapability("saved-work") && activeRepeatableKeys.has("saved")));
-  toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis));
+  toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis || activeRepeatableKeys.has("analysis")));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
 }
@@ -6487,6 +6491,38 @@ function snippetWithoutDuplicateTitle(result) {
     snippet = snippet.replace(pattern, (match) => match.startsWith("...") ? "..." : "").trim();
   });
   return snippet;
+}
+
+function searchResultPresentation(result, query = "") {
+  const clean = (value) => String(value || "").replace(/\s+/g, " ").trim();
+  const number = clean(result.sectionNumber);
+  const parent = clean(result.headerLine).replace(/^SECTION\s+/i, "");
+  const title = clean(stripLeadingSectionNumber(result.title || "", number));
+  const parentTitle = clean(result.headingLine);
+  // Numbered list items sometimes contain an entire paragraph as their title.
+  // Keep the supplied parent citation; never manufacture a subsection number.
+  const heading = title && title.length <= 110 ? title : parentTitle || "Code passage";
+  const citation = [result.codePrefix || "BC", researchCodeEdition(result),
+    parent && parent !== number && parent !== `${result.codePrefix || "BC"} ${number}` ? `Section ${parent}` : "",
+    number ? `${parent && !number.startsWith(parent.replace(/^[A-Z]+\s+/, "")) ? "Item " : "§ "}${number}` : ""
+  ].filter(Boolean).join(" · ");
+  const candidates = [clean(result.snippet), title !== heading ? title : ""].filter(Boolean);
+  const queryText = clean(query).toLocaleLowerCase();
+  let excerpt = candidates.find((text) => queryText && text.toLocaleLowerCase().includes(queryText)) || candidates[0] || "";
+  excerpt = stripLeadingSectionNumber(excerpt, number);
+  if (heading && excerpt.toLocaleLowerCase().startsWith(heading.toLocaleLowerCase())) {
+    excerpt = excerpt.slice(heading.length).replace(/^[\s.:;—–-]+/, "");
+  }
+  const maxLength = 230;
+  if (excerpt.length > maxLength) {
+    const match = excerpt.toLocaleLowerCase().indexOf(clean(query).toLocaleLowerCase());
+    let start = match > 100 ? match - 75 : 0;
+    if (start) { const boundary = excerpt.indexOf(" ", start); if (boundary < match) start = boundary + 1; }
+    let end = Math.min(excerpt.length, start + maxLength);
+    if (end < excerpt.length) { const boundary = excerpt.lastIndexOf(" ", end); if (boundary > start + 120) end = boundary; }
+    excerpt = `${start ? "… " : ""}${excerpt.slice(start, end).trim()}${end < excerpt.length ? " …" : ""}`;
+  }
+  return { citation, heading, excerpt };
 }
 
 function recentlyViewedPreviewHasEnactedText(entry) {
@@ -17419,7 +17455,7 @@ async function renderSearchResults(panel, instance) {
     hasMore: Boolean(payload.hasMore),
     totalResults
   });
-  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope)) saveWorkspaceState();
+  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope, { hasMore: Boolean(payload.hasMore) })) saveWorkspaceState();
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
   appendSearchLoadMore(results, {
     query,
@@ -17451,8 +17487,8 @@ async function renderSearchResults(panel, instance) {
 // Choose once from the first available matches, never from a later pagination update.
 // The request suffix describes the durable enabled-source scope; context tokens are
 // intentionally excluded because they change on reload without changing the scope.
-function applyInitialSearchGroupExpansion(instance, matches, sourceScope) {
-  const decisionKey = JSON.stringify([String(instance.query || "").trim(),
+function applyInitialSearchGroupExpansion(instance, matches, sourceScope, { hasMore = false } = {}) {
+  const decisionKey = JSON.stringify(["explicit-edition-v2", String(instance.query || "").trim(),
     normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all",
     sourceScope?.querySuffix || ""]);
   if (!matches.length || instance.searchExpansionDecisionKey === decisionKey) return false;
@@ -17461,9 +17497,9 @@ function applyInitialSearchGroupExpansion(instance, matches, sourceScope) {
   const sourceKey = (result) => `${result.codePrefix || "BC"}|${result.codeVersion || defaultSyncCodeVersion}`;
   const expanded = new Set(normalizeSearchResultSources(instance.expandedResultSources));
   if (!matches.some((result) => expanded.has(sourceKey(result)))) {
-    const query = String(instance.query || "").trim().toLocaleLowerCase("en-US");
-    const first = matches.find((result) => String(result.sectionNumber || "").trim().toLocaleLowerCase("en-US") === query) || matches[0];
-    instance.defaultExpandedResultSource = sourceKey(first);
+    const explicitlyScopedEdition = instance.searchEdition && instance.searchEdition !== "all";
+    const completeSingleSource = !hasMore && new Set(matches.map(sourceKey)).size === 1;
+    if (explicitlyScopedEdition || completeSingleSource) instance.defaultExpandedResultSource = sourceKey(matches[0]);
   }
   return true;
 }
@@ -17559,20 +17595,21 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       const positionKey = searchResultPositionKey(result);
       mainButton.dataset.searchResultKey = positionKey;
       if (searchPositionState(searchInstance).selectedResult === positionKey) mainButton.setAttribute("aria-current", "true");
+      const presentation = searchResultPresentation(result, query);
+      const citation = document.createElement("span");
+      citation.className = "result-chapter";
+      citation.textContent = presentation.citation;
       const heading = document.createElement("strong");
       heading.className = "result-heading";
-      const number = document.createElement("span");
-      number.className = "result-number";
-      number.textContent = result.sectionNumber || "";
       const title = document.createElement("span");
       title.className = "result-title";
-      appendHighlighted(title, stripLeadingSectionNumber(result.title || result.headingLine || "", result.sectionNumber), query);
-      heading.append(number, title);
-      const snippetText = snippetWithoutDuplicateTitle(result);
+      appendHighlighted(title, presentation.heading, query);
+      heading.append(title);
+      const snippetText = presentation.excerpt;
       const snippet = document.createElement("p");
       appendHighlighted(snippet, snippetText, query);
       markResearchSelectable(snippet, detail);
-      mainButton.append(heading);
+      mainButton.append(citation, heading);
       if (snippetText) mainButton.append(snippet);
       mainButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
@@ -17660,7 +17697,7 @@ function appendSearchLoadMore(results, options) {
       searchPositionState(options.searchInstance).loadedPages = loadedPages;
       footer.remove();
       results.dataset.searchHasMore = payload.hasMore ? "true" : "false";
-      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope)) saveWorkspaceState();
+      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope, { hasMore: true })) saveWorkspaceState();
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
       const pageTotal = Number(payload.totalResults);
@@ -19540,6 +19577,7 @@ async function postResearch(path, values = {}) {
   requireCurrentAccountRequest(identity);
   if (path.startsWith("/research/conversations/") && !["/research/conversations/list", "/research/conversations/get"].includes(path)) {
     readResearchConversationList.invalidate();
+    researchHistoryPageReaders.forEach((read) => read.invalidate());
     refreshResearchUsage.invalidate();
   }
   if (payload?.artifactRevisions) observeLocalProjectArtifactRevisions(payload.artifactRevisions);
@@ -19851,6 +19889,61 @@ const readResearchConversationList = createResearchRefresh(
     );
   }
 );
+
+// Bounded, account-scoped page sharing keeps multiple history columns cheap.
+const researchHistoryPageReaders = new Map();
+function boundedResearchHistoryQuery(value) {
+  const text = String(value || "");
+  if (text.length <= 200) return text;
+  const segments = typeof Intl.Segmenter === "function"
+    ? new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text)
+    : Array.from(text, (segment) => ({ segment }));
+  let bounded = "";
+  for (const { segment } of segments) {
+    if (bounded.length + segment.length > 200) break;
+    bounded += segment;
+  }
+  return bounded;
+}
+
+function readResearchHistoryPage(filters, options = {}) {
+  const values = { limit: 30, q: boundedResearchHistoryQuery(String(filters.q || "").trim()),
+    ...(filters.projectID !== "*" ? { projectID: String(filters.projectID || "") } : {}),
+    ...(filters.cursor ? { cursor: filters.cursor } : {}) };
+  const key = JSON.stringify(values);
+  if (!researchHistoryPageReaders.has(key)) {
+    if (researchHistoryPageReaders.size >= 40) researchHistoryPageReaders.delete(researchHistoryPageReaders.keys().next().value);
+    researchHistoryPageReaders.set(key, createResearchRefresh(
+      () => postResearch("/research/conversations/list", values), () => {}
+    ));
+  }
+  return researchHistoryPageReaders.get(key)({ reuseRecent: true, ...options });
+}
+
+async function openResearchHistoryConversation(conversation, instance) {
+  const identity = captureAccountRequest();
+  if (!researchConversationInWorkspace(conversation)) {
+    reconcileProjectWorkspaces();
+    const projectID = String(conversation.primaryProjectID || "");
+    const project = researchProjects().find((item) => researchProjectID(item) === projectID);
+    const target = workspaceRegistry.workspaces.find((workspace) =>
+      projectID ? workspace.projectID === (project ? projectRecordID(project) : projectID) : !workspace.projectID
+    );
+    if (!target) {
+      await showWebNotice("Project unavailable", "Restore this conversation's Project before opening its Research. Its history and source records are preserved.");
+      return;
+    }
+    if (!await switchWorkspace(target.id, { focus: false })) return;
+    if (!isCurrentAccountRequest(identity)) return;
+    instance = (state.utilityInstances || []).filter((item) => item.key === "analysis").at(-1);
+    if (!instance) {
+      await openNewResearchColumn();
+      if (!isCurrentAccountRequest(identity)) return;
+      instance = (state.utilityInstances || []).filter((item) => item.key === "analysis").at(-1);
+    }
+  }
+  return openResearchConversation(conversation.id, { instance });
+}
 
 async function refreshResearchConversationList(options = {}) {
   if (!activeAccount()) {
@@ -21985,6 +22078,12 @@ async function renderResearch(paneID = "utility:analysis") {
   const panelActions = panel.querySelector(".panel-actions");
   const selectedConversationIDs = new Set();
   const conversationRows = new Map();
+  let historyConversations = [];
+  const visibleHistoryConversations = () => historyConversations;
+  const historyState = instance || (state.researchHistoryFilters ||= {});
+  let historyGeneration = 0;
+  let historyCursor = null;
+  let historyTimer = null;
   let selectingConversations = false;
   let clearingSelectedConversations = false;
   const cancelSelectionButton = document.createElement("button");
@@ -22062,9 +22161,9 @@ async function renderResearch(paneID = "utility:analysis") {
     cancelSelectionButton.hidden = !selectingConversations;
     selectAllButton.hidden = !selectingConversations;
     deleteSelectedButton.hidden = !selectingConversations;
-    selectHistoryButton.hidden = selectingConversations || workspaceResearchConversations().length === 0;
-    const allSelected = workspaceResearchConversations().length > 0 &&
-      selectedConversationIDs.size === workspaceResearchConversations().length;
+    selectHistoryButton.hidden = selectingConversations || visibleHistoryConversations().length === 0;
+    const allSelected = visibleHistoryConversations().length > 0 &&
+      selectedConversationIDs.size === visibleHistoryConversations().length;
     selectAllButton.textContent = allSelected ? "Clear all" : "Select all";
     selectHistoryButton.title = "Select Research conversations";
     selectHistoryButton.setAttribute("aria-label", selectHistoryButton.title);
@@ -22102,7 +22201,7 @@ async function renderResearch(paneID = "utility:analysis") {
   };
   selectHistoryButton.addEventListener("click", () => setConversationSelectionActive(true));
   deleteSelectedButton.addEventListener("click", async () => {
-    const selectedConversations = workspaceResearchConversations().filter((conversation) =>
+    const selectedConversations = visibleHistoryConversations().filter((conversation) =>
       selectedConversationIDs.has(conversation.id)
     );
     if (!selectedConversations.length) return;
@@ -22115,12 +22214,9 @@ async function renderResearch(paneID = "utility:analysis") {
         selectingConversations = false;
         clearingSelectedConversations = false;
         updateConversationSelection();
-        if (!panel.querySelector(".research-conversation-row")) {
-          const empty = document.createElement("div");
-          empty.className = "research-conversation-empty";
-          empty.textContent = "Your previous chats will appear here.";
-          content.querySelector(".research-conversation-list")?.replaceWith(empty);
-        }
+        // Start a fresh page generation so a pending older-page response cannot
+        // restore removed conversations from this column's accumulated history.
+        if (isCurrent()) void loadHistory(false);
       }
     });
     if (!cleared && panel.isConnected) {
@@ -22130,8 +22226,8 @@ async function renderResearch(paneID = "utility:analysis") {
   });
   cancelSelectionButton.addEventListener("click", () => setConversationSelectionActive(false));
   selectAllButton.addEventListener("click", () => {
-    if (selectedConversationIDs.size === workspaceResearchConversations().length) selectedConversationIDs.clear();
-    else workspaceResearchConversations().forEach((conversation) => selectedConversationIDs.add(conversation.id));
+    if (selectedConversationIDs.size === visibleHistoryConversations().length) selectedConversationIDs.clear();
+    else visibleHistoryConversations().forEach((conversation) => selectedConversationIDs.add(conversation.id));
     updateConversationSelection();
   });
   panel.addEventListener("keydown", (event) => {
@@ -22179,7 +22275,38 @@ async function renderResearch(paneID = "utility:analysis") {
     activeWorkspaceID === renderingWorkspaceID;
   const usageHost = document.createElement("div");
   const historyHost = document.createElement("div");
-  content.append(usageHost, historyHost);
+  const filters = document.createElement("div");
+  filters.className = "research-history-filters";
+  const historySearch = document.createElement("input");
+  historySearch.type = "search";
+  historySearch.maxLength = 200;
+  historySearch.placeholder = "Search history";
+  historySearch.setAttribute("aria-label", "Search Research history");
+  historySearch.value = boundedResearchHistoryQuery(historyState.historyQuery);
+  const projectFilter = document.createElement("select");
+  projectFilter.setAttribute("aria-label", "Filter Research history by Project");
+  const projectChoices = [{ value: "*", label: "All Projects" },
+    { value: "", label: "Unassigned" }, ...researchProjectChoices({ includeUnassigned: false })];
+  projectChoices.forEach(({ value, label }) => {
+    const option = document.createElement("option"); option.value = value; option.textContent = label; projectFilter.append(option);
+  });
+  const desiredProjectFilter = historyState.historyProjectID ?? (activeProjectIDForCodeQuestions() || "*");
+  projectFilter.value = projectChoices.some((choice) => choice.value === desiredProjectFilter) ? desiredProjectFilter : "*";
+  const refreshFilters = () => {
+    clearTimeout(historyTimer);
+    historyGeneration += 1;
+    historySearch.value = boundedResearchHistoryQuery(historySearch.value);
+    historyState.historyQuery = historySearch.value;
+    historyState.historyProjectID = projectFilter.value;
+    scheduleResearchDraftPersistence();
+    selectedConversationIDs.clear();
+    historyTimer = setTimeout(() => { if (isCurrent()) void loadHistory(false); }, 200);
+  };
+  historySearch.addEventListener("input", refreshFilters);
+  historySearch.addEventListener("search", refreshFilters);
+  projectFilter.addEventListener("change", refreshFilters);
+  filters.append(historySearch, projectFilter);
+  content.append(usageHost, filters, historyHost);
   const loading = document.createElement("p");
   loading.className = "research-list-status";
   loading.setAttribute("role", "status");
@@ -22222,17 +22349,34 @@ async function renderResearch(paneID = "utility:analysis") {
       usageHost.append(retry);
     }
   };
-  const loadHistory = async (reuseRecent = true) => {
+  const loadHistory = async (reuseRecent = true, append = false) => {
     const content = historyHost;
+    const generation = ++historyGeneration;
+    const current = () => isCurrent() && generation === historyGeneration;
+    if (!append) {
+      historyCursor = null;
+      historyConversations = [];
+      clear(content);
+      const status = document.createElement("p");
+      status.className = "research-list-status";
+      status.setAttribute("role", "status");
+      status.textContent = "Loading history…";
+      content.append(status);
+    }
     try {
-      await readResearchConversationList({ reuseRecent });
-      if (!isCurrent()) return;
+      const payload = await readResearchHistoryPage({ q: historySearch.value, projectID: projectFilter.value,
+        cursor: append ? historyCursor : null }, { reuseRecent });
+      if (!current()) return;
+      const byID = new Map((append ? historyConversations : []).map((item) => [item.id, item]));
+      (payload.conversations || []).forEach((item) => byID.set(item.id, item));
+      historyConversations = [...byID.values()];
+      historyCursor = payload.hasMore ? payload.nextCursor : null;
       clear(content);
       conversationRows.clear();
-      selectHistoryButton.hidden = workspaceResearchConversations().length === 0;
+      selectHistoryButton.hidden = visibleHistoryConversations().length === 0;
     } catch (error) {
-      if (!isCurrent()) return;
-      clear(content);
+      if (!current()) return;
+      if (!append) clear(content);
       const status = document.createElement("p");
       status.className = "research-list-status is-error";
       status.textContent = error.message || "History could not be loaded.";
@@ -22240,7 +22384,7 @@ async function renderResearch(paneID = "utility:analysis") {
       retry.type = "button";
       retry.className = "ghost-button";
       retry.textContent = "Retry history";
-      retry.addEventListener("click", () => { retry.disabled = true; void loadHistory(false); });
+      retry.addEventListener("click", () => { retry.disabled = true; void loadHistory(false, append); });
       content.append(status, retry);
       return;
     }
@@ -22266,7 +22410,7 @@ async function renderResearch(paneID = "utility:analysis") {
     : "";
   if (activeDecisionID && !projectScopedResearch) {
     const linkedConversationID = linkedResearchConversationIDForQuestion(activeDecisionID);
-    const linkedConversation = workspaceResearchConversations().find((item) => item.id === linkedConversationID) || null;
+    const linkedConversation = visibleHistoryConversations().find((item) => item.id === linkedConversationID) || null;
     const decisionResearch = document.createElement("article");
     decisionResearch.className = "analysis-card code-decision-research-entry";
     const decisionAction = document.createElement("button");
@@ -22333,17 +22477,17 @@ async function renderResearch(paneID = "utility:analysis") {
   }
 
 
-  if (!workspaceResearchConversations().length) {
+  if (!visibleHistoryConversations().length) {
     const empty = document.createElement("div");
     empty.className = "research-conversation-empty";
-    empty.textContent = "Your previous chats will appear here.";
+    empty.textContent = historySearch.value.trim() || projectFilter.value !== "*" ? "No conversations match these filters." : "Your previous chats will appear here.";
     content.append(empty);
     return panel;
   }
 
   const list = document.createElement("section");
   list.className = "research-conversation-list";
-  researchConversationHistoryGroups(workspaceResearchConversations()).forEach((historyGroup) => {
+  researchConversationHistoryGroups(visibleHistoryConversations()).forEach((historyGroup) => {
     const group = document.createElement("section");
     group.className = "research-history-group";
     group.dataset.historyGroup = historyGroup.id;
@@ -22359,7 +22503,7 @@ async function renderResearch(paneID = "utility:analysis") {
     groupToggle.innerHTML = researchChevronIconsSVG();
     const groupBody = document.createElement("div");
     groupBody.className = "research-history-group-body";
-    groupBody.id = `research-history-${historyGroup.id}`;
+    groupBody.id = `research-history-${paneID}-${historyGroup.id}`;
     groupLabel.setAttribute("aria-controls", groupBody.id);
     groupToggle.setAttribute("aria-controls", groupBody.id);
     if (historyGroup.collapsible === false) {
@@ -22424,14 +22568,15 @@ async function renderResearch(paneID = "utility:analysis") {
       selectionMark.setAttribute("aria-hidden", "true");
       selectionMark.hidden = !selectingConversations;
       selectionMark.textContent = selectedConversationIDs.has(conversation.id) ? "✓" : "○";
-      openButton.append(title, meta, preview, selectionMark);
+      openButton.append(title, meta, projectPill, preview, selectionMark);
       openButton.addEventListener("click", () => {
         if (selectingConversations) {
           toggleConversationSelection(conversation.id);
           return;
         }
         if (!instance) researchConversationPaneOpened = true;
-        void openResearchConversation(conversation.id, { instance });
+        void openResearchHistoryConversation(conversation, instance)
+          .catch((error) => { if (isCurrent()) void showWebNotice("Research not opened", error.message); });
       });
       if (!releaseSurfaceVisibility.researchHistoryManagement) {
         row.append(openButton);
@@ -22719,6 +22864,14 @@ async function renderResearch(paneID = "utility:analysis") {
     list.append(group);
   });
   content.append(list);
+  if (historyCursor) {
+    const more = document.createElement("button");
+    more.type = "button";
+    more.className = "ghost-button research-history-more";
+    more.textContent = "Load older conversations";
+    more.addEventListener("click", () => { more.disabled = true; more.textContent = "Loading…"; void loadHistory(true, true); });
+    content.append(more);
+  }
   updateConversationSelection();
   };
   // Publish the column, including New chat, before either metadata request.
@@ -23425,6 +23578,88 @@ function researchMessageCaptureBasis(conversationID, messageID) {
   return `Captured from Research ${conversationID} message ${messageID}`;
 }
 
+function researchAnswerQuestion(conversation, message) {
+  const messages = Array.isArray(conversation.messages) ? conversation.messages : [];
+  const index = messages.findIndex((item) => item === message || item.id === message.id);
+  const preceding = index >= 0 ? messages.slice(0, index) : [];
+  const requestID = message.requestID || message.researchRequestID;
+  const matching = requestID ? preceding.findLast((item) => item.role === "user" &&
+    (item.requestID || item.researchRequestID) === requestID) : null;
+  const question = matching || preceding.findLast((item) => item.role === "user");
+  return String(question?.question || message.question || conversation.starterQuestion || researchConversationTitle(conversation)).trim();
+}
+
+function renderResearchNotebookHandoff(conversation, message) {
+  if (!message.id || !message.answer || !hasCapability("notebook")) return null;
+  const region = document.createElement("div");
+  region.className = "research-notebook-handoff";
+  const projects = researchProjects();
+  const select = document.createElement("select");
+  select.setAttribute("aria-label", "Notebook Project for this Research reference");
+  const projectID = String(conversation.primaryProjectID || "");
+  const choices = projectID ? projects.filter((project) => researchProjectID(project) === projectID) : projects;
+  choices.forEach((project) => {
+    const option = document.createElement("option"); option.value = researchProjectID(project);
+    option.textContent = readableProjectName(project); select.append(option);
+  });
+  select.hidden = Boolean(projectID);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "ghost-button";
+  button.textContent = "Review in Notebook";
+  button.disabled = !choices.length;
+  if (!choices.length) button.title = "Create or restore a Project to keep this Research reference in Notebook.";
+  const mutationID = `research-reference:${crypto.randomUUID()}`;
+  let savedCard = null;
+  button.addEventListener("click", async () => {
+    const requestIdentity = captureAccountRequest();
+    const project = choices.find((item) => researchProjectID(item) === select.value);
+    if (!project) return;
+    const title = researchAnswerQuestion(conversation, message).slice(0, 300);
+    if (!savedCard && !await confirmWebWarning("Keep this Research reference in Notebook?",
+      `Project: ${readableProjectName(project)}\n\n${title}\n\nThe new Note links to the exact saved answer and its cited sources. Review the answer before writing your own conclusion.`,
+      { confirmLabel: "Create reference Note", container: region })) return;
+    if (!isCurrentAccountRequest(requestIdentity) || !region.isConnected) return;
+    button.disabled = true;
+    select.disabled = true;
+    try {
+      if (!savedCard) {
+        if (navigator.onLine === false) throw new Error("Reconnect to create this Note. The saved Research answer remains available.");
+        const document = emptyNotebookDocument();
+        document.document = [{ type: "paragraph", content: [{ type: "permitextReference", props: {
+          referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${title}`
+        } }] }];
+        const payload = await postResearch("/notebook/cards/save", { projectID: researchProjectID(project),
+          clientMutationID: mutationID, expectedVersion: 0, cardType: "finding", title, document, evidenceLinks: [] });
+        requireCurrentAccountRequest(requestIdentity);
+        savedCard = payload.card;
+        await saveNotebookCardSnapshot(requestIdentity.userID, researchProjectID(project), savedCard);
+      }
+      requireCurrentAccountRequest(requestIdentity);
+      pendingNotebookCardByProject.set(researchProjectID(project), savedCard.id);
+      if (researchWorkspaceProjectID() !== researchProjectID(project)) {
+        reconcileProjectWorkspaces();
+        const target = workspaceRegistry.workspaces.find((item) => item.projectID === projectRecordID(project));
+        if (!target || !await switchWorkspace(target.id, { focus: false })) return;
+        requireCurrentAccountRequest(requestIdentity);
+      }
+      if (!await openProjectNotebook(project)) return;
+      if (!await whenWorkspacePaneReady(paneIDForProjectNotebook(project))) return;
+      const mount = notebookMounts.get(researchProjectID(project));
+      await mount?.refreshCards?.();
+      if (mount?.activeCardID?.() !== savedCard.id) await mount?.focusCard?.(savedCard.id);
+      if (mount?.activeCardID?.() === savedCard.id) pendingNotebookCardByProject.delete(researchProjectID(project));
+      button.textContent = "Open reference Note";
+    } catch (error) {
+      if (isCurrentAccountRequest(requestIdentity)) await showWebNotice("Notebook handoff not completed", error.message);
+    } finally {
+      if (isCurrentAccountRequest(requestIdentity)) { button.disabled = false; select.disabled = Boolean(savedCard); }
+    }
+  });
+  region.append(select, button);
+  return region;
+}
+
 function renderResearchMessageCapture(conversation, message) {
   const questionID = String(conversation.linkedCodeDecisionID || "").trim();
   const activeQuestionID = String(codeQuestionWorkspaceState().activeQuestionID || "").trim();
@@ -23911,6 +24146,8 @@ async function renderResearchConversation(conversationID, options = {}) {
       const evidenceReviewedBody = bubble.querySelector(".research-evidence-reviewed-body");
       (evidenceReviewedBody || bubble).append(answerSources);
     }
+    const notebookHandoff = renderResearchNotebookHandoff(conversation, message);
+    if (notebookHandoff) bubble.append(notebookHandoff);
     thread.append(bubble);
   });
   if (pendingProgress) {
@@ -25703,6 +25940,7 @@ async function renderProjectNotebook(project, options = {}) {
       await renderFocusedCard();
       if (dirty) scheduleNotebookAutosave();
     }
+    mountState.focusCard = loadCard;
 
     function scheduleIdleNotebookPrefetch() {
       if (disposed || !isCurrentAccountRequest(requestIdentity) || navigator.onLine === false || cards.length < 2) return;
@@ -26261,12 +26499,31 @@ async function renderProjectNotebook(project, options = {}) {
           snapshot: { label: `Notebook: ${activeCard.title || "Untitled card"}` }
         });
       });
-      footerActions.append(researchButton, coordinateButton);
+      const reportButton = document.createElement("button");
+      reportButton.type = "button";
+      reportButton.className = "notebook-secondary-action";
+      reportButton.textContent = "Review for Report";
+      reportButton.disabled = notebookReadOnly;
+      reportButton.addEventListener("click", async () => {
+        const handoffRenderSequence = editorRenderSequence;
+        reportButton.disabled = true;
+        try {
+          const synchronized = await saveActiveNotebookCard();
+          if (disposed || !isCurrentAccountRequest(requestIdentity) || handoffRenderSequence !== editorRenderSequence) return;
+          if (!synchronized || dirty || saveConflict) throw new Error("Finish syncing this Note and resolve any save conflict before adding it to a Report. Your device draft is preserved.");
+          if (!activeCard?.id) throw new Error("Save this Note before adding it to a Report.");
+          await promoteNotebookCardToReport(identity, activeCard);
+        } catch (error) {
+          if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report handoff not completed", error.message);
+        }
+        finally { if (!disposed) reportButton.disabled = notebookReadOnly; }
+      });
+      footerActions.append(reportButton, researchButton, coordinateButton);
       footer.append(footerActions);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
       const focusedContent = [toolbar, editorElement];
-      if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
+      focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
       let scrollCaptureReady = false;
@@ -26531,28 +26788,27 @@ async function promoteNotebookCardToReport(project, card) {
   };
   requireSavedReportEdits();
   card = structuredClone(card);
+  if (!await confirmWebWarning("Add this Note to the Report?",
+    `Project: ${identity.name}\nNote: ${card.title || "Untitled Note"}\n\n${String(card.plainText || "").slice(0, 1400)}\n\nThe Note and its source links are retained in the Report record. Full linked answers are not automatically copied into the printed Report. Review this Note before including it.`,
+    { confirmLabel: "Add to Report" })) return;
+  requireSavedReportEdits();
   const payload = await reportRequest("/reports/drafts/list", { projectID });
   requireSavedReportEdits();
   const draft = structuredClone(payload.drafts?.[0] || emptyProjectReportDraft(identity));
   const existingBlockIndex = (draft.blocks || []).findIndex((block) =>
-    block.derivedFrom?.kind === "notebookCard" && block.derivedFrom.id === card.id
+    (block.kind === "notebookCard" && block.sourceID === card.id) ||
+    (block.derivedFrom?.kind === "notebookCard" && block.derivedFrom.id === card.id)
   );
   const existingBlock = existingBlockIndex >= 0 ? draft.blocks[existingBlockIndex] : null;
   const promotedBlock = {
     id: existingBlock?.id || crypto.randomUUID(),
-    kind: "paragraph",
-    sourceClassification: "user-authored",
-    text: String(card.plainText || "").trim(),
-    derivedFrom: {
-      kind: "notebookCard",
-      id: card.id,
-      title: card.title,
-      version: card.version
-    },
-    sourceSnapshotAt: new Date().toISOString(),
-    evidenceLinks: structuredClone(card.evidenceLinks || [])
+    kind: "notebookCard",
+    sourceID: card.id,
+    label: card.title || "Notebook Note"
   };
-  if (!promotedBlock.text) throw new Error("Write the Note before adding it to a Report.");
+  if (!String(card.plainText || "").trim() && !(card.references || []).length) {
+    throw new Error("Write the Note or link a source before adding it to a Report.");
+  }
   if (existingBlockIndex >= 0) {
     draft.blocks[existingBlockIndex] = promotedBlock;
   } else {
@@ -37935,7 +38191,6 @@ function openColumnGroupMenu(panel, anchor) {
   anchor.setAttribute('aria-expanded', 'true');
   const close = () => { controller.abort(); menu.remove(); anchor.setAttribute('aria-expanded', 'false'); anchor.focus({ preventScroll: true }); };
   menu._close = close;
-  appendReaderMenuControls(menu, panel);
   const add = (label, action, disabled = false) => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -37945,20 +38200,25 @@ function openColumnGroupMenu(panel, anchor) {
     button.addEventListener('click', () => { close(); action(); });
     menu.append(button);
   };
-  if (panel.classList.contains("reader-panel")) {
-    add("Change code…", () => openReaderCodePicker(anchor, async (code) => {
-      const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
-      if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
-    }));
-  }
+  if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
+  if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
   if (!group?.collapsed) {
     add(paneIsCollapsed(panel.dataset.paneId) ? 'Expand column' : 'Collapse column', () => {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
     });
   }
   add(state.pinnedPaneID === panel.dataset.paneId ? 'Unpin column' : 'Pin column to left', () => togglePinnedPane(panel));
+  const closeButton = panel.querySelector(':scope > header button[class*="close"]');
+  if (closeButton) add('Close column', () => closeButton.click());
   add('Move left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
   add('Move right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
+  if (panel.classList.contains("reader-panel")) {
+    add("Change code…", () => openReaderCodePicker(anchor, async (code) => {
+      const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
+      if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
+    }));
+    appendReaderMenuControls(menu, panel);
+  }
   if (group) {
     add(group.collapsed ? 'Expand group' : 'Collapse group', () => {
       setColumnGroupCollapsed(group, !group.collapsed);
@@ -42433,6 +42693,46 @@ async function openNewSearchColumn() {
   if (!instance) return;
   const paneID = paneIDForUtilityInstance(instance);
   scrollPaneIntoView(paneID);
+  rememberUtilityColumn(paneID);
+}
+
+const recentUtilityColumns = new Map();
+function rememberUtilityColumn(paneID) {
+  const key = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID)?.key;
+  if (key === "search" || key === "analysis") {
+    recentUtilityColumns.set(`${activeAccount()?.userID || "public"}:${activeWorkspaceID}:${key}`, paneID);
+  }
+}
+
+async function openNewResearchColumn() {
+  const instance = newUtilityInstance("analysis");
+  state.utilityInstances.push(instance);
+  const paneID = paneIDForUtilityInstance(instance);
+  appendPaneIfMissing(paneID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  rememberUtilityColumn(paneID);
+  scrollPaneIntoView(paneID);
+}
+
+async function focusRecentUtilityColumn(key) {
+  const instances = (state.utilityInstances || []).filter((item) => item.key === key);
+  const recent = recentUtilityColumns.get(`${activeAccount()?.userID || "public"}:${activeWorkspaceID}:${key}`);
+  const instance = instances.find((item) => paneIDForUtilityInstance(item) === recent) || instances.at(-1);
+  if (!instance) {
+    if (key === "analysis" && state.utilities.analysis) return focusUtility(key);
+    return key === "search" ? openNewSearchColumn() : openNewResearchColumn();
+  }
+  const paneID = paneIDForUtilityInstance(instance);
+  rememberUtilityColumn(paneID);
+  if (!await whenWorkspacePaneReady(paneID)) return;
+  const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (!panel) return;
+  const group = columnGroupForPane(paneID);
+  if (group?.collapsed) setColumnGroupCollapsed(group, false);
+  if (paneIsCollapsed(paneID)) setPaneCollapsed(panel, false);
+  scrollPaneIntoView(paneID);
+  panel.querySelector('.search-input, .research-question-input, .research-conversation-open, button')?.focus({ preventScroll: true });
 }
 
 async function toggleProjectsColumns() {
@@ -42606,10 +42906,19 @@ function bindWorkspaceKeyboardNavigation() {
 }
 
 function bindImmediateUtilityControls() {
+  if (track.dataset.utilityFocusBound !== "true") {
+    track.dataset.utilityFocusBound = "true";
+    const remember = (event) => {
+      const paneID = event.target.closest?.('.workspace-panel')?.dataset.paneId;
+      if (paneID) rememberUtilityColumn(paneID);
+    };
+    track.addEventListener("focusin", remember);
+    track.addEventListener("pointerdown", remember, { passive: true });
+  }
   if (toggleSearchButton.dataset.coldStartBound !== "true") {
     toggleSearchButton.dataset.coldStartBound = "true";
     toggleSearchButton.addEventListener("click", () => {
-      void openNewSearchColumn();
+      void focusRecentUtilityColumn("search");
     });
   }
   if (releaseSurfaceVisibility.workboard && toggleWorkboardButton?.dataset.coldStartBound !== "true") {
@@ -42621,12 +42930,7 @@ function bindImmediateUtilityControls() {
   if (toggleAnalysisButton?.dataset.coldStartBound !== "true") {
     toggleAnalysisButton.dataset.coldStartBound = "true";
     toggleAnalysisButton.addEventListener("click", () => {
-      const instance = newUtilityInstance("analysis");
-      state.utilityInstances.push(instance);
-      const paneID = paneIDForUtilityInstance(instance);
-      appendPaneIfMissing(paneID);
-      saveWorkspaceState();
-      void transitionWorkspace("utility").then(() => scrollPaneIntoView(paneID));
+      void focusRecentUtilityColumn("analysis");
     });
   }
   if (toggleSavedButton.dataset.coldStartBound === "true") return;

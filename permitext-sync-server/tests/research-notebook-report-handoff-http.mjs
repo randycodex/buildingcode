@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+const temporary=await mkdtemp(join(tmpdir(),'permitext-reviewed-handoff-'));
+for(const key of Object.keys(process.env))if(/DATABASE_URL|POSTGRES_URL|STORAGE_URL|OPENAI|CLERK|BLOB_|VERCEL_|RESEND|STRIPE|APPLE_.*(SECRET|KEY)/.test(key))delete process.env[key];
+Object.assign(process.env,{NODE_ENV:'test',VERCEL:'',VERCEL_ENV:'',PERMITEXT_TEST_RESEARCH_MOCK:'1',PERMITEXT_SYNC_DATA_PATH:join(temporary,'sync.json'),PERMITEXT_LOCAL_PRIVATE_ASSET_PATH:join(temporary,'assets'),PERMITEXT_SYNC_GRANT_ADMIN_TOKEN:'synthetic-reviewed-handoff'});
+const {handleRequest}=await import('../app.mjs');
+const server=createServer(handleRequest);await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const base=`http://127.0.0.1:${server.address().port}`,nativeFetch=globalThis.fetch;
+globalThis.fetch=(input,options)=>{assert.equal(new URL(typeof input==='string'?input:input.url).origin,base,'No external/provider calls');return nativeFetch(input,options);};
+const userID='apple:synthetic-reviewed-handoff';let token;
+async function post(path,values={},expected=200,bearer=token){const r=await fetch(base+path,{method:'POST',headers:{'content-type':'application/json',...(bearer?{authorization:`Bearer ${bearer}`}:{})},body:JSON.stringify({auth:{accountUserID:userID},...values})});const body=await r.json();assert.equal(r.status,expected,JSON.stringify({path,body}));return body;}
+try{
+ await post('/admin/lifetime-grants/grant',{userID},200,process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
+ token=(await post('/account/sign-in',{credential:{provider:'apple',providerUserID:'synthetic-reviewed-handoff',email:'handoff@example.test',displayName:'Synthetic'}})).account.backendSessionToken;
+ for(const clientID of ['project-a','project-b'])await post('/sync/push',{batch:{user:{id:userID},mutations:[{project:{id:clientID+'-record',clientID,userID,codeVersion:'CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1',name:clientID,address:'100 Synthetic Street',colorHex:'#334455',sortOrder:0,updatedAt:'2026-10-09T12:00:00Z',structuredFacts:[{id:'address',key:'address',label:'Address',value:'100 Synthetic Street',status:'confirmed'}]}}]}});
+ const {conversation}=await post('/research/conversations/create',{projectID:'project-a'},201);
+ const answered=await post('/research/conversations/message',{conversationID:conversation.id,question:'Summarize the saved Project structured facts and address.',requestID:'reviewed-handoff-answer'});
+ const message=answered.conversation.messages.at(-1);assert.equal(message.answer.retrieval.modelRequested,false);
+ const original=(await post('/research/answers/get',{answerID:message.id})).answer;
+ const document={schema:'permitext-notebook-card',schemaVersion:2,format:'blocknote-json',document:[{type:'paragraph',content:[{type:'permitextReference',props:{referenceKind:'researchAnswer',referenceID:message.id,label:'Research: saved Project summary'}},{type:'text',text:' ',styles:{}},{type:'permitextReference',props:{referenceKind:'canonicalSection',referenceID:'2251',label:'BC 2022 section 1017.2'}}]}]};
+ const values={projectID:'project-b',clientMutationID:'reviewed-reference-creation',expectedVersion:0,cardType:'finding',title:'Review these sources',document,evidenceLinks:[]};
+ const saved=await post('/notebook/cards/save',values,201);
+ assert.deepEqual(saved.card.references.map(x=>x.referenceID),[message.id,'2251']);
+ const replay=await post('/notebook/cards/save',values);assert.equal(replay.card.id,saved.card.id,'Ambiguous network retry cannot duplicate the Note');
+ const otherDestination=await post('/notebook/cards/save',{...values,projectID:'project-a'},201);
+ assert.notEqual(otherDestination.card.id,saved.card.id,'Creation idempotency is Project scoped, so a reviewed destination change cannot collide');
+ assert.equal((await post('/notebook/cards/save',values)).card.id,saved.card.id,'Returning to the original destination reuses its exact saved Note');
+ const card=(await post('/notebook/cards/get',{projectID:'project-b',cardID:saved.card.id})).card;assert.deepEqual(card.document,saved.card.document);
+ const {draft}=await post('/reports/drafts/save',{projectID:'project-b',expectedVersion:0,title:'Reviewed sources',reportDate:'2026-10-09',blocks:[{id:'note-source',kind:'notebookCard',sourceID:card.id,label:card.title}]},201);
+ const report=await post('/reports/generate',{projectID:'project-b',draftID:draft.id,expectedVersion:draft.version},201);
+ const note=report.manifest.items.find(x=>x.kind==='notebookCard');assert.ok(note);assert.deepEqual(note.references.map(x=>x.referenceID),[message.id,'2251'],'Report manifest retains exact answer and canonical references');
+ assert.deepEqual((await post('/research/answers/get',{answerID:message.id})).answer,original,'Handoffs never rewrite the saved answer or original Project snapshot');
+ assert.equal((await post('/research/conversations/get',{conversationID:conversation.id})).conversation.primaryProjectID,'project-a','Explicit destination Note does not reassign the original Research');
+ const invalid=structuredClone(values);invalid.clientMutationID='invalid-answer-reference';invalid.document.document[0].content[0].props.referenceID='missing-answer';
+ await post('/notebook/cards/save',invalid,400);
+ console.log('Reviewed Research → Notebook → Report HTTP passed: exact references, explicit destination Project, idempotent retry, unchanged answer, missing-source rejection; no provider calls.');
+}finally{globalThis.fetch=nativeFetch;await new Promise(r=>server.close(r));await rm(temporary,{recursive:true,force:true});}
