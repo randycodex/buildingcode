@@ -30,7 +30,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     detachedWorkboardRoute: false, detachedProjectWindow: false,
     workspaceMigrationError: null, workspaceRestoreError: null, initialPersistedAccount: null,
     state: { readers: [], utilities: {}, trackScrollLeft: 0 }, track: node(),
-    document: { addEventListener: noop, querySelector: () => null, querySelectorAll: () => [] },
+    document: { addEventListener: noop, querySelector: (selector) => ["#collapse-all-columns", "#expand-all-columns"].includes(selector) ? node() : null, querySelectorAll: () => [] },
     window: { setInterval(callback, delay) { assert.equal(typeof callback, "function"); assert.equal(delay, 60000); return 1; }, addEventListener: noop, matchMedia: () => ({ addEventListener: noop }) },
     localStorage: { getItem: () => null, removeItem: noop },
     api: async (path) => { catalogLoads += 1; await delay(path.includes("libraries") ? trustMs : chapterMs); if (failCatalogs) throw new Error("Synthetic public catalog failure"); return { chapters: [{ id: "chapter", codePrefix: "BC" }], codeTrustProfiles: [{ codePrefix: "BC" }] }; },
@@ -54,7 +54,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     resumePendingProSave: async () => { events.push("save-resume"); },
     resumeProUpgradeIntent: async () => { events.push("upgrade-resume"); }
   };
-  for (const name of ["flushSearchQueryPersistence", "updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust"]) sandbox[name] = noop;
+  for (const name of ["flushSearchQueryPersistence", "flushResearchDraftPersistence", "openSavedColumnGroupsMenu", "updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust"]) sandbox[name] = noop;
   for (const name of ["addReaderButton", "toggleArchiveButton", "toggleSettingsButton", "workspaceActionsButton", "mobileMoreButton", "fitColumnsButton", "collapseReadersButton"]) sandbox[name] = node();
   const context = vm.createContext(sandbox);
   vm.runInContext(`let chapters = []; let codeTrustProfiles = []; let codeTrustProfilesStatus = "loading"; let startupCatalogPromise = null; ${catalogHelpers} ${start} globalThis.startTest = start; globalThis.catalogState = () => ({chapters,codeTrustProfiles,codeTrustProfilesStatus,startupCatalogPromise});`, context);
@@ -112,10 +112,10 @@ assert.equal(pieces.get(".reader-trust-status").textContent, "Source metadata un
 const codeOptionsSource = between("const codeOptions = [", "function researchCodeEdition(");
 const optionHelpers = between("function codeOptionVersion(", "function codeTrustProfile(");
 const selector = between("function populateCodeSelect(", "function readerCodeSelectionKey(");
-function selectNode() { return { children: [], append(child) { this.children.push(child); }, setAttribute() {} }; }
+function selectNode() { return { closest: () => ({}), children: [], append(child) { this.children.push(child); }, setAttribute() {} }; }
 const codeSelect = selectNode();
 const selectorContext = vm.createContext({ ...syncIdentity, Map,
-  document: { createElement: selectNode }, panel: { querySelector: () => codeSelect },
+  document: { createElement: selectNode }, panel: { querySelector: (selector) => selector === ".reader-collapse-title" ? selectNode() : codeSelect },
   clear: (element) => { element.children = []; }, resizeCodeSelect() {} });
 vm.runInContext(`${codeOptionsSource} ${optionHelpers} ${selector}
   globalThis.showCode = (prefix, version) => { populateCodeSelect(panel, {codePrefix:prefix, codeVersion:version}); return panel.querySelector().title; };`, selectorContext);

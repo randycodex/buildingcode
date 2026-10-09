@@ -339,12 +339,7 @@ assert(
     !syncBatchIncludesProjectMutation([]),
   "The sync push optimization does not distinguish project activity from ordinary mutations."
 );
-assert(
-  appSource.includes("const includesProjectMutation = syncBatchIncludesProjectMutation(incoming);") &&
-    appSource.includes("const previousMutations = includesProjectMutation\n      ? (await readStore())") &&
-    appSource.includes("if (includesProjectMutation) {\n      await recordMeaningfulSyncActivity("),
-  "Ordinary PostgreSQL sync pushes still materialize the full store for project activity logging."
-);
+await import("./scoped-sync-research-reads.mjs");
 
 for (const sourceName of [
   "app.mjs",

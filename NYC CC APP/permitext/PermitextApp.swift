@@ -369,13 +369,6 @@ struct PermitextApp: App {
             .onChange(of: library.isInitialContentLoaded) { _, isLoaded in
                 guard runsNormalLifecycle else { return }
                 guard isLoaded else { return }
-                Task { @MainActor in
-                    // Let the library screen render first, then pay WebKit's
-                    // one-time process startup cost before the first chapter tap.
-                    try? await Task.sleep(for: .milliseconds(250))
-                    guard !Task.isCancelled else { return }
-                    ChapterHTMLWebProcessWarmup.startIfNeeded()
-                }
                 switch library.selectedTab {
                 case .browse:
                     library.syncSelectedCodeSection(from: .primary)

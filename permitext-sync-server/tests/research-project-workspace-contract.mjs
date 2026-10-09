@@ -16,6 +16,7 @@ const context = vm.createContext({
   researchConversationList: [{ id: 'a', primaryProjectID: 'project-a' }, { id: 'b', primaryProjectID: 'project-b' }, { id: 'legacy', primaryProjectID: null }],
   activeAccount: () => ({ userID: 'owner', sessionToken: 'synthetic' }),
   captureAccountRequest: () => ({}), requireCurrentAccountRequest() {},
+  readResearchConversationList: {invalidate() {}}, refreshResearchUsage: {invalidate() {}},
   ensureResearchProjectSynced: async id => synced.push(id),
   postJSON: async (path, body) => { requests.push({ path, body }); return {}; },
   codeQuestionContextChangedError: () => Error('Workspace changed'), observeLocalProjectArtifactRevisions() {}

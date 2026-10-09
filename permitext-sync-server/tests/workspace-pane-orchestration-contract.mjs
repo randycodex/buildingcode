@@ -14,11 +14,11 @@ const deferred = () => { let resolve, reject; const promise = new Promise((a,b) 
 const tick = async () => { for (let i=0;i<8;i++) await Promise.resolve(); };
 const track = { children: [], scrollLeft: 127, querySelectorAll() { return this.children; } };
 function pane(id, loading=false) {
-  const status = { textContent: "Loading" }, retry = { hidden: true };
+  const status = { textContent: "Loading" }, retry = { hidden: true }, classes = new Set();
   return {
     dataset: { paneId: id, ...(loading ? { workspacePaneLoading: "true" } : {}) },
     isConnected: false, parentNode: null, scrollTop: 0, draft: "unchanged unsaved text", selection: [4, 12],
-    classList: { contains: () => false }, setAttribute() {}, querySelectorAll: () => [],
+    classList: { contains: name => classes.has(name), toggle(name, enabled) { if(enabled) classes.add(name); else classes.delete(name); } }, setAttribute() {}, querySelectorAll: () => [],
     querySelector: (selector) => selector.includes("retry") ? retry : status,
     replaceWith(next) {
       const index = track.children.indexOf(this); assert.ok(index >= 0);
@@ -46,9 +46,9 @@ function element() {
   return node;
 }
 let descriptors = [], generation = 1, accountCurrent = true, appendCalls = 0, capability = true;
-const discarded = [];
+const discarded = []; let pinnedDividerRefreshes = 0;
 const sandbox = vm.createContext({
-  createWorkspacePaneHydrator, Map, Set, JSON, Promise, track,
+  createWorkspacePaneHydrator, Map, Set, JSON, Promise, track, state: {pinnedPaneID: "report"},
   get workspaceRenderGeneration() { return generation; },
   activeWorkspaceID: "workspace", captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
   pendingWorkspacePaneRevealID: null, scrollPaneIntoView() {},
@@ -62,7 +62,7 @@ const sandbox = vm.createContext({
   },
   disposeUnpublishedWorkspacePane: (p) => discarded.push(p),
   applyPaneWeight() {}, ensureWorkspacePanelAccessibleName() {}, preparePaneCollapse() {}, bindPaneDragging() {},
-  refreshColumnGroupPresentation() {}, updateCollapsedPaneDividers() {}, bindReaderScrollIndicator() {},
+  refreshColumnGroupPresentation() {}, refreshPinnedPaneDivider() { pinnedDividerRefreshes++; }, updateCollapsedPaneDividers() {}, bindReaderScrollIndicator() {},
   updateReaderScrollIndicator() {}, enhanceSelect() {}, restoreReaderScrollPositions() {}, notifyWorkspaceLayoutChange() {}
 });
 vm.runInContext(`let workspacePaneHydrator=null; const workspacePaneReadyWaiters=new Set(); ${actual("finishWorkspacePaneReady")}\n${actual("whenWorkspacePaneReady")}\n${actual("workspacePaneContextIsCurrent")}\n${actual("createWorkspacePaneLoadingShell")}\n${actual("getWorkspacePaneHydrator")}\n${actual("mountWorkspacePanesIndependently")}\n globalThis.mount=(context, options={})=>mountWorkspacePanesIndependently(context,{...options,shellReady:true}); globalThis.whenReady=whenWorkspacePaneReady; globalThis.hydrator=()=>workspacePaneHydrator;`,sandbox);
@@ -89,6 +89,8 @@ assert.equal(appendCalls,1,"Completion must not republish the whole pane sequenc
 assert.equal(track.scrollLeft,127);
 const report=pane("report"); slow.resolve(report); await first; await sandbox.hydrator().settled(); assert.equal(await reportTarget,true);
 assert.equal(track.children[1],report); assert.equal(appendCalls,1);
+assert.equal(report.classList.contains("is-pinned"),true,"Async hydration preserves the stored pin on the replacement pane");
+assert.equal(pinnedDividerRefreshes,1,"Only pinned hydration reconnects its width observer/divider");
 
 // Explicit refresh creates a fresh attempt even when persistent content identity matches.
 const refreshed=pane("search"); descriptors=[descriptor("notebook",()=>editor),descriptor("report",()=>report),descriptor("search",()=>refreshed)];

@@ -4,6 +4,8 @@ import {execFileSync} from 'node:child_process';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 const source=await readFile(new URL('../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift',import.meta.url),'utf8');
+const app=await readFile(new URL('../../NYC CC APP/permitext/PermitextApp.swift',import.meta.url),'utf8');
+assert.ok(!app.includes('ChapterHTMLWebProcessWarmup.startIfNeeded()'), 'Native launch must not create an unused WebKit process');
 const start=source.indexOf('    func prepareChapterForOpening(');
 const end=source.indexOf('    private func cancelSpeculativeChapterWork()',start);
 assert.ok(start>0 && end>start);
@@ -16,6 +18,10 @@ struct Route {}
 struct Prepared {}
 struct NativeReaderPreparedOpening { let route: Route; let prepared: Prepared }
 enum Failure: Error { case invalid }
+@MainActor enum ChapterHTMLWebProcessWarmup {
+ static var calls = 0
+ static func startIfNeeded() { calls += 1 }
+}
 @MainActor class NativeReaderDocumentStore {
  static let shared = NativeReaderDocumentStore()
  var available = true
@@ -45,15 +51,15 @@ ${source.slice(start,end)}
   let h = Harness()
   NativeReaderDocumentStore.shared.checkConsumerAlive = { precondition(h.cancellations == 0, "Selected warmup was cancelled before navigation acquired it") }
   let native = try await h.prepareChapterForOpening(CodeChapter())
-  precondition(native != nil && h.fallback == 0 && h.cancellations == 2)
+  precondition(native != nil && h.fallback == 0 && h.cancellations == 2 && ChapterHTMLWebProcessWarmup.calls == 0)
   NativeReaderDocumentStore.shared.checkConsumerAlive = nil
   NativeReaderDocumentStore.shared.available = false
   let missing = try await h.prepareChapterForOpening(CodeChapter())
-  precondition(missing == nil && h.fallback == 1)
+  precondition(missing == nil && h.fallback == 1 && ChapterHTMLWebProcessWarmup.calls == 1)
   NativeReaderDocumentStore.shared.available = true
   NativeReaderDocumentStore.shared.valid = false
   let invalid = try await h.prepareChapterForOpening(CodeChapter())
-  precondition(invalid == nil && h.fallback == 2)
+  precondition(invalid == nil && h.fallback == 2 && ChapterHTMLWebProcessWarmup.calls == 2)
   let task = Task { () -> Bool in
    withUnsafeCurrentTask { $0?.cancel() }
    do { _ = try await h.prepareChapterForOpening(CodeChapter()); return false }
@@ -61,7 +67,7 @@ ${source.slice(start,end)}
    catch { return false }
   }
   let cancelled = await task.value
-  precondition(cancelled && h.fallback == 2)
+  precondition(cancelled && h.fallback == 2 && ChapterHTMLWebProcessWarmup.calls == 2)
   print("PASS: validated native skips fallback; missing/invalid native retains fallback; cancellation prevents opening")
  }
 }

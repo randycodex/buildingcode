@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261008-column-menu-focus-v649";
+} from "./offline-storage.js?v=20261008-smooth-performance-v650";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261008-column-menu-focus-v649";
+} from "./research-intent-state.js?v=20261008-smooth-performance-v650";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1383,6 +1383,30 @@ function captureResearchWorkspaceState() {
 }
 
 let pendingSearchQueryPersistence = null;
+let pendingResearchDraftPersistence = null;
+
+function consumeResearchDraftPersistence() {
+  const pending = pendingResearchDraftPersistence;
+  pendingResearchDraftPersistence = null;
+  if (pending) clearTimeout(pending.timer);
+  return pending;
+}
+
+function flushResearchDraftPersistence() {
+  const pending = consumeResearchDraftPersistence();
+  if (!pending || pending.workspaceID !== activeWorkspaceID ||
+      !isCurrentAccountRequest(pending.identity)) return;
+  saveWorkspaceState();
+}
+
+function scheduleResearchDraftPersistence() {
+  consumeResearchDraftPersistence();
+  const pending = { identity: captureAccountRequest(), workspaceID: activeWorkspaceID, timer: null };
+  pending.timer = setTimeout(() => {
+    if (pendingResearchDraftPersistence === pending) flushResearchDraftPersistence();
+  }, 325);
+  pendingResearchDraftPersistence = pending;
+}
 
 function consumeSearchQueryPersistence() {
   const pending = pendingSearchQueryPersistence;
@@ -1409,6 +1433,7 @@ function scheduleSearchQueryPersistence() {
 
 function saveWorkspaceState() {
   consumeSearchQueryPersistence();
+  consumeResearchDraftPersistence();
   // A temporary empty fallback must never replace a workspace that failed to load.
   if (workspaceRestoreError) return;
   restoreResearchWorkspaceState();
@@ -7462,6 +7487,7 @@ async function requireAccountLinkWorkSaved(account, identity) {
 
 function replaceActiveAccount(nextAccount, options = {}) {
   flushSearchQueryPersistence();
+  flushResearchDraftPersistence();
   releaseAccountLinkWriteFence();
   const previous = activeAccount();
   if (previous && previous.userID !== nextAccount?.userID) clearPendingProSave();
@@ -19512,6 +19538,10 @@ async function postResearch(path, values = {}) {
   requireCurrentAccountRequest(identity);
   const payload = await postJSON(path, { ...values, auth: { accountUserID: account.userID } }, { token: account.sessionToken });
   requireCurrentAccountRequest(identity);
+  if (path.startsWith("/research/conversations/") && !["/research/conversations/list", "/research/conversations/get"].includes(path)) {
+    readResearchConversationList.invalidate();
+    refreshResearchUsage.invalidate();
+  }
   if (payload?.artifactRevisions) observeLocalProjectArtifactRevisions(payload.artifactRevisions);
   return payload;
 }
@@ -19766,27 +19796,72 @@ async function downloadProjectReportFile(projectID, file, title = "Permitext Pro
   window.setTimeout(() => URL.revokeObjectURL(url), 2_000);
 }
 
-async function refreshResearchConversationList() {
-  const account = activeAccount();
-  if (!account) {
+// Share reads within an account, but let explicit refreshes supersede older
+// snapshots. A late request follows the current attempt instead of publishing it.
+function createResearchRefresh(load, publish) {
+  let scope = null;
+  const currentScope = () => {
+    const account = activeAccount();
+    const key = account ? JSON.stringify(captureAccountRequest()) : "";
+    if (!scope || scope.key !== key) scope = { key, generation: 0, flight: null, loadedAt: 0, value: null };
+    return scope;
+  };
+  const read = ({ reuseRecent = false } = {}) => {
+    const owner = currentScope();
+    if (!owner.key) return Promise.reject(codeQuestionContextChangedError());
+    if (reuseRecent && owner.flight) return owner.flight;
+    if (reuseRecent && owner.loadedAt && Date.now() - owner.loadedAt < 1500) return Promise.resolve(owner.value);
+    const generation = ++owner.generation;
+    const request = Promise.resolve().then(load).then((value) => {
+      if (currentScope() !== owner) throw codeQuestionContextChangedError();
+      if (owner.generation !== generation) return read({ reuseRecent: true });
+      publish(value);
+      owner.value = value;
+      owner.loadedAt = Date.now();
+      return value;
+    }, (error) => {
+      if (currentScope() !== owner) throw codeQuestionContextChangedError();
+      if (owner.generation !== generation) return read({ reuseRecent: true });
+      throw error;
+    }).finally(() => {
+      if (owner.flight === request) owner.flight = null;
+    });
+    owner.flight = request;
+    return request;
+  };
+  read.invalidate = () => {
+    const owner = currentScope();
+    owner.generation += 1;
+    owner.flight = null;
+    owner.loadedAt = 0;
+  };
+  return read;
+}
+
+const refreshResearchUsage = createResearchRefresh(
+  () => postResearch("/research/usage"),
+  (payload) => { researchUsage = payload.usage || null; }
+);
+const readResearchConversationList = createResearchRefresh(
+  () => postResearch("/research/conversations/list"),
+  (payload) => {
+    researchConversationList = (payload.conversations || []).slice().sort((left, right) =>
+      String(right.createdAt || "").localeCompare(String(left.createdAt || "")) ||
+      String(left.id || "").localeCompare(String(right.id || ""))
+    );
+  }
+);
+
+async function refreshResearchConversationList(options = {}) {
+  if (!activeAccount()) {
     researchConversationList = [];
     activeResearchConversation = null;
     researchUsage = null;
     return [];
   }
-  const [payload, usagePayload] = await Promise.all([
-    postResearch("/research/conversations/list"),
-    postResearch("/research/usage")
-  ]);
-  const current = activeAccount();
-  if (current?.userID !== account.userID || current?.sessionToken !== account.sessionToken) {
-    throw codeQuestionContextChangedError();
-  }
-  researchConversationList = (payload.conversations || []).slice().sort((left, right) =>
-    String(right.createdAt || "").localeCompare(String(left.createdAt || "")) ||
-    String(left.id || "").localeCompare(String(right.id || ""))
-  );
-  researchUsage = usagePayload.usage || null;
+  // Allowance is secondary metadata: its failure must not hide readable history.
+  void refreshResearchUsage(options).catch(() => {});
+  await readResearchConversationList(options);
   return researchConversationList;
 }
 
@@ -21791,10 +21866,11 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   };
   input.addEventListener("input", () => {
     researchNewChatDrafts.set(draftKey, input.value);
-    saveWorkspaceState();
+    scheduleResearchDraftPersistence();
     resizeComposer();
     updateSendState();
   });
+  input.addEventListener("blur", flushResearchDraftPersistence);
   const resizeComposer = () => {
     input.style.height = "auto";
     input.style.height = `${Math.min(180, Math.max(48, input.scrollHeight))}px`;
@@ -22082,18 +22158,40 @@ async function renderResearch(paneID = "utility:analysis") {
     return panel;
   }
 
-  try {
-    await refreshResearchConversationList();
-    selectHistoryButton.hidden = workspaceResearchConversations().length === 0;
-  } catch (error) {
-    const status = document.createElement("p");
-    status.className = "research-list-status is-error";
-    status.textContent = error.message;
-    content.append(status);
-    return panel;
+  const researchEnabled = hasCapability("research");
+  if (researchEnabled) {
+    const newChatButton = document.createElement("button");
+    newChatButton.type = "button";
+    newChatButton.className = "ghost-button research-new-chat";
+    newChatButton.textContent = "+ New chat";
+    newChatButton.addEventListener("click", () => {
+      researchDraftPaneIDs.add(paneID);
+      saveWorkspaceState();
+      void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+    });
+    panel.classList.add("has-research-history-footer");
+    panel.append(newChatButton);
   }
 
-  const researchEnabled = hasCapability("research");
+  const renderingIdentity = captureAccountRequest();
+  const renderingWorkspaceID = activeWorkspaceID;
+  const isCurrent = () => panel.isConnected && isCurrentAccountRequest(renderingIdentity) &&
+    activeWorkspaceID === renderingWorkspaceID;
+  const usageHost = document.createElement("div");
+  const historyHost = document.createElement("div");
+  content.append(usageHost, historyHost);
+  const loading = document.createElement("p");
+  loading.className = "research-list-status";
+  loading.setAttribute("role", "status");
+  loading.textContent = "Loading history…";
+  historyHost.append(loading);
+
+  const loadUsage = async (reuseRecent = true) => {
+    try {
+      await refreshResearchUsage({ reuseRecent });
+      if (!isCurrent()) return;
+      clear(usageHost);
+
   if (researchEnabled && researchUsage) {
     const usage = document.createElement("section");
     usage.className = "research-usage";
@@ -22111,8 +22209,42 @@ async function renderResearch(paneID = "utility:analysis") {
       buyMore.addEventListener("click", () => focusUtility("settings"));
       usage.append(buyMore);
     }
-    content.append(usage);
+    usageHost.append(usage);
   }
+    } catch {
+      if (!isCurrent()) return;
+      clear(usageHost);
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "ghost-button";
+      retry.textContent = "Retry allowance";
+      retry.addEventListener("click", () => { retry.disabled = true; void loadUsage(false); });
+      usageHost.append(retry);
+    }
+  };
+  const loadHistory = async (reuseRecent = true) => {
+    const content = historyHost;
+    try {
+      await readResearchConversationList({ reuseRecent });
+      if (!isCurrent()) return;
+      clear(content);
+      conversationRows.clear();
+      selectHistoryButton.hidden = workspaceResearchConversations().length === 0;
+    } catch (error) {
+      if (!isCurrent()) return;
+      clear(content);
+      const status = document.createElement("p");
+      status.className = "research-list-status is-error";
+      status.textContent = error.message || "History could not be loaded.";
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "ghost-button";
+      retry.textContent = "Retry history";
+      retry.addEventListener("click", () => { retry.disabled = true; void loadHistory(false); });
+      content.append(status, retry);
+      return;
+    }
+
   if (!researchEnabled) {
     const upgrade = document.createElement("article");
     upgrade.className = "analysis-card research-empty-state";
@@ -22200,19 +22332,6 @@ async function renderResearch(paneID = "utility:analysis") {
     content.append(decisionResearch);
   }
 
-  if (researchEnabled) {
-    const newChatButton = document.createElement("button");
-    newChatButton.type = "button";
-    newChatButton.className = "ghost-button research-new-chat";
-    newChatButton.textContent = "+ New chat";
-    newChatButton.addEventListener("click", () => {
-      researchDraftPaneIDs.add(paneID);
-      saveWorkspaceState();
-      void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-    });
-    panel.classList.add("has-research-history-footer");
-    panel.append(newChatButton);
-  }
 
   if (!workspaceResearchConversations().length) {
     const empty = document.createElement("div");
@@ -22601,6 +22720,13 @@ async function renderResearch(paneID = "utility:analysis") {
   });
   content.append(list);
   updateConversationSelection();
+  };
+  // Publish the column, including New chat, before either metadata request.
+  requestAnimationFrame(() => {
+    if (!isCurrent()) return;
+    void loadHistory();
+    void loadUsage();
+  });
   return panel;
 }
 
@@ -23874,13 +24000,14 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
     else researchQuestionDraft = input.value;
     researchNewChatDrafts.set(followUpDraftKey, input.value);
-    saveWorkspaceState();
+    scheduleResearchDraftPersistence();
     sendButton.disabled = !researchEnabled ||
       researchRequestActive ||
       conversation.sourceStatus === "changed" ||
       projectContextBlocked ||
       (input.value.trim() || starterAnalysisQuestion).length < 3;
   });
+  input.addEventListener("blur", flushResearchDraftPersistence);
   bindResearchSendShortcut(input, composer);
   composer.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -37637,10 +37764,10 @@ function columnPaneLabel(panel) {
     : panel.querySelector(':scope > header .panel-kind, :scope > header h2')?.textContent?.trim() || 'Column';
 }
 
-function refreshColumnGroupPresentation() {
+function refreshColumnGroupPresentation({ preparePanels = true } = {}) {
   const panels = [...track.querySelectorAll(':scope > .workspace-panel')];
   panels.forEach((panel) => panel.classList.remove('is-group-hidden'));
-  panels.forEach(preparePaneCollapse);
+  if (preparePanels) panels.forEach(preparePaneCollapse);
   const hidden = new Set();
   for (const group of state.columnGroups || []) {
     if (group.collapsed) group.paneIDs.filter((id) => id !== state.pinnedPaneID && panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
@@ -41863,12 +41990,15 @@ function getWorkspacePaneHydrator() {
       const scrollLeft = track.scrollLeft;
       pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
       pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
+      pane.classList.toggle("is-pinned", job.id === state.pinnedPaneID);
       applyPaneWeight(pane, job.id);
       ensureWorkspacePanelAccessibleName(pane);
       preparePaneCollapse(pane);
       bindPaneDragging([pane]);
       shell.replaceWith(pane);
-      refreshColumnGroupPresentation();
+      // The new header is prepared above; retained editors and menus need no rebuild.
+      refreshColumnGroupPresentation({ preparePanels: false });
+      if (job.id === state.pinnedPaneID) refreshPinnedPaneDivider();
       updateCollapsedPaneDividers();
       // Only the newly mounted Reader gets restoration listeners and frames.
       if (pane.classList.contains("reader-panel")) {
@@ -42677,7 +42807,10 @@ async function start() {
     stopForegroundSyncLoop();
   });
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState !== "visible") flushSearchQueryPersistence();
+    if (document.visibilityState !== "visible") {
+      flushSearchQueryPersistence();
+      flushResearchDraftPersistence();
+    }
     if (document.visibilityState === "visible") {
       void publicCodeRevision.probe();
       startForegroundSyncLoop({ immediate: true });
@@ -42686,6 +42819,7 @@ async function start() {
     }
   });
   window.addEventListener("pagehide", flushSearchQueryPersistence);
+  window.addEventListener("pagehide", flushResearchDraftPersistence);
   window.addEventListener("pagehide", stopForegroundSyncLoop);
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });

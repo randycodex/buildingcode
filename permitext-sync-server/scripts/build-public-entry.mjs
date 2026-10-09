@@ -1,5 +1,6 @@
 import { cp, copyFile, mkdir, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { buildWorkspaceEntry } from './build-workspace-entry.mjs';
 
 export async function buildPublicEntry(source, output) {
   await rm(output, { recursive: true, force: true });
@@ -9,5 +10,8 @@ export async function buildPublicEntry(source, output) {
   await copyFile(`${source}/home.html`, `${output}/index.html`);
 }
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  await buildPublicEntry(fileURLToPath(new URL('../public', import.meta.url)), fileURLToPath(new URL('../deployment-public', import.meta.url)));
+  const source = fileURLToPath(new URL('../public', import.meta.url));
+  const output = fileURLToPath(new URL('../deployment-public', import.meta.url));
+  await buildPublicEntry(source, output);
+  console.log('Workspace startup bundle:', await buildWorkspaceEntry(source, output));
 }

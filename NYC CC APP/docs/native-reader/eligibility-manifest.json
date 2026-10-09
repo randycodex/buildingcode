@@ -2285,7 +2285,7 @@
 
       ],
       "relativePath" : "2025-specialty-codes/chapters/32000016.html",
-      "sourceSHA256" : "c384e6dacf3af4857874b8d2e6a4268230cebda544ebb78e4f62936eb3432656",
+      "sourceSHA256" : "f42e5df6e4468d15887ddf645ec056951f5307e043f0c0dd0a7c01fb356df0af",
       "state" : "native"
     },
     {
@@ -4593,7 +4593,7 @@
       "state" : "nativeWithTableFallback"
     }
   ],
-  "corpusSHA256" : "2574fdecbfcad606a498e8209994bdadf368669bbf1eaee09f6ddb082aea134a",
+  "corpusSHA256" : "4217fce744c219f2f8592c27385bcaa15b034f8e714eaafa6f0adcd291701782",
   "parserSchemaVersion" : "native-reader-document-v3",
   "schemaVersion" : 3
 }

@@ -33326,16 +33326,7 @@ WIRING AND PROTECTION[Reserved; no operative text in source.]Informational Note:
 Electrical Vehicle (EV) requirements.
 Section 210.11(C)(5) – Add a new Section 210.11(C)(5) to read as follows:
 (5) Air-Conditioning Branch Circuit. In addition to the number of branch circuits required by other parts of this
-section, an individual branch circuit shall be provided for each air-conditioning receptacle outlet required by 210.52(J).
-SECTION 210.12(A)
-Section 210.12(A) – Retitle the “Exception” in 210.12(A) “Exception No. 1” and add a new Exception, “Exception
-No. 2”, immediately following which reads:
-Exception No. 2: AFCI protection shall not be required for the following outlets in multifamily dwellings greater
-than 3 stories:
-a) In kitchens, all receptacle outlets.
-b) In laundry areas, all receptacle outlets supplying laundry equipment such as washers, dryers and leak-
-detection equipment. This exception does not apply to convenience outlets in laundry areas that may supply
-irons, steamers or similar appliances.(A) Branch Circuits Not More Than 600V. The maximum total voltage drop from the service point to the farthest
+section, an individual branch circuit shall be provided for each air-conditioning receptacle outlet required by 210.52(J).(A) Branch Circuits Not More Than 600V. The maximum total voltage drop from the service point to the farthest
 outlet shall not exceed 5 percent on both feeders and branch circuits combined. Where compliance with the applicable
 New York City Energy Conservation Code is mandated, the voltage drop requirements of that code shall apply.
 Section 210.19(A) – Revise Informational Note No. 3 in Section 210.19(A) to read as follows:
@@ -34639,4 +34630,10 @@ Section 830.133(C) – Add a new Section 830.133(C) to read as follows:
 Electrical Equipment Rooms.
 Exception No. 1: Broadband communication equipment and cabling for control and monitoring of electrical
 equipment or associated components, or both, shall be permitted.
-Exception No. 2: Broadband communication equipment intended for emergency life-safety use shall be permitted.
+Exception No. 2: Broadband communication equipment intended for emergency life-safety use shall be permitted.No. 2”, immediately following which reads:
+Exception No. 2: AFCI protection shall not be required for the following outlets in multifamily dwellings greater
+than 3 stories:
+a) In kitchens, all receptacle outlets.
+b) In laundry areas, all receptacle outlets supplying laundry equipment such as washers, dryers and leak-
+detection equipment. This exception does not apply to convenience outlets in laundry areas that may supply
+irons, steamers or similar appliances.

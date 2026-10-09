@@ -42,6 +42,10 @@ struct NativeChapterTextReaderView: View {
     @State private var isSearchPresented = false
     @State private var searchQuery = ""
     @State private var searchMatches: [NativeReaderSearchMatch] = []
+    @State private var searchMatchesByBlock: [String: [NativeReaderSearchMatch]] = [:]
+    @State private var appliedSearchQuery: String?
+    @State private var appliedSearchRouteID: String?
+    @State private var isChapterSearchInProgress = false
     @State private var activeSearchMatchID: String?
     @State private var lastRecordedSectionTargetID: String?
     @State private var settledScrollTask: Task<Void, Never>?
@@ -200,11 +204,9 @@ struct NativeChapterTextReaderView: View {
                 openingPassage(document: document, proxy: proxy)
             }
         }
-        .onChange(of: searchQuery) { _, query in
-            searchMatches = NativeReaderSearchIndex.matches(query: query, in: displayBlocks)
-            if !searchMatches.contains(where: { $0.id == activeSearchMatchID }) {
-                activeSearchMatchID = searchMatches.first?.id
-            }
+        .task(id: "\(route.id)|\(searchQuery)|\(isBrowserTabActive)|\(isSearchPresented)") {
+            guard !isSearchPresented else { return }
+            await updateChapterSearch(presentedInSearchSheet: false)
         }
         .task(id: "\(route.id)|\(pendingInitialBlockID ?? "")|\(isBrowserTabActive)") {
             guard isBrowserTabActive else { return }
@@ -255,9 +257,12 @@ struct NativeChapterTextReaderView: View {
         .fullScreenCover(isPresented: $isSearchPresented) {
             NativeReaderSearchSheet(
                 title: chapter.displayLabel,
-                blocks: displayBlocks,
                 query: $searchQuery,
+                matches: searchMatches,
+                isSearching: isChapterSearchInProgress || appliedSearchQuery != searchQuery || appliedSearchRouteID != route.id,
                 activeMatchID: activeSearchMatchID,
+                searchTaskID: "\(route.id)|\(searchQuery)|\(isBrowserTabActive)",
+                onUpdateSearch: { await updateChapterSearch(presentedInSearchSheet: true) },
                 onSelect: { match in
                     activateSearchMatch(match, proxy: proxy, document: document)
                 }
@@ -265,6 +270,44 @@ struct NativeChapterTextReaderView: View {
         }
         .overlay(alignment: .top) {
             CodeTopContentFade(alwaysVisible: true)
+        }
+    }
+
+    @MainActor
+    private func updateChapterSearch(presentedInSearchSheet: Bool) async {
+        guard !Task.isCancelled, isSearchPresented == presentedInSearchSheet else { return }
+        guard isBrowserTabActive else { isChapterSearchInProgress = false; return }
+        let requestedQuery = searchQuery
+        let requestedRoute = route.id
+        guard appliedSearchQuery != requestedQuery || appliedSearchRouteID != requestedRoute else { return }
+        searchMatches = []
+        searchMatchesByBlock = [:]
+        appliedSearchQuery = nil
+        appliedSearchRouteID = nil
+        guard !requestedQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            activeSearchMatchID = nil
+            appliedSearchQuery = requestedQuery
+            appliedSearchRouteID = requestedRoute
+            isChapterSearchInProgress = false
+            return
+        }
+        isChapterSearchInProgress = true
+        // The visible owner coalesces typing and shares its results with Reader rows.
+        do { try await Task.sleep(for: .milliseconds(120)) } catch { return }
+        guard !Task.isCancelled, isBrowserTabActive,
+              isSearchPresented == presentedInSearchSheet,
+              searchQuery == requestedQuery, route.id == requestedRoute else { return }
+        let matches = await NativeReaderSearchIndex.matchesAsync(query: requestedQuery, in: displayBlocks)
+        guard !Task.isCancelled, isBrowserTabActive,
+              isSearchPresented == presentedInSearchSheet,
+              searchQuery == requestedQuery, route.id == requestedRoute else { return }
+        searchMatches = matches
+        searchMatchesByBlock = Dictionary(grouping: matches, by: \.blockID)
+        appliedSearchQuery = requestedQuery
+        appliedSearchRouteID = requestedRoute
+        isChapterSearchInProgress = false
+        if !matches.contains(where: { $0.id == activeSearchMatchID }) {
+            activeSearchMatchID = matches.first?.id
         }
     }
 
@@ -398,7 +441,7 @@ struct NativeChapterTextReaderView: View {
                     requestFallbackToHTML(message)
                 },
                 searchQuery: searchQuery,
-                searchMatches: searchMatches.filter { $0.blockID == displayBlock.id },
+                searchMatches: searchMatchesByBlock[displayBlock.id] ?? [],
                 activeSearchMatchID: activeSearchMatchID,
                 onResearchSelection: { selectedText in
                     sendSelectionToResearch(
@@ -507,6 +550,10 @@ struct NativeChapterTextReaderView: View {
         expandedMedia = nil
         searchQuery = ""
         searchMatches = []
+        searchMatchesByBlock = [:]
+        appliedSearchQuery = nil
+        appliedSearchRouteID = nil
+        isChapterSearchInProgress = false
         activeSearchMatchID = nil
         lastRecordedSectionTargetID = nil
         settledScrollTask?.cancel()
@@ -1073,6 +1120,7 @@ struct NativeChapterTextReaderView: View {
             Button {
                 searchQuery = ""
                 searchMatches = []
+                searchMatchesByBlock = [:]
                 activeSearchMatchID = nil
             } label: {
                 Image(systemName: "xmark")
@@ -1560,7 +1608,7 @@ enum NativeReaderSectionNavigator {
     }
 }
 
-struct NativeReaderSearchMatch: Identifiable, Hashable {
+struct NativeReaderSearchMatch: Identifiable, Hashable, Sendable {
     let id: String
     let blockID: String
     let sourceBlockID: String
@@ -1597,31 +1645,47 @@ enum NativeReaderBookmarkTargetResolver {
 }
 
 enum NativeReaderSearchIndex {
+    private static let wordExpression = try! NSRegularExpression(pattern: #"[\p{L}\p{N}]+"#)
+
+    static func matchesAsync(query: String, in blocks: [NativeReaderDisplayBlock]) async -> [NativeReaderSearchMatch] {
+        guard !Task.isCancelled else { return [] }
+        let work = Task.detached(priority: .userInitiated) {
+            matches(query: query, in: blocks)
+        }
+        let result = await withTaskCancellationHandler {
+            await work.value
+        } onCancel: { work.cancel() }
+        return Task.isCancelled ? [] : result
+    }
+
     static func matches(
         query: String,
         in blocks: [NativeReaderDisplayBlock]
     ) -> [NativeReaderSearchMatch] {
         let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !normalizedQuery.isEmpty else { return [] }
-
-        let matches = blocks.flatMap { displayBlock in
-            let searchableText = searchableText(for: displayBlock.block)
-            return ranges(of: normalizedQuery, in: searchableText).map { range in
-                NativeReaderSearchMatch(
+        guard !normalizedQuery.isEmpty, !Task.isCancelled else { return [] }
+        var definitions: [NativeReaderSearchMatch] = []
+        var ordinary: [NativeReaderSearchMatch] = []
+        var firstTextByID: [String: String] = [:]
+        for displayBlock in blocks {
+            guard !Task.isCancelled else { return [] }
+            let text = searchableText(for: displayBlock.block)
+            if firstTextByID[displayBlock.id] == nil { firstTextByID[displayBlock.id] = text }
+            for range in ranges(of: normalizedQuery, in: text) {
+                let match = NativeReaderSearchMatch(
                     id: "\(displayBlock.id):\(range.location):\(range.length)",
                     blockID: displayBlock.id,
                     sourceBlockID: displayBlock.sourceBlockID,
                     range: range,
-                    snippet: snippet(in: searchableText, around: range)
+                    snippet: snippet(in: text, around: range)
                 )
+                // Stable partition preserves the original rank/source ordering
+                // without rebuilding block text or sorting every occurrence.
+                if definitionRank(text: firstTextByID[displayBlock.id] ?? text, range: range) == 0 { definitions.append(match) }
+                else { ordinary.append(match) }
             }
         }
-        let textByID = Dictionary(blocks.map { ($0.id, searchableText(for: $0.block)) }, uniquingKeysWith: { first, _ in first })
-        return matches.enumerated().sorted { lhs, rhs in
-            let left = definitionRank(text: textByID[lhs.element.blockID] ?? "", range: lhs.element.range)
-            let right = definitionRank(text: textByID[rhs.element.blockID] ?? "", range: rhs.element.range)
-            return left == right ? lhs.offset < rhs.offset : left < right
-        }.map(\.element)
+        return Task.isCancelled ? [] : definitions + ordinary
     }
 
     // A defined term starts a paragraph and ends with a period. Preserve source
@@ -1642,6 +1706,7 @@ enum NativeReaderSearchIndex {
         var ranges: [NSRange] = []
         var searchRange = NSRange(location: 0, length: source.length)
         while searchRange.length > 0 {
+            guard !Task.isCancelled else { return [] }
             let match = source.range(
                 of: normalizedQuery,
                 options: [.caseInsensitive, .diacriticInsensitive],
@@ -1656,12 +1721,13 @@ enum NativeReaderSearchIndex {
         if !ranges.isEmpty { return ranges }
         // Fall back to consecutive words with at most two edits for words of eight letters,
         // or one edit for shorter words. Never fuzz short words or numbers.
-        let expression = try! NSRegularExpression(pattern: #"[\p{L}\p{N}]+"#)
+        let expression = wordExpression
         let queryWords = expression.matches(in: normalizedQuery, range: NSRange(location: 0, length: (normalizedQuery as NSString).length))
             .map { (normalizedQuery as NSString).substring(with: $0.range).lowercased() }
         let words = expression.matches(in: text, range: NSRange(location: 0, length: source.length))
         guard !queryWords.isEmpty, words.count >= queryWords.count else { return [] }
         for start in 0...(words.count - queryWords.count) {
+            guard !Task.isCancelled else { return [] }
             let window = Array(words[start..<(start + queryWords.count)])
             if zip(queryWords, window).allSatisfy({ wordMatches($0.0, source.substring(with: $0.1.range).lowercased()) }) {
                 ranges.append(NSRange(location: window[0].range.location, length: NSMaxRange(window.last!.range) - window[0].range.location))
@@ -1725,17 +1791,16 @@ enum NativeReaderSearchIndex {
 
 private struct NativeReaderSearchSheet: View {
     let title: String
-    let blocks: [NativeReaderDisplayBlock]
     @Binding var query: String
+    let matches: [NativeReaderSearchMatch]
+    let isSearching: Bool
     let activeMatchID: String?
+    let searchTaskID: String
+    let onUpdateSearch: () async -> Void
     let onSelect: (NativeReaderSearchMatch) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isSearchFocused: Bool
-
-    private var matches: [NativeReaderSearchMatch] {
-        NativeReaderSearchIndex.matches(query: query, in: blocks)
-    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -1778,6 +1843,9 @@ private struct NativeReaderSearchSheet: View {
                     systemImage: "text.page.badge.magnifyingglass",
                     description: Text("Enter enacted text, a section number, or a phrase.")
                 )
+            } else if isSearching {
+                ProgressView("Searching chapter…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if matches.isEmpty {
                 ContentUnavailableView.search(text: query)
             } else {
@@ -1805,6 +1873,7 @@ private struct NativeReaderSearchSheet: View {
         }
         .background(Color(uiColor: .systemBackground))
         .onAppear { isSearchFocused = true }
+        .task(id: searchTaskID) { await onUpdateSearch() }
     }
 }
 

@@ -801188,7 +801188,23 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 23,
+          "sourceOrder" : 14,
+          "text" : "SECTION 210.12(A)"
+        },
+        {
+          "anchorIDs" : [
+
+          ],
+          "level" : 3,
+          "sourceOrder" : 15,
+          "text" : "210.12(A) Section 210.12(A) – Retitle the “Exception” in 210.12(A) “Exception No. 1” and add a new Exception, “Exception"
+        },
+        {
+          "anchorIDs" : [
+
+          ],
+          "level" : 2,
+          "sourceOrder" : 24,
           "text" : "SECTION 210.19"
         },
         {
@@ -801196,7 +801212,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 24,
+          "sourceOrder" : 25,
           "text" : "210.19 Section 210.19(A) – Revise Section 210.19(A) to add a new opening paragraph to read as follows:"
         },
         {
@@ -801204,7 +801220,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 31,
+          "sourceOrder" : 32,
           "text" : "SECTION 210.50"
         },
         {
@@ -801212,7 +801228,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 32,
+          "sourceOrder" : 33,
           "text" : "210.50 Section 210.50 – Revise the Informational Note in Section 210.50 to read as follows:"
         },
         {
@@ -801220,7 +801236,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 37,
+          "sourceOrder" : 38,
           "text" : "SECTION 210.52"
         },
         {
@@ -801228,7 +801244,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 38,
+          "sourceOrder" : 39,
           "text" : "210.52 Section 210.52(J) – Add a new Section 210.52(J) to read as follows:"
         },
         {
@@ -801236,7 +801252,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 45,
+          "sourceOrder" : 46,
           "text" : "ARTICLE 215"
         },
         {
@@ -801244,7 +801260,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 46,
+          "sourceOrder" : 47,
           "text" : "ARTICLE-215 FEEDERS"
         },
         {
@@ -801252,7 +801268,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 49,
+          "sourceOrder" : 50,
           "text" : "SECTION 215.2"
         },
         {
@@ -801260,7 +801276,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 50,
+          "sourceOrder" : 51,
           "text" : "215.2 Section 215.2(A)(1) – Revise the opening paragraph in Section 215.2(A)(1) to read as follows:"
         },
         {
@@ -801268,7 +801284,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 62,
+          "sourceOrder" : 63,
           "text" : "ARTICLE 220"
         },
         {
@@ -801276,7 +801292,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 63,
+          "sourceOrder" : 64,
           "text" : "ARTICLE-220 BRANCH-CIRCUIT, FEEDER, AND SERVICE LOAD CALCULATIONS"
         },
         {
@@ -801284,7 +801300,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 66,
+          "sourceOrder" : 67,
           "text" : "SECTION 220.14"
         },
         {
@@ -801292,7 +801308,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 67,
+          "sourceOrder" : 68,
           "text" : "220.14 Section 220.14 – Revise the opening paragraph of Section 220.14 to read as follows:"
         },
         {
@@ -801300,7 +801316,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 74,
+          "sourceOrder" : 75,
           "text" : "SECTION 220.14"
         },
         {
@@ -801308,7 +801324,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 75,
+          "sourceOrder" : 76,
           "text" : "220.14 Section 220.14(A) – Revise Section 220.14(A) to read as follows:"
         },
         {
@@ -801316,7 +801332,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 82,
+          "sourceOrder" : 83,
           "text" : "SECTION 220.87"
         },
         {
@@ -801324,7 +801340,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 83,
+          "sourceOrder" : 84,
           "text" : "220.87 Section 220.87 – Revise Section 220.87 to read as follows:"
         },
         {
@@ -801332,7 +801348,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 100,
+          "sourceOrder" : 101,
           "text" : "ARTICLE 225"
         },
         {
@@ -801340,7 +801356,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 101,
+          "sourceOrder" : 102,
           "text" : "ARTICLE-225 OUTSIDE BRANCH CIRCUITS AND FEEDERS"
         },
         {
@@ -801348,7 +801364,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 104,
+          "sourceOrder" : 105,
           "text" : "SECTION 225.11"
         },
         {
@@ -801356,7 +801372,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 105,
+          "sourceOrder" : 106,
           "text" : "225.11 Section 225.11 – Revise Section 225.11 to read as follows:"
         },
         {
@@ -801364,7 +801380,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 110,
+          "sourceOrder" : 111,
           "text" : "SECTION 225.30"
         },
         {
@@ -801372,7 +801388,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 111,
+          "sourceOrder" : 112,
           "text" : "225.30 Section 225.30 – Revise the opening paragraph in Section 225.30 to read as follows:"
         },
         {
@@ -801380,7 +801396,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 117,
+          "sourceOrder" : 118,
           "text" : "SECTION 225.31"
         },
         {
@@ -801388,7 +801404,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 118,
+          "sourceOrder" : 119,
           "text" : "225.31 Section 225.31 – Revise Section 225.31 to read as follows:"
         },
         {
@@ -801396,7 +801412,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 122,
+          "sourceOrder" : 123,
           "text" : "SECTION 225.34"
         },
         {
@@ -801404,7 +801420,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 123,
+          "sourceOrder" : 124,
           "text" : "225.34 Section 225.34(A) – Add a new Informational Note at the end of Section 225.34(A) to read as follows:"
         },
         {
@@ -801412,7 +801428,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 128,
+          "sourceOrder" : 129,
           "text" : "SECTION 225.37"
         },
         {
@@ -801420,7 +801436,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 129,
+          "sourceOrder" : 130,
           "text" : "225.37 Section 225.37 – Add a new Informational Note at the end of Section 225.37 to read as follows:"
         },
         {
@@ -801428,7 +801444,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 133,
+          "sourceOrder" : 134,
           "text" : "SECTION 225.52"
         },
         {
@@ -801436,7 +801452,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 134,
+          "sourceOrder" : 135,
           "text" : "225.52 Section 225.52(B) – Revise Section 225.52(B) to read as follows:"
         },
         {
@@ -801444,7 +801460,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 145,
+          "sourceOrder" : 146,
           "text" : "SECTION 225.60"
         },
         {
@@ -801452,7 +801468,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 146,
+          "sourceOrder" : 147,
           "text" : "225.60 Section 225.60 – Retitle the Informational Note in Section 225.60 “Informational Note No. 1” and add a new"
         },
         {
@@ -801460,7 +801476,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 151,
+          "sourceOrder" : 152,
           "text" : "SECTION 225.61"
         },
         {
@@ -801468,7 +801484,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 152,
+          "sourceOrder" : 153,
           "text" : "225.61 Section 225.61 – Retitle the Informational Note in Section 225.61 “Informational Note No. 1” and add a new"
         },
         {
@@ -801476,7 +801492,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 157,
+          "sourceOrder" : 158,
           "text" : "ARTICLE 230"
         },
         {
@@ -801484,7 +801500,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 158,
+          "sourceOrder" : 159,
           "text" : "ARTICLE-230 SERVICES"
         },
         {
@@ -801492,7 +801508,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 161,
+          "sourceOrder" : 162,
           "text" : "SECTION 230.6"
         },
         {
@@ -801500,7 +801516,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 162,
+          "sourceOrder" : 163,
           "text" : "230.6 Section 230.6 – Add a new Item (6) to the list of items in Section 230.6 to read as follows:"
         },
         {
@@ -801508,7 +801524,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 165,
+          "sourceOrder" : 166,
           "text" : "SECTION 230.9"
         },
         {
@@ -801516,7 +801532,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 166,
+          "sourceOrder" : 167,
           "text" : "230.9 Section 230.9 – Add a new Informational Note at the end of Section 230.9 to read as follows:"
         },
         {
@@ -801524,7 +801540,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 170,
+          "sourceOrder" : 171,
           "text" : "SECTION 230.24"
         },
         {
@@ -801532,7 +801548,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 171,
+          "sourceOrder" : 172,
           "text" : "230.24 Section 230.24(B)(5) – Add a new Informational Note at the end of Section 230.24 (B)(5) to read as follows:"
         },
         {
@@ -801540,7 +801556,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 175,
+          "sourceOrder" : 176,
           "text" : "SECTION 230.28"
         },
         {
@@ -801548,7 +801564,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 176,
+          "sourceOrder" : 177,
           "text" : "230.28 Section 230.28 – Add a new Informational Note at the end of Section 230.28 to read as follows:"
         },
         {
@@ -801556,7 +801572,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 180,
+          "sourceOrder" : 181,
           "text" : "SECTION 230.30"
         },
         {
@@ -801564,7 +801580,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 181,
+          "sourceOrder" : 182,
           "text" : "230.30 Section 230.30(A) – Revise the Exception in Section 230.30(A) to read as follows:"
         },
         {
@@ -801572,7 +801588,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 188,
+          "sourceOrder" : 189,
           "text" : "SECTION 230.33"
         },
         {
@@ -801580,7 +801596,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 189,
+          "sourceOrder" : 190,
           "text" : "230.33 Section 230.33 – Revise Section 230.33 to read as follows:"
         },
         {
@@ -801588,7 +801604,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 193,
+          "sourceOrder" : 194,
           "text" : "SECTION 230.41"
         },
         {
@@ -801596,7 +801612,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 194,
+          "sourceOrder" : 195,
           "text" : "230.41 Section 230.41 - Revise the Exception after the opening paragraph in Section 230.41 to read as follows:"
         },
         {
@@ -801604,7 +801620,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 198,
+          "sourceOrder" : 199,
           "text" : "SECTION 230.42"
         },
         {
@@ -801612,7 +801628,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 199,
+          "sourceOrder" : 200,
           "text" : "230.42 Section 230.42(D) – Add a new Section 230.42(D) to read as follows:"
         },
         {
@@ -801620,7 +801636,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 210,
+          "sourceOrder" : 211,
           "text" : "SECTION 230.43"
         },
         {
@@ -801628,7 +801644,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 211,
+          "sourceOrder" : 212,
           "text" : "230.43 Section 230.43 – Revise Section 230.43 to read as follows:"
         },
         {
@@ -801636,7 +801652,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 236,
+          "sourceOrder" : 237,
           "text" : "SECTION 230.44"
         },
         {
@@ -801644,7 +801660,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 237,
+          "sourceOrder" : 238,
           "text" : "230.44 Section 230.44 – Revise Section 230.44 to read as follows:"
         },
         {
@@ -801652,7 +801668,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 245,
+          "sourceOrder" : 246,
           "text" : "SECTION 230.46"
         },
         {
@@ -801660,7 +801676,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 246,
+          "sourceOrder" : 247,
           "text" : "230.46 Section 230.46 - Revise Section 230.46 to read as follows:"
         },
         {
@@ -801668,7 +801684,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 270,
+          "sourceOrder" : 271,
           "text" : "SECTION 230.52"
         },
         {
@@ -801676,7 +801692,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 271,
+          "sourceOrder" : 272,
           "text" : "230.52 Section 230.52 – Revise Section 230.52 to read as follows:"
         },
         {
@@ -801684,7 +801700,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 274,
+          "sourceOrder" : 275,
           "text" : "SECTION 230.54"
         },
         {
@@ -801692,7 +801708,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 275,
+          "sourceOrder" : 276,
           "text" : "230.54 Section 230.54(C) – Add a new Informational Note at the end of Section 230.54 (C) to read as follows:"
         },
         {
@@ -801700,7 +801716,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 281,
+          "sourceOrder" : 282,
           "text" : "SECTION 230.64"
         },
         {
@@ -801708,7 +801724,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 282,
+          "sourceOrder" : 283,
           "text" : "230.64 Section 230.64 – Add a new Section 230.64 to Part V to read as follows:"
         },
         {
@@ -801716,7 +801732,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 307,
+          "sourceOrder" : 308,
           "text" : "SECTION 230.70"
         },
         {
@@ -801724,7 +801740,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 308,
+          "sourceOrder" : 309,
           "text" : "230.70 Section 230.70(B) – Revise Section 230.70(B) to read as follows:"
         },
         {
@@ -801732,7 +801748,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 318,
+          "sourceOrder" : 319,
           "text" : "SECTION 230.71"
         },
         {
@@ -801740,7 +801756,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 319,
+          "sourceOrder" : 320,
           "text" : "230.71 Section 230.71 - Revise Section 230.71 as follows:"
         },
         {
@@ -801748,7 +801764,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 345,
+          "sourceOrder" : 346,
           "text" : "SECTION 230.72"
         },
         {
@@ -801756,7 +801772,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 346,
+          "sourceOrder" : 347,
           "text" : "230.72 Section 230.72(A) – Add Informational Note at the end of Section 230.72(A) to read as follows:"
         },
         {
@@ -801764,7 +801780,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 353,
+          "sourceOrder" : 354,
           "text" : "SECTION 230.85"
         },
         {
@@ -801772,7 +801788,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 354,
+          "sourceOrder" : 355,
           "text" : "230.85 Section 230.85 – Add an Exception at the end of Section 230.85 to read as follows:"
         },
         {
@@ -801780,7 +801796,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 362,
+          "sourceOrder" : 363,
           "text" : "SECTION 230.96"
         },
         {
@@ -801788,7 +801804,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 363,
+          "sourceOrder" : 364,
           "text" : "230.96 Section 230.96 –Add a new Section 230.96 to Part VII to read as follows:"
         },
         {
@@ -801796,7 +801812,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 376,
+          "sourceOrder" : 377,
           "text" : "ARTICLE 250"
         },
         {
@@ -801804,7 +801820,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 377,
+          "sourceOrder" : 378,
           "text" : "ARTICLE-250 GROUNDING AND BONDING"
         },
         {
@@ -801812,7 +801828,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 380,
+          "sourceOrder" : 381,
           "text" : "SECTION 250.35"
         },
         {
@@ -801820,7 +801836,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 381,
+          "sourceOrder" : 382,
           "text" : "250.35 Section 250.35(B) – Revise Section 250.35(B) to read as follows:"
         },
         {
@@ -801828,7 +801844,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 390,
+          "sourceOrder" : 391,
           "text" : "SECTION 250.68"
         },
         {
@@ -801836,7 +801852,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 391,
+          "sourceOrder" : 392,
           "text" : "250.68 Section 250.68(C)(1) – Revise the Exception in Section 250.68(C)(1) to read as follows:"
         },
         {
@@ -801844,7 +801860,7 @@
 
           ],
           "level" : 2,
-          "sourceOrder" : 394,
+          "sourceOrder" : 395,
           "text" : "SECTION 250.119"
         },
         {
@@ -801852,7 +801868,7 @@
 
           ],
           "level" : 3,
-          "sourceOrder" : 395,
+          "sourceOrder" : 396,
           "text" : "250.119 Section 250.119 - Revise the Exception No. 1 in Section 250.119 to read as follows:"
         }
       ],
@@ -801871,17 +801887,17 @@
         "orderedListCount" : 0,
         "unorderedListCount" : 0
       },
-      "normalizedTextCharacterCount" : 26315,
-      "normalizedTextSHA256" : "0dca8a15e3b8dc238b59a593f1a439e35bbe3b4952439ea7f43cbe4b60007253",
+      "normalizedTextCharacterCount" : 26325,
+      "normalizedTextSHA256" : "99cb79b54772f66197ca189d53eedc49b3f897973033b68212e8aeab741816c9",
       "packageID" : "2025-specialty-codes",
       "parserMessages" : [
 
       ],
       "parserSucceeded" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000016.html",
-      "sectionCount" : 44,
-      "sourceByteCount" : 30301,
-      "sourceSHA256" : "c384e6dacf3af4857874b8d2e6a4268230cebda544ebb78e4f62936eb3432656",
+      "sectionCount" : 45,
+      "sourceByteCount" : 30366,
+      "sourceSHA256" : "f42e5df6e4468d15887ddf645ec056951f5307e043f0c0dd0a7c01fb356df0af",
       "stableAnchors" : [
         {
           "element" : "section",
@@ -801895,219 +801911,224 @@
         },
         {
           "element" : "section",
+          "id" : "section-33000361",
+          "sourceOrder" : 13
+        },
+        {
+          "element" : "section",
           "id" : "section-33000089",
-          "sourceOrder" : 22
+          "sourceOrder" : 23
         },
         {
           "element" : "section",
           "id" : "section-33000090",
-          "sourceOrder" : 30
+          "sourceOrder" : 31
         },
         {
           "element" : "section",
           "id" : "section-33000091",
-          "sourceOrder" : 36
+          "sourceOrder" : 37
         },
         {
           "element" : "section",
           "id" : "section-33000092",
-          "sourceOrder" : 44
+          "sourceOrder" : 45
         },
         {
           "element" : "section",
           "id" : "section-33000093",
-          "sourceOrder" : 48
+          "sourceOrder" : 49
         },
         {
           "element" : "section",
           "id" : "section-33000094",
-          "sourceOrder" : 61
+          "sourceOrder" : 62
         },
         {
           "element" : "section",
           "id" : "section-33000095",
-          "sourceOrder" : 65
+          "sourceOrder" : 66
         },
         {
           "element" : "section",
           "id" : "section-33000096",
-          "sourceOrder" : 73
+          "sourceOrder" : 74
         },
         {
           "element" : "section",
           "id" : "section-33000097",
-          "sourceOrder" : 81
+          "sourceOrder" : 82
         },
         {
           "element" : "section",
           "id" : "section-33000098",
-          "sourceOrder" : 99
+          "sourceOrder" : 100
         },
         {
           "element" : "section",
           "id" : "section-33000099",
-          "sourceOrder" : 103
+          "sourceOrder" : 104
         },
         {
           "element" : "section",
           "id" : "section-33000100",
-          "sourceOrder" : 109
+          "sourceOrder" : 110
         },
         {
           "element" : "section",
           "id" : "section-33000101",
-          "sourceOrder" : 116
+          "sourceOrder" : 117
         },
         {
           "element" : "section",
           "id" : "section-33000102",
-          "sourceOrder" : 121
+          "sourceOrder" : 122
         },
         {
           "element" : "section",
           "id" : "section-33000103",
-          "sourceOrder" : 127
+          "sourceOrder" : 128
         },
         {
           "element" : "section",
           "id" : "section-33000104",
-          "sourceOrder" : 132
+          "sourceOrder" : 133
         },
         {
           "element" : "section",
           "id" : "section-33000105",
-          "sourceOrder" : 144
+          "sourceOrder" : 145
         },
         {
           "element" : "section",
           "id" : "section-33000106",
-          "sourceOrder" : 150
+          "sourceOrder" : 151
         },
         {
           "element" : "section",
           "id" : "section-33000107",
-          "sourceOrder" : 156
+          "sourceOrder" : 157
         },
         {
           "element" : "section",
           "id" : "section-33000108",
-          "sourceOrder" : 160
+          "sourceOrder" : 161
         },
         {
           "element" : "section",
           "id" : "section-33000109",
-          "sourceOrder" : 164
+          "sourceOrder" : 165
         },
         {
           "element" : "section",
           "id" : "section-33000110",
-          "sourceOrder" : 169
+          "sourceOrder" : 170
         },
         {
           "element" : "section",
           "id" : "section-33000111",
-          "sourceOrder" : 174
+          "sourceOrder" : 175
         },
         {
           "element" : "section",
           "id" : "section-33000112",
-          "sourceOrder" : 179
+          "sourceOrder" : 180
         },
         {
           "element" : "section",
           "id" : "section-33000113",
-          "sourceOrder" : 187
+          "sourceOrder" : 188
         },
         {
           "element" : "section",
           "id" : "section-33000114",
-          "sourceOrder" : 192
+          "sourceOrder" : 193
         },
         {
           "element" : "section",
           "id" : "section-33000115",
-          "sourceOrder" : 197
+          "sourceOrder" : 198
         },
         {
           "element" : "section",
           "id" : "section-33000116",
-          "sourceOrder" : 209
+          "sourceOrder" : 210
         },
         {
           "element" : "section",
           "id" : "section-33000117",
-          "sourceOrder" : 235
+          "sourceOrder" : 236
         },
         {
           "element" : "section",
           "id" : "section-33000118",
-          "sourceOrder" : 244
+          "sourceOrder" : 245
         },
         {
           "element" : "section",
           "id" : "section-33000119",
-          "sourceOrder" : 269
+          "sourceOrder" : 270
         },
         {
           "element" : "section",
           "id" : "section-33000120",
-          "sourceOrder" : 273
+          "sourceOrder" : 274
         },
         {
           "element" : "section",
           "id" : "section-33000121",
-          "sourceOrder" : 280
+          "sourceOrder" : 281
         },
         {
           "element" : "section",
           "id" : "section-33000122",
-          "sourceOrder" : 306
+          "sourceOrder" : 307
         },
         {
           "element" : "section",
           "id" : "section-33000123",
-          "sourceOrder" : 317
+          "sourceOrder" : 318
         },
         {
           "element" : "section",
           "id" : "section-33000124",
-          "sourceOrder" : 344
+          "sourceOrder" : 345
         },
         {
           "element" : "section",
           "id" : "section-33000125",
-          "sourceOrder" : 352
+          "sourceOrder" : 353
         },
         {
           "element" : "section",
           "id" : "section-33000126",
-          "sourceOrder" : 361
+          "sourceOrder" : 362
         },
         {
           "element" : "section",
           "id" : "section-33000127",
-          "sourceOrder" : 375
+          "sourceOrder" : 376
         },
         {
           "element" : "section",
           "id" : "section-33000128",
-          "sourceOrder" : 379
+          "sourceOrder" : 380
         },
         {
           "element" : "section",
           "id" : "section-33000129",
-          "sourceOrder" : 389
+          "sourceOrder" : 390
         },
         {
           "element" : "section",
           "id" : "section-33000130",
-          "sourceOrder" : 393
+          "sourceOrder" : 394
         }
       ],
       "tables" : [
 
       ],
-      "textBlockCount" : 44,
+      "textBlockCount" : 45,
       "unknownClassNames" : [
 
       ],
@@ -1041577,7 +1041598,7 @@
       ]
     }
   ],
-  "corpusSHA256" : "2574fdecbfcad606a498e8209994bdadf368669bbf1eaee09f6ddb082aea134a",
+  "corpusSHA256" : "4217fce744c219f2f8592c27385bcaa15b034f8e714eaafa6f0adcd291701782",
   "goldenChapterSet" : [
     {
       "reasons" : [
@@ -1041697,7 +1041718,7 @@
     "missingAssetCount" : 39,
     "packageCount" : 6,
     "parserFailureCount" : 0,
-    "stableAnchorCount" : 104373,
+    "stableAnchorCount" : 104374,
     "tableCount" : 1448,
     "textOnlyChapterCount" : 341
   },

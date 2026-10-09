@@ -28,10 +28,11 @@ struct CodeChapter: Equatable { let id: Int64; let codeSectionID: Int64? }
 enum UserContentSyncCodeVersion { static func server(_ value: String) -> String { value } }
 struct Store { let values: [CodeChapter]; func chapters(codeSectionID: Int64?) -> [CodeChapter] { values.filter { codeSectionID == nil || $0.codeSectionID == codeSectionID } } }
 struct NativeReaderPreparedOpening { let route: Int; let prepared: Int }
+@MainActor enum ChapterHTMLWebProcessWarmup { static func startIfNeeded() {} }
 @MainActor final class NativeReaderDocumentStore {
  static let shared = NativeReaderDocumentStore()
  func rolloutRoute(for url: URL) async -> Int? { nil }
- func loadPreparedDocument(for route: Int) async throws -> Int { route }
+ func loadPreparedDocument(for route: Int, onAcquired: (@Sendable () async -> Void)? = nil) async throws -> Int { await onAcquired?(); return route }
 }
 @MainActor final class Harness {
  var activeCodeSources: ActiveCodeSources? = ActiveCodeSources()

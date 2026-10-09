@@ -30,6 +30,10 @@ assert.ok(["default", "matched"].includes(visibleWorkload));
 const seedSelfTest = option("--self-test-seed", "false");
 assert.ok(["true", "false"].includes(seedSelfTest));
 const matchedWorkload = visibleWorkload === "matched";
+// Compare an immutable source or deployment entry against the same backend and
+// synthetic workload. This override exists only in this loopback test server.
+const clientEntryPath = option("--client-entry", "");
+const clientEntry = clientEntryPath ? await readFile(clientEntryPath, "utf8") : null;
 const profile = option("--profile", "small");
 assert.ok(["small", "large"].includes(profile), "Use --profile small or large");
 const port = Number(option("--port", "8802"));
@@ -220,8 +224,17 @@ const server = createServer(async (request, response) => {
       const originalEnd = response.end.bind(response);
       response.end = (body, ...args) => {
         response.end = originalEnd;
-        return originalEnd(summaryAttributionPrelude() + String(body), ...args);
+        // Minified production bundles do not expose source function names.
+        // Report missing attribution as an empty object, never fabricated zeroes.
+        const text = String(body);
+        const instrumentable = ["currentContentSummary", "projectEvidenceCount", "summarizeMutations"]
+          .every(name => text.includes(`function ${name}(`));
+        return originalEnd((instrumentable ? summaryAttributionPrelude() : "") + text, ...args);
       };
+    }
+    if (clientEntry !== null && url.pathname === "/web/app.js" && request.method === "GET") {
+      response.writeHead(200, {"content-type":"text/javascript", "cache-control":"no-store", "x-content-type-options":"nosniff"});
+      return response.end(clientEntry);
     }
     if (ready && canonicalPath.startsWith("research/") && request.method === "POST" &&
         !(researchHistoryEnabled && ["research/conversations/list", "research/conversations/get", "research/usage"].includes(canonicalPath))) {
@@ -442,7 +455,7 @@ try {
     assert.equal(history.filter(item => item.messageCount === 0).length, 3);
     researchHistory = { total: history.length, drafts: 3, answeredID: answered.id, plainID: plain.id, namedID: named.id, selectedID: selected.id, providerCallsAllowed: false };
   }
-  receipt = { profile, visibleWorkload, matchedVisibleReceipt, imageProfile, imageReceipts: imageReceipts.map(item => ({...item, noteID: noteIDs[0]})), ...target, researchHistory, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
+  receipt = { profile, visibleWorkload, matchedVisibleReceipt, imageProfile, clientEntrySHA256: clientEntry === null ? null : createHash("sha256").update(clientEntry).digest("hex"), imageReceipts: imageReceipts.map(item => ({...item, noteID: noteIDs[0]})), ...target, researchHistory, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
     reportID: report.draft.id, editions: versions, externalRequestsAllowed: false, temporaryRecords: true };
   ready = true;
   // Verify guards with unauthenticated empty bodies, so even a failed guard

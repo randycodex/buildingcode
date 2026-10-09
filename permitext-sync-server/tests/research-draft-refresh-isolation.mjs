@@ -19,6 +19,8 @@ function harness() {
   transitionWorkspace:async()=>{for(const pane of panes.values())if(pane.input)mount(pane.id,pane.conversationID);await afterTransition();}
  });
  vm.runInContext(['restoreResearchWorkspaceState','captureResearchWorkspaceState'].map(x=>extract(x)).join('\n')+'\n'+extract('refreshVisibleResearchArtifactConsumers',true),context);
+ context.scheduleResearchDraftPersistence=()=>context.saveWorkspaceState();
+ context.flushResearchDraftPersistence=()=>context.saveWorkspaceState();
  context.saveWorkspaceState=()=>{vm.runInContext('captureResearchWorkspaceState()',context);snapshot=JSON.stringify(state.researchViewState);};
  const composerStart=source.indexOf('  const followUpDraftKey = `followup:${conversationID}`;');
  const handlerStart=source.indexOf('  input.addEventListener("input", () => {',composerStart);

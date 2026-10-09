@@ -89,8 +89,8 @@ try {
   assert.ok(answer.citations.some((citation) => String(citation.sectionID) === "41009495"));
   assert.ok(answer.citations.every((citation) => citation.codeVersion.includes("2014-construction-codes")));
   assert.equal(answer.supportingSources.length, 0);
-  assert.ok(answer.retrieval.discovery.outsideCurrentLibrary.length > 0,
-    "Unavailable outside sources must remain disclosed even when no lookup was requested.");
+  assert.deepEqual(answer.retrieval.discovery.outsideCurrentLibrary, [],
+    "A selected 2014 passage that is in the library must not invent an outside authority absent from the question.");
   const stored = await createFileStoreAdapter().read();
   const conversations = stored.researchConversationsByUserID[userID];
   const persisted = conversations.find((item) => item.id === conversationID);
@@ -101,6 +101,17 @@ try {
   assert.deepEqual(reopened.conversation.messages.at(-1).answer, answer);
   assert.match(JSON.stringify(answer.factUsage), /Only the cellar is sprinklered/);
   assert.match(JSON.stringify(answer.factUsage), /Upper-floor conversion is an assumption/);
+  const outsideQuestion = `${question} Use only the selected code text; do not search the web. Identify the separate federal accessibility requirements (ADA) that this selected passage does not establish.`;
+  const outsideResult = await request("/research/conversations/message", {
+    conversationID, question: outsideQuestion, requestID: "synthetic-passage-outside-authority"
+  });
+  const outsideAnswer = outsideResult.conversation.messages.at(-1).answer;
+  assert.equal(outsideAnswer.retrieval.webSupportRequested, false);
+  assert.equal(outsideAnswer.retrieval.webSupportSearched, false);
+  assert.deepEqual(outsideAnswer.retrieval.webSupportReasons, ["selected_evidence_boundary"]);
+  assert.ok(outsideAnswer.retrieval.discovery.outsideCurrentLibrary.some(source =>
+    source.label === "federal accessibility requirements" && source.sourceURL === "https://www.ada.gov/"),
+  "An actually named outside authority must remain disclosed even when the selected-evidence boundary forbids a web lookup.");
   console.log("Permitext selected-passage HTTP/source-policy regression passed; external/provider calls forbidden.");
 } finally {
   globalThis.fetch = originalFetch;

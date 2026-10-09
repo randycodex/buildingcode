@@ -1274,18 +1274,23 @@ private struct NotebookCardEditorView: View {
             selectedPhoto = nil
         }
         do {
-            guard let originalData = try await item.loadTransferable(type: Data.self),
-                  let image = UIImage(data: originalData),
-                  let data = image.jpegData(compressionQuality: 0.86) else {
-                throw PermitextBackendHTTPError.invalidResponse
+            guard let originalData = try await item.loadTransferable(type: Data.self) else {
+                throw NotebookUploadImagePreparer.PreparationError.invalidImage
             }
+            guard isCurrentOwner, !Task.isCancelled else { return }
+            let preparation = Task.detached(priority: .userInitiated) {
+                try NotebookUploadImagePreparer.prepare(originalData)
+            }
+            let prepared = try await withTaskCancellationHandler {
+                try await preparation.value
+            } onCancel: { preparation.cancel() }
             guard isCurrentOwner, !Task.isCancelled else { return }
             let asset = try await library.uploadNotebookAsset(
                 projectID: projectID,
-                data: data,
+                data: prepared.data,
                 contentType: "image/jpeg",
-                width: Int(image.size.width * image.scale),
-                height: Int(image.size.height * image.scale)
+                width: prepared.width,
+                height: prepared.height
             )
             guard isCurrentOwner, !Task.isCancelled else { return }
             document.document.append(
@@ -1389,6 +1394,64 @@ private struct NotebookCardEditorView: View {
             )
         ]
         linkEditor = nil
+    }
+}
+
+/// ImageIO downsamples before decoding; a full-resolution camera bitmap never
+/// lands on the UI executor. The encoded payload fits the server's 8 MiB limit.
+private enum NotebookUploadImagePreparer {
+    struct Prepared: Sendable {
+        let data: Data
+        let width: Int
+        let height: Int
+    }
+
+    enum PreparationError: LocalizedError {
+        case invalidImage
+        case tooLarge
+        var errorDescription: String? {
+            switch self {
+            case .invalidImage: return "This photo could not be prepared. Try a different image."
+            case .tooLarge: return "This image is too large to upload. Try a smaller image."
+            }
+        }
+    }
+
+    nonisolated static func prepare(_ original: Data, maximumBytes: Int = 8 * 1_024 * 1_024) throws -> Prepared {
+        try Task.checkCancellation()
+        guard maximumBytes > 0,
+              let source = CGImageSourceCreateWithData(original as CFData,
+                  [kCGImageSourceShouldCache: false] as CFDictionary) else {
+            throw PreparationError.invalidImage
+        }
+        for longestEdge in [4_096, 3_072, 2_048, 1_024] {
+            try Task.checkCancellation()
+            let result: Prepared? = try autoreleasepool {
+                guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
+                    kCGImageSourceCreateThumbnailFromImageAlways: true,
+                    kCGImageSourceCreateThumbnailWithTransform: true,
+                    kCGImageSourceShouldCacheImmediately: true,
+                    kCGImageSourceThumbnailMaxPixelSize: longestEdge
+                ] as CFDictionary) else { throw PreparationError.invalidImage }
+                for quality in [0.86, 0.72] {
+                    try Task.checkCancellation()
+                    let bytes = NSMutableData()
+                    guard let destination = CGImageDestinationCreateWithData(bytes, "public.jpeg" as CFString, 1, nil) else {
+                        throw PreparationError.invalidImage
+                    }
+                    CGImageDestinationAddImage(destination, image, [
+                        kCGImageDestinationLossyCompressionQuality: quality
+                    ] as CFDictionary)
+                    guard CGImageDestinationFinalize(destination) else { throw PreparationError.invalidImage }
+                    if bytes.length <= maximumBytes {
+                        return Prepared(data: bytes as Data, width: image.width, height: image.height)
+                    }
+                }
+                return nil
+            }
+            if let result { return result }
+        }
+        throw PreparationError.tooLarge
     }
 }
 

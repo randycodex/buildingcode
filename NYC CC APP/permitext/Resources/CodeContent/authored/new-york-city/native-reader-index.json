@@ -1,6 +1,6 @@
 {
   "compression" : "lzfse",
-  "corpusSHA256" : "2574fdecbfcad606a498e8209994bdadf368669bbf1eaee09f6ddb082aea134a",
+  "corpusSHA256" : "4217fce744c219f2f8592c27385bcaa15b034f8e714eaafa6f0adcd291701782",
   "documentSchemaVersion" : 2,
   "entries" : [
     {
@@ -5419,12 +5419,12 @@
       "uncompressedByteCount" : 34086
     },
     {
-      "blockCount" : 132,
-      "compressedByteCount" : 19538,
-      "compressedSHA256" : "9e2967148da89a97bf4ee52afc5683b7ae44113b1e84acfe9f49c4f97c426957",
+      "blockCount" : 135,
+      "compressedByteCount" : 19715,
+      "compressedSHA256" : "f1b2f0458fc051826f816f5c7626e616bee679ca1b8a255ca05a369cf3b242cc",
       "documentID" : "0431bdffcba1be1d267a665659e23cb97ce2bfef45ef3f741185d49d9064a704",
       "documentPath" : "2025-specialty-codes/prepared/native-reader-v1/chapters/0431bdffcba1be1d267a665659e23cb97ce2bfef45ef3f741185d49d9064a704.json.lzfse",
-      "documentSHA256" : "73f2f6f83bdf391889e0780d5f5f79df4d8eac7de8b37c6f7221c47acdd14c41",
+      "documentSHA256" : "d7c2625cb7b6d1c2c0f5e74ac1025c42d1e3321ac8e136c79c1372e01ea28c80",
       "eligibility" : {
         "reasons" : [
 
@@ -5434,8 +5434,8 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000016.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "c384e6dacf3af4857874b8d2e6a4268230cebda544ebb78e4f62936eb3432656",
-      "uncompressedByteCount" : 119632
+      "sourceSHA256" : "f42e5df6e4468d15887ddf645ec056951f5307e043f0c0dd0a7c01fb356df0af",
+      "uncompressedByteCount" : 121117
     },
     {
       "blockCount" : 132,

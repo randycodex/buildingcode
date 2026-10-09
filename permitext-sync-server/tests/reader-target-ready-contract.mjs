@@ -75,9 +75,9 @@ for (const ready of [true, false]) {
   const occupied={id:'occupied',chapterID:'original-chapter',targetSectionID:99};
   const occupiedBefore=JSON.stringify(occupied);
   const state={readers:[occupied],searchLinkedReaders:{}};
-  const linkedPane={getBoundingClientRect:()=>({left:1304,right:1904,width:600})};
+  const linkedPane={dataset:{},getBoundingClientRect:()=>({left:1304,right:1904,width:600})};
   const track={scrollLeft:0,scrollWidth:1904,clientWidth:1280,
-    querySelector(selector){assert.match(selector,/reader:linked/);return linkedPane;},
+    querySelector(selector){if(selector.includes("is-pinned"))return null;assert.match(selector,/reader:linked/);return linkedPane;},
     getBoundingClientRect:()=>({left:0,right:1280}),
     scrollTo(options){calls.push(['scroll',options.left,options.behavior]);this.scrollLeft=options.left;}
   };

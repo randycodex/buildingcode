@@ -8,7 +8,7 @@ function actual(name){const start=source.search(new RegExp(`(?:async )?function 
 const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});return{promise,resolve};};
 const tick=async()=>{for(let i=0;i<24;i++)await Promise.resolve();};
 const track={children:[],scrollLeft:80,querySelectorAll(){return this.children;}};
-function pane(id,loading=false){const status={textContent:""},retry={hidden:true};return{dataset:{paneId:id,...loading?{workspacePaneLoading:"true"}:{}},isConnected:false,parentNode:null,classList:{contains:()=>false},querySelectorAll:()=>[],setAttribute(){},querySelector:s=>s.includes("retry")?retry:status,replaceWith(next){const i=track.children.indexOf(this);assert.ok(i>=0);track.children[i]=next;next.isConnected=true;next.parentNode=track;this.isConnected=false;this.parentNode=null;}};}
+function pane(id,loading=false){const status={textContent:""},retry={hidden:true};return{dataset:{paneId:id,...loading?{workspacePaneLoading:"true"}:{}},isConnected:false,parentNode:null,classList:{contains:()=>false,toggle(){}},querySelectorAll:()=>[],setAttribute(){},querySelector:s=>s.includes("retry")?retry:status,replaceWith(next){const i=track.children.indexOf(this);assert.ok(i>=0);track.children[i]=next;next.isConnected=true;next.parentNode=track;this.isConnected=false;this.parentNode=null;}};}
 const sync=deferred(),report=deferred();let account="A",pulls=0,privateLoads=0,removeNotebookOnVerify=false;
 const notebook=pane("notebook"),reader=pane("reader"),search=pane("search");
 let desired=[{id:"reader",publicContent:true,load:()=>reader},{id:"search",publicContent:true,load:()=>search},{id:"notebook",load:()=>{privateLoads++;return notebook;}},{id:"report",load:()=>{privateLoads++;return report.promise;}}];
@@ -28,7 +28,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  workspacePaneDescriptors:options=>desired.map(d=>({...d,label:d.id,identity:d.id,accessGate:options.accessGate,close:noop})),
  createWorkspacePaneLoadingShell:descriptor=>{const node=pane(descriptor.id,true);node.dataset.workspacePaneIdentity=descriptor.contentIdentity;node.dataset.workspacePaneAccessIdentity=descriptor.accessIdentity;node.__workspaceAccessGate=descriptor.accessGate;return node;},
  appendPaneSequence(panes){track.children.forEach(n=>{n.isConnected=false;n.parentNode=null;});track.children=panes;panes.forEach(n=>{n.isConnected=true;n.parentNode=track;});},
- applyPaneWeight:noop,ensureWorkspacePanelAccessibleName:noop,preparePaneCollapse:noop,bindPaneDragging:noop,refreshColumnGroupPresentation:noop,
+ applyPaneWeight:noop,ensureWorkspacePanelAccessibleName:noop,preparePaneCollapse:noop,bindPaneDragging:noop,refreshColumnGroupPresentation:noop,refreshPinnedPaneDivider:noop,
  updateCollapsedPaneDividers:noop,bindReaderScrollIndicator:noop,updateReaderScrollIndicator:noop,enhanceSelect:noop,restoreReaderScrollPositions:noop,
  notifyWorkspaceLayoutChange:noop,disposeUnpublishedWorkspacePane:noop,maskUnverifiedWorkspacePane:noop
 });

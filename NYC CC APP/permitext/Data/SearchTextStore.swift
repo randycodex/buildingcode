@@ -29,6 +29,20 @@ final class SearchTextStore: @unchecked Sendable {
 
     init(preparedURL: URL) { root = preparedURL }
 
+    /// A cheap lookup hint only. Callers must still compare with a fully
+    /// validated store revision before publishing a persisted search result.
+    static func declaredRevision(preparedURL: URL) -> String? {
+        guard let data = try? Data(contentsOf: preparedURL.appendingPathComponent("searchTextManifest.json")),
+              let manifest = try? JSONDecoder().decode(Manifest.self, from: data),
+              manifest.schemaVersion == 1,
+              manifest.sectionCount >= 0, manifest.textByteCount >= 0 else { return nil }
+        return revision(for: manifest)
+    }
+
+    private static func revision(for manifest: Manifest) -> String {
+        "\(manifest.sourceRevision):\(manifest.indexSHA256):\(manifest.textSHA256)"
+    }
+
     private func loadedPack() -> Pack? {
         lock.lock()
         defer { lock.unlock() }
@@ -55,7 +69,7 @@ final class SearchTextStore: @unchecked Sendable {
 
     var revision: String? {
         guard let manifest = loadedPack()?.manifest else { return nil }
-        return "\(manifest.sourceRevision):\(manifest.indexSHA256):\(manifest.textSHA256)"
+        return Self.revision(for: manifest)
     }
 
     func text(sectionID: Int64) -> String? {

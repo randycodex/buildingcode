@@ -121,6 +121,11 @@ try {
   assert.equal(await page.evaluate(() => state.paneWeights['reader:two']), 384);
   assert.deepEqual(await page.evaluate(() => panes.filter(p=>p!==panes[1]).map(p=>p.getBoundingClientRect().width)), peerWidths,
     'Keyboard resize of pinned column must leave scrolling columns unchanged');
+  await page.waitForFunction(() => {
+    const pane = document.querySelector('.workspace-panel.is-pinned');
+    const divider = document.querySelector('.is-pinned-divider');
+    return Math.abs(divider.getBoundingClientRect().left - pane.getBoundingClientRect().right) < 2;
+  });
   const handle = await page.locator('.is-pinned-divider').boundingBox();
   await page.mouse.move(handle.x+handle.width/2,handle.y+300);
   await page.mouse.down();

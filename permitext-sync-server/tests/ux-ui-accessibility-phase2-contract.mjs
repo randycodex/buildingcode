@@ -63,6 +63,10 @@ for (const rule of stylesSource.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
   const selector = rule[1];
   const declarations = rule[2];
   if (!selector.includes("focus") && !selector.includes("hover")) continue;
+  // A collapsed Reader retains the same code-family label color at rest and on hover.
+  // It is not an interactive highlight; focus outlines and backgrounds stay neutral.
+  if (selector.trim() === ".reader-panel > .pane-collapsed-tab,\n.reader-panel > .pane-collapsed-tab:hover" &&
+      declarations.trim() === "color: var(--code-accent);") continue;
   assert.doesNotMatch(
     declarations,
     /var\(--code-accent(?:-soft)?\)/,

@@ -1235,6 +1235,11 @@ final class CodeLibraryViewModel: ObservableObject {
             return NativeReaderPreparedOpening(route: route, prepared: prepared)
         }
         try Task.checkCancellation()
+        // Native chapters never need a WebKit process. Start it only for an
+        // actual HTML opening, while that fallback's content is being prepared.
+        if authoredHTMLWarmupTarget(for: chapter) != nil {
+            ChapterHTMLWebProcessWarmup.startIfNeeded()
+        }
         await warmChapterReaderEntry(chapter: chapter, sectionLimit: 10)
         try Task.checkCancellation()
         return nil
@@ -2195,9 +2200,11 @@ final class CodeLibraryViewModel: ObservableObject {
                 var filters: [CodeSectionCategory] = []
                 var stores = cachedStores
                 var failures: [String] = []
-                // Prepare metadata and validate immutable text packs off the main
-                // actor. Cache hits still need these stores for previews/opening.
+                // Find a possible completed-cache entry using small manifests.
+                // A miss must not parse every edition before the first results.
+                // These hints never authorize a hit: full stores validate below.
                 var revisions: [String] = []
+                var declaredRevisions: [String: String] = [:]
                 var cacheScope = ["all-editions"]
                 for version in versions {
                     try Task.checkCancellation()
@@ -2207,11 +2214,11 @@ final class CodeLibraryViewModel: ObservableObject {
                         cacheScope += ["allowed-categories"] + allowed.sorted().map(String.init)
                     }
                     guard version.contentKind == .authored else { continue }
-                    if stores[version.fileName] == nil {
-                        stores[version.fileName] = try? AuthoredCodeStore(jsonURL: version.fileURL,
-                            codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
-                    }
-                    if let revision = stores[version.fileName]?.searchCorpusRevision {
+                    let revision = stores[version.fileName]?.searchCorpusRevision
+                        ?? SearchTextStore.declaredRevision(preparedURL: version.fileURL
+                            .deletingLastPathComponent().appendingPathComponent("prepared", isDirectory: true))
+                    if let revision {
+                        declaredRevisions[version.fileName] = revision
                         revisions.append(revision)
                     }
                 }
@@ -2224,7 +2231,16 @@ final class CodeLibraryViewModel: ObservableObject {
                     var expectedFilterIDs: [String: [Int64: Int64]] = [:]
                     var versionsBySource: [String: BundledCodeVersion] = [:]
                     var categoryNamesByVersion: [String: [Int64: String]] = [:]
+                    var validRevisions = true
                     for version in versions {
+                        try Task.checkCancellation()
+                        if stores[version.fileName] == nil {
+                            stores[version.fileName] = try? AuthoredCodeStore(jsonURL: version.fileURL,
+                                codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+                        }
+                        if stores[version.fileName]?.searchCorpusRevision != declaredRevisions[version.fileName] {
+                            validRevisions = false
+                        }
                         // Keep the same first-match semantics as the previous lookup.
                         if versionsBySource[version.codeVersion] == nil {
                             versionsBySource[version.codeVersion] = version
@@ -2251,7 +2267,7 @@ final class CodeLibraryViewModel: ObservableObject {
                                 name: "\($0.name) · \(editionLabels[version.fileName] ?? version.codeVersion)")
                         }
                     }
-                    let valid = cached.filters == expectedFilters && cached.results.allSatisfy { result in
+                    let valid = validRevisions && cached.filters == expectedFilters && cached.results.allSatisfy { result in
                         guard let sourceVersion = result.sourceVersion,
                               let version = versionsBySource[sourceVersion],
                               let store = stores[version.fileName] else { return false }
@@ -2343,7 +2359,11 @@ final class CodeLibraryViewModel: ObservableObject {
                     }
                 }
                 try Task.checkCancellation()
-                if failures.isEmpty, let cacheKey {
+                if failures.isEmpty, let cacheKey,
+                   versions.allSatisfy({ version in
+                       guard let declared = declaredRevisions[version.fileName] else { return false }
+                       return stores[version.fileName]?.searchCorpusRevision == declared
+                   }) {
                     await CompletedSearchCache.shared.store(results: results, filters: filters, for: cacheKey)
                 }
                 try Task.checkCancellation()

@@ -1202,6 +1202,13 @@ export function createFileStoreAdapter() {
       const store = await this.read();
       return (store.mutationsByUserID[userID] || []).filter((mutation) => mutation.project);
     },
+    async projectMutationsForRecordIDs(userID, recordIDs) {
+      const ids = new Set(recordIDs);
+      if (!ids.size) return [];
+      const store = await this.read();
+      return (store.mutationsByUserID[userID] || []).filter((mutation) =>
+        mutation.project && ids.has(mutation.project.id));
+    },
     async latestEventID(userID) {
       const store = await this.read();
       return Number(store.syncRevisionsByUserID?.[userID] || 0);
@@ -1402,12 +1409,20 @@ export function createFileStoreAdapter() {
         mutationCounts: mutationCountsByKind
       };
     },
+    async researchConversation(userID, conversationID) {
+      const store = await this.read();
+      return (store.researchConversationsByUserID?.[userID] || [])
+        .find((conversation) => conversation.id === conversationID) || null;
+    },
     async listResearchConversations(userID, options = {}) {
       const store = await this.read();
       const projectID = String(options.projectID || "").trim();
       let conversations = (store.researchConversationsByUserID?.[userID] || []).slice();
       if (projectID) {
         conversations = conversations.filter((item) => item.primaryProjectID === projectID);
+      }
+      if (options.visibleOnly) {
+        conversations = conversations.filter((item) => !item.historyHiddenAt);
       }
       if (options.migrationPendingOnly) {
         const answerIDs = new Set((store.researchAnswersByUserID?.[userID] || []).map((answer) => answer.id));
@@ -3853,6 +3868,18 @@ async function createPostgresStoreAdapter() {
       `;
       return rows.map((row) => safeJSON(row.mutation, {}));
     },
+    async projectMutationsForRecordIDs(userID, recordIDs) {
+      const ids = [...new Set(recordIDs)];
+      if (!ids.length) return [];
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      const rows = await sql`
+        SELECT mutation FROM permitext_projects
+        WHERE user_id = ${userID} AND record_id = ANY(${ids})
+        ORDER BY record_id
+      `;
+      return rows.map((row) => safeJSON(row.mutation, {}));
+    },
     async latestEventID(userID) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -4125,6 +4152,15 @@ async function createPostgresStoreAdapter() {
       ], { isolationLevel: "Serializable" });
       return true;
     },
+    async researchConversation(userID, conversationID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT conversation FROM permitext_research_conversations
+        WHERE user_id = ${userID} AND id = ${conversationID}
+        LIMIT 1
+      `;
+      return rows.length ? safeJSON(rows[0].conversation, null) : null;
+    },
     async listResearchConversations(userID, options = {}) {
       await ensureSchema();
       const projectID = String(options.projectID || "").trim();
@@ -4217,6 +4253,7 @@ async function createPostgresStoreAdapter() {
               FROM permitext_research_conversations
               WHERE user_id = ${userID}
                 AND conversation->>'primaryProjectID' = ${projectID}
+                AND (${!options.visibleOnly} OR COALESCE(conversation->>'historyHiddenAt', '') = '')
               ORDER BY updated_at DESC
             `
           : await sql`
@@ -4266,6 +4303,7 @@ async function createPostgresStoreAdapter() {
               ) AS conversation
               FROM permitext_research_conversations
               WHERE user_id = ${userID}
+                AND (${!options.visibleOnly} OR COALESCE(conversation->>'historyHiddenAt', '') = '')
               ORDER BY updated_at DESC
             `;
         return summaryRows.map((row) => safeJSON(row.conversation, {}));
@@ -6287,7 +6325,10 @@ async function listStoredResearchConversations(userID, options = {}) {
 }
 
 async function storedResearchConversation(userID, conversationID) {
-  return (await listStoredResearchConversations(userID)).find((item) => item.id === conversationID) || null;
+  if (typeof conversationID !== "string" || !conversationID) return null;
+  const adapter = await storeAdapter();
+  const conversation = await adapter.researchConversation(userID, conversationID);
+  return conversation ? { ...conversation, revision: researchConversationRevision(conversation) } : null;
 }
 
 async function saveStoredResearchConversation(userID, conversation) {
@@ -17798,7 +17839,7 @@ async function handleResearchConversationList(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
   const [conversations, links] = await Promise.all([
-    listStoredResearchConversations(context.userID, { summaryOnly: true }),
+    listStoredResearchConversations(context.userID, { summaryOnly: true, visibleOnly: true }),
     listStoredProjectLinks(context.userID, { targetKind: "researchConversation" })
   ]);
   const linkByConversationID = new Map(links
@@ -27619,7 +27660,9 @@ async function handlePush(request, response) {
     }
     const includesProjectMutation = syncBatchIncludesProjectMutation(incoming);
     const previousMutations = includesProjectMutation
-      ? (await readStore()).mutationsByUserID?.[userID] || []
+      ? await adapter.projectMutationsForRecordIDs(userID, incoming
+          .filter((mutation) => mutation.project)
+          .map((mutation) => normalizedMutationRecordID(mutation)))
       : [];
     const result = await adapter.pushUserContent(userID, incoming);
     if (includesProjectMutation) {

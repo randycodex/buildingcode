@@ -43,12 +43,14 @@ final class AuthoredCodeStore: @unchecked Sendable {
  static var missingRevisions: Set<String> = []
  static var cancelDuringSearch: Set<String> = []
  static var searchCalls: [String] = []
+ static var blockedLoadEdition: String?
  static var blockedEdition: String?
  static let started = DispatchSemaphore(value: 0)
  static let release = DispatchSemaphore(value: 0)
  let edition: String
  init(jsonURL: URL, codeID: Int64?, jurisdictionID: Int64?) throws {
-  edition = jsonURL.lastPathComponent
+  edition = jsonURL.deletingLastPathComponent().lastPathComponent
+  if Self.blockedLoadEdition == edition { Self.started.signal(); Self.release.wait() }
   if Self.loadFailures.contains(edition) { throw FixtureError.unavailable }
  }
  var searchCorpusRevision: String? { Self.missingRevisions.contains(edition) ? nil : "revision-" + edition }
@@ -62,7 +64,12 @@ final class AuthoredCodeStore: @unchecked Sendable {
   if query == "empty" { return [] }
   return [.init(id: edition == "2022" ? 1 : 2, codeSectionID: 10, chapterNumber: "1", sectionNumber: "101", title: "Scope", snippet: "", kind: "title")]
  }
- static func reset() { loadFailures = []; missingRevisions = []; cancelDuringSearch = []; searchCalls = []; blockedEdition = nil }
+ static func reset() { loadFailures = []; missingRevisions = []; cancelDuringSearch = []; searchCalls = []; blockedEdition = nil; blockedLoadEdition = nil }
+}
+struct SearchTextStore {
+ static func declaredRevision(preparedURL: URL) -> String? {
+  "revision-" + preparedURL.deletingLastPathComponent().lastPathComponent
+ }
 }
 struct BundleDatabaseLocator {}
 struct CodeDatabase {
@@ -112,7 +119,7 @@ actor CompletedSearchCache {
 @main struct Run {
  static func require(_ value: Bool, _ message: String) { precondition(value, message) }
  @MainActor static func main() async throws {
-  func versions() -> [Version] { ["2022", "2014"].map { Version(fileName: $0, codeVersion: $0, fileURL: URL(fileURLWithPath: "/" + $0), contentKind: .authored, authoredCodeID: 1, jurisdictionID: 1) } }
+  func versions() -> [Version] { ["2022", "2014"].map { Version(fileName: $0, codeVersion: $0, fileURL: URL(fileURLWithPath: "/" + $0 + "/bundle.json"), contentKind: .authored, authoredCodeID: 1, jurisdictionID: 1) } }
   func run(_ model: Harness, _ query: String = "concrete") async { model.searchAllEditions(query: query); await model.searchTask?.value }
   await CompletedSearchCache.shared.reset(); AuthoredCodeStore.reset()
   let first = Harness(versions()); await run(first)
@@ -178,6 +185,20 @@ actor CompletedSearchCache {
   let legacy = Harness(versions()); await run(legacy)
   require(legacy.searchResults.count == 2, "missing pack preserves fallback coverage")
   require(await CompletedSearchCache.shared.stats().0 == 0, "unknown revision never cached")
+  await CompletedSearchCache.shared.reset(); AuthoredCodeStore.reset()
+  AuthoredCodeStore.blockedLoadEdition = "2014"
+  let progressive = Harness(versions())
+  progressive.searchAllEditions(query: "concrete")
+  await Task.detached { AuthoredCodeStore.started.wait() }.value
+  require(progressive.searchResults.map { $0.id } == [1], "Cold miss publishes first edition before constructing the next store")
+  AuthoredCodeStore.release.signal()
+  await progressive.searchTask?.value
+  require(progressive.searchResults.map { $0.id } == [1, 2], "Lazy construction preserves full ordering")
+  AuthoredCodeStore.blockedLoadEdition = nil
+  AuthoredCodeStore.searchCalls = []
+  AuthoredCodeStore.missingRevisions = ["2014"]
+  await run(Harness(versions()))
+  require(AuthoredCodeStore.searchCalls.count == 2, "Declared manifest hints cannot authorize a cache hit with an invalid text pack")
   await CompletedSearchCache.shared.reset(); AuthoredCodeStore.reset()
   await run(Harness(versions()), "empty")
   require(await CompletedSearchCache.shared.stats().0 == 1, "complete zero-results search cached")

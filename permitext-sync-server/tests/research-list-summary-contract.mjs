@@ -3,6 +3,8 @@ import vm from "node:vm";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { researchWriterInstructions } from "../research-writer-policy.mjs";
+import { buildResearchRequestEnvelopeBuilders } from "./research-request-envelope-preflight.mjs";
 import {
   canonicalResearchBoundedCitationInterpretation,
   deterministicResearchEvidenceAnalysisForBoundedCitation,
@@ -29,8 +31,8 @@ assert.match(
 );
 assert.match(
   appSource,
-  /evidenceLimitations: \{ type: "array", minItems: 1, items: \{ type: "string", minLength: 1 \} \}/,
-  "The Research response schema must prevent blank or missing evidence limitations before validation."
+  /evidenceLimitations: \{ type: "array", items: \{ type: "string", minLength: 1 \} \}/,
+  "The Research response schema permits a fully supported answer without caveats while rejecting blank limitation entries."
 );
 
 function functionSource(source, name) {
@@ -246,7 +248,7 @@ assert.equal(
 
 assert.match(
   appSource,
-  /listStoredResearchConversations\(context\.userID,\s*\{\s*summaryOnly:\s*true\s*\}/,
+  /listStoredResearchConversations\(context\.userID,\s*\{\s*summaryOnly:\s*true,\s*visibleOnly:\s*true\s*\}/,
   "Research list handler does not request summaryOnly conversations."
 );
 assert.match(
@@ -267,7 +269,7 @@ assert.match(
 assert.match(appSource, /conversation\.starterQuestion \|\|= question;/, "The first ordinary Research question is not persisted as the stable starter question.");
 assert.match(appSource, /refreshGeneratedResearchConversationTitle\(conversation\);[\s\S]*?conversation\.messages\.push/, "The first ordinary Research question does not update the generated title.");
 assert.match(clientSource, /title\.textContent = researchConversationTitle\(conversation\);/, "Previous chats do not show the shared Research title.");
-assert.match(clientSource, /meta\.textContent = researchConversationDate\(conversation\.updatedAt \|\| conversation\.createdAt\);/, "Previous chats do not show their latest conversation date with a creation-date fallback.");
+assert.match(clientSource, /meta\.textContent = researchConversationDate\(conversation\.createdAt\);/, "Previous chats must show their stable start date rather than changing chronology on later edits.");
 assert.match(clientSource, /projectPill\.textContent = conversation\.primaryProjectID[\s\S]*?researchProjectName\(conversation\.primaryProjectID\)[\s\S]*?"Unassigned";/, "Previous chats do not identify their assigned Project or use the shared Unassigned vocabulary.");
 assert.match(stylesSource, /\.research-conversation-open \{[\s\S]*?gap: var\(--space-3\);/, "Previous chat questions need visible separation from their metadata.");
 assert.match(stylesSource, /\.research-conversation-meta \{[\s\S]*?justify-content: space-between;/, "Previous chat dates and Project pills should share an aligned metadata row.");
@@ -332,7 +334,7 @@ assert.match(stylesSource, /\.reader-internal-search\.search-box \{[\s\S]*?borde
 assert.doesNotMatch(stylesSource, /\.reader-reading-progress/, "The removed horizontal Reader progress line returned.");
 assert.match(stylesSource, /\.research-conversation-panel \{[\s\S]*?--research-conversation-background: #000000;[\s\S]*?background: var\(--research-conversation-background\);/, "Standalone Research conversations do not use a pure-black surface.");
 assert.match(stylesSource, /\.research-message\.is-user \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?opacity: 1;/, "Research user messages do not use the annotated full-opacity warm-white fill.");
-assert.doesNotMatch(stylesSource, /\.research-composer-box:has\(\.research-question-input:focus-visible\)/, "Research chat boxes still draw an active focus edge.");
+assert.match(stylesSource, /\.research-compact-composer \.research-composer-box:has\(\.research-question-input:focus-visible\)\s*\{[^}]*outline: 2px solid var\(--focus-ring\)/, "Keyboard users retain the shared neutral focus indicator around the growing composer.");
 assert.match(clientSource, /selectHistoryButton\.innerHTML = selectionModeIconSVG\(\)/, "Research history does not expose its selection icon.");
 assert.match(clientSource, /cancelSelectionButton\.textContent = "Cancel"[\s\S]*?selectAllButton\.textContent = "Select all"/, "Research selection mode is missing Cancel or Select all.");
 assert.match(clientSource, /if \(selectingConversations\)[\s\S]*?toggleConversationSelection\(conversation\.id\)/, "Conversation rows do not toggle selection instead of opening while selection mode is active.");
@@ -350,7 +352,7 @@ assert.match(
 );
 assert.match(
   clientSource,
-  /Saved Research answers and professional analysis records will remain/,
+  /saved Research answers, and professional analysis records will be preserved/,
   "Research history clearing does not disclose the preserved evidence boundary."
 );
 assert.match(
@@ -379,7 +381,7 @@ assert.match(stylesSource, /\.research-dialogue-pane > \.research-compact-compos
 assert.doesNotMatch(functionSource(clientSource, "renderResearchConversation"), /research-verification-note|AI-assisted\. Verify against cited code\./, "The verification note must leave once a Research conversation starts.");
 assert.equal((clientSource.match(/AI-assisted · Verify cited text/g) || []).length, 1, "Only the empty chat should expose the consolidated verification disclosure.");
 assert.match(clientSource, /function bindResearchSendShortcut[\s\S]*?event\.key !== "Enter" \|\| event\.shiftKey \|\| event\.isComposing[\s\S]*?form\.requestSubmit\(\)/, "Enter should start a Research conversation while Shift+Enter remains available for a line break.");
-assert.match(clientSource, /function appendProjectResearchHistory[\s\S]*?filter\(\(conversation\) => String\(conversation\.title \|\| conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = researchConversationTitle\(conversation\);/, "Project Research history does not include passage-titled conversations.");
+assert.match(clientSource, /function appendProjectResearchHistory[\s\S]*?filter\(\(conversation\) => !conversation\.historyHiddenAt && String\(conversation\.title \|\| conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = researchConversationTitle\(conversation\);/, "Project Research history does not include passage-titled conversations.");
 assert.doesNotMatch(clientSource, /renderResearchAnswerSave|Save to Project|research-answer-save/, "Per-answer Project saving must remain removed from Research conversations.");
 assert.match(clientSource, /unassignedLabel: "Unassigned"[\s\S]*?assignResearchConversationProject\(conversation, targetProjectID/, "The conversation header does not use the shared Unassigned state or auto-assign the full conversation to a Project.");
 assert.match(clientSource, /: "Not assigned to a Project";/, "Unassigned Research controls must retain an explanatory tooltip.");
@@ -387,7 +389,7 @@ assert.match(appSource, /const requiresContextReview = Boolean\(currentProjectID
 assert.match(clientSource, /`Move this conversation to \$\{targetProjectName\}\?`[\s\S]*?The entire conversation will move from \$\{currentProjectName\} to \$\{targetProjectName\}[\s\S]*?Its existing answers and citations will not change[\s\S]*?Future questions will use the current Project facts from \$\{targetProjectName\}/, "The Project-move warning should explain what moves, what stays unchanged, and which visible Project facts future questions use.");
 assert.match(clientSource, /confirmLabel: targetProjectID \? "Move conversation" : "Remove from Project"/, "The Project-move warning should use explicit action labels.");
 assert.match(appSource, /conversation\.projectContextReviewRequired = false;/, "A confirmed move should use the destination Project's visible facts without a second hidden review gate.");
-assert.match(clientSource, /function appendSavedProjectResearchConversations[\s\S]*?filter\(\(conversation\) => String\(conversation\.title \|\| conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = researchConversationTitle\(conversation\)[\s\S]*?openResearchConversation\(conversation\.id\)/, "The Project folder does not open assigned conversations by their shared title.");
+assert.match(clientSource, /function appendSavedProjectResearchConversations[\s\S]*?filter\(\(conversation\) => !conversation\.historyHiddenAt && String\(conversation\.title \|\| conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = researchConversationTitle\(conversation\)[\s\S]*?openResearchConversation\(conversation\.id\)/, "The Project folder does not open assigned conversations by their shared title.");
 assert.doesNotMatch(clientSource, /if \(state\.utilities\.analysis && researchConversationPaneIsOpen\(\)\) \{[\s\S]*?openSupplementalResearchConversation\(conversation\.id\)/, "Ordinary Project Research navigation should reuse the single active Research pair.");
 assert.match(clientSource, /function openResearchConversationPaneIDs\(\)[\s\S]*?supplementalResearchConversationIDs\.map/, "Supplemental Project conversations are missing from the active pane IDs.");
 // Exercise the actual descriptor loop: constructing the desired pane list must
@@ -419,13 +421,31 @@ assert.match(clientSource, /additional \$\{reviewedOnlyProvisionCount/, "Researc
 assert.match(clientSource, /citation\.evidenceRole === "supporting"/, "Supporting citations are not visibly classified.");
 assert.match(appSource, /"unnecessary_qualification"/, "The verifier cannot classify unjustified caution.");
 assert.match(appSource, /"repeated_established_fact"/, "The verifier cannot classify requests to reconfirm established facts.");
-assert.match(appSource, /Fail with unnecessary_qualification/, "The verifier is not instructed to reject unjustified caution.");
-assert.match(appSource, /Fail with repeated_established_fact/, "The verifier is not instructed to reject repeated fact requests.");
-assert.match(appSource, /If the value complies with a stricter baseline limit/, "The answer model is not instructed to preserve the strongest numeric-table conclusion.");
-assert.match(appSource, /same supplied table row places the user's stated category beside a materially different conditional category/, "The answer model can omit a material adjacent table category that explains the result.");
-assert.match(appSource, /table answer omits a materially different conditional category supplied beside the user's category/, "The verifier cannot catch misleading omissions from the applicable table row.");
-assert.match(appSource, /Treat a corpus or evidence limitation as a boundary/, "The answer model may still turn a missing source into an unsupported legal requirement.");
-assert.match(appSource, /Preserve the factual content of an established user shorthand such as fully sprinklered/, "The answer model may still re-ask an established sprinkler fact.");
+// The writer's compact policy is exported separately now. Check the actual
+// dispatched envelopes, including the specific table/fact rules retained in
+// the verifier, instead of requiring obsolete prose in app.mjs.
+const { buildAnswerRequest, buildVerifierRequest } = await buildResearchRequestEnvelopeBuilders();
+const policyQuestion = "For a fully sprinklered building, does the stated value satisfy the supplied table limit?";
+const policyEvidence = [{
+  sectionID: "policy-section", sourceID: "policy-passage", codePrefix: "BC",
+  sectionNumber: "synthetic", text: "Synthetic table: baseline limit 10; conditional alternative limit 20."
+}];
+const policyAnswer = { answerText: "Synthetic table comparison.", supportedPoints: [], citations: [], missingFacts: [] };
+const writerRequest = buildAnswerRequest(policyQuestion, policyEvidence, "offline-list-policy");
+const verifierRequest = buildVerifierRequest(policyQuestion, policyEvidence, policyAnswer, "offline-list-policy");
+assert.equal(writerRequest.instructions, researchWriterInstructions({ question: policyQuestion }), "The answer request must dispatch the exported writer policy.");
+assert.match(writerRequest.instructions, /leading with the strongest conclusion supported by the evidence/, "The writer must preserve the strongest supported result.");
+assert.match(writerRequest.instructions, /thresholds, units, measurement datums, calculation order, table headers and footnotes, cumulative or alternative conditions, and every exception material to the conclusion/, "The writer must preserve material table categories, values, and qualifying conditions.");
+assert.match(verifierRequest.instructions, /Fail with unnecessary_qualification/, "The verifier is not instructed to reject unjustified caution.");
+assert.match(verifierRequest.instructions, /Fail with repeated_established_fact/, "The verifier is not instructed to reject repeated fact requests.");
+assert.match(verifierRequest.instructions, /fail with weakest_supported_conclusion when the stated value satisfies a stricter directly applicable supplied limit but the answer makes compliance conditional on qualifying for a more generous allowance/, "The verifier must reject weakening a supported baseline result into a conditional allowance.");
+assert.match(appSource, /When a supplied table places the stated project category beside a materially different conditional category in the same row, record both values and the fact that selects between them/, "Evidence analysis must retain the material adjacent category and its selection condition.");
+assert.match(verifierRequest.instructions, /table answer omits a materially different conditional category supplied beside the user's category/, "The verifier cannot catch misleading omissions from the applicable table row.");
+assert.match(writerRequest.instructions, /missing law is an evidence limitation, not a prohibition or a missing project fact/, "The writer must not turn a source gap into an unsupported legal requirement.");
+assert.match(verifierRequest.instructions, /Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement/, "The verifier must reject unsupported requirements inferred from a source gap.");
+assert.match(writerRequest.instructions, /Treat supplied user facts as discussion premises, preserving qualifications, corrections and the scope of hypotheticals/, "The writer must preserve established facts and their qualifications.");
+assert.match(writerRequest.instructions, /without re-asking established facts/, "The writer must not ask for an established fact again.");
+assert.match(verifierRequest.instructions, /When the user has established that a building is fully sprinklered, treat installed throughout as established factual context/, "The verifier must preserve the factual content of established sprinkler shorthand.");
 assert.match(appSource, /accumulatedResearchVerificationIssues\(verificationAttempts\)/, "Bounded revisions do not retain earlier verifier corrections.");
 
 const analysisFixture = {
@@ -622,8 +642,10 @@ assert.deepEqual(
 );
 assert.match(appSource, /projectFactsUsed\.maxItems = 0/, "The evidence-analysis schema does not forbid invented Project facts when no Project facts exist.");
 assert.match(appSource, /max_output_tokens: 6_000,/, "The evidence-analysis model can still be cut off before returning its structured legal-research map.");
-assert.match(appSource, /max_output_tokens: 4_000,/, "The Research verifier can still be cut off before returning its structured result.");
-assert.match(appSource, /timeoutMilliseconds: 45_000,[\s\S]*?failureMessage: "The Research verifier request failed\."/, "The Research verifier timeout is too short for a complex evidence package.");
+assert.equal(verifierRequest.max_output_tokens, verifierRequest.reasoning.effort === "low" ? 4_000 : 8_000, "The dispatched verifier must retain the output allowance for its reasoning effort.");
+const verifierSource = functionSource(appSource, "openAIResearchVerification");
+assert.match(verifierSource, /timeoutMilliseconds: configuration\.verificationReasoningEffort === "low" \? 45_000 : 90_000/, "Medium-effort verification must retain its longer deadline.");
+assert.match(verifierSource, /timeoutMilliseconds: verificationProfile\.timeoutMilliseconds,[\s\S]*?failureMessage: "The Research verifier request failed\."/, "Provider dispatch must use the selected verifier deadline.");
 assert.match(appSource, /maximumResearchVerificationAttempts = 2/, "Research must allow at most one bounded correction behind the verifier gate.");
 assert.match(clientSource, /function wireResearchDetailsMotion\(details, body\)/, "Research disclosures do not share the standard collapsible motion helper.");
 assert.match(clientSource, /wireResearchDetailsMotion\(evidenceReviewed, evidenceReviewedBody\)/, "Evidence reviewed does not use the shared disclosure motion.");
@@ -677,7 +699,7 @@ assert.match(stylesSource, /\.workspace-tab \{[\s\S]*?font-size: 12px;/, "Worksp
 assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Connection status labels are not 12px.");
 assert.match(stylesSource, /\.reader-nav-chapter-row \{[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/, "Reader chapter rows retain a persistent highlight instead of highlighting on hover.");
 assert.match(clientSource, /projectID: selection\.projectID \|\| ""/, "Unassigned Reader evidence is not submitted as an unassigned Research conversation.");
-assert.match(clientSource, /function readerSectionResearchSelection\(sectionWrapper\)[\s\S]*?selectedOpenProjectID\(\)[\s\S]*?passages: \[passage\],[\s\S]*?projectID/, "Reader passage Research does not preserve the passage and active Project context.");
+assert.match(functionSource(clientSource, "readerSectionResearchSelection"), /selectedOpenProjectID\(\)[\s\S]*?passages: \[passage\],[\s\S]*?projectID/, "Reader passage Research does not preserve the passage and active Project context.");
 assert.match(functionSource(clientSource, "renderInlineCommentBox"), /if \(!allowed\(\) \|\| researchButton\.disabled\) return;[\s\S]*?openResearchDestinationMenu\(researchButton, readerSectionResearchSelection\(sectionWrapper, passage\)\)/, "Reader Research must check access and open an explicit passage destination picker.");
 await import("./reader-public-presentation-contract.mjs");
 assert.doesNotMatch(clientSource, /newResearchButton|inline-new-research-toggle|Start new Research with this passage|createNew: true/, "The Reader still exposes a duplicate new-Research icon.");

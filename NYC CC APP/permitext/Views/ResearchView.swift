@@ -466,10 +466,14 @@ private struct ResearchSessionView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var summaries: [ResearchConversationSummary] = []
     @State private var historyPreviews: [String: String] = [:]
+    @State private var historyPreviewRevisions: [String: String] = [:]
     @State private var conversation: ResearchConversation?
     @State private var question = ""
-    @State private var isLoading = true
+    @State private var isLoadingHistory = true
+    @State private var isLoadingConversation = false
     @State private var historyLoadID: UUID?
+    @State private var conversationLoadID: UUID?
+    @State private var conversationPublicationID = UUID()
     @State private var isCreatingConversation = false
     @State private var isConsumingPendingSelection = false
     @State private var retainingInterruptedIdentities: [NativeResearchRequestIdentity] = []
@@ -479,6 +483,7 @@ private struct ResearchSessionView: View {
     @State private var pendingDisclosureAttempt: ResearchQuestionAttempt?
     @State private var failedQuestionAttempt: ResearchQuestionAttempt?
     @State private var errorMessage: String?
+    @State private var historyErrorMessage: String?
     @State private var questionErrorMessage: String?
     @State private var pendingVisualReview: PendingResearchVisualReview?
     @State private var showingRename = false
@@ -643,20 +648,24 @@ private struct ResearchSessionView: View {
             }
             .task(id: "\(library.privateSessionID):\(library.hasResearchAccess)") {
                 guard isCurrentOwner else { return }
-                await library.refreshResearchTurnAllowance(
+                // Restore the selected conversation immediately; billing metadata
+                // and history are independent reads, not prerequisites for reading.
+                async let allowance: Void = library.refreshResearchTurnAllowance(
                     recoverUnfinishedPurchases: true,
                     showsErrors: false
                 )
-                guard isCurrentOwner, !Task.isCancelled else { return }
-                await loadHistory()
-                guard isCurrentOwner, !Task.isCancelled else { return }
+                async let history: Void = loadHistory()
                 await openActiveConversationIfNeeded()
+                await allowance
                 guard isCurrentOwner, !Task.isCancelled else { return }
                 await consumePendingSelectionIfNeeded()
+                await history
             }
             .onChange(of: library.activeResearchConversationID) { previousID, id in
                 guard isCurrentOwner else { return }
                 if conversation?.id != id { conversation = nil }
+                conversationLoadID = nil
+                isLoadingConversation = false
                 activeResearchRequestTask?.cancel()
                 activeResearchRequestTask = nil
                 pendingQuestionAttempt = nil
@@ -864,9 +873,32 @@ private struct ResearchSessionView: View {
         }
     }
 
-    private func plainHistoryPreview(_ value: String) -> String {
-        let text = (try? AttributedString(markdown: value)).map { String($0.characters) } ?? value
-        return text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+    private func loadHistoryPreview(_ summary: ResearchConversationSummary) async {
+        guard isCurrentOwner, let owner,
+              historyPreviewRevisions[summary.id] != summary.updatedAt else { return }
+        let cache = cache
+        let work = Task.detached(priority: .utility) {
+            guard !Task.isCancelled else { return nil as String? }
+            let cached = try? ResearchConversationCacheLifecycle.load(
+                ResearchConversation.self, cache: cache,
+                accountID: owner.accountID, conversationID: summary.id
+            )
+            let answer = cached?.value.messages.last(where: { $0.answer != nil })?.answer
+            let answerText = answer?.answerText?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let preview = answerText?.isEmpty == false ? answerText : (answer?.conclusion ?? summary.starterQuestion)
+            guard let preview, !Task.isCancelled else { return nil }
+            // A three-line history preview never needs to parse an entire answer.
+            let bounded = String(preview.prefix(1_200))
+            let text = (try? AttributedString(markdown: bounded)).map { String($0.characters) } ?? bounded
+            return text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        }
+        let preview = await withTaskCancellationHandler {
+            await work.value
+        } onCancel: { work.cancel() }
+        guard isCurrentOwner, !Task.isCancelled,
+              summaries.contains(where: { $0.id == summary.id && $0.updatedAt == summary.updatedAt }) else { return }
+        historyPreviews[summary.id] = preview
+        historyPreviewRevisions[summary.id] = summary.updatedAt
     }
 
     private func historyDateGroup(_ item: ResearchConversationSummary) -> String {
@@ -894,12 +926,12 @@ private struct ResearchSessionView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
 
-            if let errorMessage {
-                statusMessage(errorMessage)
+            if let message = errorMessage ?? historyErrorMessage {
+                statusMessage(message)
                     .listRowBackground(Color.clear)
             }
 
-            if summaries.isEmpty && !isLoading && errorMessage == nil {
+            if summaries.isEmpty && !isLoading && errorMessage == nil && historyErrorMessage == nil {
                 ContentUnavailableView(
                     "No Research yet",
                     image: "Astroid",
@@ -932,7 +964,7 @@ private struct ResearchSessionView: View {
                             .lineLimit(2)
                         if let preview = (historyPreviews[item.id] ?? item.starterQuestion)?.trimmingCharacters(in: .whitespacesAndNewlines),
                            !preview.isEmpty, preview != researchTitle(for: item) {
-                            Text(plainHistoryPreview(preview))
+                            Text(preview)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(3)
@@ -951,6 +983,7 @@ private struct ResearchSessionView: View {
                 .buttonStyle(.plain)
                 .disabled(deletingConversationID == item.id)
                 .accessibilityIdentifier("research-history-row")
+                .task(id: item.updatedAt) { await loadHistoryPreview(item) }
                 .listRowInsets(EdgeInsets(top: 12, leading: 18, bottom: 12, trailing: 18))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.visible, edges: .bottom)
@@ -1451,6 +1484,8 @@ private struct ResearchSessionView: View {
         )
     }
 
+    private var isLoading: Bool { isLoadingHistory || isLoadingConversation }
+
     private var isCurrentOwner: Bool {
         owner != nil && owner == library.privateRequestIdentity
     }
@@ -1480,20 +1515,13 @@ private struct ResearchSessionView: View {
         guard isCurrentOwner, let owner else { return }
         let loadID = UUID()
         historyLoadID = loadID
-        isLoading = true
+        isLoadingHistory = true
         defer {
             if isCurrentOwner && historyLoadID == loadID {
-                isLoading = false
-                historyPreviews = [:]
-                for item in summaries {
-                    if let cached = try? ResearchConversationCacheLifecycle.load(
-                        ResearchConversation.self, cache: cache,
-                        accountID: owner.accountID, conversationID: item.id
-                    ), let answer = cached.value.messages.last(where: { $0.answer != nil })?.answer {
-                        let preview = answer.answerText?.trimmingCharacters(in: .whitespacesAndNewlines)
-                        historyPreviews[item.id] = preview?.isEmpty == false ? preview : answer.conclusion
-                    }
-                }
+                isLoadingHistory = false
+                let visibleIDs = Set(summaries.map(\.id))
+                historyPreviews = historyPreviews.filter { visibleIDs.contains($0.key) }
+                historyPreviewRevisions = historyPreviewRevisions.filter { visibleIDs.contains($0.key) }
             }
         }
         if !forceNetwork, let cached = try? cache.load(
@@ -1505,24 +1533,26 @@ private struct ResearchSessionView: View {
             guard isCurrentOwner, historyLoadID == loadID, !Task.isCancelled else { return }
             summaries = loaded
             cacheHistory(loaded, accountID: owner.accountID)
-            errorMessage = nil
+            historyErrorMessage = nil
         } catch {
             guard isCurrentOwner, historyLoadID == loadID, !Task.isCancelled else { return }
             if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) { summaries = [] }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
                 try? cache.remove(accountID: owner.accountID, projectID: "all-research", scope: "research-history")
             }
-            errorMessage = summaries.isEmpty ? error.localizedDescription : "Showing saved Research history. Could not refresh: \(error.localizedDescription)"
+            historyErrorMessage = summaries.isEmpty ? error.localizedDescription : "Showing saved Research history. Could not refresh: \(error.localizedDescription)"
         }
     }
 
     private func refreshFromWeb() async {
         guard let identity = requestIdentity() else { return }
-        await library.refreshResearchTurnAllowance(showsErrors: false)
-        guard isCurrent(identity) else { return }
-        await loadHistory(forceNetwork: true)
-        guard isCurrent(identity), let id = identity.conversationID else { return }
-        await loadConversation(id: id, identity: identity, useCache: false)
+        async let allowance: Void = library.refreshResearchTurnAllowance(showsErrors: false)
+        async let history: Void = loadHistory(forceNetwork: true)
+        if let id = identity.conversationID, isCurrent(identity) {
+            await loadConversation(id: id, identity: identity, useCache: false)
+        }
+        await allowance
+        await history
     }
 
     private func openActiveConversationIfNeeded() async {
@@ -1535,9 +1565,12 @@ private struct ResearchSessionView: View {
     }
 
     private func loadConversation(id: String, identity: NativeResearchRequestIdentity, useCache: Bool) async {
-        guard isCurrent(identity) else { return }
-        isLoading = true
-        defer { if isCurrent(identity) { isLoading = false } }
+        guard isCurrent(identity), !Task.isCancelled else { return }
+        let loadID = UUID()
+        conversationLoadID = loadID
+        let publicationID = conversationPublicationID
+        isLoadingConversation = true
+        defer { if isCurrent(identity), conversationLoadID == loadID { isLoadingConversation = false } }
         if useCache, let cached = try? ResearchConversationCacheLifecycle.load(
             ResearchConversation.self, cache: cache, accountID: identity.account.accountID, conversationID: id
         ) { conversation = cached.value }
@@ -1549,20 +1582,22 @@ private struct ResearchSessionView: View {
         var loadedAuthoritativeConversation = false
         do {
             let loaded = try await library.researchConversation(id: id)
-            guard isCurrent(identity) else { return }
+            guard isCurrent(identity), !Task.isCancelled,
+                  conversationLoadID == loadID, conversationPublicationID == publicationID else { return }
             conversation = loaded
             loadedAuthoritativeConversation = true
             cacheConversation(loaded)
             errorMessage = nil
         } catch {
-            guard isCurrent(identity) else { return }
+            guard isCurrent(identity), !Task.isCancelled,
+                  conversationLoadID == loadID, conversationPublicationID == publicationID else { return }
             invalidateConversationIfRequired(error, id: id)
             if let backendError = error as? PermitextBackendHTTPError,
                [404, 410].contains(backendError.statusCode ?? 0) {
                 // A removed conversation returns quietly to the current history.
                 errorMessage = nil
                 library.activeResearchConversationID = nil
-                isLoading = false
+                isLoadingConversation = false
                 return
             }
             if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) { conversation = nil }
@@ -2043,6 +2078,10 @@ private struct ResearchSessionView: View {
 
     private func cacheConversation(_ conversation: ResearchConversation) {
         guard isCurrentOwner, let owner else { return }
+        // Every accepted mutation invalidates reads begun before its publication.
+        // Account/conversation identity alone cannot detect an older same-route GET.
+        conversationPublicationID = UUID()
+        historyPreviewRevisions.removeValue(forKey: conversation.id)
         try? ResearchConversationCacheLifecycle.store(
             conversation,
             cache: cache,

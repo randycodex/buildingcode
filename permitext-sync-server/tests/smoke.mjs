@@ -1530,7 +1530,7 @@ async function main() {
         workspaceScript.text.includes('list.className = "research-answer-list"') &&
         workspaceScript.text.includes('summary.textContent = "Research details"') &&
         workspaceScript.text.includes('evidenceReviewed.open = Boolean(options.detailsOpen)') &&
-        workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
+        /renderResearchInterpretation\(exactAnswer, answerRecord\.answer, \{ detailsOpen: true(?:\s*[,}])/.test(workspaceScript.text) &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
         /\/web\/app\.js\?v=[^"']+/.test(webRoot.text),
@@ -1837,7 +1837,7 @@ async function main() {
         workspaceStyles.text.includes(".research-composer {") &&
         workspaceStyles.text.includes(".research-dialogue-pane {") &&
         workspaceStyles.text.includes(".research-message.is-assistant {\n  display: grid;\n  gap: var(--space-3);") &&
-        workspaceScript.text.includes("renderResearchFeedback(container, options.message, options.conversationID)") &&
+        workspaceScript.text.includes("renderResearchFeedback(container, reportMessage, options.conversationID)") &&
         !workspaceScript.text.includes("renderResearchFeedback(card, options.message, options.conversationID)") &&
         workspaceScript.text.includes('compact.className = "research-feedback-compact"') &&
         workspaceScript.text.includes('details.className = "research-feedback-details"') &&
