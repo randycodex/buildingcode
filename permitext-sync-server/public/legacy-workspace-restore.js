@@ -1,5 +1,5 @@
 import { legacyWorkspaceRecoveryBundle, privateWorkspaceKeys, privateWorkspacePrefix } from './private-workspace-state.js?v=20260912-account-recovery-v8';
-import { normalizeWorkspaceRegistry, normalizeWorkspaceLayout } from './workspace-state.js?v=20260811-research-columns-v3';
+import { normalizeWorkspaceRegistry, normalizeWorkspaceLayout } from './workspace-state.js?v=20261008-pinned-columns-v12';
 import { workspaceLayoutWithoutCodeQuestionData } from './code-question-client-state.js?v=20260914-question-state-v4';
 
 const baseKey = 'permitext:webWorkspace:v1';

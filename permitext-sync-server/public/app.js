@@ -9,7 +9,7 @@ import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-ch
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
-import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260914-restore-v3";
+import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20261008-pinned-restore-v4";
 import {
   accountContextChangedError,
   accountRequestIdentity,
@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261006-property-record-links-v646";
+} from "./offline-storage.js?v=20261008-pinned-columns-research-v647";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -132,12 +132,12 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260914-project-default-v11";
+} from "./workspace-state.js?v=20261008-pinned-columns-v12";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261006-property-record-links-v646";
+} from "./research-intent-state.js?v=20261008-pinned-columns-research-v647";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
