@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-no-focus-highlight-v654";
+} from "./offline-storage.js?v=20261009-column-menu-copy-v655";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-no-focus-highlight-v654";
+} from "./research-intent-state.js?v=20261009-column-menu-copy-v655";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -38166,9 +38166,9 @@ function appendReaderMenuControls(menu, panel) {
   const tools = document.createElement("div");
   tools.className = "column-menu-typography";
   tools.innerHTML = `<div class="column-menu-control-row" role="group" aria-label="Reader text size">
-    <span>Text size · this reader</span><button type="button" role="menuitem" class="reader-text-decrease" aria-label="Decrease Reader text size">A−</button><button type="button" role="menuitem" class="reader-text-increase" aria-label="Increase Reader text size">A+</button>
+    <span>Text</span><button type="button" role="menuitem" class="reader-text-decrease" aria-label="Decrease Reader text size">A−</button><button type="button" role="menuitem" class="reader-text-increase" aria-label="Increase Reader text size">A+</button>
     </div><div class="column-menu-control-row" role="group" aria-label="Reader line spacing">
-    <span>Spacing · this reader</span><button type="button" role="menuitem" class="reader-spacing-decrease" aria-label="Decrease Reader line spacing">−</button><button type="button" role="menuitem" class="reader-spacing-increase" aria-label="Increase Reader line spacing">+</button></div>`;
+    <span>Spacing</span><button type="button" role="menuitem" class="reader-spacing-decrease" aria-label="Decrease Reader line spacing">−</button><button type="button" role="menuitem" class="reader-spacing-increase" aria-label="Increase Reader line spacing">+</button></div>`;
   const sync = () => { syncReaderTextSizeControls(tools, reader); syncReaderSpacingControls(tools, reader); };
   for (const [selector, change] of [
     [".reader-text-decrease", () => changeReaderTextSize(panel, reader, -1)],
@@ -38203,17 +38203,15 @@ function openColumnGroupMenu(panel, anchor) {
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
   if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
   if (!group?.collapsed) {
-    add(paneIsCollapsed(panel.dataset.paneId) ? 'Expand column' : 'Collapse column', () => {
+    add(paneIsCollapsed(panel.dataset.paneId) ? 'Expand' : 'Collapse', () => {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
     });
   }
-  add(state.pinnedPaneID === panel.dataset.paneId ? 'Unpin column' : 'Pin column to left', () => togglePinnedPane(panel));
-  const closeButton = panel.querySelector(':scope > header button[class*="close"]');
-  if (closeButton) add('Close column', () => closeButton.click());
-  add('Move left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
-  add('Move right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
+  add(state.pinnedPaneID === panel.dataset.paneId ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
+  add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
+  add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
   if (panel.classList.contains("reader-panel")) {
-    add("Change code…", () => openReaderCodePicker(anchor, async (code) => {
+    add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
       const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
       if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
     }));

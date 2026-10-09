@@ -93,7 +93,7 @@ try {
   ` });
   const menu = page.locator('.column-group-menu');
   await page.locator('[data-pane-id="reader:two"] .column-group-menu-button').click();
-  await menu.getByRole('menuitem', { name: 'Pin column to left', exact: true }).click();
+  await menu.getByRole('menuitem', { name: 'Pin', exact: true }).click();
   assert.equal(await page.evaluate(() => state.pinnedPaneID), 'reader:two');
   assert.equal(await page.evaluate(() => panes[1].querySelector('textarea') === retainedDraft), true);
   assert.equal(await page.evaluate(() => panes[1].querySelector('.body').scrollTop), 220);
