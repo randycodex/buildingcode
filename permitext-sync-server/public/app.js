@@ -838,6 +838,7 @@ function loadWorkspaceState(accountOverride) {
       account: accountOverride === undefined ? loadPersistedAccount(saved.account) : accountOverride,
       browserCredentialID: typeof saved.browserCredentialID === "string" ? saved.browserCredentialID : "",
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
+      pinnedPaneID: typeof saved.pinnedPaneID === "string" ? saved.pinnedPaneID : "",
       columnGroups: normalizeColumnGroups(saved.columnGroups),
       collapsedPaneIDs: Array.isArray(saved.collapsedPaneIDs) ? saved.collapsedPaneIDs.filter((id) => typeof id === "string") : [],
       paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
@@ -943,6 +944,7 @@ function loadWorkspaceState(accountOverride) {
       browserCredentialID: "",
       paneWeights: {},
       paneOrder: [],
+      pinnedPaneID: "",
       collapsedPaneIDs: [],
       columnGroups: [],
       recentChaptersByCode: {},
@@ -14304,10 +14306,10 @@ function refreshReaderSectionProjectContexts(sectionID = "") {
   });
 }
 
-function readerSectionResearchSelection(sectionWrapper) {
+function readerSectionResearchSelection(sectionWrapper, passageElement = sectionWrapper) {
   if (!sectionWrapper) return;
   const range = document.createRange();
-  range.selectNodeContents(sectionWrapper);
+  range.selectNodeContents(passageElement);
   const selectedText = researchSelectionTextFromRange("", range);
   if (!selectedText) return;
   const passage = {
@@ -14346,34 +14348,110 @@ function researchConversationTitle(conversation, fallback = "New Research") {
   return String(conversation?.title || conversation?.starterQuestion || fallback).trim() || fallback;
 }
 
-function currentResearchConversationLabel() {
-  const conversationID = String(state.researchConversationID || "").trim();
-  if (!conversationID) return "";
-  const conversation = activeResearchConversation?.id === conversationID
-    ? activeResearchConversation
-    : researchConversationList.find((candidate) => candidate.id === conversationID);
-  const label = researchConversationTitle(conversation, "Current Research");
-  return label.length > 32 ? `${label.slice(0, 29).trim()}…` : label;
+function openResearchSelectionDestinations() {
+  const ids = [...new Set([
+    ...(researchConversationPaneIsOpen() ? [state.researchConversationID] : []),
+    ...supplementalResearchConversationIDs,
+    ...(state.utilityInstances || []).filter((item) => item.key === "analysis").map((item) => item.conversationID)
+  ].filter(Boolean))];
+  return ids.map((id) => {
+    const conversation = activeResearchConversation?.id === id ? activeResearchConversation
+      : supplementalResearchConversations.get(id) || researchConversationList.find((item) => item.id === id);
+    return conversation && researchConversationInWorkspace(conversation)
+      ? { id, title: researchConversationTitle(conversation), paneID: paneIDForResearchConversation(id) } : null;
+  }).filter((item) => item && track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(item.paneID)}"]`));
 }
 
-async function selectReaderSectionForResearch(sectionWrapper, options = {}) {
-  if (!readerPrivateContentAllowed(sectionWrapper?.closest(".reader-panel"))) return false;
-  const selection = readerSectionResearchSelection(sectionWrapper);
-  if (!selection) return false;
-  try {
-    if (options.addToCurrent && currentResearchConversationLabel()) {
-      await addResearchSelectionToCurrent(selection);
-    } else {
-      await startNewResearchFromSelection(selection);
-    }
-    return true;
-  } catch (error) {
-    await showWebNotice(
-      options.addToCurrent ? "Research evidence not added" : "Research not started",
-      error.message
-    );
-    return false;
+function openResearchDestinationMenu(anchor, selection) {
+  if (!selection) return;
+  document.querySelector('.research-destination-menu')?._close?.();
+  const workspaceID = activeWorkspaceID;
+  const identity = captureAccountRequest();
+  const menu = document.createElement('div');
+  menu.className = 'column-group-menu research-destination-menu';
+  menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-label', 'Research this passage');
+  const controller = new AbortController();
+  anchor.setAttribute('aria-haspopup', 'menu');
+  anchor.setAttribute('aria-expanded', 'true');
+  const close = () => {
+    controller.abort();
+    menu.remove();
+    anchor.setAttribute('aria-expanded', 'false');
+    if (anchor.isConnected) anchor.focus({ preventScroll: true });
+  };
+  menu._close = close;
+  const add = (label, conversationID = '') => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.setAttribute('role', 'menuitem');
+    button.textContent = label;
+    button.addEventListener('click', async () => {
+      close();
+      if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return;
+      anchor.disabled = true;
+      try {
+        if (conversationID) {
+          // A destination can be closed while its menu is open.
+          if (!openResearchSelectionDestinations().some((item) => item.id === conversationID)) {
+            throw new Error('This Research conversation is no longer open. Reopen the menu to choose a destination.');
+          }
+          const conversation = await addResearchSelectionToCurrent(selection, conversationID);
+          if (conversation && workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) {
+            presentWorkspaceIssue(`Added to ${researchConversationTitle(conversation)}.`, {
+              actionLabel: 'View research',
+              onAction: () => {
+                if (workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) {
+                  scrollPaneIntoView(paneIDForResearchConversation(conversationID));
+                }
+              }
+            });
+          }
+        } else {
+          await startNewResearchFromSelection(selection);
+        }
+      } catch (error) {
+        if (workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity)) {
+          await showWebNotice(conversationID ? 'Research evidence not added' : 'Research not started', error.message);
+        }
+      } finally {
+        if (anchor.isConnected) anchor.disabled = false;
+      }
+    });
+    menu.append(button);
+  };
+  add('＋ Start new research');
+  const destinations = openResearchSelectionDestinations();
+  if (destinations.length) {
+    const heading = document.createElement('div');
+    heading.className = 'research-destination-heading';
+    heading.textContent = 'Add to existing research';
+    menu.append(heading);
+    destinations.forEach(({ id, title }, index) => {
+      const duplicates = destinations.filter((item) => item.title === title).length > 1;
+      add(`${title}${duplicates ? ` · Column ${index + 1}` : ''}${id === state.researchConversationID ? ' · Current' : ''}`, id);
+    });
   }
+  document.body.append(menu);
+  const rect = anchor.getBoundingClientRect();
+  menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+  menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
+  menu.addEventListener('keydown', (event) => {
+    const items = [...menu.querySelectorAll('button')];
+    if (event.key === 'Escape') { event.preventDefault(); close(); }
+    if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      const index = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1
+        : (items.indexOf(document.activeElement) + (event.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length;
+      items[index]?.focus();
+    }
+    if (event.key === 'Tab') close();
+  });
+  document.addEventListener('pointerdown', (event) => {
+    if (!menu.contains(event.target) && event.target !== anchor) close();
+  }, { signal: controller.signal });
+  window.addEventListener('resize', close, { signal: controller.signal });
+  menu.querySelector('button')?.focus();
 }
 
 function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection) {
@@ -15022,10 +15100,10 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   researchButton.className = "inline-research-toggle";
   const updateResearchControl = () => {
     if (!allowed()) return;
-    const label = currentResearchConversationLabel();
     researchButton.innerHTML = researchActionIconSVG();
-    researchButton.setAttribute("aria-label", label ? `Add as supporting evidence to ${label}` : "Start Research with this passage");
-    researchButton.title = label ? `Add as supporting evidence to “${label}”` : "Start Research with this passage";
+    researchButton.setAttribute("aria-label", "Research this passage");
+    researchButton.setAttribute("aria-haspopup", "menu");
+    researchButton.title = "Start research or add this passage to an open conversation";
     researchButton.disabled = false;
   };
   const updatePrivateControls = () => {
@@ -15077,30 +15155,12 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     }
   });
 
-  researchButton.addEventListener("click", async () => {
+  researchButton.addEventListener("click", () => {
     if (!allowed() || researchButton.disabled) return;
     const sectionWrapper = researchButton.closest(".chapter-section");
     if (!sectionWrapper) return;
-    // Resolve the current conversation at invocation, not from a pre-sync label.
-    const label = currentResearchConversationLabel();
-    researchButton.disabled = true;
-    let showingFeedback = false;
-    try {
-      const added = await selectReaderSectionForResearch(sectionWrapper, { addToCurrent: Boolean(label) });
-      if (!allowed()) return;
-      if (added && label) {
-        researchButton.innerHTML = checkActionIconSVG();
-        researchButton.setAttribute("aria-label", "Added to Research");
-        showingFeedback = true;
-        window.setTimeout(() => {
-          if (researchButton.isConnected && allowed()) updateResearchControl();
-        }, 1400);
-        return;
-      }
-      updateResearchControl();
-    } finally {
-      researchButton.disabled = showingFeedback || !allowed();
-    }
+    const passage = researchButton.closest(".annotated-code-block") || sectionWrapper;
+    openResearchDestinationMenu(researchButton, readerSectionResearchSelection(sectionWrapper, passage));
   });
   wrapper.append(bookmarkButton, researchButton);
   return wrapper;
@@ -23932,18 +23992,10 @@ function positionReaderSelectionResearchAction() {
   readerSelectionResearchPositionFrame = requestAnimationFrame(positionReaderSelectionResearchAction);
 }
 readerSelectionResearchAction.addEventListener("pointerdown", (event) => event.preventDefault());
-readerSelectionResearchAction.addEventListener("click", async () => {
+readerSelectionResearchAction.addEventListener("click", () => {
   const intent = selectedReaderResearchIntent;
   if (!intent || readerSelectionResearchAction.disabled) return;
-  readerSelectionResearchAction.disabled = true;
-  try {
-    await startNewResearchFromSelection(intent);
-    readerSelectionResearchAction.hidden = true;
-  } catch (error) {
-    await showWebNotice("Research not started", error.message);
-  } finally {
-    readerSelectionResearchAction.disabled = false;
-  }
+  openResearchDestinationMenu(readerSelectionResearchAction, intent);
 });
 document.addEventListener("selectionchange", () => {
   if (document.activeElement === readerSelectionResearchAction) return;
@@ -24102,8 +24154,8 @@ async function startNewResearchFromSelection(selection) {
   return payload.conversation;
 }
 
-async function addResearchSelectionToCurrent(selection) {
-  const conversationID = String(state.researchConversationID || "").trim();
+async function addResearchSelectionToCurrent(selection, destinationConversationID = state.researchConversationID) {
+  const conversationID = String(destinationConversationID || "").trim();
   if (!conversationID) return startNewResearchFromSelection(selection);
   if (!activeAccount()) {
     preservePendingResearchSelection(selection, "append-selection", conversationID);
@@ -24118,6 +24170,8 @@ async function addResearchSelectionToCurrent(selection) {
     );
     return null;
   }
+  const workspaceID = activeWorkspaceID;
+  const identity = captureAccountRequest();
   const passages = selection.passages || [selection];
   const payload = await postResearch("/research/conversations/evidence", {
     conversationID,
@@ -24127,10 +24181,15 @@ async function addResearchSelectionToCurrent(selection) {
       savedItemID
     }))
   });
-  activeResearchConversation = payload.conversation;
+  if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return null;
+  if (conversationID === state.researchConversationID) activeResearchConversation = payload.conversation;
+  else supplementalResearchConversations.set(conversationID, payload.conversation);
+  researchConversationList = researchConversationList.map((item) => item.id === conversationID ? payload.conversation : item);
   window.getSelection?.().removeAllRanges();
-  await refreshResearchConversationList();
-  await openResearchConversation(conversationID, { refreshList: true });
+  // Refresh only the existing destination. Its composer restores its own durable
+  // follow-up draft; adding evidence never submits a question or replaces another chat.
+  const paneID = paneIDForResearchConversation(conversationID);
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
   return payload.conversation;
 }
 
@@ -37122,18 +37181,19 @@ function applyDragPreviewOrder(order) {
   const paneIndex = new Map(order.map((id, index) => [id, index]));
   track.querySelectorAll(".workspace-panel").forEach((pane) => {
     const index = paneIndex.get(pane.dataset.paneId);
-    if (index !== undefined) pane.style.order = String(index * 2);
+    if (index !== undefined) pane.style.order = pane.dataset.paneId === state.pinnedPaneID ? "-2" : String(index * 2);
   });
   track.querySelectorAll(".pane-divider").forEach((divider) => {
     const previousIndex = paneIndex.get(divider.dataset.previousPaneId);
     const nextIndex = paneIndex.get(divider.dataset.nextPaneId);
     const index = Math.min(previousIndex ?? Number.MAX_SAFE_INTEGER, nextIndex ?? Number.MAX_SAFE_INTEGER);
-    divider.style.order = String(index * 2 + 1);
+    divider.style.order = divider.classList.contains("is-pinned-divider") ? "-1" : String(index * 2 + 1);
   });
   track.querySelectorAll(".workspace-panel").forEach((pane) => {
     const previousRect = previousRects.get(pane.dataset.paneId);
     if (!previousRect) return;
     const nextRect = pane.getBoundingClientRect();
+    if (pane.dataset.paneId === state.pinnedPaneID) return;
     const deltaX = previousRect.left - nextRect.left;
     if (Math.abs(deltaX) < 1) return;
     pane.style.willChange = "transform";
@@ -37578,7 +37638,7 @@ function refreshColumnGroupPresentation() {
   panels.forEach(preparePaneCollapse);
   const hidden = new Set();
   for (const group of state.columnGroups || []) {
-    if (group.collapsed) group.paneIDs.filter((id) => panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
+    if (group.collapsed) group.paneIDs.filter((id) => id !== state.pinnedPaneID && panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
   }
   panels.forEach((panel) => panel.classList.toggle('is-group-hidden', hidden.has(panel.dataset.paneId)));
   track.querySelectorAll(':scope > .pane-divider').forEach((divider) => {
@@ -37589,7 +37649,7 @@ function refreshColumnGroupPresentation() {
 
 function setColumnGroupCollapsed(group, collapsed) {
   const panels = [...track.querySelectorAll(':scope > .workspace-panel')]
-    .filter((panel) => group.paneIDs.includes(panel.dataset.paneId));
+    .filter((panel) => panel.dataset.paneId !== state.pinnedPaneID && group.paneIDs.includes(panel.dataset.paneId));
   panels.forEach((panel) => {
     panel._collapseAnimation?.cancel();
     panel._restoreCollapseChildWidths?.();
@@ -37650,6 +37710,21 @@ function orderWithPaneStepped(paneID, direction) {
   return moved && moved.some((id, index) => id !== order[index]) ? moved : null;
 }
 
+function togglePinnedPane(panel) {
+  const paneID = panel.dataset.paneId;
+  state.pinnedPaneID = state.pinnedPaneID === paneID ? "" : paneID;
+  if (state.pinnedPaneID) {
+    state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => id !== paneID);
+  }
+  // Keep the logical order and group membership intact. Move mounted nodes only,
+  // so readers, editors and unsent Research drafts retain their state.
+  appendPaneSequence([...track.querySelectorAll(':scope > .workspace-panel')]);
+  saveWorkspaceState();
+  const group = columnGroupForPane(paneID);
+  if (!state.pinnedPaneID && group?.collapsed) focusColumnGroupControl(group);
+  else panel.querySelector('.column-group-menu-button')?.focus({ preventScroll: true });
+}
+
 function movePaneOneStep(panel, direction) {
   const order = orderWithPaneStepped(panel.dataset.paneId, direction);
   if (!order) return;
@@ -37690,6 +37765,10 @@ function prepareColumnGroupControls(panel, header, group) {
   menuButton.classList.toggle('has-group', Boolean(group));
   menuButton.title = group ? `${group.name} · ${group.paneIDs.length} columns` : 'Column options';
   menuButton.setAttribute('aria-label', group ? `Group options: ${group.name}` : 'Column options');
+  if (panel.dataset.paneId === state.pinnedPaneID) {
+    menuButton.title += ' · Pinned to left';
+    menuButton.setAttribute('aria-label', `${menuButton.getAttribute('aria-label')} · Pinned to left`);
+  }
   panel.classList.toggle('has-column-group', Boolean(group));
 }
 
@@ -37745,6 +37824,7 @@ function openColumnGroupMenu(panel, anchor) {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
     });
   }
+  add(state.pinnedPaneID === panel.dataset.paneId ? 'Unpin column' : 'Pin column to left', () => togglePinnedPane(panel));
   add('Move left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
   add('Move right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
   if (group) {
@@ -37889,7 +37969,7 @@ function openColumnGroupEditor(panel, existing = null) {
 
 // Collapse keeps the live column DOM (including unsaved editors) in place.
 function paneIsCollapsed(paneID) {
-  return Boolean(columnGroupForPane(paneID)?.collapsed) || (state.collapsedPaneIDs || []).includes(paneID);
+  return (paneID !== state.pinnedPaneID && Boolean(columnGroupForPane(paneID)?.collapsed)) || (state.collapsedPaneIDs || []).includes(paneID);
 }
 
 function applyPaneCollapsedState(panel) {
@@ -38084,6 +38164,24 @@ function updateCollapsedPaneDividers() {
   });
 }
 
+let pinnedPaneResizeObserver = null;
+
+function refreshPinnedPaneDivider() {
+  pinnedPaneResizeObserver?.disconnect();
+  const pinned = track.querySelector(':scope > .workspace-panel.is-pinned');
+  const divider = pinned?.nextElementSibling;
+  track.querySelectorAll(':scope > .pane-divider').forEach((node) => {
+    node.classList.toggle('is-pinned-divider', node === divider);
+  });
+  if (!pinned) return;
+  const updateWidth = () => track.style.setProperty('--pinned-pane-width', `${pinned.getBoundingClientRect().width}px`);
+  updateWidth();
+  if ('ResizeObserver' in window) {
+    pinnedPaneResizeObserver = new ResizeObserver(updateWidth);
+    pinnedPaneResizeObserver.observe(pinned);
+  }
+}
+
 function appendPaneSequence(panes) {
   closeActiveCustomSelect();
   const orderedPanes = localWelcomePreviewPending ? [] : orderPanes(panes);
@@ -38095,6 +38193,13 @@ function appendPaneSequence(panes) {
   });
   const activeIDs = new Set(orderedPanes.map((pane) => pane.dataset.paneId));
   state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => activeIDs.has(id));
+  if (state.pinnedPaneID && !activeIDs.has(state.pinnedPaneID)) state.pinnedPaneID = "";
+  const pinnedIndex = orderedPanes.findIndex((pane) => pane.dataset.paneId === state.pinnedPaneID);
+  if (pinnedIndex > 0) orderedPanes.unshift(...orderedPanes.splice(pinnedIndex, 1));
+  orderedPanes.forEach((pane) => {
+    const pinned = pane.dataset.paneId === state.pinnedPaneID;
+    pane.classList.toggle("is-pinned", pinned);
+  });
   orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
   orderedPanes.forEach((pane) => { pane.classList.remove("is-group-hidden"); preparePaneCollapse(pane); });
   const previousScrollLeft = track.scrollLeft;
@@ -38136,9 +38241,20 @@ function appendPaneSequence(panes) {
   });
   nodes.forEach((node, index) => {
     const currentNode = track.children[index] || null;
-    if (currentNode !== node) track.insertBefore(node, currentNode);
+    if (currentNode === node) return;
+    if (node.parentNode === track && typeof track.moveBefore === "function") {
+      track.moveBefore(node, currentNode);
+    } else {
+      // Older browsers reset nested scroll positions when re-inserting a pane.
+      const scrolls = node.parentNode === track
+        ? [node, ...node.querySelectorAll("*")].filter((item) => item.scrollTop || item.scrollLeft)
+          .map((item) => ({ item, top: item.scrollTop, left: item.scrollLeft })) : [];
+      track.insertBefore(node, currentNode);
+      scrolls.forEach(({ item, top, left }) => { item.scrollTop = top; item.scrollLeft = left; });
+    }
   });
   refreshColumnGroupPresentation();
+  refreshPinnedPaneDivider();
   const activeSelectMenus = new Set(
     Array.from(track.querySelectorAll("select.native-select-hidden"))
       .map((select) => select._customSelectMenu)
@@ -38162,7 +38278,11 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
   const trackRect = track.getBoundingClientRect();
   const visibleRight = trackRect.right;
   const paneRight = paneRect.right - visibleRight;
-  const paneLeft = paneRect.left - trackRect.left;
+  const pinned = track.querySelector(':scope > .workspace-panel.is-pinned');
+  if (pinned === pane && window.matchMedia('(min-width: 761px)').matches) return;
+  const pinnedWidth = pinned && window.matchMedia('(min-width: 761px)').matches
+    ? pinned.getBoundingClientRect().width : 0;
+  const paneLeft = paneRect.left - trackRect.left - pinnedWidth;
   if (paneRight > 0) {
     track.scrollTo({
       left: Math.min(track.scrollLeft + paneRight, Math.max(0, track.scrollWidth - track.clientWidth)),

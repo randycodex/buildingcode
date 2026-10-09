@@ -1288,7 +1288,7 @@ async function main() {
         workspaceScript.text.includes("function renderInlineCommentBox") &&
         workspaceScript.text.includes('bookmarkButton.className = "inline-bookmark-toggle"') &&
         workspaceScript.text.includes('researchButton.className = "inline-research-toggle"') &&
-        workspaceScript.text.includes("selectReaderSectionForResearch(sectionWrapper, {") &&
+        workspaceScript.text.includes("openResearchDestinationMenu(researchButton, readerSectionResearchSelection(sectionWrapper, passage))") &&
         workspaceScript.text.includes("function readerProjectsForSection") &&
         workspaceScript.text.includes("links.some((link) => projectSectionBelongsToProject(link, project))") &&
         workspaceScript.text.includes('label.textContent = "Saved in"'),
@@ -2328,8 +2328,8 @@ async function main() {
         workspaceScript.text.includes("wrapper.append(bookmarkButton, researchButton)") &&
         workspaceScript.text.includes("bookmarkButton.innerHTML = bookmarkIconSVG(saved)") &&
         workspaceScript.text.includes("researchButton.innerHTML = researchActionIconSVG()") &&
-        workspaceScript.text.includes("currentResearchConversationLabel()") &&
-        workspaceScript.text.includes("addToCurrent: Boolean(label)") &&
+        workspaceScript.text.includes("openResearchSelectionDestinations()") &&
+        workspaceScript.text.includes("addResearchSelectionToCurrent(selection, conversationID)") &&
         workspaceScript.text.includes("async function addResearchSelectionToCurrent") &&
         !workspaceScript.text.includes("function bindResearchTextSelection") &&
         !workspaceScript.text.includes("function showResearchSelectionMenu") &&

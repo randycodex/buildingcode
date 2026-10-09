@@ -17875,3 +17875,42 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .project-refresh-dialog .project-refresh-choice input { width: 16px; height: 16px; }
 .project-refresh-dialog .project-refresh-choice small { font-size: 11px; }
 .project-fact-review-status { grid-column: 1 / -1; color: var(--text-secondary); font-size: 11px; }
+
+/* Keep the mounted column in the same track to preserve editor/reader state. */
+@media (min-width: 761px) {
+  .panel-track > .workspace-panel.is-pinned {
+    position: sticky;
+    left: 0;
+    order: -2;
+    z-index: 12;
+    box-shadow: 2px 0 0 var(--border), 6px 0 12px rgba(0, 0, 0, 0.08);
+  }
+  .panel-track > .pane-divider.is-pinned-divider {
+    position: sticky;
+    left: var(--pinned-pane-width);
+    order: -1;
+    z-index: 13;
+  }
+}
+
+.workspace-panel.is-pinned > header .column-group-menu-button::before {
+  content: "Pinned · ";
+  font-size: 0.8em;
+}
+
+.research-destination-menu {
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+}
+.research-destination-menu button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.research-destination-heading {
+  padding: 10px 12px 4px;
+  border-top: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.85em;
+}

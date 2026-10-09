@@ -262,11 +262,12 @@ const menuContext=vm.createContext({state:menuState,AbortController,
 vm.runInContext(['orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
 menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert.equal(menu.attrs['aria-label'],'Column options');assert.equal(anchor.attrs['aria-expanded'],'true');
-assert.deepEqual(menu.children.map(x=>x.textContent),['Collapse column','Move left','Move right']);
-assert.equal(menu.children[1].disabled,true);assert.equal(menu.children[2].disabled,false);
+assert.deepEqual(menu.children.map(x=>x.textContent),['Collapse column','Pin column to left','Move left','Move right']);
+assert.equal(menu.children[2].disabled,true);assert.equal(menu.children[3].disabled,false);
 assert.equal(focused,menu.children[0]);
-menu.listeners.keydown({key:'ArrowDown',preventDefault(){}});assert.equal(focused,menu.children[2],'Arrow keys skip disabled move');
-menu.children[2].listeners.click();
+menu.children[1].focus();
+menu.listeners.keydown({key:'ArrowDown',preventDefault(){}});assert.equal(focused,menu.children[3],'Arrow keys skip disabled move');
+menu.children[3].listeners.click();
 assert.equal(anchor.attrs['aria-expanded'],'false');assert.equal(focused,anchor);
 assert.equal(mountedPass[0],menuPanel);assert.equal(mountedPass[1],peerPanel);
 assert.equal(menuPanel.editor,retainedEditor);assert.equal(retainedEditor.value,'Unsent live question');assert.equal(retainedEditor.scrollTop,321);

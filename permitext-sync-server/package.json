@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:pinned-research-columns:browser": "node tests/pinned-research-columns-browser.mjs",
     "test:research-specialty-sources": "python3 scripts/repair-specialty-afci-boundary.py && node tests/research-specialty-sources-contract.mjs",
     "test:research-open-investigation": "node tests/research-open-investigation-contract.mjs && node tests/research-open-evidence-gap-contract.mjs && node tests/research-open-investigation-http-contract.mjs && node tests/research-open-recovery-http-contract.mjs",
     "test:native-saved-queue-reopen": "node tests/native-saved-queue-reopen.mjs",
