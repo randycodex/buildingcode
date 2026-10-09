@@ -264,8 +264,8 @@ button {
 
 .web-warning-field input:focus-visible {
   border-color: color-mix(in srgb, var(--focus-ring) 58%, var(--border));
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 28%, transparent);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: none;
 }
 
 .web-warning-form-error {
@@ -566,8 +566,8 @@ button {
 button:focus-visible,
 select:focus-visible,
 input[type="range"]:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--text-secondary) 46%, transparent);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: none;
 }
 
 input:focus,
@@ -658,8 +658,8 @@ textarea:focus-visible {
 }
 
 .workspace-issue-actions button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .topbar-brand {
@@ -744,8 +744,8 @@ textarea:focus-visible {
 }
 
 .connection-status.is-actionable:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .topbar-brand-name {
@@ -864,8 +864,8 @@ textarea:focus-visible {
 
 .mobile-more-sheet .mobile-more-action:focus-visible,
 .mobile-more-close:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 58%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .topbar-actions::-webkit-scrollbar,
@@ -956,8 +956,8 @@ textarea:focus-visible {
 .workspace-add-button:focus-visible,
 .workspace-actions-button:focus-visible,
 .workspace-name-input:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 58%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .workspace-tab:focus-visible {
@@ -1449,8 +1449,8 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .workspace-load-error .toolbar-button:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: none;
 }
 
 .workspace-panel.is-dragging {
@@ -1826,8 +1826,8 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .reader-to-top:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 72%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .reader-panel .panel-header > div:first-child {
@@ -2388,8 +2388,8 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .reader-trust-source:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 66%, transparent);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: none;
 }
 
 .reader-internal-search.search-box {
@@ -3308,8 +3308,8 @@ select option:checked {
 }
 
 .section-detail-note-resize-handle:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .reader-internal-results {
@@ -3812,8 +3812,8 @@ select option:checked {
 }
 
 .annotation-project-list-toggle:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .annotation-project-list-motion {
@@ -4041,8 +4041,8 @@ select option:checked {
 }
 
 .reader-section-project-chip:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 62%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .reader-section-project-context {
@@ -4092,8 +4092,8 @@ select option:checked {
 }
 
 .reader-section-title:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 58%, transparent);
-  outline-offset: 4px;
+  outline: none;
+  box-shadow: none;
 }
 
 .section-block {
@@ -4394,8 +4394,8 @@ select option:checked {
 }
 
 .search-panel .search-box:has(.search-input:focus-visible) {
-  outline: 2px solid color-mix(in srgb, var(--text-secondary) 46%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .search-box span {
@@ -4800,8 +4800,8 @@ select option:checked {
 }
 
 .search-result-group-toggle:focus-visible {
-  outline: 1px solid color-mix(in srgb, var(--focus-ring) 54%, transparent);
-  outline-offset: -1px;
+  outline: none;
+  box-shadow: none;
 }
 
 .search-result-group-meta {
@@ -4992,8 +4992,8 @@ select option:checked {
 }
 
 .search-load-more-button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .search-load-more-button:disabled {
@@ -5033,8 +5033,8 @@ select option:checked {
 }
 
 .saved-load-more-button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .search-history-section {
@@ -5180,8 +5180,8 @@ select option:checked {
 }
 
 .search-history-divider:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: none;
 }
 
 body.is-resizing-search-history,
@@ -5923,9 +5923,9 @@ ol.research-answer-list { list-style-type: decimal; }
 }
 
 .research-project-context-used > summary:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: none;
   border-radius: var(--radius-control);
+  box-shadow: none;
 }
 
 .research-project-context-used-body {
@@ -5986,9 +5986,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-evidence-reviewed > summary:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: none;
   border-radius: var(--radius-control);
+  box-shadow: none;
 }
 
 .research-evidence-reviewed-body {
@@ -6032,9 +6032,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-answer-details > summary:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: none;
   border-radius: var(--radius-control);
+  box-shadow: none;
 }
 
 .research-answer-details-body {
@@ -6272,8 +6272,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-feedback-actions .ghost-button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
-  outline-offset: 2px;
+  outline: none;
   box-shadow: none;
 }
 
@@ -7487,8 +7486,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-evidence-divider:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .research-evidence-divider[hidden] {
@@ -7563,9 +7562,9 @@ body.is-resizing-research-evidence * {
 }
 
 .research-reader-origin-open:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: none;
   border-radius: 3px;
+  box-shadow: none;
 }
 
 .research-sources {
@@ -7846,8 +7845,8 @@ body.is-resizing-research-evidence * {
 .research-project-select:focus-visible,
 .research-project-context textarea:focus-visible,
 .project-research-context-editor textarea:focus-visible {
-  outline: 2px solid var(--text-primary);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .research-project-context-warning {
@@ -9900,8 +9899,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-tile:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--project-color) 64%, var(--text-primary));
-  outline-offset: -3px;
+  outline: none;
+  box-shadow: none;
 }
 
 .saved-project-tile[data-pointer-focus="true"]:focus-visible {
@@ -10403,7 +10402,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .saved-evidence-search-toggle:focus-visible {
-  box-shadow: inset 0 -1px 0 var(--project-color, var(--accent));
+  box-shadow: none;
 }
 
 .saved-evidence-search-toggle svg,
@@ -10451,7 +10450,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .saved-evidence-heading-actions button:focus-visible {
   outline: 0;
-  box-shadow: inset 0 -1px 0 var(--project-color, var(--accent));
+  box-shadow: none;
 }
 
 .saved-evidence-search {
@@ -10558,8 +10557,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .saved-folder-back:focus-visible,
 .saved-folder-controls button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--project-color, var(--text-primary)) 62%, transparent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .saved-reference-capabilities {
@@ -11111,8 +11110,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .project-folder-type button:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .project-folder-type button span {
@@ -11737,8 +11736,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 .settings-firm-member select:focus-visible,
 .settings-firm-standard-row input:focus-visible,
 .settings-firm-standard-row select:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--focus-ring) 48%, transparent);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: none;
 }
 
 .settings-firm-invitation,
@@ -11802,8 +11801,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-firm-project:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--focus-ring) 48%, transparent);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: none;
 }
 
 .settings-firm-project span {
@@ -12271,8 +12270,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-project-row input:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .settings-project-copy {
@@ -12463,8 +12462,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .account-identity > .account-identity-editable:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--text-primary) 55%, transparent);
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .account-identity > .account-identity-editable.is-saving {
@@ -13639,7 +13638,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .notebook-card-list-title-editor:focus-visible {
-  box-shadow: inset 0 -1px color-mix(in srgb, var(--project-color) 44%, transparent);
+  box-shadow: none;
 }
 
 .notebook-card-tile {
@@ -14767,8 +14766,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .report-introduction-resize-handle:focus-visible,
 .notebook-card-list-resize-handle:focus-visible {
-  outline: 2px solid var(--project-color, var(--text-primary));
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .report-introduction-label {
@@ -15420,8 +15419,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 }
 
 .code-question-entry-box:has(.code-question-index-search:focus-visible) {
-  outline: 2px solid var(--text-secondary);
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: none;
 }
 
 .code-question-start-button {
@@ -16689,26 +16688,26 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   --saved-project-row-gap: var(--column-content-top-gap);
 }
 
-/* Quiet pointer focus, with a visible keyboard location on both themes. */
+/* Product preference: remove neutral focus highlights without adding a replacement. */
 html body :is(input, textarea, select, button, [tabindex], [contenteditable], [role]):focus:not(:focus-visible) {
   outline: none;
   box-shadow: none;
 }
 
 html body :is(input, textarea, select, button, a[href], summary, [tabindex], [contenteditable], [role]):focus-visible {
-  outline: 2px solid var(--focus-ring) !important;
-  outline-offset: -2px !important;
+  outline: none !important;
   box-shadow: none !important;
 }
 
-/* Composite search controls put the keyboard ring around their shared pill. */
+/* Composite controls follow the same no-highlight preference. */
 html body input:is(.search-input, .reader-internal-search-input):focus-visible {
   outline: none !important;
+  box-shadow: none !important;
 }
 html body .search-box:has(.search-input:focus-visible),
 html body .reader-internal-search:has(.reader-internal-search-input:focus-visible) {
-  outline: 2px solid var(--focus-ring) !important;
-  outline-offset: -2px !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .research-list-panel:not(.research-clean-start) > .research-chat-welcome {
@@ -16837,13 +16836,14 @@ html body .reader-internal-search:has(.reader-internal-search-input:focus-visibl
   background: transparent;
   box-sizing: border-box;
 }
-/* Keep keyboard focus on the whole rounded composer as its text area grows. */
+/* Keep the composer free of added focus highlights. */
 html body .research-compact-composer .research-question-input:focus-visible {
   outline: none !important;
+  box-shadow: none !important;
 }
 .research-compact-composer .research-composer-box:has(.research-question-input:focus-visible) {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: none;
 }
 .research-compact-composer .research-send-button {
   position: static;
@@ -17038,9 +17038,9 @@ html body .research-compact-composer .research-question-input:focus-visible {
 
 /* Put a column aside from its header without closing its live content. */
 .pane-header-drag-area:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: none;
   border-radius: 4px;
+  box-shadow: none;
 }
 
 .pane-collapsed-tab[hidden] { display: none; }
@@ -17081,8 +17081,8 @@ html body .research-compact-composer .research-question-input:focus-visible {
 }
 
 .pane-collapsed-tab:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -4px;
+  outline: none;
+  box-shadow: none;
 }
 
 .pane-collapsed-tab span {
@@ -17239,7 +17239,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .saved-column-groups-menu .saved-group-create-button { text-align: center; }
 
 .column-group-choice:has(input:checked) { background: rgba(57,117,110,.22); }
-.column-group-choice:focus-within { outline: 1px solid var(--text-secondary); outline-offset: -1px; }
+.column-group-choice:has(input:focus-visible) { outline: none; box-shadow: none; }
 
 .reader-section-heading-row .reader-section-saved-marker {
   opacity: 0;
@@ -17760,9 +17760,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 
 .pane-header-drag-area [data-collapse-title-bound="true"] { cursor: pointer; }
 .pane-header-drag-area [data-collapse-title-bound="true"]:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 4px;
+  outline: none;
   border-radius: 2px;
+  box-shadow: none;
 }
 
 .reader-code-picker[hidden] { display: none; }
@@ -17915,11 +17915,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   font-size: 0.85em;
 }
 
-/* Keep column options quiet; keyboard focus uses an underline instead of a box. */
+/* Column options have no added focus box or underline. */
 html body .column-group-menu-button:focus-visible {
   outline: none !important;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  box-shadow: none !important;
+  text-decoration: none;
 }
 
 /* History filters and reviewed handoffs use the existing quiet workspace controls. */

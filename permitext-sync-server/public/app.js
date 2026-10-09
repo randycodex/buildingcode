@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-workflow-ux-v652";
+} from "./offline-storage.js?v=20261009-no-focus-highlight-v654";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-workflow-ux-v652";
+} from "./research-intent-state.js?v=20261009-no-focus-highlight-v654";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

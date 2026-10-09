@@ -54,10 +54,10 @@ assert.match(stylesSource, /--panel-title-row-height:\s*max\([^;]+, 28px\)/);
 assert.match(stylesSource, /\.inline-comment\s*\{[^}]*min-width:\s*68px;[^}]*width:\s*68px;/s);
 assert.match(stylesSource, /\.inline-bookmark-toggle,\s*\.inline-research-toggle\s*\{\s*flex:\s*0 0 28px;/s);
 const globalKeyboardFocus = stylesSource.match(/html body :is\([^{}]+\):focus-visible\s*\{([^}]+)\}/);
-assert.ok(globalKeyboardFocus, "Supported controls must share a keyboard focus treatment.");
-assert.match(globalKeyboardFocus[1], /outline:\s*2px solid var\(--focus-ring\) !important/);
-assert.match(globalKeyboardFocus[1], /outline-offset:\s*-2px !important/);
-assert.match(stylesSource, /html body \.search-box:has\(\.search-input:focus-visible\),[\s\S]*?outline:\s*2px solid var\(--focus-ring\) !important/);
+assert.ok(globalKeyboardFocus, "Supported controls must share the no-highlight product preference.");
+assert.match(globalKeyboardFocus[1], /outline:\s*none !important/);
+assert.match(globalKeyboardFocus[1], /box-shadow:\s*none !important/);
+assert.match(stylesSource, /html body \.search-box:has\(\.search-input:focus-visible\),[\s\S]*?box-shadow:\s*none !important/);
 assert.match(stylesSource, /html body \.reader-internal-search:has\(\.reader-internal-search-input:focus-visible\)/);
 for (const rule of stylesSource.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
   const selector = rule[1];
