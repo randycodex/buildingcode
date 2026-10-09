@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 import {
   assertPreparedResearchSemanticIndex, loadPreparedResearchSemanticVectors,
   preparedResearchSemanticArtifactVersion, preparedResearchSemanticManifestPath,
-  preparedResearchSemanticVectorPath
+  preparedResearchSemanticVectorPath, validatePreparedResearchSemanticManifest, preparedResearchSemanticCorpusIDs
 } from "../research-semantic-artifact.mjs";
 import {
   encodeResearchSemanticVectors, researchSemanticEmbeddingDimensions,
@@ -35,6 +35,21 @@ const manifest = { schemaVersion: 1, artifactVersion: preparedResearchSemanticAr
   currentCorpora: [{ id: "nyc-2022-construction-codes", codeVersion: "test-current" }],
   authorizedIndexes: [{ fingerprint, passageCount: 1, corpusIDs: ["nyc-2022-construction-codes"] }]
 };
+// Current specialty sources must be accepted without admitting historical or
+// future corpora. The deployment inventory gate must cover the same allowlist.
+assert.equal(preparedResearchSemanticCorpusIDs.length, 5);
+for (const corpusID of ["nyc-2025-energy-code", "nyc-2025-electrical-amendments"]) {
+  const specialty = { ...manifest,
+    currentCorpora: [{ id: corpusID, codeVersion: "current-specialty" }],
+    authorizedIndexes: [{ fingerprint, passageCount: 1, corpusIDs: [corpusID] }] };
+  assert.equal(validatePreparedResearchSemanticManifest(specialty), specialty);
+}
+for (const corpusID of ["nyc-2014-construction-codes", "nyc-existing-building-code-2027", "unknown-corpus"]) {
+  assert.throws(() => validatePreparedResearchSemanticManifest({ ...manifest,
+    currentCorpora: [{ id: corpusID, codeVersion: "not-current" }],
+    authorizedIndexes: [{ fingerprint, passageCount: 1, corpusIDs: [corpusID] }] }),
+  error => error.code === "SEMANTIC_ARTIFACT_INVALID");
+}
 const index = { version: researchPassageIndexVersion, fingerprint,
   passages: [{ corpusID: "nyc-2022-construction-codes" }] };
 const save = async value => writeFile(manifestPath, JSON.stringify(value));

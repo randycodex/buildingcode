@@ -19,9 +19,11 @@ export const preparedResearchSemanticManifestPath = fileURLToPath(
 );
 export const preparedResearchSemanticArtifactVersion = "20261003-private-current-corpus-v1";
 const hashPattern = /^[a-f0-9]{64}$/;
-const supportedCorpusIDs = new Set([
-  "nyc-2022-construction-codes", "nyc-2022-fire-code", "nyc-zoning-resolution"
+export const preparedResearchSemanticCorpusIDs = Object.freeze([
+  "nyc-2022-construction-codes", "nyc-2022-fire-code", "nyc-zoning-resolution",
+  "nyc-2025-energy-code", "nyc-2025-electrical-amendments"
 ]);
+const supportedCorpusIDs = new Set(preparedResearchSemanticCorpusIDs);
 const failure = (code, message) => Object.assign(new Error(message), { code });
 
 export function validatePreparedResearchSemanticManifest(manifest) {

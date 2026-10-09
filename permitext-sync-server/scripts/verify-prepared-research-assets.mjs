@@ -11,7 +11,7 @@ import {
 } from "../research-semantic-passages.mjs";
 import {
   assertPreparedResearchSemanticIndex, loadPreparedResearchSemanticVectors,
-  preparedResearchSemanticArtifactVersion, preparedResearchSemanticVectorPath,
+  preparedResearchSemanticArtifactVersion, preparedResearchSemanticVectorPath, preparedResearchSemanticCorpusIDs,
   preparedResearchSemanticManifestPath, validatePreparedResearchSemanticManifest
 } from "../research-semantic-artifact.mjs";
 
@@ -28,8 +28,10 @@ export async function currentPreparedResearchIndexes() {
     const { researchCorpusPlanForTurn, researchCorpusResources } = await import("../app.mjs");
     const plan = await researchCorpusPlanForTurn({ question: "What requirements apply to an ordinary project?", messages: [], projectFacts: [], pinnedEvidence: [] });
     const eligibleStatuses = new Set(["current-enacted-edition", "current-consolidation", "continuously-amended"]);
-    assert(plan.selected.length === 3 && plan.selected.every(corpus => corpus.automaticResearchEligible === true &&
-      !corpus.optInRequired && eligibleStatuses.has(corpus.applicabilityStatus)), "Prepared semantic source scope is not the three current eligible corpora");
+    assert.deepEqual(plan.selected.map(corpus => corpus.id).sort(), [...preparedResearchSemanticCorpusIDs].sort(),
+      "Prepared semantic source scope differs from the supported current corpora");
+    assert(plan.selected.every(corpus => corpus.automaticResearchEligible === true &&
+      !corpus.optInRequired && eligibleStatuses.has(corpus.applicabilityStatus)), "Prepared semantic source scope contains ineligible corpora");
     const partitions = await Promise.all(plan.selected.map(corpus => researchCorpusResources({ ...plan, selected: [corpus] })));
     const combinations = [];
     for (let mask = 1; mask < (1 << partitions.length); mask++) {
