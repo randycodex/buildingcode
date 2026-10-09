@@ -44,9 +44,11 @@ struct AttributedTextView: View {
     @Environment(\.readerDefinitionContext) private var definitionContext
     @Environment(\.openURL) private var openExternalURL
     @State private var definitionPresentation: ReaderDefinitionPresentation?
+    @State private var textPreparation = ReaderAttributedTextPreparationCache()
     private var textBlocks: [AttributedTextBlock] {
-        let value = definitionContext.map { ReaderDefinitionStore.shared.matcher(for: $0).decorating(attributedText) } ?? attributedText
-        return Self.blocks(for: value)
+        textPreparation.blocks(for: attributedText, context: definitionContext) { source, context in
+            ReaderDefinitionStore.shared.matcher(for: context).decorating(source)
+        }
     }
 
     private func openReaderLink(_ url: URL) {
@@ -130,60 +132,71 @@ struct AttributedTextView: View {
         }
     }
 
-    private static func blocks(for text: NSAttributedString) -> [AttributedTextBlock] {
-        let nsText = text.string as NSString
-        guard nsText.length > 0 else {
-            return [AttributedTextBlock(id: 0, kind: .flow, attributedText: text)]
-        }
-
-        var blocks: [AttributedTextBlock] = []
-        var location = 0
-
-        while location < nsText.length {
-            let paragraphRange = nsText.paragraphRange(for: NSRange(location: location, length: 0))
-            let paragraphText = text.attributedSubstring(from: paragraphRange)
-            let paragraphKind: AttributedTextBlock.Kind = containsTable(in: paragraphText) ? .table : .flow
-
-            if let lastIndex = blocks.indices.last, blocks[lastIndex].kind == paragraphKind {
-                let combined = NSMutableAttributedString(attributedString: blocks[lastIndex].attributedText)
-                combined.append(paragraphText)
-                blocks[lastIndex] = AttributedTextBlock(
-                    id: blocks[lastIndex].id,
-                    kind: paragraphKind,
-                    attributedText: combined
-                )
-            } else {
-                blocks.append(
-                    AttributedTextBlock(
-                        id: blocks.count,
-                        kind: paragraphKind,
-                        attributedText: paragraphText
-                    )
-                )
-            }
-
-            location = paragraphRange.upperBound
-        }
-
-        return blocks.isEmpty
-            ? [AttributedTextBlock(id: 0, kind: .flow, attributedText: text)]
-            : blocks
-    }
-
-    private static func containsTable(in text: NSAttributedString) -> Bool {
-        // iOS's RTF importer does not preserve NSTextTable, so attributed text
-        // produced from RTF/RTFD overrides never carries native table structure
-        // on this platform. The previous implementation round-tripped the entire
-        // attributed string through RTF data to look for `\trowd`, which was
-        // expensive and effectively always returned false here. Treating tables
-        // as flow content preserves observable behavior without the cost.
-        _ = text
-        return false
-    }
-
     private func preferredTableWidth(for text: NSAttributedString, availableWidth: CGFloat) -> CGFloat {
         _ = text
         return availableWidth
+    }
+}
+
+@MainActor
+private final class ReaderAttributedTextPreparationCache {
+    // One entry per mounted view, released with that view. Never retain an entire
+    // oversized imported chapter, and never cache width-dependent UIKit layout.
+    private let retainedLengthLimit = 128 * 1024
+    private var source: NSAttributedString?
+    private var context: ReaderDefinitionContext?
+    private var prepared: [AttributedTextBlock]?
+
+    func blocks(for original: NSAttributedString, context: ReaderDefinitionContext?,
+                decorate: (NSAttributedString, ReaderDefinitionContext) -> NSAttributedString) -> [AttributedTextBlock] {
+        if let source, self.context == context, source.isEqual(to: original), let prepared {
+            return prepared
+        }
+        source = nil
+        prepared = nil
+        self.context = nil
+        let snapshot = original.length <= retainedLengthLimit ? Self.snapshotForCaching(original) : nil
+        let input = snapshot ?? original
+        let decorated = context.map { decorate(input, $0) } ?? input
+        // The former iOS paragraph splitter always returned a single flow block:
+        // containsTable was unconditionally false because RTF imports do not
+        // preserve NSTextTable here. Keep every attribute and UTF-16 code unit,
+        // without repeatedly copying the accumulated text for each paragraph.
+        let blocks = [AttributedTextBlock(id: 0, kind: .flow,
+                                         attributedText: NSAttributedString(attributedString: decorated))]
+        if let snapshot {
+            source = snapshot
+            self.context = context
+            prepared = blocks
+        }
+        return blocks
+    }
+
+    private static func snapshotForCaching(_ original: NSAttributedString) -> NSAttributedString? {
+        var cacheable = true
+        original.enumerateAttributes(in: NSRange(location: 0, length: original.length)) { attributes, _, stop in
+            for value in attributes.values {
+                // Foundation can intern an equal attribute dictionary, so even
+                // adding a copied style may retain its mutable original. Cache
+                // only immutable attribute values; the string container itself
+                // may be mutable because its characters/runs are snapshotted.
+                switch value {
+                case is NSMutableParagraphStyle, is NSMutableString:
+                    cacheable = false
+                case is UIFont, is UIColor, is NSNumber, is NSURL, is NSString, is NSParagraphStyle:
+                    break
+                default:
+                    // Attachments, shadows and unfamiliar objects retain the
+                    // uncached path; image fitting remains in UIKit.
+                    cacheable = false
+                }
+                if !cacheable {
+                    stop.pointee = true
+                    break
+                }
+            }
+        }
+        return cacheable ? NSAttributedString(attributedString: original) : nil
     }
 }
 

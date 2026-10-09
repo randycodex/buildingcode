@@ -623,7 +623,9 @@ struct NativeChapterTextReaderView: View {
             } catch {
                 return
             }
-            guard !Task.isCancelled, scrollState.visibleBlockID == displayBlockID else { return }
+            guard !Task.isCancelled, isBrowserTabActive,
+                  pendingInitialBlockID == nil, !scrollState.isScrollActive,
+                  scrollState.visibleBlockID == displayBlockID else { return }
             persistLocation(blockID: displayBlockID, document: document)
             scheduleNearbyMediaPrefetch(around: displayBlockID, document: document)
             settledScrollTask = nil
@@ -958,8 +960,16 @@ struct NativeChapterTextReaderView: View {
         document: NativeReaderRuntimeDocument
     ) {
         traceRestoration("phase", phase: String(describing: phase))
-        if phase != .idle { releaseRestorationLease(reason: "phase-\(phase)") }
-        scrollState.isScrollActive = phase.isScrolling
+        if phase != .idle {
+            // Tracking starts before isScrolling becomes true. A new gesture
+            // must cancel idle work even while it stays within the same block.
+            settledScrollTask?.cancel()
+            settledScrollTask = nil
+            releaseRestorationLease(reason: "phase-\(phase)")
+        }
+        // Tracking also blocks a late geometry update from queuing fresh idle
+        // work while the finger is down but the content has not moved yet.
+        scrollState.isScrollActive = phase != .idle
         scrollState.isDecelerating = phase == .decelerating
 
         guard phase == .idle,
@@ -3053,15 +3063,33 @@ enum NativeReaderAttributedTextBuilder {
         let effectiveRuns = runs.isEmpty
             ? [NativeReaderRuntimeTextRun(text: fallbackText, styles: [], linkTarget: nil)]
             : runs
+        let mutableParagraphStyle = NSMutableParagraphStyle()
+        mutableParagraphStyle.lineSpacing = CGFloat(theme.lineSpacing)
+        mutableParagraphStyle.paragraphSpacing = 0
+        mutableParagraphStyle.lineBreakMode = .byWordWrapping
+        let paragraphStyle = mutableParagraphStyle.copy() as! NSParagraphStyle
+        let textColor = foregroundColor(for: role, accentColor: accentColor)
+        // Theme and role are fixed within this build. Reuse each font variant
+        // without retaining scaled fonts across Dynamic Type or theme changes.
+        var fonts: [FontStyleKey: UIFont] = [:]
         let result = NSMutableAttributedString()
         for run in effectiveRuns where !run.text.isEmpty {
+            let fontKey = FontStyleKey(styles: run.styles)
+            let runFont: UIFont
+            if let cached = fonts[fontKey] {
+                runFont = cached
+            } else {
+                runFont = font(for: run.styles, theme: theme, role: role)
+                fonts[fontKey] = runFont
+            }
             result.append(
                 NSAttributedString(
                     string: run.text,
                     attributes: attributes(
                         for: run,
-                        theme: theme,
-                        role: role,
+                        font: runFont,
+                        paragraphStyle: paragraphStyle,
+                        foregroundColor: textColor,
                         accentColor: accentColor
                     )
                 )
@@ -3088,20 +3116,28 @@ enum NativeReaderAttributedTextBuilder {
         return result
     }
 
+    private struct FontStyleKey: Hashable {
+        let bold: Bool
+        let italic: Bool
+        let reducedSize: Bool
+
+        init(styles: [NativeReaderRuntimeTextStyle]) {
+            bold = styles.contains(.bold)
+            italic = styles.contains(.italic)
+            reducedSize = styles.contains(.small) || styles.contains(.superscript) || styles.contains(.subscript)
+        }
+    }
+
     private static func attributes(
         for run: NativeReaderRuntimeTextRun,
-        theme: ReaderTheme,
-        role: NativeReaderTypographyRole,
+        font: UIFont,
+        paragraphStyle: NSParagraphStyle,
+        foregroundColor: UIColor,
         accentColor: UIColor
     ) -> [NSAttributedString.Key: Any] {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = CGFloat(theme.lineSpacing)
-        paragraphStyle.paragraphSpacing = 0
-        paragraphStyle.lineBreakMode = .byWordWrapping
-
         var attributes: [NSAttributedString.Key: Any] = [
-            .font: font(for: run.styles, theme: theme, role: role),
-            .foregroundColor: foregroundColor(for: role, accentColor: accentColor),
+            .font: font,
+            .foregroundColor: foregroundColor,
             .paragraphStyle: paragraphStyle
         ]
         if run.styles.contains(.underline) {
