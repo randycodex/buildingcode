@@ -57,7 +57,6 @@ try {
     function refreshPaneDividerValue(){}
     function defaultPaneWidthForID(){return 300;}
     function applyPaneWeight(panel,id){panel.style.flex='0 0 '+(paneIsCollapsed(id)?48:state.paneWeights[id]||360)+'px';}
-    function singleExpandedDividerEdge(){return null;}
     function scheduleVisibleReaderScrollIndicatorUpdates(){}
     function captureAccountRequest(){return identity;}
     function isCurrentAccountRequest(value){return value===identity;}
@@ -76,7 +75,7 @@ try {
       if(failEvidence) throw new Error('Offline');
       return {conversation:{...researchConversationList.find(c=>c.id===values.conversationID),sources:values.selections}};
     }
-    ${['orderPanes','paneIDForUtilityInstance','paneIDForResearchConversation','researchConversationPaneIsOpen','researchConversationTitle','paneIsCollapsed','applyPaneCollapsedState','setPaneCollapsed','preparePaneCollapse','prepareColumnGroupControls','openColumnGroupMenu','focusColumnGroupControl','setColumnGroupCollapsed','refreshColumnGroupPresentation','updateCollapsedPaneDividers','togglePinnedPane','refreshPinnedPaneDivider','appendPaneSequence','scrollPaneIntoView','createDivider','resizeAdjacentPanesBy','updateAdjacentDividerValue','readerSectionResearchSelection','researchSelectionTextFromRange','normalizedPassageAnchorText','openResearchSelectionDestinations','openResearchDestinationMenu','addResearchSelectionToCurrent'].map(actual).join('\n')}
+    ${['orderPanes','paneIDForUtilityInstance','paneIDForResearchConversation','researchConversationPaneIsOpen','researchConversationTitle','paneIsCollapsed','applyPaneCollapsedState','setPaneCollapsed','preparePaneCollapse','prepareColumnGroupControls','openColumnGroupMenu','focusColumnGroupControl','setColumnGroupCollapsed','refreshColumnGroupPresentation','updateCollapsedPaneDividers','togglePinnedPane','refreshPinnedPaneDivider','appendPaneSequence','scrollPaneIntoView','createDivider','resizeAdjacentPanesBy','updateAdjacentDividerValue','singleExpandedDividerEdge','resizePaneEdgeBy','startPaneEdgeResize','startPaneResize','readerSectionResearchSelection','researchSelectionTextFromRange','normalizedPassageAnchorText','openResearchSelectionDestinations','openResearchDestinationMenu','addResearchSelectionToCurrent'].map(actual).join('\n')}
     const panes = state.paneOrder.map((id,index)=>{
       const pane=document.createElement('article');pane.className='workspace-panel';pane.dataset.paneId=id;
       pane.innerHTML='<header><h2>Column '+(index+1)+'</h2><div class="panel-actions"></div></header><div class="body" style="overflow:auto"><textarea>Unsent question '+index+'</textarea><div style="height:1400px"></div></div>';
@@ -104,9 +103,33 @@ try {
   await page.waitForTimeout(50);
   assert.ok(Math.abs(await page.evaluate(() => panes[1].getBoundingClientRect().left - track.getBoundingClientRect().left)) < 1, 'Pinned column stays on left while scrolling');
   assert.ok(Math.abs(await page.evaluate(() => document.querySelector('.is-pinned-divider').getBoundingClientRect().left - panes[1].getBoundingClientRect().right)) < 2, 'Pinned divider stays accessible');
+  // Scrolling must put ordinary resize handles behind the pinned surface.
+  const occluded = await page.evaluate(() => {
+    const bounds=panes[1].getBoundingClientRect();
+    return [...track.querySelectorAll('.pane-divider:not(.is-pinned-divider)')].map(n=>n.getBoundingClientRect())
+      .filter(r=>r.left>bounds.left+10 && r.left<bounds.right-10)
+      .map(r=>({x:r.left+0.5,y:bounds.top+400}));
+  });
+  assert.ok(occluded.length, 'Fixture places another column divider under the pinned column');
+  for (const point of occluded) {
+    assert.equal(await page.evaluate(({x,y})=>document.elementFromPoint(x,y)?.closest('.workspace-panel')?.dataset.paneId,point),
+      'reader:two', 'Underlying dividers must neither paint nor receive pointer events over a pinned column');
+  }
+  const peerWidths = await page.evaluate(() => panes.filter(p=>p!==panes[1]).map(p=>p.getBoundingClientRect().width));
   await page.locator('.is-pinned-divider').focus();
   await page.keyboard.press('ArrowRight');
   assert.equal(await page.evaluate(() => state.paneWeights['reader:two']), 384);
+  assert.deepEqual(await page.evaluate(() => panes.filter(p=>p!==panes[1]).map(p=>p.getBoundingClientRect().width)), peerWidths,
+    'Keyboard resize of pinned column must leave scrolling columns unchanged');
+  const handle = await page.locator('.is-pinned-divider').boundingBox();
+  await page.mouse.move(handle.x+handle.width/2,handle.y+300);
+  await page.mouse.down();
+  await page.mouse.move(handle.x+handle.width/2+120,handle.y+300,{steps:8});
+  await page.mouse.up();
+  assert.equal(await page.evaluate(() => state.paneWeights['reader:two']), 504);
+  assert.deepEqual(await page.evaluate(() => panes.filter(p=>p!==panes[1]).map(p=>p.getBoundingClientRect().width)), peerWidths,
+    'Dragging the pinned edge must resize only that column');
+
   await page.evaluate(() => setColumnGroupCollapsed(state.columnGroups[0], true));
   assert.equal(await page.locator('[data-pane-id="reader:two"]').isVisible(), true);
   assert.equal(await page.locator('[data-pane-id="reader:two"]').evaluate(n=>n.classList.contains('is-collapsed')), false);

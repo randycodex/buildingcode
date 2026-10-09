@@ -17882,14 +17882,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
     position: sticky;
     left: 0;
     order: -2;
-    z-index: 12;
+    /* Ordinary dividers use z-index 12 and must remain behind this surface. */
+    z-index: 40;
     box-shadow: 2px 0 0 var(--border), 6px 0 12px rgba(0, 0, 0, 0.08);
   }
   .panel-track > .pane-divider.is-pinned-divider {
     position: sticky;
     left: var(--pinned-pane-width);
     order: -1;
-    z-index: 13;
+    z-index: 41;
   }
 }
 

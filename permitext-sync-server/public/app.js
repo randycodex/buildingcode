@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261008-pinned-columns-research-v647";
+} from "./offline-storage.js?v=20261008-pinned-resize-v648";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261008-pinned-columns-research-v647";
+} from "./research-intent-state.js?v=20261008-pinned-resize-v648";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36829,6 +36829,9 @@ function renderSettings({ upgrade = false } = {}) {
 function singleExpandedDividerEdge(previousPaneID, nextPaneID) {
   const previousOpen = previousPaneID && !paneIsCollapsed(previousPaneID);
   const nextOpen = nextPaneID && !paneIsCollapsed(nextPaneID);
+  // The pinned boundary belongs only to the fixed column, not the scrolling
+  // neighbor that happens to follow it in the mounted sequence.
+  if (previousOpen && previousPaneID === state.pinnedPaneID) return { paneID: previousPaneID, side: "right" };
   if (previousOpen && !nextOpen) return { paneID: previousPaneID, side: "right" };
   if (nextOpen && !previousOpen) return { paneID: nextPaneID, side: "left" };
   return null;
@@ -36938,7 +36941,9 @@ function createDivider(previousPaneID, nextPaneID) {
     else if (previousPaneID && nextPaneID) startPaneResize(event, previousPaneID, nextPaneID);
   });
   divider.addEventListener("dblclick", () => {
-    if (isLeftEdge || isRightEdge) resetDividerPanes(edgePaneID, null);
+    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID);
+    if (edge) resetDividerPanes(edge.paneID, null);
+    else if (isLeftEdge || isRightEdge) resetDividerPanes(edgePaneID, null);
     else resetDividerPanes(previousPaneID, nextPaneID);
   });
   return divider;
