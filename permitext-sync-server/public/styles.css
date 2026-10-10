@@ -17731,7 +17731,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-plan-usage p { min-height: 48px; padding-inline: 0; }
 .account-screen .settings-active-sources-list { gap: 0; }
 .account-screen .settings-active-source-row { min-height: 0; }
-.account-screen .settings-status-message { grid-column: 1 / -1; padding-inline: 24px; }
+.account-screen .settings-panel .settings-footer > .settings-status-message { grid-column: 1 / -1; padding: 0; }
 .account-screen .settings-status-message:empty { display: none; }
 .account-screen .settings-panel .settings-footer {
   grid-column: 1 / -1;
