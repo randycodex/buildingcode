@@ -7164,9 +7164,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-list-panel .research-conversation-list {
-  width: 100%;
+  width: calc(100% + (2 * var(--panel-padding)));
   min-width: 0;
-  margin-inline: 0;
+  margin-inline: calc(-1 * var(--panel-padding));
 }
 
 .research-history-group {
@@ -17012,6 +17012,12 @@ html body .reader-internal-search:has(.reader-internal-search-input:focus-visibl
   padding-block: var(--column-content-top-gap);
   box-sizing: border-box;
 }
+.research-list-panel.is-history-open > .analysis-content {
+  width: calc(100% + (2 * var(--panel-padding)));
+  margin-inline: calc(-1 * var(--panel-padding));
+  padding-inline: var(--panel-padding);
+  box-sizing: border-box;
+}
 .research-list-panel.research-clean-start > .research-composer { grid-row: 3; }
 .research-list-panel.research-clean-start:not(.is-history-open) > .analysis-content,
 .research-list-panel.research-clean-start.is-history-open > .research-chat-welcome,
@@ -17136,6 +17142,7 @@ html body .research-compact-composer .research-question-input:focus-visible {
 }
 .research-list-panel .research-conversation-row {
   background: transparent;
+  padding-inline: var(--panel-padding);
   border: 0;
   border-bottom: 1px solid var(--border);
   border-radius: 0;

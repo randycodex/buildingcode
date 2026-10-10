@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-column-minimums-v743";
+} from "./offline-storage.js?v=20261010-research-dividers-v744";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-column-minimums-v743";
+} from "./research-intent-state.js?v=20261010-research-dividers-v744";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
