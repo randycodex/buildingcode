@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-search-sources-v719";
+} from "./offline-storage.js?v=20261010-search-sources-v720";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-search-sources-v719";
+} from "./research-intent-state.js?v=20261010-search-sources-v720";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36616,13 +36616,10 @@ function openSearchCodeSourceSettings(panel) {
   close.className = "settings-link-button search-code-source-close";
   close.textContent = "Close";
   const card = settingsTemplate.content.querySelector(".settings-active-sources-card").cloneNode(true);
-  const title = card.querySelector(".settings-section-title");
-  title.id = `${menu.id}-title`;
-  card.setAttribute("aria-labelledby", title.id);
-  title.textContent = "Code sources & editions";
-  card.querySelector(".settings-card-copy:not(.settings-active-sources-scope):not(.settings-active-sources-status)").textContent =
-    "Choose sources for Search and chapter browsing. Saved evidence stays available.";
-  card.append(card.querySelector(".settings-active-sources-scope"));
+  card.removeAttribute("aria-labelledby");
+  card.setAttribute("aria-label", "Code sources & editions");
+  card.querySelector(".settings-section-title").remove();
+  card.querySelectorAll(".settings-card-copy:not(.settings-active-sources-status)").forEach(copy => copy.remove());
   const dismiss = () => {
     if (panel.__refreshActiveCodeSources === refresh) delete panel.__refreshActiveCodeSources;
     menu.remove();
@@ -36715,7 +36712,7 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
   };
   const render = () => {
     const snapshot = activeCodeSourcesController.state;
-    scope.textContent = snapshot.accountID === null
+    if (scope) scope.textContent = snapshot.accountID === null
       ? "Guest choices stay in this browser on this device."
       : "These choices apply to this account in this browser on this device.";
     if (snapshot.error || !snapshot.preferences) {
