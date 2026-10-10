@@ -18199,6 +18199,124 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   padding-inline: 0;
 }
 
+/* Report workflow: document headings, quiet text actions, and separate exports. */
+.workspace-panel.report-draft-panel .report-draft-shell :is(button, summary),
+.workspace-panel.report-draft-panel .report-draft-shell :is(button, summary):hover,
+.workspace-panel.report-draft-panel .report-draft-shell button:disabled {
+  background: transparent;
+  border-radius: 0;
+}
+.workspace-panel.report-draft-panel .report-draft-shell button {
+  padding-inline: 0;
+}
+body .panel-track > article.workspace-panel.report-draft-panel .report-title-text,
+body .panel-track > article.workspace-panel.report-draft-panel .report-title-editor {
+  font-size: 21px !important;
+  line-height: 1.3;
+  white-space: normal;
+}
+.workspace-panel.report-draft-panel .report-title-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 8px;
+}
+.workspace-panel.report-draft-panel .report-title-delete svg {
+  width: 16px;
+  height: 16px;
+}
+.workspace-panel.report-draft-panel .report-draft-shell {
+  gap: 16px;
+}
+.workspace-panel.report-draft-panel .report-title-text,
+.workspace-panel.report-draft-panel .report-title-editor {
+  flex-basis: calc(100% - 48px);
+}
+.workspace-panel.report-draft-panel .report-title-revision {
+  display: none;
+}
+.report-draft-save-state {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.workspace-panel.report-draft-panel .report-draft-version-list {
+  display: block;
+  padding-top: 8px;
+}
+.report-draft-version-list > summary {
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  padding-block: 8px;
+}
+.workspace-panel.report-draft-panel .report-draft-primary-actions {
+  justify-content: flex-start;
+  gap: 28px;
+  padding-block: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+body .panel-track > article.workspace-panel.report-draft-panel :is(.report-introduction-label, .report-draft-blocks-toggle, .report-output-toggle) {
+  font-size: 16px !important;
+  font-weight: 650;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.workspace-panel.report-draft-panel .project-section-toggle-label::after {
+  content: "›";
+  display: inline-block;
+  margin-left: 10px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.workspace-panel.report-draft-panel .project-section-toggle-label[aria-expanded="true"]::after {
+  transform: rotate(90deg);
+}
+.workspace-panel.report-draft-panel :is(.report-introduction-heading, .report-draft-blocks-heading, .report-output-heading) {
+  height: auto;
+  min-height: 56px;
+}
+.workspace-panel.report-draft-panel .report-draft-add-controls {
+  padding: 0 var(--panel-padding) 16px;
+  gap: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.workspace-panel.report-draft-panel .report-draft-add-controls button {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+body .panel-track > article.workspace-panel.report-draft-panel .report-draft-classification {
+  font-size: 11px !important;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+}
+.workspace-panel.report-draft-panel .report-source-picker {
+  padding-block: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.workspace-panel.report-draft-panel .report-history-section {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.workspace-panel.report-draft-panel .report-history-card {
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+.workspace-panel.report-draft-panel .report-history-files {
+  gap: 24px;
+}
+.workspace-panel.report-draft-panel .report-history-files button {
+  font-size: 12px;
+}
+.report-workflow-help {
+  margin: 0;
+  padding: 16px var(--panel-padding) 24px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* The Report evidence picker uses the same hierarchy and previews as Evidence. */
 .report-draft-panel .report-evidence-code-toggle {
   display: flex;
