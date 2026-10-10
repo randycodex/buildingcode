@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-notebook-background-v746";
+} from "./offline-storage.js?v=20261010-flat-report-v747";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-notebook-background-v746";
+} from "./research-intent-state.js?v=20261010-flat-report-v747";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -28041,6 +28041,9 @@ async function renderProjectReportDraft(project) {
         row.append(textarea);
       } else {
         const source = sources.find((item) => item.kind === block.kind && item.id === block.sourceID);
+        if (block.kind === "evidence" && source) {
+          row.classList.add(`code-theme-${codeTheme(source.codePrefix)}`);
+        }
         const sourceTitle = document.createElement("strong");
         sourceTitle.textContent = block.kind === "projectFacts"
           ? "PROJECT FACTS"
