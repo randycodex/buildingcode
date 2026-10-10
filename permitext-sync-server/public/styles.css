@@ -4862,16 +4862,6 @@ select option:checked {
   opacity: 0.72;
 }
 
-.search-result-group-indicator {
-  display: grid;
-  width: 14px;
-  height: 14px;
-  place-items: center;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-}
-
 .search-result-group.project-section-motion.is-open > .search-result-group-body {
   padding-top: 0;
 }

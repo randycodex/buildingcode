@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-reader-table-scroll-v663";
+} from "./offline-storage.js?v=20261009-search-no-chevrons-v664";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-reader-table-scroll-v663";
+} from "./research-intent-state.js?v=20261009-search-no-chevrons-v664";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -17609,16 +17609,12 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         meta.className = "search-result-group-meta";
         const count = document.createElement("span");
         count.className = "search-result-group-count";
-        const indicator = document.createElement("span");
-        indicator.className = "search-result-group-indicator";
-        indicator.setAttribute("aria-hidden", "true");
-        meta.append(count, indicator);
+        meta.append(count);
         label.append(meta);
         const initiallyCollapsed = searchInstance.defaultExpandedResultSource !== sourceKey &&
           !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey);
         const syncToggleLabel = (expanded) => {
           label.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${codeDisplayLabel(prefix, sourceVersion)} results`);
-          indicator.textContent = expanded ? "⌃" : "⌄";
         };
         syncToggleLabel(!initiallyCollapsed);
         group.setSearchExpanded = wireProjectSectionMotion(group, groupBody, [label], codeDisplayLabel(prefix, sourceVersion), !initiallyCollapsed, {
