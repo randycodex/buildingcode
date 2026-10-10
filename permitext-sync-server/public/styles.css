@@ -17692,6 +17692,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 .account-screen-header h1 {
   margin: 0;
+  text-transform: none;
 }
 .account-screen-close {
   --panel-title-control-size: 44px;
