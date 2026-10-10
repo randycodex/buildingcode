@@ -17648,6 +17648,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen[open] { display: flex; flex-direction: column; }
 .account-screen::backdrop { background: var(--background); }
 .account-screen-header {
+  position: relative;
   display: flex;
   flex: 0 0 auto;
   align-items: center;
@@ -17657,6 +17658,13 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding: 16px 32px;
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
+}
+.account-screen-header > .topbar-brand {
+  display: grid;
+  left: 50%;
+  right: auto;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 .account-screen-header h1 {
   margin: 0;

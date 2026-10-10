@@ -54,6 +54,7 @@ function harness(signedIn) {
     },
     toggleSettingsButton: { setAttribute: (name, value) => { toggleAttributes[name] = value; },
       focus: () => { focusReturns++; }, blur() {} },
+    topbarBrand: { cloneNode: () => Object.assign(element(), { className: "topbar-brand" }) },
     activeAccount: () => signedIn ? { userID: "synthetic-account" } : null,
     renderSettings: panel, renderAccountWelcome: panel,
     trapWebModalFocus: () => { focusTraps++; }, clearProUpgradeIntent() {},

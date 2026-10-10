@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-account-close-v707";
+} from "./offline-storage.js?v=20261010-account-brand-v708";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-account-close-v707";
+} from "./research-intent-state.js?v=20261010-account-brand-v708";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36487,7 +36487,7 @@ function mountAccountScreenContent(dialog, panel) {
   close.title = "Close Account";
   close.setAttribute("aria-label", "Close Account");
   close.addEventListener("click", () => dialog.close());
-  header.append(title, close);
+  header.append(title, close, topbarBrand.cloneNode(true));
   dialog.replaceChildren(header, panel);
 }
 
