@@ -15,6 +15,9 @@ const option = (name, fallback) => {
   const index = process.argv.indexOf(name);
   return index < 0 ? fallback : process.argv[index + 1];
 };
+// Interactive previews stay available until stopped; automated fixtures remain bounded.
+const keepAliveOption = option("--keep-alive", "false");
+assert.ok(["true", "false"].includes(keepAliveOption), "Use --keep-alive true or false");
 const secondAccountOption = option("--second-account", "false");
 assert.ok(["true", "false"].includes(secondAccountOption), "Use --second-account true or false");
 const secondAccountEnabled = secondAccountOption === "true";
@@ -292,7 +295,7 @@ async function stop() {
 }
 process.once("SIGINT", stop);
 process.once("SIGTERM", stop);
-setTimeout(stop, 60 * 60 * 1000).unref();
+if (keepAliveOption !== "true") setTimeout(stop, 60 * 60 * 1000).unref();
 try {
   await post("/admin/lifetime-grants/grant", { userID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   account = await post("/account/sign-in", { credential: { provider: "apple", providerUserID: providerID,
