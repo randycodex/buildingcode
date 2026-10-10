@@ -13,7 +13,7 @@ function fixture(count){
  searchPositionState:()=>({}),searchResultPageSize:25,isCurrentActiveCodeSourceContext:()=>current,
  prepareActiveCodeSearchScope:async()=>({token:{},querySuffix:'&sourceScope=scoped',enabledSourceCount:count}),
  updateSearchDock(){},renderSearchPlaceholder:(_results,message)=>messages.push(message),clear(){},searchResultMatchesExactQuery:()=>true,
- document:{createElement:()=>({addEventListener(_event,callback){this.click=callback;}})},openActiveCodeSourceSettings(){dialogs++;},
+ document:{createElement:()=>({addEventListener(_event,callback){this.click=callback;}})},openSearchCodeSourceSettings(){dialogs++;},
  api:async()=>{requests++;return {results:[],hasMore:false};}};
  vm.createContext(context);vm.runInContext(actual('cancelSearchPanelRequest')+'\n'+actual('renderSearchResults'),context);
  return {context,panel,instance,results,messages,buttons,requests:()=>requests,dialogs:()=>dialogs,stale(){current=false;}};

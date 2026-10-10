@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-research-search-v715";
+} from "./offline-storage.js?v=20261010-search-controls-v716";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-research-search-v715";
+} from "./research-intent-state.js?v=20261010-search-controls-v716";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -17492,7 +17492,9 @@ async function renderSearch(instance, options = {}) {
     saveWorkspaceState();
     void renderSearchResults(panel, searchInstance);
   });
-  panel.querySelector(".search-sources-button").addEventListener("click", openActiveCodeSourceSettings);
+  const sourcesButton = panel.querySelector(".search-sources-button");
+  sourcesButton.setAttribute("aria-expanded", "false");
+  sourcesButton.addEventListener("click", () => openSearchCodeSourceSettings(panel));
   const clearButton = panel.querySelector(".search-clear-button");
   applyPaneWeight(panel, paneID);
   input.value = searchInstance.query || "";
@@ -17744,7 +17746,7 @@ async function renderSearchResults(panel, instance) {
       manage.type = "button";
       manage.className = "ghost-button search-empty-action";
       manage.textContent = "Manage code sources";
-      manage.addEventListener("click", () => { if (isCurrent()) openActiveCodeSourceSettings(); });
+      manage.addEventListener("click", () => { if (isCurrent()) openSearchCodeSourceSettings(panel); });
       results.append(manage);
       return;
     }
@@ -36568,6 +36570,54 @@ function toggleAccountDialog({ upgrade = false } = {}) {
   document.body.append(dialog);
   toggleSettingsButton.setAttribute("aria-pressed", "true");
   dialog.showModal();
+}
+
+function openSearchCodeSourceSettings(panel) {
+  const existing = panel.querySelector(".search-code-source-menu");
+  if (existing) { existing.__close(); return; }
+  const trigger = panel.querySelector(".search-sources-button");
+  const results = panel.querySelector(".search-results");
+  const menu = document.createElement("section");
+  menu.className = "search-code-source-menu";
+  menu.id = `search-code-sources-${crypto.randomUUID()}`;
+  menu.setAttribute("role", "region");
+  menu.setAttribute("aria-label", "Code sources & editions");
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "settings-link-button search-code-source-close";
+  close.textContent = "Close";
+  const card = settingsTemplate.content.querySelector(".settings-active-sources-card").cloneNode(true);
+  const title = card.querySelector(".settings-section-title");
+  title.id = `${menu.id}-title`;
+  card.setAttribute("aria-labelledby", title.id);
+  const dismiss = () => {
+    if (panel.__refreshActiveCodeSources === refresh) delete panel.__refreshActiveCodeSources;
+    menu.remove();
+    results.hidden = false;
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.removeAttribute("aria-controls");
+    trigger.removeEventListener("keydown", onEscape);
+    if (trigger.isConnected) trigger.focus({ preventScroll: true });
+  };
+  const onEscape = event => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    event.stopPropagation();
+    dismiss();
+  };
+  menu.__close = dismiss;
+  close.addEventListener("click", dismiss);
+  menu.addEventListener("keydown", onEscape);
+  trigger.addEventListener("keydown", onEscape);
+  menu.append(close, card);
+  results.hidden = true;
+  panel.append(menu);
+  trigger.setAttribute("aria-expanded", "true");
+  trigger.setAttribute("aria-controls", menu.id);
+  wireSettingsActiveCodeSources(menu, { enabled: true });
+  const refresh = () => menu.__refreshActiveCodeSources?.();
+  panel.__refreshActiveCodeSources = refresh;
+  close.focus();
 }
 
 function openActiveCodeSourceSettings() {
