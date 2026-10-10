@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-account-scroll-v703";
+} from "./offline-storage.js?v=20261010-account-dividers-v704";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-account-scroll-v703";
+} from "./research-intent-state.js?v=20261010-account-dividers-v704";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
