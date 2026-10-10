@@ -17554,18 +17554,71 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .saved-panel .saved-project-evidence-section > .saved-evidence-heading { flex-shrink: 0; }
 .saved-panel .saved-project-evidence-section.is-open > .saved-project-evidence-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; }
 
-/* Reserve an external rail between the evidence card and column divider. */
+/* Evidence uses the same flat, full-width list surface as Search. */
 .saved-panel > .saved-column-scroll {
-  margin-right: -16px;
-  padding-right: 16px;
+  width: calc(100% + (2 * var(--panel-padding)));
+  margin-inline: calc(-1 * var(--panel-padding));
+  padding: 0;
+  border-radius: 0;
 }
 .saved-panel .saved-folder-context.is-project > .saved-project-evidence-section {
-  overflow: visible;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.saved-panel .saved-folder-context.is-project .saved-project-evidence-section > .saved-evidence-heading {
+  height: 48px;
+  min-height: 48px;
+  padding-inline: var(--panel-padding);
+}
+.saved-panel .saved-folder-context.is-project .saved-evidence-heading > .section-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 .saved-panel .saved-project-evidence-section.is-open > .saved-project-evidence-body {
-  margin-right: calc(-1 * var(--space-3) - 16px);
-  padding-right: calc(var(--space-3) + 16px);
-  scrollbar-gutter: stable;
+  margin: 0;
+  padding: 0 0 var(--space-3);
+  scrollbar-gutter: auto;
+}
+.saved-panel .saved-project-evidence-body > :is(.saved-inline-filters, .saved-plan-usage) {
+  padding-inline: var(--panel-padding);
+}
+.saved-panel .saved-project-evidence-body .saved-evidence-search-input,
+.saved-panel .saved-project-evidence-body .saved-evidence-search-input:focus-visible {
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+}
+.saved-panel .saved-project-evidence-body :is(.saved-code-label, .saved-chapter-header) {
+  padding-inline: var(--panel-padding);
+}
+.saved-panel .saved-project-evidence-body .saved-code-label {
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.saved-panel .saved-folder-context.is-project .saved-project-evidence-body .saved-code-group .saved-row {
+  width: 100%;
+  margin: 0;
+  padding: var(--space-4) var(--panel-padding);
+  border-radius: 0;
+  background: transparent;
+}
+.saved-panel .saved-project-evidence-body .saved-row::after {
+  right: 0;
+  left: 0;
+}
+.saved-panel .saved-project-evidence-body .saved-section-heading {
+  gap: 1px;
+}
+.saved-panel .saved-project-evidence-body .saved-section-title {
+  padding: 0;
+  font-weight: 700;
+  letter-spacing: normal;
+}
+.saved-panel .saved-project-evidence-body .saved-paragraph-preview {
+  -webkit-line-clamp: 3;
 }
 
 /* Keep save feedback in the gutter below the Notebook editor. */

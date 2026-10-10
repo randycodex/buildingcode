@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-facts-menu-v737";
+} from "./offline-storage.js?v=20261010-evidence-list-v738";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-facts-menu-v737";
+} from "./research-intent-state.js?v=20261010-evidence-list-v738";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
