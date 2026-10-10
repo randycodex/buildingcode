@@ -101,8 +101,16 @@ function unassignedHarness(workspaces, activeID = 'project:a') {
     persistWorkspaceRegistry() {}, renderWorkspaceTabs() {}, focusActiveWorkspaceTab() {},
     renderWorkspaceTransitionState() {}, waitForWorkspaceTransitionPaint: async () => {},
     renderWorkspace: async () => {}, suppressReaderScrollRestore: false,
-    track: { removeAttribute() {}, scrollWidth: 1000, clientWidth: 500 },
-    transitionWorkspace: async () => ctx.saveWorkspaceState(),
+    track: { removeAttribute() {}, querySelector() { return null; }, scrollWidth: 1000, clientWidth: 500 },
+    transitions: [],
+    transitionWorkspace: async (reason, options = {}) => { ctx.transitions.push({reason, options}); ctx.saveWorkspaceState(); ctx.duringTransition?.(); },
+    newUtilityInstance: (key, properties) => ({key, id: 'new-inbox', selectedFolderID: '', codeFilters: [], folderQuery: '', ...properties}),
+    defaultPaneWidthForID: () => 600,
+    appendPaneIfMissing: id => { if (!ctx.state.paneOrder.includes(id)) ctx.state.paneOrder.push(id); },
+    scrollPaneIntoView: () => { ctx.focused++; },
+    whenWorkspacePaneReady: async () => true,
+    paneIsCollapsed: () => false,
+    CSS: { escape: value => value },
     paneIDForUtilityInstance: saved => saved.id,
     focusUtility: async key => {
       ctx.focused++;
@@ -119,54 +127,44 @@ function unassignedHarness(workspaces, activeID = 'project:a') {
 }
 for (const extras of [[], [{id:'general', name:'General'}], [{id:'ordinary',name:'Desk'}]]) {
   const {ctx, layouts} = unassignedHarness([{id:'project:a',name:'Alpha',projectID:'a'}, ...extras]);
-  const projectBefore = JSON.stringify(layouts.get('project:a'));
+  const originalSaved = JSON.stringify(ctx.state.utilityInstances[0]);
+  const readersBefore = JSON.stringify(ctx.state.readers);
+  const detailsBefore = JSON.stringify(ctx.state.projectDetails);
   const evidenceBefore = JSON.stringify(ctx.evidence);
+  const workspaceCount = ctx.workspaceRegistry.workspaces.length;
   await vm.runInContext('openUnassignedSaves()', ctx);
-  assert.equal(ctx.activeWorkspaceID, extras[0]?.id || 'general');
-  assert.equal(ctx.confirmations, 1, 'Project departure must confirm exactly once');
-  assert.equal(JSON.stringify(layouts.get('project:a')), projectBefore, 'Project layout must be preserved');
-  assert.equal(JSON.stringify(ctx.evidence), evidenceBefore, 'navigation must preserve saved identities');
-  assert.equal(ctx.state.utilityInstances[0].organizeUnassigned, true);
-  assert.equal(ctx.state.utilityInstances[0].selectedFolderID, '');
-  assert.equal(ctx.state.utilityInstances[0].folderQuery || '', '');
-  assert.equal(ctx.state.utilityInstances[0].codeFilters?.length || 0, 0);
-  if (extras.length) assert.equal(ctx.state.utilityInstances[0].id, `${extras[0].id}:saved`, 'reuse Saved pane identity');
+  assert.equal(ctx.activeWorkspaceID, 'project:a', 'Opening an inbox must preserve the active Project');
+  assert.equal(ctx.confirmations, 0, 'There is no Project departure');
+  assert.equal(JSON.stringify(ctx.state.utilityInstances[0]), originalSaved, 'Project Saved pane remains scoped to its Project');
+  assert.equal(JSON.stringify(ctx.state.readers), readersBefore);
+  assert.equal(JSON.stringify(ctx.state.projectDetails), detailsBefore);
+  assert.equal(JSON.stringify(ctx.evidence), evidenceBefore);
+  const inbox = ctx.state.utilityInstances[1];
+  assert.equal(inbox.unassignedInbox, true);
+  assert.equal(inbox.organizeUnassigned, true);
+  assert.equal(inbox.selectedFolderID, '');
+  inbox.folderQuery = 'retained search';
   await vm.runInContext('openUnassignedSaves()', ctx);
-  assert.equal(ctx.workspaceRegistry.workspaces.length, 2, 'repeat action must not create duplicate workspaces');
-  assert.equal(ctx.state.utilityInstances.length, 1, 'repeat action must not duplicate Saved panes');
-  assert.equal(ctx.confirmations, 1, 'current non-Project workspace needs no departure confirmation');
+  assert.equal(ctx.state.utilityInstances.length, 2, 'Repeat action must focus the existing inbox');
+  assert.equal(inbox.folderQuery, 'retained search');
+  assert.equal(ctx.workspaceRegistry.workspaces.length, workspaceCount);
+  assert.equal(ctx.preferenceStorage.size, 0, 'Inbox navigation must not alter destination preferences');
+}
+assert.equal(vm.runInContext('scopeSavedInstanceToWorkspace({unassignedInbox:true,selectedFolderID:"b"}).selectedFolderID', context), '');
+{
+  const {ctx} = unassignedHarness([{id:'general',name:'General'}], 'general');
+  const existing = ctx.state.utilityInstances[0];
+  existing.selectedFolderID = '';
+  existing.organizeUnassigned = true;
+  await vm.runInContext('openUnassignedSaves()', ctx);
+  assert.equal(ctx.state.utilityInstances.length, 1, 'Reuse an existing Unassigned pane');
+  assert.equal(existing.unassignedInbox, true);
+  assert.deepEqual(Array.from(ctx.transitions[0].options.refreshPaneIDs), [existing.id], 'Refresh the promoted pane, including its Free locked title');
 }
 {
   const {ctx} = unassignedHarness([{id:'project:a',name:'Alpha',projectID:'a'}]);
-  ctx.confirmation = false;
+  ctx.duringTransition = () => { ctx.currentIdentity++; };
   await vm.runInContext('openUnassignedSaves()', ctx);
-  assert.equal(ctx.activeWorkspaceID, 'project:a');
-  assert.equal(ctx.workspaceRegistry.workspaces.length, 1, 'cancel must not create even the technical fallback');
-  assert.equal(ctx.focused, 0);
-  ctx.confirmWorkspaceTransition = async () => { ctx.currentIdentity++; return true; };
-  await vm.runInContext('openUnassignedSaves()', ctx);
-  assert.equal(ctx.activeWorkspaceID, 'project:a', 'account change during confirmation must abort');
-  assert.equal(ctx.workspaceRegistry.workspaces.length, 1);
+  assert.equal(ctx.focused, 0, 'An account change must fence delayed focus');
 }
-console.log('Direct Unassigned saves: Project-only, General, ordinary workspace, repeat, cancellation, and account fencing passed.');
-
-// One remembered reading area survives Project switches; all legacy layouts
-// remain intact, and the remembered destination is scoped to the account.
-{
-  const {ctx, layouts} = unassignedHarness([
-    {id:'project:a', name:'Alpha', projectID:'a'},
-    {id:'general', name:'General'}, {id:'old-desk', name:'Legacy desk'}
-  ], 'old-desk');
-  const oldLayout = JSON.stringify(layouts.get('old-desk'));
-  await vm.runInContext('openUnassignedSaves()', ctx);
-  assert.equal(ctx.preferenceStorage.get('account:A:readingWorkspaceID'), 'old-desk');
-  await vm.runInContext('switchWorkspace("project:a", {focus:false})', ctx);
-  await vm.runInContext('openUnassignedSaves()', ctx);
-  assert.equal(ctx.activeWorkspaceID, 'old-desk');
-  assert.equal(ctx.workspaceRegistry.workspaces.length, 3, 'Retired named layouts must not be deleted');
-  assert.deepEqual(layouts.get('old-desk').readers, JSON.parse(oldLayout).readers);
-  ctx.workspaceRegistryKey = 'account:B';
-  ctx.activeWorkspaceID = 'project:a';
-  assert.equal(vm.runInContext('defaultReadingWorkspace().id', ctx), 'general', "Account B must not inherit A's chosen reading area");
-}
-console.log('Project-only navigation and retained, account-scoped default reading arrangement passed.');
+console.log('Independent Unassigned inbox: Project and Reader preservation, reuse, search retention, preferences and account fencing passed.');

@@ -87,7 +87,7 @@ const savedIdentity = new Function(
   "state",
   "currentContentSummary",
   "currentBulkClearRecords",
-  "activeFolderRecords",
+  "activeProjectRecords",
   "projectSectionBelongsToProject",
   [
     "normalizeAnnotationBlockID",
@@ -108,7 +108,7 @@ const savedIdentity = new Function(
   state,
   currentContentSummary,
   currentBulkClearRecords,
-  activeFolderRecords,
+  projects => activeFolderRecords(projects).filter(project => (project.folderType || "project") === "project"),
   projectSectionBelongsToProject
 );
 

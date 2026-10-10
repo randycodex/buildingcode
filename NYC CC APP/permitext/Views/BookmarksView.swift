@@ -17,6 +17,13 @@ struct BookmarksView: View {
     @State private var pendingExport: BookmarkExportRequest?
     @State private var showingSettings = false
     @State private var showingAccessSettings = false
+    @State private var inboxDetail: BookmarkedSection?
+    @State private var inboxQuery = ""
+    @State private var inboxSearchOpen = false
+    @State private var inboxSelecting = false
+    @State private var inboxSelectedRowIDs: Set<String> = []
+    @State private var newProjectEvidence: [BookmarkedSection] = []
+    @State private var assignmentError: String?
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.sourceFilters.v2"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
@@ -29,7 +36,7 @@ struct BookmarksView: View {
     init(filterDefaults: UserDefaults = .standard, collectionOnly: Bool = false) {
         self.filterDefaults = filterDefaults
         self.collectionOnly = collectionOnly
-        _savedFilterCodeSectionIDs = State(initialValue: Set(filterDefaults.stringArray(forKey: Self.filterCodeSectionIDsDefaultsKey) ?? []))
+        _savedFilterCodeSectionIDs = State(initialValue: collectionOnly ? [] : Set(filterDefaults.stringArray(forKey: Self.filterCodeSectionIDsDefaultsKey) ?? []))
         _savedFilterFolderIDs = State(
             initialValue: FilterIDsStorage.load(
                 key: Self.filterFolderIDsDefaultsKey,
@@ -187,16 +194,23 @@ struct BookmarksView: View {
 
                 if collectionOnly {
                     if unassignedBookmarks.isEmpty {
-                        CodeEmptyStateCard(
-                            title: "No Unassigned Saves",
-                            systemImage: "bookmark",
-                            description: "Saves outside Projects appear here. Assigned evidence stays inside its Project.",
-                            accent: accentColor
-                        )
+                        VStack(spacing: 12) {
+                            Image(systemName: "tray").foregroundStyle(.secondary).accessibilityHidden(true)
+                            Text("No unassigned saves").font(.headline)
+                            Text("Saved passages and notes without a Project appear here.")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 220)
                     } else if cachedFilteredBookmarks.isEmpty {
-                        filteredSavedEmptyState
+                        VStack(spacing: 12) {
+                            Text("No saves match").font(.headline)
+                            Button("Clear search") { inboxQuery = "" }
+                                .buttonStyle(.plain).foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 220)
                     } else {
-                        savedBookmarkList
+                        inboxBookmarkList
                     }
                 }
             }
@@ -216,7 +230,11 @@ struct BookmarksView: View {
                     .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             }
         }
-        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .background {
+            if collectionOnly { inboxSurface.ignoresSafeArea() }
+            else { CodeAppBackdrop(accent: accentColor).ignoresSafeArea() }
+        }
+        .navigationDestination(item: $inboxDetail) { bookmark in bookmarkDestination(for: bookmark) }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -241,6 +259,7 @@ struct BookmarksView: View {
         .onChange(of: showsUnassignedOnly) { _, _ in
             rebuildBookmarkCaches()
         }
+        .onChange(of: inboxQuery) { _, _ in rebuildBookmarkCaches() }
         .onChange(of: savedSortMode) { _, _ in
             rebuildBookmarkCaches()
         }
@@ -276,7 +295,7 @@ struct BookmarksView: View {
                     if let existing = target.folder {
                         library.updateFolder(existing, name: name, address: address, description: description, structuredFacts: structuredFacts, colorHex: colorHex)
                     } else {
-                        _ = library.createFolder(
+                        let created = library.createFolder(
                             name: name,
                             address: address,
                             description: description,
@@ -284,6 +303,10 @@ struct BookmarksView: View {
                             colorHex: colorHex,
                             folderType: folderType
                         )
+                        if let created, !newProjectEvidence.isEmpty {
+                            assignInboxEvidence(newProjectEvidence, to: created)
+                            newProjectEvidence = []
+                        }
                     }
                 },
                 onDelete: {
@@ -294,6 +317,12 @@ struct BookmarksView: View {
                 }
             )
         }
+        .alert("Could not add to Project", isPresented: Binding(
+            get: { assignmentError != nil },
+            set: { if !$0 { assignmentError = nil } }
+        )) {
+            Button("OK", role: .cancel) { assignmentError = nil }
+        } message: { Text(assignmentError ?? "Please try again.") }
         .sheet(item: $pendingExport) { request in
             BookmarkExportPreviewSheet(request: request) {
                 pendingExport = nil
@@ -313,8 +342,24 @@ struct BookmarksView: View {
     private var savedHeaderActionButtons: some View {
         HStack(spacing: 0) {
             if collectionOnly {
-                sortButton
-                if !library.bookmarks.isEmpty { exportButton }
+                Button {
+                    inboxSearchOpen.toggle()
+                    if !inboxSearchOpen { inboxQuery = "" }
+                } label: {
+                    Image(systemName: "magnifyingglass")
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("Search unassigned saves")
+                .accessibilityValue(inboxSearchOpen ? "Expanded" : "Collapsed")
+                Button {
+                    inboxSelecting.toggle()
+                    inboxSelectedRowIDs.removeAll()
+                } label: {
+                    Image(systemName: "checkmark.square")
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("Select unassigned saves")
+                .accessibilityValue(inboxSelecting ? "Selecting" : "Not selecting")
             } else {
                 Button {
                     if library.hasProjectAccess { folderEditorTarget = .new }
@@ -336,7 +381,9 @@ struct BookmarksView: View {
 
     @ViewBuilder
     private var savedHeaderActions: some View {
-        if #available(iOS 26.0, *) {
+        if collectionOnly {
+            savedHeaderActionButtons.buttonStyle(.plain).foregroundStyle(Color.appChrome)
+        } else if #available(iOS 26.0, *) {
             savedHeaderActionButtons
                 .glassEffect(.regular, in: Capsule())
         } else {
@@ -348,8 +395,13 @@ struct BookmarksView: View {
     private var savedScreenHeader: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
             if collectionOnly {
-                CodeScreenTitleRow(title: screenTitle, collapseProgress: collapseProgress, minimumHeight: 44) {
-                    savedHeaderActions
+                HStack(spacing: 10) {
+                    Image(systemName: "tray")
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                    CodeScreenTitleRow(title: screenTitle, collapseProgress: collapseProgress, minimumHeight: 44) {
+                        savedHeaderActions
+                    }
                 }
             } else {
                 pinnedSavedHeader
@@ -359,34 +411,29 @@ struct BookmarksView: View {
             }
 
             if collectionOnly {
-                if !referenceFolders.isEmpty {
-                    NavigationLink {
-                        ScrollView {
-                            referenceTilesSection
-                                .padding(.horizontal, contentHorizontalInset)
-                                .padding(.bottom, tabBarClearance)
-                        }
-                        .navigationTitle("References")
-                        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-                    } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "books.vertical")
-                            Text("References").font(.body.weight(.medium))
-                            Spacer()
-                            Text("\(referenceFolders.count)").foregroundStyle(.secondary)
-                            Image(systemName: "chevron.right")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                        }
-                        .foregroundStyle(Color.primary)
-                        .padding(16)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("saved-references-link")
+                HStack {
+                    Text("\(unassignedBookmarks.count) \(unassignedBookmarks.count == 1 ? "save" : "saves")")
+                    Spacer()
+                    Text("Newest first")
                 }
-                savedInlineFilters
-                    .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                if inboxSearchOpen {
+                    TextField("Search saves", text: $inboxQuery)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .accessibilityLabel("Search unassigned saves")
+                        .padding(.vertical, 8)
+                }
+                if inboxSelecting {
+                    HStack {
+                        Text("\(inboxSelectedRowIDs.count) selected")
+                            .font(.caption).foregroundStyle(.secondary)
+                        Spacer()
+                        inboxProjectMenu(for: cachedFilteredBookmarks.filter { inboxSelectedRowIDs.contains($0.rowID) })
+                            .disabled(inboxSelectedRowIDs.isEmpty)
+                    }
+                }
             } else {
                 VStack(alignment: .leading, spacing: 24) {
                     allSavedLink
@@ -407,7 +454,7 @@ struct BookmarksView: View {
             BookmarksView(filterDefaults: filterDefaults, collectionOnly: true)
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: "bookmark")
+                Image(systemName: "tray")
                 Text("Unassigned saves").font(.body.weight(.medium))
                 Spacer()
                 Text("\(unassignedBookmarks.count)").foregroundStyle(.secondary)
@@ -422,6 +469,95 @@ struct BookmarksView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("all-saved-link")
+    }
+
+    private var inboxSurface: Color {
+        Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 10/255, green: 18/255, blue: 24/255, alpha: 1)
+                : UIColor(red: 242/255, green: 246/255, blue: 249/255, alpha: 1)
+        })
+    }
+
+    private var inboxBookmarkList: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(cachedFilteredBookmarks, id: \.rowID) { bookmark in
+                HStack(alignment: .top, spacing: 8) {
+                    if inboxSelecting {
+                        Button { toggleInboxSelection(bookmark) } label: {
+                            Image(systemName: inboxSelectedRowIDs.contains(bookmark.rowID) ? "checkmark.square" : "square")
+                                .frame(width: 28, height: 44)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel("Select \(bookmark.sectionNumber) \(sourceLabel(bookmark))")
+                        .accessibilityValue(inboxSelectedRowIDs.contains(bookmark.rowID) ? "Selected" : "Not selected")
+                        Button { toggleInboxSelection(bookmark) } label: { inboxPassage(bookmark) }
+                            .buttonStyle(.plain)
+                    } else {
+                        Button { inboxDetail = bookmark } label: { inboxPassage(bookmark) }
+                            .buttonStyle(.plain)
+                        inboxProjectMenu(for: [bookmark])
+                    }
+                }
+                .padding(.vertical, 16)
+                CodeHairline()
+            }
+        }
+    }
+
+    private func inboxPassage(_ bookmark: BookmarkedSection) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text("\(sourceLabel(bookmark)) · § \(bookmark.sectionNumber)")
+                .font(.caption).foregroundStyle(.secondary)
+            Text(bookmark.evidenceDisplayTitle)
+                .font(.body.weight(.semibold)).foregroundStyle(.primary)
+            Text(bookmark.nonRepeatingPreviewText.isEmpty ? bookmark.noteBody : bookmark.nonRepeatingPreviewText)
+                .font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .multilineTextAlignment(.leading)
+        .contentShape(Rectangle())
+    }
+
+    private func inboxProjectMenu(for bookmarks: [BookmarkedSection]) -> some View {
+        Menu {
+            ForEach(library.readerSaveDestinationProjects) { project in
+                Button(project.name) { assignInboxEvidence(bookmarks, to: project) }
+            }
+            Button("New Project…", systemImage: "folder.badge.plus") {
+                newProjectEvidence = bookmarks
+                folderEditorTarget = .new
+            }
+        } label: {
+            Image(systemName: "folder.badge.plus")
+                .frame(width: 44, height: 44)
+                .foregroundStyle(Color(red: 145/255, green: 173/255, blue: 193/255))
+        }
+        .accessibilityLabel(bookmarks.count == 1 ? "Add \(bookmarks[0].sectionNumber) to Project" : "Add selected saves to Project")
+    }
+
+    private func toggleInboxSelection(_ bookmark: BookmarkedSection) {
+        if inboxSelectedRowIDs.contains(bookmark.rowID) { inboxSelectedRowIDs.remove(bookmark.rowID) }
+        else { inboxSelectedRowIDs.insert(bookmark.rowID) }
+    }
+
+    private func assignInboxEvidence(_ bookmarks: [BookmarkedSection], to project: CodeFolder) {
+        guard !bookmarks.isEmpty else { return }
+        // Membership is additive and uses each passage's edition. Reader destination and active Project stay unchanged.
+        var seen = Set<String>()
+        let sections = bookmarks.filter {
+            seen.insert(SavedEvidenceIdentity.section(version: $0.codeVersion, sectionID: $0.id)).inserted
+        }
+        let failed = library.restoreProjectSections(sections, toFolder: project.id)
+        if failed.isEmpty {
+            inboxSelecting = false
+            inboxSelectedRowIDs.removeAll()
+        } else {
+            let message = library.statusMessage ?? ""
+            assignmentError = message.isEmpty ? "Some saves could not be added. Please try again." : message
+        }
+        rebuildBookmarkCaches()
     }
 
 private var savedBookmarkList: some View {
@@ -719,7 +855,15 @@ private var filteredSavedEmptyState: some View {
 
     private func makeFilteredBookmarks() -> [BookmarkedSection] {
         let results = collectionOnly || showsUnassignedOnly ? unassignedBookmarks : library.bookmarks
-        return results.filter { savedFilterCodeSectionIDs.isEmpty || savedFilterCodeSectionIDs.contains(sourceKey($0)) }
+        let filtered = results.filter { bookmark in
+            let sourceMatches = collectionOnly || savedFilterCodeSectionIDs.isEmpty || savedFilterCodeSectionIDs.contains(sourceKey(bookmark))
+            let query = inboxQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+            let queryMatches = !collectionOnly || query.isEmpty ||
+                [sourceLabel(bookmark), bookmark.sectionNumber, bookmark.title, bookmark.previewText, bookmark.noteBody]
+                    .joined(separator: " ").localizedCaseInsensitiveContains(query)
+            return sourceMatches && queryMatches
+        }
+        return collectionOnly ? BookmarkSorter.sorted(filtered, mode: .recentlySaved, codeSectionName: { library.codeSectionName(id: $0) }) : filtered
     }
 
     private var savedInlineFilters: some View {
@@ -748,7 +892,8 @@ private var filteredSavedEmptyState: some View {
     private func rebuildBookmarkCaches() {
         let filtered = makeFilteredBookmarks()
         cachedFilteredBookmarks = filtered
-        cachedBookmarkCodeGroups = makeBookmarkCodeGroups(from: filtered)
+        inboxSelectedRowIDs.formIntersection(Set(filtered.map(\.rowID)))
+        cachedBookmarkCodeGroups = collectionOnly ? [] : makeBookmarkCodeGroups(from: filtered)
         cachedBookmarksByFolderID = makeBookmarksByFolderID()
     }
 
@@ -857,7 +1002,7 @@ private var filteredSavedEmptyState: some View {
             sectionID: bookmark.id,
             codeVersion: bookmark.codeVersion,
             codeSectionID: bookmark.codeSectionID,
-            returnsToProjectsAfterRemoval: true
+            returnsToProjectsAfterRemoval: !collectionOnly
         )
     }
 

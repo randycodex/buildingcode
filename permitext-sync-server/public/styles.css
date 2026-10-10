@@ -18178,3 +18178,97 @@ html body .column-group-menu-button:focus-visible {
 }
 .research-notebook-handoff select { flex: 1 1 140px; }
 .research-notebook-handoff button { text-align: left; }
+
+/* Unassigned is a recent inbox alongside the active Project and Readers. */
+.saved-inbox-panel {
+  background: light-dark(#f2f6f9, #0a1218);
+}
+
+.saved-inbox-panel .panel-header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.saved-inbox-icon {
+  display: inline-flex;
+  color: var(--text-secondary);
+}
+
+.saved-inbox-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.saved-inbox-panel .saved-evidence-heading {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.saved-inbox-count,
+.saved-inbox-order {
+  color: var(--text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.saved-inbox-count { margin-right: auto; }
+.saved-inbox-panel .saved-evidence-heading-actions { margin-left: 0; }
+.saved-inbox-panel .saved-code-filters { display: none; }
+
+.saved-inbox-panel .saved-section-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 8px;
+  padding: 16px 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.saved-inbox-panel .saved-section-row:last-child { border-bottom: 0; }
+.saved-inbox-panel .saved-section-meta { color: var(--text-secondary); font-weight: 400; }
+.saved-inbox-panel .saved-row-button { padding: 0; }
+.saved-inbox-panel .saved-section-title { color: var(--text-primary); }
+.saved-inbox-panel .saved-note-preview { margin-top: 6px; padding: 0; background: transparent; }
+
+.saved-inbox-assign,
+.saved-inbox-assign-selection {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #91adc1;
+  border-radius: 0;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.saved-inbox-assign svg,
+.saved-inbox-assign-selection svg { width: 18px; height: 18px; }
+
+.saved-inbox-panel.is-saved-selecting .saved-section-row {
+  grid-template-columns: 24px minmax(0, 1fr) 32px;
+}
+
+.saved-inbox-panel.is-saved-selecting .saved-selection-check {
+  position: static;
+  transform: none;
+  align-self: center;
+}
+
+.saved-inbox-panel.is-saved-selecting .saved-row-button { padding-right: 0; }
+.saved-inbox-panel.is-saved-selecting .saved-inbox-assign { visibility: hidden; }
+
+.saved-inbox-assign[hidden],
+.saved-inbox-assign-selection[hidden] { display: none; }
+
+.saved-inbox-panel .saved-content > .saved-row {
+  background: transparent;
+  border-radius: 0;
+}

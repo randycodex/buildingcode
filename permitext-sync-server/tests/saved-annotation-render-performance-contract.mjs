@@ -36,7 +36,7 @@ const context = vm.createContext({
 });
 vm.runInContext([
   "normalizeAnnotationBlockID", "normalizeAnnotationTags", "annotationRecordsForTarget",
-  "annotationForTarget", "renderSavedItemsByCode"
+  "annotationForTarget", "appendSavedEvidenceRow", "renderSavedItemsByCode"
 ].map(actual).join("\n"), context);
 const plain = value => JSON.parse(JSON.stringify(value));
 const base = { sectionID: 1, codeVersion: defaultSyncCodeVersion, updatedAt: "2026-09-01T00:00:00Z" };

@@ -6412,8 +6412,8 @@ enum BookmarkSorter {
             case .codeOrder:
                 return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
             case .recentlySaved:
-                let lhsDate = lhs.bookmarkedAt ?? .distantPast
-                let rhsDate = rhs.bookmarkedAt ?? .distantPast
+                let lhsDate = lhs.bookmarkedAt ?? lhs.updatedAt ?? .distantPast
+                let rhsDate = rhs.bookmarkedAt ?? rhs.updatedAt ?? .distantPast
                 if lhsDate != rhsDate { return lhsDate > rhsDate }
                 return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
             case .codeBook:
