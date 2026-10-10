@@ -8,9 +8,11 @@ const tick=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
 for(const mode of ['current','new-navigation','closed']){
  let fail,recoveries=0,errors=0;const recovery=new Promise((_,reject)=>{fail=reject;});
  const panel={isConnected:true,dataset:{readerRenderToken:'initial',paneId:'reader'}};
- const content={clientHeight:500,scrollHeight:500,scrollTop:0,append(){},addEventListener(){},removeEventListener(){}};
+ const content={clientWidth:500,clientHeight:500,scrollHeight:500,scrollTop:0,append(){},addEventListener(){},removeEventListener(){}};
  const status={dataset:{},setAttribute(){},remove(){},isConnected:true};
  const context=vm.createContext({AbortController,Map,performance:{now:()=>1000},document:{createElement:()=>status},
+ ResizeObserver:class {observe(){} disconnect(){}},
+ createReaderChapterExtent:()=>({loadedCount:5,nextWindow:()=>({start:5,end:10})}),
  window:{setTimeout,clearTimeout},requestAnimationFrame:()=>1,cancelAnimationFrame(){},console:{warn(){}},
  readerProgressiveSectionBatchSize:5,fetchChapterBodyWindow:async()=>{const error=Error('changed');error.code='CHAPTER_WINDOW_MISMATCH';throw error;},
  captureReaderScrollPositions:()=>new Map([['reader',{sectionID:'s5',offset:20}]]),

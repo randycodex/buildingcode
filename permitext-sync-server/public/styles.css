@@ -4083,6 +4083,26 @@ select option:checked {
 
 .reader-content {
   overflow-x: hidden;
+  overflow-anchor: none;
+}
+
+.reader-section-placeholder {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+  border: 0;
+  contain: strict;
+}
+
+.reader-progressive-status.reader-extent-status {
+  position: absolute;
+  right: var(--panel-padding);
+  bottom: var(--space-4);
+  left: var(--panel-padding);
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
 }
 
 .reader-empty {

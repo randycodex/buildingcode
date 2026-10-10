@@ -7,6 +7,7 @@ import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-chapter-search-v1";
 import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey } from "./reader-navigation-tree.js?v=20261010-contents-v1";
+import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
@@ -100,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-reader-contents-v681";
+} from "./offline-storage.js?v=20261010-reader-extent-v683";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -138,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-reader-contents-v681";
+} from "./research-intent-state.js?v=20261010-reader-extent-v683";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -14551,6 +14552,10 @@ function collapseRepeatedReaderCatalogAliases(content) {
   let latestBodySection = null;
   let latestBodyText = "";
   content.querySelectorAll(".chapter-section").forEach((section) => {
+    if (section.previousElementSibling?.classList.contains("reader-section-placeholder")) {
+      latestBodySection = null;
+      latestBodyText = "";
+    }
     const blocks = section.querySelectorAll(".annotated-code-block");
     if (blocks.length > 0) {
       latestBodySection = section;
@@ -14599,29 +14604,37 @@ async function progressivelyRenderReaderChapter(
   chapter = null
 ) {
   const requestController = new AbortController();
-  let beforeCursor = initialStart;
-  let afterCursor = initialEnd;
+  let extent = null;
   let hydrationInFlight = false;
   let hydrationCompleted = false;
   let scrollFrame = 0;
   let connectionTimer = 0;
   let connectionWaitCount = 0;
-  let ignoreScrollUntil = 0;
+  let stopped = false;
   const status = document.createElement("p");
-  status.className = "reader-progressive-status";
+  status.className = "reader-progressive-status reader-extent-status";
+  status.hidden = true;
   status.dataset.researchSelectionExclude = "true";
   status.setAttribute("role", "status");
   content.append(status);
 
   const cleanup = () => {
+    stopped = true;
     requestController.abort();
     content.removeEventListener("scroll", onScroll);
+    content.removeEventListener("wheel", onScroll);
+    content.removeEventListener("touchmove", onScroll);
     if (scrollFrame) cancelAnimationFrame(scrollFrame);
     if (connectionTimer) window.clearTimeout(connectionTimer);
+    resizeObserver?.disconnect();
+    if (content._readerChapterExtent === extent) delete content._readerChapterExtent;
+    status.remove();
     scrollFrame = 0;
     connectionTimer = 0;
   };
   content._readerProgressiveCleanup = cleanup;
+  const resizeObserver = new ResizeObserver(() => onScroll());
+  resizeObserver.observe(content);
 
   const scheduleConnectionCheck = () => {
     if (connectionTimer) return;
@@ -14632,56 +14645,32 @@ async function progressivelyRenderReaderChapter(
   };
 
   const updateStatus = (loading = false) => {
-    const loadedCount = afterCursor - beforeCursor;
+    const loadedCount = extent?.loadedCount ?? initialEnd - initialStart;
+    status.hidden = !loading;
     status.textContent = loading
       ? `Loading nearby sections… ${loadedCount} of ${sections.length} loaded`
       : `${loadedCount} of ${sections.length} sections loaded · scroll to continue`;
   };
 
-  const hydrateDirection = async (direction) => {
+  const hydrateWindow = async ({ start, end }) => {
     if (hydrationInFlight) return;
-    const loadingAfter = direction === "after";
-    if ((loadingAfter && afterCursor >= sections.length) || (!loadingAfter && beforeCursor <= 0)) return;
     hydrationInFlight = true;
     hydrationCompleted = false;
     updateStatus(true);
-    const start = loadingAfter
-      ? afterCursor
-      : Math.max(0, beforeCursor - readerProgressiveSectionBatchSize);
-    const end = loadingAfter
-      ? Math.min(sections.length, start + readerProgressiveSectionBatchSize)
-      : beforeCursor;
     try {
       const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start, chapter, { signal: requestController.signal });
-      if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
-      const fragment = document.createDocumentFragment();
-      sections.slice(start, end).forEach((section) => {
-        const sectionNode = renderReaderChapterSection(
+      if (stopped || !panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
+      const nodes = sections.slice(start, end).map((section) =>
+        renderReaderChapterSection(
           panel,
           reader,
           readerSectionWithWindowBody(section, windowChapter),
           groupLabelsByFirstSection
-        );
-        // A prepended batch participates in scroll-height compensation now;
-        // intrinsic placeholder heights would shift the passage after layout.
-        if (!loadingAfter) sectionNode.style.contentVisibility = "visible";
-        fragment.append(sectionNode);
-      });
-      if (loadingAfter) {
-        content.insertBefore(fragment, status);
-        afterCursor = end;
-      } else {
-        const previousHeight = content.scrollHeight;
-        const previousTop = content.scrollTop;
-        content.insertBefore(fragment, content.querySelector(".chapter-section") || status);
-        ignoreScrollUntil = performance.now() + 100;
-        content.scrollTop = previousTop + (content.scrollHeight - previousHeight);
-        beforeCursor = start;
-      }
-      collapseRepeatedReaderCatalogAliases(content);
+        )
+      );
+      extent.replace(start, nodes, () => collapseRepeatedReaderCatalogAliases(content));
       hydrationCompleted = true;
-      if (beforeCursor === 0 && afterCursor === sections.length) {
-        status.remove();
+      if (extent.loadedCount === sections.length) {
         content.dataset.chapterFullyLoaded = "true";
         cleanup();
         delete content._readerProgressiveCleanup;
@@ -14691,7 +14680,7 @@ async function progressivelyRenderReaderChapter(
       restorePendingReaderScrollPosition(panel);
       requestAnimationFrame(() => updateReaderScrollIndicator(panel));
     } catch (error) {
-      if (panel.isConnected && panel.dataset.readerRenderToken === renderToken) {
+      if (!stopped && panel.isConnected && panel.dataset.readerRenderToken === renderToken) {
         if (error.code === "CHAPTER_WINDOW_MISMATCH") {
           const scrollPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
           const recovery = renderSectionContent(panel, reader, { scrollPosition, corpusRecoveryAttempt: true });
@@ -14705,6 +14694,7 @@ async function progressivelyRenderReaderChapter(
           }
           return;
         }
+        status.hidden = false;
         status.textContent = "Nearby sections could not be loaded. Scroll again to retry.";
         console.warn("Reader chapter hydration paused.", error);
       }
@@ -14716,41 +14706,49 @@ async function progressivelyRenderReaderChapter(
 
   const maybeHydrate = () => {
     scrollFrame = 0;
+    if (stopped) return;
     if (!panel.isConnected) {
       if (connectionWaitCount < 120) {
         connectionWaitCount += 1;
         scheduleConnectionCheck();
       } else {
-        status.remove();
         cleanup();
       }
       return;
     }
     connectionWaitCount = 0;
     if (panel.dataset.readerRenderToken !== renderToken) {
-      status.remove();
       cleanup();
       return;
     }
-    if (hydrationInFlight || performance.now() < ignoreScrollUntil) return;
+    if (!content.clientWidth || !content.clientHeight) return;
+    if (!extent) {
+      extent = createReaderChapterExtent(content, sections, initialStart, initialEnd, chapter);
+      content._readerChapterExtent = extent;
+      // Selected middle/end sections now have reserved space before them.
+      // Their existing navigation/restoration callbacks align the actual text.
+    }
+    if (hydrationInFlight) return;
     const threshold = Math.max(320, content.clientHeight * 0.6);
-    const distanceToTop = content.scrollTop;
-    const distanceToBottom = content.scrollHeight - content.clientHeight - content.scrollTop;
-    const canLoadBefore = beforeCursor > 0 && distanceToTop <= threshold;
-    const canLoadAfter = afterCursor < sections.length && distanceToBottom <= threshold;
-    if (!canLoadBefore && !canLoadAfter) return;
-    const direction = canLoadBefore && canLoadAfter
-      ? (distanceToTop <= distanceToBottom ? "before" : "after")
-      : canLoadBefore ? "before" : "after";
-    void hydrateDirection(direction);
+    const window = extent.nextWindow(readerProgressiveSectionBatchSize, threshold);
+    if (window) void hydrateWindow(window);
+    else if (extent.loadedCount === sections.length) {
+      content.dataset.chapterFullyLoaded = "true";
+      cleanup();
+      delete content._readerProgressiveCleanup;
+    }
   };
 
   function onScroll() {
-    if (scrollFrame || performance.now() < ignoreScrollUntil) return;
+    if (stopped || scrollFrame) return;
     scrollFrame = requestAnimationFrame(maybeHydrate);
   }
 
   content.addEventListener("scroll", onScroll, { passive: true });
+  // Retrying must also work at a scroll boundary where a wheel/touch gesture
+  // cannot change scrollTop and therefore produces no scroll event.
+  content.addEventListener("wheel", onScroll, { passive: true });
+  content.addEventListener("touchmove", onScroll, { passive: true });
   updateStatus();
   maybeHydrate();
 }
@@ -39010,6 +39008,8 @@ function captureReaderScrollPositions() {
     const content = panel.querySelector(".reader-content");
     const contentKey = panel.dataset.readerContentKey || "";
     if (!content || !contentKey || content.classList.contains("is-searching-reader")) return;
+    const reservedPosition = content._readerChapterExtent?.unloadedScrollPosition(contentKey);
+    if (reservedPosition) { positions.set(panel.dataset.paneId, reservedPosition); return; }
     const top = content.getBoundingClientRect().top;
     const section = Array.from(content.querySelectorAll(".chapter-section[data-section-id]"))
       .find((node) => node.getBoundingClientRect().bottom > top);
@@ -39079,7 +39079,8 @@ function applyReaderScrollPosition(panel, position) {
     ? section.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(position.blockID)}"]`)
     : null;
   const anchor = block || section;
-  const offset = block ? position.anchorOffset : position.sectionOffset;
+  const offset = block ? position.anchorOffset : Number.isFinite(position.estimatedFraction)
+    ? -position.estimatedFraction * section.getBoundingClientRect().height : position.sectionOffset;
   const targetTop = Math.max(0, content.scrollTop + anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset);
   const maximumTop = Math.max(0, content.scrollHeight - content.clientHeight);
   content.scrollTop = Math.min(targetTop, maximumTop);
