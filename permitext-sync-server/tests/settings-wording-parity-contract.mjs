@@ -59,7 +59,9 @@ assert(webApp.includes('accountCopy.textContent = account ? "" : settingsAccount
 assert(webApp.includes('replaceActiveAccount(null);\n      panel.closest(".account-dialog")?.close();'));
 assert(webApp.includes("signInButton.hidden = Boolean(account)"));
 assert(!webApp.includes('signInButton.textContent = "Link Apple"'));
-assert(webApp.includes('panel.querySelector(".settings-close-button")?.remove()'));
+assert(webApp.includes('panel.querySelector(".panel-header")?.remove()'));
+assert(webApp.includes('dialog.className = "account-dialog account-screen"'));
+assert(webApp.includes('back.setAttribute("aria-label", "Back to reading")'));
 assert(!webApp.includes("account-welcome-close"));
 assert(webApp.includes("if (event.target !== dialog) return;"));
 

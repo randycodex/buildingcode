@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-saving-v697";
+} from "./offline-storage.js?v=20261010-account-screen-v700";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-saving-v697";
+} from "./research-intent-state.js?v=20261010-account-screen-v700";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -35165,7 +35165,7 @@ function attachSettingsTrash(panel) {
         await loadSyncedContent({force: true, skipOutbox: true});
         requireCurrentAccountRequest(identity);
         openTrashAfterSettingsDeletion = true;
-        await refreshWorkspaceAfterSettingsClear(panel.scrollTop, track.scrollLeft);
+        await refreshWorkspaceAfterSettingsClear(settingsPanelScrollTop(panel), track.scrollLeft);
         return;
       }
       status.textContent = result.entries.length ? "Choose a deletion to restore or permanently remove." : "Trash is empty.";
@@ -36116,24 +36116,28 @@ async function renderFirmWorkspaceSettings(panel, settingsProjects, setStatus) {
   container.append(firmStatus);
 }
 
+function settingsPanelScrollTop(panel) {
+  return (panel.querySelector(".settings-scroll") || panel).scrollTop;
+}
+
 async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft) {
   const refreshPaneIDs = activePaneIDs().filter((paneID) => paneID !== "utility:settings");
   await transitionWorkspace("utility", { refreshPaneIDs });
   const settingsPanel = track.querySelector('.workspace-panel[data-pane-id="utility:settings"]');
-  if (settingsPanel) settingsPanel.scrollTop = Math.min(
+  const settingsScroller = settingsPanel?.querySelector(".settings-scroll") || settingsPanel;
+  if (settingsScroller) settingsScroller.scrollTop = Math.min(
     settingsScrollTop,
-    Math.max(0, settingsPanel.scrollHeight - settingsPanel.clientHeight)
+    Math.max(0, settingsScroller.scrollHeight - settingsScroller.clientHeight)
   );
   track.scrollLeft = Math.min(
     workspaceScrollLeft,
     Math.max(0, track.scrollWidth - track.clientWidth)
   );
-  const dialog = document.querySelector(".account-dialog[open]");
+  const dialog = document.querySelector(".account-screen[open]");
   if (dialog && activeAccount()) {
     const refreshed = renderSettings();
-    refreshed.querySelectorAll(".pane-drag-handle, .settings-close-button").forEach(handle => handle.remove());
-    dialog.replaceChildren(refreshed);
-    refreshed.scrollTop = settingsScrollTop;
+    mountAccountScreenContent(dialog, refreshed);
+    refreshed.querySelector(".settings-scroll").scrollTop = settingsScrollTop;
     if (refreshed.querySelector(".settings-trash[open]")) {
       refreshed.querySelector(".settings-trash > summary")?.focus();
     }
@@ -36454,14 +36458,36 @@ function renderAccountWelcome(dialog) {
   return panel;
 }
 
+function mountAccountScreenContent(dialog, panel) {
+  // Reader column widths must not constrain the height of this screen's flex layout.
+  panel.style.removeProperty("flex");
+  panel.querySelector(".panel-header")?.remove();
+  const scroll = panel.querySelector(".settings-scroll");
+  const profile = scroll?.querySelector(".account-connector");
+  if (profile) scroll.prepend(profile);
+  const header = document.createElement("header");
+  header.className = "account-screen-header";
+  const title = document.createElement("h1");
+  title.textContent = "Account";
+  const back = document.createElement("button");
+  back.type = "button";
+  back.className = "account-screen-back";
+  back.textContent = "← Back";
+  back.setAttribute("aria-label", "Back to reading");
+  back.addEventListener("click", () => dialog.close());
+  header.append(title, back);
+  dialog.replaceChildren(header, panel);
+}
+
 function toggleAccountDialog({ upgrade = false } = {}) {
   const existing = document.querySelector(".account-dialog");
   if (existing) { existing.close(); return; }
   const dialog = document.createElement("dialog");
-  dialog.className = "account-dialog";
+  dialog.className = "account-dialog account-screen";
   let closedWithKeyboard = false;
   dialog.addEventListener("cancel", () => { closedWithKeyboard = true; });
   dialog.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented) return;
     closedWithKeyboard = true;
     trapWebModalFocus(dialog, event);
   });
@@ -36472,9 +36498,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     panel.querySelector("h1").textContent = "Continue to Pro.";
     panel.querySelector("h1 + p").textContent = "Sign in or create an account to connect your subscription. Then continue to secure checkout.";
   }
-  panel.querySelectorAll(".pane-drag-handle").forEach((handle) => handle.remove());
-  panel.querySelector(".settings-close-button")?.remove();
-  dialog.append(panel);
+  mountAccountScreenContent(dialog, panel);
   dialog.addEventListener("close", () => {
     if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
     dialog.remove();
@@ -37045,7 +37069,7 @@ function renderSettings({ upgrade = false } = {}) {
       await prepareRecoverableDeletion();
       openTrashAfterSettingsDeletion = true;
       setStatus(`${recordLabel} moved to Trash. Open Trash to undo.`);
-      await refreshWorkspaceAfterSettingsClear(panel.scrollTop, track.scrollLeft);
+      await refreshWorkspaceAfterSettingsClear(settingsPanelScrollTop(panel), track.scrollLeft);
     } catch (error) {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       setStatus(error.message || `Could not delete ${recordLabel}.`, true);
@@ -37074,7 +37098,7 @@ function renderSettings({ upgrade = false } = {}) {
       await prepareRecoverableDeletion();
       openTrashAfterSettingsDeletion = true;
       setStatus(`${recordLabel} moved to Trash. Open Trash to undo.`);
-      await refreshWorkspaceAfterSettingsClear(panel.scrollTop, track.scrollLeft);
+      await refreshWorkspaceAfterSettingsClear(settingsPanelScrollTop(panel), track.scrollLeft);
     } catch (error) {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       setStatus(error.message || `Could not delete ${recordLabel}.`, true);
@@ -37694,7 +37718,7 @@ function renderSettings({ upgrade = false } = {}) {
       const [title, message] = clearActionCopy[action];
       const confirmed = await confirmWebWarning(title, message, { confirmLabel: "Confirm" });
       if (!confirmed) return;
-      const settingsScrollTop = panel.scrollTop;
+      const settingsScrollTop = settingsPanelScrollTop(panel);
       const workspaceScrollLeft = track.scrollLeft;
       button.disabled = true;
       try {
