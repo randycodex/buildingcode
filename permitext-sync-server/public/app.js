@@ -6,6 +6,7 @@ import { createPublicCodeRevisionController, isPublicCodePath } from "./public-c
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-chapter-search-v1";
+import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey } from "./reader-navigation-tree.js?v=20261010-contents-v1";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
@@ -99,7 +100,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-definition-text-v678";
+} from "./offline-storage.js?v=20261010-reader-contents-v681";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +138,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-definition-text-v678";
+} from "./research-intent-state.js?v=20261010-reader-contents-v681";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -6713,6 +6714,7 @@ function readerCodeSelectionKey(reader) {
 
 function closeActiveCustomSelect() {
   if (!activeCustomSelect) return;
+  activeCustomSelect.menu._navigationAbort?.abort();
   activeCustomSelect.menu.hidden = true;
   activeCustomSelect.trigger.setAttribute("aria-expanded", "false");
   activeCustomSelect.panel?.classList.remove("has-open-reader-menu");
@@ -6842,229 +6844,231 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
 }
 
 function bindReaderNavigationKeyboard(menu, select, tree) {
+  const focusItem = (item) => {
+    if (!item) return;
+    readerNavVisibleItems(tree).forEach(candidate => { candidate.tabIndex = candidate === item ? 0 : -1; });
+    item.focus();
+  };
+  tree.addEventListener("focusin", (event) => {
+    const current = event.target.closest?.('[role="treeitem"]');
+    readerNavVisibleItems(tree).forEach(item => { item.tabIndex = item === current ? 0 : -1; });
+  });
   tree.addEventListener("keydown", (event) => {
     const items = readerNavVisibleItems(tree);
     if (!items.length) return;
-    const current = document.activeElement?.closest?.('[role="treeitem"]');
+    const current = event.target.closest?.('[role="treeitem"]');
     const index = Math.max(0, items.indexOf(current));
     const item = items[index] || items[0];
-    const kind = item?.dataset.navKind;
-    const chapterID = item?.dataset.chapterId || "";
-    const expandedID = menu._expandedChapterID || "";
-
-    if (event.key === "Escape") {
+    const expanded = item.getAttribute("aria-expanded") === "true";
+    const expandable = item.hasAttribute("aria-expanded");
+    const toggle = () => void renderReaderChapterNavigationMenu(menu, select, {
+      toggleID: item.dataset.navKey, focusID: item.id
+    });
+    if (event.key === "Escape" || event.key === "Tab") {
       event.preventDefault();
+      event.stopPropagation();
       closeActiveCustomSelect();
-      select._customSelectTrigger?.focus();
+      if (event.key === "Tab") focusAdjacentDocumentControl(select._customSelectTrigger, event.shiftKey);
+      else select._customSelectTrigger?.focus();
       return;
     }
-    if (event.key === "ArrowDown") {
+    if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
       event.preventDefault();
-      items[Math.min(items.length - 1, index + 1)]?.focus();
-      return;
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      items[Math.max(0, index - 1)]?.focus();
-      return;
-    }
-    if (event.key === "Home") {
-      event.preventDefault();
-      items[0]?.focus();
-      return;
-    }
-    if (event.key === "End") {
-      event.preventDefault();
-      items[items.length - 1]?.focus();
+      const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+        : Math.max(0, Math.min(items.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)));
+      focusItem(items[next]);
       return;
     }
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      if (kind === "chapter" && expandedID !== chapterID) {
-        void renderReaderChapterNavigationMenu(menu, select, {
-          expandedChapterID: chapterID,
-          focusID: item.id
-        });
-        return;
-      }
-      if (kind === "chapter" && expandedID === chapterID) {
-        items[index + 1]?.focus();
-      }
+      if (expandable && !expanded) toggle();
+      else if (expanded) focusItem(item.querySelector(':scope > [role="group"] > [role="treeitem"]'));
       return;
     }
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      if (kind === "chapter" && expandedID === chapterID) {
-        void renderReaderChapterNavigationMenu(menu, select, {
-          expandedChapterID: "",
-          focusID: item.id
-        });
-        return;
-      }
-      if (kind === "section") {
-        tree.querySelector(`[data-nav-kind="chapter"][data-chapter-id="${CSS.escape(chapterID)}"]`)?.focus();
-      }
+      if (expanded) toggle();
+      else focusItem(item.parentElement?.closest('[role="treeitem"]'));
       return;
     }
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      const panel = select.closest(".workspace-panel");
-      const reader = readerForPanel(panel);
-      if (kind === "section") {
-        void selectReaderNavigation(panel, reader, {
-          chapterID,
-          sectionID: item.dataset.sectionId
-        });
-        return;
-      }
-      if (event.key === " ") {
-        void renderReaderChapterNavigationMenu(menu, select, {
-          expandedChapterID: expandedID === chapterID ? "" : chapterID,
-          focusID: item.id
-        });
-        return;
-      }
-      void selectReaderNavigation(panel, reader, { chapterID });
+      if (expandable && (event.target.closest('.reader-nav-chevron') ||
+          (event.key === " " && event.target === item))) toggle();
+      else void selectReaderNavigation(select.closest(".workspace-panel"), readerForPanel(select.closest(".workspace-panel")), {
+        chapterID: item.dataset.chapterId, sectionID: item.dataset.sectionId
+      });
     }
   });
 }
 
 async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
-  const preservedTarget = options.focusID
-    ? menu.querySelector(`#${CSS.escape(options.focusID)}`)
-    : null;
-  const preservedTargetOffset = preservedTarget
-    ? preservedTarget.getBoundingClientRect().top - menu.getBoundingClientRect().top
-    : null;
-  const preservedScrollTop = menu.scrollTop;
   const panel = select.closest(".workspace-panel");
   const reader = readerForPanel(panel);
-  let sourceToken;
+  // Customized selects are prepared during Reader construction. Do no chapter
+  // work until this particular contents menu is actually open.
+  if (menu.hidden || !menu.isConnected || !panel?.isConnected || !reader) return;
+  const preservedTarget = options.focusID ? menu.querySelector(`#${CSS.escape(options.focusID)}`) : null;
+  const preservedOffset = preservedTarget
+    ? preservedTarget.getBoundingClientRect().top - menu.getBoundingClientRect().top : null;
+  const preservedScrollTop = menu.scrollTop;
+  const account = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const readerIdentity = workspaceReaderContentIdentity(reader);
   const attempt = crypto.randomUUID();
   menu._sourceProjectionAttempt = attempt;
+  menu._navigationAbort?.abort();
+  const controller = new AbortController();
+  menu._navigationAbort = controller;
+  let sourceToken;
+  const isCurrent = () => !controller.signal.aborted && !menu.hidden && menu.isConnected && panel.isConnected &&
+    menu._sourceProjectionAttempt === attempt && isCurrentAccountRequest(account) &&
+    activeWorkspaceID === workspaceID && workspaceReaderContentIdentity(reader) === readerIdentity &&
+    (!sourceToken || activeCodeSourcesController.isCurrent(sourceToken));
   try {
-    const projection = await enabledReaderBrowseProjection([codeOptionFor(reader?.codePrefix || "BC", reader?.codeVersion || "")]);
-    if (menu._sourceProjectionAttempt !== attempt || !activeCodeSourcesController.isCurrent(projection.token)) return;
-    if (!projection.codes.length) { renderReaderSourceRecovery(menu); return; }
+    const projection = await enabledReaderBrowseProjection([codeOptionFor(reader.codePrefix || "BC", reader.codeVersion || "")]);
     sourceToken = projection.token;
+    if (!isCurrent()) return;
+    if (!projection.codes.length) { renderReaderSourceRecovery(menu); return; }
   } catch (error) {
-    if (menu._sourceProjectionAttempt === attempt) renderReaderSourceRecovery(menu, error.message);
+    if (isCurrent()) renderReaderSourceRecovery(menu, error.message);
     return;
   }
-  const sectionSelect = panel?.querySelector(".section-select");
-  const chapters = Array.from(select.options)
-    .map((option) => ({
-      id: option.value,
-      title: option.textContent,
-      sourceChapterID: option.dataset.sourceChapterId || option.value
-    }))
-    .filter((chapter) => chapter.id);
-  const activeChapterID = String(select.value || reader?.chapterID || "");
-  const activeSectionID = String(reader?.sectionID || sectionSelect?.value || "");
-  const hasRequestedExpandedChapter = Object.prototype.hasOwnProperty.call(options, "expandedChapterID");
-  const hasPreservedExpandedChapter = Object.prototype.hasOwnProperty.call(menu, "_expandedChapterID");
-  const expandedChapterID = hasRequestedExpandedChapter
-    ? options.expandedChapterID
-    : hasPreservedExpandedChapter
-      ? menu._expandedChapterID
-      : "";
-  menu._expandedChapterID = expandedChapterID;
-
-  let sections = [];
-  if (expandedChapterID) {
-    try {
-      const chapter = await fetchChapter(expandedChapterID);
-      sections = readerNavigationSections(chapter);
-    } catch {
-      sections = [];
-    }
+  menu.style.setProperty("--code-accent", getComputedStyle(panel).getPropertyValue("--code-accent"));
+  const chapters = Array.from(select.options).filter(option => option.value).map(option => ({
+    key: readerContentsChapterKey(option.value), kind: "chapter", chapterID: option.value,
+    title: option.textContent, sectionCount: Number(option.dataset.sectionCount || -1), children: []
+  }));
+  const activeChapterID = String(select.value || reader.chapterID || "");
+  const activeSectionID = String(reader.sectionID || "");
+  const target = `${activeChapterID}:${activeSectionID}`;
+  const revealTarget = menu._navigationTarget !== target;
+  menu._navigationTarget = target;
+  if (!menu._expandedNavigationIDs) menu._expandedNavigationIDs = new Set();
+  const expanded = menu._expandedNavigationIDs;
+  if (revealTarget) expanded.add(readerContentsChapterKey(activeChapterID));
+  if (options.toggleID) {
+    if (expanded.has(options.toggleID)) expanded.delete(options.toggleID);
+    else expanded.add(options.toggleID);
   }
-
-  if (menu._sourceProjectionAttempt !== attempt || !activeCodeSourcesController.isCurrent(sourceToken)) return;
-  clear(menu);
-  const tree = document.createElement("div");
-  tree.className = "reader-nav-tree";
-  tree.setAttribute("role", "tree");
-  tree.setAttribute("aria-label", "Chapters and sections");
-  tree.tabIndex = 0;
-
-  chapters.forEach((chapter) => {
-    const expanded = chapter.id === expandedChapterID;
-    const chapterSelected = chapter.id === activeChapterID && !activeSectionID;
-    const item = document.createElement("div");
-    item.className = "reader-nav-chapter";
-    item.id = readerNavItemID("chapter", chapter.id);
-    item.setAttribute("role", "treeitem");
-    item.tabIndex = -1;
-    item.dataset.navKind = "chapter";
-    item.dataset.chapterId = chapter.id;
-    item.setAttribute("aria-expanded", String(expanded));
-    item.setAttribute("aria-selected", String(chapterSelected));
-    item.setAttribute("aria-level", "1");
-
-    const row = document.createElement("div");
-    row.className = "reader-nav-chapter-row";
-    const chevron = document.createElement("span");
-    chevron.className = "reader-nav-chevron";
-    chevron.setAttribute("aria-hidden", "true");
-    chevron.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>';
-    const label = document.createElement("span");
-    label.className = "reader-nav-chapter-label";
-    label.textContent = chapter.title;
-    row.append(chevron, label);
-    row.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      void renderReaderChapterNavigationMenu(menu, select, {
-        expandedChapterID: expanded ? "" : chapter.id,
-        focusID: item.id
-      });
-    });
-    item.append(row);
-
-    if (expanded) {
-      const group = document.createElement("div");
-      group.className = "reader-nav-section-group";
-      group.setAttribute("role", "group");
-      sections.forEach((section) => {
-        const sectionItem = document.createElement("div");
-        sectionItem.className = "reader-nav-section";
-        sectionItem.id = readerNavItemID("section", section.id);
-        sectionItem.setAttribute("role", "treeitem");
-        sectionItem.tabIndex = -1;
-        sectionItem.dataset.navKind = "section";
-        sectionItem.dataset.chapterId = chapter.id;
-        sectionItem.dataset.sectionId = String(section.id);
-        sectionItem.setAttribute("aria-selected", String(String(section.id) === activeSectionID));
-        sectionItem.setAttribute("aria-level", "2");
-        sectionItem.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
-        sectionItem.addEventListener("click", () => {
-          void selectReaderNavigation(panel, reader, {
-            chapterID: chapter.id,
-            sectionID: section.id
-          });
+  const renderTree = () => {
+    if (!isCurrent()) return;
+    clear(menu);
+    const tree = document.createElement("div");
+    tree.className = "reader-nav-tree";
+    tree.setAttribute("role", "tree");
+    tree.setAttribute("aria-label", "Chapters and sections");
+    const appendNode = (node, host, level) => {
+      const item = document.createElement("div");
+      item.className = node.kind === "chapter" ? "reader-nav-chapter" : "reader-nav-section";
+      item.id = `${menu.id}-${readerNavItemID("node", node.key)}`;
+      item.setAttribute("role", "treeitem");
+      item.setAttribute("aria-label", node.title);
+      item.setAttribute("aria-level", String(level));
+      item.setAttribute("aria-selected", String(node.kind === "chapter"
+        ? node.chapterID === activeChapterID && !activeSectionID
+        : node.kind === "section" && node.chapterID === activeChapterID && node.sectionID === activeSectionID));
+      item.tabIndex = -1;
+      item.dataset.navKind = node.kind;
+      item.dataset.navKey = node.key;
+      item.dataset.chapterId = node.chapterID;
+      if (node.sectionID) item.dataset.sectionId = node.sectionID;
+      const expandable = node.kind === "chapter" ? node.sectionCount !== 0 : node.children.length > 0;
+      const isExpanded = expandable && expanded.has(node.key);
+      if (expandable) item.setAttribute("aria-expanded", String(isExpanded));
+      const row = document.createElement("div");
+      row.className = "reader-nav-row";
+      const chevron = document.createElement(expandable ? "button" : "span");
+      chevron.className = expandable ? "reader-nav-chevron" : "reader-nav-chevron-space";
+      if (expandable) {
+        chevron.type = "button";
+        chevron.tabIndex = -1;
+        chevron.setAttribute("aria-label", `${isExpanded ? "Collapse" : "Expand"} ${node.title}`);
+        chevron.setAttribute("aria-expanded", String(isExpanded));
+        chevron.setAttribute("aria-controls", `${item.id}-children`);
+        chevron.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>';
+        chevron.addEventListener("click", (event) => {
+          event.preventDefault(); event.stopPropagation();
+          void renderReaderChapterNavigationMenu(menu, select, { toggleID: node.key, focusID: item.id });
         });
-        group.append(sectionItem);
+      } else chevron.setAttribute("aria-hidden", "true");
+      const label = document.createElement("button");
+      label.type = "button";
+      label.className = "reader-nav-label";
+      label.tabIndex = -1;
+      label.textContent = node.title;
+      label.addEventListener("click", (event) => {
+        event.preventDefault(); event.stopPropagation();
+        void selectReaderNavigation(panel, reader, { chapterID: node.chapterID, sectionID: node.sectionID });
       });
-      item.append(group);
+      row.append(chevron, label);
+      item.append(row);
+      if (isExpanded) {
+        const group = document.createElement("div");
+        group.className = "reader-nav-section-group";
+        group.id = `${item.id}-children`;
+        group.setAttribute("role", "group");
+        if (node.loading || node.error) {
+          const status = document.createElement("div");
+          status.className = "reader-nav-status";
+          status.setAttribute("role", "status");
+          status.textContent = node.error ? "Could not load sections." : "Loading sections…";
+          if (node.error) {
+            const retry = document.createElement("button");
+            retry.type = "button"; retry.textContent = "Retry";
+            retry.addEventListener("click", () => void renderReaderChapterNavigationMenu(menu, select, { focusID: item.id }));
+            status.append(retry);
+          }
+          group.append(status);
+          item.setAttribute("aria-busy", String(Boolean(node.loading)));
+        } else node.children.forEach(child => appendNode(child, group, level + 1));
+        item.append(group);
+      }
+      host.append(item);
+    };
+    chapters.forEach(chapter => appendNode(chapter, tree, 1));
+    menu.append(tree);
+    bindReaderNavigationKeyboard(menu, select, tree);
+    const focusTarget = (options.focusID && tree.querySelector(`#${CSS.escape(options.focusID)}`)) ||
+      tree.querySelector('[aria-selected="true"]') || tree.querySelector('[role="treeitem"]');
+    menu.scrollTop = preservedScrollTop;
+    if (focusTarget && preservedOffset !== null) {
+      menu.scrollTop += focusTarget.getBoundingClientRect().top - menu.getBoundingClientRect().top - preservedOffset;
     }
-    tree.append(item);
-  });
-
-  menu.append(tree);
-  bindReaderNavigationKeyboard(menu, select, tree);
-  const focusTarget = options.focusID
-    ? tree.querySelector(`#${CSS.escape(options.focusID)}`)
-    : tree.querySelector('[aria-selected="true"]') ||
-      tree.querySelector(`[data-nav-kind="chapter"][data-chapter-id="${CSS.escape(expandedChapterID)}"]`) ||
-      tree.querySelector('[role="treeitem"]');
-  menu.scrollTop = preservedScrollTop;
-  if (focusTarget && preservedTargetOffset !== null) {
-    const nextTargetOffset = focusTarget.getBoundingClientRect().top - menu.getBoundingClientRect().top;
-    menu.scrollTop += nextTargetOffset - preservedTargetOffset;
-  }
-  focusTarget?.focus({ preventScroll: true });
-  requestAnimationFrame(() => activeCustomSelect?.positionMenu());
+    if (focusTarget) { focusTarget.tabIndex = 0; focusTarget.focus({ preventScroll: true }); }
+    requestAnimationFrame(() => {
+      if (!isCurrent() || activeCustomSelect?.menu !== menu) return;
+      activeCustomSelect.positionMenu();
+      if (!options.focusID && focusTarget) {
+        const bounds = menu.getBoundingClientRect(), focusBounds = focusTarget.querySelector('.reader-nav-row').getBoundingClientRect();
+        if (focusBounds.top < bounds.top) menu.scrollTop += focusBounds.top - bounds.top;
+        else if (focusBounds.bottom > bounds.bottom) menu.scrollTop += focusBounds.bottom - bounds.bottom;
+      }
+    });
+  };
+  const openChapters = chapters.filter(chapter => expanded.has(chapter.key) && chapter.sectionCount !== 0);
+  openChapters.forEach(chapter => { chapter.loading = true; });
+  renderTree();
+  await Promise.all(openChapters.map(async node => {
+    try {
+      const chapter = await fetchChapter(node.chapterID, { signal: controller.signal });
+      if (!isCurrent()) return;
+      node.children = buildReaderChapterContents(chapter, readerNavigationSections(chapter), sectionDisplayTitle);
+      node.sectionCount = node.children.length;
+      if (revealTarget && node.chapterID === activeChapterID) {
+        const ancestors = readerContentsAncestorKeys(node.children, activeSectionID);
+        if (ancestors) ancestors.forEach(key => expanded.add(key));
+        else if (!activeSectionID && node.children[0]?.kind === "group") expanded.add(node.children[0].key);
+      }
+    } catch (error) {
+      if (!isCurrent()) return;
+      node.error = true;
+    } finally {
+      node.loading = false;
+      // Cached open chapters remain visible while another chapter is loading.
+      renderTree();
+    }
+  }));
 }
 
 function repositionActiveCustomSelect() {
@@ -7138,6 +7142,7 @@ function enhanceSelect(select) {
   select._syncCustomSelect = syncTrigger;
 
   const closeMenu = () => {
+    menu._navigationAbort?.abort();
     menu.hidden = true;
     trigger.setAttribute("aria-expanded", "false");
     selectPanel?.classList.remove("has-open-reader-menu");
@@ -7361,6 +7366,7 @@ function enhanceReaderSelects() {
 
 function resetEnhancedSelects(scope) {
   scope.querySelectorAll("select.native-select-hidden").forEach((select) => {
+    select._customSelectMenu?._navigationAbort?.abort();
     select._customSelectMenu?.remove();
     select._customSelectObserver?.disconnect();
     delete select._customSelectMenu;

@@ -2783,6 +2783,7 @@ label {
   font-weight: 650;
 }
 
+/* Contents rows stay compact; nested groups indent only their own children. */
 .reader-nav-tree {
   display: flex;
   flex-direction: column;
@@ -2791,70 +2792,73 @@ label {
   outline: 0;
 }
 
-.reader-nav-chapter {
-  min-width: 0;
-}
-
-.reader-nav-chapter-row,
+.reader-nav-chapter,
 .reader-nav-section {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  width: 100%;
-  min-height: 26px;
-  padding: 4px var(--space-2);
-  border: 0;
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--text-secondary);
-  font: inherit;
-  line-height: 1.25;
-  text-align: left;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  cursor: pointer;
-}
-
-.reader-nav-chapter-row {
-  background: transparent;
-  color: var(--text-secondary);
-  font-weight: 650;
-}
-
-.reader-nav-chapter-row:hover,
-.reader-nav-section:hover {
-  background: color-mix(in srgb, var(--focus-ring) 8%, transparent);
-  color: var(--text-primary);
-}
-
-.reader-nav-section[aria-selected="true"] {
-  background: transparent;
-  color: var(--text-primary);
-  font-weight: 650;
-}
-
-.reader-nav-chapter:focus,
-.reader-nav-chapter:focus-visible,
-.reader-nav-section:focus,
-.reader-nav-section:focus-visible,
-.reader-nav-tree:focus-visible {
+  min-width: 0;
+  padding: 0;
   outline: 0;
 }
 
-.reader-nav-chapter:focus-visible > .reader-nav-chapter-row,
-.reader-nav-section:focus-visible {
-  background: color-mix(in srgb, var(--focus-ring) 10%, transparent);
+.reader-nav-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  min-height: 28px;
+  color: var(--text-secondary);
+}
+
+.reader-nav-label,
+.reader-nav-chevron {
+  padding: 5px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1.35;
+  text-decoration: none;
+  box-shadow: none;
+  outline: 0;
+  cursor: pointer;
+}
+
+.reader-nav-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.reader-nav-chapter > .reader-nav-row > .reader-nav-label {
+  font-weight: 600;
+}
+
+.reader-nav-label:hover,
+.reader-nav-chevron:hover,
+.reader-nav-chapter:focus-visible > .reader-nav-row,
+.reader-nav-section:focus-visible > .reader-nav-row {
   color: var(--text-primary);
 }
 
-.reader-nav-chevron {
+.reader-nav-chapter[aria-selected="true"] > .reader-nav-row,
+.reader-nav-section[aria-selected="true"] > .reader-nav-row {
+  color: var(--code-accent, var(--text-primary));
+}
+
+.reader-nav-chevron,
+.reader-nav-chevron-space {
   display: inline-flex;
-  flex: 0 0 16px;
+  flex: 0 0 20px;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 1.25em;
-  color: var(--text-tertiary);
+  width: 20px;
+  min-height: 28px;
+  box-sizing: border-box;
+}
+
+.reader-nav-chevron {
+  color: var(--text-secondary);
 }
 
 .reader-nav-chevron svg {
@@ -2863,24 +2867,35 @@ label {
   transition: transform 140ms ease;
 }
 
-.reader-nav-chapter[aria-expanded="true"] .reader-nav-chevron svg {
+.reader-nav-chevron[aria-expanded="true"] svg {
   transform: rotate(90deg);
-}
-
-.reader-nav-chapter-label {
-  min-width: 0;
-  flex: 1 1 auto;
 }
 
 .reader-nav-section-group {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  margin: 1px 0 6px;
+  margin: 0 0 2px 35px;
 }
 
-.reader-nav-section {
-  padding-left: calc(var(--space-2) + 24px);
+.reader-nav-status {
+  padding: 5px 0 5px 24px;
+  color: var(--text-secondary);
+  font: inherit;
+}
+
+.reader-nav-status button {
+  margin-left: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reader-nav-chevron svg { transition: none; }
 }
 
 .custom-select-option {
@@ -17578,10 +17593,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .saved-section-row .saved-section-title {
   display: block;
   padding-block: 4px;
-}
-
-.reader-nav-section-group > .reader-nav-section {
-  padding-left: calc(var(--space-2) + 44px);
 }
 
 .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button) {
