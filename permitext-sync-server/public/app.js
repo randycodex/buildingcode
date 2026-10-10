@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-inbox-navigation-v690";
+} from "./offline-storage.js?v=20261010-inbox-toggle-v691";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-inbox-navigation-v690";
+} from "./research-intent-state.js?v=20261010-inbox-toggle-v691";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1762,12 +1762,29 @@ function defaultReadingWorkspace() {
     || null;
 }
 
+function unassignedInboxInstance() {
+  return (state.utilityInstances || []).find((instance) => instance.key === "saved" &&
+    (instance.unassignedInbox || (!instance.selectedFolderID && instance.organizeUnassigned)));
+}
+
+let unassignedToggleInFlight = false;
+async function toggleUnassignedSaves() {
+  if (!workspacePrivatePresentationAllowed() || unassignedToggleInFlight) return;
+  unassignedToggleInFlight = true;
+  try {
+    const inbox = unassignedInboxInstance();
+    if (inbox) await closeUtilityInstance(inbox, { preserveSavedPassages: true });
+    else await openUnassignedSaves();
+  } finally {
+    unassignedToggleInFlight = false;
+  }
+}
+
 async function openUnassignedSaves() {
   if (!workspacePrivatePresentationAllowed()) return;
   const requestIdentity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
-  let inbox = (state.utilityInstances || []).find((instance) => instance.key === "saved" &&
-    (instance.unassignedInbox || (!instance.selectedFolderID && instance.organizeUnassigned)));
+  let inbox = unassignedInboxInstance();
   if (!inbox) {
     inbox = newUtilityInstance("saved", { unassignedInbox: true, organizeUnassigned: true, projectsMenuOpen: false });
     state.utilityInstances = [...(state.utilityInstances || []), inbox];
@@ -4695,6 +4712,7 @@ function setUtilityButtonStates() {
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
+  unassignedSavesButton?.setAttribute("aria-pressed", String(Boolean(unassignedInboxInstance())));
   toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis || activeRepeatableKeys.has("analysis")));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
@@ -18852,7 +18870,7 @@ function renderUtility(template, paneID) {
   return panel;
 }
 
-async function closeUtilityInstance(instance) {
+async function closeUtilityInstance(instance, options = {}) {
   const paneID = paneIDForUtilityInstance(instance);
   const detailID = instance.key === "search" ? paneIDForSectionDetail(instance.id) : "";
   const closingProjectHost = instance.key === "saved" && paneID === state.projectHostPaneID;
@@ -18872,12 +18890,24 @@ async function closeUtilityInstance(instance) {
   }
   if (instance.key === "search") closeLinkedReaderForSearch(instance.id);
   if (instance.key === "saved") {
+    savedItemOpeningAttempts.delete(paneID);
     if (closingProjectHost) {
       const current = openProjectDetails()[0] || null;
       if (current && !(await deactivateProjectStudio(current, { transition: false }))) return false;
     }
-    closeLinkedReaderForSavedPane(paneID);
-    closeSavedItemDetailsForPane(paneID);
+    if (options.preserveSavedPassages) {
+      // The inbox toggle closes only its column; open passages become independent.
+      (state.readers || []).forEach((reader) => {
+        if (reader.savedSourcePaneID === paneID) delete reader.savedSourcePaneID;
+      });
+      const anchors = sectionDetailAnchorsBySearch();
+      Object.entries(anchors).forEach(([searchID, anchorPaneID]) => {
+        if (anchorPaneID === paneID) delete anchors[searchID];
+      });
+    } else {
+      closeLinkedReaderForSavedPane(paneID);
+      closeSavedItemDetailsForPane(paneID);
+    }
   }
   state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
   if (closingProjectHost) {
@@ -43563,7 +43593,7 @@ async function start() {
   });
   unassignedSavesButton?.addEventListener("click", () => {
     closeWorkspaceContextMenu();
-    void openUnassignedSaves();
+    void toggleUnassignedSaves();
   });
   mobileMoreButton?.addEventListener("click", openMobileMoreSheet);
   window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {

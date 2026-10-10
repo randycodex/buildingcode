@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261010-definition-text-v88">
-    <link rel="stylesheet" href="/web/styles.css?v=20261010-inbox-navigation-v690">
+    <link rel="stylesheet" href="/web/styles.css?v=20261010-inbox-toggle-v691">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -85,7 +85,7 @@
         </nav>
         <div class="topbar-workspaces" aria-label="Saved inbox and Projects">
           <span class="connection-status" id="connection-status" role="status" aria-live="polite" data-state="clean"><span class="connection-status-label">Online</span></span>
-          <button class="workspace-actions-button" id="open-unassigned" type="button" aria-label="Open Unassigned saves" title="Unassigned saves">Unassigned saves</button>
+          <button class="workspace-actions-button" id="open-unassigned" type="button" aria-label="Unassigned saves" title="Unassigned saves" aria-pressed="false">Unassigned saves</button>
           <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Choose Project" title="Projects" aria-haspopup="menu" aria-expanded="false">
             <span class="workspace-current-name">Projects</span>
           </button>
@@ -578,6 +578,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261010-inbox-navigation-v690" type="module"></script>
+    <script src="/web/app.js?v=20261010-inbox-toggle-v691" type="module"></script>
   </body>
 </html>

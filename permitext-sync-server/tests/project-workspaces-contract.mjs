@@ -75,7 +75,7 @@ assert.ok(context.workspaceRegistry.workspaces.some(w=>w.id==='project:a'), 'ret
 // Execute the actual menu destination and workspace switch against persisted layouts.
 // A Project-only account must reach its existing unassigned evidence without creating
 // a Project, changing saved identities, or overwriting the Project's pane arrangement.
-assert.match(app, /unassignedSavesButton\?\.addEventListener\("click", \(\) => \{\s*closeWorkspaceContextMenu\(\);\s*void openUnassignedSaves\(\);/);
+assert.match(app, /unassignedSavesButton\?\.addEventListener\("click", \(\) => \{\s*closeWorkspaceContextMenu\(\);\s*void toggleUnassignedSaves\(\);/);
 const switchSource = app.slice(app.indexOf('async function switchWorkspace('), app.indexOf('\nfunction workspaceProject('));
 const unassignedSource = app.slice(app.indexOf('function defaultReadingWorkspace('), app.indexOf('\nasync function createGeneralWorkspace('));
 function unassignedHarness(workspaces, activeID = 'project:a') {
