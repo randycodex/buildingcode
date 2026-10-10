@@ -16464,6 +16464,8 @@ function reportSourceClientSummary(source) {
     label: source.label,
     summary: source.summary || "",
     ...(source.kind === "evidence" ? {
+      sectionID: source.sectionID || "",
+      selectionBlockID: source.selectionBlockID || "",
       chapterNumber: source.chapterNumber || "",
       selectionKind: source.selectionKind || "section",
       previewText: source.previewText || "",
@@ -16563,6 +16565,8 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
         id: sourceID, kind: "evidence", codePrefix: evidence.codeBook,
         codeEdition: evidence.codeEdition, sourceLibraryVersion: evidence.sourceLibraryVersion,
         sectionNumber: evidence.sectionNumber, title: evidence.title,
+        sectionID: selection.sectionID,
+        selectionBlockID: selection.blockID || "",
         chapterNumber: evidence.chapter === "unknown" ? "" : evidence.chapter,
         selectionKind: selection.blockID ? "paragraph" : "section",
         previewText: evidence.passageText.replace(/\s+/g, " ").trim().slice(0, 240),

@@ -18776,3 +18776,8 @@ html body .column-group-menu-button:focus-visible {
 .project-facts-panel .project-refresh-status:empty {
   display: none;
 }
+
+.report-destination-select { display: block; width: 100%; margin-top: var(--space-3); padding: var(--space-2); color: var(--text-primary); background: var(--surface); border: 0; border-radius: 8px; }
+.saved-evidence-add-report-selection { border: 0; border-radius: 999px; padding: 6px 12px; background: var(--surface); color: var(--text-primary); }
+
+.web-warning-dialog.is-report-destination .web-warning-confirm { background: #222; color: var(--text-primary); border-color: transparent; }

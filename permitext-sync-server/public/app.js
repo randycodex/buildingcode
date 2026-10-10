@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-report-evidence-layout-v757";
+} from "./offline-storage.js?v=20261010-report-source-actions-v760";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-report-evidence-layout-v757";
+} from "./research-intent-state.js?v=20261010-report-source-actions-v760";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -5951,7 +5951,8 @@ function openWebWarning({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   cancellable = true,
-  container = null
+  container = null,
+  choices = []
 }) {
   activeWebWarningClose?.(false);
   const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -5961,6 +5962,7 @@ function openWebWarning({
   backdrop.className = "web-warning-backdrop";
   const dialog = document.createElement("section");
   dialog.className = "web-warning-dialog";
+  if (choices.length) dialog.classList.add("is-report-destination");
   dialog.tabIndex = -1;
   dialog.setAttribute("role", "alertdialog");
   dialog.setAttribute("aria-modal", "true");
@@ -5974,6 +5976,14 @@ function openWebWarning({
   body.className = "web-warning-message";
   body.id = messageID;
   body.textContent = message;
+  let choice = null;
+  if (choices.length) {
+    choice = document.createElement("select");
+    choice.className = "report-destination-select";
+    choice.setAttribute("aria-label", "Destination Report");
+    choices.forEach(item => choice.append(new Option(item.label, item.value)));
+    body.append(choice);
+  }
   const actions = document.createElement("div");
   actions.className = "web-warning-actions";
   let cancelButton = null;
@@ -6005,7 +6015,7 @@ function openWebWarning({
     };
     activeWebWarningClose = close;
     cancelButton?.addEventListener("click", () => close(false));
-    confirmButton.addEventListener("click", () => close(true));
+    confirmButton.addEventListener("click", () => close(choice ? choice.value : true));
     backdrop.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -27292,7 +27302,7 @@ async function renderProjectNotebook(project, options = {}) {
       const reportButton = document.createElement("button");
       reportButton.type = "button";
       reportButton.className = "notebook-secondary-action";
-      reportButton.textContent = "Review for Report";
+      reportButton.textContent = "Add to Report";
       reportButton.disabled = notebookReadOnly;
       reportButton.addEventListener("click", async () => {
         const handoffRenderSequence = editorRenderSequence;
@@ -27302,7 +27312,8 @@ async function renderProjectNotebook(project, options = {}) {
           if (disposed || !isCurrentAccountRequest(requestIdentity) || handoffRenderSequence !== editorRenderSequence) return;
           if (!synchronized || dirty || saveConflict) throw new Error("Finish syncing this Note and resolve any save conflict before adding it to a Report. Your device draft is preserved.");
           if (!activeCard?.id) throw new Error("Save this Note before adding it to a Report.");
-          await promoteNotebookCardToReport(identity, activeCard);
+          const addedReport = await promoteNotebookCardToReport(identity, activeCard);
+          reportAdditionFeedback(reportButton, addedReport);
         } catch (error) {
           if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report handoff not completed", error.message);
         }
@@ -27544,31 +27555,6 @@ async function renderProjectNotebook(project, options = {}) {
   return panel;
 }
 
-function groupReportEvidenceSources(sources = []) {
-  const codeOrder = new Map();
-  codeOptions.forEach((option, index) => {
-    if (!codeOrder.has(option.prefix)) codeOrder.set(option.prefix, index);
-  });
-  const groups = new Map();
-  sources.forEach((source) => {
-    const prefix = String(source.codePrefix || "Other").trim() || "Other";
-    const version = String(source.sourceLibraryVersion || "").trim();
-    const key = `${prefix}::${version || source.codeEdition || "unrecorded"}`;
-    if (!groups.has(key)) groups.set(key, { prefix, version, key, sources: [] });
-    groups.get(key).sources.push(source);
-  });
-  const compare = (left, right) => String(left || "").localeCompare(String(right || ""), undefined, { numeric: true, sensitivity: "base" });
-  return [...groups.values()]
-    .sort((left, right) => (codeOrder.get(left.prefix) ?? Number.MAX_SAFE_INTEGER) -
-      (codeOrder.get(right.prefix) ?? Number.MAX_SAFE_INTEGER) ||
-      compare(left.prefix, right.prefix) || compare(left.version, right.version))
-    .map((group) => ({ ...group, sources: group.sources.sort((left, right) =>
-      Number(!left.chapterNumber) - Number(!right.chapterNumber) ||
-      compare(left.chapterNumber, right.chapterNumber) || compare(left.sectionNumber, right.sectionNumber) ||
-      Number(left.selectionKind === "paragraph") - Number(right.selectionKind === "paragraph")
-    ) }));
-}
-
 function emptyProjectReportDraft(project) {
   return {
     id: "",
@@ -27590,71 +27576,102 @@ async function notebookCardReportBlock(project, cardID) {
   ) || null;
 }
 
-async function promoteNotebookCardToReport(project, card) {
-  const requestIdentity = captureAccountRequest();
-  const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };
+function appendUniqueReportSources(draft, sources) {
+  draft.blocks ||= [];
+  for (const source of sources) {
+    if (draft.blocks.some(block => block.kind === source.kind && block.sourceID === source.id)) continue;
+    const legacyIndex = source.kind === "notebookCard" ? draft.blocks.findIndex(block =>
+      block.derivedFrom?.kind === "notebookCard" && block.derivedFrom.id === source.id) : -1;
+    if (legacyIndex >= 0) {
+      draft.blocks[legacyIndex] = { id: draft.blocks[legacyIndex].id, kind: source.kind,
+        sourceID: source.id, label: source.label, sourceClassification: source.sourceClassification };
+      continue;
+    }
+    draft.blocks.push({ id: crypto.randomUUID(), kind: source.kind, sourceID: source.id,
+      label: source.label, sourceClassification: source.sourceClassification });
+  }
+}
+
+async function addProjectSourcesToReport(project, selectSources) {
   const identity = projectIdentity(project);
   const projectID = projectDetailKey(identity);
-  const requireSavedReportEdits = () => {
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const check = () => {
     requireCurrentAccountRequest(requestIdentity);
-    if (reportDraftMounts.get(projectID)?.hasUnsavedChanges?.()) {
-      throw new Error("Save your open Report edits before updating it from a Note.");
-    }
+    if (workspaceID !== activeWorkspaceID) throw accountContextChangedError();
   };
-  requireSavedReportEdits();
-  card = structuredClone(card);
-  if (!await confirmWebWarning("Add this Note to the Report?",
-    `Project: ${identity.name}\nNote: ${card.title || "Untitled Note"}\n\n${String(card.plainText || "").slice(0, 1400)}\n\nThe Note and its source links are retained in the Report record. Full linked answers are not automatically copied into the printed Report. Review this Note before including it.`,
-    { confirmLabel: "Add to Report" })) return;
-  requireSavedReportEdits();
-  const payload = await reportRequest("/reports/drafts/list", { projectID });
-  requireSavedReportEdits();
-  const draft = structuredClone(payload.drafts?.[0] || emptyProjectReportDraft(identity));
-  const existingBlockIndex = (draft.blocks || []).findIndex((block) =>
-    (block.kind === "notebookCard" && block.sourceID === card.id) ||
-    (block.derivedFrom?.kind === "notebookCard" && block.derivedFrom.id === card.id)
-  );
-  const existingBlock = existingBlockIndex >= 0 ? draft.blocks[existingBlockIndex] : null;
-  const promotedBlock = {
-    id: existingBlock?.id || crypto.randomUUID(),
-    kind: "notebookCard",
-    sourceID: card.id,
-    label: card.title || "Notebook Note"
-  };
+  if (!hasCapability("professional-exports")) throw new Error("Pro is required to add to a Report.");
+  if (identity.sharedOnly) throw new Error("Shared Report editing is not available yet.");
+  const [draftPayload, sourcePayload] = await Promise.all([
+    postResearch("/reports/drafts/list", { projectID }),
+    postResearch("/reports/sources/list", { projectID })
+  ]);
+  check();
+  const selectedSources = selectSources(sourcePayload.sources || []);
+  if (!selectedSources.length) throw new Error("This material is not available for this Project's Report yet. Sync it and try again.");
+  const drafts = [...(draftPayload.drafts || [])];
+  const mountedDraft = reportDraftMounts.get(projectID)?.getDraftSnapshot?.();
+  if (mountedDraft && !mountedDraft.id && reportDraftMounts.get(projectID)?.hasUnsavedChanges?.()) drafts.unshift(mountedDraft);
+  if (!drafts.length) drafts.push(emptyProjectReportDraft(identity));
+  let target = drafts[0];
+  if (drafts.length > 1) {
+    const selected = await openWebWarning({ title: "Add to Report", message: "Choose the destination Report.",
+      confirmLabel: "Add", choices: drafts.map((draft, index) => ({ value: String(index), label: draft.title || "Untitled Report" })) });
+    check();
+    if (selected === false) return null;
+    target = drafts[Number(selected)];
+  }
+  check();
+  const mount = reportDraftMounts.get(projectID);
+  let saved;
+  if (mount?.getDraftSnapshot?.().id === target.id) {
+    saved = await mount.addSources(target.id, selectedSources);
+  } else {
+    const draft = structuredClone(target);
+    appendUniqueReportSources(draft, selectedSources);
+    check();
+    const payload = await postResearch("/reports/drafts/save", { projectID, draftID: draft.id,
+      expectedVersion: draft.version || 0, title: draft.title, reportDate: draft.reportDate,
+      introduction: draft.introduction, blocks: draft.blocks });
+    check();
+    saved = payload.draft;
+    await reportDraftMounts.get(projectID)?.refreshArtifacts?.();
+  }
+  check();
+  await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
+  check();
+  return saved;
+}
+
+function reportAdditionFeedback(button, draft) {
+  if (!draft || !button.isConnected) return;
+  button.dataset.reportActionLabel ||= button.textContent;
+  window.clearTimeout(button.reportFeedbackTimer);
+  button.setAttribute("aria-live", "polite");
+  button.textContent = `Added to ${draft.title || "Report"}`;
+  button.reportFeedbackTimer = window.setTimeout(() => {
+    if (button.isConnected) button.textContent = button.dataset.reportActionLabel;
+  }, 4000);
+}
+
+async function addSavedEvidenceToReport(project, items) {
+  return addProjectSourcesToReport(project, sources => items.map(item => {
+    const blockID = item.scope === "section" ? "" : String(item.blockID || "").trim();
+    const source = sources.find(source => source.kind === "evidence" &&
+      String(source.sectionID) === String(item.sectionID) &&
+      source.sourceLibraryVersion === syncCodeVersion(item.codeVersion) &&
+      String(source.selectionBlockID || "") === blockID);
+    if (!source) throw new Error("A selected passage is not available for this Project's Report. Sync the evidence and try again.");
+    return source;
+  }));
+}
+
+async function promoteNotebookCardToReport(project, card) {
   if (!String(card.plainText || "").trim() && !(card.references || []).length) {
     throw new Error("Write the Note or link a source before adding it to a Report.");
   }
-  if (existingBlockIndex >= 0) {
-    draft.blocks[existingBlockIndex] = promotedBlock;
-  } else {
-    draft.blocks = [...(draft.blocks || []), promotedBlock];
-  }
-  const saved = await reportRequest("/reports/drafts/save", {
-    projectID,
-    draftID: draft.id,
-    expectedVersion: draft.version || 0,
-    title: draft.title,
-    reportDate: draft.reportDate,
-    introduction: draft.introduction,
-    blocks: draft.blocks
-  });
-  requireCurrentAccountRequest(requestIdentity);
-  pendingReportDraftByProject.set(projectID, saved.draft.id);
-  await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
-  requireCurrentAccountRequest(requestIdentity);
-  await openProjectReportDraft(identity);
-  if (!await whenWorkspacePaneReady(paneIDForProjectReportDraft(identity))) return;
-  requireCurrentAccountRequest(requestIdentity);
-  // Opening an existing pane preserves its editor. Explicitly refresh the saved
-  // snapshot, while retaining any edits made during the asynchronous promotion.
-  const mounted = reportDraftMounts.get(projectID);
-  await mounted?.refreshArtifacts?.({ draftID: saved.draft.id });
-  requireCurrentAccountRequest(requestIdentity);
-  if (mounted?.hasUnsavedChanges?.()) {
-    await showWebNotice("Note saved to Report", "Your unsaved Report edits are still open. Copy those edits before reopening the Report to review its saved update.");
-  } else {
-    pendingReportDraftByProject.delete(projectID);
-  }
+  return addProjectSourcesToReport(project, sources => sources.filter(source => source.kind === "notebookCard" && source.id === card.id));
 }
 
 function reportSourceClassificationLabel(value) {
@@ -27752,6 +27769,16 @@ async function renderProjectReportDraft(project) {
   const mountState = {
     panel,
     hasUnsavedChanges: () => dirty,
+    getDraftSnapshot: () => structuredClone(activeDraft),
+    async addSources(draftID, selectedSources) {
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) throw accountContextChangedError();
+      if (activeDraft.id !== draftID || generatingReport || deletingReport || pendingDraftSave) throw new Error("The Report is busy or has changed. Try adding again.");
+      appendUniqueReportSources(activeDraft, selectedSources);
+      setDirty();
+      renderWorkspaceContent();
+      if (!await saveDraft()) throw new Error("The Report could not finish saving. Your added material and edits remain in the Report; use Save draft to retry.");
+      return structuredClone(activeDraft);
+    },
     async confirmDiscardIfNeeded() {
       if (!dirty) return true;
       return confirmWebWarning(
@@ -28176,44 +28203,12 @@ async function renderProjectReportDraft(project) {
     const appendSourceCard = (container, source) => {
       const row = document.createElement("article");
       row.className = "report-source-card";
-      if (source.kind === "evidence") {
-        row.classList.add("report-evidence-source-card", "saved-row", `code-theme-${codeTheme(source.codePrefix)}`);
-      }
       const copy = document.createElement("div");
-      let heading;
-      if (source.kind === "evidence") {
-        const sectionNumber = String(source.sectionNumber || "").trim();
-        const meta = document.createElement("span");
-        meta.className = "saved-section-meta";
-        const edition = savedEvidenceEdition({ codePrefix: source.codePrefix, codeVersion: source.sourceLibraryVersion });
-        meta.textContent = [source.selectionKind === "paragraph" ? "Paragraph" : "Section", sectionNumber,
-          edition === "Edition not recorded" ? source.codeEdition || edition : edition].filter(Boolean).join(" · ");
-        heading = document.createElement("strong");
-        heading.className = "saved-section-title";
-        heading.textContent = sectionTitleWithoutNumber({ sectionNumber, title: source.title }) || "Section";
-        const sectionHeading = document.createElement("div");
-        sectionHeading.className = "saved-section-heading";
-        sectionHeading.append(meta, heading);
-        const preview = document.createElement("span");
-        preview.className = "saved-paragraph-preview";
-        preview.textContent = source.previewText || source.summary || "";
-        copy.append(sectionHeading, preview);
-        (source.notes || []).forEach((savedNote) => {
-          const note = document.createElement("span");
-          note.className = "saved-note-preview";
-          const noteText = document.createElement("span");
-          noteText.className = "saved-note-text";
-          noteText.textContent = savedNote.body;
-          note.append(noteText);
-          copy.append(note);
-        });
-      } else {
-        heading = document.createElement("strong");
-        heading.textContent = source.label;
-        const summary = document.createElement("p");
-        summary.textContent = source.summary || "Project source";
-        copy.append(heading, summary);
-      }
+      const heading = document.createElement("strong");
+      heading.textContent = source.label;
+      const summary = document.createElement("p");
+      summary.textContent = source.summary || "Project source";
+      copy.append(heading, summary);
       const add = document.createElement("button");
       add.type = "button";
       add.textContent = "Add";
@@ -28243,94 +28238,12 @@ async function renderProjectReportDraft(project) {
       projectFactsSources.forEach((source) => appendSourceCard(groupBody, source));
     });
 
-    const evidenceSources = sources.filter((source) => source.kind === "evidence");
-    appendSourceGroup("Saved evidence", "", (groupBody) => {
-      if (sourceWarnings.length) {
-        const warning = document.createElement("div");
-        warning.className = "project-studio-warning";
-        const warningTitle = document.createElement("strong");
-        warningTitle.textContent = `${sourceWarnings.length} linked code ${sourceWarnings.length === 1 ? "source is" : "sources are"} unavailable`;
-        const warningCopy = document.createElement("p");
-        warningCopy.textContent = "The unavailable source was omitted so you can continue editing this Report. Re-open or remove its Saved evidence link before finalizing the report.";
-        const warningList = document.createElement("ul");
-        sourceWarnings.slice(0, 5).forEach((item) => {
-          const row = document.createElement("li");
-          row.textContent = item.message || item.sourceID || "Unavailable linked code source";
-          warningList.append(row);
-        });
-        warning.append(warningTitle, warningCopy, warningList);
-        groupBody.append(warning);
-      }
-
-      groupReportEvidenceSources(evidenceSources).forEach(({ prefix, version, key, sources: codeSources }) => {
-        const codeGroup = document.createElement("section");
-        codeGroup.className = `report-evidence-code-group code-theme-${codeTheme(prefix)}`;
-        const codeHeading = document.createElement("div");
-        codeHeading.className = "report-evidence-code-heading project-collapsible-heading";
-        const codeTitle = document.createElement("button");
-        codeTitle.type = "button";
-        codeTitle.className = "project-section-toggle-label section-label saved-code-label report-evidence-code-toggle";
-        const codeName = document.createElement("span");
-        codeName.textContent = prefix === "Other" ? "Other enacted codes" : codeLabel(prefix, version);
-        const codeToggle = document.createElement("span");
-        codeToggle.className = "saved-code-toggle-chevron";
-        codeToggle.setAttribute("aria-hidden", "true");
-        codeToggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>';
-        codeTitle.append(codeName, codeToggle);
-        codeHeading.append(codeTitle);
-        const codeBody = document.createElement("div");
-        codeBody.className = "report-evidence-code-body";
-        let previousChapter = null;
-        codeSources.forEach((source) => {
-          const chapterNumber = String(source.chapterNumber || "");
-          if (chapterNumber && chapterNumber !== previousChapter) {
-            const chapterHeading = document.createElement("div");
-            chapterHeading.className = "saved-chapter-header";
-            const chapterLabel = document.createElement("strong");
-            chapterLabel.textContent = `Chapter ${chapterNumber}`;
-            chapterHeading.append(chapterLabel);
-            codeBody.append(chapterHeading);
-          }
-          previousChapter = chapterNumber;
-          appendSourceCard(codeBody, source);
-        });
-        codeGroup.append(codeHeading, codeBody);
-        groupBody.append(codeGroup);
-        const groupKey = `Saved evidence:${key}`;
-        const initiallyExpanded = reportSectionExpanded(groupKey);
-        wireProjectSectionMotion(
-          codeGroup,
-          codeBody,
-          [codeTitle],
-          codeName.textContent,
-          initiallyExpanded,
-          {
-            onChange(expanded) {
-              codeGroup.classList.toggle("is-collapsed", !expanded);
-              persistReportSectionExpanded(groupKey, expanded);
-            }
-          }
-        );
-        codeGroup.classList.toggle("is-collapsed", !initiallyExpanded);
-      });
-    });
-
     const researchSources = sources.filter((source) => source.kind === "researchAnswer");
     appendSourceGroup("Research", "", (groupBody) => {
 
       researchSources.forEach((source) => appendSourceCard(groupBody, source));
     });
 
-    const notebookSources = sources.filter((source) => source.kind === "notebookCard");
-    appendSourceGroup("Notebook notes", "", (groupBody) => {
-      if (!notebookSources.length) {
-        const empty = document.createElement("p");
-        empty.className = "report-draft-empty";
-        empty.textContent = "No Notebook Notes are linked to this Project.";
-        groupBody.append(empty);
-      }
-      notebookSources.forEach((source) => appendSourceCard(groupBody, source));
-    });
   }
 
   function renderHistory(container) {
@@ -28584,7 +28497,7 @@ async function renderProjectReportDraft(project) {
     sourcePickerToggle.className = "section-label";
     const sourcePickerHelp = document.createElement("p");
     sourcePickerHelp.className = "report-source-picker-help";
-    sourcePickerHelp.textContent = "Choose sources to include in this draft. Added items appear in Report content.";
+    sourcePickerHelp.textContent = "Add evidence from Evidence and notes from Notebook. Choose other Project sources below.";
     const sourcePickerDone = document.createElement("button");
     sourcePickerDone.type = "button";
     sourcePickerDone.textContent = "Done adding sources";
@@ -33188,6 +33101,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     : !workspaceProject() ? combinedItems : [];
   const selectionController = removableSavedItems.length
     ? createSavedBulkSelectionController(panel, removableSavedItems, {
+        reportProject: selectedFolder && folderIsProject(selectedFolder) ? selectedFolder : null,
         allowProjectAssignment: showingUnassigned || !workspaceProject(),
         inbox: showingUnassigned,
         removeAction: (item) => selectedFolder ? unlinkEvidenceFromFolder(
@@ -33301,6 +33215,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         selectionController,
         projectNamesForItem,
         showProjectContext: !selectedFolder && !savedInstance.organizeUnassigned,
+        reportProject: selectedFolder && folderIsProject(selectedFolder) ? selectedFolder : null,
         researchProjectID: selectedFolder && folderIsProject(selectedFolder) ? projectDetailKey(selectedFolder) : "",
         animateSavedItemRemoval: animateSavedRowRemoval,
         onSavedItemRemoved: async () => {
@@ -34343,6 +34258,22 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
   const removeButton = panel.querySelector(".saved-evidence-delete-selection");
   const cancelButton = panel.querySelector(".saved-evidence-cancel-selection");
   if (!selectButton || !removeButton || !cancelButton) return null;
+  const reportButton = document.createElement("button");
+  reportButton.type = "button";
+  reportButton.className = "saved-evidence-add-report-selection";
+  reportButton.textContent = "Add to Report";
+  reportButton.hidden = true;
+  if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("professional-exports")) cancelButton.before(reportButton);
+  reportButton.addEventListener("click", async () => {
+    if (busy || !selectedIDs.size) return;
+    busy = true;
+    update();
+    try {
+      const draft = await addSavedEvidenceToReport(options.reportProject, [...selectedIDs].map(id => recordByID.get(id)));
+      reportAdditionFeedback(reportButton, draft);
+    } catch (error) { await showWebNotice("Could not add to Report", error.message); }
+    finally { busy = false; update(); }
+  });
   const projectPicker = document.createElement("select");
   projectPicker.setAttribute("aria-label", "Add selected evidence to project");
   projectPicker.hidden = true;
@@ -34406,6 +34337,8 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     panel.classList.toggle("is-saved-selecting", active);
     selectButton.setAttribute("aria-pressed", String(active));
     const selectedCount = selectedIDs.size;
+    reportButton.hidden = selectedCount === 0;
+    reportButton.disabled = busy || selectedCount === 0;
     projectPicker.hidden = options.inbox || !options.allowProjectAssignment || selectedCount === 0;
     assignButton.hidden = !options.inbox || selectedCount === 0;
     assignButton.disabled = busy;
@@ -34614,6 +34547,19 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
       }
     });
     actions.append(researchButton);
+    if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("professional-exports")) {
+      const reportButton = document.createElement("button");
+      reportButton.type = "button";
+      reportButton.className = "saved-add-to-report";
+      reportButton.textContent = "Add to Report";
+      reportButton.addEventListener("click", async () => {
+        reportButton.disabled = true;
+        try { reportAdditionFeedback(reportButton, await addSavedEvidenceToReport(options.reportProject, [item])); }
+        catch (error) { await showWebNotice("Could not add to Report", error.message); }
+        finally { if (reportButton.isConnected) reportButton.disabled = false; }
+      });
+      actions.append(reportButton);
+    }
     if (item.savedColumnKind === "bookmark") {
       const removeItemButton = document.createElement("button");
       removeItemButton.type = "button";

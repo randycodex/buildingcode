@@ -64,6 +64,8 @@ try {
   assert.equal(palette.warnings.length, 0);
   for (const [index, section] of [current, historical, table, deadEnd].entries()) {
     const source = palette.sources.find(source => source.id === reportSavedSourceID(savedRecords[index]));
+    assert.equal(source.sectionID, String(section.id));
+    assert.equal(source.selectionBlockID, "");
     assert.equal(source.chapterNumber, String(section.chapterNumber));
     assert.equal(source.selectionKind, "section");
     assert.equal(source.previewText.length, 240);
@@ -124,6 +126,8 @@ try {
   const paragraphSourceID = reportSavedSourceID(paragraphRecord);
   const paragraphSource = palette.sources.find(source => source.id === paragraphSourceID);
   assert(paragraphSource);
+  assert.equal(paragraphSource.sectionID, String(deadEnd.id));
+  assert.equal(paragraphSource.selectionBlockID, paragraphID);
   assert.equal(paragraphSource.selectionKind, "paragraph");
   assert.equal(paragraphSource.chapterNumber, "10");
   assert.equal(paragraphSource.previewText, savedExportSourceText(sourceBody, paragraphID).replace(/\s+/g, " ").trim().slice(0, 240));

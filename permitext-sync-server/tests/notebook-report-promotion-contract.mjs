@@ -1,122 +1,88 @@
-import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import vm from "node:vm";
-
-const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
-const start = source.indexOf("async function promoteNotebookCardToReport(");
-const end = source.indexOf("\nfunction reportSourceClassificationLabel(", start);
-const refreshStart = source.indexOf("  refreshReportArtifacts = async");
-const refreshEnd = source.indexOf("\n\n  try {", refreshStart);
-assert.ok(start >= 0 && end > start && refreshStart >= 0 && refreshEnd > refreshStart);
-const old = { id: "report-a", version: 2, title: "Synthetic", blocks: [{ id: "block-a", text: "Old text", derivedFrom: { kind: "notebookCard", id: "card-a" } }] };
-const other = { id: "report-b", version: 1, blocks: [] };
-const card = { id: "card-a", title: "Synthetic note", version: 3, plainText: "Only the cellar is sprinklered. PHONE checkpoint.", evidenceLinks: [] };
-const defer = () => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; };
-
-function fixture(options = {}) {
-  let generation = 1, unsaved = Boolean(options.dirty), server = structuredClone(old);
-  const calls = [], rendered = [], notices = [], pending = new Map();
-  let mounted;
-  const c = {
-    confirmWebWarning: async () => options.confirmed !== false,
-    structuredClone, crypto: { randomUUID: () => "new-block" }, Date,
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import vm from 'node:vm';
+import { randomUUID } from 'node:crypto';
+const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+const start = app.indexOf('function appendUniqueReportSources(');
+const end = app.indexOf('\nfunction reportSourceClassificationLabel(', start);
+const note = { id: 'note-a', title: 'Note', plainText: 'Analysis', references: [] };
+const source = { id: 'note-a', kind: 'notebookCard', label: 'Note', sourceClassification: 'user-authored' };
+const evidence = { id: 'passage-a', kind: 'evidence', sectionID: 'section-a', sourceLibraryVersion: '2022', selectionBlockID: 'paragraph-a', label: 'Passage' };
+const project = { id: 'project-a', name: 'Project A' };
+const draft = { id: 'report-a', title: 'Report A', version: 2, introduction: 'Keep this', blocks: [{ id: 'text-a', kind: 'paragraph', text: 'Existing text' }] };
+function fixture({ drafts = [draft], choice = '0', mount, gate } = {}) {
+  let generation = 1;
+  const calls = [], dialogs = [], saved = [];
+  const c = vm.createContext({ structuredClone, crypto: { randomUUID }, Date,
+    activeWorkspaceID: 'workspace-a', hasCapability: () => true,
     captureAccountRequest: () => generation,
-    requireCurrentAccountRequest: g => { if (g !== generation) throw Object.assign(new Error("Account changed"), { name: "AbortError" }); },
-    isCurrentAccountRequest: g => g === generation,
-    projectIdentity: p => p, projectDetailKey: p => p.id,
-    reportDraftMounts: new Map(), notebookMounts: new Map(), pendingReportDraftByProject: pending,
-    emptyProjectReportDraft: () => ({ id: "", version: 0, blocks: [] }),
-    async postResearch(path, body) {
+    requireCurrentAccountRequest: value => { if (value !== generation) throw new Error('Account changed'); },
+    accountContextChangedError: () => new Error('Workspace changed'),
+    projectIdentity: value => value, projectDetailKey: value => value.id,
+    syncCodeVersion: value => value,
+    reportDraftMounts: new Map(mount ? [['project-a', mount]] : []), notebookMounts: new Map(),
+    emptyProjectReportDraft: () => ({ id: '', title: 'New Report', version: 0, blocks: [] }),
+    openWebWarning: async options => { dialogs.push(options); return choice; },
+    postResearch: async (path, body) => {
       calls.push(path);
-      if (path.endsWith("drafts/list")) { if (options.listGate) await options.listGate.promise; return { drafts: [structuredClone(server), other] }; }
-      if (path.endsWith("drafts/save")) {
-        assert.equal(body.expectedVersion, server.version);
-        if (options.saveGate) await options.saveGate.promise;
-        server = { ...structuredClone(body), id: "report-a", version: 3 }; return { draft: structuredClone(server) };
-      }
-      if (path.endsWith("sources/list")) return { sources: [] };
-      if (path.endsWith("history/list")) return { reports: [] };
+      if (path.endsWith('drafts/list')) { if (gate) await gate; return { drafts: structuredClone(drafts) }; }
+      if (path.endsWith('sources/list')) return { sources: [source, evidence, { ...evidence, id: 'historical', sourceLibraryVersion: '2014' }] };
+      if (path.endsWith('drafts/save')) { saved.push(structuredClone(body)); return { draft: { ...body, id: body.draftID || 'new-id', version: body.expectedVersion + 1 } }; }
       throw new Error(path);
-    },
-    async openProjectReportDraft() { calls.push("open-existing-pane"); },
-    paneIDForProjectReportDraft: project => `report:${project.id}`,
-    whenWorkspacePaneReady: async () => options.readyGate ? options.readyGate.promise : true,
-    async showWebNotice(...args) { notices.push(args); },
-    disposed: false, requestIdentity: 1, projectID: "project-a", identity: { id: "project-a" },
-    activeCard: structuredClone(card), notebookReadOnly: false,
-    flushNotebookAutosave: async () => true, reportStatus: {}, existingReportBlock: old.blocks[0],
-    drafts: [], sources: [], sourceWarnings: [], history: [], activeDraft: structuredClone(options.otherSelected ? other : old),
-    panel: { querySelector: () => ({ replaceChildren() {} }) },
-    renderSourcePalette() {}, renderHistory() {}, clearStatus() {},
-    renderWorkspaceContent() { rendered.push(structuredClone(c.activeDraft)); }
-  };
-  Object.defineProperty(c, "dirty", { get: () => unsaved });
-  c.reportRequest = async (...args) => { c.requireCurrentAccountRequest(c.requestIdentity); return c.postResearch(...args); };
-  vm.createContext(c);
-  vm.runInContext(source.slice(start, end) + "\n" + source.slice(refreshStart, refreshEnd), c);
-  mounted = { hasUnsavedChanges: () => unsaved, refreshArtifacts: options => c.refreshReportArtifacts(options) };
-  c.reportDraftMounts.set("project-a", mounted);
-  return { c, calls, rendered, notices, pending, run: () => c.promoteNotebookCardToReport({ id: "project-a" }, card),
-    setDirty: () => { unsaved = true; }, switchAccount: () => { generation += 1; }, server: () => server };
+    }
+  });
+  vm.runInContext(app.slice(start, end), c);
+  return { c, calls, dialogs, saved, switchAccount: () => generation++, run: () => c.promoteNotebookCardToReport(project, note) };
 }
-
-for (const otherSelected of [false, true]) {
-  const h = fixture({ otherSelected }); await h.run();
-  assert.equal(h.rendered.at(-1).id, "report-a");
-  assert.equal(h.rendered.at(-1).version, 3);
-  assert.equal(h.rendered.at(-1).blocks[0].kind, "notebookCard");
-  assert.equal(h.rendered.at(-1).blocks[0].sourceID, card.id, "An open Report must retain the Note source and its inline references");
-  assert.equal(h.rendered.at(-1).blocks[0].id, "block-a");
-  assert.equal(h.pending.size, 0);
-}
-const declined = fixture({ confirmed: false }); await declined.run(); assert.deepEqual(declined.calls, [], "Review cancellation performs no reads or writes");
-const dirty = fixture({ dirty: true });
-await assert.rejects(dirty.run(), /Save your open Report edits/); assert.deepEqual(dirty.calls, []);
-for (const action of ["setDirty", "switchAccount"]) {
-  const gate = defer(), h = fixture({ listGate: gate }); const run = h.run(); h[action](); gate.resolve();
-  await assert.rejects(run); assert.equal(h.calls.includes("/reports/drafts/save"), false);
-}
-const gate = defer(), duringSave = fixture({ saveGate: gate });
-const saving = duringSave.run();
-for (let i = 0; i < 20 && !duringSave.calls.includes("/reports/drafts/save"); i++) await Promise.resolve();
-duringSave.setDirty(); gate.resolve(); await saving;
-assert.equal(duringSave.server().blocks[0].sourceID, card.id);
-assert.equal(duringSave.rendered.length, 0, "In-flight local edits must not be replaced by refresh");
-assert.equal(duringSave.notices.length, 1, "The preserved unsaved view must be disclosed");
-const accountGate = defer(), changed = fixture({ saveGate: accountGate }); const changing = changed.run();
-for (let i = 0; i < 20 && !changed.calls.includes("/reports/drafts/save"); i++) await Promise.resolve();
-changed.switchAccount(); accountGate.resolve(); await assert.rejects(changing, { name: "AbortError" });
-assert.equal(changed.rendered.length, 0); assert.equal(changed.pending.size, 0);
-// Exercise the reviewed handoff’s asynchronous pane-ready boundary directly.
-for (const switchAccount of [false, true]) {
-  const readyGate = defer(), waiting = fixture({ readyGate });
-  const promotion = waiting.run();
-  for (let i = 0; i < 50 && !waiting.calls.includes("open-existing-pane"); i++) await Promise.resolve();
-  assert.ok(waiting.calls.includes("open-existing-pane"));
-  assert.equal(waiting.rendered.length, 0, "Promotion waits for its Report pane before refreshing");
-  if (switchAccount) waiting.switchAccount();
-  readyGate.resolve(true);
-  if (switchAccount) await assert.rejects(promotion, { name: "AbortError" });
-  else await promotion;
-  assert.equal(waiting.rendered.length, switchAccount ? 0 : 1);
-  assert.equal(waiting.notices.length, 0, "An obsolete promotion must not show a notice in another account");
-}
-// The current user-facing route adds Notebook sources from the Report palette.
-const paletteStart = source.indexOf("    const appendSourceCard = (container, source) => {");
-const paletteEnd = source.indexOf("\n\n    const projectFactsSources", paletteStart);
-assert.ok(paletteStart >= 0 && paletteEnd > paletteStart);
-let addClick, dirtyCount = 0, renderCount = 0;
-const palette = vm.createContext({
-  document: { createElement: () => ({ classList: { add() {} }, append() {}, setAttribute() {},
-    addEventListener(_event, listener) { addClick = listener; } }) },
-  crypto: { randomUUID: () => "added-block" }, activeDraft: { blocks: [] },
-  setDirty() { dirtyCount++; }, renderWorkspaceContent() { renderCount++; }
-});
-vm.runInContext(source.slice(paletteStart, paletteEnd) + "\nglobalThis.appendSourceCard = appendSourceCard;", palette);
-palette.appendSourceCard({ append() {} }, { id: "card-a", kind: "notebook", label: "Synthetic note", sourceClassification: "professional-note" });
-addClick();
-assert.equal(palette.activeDraft.blocks[0].sourceID, "card-a");
-assert.equal(palette.activeDraft.blocks[0].sourceClassification, "professional-note");
-assert.equal(dirtyCount, 1);
-assert.equal(renderCount, 1);
-console.log("Notebook Report promotion passed: visible exact draft/revision, stable provenance, unsaved edits and account isolation.");
+const single = fixture();
+assert.equal((await single.run()).title, 'Report A');
+assert.equal(single.dialogs.length, 0);
+assert.equal(single.saved[0].blocks[0].text, 'Existing text');
+assert.equal(single.saved[0].blocks[1].sourceID, note.id);
+assert.equal(single.saved[0].introduction, 'Keep this');
+assert.equal(single.saved[0].expectedVersion, 2);
+const multiple = fixture({ drafts: [draft, { ...draft, id: 'report-b', title: 'Report B', version: 5 }], choice: '1' });
+await multiple.run();
+assert.equal(multiple.dialogs.length, 1);
+assert.equal(multiple.saved[0].draftID, 'report-b');
+assert.equal(multiple.saved[0].expectedVersion, 5);
+const cancelled = fixture({ drafts: [draft, { ...draft, id: 'report-b' }], choice: false });
+assert.equal(await cancelled.run(), null);
+assert.equal(cancelled.saved.length, 0);
+const first = fixture({ drafts: [] });
+assert.equal((await first.run()).id, 'new-id');
+assert.equal(first.saved[0].expectedVersion, 0);
+const duplicate = fixture({ drafts: [{ ...draft, blocks: [{ id: 'existing', kind: 'notebookCard', sourceID: note.id }] }] });
+await duplicate.run();
+assert.equal(duplicate.saved[0].blocks.length, 1);
+const legacy = fixture({ drafts: [{ ...draft, blocks: [{ id: 'existing', derivedFrom: { kind: 'notebookCard', id: note.id } }] }] });
+await legacy.run();
+assert.equal(legacy.saved[0].blocks.length, 1);
+assert.equal(legacy.saved[0].blocks[0].id, "existing");
+assert.equal(legacy.saved[0].blocks[0].kind, "notebookCard");
+assert.equal(legacy.saved[0].blocks[0].sourceID, note.id);
+let mountedAdds = 0;
+const mounted = fixture({ mount: { getDraftSnapshot: () => draft, hasUnsavedChanges: () => true,
+  async addSources(id, sources) { assert.equal(id, draft.id); assert.equal(sources[0].id, note.id); mountedAdds++; return draft; } } });
+await mounted.run();
+assert.equal(mountedAdds, 1, 'Open drafts append through their editor to retain unsaved changes.');
+assert.equal(mounted.saved.length, 0, 'Never overwrite a mounted draft with an older server snapshot.');
+const batch = fixture();
+await batch.c.addSavedEvidenceToReport(project, [
+  { sectionID: 'section-a', codeVersion: '2022', blockID: 'paragraph-a' },
+  { sectionID: 'section-a', codeVersion: '2014', blockID: 'paragraph-a' }
+]);
+assert.deepEqual(batch.saved[0].blocks.slice(1).map(block => block.sourceID), ['passage-a', 'historical']);
+const unavailable = fixture();
+await assert.rejects(unavailable.c.addSavedEvidenceToReport(project, [{ sectionID: 'section-a', codeVersion: '2022', blockID: 'different' }]), /not available/);
+assert.equal(unavailable.saved.length, 0, 'Never expand an unavailable paragraph into its full section.');
+let resolve;
+const changed = fixture({ gate: new Promise(r => resolve = r) });
+const pending = changed.run(); changed.switchAccount(); resolve();
+await assert.rejects(pending, /Account changed/);
+assert.equal(changed.saved.length, 0);
+const palette = app.slice(app.indexOf('  function renderSourcePalette('), app.indexOf('  function renderHistory('));
+assert(!palette.includes('appendSourceGroup("Saved evidence"'));
+assert(!palette.includes('appendSourceGroup("Notebook notes"'));
+assert(!app.slice(start, end).includes('openProjectReportDraft('), 'Adding must leave the source column in place.');
+console.log('Report source handoff passed: destinations, cancellation, first draft, deduplication, mounted edits, exact passages and editions, account fence, no column navigation.');
