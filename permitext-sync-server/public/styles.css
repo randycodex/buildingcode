@@ -18450,8 +18450,4 @@ html body .column-group-menu-button:focus-visible {
 .research-entry-project { margin: 0 0 8px; color: var(--text-secondary); font-size: 12px; }
 .research-entry-context h3 { margin: 0 0 10px; color: var(--text-primary); font-size: 18px; font-weight: 550; line-height: 1.35; }
 .research-entry-context .research-project-context-preview { color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
-.research-entry-tasks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
-.research-entry-tasks button { padding: 10px 12px; min-height: 42px; border: 1px solid var(--border); border-radius: 5px; text-align: left; background: transparent; color: var(--text-primary); font: inherit; font-size: 12px; cursor: pointer; }
-.research-entry-tasks button:hover { background: var(--surface); }
-.research-entry-tasks button:disabled { color: var(--text-tertiary); cursor: default; }
 .topbar .workspace-actions-button .workspace-current-name { color: var(--text-primary); font-weight: 550; }

@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-research-search-v714";
+} from "./offline-storage.js?v=20261010-research-search-v715";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-research-search-v714";
+} from "./research-intent-state.js?v=20261010-research-search-v715";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -24774,26 +24774,7 @@ async function renderResearchConversation(conversationID, options = {}) {
       ? `Project · ${researchProjectName(conversation.primaryProjectID)}` : "Unassigned Research";
     const heading = document.createElement("h3");
     heading.textContent = "What would you like to understand?";
-    const tasks = document.createElement("div");
-    tasks.className = "research-entry-tasks";
-    for (const [label, question] of [
-      ["Explain this provision", "Explain the selected provision in plain language, preserving its conditions and exceptions."],
-      ["Identify exceptions", "Identify the exceptions and cross-references relevant to the selected provision, and explain when each applies."],
-      ["List missing facts", "What project facts are needed to apply this provision? Distinguish known facts from facts still needed."],
-      ["Draft review checks", "Draft a short review checklist for this provision, linking each check to its supporting source and identifying unresolved facts."]
-    ]) {
-      const task = document.createElement("button");
-      task.type = "button";
-      task.textContent = label;
-      task.disabled = input.disabled || conversation.sourceStatus === "changed" || projectContextBlocked;
-      task.addEventListener("click", () => {
-        input.value = question;
-        input.dispatchEvent(new Event("input", { bubbles: true }));
-        input.focus();
-      });
-      tasks.append(task);
-    }
-    welcome.append(projectLabel, heading, projectPreview, tasks);
+    welcome.append(projectLabel, heading, projectPreview);
     thread.append(welcome);
   }
   bindResearchSendShortcut(input, composer);
