@@ -10691,6 +10691,51 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   font-size: calc(var(--saved-font-size) * 0.8) !important;
 }
 
+.report-export-review {
+  width: min(860px, calc(100vw - 40px));
+  max-height: calc(100dvh - 64px);
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--menu-surface);
+  color: var(--text-primary);
+}
+.report-export-review[open] { display: flex; flex-direction: column; }
+.report-export-review::backdrop { background: rgb(0 0 0 / 65%); }
+.report-export-review > header, .report-export-review > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  flex-shrink: 0;
+}
+.report-export-review h2 { margin: 0; font-size: 18px; }
+.report-export-review button { border: 0; cursor: pointer; }
+.report-export-close {
+  padding: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 26px;
+}
+.report-export-status { margin: 0; padding: 0 24px 18px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.report-export-content { padding: 0 24px; overflow-y: auto; min-height: 0; }
+.report-export-content article { margin: 0 0 28px; }
+.report-export-source { color: var(--text-secondary); font-size: 12px; }
+.report-export-content h3 { font-size: 15px; margin: 8px 0 16px; }
+.report-export-passage, .report-export-note { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; font-size: 14px; }
+.report-export-note-heading { color: var(--text-secondary); }
+.report-export-notice { color: var(--text-secondary); font-size: 12px; margin-top: 28px; }
+.report-export-review > footer { justify-content: flex-end; }
+.report-export-review > footer button {
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--toolbar-active);
+  color: var(--text-primary);
+}
+.report-export-review > footer button:disabled { opacity: 0.45; cursor: default; }
+.report-export-review > footer button[hidden] { display: none; }
+
 .saved-evidence-cancel-selection:hover,
 .saved-evidence-cancel-selection:focus-visible {
   background: var(--toolbar-active);

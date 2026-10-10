@@ -1,3 +1,4 @@
+import { openReportExportReview } from "./report-export-review.js?v=20261010-report-export-v2";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
@@ -101,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-account-title-v726";
+} from "./offline-storage.js?v=20261010-report-export-v731";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-account-title-v726";
+} from "./research-intent-state.js?v=20261010-report-export-v731";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -20349,7 +20350,8 @@ async function projectsWithOrganizationAccess(projects = []) {
   return mergeProjectsWithOrganizationAccess(projects, workspace);
 }
 
-async function downloadProjectReportFile(projectID, file, title = "Permitext Project Report") {
+async function readProjectReportFile(projectID, file, title = "Permitext Project Report") {
+  const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   if (!account) throw new Error("Sign in from Account to download private Project Reports.");
   const response = await fetch("/reports/files/read", {
@@ -20369,14 +20371,18 @@ async function downloadProjectReportFile(projectID, file, title = "Permitext Pro
     throw new Error(payload.error || "The Report PDF could not be downloaded.");
   }
   const blob = await response.blob();
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
+  requireCurrentAccountRequest(requestIdentity);
   const safeTitle = String(title || "Permitext Project Report")
-    .replace(/[^a-z0-9]+/gi, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80) || "Permitext-Project-Report";
+    .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "Permitext-Project-Report";
+  return { pdfBlob: blob, filename: `${safeTitle}-v${file.reportVersion || 1}-${file.format || "report"}.pdf` };
+}
+
+async function downloadProjectReportFile(projectID, file, title = "Permitext Project Report") {
+  const packet = await readProjectReportFile(projectID, file, title);
+  const url = URL.createObjectURL(packet.pdfBlob);
+  const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = `${safeTitle}-${file.format || "report"}.pdf`;
+  anchor.download = packet.filename;
   anchor.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 2_000);
 }
@@ -27421,272 +27427,6 @@ function reportBlockTitle(block) {
   return block.label || block.title || block.kind;
 }
 
-function appendReportPDFList(documentRoot, parent, title, items) {
-  const normalized = (Array.isArray(items) ? items : []).filter(Boolean);
-  if (!normalized.length) return;
-  const heading = documentRoot.createElement("h4");
-  heading.textContent = title;
-  const list = documentRoot.createElement("ul");
-  normalized.forEach((item) => {
-    const row = documentRoot.createElement("li");
-    row.textContent = String(item);
-    list.append(row);
-  });
-  parent.append(heading, list);
-}
-
-function appendReportPDFResearchAnswer(documentRoot, parent, item) {
-  const text = researchAnswerNarrativeText(item);
-  text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean).forEach((block) => {
-    const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
-    if (lines.length && lines.every((line) => /^[-*]\s+/.test(line))) {
-      const list = documentRoot.createElement("ul");
-      lines.forEach((line) => {
-        const row = documentRoot.createElement("li");
-        row.textContent = line.replace(/^[-*]\s+/, "");
-        list.append(row);
-      });
-      parent.append(list);
-      return;
-    }
-    const paragraph = documentRoot.createElement("p");
-    paragraph.textContent = block;
-    parent.append(paragraph);
-  });
-}
-
-function printReportManifestAsPDF(manifest) {
-  if (!hasCapability("professional-exports")) {
-    void presentPlanLimitNotice(
-      "Professional reports require Pro",
-      "Upgrade to Pro to export a Project Report as PDF."
-    );
-    return;
-  }
-  const frame = document.createElement("iframe");
-  frame.className = "saved-print-frame";
-  frame.title = `${manifest.title || "Project Report"} PDF export`;
-  frame.srcdoc = "<!doctype html><html><head><title>Permitext Project Report</title></head><body></body></html>";
-  frame.addEventListener("load", () => {
-    const documentRoot = frame.contentDocument;
-    if (!documentRoot) return;
-    const presentation = manifest.presentation || {};
-    const accentCandidate = String(presentation.branding?.accentColorHex || "").toLowerCase();
-    const accent = /^#[0-9a-f]{6}$/.test(accentCandidate) ? accentCandidate : "#9a4f12";
-    const style = documentRoot.createElement("style");
-    style.textContent = `
-      body{margin:0;color:#161616;font:10.5pt/1.5 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
-      main{max-width:7.2in;margin:0 auto;padding:.55in .5in .7in}
-      .cover{min-height:7.4in;display:flex;flex-direction:column;justify-content:center;break-after:page}
-      .eyebrow,.classification{font-size:8pt;font-weight:750;letter-spacing:.09em;text-transform:uppercase}
-      .eyebrow{color:${accent}}.classification{display:inline-block;margin-bottom:8px;padding:4px 7px;border-radius:999px;background:#f1ece7;color:#5a4a3d}
-      h1{margin:8px 0 14px;font-size:30pt;line-height:1.08}h2{margin:28px 0 10px;font-size:17pt}h3{margin:0 0 8px;font-size:13pt}h4{margin:12px 0 4px;font-size:9pt;text-transform:uppercase;letter-spacing:.06em}
-      p{margin:0 0 10px}.meta{color:#555}.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:28px}
-      article{margin:0 0 18px;padding:16px;border-radius:10px;background:#f7f5f2;break-inside:avoid}
-      article.published-code{background:#f5eee6}article.ai-assisted{background:#eef1f8}article.user-authored{background:#f4f1f8}
-      blockquote{margin:10px 0 0;padding-left:14px;border-left:3px solid ${accent};color:#333}
-      ul{margin:4px 0 10px;padding-left:20px}.disclaimers{margin-top:32px;padding-top:16px;border-top:1px solid #bbb;color:#555;font-size:8.5pt}
-      .hash{margin-top:14px;overflow-wrap:anywhere;font:7pt/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,"Segoe UI",sans-serif;color:#777;font-variant-numeric:tabular-nums}
-      @page{margin:.35in}
-    `;
-    documentRoot.head.append(style);
-    const main = documentRoot.createElement("main");
-    const cover = documentRoot.createElement("section");
-    cover.className = "cover";
-    const eyebrow = documentRoot.createElement("p");
-    eyebrow.className = "eyebrow";
-    eyebrow.textContent = presentation.template?.coverLabel || "Permitext Project Report";
-    const brand = documentRoot.createElement("p");
-    brand.className = "meta";
-    brand.textContent = [
-      presentation.branding?.displayName,
-      presentation.branding?.website
-    ].filter(Boolean).join(" · ");
-    const title = documentRoot.createElement("h1");
-    title.textContent = manifest.title;
-    const projectName = documentRoot.createElement("h2");
-    projectName.textContent = manifest.project?.name || "Project";
-    const metadata = documentRoot.createElement("p");
-    metadata.className = "meta";
-    metadata.textContent = [
-      manifest.project?.address,
-      new Date(manifest.reportDate).toLocaleString(),
-      manifest.author?.displayName,
-      `Report version ${manifest.reportVersion}`,
-      manifest.codeEdition
-    ].filter(Boolean).join(" · ");
-    const legend = documentRoot.createElement("div");
-    legend.className = "legend";
-    ["Published code", "User-authored", "AI-assisted Research", "Project material"].forEach((label) => {
-      const item = documentRoot.createElement("span");
-      item.className = "classification";
-      item.textContent = label;
-      legend.append(item);
-    });
-    cover.append(eyebrow);
-    if (brand.textContent) cover.append(brand);
-    cover.append(title, projectName, metadata, legend);
-    main.append(cover);
-
-    (manifest.items || []).forEach((item) => {
-      if (item.kind === "heading") {
-        const heading = documentRoot.createElement("h2");
-        heading.textContent = item.text;
-        main.append(heading);
-        return;
-      }
-      if (item.kind === "paragraph") {
-        const paragraph = documentRoot.createElement("p");
-        paragraph.textContent = item.text;
-        main.append(paragraph);
-        appendReportPDFList(
-          documentRoot,
-          main,
-          item.derivedFrom?.kind === "notebookCard" ? `Evidence linked to ${item.derivedFrom.title}` : "",
-          (item.evidenceLinks || []).map((link) => link.label || [
-            link.source?.codePrefix,
-            link.source?.sectionNumber
-          ].filter(Boolean).join(" § "))
-        );
-        return;
-      }
-      if (item.kind === "list") {
-        const list = documentRoot.createElement("ul");
-        (item.items || []).forEach((value) => {
-          const row = documentRoot.createElement("li");
-          row.textContent = value;
-          list.append(row);
-        });
-        main.append(list);
-        return;
-      }
-      const article = documentRoot.createElement("article");
-      article.className = item.sourceClassification || "";
-      const classification = documentRoot.createElement("span");
-      classification.className = "classification";
-      classification.textContent = reportSourceClassificationLabel(item.sourceClassification);
-      article.append(classification);
-      if (item.kind === "evidence") {
-        const heading = documentRoot.createElement("h3");
-        heading.textContent = `${item.codeBook} ${item.sectionNumber}: ${item.title}`;
-        const passage = documentRoot.createElement("blockquote");
-        passage.textContent = item.passageText;
-        article.append(heading, passage);
-      } else if (item.kind === "notebookCard") {
-        const heading = documentRoot.createElement("h3");
-        heading.textContent = item.title;
-        const body = documentRoot.createElement("p");
-        body.textContent = item.plainText;
-        article.append(heading, body);
-      } else if (item.kind === "researchAnswer") {
-        const heading = documentRoot.createElement("h3");
-        heading.textContent = item.question;
-        article.append(heading);
-        const sourceDate = item.sourceAsOf ? new Date(item.sourceAsOf) : null;
-        const sourceDateLabel = sourceDate && Number.isFinite(sourceDate.getTime())
-          ? `Research basis captured ${sourceDate.toISOString().slice(0, 10)}`
-          : "";
-        const boundary = documentRoot.createElement("p");
-        boundary.className = "meta";
-        boundary.textContent = [
-          item.authorityLabel || item.authorityStatus,
-          item.codeEdition ? `Edition: ${item.codeEdition}` : "",
-          sourceDateLabel
-        ].filter(Boolean).join(" · ");
-        if (boundary.textContent) article.append(boundary);
-        appendReportPDFList(documentRoot, article, "Code basis", [
-          item.codeBasis?.disclosure,
-          item.codeBasis?.limitation
-        ].filter(Boolean));
-        appendReportPDFList(
-          documentRoot,
-          article,
-          "Corpus basis",
-          researchCorpusMetadataLines(item.codeBasis)
-        );
-        appendReportPDFResearchAnswer(documentRoot, article, item);
-        appendReportPDFList(
-          documentRoot,
-          article,
-          "What the selected evidence establishes",
-          (item.supportedPoints || []).map((point) =>
-            [researchDisplayText(point.heading), researchDisplayText(point.explanation)]
-              .filter(Boolean)
-              .join(": ")
-          )
-        );
-        appendReportPDFList(documentRoot, article, "Assumptions", researchDisplayList(item.assumptions));
-        appendReportPDFList(
-          documentRoot,
-          article,
-          "Project facts to verify",
-          researchDisplayList(item.missingFacts)
-        );
-        appendReportPDFList(
-          documentRoot,
-          article,
-          "Limits of this answer",
-          researchDisplayList(item.limitations)
-        );
-        appendReportPDFList(
-          documentRoot,
-          article,
-          "Related evidence to add",
-          researchDisplayList(item.additionalEvidenceNeeded)
-        );
-        appendReportPDFList(
-          documentRoot,
-          article,
-          "Citations",
-          (item.citations || []).map((citation) =>
-            [citation.sectionID, ...(citation.sourceIDs || [])].filter(Boolean).join(" · ")
-          )
-        );
-        appendReportPDFList(
-          documentRoot,
-          article,
-          "Professional-use notice",
-          [item.disclaimer].filter(Boolean)
-        );
-      } else if (item.kind === "projectFacts") {
-        const heading = documentRoot.createElement("h3");
-        heading.textContent = item.title || "Project facts";
-        const facts = documentRoot.createElement("p");
-        facts.textContent = [item.address, item.facts].filter(Boolean).join(" · ");
-        article.append(heading, facts);
-      } else {
-        const heading = documentRoot.createElement("h3");
-        heading.textContent = item.title || "Project material";
-        const detail = documentRoot.createElement("p");
-        detail.textContent = item.contentType || "Included Project material";
-        article.append(heading, detail);
-      }
-      main.append(article);
-    });
-
-    const disclaimers = documentRoot.createElement("section");
-    disclaimers.className = "disclaimers";
-    const disclaimerHeading = documentRoot.createElement("h3");
-    disclaimerHeading.textContent = "Professional-use notice";
-    disclaimers.append(disclaimerHeading);
-    (manifest.disclaimers || []).forEach((value) => {
-      const paragraph = documentRoot.createElement("p");
-      paragraph.textContent = value;
-      disclaimers.append(paragraph);
-    });
-    const hash = documentRoot.createElement("p");
-    hash.className = "hash";
-    hash.textContent = `Manifest ${manifest.id} · ${manifest.generatorVersion} · SHA-256 ${manifest.contentHash}`;
-    disclaimers.append(hash);
-    main.append(disclaimers);
-    documentRoot.body.append(main);
-    frame.contentWindow?.focus();
-    frame.contentWindow?.print();
-    window.setTimeout(() => frame.remove(), 1000);
-  }, { once: true });
-  document.body.append(frame);
-}
-
 async function renderProjectReportDraft(project) {
   if (!hasCapability("professional-exports")) return renderProLockedPane(paneIDForProjectReportDraft(project), "Reports");
   const requestIdentity = captureAccountRequest();
@@ -27853,54 +27593,69 @@ async function renderProjectReportDraft(project) {
     return pendingDraftSave;
   };
 
+  const reviewReport = (manifest, file) => openReportExportReview({
+    isCurrent: () => !disposed && panel.isConnected && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
+    prepare: async () => ({ manifest, ...(await readProjectReportFile(projectID, file, manifest.title)) })
+  });
+
   const openHistoricalReport = async (manifestID) => {
     clearStatus();
     try {
       const payload = await reportRequest("/reports/manifests/get", { manifestID });
-      clearStatus();
-      printReportManifestAsPDF(payload.manifest);
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+      const file = history.find(report => report.id === manifestID)?.files?.find(file => file.format === "web-pdf");
+      if (!file) throw new Error("The stored Report PDF is unavailable. Its saved version remains in history.");
+      reviewReport(payload.manifest, file);
     } catch (error) {
+      if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
       showStatusError(error.message || "The historical Report could not be opened.");
     }
   };
 
+  let generatingReport = false;
   const generateReport = async () => {
-    if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
-    if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
-    if (dirty) {
-      showStatusError("Your newer changes are not saved yet. Save draft again before exporting.");
-      return;
-    }
-    if (!activeDraft.blocks.length && !activeDraft.introduction) {
-      showStatusError("Add at least one Report item before generating a PDF.");
-      return;
-    }
-    clearStatus();
+    if (generatingReport) return;
+    generatingReport = true;
     try {
-      const payload = await reportRequest("/reports/generate", {
-        projectID,
-        draftID: activeDraft.id,
-        expectedVersion: activeDraft.version,
-        reportTemplateID: selectedReportTemplateID
-      });
-      const historyPayload = await reportRequest("/reports/history/list", { projectID });
-      history = historyPayload.reports || [];
-      clearStatus();
-      renderWorkspaceContent();
-      printReportManifestAsPDF(payload.manifest);
-      await transitionWorkspace("utility", {
-        refreshPaneIDs: [paneIDForProjectDetail(identity)]
-      });
-    } catch (error) {
-      if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
-      if (error.payload?.code === "REPORT_DRAFT_VERSION_CONFLICT" && !dirty) {
-        await refreshReportArtifacts();
-        if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+      if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+      if (dirty) {
+        showStatusError("Your newer changes are not saved yet. Save draft again before exporting.");
+        return;
       }
-      showStatusError(error.message === "Report text is too long."
-        ? "A Report item exceeds the supported text length. Shorten that item and try again."
-        : error.message || "The Report could not be generated.");
-    }
+      if (!activeDraft.blocks.length && !activeDraft.introduction) {
+        showStatusError("Add at least one Report item before generating a PDF.");
+        return;
+      }
+      clearStatus();
+      try {
+        const payload = await reportRequest("/reports/generate", {
+          projectID,
+          draftID: activeDraft.id,
+          expectedVersion: activeDraft.version,
+          reportTemplateID: selectedReportTemplateID
+        });
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+        const historyPayload = await reportRequest("/reports/history/list", { projectID });
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+        history = historyPayload.reports || [];
+        clearStatus();
+        renderWorkspaceContent();
+        reviewReport(payload.manifest, payload.generatedReport.file);
+        await transitionWorkspace("utility", {
+          refreshPaneIDs: [paneIDForProjectDetail(identity)]
+        });
+      } catch (error) {
+        if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+        if (error.payload?.code === "REPORT_DRAFT_VERSION_CONFLICT" && !dirty) {
+          await refreshReportArtifacts();
+          if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+        }
+        showStatusError(error.message === "Report text is too long."
+          ? "A Report item exceeds the supported text length. Shorten that item and try again."
+          : error.message || "The Report could not be generated.");
+      }
+    } finally { generatingReport = false; }
   };
 
   function renderBlockEditor(container) {
@@ -31923,64 +31678,6 @@ function openSavedActionMenu(panel, anchor, items) {
   anchor.closest(".panel-actions")?.append(menu);
   anchor.setAttribute("aria-expanded", "true");
   menu.querySelector("button")?.focus({ preventScroll: true });
-}
-
-function printSavedItemsAsPDF(items, scopeLabel) {
-  if (!hasCapability("professional-exports")) {
-    void presentPlanLimitNotice("PDF export requires Pro", "Upgrade to Pro to export saved code and notes as a PDF.");
-    return;
-  }
-  const frame = document.createElement("iframe");
-  frame.className = "saved-print-frame";
-  frame.title = "Saved sections PDF export";
-  frame.srcdoc = "<!doctype html><html><head><title>permitext Saved</title></head><body></body></html>";
-  frame.addEventListener("load", () => {
-    const documentRoot = frame.contentDocument;
-    if (!documentRoot) return;
-    const style = documentRoot.createElement("style");
-    style.textContent = "body{margin:40px;color:#111;font:14px/1.45 -apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}h1{font-size:26px;margin:0 0 4px}h2{margin:28px 0 8px;padding-bottom:6px;border-bottom:1px solid #ccc;font-size:15px;text-transform:uppercase}article{padding:12px 0;border-bottom:1px solid #ddd;break-inside:avoid}strong,span{display:block}.meta{color:#8a4a10;font-weight:700}.preview{margin-top:4px;color:#555}.note{margin-top:6px;color:#8a4a10}@page{margin:0.6in}";
-    documentRoot.head.append(style);
-    const heading = documentRoot.createElement("h1");
-    heading.textContent = "permitext Saved";
-    const scope = documentRoot.createElement("p");
-    scope.textContent = `${scopeLabel} · ${items.length} ${items.length === 1 ? "item" : "items"}`;
-    documentRoot.body.append(heading, scope);
-    let currentCode = "";
-    items.forEach((item) => {
-      const code = codeDisplayLabel(item.codePrefix || item.code || "BC");
-      if (code !== currentCode) {
-        currentCode = code;
-        const codeHeading = documentRoot.createElement("h2");
-        codeHeading.textContent = code;
-        documentRoot.body.append(codeHeading);
-      }
-      const row = documentRoot.createElement("article");
-      const meta = documentRoot.createElement("span");
-      meta.className = "meta";
-      meta.textContent = [item.chapterNumber ? `Chapter ${item.chapterNumber}` : "", item.sectionNumber || ""].filter(Boolean).join(" · ");
-      const title = documentRoot.createElement("strong");
-      title.textContent = savedItemTitle(item);
-      row.append(meta, title);
-      if (item.previewText) {
-        const preview = documentRoot.createElement("span");
-        preview.className = "preview";
-        preview.textContent = item.previewText;
-        row.append(preview);
-      }
-      const noteText = String(item.noteBody || annotationForTarget(item).noteBody || "").trim();
-      if (noteText) {
-        const note = documentRoot.createElement("span");
-        note.className = "note";
-        note.textContent = noteText;
-        row.append(note);
-      }
-      documentRoot.body.append(row);
-    });
-    frame.contentWindow?.focus();
-    frame.contentWindow?.print();
-    window.setTimeout(() => frame.remove(), 1000);
-  }, { once: true });
-  document.body.append(frame);
 }
 
 function renderSavedFilters(panel, instance, allItems, onChange) {

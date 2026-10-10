@@ -16363,6 +16363,27 @@ async function handleNotebookCardArchive(request, response) {
   });
 }
 
+async function reportSavedEvidenceResolver() {
+  const { findActiveCodeSource } = await import("./active-code-source-catalog.mjs");
+  const catalog = await allSectionCatalogByID();
+  const resolved = new Map();
+  return async selection => {
+    const section = catalog.get(selection.sectionID);
+    if (!section || canonicalCodeVersion(section.codeVersion) !== selection.codeVersion) {
+      throw new Error("The saved source is unavailable in its recorded edition. Reopen the source and try again.");
+    }
+    const key = `${selection.codeVersion}:${section.id}`;
+    if (!resolved.has(key)) resolved.set(key, (async () => {
+      const body = isHistoricalConstructionSectionID(section.id)
+        ? await historicalConstructionSection(section.id)
+        : await researchBodyForCatalogSection(section);
+      const source = await findActiveCodeSource({ canonicalEdition: selection.codeVersion, codePrefix: section.codePrefix });
+      return { section, body, source };
+    })());
+    return resolved.get(key);
+  };
+}
+
 async function authenticatedReportBody(request, response, options = {}) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return null;
@@ -16447,165 +16468,6 @@ function reportSourceClientSummary(source) {
   };
 }
 
-const reportPreparedChapterIndexCache = new Map();
-
-function codeLibraryReferenceForProjectLink(link) {
-  const legacyRecordID = String(link?.metadata?.legacyRecordID || "");
-  const match = legacyRecordID.match(
-    /(CodeContent\/authored\/new-york-city\/([a-z0-9-]+)\/bundle\.json(?:#\d+)?)/i
-  );
-  if (!match) {
-    return {
-      slug: "2022-construction-codes",
-      version: defaultSyncCodeVersion
-    };
-  }
-  return {
-    slug: match[2].toLowerCase(),
-    version: match[1]
-  };
-}
-
-function preparedSectionText(section) {
-  const blockText = (section?.blocks || [])
-    .map((block) => block.plainText || plainTextFromPreparedHTML(block.html || ""))
-    .filter(Boolean)
-    .join("\n\n");
-  return String(section?.officialText || blockText || section?.title || "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function indexPreparedChapterSections(value, chapterNumber, index) {
-  if (Array.isArray(value)) {
-    value.forEach((item) => indexPreparedChapterSections(item, chapterNumber, index));
-    return;
-  }
-  if (!value || typeof value !== "object") return;
-  const sectionID = value.id ?? value.sectionID;
-  if (sectionID != null && value.sectionNumber && preparedSectionText(value)) {
-    index.set(String(sectionID), { ...value, chapterNumber: value.chapterNumber || chapterNumber });
-  }
-  Object.values(value).forEach((item) => {
-    if (item && typeof item === "object") {
-      indexPreparedChapterSections(item, chapterNumber, index);
-    }
-  });
-}
-
-async function preparedChapterSectionIndex(librarySlug) {
-  if (!reportPreparedChapterIndexCache.has(librarySlug)) {
-    reportPreparedChapterIndexCache.set(librarySlug, (async () => {
-      const chapterPath = join(authoredNYCCodeContentPath, librarySlug, "prepared", "chapters");
-      const index = new Map();
-      const filenames = (await readdir(chapterPath)).filter((name) => name.endsWith(".json"));
-      for (const filename of filenames) {
-        const chapter = await readJSONFile(join(chapterPath, filename));
-        indexPreparedChapterSections(chapter, chapter.chapterNumber || "", index);
-      }
-      return index;
-    })());
-  }
-  return reportPreparedChapterIndexCache.get(librarySlug);
-}
-
-async function preparedReportEvidence(link, charactersPerSection) {
-  const requestedID = String(link.targetID || "").trim();
-  const library = codeLibraryReferenceForProjectLink(link);
-  const preparedPath = join(authoredNYCCodeContentPath, library.slug, "prepared");
-  const catalogSummary = library.slug === "2022-construction-codes"
-    ? await sectionSummaryByID(requestedID)
-    : null;
-  let section;
-  try {
-    section = await readJSONFile(join(preparedPath, "sections", `${requestedID}.json`));
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-    section = (await preparedChapterSectionIndex(library.slug)).get(requestedID) || null;
-  }
-  if (!section) {
-    const error = new Error(`Unknown code section: ${requestedID}.`);
-    error.code = "INVALID_RESEARCH_SECTION";
-    throw error;
-  }
-  const enactedText = preparedSectionText(section);
-  if (!enactedText) {
-    const error = new Error(`Section ${section.sectionNumber || requestedID} has no enacted text available.`);
-    error.code = "INCOMPLETE_RESEARCH_SECTION";
-    throw error;
-  }
-  let manifest = {};
-  try {
-    manifest = await readJSONFile(join(preparedPath, "manifest.json"));
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
-  const chapters = manifest.chapters || [];
-  const chapterID = String(section.chapterID || catalogSummary?.chapterID || "");
-  const chapterNumber = String(section.chapterNumber || catalogSummary?.chapterNumber || "");
-  // Chapter numbers repeat across codes in the administrative-code package.
-  // Resolve the stable chapter ID first; never guess among number collisions.
-  const numberedChapters = chapterNumber
-    ? chapters.filter((candidate) => String(candidate.chapterNumber || "") === chapterNumber)
-    : [];
-  const chapter = (chapterID
-    ? chapters.find((candidate) => String(candidate.chapterID || "") === chapterID)
-    : null) || (!chapterID && numberedChapters.length === 1 ? numberedChapters[0] : null);
-  const codePrefix = String(section.codePrefix || catalogSummary?.codePrefix || chapter?.codePrefix || "");
-  const sectionNumber = String(section.sectionNumber || catalogSummary?.sectionNumber || "");
-  const title = String(section.title || catalogSummary?.title || "Section");
-  const canonicalText = [sectionNumber, title, enactedText]
-    .filter(Boolean)
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .trim();
-  return {
-    sectionID: String(section.sectionID || section.id || requestedID),
-    sectionNumber,
-    title,
-    codePrefix,
-    chapterNumber: String(
-      section.chapterNumber || catalogSummary?.chapterNumber || chapter?.chapterNumber || ""
-    ),
-    text: enactedText.slice(0, charactersPerSection),
-    canonicalText,
-    sectionTextHash: createHash("sha256").update(canonicalText).digest("hex"),
-    sourceLibraryVersion: library.version
-  };
-}
-
-async function reportEvidenceForProjectLinks(links, options = {}) {
-  const evidence = [];
-  const charactersPerSection = Math.min(12_000, Math.floor(60_000 / links.length));
-  for (const link of links) {
-    const library = codeLibraryReferenceForProjectLink(link);
-    try {
-      if (library.slug === "2022-construction-codes") {
-        try {
-          const [canonicalEvidence] = await researchEvidenceForSectionIDs([link.targetID]);
-          if (canonicalEvidence) {
-            evidence.push({ ...canonicalEvidence, sourceLibraryVersion: library.version });
-            continue;
-          }
-        } catch (error) {
-          if (!["ENOENT", "INCOMPLETE_RESEARCH_SECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
-            throw error;
-          }
-        }
-      }
-      evidence.push(await preparedReportEvidence(link, charactersPerSection));
-    } catch (error) {
-      const warning = unavailableReportEvidenceWarning(error, {
-        requestedID: String(link.targetID || ""),
-        canonicalID: String(link.targetID || "")
-      });
-      if (!options.skipUnavailable || !warning) throw error;
-      options.onUnavailable?.(warning);
-    }
-  }
-  return evidence;
-}
-
 function latestContentMutationsByID(mutations) {
   const latestByID = new Map();
   [...(mutations || [])]
@@ -16672,48 +16534,38 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
   }
 
   const currentProjectSections = await currentProjectSectionRecords(userID, projectID);
-  const currentSectionIDs = new Set(currentProjectSections.map((record) => String(record.sectionID || "")));
-  const sectionLinks = Array.from(new Map(
-    links
-      .filter((link) =>
-        link.targetKind === "canonicalSection" &&
-        currentSectionIDs.has(String(link.targetID || ""))
-      )
-      .map((link) => [link.targetID, link])
-  ).values());
-  if (sectionLinks.length) {
-    const evidenceItems = await reportEvidenceForProjectLinks(sectionLinks, {
-      skipUnavailable: true,
-      onUnavailable(warning) {
-        warnings.push(warning);
-      }
-    });
-    evidenceItems.forEach((evidence) => {
+  const { prepareSavedEvidenceItems, reportSavedSourceID, reportSavedSelection } = await import("./report-evidence.mjs");
+  const mutations = latestContentMutationsByID(await userContentMutations(userID));
+  const notes = mutations.map(mutationKindAndRecord).filter(({ kind, record }) => kind === "annotation" && record?.noteBody !== undefined)
+    .map(({ record }) => ({ ...record, codeVersion: canonicalCodeVersion(record.codeVersion) }));
+  const savedItems = mutations.map(mutationKindAndRecord).filter(({ kind, record }) => kind === "savedItem" && record)
+    .map(({ record }) => ({ ...record, codeVersion: canonicalCodeVersion(record.codeVersion) }));
+  const clearRecords = mutations.map(mutationKindAndRecord).filter(({ kind, record }) => kind === "codeVersionClear" && record).map(({ record }) => record);
+  const currentNotes = notes.filter(record => recordSurvivesBulkClear(record, clearRecords, ["notes"]));
+  const currentSaved = savedItems.filter(record => recordSurvivesBulkClear(record, clearRecords, ["bookmarks"]))
+    .map(record => recordSurvivesBulkClear(record, clearRecords, ["notes"]) ? record : { ...record, noteBody: "" });
+  const resolveSource = currentProjectSections.length ? await reportSavedEvidenceResolver() : null;
+  const selectedIDs = options.evidenceSourceIDs ? new Set(options.evidenceSourceIDs) : null;
+  const recordsBySource = new Map(currentProjectSections.map(record => [reportSavedSourceID(record), record]));
+  for (const [sourceID, record] of recordsBySource) {
+    if (selectedIDs && !selectedIDs.has(sourceID)) continue;
+    try {
+      const selection = reportSavedSelection({ ...record, codeVersion: canonicalCodeVersion(record.codeVersion) }, currentNotes, currentSaved);
+      const prepared = await prepareSavedEvidenceItems({ selections: [selection], resolveSource });
+      const evidence = prepared.items.find(item => item.kind === "evidence");
       sources.push({
-        id: evidence.sectionID,
-        kind: "evidence",
-        codePrefix: evidence.codePrefix || "BC",
-        codeEdition: reportEvidenceEdition(evidence),
-        sourceLibraryVersion: evidence.sourceLibraryVersion,
-        sectionNumber: evidence.sectionNumber,
-        title: evidence.title,
-        label: `${evidence.codePrefix || "Code"} ${evidence.sectionNumber} · ${reportEvidenceEdition(evidence)}: ${evidence.title}`,
-        summary: evidence.text.slice(0, 500),
-        sourceClassification: "published-code",
-        manifestItem: {
-          kind: "evidence",
-          sectionID: evidence.sectionID,
-          sectionNumber: evidence.sectionNumber,
-          codeBook: evidence.codePrefix || "NYC Construction Code",
-          codeEdition: reportEvidenceEdition(evidence),
-          chapter: evidence.chapterNumber || "unknown",
-          title: evidence.title,
-          passageText: evidence.text,
-          passageTextHash: createHash("sha256").update(evidence.text).digest("hex"),
-          sourceLibraryVersion: evidence.sourceLibraryVersion
-        }
+        id: sourceID, kind: "evidence", codePrefix: evidence.codeBook,
+        codeEdition: evidence.codeEdition, sourceLibraryVersion: evidence.sourceLibraryVersion,
+        sectionNumber: evidence.sectionNumber, title: evidence.title,
+        label: `${evidence.codeBook} ${evidence.sectionNumber} · ${evidence.codeEdition}: ${evidence.title}`,
+        summary: `${evidence.passageText.slice(0, 500)}${selection.notes.length ? ` · ${selection.notes.length} saved ${selection.notes.length === 1 ? "note" : "notes"} included` : ""}`,
+        sourceClassification: "published-code", manifestItem: evidence,
+        manifestItems: prepared.items, sourceSnapshot: prepared.sources[0]
       });
-    });
+    } catch (error) {
+      warnings.push({ kind: "evidence", sourceID, code: "REPORT_EVIDENCE_UNAVAILABLE",
+        message: `${record.sectionNumber || record.sectionID}: ${error.message || "Complete source unavailable."}` });
+    }
   }
 
   const linkedNotebookIDs = new Set(
@@ -17135,6 +16987,13 @@ function reportManifestItemForDraftBlock(block, sourcesByKey) {
   return { ...source.manifestItem, id: block.id };
 }
 
+function reportManifestItemsForDraftBlock(block, sourcesByKey) {
+  const source = sourcesByKey.get(`${block.kind}:${block.sourceID}`);
+  return source?.manifestItems
+    ? source.manifestItems.map((item, index) => ({ ...item, id: index ? `${block.id}-${index}` : block.id }))
+    : [reportManifestItemForDraftBlock(block, sourcesByKey)];
+}
+
 async function projectReportManifests(userID, projectID) {
   const linkedManifestIDs = new Set(
     (await listStoredProjectLinks(userID, { projectID, targetKind: "reportManifest" }))
@@ -17275,6 +17134,7 @@ async function handleReportGenerate(request, response) {
       context.body.reportTemplateID
     );
     const { sources } = await reportSourcesForProject(storageOwnerUserID, access.projectID, {
+      evidenceSourceIDs: draft.payload.blocks.filter(block => block.kind === "evidence").map(block => block.sourceID),
       researchAnswerIDs: draft.payload.blocks
         .filter((block) => block.kind === "researchAnswer")
         .map((block) => block.sourceID)
@@ -17287,6 +17147,18 @@ async function handleReportGenerate(request, response) {
     ) + 1;
     const now = new Date().toISOString();
     const manifestID = randomUUID();
+    const evidenceSnapshots = draft.payload.blocks.filter(block => block.kind === "evidence")
+      .map(block => sourcesByKey.get(`evidence:${block.sourceID}`)?.sourceSnapshot).filter(Boolean);
+    const codeEdition = [...new Set(evidenceSnapshots.map(source => source.codeEdition))].join(" · ") || defaultResearchCodeEdition;
+    const codeContent = [...new Set(evidenceSnapshots.map(source => source.codeVersion))].join(" · ") || defaultSyncCodeVersion;
+    const items = [
+      ...(draft.payload.introduction
+        ? [{ id: `${draft.envelope.id}-introduction`, kind: "paragraph", text: draft.payload.introduction }]
+        : []),
+      ...draft.payload.blocks.flatMap(block => reportManifestItemsForDraftBlock(block, sourcesByKey))
+    ];
+    const evidenceCharacters = items.reduce((sum, item) => sum + (item.passageText || item.text || "").length, 0);
+    if (evidenceCharacters > 1_000_000) throw new Error("The Report is too large. Remove some sources and try again.");
     const manifest = immutableReportManifest({
       id: manifestID,
       project: {
@@ -17304,13 +17176,8 @@ async function handleReportGenerate(request, response) {
           context.authContext.account?.publicUsername ||
           "Permitext user"
       },
-      codeEdition: defaultResearchCodeEdition,
-      items: [
-        ...(draft.payload.introduction
-          ? [{ id: `${draft.envelope.id}-introduction`, kind: "paragraph", text: draft.payload.introduction }]
-          : []),
-        ...draft.payload.blocks.map((block) => reportManifestItemForDraftBlock(block, sourcesByKey))
-      ],
+      codeEdition,
+      items,
       disclaimers: reportConfiguration.organization
         ? reportDisclaimersForFirm({
             controls: reportConfiguration.controls,
@@ -17324,10 +17191,11 @@ async function handleReportGenerate(request, response) {
       }),
       reportVersion,
       sourceVersions: {
-        codeEdition: defaultResearchCodeEdition,
-        codeContent: defaultSyncCodeVersion,
+        codeEdition,
+        codeContent,
         draftVersion: draft.envelope.version,
-        firmControlsVersion: reportConfiguration.controls.version
+        firmControlsVersion: reportConfiguration.controls.version,
+        selections: evidenceSnapshots
       },
       createdAt: now
     });
