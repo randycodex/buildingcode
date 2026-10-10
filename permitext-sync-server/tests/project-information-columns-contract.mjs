@@ -51,7 +51,7 @@ const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projec
   openProjectDetails: () => openDetails,
   activateProjectStudio: async value => { if (activation) await activation.promise; openDetails = [value]; return true; },
   syncTopbarProjectToolStates() {}, saveWorkspaceState() {}, transitionWorkspace: async () => {},
-  scrollPaneIntoView() {}, defaultNonReaderPaneWidth: 600,
+  scrollPaneIntoView() {}, defaultPaneWidthForID: id => id.startsWith("project:facts:") ? 600 : 400,
   placeProjectToolPaneLast: (_project, id) => { state.paneOrder = [...state.paneOrder.filter(value => value !== id), id]; },
   presentWorkspaceIssue: value => issues.push(value)
 });
@@ -61,6 +61,8 @@ await c.toggleProjectInformation("context");
 await c.toggleProjectInformation("facts");
 assert.equal(state.projectContextOpen, true);
 assert.equal(state.projectFactsOpen, true);
+assert.equal(state.paneWeights["project:facts:alpha"], 600);
+assert.equal(state.paneWeights["project:context:alpha"], 400);
 state.paneWeights["project:context:alpha"] = 670;
 mounts.set("project:context:alpha", { panel: { isConnected: true }, flush: async () => { throw Error("Save failed"); } });
 assert.equal(await c.closeProjectInformation(alpha, "context"), false);
@@ -88,6 +90,42 @@ assert.equal(await c.toggleProjectInformation("context"), false, "Repeated click
 accountCurrent = false; activation.resolve();
 assert.equal(await opening, false);
 assert.equal(state.projectContextOpen, false, "Stale activation must not open private content.");
+
+// Restoring narrow Facts widths respects the minimum even with fewer than four columns.
+const factsID = "project:facts:alpha", contextID = "project:context:alpha";
+const widthContext = vm.createContext({
+  state: { paneWeights: {}, readers: [], paneWidthDefaultsVersion: 5 },
+  ids: [], activePaneIDs: () => widthContext.ids,
+  isCodeQuestionPaneID: () => false, isProjectWorkboardPaneID: () => false,
+  isProjectNotebookPaneID: () => false, isProjectReportDraftPaneID: () => false,
+  isProjectCoordinationThreadPaneID: () => false, isProjectCoordinationPaneID: () => false,
+  isProjectDetailPaneID: () => false, isFixedWidthPaneID: () => false,
+  detachedProjectWindow: false
+});
+vm.runInContext([
+  ...app.matchAll(/const (?:legacy|default)\w*PaneWidth = [^;]+;/g)
+].map(match => match[0]).join("\n") + "\n" + ["defaultPaneWidthForID", "migrateLegacyPaneWidth",
+  "normalizePaneWeights", "isFlexibleReaderPaneID", "applyPaneWeight"].map(actual).join("\n"), widthContext);
+assert.equal(widthContext.defaultPaneWidthForID(factsID), 600);
+for (const ids of [[factsID], [factsID, contextID], [factsID, contextID, "utility:search"]]) {
+  widthContext.ids = ids;
+  widthContext.state.paneWeights = { [factsID]: 400, [contextID]: 400 };
+  widthContext.normalizePaneWeights(ids);
+  assert.equal(widthContext.state.paneWeights[factsID], 600);
+  const style = { setProperty(key, value) { this[key] = value; } };
+  widthContext.applyPaneWeight({ dataset: {}, classList: { contains: () => false }, style }, factsID);
+  assert.equal(style["--pane-resized-min-width"], "600px");
+  assert.equal(style.flex, "1 1 600px");
+}
+widthContext.state.paneWeights[factsID] = 850;
+widthContext.normalizePaneWeights([factsID, contextID]);
+assert.equal(widthContext.state.paneWeights[factsID], 850, "Keep wider saved sizes.");
+assert.equal(widthContext.state.paneWeights[contextID], 400, "Other columns keep their defaults.");
+const collapsedStyle = { setProperty(key, value) { this[key] = value; } };
+widthContext.applyPaneWeight({ dataset: {}, classList: { contains: () => true }, style: collapsedStyle }, factsID);
+assert.equal(collapsedStyle.flex, "0 0 48px", "Facts can still collapse.");
+const styles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
+assert.match(styles, /\.project-facts-panel\s*\{\s*--pane-min-width: 600px;/);
 
 // Execute the actual split editors: Context patches only description; Facts patches only fact fields.
 function element(tag) {

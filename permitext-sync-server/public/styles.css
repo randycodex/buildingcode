@@ -18569,6 +18569,9 @@ html body .column-group-menu-button:focus-visible {
 .project-context-panel .saved-project-fact-description {
   min-height: 10em;
 }
+.project-facts-panel {
+  --pane-min-width: 600px;
+}
 .project-facts-panel > .project-information-content {
   width: calc(100% + (2 * var(--panel-padding)));
   margin-inline: calc(-1 * var(--panel-padding));

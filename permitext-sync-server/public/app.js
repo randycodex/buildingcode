@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-facts-spacing-v740";
+} from "./offline-storage.js?v=20261010-facts-width-v741";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-facts-spacing-v740";
+} from "./research-intent-state.js?v=20261010-facts-width-v741";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -422,6 +422,7 @@ const legacySourceLinkedReaderPaneWidth = 400;
 const defaultSourceLinkedReaderPaneWidth = 600;
 const legacyCoordinationPaneWidth = 430;
 const defaultNonReaderPaneWidth = 400;
+const defaultFactsPaneWidth = 600;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
 const defaultSearchPaneWidth = 600;
 const defaultSavedPaneWidth = 600;
@@ -3582,7 +3583,7 @@ async function toggleProjectInformation(kind) {
         !projectDetailMatches(workspaceProject(), identity)) return false;
     state[projectInformationStateKey(kind)] = true;
     const paneID = paneIDForProjectInformation(identity, kind);
-    state.paneWeights[paneID] ||= defaultNonReaderPaneWidth;
+    state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
     placeProjectToolPaneLast(identity, paneID);
     saveWorkspaceState();
     await transitionWorkspace("utility");
@@ -3910,6 +3911,7 @@ async function activateProjectStudio(project, options = {}) {
 
 function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
+  if (paneID.startsWith("project:facts:")) return defaultFactsPaneWidth;
   if (isCodeQuestionPaneID(paneID)) {
     const parsed = parseQuestionPaneKey(paneID);
     if (parsed?.paneRole === "question-index") {
@@ -3937,6 +3939,7 @@ function defaultPaneWidthForID(paneID) {
 }
 
 function migrateLegacyPaneWidth(paneID, value) {
+  if (paneID.startsWith("project:facts:") && value < defaultFactsPaneWidth) return defaultFactsPaneWidth;
   if (paneID.startsWith("utility:analysis:") && value === defaultUtilityPaneWidth) return defaultResearchPaneWidth;
   if ((paneID === "utility:saved" || paneID.startsWith("utility:saved:")) && value === defaultUtilityPaneWidth) {
     return defaultSavedPaneWidth;
