@@ -62,6 +62,15 @@ try {
   let palette = await post("/reports/sources/list", { projectID });
   assert.equal(palette.sources.filter(source => source.kind === "evidence").length, 4);
   assert.equal(palette.warnings.length, 0);
+  for (const [index, section] of [current, historical, table, deadEnd].entries()) {
+    const source = palette.sources.find(source => source.id === reportSavedSourceID(savedRecords[index]));
+    assert.equal(source.chapterNumber, String(section.chapterNumber));
+    assert.equal(source.selectionKind, "section");
+    assert.equal(source.previewText.length, 240);
+    assert.doesNotMatch(source.previewText, /saved notes? included/);
+    assert.deepEqual(source.notes.map(note => note.body), index === 0 ? ["Original scope note."] :
+      index === 1 ? ["Historical note stays with 2014."] : []);
+  }
   const blocks = savedRecords.map((record, index) => ({ id: `evidence-${index}`, kind: "evidence", sourceID: reportSavedSourceID(record), label: "Selected saved code" }));
   const { draft } = await post("/reports/drafts/save", { projectID, expectedVersion: 0, title: "Complete evidence report", reportDate: "2026-10-10", blocks }, 201);
   const issued = await post("/reports/generate", { projectID, draftID: draft.id, expectedVersion: draft.version }, 201);
@@ -113,7 +122,13 @@ try {
       blockID: paragraphID, noteBody: "Only the selected final exception.", updatedAt } }]);
   palette = await post("/reports/sources/list", { projectID });
   const paragraphSourceID = reportSavedSourceID(paragraphRecord);
-  assert(palette.sources.some(source => source.id === paragraphSourceID));
+  const paragraphSource = palette.sources.find(source => source.id === paragraphSourceID);
+  assert(paragraphSource);
+  assert.equal(paragraphSource.selectionKind, "paragraph");
+  assert.equal(paragraphSource.chapterNumber, "10");
+  assert.equal(paragraphSource.previewText, savedExportSourceText(sourceBody, paragraphID).replace(/\s+/g, " ").trim().slice(0, 240));
+  assert.doesNotMatch(paragraphSource.previewText, /Group I-3|least width/);
+  assert.deepEqual(paragraphSource.notes.map(note => note.body), ["Only the selected final exception."]);
   const { draft: paragraphDraft } = await post("/reports/drafts/save", { projectID, expectedVersion: 0,
     title: "Selected paragraph report", reportDate: "2026-10-10", blocks: [{ id: "selected-p", kind: "evidence", sourceID: paragraphSourceID, label: "Final exception" }] }, 201);
   const paragraphReport = await post("/reports/generate", { projectID, draftID: paragraphDraft.id, expectedVersion: paragraphDraft.version }, 201);

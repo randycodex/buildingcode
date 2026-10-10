@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { immutableReportManifest } from "../report-contract.mjs";
 import { readFile } from "node:fs/promises";
+import vm from "node:vm";
 import { prepareSavedEvidenceItems, savedExportSourceText, reportSavedSelection, reportSavedSourceID } from "../report-evidence.mjs";
 
 const tail = "Exception: retain this condition at the end of the complete source.";
@@ -53,6 +54,27 @@ const oldSaved = [{ ...record, noteBody: "Old rendered note" }];
 assert.equal(reportSavedSelection(record, notes, oldSaved).notes[0].body, "Paragraph note");
 assert.equal(reportSavedSelection(record, [{ ...record, noteBody: "", deletedAt: "today" }], oldSaved).notes.length, 0);
 const app = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
+// Palette grouping must keep editions and selected paragraphs distinct while following Evidence order.
+const groupingStart = app.indexOf("function groupReportEvidenceSources(");
+assert(groupingStart >= 0);
+const groupingContext = vm.createContext({ codeOptions: [{ prefix: "BC" }, { prefix: "AC" }, { prefix: "BC" }] });
+vm.runInContext(app.slice(groupingStart, app.indexOf("\nfunction emptyProjectReportDraft", groupingStart)), groupingContext);
+const paletteSources = [
+  { id: "chapter-10-paragraph", codePrefix: "BC", sourceLibraryVersion: "2022", chapterNumber: "10", sectionNumber: "1020.4", selectionKind: "paragraph" },
+  { id: "administrative", codePrefix: "AC", sourceLibraryVersion: "2022", chapterNumber: "1", sectionNumber: "28-101.1" },
+  { id: "historical", codePrefix: "BC", sourceLibraryVersion: "2014", chapterNumber: "10", sectionNumber: "1020.4" },
+  { id: "unrecorded-chapter", codePrefix: "BC", sourceLibraryVersion: "2022", chapterNumber: "", sectionNumber: "101" },
+  { id: "chapter-10-section", codePrefix: "BC", sourceLibraryVersion: "2022", chapterNumber: "10", sectionNumber: "1020.4", selectionKind: "section" },
+  { id: "chapter-4", codePrefix: "BC", sourceLibraryVersion: "2022", chapterNumber: "4", sectionNumber: "402.8.6" }
+];
+const originalPaletteSources = structuredClone(paletteSources);
+const grouped = groupingContext.groupReportEvidenceSources(paletteSources);
+assert.deepEqual(JSON.parse(JSON.stringify(grouped.map(group => [group.prefix, group.version, group.sources.map(source => source.id)]))), [
+  ["BC", "2014", ["historical"]],
+  ["BC", "2022", ["chapter-4", "chapter-10-section", "chapter-10-paragraph", "unrecorded-chapter"]],
+  ["AC", "2022", ["administrative"]]
+]);
+assert.deepEqual(paletteSources, originalPaletteSources, "Palette grouping must not alter source identities or the supplied list.");
 assert(!app.includes("function printSavedItemsAsPDF("));
 assert(!app.includes("saved-evidence-export-selection"), "Saved must not introduce another export surface.");
 assert(!app.includes("printReportManifestAsPDF"), "Use the immutable issued PDF instead of regenerating it through print.");

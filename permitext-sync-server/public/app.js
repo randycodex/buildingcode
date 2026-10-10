@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-report-source-labels-v756";
+} from "./offline-storage.js?v=20261010-report-evidence-layout-v757";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-report-source-labels-v756";
+} from "./research-intent-state.js?v=20261010-report-evidence-layout-v757";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -27544,6 +27544,31 @@ async function renderProjectNotebook(project, options = {}) {
   return panel;
 }
 
+function groupReportEvidenceSources(sources = []) {
+  const codeOrder = new Map();
+  codeOptions.forEach((option, index) => {
+    if (!codeOrder.has(option.prefix)) codeOrder.set(option.prefix, index);
+  });
+  const groups = new Map();
+  sources.forEach((source) => {
+    const prefix = String(source.codePrefix || "Other").trim() || "Other";
+    const version = String(source.sourceLibraryVersion || "").trim();
+    const key = `${prefix}::${version || source.codeEdition || "unrecorded"}`;
+    if (!groups.has(key)) groups.set(key, { prefix, version, key, sources: [] });
+    groups.get(key).sources.push(source);
+  });
+  const compare = (left, right) => String(left || "").localeCompare(String(right || ""), undefined, { numeric: true, sensitivity: "base" });
+  return [...groups.values()]
+    .sort((left, right) => (codeOrder.get(left.prefix) ?? Number.MAX_SAFE_INTEGER) -
+      (codeOrder.get(right.prefix) ?? Number.MAX_SAFE_INTEGER) ||
+      compare(left.prefix, right.prefix) || compare(left.version, right.version))
+    .map((group) => ({ ...group, sources: group.sources.sort((left, right) =>
+      Number(!left.chapterNumber) - Number(!right.chapterNumber) ||
+      compare(left.chapterNumber, right.chapterNumber) || compare(left.sectionNumber, right.sectionNumber) ||
+      Number(left.selectionKind === "paragraph") - Number(right.selectionKind === "paragraph")
+    ) }));
+}
+
 function emptyProjectReportDraft(project) {
   return {
     id: "",
@@ -28152,19 +28177,43 @@ async function renderProjectReportDraft(project) {
       const row = document.createElement("article");
       row.className = "report-source-card";
       if (source.kind === "evidence") {
-        row.classList.add("report-evidence-source-card", `code-theme-${codeTheme(source.codePrefix)}`);
+        row.classList.add("report-evidence-source-card", "saved-row", `code-theme-${codeTheme(source.codePrefix)}`);
       }
       const copy = document.createElement("div");
-      const heading = document.createElement("strong");
+      let heading;
       if (source.kind === "evidence") {
         const sectionNumber = String(source.sectionNumber || "").trim();
-        heading.textContent = [source.codePrefix || "Code", sectionNumber, savedEvidenceEdition(source)].filter(Boolean).join(" · ");
+        const meta = document.createElement("span");
+        meta.className = "saved-section-meta";
+        const edition = savedEvidenceEdition({ codePrefix: source.codePrefix, codeVersion: source.sourceLibraryVersion });
+        meta.textContent = [source.selectionKind === "paragraph" ? "Paragraph" : "Section", sectionNumber,
+          edition === "Edition not recorded" ? source.codeEdition || edition : edition].filter(Boolean).join(" · ");
+        heading = document.createElement("strong");
+        heading.className = "saved-section-title";
+        heading.textContent = sectionTitleWithoutNumber({ sectionNumber, title: source.title }) || "Section";
+        const sectionHeading = document.createElement("div");
+        sectionHeading.className = "saved-section-heading";
+        sectionHeading.append(meta, heading);
+        const preview = document.createElement("span");
+        preview.className = "saved-paragraph-preview";
+        preview.textContent = source.previewText || source.summary || "";
+        copy.append(sectionHeading, preview);
+        (source.notes || []).forEach((savedNote) => {
+          const note = document.createElement("span");
+          note.className = "saved-note-preview";
+          const noteText = document.createElement("span");
+          noteText.className = "saved-note-text";
+          noteText.textContent = savedNote.body;
+          note.append(noteText);
+          copy.append(note);
+        });
       } else {
+        heading = document.createElement("strong");
         heading.textContent = source.label;
+        const summary = document.createElement("p");
+        summary.textContent = source.summary || "Project source";
+        copy.append(heading, summary);
       }
-      const summary = document.createElement("p");
-      summary.textContent = source.summary || "Project source";
-      copy.append(heading, summary);
       const add = document.createElement("button");
       add.type = "button";
       add.textContent = "Add";
@@ -28213,58 +28262,56 @@ async function renderProjectReportDraft(project) {
         groupBody.append(warning);
       }
 
-      const codeOrder = new Map(codeOptions.map((option, index) => [option.prefix, index]));
-      const groupedEvidence = Array.from(
-        evidenceSources.reduce((groups, source) => {
-          const prefix = String(source.codePrefix || "Other").trim() || "Other";
-          if (!groups.has(prefix)) groups.set(prefix, []);
-          groups.get(prefix).push(source);
-          return groups;
-        }, new Map())
-      ).sort(([leftPrefix], [rightPrefix]) => {
-        const leftOrder = codeOrder.get(leftPrefix) ?? Number.MAX_SAFE_INTEGER;
-        const rightOrder = codeOrder.get(rightPrefix) ?? Number.MAX_SAFE_INTEGER;
-        return leftOrder - rightOrder || codeLabel(leftPrefix).localeCompare(codeLabel(rightPrefix));
-      });
-      groupedEvidence.forEach(([prefix, codeSources]) => {
+      groupReportEvidenceSources(evidenceSources).forEach(({ prefix, version, key, sources: codeSources }) => {
         const codeGroup = document.createElement("section");
         codeGroup.className = `report-evidence-code-group code-theme-${codeTheme(prefix)}`;
         const codeHeading = document.createElement("div");
         codeHeading.className = "report-evidence-code-heading project-collapsible-heading";
         const codeTitle = document.createElement("button");
         codeTitle.type = "button";
-        codeTitle.className = "project-section-toggle-label section-label report-evidence-code-toggle";
-        codeTitle.textContent = prefix === "Other" ? "Other enacted codes" : codeLabel(prefix);
-        const codeToggle = document.createElement("button");
-        codeToggle.type = "button";
-        codeToggle.className = "project-section-toggle-chevron report-evidence-code-chevron";
-        codeToggle.innerHTML = researchChevronIconsSVG();
-        codeHeading.append(codeTitle, codeToggle);
+        codeTitle.className = "project-section-toggle-label section-label saved-code-label report-evidence-code-toggle";
+        const codeName = document.createElement("span");
+        codeName.textContent = prefix === "Other" ? "Other enacted codes" : codeLabel(prefix, version);
+        const codeToggle = document.createElement("span");
+        codeToggle.className = "saved-code-toggle-chevron";
+        codeToggle.setAttribute("aria-hidden", "true");
+        codeToggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>';
+        codeTitle.append(codeName, codeToggle);
+        codeHeading.append(codeTitle);
         const codeBody = document.createElement("div");
         codeBody.className = "report-evidence-code-body";
-        codeSources
-          .sort((left, right) => String(left.sectionNumber || "").localeCompare(
-            String(right.sectionNumber || ""),
-            undefined,
-            { numeric: true, sensitivity: "base" }
-          ))
-          .forEach((source) => appendSourceCard(codeBody, source));
+        let previousChapter = null;
+        codeSources.forEach((source) => {
+          const chapterNumber = String(source.chapterNumber || "");
+          if (chapterNumber && chapterNumber !== previousChapter) {
+            const chapterHeading = document.createElement("div");
+            chapterHeading.className = "saved-chapter-header";
+            const chapterLabel = document.createElement("strong");
+            chapterLabel.textContent = `Chapter ${chapterNumber}`;
+            chapterHeading.append(chapterLabel);
+            codeBody.append(chapterHeading);
+          }
+          previousChapter = chapterNumber;
+          appendSourceCard(codeBody, source);
+        });
         codeGroup.append(codeHeading, codeBody);
         groupBody.append(codeGroup);
-        const groupKey = `Saved evidence:${prefix}`;
+        const groupKey = `Saved evidence:${key}`;
         const initiallyExpanded = reportSectionExpanded(groupKey);
         wireProjectSectionMotion(
           codeGroup,
           codeBody,
-          [codeTitle, codeToggle],
-          codeTitle.textContent,
+          [codeTitle],
+          codeName.textContent,
           initiallyExpanded,
           {
             onChange(expanded) {
+              codeGroup.classList.toggle("is-collapsed", !expanded);
               persistReportSectionExpanded(groupKey, expanded);
             }
           }
         );
+        codeGroup.classList.toggle("is-collapsed", !initiallyExpanded);
       });
     });
 

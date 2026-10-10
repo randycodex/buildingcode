@@ -15306,6 +15306,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .report-evidence-code-group {
+  --saved-font-size: var(--reader-font-size);
   display: grid;
   gap: 0;
 }
@@ -18187,6 +18188,47 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .report-draft-panel .report-source-picker > summary,
 .report-draft-panel .report-evidence-code-heading > .project-section-toggle-label {
   padding-inline: 0;
+}
+
+/* The Report evidence picker uses the same hierarchy and previews as Evidence. */
+.report-draft-panel .report-evidence-code-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex: 1 1 auto;
+  width: 100%;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.report-evidence-code-body {
+  gap: 0;
+}
+.report-evidence-code-body > .saved-chapter-header {
+  padding-inline: var(--panel-padding);
+}
+.report-evidence-code-group.is-collapsed .saved-code-toggle-chevron {
+  transform: rotate(0deg);
+}
+.report-source-card.report-evidence-source-card {
+  padding-block: var(--space-4);
+}
+.report-evidence-source-card > div {
+  gap: 0;
+}
+.report-evidence-source-card .saved-section-heading {
+  gap: 1px;
+}
+.report-source-card.report-evidence-source-card .saved-section-title {
+  padding: 0;
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: normal;
+}
+.report-evidence-source-card .saved-paragraph-preview {
+  -webkit-line-clamp: 3;
 }
 
 /* Selection remains visible without relying on its accent color. */

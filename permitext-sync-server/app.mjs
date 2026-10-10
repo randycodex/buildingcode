@@ -16463,6 +16463,12 @@ function reportSourceClientSummary(source) {
     title: source.title || "",
     label: source.label,
     summary: source.summary || "",
+    ...(source.kind === "evidence" ? {
+      chapterNumber: source.chapterNumber || "",
+      selectionKind: source.selectionKind || "section",
+      previewText: source.previewText || "",
+      notes: source.notes || []
+    } : {}),
     sourceClassification: source.sourceClassification,
     updatedAt: source.updatedAt || null
   };
@@ -16557,6 +16563,10 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
         id: sourceID, kind: "evidence", codePrefix: evidence.codeBook,
         codeEdition: evidence.codeEdition, sourceLibraryVersion: evidence.sourceLibraryVersion,
         sectionNumber: evidence.sectionNumber, title: evidence.title,
+        chapterNumber: evidence.chapter === "unknown" ? "" : evidence.chapter,
+        selectionKind: selection.blockID ? "paragraph" : "section",
+        previewText: evidence.passageText.replace(/\s+/g, " ").trim().slice(0, 240),
+        notes: selection.notes.map(note => ({ label: note.label, body: note.body })),
         label: `${evidence.codeBook} ${evidence.sectionNumber} · ${evidence.codeEdition}: ${evidence.title}`,
         summary: `${evidence.passageText.slice(0, 500)}${selection.notes.length ? ` · ${selection.notes.length} saved ${selection.notes.length === 1 ? "note" : "notes"} included` : ""}`,
         sourceClassification: "published-code", manifestItem: evidence,
