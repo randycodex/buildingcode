@@ -19,8 +19,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1295";
-const shellAssetVersion = "20261009-column-menu-copy-v655";
+const shellCacheName = "permitext-pro-shell-v1298";
+const shellAssetVersion = "20261009-scoped-search-v658";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -54,17 +54,17 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261009-column-menu-copy-v655",
+  "/web/styles.css?v=20261009-scoped-search-v658",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261009-column-menu-copy-v655",
+  "/web/app.js?v=20261009-scoped-search-v658",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261009-column-menu-copy-v655",
-  "/web/research-intent-state.js?v=20261009-column-menu-copy-v655",
+  "/web/offline-storage.js?v=20261009-scoped-search-v658",
+  "/web/research-intent-state.js?v=20261009-scoped-search-v658",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20261008-pinned-columns-v12",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -1290,7 +1290,7 @@ async function offlineSectionMetadataRecords(installID) {
   } finally { database.close(); }
 }
 
-async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens, sourceScope = null }) {
+async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens, sourceScope = null, exactPattern = null }) {
   const database = await openDatabase();
   try {
     const transaction = database.transaction(sectionsStoreName, "readonly");
@@ -1312,7 +1312,8 @@ async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQ
         if (
           permitted &&
           (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
-          tokens.every((token) => section.searchText.includes(token))
+          tokens.every((token) => section.searchText.includes(token)) &&
+          (!exactPattern || exactPattern.test([section.sectionNumber, section.title, section.headingLine, section.plainText].filter(Boolean).join(" ").replace(/\s+/g, " ")))
         ) {
           const number = String(section.sectionNumber || "").toLowerCase();
           const title = String(section.title || "").toLowerCase();
@@ -1487,16 +1488,33 @@ async function offlineSearch(metadata, url) {
   const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 500) : 0;
   const normalizedQuery = query.toLowerCase();
   const requestedVersion = url.searchParams.get("version");
+  const offset = Math.max(0, Number.parseInt(url.searchParams.get("offset") || "0", 10) || 0);
+  let resultSource = null;
+  if (url.searchParams.has("resultSource")) {
+    const values = url.searchParams.getAll("resultSource");
+    if (values.length !== 1 || values[0].length > 1024) throw new Error("Invalid search result source.");
+    resultSource = JSON.parse(values[0]);
+    if (!resultSource || typeof resultSource.codePrefix !== "string" ||
+        !/^[A-Z][A-Z0-9]{0,8}$/.test(resultSource.codePrefix) ||
+        typeof resultSource.codeVersion !== "string" || !resultSource.codeVersion ||
+        resultSource.codeVersion.length > 512) throw new Error("Invalid search result source.");
+  }
+  const needle = query.replace(/\s+/g, " ");
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").split(" ").join("\\s+");
+  const exactPattern = url.searchParams.get("match") === "exact" ? new RegExp(
+    `${/^[\p{L}\p{N}_]/u.test(needle) ? "(?<![\\p{L}\\p{N}_])" : ""}${escaped}${/[\p{L}\p{N}_]$/u.test(needle) ? "(?![\\p{L}\\p{N}_])" : ""}`, "iu") : null;
   const chapters = new Map();
   const matches = (await Promise.all((await matchingOfflineSearchResults(metadata.installID, {
     codeFilter,
     normalizedQuery,
     query,
     tokens,
-    sourceScope
+    sourceScope,
+    exactPattern
   })).map(async (match) => {
     const record = await offlineSectionWithEdition(match.record, metadata, chapters);
     if (!record || (requestedVersion && requestedVersion !== "all" && record.codeVersion !== syncCodeVersion(requestedVersion))) return null;
+    if (resultSource && (record.codePrefix !== resultSource.codePrefix || record.codeVersion !== resultSource.codeVersion)) return null;
     return { rank: match.rank, result: { ...match.result, codeVersion: record.codeVersion } };
   }))).filter(Boolean)
     .sort((left, right) =>
@@ -1508,12 +1526,33 @@ async function offlineSearch(metadata, url) {
       }) ||
       Number(left.result.id) - Number(right.result.id)
     );
+  if (url.searchParams.get("grouped") === "true" && !resultSource) {
+    const grouped = new Map();
+    for (const match of matches) {
+      const key = `${match.result.codePrefix}|${match.result.codeVersion}`;
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key).push(match.result);
+    }
+    const groups = [], results = [];
+    for (const group of grouped.values()) {
+      const page = group.slice(0, Math.min(limit || 25, 5));
+      results.push(...page);
+      groups.push({ codePrefix: group[0].codePrefix, codeVersion: group[0].codeVersion,
+        nextOffset: page.length, nextCandidateOffset: page.length, cursorKind: "offset",
+        hasMore: page.length < group.length, totalResults: group.length });
+    }
+    const hasMore = groups.some(group => group.hasMore);
+    return { query, groups, results, hasMore, limited: hasMore, totalResults: matches.length };
+  }
   const totalResults = matches.length;
-  const selected = limit ? matches.slice(0, limit) : matches;
+  const selected = limit ? matches.slice(offset, offset + limit) : matches.slice(offset);
+  const nextOffset = offset + selected.length;
+  const hasMore = nextOffset < totalResults;
   return {
     query,
     totalResults,
-    limited: Boolean(limit && totalResults > selected.length),
+    offset, nextOffset, nextCandidateOffset: nextOffset, cursorKind: "offset", hasMore,
+    limited: hasMore,
     results: selected.map(({ result }) => result)
   };
 }

@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-column-menu-copy-v655";
+} from "./offline-storage.js?v=20261009-scoped-search-v658";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-column-menu-copy-v655";
+} from "./research-intent-state.js?v=20261009-scoped-search-v658";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1138,6 +1138,11 @@ function newUtilityInstance(key, overrides = {}) {
     instance.defaultExpandedResultSource = typeof overrides.defaultExpandedResultSource === "string" ? overrides.defaultExpandedResultSource : "";
     if (overrides.searchPosition && typeof overrides.searchPosition === "object") {
       instance.searchPosition = { ...overrides.searchPosition };
+      if (overrides.searchPosition.groupPages && typeof overrides.searchPosition.groupPages === "object") {
+        instance.searchPosition.groupPages = Object.fromEntries(Object.entries(overrides.searchPosition.groupPages)
+          .filter(([key, pages]) => key.length <= 1024 && Number.isSafeInteger(pages) && pages > 0)
+          .map(([key, pages]) => [key, Math.min(pages, 1000)]));
+      }
     }
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
     instance.historySplitRatio = normalizeSearchHistorySplitRatio(overrides.historySplitRatio);
@@ -16652,8 +16657,8 @@ function searchGroupCountText(count, hasMore) {
 
 function refreshSearchGroupCounts(results) {
   if (!results) return;
-  const hasMore = results.dataset.searchHasMore === "true";
   results.querySelectorAll(".search-result-group").forEach((group) => {
+    const hasMore = (group.dataset.searchHasMore ?? results.dataset.searchHasMore) === "true";
     const count = group.querySelector(".search-result-group-count");
     if (!count) return;
     const loaded = group.querySelectorAll(".result-row").length;
@@ -17314,6 +17319,7 @@ function cancelSearchPanelRequest(panel) {
     delete results.dataset.searchRenderToken;
     results.dataset.restoringSearch = "false";
     results.searchLoadMore = null;
+    results.searchGroupPages = null;
   }
 }
 
@@ -17341,6 +17347,7 @@ async function renderSearchResults(panel, instance) {
   results.dataset.searchRenderToken = renderToken;
   results.dataset.restoringSearch = "true";
   results.searchLoadMore = null;
+  results.searchGroupPages = null;
   results.classList.remove("is-history");
   if (query.length < 2) {
     results.dataset.searchHasMore = "false";
@@ -17373,7 +17380,7 @@ async function renderSearchResults(panel, instance) {
       return;
     }
     payload = await api(
-      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0${sourceScope.querySuffix}`, { signal: controller.signal }
+      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true${sourceScope.querySuffix}`, { signal: controller.signal }
     );
   } catch (error) {
     if (!isCurrent()) return;
@@ -17457,6 +17464,40 @@ async function renderSearchResults(panel, instance) {
   });
   if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope, { hasMore: Boolean(payload.hasMore) })) saveWorkspaceState();
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
+  if (Array.isArray(payload.groups)) {
+    const options = { query, searchInstance, panel, edition, controller, isCurrent, sourceScope };
+    const restoreGroups = position.groupScope === sourceScope.querySuffix ? { ...position.groupPages } : {};
+    position.groupScope = sourceScope.querySuffix;
+    position.groupPages = {};
+    results.searchGroupPages = new Map();
+    for (const source of payload.groups) {
+      const key = `${source.codePrefix}|${source.codeVersion}`;
+      const group = results.querySelector(`.search-result-group[data-source-key="${CSS.escape(key)}"]`);
+      if (!group) continue;
+      const page = { ...source, key, group, loadedPages: 1, candidateOffset: source.nextCandidateOffset || 0 };
+      results.searchGroupPages.set(key, page);
+      const desiredPages = Number.isSafeInteger(restoreGroups[key]) && restoreGroups[key] > 0 ? Math.min(restoreGroups[key], 1000) : 1;
+      position.groupPages[key] = desiredPages;
+      appendSearchGroupLoadMore(results, page, options);
+    }
+    refreshSearchGroupCounts(results);
+    for (const page of results.searchGroupPages.values()) {
+      const desiredPages = position.groupPages[page.key];
+      let failed = false;
+      while (page.loadedPages < desiredPages && page.hasMore && isCurrent()) {
+        if (!(await page.loadMore())) { failed = true; break; }
+      }
+      if (!isCurrent()) return;
+      if (!failed) position.groupPages[page.key] = page.loadedPages;
+    }
+    requestAnimationFrame(() => {
+      if (!isCurrent()) return;
+      results.scrollTop = restoreScrollTop;
+      results.dataset.restoringSearch = "false";
+    });
+    return;
+  }
+  // Older servers keep their original cursor while cached clients transition.
   appendSearchLoadMore(results, {
     query,
     selectedPrefixes,
@@ -17585,20 +17626,26 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       family.append(group);
     }
     const groupBody = group.querySelector(".search-result-group-body") || group;
+    const existingKeys = new Set([...groupBody.querySelectorAll(".result-row-main")]
+      .map(button => button.dataset.searchResultKey));
     groupResults.forEach((result) => {
+      const positionKey = searchResultPositionKey(result);
+      if (existingKeys.has(positionKey)) return;
+      existingKeys.add(positionKey);
       const detail = searchResultDetail(result);
       const row = document.createElement("article");
       row.className = "result-row";
       const mainButton = document.createElement("button");
       mainButton.className = "result-row-main";
       mainButton.type = "button";
-      const positionKey = searchResultPositionKey(result);
       mainButton.dataset.searchResultKey = positionKey;
       if (searchPositionState(searchInstance).selectedResult === positionKey) mainButton.setAttribute("aria-current", "true");
       const presentation = searchResultPresentation(result, query);
       const citation = document.createElement("span");
       citation.className = "result-chapter";
+      citation.id = `search-result-citation-${crypto.randomUUID()}`;
       citation.textContent = presentation.citation;
+      mainButton.setAttribute("aria-describedby", citation.id);
       const heading = document.createElement("strong");
       heading.className = "result-heading";
       const title = document.createElement("span");
@@ -17609,7 +17656,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       const snippet = document.createElement("p");
       appendHighlighted(snippet, snippetText, query);
       markResearchSelectable(snippet, detail);
-      mainButton.append(citation, heading);
+      mainButton.append(heading);
       if (snippetText) mainButton.append(snippet);
       mainButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
@@ -17638,7 +17685,10 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       const actions = document.createElement("div");
       actions.className = "saved-row-actions search-row-actions";
       actions.append(openNewButton);
-      row.append(mainButton, saveButton, actions);
+      const header = document.createElement("div");
+      header.className = "result-row-header";
+      header.append(citation, actions, saveButton);
+      row.append(header, mainButton);
       groupBody.append(row);
     });
     const count = group.querySelector(".search-result-group-count");
@@ -17658,6 +17708,80 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       results.append(family);
     });
   refreshSearchGroupCounts(results);
+}
+
+function appendSearchGroupLoadMore(results, page, options) {
+  const group = page.group;
+  const body = group.querySelector(".search-result-group-body");
+  body.querySelector(".search-load-more")?.remove();
+  group.dataset.searchHasMore = page.hasMore ? "true" : "false";
+  page.loadMore = null;
+  if (!page.hasMore) return;
+  const footer = document.createElement("section");
+  footer.className = "search-load-more";
+  const status = document.createElement("p");
+  status.hidden = true;
+  status.setAttribute("role", "status");
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "search-load-more-button";
+  button.textContent = "Load more matches";
+  button.setAttribute("aria-label", `Load more ${page.codePrefix} ${researchCodeEdition({ codePrefix: page.codePrefix, codeVersion: page.codeVersion })} matches`);
+  page.loadMore = async () => {
+    if (!options.isCurrent() || button.disabled) return false;
+    button.disabled = true;
+    button.textContent = "Loading matches…";
+    status.hidden = true;
+    try {
+      const source = encodeURIComponent(JSON.stringify({ codePrefix: page.codePrefix, codeVersion: page.codeVersion }));
+      const payload = await api(`/code/search?q=${encodeURIComponent(options.query)}` +
+        `&code=${encodeURIComponent(page.codePrefix)}&version=all&resultSource=${source}&match=exact` +
+        `&limit=${searchResultPageSize}&offset=${page.nextOffset}` +
+        `${page.cursorKind === "candidate" ? `&candidateOffset=${page.candidateOffset}` : ""}${options.sourceScope.querySuffix}`,
+        { signal: options.controller.signal });
+      if (!options.isCurrent()) return false;
+      if ((payload.results || []).some(result => result.codePrefix !== page.codePrefix || result.codeVersion !== page.codeVersion)) {
+        throw new Error("The returned matches belong to a different code edition.");
+      }
+      const matches = (payload.results || []).filter(result => searchResultMatchesExactQuery(result, options.query));
+      const hadFocus = footer.contains(document.activeElement);
+      footer.remove();
+      appendSearchResultGroups(results, matches, options.query, options.searchInstance);
+      page.nextOffset = Number(payload.nextOffset) || page.nextOffset + (payload.results || []).length;
+      page.candidateOffset = Number(payload.nextCandidateOffset) || 0;
+      page.cursorKind = payload.cursorKind || "offset";
+      page.hasMore = Boolean(payload.hasMore);
+      page.totalResults = payload.totalResults;
+      page.loadedPages += 1;
+      appendSearchGroupLoadMore(results, page, options);
+      const hasMore = [...results.searchGroupPages.values()].some(item => item.hasMore);
+      results.dataset.searchHasMore = hasMore ? "true" : "false";
+      const loaded = results.querySelectorAll(".result-row").length;
+      updateSearchDock(options.panel, options.searchInstance, loaded, { hasMore });
+      refreshSearchGroupCounts(results);
+      if (results.dataset.restoringSearch !== "true") {
+        searchPositionState(options.searchInstance).groupPages[page.key] = page.loadedPages;
+        saveWorkspaceState();
+      }
+      if (hadFocus) {
+        const firstNew = matches.length && [...body.querySelectorAll(".result-row-main")]
+          .find(item => item.dataset.searchResultKey === searchResultPositionKey(matches[0]));
+        (firstNew || body.querySelector(".search-load-more-button") || group.querySelector(".search-result-group-toggle"))
+          ?.focus({ preventScroll: true });
+      }
+      return true;
+    } catch {
+      if (!options.isCurrent()) return false;
+      button.disabled = false;
+      button.textContent = "Try again";
+      status.hidden = false;
+      status.textContent = "More matches could not be loaded for this edition.";
+      return false;
+    }
+  };
+  button.addEventListener("click", () => { void page.loadMore(); });
+  footer.append(status, button);
+  body.append(footer);
 }
 
 function appendSearchLoadMore(results, options) {

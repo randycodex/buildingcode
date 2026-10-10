@@ -23555,6 +23555,68 @@ async function exactSearchPage(hits, query, candidateOffset, resultLimit) {
   };
 }
 
+function codeSearchSectionVersion(section) {
+  return section.codeVersion ||
+    (section.codePrefix === zoningCodePrefix ? zoningSyncCodeVersion
+      : section.codePrefix === existingBuildingCodePrefix ? existingBuildingSyncCodeVersion
+      : enactedCodePrefixes.has(section.codePrefix) ? enactedSyncCodeVersionForPrefix(section.codePrefix)
+      : defaultSyncCodeVersion);
+}
+
+async function codeSearchResults(hits, query) {
+  return Promise.all(hits.map(async ({ section, plainText: matchedPlainText }) => {
+    const plainText = matchedPlainText ?? await searchableSectionPlainText(section);
+    return {
+      id: section.id,
+      chapterID: section.chapterID,
+      sourceChapterID: section.sourceChapterID || section.chapterID,
+      navigationChapterID: section.navigationChapterID || section.chapterID,
+      codePrefix: section.codePrefix,
+      codeVersion: codeSearchSectionVersion(section),
+      chapterNumber: section.chapterNumber,
+      sectionNumber: section.sectionNumber,
+      title: section.title,
+      headerLine: section.headerLine,
+      headingLine: section.headingLine,
+      snippet: searchSnippet(plainText || section.title || "", query)
+    };
+  }));
+}
+
+async function groupedCodeSearchPage(hits, query, resultLimit) {
+  const sources = new Map();
+  for (const hit of hits) {
+    const codePrefix = hit.section.codePrefix;
+    const codeVersion = codeSearchSectionVersion(hit.section);
+    const key = JSON.stringify([codePrefix, codeVersion]);
+    if (!sources.has(key)) sources.set(key, { codePrefix, codeVersion, hits: [] });
+    sources.get(key).hits.push(hit);
+  }
+  const entries = [...sources.values()];
+  const pages = new Array(entries.length);
+  let next = 0;
+  // Preview a few matches in every edition without reading every matching body.
+  // Two workers keep aggregate content-read concurrency bounded at sixteen.
+  await Promise.all(Array.from({ length: Math.min(2, entries.length) }, async () => {
+    while (next < entries.length) {
+      const index = next++;
+      const source = entries[index];
+      const page = await exactSearchPage(source.hits, query, 0, Math.min(5, resultLimit));
+      pages[index] = { codePrefix: source.codePrefix, codeVersion: source.codeVersion, ...page };
+    }
+  }));
+  const available = pages.filter(page => page.hits.length || page.hasMore);
+  const groups = available.map(page => ({
+    codePrefix: page.codePrefix, codeVersion: page.codeVersion,
+    nextOffset: page.hits.length, nextCandidateOffset: page.nextCandidateOffset, cursorKind: "candidate",
+    hasMore: page.hasMore, totalResults: page.hasMore ? null : page.hits.length
+  }));
+  const results = await codeSearchResults(available.flatMap(page => page.hits), query);
+  const hasMore = groups.some(group => group.hasMore);
+  return { query, results, groups, hasMore, limited: hasMore,
+    totalResults: hasMore ? null : results.length };
+}
+
 async function handleCodeSearch(request, response) {
   const url = requestURL(request);
   let activeScope = null;
@@ -23582,6 +23644,21 @@ async function handleCodeSearch(request, response) {
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix));
   }).map(section => section.id));
   const query = url.searchParams.get("q")?.trim() || "";
+  let resultSource = null;
+  if (url.searchParams.has("resultSource")) {
+    try {
+      const values = url.searchParams.getAll("resultSource");
+      if (values.length !== 1 || values[0].length > 1024) throw new Error();
+      resultSource = JSON.parse(values[0]);
+      if (!resultSource || typeof resultSource.codePrefix !== "string" ||
+          !/^[A-Z][A-Z0-9]{0,8}$/.test(resultSource.codePrefix) ||
+          typeof resultSource.codeVersion !== "string" || !resultSource.codeVersion ||
+          resultSource.codeVersion.length > 512) throw new Error();
+    } catch {
+      sendError(response, 400, "Invalid search result source.");
+      return;
+    }
+  }
   if (query.length > 200) {
     sendError(response, 400, "Search queries are limited to 200 characters.");
     return;
@@ -23702,7 +23779,9 @@ async function handleCodeSearch(request, response) {
     );
   }
   const hits = timePublicCodePhase("ranking", () => {
-    const hits = candidates.map((section) => {
+    const hits = candidates.filter(section => !resultSource ||
+      (section.codePrefix === resultSource.codePrefix &&
+        codeSearchSectionVersion(section) === resultSource.codeVersion)).map((section) => {
       const sectionNumber = String(section.sectionNumber || "").toLowerCase();
       const title = String(section.title || "").toLowerCase();
       const rank = sectionNumber === normalizedQuery
@@ -23727,8 +23806,16 @@ async function handleCodeSearch(request, response) {
     return hits;
   });
 
-  const exactPage = exactCursorMode
-    ? await timePublicCodePhase("exact_match", () => exactSearchPage(hits, query, candidateOffset, resultLimit))
+  if (exactMatch && url.searchParams.get("grouped") === "true" && !resultSource) {
+    const page = await timePublicCodePhase("exact_match", () => groupedCodeSearchPage(hits, query, resultLimit));
+    sendPublicCodeJSON(request, response, page);
+    return;
+  }
+
+  const sourceOffsetMode = Boolean(resultSource && exactMatch && !exactCursorMode);
+  const exactPage = exactCursorMode || sourceOffsetMode
+    ? await timePublicCodePhase("exact_match", () => exactSearchPage(hits, query, sourceOffsetMode ? 0 : candidateOffset,
+        sourceOffsetMode ? resultOffset + resultLimit : resultLimit))
     : null;
   const matchedHits = exactPage
     ? exactPage.hits
@@ -23736,32 +23823,9 @@ async function handleCodeSearch(request, response) {
       ? await timePublicCodePhase("exact_match", () => exactSearchHits(hits, query))
       : hits;
   const selectedHits = exactPage
-    ? matchedHits
+    ? sourceOffsetMode ? matchedHits.slice(resultOffset) : matchedHits
     : matchedHits.slice(resultOffset, resultOffset + resultLimit);
-  const results = await timePublicCodePhase("snippets", () => Promise.all(selectedHits.map(async ({ section, plainText: matchedPlainText }) => {
-    const plainText = matchedPlainText ?? await searchableSectionPlainText(section);
-    return {
-      id: section.id,
-      chapterID: section.chapterID,
-      sourceChapterID: section.sourceChapterID || section.chapterID,
-      navigationChapterID: section.navigationChapterID || section.chapterID,
-      codePrefix: section.codePrefix,
-      codeVersion: section.codeVersion ||
-        (section.codePrefix === zoningCodePrefix
-          ? zoningSyncCodeVersion
-          : section.codePrefix === existingBuildingCodePrefix
-            ? existingBuildingSyncCodeVersion
-            : enactedCodePrefixes.has(section.codePrefix)
-              ? enactedSyncCodeVersionForPrefix(section.codePrefix)
-            : defaultSyncCodeVersion),
-      chapterNumber: section.chapterNumber,
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      headerLine: section.headerLine,
-      headingLine: section.headingLine,
-      snippet: searchSnippet(plainText || section.title || "", query)
-    };
-  })));
+  const results = await timePublicCodePhase("snippets", () => codeSearchResults(selectedHits, query));
   const nextOffset = resultOffset + results.length;
   const hasMore = exactPage ? exactPage.hasMore : nextOffset < matchedHits.length;
   const totalResults = exactPage && hasMore ? null : exactPage ? nextOffset : matchedHits.length;
@@ -23772,6 +23836,7 @@ async function handleCodeSearch(request, response) {
     offset: resultOffset,
     nextOffset,
     ...(exactPage ? { nextCandidateOffset: exactPage.nextCandidateOffset } : {}),
+    cursorKind: exactPage ? "candidate" : "offset",
     hasMore,
     limited: hasMore
   });
