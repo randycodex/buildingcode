@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-unassigned-inbox-v689";
+} from "./offline-storage.js?v=20261010-inbox-navigation-v690";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-unassigned-inbox-v689";
+} from "./research-intent-state.js?v=20261010-inbox-navigation-v690";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -340,6 +340,7 @@ const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
+const unassignedSavesButton = document.querySelector("#open-unassigned");
 const connectionStatus = document.querySelector("#connection-status");
 const workspaceIssue = document.querySelector("#workspace-issue");
 const workspaceIssueCopy = workspaceIssue?.querySelector(".workspace-issue-copy");
@@ -2031,9 +2032,6 @@ function openMobileMoreSheet() {
   projectLabel.textContent = "Projects";
   const projectList = document.createElement("div");
   projectList.className = "mobile-more-workspaces";
-  projectList.append(mobileMoreAction("Unassigned saves", () => void openUnassignedSaves(), {
-    current: !activeWorkspaceRecord()?.projectID
-  }));
   visibleWorkspaceRecords().forEach((workspace) => {
     projectList.append(mobileMoreAction(workspace.name,
       () => void switchWorkspace(workspace.id, { focus: false }),
@@ -2046,7 +2044,10 @@ function openMobileMoreSheet() {
   const accountSection = document.createElement("section");
   accountSection.className = "mobile-more-section";
   accountSection.append(mobileMoreAction("Account", () => toggleUtilityPane("settings")));
-  sheet.append(header, projectSection, accountSection);
+  const inboxSection = document.createElement("section");
+  inboxSection.className = "mobile-more-section";
+  inboxSection.append(mobileMoreAction("Unassigned saves", () => void openUnassignedSaves()));
+  sheet.append(header, inboxSection, projectSection, accountSection);
   backdrop.append(sheet);
   backdrop.addEventListener("click", (event) => {
     if (event.target === backdrop) closeMobileMoreSheet();
@@ -2108,10 +2109,6 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     section.append(button);
   };
-  const savedSection = document.createElement("div");
-  savedSection.className = "workspace-context-section";
-  appendMenuAction(savedSection, { label: "Unassigned saves", run: () => void openUnassignedSaves() });
-  menu.append(savedSection);
   const projectSection = document.createElement("div");
   projectSection.className = "workspace-context-section";
   projectSection.setAttribute("role", "group");
@@ -2185,6 +2182,7 @@ function renderWorkspaceTabs() {
   if (!workspaceActionsButton || !container) return;
   container.hidden = detachedProjectWindow;
   if (detachedProjectWindow) return;
+  if (unassignedSavesButton) unassignedSavesButton.disabled = !workspacePrivatePresentationAllowed();
   if (!workspacePrivatePresentationAllowed()) {
     const label = workspaceActionsButton.querySelector(".workspace-current-name");
     if (label) label.textContent = "Projects";
@@ -2196,13 +2194,13 @@ function renderWorkspaceTabs() {
   const workspace = activeWorkspaceRecord();
   const visibleWorkspaces = visibleWorkspaceRecords();
   const activeVisibleWorkspace = visibleWorkspaces.find((candidate) => candidate.id === workspace?.id);
-  const emptyLabel = "Unassigned saves";
+  const emptyLabel = "Projects";
   const label = workspaceActionsButton.querySelector(".workspace-current-name");
   if (label) label.textContent = activeVisibleWorkspace?.name || emptyLabel;
   workspaceActionsButton.title = activeVisibleWorkspace?.name || emptyLabel;
   workspaceActionsButton.setAttribute("aria-label", activeVisibleWorkspace
     ? `Open ${activeVisibleWorkspace.name} Project menu`
-    : "Choose Project or Unassigned saves");
+    : "Choose Project");
   workspaceActionsButton.disabled = false;
 }
 
@@ -43562,6 +43560,10 @@ async function start() {
       return;
     }
     openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
+  });
+  unassignedSavesButton?.addEventListener("click", () => {
+    closeWorkspaceContextMenu();
+    void openUnassignedSaves();
   });
   mobileMoreButton?.addEventListener("click", openMobileMoreSheet);
   window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {

@@ -7,12 +7,14 @@ const chooser = app.slice(app.indexOf('async function openWorkspaceContextMenu('
 const mobileChooser = app.slice(app.indexOf('function openMobileMoreSheet('), app.indexOf('async function openWorkspaceContextMenu('));
 for (const source of [chooser, mobileChooser]) {
   assert.doesNotMatch(source, /New workspace|Manage workspaces|Rename workspace|Duplicate workspace|Delete workspace|Workspaces share/);
-  assert.match(source, /Unassigned saves/);
   assert.match(source, /New Project/);
   assert.match(source, /Manage Projects/);
 }
 assert.match(app, /function visibleWorkspaceRecords\(\)[\s\S]*?workspace\.projectID && availableProjectIDs\.has\(workspace\.projectID\)/);
-assert.match(app, /const emptyLabel = "Unassigned saves"/);
+assert.doesNotMatch(chooser, /Unassigned saves/);
+assert.match(mobileChooser, /inboxSection\.append\(mobileMoreAction\("Unassigned saves"/);
+assert.doesNotMatch(mobileChooser, /projectList\.append\(mobileMoreAction\("Unassigned saves"/);
+assert.match(app, /const emptyLabel = "Projects"/);
 const storage = new Map();
 const projects = [{id:'a', name:'Alpha', folderType:'project'}, {id:'b', name:'Beta', folderType:'project'}];
 const context = vm.createContext({
@@ -73,7 +75,7 @@ assert.ok(context.workspaceRegistry.workspaces.some(w=>w.id==='project:a'), 'ret
 // Execute the actual menu destination and workspace switch against persisted layouts.
 // A Project-only account must reach its existing unassigned evidence without creating
 // a Project, changing saved identities, or overwriting the Project's pane arrangement.
-assert.match(app, /appendMenuAction\(savedSection, \{ label: "Unassigned saves", run: \(\) => void openUnassignedSaves\(\) \}\)/);
+assert.match(app, /unassignedSavesButton\?\.addEventListener\("click", \(\) => \{\s*closeWorkspaceContextMenu\(\);\s*void openUnassignedSaves\(\);/);
 const switchSource = app.slice(app.indexOf('async function switchWorkspace('), app.indexOf('\nfunction workspaceProject('));
 const unassignedSource = app.slice(app.indexOf('function defaultReadingWorkspace('), app.indexOf('\nasync function createGeneralWorkspace('));
 function unassignedHarness(workspaces, activeID = 'project:a') {
