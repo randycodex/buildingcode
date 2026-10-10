@@ -12,6 +12,9 @@ const [destination, presentation, handoff, model, browse, search, reader, chapte
  read('Models/NativeReaderHandoff.swift'),read('ViewModels/CodeLibraryViewModel.swift'),read('Views/BrowseView.swift'),
  read('Views/SearchView.swift'),read('Views/ReaderView.swift'),read('Views/ChapterReaderView.swift'),read('PermitextApp.swift')]);
 const methods = model.slice(model.indexOf('    var readerSaveDestinationProjects:'),model.indexOf('    func toggleBookmark(sectionID:'));
+const projectNavigationMethods = model.slice(model.indexOf('    func noteProjectOpened('), model.indexOf('    func sectionPreviewSnippet('));
+const continuityValues = model.slice(model.indexOf('    private func continuitySyncValues('), model.indexOf('    private func refreshContinuityStateFromStore('));
+assert.doesNotMatch(continuityValues, /readerSaveDestination|saveDestination/, 'Web continuity must not overwrite the explicit phone save preference');
 assert.ok(methods.includes('func toggleReaderDestinationSave'));
 assert.doesNotMatch(methods.replace(/\/\/[^\n]*/g,''),/activeProjectID/, 'Last opened Project is never the save choice');
 assert.match(model,/readerSaveDestinationChoice = NativeReaderSaveDestination\.load\(accountID: signedInAccount\?\.appUserID/);
@@ -68,6 +71,8 @@ final class Repository {
  let preferencesDefaults:UserDefaults
  var userContentRepository:Repository? = Repository()
  var folders:[CodeFolder] = []; var folderMembership:[Int64:[Int64]] = [:]
+ var activeProjectID:Int64?; var continuityCalls=0
+ func persistContinuityContext() { continuityCalls += 1 }
  var statusMessage:String?; var saveCalls=0; var toggleCalls=0; var syncCalls=0
  init(_ defaults:UserDefaults) { preferencesDefaults=defaults; refreshBookmarks() }
  func captureCodeSourceNavigationContext()->CodeSourceNavigationContext? {
@@ -89,6 +94,7 @@ final class Repository {
   userContentRepository?.bookmarks.insert(sectionID);refreshBookmarks();return true
  }
  ${methods}
+ ${projectNavigationMethods}
 }
 ${handoff}
 @main struct Main {
@@ -103,6 +109,10 @@ ${handoff}
   precondition(NativeReaderSaveDestination.project("deleted").validated(projectClientIDs:["p1"]) == .unassigned)
   let library=CodeLibraryViewModel(defaults), repo=library.userContentRepository!
   library.selectReaderSaveDestination(.project("p1"))
+  library.noteProjectOpened(2)
+  precondition(library.activeProjectID == 2 && library.readerSaveDestination == .project("p1"), "Opening another Project must not redirect Reader saves")
+  library.clearActiveProject()
+  precondition(library.readerSaveDestination == .project("p1"), "Returning to general Research must preserve the explicit Reader destination")
   repo.bookmarks.insert(42);repo.members[42]=[2];library.refreshBookmarks()
   precondition(library.toggleReaderDestinationSave(sectionID:42))
   precondition(Set(repo.members[42]!) == [1,2] && repo.bookmarks.contains(42),"Saving to Project must preserve existing memberships")

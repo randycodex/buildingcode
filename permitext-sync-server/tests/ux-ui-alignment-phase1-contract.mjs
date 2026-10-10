@@ -69,7 +69,7 @@ assert.match(clientSource, /addReaderButton\.disabled = limitReached/);
 assert.match(clientSource, /Two Reader limit reached/);
 assert.match(clientSource, /const visibleFolders = visibleRecords;[\s\S]*?visibleFolders\.forEach/);
 assert.doesNotMatch(clientSource, /const visibleProjects = visibleRecords\.filter\(folderIsProject\)/);
-assert.match(clientSource, /function unassignedSavedEvidenceKeys[\s\S]*?activeFolderRecords\(projects \|\| \[\]\)/);
+assert.match(clientSource, /function unassignedSavedEvidenceKeys[\s\S]*?activeProjectRecords\(projects \|\| \[\]\)/);
 assert.match(clientSource, /typeLabel\.textContent = folderTypeLabel\(project\)/);
 assert.match(clientSource, /folderRecordCountLabel\(selectedProjects\)/);
 assert.match(indexSource, /id="add-reader"[^>]*aria-label="Reader"[^>]*title="Reader"[\s\S]*?<span>Reader<\/span>/);

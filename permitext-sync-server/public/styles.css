@@ -10172,6 +10172,23 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: var(--surface-muted);
 }
 
+.saved-folder-context.is-unassigned-context {
+  margin-top: var(--space-2);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.saved-inbox {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.saved-inbox > .saved-evidence-heading {
+  justify-content: flex-end;
+}
+
 .saved-folder-context.is-project {
   --saved-project-row-gap: calc(var(--space-2) + var(--space-3));
   gap: var(--saved-project-row-gap);

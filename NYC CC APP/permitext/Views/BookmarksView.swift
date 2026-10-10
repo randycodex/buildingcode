@@ -2,7 +2,6 @@ import SwiftUI
 import UIKit
 
 struct BookmarksView: View {
-    @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var savedFilterCodeSectionIDs: Set<String>
@@ -218,14 +217,6 @@ struct BookmarksView: View {
             }
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-        .overlay(alignment: .bottom) {
-            if !collectionOnly {
-                allSavedLink
-                    .padding(.bottom, floatingNavigationClearance)
-                    .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
-                    .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-            }
-        }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -398,8 +389,8 @@ struct BookmarksView: View {
                     .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
             } else {
                 VStack(alignment: .leading, spacing: 24) {
+                    allSavedLink
                     if showsProjectsSection { projectTilesSection }
-
                 }
             }
         }
@@ -427,7 +418,7 @@ struct BookmarksView: View {
             .foregroundStyle(Color.primary)
             .padding(16)
             .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
-            .codeLiquidGlassCapsule()
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("all-saved-link")

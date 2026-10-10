@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-project-assignment-menu-v675";
+} from "./offline-storage.js?v=20261009-projects-inbox-v676";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-project-assignment-menu-v675";
+} from "./research-intent-state.js?v=20261009-projects-inbox-v676";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1240,8 +1240,7 @@ function visibleWorkspaceRecords() {
     ).map(projectRecordID)
   );
   return (workspaceRegistry?.workspaces || []).filter((workspace) =>
-    !isTechnicalFallbackWorkspace(workspace) &&
-    (!workspace.projectID || availableProjectIDs.has(workspace.projectID))
+    workspace.projectID && availableProjectIDs.has(workspace.projectID)
   );
 }
 
@@ -1251,6 +1250,9 @@ function persistWorkspaceRegistry() {
   activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
   localStorage.setItem(workspaceRegistryKey, JSON.stringify(workspaceRegistry));
   sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
+  if (activeWorkspaceRecord() && !activeWorkspaceRecord().projectID) {
+    localStorage.setItem(`${workspaceRegistryKey}:readingWorkspaceID`, activeWorkspaceID);
+  }
   scheduleWorkspaceCatalogSync();
 }
 
@@ -1743,6 +1745,17 @@ function scopeSavedInstanceToWorkspace(instance, options = {}) {
   return instance;
 }
 
+function defaultReadingWorkspace() {
+  const key = `${workspaceRegistryKey}:readingWorkspaceID`;
+  const rememberedID = localStorage.getItem(key);
+  const general = workspaceRegistry.workspaces.filter((workspace) => !workspace.projectID);
+  return general.find((workspace) => workspace.id === rememberedID)
+    || general.find((workspace) => workspace.id === activeWorkspaceID)
+    || general.find((workspace) => workspace.id === "general")
+    || general[0]
+    || null;
+}
+
 async function openUnassignedSaves() {
   if (!workspacePrivatePresentationAllowed()) return;
   if (!hasCapability("saved-work")) {
@@ -1750,10 +1763,7 @@ async function openUnassignedSaves() {
     return;
   }
   const requestIdentity = captureAccountRequest();
-  const current = activeWorkspaceRecord();
-  let target = !current?.projectID ? current : null;
-  target ||= workspaceRegistry.workspaces.find((workspace) => !workspace.projectID && workspace.id === "general")
-    || workspaceRegistry.workspaces.find((workspace) => !workspace.projectID);
+  let target = defaultReadingWorkspace();
   if (!target || target.id !== activeWorkspaceID) {
     if (!(await confirmWorkspaceTransition()) || !isCurrentAccountRequest(requestIdentity)) return;
     if (!target) {
@@ -1765,6 +1775,7 @@ async function openUnassignedSaves() {
     if (!(await switchWorkspace(target.id, { focus: false, transitionConfirmed: true }))) return;
   }
   if (!isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== target.id) return;
+  localStorage.setItem(`${workspaceRegistryKey}:readingWorkspaceID`, target.id);
   const saved = (state.utilityInstances || []).find((instance) => instance.key === "saved");
   if (saved) {
     // Preserve its identity and the surrounding layout; this destination must not
@@ -1991,7 +2002,7 @@ function openMobileMoreSheet() {
   sheet.className = "mobile-more-sheet";
   sheet.setAttribute("role", "dialog");
   sheet.setAttribute("aria-modal", "true");
-  sheet.setAttribute("aria-label", "More workspace controls");
+  sheet.setAttribute("aria-label", "More controls");
   const header = document.createElement("header");
   const title = document.createElement("strong");
   title.textContent = "More";
@@ -2003,48 +2014,28 @@ function openMobileMoreSheet() {
   closeButton.addEventListener("click", () => closeMobileMoreSheet());
   header.append(title, closeButton);
 
-  const workspaceSection = document.createElement("section");
-  workspaceSection.className = "mobile-more-section";
-  const workspaceLabel = document.createElement("p");
-  workspaceLabel.className = "mobile-more-section-label";
-  workspaceLabel.textContent = "Workspaces";
-  const workspaceList = document.createElement("div");
-  workspaceList.className = "mobile-more-workspaces";
+  const projectSection = document.createElement("section");
+  projectSection.className = "mobile-more-section";
+  const projectLabel = document.createElement("p");
+  projectLabel.className = "mobile-more-section-label";
+  projectLabel.textContent = "Projects";
+  const projectList = document.createElement("div");
+  projectList.className = "mobile-more-workspaces";
+  projectList.append(mobileMoreAction("Unassigned saves", () => void openUnassignedSaves(), {
+    current: !activeWorkspaceRecord()?.projectID
+  }));
   visibleWorkspaceRecords().forEach((workspace) => {
-    workspaceList.append(mobileMoreAction(
-      workspace.name,
+    projectList.append(mobileMoreAction(workspace.name,
       () => void switchWorkspace(workspace.id, { focus: false }),
-      { current: workspace.id === activeWorkspaceID }
-    ));
+      { current: workspace.id === activeWorkspaceID }));
   });
-  workspaceList.append(mobileMoreAction("New Project", () => void createNewWorkspace()));
-  workspaceList.append(mobileMoreAction("New workspace", () => void createGeneralWorkspace()));
-  workspaceSection.append(workspaceLabel, workspaceList);
-
-  const activeWorkspace = activeWorkspaceRecord();
-  const activeVisibleWorkspace = visibleWorkspaceRecords().find((workspace) => workspace.id === activeWorkspace?.id);
-  const workspaceActions = document.createElement("section");
-  workspaceActions.className = "mobile-more-section";
-  const actionsLabel = document.createElement("p");
-  actionsLabel.className = "mobile-more-section-label";
-  actionsLabel.textContent = activeVisibleWorkspace ? `${activeVisibleWorkspace.name} actions` : "Workspace actions";
-  const actions = document.createElement("div");
-  actions.className = "mobile-more-actions";
-  if (activeWorkspace && !isTechnicalFallbackWorkspace(activeWorkspace)) {
-    const activeIndex = workspaceRegistry.workspaces.findIndex((workspace) => workspace.id === activeWorkspace.id);
-    actions.append(
-      mobileMoreAction("Rename workspace", () => beginWorkspaceRename(activeWorkspace.id)),
-      mobileMoreAction("Duplicate workspace", () => void duplicateNamedWorkspace(activeWorkspace.id)),
-      mobileMoreAction("Move workspace left", () => moveNamedWorkspace(activeWorkspace.id, -1), { disabled: activeIndex <= 0 }),
-      mobileMoreAction("Move workspace right", () => moveNamedWorkspace(activeWorkspace.id, 1), { disabled: activeIndex >= workspaceRegistry.workspaces.length - 1 }),
-      mobileMoreAction("Delete workspace", () => void removeNamedWorkspace(activeWorkspace.id), { danger: true })
-    );
-  }
-  actions.append(mobileMoreAction("Manage workspaces…", () => openWorkspaceManager()));
-  actions.append(mobileMoreAction("Account", () => toggleUtilityPane("settings")));
-  workspaceActions.append(actionsLabel, actions);
-
-  sheet.append(header, workspaceSection, workspaceActions);
+  projectList.append(mobileMoreAction("New Project", () => void createNewWorkspace()));
+  projectList.append(mobileMoreAction("Manage Projects…", () => openProjectManager()));
+  projectSection.append(projectLabel, projectList);
+  const accountSection = document.createElement("section");
+  accountSection.className = "mobile-more-section";
+  accountSection.append(mobileMoreAction("Account", () => toggleUtilityPane("settings")));
+  sheet.append(header, projectSection, accountSection);
   backdrop.append(sheet);
   backdrop.addEventListener("click", (event) => {
     if (event.target === backdrop) closeMobileMoreSheet();
@@ -2084,7 +2075,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu";
   menu.setAttribute("role", "menu");
-  menu.setAttribute("aria-label", "Workspace menu");
+  menu.setAttribute("aria-label", "Project menu");
   const appendMenuAction = (section, action) => {
     if (action.separated) {
       const actionDivider = document.createElement("div");
@@ -2110,42 +2101,15 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   savedSection.className = "workspace-context-section";
   appendMenuAction(savedSection, { label: "Unassigned saves", run: () => void openUnassignedSaves() });
   menu.append(savedSection);
-  if (!workspaces.length) {
-    const createSection = document.createElement("div");
-    createSection.className = "workspace-context-section workspace-context-create";
-    appendMenuAction(createSection, { label: "New Project", run: () => void createNewWorkspace() });
-    appendMenuAction(createSection, { label: "New workspace", run: () => void createGeneralWorkspace() });
-    const manageSection = document.createElement("div");
-    manageSection.className = "workspace-context-section";
-    appendMenuAction(manageSection, { label: "Manage Projects…", run: () => openProjectManager() });
-    appendMenuAction(manageSection, { label: "Manage workspaces…", run: () => openWorkspaceManager() });
-    menu.append(createSection, manageSection);
-  } else {
-  const orderedWorkspaces = [
-    ...workspaces.filter((candidate) => candidate.projectID),
-    ...workspaces.filter((candidate) => !candidate.projectID)
-  ];
-  const sections = new Map();
-  ["Projects", "Workspaces"].forEach((category) => {
-    const section = document.createElement("div");
-    section.className = "workspace-context-section";
-    section.setAttribute("role", "group");
-    section.setAttribute("aria-label", category);
-    const heading = document.createElement("strong");
-    heading.className = "workspace-context-heading";
-    heading.textContent = category;
-    section.append(heading);
-    if (category === "Workspaces") {
-      const explanation = document.createElement("p");
-      explanation.className = "workspace-context-explanation";
-      explanation.textContent = "Workspaces share Saved material. Each keeps its own column layout.";
-      section.append(explanation);
-    }
-    sections.set(category, section);
-    menu.append(section);
-  });
-  orderedWorkspaces.forEach((candidate) => {
-    const section = sections.get(candidate.projectID ? "Projects" : "Workspaces");
+  const projectSection = document.createElement("div");
+  projectSection.className = "workspace-context-section";
+  projectSection.setAttribute("role", "group");
+  projectSection.setAttribute("aria-label", "Projects");
+  const heading = document.createElement("strong");
+  heading.className = "workspace-context-heading";
+  heading.textContent = "Projects";
+  projectSection.append(heading);
+  workspaces.forEach((candidate) => {
     const button = document.createElement("button");
     button.type = "button";
     button.setAttribute("role", "menuitemradio");
@@ -2161,40 +2125,28 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
       closeWorkspaceContextMenu();
       void switchWorkspace(candidate.id, { focus: false });
     });
-    section.append(button);
+    projectSection.append(button);
   });
-  const actions = [
-    { label: "New Project", run: () => void createNewWorkspace() },
-    { label: "New workspace", run: () => void createGeneralWorkspace() },
-    ...(workspace && !isTechnicalFallbackWorkspace(workspace) ? [{ label: workspace.projectID ? "Edit Project" : "Rename workspace", run: () => {
-      if (!workspace.projectID) return beginWorkspaceRename(workspaceID);
+  appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
+  appendMenuAction(projectSection, { label: "Manage Projects…", run: () => openProjectManager() });
+  if (workspace?.projectID && workspaces.some((candidate) => candidate.id === workspace.id)) {
+    appendMenuAction(projectSection, { label: "Edit Project", run: () => {
       const project = workspaceProject();
       if (project) showProjectCreateSheet(track, project);
-    } }] : []),
-    { label: "Manage workspaces…", run: () => openWorkspaceManager() },
-    { label: "Manage Projects…", run: () => openProjectManager() },
-    ...(workspace && !isTechnicalFallbackWorkspace(workspace) && workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
+    } });
+    appendMenuAction(projectSection, { label: "Archive Project", danger: true, separated: true, run: async () => {
       const project = workspaceProject();
-      if (project) {
-        if (!(await archiveProject(project))) return;
-        const main = workspaceRegistry.workspaces.find((item) => !item.projectID);
-        if (main) await switchWorkspace(main.id, { focus: false });
-        if (!state.projectArchiveNoticeSeen) {
-          state.projectArchiveNoticeSeen = true;
-          saveWorkspaceState();
-          await showWebNotice("Project archived", "Restore it from Account → Archived Projects.");
-        }
+      if (!project || !(await archiveProject(project))) return;
+      const main = defaultReadingWorkspace();
+      if (main) await switchWorkspace(main.id, { focus: false });
+      if (!state.projectArchiveNoticeSeen) {
+        state.projectArchiveNoticeSeen = true;
+        saveWorkspaceState();
+        await showWebNotice("Project archived", "Restore it from Account → Archived Projects.");
       }
-    } }] : workspace && !isTechnicalFallbackWorkspace(workspace) ? [
-      { label: "Duplicate workspace", run: () => void duplicateNamedWorkspace(workspaceID) },
-      { label: "Delete workspace", danger: true, separated: true, run: () => void removeNamedWorkspace(workspaceID) }
-    ] : [])
-  ];
-  actions.forEach((action) => {
-    const section = sections.get(action.label.toLowerCase().includes("workspace") ? "Workspaces" : "Projects");
-    appendMenuAction(section, action);
-  });
+    } });
   }
+  menu.append(projectSection);
   document.body.append(menu);
   workspaceContextMenu = menu;
   workspaceActionsButton?.setAttribute("aria-expanded", "true");
@@ -2223,22 +2175,22 @@ function renderWorkspaceTabs() {
   if (detachedProjectWindow) return;
   if (!workspacePrivatePresentationAllowed()) {
     const label = workspaceActionsButton.querySelector(".workspace-current-name");
-    if (label) label.textContent = "Workspace";
-    workspaceActionsButton.title = "Workspace";
-    workspaceActionsButton.setAttribute("aria-label", "Workspace");
+    if (label) label.textContent = "Projects";
+    workspaceActionsButton.title = "Projects";
+    workspaceActionsButton.setAttribute("aria-label", "Projects");
     workspaceActionsButton.disabled = true;
     return;
   }
   const workspace = activeWorkspaceRecord();
   const visibleWorkspaces = visibleWorkspaceRecords();
   const activeVisibleWorkspace = visibleWorkspaces.find((candidate) => candidate.id === workspace?.id);
-  const emptyLabel = visibleWorkspaces.length ? "Choose workspace or project" : "Create workspace or project";
+  const emptyLabel = "Unassigned saves";
   const label = workspaceActionsButton.querySelector(".workspace-current-name");
   if (label) label.textContent = activeVisibleWorkspace?.name || emptyLabel;
-  workspaceActionsButton.title = activeVisibleWorkspace ? `${activeVisibleWorkspace.name} workspace` : emptyLabel;
+  workspaceActionsButton.title = activeVisibleWorkspace?.name || emptyLabel;
   workspaceActionsButton.setAttribute("aria-label", activeVisibleWorkspace
-    ? `Open ${activeVisibleWorkspace.name} workspace menu`
-    : emptyLabel);
+    ? `Open ${activeVisibleWorkspace.name} Project menu`
+    : "Choose Project or Unassigned saves");
   workspaceActionsButton.disabled = false;
 }
 
@@ -13760,8 +13712,8 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
     const addButton = document.createElement("button");
     addButton.type = "button";
     addButton.className = "annotation-project-add";
-    addButton.title = "Create Project or saved collection";
-    addButton.setAttribute("aria-label", "Create Project or saved collection");
+    addButton.title = "New Project";
+    addButton.setAttribute("aria-label", "New Project");
     addButton.innerHTML = `
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M12 5v14"></path>
@@ -15477,7 +15429,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload, options = {}) {
   if (sheet.getBoundingClientRect().height < 440) {
     sheet.style.setProperty("--reader-notes-height", "440px");
   }
-  const projects = activeFolderRecords(currentContentSummary().projects || []);
+  const projects = activeProjectRecords(currentContentSummary().projects || []);
   const existingLinks = (currentContentSummary().projectSections || []).filter((item) =>
     savedEvidenceKey(item) === savedEvidenceKey(sectionPayload)
   );
@@ -15495,7 +15447,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload, options = {}) {
     label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save evidence";
     const instruction = document.createElement("p");
     instruction.className = "reader-notes-project-instruction";
-    instruction.textContent = "Select one or more Projects or saved collections, then confirm. Permitext keeps one saved record linked to every destination you choose.";
+    instruction.textContent = "Select Projects for this saved passage.";
     pickerHeader.append(label);
     picker.append(pickerHeader, instruction);
   }
@@ -15577,7 +15529,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload, options = {}) {
   if (!projects.length) {
     const empty = document.createElement("p");
     empty.className = "reader-notes-project-empty";
-    empty.textContent = "No Projects or saved collections yet. Create one below.";
+    empty.textContent = "No Projects yet. Create one below.";
     destinationList.append(empty);
   }
   projects.forEach(appendFolderOption);
@@ -15626,7 +15578,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload, options = {}) {
     picker.append(form);
     input.focus();
   };
-  [["project", "New Project…"], ["reference", "New saved collection…"]].forEach(([type, text]) => {
+  [["project", "New Project…"]].forEach(([type, text]) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "reader-notes-new-project";
@@ -31296,9 +31248,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const isEditing = Boolean(project);
   const identity = isEditing ? projectIdentity(project) : null;
-  let selectedFolderType = String(options.folderType || identity?.folderType || "project") === "reference"
-    ? "reference"
-    : "project";
+  const selectedFolderType = isEditing && folderType(project) === "reference" ? "reference" : "project";
   const overlay = document.createElement("section");
   overlay.className = "project-sheet-overlay";
   overlay.setAttribute("role", "dialog");
@@ -31319,42 +31269,14 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   saveButton.disabled = !isEditing;
   header.append(cancelButton, saveButton);
 
-  const typeGroup = document.createElement("fieldset");
-  typeGroup.className = "project-folder-type";
-  typeGroup.setAttribute("aria-label", "Record type");
-  const typeChoices = document.createElement("div");
   const syncFolderTypeControls = () => {
     sheet.classList.toggle("is-reference-folder", selectedFolderType === "reference");
-    typeChoices.querySelectorAll("button").forEach((button) => {
-      button.setAttribute("aria-pressed", String(button.dataset.folderType === selectedFolderType));
-    });
     addressLabel.hidden = selectedFolderType === "reference";
-    nameInput.placeholder = selectedFolderType === "reference" ? "Saved collection name" : "Project Name";
+    nameInput.placeholder = isEditing && selectedFolderType === "reference" ? "Name" : "Project Name";
     descriptionInput.placeholder = selectedFolderType === "reference"
-      ? "Saved collection notes: purpose, topic, or how this collection should be used"
+      ? "Notes"
       : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
   };
-  [
-    ["project", "Project", "A job, property, address, or professional matter"],
-    ["reference", "Saved collection", "Reusable research that is not attached to a job yet"]
-  ].forEach(([value, label, description]) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.dataset.folderType = value;
-    button.innerHTML = `<strong>${label}</strong><span>${description}</span>`;
-    if (value === "project" && !hasCapability("projects")) {
-      button.disabled = true;
-      button.title = "Projects require Pro";
-      if (selectedFolderType === "project" && !isEditing) selectedFolderType = "reference";
-    }
-    button.addEventListener("click", () => {
-      selectedFolderType = value;
-      syncFolderTypeControls();
-    });
-    typeChoices.append(button);
-  });
-  typeGroup.append(typeChoices);
-  if (isEditing && folderIsProject(project)) typeGroup.hidden = true;
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "project-sheet-field";
@@ -31567,7 +31489,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   overlay.append(sheet);
   panel.append(overlay);
   syncFolderTypeControls();
-  if (options.workspaceProject) { typeGroup.remove(); overlay.setAttribute("aria-label", "New Project"); }
+  if (options.workspaceProject) overlay.setAttribute("aria-label", "New Project");
   nameInput.focus();
 }
 
@@ -32495,20 +32417,16 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders, o
     panel.querySelector(".saved-unassigned-notice")?.remove();
     if (savedInstance.organizeUnassigned) {
       const context = document.createElement("section");
-      context.className = "saved-folder-context is-project is-unassigned-context";
+      context.className = "saved-folder-context is-unassigned-context";
       const explanation = document.createElement("p");
       explanation.className = "saved-reference-capabilities";
       explanation.textContent = "Saved passages and notes that are not assigned to a Project.";
       const savedSection = document.createElement("section");
-      savedSection.className = "project-studio-section saved-project-evidence-section";
-      populateSavedEvidenceSection(
-        savedSection,
-        savedInstance,
-        { id: "unassigned-saved", name: "Unassigned saves", folderType: "project" },
-        inlineFilters,
-        planUsage,
-        savedContent
-      );
+      savedSection.className = "saved-inbox";
+      const { heading, title } = createSavedEvidenceHeading();
+      title.remove();
+      heading.setAttribute("aria-label", "Unassigned save actions");
+      savedSection.append(heading, inlineFilters, planUsage, savedContent);
       context.append(explanation, savedSection);
       projectsSection.after(context);
     } else {
@@ -32756,7 +32674,7 @@ function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems
 }
 
 function unassignedSavedEvidenceKeys(savedItems, projectSections, projects = [], annotations = []) {
-  const projectRecords = activeFolderRecords(projects || []);
+  const projectRecords = activeProjectRecords(projects || []);
   const linkedSectionIDs = new Set((projectSections || [])
     .filter((item) => projectRecords.some((project) => projectSectionBelongsToProject(item, project)))
     .map((item) => savedEvidenceKey(item)));
@@ -33529,6 +33447,10 @@ async function renderSaved(instance, options = {}) {
   const paneID = paneIDForUtilityInstance(savedInstance);
   const panel = renderTemplate(savedTemplate);
   panel.classList.add("saved-panel");
+  if (savedInstance.organizeUnassigned) {
+    panel.classList.add("saved-inbox-panel");
+    panel.querySelectorAll(".panel-kind, .panel-title").forEach((label) => { label.textContent = "Unassigned saves"; });
+  }
   applyPaneWeight(panel, paneID);
   const content = panel.querySelector(".saved-content");
   content.hidden = !savedInstance.selectedFolderID;

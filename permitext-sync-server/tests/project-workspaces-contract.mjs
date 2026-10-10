@@ -3,12 +3,16 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { emptyWorkspaceLayout, normalizeWorkspaceRegistry, captureWorkspaceLayout } from '../public/workspace-state.js';
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
-assert.match(app, /const orderedWorkspaces = \[\s*\.\.\.workspaces\.filter\(\(candidate\) => candidate\.projectID\),\s*\.\.\.workspaces\.filter\(\(candidate\) => !candidate\.projectID\)\s*\];[\s\S]*?\["Projects", "Workspaces"\]\.forEach/, 'workspace menu must present Projects before general workspaces');
-assert.match(app, /function isTechnicalFallbackWorkspace\(workspace\)[\s\S]*?workspace\.id === "general" \|\| workspace\.name === "General"/, 'General must be treated as an invisible technical fallback');
-assert.match(app, /function visibleWorkspaceRecords\(\)[\s\S]*?!isTechnicalFallbackWorkspace\(workspace\)/, 'visible workspace choices must exclude the technical fallback');
-assert.match(app, /const emptyLabel = visibleWorkspaces\.length \? "Choose workspace or project" : "Create workspace or project"/, 'the top control must prompt creation when no named destination exists');
-assert.match(app, /if \(!workspaces\.length\) \{[\s\S]*?label: "New Project"[\s\S]*?label: "New workspace"/, 'the empty workspace menu must lead with Project and workspace creation');
-assert.doesNotMatch(app, /explanation\.textContent = "General workspaces/, 'General must not be presented as a user-facing workspace category');
+const chooser = app.slice(app.indexOf('async function openWorkspaceContextMenu('), app.indexOf('function focusActiveWorkspaceTab('));
+const mobileChooser = app.slice(app.indexOf('function openMobileMoreSheet('), app.indexOf('async function openWorkspaceContextMenu('));
+for (const source of [chooser, mobileChooser]) {
+  assert.doesNotMatch(source, /New workspace|Manage workspaces|Rename workspace|Duplicate workspace|Delete workspace|Workspaces share/);
+  assert.match(source, /Unassigned saves/);
+  assert.match(source, /New Project/);
+  assert.match(source, /Manage Projects/);
+}
+assert.match(app, /function visibleWorkspaceRecords\(\)[\s\S]*?workspace\.projectID && availableProjectIDs\.has\(workspace\.projectID\)/);
+assert.match(app, /const emptyLabel = "Unassigned saves"/);
 const storage = new Map();
 const projects = [{id:'a', name:'Alpha', folderType:'project'}, {id:'b', name:'Beta', folderType:'project'}];
 const context = vm.createContext({
@@ -71,7 +75,7 @@ assert.ok(context.workspaceRegistry.workspaces.some(w=>w.id==='project:a'), 'ret
 // a Project, changing saved identities, or overwriting the Project's pane arrangement.
 assert.match(app, /appendMenuAction\(savedSection, \{ label: "Unassigned saves", run: \(\) => void openUnassignedSaves\(\) \}\)/);
 const switchSource = app.slice(app.indexOf('async function switchWorkspace('), app.indexOf('\nfunction workspaceProject('));
-const unassignedSource = app.slice(app.indexOf('async function openUnassignedSaves('), app.indexOf('\nasync function createGeneralWorkspace('));
+const unassignedSource = app.slice(app.indexOf('function defaultReadingWorkspace('), app.indexOf('\nasync function createGeneralWorkspace('));
 function unassignedHarness(workspaces, activeID = 'project:a') {
   const layouts = new Map(workspaces.map(workspace => [workspace.id, {
     utilityInstances: [{ key: 'saved', id: `${workspace.id}:saved`, selectedFolderID: workspace.projectID || 'collection', folderQuery: 'hidden', codeFilters: ['BC'], organizeUnassigned: false }],
@@ -82,6 +86,8 @@ function unassignedHarness(workspaces, activeID = 'project:a') {
   const ctx = vm.createContext({
     workspaceRegistry: { workspaces: structuredClone(workspaces), activeWorkspaceID: activeID },
     activeWorkspaceID: activeID, state: structuredClone(layouts.get(activeID)),
+    workspaceRegistryKey: 'account:A', preferenceStorage: new Map(),
+    localStorage: { getItem: key => ctx.preferenceStorage.get(key), setItem: (key, value) => ctx.preferenceStorage.set(key, value) },
     evidence: [{ id: 'existing-phone-save', sectionID: '41000003', projectID: null }],
     allowed: true, currentIdentity: 1, confirmation: true, confirmations: 0, focused: 0,
     workspacePrivatePresentationAllowed: () => true, hasCapability: () => true,
@@ -143,3 +149,24 @@ for (const extras of [[], [{id:'general', name:'General'}], [{id:'ordinary',name
   assert.equal(ctx.workspaceRegistry.workspaces.length, 1);
 }
 console.log('Direct Unassigned saves: Project-only, General, ordinary workspace, repeat, cancellation, and account fencing passed.');
+
+// One remembered reading area survives Project switches; all legacy layouts
+// remain intact, and the remembered destination is scoped to the account.
+{
+  const {ctx, layouts} = unassignedHarness([
+    {id:'project:a', name:'Alpha', projectID:'a'},
+    {id:'general', name:'General'}, {id:'old-desk', name:'Legacy desk'}
+  ], 'old-desk');
+  const oldLayout = JSON.stringify(layouts.get('old-desk'));
+  await vm.runInContext('openUnassignedSaves()', ctx);
+  assert.equal(ctx.preferenceStorage.get('account:A:readingWorkspaceID'), 'old-desk');
+  await vm.runInContext('switchWorkspace("project:a", {focus:false})', ctx);
+  await vm.runInContext('openUnassignedSaves()', ctx);
+  assert.equal(ctx.activeWorkspaceID, 'old-desk');
+  assert.equal(ctx.workspaceRegistry.workspaces.length, 3, 'Retired named layouts must not be deleted');
+  assert.deepEqual(layouts.get('old-desk').readers, JSON.parse(oldLayout).readers);
+  ctx.workspaceRegistryKey = 'account:B';
+  ctx.activeWorkspaceID = 'project:a';
+  assert.equal(vm.runInContext('defaultReadingWorkspace().id', ctx), 'general', "Account B must not inherit A's chosen reading area");
+}
+console.log('Project-only navigation and retained, account-scoped default reading arrangement passed.');

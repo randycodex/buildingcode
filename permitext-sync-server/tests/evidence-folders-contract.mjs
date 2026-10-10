@@ -156,9 +156,9 @@ assert.notEqual(
 );
 
 const unassignedSavedEvidenceKeys = new Function(
-  "savedEvidenceKey", "activeFolderRecords", "projectSectionBelongsToProject",
+  "savedEvidenceKey", "activeProjectRecords", "projectSectionBelongsToProject",
   `${functionSource(appSource, "unassignedSavedEvidenceKeys")}; return unassignedSavedEvidenceKeys;`
-)(savedEvidenceKey, (projects) => projects.filter((project) => !project.deletedAt),
+)(savedEvidenceKey, (projects) => projects.filter((project) => !project.deletedAt && !project.archivedAt && project.folderType !== "reference"),
   (link, project) => link.folderClientID === project.id);
 const wholeSectionSave = { codeVersion: "library-a", sectionID: 101 };
 const historicalSectionSave = { codeVersion: "library-b", sectionID: 101 };
@@ -181,6 +181,13 @@ assert.deepEqual(
     [{ ...wholeSectionSave, folderClientID: "collection" }], [{ id: "collection", deletedAt: "2026-09-05" }])],
   [wholeSectionSave, historicalSectionSave, paragraphSave].map(savedEvidenceKey),
   "A deleted collection must not hide its former whole-section saves."
+);
+
+assert.deepEqual(
+  [...unassignedSavedEvidenceKeys([wholeSectionSave],
+    [{ ...wholeSectionSave, folderClientID: "legacy" }], [{ id: "legacy", folderType: "reference" }])],
+  [savedEvidenceKey(wholeSectionSave)],
+  "A retained collection link must not hide an otherwise Unassigned passage."
 );
 
 const readerChapterSectionSource = functionSource(appSource, "renderReaderChapterSection");
@@ -325,7 +332,8 @@ assert.match(
 );
 assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?return selectedFolder \? new Set\(\) : unassignedIDs;/);
 assert.doesNotMatch(appSource, /These passages are saved safely without a Project|Return to All Saved/);
-assert.match(functionSource(appSource, "renderSavedFolderContext"), /is-unassigned-context[\s\S]*?populateSavedEvidenceSection\([\s\S]*?"unassigned-saved"[\s\S]*?savedContent/);
+assert.match(functionSource(appSource, "renderSavedFolderContext"), /is-unassigned-context[\s\S]*?savedSection\.className = "saved-inbox"[\s\S]*?title\.remove\(\)[\s\S]*?savedSection\.append\(heading, inlineFilters, planUsage, savedContent\)/);
+assert.doesNotMatch(functionSource(appSource, "renderSavedFolderContext"), /is-project is-unassigned-context|id: "unassigned-saved"/);
 assert(!appSource.includes("No archived folders."), "An empty archive should not render a redundant placeholder row.");
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
 assert.match(savedFolderContextSource, /projectsSection\.hidden = true/);
@@ -772,7 +780,7 @@ assert.match(stylesSource, /\.saved-project-tile\.is-selected \{[\s\S]*?box-shad
 assert.match(stylesSource, /\.saved-project-tile\.is-selected \.saved-project-count \{[\s\S]*?color: #ffffff;/);
 assert.match(stylesSource, /\.saved-projects-section\.is-selecting \.saved-project-tile\[data-bulk-selectable="true"\] \{[\s\S]*?opacity: 0\.58;/);
 assert.match(stylesSource, /\.saved-project-tile\.is-bulk-selected \{[\s\S]*?opacity: 1 !important;[\s\S]*?box-shadow: none;/);
-assert.match(indexSource, /id="workspace-actions"[^>]*aria-label="Open workspace menu"/);
+assert.match(indexSource, /id="workspace-actions"[^>]*aria-label="Choose Project or Unassigned saves"/);
 assert.doesNotMatch(indexSource, /id="add-workspace"/);
 assert.match(stylesSource, /\.workspace-add-button,[\s\S]*?\.workspace-actions-button \{[\s\S]*?display: inline-flex;[\s\S]*?padding: 0 11px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-notebook-button,[\s\S]*?\.project-report-draft-button \{[^}]*height: 40px;[^}]*min-height: 40px;/);
@@ -859,9 +867,10 @@ assert.match(stylesSource, /\.notebook-focus \{[^}]*grid-template-rows: auto min
 assert.match(stylesSource, /\.notebook-draft-status \{[^}]*position: absolute;[^}]*bottom: 0;[\s\S]*?\.notebook-draft-status:empty \{ display: none; \}/, "Notebook sync status must overlay the column footer without reserving content height.");
 assert.match(stylesSource, /\.workspace-context-menu \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?\.workspace-context-menu button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;[\s\S]*?max-width: 100%;/, "Workspace menu rows must remain within the menu card.");
 assert.match(stylesSource, /\.workspace-context-menu \.workspace-context-switch \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?overflow: hidden;/, "Long workspace names must truncate before the fixed Current label.");
-assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Record type"\)/);
-assert.match(appSource, /\["reference", "Saved collection", "Reusable research that is not attached to a job yet"\]/);
-assert.match(appSource, /nameInput\.placeholder = selectedFolderType === "reference" \? "Saved collection name" : "Project Name"/);
+assert.match(appSource, /const selectedFolderType = isEditing && folderType\(project\) === "reference" \? "reference" : "project";/, "New records must be Projects while editing preserves legacy collection identity.");
+assert.doesNotMatch(appSource, /typeGroup\.setAttribute\("aria-label", "Record type"\)/);
+assert.doesNotMatch(appSource, /\["reference", "Saved collection", "Reusable research that is not attached to a job yet"\]/);
+assert.match(appSource, /nameInput\.placeholder = isEditing && selectedFolderType === "reference" \? "Name" : "Project Name"/);
 assert.match(appSource, /addressLabel\.hidden = selectedFolderType === "reference"/);
 assert.match(appSource, /sheet\.classList\.toggle\("is-reference-folder", selectedFolderType === "reference"\)/);
 assert.match(appSource, /address: selectedFolderType === "reference" \? "" : property\?\.normalizedAddress \|\| addressInput\.value/);

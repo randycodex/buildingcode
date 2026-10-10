@@ -90,7 +90,7 @@ struct FolderEditorSheet: View {
     @FocusState private var addressIsFocused: Bool
 
     private var isEditing: Bool { existing != nil }
-    private var folderType: CodeFolderType { existing?.folderType ?? defaultFolderType }
+    private var folderType: CodeFolderType { existing?.folderType ?? .project }
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var canSave: Bool {
         !trimmedName.isEmpty && !isSaving &&
@@ -298,14 +298,12 @@ struct FolderPickerSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    private var projectFolders: [CodeFolder] { folders.filter { $0.folderType == .project } }
+
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    Button { onCreateNew(.reference) } label: {
-                        Label("New reference", systemImage: "folder.badge.plus")
-                            .foregroundStyle(Color.appChrome)
-                    }
                     Button {
                         if canUseProjects {
                             onCreateNew(.project)
@@ -322,13 +320,13 @@ struct FolderPickerSheet: View {
                     }
                 }
 
-                Section("Your folders") {
-                    if folders.isEmpty {
-                        Text("Create a Reference or Project folder to save this section.")
+                Section("Projects") {
+                    if projectFolders.isEmpty {
+                        Text("Create a Project to add this saved passage.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     } else {
-                        ForEach(folders) { folder in
+                        ForEach(projectFolders) { folder in
                             let projectIsLocked = folder.folderType == .project &&
                                 !canUseProjects &&
                                 !selectedFolderIDs.contains(folder.id)
@@ -350,9 +348,6 @@ struct FolderPickerSheet: View {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(folder.name)
                                             .foregroundStyle(.primary)
-                                        Text(folder.folderType == .project ? "Project" : "Reference")
-                                            .font(.caption2.weight(.semibold))
-                                            .foregroundStyle(.secondary)
                                         if !folder.description.isEmpty {
                                             Text(folder.description)
                                                 .font(.caption)

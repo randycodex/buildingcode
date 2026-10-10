@@ -13,7 +13,7 @@ const context=vm.createContext({workspaceActionsButton:button,detachedProjectWin
  activeWorkspaceRecord(){privateReads++;return{id:'project'};},visibleWorkspaceRecords(){privateReads++;return[{id:'project',name:'Private Project'}];}});
 const menus=['openMobileMoreSheet','openWorkspaceContextMenu','openWorkspaceManager','openSavedColumnGroupsMenu','openColumnGroupEditor'];
 vm.runInContext(['renderWorkspaceTabs',...menus].map(actual).join('\n'),context);
-context.renderWorkspaceTabs();assert.equal(privateReads,0);assert.equal(label.textContent,'Workspace');assert.equal(button.title,'Workspace');assert.equal(button['aria-label'],'Workspace');assert.equal(button.disabled,true);
+context.renderWorkspaceTabs();assert.equal(privateReads,0);assert.equal(label.textContent,'Projects');assert.equal(button.title,'Projects');assert.equal(button['aria-label'],'Projects');assert.equal(button.disabled,true);
 for(const name of menus) await context[name](); // Denied account verification must not expose workspace titles.
 assert.equal(privateReads,0);
 allowed=true;context.renderWorkspaceTabs();assert.equal(label.textContent,'Private Project');assert.equal(button.disabled,false);assert.equal(privateReads,2);
