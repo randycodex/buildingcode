@@ -164,7 +164,7 @@ const descriptorContext=vm.createContext({
   projectHasOpenReportDraft:()=>true,paneIDForProjectReportDraft:()=> 'report',renderProjectReportDraft:()=>buildEditor('report','professional-exports'),closeProjectReportDraft:noop,
   releaseSurfaceVisibility:{coordination:false},openCodeQuestionPaneIDs:()=>[],researchConversationPaneIsOpen:()=>false,supplementalResearchConversationIDs:[]
 });
-vm.runInContext('const initialProjectFoundationScopes=new Set();'+actual('createInitialProjectFoundationScope')+actual('workspacePaneDescriptors'),descriptorContext);
+vm.runInContext('const initialProjectFoundationScopes=new Set();'+actual('createInitialProjectFoundationScope')+actual('projectInformationStateKey')+actual('workspacePaneDescriptors'),descriptorContext);
 descriptors=descriptorContext.workspacePaneDescriptors();generation++;await mountAndSettle(context());
 const liveEditors=new Map(track.children.map(node=>[node.dataset.paneId,node]));
 for(const [id,node] of liveEditors) node.draft=`Unsaved ${id} text`;

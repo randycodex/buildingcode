@@ -338,11 +338,11 @@ assert(!appSource.includes("No archived folders."), "An empty archive should not
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
 assert.match(savedFolderContextSource, /projectsSection\.hidden = true/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
-assert.match(savedFolderContextSource, /appendSavedProjectFactEditor\(summary, folder, identity\)/);
+assert.doesNotMatch(savedFolderContextSource, /appendSavedProjectFactEditor|saved-project-summary/);
 assert.match(savedFolderContextSource, /releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"/);
 assert.doesNotMatch(savedFolderContextSource, /"Workboard"/);
 assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
-assert.match(savedFolderContextSource, /releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"[\s\S]*?if \(controls\.childElementCount\) context\.append\(controls\)[\s\S]*?appendSavedProjectFactEditor\(summary, folder, identity\)[\s\S]*?context\.append\(summary\)[\s\S]*?populateSavedEvidenceSection/);
+assert.match(savedFolderContextSource, /releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"[\s\S]*?if \(controls\.childElementCount\) context\.append\(controls\)[\s\S]*?populateSavedEvidenceSection/);
 assert.doesNotMatch(savedFolderContextSource, /Blocknotes|appendProjectNotes|appendProjectResearchHistory|loadProjectCoordinationFoundation/);
 assert.doesNotMatch(savedFolderContextSource, /appendProjectActivity|Recent Activities/);
 const savedEvidenceHeadingSource = functionSource(appSource, "createSavedEvidenceHeading");

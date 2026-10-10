@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-tool-toolbar-v733";
+} from "./offline-storage.js?v=20261010-project-information-v736";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,12 +135,12 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261008-pinned-columns-v12";
+} from "./workspace-state.js?v=20261010-project-information-v13";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-tool-toolbar-v733";
+} from "./research-intent-state.js?v=20261010-project-information-v736";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -326,6 +326,7 @@ const toggleSavedButton = document.querySelector("#toggle-saved");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
 const toggleReportButton = document.querySelector("#toggle-report");
 let projectToolTogglePending = false;
+const projectInformationMounts = new Map();
 const toggleAnalysisButton = document.querySelector("#toggle-analysis") || (() => {
   const button = document.createElement("button");
   button.className = "toolbar-button";
@@ -830,6 +831,8 @@ function loadWorkspaceState(accountOverride) {
       searchLinkedReaders: saved.searchLinkedReaders && typeof saved.searchLinkedReaders === "object" ? saved.searchLinkedReaders : {},
       projectDetail: activeProjectDetail,
       projectDetails,
+      projectContextOpen: Boolean(activeProjectDetail && saved.projectContextOpen),
+      projectFactsOpen: Boolean(activeProjectDetail && saved.projectFactsOpen),
       projectHostPaneID: typeof saved.projectHostPaneID === "string" ? saved.projectHostPaneID : "",
       sectionNotes: saved.sectionNotes && typeof saved.sectionNotes === "object" ? saved.sectionNotes : {},
       localSavedSectionIDs: Array.isArray(saved.localSavedSectionIDs) ? saved.localSavedSectionIDs.map(String) : [],
@@ -942,6 +945,8 @@ function loadWorkspaceState(accountOverride) {
       searchLinkedReaders: {},
       projectDetail: null,
       projectDetails: [],
+      projectContextOpen: false,
+      projectFactsOpen: false,
       projectHostPaneID: "",
       sectionNotes: {},
       localSavedSectionIDs: [],
@@ -1584,6 +1589,7 @@ function applySharedWorkspaceState(serializedState) {
 }
 
 function clearWorkspaceTransientRuntime() {
+  projectInformationMounts.clear();
   researchOpenGeneration += 1;
   searchTimers.forEach((timer) => clearTimeout(timer));
   readerSearchTimers.forEach((timer) => clearTimeout(timer));
@@ -1599,6 +1605,7 @@ function clearWorkspaceTransientRuntime() {
 }
 
 async function confirmWorkspaceTransition() {
+  if (!(await flushProjectInformationPanes())) return false;
   for (const project of openProjectDetails()) {
     if (projectHasOpenNotebook(project) && !(await confirmNotebookDiscard(project))) return false;
     if (projectHasOpenReportDraft(project) && !(await confirmReportDraftDiscard(project))) return false;
@@ -1609,8 +1616,10 @@ async function confirmWorkspaceTransition() {
 function workspaceTransitionPaneLabel(paneID) {
   if (paneID.startsWith("reader:")) return "Reader";
   if (paneID.startsWith("utility:search:")) return "Search";
-  if (paneID.startsWith("utility:saved:")) return "Saved";
-  if (paneID === "utility:archive") return "Saved archive";
+  if (paneID.startsWith("utility:saved:")) return "Evidence";
+  if (paneID.startsWith("project:context:")) return "Context";
+  if (paneID.startsWith("project:facts:")) return "Facts";
+  if (paneID === "utility:archive") return "Evidence archive";
   if (paneID === "utility:analysis") return "Research";
   if (paneID === "utility:settings") return "Account";
   if (paneID.startsWith("research:conversation:")) return "Research conversation";
@@ -1697,6 +1706,8 @@ async function switchWorkspace(workspaceID, options = {}) {
   applyStoredWorkspaceLayout(nextLayout);
   if (!target.projectID) {
     setOpenProjectDetails([]);
+    state.projectContextOpen = false;
+    state.projectFactsOpen = false;
     state.notebooks = [];
     state.reportDrafts = [];
     state.coordinations = [];
@@ -1720,7 +1731,7 @@ async function switchWorkspace(workspaceID, options = {}) {
 
 function workspaceProject(projects = null) {
   const id = activeWorkspaceRecord()?.projectID;
-  return id ? activeFolderRecords(mergeProjectsWithOrganizationAccess(projects ?? currentContentSummary().projects ?? []))
+  return id ? activeFolderRecords(mergeProjectsWithOrganizationAccess(visibleProjectRecords(projects ?? currentContentSummary().projects ?? [])))
     .find((project) => projectRecordID(project) === id) || null : null;
 }
 
@@ -2067,6 +2078,12 @@ function openMobileMoreSheet() {
   if (activeWorkspaceRecord()?.projectID) projectList.append(mobileMoreAction("Close Project", () => void closeActiveProject()));
   const project = workspaceProject();
   const identity = project ? projectIdentity(project) : null;
+  for (const kind of ["context", "facts"]) {
+    projectList.append(mobileMoreAction(kind === "context" ? "Context" : "Facts", () => void toggleProjectInformation(kind), {
+      current: Boolean(identity && state[projectInformationStateKey(kind)]),
+      disabled: !identity || !hasCapability("projects") || projectToolTogglePending
+    }));
+  }
   projectList.append(
     mobileMoreAction("Notebook", () => void toggleProjectTool("notebook"), {
       current: Boolean(identity && projectHasOpenNotebook(identity)),
@@ -2130,7 +2147,11 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     }
     const button = document.createElement("button");
     button.type = "button";
-    button.setAttribute("role", "menuitem");
+    button.setAttribute("role", action.checked === undefined ? "menuitem" : "menuitemcheckbox");
+    if (action.checked !== undefined) {
+      button.setAttribute("aria-checked", String(action.checked));
+      button.classList.add("workspace-context-switch");
+    }
     button.textContent = action.label;
     button.disabled = Boolean(action.disabled);
     button.classList.toggle("is-danger", Boolean(action.danger));
@@ -2169,6 +2190,15 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     projectSection.append(button);
   });
+  for (const kind of ["context", "facts"]) {
+    appendMenuAction(projectSection, {
+      label: kind === "context" ? "Context" : "Facts",
+      checked: Boolean(state[projectInformationStateKey(kind)]),
+      separated: kind === "context",
+      disabled: !workspaceProject() || !hasCapability("projects") || projectToolTogglePending,
+      run: () => void toggleProjectInformation(kind)
+    });
+  }
   appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
   appendMenuAction(projectSection, { label: "Manage Projects…", run: () => openProjectManager() });
   if (workspace?.projectID && workspaces.some((candidate) => candidate.id === workspace.id)) {
@@ -2330,6 +2360,8 @@ function initializeDetachedProjectState(project) {
   document.body.dataset.detachedProjectId = workboardProjectID(identity);
   state.projectDetail = null;
   state.projectDetails = [];
+  state.projectContextOpen = false;
+  state.projectFactsOpen = false;
   state.workboards = [identity];
   state.notebooks = [];
   state.reportDrafts = [];
@@ -3228,11 +3260,11 @@ function applySavedTextSize(panel) {
   const increaseButton = panel.querySelector(".saved-text-increase");
   if (decreaseButton) {
     decreaseButton.disabled = size <= 10;
-    decreaseButton.title = `Decrease Saved text size (${size} pt)`;
+    decreaseButton.title = `Decrease Evidence text size (${size} pt)`;
   }
   if (increaseButton) {
     increaseButton.disabled = size >= 18;
-    increaseButton.title = `Increase Saved text size (${size} pt)`;
+    increaseButton.title = `Increase Evidence text size (${size} pt)`;
   }
 }
 
@@ -3492,6 +3524,78 @@ function paneIDForProjectDetail(detail = null) {
   return `project:detail:${encodeURIComponent(projectDetailKey(detail))}`;
 }
 
+function projectInformationStateKey(kind) {
+  return kind === "context" ? "projectContextOpen" : "projectFactsOpen";
+}
+
+function paneIDForProjectInformation(project, kind) {
+  return `project:${kind}:${encodeURIComponent(projectDetailKey(project))}`;
+}
+
+async function flushProjectInformationPanes(paneID = "") {
+  try {
+    const mounts = paneID ? [projectInformationMounts.get(paneID)] : [...projectInformationMounts.values()];
+    for (const mounted of mounts) {
+      if (mounted?.panel.isConnected) await mounted.flush();
+    }
+    return true;
+  } catch (error) {
+    presentWorkspaceIssue(error.message || "Project edits could not be saved. Try again before closing the column.");
+    return false;
+  }
+}
+
+async function closeProjectInformation(project, kind) {
+  const workspaceID = activeWorkspaceID;
+  const requestIdentity = captureAccountRequest();
+  const paneID = paneIDForProjectInformation(project, kind);
+  if (!(await flushProjectInformationPanes(paneID))) return false;
+  // A late save must never close a column in a different Project workspace.
+  const current = workspaceProject();
+  if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(requestIdentity) ||
+      !current || !projectDetailMatches(current, project)) return false;
+  state[projectInformationStateKey(kind)] = false;
+  projectInformationMounts.delete(paneID);
+  state.paneOrder = (state.paneOrder || []).filter(id => id !== paneID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  return true;
+}
+
+async function toggleProjectInformation(kind) {
+  if (!["context", "facts"].includes(kind) || projectToolTogglePending ||
+      !workspacePrivatePresentationAllowed() || !hasCapability("projects")) return false;
+  const project = workspaceProject();
+  if (!project) return false;
+  const identity = projectIdentity(project);
+  const workspaceID = activeWorkspaceID;
+  const requestIdentity = captureAccountRequest();
+  projectToolTogglePending = true;
+  syncTopbarProjectToolStates();
+  try {
+    if (state[projectInformationStateKey(kind)]) return await closeProjectInformation(identity, kind);
+    if (!openProjectDetails().some(detail => projectDetailMatches(identity, detail))) {
+      if (!(await activateProjectStudio(identity, { transition: false, focusSaved: false }))) return false;
+    }
+    if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(requestIdentity) ||
+        !projectDetailMatches(workspaceProject(), identity)) return false;
+    state[projectInformationStateKey(kind)] = true;
+    const paneID = paneIDForProjectInformation(identity, kind);
+    state.paneWeights[paneID] ||= defaultNonReaderPaneWidth;
+    placeProjectToolPaneLast(identity, paneID);
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+    scrollPaneIntoView(paneID);
+    return true;
+  } catch (error) {
+    presentWorkspaceIssue(error.message || "Could not update the Project column.");
+    return false;
+  } finally {
+    projectToolTogglePending = false;
+    syncTopbarProjectToolStates();
+  }
+}
+
 function isProjectDetailPaneID(paneID) {
   return String(paneID || "").startsWith("project:detail:");
 }
@@ -3555,6 +3659,8 @@ function reconcileOpenProjectToolState() {
   const details = openProjectDetails();
   const keepGenericWorkboard = genericWorkboardIsOpen();
   if (!details.length) {
+    state.projectContextOpen = false;
+    state.projectFactsOpen = false;
     state.workboards = keepGenericWorkboard ? [genericWorkboardIdentity] : [];
     state.notebooks = [];
     state.reportDrafts = [];
@@ -3632,6 +3738,10 @@ async function deactivateProjectStudio(project = openProjectDetails()[0] || null
     if (options.outcome) options.outcome.value = "applied";
     return true;
   }
+  if (!(await flushProjectInformationPanes())) {
+    if (options.outcome) options.outcome.value = "cancelled";
+    return false;
+  }
   if (!options.skipDiscardConfirmation && !(await confirmNotebookDiscard(current))) {
     if (options.outcome) options.outcome.value = "cancelled";
     return false;
@@ -3697,6 +3807,10 @@ async function activateProjectStudio(project, options = {}) {
     return false;
   }
 
+  if (current && !(await flushProjectInformationPanes())) {
+    if (options.outcome) options.outcome.value = "cancelled";
+    return false;
+  }
   if (current && !options.skipDiscardConfirmation && !(await confirmNotebookDiscard(current))) {
     if (options.outcome) options.outcome.value = "cancelled";
     return false;
@@ -3740,6 +3854,8 @@ async function activateProjectStudio(project, options = {}) {
     delete state.paneWeights[oldPaneID];
   };
   if (current) {
+    remapProjectPane(paneIDForProjectInformation(current, "context"), paneIDForProjectInformation(identity, "context"));
+    remapProjectPane(paneIDForProjectInformation(current, "facts"), paneIDForProjectInformation(identity, "facts"));
     remapProjectPane(paneIDForProjectNotebook(current), paneIDForProjectNotebook(identity));
     remapProjectPane(paneIDForProjectReportDraft(current), paneIDForProjectReportDraft(identity));
     remapProjectPane(paneIDForProjectCoordination(current), paneIDForProjectCoordination(identity));
@@ -3940,6 +4056,8 @@ function defaultActivePaneIDs() {
   const ids = [];
   if (genericWorkboardIsOpen()) ids.push(paneIDForProjectWorkboard(genericWorkboardIdentity));
   openProjectDetails().forEach((detail) => {
+    if (state.projectContextOpen) ids.push(paneIDForProjectInformation(detail, "context"));
+    if (state.projectFactsOpen) ids.push(paneIDForProjectInformation(detail, "facts"));
     if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
     if (projectHasOpenReportDraft(detail)) ids.push(paneIDForProjectReportDraft(detail));
     if (projectHasOpenCoordination(detail)) {
@@ -3967,6 +4085,8 @@ function defaultActivePaneIDs() {
 
 function projectWorkspacePaneIDs(detail) {
   const activeIDs = [
+    ...(state.projectContextOpen ? [paneIDForProjectInformation(detail, "context")] : []),
+    ...(state.projectFactsOpen ? [paneIDForProjectInformation(detail, "facts")] : []),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
@@ -3984,6 +4104,8 @@ function projectWorkspacePaneIDs(detail) {
 
 function projectToolPaneIDs(detail) {
   return [
+    paneIDForProjectInformation(detail, "context"),
+    paneIDForProjectInformation(detail, "facts"),
     paneIDForProjectNotebook(detail),
     paneIDForProjectReportDraft(detail),
     paneIDForProjectCoordination(detail),
@@ -4377,6 +4499,10 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
   ].filter(Boolean);
   return Array.from(new Set([
     ...savedPaneIDs(),
+    ...openProjectDetails().flatMap(project => [
+      state.projectContextOpen ? paneIDForProjectInformation(project, "context") : "",
+      state.projectFactsOpen ? paneIDForProjectInformation(project, "facts") : ""
+    ]),
     ...researchPaneIDs,
     state.utilities.settings ? "utility:settings" : "",
     ...additionalPaneIDs.filter(Boolean)
@@ -7625,6 +7751,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   document.querySelectorAll(".command-palette-backdrop, .project-sheet-overlay").forEach((node) => node.remove());
   notebookMounts.forEach((mount) => mount.dispose());
   notebookMounts.clear();
+  projectInformationMounts.clear();
   reportDraftMounts.forEach((mount) => mount.dispose());
   reportDraftMounts.clear();
   workboardMounts.forEach((mount) => mount.dispose?.());
@@ -13012,12 +13139,14 @@ async function updateProjectFolder(project, details = {}) {
   const requestIdentity = captureAccountRequest();
   const id = projectRecordID(project);
   if (!id) return;
+  // Independent Context and Facts editors patch the latest Project record.
+  project = visibleProjectRecords(currentContentSummary().projects || []).find(item => projectDetailMatches(item, project)) || project;
   const nextFolderType = details.folderType ? folderType(details) : folderType(project);
   if (nextFolderType === "project" && folderType(project) === "reference" && !hasCapability("projects")) {
     void presentPlanLimitNotice("Projects require Pro", "Upgrade to convert this saved collection into a Project workspace.");
     return false;
   }
-  const now = new Date().toISOString();
+  const now = new Date(Math.max(Date.now(), (Date.parse(project.updatedAt || "") || 0) + 1)).toISOString();
   const name = String(details.name || "").trim() || project.name || project.title || "Project";
   const color = details.color || projectColor(project);
   const hasAddress = Object.prototype.hasOwnProperty.call(details, "address");
@@ -13054,6 +13183,7 @@ async function updateProjectFolder(project, details = {}) {
     nextProjects.push(updated);
   }
   state.localProjects = nextProjects;
+  const localRevision = JSON.stringify(nextProjects.find(item => projectRecordID(item) === id));
   setOpenProjectDetails(openProjectDetails().map((detail) => projectDetailMatches(project, detail) ? projectIdentity(updated) : detail));
   saveWorkspaceState();
   refreshOpenProjectPaneTheme(updated);
@@ -13063,7 +13193,8 @@ async function updateProjectFolder(project, details = {}) {
     try {
       await pushMutation(projectMutationForRecord(updated, account));
       requireCurrentAccountRequest(requestIdentity);
-      state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
+      state.localProjects = (state.localProjects || []).filter((item) =>
+        projectRecordID(item) !== id || JSON.stringify(item) !== localRevision);
       saveWorkspaceState();
       projectUpdatePersisted = true;
     } catch (error) {
@@ -13257,7 +13388,7 @@ function bookmarkActionLabel(saved) {
   const project = workspaceProject();
   return project
     ? `Remove from project: ${project.name || project.title || "Untitled project"}`
-    : "Remove from Saved";
+    : "Remove from Evidence";
 }
 
 function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneID) {
@@ -14761,8 +14892,8 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
     showBookmark: savedSection, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
   }).querySelector('.inline-bookmark-toggle');
   savedMarker.classList.add('reader-section-saved-marker');
-  savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section');
-  savedMarker.title = savedSection ? 'Remove section from Saved' : 'Save section';
+  savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Evidence' : 'Save section');
+  savedMarker.title = savedSection ? 'Remove section from Evidence' : 'Save section';
   headingRow.append(sectionHeading, savedMarker);
   sectionWrapper.append(headingRow);
 
@@ -15394,7 +15525,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     bookmarkButton.classList.toggle("is-saved", saved);
     bookmarkButton.innerHTML = bookmarkIconSVG(saved);
     const bookmarkLabel = options.sectionMarker
-      ? (saved ? "Remove section from Saved" : "Save section")
+      ? (saved ? "Remove section from Evidence" : "Save section")
       : bookmarkActionLabel(saved);
     bookmarkButton.setAttribute("aria-label", bookmarkLabel);
     bookmarkButton.title = bookmarkLabel;
@@ -15419,7 +15550,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       if (!savedPassage || !allowed()) return;
       bookmarkButton.classList.add("is-saved");
       bookmarkButton.innerHTML = bookmarkIconSVG(true);
-      const label = options.sectionMarker ? "Remove section from Saved" : bookmarkActionLabel(true);
+      const label = options.sectionMarker ? "Remove section from Evidence" : bookmarkActionLabel(true);
       bookmarkButton.setAttribute("aria-label", label);
       bookmarkButton.title = label;
     } finally {
@@ -15919,8 +16050,8 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
       blockID: ""
     }));
     syncImmediateBookmarkButton(marker, showSectionMarker);
-    marker.setAttribute("aria-label", showSectionMarker ? "Remove section from Saved" : "Save section");
-    marker.title = showSectionMarker ? "Remove section from Saved" : "Save section";
+    marker.setAttribute("aria-label", showSectionMarker ? "Remove section from Evidence" : "Save section");
+    marker.title = showSectionMarker ? "Remove section from Evidence" : "Save section";
   });
 }
 
@@ -28519,9 +28650,17 @@ async function renderProjectReportDraft(project) {
 function closeProjectDetailForProject(project) {
   const matchingDetails = openProjectDetails().filter((detail) => projectDetailMatches(project, detail));
   if (!matchingDetails.length) return;
+  state.projectContextOpen = false;
+  state.projectFactsOpen = false;
   setOpenProjectDetails(openProjectDetails().filter((detail) => !projectDetailMatches(project, detail)));
   matchingDetails.forEach((detail) => {
     const detailID = paneIDForProjectDetail(detail);
+    const contextID = paneIDForProjectInformation(detail, "context");
+    const factsID = paneIDForProjectInformation(detail, "facts");
+    projectInformationMounts.delete(contextID);
+    projectInformationMounts.delete(factsID);
+    delete state.paneWeights[contextID];
+    delete state.paneWeights[factsID];
     const workboardID = paneIDForProjectWorkboard(detail);
     const notebookID = paneIDForProjectNotebook(detail);
     const reportDraftID = paneIDForProjectReportDraft(detail);
@@ -28539,6 +28678,8 @@ function closeProjectDetailForProject(project) {
     state.paneOrder = (state.paneOrder || [])
       .filter((id) =>
         id !== detailID &&
+        id !== contextID &&
+        id !== factsID &&
         id !== workboardID &&
         id !== notebookID &&
         id !== reportDraftID &&
@@ -31873,8 +32014,47 @@ function populateSavedEvidenceSection(section, savedInstance, folder, ...childre
   }, { capture: true }));
 }
 
-function appendSavedProjectFactEditor(container, folder, identity) {
+async function renderProjectInformation(project, kind) {
+  const identity = projectIdentity(project);
+  const paneID = paneIDForProjectInformation(identity, kind);
+  const label = kind === "context" ? "Context" : "Facts";
+  if (!hasCapability("projects")) return renderProLockedPane(paneID, label);
+  const current = workspaceProject();
+  if (!current || !projectDetailMatches(current, identity)) throw accountContextChangedError();
+  const panel = document.createElement("article");
+  panel.className = `workspace-panel project-information-panel project-${kind}-panel`;
+  panel.dataset.paneId = paneID;
+  panel.dataset.projectId = projectDetailKey(identity);
+  const header = document.createElement("header");
+  header.className = "panel-header";
+  const title = document.createElement("h2");
+  title.className = "eyebrow panel-kind";
+  title.textContent = label;
+  const actions = document.createElement("div");
+  actions.className = "panel-actions";
+  const close = document.createElement("button");
+  close.className = "icon-button utility-close";
+  close.type = "button";
+  close.setAttribute("aria-label", `Close ${label}`);
+  close.innerHTML = circleXIconSVG();
+  close.addEventListener("click", () => void closeProjectInformation(identity, kind));
+  actions.append(close);
+  actions.append(createProjectToolDragHandle(identity));
+  header.append(title, actions);
+  const content = document.createElement("section");
+  content.className = "saved-project-summary project-information-content";
+  const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind, headerActions: actions });
+  projectInformationMounts.set(paneID, { panel, ...editor });
+  panel.append(header, content);
+  applyPaneWeight(panel, paneID);
+  return panel;
+}
+
+function appendSavedProjectFactEditor(container, folder, identity, options = {}) {
   const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const contextOnly = options.section === "context";
+  const factsOnly = options.section === "facts";
   const factsSection = document.createElement("section");
   factsSection.className = "saved-project-facts-section";
   const heading = document.createElement("div");
@@ -31916,34 +32096,48 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     structuredFacts: storedStructuredFacts
   };
   let saveSequence = Promise.resolve();
+  let submitted = null;
   const save = ({ reportFailure = false } = {}) => {
-    if (!isCurrentAccountRequest(requestIdentity)) return Promise.resolve();
+    if (!isCurrentAccountRequest(requestIdentity) || workspaceID !== activeWorkspaceID) return Promise.resolve();
     const next = {
       address: address.value.trim(),
       description: description.value.trim(),
       structuredFacts: projectStructuredFacts({ structuredFacts })
     };
-    if (
-      next.address === saved.address &&
-      next.description === saved.description &&
-      JSON.stringify(next.structuredFacts) === JSON.stringify(saved.structuredFacts)
+    if (!submitted &&
+      (contextOnly || next.address === saved.address) &&
+      (factsOnly || next.description === saved.description) &&
+      (contextOnly || JSON.stringify(next.structuredFacts) === JSON.stringify(saved.structuredFacts))
     ) return saveSequence;
-    saveSequence = updateProjectFolder(folder, {
-        name: folder.name || folder.title || identity.name,
-        address: next.address,
-        description: next.description,
-        structuredFacts: next.structuredFacts,
-        color: projectColor(folder),
-        folderType: folderType(folder)
-      }).then((updated) => {
-        if (reportFailure && updated === false) throw new Error("Project facts were not saved. Try again.");
-        if (isCurrentAccountRequest(requestIdentity)) saved = next;
+    if (JSON.stringify(next) === JSON.stringify(submitted)) return saveSequence;
+    submitted = next;
+    const changes = contextOnly ? { description: next.description }
+      : factsOnly ? { address: next.address, structuredFacts: next.structuredFacts }
+      : { address: next.address, description: next.description, structuredFacts: next.structuredFacts };
+    saveSequence = updateProjectFolder(folder, changes).then((updated) => {
+        if (updated === false) throw new Error("Project edits were not saved. Try again.");
+        if (isCurrentAccountRequest(requestIdentity) && submitted === next) { saved = next; submitted = null; }
       }).catch((error) => {
+      if (submitted === next) submitted = null;
       if (reportFailure) throw error;
-      void showWebNotice("Project context not saved", error.message || "Could not save Project context");
+      void showWebNotice(factsOnly ? "Project facts not saved" : "Project context not saved", error.message || "Could not save Project edits");
+      throw error;
     });
+    // Blur autosave reports its own failure; explicit close/switch still awaits it.
+    void saveSequence.catch(() => {});
     return saveSequence;
   };
+  if (contextOnly) {
+    description.addEventListener("blur", () => void save());
+    description.addEventListener("keydown", event => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") description.blur();
+      if (event.key === "Escape") { event.preventDefault(); description.value = saved.description; description.blur(); }
+    });
+    description.disabled = Boolean(identity.sharedOnly);
+    if (identity.sharedOnly) description.title = "Project context is read-only in this shared Project";
+    container.append(description);
+    return { flush: () => save({ reportFailure: true }) };
+  }
   let structuredSaveTimer = 0;
   const scheduleStructuredSave = () => {
     window.clearTimeout(structuredSaveTimer);
@@ -32241,6 +32435,14 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   }
   body.append(description);
   factsSection.append(heading, body);
+  if (factsOnly) {
+    structuredSection.classList.add("is-open");
+    const refresh = structuredHeading.querySelector(".saved-project-refresh-facts");
+    if (refresh && options.headerActions) options.headerActions.prepend(refresh);
+    structuredHeading.remove();
+    container.append(structuredSection);
+    return { flush: () => save({ reportFailure: true }) };
+  }
   container.append(factsSection, structuredSection);
   wireProjectSectionMotion(
     factsSection,
@@ -32266,6 +32468,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       }
     }
   );
+  return { flush: () => save({ reportFailure: true }) };
 }
 
 const initialProjectFoundationScopes = new Set();
@@ -32421,11 +32624,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     });
     if (controls.childElementCount) context.append(controls);
 
-    const summary = document.createElement("section");
-    summary.className = "saved-project-summary";
-    appendSavedProjectFactEditor(summary, folder, identity);
-    context.append(summary);
-
     const savedSection = document.createElement("section");
     savedSection.className = "project-studio-section saved-project-evidence-section";
     populateSavedEvidenceSection(
@@ -32574,8 +32772,11 @@ async function reconcileProjectStudioWithSavedFolders(folders) {
         ...openReportDrafts(),
         ...openCoordinations(),
         ...openCoordinationThreads()
-      ].length > 0;
+      ].length > 0 || state.projectContextOpen || state.projectFactsOpen;
       if (hadOrphanTools) {
+        state.projectContextOpen = false;
+        state.projectFactsOpen = false;
+        projectInformationMounts.clear();
         state.workboards = genericWorkboardIsOpen() ? [genericWorkboardIdentity] : [];
         state.notebooks = [];
         state.reportDrafts = [];
@@ -33376,7 +33577,7 @@ async function renderSaved(instance, options = {}) {
   if (!hasCapability("saved-work")) {
     const paneID = paneIDForUtilityInstance(instance);
     options.foundationScope?.release(paneID);
-    return renderProLockedPane(paneID, "Saved");
+    return renderProLockedPane(paneID, "Evidence");
   }
   // Share only within this synchronous setup; hydration obtains its own fresh summary.
   const summary = currentContentSummary();
@@ -38636,7 +38837,7 @@ function openColumnGroupEditor(panel, existing = null) {
   dialog.setAttribute('aria-label', existing ? 'Edit group' : 'Group columns');
   dialog.innerHTML = `<form>
     <label class="column-group-name-label">Group Name<input name="groupName" maxlength="40" required autocomplete="off" placeholder="e.g. Fire safety"></label>
-    <p class="column-group-editor-hint">Choose columns to keep together. Saved, Notebook and Report cannot be grouped.</p>
+    <p class="column-group-editor-hint">Choose columns to keep together. Evidence, Context, Facts, Notebook and Report cannot be grouped.</p>
     <div class="column-group-choices"></div><p class="column-group-editor-error" role="status"></p>
     <div class="column-group-editor-actions"><button type="button" data-cancel>Cancel</button><button type="submit">${existing ? 'Save group' : 'Create group'}</button></div></form>`;
   const ids = activePaneIDs();
@@ -40818,7 +41019,7 @@ function renderCodeQuestionCandidatesBody(project, questionID) {
   const loadSaved = document.createElement("button");
   loadSaved.type = "button";
   loadSaved.className = "code-question-define-secondary";
-  loadSaved.textContent = "Load Project Saved";
+  loadSaved.textContent = "Load Project Evidence";
   loadSaved.disabled = !canProposeEvidence(role) && role === "viewer";
   loadSaved.addEventListener("click", async () => {
     loadSaved.disabled = true;
@@ -40854,15 +41055,15 @@ function renderCodeQuestionCandidatesBody(project, questionID) {
       refreshCodeQuestionEvidencePanes(qid);
       if (!candidates.length) {
         void showWebNotice(
-          "No Project Saved candidates",
+          "No Project Evidence candidates",
           "Save an exact code passage to this Project first, then load it here for professional proposal and approval."
         );
       }
     } catch (error) {
-      void showWebNotice("Could not load Project Saved evidence", error.message || "Saved evidence could not be loaded.");
+      void showWebNotice("Could not load Project evidence", error.message || "Saved evidence could not be loaded.");
     } finally {
       loadSaved.disabled = false;
-      loadSaved.textContent = "Load Project Saved";
+      loadSaved.textContent = "Load Project Evidence";
     }
   });
   toolbar.append(search, loadSaved);
@@ -40880,7 +41081,7 @@ function renderCodeQuestionCandidatesBody(project, questionID) {
     if (!items.length) {
       const empty = document.createElement("li");
       empty.className = "code-question-define-empty-item";
-      empty.textContent = "No candidates. Save an exact passage to this Project, then load Project Saved.";
+      empty.textContent = "No candidates. Save an exact passage to this Project, then load Project Evidence.";
       list.appendChild(empty);
       return;
     }
@@ -42379,10 +42580,10 @@ function renderCodeQuestionShellChrome() {
   if (project) ensureCodeQuestionShellForProject(project);
   document.querySelector(".code-decision-context-bar")?.remove();
   document.querySelector(".code-question-stage-control")?.remove();
-  // Preserve the Saved destination label when the Code Question shell is active.
+  // Preserve the Evidence destination label when the Code Question shell is active.
   if (toggleSavedButton) {
-    toggleSavedButton.setAttribute("aria-label", "Saved");
-    toggleSavedButton.title = "Saved";
+    toggleSavedButton.setAttribute("aria-label", "Evidence");
+    toggleSavedButton.title = "Evidence";
   }
 }
 
@@ -42534,7 +42735,7 @@ function disposeUnpublishedWorkspacePane(pane) {
   if (!pane || pane.isConnected) return;
   cancelSearchPanelRequest(pane);
   disposeWorkspaceNodeAccess(pane);
-  for (const mounts of [notebookMounts, reportDraftMounts, workboardMounts]) {
+  for (const mounts of [notebookMounts, reportDraftMounts, workboardMounts, projectInformationMounts]) {
     for (const [id, mounted] of mounts) {
       // A late result must never dispose a newer controller with the same ID.
       if (mounted.panel !== pane) continue;
@@ -42686,6 +42887,11 @@ function workspacePaneDescriptors(options = {}) {
   if (genericWorkboardIsOpen()) addWorkboard(genericWorkboardIdentity, closeGenericWorkboard);
   for (const project of openProjectDetails()) {
     const projectID = projectDetailKey(project);
+    for (const kind of ["context", "facts"]) {
+      if (state[projectInformationStateKey(kind)]) add(paneIDForProjectInformation(project, kind), kind === "context" ? "Context" : "Facts",
+        () => renderProjectInformation(project, kind), () => closeProjectInformation(project, kind),
+        { ownerClass: `project-information-panel project-${kind}-panel`, projectID, accessCapabilities: ["projects"] });
+    }
     if (projectHasOpenNotebook(project)) {
       foundationScope.register(paneIDForProjectNotebook(project));
       add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project, { foundationScope }),
@@ -42709,7 +42915,7 @@ function workspacePaneDescriptors(options = {}) {
   for (const instance of state.utilityInstances || []) {
     const savedFoundationScope = instance.key === "saved" && hasCapability("saved-work") ? foundationScope : null;
     savedFoundationScope?.register(paneIDForUtilityInstance(instance));
-    if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Saved", analysis: "Research" }[instance.key] || "Column"),
+    if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Evidence", analysis: "Research" }[instance.key] || "Column"),
       (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: savedFoundationScope, signal }), () => closeUtilityInstance(instance),
       { foundationScope: savedFoundationScope, deferredFoundationRelease: Boolean(savedFoundationScope), publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
     if (instance.key === "search" || instance.key === "sdc") {
@@ -42982,6 +43188,8 @@ async function closeAllColumns() {
   state.sectionDetailAnchors = {};
   state.searchLinkedReaders = {};
   setOpenProjectDetails([]);
+  state.projectContextOpen = false;
+  state.projectFactsOpen = false;
   state.workboards = [];
   state.notebooks = [];
   state.reportDrafts = [];
@@ -43113,7 +43321,7 @@ function workspaceCommandDefinitions() {
     ...(isProAccount() || state.readers.length < 2
       ? [{ label: "New Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
       : []),
-    { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
+    { label: "Open Evidence and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open Account", hint: "Plan, account, sync, and privacy", run: () => focusUtility("settings") },
     { label: "Reset Layout", hint: "Restore default panel widths", run: () => resetVisibleColumnWidths() },
     ...(defaultActivePaneIDs().length

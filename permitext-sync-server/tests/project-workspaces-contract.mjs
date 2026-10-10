@@ -21,7 +21,7 @@ const context = vm.createContext({
  workspaceRegistry: normalizeWorkspaceRegistry({workspaces:[{id:'main',name:'Main'}]}), activeWorkspaceID:'main',
  syncedContent:{status:"disconnected"}, applyStoredWorkspaceLayout(){},
  state:{utilityInstances:[], projectDetails:[]}, detachedProjectWindow:false,
- currentContentSummary:()=>({projects}), activeFolderRecords:x=>x.filter(project=>!project.deletedAt&&!project.archivedAt), mergeProjectsWithOrganizationAccess:x=>x,
+ visibleProjectRecords:x=>x, currentContentSummary:()=>({projects}), activeFolderRecords:x=>x.filter(project=>!project.deletedAt&&!project.archivedAt), mergeProjectsWithOrganizationAccess:x=>x,
  folderIsProject:x=>x.folderType==='project', projectRecordID:x=>x.id, projectIdentity:x=>({...x}),
  projectIsArchived:x=>Boolean(x?.archivedAt),
  projectDetailMatches:(a,b)=>a.id===b.id, emptyWorkspaceLayout, captureWorkspaceLayout,

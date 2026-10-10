@@ -12,6 +12,8 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "projectDetail",
   "projectDetails",
   "projectHostPaneID",
+  "projectContextOpen",
+  "projectFactsOpen",
   "utilityInstances",
   "utilities",
   "paneWidthDefaultsVersion",
@@ -33,7 +35,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
 ]);
 
 export function canGroupColumn(id) {
-  return typeof id === "string" && !/^(?:utility:(?:saved|sdc)(?::|$)|project:notebook:|project:report-draft:)/.test(id);
+  return typeof id === "string" && !/^(?:utility:(?:saved|sdc)(?::|$)|project:(?:context|facts|notebook|report-draft):)/.test(id);
 }
 
 export function normalizeColumnGroups(value) {
@@ -238,6 +240,8 @@ export function emptyWorkspaceLayout() {
     projectDetail: null,
     projectDetails: [],
     projectHostPaneID: "",
+    projectContextOpen: false,
+    projectFactsOpen: false,
     utilityInstances: [],
     utilities: utilityState(),
     paneWidthDefaultsVersion: 4,
@@ -341,6 +345,8 @@ export function normalizeWorkspaceLayout(value = {}) {
     supplementalIDs: Array.isArray(research.supplementalIDs) ? [...new Set(research.supplementalIDs.filter(id => typeof id === "string" && id))] : []
   };
   const activeProject = layout.projectDetails[0] || null;
+  layout.projectContextOpen = Boolean(activeProject && source.projectContextOpen === true);
+  layout.projectFactsOpen = Boolean(activeProject && source.projectFactsOpen === true);
   layout.workboards = genericWorkboardState(source.workboards);
   layout.notebooks = openProjectToolState(source.notebooks, layout.projectDetails);
   layout.reportDrafts = openProjectToolState(source.reportDrafts, layout.projectDetails);

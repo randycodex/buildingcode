@@ -18503,3 +18503,22 @@ html body .column-group-menu-button:focus-visible {
 .search-code-source-menu .settings-active-source-row input:checked::before { content: ""; position: absolute; inset: 0; background: currentColor; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='m5 12 4 4L19 6'/%3E%3C/svg%3E") center / contain no-repeat; }
 .search-code-source-menu .settings-active-source-row input:disabled { opacity: 0.45; cursor: default; }
 .search-code-source-menu .settings-active-sources-status:empty { display: none; }
+
+/* Standalone Project editors share the workspace column chrome. */
+.project-information-panel > .project-information-content {
+  display: block;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+.project-context-panel .saved-project-fact-description {
+  min-height: 10em;
+}
+.project-facts-panel .saved-project-structured-facts-list {
+  width: 100%;
+  margin-inline: 0;
+}
+.project-facts-panel .project-refresh-status:empty {
+  display: none;
+}
