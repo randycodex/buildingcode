@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-pro-prompt-v661";
+} from "./offline-storage.js?v=20261009-free-saved-column-v662";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-pro-prompt-v661";
+} from "./research-intent-state.js?v=20261009-free-saved-column-v662";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1746,7 +1746,7 @@ function scopeSavedInstanceToWorkspace(instance, options = {}) {
 async function openUnassignedSaves() {
   if (!workspacePrivatePresentationAllowed()) return;
   if (!hasCapability("saved-work")) {
-    await presentPlanLimitNotice("Saved requires Pro", "Upgrade to Pro to save sections and organize projects. Any existing saved work is preserved.");
+    await focusUtility("saved");
     return;
   }
   const requestIdentity = captureAccountRequest();
@@ -4731,7 +4731,7 @@ function setUtilityButtonStates() {
   addReaderButton.classList.toggle("has-open-reader", state.readers.length > 0);
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
-  toggleSavedButton.setAttribute("aria-pressed", String(hasCapability("saved-work") && activeRepeatableKeys.has("saved")));
+  toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
   toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis || activeRepeatableKeys.has("analysis")));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
@@ -33280,7 +33280,11 @@ function renderProLockedPane(paneID, title) {
 }
 
 async function renderSaved(instance, options = {}) {
-  if (!hasCapability("saved-work")) return null;
+  if (!hasCapability("saved-work")) {
+    const paneID = paneIDForUtilityInstance(instance);
+    options.foundationScope?.release(paneID);
+    return renderProLockedPane(paneID, "Saved");
+  }
   // Share only within this synchronous setup; hydration obtains its own fresh summary.
   const summary = currentContentSummary();
   const savedInstance = scopeSavedInstanceToWorkspace(normalizeSavedInstance(instance), { projects: summary.projects || [] });
@@ -42461,11 +42465,11 @@ function workspacePaneDescriptors(options = {}) {
   }
   if (state.utilities.archive) add("utility:archive", "Archive", renderArchive, closeArchiveColumn);
   for (const instance of state.utilityInstances || []) {
-    if (instance.key === "saved" && options.accessGate?.allowed && !hasCapability("saved-work")) continue;
-    if (instance.key === "saved") foundationScope.register(paneIDForUtilityInstance(instance));
+    const savedFoundationScope = instance.key === "saved" && hasCapability("saved-work") ? foundationScope : null;
+    savedFoundationScope?.register(paneIDForUtilityInstance(instance));
     if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Saved", analysis: "Research" }[instance.key] || "Column"),
-      (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: instance.key === "saved" ? foundationScope : null, signal }), () => closeUtilityInstance(instance),
-      { foundationScope: instance.key === "saved" ? foundationScope : null, deferredFoundationRelease: instance.key === "saved", publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
+      (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: savedFoundationScope, signal }), () => closeUtilityInstance(instance),
+      { foundationScope: savedFoundationScope, deferredFoundationRelease: Boolean(savedFoundationScope), publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
     if (instance.key === "search" || instance.key === "sdc") {
       const detail = sectionDetailsBySearch()[instance.id];
       if (detail) add(paneIDForSectionDetail(instance.id), "Section", () => renderSectionDetail(instance.id, detail),
@@ -42625,10 +42629,6 @@ async function transitionWorkspace(mode = "default", options = {}) {
 }
 
 async function toggleUtilityPane(key) {
-  if (key === "saved" && !hasCapability("saved-work")) {
-    await presentPlanLimitNotice("Saved requires Pro", "Upgrade to Pro to save sections and organize projects. Any existing saved work is preserved.");
-    return;
-  }
   if (key === "settings") { toggleAccountDialog(); return; }
   if (key === "analysis" && state.utilities.analysis) {
     await closeResearchWorkspace();
@@ -42774,10 +42774,6 @@ async function closeAllColumns() {
 }
 
 async function focusUtility(key, selector = "") {
-  if (key === "saved" && !hasCapability("saved-work")) {
-    await presentPlanLimitNotice("Saved requires Pro", "Upgrade to Pro to save sections and organize projects. Any existing saved work is preserved.");
-    return;
-  }
   if (key === "settings") { if (!document.querySelector(".account-dialog")) toggleAccountDialog(); return; }
   let paneID = "";
   if (repeatableUtilityKeys.has(key)) {
@@ -42851,10 +42847,6 @@ async function focusRecentUtilityColumn(key) {
 }
 
 async function toggleProjectsColumns() {
-  if (!hasCapability("saved-work")) {
-    await focusUtility("saved");
-    return;
-  }
   const instances = (state.utilityInstances || []).filter((item) => item.key === "saved");
   if (!instances.length) {
     await focusUtility("saved");
