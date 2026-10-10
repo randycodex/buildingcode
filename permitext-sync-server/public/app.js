@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-report-title-v754";
+} from "./offline-storage.js?v=20261010-report-delete-v755";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-report-title-v754";
+} from "./research-intent-state.js?v=20261010-report-delete-v755";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -27769,6 +27769,7 @@ async function renderProjectReportDraft(project) {
 
   let pendingDraftSave = null;
   const saveDraft = () => {
+    if (deletingReport) return Promise.resolve(false);
     if (pendingDraftSave) return pendingDraftSave;
     const savingDraft = activeDraft;
     const snapshot = structuredClone(savingDraft);
@@ -27834,8 +27835,9 @@ async function renderProjectReportDraft(project) {
   };
 
   let generatingReport = false;
+  let deletingReport = false;
   const generateReport = async () => {
-    if (generatingReport) return;
+    if (generatingReport || deletingReport) return;
     generatingReport = true;
     try {
       if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
@@ -27877,6 +27879,53 @@ async function renderProjectReportDraft(project) {
           : error.message || "The Report could not be generated.");
       }
     } finally { generatingReport = false; }
+  };
+
+  const deleteReport = async (trigger) => {
+    if (deletingReport || !activeDraft.id || disposed ||
+        !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
+    if (pendingDraftSave || generatingReport) {
+      showStatusError("Wait for the Report to finish saving or exporting before deleting it.");
+      return false;
+    }
+    const deletingDraft = activeDraft;
+    const draftID = deletingDraft.id;
+    const expectedVersion = deletingDraft.version;
+    deletingReport = true;
+    trigger.disabled = true;
+    shell.inert = true;
+    try {
+      const confirmed = await confirmWebWarning(
+        "Delete Report?",
+        `“${deletingDraft.title || "Untitled Report"}” will be deleted.${dirty ? " Unsaved edits will also be discarded." : ""} Exported versions stay available.`,
+        { confirmLabel: "Delete Report" }
+      );
+      if (!confirmed || disposed || !isCurrentAccountRequest(requestIdentity) ||
+          requestWorkspaceID !== activeWorkspaceID || activeDraft !== deletingDraft) return false;
+      clearStatus();
+      await reportRequest("/reports/drafts/delete", { projectID, draftID, expectedVersion });
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
+      drafts = drafts.filter((draft) => draft.id !== draftID);
+      activeDraft = drafts[0] ? structuredClone(drafts[0]) : emptyProjectReportDraft(identity);
+      dirty = false;
+      clearStatus();
+      renderWorkspaceContent();
+      await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
+      return true;
+    } catch (error) {
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
+      if (error.payload?.code === "REPORT_DRAFT_VERSION_CONFLICT" && !dirty) {
+        deletingReport = false;
+        await refreshReportArtifacts().catch(() => false);
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
+      }
+      showStatusError(error.message || "The Report could not be deleted. Try again.");
+      return false;
+    } finally {
+      deletingReport = false;
+      shell.inert = false;
+      trigger.disabled = false;
+    }
   };
 
   function renderBlockEditor(container) {
@@ -28322,6 +28371,14 @@ async function renderProjectReportDraft(project) {
     const revisionLabel = document.createElement("span");
     revisionLabel.className = "report-title-revision";
     revisionLabel.textContent = `Revision ${activeDraft.version || 1}`;
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "report-title-delete";
+    deleteButton.title = activeDraft.id ? "Delete Report" : "Save this Report before deleting it";
+    deleteButton.setAttribute("aria-label", "Delete Report");
+    deleteButton.innerHTML = trashIconSVG();
+    deleteButton.disabled = !activeDraft.id;
+    deleteButton.addEventListener("click", () => void deleteReport(deleteButton));
     const beginTitleEditing = () => {
       titleEditor.value = activeDraft.title || "";
       titleButton.hidden = true;
@@ -28356,6 +28413,7 @@ async function renderProjectReportDraft(project) {
     const versionList = document.createElement("div");
     versionList.className = "report-draft-version-list";
     const switchDraft = async (draftID) => {
+      if (deletingReport) return;
       if (dirty && !(await mountState.confirmDiscardIfNeeded())) return;
       activeDraft = draftID === "__new__"
         ? emptyProjectReportDraft(identity)
@@ -28387,7 +28445,7 @@ async function renderProjectReportDraft(project) {
       versionList.append(createNew);
     }
     versionList.hidden = !versionList.childElementCount;
-    titleControl.append(titleButton, titleEditor, revisionLabel);
+    titleControl.append(titleButton, titleEditor, revisionLabel, deleteButton);
     draftPicker.append(titleControl, versionList);
 
     const metadata = document.createElement("div");
@@ -28587,7 +28645,7 @@ async function renderProjectReportDraft(project) {
   };
 
   refreshReportArtifacts = async (options = {}) => {
-    if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
+    if (disposed || deletingReport || !isCurrentAccountRequest(requestIdentity)) return false;
     const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
       reportRequest("/reports/drafts/list", { projectID }),
       reportRequest("/reports/sources/list", { projectID }),

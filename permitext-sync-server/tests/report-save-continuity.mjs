@@ -9,7 +9,7 @@ function harness() {
   let resolve, reject;
   const context = vm.createContext({
     structuredClone, activeDraft: {id: null, version: 0, title:'Draft', introduction:'Before', blocks:[]},
-    drafts: [], dirty:true, disposed:false, projectID:'p', requestIdentity:'a', current:true,
+    drafts: [], dirty:true, disposed:false, deletingReport:false, projectID:'p', requestIdentity:'a', current:true,
     isCurrentAccountRequest:()=>context.current, calls:[], renders:0, message:'',
     clearStatus:()=>{context.message='';}, showStatusError:m=>{context.message=m;},
     renderWorkspaceContent:()=>{context.renders++;}, notebookMounts:new Map(),
@@ -45,7 +45,7 @@ console.log('Report save continuity passed: pending edits, duplicate clicks, ret
 const refreshStart = source.indexOf('  refreshReportArtifacts = async');
 const refreshImplementation = source.slice(refreshStart, source.indexOf('\n  try {', refreshStart));
 for (const mode of ['success', 'dirty', 'failure', 'account']) {
- const c = vm.createContext({structuredClone, disposed:false, dirty:mode==='dirty',
+ const c = vm.createContext({structuredClone, disposed:false, deletingReport:false, dirty:mode==='dirty',
   requestIdentity:'a',projectID:'p',identity:{},drafts:[],sources:[],sourceWarnings:[],history:[],
   activeDraft:{id:'d',title:'Local'},message:'Earlier failure',renders:0,
   isCurrentAccountRequest:()=>mode!=='account',panel:{querySelector:()=>null},

@@ -184,6 +184,22 @@ try {
     await request(path, { projectID: "handoff-a" }, 401, "invalid-session");
     await request(path, { projectID: "unowned-project" }, 404);
   }
+  const deletingDraft = (await request("/reports/drafts/list", { projectID: "handoff-b" })).drafts[0];
+  const deletion = { projectID: "handoff-b", draftID: deletingDraft.id, expectedVersion: deletingDraft.version };
+  const retainedHistory = await request("/reports/history/list", { projectID: "handoff-b" });
+  await request("/reports/drafts/delete", deletion, 401, "invalid-session");
+  await request("/reports/drafts/delete", { ...deletion, projectID: "handoff-a" }, 404);
+  const conflict = await request("/reports/drafts/delete", { ...deletion, expectedVersion: deletingDraft.version - 1 }, 409);
+  assert.equal(conflict.code, "REPORT_DRAFT_VERSION_CONFLICT");
+  assert.equal((await request("/reports/drafts/list", { projectID: "handoff-b" })).drafts.length, 1);
+  const removed = await request("/reports/drafts/delete", deletion);
+  assert.equal(removed.draftID, deletingDraft.id);
+  assert.ok(removed.deletedAt);
+  assert.equal((await request("/reports/drafts/list", { projectID: "handoff-b" })).drafts.length, 0);
+  assert.equal((await request("/reports/drafts/list", { projectID: "handoff-a" })).drafts.length, 1);
+  assert.deepEqual(await request("/reports/history/list", { projectID: "handoff-b" }), retainedHistory);
+  assert.deepEqual((await request("/reports/manifests/get", { projectID: "handoff-b", manifestID: currentManifest.id })).manifest,
+    currentManifest, "Deleting a Report draft must preserve its issued version and export files.");
   // Old conversations may arrive after the completed foundation checkpoint.
   // The bounded migration must preserve the answer and question, once per ID.
   let previousCount = 0;
