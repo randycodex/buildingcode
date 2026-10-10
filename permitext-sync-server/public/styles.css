@@ -18453,7 +18453,6 @@ html body .column-group-menu-button:focus-visible {
 .search-panel > .search-results[hidden] { display: none; }
 .search-code-source-menu { grid-row: 3; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-bottom: var(--space-5); }
 .search-code-source-menu .settings-active-sources-card { padding: 0; background: transparent; }
-.search-code-source-close { display: block; margin: 0 0 8px auto; min-height: 36px; }
 
 .search-match-control { position: relative; }
 .search-match-mode, .search-match-alternative { box-sizing: border-box; line-height: 1.4; min-height: 30px; padding: 4px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-secondary); font: inherit; cursor: pointer; }

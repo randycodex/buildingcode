@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-search-sources-v720";
+} from "./offline-storage.js?v=20261010-search-sources-v721";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-search-sources-v720";
+} from "./research-intent-state.js?v=20261010-search-sources-v721";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36611,10 +36611,6 @@ function openSearchCodeSourceSettings(panel) {
   menu.id = `search-code-sources-${crypto.randomUUID()}`;
   menu.setAttribute("role", "region");
   menu.setAttribute("aria-label", "Code sources & editions");
-  const close = document.createElement("button");
-  close.type = "button";
-  close.className = "settings-link-button search-code-source-close";
-  close.textContent = "Close";
   const card = settingsTemplate.content.querySelector(".settings-active-sources-card").cloneNode(true);
   card.removeAttribute("aria-labelledby");
   card.setAttribute("aria-label", "Code sources & editions");
@@ -36636,10 +36632,9 @@ function openSearchCodeSourceSettings(panel) {
     dismiss();
   };
   menu.__close = dismiss;
-  close.addEventListener("click", dismiss);
   menu.addEventListener("keydown", onEscape);
   trigger.addEventListener("keydown", onEscape);
-  menu.append(close, card);
+  menu.append(card);
   results.hidden = true;
   panel.append(menu);
   trigger.setAttribute("aria-expanded", "true");
@@ -36647,7 +36642,7 @@ function openSearchCodeSourceSettings(panel) {
   wireSettingsActiveCodeSources(menu, { enabled: true, readerMenu: true });
   const refresh = () => menu.__refreshActiveCodeSources?.();
   panel.__refreshActiveCodeSources = refresh;
-  close.focus();
+  trigger.focus({ preventScroll: true });
 }
 
 function openActiveCodeSourceSettings() {
