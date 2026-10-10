@@ -18173,6 +18173,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   padding: 8px 14px;
   list-style-position: inside;
 }
+.report-draft-panel > button.pane-collapsed-tab,
+.report-draft-panel > button.pane-collapsed-tab:hover,
 .report-draft-panel .report-draft-primary-actions > button:nth-child(-n+2),
 .report-draft-panel .report-draft-primary-actions > button:nth-child(-n+2):hover,
 .report-draft-panel .report-draft-primary-actions > button:nth-child(-n+2):disabled,
