@@ -13,7 +13,7 @@ const panes = new Map(['left', 'right'].map(id => [id, {dataset:{paneId:id}, wid
 const state = {paneWeights:{}};
 let saves=0, layouts=0, indicators=0;
 const track = {scrollLeft:0, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
-const context = vm.createContext({state, track, CSS:{escape:x=>x},
+const context = vm.createContext({state, track, CSS:{escape:x=>x},isProAccount:()=>false,
   paneIsCollapsed:id=>collapsed.has(id), defaultPaneWidthForID:()=>600,
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
@@ -21,7 +21,7 @@ const context = vm.createContext({state, track, CSS:{escape:x=>x},
   document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, classList:{add(){}},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
-vm.runInContext(['singleExpandedDividerEdge','updateAdjacentDividerValue','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
+vm.runInContext(['activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
 const divider=context.createDivider('left','right');
 function press(handle,key,shiftKey=false){let prevented=false;handle.handlers.keydown({key,shiftKey,preventDefault(){prevented=true;}});return prevented;}
 function widths(){return [...panes.values()].map(p=>p.width);}

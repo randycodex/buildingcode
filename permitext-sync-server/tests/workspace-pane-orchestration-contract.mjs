@@ -52,7 +52,7 @@ const sandbox = vm.createContext({
   get workspaceRenderGeneration() { return generation; },
   activeWorkspaceID: "workspace", captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
   pendingWorkspacePaneRevealID: null, scrollPaneIntoView() {},
-  workspacePaneDescriptors: () => descriptors.map(item => ({...item})), hasCapability: () => capability,
+  workspacePaneDescriptors: () => descriptors.map(item => ({...item})), hasCapability: () => capability, isProAccount: () => capability,
   document: { createElement: element }, circleXIconSVG: () => "",
   appendPaneSequence(panes) {
     appendCalls++;
@@ -65,7 +65,7 @@ const sandbox = vm.createContext({
   refreshColumnGroupPresentation() {}, refreshPinnedPaneDivider() { pinnedDividerRefreshes++; }, updateCollapsedPaneDividers() {}, bindReaderScrollIndicator() {},
   updateReaderScrollIndicator() {}, enhanceSelect() {}, restoreReaderScrollPositions() {}, notifyWorkspaceLayoutChange() {}
 });
-vm.runInContext(`let workspacePaneHydrator=null; const workspacePaneReadyWaiters=new Set(); ${actual("finishWorkspacePaneReady")}\n${actual("whenWorkspacePaneReady")}\n${actual("workspacePaneContextIsCurrent")}\n${actual("createWorkspacePaneLoadingShell")}\n${actual("getWorkspacePaneHydrator")}\n${actual("mountWorkspacePanesIndependently")}\n globalThis.mount=(context, options={})=>mountWorkspacePanesIndependently(context,{...options,shellReady:true}); globalThis.whenReady=whenWorkspacePaneReady; globalThis.hydrator=()=>workspacePaneHydrator;`,sandbox);
+vm.runInContext(`let workspacePaneHydrator=null; const workspacePaneReadyWaiters=new Set(); ${actual("activePinnedPaneID")}\n${actual("finishWorkspacePaneReady")}\n${actual("whenWorkspacePaneReady")}\n${actual("workspacePaneContextIsCurrent")}\n${actual("createWorkspacePaneLoadingShell")}\n${actual("getWorkspacePaneHydrator")}\n${actual("mountWorkspacePanesIndependently")}\n globalThis.mount=(context, options={})=>mountWorkspacePanesIndependently(context,{...options,shellReady:true}); globalThis.whenReady=whenWorkspacePaneReady; globalThis.hydrator=()=>workspacePaneHydrator;`,sandbox);
 const context = () => ({ key:"account:workspace",workspaceID:"workspace",identity:{},generation });
 const mountAndSettle = async (context, options) => { await sandbox.mount(context, options); await sandbox.hydrator().settled(); };
 const descriptor = (id, load) => ({id,label:id,identity:id,load,close(){}});
@@ -138,7 +138,10 @@ let accessLoads=0;
 descriptors=[descriptor("access",()=>{accessLoads++; return pane("access");})]; generation++;
 await mountAndSettle(context()); const enabled=track.children[0];
 generation++; await mountAndSettle(context()); assert.equal(track.children[0],enabled);
+sandbox.state.pinnedPaneID='access';
 capability=false; generation++; await mountAndSettle(context()); assert.notEqual(track.children[0],enabled);
+assert.equal(track.children[0].classList.contains('is-pinned'),false,'Free hydration must not activate a stored Pro pin.');
+assert.equal(sandbox.state.pinnedPaneID,'access','Free hydration preserves the dormant Pro preference.');
 assert.equal(accessLoads,2);
 
 // Use the actual descriptor builder to exercise pane-specific editor access.

@@ -18106,11 +18106,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   }
 }
 
-.workspace-panel.is-pinned > header .column-group-menu-button::before {
-  content: "Pinned · ";
-  font-size: 0.8em;
-}
-
 .research-destination-menu {
   max-width: min(360px, calc(100vw - 16px));
   max-height: calc(100dvh - 16px);

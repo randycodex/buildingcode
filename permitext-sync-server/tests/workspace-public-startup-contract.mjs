@@ -24,7 +24,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  closeDeletedProjectDetails:()=>{if(removeNotebookOnVerify)desired=desired.filter(d=>d.id!=="notebook");},
  restoreResearchWorkspaceState:noop,captureReaderScrollPositions:()=>new Map(),updateReaderPlanControls:noop,
  renderWorkspaceTabs:noop,renderCodeQuestionShellChrome:noop,normalizePaneWeights:noop,activePaneIDs:()=>desired.map(d=>d.id),setUtilityButtonStates:noop,
- saveWorkspaceState:noop,scheduleWorkspaceStateSaveAfterPaint:noop,startProjectArtifactCheckpointLoop:noop,hasCapability:()=>true,
+ saveWorkspaceState:noop,scheduleWorkspaceStateSaveAfterPaint:noop,startProjectArtifactCheckpointLoop:noop,hasCapability:()=>true,isProAccount:()=>true,
  workspacePaneDescriptors:options=>desired.map(d=>({...d,label:d.id,identity:d.id,accessGate:options.accessGate,close:noop})),
  createWorkspacePaneLoadingShell:descriptor=>{const node=pane(descriptor.id,true);node.dataset.workspacePaneIdentity=descriptor.contentIdentity;node.dataset.workspacePaneAccessIdentity=descriptor.accessIdentity;node.__workspaceAccessGate=descriptor.accessGate;return node;},
  appendPaneSequence(panes){track.children.forEach(n=>{n.isConnected=false;n.parentNode=null;});track.children=panes;panes.forEach(n=>{n.isConnected=true;n.parentNode=track;});},
@@ -32,7 +32,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  updateCollapsedPaneDividers:noop,bindReaderScrollIndicator:noop,updateReaderScrollIndicator:noop,enhanceSelect:noop,restoreReaderScrollPositions:noop,
  notifyWorkspaceLayoutChange:noop,disposeUnpublishedWorkspacePane:noop,maskUnverifiedWorkspacePane:noop
 });
-const names=["workspacePrivatePresentationAllowed","finishWorkspacePaneReady","whenWorkspacePaneReady","workspaceAccessGateForRender","workspacePaneRenderContext","workspacePaneContextIsCurrent","getWorkspacePaneHydrator","mountWorkspacePanesIndependently","renderWorkspace","renderUtilityWorkspace"];
+const names=["activePinnedPaneID","workspacePrivatePresentationAllowed","finishWorkspacePaneReady","whenWorkspacePaneReady","workspaceAccessGateForRender","workspacePaneRenderContext","workspacePaneContextIsCurrent","getWorkspacePaneHydrator","mountWorkspacePanesIndependently","renderWorkspace","renderUtilityWorkspace"];
 vm.runInContext(`let workspacePaneHydrator=null;let workspaceAccessState=null;const workspacePaneReadyWaiters=new Set();${names.map(actual).join("\n")}`,sandbox);
 assert.equal(await sandbox.renderWorkspace(),true,"Startup resolves after shells, while sync remains held.");
 await tick();assert.equal(pulls,1);assert.equal(privateLoads,0);assert.equal(track.children[0],reader);assert.equal(track.children[1],search);

@@ -31,7 +31,7 @@ const state = { collapsedPaneIDs: [], paneWeights: { 'utility:search:1': 720 }, 
 let reducedMotion = false;
 let saves = 0;
 const context = vm.createContext({
-  state, Set, Map, Array, Object,
+  state, Set, Map, Array, Object, isProAccount:()=>false,
   columnGroupForPane: id => state.columnGroups?.find(group => group.paneIDs.includes(id)),
   track: { querySelectorAll: () => [] },
   window: { matchMedia: () => ({ matches: reducedMotion }) },
@@ -40,7 +40,7 @@ const context = vm.createContext({
   applyPaneWeight() {}, closeActiveCustomSelect() {}, notifyWorkspaceLayoutChange() {},
   saveWorkspaceState: () => saves++
 });
-vm.runInContext(['paneIsCollapsed', 'applyPaneCollapsedState', 'updateCollapsedPaneDividers', 'setPaneCollapsed'].map(actual).join('\n'), context);
+vm.runInContext(['activePinnedPaneID', 'paneIsCollapsed', 'applyPaneCollapsedState', 'updateCollapsedPaneDividers', 'setPaneCollapsed'].map(actual).join('\n'), context);
 context.setPaneCollapsed(panel, true);
 assert.equal(context.paneIsCollapsed(panel.dataset.paneId), true);
 assert.equal(rail.hidden, false);
@@ -245,9 +245,9 @@ const menuPanel={dataset:{paneId:'reader:one'},editor:retainedEditor,
   querySelector:selector=>selector.includes('pane-collapsed-tab')?menuRail:anchor,
   classList:{contains:()=>false}};
 const peerPanel={dataset:{paneId:'reader:two'}};
-let menuOrder=['reader:one','reader:two'];
+let menuOrder=['reader:one','reader:two'], menuPro=false;
 const menuState={paneOrder:menuOrder,columnGroups:[]};
-const menuContext=vm.createContext({state:menuState,AbortController,
+const menuContext=vm.createContext({state:menuState,AbortController,isProAccount:()=>menuPro,
   document:{querySelector:()=>null,createElement:tag=>menuNode(tag),body:{append:n=>{menu=n;}},addEventListener(){},get activeElement(){return focused;}},
   window:{innerWidth:1200,innerHeight:800},
   track:{querySelectorAll:()=>[menuPanel,peerPanel]},
@@ -259,7 +259,17 @@ const menuContext=vm.createContext({state:menuState,AbortController,
   appendReaderMenuControls(){},paneIsCollapsed:()=>false,
   setPaneCollapsed:(...args)=>{collapsedCall=args;menuRail.focus();}
 });
-vm.runInContext(['orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
+vm.runInContext(['activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
+menuState.pinnedPaneID='reader:one';
+menuContext.openColumnGroupMenu(menuPanel,anchor);
+assert.deepEqual(menu.children.map(x=>x.textContent),['Collapse','Move Left','Move Right'],'Free menus omit both Pin and Unpin, even with a stored Pro pin.');
+assert.equal(menuContext.activePinnedPaneID(),'','A stored Pro pin is inactive on Free.');
+menuContext.togglePinnedPane(menuPanel);
+assert.equal(menuState.pinnedPaneID,'reader:one','Free cannot change a pin through a stale action handler.');
+assert.equal(menuSaves,0);
+menuPro=true;
+assert.equal(menuContext.activePinnedPaneID(),'reader:one','The original pin preference remains available to Pro.');
+menuState.pinnedPaneID='';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert.equal(menu.attrs['aria-label'],'Column options');assert.equal(anchor.attrs['aria-expanded'],'true');
 assert.deepEqual(menu.children.map(x=>x.textContent),['Collapse','Pin','Move Left','Move Right']);

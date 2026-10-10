@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-projects-inbox-v676";
+} from "./offline-storage.js?v=20261010-pro-column-pinning-v677";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-projects-inbox-v676";
+} from "./research-intent-state.js?v=20261010-pro-column-pinning-v677";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -37495,7 +37495,7 @@ function singleExpandedDividerEdge(previousPaneID, nextPaneID) {
   const nextOpen = nextPaneID && !paneIsCollapsed(nextPaneID);
   // The pinned boundary belongs only to the fixed column, not the scrolling
   // neighbor that happens to follow it in the mounted sequence.
-  if (previousOpen && previousPaneID === state.pinnedPaneID) return { paneID: previousPaneID, side: "right" };
+  if (previousOpen && previousPaneID === activePinnedPaneID()) return { paneID: previousPaneID, side: "right" };
   if (previousOpen && !nextOpen) return { paneID: previousPaneID, side: "right" };
   if (nextOpen && !previousOpen) return { paneID: nextPaneID, side: "left" };
   return null;
@@ -37850,7 +37850,7 @@ function applyDragPreviewOrder(order) {
   const paneIndex = new Map(order.map((id, index) => [id, index]));
   track.querySelectorAll(".workspace-panel").forEach((pane) => {
     const index = paneIndex.get(pane.dataset.paneId);
-    if (index !== undefined) pane.style.order = pane.dataset.paneId === state.pinnedPaneID ? "-2" : String(index * 2);
+    if (index !== undefined) pane.style.order = pane.dataset.paneId === activePinnedPaneID() ? "-2" : String(index * 2);
   });
   track.querySelectorAll(".pane-divider").forEach((divider) => {
     const previousIndex = paneIndex.get(divider.dataset.previousPaneId);
@@ -37862,7 +37862,7 @@ function applyDragPreviewOrder(order) {
     const previousRect = previousRects.get(pane.dataset.paneId);
     if (!previousRect) return;
     const nextRect = pane.getBoundingClientRect();
-    if (pane.dataset.paneId === state.pinnedPaneID) return;
+    if (pane.dataset.paneId === activePinnedPaneID()) return;
     const deltaX = previousRect.left - nextRect.left;
     if (Math.abs(deltaX) < 1) return;
     pane.style.willChange = "transform";
@@ -38307,7 +38307,7 @@ function refreshColumnGroupPresentation({ preparePanels = true } = {}) {
   if (preparePanels) panels.forEach(preparePaneCollapse);
   const hidden = new Set();
   for (const group of state.columnGroups || []) {
-    if (group.collapsed) group.paneIDs.filter((id) => id !== state.pinnedPaneID && panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
+    if (group.collapsed) group.paneIDs.filter((id) => id !== activePinnedPaneID() && panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
   }
   panels.forEach((panel) => panel.classList.toggle('is-group-hidden', hidden.has(panel.dataset.paneId)));
   track.querySelectorAll(':scope > .pane-divider').forEach((divider) => {
@@ -38318,7 +38318,7 @@ function refreshColumnGroupPresentation({ preparePanels = true } = {}) {
 
 function setColumnGroupCollapsed(group, collapsed) {
   const panels = [...track.querySelectorAll(':scope > .workspace-panel')]
-    .filter((panel) => panel.dataset.paneId !== state.pinnedPaneID && group.paneIDs.includes(panel.dataset.paneId));
+    .filter((panel) => panel.dataset.paneId !== activePinnedPaneID() && group.paneIDs.includes(panel.dataset.paneId));
   panels.forEach((panel) => {
     panel._collapseAnimation?.cancel();
     panel._restoreCollapseChildWidths?.();
@@ -38379,7 +38379,13 @@ function orderWithPaneStepped(paneID, direction) {
   return moved && moved.some((id, index) => id !== order[index]) ? moved : null;
 }
 
+function activePinnedPaneID() {
+  // Retain the saved Pro preference, but never apply it to a Free layout.
+  return isProAccount() ? state.pinnedPaneID : "";
+}
+
 function togglePinnedPane(panel) {
+  if (!isProAccount()) return;
   const paneID = panel.dataset.paneId;
   state.pinnedPaneID = state.pinnedPaneID === paneID ? "" : paneID;
   if (state.pinnedPaneID) {
@@ -38434,10 +38440,6 @@ function prepareColumnGroupControls(panel, header, group) {
   menuButton.classList.toggle('has-group', Boolean(group));
   menuButton.title = group ? `${group.name} · ${group.paneIDs.length} columns` : 'Column options';
   menuButton.setAttribute('aria-label', group ? `Group options: ${group.name}` : 'Column options');
-  if (panel.dataset.paneId === state.pinnedPaneID) {
-    menuButton.title += ' · Pinned to left';
-    menuButton.setAttribute('aria-label', `${menuButton.getAttribute('aria-label')} · Pinned to left`);
-  }
   panel.classList.toggle('has-column-group', Boolean(group));
 }
 
@@ -38488,7 +38490,7 @@ function openColumnGroupMenu(panel, anchor) {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
     });
   }
-  add(state.pinnedPaneID === panel.dataset.paneId ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
+  if (isProAccount()) add(activePinnedPaneID() === panel.dataset.paneId ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
   add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
   add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
   if (panel.classList.contains("reader-panel")) {
@@ -38640,7 +38642,7 @@ function openColumnGroupEditor(panel, existing = null) {
 
 // Collapse keeps the live column DOM (including unsaved editors) in place.
 function paneIsCollapsed(paneID) {
-  return (paneID !== state.pinnedPaneID && Boolean(columnGroupForPane(paneID)?.collapsed)) || (state.collapsedPaneIDs || []).includes(paneID);
+  return (paneID !== activePinnedPaneID() && Boolean(columnGroupForPane(paneID)?.collapsed)) || (state.collapsedPaneIDs || []).includes(paneID);
 }
 
 function applyPaneCollapsedState(panel) {
@@ -38865,10 +38867,11 @@ function appendPaneSequence(panes) {
   const activeIDs = new Set(orderedPanes.map((pane) => pane.dataset.paneId));
   state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => activeIDs.has(id));
   if (state.pinnedPaneID && !activeIDs.has(state.pinnedPaneID)) state.pinnedPaneID = "";
-  const pinnedIndex = orderedPanes.findIndex((pane) => pane.dataset.paneId === state.pinnedPaneID);
+  const pinnedPaneID = activePinnedPaneID();
+  const pinnedIndex = orderedPanes.findIndex((pane) => pane.dataset.paneId === pinnedPaneID);
   if (pinnedIndex > 0) orderedPanes.unshift(...orderedPanes.splice(pinnedIndex, 1));
   orderedPanes.forEach((pane) => {
-    const pinned = pane.dataset.paneId === state.pinnedPaneID;
+    const pinned = pane.dataset.paneId === pinnedPaneID;
     pane.classList.toggle("is-pinned", pinned);
   });
   orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
@@ -42529,7 +42532,7 @@ function getWorkspacePaneHydrator() {
       const scrollLeft = track.scrollLeft;
       pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
       pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
-      pane.classList.toggle("is-pinned", job.id === state.pinnedPaneID);
+      pane.classList.toggle("is-pinned", job.id === activePinnedPaneID());
       applyPaneWeight(pane, job.id);
       ensureWorkspacePanelAccessibleName(pane);
       preparePaneCollapse(pane);
@@ -42537,7 +42540,7 @@ function getWorkspacePaneHydrator() {
       shell.replaceWith(pane);
       // The new header is prepared above; retained editors and menus need no rebuild.
       refreshColumnGroupPresentation({ preparePanels: false });
-      if (job.id === state.pinnedPaneID) refreshPinnedPaneDivider();
+      if (job.id === activePinnedPaneID()) refreshPinnedPaneDivider();
       updateCollapsedPaneDividers();
       // Only the newly mounted Reader gets restoration listeners and frames.
       if (pane.classList.contains("reader-panel")) {

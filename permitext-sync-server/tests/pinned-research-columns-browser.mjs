@@ -62,6 +62,7 @@ try {
     function isCurrentAccountRequest(value){return value===identity;}
     function activeAccount(){return {userID:identity};}
     function hasCapability(){return true;}
+    function isProAccount(){return true;}
     function researchConversationInWorkspace(c){return c.primaryProjectID==='';}
     function researchCreationProjectID(){return '';}
     function selectedOpenProjectID(){return '';}
@@ -75,7 +76,7 @@ try {
       if(failEvidence) throw new Error('Offline');
       return {conversation:{...researchConversationList.find(c=>c.id===values.conversationID),sources:values.selections}};
     }
-    ${['orderPanes','paneIDForUtilityInstance','paneIDForResearchConversation','researchConversationPaneIsOpen','researchConversationTitle','paneIsCollapsed','applyPaneCollapsedState','setPaneCollapsed','preparePaneCollapse','prepareColumnGroupControls','openColumnGroupMenu','focusColumnGroupControl','setColumnGroupCollapsed','refreshColumnGroupPresentation','updateCollapsedPaneDividers','togglePinnedPane','refreshPinnedPaneDivider','appendPaneSequence','scrollPaneIntoView','createDivider','resizeAdjacentPanesBy','updateAdjacentDividerValue','singleExpandedDividerEdge','resizePaneEdgeBy','startPaneEdgeResize','startPaneResize','readerSectionResearchSelection','researchSelectionTextFromRange','normalizedPassageAnchorText','openResearchSelectionDestinations','openResearchDestinationMenu','addResearchSelectionToCurrent'].map(actual).join('\n')}
+    ${['activePinnedPaneID','orderPanes','paneIDForUtilityInstance','paneIDForResearchConversation','researchConversationPaneIsOpen','researchConversationTitle','paneIsCollapsed','applyPaneCollapsedState','setPaneCollapsed','preparePaneCollapse','prepareColumnGroupControls','openColumnGroupMenu','focusColumnGroupControl','setColumnGroupCollapsed','refreshColumnGroupPresentation','updateCollapsedPaneDividers','togglePinnedPane','refreshPinnedPaneDivider','appendPaneSequence','scrollPaneIntoView','createDivider','resizeAdjacentPanesBy','updateAdjacentDividerValue','singleExpandedDividerEdge','resizePaneEdgeBy','startPaneEdgeResize','startPaneResize','readerSectionResearchSelection','researchSelectionTextFromRange','normalizedPassageAnchorText','openResearchSelectionDestinations','openResearchDestinationMenu','addResearchSelectionToCurrent'].map(actual).join('\n')}
     const panes = state.paneOrder.map((id,index)=>{
       const pane=document.createElement('article');pane.className='workspace-panel';pane.dataset.paneId=id;
       pane.innerHTML='<header><h2>Column '+(index+1)+'</h2><div class="panel-actions"></div></header><div class="body" style="overflow:auto"><textarea>Unsent question '+index+'</textarea><div style="height:1400px"></div></div>';
