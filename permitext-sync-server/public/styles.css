@@ -14304,6 +14304,13 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   }
 }
 
+.notebook-panel .notebook-editor-surface,
+.notebook-panel .notebook-editor-surface .bn-container,
+.notebook-panel .notebook-editor-surface .bn-editor {
+  background: var(--surface);
+  --bn-colors-editor-background: var(--surface);
+}
+
 .notebook-reference-chip {
   display: inline-grid;
   gap: 1px;
