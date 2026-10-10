@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import vm from "node:vm";
 
 const serverRoot = new URL("../", import.meta.url);
 const [webClient, webStyles] = await Promise.all([
@@ -52,7 +53,15 @@ const sectionDetailSaveEnd = sectionDetail.indexOf("\n  heading.addEventListener
 assert(sectionDetailSaveStart >= 0 && sectionDetailSaveEnd > sectionDetailSaveStart);
 const sectionDetailSave = sectionDetail.slice(sectionDetailSaveStart, sectionDetailSaveEnd);
 assert.match(sectionDetailSave, /persistSectionBookmark\(sectionPayload, true/);
-assert.match(sectionDetailSave, /showReaderSaveConfirmation\(panel, sectionPayload/);
+assert.doesNotMatch(sectionDetailSave, /showReaderSaveConfirmation\(panel, sectionPayload/);
+assert.doesNotMatch(sectionDetailSave, /removeSectionDetail/,
+  "Unbookmarking in Source Detail must leave the passage open for saving again.");
+assert.match(sectionDetail, /actions\.append\(projectButton, backButton\)/,
+  "Source Detail keeps project assignment in its header before the menu and close controls.");
+assert.match(sectionDetail, /showSectionProjectAssignment\(panel, sectionPayload, projectButton, \{ chooseDestination: true \}\)/,
+  "The Source Detail header opens a destination picker for its exact passage.");
+assert.match(webClient, /if \(!panel \|\| panel\.classList\.contains\("section-detail-panel"\)\) return;/,
+  "Source Detail does not show Undo because its bookmark remains available.");
 assert.doesNotMatch(sectionDetailSave, /confirmSectionBookmarkRemoval\(panel\)/);
 assert.doesNotMatch(sectionDetailSave, /showReaderNotesProjectPicker\(notes, sectionPayload\)/);
 
@@ -65,8 +74,35 @@ assert.match(webStyles, /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.r
 assert.match(webClient, /sheet\.setAttribute\("role", "region"\)/);
 assert.doesNotMatch(webClient, /section-save-project-sheet[\s\S]{0,260}aria-modal/);
 assert.match(webClient, /if \(event\.key !== "Escape"\) return;[\s\S]*?closeSectionSaveProjectSheet\(panel, focusTarget\)/);
-assert.match(webClient, /onClose: \(\) => closeSectionSaveProjectSheet\(panel, focusTarget\)/);
+assert.match(webClient, /onClose: \(\) => \{[\s\S]*?panel\.querySelector\("\.section-save-project-sheet"\) !== sheet[\s\S]*?closeSectionSaveProjectSheet\(panel, focusTarget\)/);
 assert.match(webClient, /if \(focusTarget\?\.isConnected\) focusTarget\.focus/);
+
+// A delayed completion from an older picker cannot close its replacement.
+const assignmentSource = sourceBetween("function showSectionProjectAssignment(", "\nfunction showReaderSaveConfirmation");
+const pickerCallbacks = [];
+const pickerPanel = { currentSheet: null, append(sheet) { this.currentSheet = sheet; }, querySelector() { return this.currentSheet; } };
+let closes = 0;
+const assignmentContext = vm.createContext({
+  readerPrivateContentAllowed: () => true,
+  hasCapability: () => true,
+  workspaceProject: () => ({ id: "active-project" }),
+  closeSectionSaveProjectSheet(panel) { panel.currentSheet = null; closes += 1; },
+  document: { createElement: () => ({ setAttribute() {}, addEventListener() {} }) },
+  showReaderNotesProjectPicker(_sheet, optionsPayload, options) { pickerCallbacks.push(options.onClose); },
+  persistSectionInProject() { throw new Error("Explicit destination selection must still open the picker inside a Project."); }
+});
+vm.runInContext(assignmentSource, assignmentContext);
+assignmentContext.showSectionProjectAssignment(pickerPanel, { sectionID: "exact-passage" }, null, { chooseDestination: true });
+const firstSheet = pickerPanel.currentSheet;
+assignmentContext.showSectionProjectAssignment(pickerPanel, { sectionID: "exact-passage" }, null, { chooseDestination: true });
+const replacementSheet = pickerPanel.currentSheet;
+assert.notEqual(firstSheet, replacementSheet);
+pickerCallbacks[0]();
+assert.equal(pickerPanel.currentSheet, replacementSheet, "A delayed old completion must preserve the currently open picker.");
+assert.equal(closes, 2);
+pickerCallbacks[1]();
+assert.equal(pickerPanel.currentSheet, null, "The current picker still closes normally.");
+assert.equal(closes, 3);
 
 assert.equal(
   (webClient.match(/confirmSectionBookmarkRemoval\(/g) || []).length,

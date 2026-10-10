@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-detail-column-header-v668";
+} from "./offline-storage.js?v=20261009-detail-project-action-v670";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-detail-column-header-v668";
+} from "./research-intent-state.js?v=20261009-detail-project-action-v670";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -13088,6 +13088,8 @@ function bookmarkActionLabel(saved) {
 }
 
 function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneID) {
+  const panel = track.querySelector(`[data-pane-id="${CSS.escape(paneID || '')}"]`);
+  if (!panel || panel.classList.contains("section-detail-panel")) return;
   const notice = document.createElement("div");
   notice.className = "bookmark-undo-notice";
   notice.setAttribute("role", "status");
@@ -13116,8 +13118,6 @@ function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneI
     }
   });
   notice.append(undo);
-  const panel = track.querySelector(`[data-pane-id="${CSS.escape(paneID || '')}"]`);
-  if (!panel) return;
   let tray = panel.querySelector(':scope > .bookmark-undo-tray');
   if (!tray) { tray = document.createElement('div'); tray.className = 'bookmark-undo-tray'; panel.append(tray); }
   tray.append(notice);
@@ -15075,14 +15075,14 @@ function closeSectionSaveProjectSheet(panel, focusTarget = null) {
   if (focusTarget?.isConnected) focusTarget.focus({ preventScroll: true });
 }
 
-function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null) {
+function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null, options = {}) {
   if (!readerPrivateContentAllowed(panel)) return;
   if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to organize saved work in Projects.");
     return;
   }
   if (!panel || !sectionPayload?.sectionID) return;
-  if (workspaceProject()) {
+  if (!options.chooseDestination && workspaceProject()) {
     void persistSectionInProject(workspaceProject(), sectionPayload);
     return;
   }
@@ -15098,7 +15098,10 @@ function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null)
   });
   panel.append(sheet);
   showReaderNotesProjectPicker(sheet, sectionPayload, {
-    onClose: () => closeSectionSaveProjectSheet(panel, focusTarget)
+    onClose: () => {
+      if (panel.querySelector(".section-save-project-sheet") !== sheet) return;
+      closeSectionSaveProjectSheet(panel, focusTarget);
+    }
   });
 }
 
@@ -18352,7 +18355,12 @@ async function renderSectionDetail(searchID, detail) {
   syncImmediateBookmarkButton(saveButton, saved);
   const actions = document.createElement("div");
   actions.className = "panel-actions";
-  actions.append(backButton);
+  const projectButton = document.createElement("button");
+  projectButton.type = "button";
+  projectButton.className = "section-detail-project-add";
+  projectButton.textContent = "Add to Project";
+  projectButton.hidden = !hasCapability("projects");
+  actions.append(projectButton, backButton);
   chrome.append(saveButton, actions);
 
   const content = document.createElement("section");
@@ -18482,10 +18490,15 @@ async function renderSectionDetail(searchID, detail) {
   notes.append(notesHeader, textareaWrap);
   panel.__annotationTarget = sectionTarget;
   panel.__sectionPayload = sectionPayload;
-  notes.addEventListener("permitext-folder-save", (event) => {
+  const syncDetailBookmark = (event) => {
     const nextSaved = event.detail?.saved === true;
     syncImmediateBookmarkButton(saveButton, nextSaved);
     syncSearchResultBookmarkButtons(sectionPayload, nextSaved);
+  };
+  notes.addEventListener("permitext-folder-save", syncDetailBookmark);
+  projectButton.addEventListener("click", () => {
+    showSectionProjectAssignment(panel, sectionPayload, projectButton, { chooseDestination: true });
+    panel.querySelector(".section-save-project-sheet")?.addEventListener("permitext-folder-save", syncDetailBookmark);
   });
 
   backButton.addEventListener("click", () => {
@@ -18498,6 +18511,7 @@ async function renderSectionDetail(searchID, detail) {
     const shouldRemove = saveButton.classList.contains("is-saved");
     saveButton.disabled = true;
     saveButton.classList.remove("has-error");
+    closeSectionSaveProjectSheet(panel);
     try {
       if (!shouldRemove) {
         const persisted = await persistSectionBookmark(sectionPayload, true, {
@@ -18508,7 +18522,6 @@ async function renderSectionDetail(searchID, detail) {
         syncImmediateBookmarkButton(saveButton, true);
         syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
         syncSearchResultBookmarkButtons(sectionPayload, true);
-        showReaderSaveConfirmation(panel, sectionPayload, { focusTarget: saveButton });
         refreshVisibleSyncedDerivedState();
         return;
       }

@@ -3131,6 +3131,29 @@ select option:checked {
   height: var(--panel-title-icon-size);
 }
 
+.section-detail-project-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--panel-title-control-size);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+  font-family: var(--chrome-font-family);
+  font-size: var(--chrome-font-size) !important;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.section-detail-project-add:hover,
+.section-detail-project-add:focus-visible {
+  background: transparent;
+  color: var(--text-primary);
+}
+
 .section-detail-icon:hover,
 .section-detail-icon:focus-visible {
   color: var(--text-primary);
