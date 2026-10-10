@@ -15598,6 +15598,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   }
 }
 
+body .account-screen-header h1,
 body .panel-track > article.workspace-panel:not(.reader-panel),
 body .panel-track > article.workspace-panel:not(.reader-panel) * {
   font-size: 14px !important;
@@ -17659,9 +17660,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 .account-screen-header h1 {
   margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: normal;
 }
 .account-screen-back {
   flex: 0 0 auto;

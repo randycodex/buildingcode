@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-account-dividers-v704";
+} from "./offline-storage.js?v=20261010-account-title-v706";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-account-dividers-v704";
+} from "./research-intent-state.js?v=20261010-account-title-v706";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36478,6 +36478,7 @@ function mountAccountScreenContent(dialog, panel) {
   const header = document.createElement("header");
   header.className = "account-screen-header";
   const title = document.createElement("h1");
+  title.className = "eyebrow panel-kind";
   title.textContent = "Account";
   const back = document.createElement("button");
   back.type = "button";
