@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-centered-pro-prompts-v665";
+} from "./offline-storage.js?v=20261009-note-confirmation-ui-v667";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-centered-pro-prompts-v665";
+} from "./research-intent-state.js?v=20261009-note-confirmation-ui-v667";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18436,14 +18436,12 @@ async function renderSectionDetail(searchID, detail) {
   notesHeader.className = "section-detail-notes-header";
   const saveState = document.createElement("span");
   saveState.className = "section-detail-note-state";
-  const privateNoteLabel = document.createElement("span");
-  privateNoteLabel.textContent = "Private note";
-  notesHeader.append(privateNoteLabel, saveState);
+  notesHeader.append(saveState);
   const textareaWrap = document.createElement("label");
   textareaWrap.className = "section-detail-note-box";
   const textarea = document.createElement("textarea");
   textarea.value = noteBody;
-  textarea.placeholder = "Add a private note";
+  textarea.placeholder = "Add a note";
   textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
   const noteResizeHandle = document.createElement("div");
   noteResizeHandle.className = "section-detail-note-resize-handle";

@@ -231,7 +231,7 @@ assert.match(sectionDetailSource, /heading\.addEventListener\("click"[\s\S]*?ope
   "Source Detail must provide an explicit path to its exact enacted source in Reader.");
 assert.match(
   sectionDetailSource,
-  /textarea\.placeholder = "Add a private note"/,
+  /textarea\.placeholder = "Add a note"/,
   "The Source Detail opened from Saved must expose the note editor."
 );
 const setAnnotationNoteValueSource = functionSource(appSource, "setAnnotationNoteValue");

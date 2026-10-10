@@ -3270,6 +3270,10 @@ select option:checked {
   gap: var(--space-3);
 }
 
+.section-detail-notes-header:has(.section-detail-note-state:empty) {
+  display: none;
+}
+
 .section-detail-notes h3 {
   margin: 0;
   color: var(--text-secondary);
@@ -3299,7 +3303,7 @@ select option:checked {
   overflow-y: auto;
   resize: none;
   padding: var(--space-4);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 18px;
   background: var(--surface);
   color: var(--text-primary);
@@ -3307,7 +3311,7 @@ select option:checked {
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
   line-height: var(--reader-line-height);
   outline: 0;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-primary) 4%, transparent);
+  box-shadow: none;
 }
 
 .section-detail-note-box textarea::placeholder {
@@ -3504,21 +3508,26 @@ select option:checked {
 
 .reader-save-confirmation {
   position: absolute;
-  right: calc(var(--panel-padding) + var(--reader-scrollbar-rail-width));
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - var(--panel-padding) - var(--panel-padding));
+  translate: -50% 0;
   bottom: calc(var(--panel-padding) + var(--space-3));
   z-index: 19;
   display: flex;
-  min-height: 38px;
+  min-height: 44px;
   align-items: center;
+  justify-content: center;
   gap: var(--space-3);
-  padding: 8px 10px 8px 14px;
-  border-radius: var(--radius-pill);
-  background: var(--text-primary);
-  color: var(--surface);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
   font-family: var(--chrome-font-family);
   font-size: var(--chrome-font-size) !important;
-  box-shadow: var(--shadow-panel);
-  transform-origin: right bottom;
+  box-shadow: none;
+  transform-origin: center bottom;
   animation: reader-save-confirmation-enter 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
@@ -3528,20 +3537,27 @@ select option:checked {
 }
 
 .reader-save-confirmation button {
-  min-height: 26px;
-  padding: 3px 9px;
+  min-height: 44px;
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--surface) 16%, transparent);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   color: inherit;
   font: inherit;
   font-weight: 650;
-  transition: background-color 160ms ease, transform 160ms ease;
+  text-decoration: none;
+  transition: color 160ms ease, transform 160ms ease;
 }
 
 .reader-save-confirmation button:hover,
 .reader-save-confirmation button:focus-visible {
-  background: color-mix(in srgb, var(--surface) 24%, transparent);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.workspace-panel:has(> .reader-save-confirmation) > .bookmark-undo-tray {
+  bottom: calc(var(--panel-padding) + var(--space-3) + 44px + var(--space-2));
 }
 
 .reader-save-confirmation button:active {
