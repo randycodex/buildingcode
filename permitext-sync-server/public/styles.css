@@ -1275,10 +1275,11 @@ textarea:focus-visible {
 .pro-locked-content {
   display: grid;
   align-content: start;
-  justify-items: start;
+  justify-items: center;
   gap: var(--space-3);
   padding: 24px;
   color: var(--text-secondary);
+  text-align: center;
 }
 .pro-locked-content p { margin: 0; }
 .pro-locked-content button {
