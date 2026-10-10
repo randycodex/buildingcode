@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-free-saved-column-v662";
+} from "./offline-storage.js?v=20261009-reader-table-scroll-v663";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-free-saved-column-v662";
+} from "./research-intent-state.js?v=20261009-reader-table-scroll-v663";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15700,6 +15700,10 @@ function renderCodeBlock(block) {
     wrapper.className = "code-table";
     wrapper.innerHTML = rewriteCodeHTML(block.html || "", block.assetRevision);
     decorateCodeHTML(wrapper);
+    wrapper.tabIndex = 0;
+    wrapper.setAttribute("role", "region");
+    wrapper.setAttribute("aria-label", "Code table");
+    bindHorizontalWheelScroll(wrapper, { shiftWheel: true, contain: true });
     return wrapper;
   }
 
@@ -16993,22 +16997,29 @@ function bindSearchHistoryDivider(results, divider, instance) {
   });
 }
 
-function bindHorizontalWheelScroll(element) {
+function bindHorizontalWheelScroll(element, options = {}) {
   if (!element || element.dataset.horizontalWheelBound === "true") return;
   element.dataset.horizontalWheelBound = "true";
   element.addEventListener(
     "wheel",
     (event) => {
-      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey) return;
+      let delta = event.deltaX;
+      if (options.shiftWheel && event.shiftKey) {
+        delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      } else {
+        if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+      }
       const canScroll = element.scrollWidth > element.clientWidth;
       if (!canScroll) return;
-      const delta = event.deltaX;
       if (!delta) return;
+      if (event.deltaMode === 1) delta *= 16;
+      if (event.deltaMode === 2) delta *= element.clientWidth;
       const nextLeft = element.scrollLeft + delta;
       const maxLeft = element.scrollWidth - element.clientWidth;
       const isAtStart = element.scrollLeft <= 0;
       const isAtEnd = element.scrollLeft >= maxLeft - 1;
-      if ((delta < 0 && isAtStart) || (delta > 0 && isAtEnd)) return;
+      if (!options.contain && ((delta < 0 && isAtStart) || (delta > 0 && isAtEnd))) return;
       event.preventDefault();
       element.scrollLeft = Math.max(0, Math.min(maxLeft, nextLeft));
     },

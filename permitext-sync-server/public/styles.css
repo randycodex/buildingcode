@@ -3075,6 +3075,17 @@ select option:checked {
   margin-left: auto;
 }
 
+.reader-content > .chapter-section:has(.code-table) {
+  max-width: none;
+}
+
+.reader-content > .chapter-section:has(.code-table) > :not(.annotated-code-block:has(> .code-table)) {
+  width: 100%;
+  max-width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .reader-panel .reader-content {
   padding-top: var(--reader-header-overlay-height);
 }
@@ -4197,6 +4208,22 @@ select option:checked {
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
   line-height: var(--reader-line-height);
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
+}
+
+.code-table::-webkit-scrollbar {
+  height: 6px;
+}
+
+.code-table::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-table::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-tertiary) 58%, transparent);
 }
 
 .code-table table {

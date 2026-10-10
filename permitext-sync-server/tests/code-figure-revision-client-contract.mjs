@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 function actual(name){const a=source.indexOf(`function ${name}(`),b=source.indexOf('\n}',a);assert.ok(a>=0&&b>a);return source.slice(a,b+2);}
-const context=vm.createContext({encodeURIComponent,decodeURIComponent,offlineFeatureMetadata:{assetVersion:'legacy'},rewriteStructuredCodeLinks:x=>x,decorateCodeHTML(){},promoteAuthoredSectionLabels(){},document:{createElement(){return {children:[],append(x){this.children.push(x);},querySelector(){return true;},textContent:''};}}});
+const context=vm.createContext({encodeURIComponent,decodeURIComponent,offlineFeatureMetadata:{assetVersion:'legacy'},rewriteStructuredCodeLinks:x=>x,decorateCodeHTML(){},bindHorizontalWheelScroll(){},promoteAuthoredSectionLabels(){},document:{createElement(){return {children:[],append(x){this.children.push(x);},setAttribute(){},querySelector(){return true;},textContent:''};}}});
 vm.runInContext(['codeFigureURL','rewriteCodeHTML','renderCodeBlock'].map(actual).join('\n'),context);
 const old='a'.repeat(64),next='b'.repeat(64);
 for(const revision of [old,next]){

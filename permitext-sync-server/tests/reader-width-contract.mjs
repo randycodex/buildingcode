@@ -44,3 +44,64 @@ assert.equal(layout('reader:a', ['reader:a','reader:b'], 900, false, true).flex,
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
 assert.match(css, /\.reader-content > \*\s*\{[^}]*max-width: 800px;[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the existing centered text measure');
 console.log('Reader width contract passed: sole/restored/linked Readers, sharing, minimums, manual resizing, and text measure.');
+
+function scrollElement(width = 400, scrollWidth = 900) {
+  return {
+    dataset: {}, attributes: {}, listeners: [], clientWidth: width, scrollWidth, scrollLeft: 0,
+    setAttribute(name, value) { this.attributes[name] = value; },
+    addEventListener(type, callback, options) { this.listeners.push({ type, callback, options }); }
+  };
+}
+const tableContext = vm.createContext({
+  document: { createElement: () => scrollElement() },
+  rewriteCodeHTML: value => value, decorateCodeHTML() {}
+});
+function actual(name) {
+  const start = source.indexOf(`function ${name}(`);
+  const end = source.indexOf('\n}', start);
+  assert.ok(start >= 0 && end > start, name);
+  return source.slice(start, end + 2);
+}
+vm.runInContext(['bindHorizontalWheelScroll', 'renderCodeBlock'].map(actual).join('\n'), tableContext);
+const html = '<table><tr><td rowspan="2">Roof slope</td><td>Attachment</td></tr></table>';
+const table = tableContext.renderCodeBlock({ kind: 'table', html });
+assert.equal(table.innerHTML, html, 'Scrolling preserves authored table cells, spans and text.');
+assert.equal(table.tabIndex, 0, 'The table can receive keyboard scrolling.');
+assert.equal(table.attributes['aria-label'], 'Code table');
+assert.equal(table.listeners[0].options.passive, false);
+tableContext.bindHorizontalWheelScroll(table);
+assert.equal(table.listeners.length, 1, 'Rebinding does not duplicate the wheel handler.');
+const workspace = scrollElement(1000, 3000);
+tableContext.bindHorizontalWheelScroll(workspace);
+function wheel(values = {}) {
+  const event = { deltaX: 0, deltaY: 0, deltaMode: 0, defaultPrevented: false,
+    preventDefault() { this.defaultPrevented = true; }, ...values };
+  table.listeners[0].callback(event);
+  workspace.listeners[0].callback(event);
+  return event;
+}
+assert.equal(wheel({ shiftKey: true, deltaY: 80 }).defaultPrevented, true);
+assert.equal(table.scrollLeft, 80, 'Shift + mouse wheel scrolls the table.');
+assert.equal(workspace.scrollLeft, 0, 'The outer workspace respects the handled gesture.');
+wheel({ deltaX: 120, deltaY: 2 });
+assert.equal(table.scrollLeft, 200, 'Horizontal trackpad gestures scroll the table.');
+assert.equal(workspace.scrollLeft, 0);
+assert.equal(wheel({ deltaY: 120 }).defaultPrevented, false, 'Ordinary vertical scrolling stays available.');
+assert.equal(table.scrollLeft, 200);
+table.scrollLeft = 500;
+assert.equal(wheel({ deltaX: 120 }).defaultPrevented, true, 'The right table edge contains sideways gestures.');
+assert.equal(table.scrollLeft, 500);
+table.scrollLeft = 0;
+assert.equal(wheel({ deltaX: -120 }).defaultPrevented, true, 'The left table edge also contains gestures.');
+assert.equal(workspace.scrollLeft, 0, 'Reaching a table edge cannot move other columns.');
+wheel({ shiftKey: true, deltaY: 2, deltaMode: 1 });
+assert.equal(table.scrollLeft, 32, 'Line-based mouse wheels use pixel distances.');
+wheel({ shiftKey: true, deltaY: 1, deltaMode: 2 });
+assert.equal(table.scrollLeft, 432, 'Page-based mouse wheels use the table viewport.');
+for (const modifier of ['ctrlKey', 'metaKey']) {
+  assert.equal(wheel({ [modifier]: true, deltaX: 40 }).defaultPrevented, false, 'Zoom gestures remain native.');
+}
+table.scrollWidth = table.clientWidth;
+wheel({ deltaX: 60 });
+assert.equal(workspace.scrollLeft, 60, 'A table that fits does not trap workspace scrolling.');
+console.log('Table scrolling passed: authored content, Shift wheel, trackpad, both edges, keyboard focus, wheel units, vertical scrolling and zoom.');
