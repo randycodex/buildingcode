@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-research-dividers-v744";
+} from "./offline-storage.js?v=20261010-small-layout-fill-v745";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-research-dividers-v744";
+} from "./research-intent-state.js?v=20261010-small-layout-fill-v745";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -4907,6 +4907,10 @@ function applyPaneWeight(panel, paneID) {
   }
   if (flexibleReader && activePaneIDs().length === 1) {
     panel.style.flex = `1 1 ${defaultWidth}px`;
+    return;
+  }
+  if (!hasManyColumns) {
+    panel.style.flex = `1 1 ${width}px`;
     return;
   }
   if (isFixedWidthPaneID(paneID)) {

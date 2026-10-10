@@ -44,8 +44,10 @@ for (const ids of [['reader:a','reader:b'], ['reader:a','reader:b','reader:c'], 
   assert.equal(style.flex, '1 1 600px');
   assert.equal(style['--pane-default-min-width'], '600px', 'Readers stop shrinking at 600px even with fewer than four columns');
 }
-assert.equal(layout('reader:a', ['reader:a','reader:b'], 900).flex, '0 0 900px', 'Multi-column manual divider widths remain respected');
-assert.equal(layout('utility:search', ['utility:search','reader:a']).flex, '0 0 600px', 'Utility sizing stays unchanged');
+assert.equal(layout('reader:a', ['reader:a','reader:b'], 900).flex, '1 1 900px', 'Small layouts fill available space while retaining the saved width as their basis');
+assert.equal(layout('reader:a', ['reader:a','reader:b','utility:search','utility:saved'], 900).flex, '0 0 900px', 'Larger layouts retain fixed manual Reader widths');
+assert.equal(layout('utility:search', ['utility:search','reader:a']).flex, '1 1 600px', 'Search shares available space in small layouts');
+assert.equal(layout('utility:search', ['utility:search','reader:a','utility:saved','utility:analysis']).flex, '0 0 600px', 'Larger layouts retain fixed utility widths');
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900, false, true).flex, '0 0 48px', 'Collapsed columns retain their compact width');
 const mainPaneIDs = [
   'utility:saved', 'utility:saved:instance', 'reader:a', 'utility:search', 'utility:search:instance',
@@ -63,6 +65,10 @@ for (const id of mainPaneIDs) {
       const style = layout(id, ids, restoredWidth);
       assert.equal(style['--pane-default-min-width'], '600px', `${id} enforces its rendered minimum`);
       assert.equal(context.state.paneWeights[id], Math.max(600, restoredWidth), `${id} also clamps widths when mounted directly`);
+      if (count <= 3) {
+        const basis = id.startsWith('reader:') && count === 1 ? 600 : Math.max(600, restoredWidth);
+        assert.equal(style.flex, `1 1 ${basis}px`, `${id} fills available space with ${count} columns`);
+      }
     }
   }
   assert.equal(layout(id, [id], 600, false, true).flex, '0 0 48px', `${id} keeps its collapsed width`);
