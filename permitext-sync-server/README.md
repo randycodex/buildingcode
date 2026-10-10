@@ -20,6 +20,20 @@ Defaults:
 - URL: `http://localhost:8787`
 - Data file: `data/sync-store.json` when no database URL is configured
 
+For a local Pro test account that retains edits across restarts:
+
+```sh
+npm run start:local-pro
+```
+
+The preview uses `http://127.0.0.1:8788/workspace` and retains its account, records,
+Trash and private images in `~/Library/Application Support/Permitext/Local Pro Preview`.
+Open the bootstrap URL printed on first startup to sign in to the synthetic account;
+subsequent restarts keep the same browser session and seed no additional sample data.
+Stopping the preview leaves its data intact. It has no automatic shutdown and makes
+no external provider calls. Reader and column preferences also require retaining
+the browser's local storage for the same origin.
+
 Override with:
 
 ```sh

@@ -1,12 +1,14 @@
-// Isolated, temporary full-app fixture. Never uses owner accounts or production data.
+// Isolated full-app fixture. Temporary by default; explicit local previews retain data.
+// Never uses owner accounts or production data.
 import assert from "node:assert/strict";
 import { createRolloutFixture } from "./populated-rollout-fixture.mjs";
 import { fileURLToPath } from "node:url";
 import { summaryAttributionPrelude } from "./populated-summary-attribution.mjs";
 import { createServer, request as httpRequest } from "node:http";
-import { mkdtemp, rm, readFile } from "node:fs/promises";
+import { mkdtemp, mkdir, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { readJSONFile, writeJSONFileAtomically } from "../file-store-coordinator.mjs";
 import { randomUUID, createHash } from "node:crypto";
 import { deflateSync, inflateSync } from "node:zlib";
 import { performance } from "node:perf_hooks";
@@ -79,7 +81,23 @@ function photoSizePNG() {
   assert.ok(png.length > 5 * 1024 * 1024 && png.length < 8 * 1024 * 1024);
   return { png, width, height };
 }
-const directory = await mkdtemp(join(tmpdir(), "permitext-populated-performance-"));
+const retainedDataPath = option("--data-dir", "");
+const persistent = Boolean(retainedDataPath);
+assert.ok(!persistent || (seedSelfTest === "false" && outageSelfTest === "false"), "Run fixture self-tests in a disposable directory, without --data-dir");
+const directory = persistent ? resolve(retainedDataPath) : await mkdtemp(join(tmpdir(), "permitext-populated-performance-"));
+if (persistent) await mkdir(directory, { recursive: true, mode: 0o700 });
+const manifestPath = join(directory, "preview.json");
+const retainedFixture = persistent ? await readJSONFile(manifestPath, null) : null;
+const seedOptions = { profile, researchHistory: researchHistoryEnabled, secondAccount: secondAccountEnabled, imageProfile, visibleWorkload };
+if (retainedFixture) {
+  assert.equal(retainedFixture.schema, "permitext-local-pro-preview");
+  assert.equal(retainedFixture.version, 1);
+  assert.match(retainedFixture.providerID, /^synthetic-populated-/);
+  assert.ok(retainedFixture.capability && retainedFixture.receipt);
+  assert.deepEqual(retainedFixture.seedOptions, seedOptions, "Reuse the preview's original seed options; existing data will not be reseeded");
+} else if (persistent) {
+  assert.ok(await readJSONFile(join(directory, "sync.json"), null) === null, "Existing preview data has no identity manifest; refusing to reset it");
+}
 for (const key of Object.keys(process.env)) {
   if (/DATABASE_URL|POSTGRES_URL|STORAGE_URL|OPENAI|CLERK|BLOB_|VERCEL_|RESEND|STRIPE|APPLE_.*(SECRET|KEY)/.test(key)) delete process.env[key];
 }
@@ -90,10 +108,10 @@ Object.assign(process.env, {
   PERMITEXT_SYNC_GRANT_ADMIN_TOKEN: randomUUID()
 });
 const { handleRequest } = await import("../app.mjs");
-const capability = randomUUID();
+const capability = retainedFixture?.capability || randomUUID();
 const rolloutBaselineDir = option("--rollout-baseline-dir", "");
 const rollout = rolloutBaselineDir ? await createRolloutFixture({baselineDir: rolloutBaselineDir, currentDir: option("--rollout-current-dir", fileURLToPath(new URL("../public/", import.meta.url))), capability}) : null;
-const providerID = `synthetic-populated-${randomUUID()}`;
+const providerID = retainedFixture?.providerID || `synthetic-populated-${randomUUID()}`;
 const userID = `apple:${providerID}`;
 const base = `http://127.0.0.1:${port}`;
 let token, account, receipt, ready = false;
@@ -290,13 +308,13 @@ async function stop() {
   server.closeAllConnections();
   await new Promise(resolve => server.close(resolve));
   globalThis.fetch = originalFetch;
-  await rm(directory, { recursive: true, force: true });
+  if (!persistent) await rm(directory, { recursive: true, force: true });
   process.exit(process.exitCode || 0);
 }
 process.once("SIGINT", stop);
 process.once("SIGTERM", stop);
-if (keepAliveOption !== "true") setTimeout(stop, 60 * 60 * 1000).unref();
-try {
+if (!persistent && keepAliveOption !== "true") setTimeout(stop, 60 * 60 * 1000).unref();
+async function seedFixture() {
   await post("/admin/lifetime-grants/grant", { userID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   account = await post("/account/sign-in", { credential: { provider: "apple", providerUserID: providerID,
     email: "populated@example.test", displayName: "Synthetic populated workspace" } });
@@ -459,7 +477,7 @@ try {
     researchHistory = { total: history.length, drafts: 3, answeredID: answered.id, plainID: plain.id, namedID: named.id, selectedID: selected.id, providerCallsAllowed: false };
   }
   receipt = { profile, visibleWorkload, matchedVisibleReceipt, imageProfile, clientEntrySHA256: clientEntry === null ? null : createHash("sha256").update(clientEntry).digest("hex"), imageReceipts: imageReceipts.map(item => ({...item, noteID: noteIDs[0]})), ...target, researchHistory, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
-    reportID: report.draft.id, editions: versions, externalRequestsAllowed: false, temporaryRecords: true };
+    reportID: report.draft.id, editions: versions, externalRequestsAllowed: false, temporaryRecords: !persistent, ...(persistent ? { persistentRecords: true } : {}) };
   ready = true;
   // Verify guards with unauthenticated empty bodies, so even a failed guard
   // cannot mutate a Research record. Absolute-form targets exercise normalization.
@@ -588,10 +606,38 @@ try {
     assert.equal(metrics.benchmarkSamples[0].visibleContentSHA256, receipt.matchedVisibleReceipt.stableContentSHA256);
     console.log("Fixture benchmark HTTP contract passed: actual HTML with same CSP/headers, gated observer, strict sample schema and receipt binding.");
   }
+  if (persistent) {
+    await writeJSONFileAtomically(manifestPath, { schema: "permitext-local-pro-preview", version: 1,
+      providerID, capability, seedOptions, receipt, secondaryUserID: secondaryAccount?.userID || null });
+    console.log("PERSISTENT_PREVIEW_CREATED " + directory);
+  }
   console.log("POPULATED_FIXTURE_RECEIPT", JSON.stringify(receipt));
   if (seedSelfTest === "true") await stop();
   if (rollout) console.log("ROLLOUT_FIXTURE_READY " + base + "/fixture/rollout?key=" + capability);
   console.log("POPULATED_FIXTURE_READY " + base + "/fixture/start?key=" + capability);
+}
+
+async function resumeFixture() {
+  const stored = await readJSONFile(join(directory, "sync.json"), null);
+  assert.ok(stored?.users?.[userID] && stored.sessions?.[userID], "The retained preview account is missing; refusing to replace it");
+  token = stored.sessions[userID];
+  const pulled = await post("/sync/pull", {});
+  account = { account: stored.users[userID], entitlement: pulled.entitlement };
+  if (retainedFixture.secondaryUserID) {
+    const secondaryUserID = retainedFixture.secondaryUserID;
+    assert.ok(stored.users[secondaryUserID] && stored.sessions[secondaryUserID]);
+    secondaryAccount = { userID: secondaryUserID, sessionToken: stored.sessions[secondaryUserID],
+      authProvider: "apple", displayName: "Synthetic secondary workspace", entitlement: stored.entitlements[secondaryUserID] };
+  }
+  receipt = retainedFixture.receipt;
+  ready = true;
+  console.log("PERSISTENT_PREVIEW_RESUMED " + directory);
+  console.log("POPULATED_FIXTURE_READY " + base + "/fixture/start?key=" + capability);
+}
+
+try {
+  if (retainedFixture) await resumeFixture();
+  else await seedFixture();
 } catch (error) {
   console.error("Populated fixture seed failed:", error.message);
   process.exitCode = 1;
