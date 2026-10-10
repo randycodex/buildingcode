@@ -13472,6 +13472,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   .topbar #fit-columns,
   .topbar #collapse-readers,
   .topbar #toggle-workboard,
+  .topbar #toggle-facts,
   .topbar #toggle-notebook,
   .topbar #toggle-report {
     display: none !important;
@@ -17704,7 +17705,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button):is(:hover, :focus-visible) {
   background: var(--menu-surface);
 }
-.topbar :is(#toggle-notebook, #toggle-report)[aria-pressed="true"] {
+.topbar :is(#toggle-facts, #toggle-notebook, #toggle-report)[aria-pressed="true"] {
   background: var(--menu-surface);
 }
 
@@ -18567,6 +18568,22 @@ html body .column-group-menu-button:focus-visible {
 }
 .project-context-panel .saved-project-fact-description {
   min-height: 10em;
+}
+.project-facts-panel > .project-information-content {
+  width: calc(100% + (2 * var(--panel-padding)));
+  margin-inline: calc(-1 * var(--panel-padding));
+  scrollbar-gutter: auto;
+}
+.project-facts-panel .saved-project-structured-group-heading,
+.project-facts-panel .saved-project-structured-fact {
+  padding-inline: var(--panel-padding);
+}
+.project-facts-panel .saved-project-structured-group-label {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--chrome-font-size);
+  font-weight: 600;
+  line-height: 1.4;
 }
 .project-facts-panel .saved-project-structured-facts-list {
   width: 100%;

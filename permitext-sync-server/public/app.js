@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-evidence-list-v738";
+} from "./offline-storage.js?v=20261010-facts-toolbar-v739";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-evidence-list-v738";
+} from "./research-intent-state.js?v=20261010-facts-toolbar-v739";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -323,6 +323,7 @@ const addReaderButton = document.querySelector("#add-reader");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
+const toggleFactsButton = document.querySelector("#toggle-facts");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
 const toggleReportButton = document.querySelector("#toggle-report");
 let projectToolTogglePending = false;
@@ -4513,6 +4514,7 @@ function syncTopbarProjectToolStates() {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const identity = project ? projectIdentity(project) : null;
   [
+    [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
     [toggleNotebookButton, "Notebook", "notebook", projectHasOpenNotebook],
     [toggleReportButton, "Report", "professional-exports", projectHasOpenReportDraft]
   ].forEach(([button, label, capability, isOpen]) => {
@@ -32213,15 +32215,11 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     groupSection.className = `saved-project-structured-group is-${group.key}`;
     const groupHeading = document.createElement("div");
     groupHeading.className = "saved-project-structured-group-heading";
-    const groupToggle = document.createElement("button");
-    groupToggle.type = "button";
-    groupToggle.className = "saved-project-structured-group-toggle section-label";
+    const groupToggle = document.createElement(factsOnly ? "h3" : "button");
+    if (!factsOnly) groupToggle.type = "button";
+    groupToggle.className = factsOnly ? "saved-project-structured-group-label" : "saved-project-structured-group-toggle section-label";
     groupToggle.textContent = group.label;
-    const groupChevron = document.createElement("button");
-    groupChevron.type = "button";
-    groupChevron.className = "project-section-toggle-chevron saved-project-structured-group-chevron";
-    groupChevron.innerHTML = researchChevronIconsSVG();
-    groupHeading.append(groupToggle, groupChevron);
+    groupHeading.append(groupToggle);
     const groupBody = document.createElement("section");
     groupBody.className = "saved-project-structured-group-body";
     const groupList = document.createElement("div");
@@ -32230,18 +32228,27 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     groupSection.append(groupHeading, groupBody);
     structuredGroups.append(groupSection);
     groupLists.set(group.key, groupList);
-    wireProjectSectionMotion(
-      groupSection,
-      groupBody,
-      [groupToggle, groupChevron],
-      group.label,
-      projectSectionExpanded(identity, `structuredFacts:${group.key}`, groupIndex === 0),
-      {
-        onChange(expanded) {
-          persistProjectSectionExpansion(identity, `structuredFacts:${group.key}`, expanded);
+    if (factsOnly) {
+      groupSection.classList.add("is-open");
+    } else {
+      const groupChevron = document.createElement("button");
+      groupChevron.type = "button";
+      groupChevron.className = "project-section-toggle-chevron saved-project-structured-group-chevron";
+      groupChevron.innerHTML = researchChevronIconsSVG();
+      groupHeading.append(groupChevron);
+      wireProjectSectionMotion(
+        groupSection,
+        groupBody,
+        [groupToggle, groupChevron],
+        group.label,
+        projectSectionExpanded(identity, `structuredFacts:${group.key}`, groupIndex === 0),
+        {
+          onChange(expanded) {
+            persistProjectSectionExpansion(identity, `structuredFacts:${group.key}`, expanded);
+          }
         }
-      }
-    );
+      );
+    }
   });
   const renderStructuredFacts = () => {
     groupLists.forEach((list) => clear(list));
@@ -43474,12 +43481,13 @@ function bindWorkspaceKeyboardNavigation() {
 
 function bindImmediateUtilityControls() {
   [
+    [toggleFactsButton, "facts"],
     [toggleNotebookButton, "notebook"],
     [toggleReportButton, "report"]
   ].forEach(([button, tool]) => {
     if (!button || button.dataset.coldStartBound === "true") return;
     button.dataset.coldStartBound = "true";
-    button.addEventListener("click", () => void toggleProjectTool(tool));
+    button.addEventListener("click", () => void (tool === "facts" ? toggleProjectInformation(tool) : toggleProjectTool(tool)));
   });
   if (track.dataset.utilityFocusBound !== "true") {
     track.dataset.utilityFocusBound = "true";

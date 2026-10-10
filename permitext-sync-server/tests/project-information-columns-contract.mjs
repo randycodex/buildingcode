@@ -107,22 +107,30 @@ function find(root, predicate) {
   for (const child of root.children) { const match = find(child, predicate); if (match) return match; }
 }
 let editorCurrent = true, failWrite = false;
+const factMotionCalls = [];
 const patches = [];
 const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { createElement: element },
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => editorCurrent,
   projectStructuredFacts: project => copy(project.structuredFacts || []), migratedProjectStructuredFacts: project => copy(project.structuredFacts),
   normalizeProjectStructuredFact: value => value.value ? value : null,
   projectRecordID: project => project.id, safeAnnotationIDPart: value => value,
-  researchChevronIconsSVG: () => "", projectSectionExpanded: (_p, _key, fallback) => fallback,
-  wireProjectSectionMotion() {}, persistProjectSectionExpansion() {}, clear: node => { node.children = []; },
+  researchChevronIconsSVG: () => "", projectSectionExpanded: () => false,
+  wireProjectSectionMotion(...args) { factMotionCalls.push(args); }, persistProjectSectionExpansion() {}, clear: node => { node.children = []; },
   window: { clearTimeout() {} }, showWebNotice() {},
-  projectStructuredFactGroups: [{ key: "building", label: "Building & code", fields: [{ key: "occupancy", label: "Occupancy" }] }],
+  projectStructuredFactGroups: [
+    { key: "building", label: "Building & code", fields: [{ key: "occupancy", label: "Occupancy" }] },
+    { key: "zoning", label: "Zoning", fields: [{ key: "address", label: "Address", projectAddress: true }] }
+  ],
   async updateProjectFolder(_project, patch) { if (failWrite) throw Error("Write failed"); patches.push(copy(patch)); return true; }
 });
 vm.runInContext(actual("appendSavedProjectFactEditor"), e);
 const contextRoot = element("section"), factsRoot = element("section");
 const contextEditor = e.appendSavedProjectFactEditor(contextRoot, alpha, alpha, { section: "context" });
 const factsEditor = e.appendSavedProjectFactEditor(factsRoot, alpha, alpha, { section: "facts" });
+assert.equal(factMotionCalls.length, 0, "Standalone Facts ignores stored collapsed state and has no accordions.");
+for (const label of ["Building & code", "Zoning"]) {
+  assert.ok(find(factsRoot, node => node.tag === "h3" && node.textContent === label));
+}
 const narrative = find(contextRoot, node => node.tag === "textarea");
 const occupancy = find(factsRoot, node => node.attributes["aria-label"] === "Occupancy");
 narrative.value = "Changed context";
