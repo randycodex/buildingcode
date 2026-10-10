@@ -16939,7 +16939,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   width: 40px;
   height: 40px;
   flex-basis: 40px;
-  background: transparent;
+  background: var(--toolbar-active);
 }
 
 .report-source-palette {
@@ -18117,6 +18117,57 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .report-source-picker > button:hover,
 .report-source-picker > summary:hover {
   color: var(--text-primary);
+}
+
+/* Report controls share pill surfaces while the content rows stay flat. */
+.report-draft-panel :is(button, [role="button"], .report-source-picker > summary) {
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--toolbar-active);
+}
+.report-draft-panel :is(button, [role="button"], .report-source-picker > summary):hover {
+  background: var(--menu-highlight);
+}
+.report-draft-panel button:disabled {
+  background: var(--toolbar-active);
+}
+.report-draft-panel .report-draft-shell button {
+  min-height: 32px;
+  padding: 8px 14px;
+}
+.report-draft-panel .report-draft-shell :is(
+  .report-draft-block-remove,
+  .report-draft-block-drag-handle,
+  .report-evidence-code-chevron
+) {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  flex-basis: 32px;
+  padding: 6px;
+}
+.report-draft-panel [role="button"].panel-kind {
+  width: fit-content;
+  padding-inline: 12px;
+}
+.report-draft-panel .report-evidence-code-chevron[aria-expanded="true"] .research-chevron-up,
+.report-draft-panel .report-evidence-code-chevron[aria-expanded="false"] .research-chevron-down {
+  display: block;
+}
+.report-draft-panel .project-section-toggle-label {
+  flex: 0 1 auto;
+  width: fit-content;
+  max-width: 100%;
+}
+.report-draft-panel :is(.report-draft-picker, .report-draft-version-list) {
+  gap: var(--space-2);
+}
+.report-draft-panel .report-source-picker > summary {
+  width: fit-content;
+  max-width: calc(100% - (2 * var(--panel-padding)));
+  margin-inline: var(--panel-padding);
+  padding: 8px 14px;
+  list-style-position: inside;
 }
 
 /* Selection remains visible without relying on its accent color. */
