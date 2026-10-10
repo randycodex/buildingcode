@@ -18234,11 +18234,6 @@ body .panel-track > article.workspace-panel.report-draft-panel .report-title-edi
 .workspace-panel.report-draft-panel .report-title-revision {
   display: none;
 }
-.report-draft-save-state {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 12px;
-}
 .workspace-panel.report-draft-panel .report-draft-version-list {
   display: block;
   padding-top: 8px;

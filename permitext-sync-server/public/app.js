@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-report-workflow-v767";
+} from "./offline-storage.js?v=20261010-report-status-removed-v768";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-report-workflow-v767";
+} from "./research-intent-state.js?v=20261010-report-status-removed-v768";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -27817,8 +27817,6 @@ async function renderProjectReportDraft(project) {
   const setDirty = () => {
     dirty = true;
     clearStatus();
-    const draftState = shell.querySelector(".report-draft-save-state");
-    if (draftState) draftState.textContent = "Draft · Unsaved changes";
   };
 
   let pendingDraftSave = null;
@@ -28426,11 +28424,7 @@ async function renderProjectReportDraft(project) {
     }
     versionList.hidden = versionList.childElementCount <= 1;
     titleControl.append(titleButton, titleEditor, revisionLabel, deleteButton);
-    const draftState = document.createElement("p");
-    draftState.className = "report-draft-save-state";
-    draftState.setAttribute("role", "status");
-    draftState.textContent = dirty ? "Draft · Unsaved changes" : activeDraft.id ? "Draft · Saved" : "Draft · Not saved yet";
-    draftPicker.append(titleControl, draftState, versionList);
+    draftPicker.append(titleControl, versionList);
 
     const metadata = document.createElement("div");
     metadata.className = "report-draft-metadata";
