@@ -17661,16 +17661,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen-header h1 {
   margin: 0;
 }
-.account-screen-back {
-  flex: 0 0 auto;
-  min-height: 44px;
-  padding: 0 8px;
-  border: 0;
-  background: transparent;
-  color: var(--text-secondary);
-  font: inherit;
+.account-screen-close {
+  --panel-title-control-size: 44px;
+  --panel-title-icon-size: 18px;
 }
-.account-screen-back:hover { color: var(--text-primary); }
 .account-screen > .settings-panel {
   flex: 1 !important;
   min-height: 0;

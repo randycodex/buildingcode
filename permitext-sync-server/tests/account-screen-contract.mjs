@@ -60,7 +60,7 @@ function harness(signedIn) {
     activePaneIDs: () => ["reader:one", "utility:settings", "utility:saved"],
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
-  vm.runInContext(["settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
+  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
   return { context, track, panels, transitions, toggleAttributes,
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
 }
@@ -86,7 +86,7 @@ for (const signedIn of [false, true]) {
   assert.equal(h.focusReturns(), 1, "Escape returns focus to the Account entry.");
 }
 
-// Content recovery refreshes must retain the screen's Back action and scroll location.
+// Content recovery refreshes must retain the screen's close action and scroll location.
 const h = harness(true);
 h.context.toggleAccountDialog();
 h.panels[0].scroll.scrollTop = 240;
@@ -104,4 +104,4 @@ assert.equal(h.track.scrollLeft, 350);
 assert.equal(h.transitions[0].options.refreshPaneIDs.join(","), "reader:one,utility:saved");
 h.dialog().children[0].children[1].listeners.click();
 assert.equal(h.dialog(), null);
-console.log("Account screen passed: signed-in/guest lifecycle, original controls, Back/Escape, nested keyboard handling, and independent category scroll restoration.");
+console.log("Account screen passed: signed-in/guest lifecycle, original controls, close/Escape, nested keyboard handling, and independent category scroll restoration.");
