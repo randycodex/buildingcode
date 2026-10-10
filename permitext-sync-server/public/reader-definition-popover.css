@@ -1,10 +1,8 @@
 .reader-definition-term {
   display: inline; padding: 0; margin: 0; border: 0; border-radius: 0;
-  background: transparent; color: inherit; font: inherit; line-height: inherit;
-  text-align: inherit; cursor: pointer; text-decoration: underline dotted;
-  text-underline-offset: .2em; text-decoration-color: currentColor;
+  background: transparent; color: color-mix(in srgb, currentColor 55%, var(--text-secondary, #bfc2c6)); font: inherit; line-height: inherit;
+  text-align: inherit; cursor: pointer; text-decoration: none;
 }
-.reader-definition-term:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 .reader-definition-popover {
   position: fixed; inset: auto; margin: 0; box-sizing: border-box;
   max-height: min(420px, calc(100vh - 24px)); overflow-y: auto;

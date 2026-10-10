@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-pro-column-pinning-v677";
+} from "./offline-storage.js?v=20261010-definition-text-v678";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-pro-column-pinning-v677";
+} from "./research-intent-state.js?v=20261010-definition-text-v678";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
