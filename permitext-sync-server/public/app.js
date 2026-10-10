@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-free-pane-header-v660";
+} from "./offline-storage.js?v=20261009-pro-prompt-v661";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-free-pane-header-v660";
+} from "./research-intent-state.js?v=20261009-pro-prompt-v661";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33268,7 +33268,7 @@ function renderProLockedPane(paneID, title) {
   const content = document.createElement("div");
   content.className = "pro-locked-content";
   const message = document.createElement("p");
-  message.textContent = `${title} requires Pro. Existing work is preserved. You can continue reading and searching for free.`;
+  message.textContent = `${title} requires Pro`;
   const upgrade = document.createElement("button");
   upgrade.type = "button";
   upgrade.textContent = "View Pro";
