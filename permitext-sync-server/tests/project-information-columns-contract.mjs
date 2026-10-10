@@ -104,7 +104,7 @@ const widthContext = vm.createContext({
 });
 vm.runInContext([
   ...app.matchAll(/const (?:legacy|default)\w*PaneWidth = [^;]+;/g)
-].map(match => match[0]).join("\n") + "\n" + ["defaultPaneWidthForID", "migrateLegacyPaneWidth",
+].map(match => match[0]).join("\n") + "\n" + ["defaultPaneWidthForID", "minimumPaneWidthForID", "migrateLegacyPaneWidth",
   "normalizePaneWeights", "isFlexibleReaderPaneID", "applyPaneWeight"].map(actual).join("\n"), widthContext);
 assert.equal(widthContext.defaultPaneWidthForID(factsID), 600);
 assert.equal(widthContext.defaultPaneWidthForID(contextID), 600);

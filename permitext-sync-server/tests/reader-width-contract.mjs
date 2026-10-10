@@ -3,19 +3,25 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
-const extract = (name, next) => source.slice(source.indexOf(`function ${name}(`), source.indexOf(`function ${next}(`));
 const context = vm.createContext({
-  state: { paneWeights: {}, readers: [] },
+  state: { paneWeights: {}, readers: [], paneWidthDefaultsVersion: 5 },
   paneIDs: [],
   activePaneIDs() { return context.paneIDs; },
-  defaultPaneWidthForID: () => 600,
-  migrateLegacyPaneWidth: (_id, width) => width,
-  isFixedWidthPaneID: id => id.startsWith('utility:'),
   detachedProjectWindow: false,
   isProjectWorkboardPaneID: () => false,
+  isCodeQuestionPaneID: () => false,
+  isProjectCoordinationThreadPaneID: () => false,
+  isProjectCoordinationPaneID: () => false,
+  isProjectDetailPaneID: () => false,
   isProAccount() { throw new Error('Reader layout must not depend on subscription'); }
 });
-vm.runInContext(extract('isFlexibleReaderPaneID', 'linkedReaderPaneIDForSearch') + extract('applyPaneWeight', 'setUtilityButtonStates'), context);
+vm.runInContext([
+  ...source.matchAll(/const (?:legacy|default)\w*PaneWidth = [^;]+;/g)
+].map(match => match[0]).join('\n') + '\n' + [
+  'isProjectNotebookPaneID', 'isProjectReportDraftPaneID', 'defaultPaneWidthForID',
+  'minimumPaneWidthForID', 'migrateLegacyPaneWidth', 'normalizePaneWeights',
+  'isFixedWidthPaneID', 'isFlexibleReaderPaneID', 'applyPaneWeight'
+].map(actual).join('\n'), context);
 function layout(id, ids, storedWidth = 600, linked = false, collapsed = false) {
   context.paneIDs = ids;
   context.state.paneWeights = { [id]: storedWidth };
@@ -41,6 +47,31 @@ for (const ids of [['reader:a','reader:b'], ['reader:a','reader:b','reader:c'], 
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900).flex, '0 0 900px', 'Multi-column manual divider widths remain respected');
 assert.equal(layout('utility:search', ['utility:search','reader:a']).flex, '0 0 600px', 'Utility sizing stays unchanged');
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900, false, true).flex, '0 0 48px', 'Collapsed columns retain their compact width');
+const mainPaneIDs = [
+  'utility:saved', 'utility:saved:instance', 'reader:a', 'utility:search', 'utility:search:instance',
+  'utility:analysis', 'utility:analysis:instance', 'research:conversation:conversation',
+  'project:context:alpha', 'project:facts:alpha', 'project:notebook:alpha', 'project:report-draft:alpha'
+];
+for (const id of mainPaneIDs) {
+  for (const count of [1, 2, 3, 4, 8]) {
+    const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];
+    for (const restoredWidth of [400, 550, 600, 850]) {
+      context.paneIDs = ids;
+      context.state.paneWeights = { [id]: restoredWidth };
+      context.normalizePaneWeights(ids);
+      assert.equal(context.state.paneWeights[id], Math.max(600, restoredWidth), `${id} restores its minimum with ${count} columns`);
+      const style = layout(id, ids, restoredWidth);
+      assert.equal(style['--pane-default-min-width'], '600px', `${id} enforces its rendered minimum`);
+      assert.equal(context.state.paneWeights[id], Math.max(600, restoredWidth), `${id} also clamps widths when mounted directly`);
+    }
+  }
+  assert.equal(layout(id, [id], 600, false, true).flex, '0 0 48px', `${id} keeps its collapsed width`);
+}
+context.paneIDs = ['utility:archive'];
+context.state.paneWeights = { 'utility:archive': 350 };
+context.normalizePaneWeights(context.paneIDs);
+assert.equal(context.state.paneWeights['utility:archive'], 350, 'Unrelated column widths stay unchanged');
+console.log('Main column minimums passed: all eight kinds, repeated utilities, saved narrow/wider widths, one through eight columns, and collapse.');
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
 assert.match(css, /\.reader-content > \*\s*\{[^}]*max-width: 800px;[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the existing centered text measure');
 console.log('Reader width contract passed: sole/restored/linked Readers, sharing, minimums, manual resizing, and text measure.');

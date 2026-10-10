@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-context-toolbar-v742";
+} from "./offline-storage.js?v=20261010-column-minimums-v743";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-context-toolbar-v742";
+} from "./research-intent-state.js?v=20261010-column-minimums-v743";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -3941,9 +3941,20 @@ function defaultPaneWidthForID(paneID) {
   return defaultNonReaderPaneWidth;
 }
 
+function minimumPaneWidthForID(paneID) {
+  if (paneID?.startsWith("reader:") ||
+    paneID === "utility:saved" || paneID?.startsWith("utility:saved:") ||
+    paneID === "utility:search" || paneID?.startsWith("utility:search:") ||
+    paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") ||
+    paneID?.startsWith("research:conversation:") ||
+    paneID?.startsWith("project:context:") || paneID?.startsWith("project:facts:") ||
+    isProjectNotebookPaneID(paneID) || isProjectReportDraftPaneID(paneID)) return 600;
+  return 0;
+}
+
 function migrateLegacyPaneWidth(paneID, value) {
-  if (paneID.startsWith("project:context:") && value < defaultContextPaneWidth) return defaultContextPaneWidth;
-  if (paneID.startsWith("project:facts:") && value < defaultFactsPaneWidth) return defaultFactsPaneWidth;
+  const minimumWidth = minimumPaneWidthForID(paneID);
+  if (minimumWidth > 0 && value < minimumWidth) return minimumWidth;
   if (paneID.startsWith("utility:analysis:") && value === defaultUtilityPaneWidth) return defaultResearchPaneWidth;
   if ((paneID === "utility:saved" || paneID.startsWith("utility:saved:")) && value === defaultUtilityPaneWidth) {
     return defaultSavedPaneWidth;
@@ -4885,7 +4896,11 @@ function applyPaneWeight(panel, paneID) {
     "--pane-resized-min-width",
     `${flexibleReader && !explicitlyResizedReader ? defaultWidth : width}px`
   );
-  panel.style.setProperty("--pane-default-min-width", flexibleReader || hasManyColumns ? `${defaultWidth}px` : "0px");
+  const minimumWidth = Math.max(
+    minimumPaneWidthForID(paneID),
+    flexibleReader || hasManyColumns ? defaultWidth : 0
+  );
+  panel.style.setProperty("--pane-default-min-width", `${minimumWidth}px`);
   if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
     panel.style.flex = `1 1 ${width}px`;
     return;
