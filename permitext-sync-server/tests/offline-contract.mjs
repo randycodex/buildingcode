@@ -229,7 +229,8 @@ assert(shellPrecacheURLs.includes("/web/code-question-define.js?v=20260803-code-
 assert(shellPrecacheURLs.includes("/web/code-question-evidence.js?v=20260807-code-question-phase5a-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-analysis.js?v=20260817-adaptive-research-answer-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-review.js?v=20260803-code-question-review-v1"));
-assert(!shellPrecacheURLs.some((url) => url.includes("/web/fonts/inter-")));
+assert(shellPrecacheURLs.includes("/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0"));
+assert(shellPrecacheURLs.includes("/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0"));
 assert(shellPrecacheURLs.includes("/web/fonts/source-serif-4-latin-wght-normal.woff2"));
 assert(shellPrecacheURLs.includes("/web/fonts/source-serif-4-latin-wght-italic.woff2"));
 

@@ -529,7 +529,7 @@ async function main() {
     assert(workspaceScriptURL, "Web HTML must select a versioned workspace script.");
     const workspaceScript = await request(workspaceScriptURL);
     const workspaceStyles = await request("/web/styles.css");
-    const sourceSerifFont = await requestBinary("/web/fonts/source-serif-4-latin-wght-normal.woff2?v=20260808-typography-v1");
+    const readerFont = await requestBinary("/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0");
     const workspaceStateScript = await request("/web/workspace-state.js");
     const workspaceStartupSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("async function start()"),
@@ -542,26 +542,26 @@ async function main() {
     );
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
-      sourceSerifFont.response.ok &&
-        sourceSerifFont.body.length > 40_000 &&
-        sourceSerifFont.response.headers.get("content-type")?.includes("font/woff2") &&
-        sourceSerifFont.response.headers.get("cache-control")?.includes("immutable"),
+      readerFont.response.ok &&
+        readerFont.body.length > 40_000 &&
+        readerFont.response.headers.get("content-type")?.includes("font/woff2") &&
+        readerFont.response.headers.get("cache-control")?.includes("immutable"),
       "The self-hosted Permitext Reader typeface was missing, empty, or not immutable."
     );
     assert(
-      workspaceStyles.text.includes('font-family: "Source Serif 4 Variable";') &&
-        workspaceStyles.text.includes('--ui-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui') &&
-        workspaceStyles.text.includes('--source-font-family: "Source Serif 4 Variable"') &&
-        !workspaceStyles.text.includes('Inter Variable') &&
+      workspaceStyles.text.includes('font-family: "IBM Plex Sans";') &&
+        workspaceStyles.text.includes('--ui-font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui') &&
+        workspaceStyles.text.includes('--source-font-family: var(--ui-font-family);') &&
+        workspaceStyles.text.includes('/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0') &&
         workspaceStyles.text.includes('--reader-font-size: 16.5px;') &&
         workspaceStyles.text.includes('--reader-line-height: 1.6;') &&
         workspaceStyles.text.includes('.chapter-section h3 {') &&
         workspaceStyles.text.includes('.section-block {') &&
         workspaceStyles.text.match(/\.code-table \{[\s\S]*?font-family: var\(--reader-font-family\);/) &&
         workspaceStyles.text.includes('font-family: var(--ui-font-family);') &&
-        workspaceScript.text.includes('fontFamily: "source-serif-4"') &&
+        workspaceScript.text.includes('fontFamily: "ibm-plex-sans"') &&
         !workspaceScript.text.includes('data-reader-font-family'),
-      "The two-font Permitext typography contract is incomplete."
+      "The IBM Plex Sans app typography contract is incomplete."
     );
     assert(workspaceStateScript.response.ok, "Named workspace state module did not load.");
     assert(

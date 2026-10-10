@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-account-footer-v709";
+} from "./offline-storage.js?v=20261010-app-plex-v712";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-account-footer-v709";
+} from "./research-intent-state.js?v=20261010-app-plex-v712";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -480,7 +480,7 @@ const globalWorkspaceStateKeys = [
 ];
 
 const defaultReaderSettings = {
-  fontFamily: "source-serif-4"
+  fontFamily: "ibm-plex-sans"
 };
 
 let chapters = [];
@@ -2986,7 +2986,7 @@ function clampNumber(value, min, max, fallback) {
 }
 
 function normalizeReaderSettings(settings = {}) {
-  return { fontFamily: "source-serif-4" };
+  return { fontFamily: "ibm-plex-sans" };
 }
 
 function normalizeSearchCodeFilters(value) {
@@ -3117,7 +3117,7 @@ function normalizeSearchInstance(instance) {
 }
 
 function readerFontFamilyValue() {
-  return '"Source Serif 4 Variable", "Source Serif 4", Iowan Old Style, Georgia, serif';
+  return 'var(--ui-font-family)';
 }
 
 function applyReaderSettings() {

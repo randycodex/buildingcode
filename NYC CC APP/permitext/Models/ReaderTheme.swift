@@ -23,7 +23,7 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
     case monospaced
 
     static var allCases: [ReaderFontChoice] {
-        [.sourceSerif4]
+        [.sfPro]
     }
 
     var id: String { rawValue }
@@ -52,7 +52,7 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
     }
 
     var normalizedChoice: ReaderFontChoice {
-        .sourceSerif4
+        .sfPro
     }
 }
 
@@ -67,7 +67,7 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     static let minimumLineSpacing: Double = -6
     static let maximumLineSpacing: Double = 6
 
-    var fontChoice: ReaderFontChoice = .sourceSerif4
+    var fontChoice: ReaderFontChoice = .sfPro
     var fontSize: Double = 17
     var lineSpacing: Double = 0
     var paragraphSpacing: Double = 9
@@ -286,32 +286,27 @@ enum CodeSectionThemeProfile: Sendable {
 
 private extension ReaderFontChoice {
     func bodyFont(size: Double) -> PlatformFont {
-        sourceSerifFont(size: size, weight: .regular, italic: false)
+        systemFont(size: size, weight: .regular, italic: false)
     }
 
     func boldFont(size: Double) -> PlatformFont {
-        sourceSerifFont(size: size, weight: .semibold, italic: false)
+        systemFont(size: size, weight: .semibold, italic: false)
     }
 
     func italicFont(size: Double) -> PlatformFont {
-        sourceSerifFont(size: size, weight: .regular, italic: true)
+        systemFont(size: size, weight: .regular, italic: true)
     }
 
-    private func sourceSerifFont(size: Double, weight: PlatformFont.Weight, italic: Bool) -> PlatformFont {
+    private func systemFont(size: Double, weight: PlatformFont.Weight, italic: Bool) -> PlatformFont {
+        let font = PlatformFont.systemFont(ofSize: size, weight: weight)
         #if canImport(UIKit)
-        let postScriptName = italic ? "SourceSerif4Variable-Italic" : "SourceSerif4Variable-Roman"
-        guard let registeredFont = UIFont(name: postScriptName, size: size) else {
-            let fallbackDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
-                .withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
-            return UIFont(descriptor: fallbackDescriptor, size: size)
+        guard italic,
+              let descriptor = font.fontDescriptor.withSymbolicTraits(.traitItalic) else {
+            return font
         }
-        let descriptor = registeredFont.fontDescriptor.addingAttributes([
-            .traits: [UIFontDescriptor.TraitKey.weight: weight]
-        ])
         return UIFont(descriptor: descriptor, size: size)
         #else
-        return NSFont(name: italic ? "Source Serif 4 Variable Italic" : "Source Serif 4 Variable", size: size)
-            ?? .systemFont(ofSize: size, weight: weight)
+        return italic ? NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask) : font
         #endif
     }
 }

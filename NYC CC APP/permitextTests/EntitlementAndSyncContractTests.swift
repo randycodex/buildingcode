@@ -713,11 +713,12 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(secondReader.selectedVersionFileName, "secondary-version")
     }
 
-    func testTwoTypefaceContractUsesSourceSerifForReaderAndMigratesLegacyChoices() throws {
-        XCTAssertEqual(ReaderFontChoice.allCases, [.sourceSerif4])
-        XCTAssertEqual(ReaderTheme.default.fontChoice, .sourceSerif4)
-        XCTAssertEqual(ReaderTheme.default.bodyFont.fontName, "SourceSerif4Variable-Roman")
-        XCTAssertEqual(ReaderTheme.default.italicFont.fontName, "SourceSerif4Variable-Italic")
+    func testReaderTypographyUsesSystemFontAndMigratesLegacyChoices() throws {
+        XCTAssertEqual(ReaderFontChoice.allCases, [.sfPro])
+        XCTAssertEqual(ReaderTheme.default.fontChoice, .sfPro)
+        XCTAssertEqual(ReaderTheme.default.bodyFont, UIFont.systemFont(ofSize: 17))
+        XCTAssertEqual(ReaderTheme.default.boldFont, UIFont.systemFont(ofSize: 17, weight: .semibold))
+        XCTAssertTrue(ReaderTheme.default.italicFont.fontDescriptor.symbolicTraits.contains(.traitItalic))
         XCTAssertEqual(ReaderTheme.minimumFontSize, 10)
         XCTAssertEqual(ReaderTheme.maximumFontSize, 24)
         XCTAssertEqual(ReaderTheme.default.fontSize, 17)
@@ -737,29 +738,25 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(undersizedTheme.normalized.fontSize, 10)
 
         let legacyChoices: [ReaderFontChoice] = [
-            .sfPro, .sfCompact, .sfMono, .newYork,
+            .sourceSerif4, .sfCompact, .sfMono, .newYork,
             .sanFrancisco, .serif, .rounded, .monospaced
         ]
-        XCTAssertTrue(legacyChoices.allSatisfy { $0.normalizedChoice == .sourceSerif4 })
+        XCTAssertTrue(legacyChoices.allSatisfy { $0.normalizedChoice == .sfPro })
 
-        let projectRoot = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let infoData = try Data(contentsOf: projectRoot.appendingPathComponent("permitext/Info.plist"))
-        let info = try XCTUnwrap(
-            PropertyListSerialization.propertyList(from: infoData, format: nil) as? [String: Any]
-        )
-        XCTAssertEqual(
-            info["UIAppFonts"] as? [String],
-            ["SourceSerif4Variable-Roman.ttf", "SourceSerif4Variable-Italic.ttf"]
-        )
-
-        let projectSource = try String(
-            contentsOf: projectRoot.appendingPathComponent("NYC CC APP.xcodeproj/project.pbxproj"),
-            encoding: .utf8
-        )
-        XCTAssertTrue(projectSource.contains("SourceSerif4Variable-Roman.ttf in Resources"))
-        XCTAssertTrue(projectSource.contains("SourceSerif4Variable-Italic.ttf in Resources"))
+        let suiteName = "reader-system-font-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        var legacyTheme = ReaderTheme.default
+        legacyTheme.fontChoice = .sourceSerif4
+        legacyTheme.fontSize = 21
+        legacyTheme.lineSpacing = 2
+        let store = ReaderThemeStore(defaults: defaults)
+        store.save(legacyTheme)
+        let restoredTheme = store.load()
+        XCTAssertEqual(restoredTheme.fontChoice, .sfPro)
+        XCTAssertEqual(restoredTheme.fontSize, 21)
+        XCTAssertEqual(restoredTheme.lineSpacing, 2)
+        XCTAssertEqual(store.load(), restoredTheme)
     }
 
     func testDistributionMetadataIsIPhoneOnly() throws {

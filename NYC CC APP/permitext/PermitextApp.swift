@@ -89,7 +89,7 @@ private struct PermitextClerkAuthenticationView: View {
             }
             Spacer()
             Text("permitext")
-                .font(.system(size: 38, weight: .semibold, design: .serif))
+                .font(.system(size: 38, weight: .semibold))
             if let message {
                 Text("Unable to start sign-in")
                     .font(.title2.weight(.semibold))
@@ -1622,7 +1622,7 @@ private struct PermitextFirstUseSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 Text("permitext")
-                    .font(.system(size: 38, weight: .semibold, design: .serif))
+                    .font(.system(size: 38, weight: .semibold))
                     .foregroundStyle(.primary)
                 Text("Explore NYC construction codes and read the enacted text.")
                     .font(.title2.weight(.semibold))
@@ -1821,7 +1821,7 @@ private struct AppLaunchLoadingView: View {
         VStack(spacing: 22) {
             VStack(spacing: 8) {
                 Text("permitext")
-                    .font(.system(size: 28, weight: .semibold, design: .serif))
+                    .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(.primary)
 
                 Text(message)

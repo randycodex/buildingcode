@@ -39,7 +39,7 @@ struct PermitextAccountEntryView: View {
         VStack(spacing: 0) {
             Spacer(minLength: 32)
             Text("permitext")
-                .font(.system(size: 38, weight: .semibold, design: .serif))
+                .font(.system(size: 38, weight: .semibold))
                 .padding(.bottom, 28)
             Text("Your account, your workspace.")
                 .font(.title2.weight(.semibold))
@@ -1893,7 +1893,7 @@ struct ProSubscriptionStoreView: View {
             ScrollView {
                 VStack(spacing: 18) {
                     Text("permitext")
-                        .font(.system(size: 38, weight: .semibold, design: .serif))
+                        .font(.system(size: 38, weight: .semibold))
 
                     Text("Pro")
                         .font(.title2.weight(.bold))

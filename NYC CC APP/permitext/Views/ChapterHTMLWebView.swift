@@ -1567,7 +1567,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let tableFontSize = max(bodyFontSize * 0.82, 14)
             let lineHeight = max(1.35, min(1.64, 1.28 + theme.lineSpacing / 28))
             let paragraphSpacing = max(theme.paragraphSpacing / 20, 0.42)
-            let fontFamily = #""Source Serif 4 Variable", "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif"#
+            let fontFamily = #"-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif"#
 
             return """
             html {
