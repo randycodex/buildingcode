@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-menu-hover-v724";
+} from "./offline-storage.js?v=20261010-account-header-v725";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-menu-hover-v724";
+} from "./research-intent-state.js?v=20261010-account-header-v725";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
