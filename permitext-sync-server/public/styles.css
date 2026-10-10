@@ -2834,18 +2834,6 @@ label {
   font-weight: 600;
 }
 
-.reader-nav-label:hover,
-.reader-nav-chevron:hover,
-.reader-nav-chapter:focus-visible > .reader-nav-row,
-.reader-nav-section:focus-visible > .reader-nav-row {
-  color: var(--text-primary);
-}
-
-.reader-nav-chapter[aria-selected="true"] > .reader-nav-row,
-.reader-nav-section[aria-selected="true"] > .reader-nav-row {
-  color: var(--code-accent, var(--text-primary));
-}
-
 .reader-nav-chevron,
 .reader-nav-chevron-space {
   display: inline-flex;

@@ -50,7 +50,6 @@ assert(
 assert(styles.includes(".reader-nav-tree"), "Tree menu styles are missing.");
 assert(styles.includes(".reader-nav-chapter"), "Chapter row styles are missing.");
 assert(styles.includes(".reader-nav-section"), "Section row styles are missing.");
-assert(styles.includes("aria-selected=\"true\""), "Selected-state styles are missing.");
 assert(
   !/reader-nav-tree[^{]*\{[^}]*border:\s*1px solid/.test(styles),
   "Reader navigation tree should not rely on thin outline borders."
