@@ -89,6 +89,7 @@ const assignmentContext = vm.createContext({
   closeSectionSaveProjectSheet(panel) { panel.currentSheet = null; closes += 1; },
   document: { createElement: () => ({ setAttribute() {}, addEventListener() {} }) },
   showReaderNotesProjectPicker(_sheet, optionsPayload, options) { pickerCallbacks.push(options.onClose); },
+  showSectionDetailProjectPicker(_sheet, optionsPayload, options) { pickerCallbacks.push(options.onClose); },
   persistSectionInProject() { throw new Error("Explicit destination selection must still open the picker inside a Project."); }
 });
 vm.runInContext(assignmentSource, assignmentContext);
@@ -103,6 +104,7 @@ assert.equal(closes, 2);
 pickerCallbacks[1]();
 assert.equal(pickerPanel.currentSheet, null, "The current picker still closes normally.");
 assert.equal(closes, 3);
+await import("./section-detail-project-picker.mjs");
 
 assert.equal(
   (webClient.match(/confirmSectionBookmarkRemoval\(/g) || []).length,

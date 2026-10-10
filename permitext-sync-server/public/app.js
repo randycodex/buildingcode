@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-detail-picker-surface-v672";
+} from "./offline-storage.js?v=20261009-direct-project-picker-v673";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-detail-picker-surface-v672";
+} from "./research-intent-state.js?v=20261009-direct-project-picker-v673";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15087,18 +15087,19 @@ function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null,
     return;
   }
   closeSectionSaveProjectSheet(panel);
+  const detailPicker = panel.classList.contains("section-detail-panel");
   const sheet = document.createElement("section");
   sheet.className = "section-save-project-sheet";
   sheet.setAttribute("role", "region");
-  sheet.setAttribute("aria-label", "Add saved evidence to a Project or saved collection");
+  sheet.setAttribute("aria-label", detailPicker ? "Add passage to a Project" : "Add saved evidence to a Project or saved collection");
   sheet.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     event.preventDefault();
     closeSectionSaveProjectSheet(panel, focusTarget);
   });
   panel.append(sheet);
-  showReaderNotesProjectPicker(sheet, sectionPayload, {
-    hideIntroduction: panel.classList.contains("section-detail-panel"),
+  const showPicker = detailPicker ? showSectionDetailProjectPicker : showReaderNotesProjectPicker;
+  showPicker(sheet, sectionPayload, {
     onClose: () => {
       if (panel.querySelector(".section-save-project-sheet") !== sheet) return;
       closeSectionSaveProjectSheet(panel, focusTarget);
@@ -15259,6 +15260,130 @@ function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
 
 function removeReaderNotesProjectPicker(sheet) {
   sheet?.querySelector(".reader-notes-project-picker")?.remove();
+}
+
+function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
+  removeReaderNotesProjectPicker(sheet);
+  const projects = activeFolderRecords(currentContentSummary().projects || []).filter(folderIsProject);
+  const picker = document.createElement("section");
+  picker.className = "reader-notes-project-picker section-detail-project-picker";
+  picker.setAttribute("aria-label", "Choose a Project");
+  const projectList = document.createElement("div");
+  projectList.className = "reader-notes-project-options";
+  projectList.setAttribute("role", "group");
+  projectList.setAttribute("aria-label", "Projects");
+  const status = document.createElement("p");
+  status.className = "reader-notes-project-status";
+  status.setAttribute("role", "status");
+  const detailPanel = sheet.closest(".section-detail-panel");
+  const bookmark = detailPanel?.querySelector(".section-detail-save");
+  let busy = false;
+  const setBusy = (value) => {
+    busy = value;
+    picker.querySelectorAll("button, input").forEach((control) => { control.disabled = value; });
+    if (bookmark) bookmark.disabled = value || !readerPrivateContentAllowed(detailPanel);
+  };
+  const addToProject = async (project) => {
+    if (busy) return;
+    setBusy(true);
+    status.textContent = "Adding…";
+    try {
+      // Only the chosen Project is visible to this additive operation, so
+      // links to other Projects and existing collections remain intact.
+      const result = await persistSectionFolderSelection(sectionPayload, [project], [project]);
+      if (!result.saved) {
+        status.textContent = "The passage could not be added. Please try again.";
+        return;
+      }
+      syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
+      sheet.dispatchEvent(new CustomEvent("permitext-folder-save", {
+        detail: { saved: true, folders: [project] }
+      }));
+      refreshOpenAnnotationProjectEditors();
+      removeReaderNotesProjectPicker(sheet);
+      options.onClose?.({ saved: true, folders: [project] });
+    } catch (error) {
+      status.textContent = error.message || "The passage could not be added. Please try again.";
+    } finally {
+      setBusy(false);
+    }
+  };
+  const appendProject = (project) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "section-detail-project-option";
+    button.textContent = project.name || project.title || "Untitled Project";
+    button.setAttribute("aria-label", `Add passage to ${button.textContent}`);
+    button.addEventListener("click", () => { void addToProject(project); });
+    projectList.append(button);
+  };
+  if (!projects.length) {
+    const empty = document.createElement("p");
+    empty.className = "reader-notes-project-empty";
+    empty.textContent = "No Projects yet.";
+    projectList.append(empty);
+  }
+  projects.forEach(appendProject);
+  const createProject = document.createElement("button");
+  createProject.type = "button";
+  createProject.className = "reader-notes-new-project section-detail-project-create";
+  createProject.textContent = "New Project…";
+  createProject.addEventListener("click", () => {
+    if (busy || picker.querySelector("form")) return;
+    createProject.hidden = true;
+    const form = document.createElement("form");
+    form.className = "reader-notes-new-project-form section-detail-project-create";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Project name";
+    input.setAttribute("aria-label", "New Project name");
+    const createButton = document.createElement("button");
+    createButton.type = "submit";
+    createButton.textContent = "Create and add";
+    form.append(input, createButton);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (busy || !input.value.trim()) return;
+      setBusy(true);
+      status.textContent = "Creating…";
+      let project;
+      try {
+        project = await createProjectFolder({ name: input.value.trim(), folderType: "project" });
+        if (!project) {
+          status.textContent = "The Project could not be created. Please try again.";
+          return;
+        }
+        projectList.querySelector(".reader-notes-project-empty")?.remove();
+        appendProject(project);
+        form.remove();
+        createProject.hidden = false;
+      } catch (error) {
+        status.textContent = error.message || "The Project could not be created. Please try again.";
+      } finally {
+        setBusy(false);
+      }
+      if (project) await addToProject(project);
+    });
+    createProject.after(form);
+    input.focus();
+  });
+  const actions = document.createElement("div");
+  actions.className = "reader-notes-project-picker-actions";
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.textContent = "Cancel";
+  cancelButton.addEventListener("click", () => {
+    if (busy) return;
+    removeReaderNotesProjectPicker(sheet);
+    options.onClose?.({ saved: false, folders: [] });
+  });
+  actions.append(cancelButton);
+  picker.append(projectList, createProject, status, actions);
+  sheet.prepend(picker);
+  requestAnimationFrame(() => {
+    if (!sheet.isConnected) return;
+    (projectList.querySelector("button") || createProject).focus({ preventScroll: true });
+  });
 }
 
 function showReaderNotesProjectPicker(sheet, sectionPayload, options = {}) {

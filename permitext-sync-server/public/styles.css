@@ -3636,6 +3636,10 @@ select option:checked {
   box-shadow: none;
 }
 
+.section-detail-panel:has(> .section-save-project-sheet) .section-detail-project-add {
+  display: none;
+}
+
 .section-save-project-sheet .reader-notes-project-picker {
   margin: 0;
 }
@@ -3776,6 +3780,31 @@ select option:checked {
   .reader-notes-project-picker .reader-notes-project-option:focus-visible {
     background: color-mix(in srgb, var(--project-color) 42%, transparent);
   }
+}
+
+.section-detail-project-picker .section-detail-project-option,
+.section-detail-project-picker .section-detail-project-option:hover,
+.section-detail-project-picker .section-detail-project-option:focus-visible {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.section-detail-project-picker .section-detail-project-create {
+  justify-self: start;
+  margin-top: var(--space-4);
+}
+
+.section-detail-project-picker .reader-notes-project-status:empty {
+  display: none;
 }
 
 .reader-notes-new-project-form {
