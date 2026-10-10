@@ -4387,6 +4387,7 @@ select option:checked {
 .code-table table {
   width: max-content;
   max-width: none;
+  margin-inline: auto;
   border-collapse: collapse;
   border: 1px solid color-mix(in srgb, var(--text-primary) 34%, var(--border));
   color: var(--text-primary);
