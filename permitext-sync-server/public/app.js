@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-note-confirmation-ui-v667";
+} from "./offline-storage.js?v=20261009-detail-column-header-v668";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-note-confirmation-ui-v667";
+} from "./research-intent-state.js?v=20261009-detail-column-header-v668";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18340,6 +18340,7 @@ async function renderSectionDetail(searchID, detail) {
   const backButton = appendDetailIconButton(chrome, {
     title: "Close",
     label: "Close saved item",
+    className: "section-detail-icon section-detail-close",
     svg: circleXIconSVG()
   });
   const saveButton = appendDetailIconButton(chrome, {
@@ -18349,7 +18350,10 @@ async function renderSectionDetail(searchID, detail) {
     svg: bookmarkIconSVG(saved)
   });
   syncImmediateBookmarkButton(saveButton, saved);
-  chrome.append(saveButton, backButton);
+  const actions = document.createElement("div");
+  actions.className = "panel-actions";
+  actions.append(backButton);
+  chrome.append(saveButton, actions);
 
   const content = document.createElement("section");
   content.className = "section-detail-content";

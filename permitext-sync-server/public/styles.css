@@ -3107,8 +3107,8 @@ select option:checked {
 }
 
 .section-detail-chrome {
-  display: grid;
-  grid-template-columns: var(--panel-title-control-size) var(--panel-title-control-size);
+  display: flex;
+  align-items: start;
   justify-content: space-between;
   gap: var(--space-3);
 }
