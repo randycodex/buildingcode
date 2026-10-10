@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-report-plain-labels-v761";
+} from "./offline-storage.js?v=20261010-report-primary-plain-v762";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-report-plain-labels-v761";
+} from "./research-intent-state.js?v=20261010-report-primary-plain-v762";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
