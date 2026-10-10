@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-saved-research-v732";
+} from "./offline-storage.js?v=20261010-project-tool-toolbar-v733";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-saved-research-v732";
+} from "./research-intent-state.js?v=20261010-project-tool-toolbar-v733";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -323,6 +323,9 @@ const addReaderButton = document.querySelector("#add-reader");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
+const toggleNotebookButton = document.querySelector("#toggle-notebook");
+const toggleReportButton = document.querySelector("#toggle-report");
+let projectToolTogglePending = false;
 const toggleAnalysisButton = document.querySelector("#toggle-analysis") || (() => {
   const button = document.createElement("button");
   button.className = "toolbar-button";
@@ -2062,6 +2065,18 @@ function openMobileMoreSheet() {
   projectList.append(mobileMoreAction("New Project", () => void createNewWorkspace()));
   projectList.append(mobileMoreAction("Manage Projects…", () => openProjectManager()));
   if (activeWorkspaceRecord()?.projectID) projectList.append(mobileMoreAction("Close Project", () => void closeActiveProject()));
+  const project = workspaceProject();
+  const identity = project ? projectIdentity(project) : null;
+  projectList.append(
+    mobileMoreAction("Notebook", () => void toggleProjectTool("notebook"), {
+      current: Boolean(identity && projectHasOpenNotebook(identity)),
+      disabled: !identity || !hasCapability("notebook") || projectToolTogglePending
+    }),
+    mobileMoreAction("Report", () => void toggleProjectTool("report"), {
+      current: Boolean(identity && projectHasOpenReportDraft(identity)),
+      disabled: !identity || !hasCapability("professional-exports") || identity.sharedOnly || projectToolTogglePending
+    })
+  );
   projectSection.append(projectLabel, projectList);
   const accountSection = document.createElement("section");
   accountSection.className = "mobile-more-section";
@@ -4368,7 +4383,51 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
   ].filter(Boolean)));
 }
 
+function syncTopbarProjectToolStates() {
+  const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
+  const identity = project ? projectIdentity(project) : null;
+  [
+    [toggleNotebookButton, "Notebook", "notebook", projectHasOpenNotebook],
+    [toggleReportButton, "Report", "professional-exports", projectHasOpenReportDraft]
+  ].forEach(([button, label, capability, isOpen]) => {
+    if (!button) return;
+    const opened = Boolean(identity && isOpen(identity));
+    const sharedReport = Boolean(label === "Report" && identity?.sharedOnly);
+    button.disabled = projectToolTogglePending || !identity || !hasCapability(capability) || sharedReport;
+    button.setAttribute("aria-pressed", String(opened));
+    button.title = !identity ? `Choose a Project to open ${label}`
+      : !hasCapability(capability) ? `${label} requires Pro`
+      : sharedReport ? "Report editing is unavailable for shared-only Projects."
+      : `${opened ? "Close" : "Open"} ${label} · ${identity.name}`;
+  });
+}
+
+async function toggleProjectTool(tool) {
+  if (projectToolTogglePending || !workspacePrivatePresentationAllowed()) return false;
+  const project = workspaceProject();
+  if (!project) return false;
+  const identity = projectIdentity(project);
+  const notebook = tool === "notebook";
+  if (!notebook && tool !== "report") return false;
+  if (!hasCapability(notebook ? "notebook" : "professional-exports") || (!notebook && identity.sharedOnly)) return false;
+  projectToolTogglePending = true;
+  syncTopbarProjectToolStates();
+  try {
+    if (notebook) {
+      return projectHasOpenNotebook(identity) ? await closeProjectNotebook(identity) : await openProjectNotebook(identity);
+    }
+    return projectHasOpenReportDraft(identity) ? await closeProjectReportDraft(identity) : await openProjectReportDraft(identity);
+  } catch (error) {
+    presentWorkspaceIssue(error.message || `Could not update the ${notebook ? "Notebook" : "Report"} column.`);
+    return false;
+  } finally {
+    projectToolTogglePending = false;
+    syncTopbarProjectToolStates();
+  }
+}
+
 function syncProjectToolButtonStates(project) {
+  syncTopbarProjectToolStates();
   const projectID = projectDetailKey(project);
   const buttonStates = [
     [".project-notebook-button", projectHasOpenNotebook(project)],
@@ -4723,6 +4782,7 @@ function setUtilityButtonStates() {
   toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis || activeRepeatableKeys.has("analysis")));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
+  syncTopbarProjectToolStates();
 }
 
 function codeOptionVersion(option) {
@@ -19071,6 +19131,7 @@ async function closeUtilityInstance(instance) {
   const paneID = paneIDForUtilityInstance(instance);
   const detailID = instance.key === "search" ? paneIDForSectionDetail(instance.id) : "";
   const closingProjectHost = instance.key === "saved" && paneID === state.projectHostPaneID;
+  const keepProjectTools = Boolean(workspaceProject());
   const successor = closingProjectHost
     ? (state.utilityInstances || []).find((candidate) => candidate.key === "saved" && candidate.id !== instance.id) || null
     : null;
@@ -19088,7 +19149,7 @@ async function closeUtilityInstance(instance) {
   if (instance.key === "search") closeLinkedReaderForSearch(instance.id);
   if (instance.key === "saved") {
     savedItemOpeningAttempts.delete(paneID);
-    if (closingProjectHost) {
+    if (closingProjectHost && !keepProjectTools) {
       const current = openProjectDetails()[0] || null;
       if (current && !(await deactivateProjectStudio(current, { transition: false }))) return false;
     }
@@ -19101,7 +19162,7 @@ async function closeUtilityInstance(instance) {
   if (closingProjectHost) {
     state.projectHostPaneID = successor ? paneIDForUtilityInstance(successor) : "";
     if (successor && successor.selectedFolderID && !successorFolder) successor.selectedFolderID = "";
-    if (successorFolder && folderIsProject(successorFolder)) {
+    if (!keepProjectTools && successorFolder && folderIsProject(successorFolder)) {
       const activated = await activateProjectStudio(successorFolder, {
         sourcePaneID: state.projectHostPaneID,
         focusSaved: false,
@@ -32335,8 +32396,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     controls.className = "saved-folder-controls saved-project-tool-controls";
     controls.setAttribute("aria-label", `${identity.name} tools`);
     [
-      ["Notebook", "project-notebook-button", projectHasOpenNotebook, openProjectNotebook, closeProjectNotebook],
-      ["Report", "project-report-draft-button", projectHasOpenReportDraft, openProjectReportDraft, closeProjectReportDraft],
       ...(releaseSurfaceVisibility.coordination
         ? [["Coordination", "project-coordination-button", projectHasOpenCoordination, openProjectCoordination, closeProjectCoordination]]
         : [])
@@ -32346,10 +32405,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       button.className = className;
       button.textContent = label;
       button.setAttribute("aria-pressed", String(isOpen(identity)));
-      if (identity.sharedOnly && label === "Report") {
-        button.disabled = true;
-        button.title = `${label} editing is unavailable for shared-only Projects.`;
-      }
       button.addEventListener("click", async () => {
         const previousHostPaneID = state.projectHostPaneID;
         state.projectHostPaneID = paneID;
@@ -32364,7 +32419,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       });
       controls.append(button);
     });
-    context.append(controls);
+    if (controls.childElementCount) context.append(controls);
 
     const summary = document.createElement("section");
     summary.className = "saved-project-summary";
@@ -43201,6 +43256,14 @@ function bindWorkspaceKeyboardNavigation() {
 }
 
 function bindImmediateUtilityControls() {
+  [
+    [toggleNotebookButton, "notebook"],
+    [toggleReportButton, "report"]
+  ].forEach(([button, tool]) => {
+    if (!button || button.dataset.coldStartBound === "true") return;
+    button.dataset.coldStartBound = "true";
+    button.addEventListener("click", () => void toggleProjectTool(tool));
+  });
   if (track.dataset.utilityFocusBound !== "true") {
     track.dataset.utilityFocusBound = "true";
     const remember = (event) => {

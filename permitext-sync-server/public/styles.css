@@ -10224,8 +10224,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin-top: 0;
 }
 
-.saved-folder-context.is-project .project-notebook-button,
-.saved-folder-context.is-project .project-report-draft-button {
+.saved-folder-context.is-project .project-coordination-button {
   height: 40px;
   min-height: 40px;
   border-radius: var(--radius-control);
@@ -13472,7 +13471,9 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
   .topbar #fit-columns,
   .topbar #collapse-readers,
-  .topbar #toggle-workboard {
+  .topbar #toggle-workboard,
+  .topbar #toggle-notebook,
+  .topbar #toggle-report {
     display: none !important;
   }
 
@@ -16777,7 +16778,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   .topbar .topbar-actions > .toolbar-button { font-size: 10px !important; }
 }
 
-@media (min-width: 761px) and (max-width: 1180px) {
+@media (min-width: 761px) and (max-width: 1400px) {
   :root { --header-height: 106px; }
   .topbar {
     display: grid;
@@ -17648,6 +17649,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: transparent;
 }
 .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button):is(:hover, :focus-visible) {
+  background: var(--menu-surface);
+}
+.topbar :is(#toggle-notebook, #toggle-report)[aria-pressed="true"] {
   background: var(--menu-surface);
 }
 

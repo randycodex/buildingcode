@@ -339,10 +339,10 @@ const savedFolderContextSource = functionSource(appSource, "renderSavedFolderCon
 assert.match(savedFolderContextSource, /projectsSection\.hidden = true/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
 assert.match(savedFolderContextSource, /appendSavedProjectFactEditor\(summary, folder, identity\)/);
-assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report"[\s\S]*?releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"/);
+assert.match(savedFolderContextSource, /releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"/);
 assert.doesNotMatch(savedFolderContextSource, /"Workboard"/);
 assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
-assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report"[\s\S]*?releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?appendSavedProjectFactEditor\(summary, folder, identity\)[\s\S]*?context\.append\(summary\)[\s\S]*?populateSavedEvidenceSection/);
+assert.match(savedFolderContextSource, /releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"[\s\S]*?if \(controls\.childElementCount\) context\.append\(controls\)[\s\S]*?appendSavedProjectFactEditor\(summary, folder, identity\)[\s\S]*?context\.append\(summary\)[\s\S]*?populateSavedEvidenceSection/);
 assert.doesNotMatch(savedFolderContextSource, /Blocknotes|appendProjectNotes|appendProjectResearchHistory|loadProjectCoordinationFoundation/);
 assert.doesNotMatch(savedFolderContextSource, /appendProjectActivity|Recent Activities/);
 const savedEvidenceHeadingSource = functionSource(appSource, "createSavedEvidenceHeading");
@@ -783,7 +783,8 @@ assert.match(stylesSource, /\.saved-project-tile\.is-bulk-selected \{[\s\S]*?opa
 assert.match(indexSource, /id="workspace-actions"[^>]*aria-label="Choose Project or Unassigned saves"/);
 assert.doesNotMatch(indexSource, /id="add-workspace"/);
 assert.match(stylesSource, /\.workspace-add-button,[\s\S]*?\.workspace-actions-button \{[\s\S]*?display: inline-flex;[\s\S]*?padding: 0 11px;/);
-assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-notebook-button,[\s\S]*?\.project-report-draft-button \{[^}]*height: 40px;[^}]*min-height: 40px;/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-coordination-button \{[^}]*height: 40px;[^}]*min-height: 40px;/);
+assert.doesNotMatch(savedFolderContextSource, /project-notebook-button|project-report-draft-button/, "Notebook and Report belong in the Project's top menu.");
 assert.match(stylesSource, /\.report-draft-shell \{[^}]*display: flex;[^}]*flex-direction: column;/, "Report sections must use a vertical flow that can animate without overlapping.");
 assert.match(stylesSource, /\.report-draft-shell > \* \{[^}]*flex: 0 0 auto;/, "Expanded Report sources must scroll instead of collapsing earlier Report sections.");
 assert.match(stylesSource, /\.report-draft-primary-actions \{[^}]*position: static;/, "Save Report and Export Report must scroll with the Report content.");
