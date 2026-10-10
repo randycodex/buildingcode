@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-inbox-toggle-v691";
+} from "./offline-storage.js?v=20261010-inbox-close-v692";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-inbox-toggle-v691";
+} from "./research-intent-state.js?v=20261010-inbox-close-v692";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1773,7 +1773,7 @@ async function toggleUnassignedSaves() {
   unassignedToggleInFlight = true;
   try {
     const inbox = unassignedInboxInstance();
-    if (inbox) await closeUtilityInstance(inbox, { preserveSavedPassages: true });
+    if (inbox) await closeUtilityInstance(inbox);
     else await openUnassignedSaves();
   } finally {
     unassignedToggleInFlight = false;
@@ -4271,10 +4271,16 @@ function closeLinkedReaderForSearch(searchID) {
   state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== readerPaneID);
 }
 
-function closeLinkedReaderForSavedPane(savedPaneID) {
+function closeLinkedReaderForSavedPane(savedPaneID, options = {}) {
+  const detailIDs = new Set(options.includeDetailReaders ? savedItemDetailIDsForPane(savedPaneID) : []);
+  const detailPaneIDs = new Set((state.utilityInstances || [])
+    .filter((instance) => detailIDs.has(instance.id)).map(paneIDForUtilityInstance));
+  const detailReaderIDs = new Set(Object.entries(searchLinkedReadersBySearch())
+    .filter(([sourceID]) => detailIDs.has(sourceID)).map(([, readerID]) => readerID));
   const linkedReaderIDs = new Set(
     (state.readers || [])
-      .filter((reader) => reader.savedSourcePaneID === savedPaneID)
+      .filter((reader) => reader.savedSourcePaneID === savedPaneID || detailReaderIDs.has(reader.id) ||
+        detailIDs.has(reader.pinnedDetailSourceID) || detailPaneIDs.has(reader.pinnedSearchPaneID))
       .map((reader) => reader.id)
   );
   if (!linkedReaderIDs.size) return;
@@ -18870,7 +18876,7 @@ function renderUtility(template, paneID) {
   return panel;
 }
 
-async function closeUtilityInstance(instance, options = {}) {
+async function closeUtilityInstance(instance) {
   const paneID = paneIDForUtilityInstance(instance);
   const detailID = instance.key === "search" ? paneIDForSectionDetail(instance.id) : "";
   const closingProjectHost = instance.key === "saved" && paneID === state.projectHostPaneID;
@@ -18895,19 +18901,10 @@ async function closeUtilityInstance(instance, options = {}) {
       const current = openProjectDetails()[0] || null;
       if (current && !(await deactivateProjectStudio(current, { transition: false }))) return false;
     }
-    if (options.preserveSavedPassages) {
-      // The inbox toggle closes only its column; open passages become independent.
-      (state.readers || []).forEach((reader) => {
-        if (reader.savedSourcePaneID === paneID) delete reader.savedSourcePaneID;
-      });
-      const anchors = sectionDetailAnchorsBySearch();
-      Object.entries(anchors).forEach(([searchID, anchorPaneID]) => {
-        if (anchorPaneID === paneID) delete anchors[searchID];
-      });
-    } else {
-      closeLinkedReaderForSavedPane(paneID);
-      closeSavedItemDetailsForPane(paneID);
-    }
+    closeLinkedReaderForSavedPane(paneID, {
+      includeDetailReaders: Boolean(instance.unassignedInbox || (!instance.selectedFolderID && instance.organizeUnassigned))
+    });
+    closeSavedItemDetailsForPane(paneID);
   }
   state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
   if (closingProjectHost) {
@@ -33504,11 +33501,6 @@ async function renderSaved(instance, options = {}) {
   panel.classList.add("saved-panel");
   if (savedInstance.organizeUnassigned) {
     panel.classList.add("saved-inbox-panel");
-    const icon = document.createElement("span");
-    icon.className = "saved-inbox-icon";
-    icon.setAttribute("aria-hidden", "true");
-    icon.innerHTML = inboxIconSVG();
-    panel.querySelector(".panel-kind")?.before(icon);
     panel.querySelectorAll(".panel-kind, .panel-title").forEach((label) => { label.textContent = "Unassigned saves"; });
   }
   applyPaneWeight(panel, paneID);
@@ -34294,10 +34286,6 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
   return controller;
 }
 
-function inboxIconSVG() {
-  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 4-3 10v6h22v-6L20 4Z"/><path d="M1 14h6l2 3h6l2-3h6"/></svg>';
-}
-
 function folderAddIconSVG() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V4h6l2 3h10v13H3Z"/><path d="M12 10v7m-3.5-3.5h7"/></svg>';
 }
@@ -34888,12 +34876,17 @@ function removeSectionDetail(searchID) {
 }
 
 function closeSavedItemDetailsForPane(savedPaneID) {
+  savedItemDetailIDsForPane(savedPaneID).forEach(removeSectionDetail);
+}
+
+function savedItemDetailIDsForPane(savedPaneID) {
   const details = sectionDetailsBySearch();
   const anchors = sectionDetailAnchorsBySearch();
-  Object.entries(anchors).forEach(([searchID, anchorPaneID]) => {
-    if (anchorPaneID !== savedPaneID || !details[searchID]) return;
-    removeSectionDetail(searchID);
-  });
+  const savedDetailIDs = new Set((state.utilityInstances || [])
+    .filter((instance) => instance.key === "sdc").map((instance) => instance.id));
+  // Match the same fallback anchor used to place older saved-detail columns.
+  return Object.keys(details).filter((searchID) =>
+    (anchors[searchID] || (savedDetailIDs.has(searchID) ? primarySavedPaneID() : "")) === savedPaneID);
 }
 
 const savedItemOpeningAttempts = new Map();

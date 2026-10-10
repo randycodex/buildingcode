@@ -89,23 +89,31 @@ function actualAsync(name) {
   return source.slice(start, source.indexOf("\n}", start) + 2);
 }
 const inbox = { key: "saved", id: "inbox", unassignedInbox: true };
-const retainedDetail = { key: "sdc", id: "detail" };
+const inboxDetail = { key: "sdc", id: "detail" };
+const otherDetail = { key: "sdc", id: "other" };
 const toggleContext = vm.createContext({
   state: {
-    utilityInstances: [{ key: "saved", id: "project-saved", selectedFolderID: "active" }, inbox, retainedDetail],
+    utilityInstances: [{ key: "saved", id: "project-saved", selectedFolderID: "active" }, inbox, inboxDetail, otherDetail, { key: "sdc", id: "older-detail" }],
     projectHostPaneID: "project-saved",
-    readers: [{ id: "reader", position: 1156 }, { id: "linked", savedSourcePaneID: "inbox", position: 80 }],
-    paneOrder: ["project-saved", "reader", "inbox", "detail", "linked"],
-    paneWeights: { "project-saved": 600, reader: 800, inbox: 600, detail: 600, linked: 800 },
+    readers: [{ id: "reader", position: 1156 }, { id: "linked", savedSourcePaneID: "inbox", position: 80 },
+      { id: "detail-reader" }, { id: "kept-reader", pinnedDetailSourceID: "detail" }, { id: "other-reader", pinnedDetailSourceID: "other", position: 900 }],
+    searchLinkedReaders: { detail: "detail-reader" },
+    paneOrder: ["project-saved", "reader:reader", "inbox", "detail", "older-detail", "reader:linked", "reader:detail-reader", "reader:kept-reader", "other", "reader:other-reader"],
+    paneWeights: { "project-saved": 600, "reader:reader": 800, inbox: 600, detail: 600, "older-detail": 600,
+      "reader:linked": 800, "reader:detail-reader": 800, "reader:kept-reader": 800, other: 600, "reader:other-reader": 800 },
     localAnnotations: structuredClone(records)
   },
-  anchors: { detail: "inbox", other: "project-saved" },
+  anchors: { detail: "inbox", "older-detail": "inbox", other: "project-saved" },
+  details: { detail: { sectionID: "261" }, other: { sectionID: "262" }, "older-detail": { sectionID: "263" } },
   savedItemOpeningAttempts: new Map([["inbox", {}]]), activeWorkspaceID: "project:active",
   workspacePrivatePresentationAllowed: () => true,
   paneIDForUtilityInstance: item => item.id,
+  paneIDForSectionDetail: id => id,
+  primarySavedPaneID: () => "project-saved",
+  sectionDetailsBySearch: () => toggleContext.details,
   sectionDetailAnchorsBySearch: () => toggleContext.anchors,
-  closeLinkedReaderForSavedPane: () => { throw Error("Must retain open Readers"); },
-  closeSavedItemDetailsForPane: () => { throw Error("Must retain open details"); },
+  searchLinkedReadersBySearch: () => toggleContext.state.searchLinkedReaders,
+  track: { querySelectorAll: () => [] },
   saveWorkspaceState() {}, transitions: 0,
   transitionWorkspace: () => {
     toggleContext.transitions++;
@@ -116,20 +124,29 @@ const toggleContext = vm.createContext({
   }
 });
 vm.runInContext(actual("unassignedInboxInstance") + "\nlet unassignedToggleInFlight = false;\n" +
-  actualAsync("toggleUnassignedSaves") + "\n" + actualAsync("closeUtilityInstance"), toggleContext);
+  actualAsync("toggleUnassignedSaves") + "\n" + actualAsync("closeUtilityInstance") + "\n" +
+  ["closeLinkedReaderForSavedPane", "closeLinkedReaderForSearch", "removeSectionDetail", "closeSavedItemDetailsForPane", "savedItemDetailIDsForPane"]
+    .map(actual).join("\n"), toggleContext);
 const pendingClose = vm.runInContext("toggleUnassignedSaves()", toggleContext);
 await vm.runInContext("toggleUnassignedSaves()", toggleContext);
 assert.equal(toggleContext.transitions, 1, "Repeated clicks during a pending close must not reopen or close twice");
 toggleContext.completeTransition();
 await pendingClose;
-assert.deepEqual(Array.from(toggleContext.state.utilityInstances, item => item.id), ["project-saved", "detail"]);
-assert.deepEqual(Array.from(toggleContext.state.readers, item => [item.id, item.position]), [["reader", 1156], ["linked", 80]]);
-assert.equal(toggleContext.state.readers[1].savedSourcePaneID, undefined);
+assert.deepEqual(Array.from(toggleContext.state.utilityInstances, item => item.id), ["project-saved", "other"]);
+assert.deepEqual(Array.from(toggleContext.state.readers, item => [item.id, item.position]), [["reader", 1156], ["other-reader", 900]]);
 assert.deepEqual(toggleContext.anchors, { other: "project-saved" });
+assert.deepEqual(toggleContext.details, { other: { sectionID: "262" } });
+assert.deepEqual(Array.from(toggleContext.state.paneOrder), ["project-saved", "reader:reader", "other", "reader:other-reader"]);
+assert.deepEqual(Object.keys(toggleContext.state.paneWeights).sort(), ["other", "project-saved", "reader:other-reader", "reader:reader"]);
 assert.equal(toggleContext.savedItemOpeningAttempts.has("inbox"), false, "Fence a delayed passage opening when closing the inbox");
 assert.deepEqual(toggleContext.state.localAnnotations, records, "Toggling must not remove saved notes");
 assert.equal(toggleContext.state.projectHostPaneID, "project-saved");
 assert.equal(toggleContext.activeWorkspaceID, "project:active");
 await vm.runInContext("toggleUnassignedSaves()", toggleContext);
 assert.equal(toggleContext.state.utilityInstances.filter(item => item.unassignedInbox).length, 1);
-console.log("Inbox toggle passed: open/close, rapid-click guard, active Project, Reader positions, notes and retained passage details.");
+toggleContext.state.utilityInstances.push({ key: "sdc", id: "legacy-detail" });
+toggleContext.details["legacy-detail"] = { sectionID: "263" };
+toggleContext.primarySavedPaneID = () => "reopened-inbox";
+assert.deepEqual(Array.from(vm.runInContext('savedItemDetailIDsForPane("reopened-inbox")', toggleContext)), ["legacy-detail"],
+  "Older details without an explicit anchor must use the same Saved pane fallback as their rendered placement");
+console.log("Inbox toggle passed: rapid-click guard, closing derived details and Readers, older fallback anchors, and retaining independent columns, notes and active Project.");

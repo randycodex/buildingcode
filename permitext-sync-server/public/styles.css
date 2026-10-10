@@ -18184,22 +18184,6 @@ html body .column-group-menu-button:focus-visible {
   background: light-dark(#f2f6f9, #0a1218);
 }
 
-.saved-inbox-panel .panel-header > div:first-child {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.saved-inbox-icon {
-  display: inline-flex;
-  color: var(--text-secondary);
-}
-
-.saved-inbox-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
 .saved-inbox-panel .saved-evidence-heading {
   justify-content: flex-start;
   gap: 10px;
