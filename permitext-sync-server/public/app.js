@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-information-v736";
+} from "./offline-storage.js?v=20261010-facts-menu-v737";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-information-v736";
+} from "./research-intent-state.js?v=20261010-facts-menu-v737";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -32043,7 +32043,7 @@ async function renderProjectInformation(project, kind) {
   header.append(title, actions);
   const content = document.createElement("section");
   content.className = "saved-project-summary project-information-content";
-  const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind, headerActions: actions });
+  const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind });
   projectInformationMounts.set(paneID, { panel, ...editor });
   panel.append(header, content);
   applyPaneWeight(panel, paneID);
@@ -32252,8 +32252,9 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     });
   };
   renderStructuredFacts();
+  let refreshFacts = null;
   if (!identity.sharedOnly) {
-    const refreshFacts = document.createElement("button");
+    refreshFacts = document.createElement("button");
     refreshFacts.type = "button";
     refreshFacts.className = "saved-project-refresh-facts";
     refreshFacts.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>';
@@ -32341,7 +32342,11 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
         const apply = document.createElement("button");
         apply.type = "button";
         apply.textContent = "Apply updates";
-        const close = () => { overlay.remove(); refreshFacts.focus(); };
+        const close = () => {
+          overlay.remove();
+          const returnTarget = factsOnly ? container.closest(".workspace-panel")?.querySelector(".column-group-menu-button") : refreshFacts;
+          returnTarget?.focus();
+        };
         cancel.addEventListener("click", close);
         overlay.addEventListener("keydown", event => {
           if (event.key === "Escape" && !apply.disabled) { event.preventDefault(); close(); }
@@ -32437,11 +32442,13 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
   factsSection.append(heading, body);
   if (factsOnly) {
     structuredSection.classList.add("is-open");
-    const refresh = structuredHeading.querySelector(".saved-project-refresh-facts");
-    if (refresh && options.headerActions) options.headerActions.prepend(refresh);
     structuredHeading.remove();
     container.append(structuredSection);
-    return { flush: () => save({ reportFailure: true }) };
+    return {
+      flush: () => save({ reportFailure: true }),
+      refreshZoLa: refreshFacts ? () => refreshFacts.click() : null,
+      isRefreshing: () => Boolean(refreshFacts?.disabled)
+    };
   }
   container.append(factsSection, structuredSection);
   wireProjectSectionMotion(
@@ -38760,6 +38767,8 @@ function openColumnGroupMenu(panel, anchor) {
     button.addEventListener('click', () => { close(); action(); });
     menu.append(button);
   };
+  const factEditor = panel.classList.contains("project-facts-panel") ? projectInformationMounts.get(panel.dataset.paneId) : null;
+  if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
   if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
   if (!group?.collapsed) {

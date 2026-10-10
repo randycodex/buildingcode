@@ -120,9 +120,9 @@ const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { c
   async updateProjectFolder(_project, patch) { if (failWrite) throw Error("Write failed"); patches.push(copy(patch)); return true; }
 });
 vm.runInContext(actual("appendSavedProjectFactEditor"), e);
-const contextRoot = element("section"), factsRoot = element("section"), actions = element("div");
+const contextRoot = element("section"), factsRoot = element("section");
 const contextEditor = e.appendSavedProjectFactEditor(contextRoot, alpha, alpha, { section: "context" });
-const factsEditor = e.appendSavedProjectFactEditor(factsRoot, alpha, alpha, { section: "facts", headerActions: actions });
+const factsEditor = e.appendSavedProjectFactEditor(factsRoot, alpha, alpha, { section: "facts" });
 const narrative = find(contextRoot, node => node.tag === "textarea");
 const occupancy = find(factsRoot, node => node.attributes["aria-label"] === "Occupancy");
 narrative.value = "Changed context";
@@ -132,7 +132,9 @@ await factsEditor.flush();
 assert.deepEqual(patches[0], { description: "Changed context" });
 assert.deepEqual(Object.keys(patches[1]).sort(), ["address", "structuredFacts"]);
 assert.equal(patches[1].structuredFacts[0].value, "R-2");
-assert.equal(actions.children[0].attributes["aria-label"], "Refresh ZoLa data");
+assert.equal(typeof factsEditor.refreshZoLa, "function");
+assert.equal(factsEditor.isRefreshing(), false);
+assert.equal(find(factsRoot, node => node.className === "saved-project-refresh-facts"), undefined);
 failWrite = true; narrative.value = "Retry context";
 await assert.rejects(contextEditor.flush(), /Write failed/);
 failWrite = false; await contextEditor.flush();
