@@ -18167,12 +18167,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 }
 .report-draft-panel .report-draft-header :is(.panel-kind, .panel-actions > button),
 .report-draft-panel .report-draft-header :is(.panel-kind, .panel-actions > button):hover,
-.report-draft-panel .report-draft-shell :is(.report-draft-blocks-toggle, .report-draft-block-drag-handle, .report-draft-block-remove),
-.report-draft-panel .report-draft-shell :is(.report-draft-blocks-toggle, .report-draft-block-drag-handle, .report-draft-block-remove):hover {
+.report-draft-panel .report-draft-shell :is(.report-title-text, .report-draft-blocks-toggle, .report-draft-block-drag-handle, .report-draft-block-remove),
+.report-draft-panel .report-draft-shell :is(.report-title-text, .report-draft-blocks-toggle, .report-draft-block-drag-handle, .report-draft-block-remove):hover {
   border-radius: 0;
   background: transparent;
 }
-.report-draft-panel .report-draft-shell .report-draft-blocks-toggle {
+.report-draft-panel .report-draft-shell :is(.report-title-text, .report-draft-blocks-toggle) {
   padding-inline: 0;
 }
 
