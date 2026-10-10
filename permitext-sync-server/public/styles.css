@@ -18438,8 +18438,6 @@ html body .column-group-menu-button:focus-visible {
 
 /* Research and Search: make source context and the next action readable. */
 .search-options { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; color: var(--text-secondary); font-size: 12px; }
-.search-options label { display: inline-flex; align-items: center; gap: 6px; }
-.search-options select { appearance: none; -webkit-appearance: none; width: auto; min-height: 30px; padding: 3px 0; color: var(--text-primary); background: transparent; background-image: none; border: 0; border-radius: 0; box-shadow: none; font: inherit; cursor: pointer; }
 .search-sources-button { padding: 4px 0; min-height: 30px; border: 0; background: transparent; color: var(--text-secondary); font: inherit; cursor: pointer; }
 .search-sources-button:hover { color: var(--text-primary); }
 .search-match-kind { display: inline-block; white-space: nowrap; margin-left: 10px; color: var(--text-secondary); font-size: 11px; font-weight: 400; }
@@ -18456,3 +18454,13 @@ html body .column-group-menu-button:focus-visible {
 .search-code-source-menu { grid-row: 3; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-bottom: var(--space-5); }
 .search-code-source-menu .settings-active-sources-card { padding: 0; background: transparent; }
 .search-code-source-close { display: block; margin: 0 0 8px auto; min-height: 36px; }
+
+.search-match-control { position: relative; }
+.search-match-mode, .search-match-alternative { min-height: 30px; padding: 3px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-primary); font: inherit; cursor: pointer; }
+.search-match-mode { display: block; list-style: none; }
+.search-match-mode::-webkit-details-marker { display: none; }
+.search-match-mode::marker { content: ""; }
+.search-match-alternative { display: none; position: absolute; top: 100%; left: 0; white-space: nowrap; }
+.search-match-control[open] .search-match-alternative { display: block; }
+.search-match-mode:focus, .search-match-alternative:focus { outline: none; box-shadow: none; }
+.search-match-alternative:hover span, .search-match-alternative:focus-visible span { background: var(--text-primary); color: var(--background); }

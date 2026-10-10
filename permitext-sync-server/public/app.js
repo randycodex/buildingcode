@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-search-controls-v716";
+} from "./offline-storage.js?v=20261010-search-controls-v717";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-search-controls-v716";
+} from "./research-intent-state.js?v=20261010-search-controls-v717";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -17485,12 +17485,41 @@ async function renderSearch(instance, options = {}) {
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
   panel.__workspaceAccessGate = options.accessGate || null;
   const input = panel.querySelector(".search-input");
-  const matchSelect = panel.querySelector(".search-match-mode");
-  matchSelect.value = searchInstance.matchMode;
-  matchSelect.addEventListener("change", () => {
-    searchInstance.matchMode = matchSelect.value;
+  const matchControl = panel.querySelector(".search-match-control");
+  const matchLabel = panel.querySelector(".search-match-mode");
+  const matchAlternative = panel.querySelector(".search-match-alternative");
+  const updateMatchLabels = () => {
+    const exact = searchInstance.matchMode === "exact";
+    matchLabel.textContent = exact ? "Exact phrase" : "All words";
+    matchLabel.setAttribute("aria-label", `Search matching: ${matchLabel.textContent}`);
+    matchAlternative.querySelector("span").textContent = exact ? "All words" : "Exact phrase";
+  };
+  updateMatchLabels();
+  matchAlternative.addEventListener("click", () => {
+    searchInstance.matchMode = searchInstance.matchMode === "exact" ? "words" : "exact";
+    updateMatchLabels();
+    matchControl.open = false;
+    matchLabel.focus({ preventScroll: true });
     saveWorkspaceState();
     void renderSearchResults(panel, searchInstance);
+  });
+  matchControl.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      matchControl.open = false;
+      matchLabel.focus({ preventScroll: true });
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      matchControl.open = true;
+      matchAlternative.focus({ preventScroll: true });
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      matchLabel.focus({ preventScroll: true });
+    }
+  });
+  matchControl.addEventListener("focusout", event => {
+    if (!matchControl.contains(event.relatedTarget)) matchControl.open = false;
   });
   const sourcesButton = panel.querySelector(".search-sources-button");
   sourcesButton.setAttribute("aria-expanded", "false");
@@ -43937,4 +43966,11 @@ document.addEventListener("keydown", (event) => {
     layoutMenu.open = false;
     layoutMenu.querySelector("summary").focus();
   }
+});
+
+// Close Search matching alternatives when clicking elsewhere in the workspace.
+document.addEventListener("pointerdown", event => {
+  document.querySelectorAll(".search-match-control[open]").forEach(control => {
+    if (!control.contains(event.target)) control.open = false;
+  });
 });
