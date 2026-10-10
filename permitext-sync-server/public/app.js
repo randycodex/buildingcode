@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-direct-project-picker-v673";
+} from "./offline-storage.js?v=20261009-project-assignment-menu-v675";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-direct-project-picker-v673";
+} from "./research-intent-state.js?v=20261009-project-assignment-menu-v675";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15071,6 +15071,7 @@ function readerPassagePayload(section, reader, target) {
 }
 
 function closeSectionSaveProjectSheet(panel, focusTarget = null) {
+  panel?.__sectionProjectMenu?._close?.();
   panel?.querySelector(".section-save-project-sheet")?.remove();
   if (focusTarget?.isConnected) focusTarget.focus({ preventScroll: true });
 }
@@ -15086,20 +15087,22 @@ function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null,
     void persistSectionInProject(workspaceProject(), sectionPayload);
     return;
   }
+  if (panel.classList.contains("section-detail-panel")) {
+    showSectionDetailProjectMenu(panel, sectionPayload, focusTarget);
+    return;
+  }
   closeSectionSaveProjectSheet(panel);
-  const detailPicker = panel.classList.contains("section-detail-panel");
   const sheet = document.createElement("section");
   sheet.className = "section-save-project-sheet";
   sheet.setAttribute("role", "region");
-  sheet.setAttribute("aria-label", detailPicker ? "Add passage to a Project" : "Add saved evidence to a Project or saved collection");
+  sheet.setAttribute("aria-label", "Add saved evidence to a Project or saved collection");
   sheet.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     event.preventDefault();
     closeSectionSaveProjectSheet(panel, focusTarget);
   });
   panel.append(sheet);
-  const showPicker = detailPicker ? showSectionDetailProjectPicker : showReaderNotesProjectPicker;
-  showPicker(sheet, sectionPayload, {
+  showReaderNotesProjectPicker(sheet, sectionPayload, {
     onClose: () => {
       if (panel.querySelector(".section-save-project-sheet") !== sheet) return;
       closeSectionSaveProjectSheet(panel, focusTarget);
@@ -15262,6 +15265,81 @@ function removeReaderNotesProjectPicker(sheet) {
   sheet?.querySelector(".reader-notes-project-picker")?.remove();
 }
 
+function showSectionDetailProjectMenu(panel, sectionPayload, anchor) {
+  const wasOpen = Boolean(panel.__sectionProjectMenu);
+  closeSectionSaveProjectSheet(panel);
+  if (wasOpen || !anchor?.isConnected) return;
+  document.querySelector(".section-detail-project-menu")?._close?.();
+  closeWorkspaceContextMenu();
+  document.querySelector(".column-group-menu")?._close?.();
+  const workspaceID = activeWorkspaceID;
+  const identity = captureAccountRequest();
+  const menu = document.createElement("div");
+  menu.className = "workspace-context-menu section-detail-project-menu";
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", "Add to Project");
+  const controller = new AbortController();
+  const observer = new MutationObserver(() => {
+    if (!isCurrent()) close();
+  });
+  const isCurrent = () => panel.isConnected && menu.isConnected &&
+    workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity) && readerPrivateContentAllowed(panel);
+  const close = (restoreFocus = false) => {
+    controller.abort();
+    observer.disconnect();
+    menu.remove();
+    if (panel.__sectionProjectMenu === menu) delete panel.__sectionProjectMenu;
+    anchor.setAttribute("aria-expanded", "false");
+    if (restoreFocus && anchor.isConnected) anchor.focus({ preventScroll: true });
+  };
+  menu._close = close;
+  const position = () => {
+    if (!isCurrent()) { close(); return; }
+    const rect = anchor.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const width = menu.offsetWidth;
+    const fitsColumn = panelRect.width >= width + 16;
+    const leftLimit = Math.max(8, fitsColumn ? panelRect.left + 8 : 8);
+    const rightLimit = Math.min(window.innerWidth - 8, fitsColumn ? panelRect.right - 8 : window.innerWidth - 8);
+    menu.style.left = `${Math.max(8, Math.min(Math.max(leftLimit, rect.right - width), rightLimit - width))}px`;
+    menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
+  };
+  document.body.append(menu);
+  panel.__sectionProjectMenu = menu;
+  anchor.setAttribute("aria-expanded", "true");
+  showSectionDetailProjectPicker(menu, sectionPayload, {
+    menu: true,
+    detailPanel: panel,
+    isCurrent,
+    onClose: () => close(true),
+    onLayoutChange: () => {
+      const editing = Boolean(menu.querySelector("form"));
+      menu.setAttribute("role", editing ? "dialog" : "menu");
+      menu.setAttribute("aria-label", editing ? "New Project" : "Add to Project");
+      position();
+    }
+  });
+  position();
+  menu.addEventListener("keydown", event => {
+    if (event.key === "Escape") { event.preventDefault(); close(true); return; }
+    if (menu.querySelector("form")) return;
+    const items = [...menu.querySelectorAll("button:not(:disabled)")];
+    if (items.length && ["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+      event.preventDefault();
+      const index = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+        : (items.indexOf(document.activeElement) + (event.key === "ArrowDown" ? 1 : items.length - 1)) % items.length;
+      items[index]?.focus();
+    }
+    if (event.key === "Tab") close(true);
+  });
+  document.addEventListener("pointerdown", event => {
+    if (!menu.contains(event.target) && !anchor.contains(event.target)) close();
+  }, { signal: controller.signal });
+  window.addEventListener("resize", () => close(), { signal: controller.signal });
+  track.addEventListener("scroll", () => close(), { capture: true, signal: controller.signal });
+  observer.observe(track, { childList: true, subtree: true });
+}
+
 function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
   removeReaderNotesProjectPicker(sheet);
   const projects = activeFolderRecords(currentContentSummary().projects || []).filter(folderIsProject);
@@ -15275,8 +15353,9 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
   const status = document.createElement("p");
   status.className = "reader-notes-project-status";
   status.setAttribute("role", "status");
-  const detailPanel = sheet.closest(".section-detail-panel");
+  const detailPanel = options.detailPanel || sheet.closest(".section-detail-panel");
   const bookmark = detailPanel?.querySelector(".section-detail-save");
+  const isCurrent = () => !options.isCurrent || options.isCurrent();
   let busy = false;
   const setBusy = (value) => {
     busy = value;
@@ -15284,7 +15363,7 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
     if (bookmark) bookmark.disabled = value || !readerPrivateContentAllowed(detailPanel);
   };
   const addToProject = async (project) => {
-    if (busy) return;
+    if (busy || !isCurrent()) return;
     setBusy(true);
     status.textContent = "Adding…";
     try {
@@ -15295,6 +15374,7 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
         status.textContent = "The passage could not be added. Please try again.";
         return;
       }
+      if (!isCurrent()) return;
       syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
       sheet.dispatchEvent(new CustomEvent("permitext-folder-save", {
         detail: { saved: true, folders: [project] }
@@ -15311,6 +15391,7 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
   const appendProject = (project) => {
     const button = document.createElement("button");
     button.type = "button";
+    if (options.menu) button.setAttribute("role", "menuitem");
     button.className = "section-detail-project-option";
     button.textContent = project.name || project.title || "Untitled Project";
     button.setAttribute("aria-label", `Add passage to ${button.textContent}`);
@@ -15328,8 +15409,9 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
   createProject.type = "button";
   createProject.className = "reader-notes-new-project section-detail-project-create";
   createProject.textContent = "New Project…";
+  if (options.menu) createProject.setAttribute("role", "menuitem");
   createProject.addEventListener("click", () => {
-    if (busy || picker.querySelector("form")) return;
+    if (busy || !isCurrent() || picker.querySelector("form")) return;
     createProject.hidden = true;
     const form = document.createElement("form");
     form.className = "reader-notes-new-project-form section-detail-project-create";
@@ -15343,12 +15425,13 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
     form.append(input, createButton);
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (busy || !input.value.trim()) return;
+      if (busy || !isCurrent() || !input.value.trim()) return;
       setBusy(true);
       status.textContent = "Creating…";
       let project;
       try {
         project = await createProjectFolder({ name: input.value.trim(), folderType: "project" });
+        if (!isCurrent()) return;
         if (!project) {
           status.textContent = "The Project could not be created. Please try again.";
           return;
@@ -15357,6 +15440,7 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
         appendProject(project);
         form.remove();
         createProject.hidden = false;
+        options.onLayoutChange?.();
       } catch (error) {
         status.textContent = error.message || "The Project could not be created. Please try again.";
       } finally {
@@ -15365,6 +15449,7 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
       if (project) await addToProject(project);
     });
     createProject.after(form);
+    options.onLayoutChange?.();
     input.focus();
   });
   const actions = document.createElement("div");
@@ -15378,7 +15463,8 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
     options.onClose?.({ saved: false, folders: [] });
   });
   actions.append(cancelButton);
-  picker.append(projectList, createProject, status, actions);
+  picker.append(projectList, createProject, status);
+  if (!options.menu) picker.append(actions);
   sheet.prepend(picker);
   requestAnimationFrame(() => {
     if (!sheet.isConnected) return;
@@ -18487,6 +18573,8 @@ async function renderSectionDetail(searchID, detail) {
   projectButton.type = "button";
   projectButton.className = "section-detail-project-add";
   projectButton.textContent = "Add to Project";
+  projectButton.setAttribute("aria-haspopup", "menu");
+  projectButton.setAttribute("aria-expanded", "false");
   projectButton.hidden = !hasCapability("projects");
   actions.append(projectButton, backButton);
   chrome.append(saveButton, actions);
@@ -18626,7 +18714,7 @@ async function renderSectionDetail(searchID, detail) {
   notes.addEventListener("permitext-folder-save", syncDetailBookmark);
   projectButton.addEventListener("click", () => {
     showSectionProjectAssignment(panel, sectionPayload, projectButton, { chooseDestination: true });
-    panel.querySelector(".section-save-project-sheet")?.addEventListener("permitext-folder-save", syncDetailBookmark);
+    panel.__sectionProjectMenu?.addEventListener("permitext-folder-save", syncDetailBookmark);
   });
 
   backButton.addEventListener("click", () => {

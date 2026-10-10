@@ -80,7 +80,7 @@ assert.match(webClient, /if \(focusTarget\?\.isConnected\) focusTarget\.focus/);
 // A delayed completion from an older picker cannot close its replacement.
 const assignmentSource = sourceBetween("function showSectionProjectAssignment(", "\nfunction showReaderSaveConfirmation");
 const pickerCallbacks = [];
-const pickerPanel = { currentSheet: null, classList: { contains: () => true }, append(sheet) { this.currentSheet = sheet; }, querySelector() { return this.currentSheet; } };
+const pickerPanel = { currentSheet: null, classList: { contains: () => false }, append(sheet) { this.currentSheet = sheet; }, querySelector() { return this.currentSheet; } };
 let closes = 0;
 const assignmentContext = vm.createContext({
   readerPrivateContentAllowed: () => true,
@@ -89,7 +89,7 @@ const assignmentContext = vm.createContext({
   closeSectionSaveProjectSheet(panel) { panel.currentSheet = null; closes += 1; },
   document: { createElement: () => ({ setAttribute() {}, addEventListener() {} }) },
   showReaderNotesProjectPicker(_sheet, optionsPayload, options) { pickerCallbacks.push(options.onClose); },
-  showSectionDetailProjectPicker(_sheet, optionsPayload, options) { pickerCallbacks.push(options.onClose); },
+  showSectionDetailProjectMenu() { throw new Error("Reader assignment retains its existing sheet."); },
   persistSectionInProject() { throw new Error("Explicit destination selection must still open the picker inside a Project."); }
 });
 vm.runInContext(assignmentSource, assignmentContext);

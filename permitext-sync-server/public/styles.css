@@ -3636,10 +3636,6 @@ select option:checked {
   box-shadow: none;
 }
 
-.section-detail-panel:has(> .section-save-project-sheet) .section-detail-project-add {
-  display: none;
-}
-
 .section-save-project-sheet .reader-notes-project-picker {
   margin: 0;
 }
@@ -3805,6 +3801,55 @@ select option:checked {
 
 .section-detail-project-picker .reader-notes-project-status:empty {
   display: none;
+}
+
+.section-detail-project-menu {
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+}
+
+.section-detail-project-menu .reader-notes-project-picker {
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
+
+.section-detail-project-menu .reader-notes-project-options {
+  gap: 0;
+  padding: 0;
+  scrollbar-gutter: auto;
+}
+
+.section-detail-project-menu .section-detail-project-option,
+.section-detail-project-menu .section-detail-project-option:hover,
+.section-detail-project-menu .section-detail-project-option:focus-visible,
+.section-detail-project-menu .reader-notes-new-project {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--chrome-font-family);
+  font-size: var(--chrome-font-size) !important;
+}
+
+.section-detail-project-menu .section-detail-project-create {
+  justify-self: stretch;
+  margin-top: var(--space-3);
+}
+
+.section-detail-project-menu .reader-notes-new-project-form {
+  min-width: 0;
+  padding: 0 var(--space-2);
+}
+
+.section-detail-project-menu .reader-notes-project-status:not(:empty) {
+  margin: var(--space-2) 10px;
+}
+
+.section-detail-project-menu button:hover,
+.section-detail-project-menu button:focus-visible {
+  background: transparent;
+  text-decoration: none;
 }
 
 .reader-notes-new-project-form {

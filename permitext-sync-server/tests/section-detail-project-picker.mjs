@@ -9,8 +9,11 @@ assert(start >= 0 && end > start);
 
 // Minimal event-capable DOM for executing the picker with deferred persistence.
 class Element {
-  constructor(tag) { this.tag = tag; this.children = []; this.events = {}; this.attributes = {}; this.value = ""; }
-  matches(selector) { return selector.startsWith(".") ? (this.className || "").split(" ").includes(selector.slice(1)) : this.tag === selector; }
+  constructor(tag) { this.tag = tag; this.children = []; this.events = {}; this.attributes = {}; this.value = ""; this.style = {}; }
+  matches(selector) {
+    if (selector === "button:not(:disabled)") return this.tag === "button" && !this.disabled;
+    return selector.startsWith(".") ? (this.className || "").split(" ").includes(selector.slice(1)) : this.tag === selector;
+  }
   querySelectorAll(selectors) {
     const matches = [];
     for (const child of this.children) {
@@ -26,10 +29,15 @@ class Element {
   after(node) { node.parent = this.parent; this.parent.children.splice(this.parent.children.indexOf(this) + 1, 0, node); }
   remove() { if (this.parent) this.parent.children.splice(this.parent.children.indexOf(this), 1); this.parent = null; }
   setAttribute(name, value) { this.attributes[name] = value; }
+  getAttribute(name) { return this.attributes[name]; }
   addEventListener(name, callback) { this.events[name] = callback; }
   dispatchEvent(event) { this.events[event.type]?.(event); }
-  fire(name) { return this.events[name]?.({ preventDefault() {} }); }
-  focus() {}
+  fire(name, properties = {}) { return this.events[name]?.({ preventDefault() {}, ...properties }); }
+  focus() { documentStub.activeElement = this; }
+  contains(node) { return this === node || this.children.some(child => child.contains(node)); }
+  getBoundingClientRect() { return this.rect || { left: 500, right: 1000, bottom: 65, width: 500 }; }
+  get offsetWidth() { return 260; }
+  get offsetHeight() { return 120; }
   get isConnected() { return Boolean(this.root || this.parent?.isConnected); }
 }
 
@@ -42,8 +50,22 @@ let creation;
 let permitted = true;
 let saveEvents = 0;
 let closes = 0;
+const body = new Element("body");
+body.root = true;
+const track = new Element("main");
+body.append(track);
+const documentStub = { body, createElement: tag => new Element(tag), querySelector: selector => body.querySelector(selector), events: {}, addEventListener(name, callback) { this.events[name] = callback; } };
+const observers = [];
 const context = vm.createContext({
-  document: { createElement: tag => new Element(tag) },
+  document: documentStub,
+  track,
+  window: { innerWidth: 1000, innerHeight: 700, events: {}, addEventListener(name, callback) { this.events[name] = callback; } },
+  activeWorkspaceID: "original",
+  captureAccountRequest: () => ({}),
+  isCurrentAccountRequest: () => true,
+  closeWorkspaceContextMenu() {},
+  AbortController,
+  MutationObserver: class { constructor(callback) { this.callback = callback; observers.push(this); } observe() {} disconnect() { this.disconnected = true; } },
   activeFolderRecords: folders => folders,
   currentContentSummary: () => ({ projects: [first, collection, second] }),
   folderIsProject: folder => folder.folderType === "project",
@@ -56,6 +78,7 @@ const context = vm.createContext({
   requestAnimationFrame: callback => callback()
 });
 vm.runInContext(source.slice(start, end), context);
+vm.runInContext(source.slice(source.indexOf("function closeSectionSaveProjectSheet("), source.indexOf("\nfunction showSectionProjectAssignment(")), context);
 
 function openPicker() {
   const panel = new Element("article");
@@ -131,4 +154,64 @@ permitted = false;
 resolveSave({ saved: false });
 await new Promise(setImmediate);
 assert.equal(revoked.bookmark.disabled, true);
-console.log("Source Detail direct Project assignment, retry, creation, and control restoration passed.");
+permitted = true;
+
+const owner = new Element("article");
+owner.className = "section-detail-panel";
+const anchor = new Element("button");
+anchor.rect = { left: 835, right: 925, bottom: 65, width: 90 };
+const note = new Element("textarea");
+note.value = "Draft remains visible";
+const ownerBookmark = new Element("button");
+ownerBookmark.className = "section-detail-save";
+owner.append(anchor, note, ownerBookmark);
+track.append(owner);
+context.showSectionDetailProjectMenu(owner, payload, anchor);
+let menu = owner.__sectionProjectMenu;
+assert.equal(menu.parent, body, "The menu floats outside the column without covering its passage.");
+assert.equal(note.value, "Draft remains visible");
+assert.equal(menu.style.left, "665px");
+assert.equal(menu.style.top, "71px");
+assert.equal(anchor.getAttribute("aria-expanded"), "true");
+assert.equal(menu.getAttribute("role"), "menu");
+const items = menu.querySelectorAll("button:not(:disabled)");
+menu.fire("keydown", { key: "End" });
+assert.equal(documentStub.activeElement, items.at(-1));
+menu.fire("keydown", { key: "Home" });
+assert.equal(documentStub.activeElement, items[0]);
+menu.fire("keydown", { key: "Escape" });
+assert.equal(owner.__sectionProjectMenu, undefined);
+assert.equal(anchor.getAttribute("aria-expanded"), "false");
+assert.equal(documentStub.activeElement, anchor);
+assert.equal(observers.at(-1).disconnected, true);
+
+context.showSectionDetailProjectMenu(owner, payload, anchor);
+context.showSectionDetailProjectMenu(owner, payload, anchor);
+assert.equal(owner.__sectionProjectMenu, undefined, "The trigger toggles its menu closed.");
+context.showSectionDetailProjectMenu(owner, payload, anchor);
+documentStub.events.pointerdown({ target: note });
+assert.equal(owner.__sectionProjectMenu, undefined, "Clicking outside dismisses the menu.");
+
+context.showSectionDetailProjectMenu(owner, payload, anchor);
+menu = owner.__sectionProjectMenu;
+menu.querySelector(".reader-notes-new-project").fire("click");
+assert.equal(menu.getAttribute("role"), "dialog", "The name entry supports form keyboard interaction.");
+menu.fire("keydown", { key: "Tab" });
+assert.equal(owner.__sectionProjectMenu, menu, "Tab can move from the name field to Create and add.");
+menu.fire("keydown", { key: "Escape" });
+
+context.showSectionDetailProjectMenu(owner, payload, anchor);
+menu = owner.__sectionProjectMenu;
+calls = 0;
+persistence = async () => { calls += 1; return { saved: true }; };
+context.activeWorkspaceID = "replacement";
+menu.querySelector(".section-detail-project-option").fire("click");
+assert.equal(calls, 0, "A menu from a previous workspace cannot assign a passage.");
+observers.at(-1).callback();
+assert.equal(owner.__sectionProjectMenu, undefined);
+context.activeWorkspaceID = "original";
+context.showSectionDetailProjectMenu(owner, payload, anchor);
+owner.remove();
+observers.at(-1).callback();
+assert.equal(body.querySelector(".section-detail-project-menu"), null, "Closing the column removes its floating menu and listeners.");
+console.log("Source Detail Project assignment, retry, creation, and anchored menu lifecycle passed.");
