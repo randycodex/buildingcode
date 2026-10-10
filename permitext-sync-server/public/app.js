@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-reader-table-center-v722";
+} from "./offline-storage.js?v=20261010-menu-consistency-v723";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-reader-table-center-v722";
+} from "./research-intent-state.js?v=20261010-menu-consistency-v723";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
