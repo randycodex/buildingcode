@@ -16,7 +16,7 @@ const projectNavigationMethods = model.slice(model.indexOf('    func noteProject
 const continuityValues = model.slice(model.indexOf('    private func continuitySyncValues('), model.indexOf('    private func refreshContinuityStateFromStore('));
 assert.doesNotMatch(continuityValues, /readerSaveDestination|saveDestination/, 'Web continuity must not overwrite the explicit phone save preference');
 assert.ok(methods.includes('func toggleReaderDestinationSave'));
-assert.doesNotMatch(methods.replace(/\/\/[^\n]*/g,''),/activeProjectID/, 'Last opened Project is never the save choice');
+assert.match(methods,/owner.readerSaveDestinationChoice/, 'Reader uses the explicit Project selected on this device');
 assert.match(model,/readerSaveDestinationChoice = NativeReaderSaveDestination\.load\(accountID: signedInAccount\?\.appUserID/);
 assert.match(model,/readerSaveDestinationChoice = sharedLibrary\.readerSaveDestinationChoice/);
 assert.match(model,/self.readerSaveDestinationChoice = NativeReaderSaveDestination\.load\(accountID: loadedSignedInAccount\?\.appUserID/);
@@ -27,7 +27,7 @@ assert.match(chapter,/showBookmarkConfirmation\("Saved to /, 'Transient confirma
 assert.match(chapter,/if let sectionID, library.isBookmarked\(sectionID: sectionID\) \{\s*Divider\(\)\s*Button\("Add to Projects"\) \{ openFolderPicker\(\) \}/,
  'Already saved passages retain deliberate additional Project assignment in the context menu');
 assert.match(chapter,/memberFolderIDs: Set\(library.folderMembership\[sectionID\] \?\? \[\]\)/, 'Secondary assignment retains current memberships');
-assert.match(browse,/ReaderSaveDestinationMenuContent\(\)/);
+assert.match(browse,/ReaderProjectMenu\(\)/);
 assert.match(search,/Button\("Open in Reader 1"\)/);
 assert.match(search,/Button\("Open in Reader 2"\)/);
 assert.match(browse,/rememberedSectionBinding\(for: target.chapter.id\).wrappedValue = target.section.id/);
@@ -73,7 +73,9 @@ final class Repository {
  var folders:[CodeFolder] = []; var folderMembership:[Int64:[Int64]] = [:]
  var activeProjectID:Int64?; var continuityCalls=0
  func persistContinuityContext() { continuityCalls += 1 }
- var statusMessage:String?; var saveCalls=0; var toggleCalls=0; var syncCalls=0
+ var statusMessage:String?; var saveCalls=0; var toggleCalls=0; var syncCalls=0; var projectRequests=0
+ func requestProjectSelection(sectionID:Int64? = nil) { projectRequests += 1 }
+ func preservePendingProSave(sectionID:Int64) {}
  init(_ defaults:UserDefaults) { preferencesDefaults=defaults; refreshBookmarks() }
  func captureCodeSourceNavigationContext()->CodeSourceNavigationContext? {
   let owner=sharedAccountLibrary ?? self
@@ -109,10 +111,13 @@ ${handoff}
   precondition(NativeReaderSaveDestination.project("deleted").validated(projectClientIDs:["p1"]) == .unassigned)
   let library=CodeLibraryViewModel(defaults), repo=library.userContentRepository!
   library.selectReaderSaveDestination(.project("p1"))
+  library.activeProjectID = 2
+  precondition(library.readerSaveDestination == .project("p1"), "Synced continuity cannot redirect the phone save destination")
   library.noteProjectOpened(2)
-  precondition(library.activeProjectID == 2 && library.readerSaveDestination == .project("p1"), "Opening another Project must not redirect Reader saves")
+  precondition(library.activeProjectID == 2 && library.readerSaveDestination == .project("p2"), "Opening a Project selects it for Reader saves")
   library.clearActiveProject()
-  precondition(library.readerSaveDestination == .project("p1"), "Returning to general Research must preserve the explicit Reader destination")
+  precondition(library.readerSaveDestination == .unassigned, "Closing the selected Project requires another selection before saving")
+  library.selectReaderSaveDestination(.project("p1"))
   repo.bookmarks.insert(42);repo.members[42]=[2];library.refreshBookmarks()
   precondition(library.toggleReaderDestinationSave(sectionID:42))
   precondition(Set(repo.members[42]!) == [1,2] && repo.bookmarks.contains(42),"Saving to Project must preserve existing memberships")
@@ -122,8 +127,8 @@ ${handoff}
   precondition(library.toggleCalls == 0 && library.syncCalls == 1)
   repo.folders.removeAll{$0.id == 1}
   precondition(!library.toggleReaderDestinationSave(sectionID:43) && !repo.bookmarks.contains(43),"Deleted Project revalidated from storage before mutation")
-  library.selectReaderSaveDestination(.unassigned)
-  precondition(library.toggleReaderDestinationSave(sectionID:44) && repo.members[44] == nil,"Unassigned adds no Project membership")
+  library.clearActiveProject()
+  precondition(!library.toggleReaderDestinationSave(sectionID:44) && repo.members[44] == nil && library.projectRequests == 1,"Missing Project requests a selection without saving")
   library.hasProjectAccess=false
   library.selectReaderSaveDestination(.project("p2"))
   precondition(library.readerSaveDestinationChoice == .unassigned,"Project access cannot be bypassed by destination picker")
@@ -131,8 +136,8 @@ ${handoff}
   precondition(!library.toggleReaderDestinationSave(sectionID:45) && !repo.bookmarks.contains(45),"Storage failure never falls back to a different destination")
   repo.fail=false
   let secondary=CodeLibraryViewModel(defaults);secondary.sharedAccountLibrary=library
-  secondary.selectReaderSaveDestination(.unassigned)
-  precondition(library.readerSaveDestinationChoice == .unassigned && secondary.readerSaveDestination == .unassigned,"Secondary selection updates the shared explicit choice")
+  secondary.selectReaderSaveDestination(.project("p2"))
+  precondition(library.readerSaveDestinationChoice == .project("p2") && secondary.readerSaveDestination == .project("p2"),"Secondary selection updates the shared Project choice")
   let p=NativeSearchResultPresentation(sectionNumber:"403.1.1",title:"The building shall comply with section 403.1.1.",isParagraph:true,codeName:"Building Code",edition:"2022",chapterNumber:"4",parentLabels:["403 High-rise buildings"],snippet:"The building shall comply with section 403.1.1.")
   precondition(p.source == "Building Code · 2022" && p.heading == "Passage 403.1.1" && p.context == "Chapter 4 · 403 High-rise buildings")
   precondition(!p.heading.contains("shall") && p.excerpt.contains("shall"),"Paragraph text appears once as excerpt, never duplicated as heading")

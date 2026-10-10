@@ -169,6 +169,15 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var folders: [CodeFolder] = []
     @Published private(set) var readerSaveDestinationChoice: NativeReaderSaveDestination = .unassigned
     @Published private(set) var activeProjectID: Int64?
+    struct ProjectSaveRequest: Identifiable {
+        let id = UUID()
+        let accountID: String?
+        let codeVersion: String?
+        let sectionID: Int64?
+        let blockID: String
+        let noteBody: String?
+    }
+    @Published private(set) var projectSaveRequest: ProjectSaveRequest?
     @Published private(set) var currentPlan: AppPlan {
         didSet {
             if currentPlan == .pro { Task { @MainActor [weak self] in self?.resumePendingProSave() } }
@@ -200,6 +209,8 @@ final class CodeLibraryViewModel: ObservableObject {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             readerSaveDestinationChoice = NativeReaderSaveDestination.load(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
+            activeProjectID = nil
+            projectSaveRequest = nil
             reloadActiveCodeSourcePreferences(forceInvalidation: true)
             privateSessionID = UUID()
             contentTrashEntries = []
@@ -997,16 +1008,25 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func noteProjectOpened(_ folderID: Int64) {
+        let owner = sharedAccountLibrary ?? self
+        if owner !== self { owner.noteProjectOpened(folderID); activeProjectID = owner.activeProjectID; return }
+        guard let project = readerSaveDestinationProjects.first(where: { $0.id == folderID }) else { return }
+        readerSaveDestinationChoice = .project(project.clientID)
+        readerSaveDestinationChoice.store(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
         guard activeProjectID != folderID else { return }
         activeProjectID = folderID
         persistContinuityContext()
     }
 
     func clearActiveProject(ifMatches folderID: Int64? = nil) {
+        let owner = sharedAccountLibrary ?? self
+        if owner !== self { owner.clearActiveProject(ifMatches: folderID); activeProjectID = owner.activeProjectID; return }
         if let folderID, activeProjectID != folderID {
             return
         }
         guard activeProjectID != nil else { return }
+        readerSaveDestinationChoice = .unassigned
+        readerSaveDestinationChoice.store(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
         activeProjectID = nil
         persistContinuityContext()
     }
@@ -3034,7 +3054,7 @@ final class CodeLibraryViewModel: ObservableObject {
             folderMembership = [:]
             projectBookmarksByFolderID = [:]
             projectEvidenceRecordCountByFolderID = [:]
-            clearActiveProject()
+            activeProjectID = nil
             return
         }
 
@@ -3063,7 +3083,7 @@ final class CodeLibraryViewModel: ObservableObject {
             folderMembership = (try? userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
             validateReaderSaveDestination()
             if let activeProjectID, folders.contains(where: { $0.id == activeProjectID }) == false {
-                clearActiveProject(ifMatches: activeProjectID)
+                self.activeProjectID = nil
             }
             if scheduleProjectPresentation { scheduleProjectPresentationRefresh() }
         } catch {
@@ -3073,7 +3093,7 @@ final class CodeLibraryViewModel: ObservableObject {
             folderMembership = [:]
             projectBookmarksByFolderID = [:]
             projectEvidenceRecordCountByFolderID = [:]
-            clearActiveProject()
+            activeProjectID = nil
         }
     }
 
@@ -3290,7 +3310,8 @@ final class CodeLibraryViewModel: ObservableObject {
             return false
         }
         let destinations = folders.filter { folderIDs.contains($0.id) }
-        guard destinations.count == folderIDs.count else {
+        guard destinations.count == folderIDs.count,
+              destinations.contains(where: { $0.folderType == .project && $0.deletedAt == nil }) else {
             statusMessage = "One or more selected folders are no longer available."
             return false
         }
@@ -4082,33 +4103,10 @@ final class CodeLibraryViewModel: ObservableObject {
         guard ownsAccountSync, let pending = pendingProSave else { return }
         guard pending.expiresAt > Date() else { pendingProSave = nil; return }
         guard currentPlan == .pro, signedInAccount != nil,
-              pending.permits(accountID: signedInAccount?.appUserID),
-              availableVersions.contains(where: { $0.codeVersion == pending.codeVersion }),
-              let userContentRepository else { return }
-        do {
-            // The saved edition may belong to a separate Search Reader. Do not
-            // change the main Reader's edition or toggle an already-saved section off.
-            if try !userContentRepository.isBookmarked(sectionID: pending.sectionID, codeVersion: pending.codeVersion) {
-                try userContentRepository.toggleBookmark(sectionID: pending.sectionID, codeVersion: pending.codeVersion)
-            }
-            pendingProSave = nil
-            refreshBookmarks()
-            if selectedVersion?.codeVersion != pending.codeVersion {
-                let identity = privateRequestIdentity
-                let reader = makeSearchReaderLibrary(sourceVersion: pending.codeVersion)
-                Task { @MainActor [weak self] in
-                    guard await reader.prepareCodeVersionForEvidence(pending.codeVersion),
-                          let self, self.privateRequestIdentity == identity else { return }
-                    reader.refreshBookmarks()
-                    self.reconcileExternalSavedWorkChange(from: reader, scheduleAccountSync: false)
-                }
-            }
-            scheduleUserContentAutoSync()
-            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
-            statusMessage = "Section saved."
-        } catch {
-            statusMessage = "The section could not be saved yet. Your pending save is retained."
-        }
+              pending.permits(accountID: signedInAccount?.appUserID) else { return }
+        projectSaveRequest = ProjectSaveRequest(accountID: signedInAccount?.appUserID,
+            codeVersion: pending.codeVersion, sectionID: pending.sectionID, blockID: "", noteBody: nil)
+        pendingProSave = nil
     }
 
     @discardableResult
@@ -6242,6 +6240,53 @@ final class CodeLibraryViewModel: ObservableObject {
         NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
     }
 
+    func requestProjectSelection(sectionID: Int64? = nil, blockID: String = "", noteBody: String? = nil) {
+        let owner = sharedAccountLibrary ?? self
+        guard owner.requireProjectAccess() else { return }
+        owner.projectSaveRequest = ProjectSaveRequest(accountID: owner.signedInAccount?.appUserID,
+            codeVersion: sectionID == nil ? nil : selectedVersion?.codeVersion,
+            sectionID: sectionID, blockID: blockID, noteBody: noteBody)
+    }
+
+    func cancelProjectSelection() {
+        let owner = sharedAccountLibrary ?? self
+        owner.projectSaveRequest = nil
+    }
+
+    @discardableResult
+    func completeProjectSelection(_ project: CodeFolder) async -> Bool {
+        let owner = sharedAccountLibrary ?? self
+        guard let request = owner.projectSaveRequest,
+              request.accountID == owner.signedInAccount?.appUserID,
+              owner.readerSaveDestinationProjects.contains(where: { $0.clientID == project.clientID }) else { return false }
+        let identity = owner.privateRequestIdentity
+        owner.selectReaderSaveDestination(.project(project.clientID))
+        guard let sectionID = request.sectionID, let version = request.codeVersion else {
+            owner.projectSaveRequest = nil
+            return true
+        }
+        let reader = owner.makeSearchReaderLibrary(sourceVersion: version)
+        guard await reader.prepareCodeVersionForEvidence(version),
+              owner.privateRequestIdentity == identity,
+              owner.projectSaveRequest?.id == request.id,
+              owner.readerSaveDestination.projectClientID == project.clientID,
+              let destination = reader.readerSaveDestinationProjects.first(where: { $0.clientID == project.clientID }) else { return false }
+        let memberships = Set(reader.folderMembership[sectionID] ?? [])
+        guard reader.saveSection(sectionID: sectionID, toFolderIDs: memberships.union([destination.id])) else {
+            owner.statusMessage = reader.statusMessage
+            return false
+        }
+        if let body = request.noteBody,
+           case .failed(_, let message) = reader.saveNote(sectionID: sectionID, blockID: request.blockID, body: body) {
+            owner.statusMessage = message
+            return false
+        }
+        owner.reconcileExternalSavedWorkChange(from: reader, scheduleAccountSync: true)
+        owner.projectSaveRequest = nil
+        owner.statusMessage = "Saved to \(destination.name)"
+        return true
+    }
+
     var readerSaveDestinationProjects: [CodeFolder] {
         let owner = sharedAccountLibrary ?? self
         guard owner.hasProjectAccess, owner.signedInAccount != nil else { return [] }
@@ -6250,6 +6295,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
     var readerSaveDestination: NativeReaderSaveDestination {
         let owner = sharedAccountLibrary ?? self
+        // Explicit device selection is authoritative. Synced reading continuity
+        // from web must never redirect the phone's next save.
         return owner.readerSaveDestinationChoice.validated(
             projectClientIDs: Set(readerSaveDestinationProjects.map(\.clientID)))
     }
@@ -6259,11 +6306,11 @@ final class CodeLibraryViewModel: ObservableObject {
         return readerSaveDestinationProjects.first { $0.clientID == selected }
     }
 
-    var readerSaveDestinationName: String { readerSaveDestinationProject?.name ?? "Unassigned" }
+    var readerSaveDestinationName: String { readerSaveDestinationProject?.name ?? "Choose Project" }
 
     func selectReaderSaveDestination(_ destination: NativeReaderSaveDestination) {
         let owner = sharedAccountLibrary ?? self
-        guard destination.projectClientID == nil || owner.requireProjectAccess() else { return }
+        guard destination.projectClientID != nil, owner.requireProjectAccess() else { return }
         let validated = destination.validated(projectClientIDs: Set(readerSaveDestinationProjects.map(\.clientID)))
         guard destination == validated else {
             statusMessage = "That Project is no longer available. Choose a save destination again."
@@ -6272,6 +6319,10 @@ final class CodeLibraryViewModel: ObservableObject {
         owner.readerSaveDestinationChoice = validated
         validated.store(accountID: owner.signedInAccount?.appUserID, defaults: owner.preferencesDefaults)
         readerSaveDestinationChoice = validated
+        if let project = owner.readerSaveDestinationProjects.first(where: { $0.clientID == validated.projectClientID }) {
+            owner.noteProjectOpened(project.id)
+            activeProjectID = owner.activeProjectID
+        }
         NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: owner)
     }
 
@@ -6281,13 +6332,15 @@ final class CodeLibraryViewModel: ObservableObject {
         // or failed read must not erase the user's persisted destination.
         let validated = readerSaveDestinationChoice.validated(
             projectClientIDs: Set(folders.filter { $0.folderType == .project && $0.deletedAt == nil }.map(\.clientID)))
-        guard validated != readerSaveDestinationChoice else { return }
-        readerSaveDestinationChoice = validated
-        validated.store(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
+        if validated != readerSaveDestinationChoice {
+            readerSaveDestinationChoice = validated
+            validated.store(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
+        }
+        activeProjectID = folders.first(where: { $0.folderType == .project && $0.deletedAt == nil && $0.clientID == validated.projectClientID })?.id
     }
 
     func isSavedToReaderDestination(sectionID: Int64) -> Bool {
-        guard let project = readerSaveDestinationProject else { return isBookmarked(sectionID: sectionID) }
+        guard let project = readerSaveDestinationProject else { return false }
         return (folderMembership[sectionID] ?? []).contains(project.id)
     }
 
@@ -6296,19 +6349,17 @@ final class CodeLibraryViewModel: ObservableObject {
         if let project = readerSaveDestinationProject {
             return saved ? "Remove from Project: \(project.name)" : "Save to Project: \(project.name)"
         }
-        return saved ? "Remove from Saved" : "Save passage"
+        return "Choose a Project to save passage"
     }
 
-    /// A Project action changes that membership only. Unassigned uses the
-    /// existing global Saved action; neither path uses activeProjectID.
+    /// Reader, Saved and Research use the same Project selection on this device.
     @discardableResult
     func toggleReaderDestinationSave(sectionID: Int64) -> Bool {
-        let owner = sharedAccountLibrary ?? self
         guard let selectedVersion, let userContentRepository else { return false }
-        let requested = owner.readerSaveDestinationChoice
+        let requested = readerSaveDestination
         if let projectClientID = requested.projectClientID {
             guard requireProjectAccess(), let project = readerSaveDestinationProjects.first(where: { $0.clientID == projectClientID }) else {
-                statusMessage = "The selected Project is unavailable. Choose Unassigned or another Project before saving."
+                requestProjectSelection(sectionID: sectionID)
                 return isSavedToReaderDestination(sectionID: sectionID)
             }
             do {
@@ -6332,77 +6383,13 @@ final class CodeLibraryViewModel: ObservableObject {
                 return isSavedToReaderDestination(sectionID: sectionID)
             }
         }
-        return toggleBookmark(sectionID: sectionID)
+        if !requireSavedWorkAccess() { preservePendingProSave(sectionID: sectionID); return false }
+        requestProjectSelection(sectionID: sectionID)
+        return false
     }
 
     func toggleBookmark(sectionID: Int64) -> Bool {
-        guard let selectedVersion, let userContentRepository else { return false }
-        let wasBookmarked = bookmarkedSectionIDs.contains(sectionID)
-        if !wasBookmarked, !requireSavedWorkAccess() {
-            preservePendingProSave(sectionID: sectionID)
-            return false
-        }
-
-        let previousBookmarkedSectionIDs = bookmarkedSectionIDs
-        let previousBookmarks = bookmarks
-        let previousFolderMembership = folderMembership
-        let previousProjectBookmarks = projectBookmarksByFolderID
-        let previousProjectCounts = projectEvidenceRecordCountByFolderID
-        let newState = !wasBookmarked
-        applyOptimisticBookmarkState(
-            sectionID: sectionID,
-            isBookmarked: newState,
-            codeVersion: selectedVersion.codeVersion
-        )
-
-        let signpostID = OSSignpostID(log: AppSignpost.reader)
-        os_signpost(
-            .begin,
-            log: AppSignpost.reader,
-            name: "bookmarkMutation",
-            signpostID: signpostID,
-            "sectionID=%{public}lld",
-            sectionID
-        )
-        defer {
-            os_signpost(
-                .end,
-                log: AppSignpost.reader,
-                name: "bookmarkMutation",
-                signpostID: signpostID
-            )
-        }
-
-        do {
-            let removal = wasBookmarked ? SavedPassageRemoval(
-                sectionID: sectionID,
-                codeVersion: selectedVersion.codeVersion,
-                folderIDs: Set(try userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)[sectionID] ?? []),
-                sessionID: privateSessionID
-            ) : nil
-            try userContentRepository.toggleBookmark(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
-            if let removal {
-                // Preserve the original membership snapshot if the passage was
-                // manually re-saved and removed again before Undo.
-                if !removedSavedPassages.contains(where: { $0.sectionID == sectionID && $0.codeVersion == selectedVersion.codeVersion }) {
-                    removedSavedPassages.append(removal)
-                }
-                savedRemovalUndoFailed = false
-            }
-            scheduleProjectPresentationRefresh()
-            scheduleUserContentAutoSync()
-            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
-            return newState
-        } catch {
-            bookmarkedSectionIDs = previousBookmarkedSectionIDs
-            bookmarks = previousBookmarks
-            folderMembership = previousFolderMembership
-            projectBookmarksByFolderID = previousProjectBookmarks
-            projectEvidenceRecordCountByFolderID = previousProjectCounts
-            bookmarkRevision &+= 1
-            statusMessage = error.localizedDescription
-            return bookmarkedSectionIDs.contains(sectionID)
-        }
+        toggleReaderDestinationSave(sectionID: sectionID)
     }
 
     private func applyOptimisticBookmarkState(
@@ -6506,6 +6493,18 @@ final class CodeLibraryViewModel: ObservableObject {
                         persistedBody: existingBody,
                         message: statusMessage ?? "The note was not saved."
                     )
+                }
+            }
+            if !body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                guard let project = readerSaveDestinationProject else {
+                    requestProjectSelection(sectionID: sectionID, blockID: normalizedBlockID, noteBody: body)
+                    return .failed(persistedBody: existingBody, message: "Choose a Project to save this note.")
+                }
+                if !(folderMembership[sectionID] ?? []).contains(project.id) {
+                    let ids = Set(folderMembership[sectionID] ?? []).union([project.id])
+                    guard saveSection(sectionID: sectionID, toFolderIDs: ids) else {
+                        return .failed(persistedBody: existingBody, message: statusMessage ?? "The Project could not be saved.")
+                    }
                 }
             }
             // Persist every edit immediately, but debounce the heavier Saved

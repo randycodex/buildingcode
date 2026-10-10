@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-inbox-close-v692";
+} from "./offline-storage.js?v=20261010-project-saving-v697";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-inbox-close-v692";
+} from "./research-intent-state.js?v=20261010-project-saving-v697";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -340,7 +340,6 @@ const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
-const unassignedSavesButton = document.querySelector("#open-unassigned");
 const connectionStatus = document.querySelector("#connection-status");
 const workspaceIssue = document.querySelector("#workspace-issue");
 const workspaceIssueCopy = workspaceIssue?.querySelector(".workspace-issue-copy");
@@ -778,6 +777,7 @@ function loadWorkspaceState(accountOverride) {
       });
       sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
     }
+    saved = retireUnassignedLayout(saved);
     const utilityInstances = normalizeUtilityInstances(saved);
     const projectDetails = (Array.isArray(saved.projectDetails)
       ? saved.projectDetails.filter((detail) => detail && typeof detail === "object")
@@ -1177,6 +1177,48 @@ function newUtilityInstance(key, overrides = {}) {
     ));
   }
   return instance;
+}
+
+function retireUnassignedLayout(layout = {}) {
+  const panes = Array.isArray(layout.utilityInstances) ? layout.utilityInstances : [];
+  const inboxes = panes.filter(pane => pane.key === "saved" && pane.unassignedInbox);
+  if (!inboxes.length) return layout;
+  const removedPaneIDs = new Set(inboxes.map(pane => `utility:saved:${pane.id}`));
+  const removedIDs = new Set(inboxes.map(pane => pane.id));
+  const fallback = layout.projectHostPaneID || panes.filter(pane => pane.key === "saved").map(pane => `utility:saved:${pane.id}`)[0];
+  for (const pane of panes) {
+    if (pane.key === "sdc" && removedPaneIDs.has(layout.sectionDetailAnchors?.[pane.id] || fallback)) {
+      removedIDs.add(pane.id);
+      removedPaneIDs.add(`utility:sdc:${pane.id}`);
+    }
+  }
+  const linked = new Set(Object.entries(layout.searchLinkedReaders || {})
+    .filter(([sourceID]) => removedIDs.has(sourceID)).map(([, readerID]) => readerID));
+  const readers = (layout.readers || []).filter(reader => {
+    const remove = linked.has(reader.id) || removedPaneIDs.has(reader.savedSourcePaneID) ||
+      removedPaneIDs.has(reader.sourceAnchorPaneID) || removedIDs.has(reader.pinnedDetailSourceID) ||
+      removedPaneIDs.has(reader.pinnedSearchPaneID);
+    if (remove) removedPaneIDs.add(`reader:${reader.id}`);
+    return !remove;
+  });
+  const keepEntries = (value, predicate) => Object.fromEntries(Object.entries(value || {}).filter(predicate));
+  return {
+    ...layout, readers,
+    utilityInstances: panes.filter(pane => !removedIDs.has(pane.id)),
+    utilities: { ...layout.utilities, saved: panes.some(pane => pane.key === "saved" && !removedIDs.has(pane.id)) },
+    sectionDetails: keepEntries(layout.sectionDetails, ([id]) => !removedIDs.has(id)),
+    sectionDetailAnchors: keepEntries(layout.sectionDetailAnchors, ([id]) => !removedIDs.has(id)),
+    searchLinkedReaders: keepEntries(layout.searchLinkedReaders, ([id, readerID]) => !removedIDs.has(id) && !removedPaneIDs.has(`reader:${readerID}`)),
+    paneOrder: (layout.paneOrder || []).filter(id => !removedPaneIDs.has(id)),
+    paneWeights: keepEntries(layout.paneWeights, ([id]) => !removedPaneIDs.has(id)),
+    collapsedPaneIDs: (layout.collapsedPaneIDs || []).filter(id => !removedPaneIDs.has(id)),
+    pinnedPaneID: removedPaneIDs.has(layout.pinnedPaneID) ? "" : layout.pinnedPaneID,
+    projectHostPaneID: removedPaneIDs.has(layout.projectHostPaneID) ? "" : layout.projectHostPaneID,
+    columnGroups: (layout.columnGroups || []).map(group => ({ ...group,
+      paneIDs: (group.paneIDs || []).filter(id => !removedPaneIDs.has(id)),
+      columns: keepEntries(group.columns, ([id]) => !removedPaneIDs.has(id))
+    })).filter(group => group.paneIDs.length)
+  };
 }
 
 function normalizeUtilityInstances(saved = {}) {
@@ -1610,7 +1652,7 @@ function waitForWorkspaceTransitionPaint() {
 
 function applyStoredWorkspaceLayout(layout) {
   projectStudioTransitionGeneration += 1;
-  applyWorkspaceLayout(state, workspaceLayoutWithoutCodeQuestionData(layout));
+  applyWorkspaceLayout(state, retireUnassignedLayout(workspaceLayoutWithoutCodeQuestionData(layout)));
   loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
   state.utilityInstances = normalizeUtilityInstances(state);
   setOpenProjectDetails(state.projectDetails);
@@ -1742,11 +1784,11 @@ function scopeSavedInstanceToWorkspace(instance, options = {}) {
   // Also used directly by forEach, whose second argument is a numeric index.
   const projects = Array.isArray(options?.projects) ? options.projects : null;
   const project = workspaceProject(projects);
-  if (instance.unassignedInbox) instance.selectedFolderID = "";
-  else if (project) instance.selectedFolderID = projectRecordID(project);
+  instance.unassignedInbox = false;
+  if (project) instance.selectedFolderID = projectRecordID(project);
   else if (!activeFolderRecords(projects ?? currentContentSummary().projects ?? []).some((folder) =>
     !folderIsProject(folder) && projectRecordID(folder) === instance.selectedFolderID)) instance.selectedFolderID = "";
-  instance.organizeUnassigned = !instance.selectedFolderID;
+  instance.organizeUnassigned = false;
   instance.showAllSaved = false;
   return instance;
 }
@@ -1762,49 +1804,9 @@ function defaultReadingWorkspace() {
     || null;
 }
 
-function unassignedInboxInstance() {
-  return (state.utilityInstances || []).find((instance) => instance.key === "saved" &&
-    (instance.unassignedInbox || (!instance.selectedFolderID && instance.organizeUnassigned)));
-}
-
-let unassignedToggleInFlight = false;
-async function toggleUnassignedSaves() {
-  if (!workspacePrivatePresentationAllowed() || unassignedToggleInFlight) return;
-  unassignedToggleInFlight = true;
-  try {
-    const inbox = unassignedInboxInstance();
-    if (inbox) await closeUtilityInstance(inbox);
-    else await openUnassignedSaves();
-  } finally {
-    unassignedToggleInFlight = false;
-  }
-}
-
+// Old inbox links now lead to Projects; there is no unassigned save destination.
 async function openUnassignedSaves() {
-  if (!workspacePrivatePresentationAllowed()) return;
-  const requestIdentity = captureAccountRequest();
-  const workspaceID = activeWorkspaceID;
-  let inbox = unassignedInboxInstance();
-  if (!inbox) {
-    inbox = newUtilityInstance("saved", { unassignedInbox: true, organizeUnassigned: true, projectsMenuOpen: false });
-    state.utilityInstances = [...(state.utilityInstances || []), inbox];
-    const paneID = paneIDForUtilityInstance(inbox);
-    state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
-    appendPaneIfMissing(paneID);
-    saveWorkspaceState();
-    await transitionWorkspace("utility");
-  } else if (!inbox.unassignedInbox) {
-    inbox.unassignedInbox = true;
-    saveWorkspaceState();
-    await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForUtilityInstance(inbox)] });
-  }
-  if (!isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== workspaceID) return;
-  const paneID = paneIDForUtilityInstance(inbox);
-  scrollPaneIntoView(paneID);
-  if (!await whenWorkspacePaneReady(paneID) || !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== workspaceID) return;
-  const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
-  if (panel && paneIsCollapsed(paneID)) setPaneCollapsed(panel, false);
-  panel?.querySelector(".panel-collapse-button")?.focus({ preventScroll: true });
+  await openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
 }
 
 async function closeActiveProject() {
@@ -2061,10 +2063,7 @@ function openMobileMoreSheet() {
   const accountSection = document.createElement("section");
   accountSection.className = "mobile-more-section";
   accountSection.append(mobileMoreAction("Account", () => toggleUtilityPane("settings")));
-  const inboxSection = document.createElement("section");
-  inboxSection.className = "mobile-more-section";
-  inboxSection.append(mobileMoreAction("Unassigned saves", () => void openUnassignedSaves()));
-  sheet.append(header, inboxSection, projectSection, accountSection);
+  sheet.append(header, projectSection, accountSection);
   backdrop.append(sheet);
   backdrop.addEventListener("click", (event) => {
     if (event.target === backdrop) closeMobileMoreSheet();
@@ -2199,7 +2198,6 @@ function renderWorkspaceTabs() {
   if (!workspaceActionsButton || !container) return;
   container.hidden = detachedProjectWindow;
   if (detachedProjectWindow) return;
-  if (unassignedSavesButton) unassignedSavesButton.disabled = !workspacePrivatePresentationAllowed();
   if (!workspacePrivatePresentationAllowed()) {
     const label = workspaceActionsButton.querySelector(".workspace-current-name");
     if (label) label.textContent = "Projects";
@@ -4718,7 +4716,6 @@ function setUtilityButtonStates() {
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
-  unassignedSavesButton?.setAttribute("aria-pressed", String(Boolean(unassignedInboxInstance())));
   toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis || activeRepeatableKeys.has("analysis")));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
@@ -7549,6 +7546,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   } : null;
   if (options.persistPrevious !== false) saveWorkspaceState();
   accountRuntimeGeneration += 1;
+  cancelPendingProjectChoice?.();
   notebookReturnScrollPositions.clear();
   notebookReturnCardIDs.clear();
   workspaceRenderGeneration += 1;
@@ -13030,7 +13028,7 @@ function isSectionSaved(section, codeVersion = "") {
   const project = workspaceProject();
   if (project) return (currentContentSummary().projectSections || []).some((item) =>
     savedEvidenceKey(item) === savedEvidenceKey(section, codeVersion) && projectSectionBelongsToProject(item, project));
-  return Boolean(savedSectionRecord(section, codeVersion));
+  return false;
 }
 
 function savedSectionRecord(section, codeVersion = "") {
@@ -13069,6 +13067,125 @@ function setLocalSectionSaved(section, saved, codeVersion = defaultSyncCodeVersi
   }
   state.localSavedSectionIDs = Array.from(current);
   saveWorkspaceState();
+}
+
+let pendingProjectChoice = null;
+let cancelPendingProjectChoice = null;
+
+async function chooseProjectForSaving() {
+  if (workspaceProject()) return workspaceProject();
+  if (!hasCapability("projects")) return null;
+  if (pendingProjectChoice) return pendingProjectChoice;
+  const identity = captureAccountRequest();
+  const returnFocus = document.activeElement;
+  const backdrop = document.createElement("div");
+  backdrop.className = "web-warning-backdrop";
+  const dialog = document.createElement("section");
+  dialog.className = "web-warning-dialog project-save-dialog";
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-label", "Choose a Project");
+  const title = document.createElement("h2");
+  title.textContent = "Choose a Project";
+  const list = document.createElement("div");
+  list.className = "project-save-options";
+  const status = document.createElement("p");
+  status.setAttribute("role", "status");
+  const form = document.createElement("form");
+  form.hidden = true;
+  const input = document.createElement("input");
+  input.placeholder = "Project name";
+  input.setAttribute("aria-label", "Project name");
+  input.required = true;
+  const create = document.createElement("button");
+  create.type = "submit";
+  create.textContent = "Create Project";
+  form.append(input, create);
+  const newProject = document.createElement("button");
+  newProject.type = "button";
+  newProject.textContent = "New Project…";
+  newProject.addEventListener("click", () => {
+    form.hidden = false;
+    newProject.hidden = true;
+    input.focus();
+  });
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.textContent = "Cancel";
+  dialog.append(title, list, newProject, form, status, cancel);
+  backdrop.append(dialog);
+  let resolveChoice;
+  let busy = false;
+  let settled = false;
+  const setBusy = value => {
+    busy = value;
+    dialog.querySelectorAll("button, input").forEach(control => { control.disabled = value; });
+  };
+  const choice = new Promise(resolve => { resolveChoice = resolve; });
+  pendingProjectChoice = choice;
+  const finish = (project) => {
+    if (settled) return;
+    settled = true;
+    cancelPendingProjectChoice = null;
+    backdrop.remove();
+    if (pendingProjectChoice === choice) pendingProjectChoice = null;
+    resolveChoice(project);
+    if (returnFocus?.isConnected && isCurrentAccountRequest(identity)) returnFocus.focus({ preventScroll: true });
+  };
+  cancelPendingProjectChoice = () => finish(null);
+  const select = async (project) => {
+    if (settled) return;
+    setBusy(true);
+    try {
+      requireCurrentAccountRequest(identity);
+      reconcileProjectWorkspaces();
+      const live = activeFolderRecords(currentContentSummary().projects || []).find(item =>
+        folderIsProject(item) && projectDetailMatches(item, project));
+      if (!live) throw new Error("That Project is no longer available.");
+      const linked = workspaceRegistry.workspaces.find(item => item.projectID === projectRecordID(live));
+      if (!linked || !await switchWorkspace(linked.id, { focus: false })) {
+        finish(null);
+        return;
+      }
+      requireCurrentAccountRequest(identity);
+      finish(workspaceProject());
+    } catch (error) {
+      if (!isCurrentAccountRequest(identity)) { finish(null); return; }
+      status.textContent = error.message || "The Project could not be opened. Please try again.";
+    } finally {
+      if (!settled) setBusy(false);
+    }
+  };
+  activeFolderRecords(currentContentSummary().projects || []).filter(folderIsProject).forEach(project => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = project.name || project.title || "Untitled Project";
+    button.addEventListener("click", () => { if (!busy) void select(project); });
+    list.append(button);
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (busy || settled || !input.value.trim()) return;
+    setBusy(true);
+    try {
+      requireCurrentAccountRequest(identity);
+      const project = await createProjectFolder({ name: input.value.trim(), folderType: "project" });
+      requireCurrentAccountRequest(identity);
+      if (project && !settled) await select(project);
+    } catch (error) {
+      if (!isCurrentAccountRequest(identity)) { finish(null); return; }
+      status.textContent = error.message || "The Project could not be created. Please try again.";
+    } finally { if (!settled) setBusy(false); }
+  });
+  cancel.addEventListener("click", () => { if (!busy) finish(null); });
+  backdrop.addEventListener("click", event => { if (event.target === backdrop && !busy) finish(null); });
+  dialog.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !busy) { event.preventDefault(); finish(null); }
+    else trapWebModalFocus(dialog, event);
+  });
+  document.body.append(backdrop);
+  (list.querySelector("button") || newProject).focus();
+  return choice;
 }
 
 function bookmarkActionLabel(saved) {
@@ -13120,7 +13237,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
-  const targetProject = options.attachToWorkspaceProject === false ? null : workspaceProject();
+  let targetProject = workspaceProject();
   const existingRecord = savedItemForSection(sectionPayload);
   const undoWorkspaceID = activeWorkspaceID;
   const undoPaneID = options.undoPaneID || document.activeElement?.closest(".workspace-panel")?.dataset.paneId || primarySavedPaneID();
@@ -13147,6 +13264,12 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
       "Upgrade to Pro to save this section. Your place in the code will be kept."
     ).then(accepted => { if (!accepted) clearPendingProSave(); });
     return false;
+  }
+  if (saved) {
+    targetProject = targetProject || await chooseProjectForSaving();
+    requireCurrentAccountRequest(requestIdentity);
+    if (!targetProject || !workspaceProject() ||
+        projectRecordID(targetProject) !== projectRecordID(workspaceProject())) return false;
   }
   if (syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
     setLocalSectionSaved(sectionPayload, saved, sectionPayload.codeVersion);
@@ -13236,7 +13359,7 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   const selectedByID = new Map(selectedFolders.map((folder) => [projectRecordID(folder), folder]));
-  if (!selectedByID.size) return { saved: false, changed: false, queued: false };
+  if (!selectedByID.size || !selectedFolders.some(folderIsProject)) return { saved: false, changed: false, queued: false };
   if (
     !hasCapability("saved-work")
   ) {
@@ -13679,6 +13802,20 @@ function setAnnotationNoteValue(target, value, onStatus = () => {}) {
       "Upgrade to Pro to add or edit notes. Existing notes are preserved."
     );
     return false;
+  }
+  const project = workspaceProject();
+  if (nextNote.trim() && !project) {
+    const identity = captureAccountRequest();
+    void chooseProjectForSaving().then(chosen => {
+      if (chosen && isCurrentAccountRequest(identity)) setAnnotationNoteValue(target, nextNote, onStatus);
+    });
+    return false;
+  }
+  if (nextNote.trim() && project && !projectLinkForAnnotationTarget(project, target)) {
+    const link = projectSectionRecordForSection(project, target);
+    state.localProjectSections = [...(state.localProjectSections || []).filter(item => item.id !== link.id), link];
+    const account = activeAccount();
+    if (account) enqueueSyncMutation(projectSectionMutationForSection(project, target), account);
   }
   const existingTags = tagsForTarget(target);
   const deleteEmptyAnnotation = !nextNote.trim() && existingTags.length === 0;
@@ -14550,7 +14687,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
   const blocks = annotatedBlocksForSection(section);
-  const savedWholeSectionRecord = readerPrivateContentAllowed(panel) && savedSectionRecord({
+  const savedWholeSectionRecord = readerPrivateContentAllowed(panel) && isSectionSaved({
     sectionID: section.id,
     codeVersion: reader.codeVersion,
     blockID: ""
@@ -14567,7 +14704,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
 
   blocks.forEach((block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
-    const savedBlockRecord = readerPrivateContentAllowed(panel) && savedSectionRecord({
+    const savedBlockRecord = readerPrivateContentAllowed(panel) && isSectionSaved({
       sectionID: target.sectionID,
       codeVersion: target.codeVersion,
       blockID: target.blockID
@@ -15177,7 +15314,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     researchButton.hidden = !permitted;
     researchButton.disabled = !permitted;
     if (!permitted) return;
-    const saved = gate ? Boolean(savedSectionRecord({
+    const saved = gate ? Boolean(isSectionSaved({
       sectionID: target.sectionID || section.id,
       codeVersion: target.codeVersion,
       blockID: target.blockID || ""
@@ -15390,12 +15527,6 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
     button.addEventListener("click", () => { void addToProject(project); });
     projectList.append(button);
   };
-  if (!projects.length) {
-    const empty = document.createElement("p");
-    empty.className = "reader-notes-project-empty";
-    empty.textContent = "No Projects yet.";
-    projectList.append(empty);
-  }
   projects.forEach(appendProject);
   const createProject = document.createElement("button");
   createProject.type = "button";
@@ -15428,7 +15559,6 @@ function showSectionDetailProjectPicker(sheet, sectionPayload, options = {}) {
           status.textContent = "The Project could not be created. Please try again.";
           return;
         }
-        projectList.querySelector(".reader-notes-project-empty")?.remove();
         appendProject(project);
         form.remove();
         createProject.hidden = false;
@@ -15694,7 +15824,7 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
   wrappers.forEach((wrapper) => {
     if (!readerPrivateContentAllowed(wrapper.closest(".reader-panel"))) return;
     const wrapperBlockID = normalizeAnnotationBlockID(wrapper.dataset.commentBlockId);
-    const savedRecord = savedSectionRecord({
+    const savedRecord = isSectionSaved({
       sectionID,
       codeVersion: exactCodeVersion,
       blockID: wrapperBlockID
@@ -15712,7 +15842,7 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     if (section.dataset.codeVersion !== exactCodeVersion || !readerPrivateContentAllowed(section.closest(".reader-panel"))) return;
     const marker = section.querySelector(".reader-section-saved-marker");
     if (!marker) return;
-    const showSectionMarker = Boolean(savedSectionRecord({
+    const showSectionMarker = Boolean(isSectionSaved({
       sectionID,
       codeVersion: exactCodeVersion,
       blockID: ""
@@ -18856,6 +18986,9 @@ async function renderSectionDetail(searchID, detail) {
       saveState.textContent = "Couldn’t save on this device";
     }
   };
+  textarea.addEventListener("focus", () => {
+    if (!workspaceProject()) void chooseProjectForSaving();
+  });
   textarea.addEventListener("input", persistNote);
   const restoredPendingNote = pendingAnnotationNoteForTarget(sectionTarget);
   if (pendingAnnotationNoteForTarget(sectionTarget, state.syncConflicts)) renderNoteStatus("conflict");
@@ -33491,7 +33624,7 @@ async function renderSaved(instance, options = {}) {
   if (!hasCapability("saved-work")) {
     const paneID = paneIDForUtilityInstance(instance);
     options.foundationScope?.release(paneID);
-    return renderProLockedPane(paneID, instance.unassignedInbox ? "Unassigned saves" : "Saved");
+    return renderProLockedPane(paneID, "Saved");
   }
   // Share only within this synchronous setup; hydration obtains its own fresh summary.
   const summary = currentContentSummary();
@@ -33499,16 +33632,30 @@ async function renderSaved(instance, options = {}) {
   const paneID = paneIDForUtilityInstance(savedInstance);
   const panel = renderTemplate(savedTemplate);
   panel.classList.add("saved-panel");
-  if (savedInstance.organizeUnassigned) {
-    panel.classList.add("saved-inbox-panel");
-    panel.querySelectorAll(".panel-kind, .panel-title").forEach((label) => { label.textContent = "Unassigned saves"; });
-  }
   applyPaneWeight(panel, paneID);
   const content = panel.querySelector(".saved-content");
   content.hidden = !savedInstance.selectedFolderID;
   panel.querySelector(".saved-inline-filters").hidden = !savedInstance.selectedFolderID;
   clear(content);
   renderSavedPlanUsage(panel.querySelector(".saved-plan-usage"));
+  if (!workspaceProject(summary.projects || [])) {
+    content.hidden = false;
+    panel.querySelector(".saved-projects-section").hidden = true;
+    panel.querySelector(".saved-plan-usage").hidden = true;
+    const prompt = document.createElement("div");
+    prompt.className = "pro-locked-content saved-project-required";
+    const message = document.createElement("p");
+    message.textContent = "Choose a Project to view saved passages";
+    const choose = document.createElement("button");
+    choose.type = "button";
+    choose.textContent = "Choose Project";
+    choose.addEventListener("click", () => void chooseProjectForSaving());
+    prompt.append(message, choose);
+    content.append(prompt);
+    wireUtilityInstanceActions(panel, savedInstance);
+    options.foundationScope?.release(paneID);
+    return panel;
+  }
   renderSavedProjects(
     panel,
     savedInstance,
@@ -33838,43 +33985,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
       });
       list.append(tile);
     });
-    const unassignedCount = unassignedSavedEvidenceKeys(savedItems, projectSections, projects, annotations).size;
-    if (!showingArchived && unassignedCount > 0) {
-      const unassignedTile = document.createElement("article");
-      unassignedTile.className = "saved-project-tile is-reference is-unassigned-saved";
-      unassignedTile.tabIndex = 0;
-      unassignedTile.setAttribute("role", "button");
-      unassignedTile.setAttribute("aria-label", "Open Unassigned saves");
-      unassignedTile.dataset.projectName = "Unassigned saves";
-      unassignedTile.dataset.defaultAriaLabel = "Open Unassigned saves";
-      unassignedTile.dataset.bulkSelectable = "false";
-      unassignedTile.classList.toggle("is-selected", instance.organizeUnassigned);
-      if (instance.organizeUnassigned) unassignedTile.setAttribute("aria-current", "true");
-      const unassignedHeading = document.createElement("strong");
-      unassignedHeading.textContent = "Unassigned saves";
-      const unassignedCountLabel = document.createElement("span");
-      unassignedCountLabel.className = "saved-project-count";
-      unassignedCountLabel.textContent = String(unassignedCount);
-      unassignedCountLabel.title = unassignedCount === 1 ? "1 unassigned save" : `${unassignedCount} unassigned saves`;
-      unassignedCountLabel.setAttribute("aria-label", unassignedCountLabel.title);
-      unassignedTile.append(unassignedHeading, unassignedCountLabel);
-      const openUnassigned = () => {
-        if (selecting || selectionBusy) return;
-        const organizeUnassigned = !instance.organizeUnassigned;
-        void requestProjectSelection(paneID, instance.id, {
-          kind: organizeUnassigned ? "unassigned" : "none",
-          folderID: "",
-          project: null
-        });
-      };
-      unassignedTile.addEventListener("click", () => void openUnassigned());
-      unassignedTile.addEventListener("keydown", (event) => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        void openUnassigned();
-      });
-      list.append(unassignedTile);
-    }
     updateSelectionControls();
     updateCodeFilterMenu(list, instance, {
       stateKey: "projectsMenuOpen",
@@ -43583,10 +43693,6 @@ async function start() {
       return;
     }
     openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
-  });
-  unassignedSavesButton?.addEventListener("click", () => {
-    closeWorkspaceContextMenu();
-    void toggleUnassignedSaves();
   });
   mobileMoreButton?.addEventListener("click", openMobileMoreSheet);
   window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {

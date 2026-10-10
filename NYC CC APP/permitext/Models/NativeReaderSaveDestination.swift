@@ -1,6 +1,7 @@
 import Foundation
 
-/// A deliberate save choice, separate from the last Project opened for Research.
+/// Stable Project identity for saving, shared with the active Project on this device.
+/// A nil identity is a legacy or missing selection; it never permits a new save.
 struct NativeReaderSaveDestination: Codable, Hashable, Sendable {
     var projectClientID: String?
     static let unassigned = Self(projectClientID: nil)

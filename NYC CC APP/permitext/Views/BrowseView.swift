@@ -403,9 +403,8 @@ struct BrowseView: View {
                 .foregroundStyle(.primary)
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 0)
+            ReaderProjectMenu()
             Menu {
-                ReaderSaveDestinationMenuContent()
-                Divider()
                 Section(ReaderCodeMenuSectionTitle.construction2022) {
                     ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
                         readerCodePickerButton(

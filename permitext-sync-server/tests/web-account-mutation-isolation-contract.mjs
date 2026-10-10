@@ -63,7 +63,7 @@ function harness(overrides = {}) {
     savedSectionRecord: () => null, isSectionSaved: () => false, isProAccount: () => true, hasCapability: () => true,
     folderIsProject: () => true, syncCodeVersion: (value) => value, defaultSyncCodeVersion: "synthetic-edition",
     setLocalSectionSaved() {}, normalizeAnnotationBlockID: (value) => value || "", syncReaderNoteBookmarkButtons() {},
-    workspaceProject: () => null, activeWorkspaceID: "synthetic-workspace",
+    workspaceProject: () => project, activeWorkspaceID: "synthetic-workspace",
     document: { activeElement: null }, primarySavedPaneID: () => "saved", showBookmarkUndo() {},
     currentContentSummary: () => ({ projects: [project], projectSections: [] }),
     transitionWorkspace: async () => {}, refreshProjectMembershipPanes: async () => {}, refreshOpenSavedPanes: async () => {},

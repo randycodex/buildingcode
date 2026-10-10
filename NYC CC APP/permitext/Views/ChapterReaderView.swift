@@ -175,6 +175,7 @@ struct ChapterReaderView: View {
                 .sourceProblemReporting(sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id)
             }
             ToolbarItem(placement: .topBarTrailing) {
+                ReaderProjectMenu()
                 ReaderCurrentSectionBookmarkButton(
                     sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id,
                     accentColor: accentColor)
@@ -1331,20 +1332,90 @@ struct ReaderChapterJumpHeader: View {
     }
 }
 
-/// Reused in the existing Reader source menu and passage bookmark context menu.
+/// One Project selection is shared by Reader, Saved and Research on this device.
 struct ReaderSaveDestinationMenuContent: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
 
     var body: some View {
-        Picker("Save destination", selection: Binding(
-            get: { library.readerSaveDestination },
-            set: { library.selectReaderSaveDestination($0) }
-        )) {
-            Text("Unassigned").tag(NativeReaderSaveDestination.unassigned)
-            ForEach(library.readerSaveDestinationProjects) { project in
-                Text(project.name).tag(NativeReaderSaveDestination.project(project.clientID))
+        ForEach(library.readerSaveDestinationProjects) { project in
+            Button {
+                library.selectReaderSaveDestination(.project(project.clientID))
+            } label: {
+                if library.readerSaveDestinationProject?.clientID == project.clientID {
+                    Label(project.name, systemImage: "checkmark")
+                } else { Text(project.name) }
             }
         }
-        .accessibilityIdentifier("reader-save-destination")
+        Button("New Project…") { library.requestProjectSelection() }
+    }
+}
+
+struct ReaderProjectMenu: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+
+    var body: some View {
+        if library.hasProjectAccess {
+            Menu { ReaderSaveDestinationMenuContent() } label: {
+                Text(library.readerSaveDestinationName)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .frame(maxWidth: 150)
+            }
+            .accessibilityLabel("Save to Project: \(library.readerSaveDestinationName)")
+            .accessibilityIdentifier("reader-project-menu")
+        }
+    }
+}
+
+struct ReaderProjectSelectionSheet: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var creating = false
+    @State private var projectName = ""
+    @State private var busy = false
+    @State private var failure: String?
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(library.readerSaveDestinationProjects) { project in
+                    Button(project.name) { choose(project) }
+                }
+                if creating {
+                    TextField("Project name", text: $projectName)
+                        .textInputAutocapitalization(.words)
+                    Button("Create Project") {
+                        if let project = library.createFolder(name: projectName.trimmingCharacters(in: .whitespacesAndNewlines)) {
+                            choose(project)
+                        } else { failure = library.statusMessage ?? "The Project could not be created." }
+                    }
+                    .disabled(projectName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                } else {
+                    Button("New Project…") { creating = true }
+                }
+                if let failure { Text(failure).foregroundStyle(.secondary) }
+            }
+            .disabled(busy)
+            .navigationTitle("Choose a Project")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { library.cancelProjectSelection(); dismiss() }
+                        .disabled(busy)
+                }
+            }
+        }
+        .interactiveDismissDisabled(busy)
+    }
+
+    private func choose(_ project: CodeFolder) {
+        guard !busy else { return }
+        busy = true
+        Task { @MainActor in
+            if await library.completeProjectSelection(project) { dismiss() }
+            else { failure = library.statusMessage ?? "The passage could not be saved. Please try again." }
+            busy = false
+        }
     }
 }

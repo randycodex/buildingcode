@@ -1301,6 +1301,13 @@ struct PermitextAccountFlowPresentation: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .sheet(isPresented: Binding(
+                get: { isOwner && library.projectSaveRequest != nil },
+                set: { if !$0 && isOwner { library.cancelProjectSelection() } }
+            )) {
+                ReaderProjectSelectionSheet().environmentObject(library)
+            }
+            .onChange(of: library.signedInAccount?.appUserID) { _, _ in library.cancelProjectSelection() }
             .alert(
                 "Upgrade to Pro",
                 isPresented: Binding(

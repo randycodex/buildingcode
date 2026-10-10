@@ -175,6 +175,7 @@ struct ReaderView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
+                ReaderProjectMenu()
                 ReaderCurrentSectionBookmarkButton(sectionID: sectionID, accentColor: accentColor)
             }
         }
@@ -208,6 +209,7 @@ struct ReaderView: View {
         .onChange(of: library.bookmarkRevision) { _, _ in
             syncUserContentState()
         }
+        .onChange(of: library.readerSaveDestination) { _, _ in syncUserContentState() }
         .sheet(isPresented: $isFolderPickerOpen) {
             FolderPickerSheet(
                 folders: library.folders,
@@ -571,7 +573,7 @@ struct ReaderView: View {
     }
 
     private func syncUserContentState() {
-        isBookmarked = library.isBookmarked(sectionID: sectionID)
+        isBookmarked = library.isSavedToReaderDestination(sectionID: sectionID)
         if !isFolderPickerOpen {
             pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
         }

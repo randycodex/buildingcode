@@ -18256,3 +18256,13 @@ html body .column-group-menu-button:focus-visible {
   background: transparent;
   border-radius: 0;
 }
+
+.project-save-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.project-save-dialog button { color: var(--text-primary); background: transparent; border: 0; padding: 10px 0; text-align: left; border-radius: 0; text-decoration: none; }
+.project-save-dialog form { display: flex; flex-direction: column; gap: 12px; }
+.project-save-dialog [hidden] { display: none; }
+.project-save-dialog input { width: 100%; box-sizing: border-box; padding: 12px; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.project-save-dialog p:empty { display: none; }
+
+.project-save-dialog > button { display: block; margin-top: 16px; }
+.project-save-dialog > button:last-child { margin-left: auto; }
