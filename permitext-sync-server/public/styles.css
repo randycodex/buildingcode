@@ -18585,6 +18585,9 @@ html body .column-group-menu-button:focus-visible {
   font-weight: 600;
   line-height: 1.4;
 }
+.project-facts-panel .saved-project-structured-groups {
+  gap: calc(2 * var(--space-2));
+}
 .project-facts-panel .saved-project-structured-facts-list {
   width: 100%;
   margin-inline: 0;

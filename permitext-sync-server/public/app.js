@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-facts-toolbar-v739";
+} from "./offline-storage.js?v=20261010-facts-spacing-v740";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-facts-toolbar-v739";
+} from "./research-intent-state.js?v=20261010-facts-spacing-v740";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
