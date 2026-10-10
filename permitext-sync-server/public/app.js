@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-account-screen-v700";
+} from "./offline-storage.js?v=20261010-account-scroll-v703";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-account-screen-v700";
+} from "./research-intent-state.js?v=20261010-account-scroll-v703";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36121,6 +36121,10 @@ function settingsPanelScrollTop(panel) {
 }
 
 async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft) {
+  const accountScreen = document.querySelector(".account-screen[open]");
+  const categoryScrollTops = new Map(Array.from(accountScreen?.querySelectorAll(".settings-card") || [], card => [
+    card.getAttribute("aria-labelledby"), card.scrollTop
+  ]));
   const refreshPaneIDs = activePaneIDs().filter((paneID) => paneID !== "utility:settings");
   await transitionWorkspace("utility", { refreshPaneIDs });
   const settingsPanel = track.querySelector('.workspace-panel[data-pane-id="utility:settings"]');
@@ -36138,6 +36142,12 @@ async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceSc
     const refreshed = renderSettings();
     mountAccountScreenContent(dialog, refreshed);
     refreshed.querySelector(".settings-scroll").scrollTop = settingsScrollTop;
+    // Source rows load asynchronously; restore their position after they exist.
+    await refreshed.__refreshActiveCodeSources?.();
+    if (document.querySelector(".account-screen[open]") !== dialog) return;
+    refreshed.querySelectorAll(".settings-card").forEach(card => {
+      card.scrollTop = categoryScrollTops.get(card.getAttribute("aria-labelledby")) || 0;
+    });
     if (refreshed.querySelector(".settings-trash[open]")) {
       refreshed.querySelector(".settings-trash > summary")?.focus();
     }

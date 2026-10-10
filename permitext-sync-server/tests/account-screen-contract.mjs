@@ -23,13 +23,15 @@ function harness(signedIn) {
       showModal() { this.open = true; },
       close() { this.open = false; this.listeners.close(); },
       remove() { currentDialog = null; },
-      querySelector() { return null; }
+      querySelector() { return null; },
+      querySelectorAll(selector) { return this.children.flatMap(child => child.querySelectorAll?.(selector) || []); }
     };
   }
   function panel() {
     const result = element();
     result.style.owner = result;
-    const profile = {}, plan = {}, sources = {};
+    const category = id => ({ scrollTop: 0, getAttribute: name => name === "aria-labelledby" ? id : null });
+    const profile = category("profile"), plan = category("plan"), sources = category("sources");
     const scroll = {
       children: [plan, profile, sources], scrollTop: 0,
       querySelector: selector => selector === ".account-connector" ? profile : null,
@@ -37,6 +39,8 @@ function harness(signedIn) {
     };
     const oldHeader = { remove() { result.headerRemoved = true; } };
     result.querySelector = selector => ({ ".panel-header": oldHeader, ".settings-scroll": signedIn ? scroll : null })[selector] || null;
+    result.querySelectorAll = selector => signedIn && selector === ".settings-card" ? [profile, plan, sources] : [];
+    result.__refreshActiveCodeSources = async () => { result.sourcesReady = true; };
     Object.assign(result, { scroll, profile, plan, sources });
     panels.push(result);
     return result;
@@ -86,12 +90,18 @@ for (const signedIn of [false, true]) {
 const h = harness(true);
 h.context.toggleAccountDialog();
 h.panels[0].scroll.scrollTop = 240;
+h.panels[0].profile.scrollTop = 25;
+h.panels[0].sources.scrollTop = 360;
 assert.equal(h.context.settingsPanelScrollTop(h.panels[0]), 240);
 await h.context.refreshWorkspaceAfterSettingsClear(240, 350);
 assert.equal(h.dialog().children[1], h.panels[1]);
 assert.equal(h.panels[1].scroll.scrollTop, 240);
+assert.equal(h.panels[1].profile.scrollTop, 25);
+assert.equal(h.panels[1].sources.scrollTop, 360);
+assert.equal(h.panels[1].sourcesReady, true);
+assert.equal(h.panels[1].plan.scrollTop, 0);
 assert.equal(h.track.scrollLeft, 350);
 assert.equal(h.transitions[0].options.refreshPaneIDs.join(","), "reader:one,utility:saved");
 h.dialog().children[0].children[1].listeners.click();
 assert.equal(h.dialog(), null);
-console.log("Account screen passed: signed-in/guest lifecycle, original controls, Back/Escape, nested keyboard handling, and recovery scroll restoration.");
+console.log("Account screen passed: signed-in/guest lifecycle, original controls, Back/Escape, nested keyboard handling, and independent category scroll restoration.");

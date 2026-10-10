@@ -17683,6 +17683,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-panel > .settings-scroll {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: max-content;
   align-content: start;
   align-items: start;
   gap: 40px 0;
@@ -17698,17 +17699,31 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-scroll > .settings-card {
   align-content: start;
   gap: 20px;
+  min-height: 0;
+  max-height: clamp(240px, calc(100dvh - 180px), 640px);
   margin: 0;
   padding: 0 24px 24px;
+  box-sizing: border-box;
   border-inline-end: 1px solid var(--border);
   border-radius: 0;
   background: transparent;
+  overflow-y: auto;
+  overscroll-behavior: auto;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
+.account-screen .settings-scroll > .settings-card::-webkit-scrollbar { display: block; width: 6px; }
+.account-screen .settings-scroll > .settings-card::-webkit-scrollbar-thumb { border-radius: 8px; background: var(--border); }
 .account-screen .settings-section-title {
   justify-self: start;
+  position: sticky;
+  top: 0;
+  z-index: 1;
   padding-bottom: 8px;
+  background: var(--background);
   text-align: left;
 }
+.account-screen .settings-card > .settings-card-heading { position: sticky; top: 0; z-index: 1; background: var(--background); }
 .account-screen .account-identity > div {
   min-height: 48px;
   padding-inline: 0;
@@ -17739,7 +17754,17 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   overflow-y: auto;
 }
 @media (min-width: 2000px) {
-  .account-screen .settings-panel > .settings-scroll { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .account-screen .settings-panel > .settings-scroll {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+    align-content: stretch;
+    align-items: stretch;
+    overflow: hidden;
+  }
+  .account-screen .settings-panel > .settings-scroll:has(> .settings-sync-conflicts-card:not([hidden])) {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  .account-screen .settings-scroll > .settings-card { height: 100%; max-height: none; overscroll-behavior: contain; }
 }
 @media (min-width: 701px) and (max-width: 1100px) {
   .account-screen .settings-panel > .settings-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); }
