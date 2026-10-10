@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {createActiveCodeSourceController} from '../public/active-code-source-controller.js';
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
-const implementation=app.slice(app.indexOf('function wireSettingsActiveCodeSources('),app.indexOf('\nfunction renderSettings('));
+const implementation=app.slice(app.indexOf('function activeCodeSourceMenuRows('),app.indexOf('\nfunction renderSettings('));
 class Element {
   hidden=true; children=[]; events=new Map(); textContent=''; disabled=false;
   append(...nodes){this.children.push(...nodes);}
@@ -12,7 +12,7 @@ class Element {
   fire(name){return this.events.get(name)?.();}
 }
 const sources=[2022,2014].map((year,index)=>({canonicalEdition:`edition:${year}`,jurisdictionID:1,codeID:index+1,categoryID:index+3,categoryLabel:'Building Code',editionLabel:String(year)}));
-function fixture({catalog=async()=>sources,stored=null}={}){
+function fixture({catalog=async()=>sources,stored=null,readerMenu=false}={}){
  const storage=new Map(stored?[['permitext.active-code-sources.v1.guest',stored]]:[]);
  let writes=0,failWrite=false;
  const controller=createActiveCodeSourceController({storage:{getItem:k=>storage.get(k)??null,setItem(k,v){if(failWrite)throw new Error('Storage full');writes++;storage.set(k,v);}},loadCatalog:catalog});
@@ -20,9 +20,9 @@ function fixture({catalog=async()=>sources,stored=null}={}){
  const nodes=new Map(['status','list','retry','scope'].map(key=>[key,new Element()]));
  const card=new Element();card.querySelector=selector=>nodes.get(selector.replace('.settings-active-sources-',''));
  const panel={isConnected:true,querySelector:()=>card};
- const context=vm.createContext({document:{createElement:()=>new Element()},activeCodeSourcesController:controller,activeWorkspaceID:'w',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true});
+ const context=vm.createContext({document:{createElement:()=>new Element()},codeOptions:[{prefix:'BC',codeVersion:'edition:2022',group:'2022 Construction Codes',label:'Building Code (2022)'},{prefix:'BC',codeVersion:'edition:2014',group:'2014 Construction Codes (Historical)',label:'Building Code (2014)'}],codeOptionVersion:code=>code.codeVersion,readerCodeOptionLabel:code=>code.label,activeCodeSourcesController:controller,activeWorkspaceID:'w',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true});
  vm.runInContext(implementation,context);
- return {controller,panel,card,nodes,context,storage,get writes(){return writes;},set failWrite(value){failWrite=value;},wire:()=>context.wireSettingsActiveCodeSources(panel,{enabled:true})};
+ return {controller,panel,card,nodes,context,storage,get writes(){return writes;},set failWrite(value){failWrite=value;},wire:()=>context.wireSettingsActiveCodeSources(panel,{enabled:true,readerMenu})};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 const f=fixture();f.wire();await settle();
@@ -47,3 +47,16 @@ let finish;const pending=fixture({catalog:()=>new Promise(resolve=>{finish=resol
 pending.controller.setContext({accountID:'other',sessionID:'2'});finish(sources);await settle();
 assert.equal(pending.nodes.get('list').children.length,0,'Late catalog cannot populate stale account controls');
 console.log('Actual Settings controls passed: exact toggles, stable rows, all-off, failed-write recovery, corrupt preservation and stale context.');
+
+const reversed=sources.map(source=>({...source,codePrefix:'BC'})).reverse();
+const grouped=fixture({catalog:async()=>reversed,readerMenu:true});grouped.wire();await settle();
+const groupedChildren=grouped.nodes.get('list').children;
+assert.deepEqual(groupedChildren.map(node=>node.textContent || node.children[1].textContent),['2022 Construction Codes','Building Code (2022)','2014 Construction Codes (Historical)','Building Code (2014)']);
+assert.match(groupedChildren[1].title,/Building Code — 2022/);
+const grouped2022=groupedChildren[1].children[0];grouped2022.checked=false;grouped2022.fire('change');
+assert.equal(grouped.controller.state.preferences.isEnabled(reversed[1]),false,'Reordered labels still toggle the exact 2022 source');
+assert.equal(grouped.controller.state.preferences.isEnabled(reversed[0]),true,'The historical edition stays enabled');
+assert.equal(grouped.nodes.get('list').children[1],groupedChildren[1],'Grouped source changes retain row identity and focus');
+const unknown={...reversed[0],canonicalEdition:'edition:unlisted'};
+assert.equal(grouped.context.activeCodeSourceMenuRows([unknown])[0].group,'Other installed sources','An unknown edition is not mislabeled as an installed Reader edition');
+console.log('Reader-style source organization passed: exact edition mapping, Reader order, compact labels, stable rows and unknown-edition fallback.');

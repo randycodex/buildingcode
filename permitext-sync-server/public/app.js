@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-search-controls-v718";
+} from "./offline-storage.js?v=20261010-search-sources-v719";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-search-controls-v718";
+} from "./research-intent-state.js?v=20261010-search-sources-v719";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36619,6 +36619,10 @@ function openSearchCodeSourceSettings(panel) {
   const title = card.querySelector(".settings-section-title");
   title.id = `${menu.id}-title`;
   card.setAttribute("aria-labelledby", title.id);
+  title.textContent = "Code sources & editions";
+  card.querySelector(".settings-card-copy:not(.settings-active-sources-scope):not(.settings-active-sources-status)").textContent =
+    "Choose sources for Search and chapter browsing. Saved evidence stays available.";
+  card.append(card.querySelector(".settings-active-sources-scope"));
   const dismiss = () => {
     if (panel.__refreshActiveCodeSources === refresh) delete panel.__refreshActiveCodeSources;
     menu.remove();
@@ -36643,7 +36647,7 @@ function openSearchCodeSourceSettings(panel) {
   panel.append(menu);
   trigger.setAttribute("aria-expanded", "true");
   trigger.setAttribute("aria-controls", menu.id);
-  wireSettingsActiveCodeSources(menu, { enabled: true });
+  wireSettingsActiveCodeSources(menu, { enabled: true, readerMenu: true });
   const refresh = () => menu.__refreshActiveCodeSources?.();
   panel.__refreshActiveCodeSources = refresh;
   close.focus();
@@ -36678,8 +36682,19 @@ function openActiveCodeSourceSettings() {
   close.focus();
 }
 
+function activeCodeSourceMenuRows(catalog) {
+  return catalog.map((source, index) => {
+    const order = codeOptions.findIndex(code =>
+      code.prefix === source.codePrefix && codeOptionVersion(code) === source.canonicalEdition);
+    const code = order < 0 ? null : codeOptions[order];
+    return { source, order: order < 0 ? codeOptions.length + index : order,
+      group: code?.group || "Other installed sources",
+      label: code ? readerCodeOptionLabel(code) : `${source.categoryLabel} — ${source.editionLabel}` };
+  }).sort((a, b) => a.order - b.order);
+}
+
 // Explicit navigation validates source access before changing Reader or detail state.
-function wireSettingsActiveCodeSources(panel, { enabled = false } = {}) {
+function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = false } = {}) {
   const card = panel.querySelector(".settings-active-sources-card");
   if (!card || !enabled) return;
   card.hidden = false;
@@ -36711,13 +36726,23 @@ function wireSettingsActiveCodeSources(panel, { enabled = false } = {}) {
     const catalogKey = JSON.stringify(catalog);
     if (rowCatalog !== catalogKey) {
       list.replaceChildren();
-      rows = catalog.map(source => {
+      let currentGroup = "";
+      const items = readerMenu ? activeCodeSourceMenuRows(catalog) : catalog.map(source => ({ source }));
+      rows = items.map(({ source, group, label: shortLabel }) => {
+        if (readerMenu && group !== currentGroup) {
+          const heading = document.createElement("h3");
+          heading.className = "search-source-group-heading";
+          heading.textContent = group;
+          list.append(heading);
+          currentGroup = group;
+        }
         const label = document.createElement("label");
         label.className = "settings-active-source-row";
         const input = document.createElement("input");
         input.type = "checkbox";
         const text = document.createElement("span");
-        text.textContent = `${source.categoryLabel} — ${source.editionLabel}`;
+        text.textContent = shortLabel || `${source.categoryLabel} — ${source.editionLabel}`;
+        if (readerMenu) label.title = `${source.categoryLabel} — ${source.editionLabel}`;
         label.append(input, text);
         list.append(label);
         const row = { input, source, token: null };
