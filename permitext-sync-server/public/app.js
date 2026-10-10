@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-detail-project-action-v670";
+} from "./offline-storage.js?v=20261009-detail-picker-surface-v672";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-detail-project-action-v670";
+} from "./research-intent-state.js?v=20261009-detail-picker-surface-v672";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15098,6 +15098,7 @@ function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null,
   });
   panel.append(sheet);
   showReaderNotesProjectPicker(sheet, sectionPayload, {
+    hideIntroduction: panel.classList.contains("section-detail-panel"),
     onClose: () => {
       if (panel.querySelector(".section-save-project-sheet") !== sheet) return;
       closeSectionSaveProjectSheet(panel, focusTarget);
@@ -15276,15 +15277,17 @@ function showReaderNotesProjectPicker(sheet, sectionPayload, options = {}) {
   picker.className = "reader-notes-project-picker";
   picker.setAttribute("aria-label", "Choose save destinations");
 
-  const pickerHeader = document.createElement("header");
-  pickerHeader.className = "reader-notes-project-picker-header";
-  const label = document.createElement("strong");
-  label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save evidence";
-  const instruction = document.createElement("p");
-  instruction.className = "reader-notes-project-instruction";
-  instruction.textContent = "Select one or more Projects or saved collections, then confirm. Permitext keeps one saved record linked to every destination you choose.";
-  pickerHeader.append(label);
-  picker.append(pickerHeader, instruction);
+  if (!options.hideIntroduction) {
+    const pickerHeader = document.createElement("header");
+    pickerHeader.className = "reader-notes-project-picker-header";
+    const label = document.createElement("strong");
+    label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save evidence";
+    const instruction = document.createElement("p");
+    instruction.className = "reader-notes-project-instruction";
+    instruction.textContent = "Select one or more Projects or saved collections, then confirm. Permitext keeps one saved record linked to every destination you choose.";
+    pickerHeader.append(label);
+    picker.append(pickerHeader, instruction);
+  }
 
   const status = document.createElement("p");
   status.className = "reader-notes-project-status";

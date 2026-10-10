@@ -80,7 +80,7 @@ assert.match(webClient, /if \(focusTarget\?\.isConnected\) focusTarget\.focus/);
 // A delayed completion from an older picker cannot close its replacement.
 const assignmentSource = sourceBetween("function showSectionProjectAssignment(", "\nfunction showReaderSaveConfirmation");
 const pickerCallbacks = [];
-const pickerPanel = { currentSheet: null, append(sheet) { this.currentSheet = sheet; }, querySelector() { return this.currentSheet; } };
+const pickerPanel = { currentSheet: null, classList: { contains: () => true }, append(sheet) { this.currentSheet = sheet; }, querySelector() { return this.currentSheet; } };
 let closes = 0;
 const assignmentContext = vm.createContext({
   readerPrivateContentAllowed: () => true,

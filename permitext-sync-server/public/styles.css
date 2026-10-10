@@ -3631,6 +3631,11 @@ select option:checked {
   box-shadow: var(--shadow-panel);
 }
 
+.section-detail-panel > .section-save-project-sheet {
+  background: inherit;
+  box-shadow: none;
+}
+
 .section-save-project-sheet .reader-notes-project-picker {
   margin: 0;
 }
