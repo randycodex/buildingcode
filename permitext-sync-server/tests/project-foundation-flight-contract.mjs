@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 const source=await readFile(new URL("../public/app.js",import.meta.url),"utf8");
 const start=source.indexOf("const initialProjectFoundationScopes = new Set();");
-const end=source.indexOf("async function appendSavedProjectResearchConversations",start);
+const end=source.indexOf("async function renderSavedFolderContext",start);
 assert.ok(start>=0&&end>start);
 let identity={userID:"a",sessionToken:"token-a",generation:1};
 const requests=[];
@@ -36,7 +36,7 @@ const beforeSwitch=c.loadInitialProjectFoundation({id:"p"});const cancelled=asse
 c.activeWorkspaceID="workspace-b";const afterSwitch=c.loadInitialProjectFoundation({id:"p"});await tick();assert.equal(requests.length,9);
 requests[7].resolve({});requests[8].resolve({});await cancelled;await afterSwitch;
 assert.match(source,/loadInitialProjectFoundation\(identity\),\s*notebookRequest\("\/notebook\/cards\/list"/);
-assert.match(source,/foundation = hubPayload\?\.foundation \|\| await \(options.foundationScope/);
+assert.match(source,/options.foundationScope \? options.foundationScope.read\(identity\) : loadInitialProjectFoundation\(identity\)/);
 console.log("Project foundation flights passed: initial consumer sharing, project/shared/account/workspace isolation and fresh reads after success/failure.");
 const scope=c.createInitialProjectFoundationScope();scope.register("notebook");scope.register("saved");
 const count=requests.length;

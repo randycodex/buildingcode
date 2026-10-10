@@ -857,7 +857,7 @@ async function main() {
         !workspaceScript.text.includes('typeBadge.className = "saved-folder-type"') &&
         !workspaceScript.text.includes("saved-project-folder-icon") &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
-        workspaceScript.text.includes("async function renderSavedFolderContext(panel, savedInstance, paneID, folders, options = {})") &&
+        workspaceScript.text.includes("async function renderSavedFolderContext(panel, savedInstance, paneID, folders)") &&
         workspaceScript.text.includes("async function applyProjectSelectionIntent(controller, requestedIntent)") &&
         workspaceScript.text.includes('liveInstance.selectedFolderID = intent.kind === "project" ? intent.folderID : ""') &&
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
