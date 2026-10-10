@@ -18173,6 +18173,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   padding: 8px 14px;
   list-style-position: inside;
 }
+.report-draft-panel .report-draft-shell :is(.report-draft-version-option.is-create, .report-source-group-toggle),
+.report-draft-panel .report-draft-shell :is(.report-draft-version-option.is-create, .report-source-group-toggle):hover,
 .report-draft-panel .report-draft-header :is(.panel-kind, .panel-actions > button),
 .report-draft-panel .report-draft-header :is(.panel-kind, .panel-actions > button):hover,
 .report-draft-panel .report-source-picker > summary,
@@ -18184,6 +18186,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   border-radius: 0;
   background: transparent;
 }
+.report-draft-panel .report-draft-shell :is(.report-draft-version-option.is-create, .report-source-group-toggle),
 .report-draft-panel .report-draft-shell :is(.report-title-text, .report-draft-blocks-toggle),
 .report-draft-panel .report-source-picker > summary,
 .report-draft-panel .report-evidence-code-heading > .project-section-toggle-label {
