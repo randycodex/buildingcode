@@ -1,3 +1,4 @@
+import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
 import { researchHistoryOptions, researchHistoryCursor, researchHistoryFileRows, researchHistoryPageQuery } from "./research-history-pagination.mjs";
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
@@ -23409,10 +23410,10 @@ export async function allSectionCatalogByID() {
   }
 }
 
-export function candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs = null) {
+export function candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs = null, matchMode = "exact") {
   if (allowedSectionIDs?.size === 0) return new Set();
   const postings = queryTokens
-    .map((token) => index.get(token) || [])
+    .map((token) => matchMode === "words" ? searchWordPosting(index, token) : index.get(token) || [])
     .sort((left, right) => postingListSize(left) - postingListSize(right));
   let candidateIDs = new Set(allowedSectionIDs == null
     ? postings[0] || []
@@ -23499,13 +23500,13 @@ function searchableSectionPlainText(section) {
 
 const exactSearchConcurrency = 8;
 
-async function exactSearchHits(hits, query) {
+async function exactSearchHits(hits, query, matchMode = "exact") {
   const matches = [];
   for (let index = 0; index < hits.length; index += exactSearchConcurrency) {
     const batch = await Promise.all(
       hits.slice(index, index + exactSearchConcurrency).map(async (hit) => {
         const plainText = await searchableSectionPlainText(hit.section);
-        const matchesQuery = searchTextMatchesExactQuery([
+        const matchesQuery = (matchMode === "words" ? matchesSearchWords : searchTextMatchesExactQuery)([
           hit.section.sectionNumber,
           hit.section.title,
           hit.section.headingLine,
@@ -23519,14 +23520,14 @@ async function exactSearchHits(hits, query) {
   return matches;
 }
 
-async function exactSearchPage(hits, query, candidateOffset, resultLimit) {
+async function exactSearchPage(hits, query, candidateOffset, resultLimit, matchMode = "exact") {
   const matches = [];
   for (let index = candidateOffset; index < hits.length; index += exactSearchConcurrency) {
     const batchStart = index;
     const batch = await Promise.all(
       hits.slice(index, index + exactSearchConcurrency).map(async (hit) => {
         const plainText = await searchableSectionPlainText(hit.section);
-        const matchesQuery = searchTextMatchesExactQuery([
+        const matchesQuery = (matchMode === "words" ? matchesSearchWords : searchTextMatchesExactQuery)([
           hit.section.sectionNumber,
           hit.section.title,
           hit.section.headingLine,
@@ -23563,7 +23564,7 @@ function codeSearchSectionVersion(section) {
       : defaultSyncCodeVersion);
 }
 
-async function codeSearchResults(hits, query) {
+async function codeSearchResults(hits, query, matchMode = "exact") {
   return Promise.all(hits.map(async ({ section, plainText: matchedPlainText }) => {
     const plainText = matchedPlainText ?? await searchableSectionPlainText(section);
     return {
@@ -23578,12 +23579,13 @@ async function codeSearchResults(hits, query) {
       title: section.title,
       headerLine: section.headerLine,
       headingLine: section.headingLine,
-      snippet: searchSnippet(plainText || section.title || "", query)
+      matchKind: searchTextMatchesExactQuery([section.sectionNumber, section.title, plainText], query) ? "exact" : "words",
+      snippet: (matchMode === "words" ? searchWordsSnippet : searchSnippet)(plainText || section.title || "", query)
     };
   }));
 }
 
-async function groupedCodeSearchPage(hits, query, resultLimit) {
+async function groupedCodeSearchPage(hits, query, resultLimit, matchMode = "exact") {
   const sources = new Map();
   for (const hit of hits) {
     const codePrefix = hit.section.codePrefix;
@@ -23601,7 +23603,7 @@ async function groupedCodeSearchPage(hits, query, resultLimit) {
     while (next < entries.length) {
       const index = next++;
       const source = entries[index];
-      const page = await exactSearchPage(source.hits, query, 0, Math.min(5, resultLimit));
+      const page = await exactSearchPage(source.hits, query, 0, Math.min(5, resultLimit), matchMode);
       pages[index] = { codePrefix: source.codePrefix, codeVersion: source.codeVersion, ...page };
     }
   }));
@@ -23611,7 +23613,7 @@ async function groupedCodeSearchPage(hits, query, resultLimit) {
     nextOffset: page.hits.length, nextCandidateOffset: page.nextCandidateOffset, cursorKind: "candidate",
     hasMore: page.hasMore, totalResults: page.hasMore ? null : page.hits.length
   }));
-  const results = await codeSearchResults(available.flatMap(page => page.hits), query);
+  const results = await codeSearchResults(available.flatMap(page => page.hits), query, matchMode);
   const hasMore = groups.some(group => group.hasMore);
   return { query, results, groups, hasMore, limited: hasMore,
     totalResults: hasMore ? null : results.length };
@@ -23671,7 +23673,8 @@ async function handleCodeSearch(request, response) {
   const resultOffset = Number.isFinite(requestedOffset) && requestedOffset > 0
     ? requestedOffset
       : 0;
-  const exactMatch = url.searchParams.get("match") === "exact";
+  const matchMode = url.searchParams.get("match") === "words" ? "words" : "exact";
+  const exactMatch = ["exact", "words"].includes(url.searchParams.get("match"));
   const candidateOffsetParameter = url.searchParams.get("candidateOffset");
   const requestedCandidateOffset = Number.parseInt(candidateOffsetParameter || "", 10);
   const candidateOffset = Number.isFinite(requestedCandidateOffset) && requestedCandidateOffset > 0
@@ -23700,7 +23703,7 @@ async function handleCodeSearch(request, response) {
     return;
   }
   const normalizedQuery = query.toLowerCase();
-  const queryTokens = tokenizeSearchText(query);
+  const queryTokens = matchMode === "words" ? searchWords(query).filter(word => word.length >= 2) : tokenizeSearchText(query);
   if (!queryTokens.length) {
     sendPublicCodeJSON(request, response, {
       query,
@@ -23732,7 +23735,7 @@ async function handleCodeSearch(request, response) {
     const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => sectionCatalog());
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "construction");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => shippedSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
     candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => sectionCatalog())).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
@@ -23742,7 +23745,7 @@ async function handleCodeSearch(request, response) {
     const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "historical2014");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
     candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog())).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
@@ -23752,14 +23755,14 @@ async function handleCodeSearch(request, response) {
     const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "zoning");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => zoningSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
     candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
   }
   if (includeExistingBuilding && familyEnabled("existingBuilding")) {
     const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "existingBuilding");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
     candidates.push(
       ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id)
@@ -23770,7 +23773,7 @@ async function handleCodeSearch(request, response) {
     const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "enacted");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => enactedSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
     candidates.push(
       ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => enactedSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id) &&
@@ -23790,7 +23793,9 @@ async function handleCodeSearch(request, response) {
           ? 1
           : title.includes(normalizedQuery)
             ? 2
-            : 3;
+            : matchMode === "words"
+              ? 3 - queryTokens.filter(word => matchesSearchWords(title, word)).length / Math.max(1, queryTokens.length)
+              : 3;
       return { section, rank };
     });
     hits.sort((left, right) =>
@@ -23807,7 +23812,7 @@ async function handleCodeSearch(request, response) {
   });
 
   if (exactMatch && url.searchParams.get("grouped") === "true" && !resultSource) {
-    const page = await timePublicCodePhase("exact_match", () => groupedCodeSearchPage(hits, query, resultLimit));
+    const page = await timePublicCodePhase("exact_match", () => groupedCodeSearchPage(hits, query, resultLimit, matchMode));
     sendPublicCodeJSON(request, response, page);
     return;
   }
@@ -23815,17 +23820,17 @@ async function handleCodeSearch(request, response) {
   const sourceOffsetMode = Boolean(resultSource && exactMatch && !exactCursorMode);
   const exactPage = exactCursorMode || sourceOffsetMode
     ? await timePublicCodePhase("exact_match", () => exactSearchPage(hits, query, sourceOffsetMode ? 0 : candidateOffset,
-        sourceOffsetMode ? resultOffset + resultLimit : resultLimit))
+        sourceOffsetMode ? resultOffset + resultLimit : resultLimit, matchMode))
     : null;
   const matchedHits = exactPage
     ? exactPage.hits
     : exactMatch
-      ? await timePublicCodePhase("exact_match", () => exactSearchHits(hits, query))
+      ? await timePublicCodePhase("exact_match", () => exactSearchHits(hits, query, matchMode))
       : hits;
   const selectedHits = exactPage
     ? sourceOffsetMode ? matchedHits.slice(resultOffset) : matchedHits
     : matchedHits.slice(resultOffset, resultOffset + resultLimit);
-  const results = await timePublicCodePhase("snippets", () => codeSearchResults(selectedHits, query));
+  const results = await timePublicCodePhase("snippets", () => codeSearchResults(selectedHits, query, matchMode));
   const nextOffset = resultOffset + results.length;
   const hasMore = exactPage ? exactPage.hasMore : nextOffset < matchedHits.length;
   const totalResults = exactPage && hasMore ? null : exactPage ? nextOffset : matchedHits.length;

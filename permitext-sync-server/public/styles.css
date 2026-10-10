@@ -18435,3 +18435,23 @@ html body .column-group-menu-button:focus-visible {
 
 .project-save-dialog > button { display: block; margin-top: 16px; }
 .project-save-dialog > button:last-child { margin-left: auto; }
+
+/* Research and Search: make source context and the next action readable. */
+.search-options { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; color: var(--text-secondary); font-size: 12px; }
+.search-options label { display: inline-flex; align-items: center; gap: 6px; }
+.search-options select { width: auto; min-height: 30px; padding: 3px 20px 3px 6px; color: var(--text-primary); background: transparent; border: 1px solid var(--border); border-radius: 4px; font: inherit; }
+.search-sources-button { padding: 4px 0; min-height: 30px; border: 0; background: transparent; color: var(--text-secondary); font: inherit; cursor: pointer; }
+.search-sources-button:hover { color: var(--text-primary); }
+.search-match-kind { display: inline-block; white-space: nowrap; margin-left: 10px; color: var(--text-secondary); font-size: 11px; font-weight: 400; }
+.search-panel .result-title { color: var(--text-primary); font-weight: 550; }
+.search-panel .result-row-main > p { color: var(--text-secondary); line-height: 1.55; }
+.research-origin-edition { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 12px; }
+.research-entry-context { padding: 20px 0; border-top: 1px solid var(--border); }
+.research-entry-project { margin: 0 0 8px; color: var(--text-secondary); font-size: 12px; }
+.research-entry-context h3 { margin: 0 0 10px; color: var(--text-primary); font-size: 18px; font-weight: 550; line-height: 1.35; }
+.research-entry-context .research-project-context-preview { color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.research-entry-tasks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+.research-entry-tasks button { padding: 10px 12px; min-height: 42px; border: 1px solid var(--border); border-radius: 5px; text-align: left; background: transparent; color: var(--text-primary); font: inherit; font-size: 12px; cursor: pointer; }
+.research-entry-tasks button:hover { background: var(--surface); }
+.research-entry-tasks button:disabled { color: var(--text-tertiary); cursor: default; }
+.topbar .workspace-actions-button .workspace-current-name { color: var(--text-primary); font-weight: 550; }

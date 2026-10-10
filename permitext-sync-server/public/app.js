@@ -101,7 +101,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-app-plex-v712";
+} from "./offline-storage.js?v=20261010-research-search-v714";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -139,7 +139,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-app-plex-v712";
+} from "./research-intent-state.js?v=20261010-research-search-v714";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1132,6 +1132,7 @@ function newUtilityInstance(key, overrides = {}) {
     instance.historyProjectID = overrides.historyProjectID === undefined ? null : overrides.historyProjectID;
   } else if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
+    instance.matchMode = overrides.matchMode === "exact" ? "exact" : "words";
     instance.searchEdition = typeof overrides.searchEdition === "string" ? overrides.searchEdition : "all";
     instance.expandedResultSources = normalizeSearchResultSources(
       overrides.expandedResultSources,
@@ -1236,6 +1237,7 @@ function normalizeUtilityInstances(saved = {}) {
       searchExpansionDecisionKey: pane?.searchExpansionDecisionKey,
       defaultExpandedResultSource: pane?.defaultExpandedResultSource,
       searchEdition: pane?.searchEdition,
+      matchMode: pane?.matchMode,
       expandedResultSources: pane?.expandedResultSources,
       expandedResultSource: pane?.expandedResultSource,
       codeFilters: pane?.codeFilters,
@@ -3087,7 +3089,7 @@ function normalizeSavedInstance(instance) {
 }
 
 function searchPositionState(instance) {
-  const key = JSON.stringify([String(instance.query || "").trim(), normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all"]);
+  const key = JSON.stringify([String(instance.query || "").trim(), normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all", instance.matchMode || "exact"]);
   if (!instance.searchPosition || instance.searchPosition.key !== key) {
     instance.searchPosition = { key, scrollTop: 0, loadedPages: 1, selectedResult: "" };
   }
@@ -3104,6 +3106,7 @@ function normalizeSearchInstance(instance) {
     return { query: "", codeFilters: [], expandedResultSources: [], collapsedResultCodePrefixes: [] };
   }
   instance.query = typeof instance.query === "string" ? instance.query : "";
+  instance.matchMode = instance.matchMode === "exact" ? "exact" : "words";
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
   instance.expandedResultSources = normalizeSearchResultSources(
     instance.expandedResultSources,
@@ -15248,6 +15251,13 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
   const projectButton = document.createElement("button");
   projectButton.type = "button";
   projectButton.textContent = "Add to Project";
+  const project = workspaceProject();
+  const savedInProject = project && (currentContentSummary().projectSections || []).some((link) =>
+    savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project));
+  if (savedInProject) {
+    message.textContent = `Saved to ${project.name || project.title || "Project"}`;
+    projectButton.textContent = "Manage Projects";
+  }
   confirmation.append(message, projectButton);
   panel.append(confirmation);
   let removeTimer = null;
@@ -17475,6 +17485,14 @@ async function renderSearch(instance, options = {}) {
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
   panel.__workspaceAccessGate = options.accessGate || null;
   const input = panel.querySelector(".search-input");
+  const matchSelect = panel.querySelector(".search-match-mode");
+  matchSelect.value = searchInstance.matchMode;
+  matchSelect.addEventListener("change", () => {
+    searchInstance.matchMode = matchSelect.value;
+    saveWorkspaceState();
+    void renderSearchResults(panel, searchInstance);
+  });
+  panel.querySelector(".search-sources-button").addEventListener("click", openActiveCodeSourceSettings);
   const clearButton = panel.querySelector(".search-clear-button");
   applyPaneWeight(panel, paneID);
   input.value = searchInstance.query || "";
@@ -17678,6 +17696,7 @@ async function renderSearchResults(panel, instance) {
   const searchInstance = normalizeSearchInstance(instance);
   const results = panel.querySelector(".search-results");
   const query = searchInstance.query.trim();
+  const matchMode = searchInstance.matchMode || "exact";
   const selectedPrefixes = normalizeSearchCodeFilters(searchInstance.codeFilters);
   const position = searchPositionState(searchInstance);
   const restorePages = (Number.isSafeInteger(position.loadedPages) && position.loadedPages > 0 ? Math.min(position.loadedPages, 1000) : 1);
@@ -17692,7 +17711,7 @@ async function renderSearchResults(panel, instance) {
   const isCurrent = () => (sourceScope === null || isCurrentActiveCodeSourceContext(sourceScope.token)) && !controller.signal.aborted && panel.isConnected &&
     panel.__searchRequestController === controller && isCurrentAccountRequest(identity) &&
     activeWorkspaceID === workspaceID && results.dataset.searchRenderToken === renderToken &&
-    searchInstance.query.trim() === query && (searchInstance.searchEdition || "all") === edition &&
+    searchInstance.query.trim() === query && (searchInstance.matchMode || "exact") === matchMode && (searchInstance.searchEdition || "all") === edition &&
     normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") === selectedPrefixes.join(",");
   results.dataset.searchRenderToken = renderToken;
   results.dataset.restoringSearch = "true";
@@ -17730,7 +17749,7 @@ async function renderSearchResults(panel, instance) {
       return;
     }
     payload = await api(
-      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true${sourceScope.querySuffix}`, { signal: controller.signal }
+      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=${matchMode}&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true${sourceScope.querySuffix}`, { signal: controller.signal }
     );
   } catch (error) {
     if (!isCurrent()) return;
@@ -17750,7 +17769,7 @@ async function renderSearchResults(panel, instance) {
 
   const filteredResults = (payload.results || []).filter((result) =>
     (selectedPrefixes.length === 0 || selectedPrefixes.includes(result.codePrefix || "BC")) &&
-    searchResultMatchesExactQuery(result, query)
+    (matchMode === "words" || searchResultMatchesExactQuery(result, query))
   );
 
   if (filteredResults.length === 0 && !payload.hasMore) {
@@ -17766,8 +17785,8 @@ async function renderSearchResults(panel, instance) {
       .filter((term) => term.toLowerCase() !== query.toLowerCase())
       .slice(0, 4);
     renderSearchPlaceholder(results, {
-      title: "No exact match",
-      body: `Search looks for this phrase together in section titles or code text. It was not found in ${scope}. Try a shorter phrase or a section number${terms.length ? ", or search one term below." : "."}`
+      title: matchMode === "words" ? "No matches for all words" : "No exact match",
+      body: matchMode === "words" ? `No section containing all these words was found in ${scope}. Try fewer words or a section number.` : `Search looks for this phrase together in section titles or code text. It was not found in ${scope}. Try a shorter phrase or a section number${terms.length ? ", or search one term below." : "."}`
     });
     for (const term of terms) {
       const termButton = document.createElement("button");
@@ -17815,7 +17834,7 @@ async function renderSearchResults(panel, instance) {
   if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope, { hasMore: Boolean(payload.hasMore) })) saveWorkspaceState();
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
   if (Array.isArray(payload.groups)) {
-    const options = { query, searchInstance, panel, edition, controller, isCurrent, sourceScope };
+    const options = { query, matchMode, searchInstance, panel, edition, controller, isCurrent, sourceScope };
     const restoreGroups = position.groupScope === sourceScope.querySuffix ? { ...position.groupPages } : {};
     position.groupScope = sourceScope.querySuffix;
     position.groupPages = {};
@@ -17850,6 +17869,7 @@ async function renderSearchResults(panel, instance) {
   // Older servers keep their original cursor while cached clients transition.
   appendSearchLoadMore(results, {
     query,
+    matchMode,
     selectedPrefixes,
     nextOffset: Number(payload.nextOffset) || (payload.results || []).length,
     candidateOffset: Number(payload.nextCandidateOffset) || 0,
@@ -17991,6 +18011,12 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       citation.className = "result-chapter";
       citation.id = `search-result-citation-${crypto.randomUUID()}`;
       citation.textContent = presentation.citation;
+      if (searchInstance.matchMode === "words") {
+        const kind = document.createElement("span");
+        kind.className = "search-match-kind";
+        kind.textContent = result.matchKind === "exact" ? "Exact phrase" : "All words";
+        citation.append(kind);
+      }
       mainButton.setAttribute("aria-describedby", citation.id);
       const heading = document.createElement("strong");
       heading.className = "result-heading";
@@ -18081,7 +18107,7 @@ function appendSearchGroupLoadMore(results, page, options) {
     try {
       const source = encodeURIComponent(JSON.stringify({ codePrefix: page.codePrefix, codeVersion: page.codeVersion }));
       const payload = await api(`/code/search?q=${encodeURIComponent(options.query)}` +
-        `&code=${encodeURIComponent(page.codePrefix)}&version=all&resultSource=${source}&match=exact` +
+        `&code=${encodeURIComponent(page.codePrefix)}&version=all&resultSource=${source}&match=${options.matchMode || "exact"}` +
         `&limit=${searchResultPageSize}&offset=${page.nextOffset}` +
         `${page.cursorKind === "candidate" ? `&candidateOffset=${page.candidateOffset}` : ""}${options.sourceScope.querySuffix}`,
         { signal: options.controller.signal });
@@ -18089,7 +18115,7 @@ function appendSearchGroupLoadMore(results, page, options) {
       if ((payload.results || []).some(result => result.codePrefix !== page.codePrefix || result.codeVersion !== page.codeVersion)) {
         throw new Error("The returned matches belong to a different code edition.");
       }
-      const matches = (payload.results || []).filter(result => searchResultMatchesExactQuery(result, options.query));
+      const matches = (payload.results || []).filter(result => (options.matchMode === "words" || searchResultMatchesExactQuery(result, options.query)));
       const hadFocus = footer.contains(document.activeElement);
       footer.remove();
       appendSearchResultGroups(results, matches, options.query, options.searchInstance);
@@ -18152,7 +18178,7 @@ function appendSearchLoadMore(results, options) {
       : "";
     try {
       const payload = await api(
-        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=exact` +
+        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=${options.matchMode || "exact"}` +
         `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
         `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}${options.sourceScope.querySuffix}`,
         { signal: options.controller.signal }
@@ -18160,7 +18186,7 @@ function appendSearchLoadMore(results, options) {
       if (!options.isCurrent()) return false;
       const nextResults = (payload.results || []).filter((result) =>
         (options.selectedPrefixes.length === 0 || options.selectedPrefixes.includes(result.codePrefix || "BC")) &&
-        searchResultMatchesExactQuery(result, options.query)
+        (options.matchMode === "words" || searchResultMatchesExactQuery(result, options.query))
       );
       const loadedPages = (Number(results.dataset.loadedSearchPages) || 1) + 1;
       results.dataset.loadedSearchPages = String(loadedPages);
@@ -23683,10 +23709,10 @@ function researchOriginExcerpt(source, limit = 280) {
 }
 
 function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
-  if (!researchConversationHasSelectionOrigin(conversation) || !sources.length) return null;
+  if (!sources.length) return null;
   const origin = document.createElement("section");
   origin.className = "research-reader-origin";
-  origin.setAttribute("aria-label", "Research started from Reader evidence");
+  origin.setAttribute("aria-label", "Starting Research evidence");
   const list = document.createElement("section");
   list.className = "research-reader-origin-list";
   sources.forEach((source) => {
@@ -23709,7 +23735,11 @@ function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
         { projectID: conversation.primaryProjectID || "" }
       );
     });
+    const edition = document.createElement("span");
+    edition.className = "research-origin-edition";
+    edition.textContent = researchCodeEdition(source);
     passageHeader.append(reference);
+    passageHeader.append(edition);
     const excerpt = document.createElement("blockquote");
     excerpt.textContent = researchOriginExcerpt(source);
     passage.append(passageHeader, excerpt);
@@ -24682,7 +24712,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const starterAnalysisQuestion = conversation.messages.length === 0
     ? conversation.starterQuestion || ""
     : "";
-  input.placeholder = "Ask a follow-up…";
+  input.placeholder = conversation.messages.length ? "Ask a follow-up…" : displayedSources.length ? "Ask about this evidence…" : "Ask a question…";
   const followUpDraftKey = `followup:${conversationID}`;
   input.dataset.researchDraftKey = followUpDraftKey;
   input.value = researchNewChatDrafts.get(followUpDraftKey) ?? (ownerInstance?.draft || "");
@@ -24735,6 +24765,37 @@ async function renderResearchConversation(conversationID, options = {}) {
       (input.value.trim() || starterAnalysisQuestion).length < 3;
   });
   input.addEventListener("blur", flushResearchDraftPersistence);
+  if (!conversation.messages.length && !pendingProgress && displayedSources.length) {
+    const welcome = document.createElement("section");
+    welcome.className = "research-entry-context";
+    const projectLabel = document.createElement("p");
+    projectLabel.className = "research-entry-project";
+    projectLabel.textContent = conversation.primaryProjectID
+      ? `Project · ${researchProjectName(conversation.primaryProjectID)}` : "Unassigned Research";
+    const heading = document.createElement("h3");
+    heading.textContent = "What would you like to understand?";
+    const tasks = document.createElement("div");
+    tasks.className = "research-entry-tasks";
+    for (const [label, question] of [
+      ["Explain this provision", "Explain the selected provision in plain language, preserving its conditions and exceptions."],
+      ["Identify exceptions", "Identify the exceptions and cross-references relevant to the selected provision, and explain when each applies."],
+      ["List missing facts", "What project facts are needed to apply this provision? Distinguish known facts from facts still needed."],
+      ["Draft review checks", "Draft a short review checklist for this provision, linking each check to its supporting source and identifying unresolved facts."]
+    ]) {
+      const task = document.createElement("button");
+      task.type = "button";
+      task.textContent = label;
+      task.disabled = input.disabled || conversation.sourceStatus === "changed" || projectContextBlocked;
+      task.addEventListener("click", () => {
+        input.value = question;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.focus();
+      });
+      tasks.append(task);
+    }
+    welcome.append(projectLabel, heading, projectPreview, tasks);
+    thread.append(welcome);
+  }
   bindResearchSendShortcut(input, composer);
   composer.addEventListener("submit", async (event) => {
     event.preventDefault();

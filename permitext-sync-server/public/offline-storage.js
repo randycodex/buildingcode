@@ -1,3 +1,4 @@
+import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js";
 import { parseActiveCodeSearchScope } from "./active-code-search-scope.js";
 import { codeSourceIdentity, codeSourceKey } from "./active-code-sources.js";
 import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
@@ -19,12 +20,13 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1352";
-const shellAssetVersion = "20261010-app-plex-v712";
+const shellCacheName = "permitext-pro-shell-v1354";
+const shellAssetVersion = "20261010-research-search-v714";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/search-words.js",
   "/web/nyc-property-facts.js?v=20261004-zola-facts-v1",
   "/web/active-code-sources.js",
   "/web/active-code-search-scope.js",
@@ -56,19 +58,19 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261010-app-plex-v712",
+  "/web/styles.css?v=20261010-research-search-v714",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261010-app-plex-v712",
+  "/web/app.js?v=20261010-research-search-v714",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261010-app-plex-v712",
-  "/web/research-intent-state.js?v=20261010-app-plex-v712",
+  "/web/offline-storage.js?v=20261010-research-search-v714",
+  "/web/research-intent-state.js?v=20261010-research-search-v714",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20261008-pinned-columns-v12",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -1294,7 +1296,7 @@ async function offlineSectionMetadataRecords(installID) {
   } finally { database.close(); }
 }
 
-async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens, sourceScope = null, exactPattern = null }) {
+async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens, sourceScope = null, exactPattern = null, phrasePattern = null, matchMode = "exact" }) {
   const database = await openDatabase();
   try {
     const transaction = database.transaction(sectionsStoreName, "readonly");
@@ -1316,7 +1318,7 @@ async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQ
         if (
           permitted &&
           (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
-          tokens.every((token) => section.searchText.includes(token)) &&
+          (matchMode === "words" ? matchesSearchWords([section.sectionNumber, section.title, section.headingLine, section.plainText], query) : tokens.every((token) => section.searchText.includes(token))) &&
           (!exactPattern || exactPattern.test([section.sectionNumber, section.title, section.headingLine, section.plainText].filter(Boolean).join(" ").replace(/\s+/g, " ")))
         ) {
           const number = String(section.sectionNumber || "").toLowerCase();
@@ -1325,7 +1327,8 @@ async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQ
             ? 0
             : number.startsWith(normalizedQuery)
               ? 1
-              : title.includes(normalizedQuery) ? 2 : 3;
+              : title.includes(normalizedQuery) ? 2 : matchMode === "words"
+                ? 3 - searchWords(query).filter(word => matchesSearchWords(title, word)).length / Math.max(1, searchWords(query).length) : 3;
           matches.push({
             rank,
             record: {
@@ -1344,7 +1347,8 @@ async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQ
               title: section.title,
               headerLine: section.headerLine,
               headingLine: section.headingLine,
-              snippet: searchSnippet(section.plainText || section.title, query)
+              matchKind: phrasePattern?.test([section.sectionNumber, section.title, section.plainText].join(" ")) ? "exact" : "words",
+              snippet: (matchMode === "words" ? searchWordsSnippet : searchSnippet)(section.plainText || section.title, query)
             }
           });
         }
@@ -1505,8 +1509,9 @@ async function offlineSearch(metadata, url) {
   }
   const needle = query.replace(/\s+/g, " ");
   const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").split(" ").join("\\s+");
-  const exactPattern = url.searchParams.get("match") === "exact" ? new RegExp(
-    `${/^[\p{L}\p{N}_]/u.test(needle) ? "(?<![\\p{L}\\p{N}_])" : ""}${escaped}${/[\p{L}\p{N}_]$/u.test(needle) ? "(?![\\p{L}\\p{N}_])" : ""}`, "iu") : null;
+  const phrasePattern = new RegExp(
+    `${/^[\p{L}\p{N}_]/u.test(needle) ? "(?<![\\p{L}\\p{N}_])" : ""}${escaped}${/[\p{L}\p{N}_]$/u.test(needle) ? "(?![\\p{L}\\p{N}_])" : ""}`, "iu");
+  const exactPattern = url.searchParams.get("match") === "exact" ? phrasePattern : null;
   const chapters = new Map();
   const matches = (await Promise.all((await matchingOfflineSearchResults(metadata.installID, {
     codeFilter,
@@ -1514,7 +1519,8 @@ async function offlineSearch(metadata, url) {
     query,
     tokens,
     sourceScope,
-    exactPattern
+    exactPattern, phrasePattern,
+    matchMode: url.searchParams.get("match") === "words" ? "words" : "exact"
   })).map(async (match) => {
     const record = await offlineSectionWithEdition(match.record, metadata, chapters);
     if (!record || (requestedVersion && requestedVersion !== "all" && record.codeVersion !== syncCodeVersion(requestedVersion))) return null;

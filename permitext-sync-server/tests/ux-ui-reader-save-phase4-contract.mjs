@@ -67,6 +67,29 @@ assert.doesNotMatch(sectionDetailSave, /showReaderNotesProjectPicker\(notes, sec
 
 assert.match(webClient, /message\.textContent = "Saved"/);
 assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
+// The confirmation names only a Project that actually contains this exact evidence.
+let confirmationProject = { id: "p1", name: "Test Project" };
+let confirmationLinks = [{ projectID: "p1", key: "BC2022:1020.4" }];
+const confirmationPanel = { querySelector: () => null, append(node) { this.current = node; } };
+const confirmationContext = vm.createContext({
+  document: { createElement: () => ({ children: [], setAttribute() {}, addEventListener() {}, append(...nodes) { this.children.push(...nodes); } }) },
+  window: { setTimeout() {} },
+  workspaceProject: () => confirmationProject,
+  currentContentSummary: () => ({ projectSections: confirmationLinks }),
+  savedEvidenceKey: item => item.key,
+  projectSectionBelongsToProject: (link, project) => link.projectID === project.id
+});
+vm.runInContext(sourceBetween("function showReaderSaveConfirmation(", "\nasync function saveReaderPassage"), confirmationContext);
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
+assert.equal(confirmationPanel.current.children[0].textContent, "Saved to Test Project");
+assert.equal(confirmationPanel.current.children[1].textContent, "Manage Projects");
+confirmationLinks = [{ projectID: "p1", key: "BC2014:1020.4" }];
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
+assert.equal(confirmationPanel.current.children[0].textContent, "Saved", "A different edition does not confirm this Project destination.");
+confirmationProject = null;
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
+assert.equal(confirmationPanel.current.children[1].textContent, "Add to Project");
+
 assert.match(webClient, /confirmation\.classList\.add\("is-leaving"\)/);
 assert.match(cssRule(".reader-save-confirmation"), /animation: reader-save-confirmation-enter/);
 assert.match(cssRule(".reader-save-confirmation.is-leaving"), /animation: reader-save-confirmation-exit/);
