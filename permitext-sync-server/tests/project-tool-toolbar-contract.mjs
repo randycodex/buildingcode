@@ -10,7 +10,7 @@ function actual(name) {
   assert.ok(start >= 0 && end > start, name);
   return app.slice(start, end + 2);
 }
-const menuIDs = ["toggle-saved", "add-reader", "toggle-search", "toggle-analysis", "toggle-facts", "toggle-notebook", "toggle-report"];
+const menuIDs = ["toggle-saved", "add-reader", "toggle-search", "toggle-analysis", "toggle-context", "toggle-facts", "toggle-notebook", "toggle-report"];
 assert.deepEqual(menuIDs.map(id => shell.indexOf(`id="${id}"`)).slice().sort((a, b) => a - b), menuIDs.map(id => shell.indexOf(`id="${id}"`)));
 assert.doesNotMatch(actual("renderSavedFolderContext"), /project-notebook-button|project-report-draft-button/);
 
@@ -21,10 +21,10 @@ let project = { id: "a", name: "Alpha" };
 let allowed = true, privateAllowed = true, discard = true, heldOpen = null;
 const capabilities = new Set(["projects", "notebook", "professional-exports"]);
 const calls = [];
-const factsButton = button(), notebookButton = button(), reportButton = button();
+const contextButton = button(), factsButton = button(), notebookButton = button(), reportButton = button();
 const state = { notebooks: [], reportDrafts: [], paneOrder: [], paneWeights: {} };
 const c = vm.createContext({
-  state, toggleFactsButton: factsButton, toggleNotebookButton: notebookButton, toggleReportButton: reportButton,
+  state, toggleContextButton: contextButton, toggleFactsButton: factsButton, toggleNotebookButton: notebookButton, toggleReportButton: reportButton,
   workspaceProject: () => project,
   workspacePrivatePresentationAllowed: () => privateAllowed,
   projectIdentity: value => ({ ...value }), projectDetailKey: value => value.id,
@@ -44,6 +44,14 @@ const c = vm.createContext({
 });
 vm.runInContext("let projectToolTogglePending = false;\n" + ["syncTopbarProjectToolStates", "toggleProjectTool", "closeProjectNotebook", "closeProjectReportDraft"].map(actual).join("\n"), c);
 
+c.syncTopbarProjectToolStates();
+assert.equal(contextButton.disabled, false);
+assert.equal(contextButton.attributes["aria-pressed"], "false");
+state.projectContextOpen = true;
+c.syncTopbarProjectToolStates();
+assert.equal(contextButton.attributes["aria-pressed"], "true");
+assert.equal(contextButton.title, "Close Context · Alpha");
+state.projectContextOpen = false;
 c.syncTopbarProjectToolStates();
 assert.equal(factsButton.disabled, false);
 assert.equal(factsButton.attributes["aria-pressed"], "false");
@@ -87,12 +95,15 @@ const opening = c.toggleProjectTool("notebook");
 assert.equal(notebookButton.disabled, true);
 assert.equal(reportButton.disabled, true);
 assert.equal(factsButton.disabled, true);
+assert.equal(contextButton.disabled, true);
 assert.equal(await c.toggleProjectTool("notebook"), false, "Repeated clicks cannot create duplicate columns.");
 release(); await opening; heldOpen = null;
 assert.equal(state.notebooks.length, 1);
 assert.equal(notebookButton.disabled, false);
 
 project = null; c.syncTopbarProjectToolStates();
+assert.equal(contextButton.disabled, true);
+assert.equal(contextButton.attributes["aria-pressed"], "false");
 assert.equal(factsButton.disabled, true);
 assert.equal(factsButton.attributes["aria-pressed"], "false");
 assert.equal(notebookButton.disabled, true);
@@ -114,6 +125,7 @@ c.syncTopbarProjectToolStates();
 assert.equal(notebookButton.disabled, false);
 assert.equal(reportButton.disabled, true);
 assert.equal(factsButton.disabled, false, "Shared Projects can open their read-only Facts.");
+assert.equal(contextButton.disabled, false, "Shared Projects can open their read-only Context.");
 assert.equal(await c.toggleProjectTool("report"), false);
 
 // Closing the Saved host only removes that column in a Project workspace.

@@ -13472,6 +13472,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   .topbar #fit-columns,
   .topbar #collapse-readers,
   .topbar #toggle-workboard,
+  .topbar #toggle-context,
   .topbar #toggle-facts,
   .topbar #toggle-notebook,
   .topbar #toggle-report {
@@ -17705,7 +17706,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button):is(:hover, :focus-visible) {
   background: var(--menu-surface);
 }
-.topbar :is(#toggle-facts, #toggle-notebook, #toggle-report)[aria-pressed="true"] {
+.topbar :is(#toggle-context, #toggle-facts, #toggle-notebook, #toggle-report)[aria-pressed="true"] {
   background: var(--menu-surface);
 }
 
@@ -18569,6 +18570,7 @@ html body .column-group-menu-button:focus-visible {
 .project-context-panel .saved-project-fact-description {
   min-height: 10em;
 }
+.project-context-panel,
 .project-facts-panel {
   --pane-min-width: 600px;
 }

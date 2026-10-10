@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-facts-width-v741";
+} from "./offline-storage.js?v=20261010-context-toolbar-v742";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-facts-width-v741";
+} from "./research-intent-state.js?v=20261010-context-toolbar-v742";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -323,6 +323,7 @@ const addReaderButton = document.querySelector("#add-reader");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
+const toggleContextButton = document.querySelector("#toggle-context");
 const toggleFactsButton = document.querySelector("#toggle-facts");
 const toggleNotebookButton = document.querySelector("#toggle-notebook");
 const toggleReportButton = document.querySelector("#toggle-report");
@@ -422,6 +423,7 @@ const legacySourceLinkedReaderPaneWidth = 400;
 const defaultSourceLinkedReaderPaneWidth = 600;
 const legacyCoordinationPaneWidth = 430;
 const defaultNonReaderPaneWidth = 400;
+const defaultContextPaneWidth = 600;
 const defaultFactsPaneWidth = 600;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
 const defaultSearchPaneWidth = 600;
@@ -3911,6 +3913,7 @@ async function activateProjectStudio(project, options = {}) {
 
 function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
+  if (paneID.startsWith("project:context:")) return defaultContextPaneWidth;
   if (paneID.startsWith("project:facts:")) return defaultFactsPaneWidth;
   if (isCodeQuestionPaneID(paneID)) {
     const parsed = parseQuestionPaneKey(paneID);
@@ -3939,6 +3942,7 @@ function defaultPaneWidthForID(paneID) {
 }
 
 function migrateLegacyPaneWidth(paneID, value) {
+  if (paneID.startsWith("project:context:") && value < defaultContextPaneWidth) return defaultContextPaneWidth;
   if (paneID.startsWith("project:facts:") && value < defaultFactsPaneWidth) return defaultFactsPaneWidth;
   if (paneID.startsWith("utility:analysis:") && value === defaultUtilityPaneWidth) return defaultResearchPaneWidth;
   if ((paneID === "utility:saved" || paneID.startsWith("utility:saved:")) && value === defaultUtilityPaneWidth) {
@@ -4517,6 +4521,7 @@ function syncTopbarProjectToolStates() {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const identity = project ? projectIdentity(project) : null;
   [
+    [toggleContextButton, "Context", "projects", () => Boolean(state.projectContextOpen)],
     [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
     [toggleNotebookButton, "Notebook", "notebook", projectHasOpenNotebook],
     [toggleReportButton, "Report", "professional-exports", projectHasOpenReportDraft]
@@ -43484,13 +43489,14 @@ function bindWorkspaceKeyboardNavigation() {
 
 function bindImmediateUtilityControls() {
   [
+    [toggleContextButton, "context"],
     [toggleFactsButton, "facts"],
     [toggleNotebookButton, "notebook"],
     [toggleReportButton, "report"]
   ].forEach(([button, tool]) => {
     if (!button || button.dataset.coldStartBound === "true") return;
     button.dataset.coldStartBound = "true";
-    button.addEventListener("click", () => void (tool === "facts" ? toggleProjectInformation(tool) : toggleProjectTool(tool)));
+    button.addEventListener("click", () => void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : toggleProjectTool(tool)));
   });
   if (track.dataset.utilityFocusBound !== "true") {
     track.dataset.utilityFocusBound = "true";
