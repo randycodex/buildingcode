@@ -17631,7 +17631,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: transparent;
 }
 .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button):is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
+  background: var(--menu-surface);
 }
 
 .account-dialog {
