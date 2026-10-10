@@ -99,7 +99,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261009-scoped-search-v658";
+} from "./offline-storage.js?v=20261009-free-pane-header-v660";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -137,7 +137,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261009-scoped-search-v658";
+} from "./research-intent-state.js?v=20261009-free-pane-header-v660";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33256,23 +33256,15 @@ function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 
 }
 
 function renderProLockedPane(paneID, title) {
-  const panel = document.createElement("section");
-  panel.className = "workspace-panel pro-locked-panel";
-  applyPaneWeight(panel, paneID);
-  const header = document.createElement("header");
-  const heading = document.createElement("h2");
-  heading.textContent = title;
-  header.append(heading);
+  const panel = renderUtility(analysisTemplate, paneID);
+  panel.classList.add("pro-locked-panel");
+  const header = panel.querySelector(".panel-header");
+  header.querySelector(".panel-kind").textContent = title;
+  header.querySelector(".panel-title").textContent = title;
   const instance = (state.utilityInstances || []).find(item => paneIDForUtilityInstance(item) === paneID);
-  if (instance || paneID === "utility:analysis") {
-    const close = document.createElement("button");
-    close.type = "button";
-    close.className = "icon-button";
-    close.textContent = "×";
-    close.setAttribute("aria-label", "Close column");
-    close.addEventListener("click", () => void (instance ? closeUtilityInstance(instance) : closeResearchWorkspace()));
-    header.append(close);
-  }
+  const close = header.querySelector(".utility-close");
+  if (!instance && paneID === "utility:analysis") close.addEventListener("click", closeResearchWorkspace);
+  else if (!instance) close.remove();
   const content = document.createElement("div");
   content.className = "pro-locked-content";
   const message = document.createElement("p");
@@ -33282,7 +33274,8 @@ function renderProLockedPane(paneID, title) {
   upgrade.textContent = "View Pro";
   upgrade.addEventListener("click", () => void focusUtility("settings"));
   content.append(message, upgrade);
-  panel.append(header, content);
+  panel.querySelector(".analysis-content").replaceWith(content);
+  if (instance) wireUtilityInstanceActions(panel, instance);
   return panel;
 }
 
