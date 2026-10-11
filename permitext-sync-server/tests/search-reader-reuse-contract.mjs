@@ -25,3 +25,24 @@ hidden.add(notebook.id);
 const independent = await context.openSourceInReader({sectionID:'9'},'notebook');
 assert.notEqual(independent.id,notebook.id,'A link cannot move a hidden Reader in another view');
 assert.equal(notebook.sectionID,'8');
+
+// A delayed source cannot open in a different view, or reveal after switching
+// away and back while its column is hydrating.
+for (const delay of ['metadata', 'hydration']) {
+  let finish;
+  const gate = new Promise(resolve => { finish = resolve; });
+  const priorCount = state.readers.length;
+  const reveals = [];
+  context.resolveReaderSource = delay === 'metadata' ? () => gate : async item => item;
+  context.whenWorkspacePaneReady = delay === 'hydration' ? () => gate : async () => true;
+  context.revealReaderSourceTarget = () => reveals.push('reveal');
+  context.scrollPaneIntoView = () => reveals.push('scroll');
+  const pending = open('delayed', {forceNewReader:true});
+  await new Promise(resolve => setImmediate(resolve));
+  state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 2;
+  finish(delay === 'metadata' ? {sectionID:'delayed'} : true);
+  assert.equal(await pending, null);
+  assert.equal(state.readers.length, priorCount + (delay === 'hydration' ? 1 : 0));
+  assert.deepEqual(reveals, [], 'A stale source must not scroll or reveal in the current view');
+}
+console.log('Delayed source navigation remains confined to its originating view.');

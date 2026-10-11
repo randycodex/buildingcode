@@ -4187,6 +4187,7 @@ async function switchWorkflowView(view) {
   if (notifyProjectRequiredForColumn()) return false;
   view = normalizeWorkflowView(view);
   if (view !== currentWorkflowView()) {
+    state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     const panes = [...track.querySelectorAll(':scope > .workspace-panel')];
     const readerPositions = captureReaderScrollPositions();
     panes.forEach(pane => { if (readerPositions.has(pane.dataset.paneId)) pane._workflowReaderPosition = readerPositions.get(pane.dataset.paneId); });
@@ -21072,13 +21073,15 @@ async function openSupplementalResearchConversation(conversationID) {
 async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
+  const workflowGeneration = state.workflowNavigationGeneration || 0;
+  const workflowIsCurrent = () => workflowGeneration === (state.workflowNavigationGeneration || 0);
   researchDraftPaneIDs.delete(options.instance ? paneIDForUtilityInstance(options.instance) : "utility:analysis");
   if (options.instance) {
     const instanceID = options.instance.id;
     const workspaceID = activeWorkspaceID;
     const identity = captureAccountRequest();
     const conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
-    if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return null;
+    if (!workflowIsCurrent() || workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return null;
     const instance = (state.utilityInstances || []).find((item) => item.key === "analysis" && item.id === instanceID);
     if (!instance) return null;
     const previousConversationID = instance.conversationID;
@@ -21120,11 +21123,11 @@ async function openResearchConversation(conversationID, options = {}) {
   try {
     conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
   } catch (error) {
-    if (!researchOpenContextIsCurrent(openingContext)) return null;
+    if (!workflowIsCurrent() || !researchOpenContextIsCurrent(openingContext)) return null;
     await showWebNotice("Could not open Research", error.message || "The conversation could not be loaded.");
     return null;
   }
-  if (!researchOpenContextIsCurrent(openingContext)) return null;
+  if (!workflowIsCurrent() || !researchOpenContextIsCurrent(openingContext)) return null;
   // Every explicit entry point (including Note references) must reveal the
   // conversation. Setting only its ID loads History but leaves the answer hidden.
   researchConversationPaneOpened = true;
@@ -21137,7 +21140,7 @@ async function openResearchConversation(conversationID, options = {}) {
   );
   if (codeQuestionWorkspaceEnabled() && linkedQuestionID && sameProject) {
     await hydrateCodeQuestionList(codeQuestionProjectID, { force: true, render: false });
-    if (!researchOpenContextIsCurrent(openingContext)) return null;
+    if (!workflowIsCurrent() || !researchOpenContextIsCurrent(openingContext)) return null;
   }
   const linkedQuestion = questionsForActiveProject().find((item) => item.id === linkedQuestionID);
   const exactLinkedDecision = Boolean(
@@ -21206,10 +21209,10 @@ async function openResearchConversation(conversationID, options = {}) {
       Math.max(0, refreshedResearchList.scrollHeight - refreshedResearchList.clientHeight)
     );
   }
-  if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return null;
+  if (!workflowIsCurrent() || !researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return null;
   scrollPaneIntoView(conversationPaneID);
   requestAnimationFrame(() => {
-    if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return;
+    if (!workflowIsCurrent() || !researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return;
     const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(conversationPaneID)}"]`);
     const focusTarget = pane?.querySelector(".research-question-input:not(:disabled), .panel-title");
     focusTarget?.focus({ preventScroll: true });
@@ -25517,6 +25520,11 @@ async function startNewResearchFromSelection(selection) {
     );
     return null;
   }
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const workflowGeneration = state.workflowNavigationGeneration || 0;
+  const navigationIsCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    workflowGeneration === (state.workflowNavigationGeneration || 0);
   const passages = selection.passages || [selection];
   const payload = await postResearch("/research/conversations/create", {
     selections: passages.map(({ sectionID, selectedText, savedItemID }) => ({
@@ -25528,9 +25536,11 @@ async function startNewResearchFromSelection(selection) {
     savedItemID: selection.savedItemID || "",
     originSurface: selection.originSurface || "reader"
   });
+  if (!navigationIsCurrent()) return payload.conversation;
   activeResearchConversation = payload.conversation;
   window.getSelection?.().removeAllRanges();
   await refreshResearchConversationList();
+  if (!navigationIsCurrent()) return payload.conversation;
   await openResearchConversation(payload.conversation.id, {
     refreshList: true,
     anchorPaneID: selection.originPaneID || ""
@@ -35526,9 +35536,10 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (workspaceColumnsRequireProject()) return null;
   const requestIdentity = captureAccountRequest();
   const sourceWorkspaceID = activeWorkspaceID;
+  const workflowGeneration = state.workflowNavigationGeneration || 0;
   let navigationItem;
   const navigationIsCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === sourceWorkspaceID &&
-    !workspaceColumnsRequireProject() &&
+    !workspaceColumnsRequireProject() && workflowGeneration === (state.workflowNavigationGeneration || 0) &&
     (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext));
   try {
     navigationItem = await resolveReaderSource(item, {isCurrent: navigationIsCurrent});
@@ -35624,8 +35635,10 @@ async function openSavedItemInReader(item, savedPaneID) {
   if (!sectionID) return;
   const requestIdentity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
+  const workflowGeneration = state.workflowNavigationGeneration || 0;
   const isCurrent = () => savedItemOpeningAttempts.get(savedPaneID) === attempt &&
-    isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
+    isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    workflowGeneration === (state.workflowNavigationGeneration || 0);
   let navigationItem = {
     ...item,
     id: sectionID,

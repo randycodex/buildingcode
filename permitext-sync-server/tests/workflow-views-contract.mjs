@@ -36,6 +36,7 @@ await c.switchWorkflowView('research');
 assert.equal(reader.scrollTop,1700); assert.equal(track.scrollLeft,110);
 assert.equal(notebook.draft,'Unsaved text'); assert.equal(constructions,0);
 await c.switchWorkflowView('notebook'); assert.equal(notebook.scrollTop,450); assert.equal(track.scrollLeft,200);
+assert.equal(state.workflowNavigationGeneration,3,'Each actual view change invalidates pending navigation');
 needProject=true; assert.equal(await c.switchWorkflowView('research'),false); assert.equal(state.workflowView,'notebook');
 console.log('Workflow views passed: independent visibility, linked destinations, layout persistence, retained editors, nested scroll and project guard.');
 
