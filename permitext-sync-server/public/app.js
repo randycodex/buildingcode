@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-autosave-v848";
+} from "./offline-storage.js?v=20261011-notes-insert-v851";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -316,7 +316,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261005-notebook-dependencies-v20";
+const notebookClientVersion = "20261011-notebook-insert-v21";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -27471,13 +27471,13 @@ async function renderProjectNotebook(project, options = {}) {
 
       const toolbar = document.createElement("div");
       toolbar.className = "notebook-toolbar code-filter-menu notebook-reference-menu";
-      toolbar.setAttribute("aria-label", "Notebook references");
+      toolbar.setAttribute("aria-label", "Insert into note");
       const referenceToggle = document.createElement("button");
       referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle";
       referenceToggle.type = "button";
       const referenceLabel = document.createElement("span");
       referenceLabel.className = "code-filter-menu-label";
-      referenceLabel.textContent = "Insert evidence or Research";
+      referenceLabel.textContent = "Insert";
       referenceToggle.append(referenceLabel);
       const referenceList = document.createElement("div");
       referenceList.className = "notebook-reference-list";
@@ -27516,6 +27516,33 @@ async function renderProjectNotebook(project, options = {}) {
       };
       const renderReferenceOptions = () => {
         referenceList.replaceChildren();
+        const addInsertAction = (label, action) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "notebook-insert-action";
+          button.textContent = label;
+          button.disabled = notebookReadOnly;
+          button.addEventListener("click", () => {
+            if (notebookReadOnly || !editorMount) return;
+            action();
+            referenceMenuState.referenceMenuOpen = false;
+            updateCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
+          });
+          referenceList.append(button);
+        };
+        addInsertAction("Image", () => editorMount.insertImage());
+        addInsertAction("Finding template", () => {
+          activeCard.cardType = "finding";
+          draftDocument = appendFindingTemplate(editorMount.getDocument(), () => crypto.randomUUID());
+          editorMount.setDocument(draftDocument);
+          markNotebookDirty();
+        });
+        const evidenceGroup = document.createElement("details");
+        evidenceGroup.className = "notebook-insert-group";
+        const evidenceSummary = document.createElement("summary");
+        evidenceSummary.textContent = "Evidence";
+        evidenceGroup.append(evidenceSummary);
+        referenceList.append(evidenceGroup);
         const canonicalGroups = new Map();
         candidates.forEach((reference, index) => {
           if (reference.referenceKind !== "canonicalSection") return;
@@ -27549,29 +27576,44 @@ async function renderProjectNotebook(project, options = {}) {
             codeBody.append(chapterGroup);
           });
           codeGroup.append(codeSummary, codeBody);
-          referenceList.append(codeGroup);
+          evidenceGroup.append(codeGroup);
         });
         let activeReferenceKind = "";
+        let referenceGroup = null;
         candidates.forEach((reference, index) => {
           if (reference.referenceKind === "canonicalSection") return;
           if (reference.referenceKind !== activeReferenceKind) {
             activeReferenceKind = reference.referenceKind;
-            const groupTitle = document.createElement("h4");
+            referenceGroup = document.createElement("details");
+            referenceGroup.className = "notebook-insert-group";
+            const groupTitle = document.createElement("summary");
             groupTitle.className = "notebook-reference-group-title";
             groupTitle.textContent = reference.referenceKind === "researchAnswer"
-              ? "Research answers"
+              ? "Assistant answer"
               : reference.referenceKind === "notebookCard"
                 ? "Other Notes"
                 : "Project references";
-            referenceList.append(groupTitle);
+            referenceGroup.append(groupTitle);
+            referenceList.append(referenceGroup);
           }
-          appendReferenceOption(reference, index, referenceList);
+          appendReferenceOption(reference, index, referenceGroup);
         });
-        if (!candidates.length) {
+        if (!canonicalGroups.size) {
           const empty = document.createElement("p");
           empty.className = "notebook-reference-empty";
-          empty.textContent = "No Project references are available yet.";
-          referenceList.append(empty);
+          empty.textContent = "Save a passage in Evidence to insert it here.";
+          evidenceGroup.append(empty);
+        }
+        if (!candidates.some(reference => reference.referenceKind === "researchAnswer")) {
+          const assistantGroup = document.createElement("details");
+          assistantGroup.className = "notebook-insert-group";
+          const summary = document.createElement("summary");
+          summary.textContent = "Assistant answer";
+          const empty = document.createElement("p");
+          empty.className = "notebook-reference-empty";
+          empty.textContent = "Assistant answers linked to this Project will appear here.";
+          assistantGroup.append(summary, empty);
+          referenceList.append(assistantGroup);
         }
         referenceList.querySelectorAll(".notebook-reference-option").forEach((option) => {
           option.addEventListener("click", () => {
@@ -27599,12 +27641,12 @@ async function renderProjectNotebook(project, options = {}) {
       const referenceMenuState = { referenceMenuOpen: false };
       const referenceMenuOptions = {
         stateKey: "referenceMenuOpen",
-        menuName: "Notebook references",
-        label: "Insert evidence or Research"
+        menuName: "Insert into note",
+        label: "Insert"
       };
       renderReferenceOptions();
       wireCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
-      referenceToggle.disabled = notebookReadOnly || !candidates.length;
+      referenceToggle.disabled = notebookReadOnly;
       if (notebookReadOnly) {
         toolbar.querySelectorAll("button").forEach((control) => {
           control.disabled = true;
@@ -27626,7 +27668,7 @@ async function renderProjectNotebook(project, options = {}) {
         if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
         candidates = nextCandidates;
         renderReferenceOptions();
-        referenceToggle.disabled = notebookReadOnly || !candidates.length;
+        referenceToggle.disabled = notebookReadOnly;
         updateCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
         return true;
       };
@@ -27709,22 +27751,9 @@ async function renderProjectNotebook(project, options = {}) {
       footer.append(reportMembershipIndicator(projectID, "notebookCard", activeCard), footerActions);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      const findingButton = document.createElement("button");
-      findingButton.type = "button";
-      findingButton.className = "workflow-action workflow-action-secondary notebook-finding-action";
-      findingButton.textContent = "Insert finding template";
-      findingButton.title = "Add Conclusion, Supporting evidence, Uncertainty, and Next action to this Note";
-      findingButton.disabled = notebookReadOnly;
-      findingButton.addEventListener("click", () => {
-        if (!editorMount || notebookReadOnly) return;
-        activeCard.cardType = "finding";
-        draftDocument = appendFindingTemplate(editorMount.getDocument(), () => crypto.randomUUID());
-        editorMount.setDocument(draftDocument);
-        markNotebookDirty();
-      });
       const notebookTools = document.createElement("div");
       notebookTools.className = "notebook-source-actions";
-      notebookTools.append(toolbar, findingButton);
+      notebookTools.append(toolbar);
       const focusedContent = [notebookTools, editorElement];
       focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);

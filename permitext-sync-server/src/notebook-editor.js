@@ -282,6 +282,13 @@ export function mountPermitextNotebookEditor(element, options = {}) {
       if (!editor) return;
       editor.replaceBlocks(editor.document, blockNoteBlocksFromNotebookDocument(document));
     },
+    insertImage() {
+      const editor = controllerRef.current;
+      if (!editor) return false;
+      editor.focus();
+      editor.insertBlocks([{ type: "image" }], editor.getTextCursorPosition().block, "after");
+      return true;
+    },
     insertReference(reference) {
       const editor = controllerRef.current;
       if (!editor) return false;
