@@ -13,7 +13,7 @@ function actual(name) {
 const topNavigation = shell.match(/<nav class="topbar-actions"[\s\S]*?<\/nav>/)[0];
 assert.match(topNavigation,/data-workflow-view="research"[\s\S]*data-workflow-view="notebook"[\s\S]*id="toggle-report"/);
 assert.doesNotMatch(topNavigation,/id="toggle-(?:saved|search|analysis|notebook)"/);
-assert.match(shell,/data-workflow-tools="research"[\s\S]*id="toggle-search"[\s\S]*id="add-reader"[\s\S]*id="toggle-analysis"/);
+assert.match(shell,/data-workflow-tools="research"[\s\S]*id="add-reader"[\s\S]*id="toggle-search"[\s\S]*id="toggle-analysis"/);
 assert.doesNotMatch(actual("renderSavedFolderContext"), /project-notebook-button|project-report-draft-button/);
 
 function button() {

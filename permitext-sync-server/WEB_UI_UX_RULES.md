@@ -25,7 +25,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 
 - Keep the top menu compact, with text actions rather than large pill bubbles.
 - Primary working views are `Research`, `Notebook`, and `Report`.
-- Research tools are `Search`, `Reader`, and `Assistant`; Notebook tools are `Evidence`, `Notes`, and `Reader`. Use `Assistant` for the AI conversation column title too.
+- Keep toolbar actions in workflow order: Research uses `Reader`, `Search`, `Assistant`; Notebook uses `Reader`, `Notes`, `Evidence`; Report uses `Reader`, `Sources and version`, `Save draft`, `Export PDF version`. Use `Assistant` for the AI conversation column title too.
 - Reader is available in Research, Notebook, Report, and Project details. Open new Readers beside the current work without switching views. Each view retains its own Reader columns, source selections, widths, and scroll positions. Report and Project details use reference columns to the right and regain their full width when those columns close.
 - Research history's Project filter and Search's matching options share the Layout menu's surface, padding, corners, shadow, and option styling. Keep keyboard selection, Escape, and outside-click dismissal available.
 - Keep Project selection, `Project details`, `Layout`, and `Account` available across working views, including Project details and Account. Open one working view at a time and keep inactive columns mounted.

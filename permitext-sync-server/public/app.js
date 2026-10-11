@@ -29110,7 +29110,7 @@ async function renderProjectReportDraft(project) {
         snapshot: { label: `Report: ${activeDraft.title || "Untitled Report"}` }
       });
     });
-    primaryActions.append(save, generate, coordinate, createReaderToolbarButton());
+    primaryActions.append(createReaderToolbarButton(), save, generate, coordinate);
 
     const appendOutputDisclosure = (label, body, className, stateKey = label) => {
       const section = document.createElement("section");
@@ -29181,7 +29181,7 @@ async function renderProjectReportDraft(project) {
     library.append(libraryControls.header, sourcePicker, historySection);
     const tools = document.createElement("button");
     tools.type = "button";
-    tools.textContent = "Sources & versions";
+    tools.textContent = "Sources and version";
     tools.setAttribute("aria-expanded", String(panel.dataset.libraryOpen === "true"));
     tools.addEventListener("click", () => {
       const expanded = panel.dataset.libraryOpen !== "true";
@@ -29189,7 +29189,7 @@ async function renderProjectReportDraft(project) {
       tools.setAttribute("aria-expanded", String(expanded));
       syncReferenceReaderLayout();
     });
-    primaryActions.prepend(tools);
+    primaryActions.insertBefore(tools, save);
     shell.append(primaryActions, library, libraryControls.divider, outline, documentBody);
     if (panel.isConnected) syncReferenceReaderLayout();
   }
