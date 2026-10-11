@@ -16505,10 +16505,8 @@ function renderCodeBlock(block) {
     wrapper.className = "code-table";
     wrapper.innerHTML = rewriteCodeHTML(block.html || "", block.assetRevision);
     decorateCodeHTML(wrapper);
-    wrapper.tabIndex = 0;
     wrapper.setAttribute("role", "region");
     wrapper.setAttribute("aria-label", "Code table");
-    bindHorizontalWheelScroll(wrapper, { shiftWheel: true, contain: true });
     return wrapper;
   }
 
@@ -19845,9 +19843,8 @@ function appendResearchAnswerNarrative(container, result, question = "", include
     if (tableValue) {
       const scroller = document.createElement("div");
       scroller.className = "research-answer-table-scroll";
-      scroller.tabIndex = 0;
       scroller.setAttribute("role", "region");
-      scroller.setAttribute("aria-label", "Research answer table, scroll horizontally for more columns");
+      scroller.setAttribute("aria-label", "Assistant answer table");
       const table = document.createElement("table");
       table.className = "research-answer-table";
       const head = document.createElement("thead");

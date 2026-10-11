@@ -4415,23 +4415,9 @@ select option:checked {
   font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
   line-height: var(--reader-line-height);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
-}
-
-.code-table::-webkit-scrollbar {
-  height: 6px;
-}
-
-.code-table::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.code-table::-webkit-scrollbar-thumb {
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--text-tertiary) 58%, transparent);
+  /* Widen the column to reveal more; the table is not a scroll container. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .code-table table {
@@ -6110,7 +6096,8 @@ ol.research-answer-list { list-style-type: decimal; }
 .research-answer-table-scroll {
   min-width: 0;
   max-width: 100%;
-  overflow-x: auto;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .research-answer-table {
@@ -19048,7 +19035,7 @@ html body .column-group-menu-button:focus-visible {
 
 .report-draft-block:has(.report-full-preview[open]) > .report-block-summary { display: none; }
 
-.report-full-preview .report-preview-table { overflow-x: auto; margin-block: 12px; }
+.report-full-preview .report-preview-table { min-width: 0; max-width: 100%; overflow-x: clip; overflow-y: visible; margin-block: 12px; }
 .report-full-preview table { width: 100%; border-collapse: collapse; }
 .report-full-preview td { padding: 8px; border: 1px solid var(--border); vertical-align: top; white-space: pre-wrap; }
 .report-full-preview > div > strong { display: block; margin-top: 16px; }

@@ -17,6 +17,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - On desktop, horizontal scrolling is a consequence of a wide multi-column desk, not the primary navigation model. On narrow screens, use one scroll-snapped full-width pane at a time.
 - Adding a reader should split the workspace proportionally.
 - Each reader should remain independently scrollable.
+- Web tables do not scroll horizontally inside themselves. Keep readable cell widths, clip excess at the column edge, and reveal more by expanding or resizing the column. This also applies to Evidence detail, Assistant, and Report previews.
 - Columns are independent tools within the Research or Notebook view. Opening Evidence, Notebook, or Report must not force the others open.
 - Web layout changes must avoid full-screen blink/flicker: do not clear the whole workspace before rebuilding it; preserve existing panes or swap the next pane sequence in one operation.
 
@@ -95,7 +96,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Do not use gradients.
 - Avoid oversized rounded UI.
 - Keep contrast clear in light and dark themes.
-- Keep every scrollbar visually hidden. Wheel, trackpad, touch, keyboard, and programmatic scrolling must continue to work without visible rails or thumbs.
+- Keep every scrollbar visually hidden. Column and workspace scrolling must continue to work without visible rails or thumbs; tables themselves are not scroll containers.
 - Main panes should feel like workspace columns, not floating cards.
 - Internal controls can stay lightly rounded only when it helps usability.
 - Match the iOS radius set for shared surfaces: cards use a 14 px radius and compact tiles use a 10 px radius unless a desktop-specific control needs a different value.

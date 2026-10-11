@@ -62,7 +62,7 @@ class Element {
   set textContent(text) { this.children = [String(text)]; }
 }
 context.document = { createElement: (name) => new Element(name), createTextNode: (text) => ({ textContent: text }) };
-vm.runInContext(["researchDisplayText", "researchAnswerNarrativeText", "appendResearchInlineFormatting", "appendResearchInlineLines", "researchAnswerTable", "appendResearchAnswerNarrative"].map(extract).join("\n"), context);
+vm.runInContext(["researchDisplayText", "researchAnswerHasVerificationRecovery", "researchVerificationRecoveryText", "researchAnswerNarrativeText", "appendResearchInlineFormatting", "appendResearchInlineLines", "researchAnswerTable", "appendResearchAnswerNarrative"].map(extract).join("\n"), context);
 const saved = Object.freeze({ answerText: alternatives, mode: "openai", verification: Object.freeze({ status: "verified" }) });
 const container = new Element("article");
 context.appendResearchAnswerNarrative(container, saved);
@@ -79,4 +79,6 @@ assert.equal(quoteContainer.children[0].children[0].localName, "blockquote");
 const tableContainer = new Element("article");
 context.appendResearchAnswerNarrative(tableContainer, { answerText: "| Method | Condition |\n| --- | --- |\n| Listed detector | Before overflow |" });
 assert.equal(tableContainer.children[0].children[0].className, "research-answer-table-scroll");
+assert.equal(tableContainer.children[0].children[0].tabIndex, undefined, "Assistant tables do not add a keyboard scrolling stop.");
+assert.equal(tableContainer.children[0].children[0].attributes["aria-label"], "Assistant answer table");
 console.log("Inline alternatives display contract passed: conservative contiguous lists, unchanged legal/quoted/code/table text, intact conjunctions/conditions/citations, renderer list and immutable stored/copy answer.");
