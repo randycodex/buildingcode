@@ -19142,9 +19142,18 @@ dialog.report-export-review {
 
 .project-details-screen .saved-project-structured-fact-value { text-align: left; }
 
-/* Working views keep their inactive editors mounted without consuming width. */
-.workspace-shell { grid-template-rows: var(--header-height) 42px minmax(0, 1fr); }
-.workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: var(--header-height) 42px auto minmax(0, 1fr); }
+/* Brand, working views, and view tools each occupy a 42px bar. */
+:root { --header-height: 42px; }
+.workspace-shell { grid-template-rows: 42px 42px 42px minmax(0, 1fr); }
+.workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: 42px 42px 42px auto minmax(0, 1fr); }
+.workspace-brand-bar {
+  grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center;
+  height: 42px; min-height: 42px; box-sizing: border-box; border-bottom: 1px solid var(--border);
+}
+.workspace-brand-bar .topbar-brand { display: flex; align-items: baseline; }
+.workspace-shell > .topbar { grid-column: 1; grid-row: 2; height: 42px; min-height: 42px; box-sizing: border-box; }
+.workspace-shell > .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button, .mobile-more-button) { height: 42px; min-height: 42px; }
+body.is-detached-workboard-window .workspace-brand-bar { display: none; }
 .workflow-toolbar { display: flex; align-items: center; padding: 0 clamp(22px, 3vw, 46px); border-bottom: 1px solid var(--border); }
 .workflow-toolbar > div { display: flex; align-items: center; gap: 20px; }
 .workflow-toolbar > [hidden], .panel-track > .is-workflow-hidden { display: none !important; }
@@ -19154,7 +19163,7 @@ dialog.report-export-review {
 .topbar-actions > :is([data-workflow-view], #toggle-report) { background: transparent; border-radius: 0; color: var(--text-secondary); }
 .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text); font-weight: 700; }
 @media (min-width:761px) {
-  :root { --header-height: 56px; }
+  :root { --header-height: 42px; }
   .topbar { grid-template-columns: max-content minmax(100px, 1fr) max-content; grid-template-rows: 1fr; gap: 12px; padding: 0 24px; }
   .topbar-end { display: flex; grid-column: 3; grid-row: 1; gap: 16px; }
   .topbar-end > * { grid-column: auto; grid-row: auto; }
@@ -19166,12 +19175,13 @@ dialog.report-export-review {
 .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text-primary); }
 
 /* Report shares the workspace navigation; retain column geometry underneath. */
-.report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg, #000); }
+.report-workspace-view { grid-column: 1; grid-row: 3 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg, #000); }
 .report-workspace-view[hidden] { display: none; }
 .workspace-shell:has(> .report-workspace-view:not([hidden])) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
-.workspace-shell > .workflow-toolbar { grid-row: 2; grid-column: 1; }
-.workspace-shell > .panel-track { grid-row: 3; grid-column: 1; }
-.workspace-shell:has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 4; }
+.workspace-shell > .workflow-toolbar { grid-row: 3; grid-column: 1; }
+.workspace-shell > .panel-track { grid-row: 4; grid-column: 1; }
+.workspace-shell:has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 5; }
+.workspace-shell > .workspace-issue { grid-column: 1; grid-row: 4; }
 
 /* Match the shared Research and Notebook toolbar without column spacing. */
 .report-workspace-view .workspace-panel.report-draft-panel { padding: 0; }
@@ -19196,7 +19206,7 @@ dialog.report-export-review {
 .project-details-screen .project-details-tabs button { padding: 4px 0; font-size: 13px; }
 .project-details-screen .project-information-panel { max-width: 1080px; margin-inline: auto; }
 .workspace-shell > .account-workspace-view {
-  grid-column: 1; grid-row: 2 / -1; z-index: 2;
+  grid-column: 1; grid-row: 3 / -1; z-index: 2;
   width: 100%; height: auto; min-width: 0; min-height: 0; margin: 0;
   border-radius: 0; display: flex; flex-direction: column; background: var(--bg, #000);
 }

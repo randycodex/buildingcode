@@ -26,7 +26,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Primary working views are `Research`, `Notebook`, and `Report`.
 - Research tools are `Search`, `New reader`, and `Conversations`; Notebook tools are `Evidence` and `Notes`.
 - Keep Project selection, `Project details`, `Layout`, and `Account` available across working views, including Project details and Account. Open one working view at a time and keep inactive columns mounted.
-- Center the brand in the available gap between the last left navigation action and Project selection as the viewport narrows.
+- Center the Permitext brand and plan in their own top bar. The brand bar, main navigation, and current-view toolbar are each 42px tall.
 - Project details contains Context & records and Facts below the shared top menu, with the same 42px toolbar as Research, Notebook, Report, and Account. Do not duplicate Context and Facts in the Project menu.
 - Retain mounted editors, drafts, selected sources, column order, and scroll positions when switching views or returning from Report/Project details.
 - Open linked columns beside their origin. Preserve unrelated Readers, including Readers in another working view.

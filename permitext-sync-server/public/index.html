@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261010-definition-text-v88">
-    <link rel="stylesheet" href="/web/styles.css?v=20261011-details-account-shell-v820">
+    <link rel="stylesheet" href="/web/styles.css?v=20261011-three-bars-v821">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -38,6 +38,14 @@
       </div>
     </main>
     <main class="workspace-shell">
+      <header class="workspace-brand-bar">
+        <div class="topbar-account-state">
+          <div class="topbar-brand" aria-label="permitext">
+            <span class="topbar-brand-name">permitext</span>
+            <strong class="topbar-brand-plan" hidden></strong>
+          </div>
+        </div>
+      </header>
       <header class="topbar">
         <nav class="topbar-actions" aria-label="Working views">
 <button class="toolbar-button" type="button" data-workflow-view="research" aria-pressed="true">Research</button>
@@ -74,12 +82,6 @@
             </details>
           </div>
           <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Account" title="Account" aria-pressed="false">Account</button>
-        </div>
-        <div class="topbar-account-state">
-          <div class="topbar-brand" aria-label="permitext">
-            <span class="topbar-brand-name">permitext</span>
-            <strong class="topbar-brand-plan" hidden></strong>
-          </div>
         </div>
       </header>
 <nav class="workflow-toolbar" aria-label="Tools for current view"><div data-workflow-tools="research"><button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search">
@@ -594,6 +596,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261011-details-account-shell-v820" type="module"></script>
+    <script src="/web/app.js?v=20261011-three-bars-v821" type="module"></script>
   </body>
 </html>
