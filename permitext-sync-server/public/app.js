@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-required-message-v778";
+} from "./offline-storage.js?v=20261010-project-inline-message-v779";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-required-message-v778";
+} from "./research-intent-state.js?v=20261010-project-inline-message-v779";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -707,6 +707,7 @@ let activeWebWarningClose = null;
 const webWarningPositionCleanups = new WeakMap();
 let activeWorkspaceIssueAction = null;
 let activeWorkspaceIssueDismiss = null;
+let projectRequiredColumnNoticeVisible = false;
 let pendingResearchIntentResumePromise = null;
 let pendingResearchIntentInFlightID = "";
 let localWelcomePreviewPending = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname)
@@ -1751,16 +1752,15 @@ function workspaceColumnsRequireProject() {
 
 function notifyProjectRequiredForColumn() {
   if (!workspaceColumnsRequireProject()) return false;
-  presentWorkspaceIssue("Create a Project first to open workspace columns.", {
-    actionLabel: "Create Project",
-    onAction: createNewWorkspace
-  });
+  projectRequiredColumnNoticeVisible = true;
+  const message = track.querySelector(".workspace-project-required-message");
+  if (message) message.hidden = false;
   return true;
 }
 
 function enforceProjectRequiredWorkspace() {
   if (!workspaceColumnsRequireProject()) {
-    if (activeWorkspaceIssueAction === createNewWorkspace) dismissWorkspaceIssue();
+    projectRequiredColumnNoticeVisible = false;
     return false;
   }
   if (state.readers.length || state.utilityInstances.length || openProjectDetails().length ||
@@ -38694,7 +38694,12 @@ function renderProjectRequiredWorkspace() {
   create.textContent = "Create Project";
   create.addEventListener("click", () => { void createNewWorkspace(); });
   actions.append(create);
-  content.append(actions);
+  const message = document.createElement("p");
+  message.className = "workspace-project-required-message";
+  message.setAttribute("role", "alert");
+  message.textContent = "Create a Project first to open workspace columns.";
+  message.hidden = !projectRequiredColumnNoticeVisible;
+  content.append(actions, message);
   welcome.append(content);
   return welcome;
 }

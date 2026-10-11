@@ -1280,6 +1280,15 @@ textarea:focus-visible {
   font: inherit;
 }
 
+.workspace-empty-guidance .workspace-empty-actions {
+  margin-top: 0;
+}
+
+.workspace-empty-guidance .workspace-project-required-message {
+  margin-top: var(--space-3);
+  line-height: 1.4;
+}
+
 .workspace-first-use {
   align-items: center;
   padding: clamp(2.5rem, 8vh, 6.5rem) clamp(1.5rem, 6vw, 6rem);

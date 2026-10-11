@@ -11,7 +11,7 @@ const actual = (name) => {
 };
 let account = { userID: "owner" }, capability = true, projects = [], overlays = [], shared = [];
 let layoutClears = 0, accountOpens = 0, projectCreates = 0, columnAttempts = 0;
-const notices = [];
+let inlineMessage;
 const retainedEvidence = { id: "saved", sectionID: 2416 };
 const state = { ...emptyWorkspaceLayout(), localSavedItems: [retainedEvidence], localProjects: [] };
 const sandbox = vm.createContext({
@@ -29,18 +29,16 @@ const sandbox = vm.createContext({
   supplementalResearchConversationIDs: [], emptyWorkspaceLayout,
   applyStoredWorkspaceLayout: (layout) => { Object.assign(state, layout); layoutClears++; },
   codeQuestionWorkspaceState: () => ({}), closeCodeDecisionContext: (s) => s, setCodeQuestionWorkspaceState() {},
-  document: { querySelector: () => null },
+  document: { querySelector: () => null, createElement: () => ({ ...toolbarButton(), children: [],
+    append(...nodes) { this.children.push(...nodes); } }) },
   toggleAccountDialog: () => { accountOpens++; },
-  activeWorkspaceIssueAction: null,
   createNewWorkspace: () => { projectCreates++; },
-  presentWorkspaceIssue: (message, options) => {
-    notices.push({ message, options }); sandbox.activeWorkspaceIssueAction = options.onAction;
-  },
-  dismissWorkspaceIssue: () => { sandbox.activeWorkspaceIssueAction = null; }
+  presentWorkspaceIssue: () => assert.fail("Project guidance belongs below the central button, not in a banner")
 });
+vm.runInContext("let projectRequiredColumnNoticeVisible = false;", sandbox);
 for (const name of ["workspaceColumnsRequireProject", "notifyProjectRequiredForColumn", "enforceProjectRequiredWorkspace", "defaultActivePaneIDs",
   "workspacePaneDescriptors", "toggleUtilityPane", "focusUtility", "openNewResearchColumn",
-  "focusRecentUtilityColumn", "openDeepLinkedSectionInReader", "openSourceInReader", "workspaceCommandDefinitions"])
+  "focusRecentUtilityColumn", "openDeepLinkedSectionInReader", "openSourceInReader", "workspaceCommandDefinitions", "renderProjectRequiredWorkspace"])
   vm.runInContext(actual(name), sandbox);
 
 const requiresProject = () => sandbox.workspaceColumnsRequireProject();
@@ -86,7 +84,7 @@ function toolbarButton() {
 const buttons = Object.fromEntries(["toggleContextButton", "toggleFactsButton", "toggleNotebookButton", "toggleReportButton",
   "toggleSearchButton", "toggleAnalysisButton", "toggleSavedButton", "addReaderButton"].map(name => [name, toolbarButton()]));
 Object.assign(sandbox, buttons, {
-  track: { dataset: { utilityFocusBound: "true" } }, releaseSurfaceVisibility: { workboard: false },
+  track: { dataset: { utilityFocusBound: "true" }, querySelector: () => inlineMessage }, releaseSurfaceVisibility: { workboard: false },
   toggleArchiveButton: null, toggleWorkboardButton: null, toggleSettingsButton: toolbarButton(), collapseReadersButton: toolbarButton(),
   genericWorkboardIsOpen: () => false, syncTopbarProjectToolStates() {}, isProAccount: () => true,
   updateWorkspaceLayoutControls() {},
@@ -99,26 +97,34 @@ assert.ok(readerListener);
 vm.runInContext(readerListener, sandbox);
 sandbox.bindImmediateUtilityControls();
 sandbox.setUtilityButtonStates(); sandbox.updateReaderPlanControls();
+const guidance = sandbox.renderProjectRequiredWorkspace();
+const content = guidance.children[0];
+const actions = content.children[0];
+inlineMessage = content.children[1];
+assert.equal(actions.children.length, 1, "Keep only the original Create Project button");
+assert.equal(actions.children[0].textContent, "Create Project");
+assert.equal(inlineMessage.hidden, true, "The message appears only after a blocked column click");
+assert.equal(inlineMessage.attributes.role, "alert");
 const emptyLayout = JSON.stringify(state);
 for (const [name, control] of Object.entries(buttons)) {
   if (["toggleSearchButton", "toggleAnalysisButton", "toggleSavedButton", "addReaderButton"].includes(name))
     assert.equal(control.disabled, false, `${name} can receive a click`);
-  const previousCount = notices.length;
+  inlineMessage.hidden = true;
   await control.click();
-  assert.equal(notices.length, previousCount + 1, `${name} announces the Project requirement`);
-  assert.match(notices.at(-1).message, /Create a Project first/);
-  assert.equal(notices.at(-1).options.actionLabel, "Create Project");
+  assert.equal(inlineMessage.hidden, false, `${name} reveals the message below Create Project`);
+  assert.match(inlineMessage.textContent, /Create a Project first/);
 }
 assert.equal(columnAttempts, 0);
 assert.equal(projectCreates, 0, "A column click must not create a Project automatically");
 assert.equal(JSON.stringify(state), emptyLayout, "No column opens while showing the message");
-notices.at(-1).options.onAction();
-assert.equal(projectCreates, 1, "The message action uses the existing Project creation flow");
+assert.equal(sandbox.renderProjectRequiredWorkspace().children[0].children[1].hidden, false, "A background render preserves the visible message");
+await actions.children[0].click();
+assert.equal(projectCreates, 1, "The original button uses the existing Project creation flow");
 for (const publicAccount of [null, { userID: "owner" }]) {
   account = publicAccount; capability = false;
-  const previousCount = notices.length;
+  inlineMessage.hidden = true;
   assert.equal(sandbox.notifyProjectRequiredForColumn(), false);
-  assert.equal(notices.length, previousCount, "Public browsing does not receive a Pro Project requirement");
+  assert.equal(inlineMessage.hidden, true, "Public browsing does not receive a Pro Project requirement");
 }
 account = { userID: "owner" }; capability = true;
 
@@ -156,7 +162,7 @@ assert.equal(accountOpens, 2, "Account remains accessible for Trash recovery");
 projects = [{ id: "new-project", folderType: "project" }];
 assert.equal(requiresProject(), false, "Creating or restoring a Project unlocks columns");
 assert.equal(sandbox.enforceProjectRequiredWorkspace(), false);
-assert.equal(sandbox.activeWorkspaceIssueAction, null, "Creating or restoring a Project removes the obsolete notice");
+assert.equal(sandbox.renderProjectRequiredWorkspace().children[0].children[1].hidden, true, "Creating or restoring a Project resets the obsolete notice");
 
 // Exercise the real deletion-to-render transition with a stale open layout.
 state.readers = [{ id: "open-reader" }];
