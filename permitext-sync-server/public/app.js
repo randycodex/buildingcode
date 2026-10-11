@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-menu-divider-v774";
+} from "./offline-storage.js?v=20261010-account-divider-intersections-v775";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-menu-divider-v774";
+} from "./research-intent-state.js?v=20261010-account-divider-intersections-v775";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
