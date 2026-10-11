@@ -15,7 +15,11 @@ export function workflowHome(paneID, anchors = {}) {
   return 'research';
 }
 export function paneBelongsToView(paneID, view, membership, anchors) {
-  return membership?.[paneID]?.length ? membership[paneID].includes(view) : workflowHome(paneID, anchors) === view;
+  if (view === 'report') return false;
+  const views = membership?.[paneID] || [];
+  // Retained Readers from older Report layouts remain available in Research.
+  if (view === 'research' && /^reader:/.test(paneID) && views.includes('report')) return true;
+  return views.length ? views.includes(view) : workflowHome(paneID, anchors) === view;
 }
 export function linkPaneToView(membership, paneID, view) {
   const home = /^(?:project:notebook:|utility:saved(?::|$))/.test(paneID) ? ['notebook'] : [];
@@ -26,12 +30,12 @@ export function referenceColumnsWidth(widths, availableWidth, documentWidth = 60
   const requested = widths.reduce((sum, width) => sum + width, widths.length + 1);
   return Math.min(requested, Math.max(Math.max(...widths) + 2, availableWidth - documentWidth));
 }
-// Sources reserve their chosen width before the Report document shares space
-// with Readers. Hide the optional outline before shrinking the document.
+// Sources reserve their chosen width beside the Report document.
+// Hide the optional outline before shrinking the document.
 export function reportColumnsLayout(availableWidth, libraryWidth = 0) {
   const sourceWidth = libraryWidth > 0 ? Math.max(280, Math.min(720, libraryWidth)) : 0;
   const minimumWidth = 600 + sourceWidth + (sourceWidth ? 1 : 0);
-  const outlineWidth = sourceWidth ? 210 : 230;
+  const outlineWidth = 300;
   return { minimumWidth, compact: availableWidth < minimumWidth + outlineWidth };
 }
 // Keep scroll snapshots per DOM node, not indexes: asynchronous hydration may

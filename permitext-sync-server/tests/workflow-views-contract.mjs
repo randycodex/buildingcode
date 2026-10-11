@@ -18,8 +18,8 @@ for (const view of ['report','project-details']) {
   const linked=linkPaneToView({},'reader:reference',view);
   const layout={};
   applyWorkspaceLayout(layout,captureWorkspaceLayout({workflowMembership:linked,workflowScroll:{[view]:320}}));
-  assert.equal(paneBelongsToView('reader:reference',view,layout.workflowMembership),true);
-  assert.equal(paneBelongsToView('reader:reference','research',layout.workflowMembership),false);
+  assert.equal(paneBelongsToView('reader:reference',view,layout.workflowMembership),view !== 'report');
+  assert.equal(paneBelongsToView('reader:reference','research',layout.workflowMembership),view === 'report');
   assert.equal(layout.workflowScroll[view],320);
 }
 assert.equal(referenceColumnsWidth([],1920),0);
@@ -34,7 +34,7 @@ for (const libraryWidth of [0,330,640,720]) {
     const dock=referenceColumnsWidth(readers,1920,constraints.minimumWidth);
     const reportWidth=Math.max(constraints.minimumWidth,1920-dock);
     const layout=reportColumnsLayout(reportWidth,libraryWidth);
-    const outline=layout.compact?0:libraryWidth?210:230;
+    const outline=layout.compact?0:300;
     const document=reportWidth-libraryWidth-(libraryWidth?1:0)-outline;
     assert.ok(document>=600,`Report remains at least 600px with Sources ${libraryWidth} and Readers ${readers}`);
     assert.ok(dock>=602,'A Reader retains 600px plus its edge dividers');
@@ -68,7 +68,7 @@ assert.equal(reader.scrollTop,1700); assert.equal(track.scrollLeft,110);
 assert.equal(notebook.draft,'Unsaved text'); assert.equal(constructions,0);
 await c.switchWorkflowView('notebook'); assert.equal(notebook.scrollTop,450); assert.equal(track.scrollLeft,200);
 assert.equal(state.workflowNavigationGeneration,3,'Each actual view change invalidates pending navigation');
-for (const view of ['report','project-details']) {
+for (const view of ['project-details']) {
   const reference=pane(`reader:${view}`);panes.push(reference);
   state.workflowMembership=linkPaneToView(state.workflowMembership,reference.dataset.paneId,view);
   reportOpen=view==='report';detailsOpen=view==='project-details';
@@ -108,9 +108,9 @@ const referenceContext=vm.createContext({
 vm.runInContext(actual('syncReferenceReaderLayout'),referenceContext);
 referenceContext.syncReferenceReaderLayout();
 assert.equal(referenceStyles.get('--reference-document-min-width'),'1241px');
-assert.equal(referenceStyles.get('--reference-readers-width'),'974px');
-assert.ok(referenceClasses.has('has-compact-reference-document'));
-assert.equal(referenceTrack.inert,false);
+assert.equal(referenceStyles.get('--reference-readers-width'),'0px');
+assert.equal(referenceClasses.has('has-compact-reference-document'),false);
+assert.equal(referenceTrack.inert,true);
 referencePanel.dataset.libraryOpen='false';referenceContext.syncReferenceReaderLayout();
 assert.equal(referenceStyles.get('--reference-document-min-width'),'600px');
 assert.equal(referenceClasses.has('has-compact-reference-document'),false,'Closing Sources makes room for the outline again');
@@ -119,4 +119,4 @@ assert.equal(referenceClasses.has('has-reference-readers'),false);
 accountOpen=true;referenceIDs=['reader:reference'];referenceContext.syncReferenceReaderLayout();
 assert.equal(referenceTrack.inert,true,'Account keeps reference columns inactive');
 assert.equal(referenceClasses.has('has-reference-readers'),false);
-console.log('Report constraints passed: 600px document minimum, expanded Sources, complete Reader width, optional outline and Account isolation.');
+console.log('Report constraints passed: 600px document minimum, expanded Sources, 300px optional outline, retained hidden Readers and Account isolation.');

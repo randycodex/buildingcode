@@ -1,5 +1,5 @@
 import { createReportAutosave } from "./report-autosave.js?v=1";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=5";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=6";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls } from "./report-library.js?v=20261011-document-minimum-v2";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-actions-v860";
+} from "./offline-storage.js?v=20261011-report-toolbar-v861";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4198,14 +4198,15 @@ function workflowPaneAnchors() {
   return Object.fromEntries(Object.entries(sectionDetailAnchorsBySearch()).map(([id, anchor]) => [paneIDForSectionDetail(id), anchor]));
 }
 function workflowPaneIsVisible(paneID) {
-  return detachedProjectWindow || paneBelongsToView(paneID, currentColumnWorkflowView(), state.workflowMembership, workflowPaneAnchors());
+  const view = currentColumnWorkflowView();
+  return view !== "report" && (detachedProjectWindow || paneBelongsToView(paneID, view, state.workflowMembership, workflowPaneAnchors()));
 }
 function syncReferenceReaderLayout() {
   const shell = document.querySelector(".workspace-shell");
   if (!shell) return;
   const view = currentColumnWorkflowView();
   const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
-  const screenOpen = view === "report" || view === "project-details";
+  const screenOpen = view === "project-details";
   const visibleIDs = screenOpen ? defaultActivePaneIDs().filter(workflowPaneIsVisible) : [];
   const widths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : Math.max(minimumPaneWidthForID(id), state.paneWeights[id] || defaultPaneWidthForID(id)));
   const reportPanel = document.querySelector(".report-workspace-view:not([hidden]) .report-draft-panel");
@@ -4216,7 +4217,7 @@ function syncReferenceReaderLayout() {
   shell.style.setProperty("--reference-readers-width", `${width}px`);
   shell.style.setProperty("--reference-document-min-width", `${minimumDocumentWidth}px`);
   shell.classList.toggle("has-compact-reference-document", !accountOpen && view === "report" && reportColumnsLayout(shell.clientWidth - width, libraryWidth).compact);
-  track.inert = accountOpen || screenOpen && !visibleIDs.length;
+  track.inert = accountOpen || view === "report" || screenOpen && !visibleIDs.length;
 }
 function syncWorkflowColumnPresentation() {
   const view = currentColumnWorkflowView();
@@ -29485,7 +29486,7 @@ async function renderProjectReportDraft(project) {
         snapshot: { label: `Report: ${activeDraft.title || "Untitled Report"}` }
       });
     });
-    primaryActions.append(createReaderToolbarButton(), saveStatus, save, saveCopy, generate, coordinate);
+    primaryActions.append(saveStatus, save, saveCopy, generate, coordinate);
 
     const historyContent = document.createElement("div");
     historyContent.className = "report-history-content";
@@ -36139,6 +36140,10 @@ function reusableSearchReader(readers, anchorPaneID, forceNewReader = false) {
 
 async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (workspaceColumnsRequireProject()) return null;
+  if (currentColumnWorkflowView() === "report") {
+    if (!await switchWorkflowView("research")) return null;
+    anchorPaneID = "";
+  }
   const requestIdentity = captureAccountRequest();
   const sourceWorkspaceID = activeWorkspaceID;
   const workflowGeneration = state.workflowNavigationGeneration || 0;

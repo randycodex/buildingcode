@@ -29,6 +29,7 @@ import { activeCodeSourceCatalog } from "../active-code-source-catalog.mjs";
 import { createActiveCodeSourceController } from "../public/active-code-source-controller.js";
 import { createActiveCodeSourceNavigationGuard } from "../public/active-code-source-navigation.js";
 import { codeSourceIdentity, codeSourceKey } from "../public/active-code-sources.js";
+import {linkPaneToView} from "../public/workflow-views.js";
 import { withCodeAssetRevision } from "../public/code-asset-identity.js";
 import { parseActiveCodeSearchScope } from "../public/active-code-search-scope.js";
 const sourceCatalog = await activeCodeSourceCatalog();
@@ -72,7 +73,7 @@ const citation = {
 const clientFunctions = [
   between(clientSource, "function normalizedInlineSectionNumber(", "async function openReferenceInAdjacentReader("),
   between(clientSource, "function searchResultDetail(", "function savedPaneIDs("),
-  between(clientSource, "function readerFieldsForSectionDetail(", "function defaultActivePaneIDs("),
+  between(clientSource, "function readerFieldsForSectionDetail(", "const workflowScrollStore ="),
   between(clientSource, "async function openNotebookReference(", "async function renderProjectNotebook("),
   between(clientSource, "async function resolveReaderSourceMetadata(", "function closeSavedItemDetailsForPane(")
 ].join("\n");
@@ -90,6 +91,8 @@ function clientHarness(overrides = {}) {
     whenWorkspacePaneReady: async () => true,
     URLSearchParams, syncCodeVersion, syncCodeVersionForPrefix, state,
     currentContentSummary: () => ({ savedItems: [] }),
+    currentColumnWorkflowView: () => "research", workspaceColumnsRequireProject: () => false,
+    workflowPaneIsVisible: () => true, linkPaneToView,
     normalizeAnnotationBlockID: (value) => String(value || ""),
     api: async (path) => {
       requests.push(path);
@@ -477,3 +480,20 @@ for (const canonical of [
 }
 
 console.log("Research source edition integrity behavior contract passed; network and provider calls: zero.");
+
+{
+  const report = clientHarness();
+  let view = "report";
+  report.context.currentColumnWorkflowView = () => view;
+  report.context.switchWorkflowView = async next => {
+    view = next;
+    report.state.workflowNavigationGeneration = 1;
+    return true;
+  };
+  const reader = await report.context.openSourceInReader(citation, "project:report:p", {projectID:"project-probe"});
+  assert.equal(view, "research", "Report source links open their Reader in Research");
+  assert(reader);
+  assert.equal(reader.codeVersion, historicalConstructionSyncCodeVersion, "Changing views retains the exact cited edition");
+  assert.equal(reader.sourceAnchorPaneID, "", "The Reader is not anchored to a hidden Report column");
+}
+console.log("Report source links preserve exact editions and open in Research.");

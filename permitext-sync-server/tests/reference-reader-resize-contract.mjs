@@ -73,7 +73,7 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
 }
 
 // Exercise a held drag, before pointerup can mask the stale document layout.
-for (const [view, sourcesWidth] of [['report', 0], ['report', 640], ['project-details', 0]]) {
+for (const [view, sourcesWidth] of [['project-details', 0]]) {
   const f = fixture(view, [800], sourcesWidth);
   const startX = f.reportWidth() + 1;
   const originalReportWidth = f.reportWidth();
@@ -96,7 +96,10 @@ for (const [view, sourcesWidth] of [['report', 0], ['report', 640], ['project-de
 }
 
 // Minimum-clamped adjacent Readers can enlarge their shared reference dock.
-const pair = fixture('report', [600, 700]);
+const report = fixture('report', [800]);
+assert.equal(report.dockWidth(), 0, 'Report keeps existing Readers hidden while retaining their state');
+assert.equal(report.panes[0].width, 800);
+const pair = fixture('project-details', [600, 700]);
 pair.context.startPaneResize(pair.event(1300), 'reader:0', 'reader:1');
 pair.move(1140); pair.frame();
 assert.deepEqual(pair.panes.map(pane => pane.width), [600, 860]);
@@ -111,4 +114,4 @@ ordinary.move(0); ordinary.frame(16); ordinary.frame(32);
 assert.ok(ordinary.panes[0].width > 801);
 ordinary.finish('pointerup', 0);
 assert.equal(ordinary.frames.size, 0);
-console.log('Reference Reader resize passed: live Report/Project details geometry, expanded Sources, stopped-pointer stability, adjacent minimums, cancellation, cleanup and ordinary edge growth.');
+console.log('Reference Reader resize passed: Report isolation and live Project details geometry, stopped-pointer stability, adjacent minimums, cancellation, cleanup and ordinary edge growth.');
