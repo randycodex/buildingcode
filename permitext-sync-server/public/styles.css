@@ -19313,6 +19313,16 @@ dialog.report-export-review {
   --top-menu-font-weight: 700;
 }
 
+/* All navigation bars share the same hover highlight. */
+.topbar .topbar-actions > :is([data-workflow-view], #toggle-report):not(:disabled):is(:hover, :focus-visible),
+.topbar :is(.workspace-actions-button, .topbar-settings-button, .topbar-layout-menu > summary, .mobile-more-button):not(:disabled):is(:hover, :focus-visible),
+.workflow-toolbar .toolbar-button:not(:disabled):is(:hover, :focus-visible),
+.project-details-screen .project-details-tabs button:not(:disabled):is(:hover, :focus-visible),
+.report-workspace-view .report-draft-primary-actions > button:not(:disabled):is(:hover, :focus-visible) {
+  background: var(--menu-surface) !important;
+  color: var(--text-primary);
+}
+
 /* Keep the Account disclaimer on the screen centerline within a 42px footer. */
 .account-workspace-view .settings-panel .settings-footer {
   position: relative; height: 42px; min-height: 42px; box-sizing: border-box;
