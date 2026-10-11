@@ -17756,24 +17756,41 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
+}
+.workspace-menu {
   display: grid;
   min-width: 140px;
+  box-sizing: border-box;
   padding: 6px;
   border: 0;
   border-radius: 10px;
   background: var(--menu-surface);
+  color: var(--text-primary);
+  font-family: var(--ui-font-family);
+  font-size: var(--chrome-font-size);
+  font-weight: 400;
+  line-height: normal;
   box-shadow: var(--shadow-panel);
 }
-.topbar-layout-menu-items button {
+.workspace-menu[hidden] { display: none; }
+.topbar-layout-menu-items button,
+.workspace-menu .workspace-menu-option {
   padding: 8px 10px;
   border: 0;
   border-radius: 8px;
   background: transparent;
   color: var(--text-primary);
+  font: inherit;
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
 }
+.workspace-menu .workspace-menu-option { width: 100%; }
+.workspace-menu .workspace-menu-option:is(:hover, :focus-visible, [aria-selected="true"]) {
+  background: var(--menu-highlight);
+  outline: 0;
+}
+.workspace-menu .workspace-menu-option[aria-selected="true"] { font-weight: 600; }
 .topbar-workspaces .connection-status { background: transparent; border: 0; box-shadow: none; }
 
 .saved-folder-context.is-project .saved-project-tool-controls :is(.project-notebook-button, .project-report-draft-button) {
@@ -18803,6 +18820,13 @@ html body .column-group-menu-button:focus-visible {
   color: var(--text-primary);
   font: inherit;
 }
+.research-history-custom-select { font: inherit !important; }
+.research-history-custom-select .custom-select-trigger {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid var(--border);
+  font: inherit; font-size: inherit !important;
+}
+.research-history-custom-select .custom-select-trigger::after { content: "⌄"; color: var(--text-secondary); }
 .research-history-more { display: block; margin: var(--space-3) auto; }
 .research-notebook-handoff {
   display: flex;
@@ -18921,14 +18945,13 @@ html body .column-group-menu-button:focus-visible {
 .search-code-source-menu .settings-active-sources-card { padding: 0; background: transparent; }
 
 .search-match-control { position: relative; }
-.search-match-mode, .search-match-alternative { box-sizing: border-box; line-height: 1.4; min-height: 30px; padding: 4px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-secondary); font: inherit; cursor: pointer; }
+.search-match-mode { box-sizing: border-box; line-height: 1.4; min-height: 30px; padding: 4px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-secondary); font: inherit; cursor: pointer; }
 .search-match-mode { display: flex; align-items: center; list-style: none; }
 .search-match-mode::-webkit-details-marker { display: none; }
 .search-match-mode::marker { content: ""; }
-.search-match-alternative { display: none; position: absolute; top: 100%; left: 0; white-space: nowrap; }
-.search-match-control[open] .search-match-alternative { display: block; }
+.search-match-menu { position: absolute; top: calc(100% + 8px); left: 0; z-index: 100; }
+.search-match-control:not([open]) .search-match-menu { display: none; }
 .search-match-mode:focus, .search-match-alternative:focus { outline: none; box-shadow: none; }
-.search-match-alternative:hover span, .search-match-alternative:focus-visible span { background: var(--text-primary); color: var(--background); }
 
 .search-code-source-menu .settings-active-sources-list { gap: 0; }
 .search-source-group-heading { margin: 18px 0 8px; color: var(--text-primary); font-size: 16px; font-weight: 600; line-height: 1.4; }
