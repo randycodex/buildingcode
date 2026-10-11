@@ -16873,15 +16873,31 @@ async function handleReportDraftSave(request, response) {
   );
   if (!access) return;
   const storageOwnerUserID = access.storageOwnerUserID;
-  const requestedDraftID = String(context.body.draftID || "").trim();
+  const clientDraftID = String(context.body.clientDraftID || "").trim();
+  if (clientDraftID && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clientDraftID)) {
+    return sendError(response, 400, "Invalid Report creation identity.");
+  }
+  const requestedDraftID = String(context.body.draftID || clientDraftID || "").trim();
   const existing = requestedDraftID
     ? await reportDraftArtifact(storageOwnerUserID, access.projectID, requestedDraftID)
     : null;
-  if (requestedDraftID && !existing) {
+  if (context.body.draftID && !existing) {
     sendError(response, 404, "Report not found.");
     return;
   }
   const expectedVersion = Number(context.body.expectedVersion ?? 0);
+  // A lost response must not create a second report or turn the same save into
+  // a false conflict. Retries carry the same immutable body and creation ID.
+  if (existing && existing.envelope.version === expectedVersion + 1) {
+    try {
+      const retried = normalizeReportDraftPayload({ title:context.body.title, reportDate:context.body.reportDate,
+        introduction:context.body.introduction, blocks:context.body.blocks,
+        createdBy:existing.payload.createdBy, updatedBy:context.userID });
+      if (JSON.stringify(retried) === JSON.stringify(existing.payload)) {
+        return sendJSON(response, 200, {draft:reportDraftForClient(existing,[access.projectID])});
+      }
+    } catch { /* Invalid retry bodies follow the normal validation path. */ }
+  }
   if (
     existing &&
     (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
@@ -16895,7 +16911,7 @@ async function handleReportDraftSave(request, response) {
   }
   try {
     const now = new Date().toISOString();
-    const draftID = existing?.envelope.id || randomUUID();
+    const draftID = existing?.envelope.id || clientDraftID || randomUUID();
     const payload = normalizeReportDraftPayload({
       title: context.body.title,
       reportDate: context.body.reportDate,
@@ -16916,7 +16932,7 @@ async function handleReportDraftSave(request, response) {
       }),
       payload
     };
-    await saveStoredFoundationArtifact(storageOwnerUserID, artifact);
+    await saveStoredFoundationArtifactCompareAndSwap(storageOwnerUserID, artifact, expectedVersion);
     if (!existing) {
       await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
         id: deterministicFoundationLinkID(
@@ -16945,6 +16961,9 @@ async function handleReportDraftSave(request, response) {
       artifactRevisions
     });
   } catch (error) {
+    if (error?.code === "CODE_QUESTION_VERSION_CONFLICT") {
+      return sendJSON(response, 409, {error:"This Report changed while saving. Your local edits are retained.", code:"REPORT_DRAFT_VERSION_CONFLICT"});
+    }
     sendJSON(response, 400, {
       error: error instanceof Error ? error.message : "Invalid Report.",
       code: "INVALID_REPORT_DRAFT"

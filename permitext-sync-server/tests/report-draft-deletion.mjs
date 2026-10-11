@@ -11,7 +11,11 @@ function harness({ confirmed = true, requestError = null, dirty = true } = {}) {
   const currentDraft = { id: "draft-a", version: 3, title: "Delete me", introduction: "Unsaved", blocks: [] };
   const otherDraft = { id: "draft-b", version: 1, title: "Keep me", blocks: [] };
   const c = vm.createContext({
-    structuredClone, activeDraft: currentDraft, drafts: [currentDraft, otherDraft], dirty,
+    structuredClone, crypto: { randomUUID: () => "new-editor" }, recoveryEditorID: "editor",
+    autosave: { isSaving: () => Boolean(c.pendingDraftSave), reset() {}, suspend() {}, resume() {}, settleRecovery: async () => {} },
+    accountUserID: "account-a", reportDraftRecoveries: async () => [],
+    deleteReportDraftRecovery: async () => {},
+    activeDraft: currentDraft, drafts: [currentDraft, otherDraft], dirty,
     history: [{ id: "export-a", draftID: "draft-a" }], identity: {}, projectID: "project-a",
     requestIdentity: "account-a", requestWorkspaceID: "workspace-a", activeWorkspaceID: "workspace-a",
     current: true, disposed: false, pendingDraftSave: null, generatingReport: false, deletingReport: false,

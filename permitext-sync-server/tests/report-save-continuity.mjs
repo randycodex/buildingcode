@@ -1,46 +1,56 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import {createReportAutosave} from '../public/report-autosave.js';
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
-const start = source.indexOf('  let pendingDraftSave = null;');
+const start = source.indexOf('  const paintReportSaveState = () => {');
 assert.ok(start > 0);
-const implementation = source.slice(start, source.indexOf('\n  const openHistoricalReport', start));
+const implementation = source.slice(start, source.indexOf('\n  const reviewReport', start));
+const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function harness() {
   let resolve, reject;
   const context = vm.createContext({
-    structuredClone, activeDraft: {id: null, version: 0, title:'Draft', introduction:'Before', blocks:[]},
-    drafts: [], dirty:true, disposed:false, deletingReport:false, projectID:'p', requestIdentity:'a', current:true,
+    structuredClone, crypto:{randomUUID:()=> 'synthetic-create-id'},
+    activeDraft: {id: null, version: 0, title:'Draft', introduction:'Before', blocks:[]},
+    drafts: [], dirty:false, disposed:false, deletingReport:false, projectID:'p', requestIdentity:'a', current:true,
+    requestWorkspaceID:'w',activeWorkspaceID:'w',accountUserID:'a',recoveryEditorID:'editor',restoredRecovery:null,recoveredDrafts:[],
+    autosave:null,savePresentation:{state:'saved'},shell:{querySelector:()=>null},
+    createReportAutosave:options=>createReportAutosave({...options,setTimer:()=>1,clearTimer:()=>{}}),
+    saveReportDraftRecovery:async record=>record,deleteReportDraftRecovery:async()=>true,
     isCurrentAccountRequest:()=>context.current, calls:[], renders:0, message:'',
     clearStatus:()=>{context.message='';}, showStatusError:m=>{context.message=m;},
     renderWorkspaceContent:()=>{context.renders++;}, notebookMounts:new Map(), refreshProjectReportMembership:async()=>{},
     reportRequest:(path, body)=>{context.calls.push(structuredClone(body)); return new Promise((yes,no)=>{resolve=yes; reject=no;});}
   });
-  vm.runInContext(implementation+'\nglobalThis.save = saveDraft;', context);
-  return {c:context, complete:()=>resolve({draft:{...context.calls.at(-1), id:'saved',version:1}}), fail:()=>reject(new Error('Offline'))};
+  vm.runInContext(implementation+'\nglobalThis.save = saveDraft; globalThis.change = setDirty;', context);
+  context.change();
+  return {c:context, complete:()=>resolve({draft:{...context.calls.at(-1), id:'saved',version:context.calls.at(-1).expectedVersion+1}}), fail:()=>reject(new Error('Offline'))};
 }
 {
- const h=harness(), p=h.c.save(); assert.equal(h.c.save(),p); assert.equal(h.c.calls.length,1);
- h.c.activeDraft.introduction='Newer'; h.c.activeDraft.blocks.push({kind:'paragraph',text:'New'});
- assert.equal(h.c.calls[0].blocks.length,0); h.complete(); assert.equal(await p,false);
- assert.equal(h.c.activeDraft.introduction,'Newer'); assert.equal(h.c.activeDraft.blocks.length,1);
- assert.equal(h.c.activeDraft.id,'saved'); assert.equal(h.c.activeDraft.version,1);
- assert.equal(h.c.dirty,true); assert.equal(h.c.renders,0); assert.match(h.c.message,/newer changes/);
- const retry=h.c.save(); assert.equal(h.c.calls[1].expectedVersion,1); h.complete(); assert.equal(await retry,true);
- assert.equal(h.c.dirty,false);
+ const h=harness(), p=h.c.save(); assert.equal(h.c.save(),p); await tick(); assert.equal(h.c.calls.length,1);
+ const blocks=h.c.activeDraft.blocks;
+ h.c.activeDraft.introduction='Newer'; blocks.push({kind:'paragraph',text:'New'}); h.c.change();
+ assert.equal(h.c.calls[0].blocks.length,0); h.complete(); await tick();
+ assert.equal(h.c.calls.length,2); assert.equal(h.c.calls[1].expectedVersion,1);
+ h.complete(); assert.equal(await p,true);
+ assert.equal(h.c.activeDraft.introduction,'Newer'); assert.equal(h.c.activeDraft.blocks,blocks);
+ assert.equal(h.c.activeDraft.version,2); assert.equal(h.c.dirty,false);assert.equal(h.c.renders,0);
 }
-for (const action of ['switch','dispose','account']) {
- const h=harness(), p=h.c.save();
+for (const action of ['switch','dispose','account','workspace']) {
+ const h=harness(), p=h.c.save();await tick();
  if(action==='switch')h.c.activeDraft={id:'other',title:'Other'};
  if(action==='dispose')h.c.disposed=true;
  if(action==='account')h.c.current=false;
+ if(action==='workspace')h.c.activeWorkspaceID='other';
  const before=structuredClone(h.c.activeDraft); h.complete(); assert.equal(await p,false);
  assert.deepEqual(h.c.activeDraft,before); assert.equal(h.c.renders,0);
 }
 {
- const h=harness(),p=h.c.save(); h.fail(); assert.equal(await p,false);
+ const h=harness(),p=h.c.save();await tick(); h.fail(); assert.equal(await p,false);
  assert.equal(h.c.activeDraft.introduction,'Before'); assert.equal(h.c.dirty,true); assert.match(h.c.message,/Offline/);
+ assert.match(h.c.message,/recovery copy/);assert.match(h.c.message,/Retry/);
 }
-console.log('Report save continuity passed: pending edits, duplicate clicks, retry versions, draft switch, account change, disposal and failure.');
+console.log('Report autosave integration passed: edits during save, live editor identity, serial versions, recovery feedback, account/workspace/draft fences.');
 
 const refreshStart = source.indexOf('  refreshReportArtifacts = async');
 const refreshImplementation = source.slice(refreshStart, source.indexOf('\n  try {', refreshStart));

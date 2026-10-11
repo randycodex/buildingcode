@@ -84,6 +84,21 @@ try {
   }
   const blocks = savedRecords.map((record, index) => ({ id: `evidence-${index}`, kind: "evidence", sourceID: reportSavedSourceID(record), label: "Selected saved code" }));
   const { draft } = await post("/reports/drafts/save", { projectID, expectedVersion: 0, title: "Complete evidence report", reportDate: "2026-10-10", blocks }, 201);
+  const creation = {projectID, clientDraftID:'5c39bfca-c126-4b29-9c74-1e46c2be910d', expectedVersion:0,
+    title:'Autosave retry', reportDate:'2026-10-10', introduction:'Retained edit', blocks:[]};
+  const created = (await post('/reports/drafts/save',creation,201)).draft;
+  const retried = (await post('/reports/drafts/save',creation)).draft;
+  assert.equal(retried.id,created.id);assert.equal(retried.version,1);
+  const update = {...creation,draftID:created.id,expectedVersion:1,introduction:'Second edit'};
+  const updated = (await post('/reports/drafts/save',update)).draft;
+  assert.equal(updated.version,2);
+  assert.equal((await post('/reports/drafts/save',update)).draft.version,2,'Lost update response retries without a new revision');
+  await post('/reports/drafts/save',{...update,introduction:'Conflicting edit'},409);
+  const concurrent = await Promise.all(['Tab A','Tab B'].map(introduction=>fetch(`${base}/reports/drafts/save`,{
+    method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${token}`},
+    body:JSON.stringify({auth:{accountUserID:userID},...update,expectedVersion:2,introduction})
+  })));
+  assert.deepEqual(concurrent.map(response=>response.status).sort(),[200,409],'Only one concurrent writer may replace the same revision');
   const issued = await post("/reports/generate", { projectID, draftID: draft.id, expectedVersion: draft.version }, 201);
   const evidence = issued.manifest.items.filter(item => item.kind === "evidence");
   assert(evidence.find(item => item.sectionID === String(current.id)).passageText.length > 240);

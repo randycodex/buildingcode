@@ -9,7 +9,7 @@ import {
 } from "./sync-identity.js?v=20260901-2014-code-v7";
 
 const databaseName = "permitext-offline";
-const databaseVersion = 5;
+const databaseVersion = 6;
 const offlineLibrarySchemaVersion = 3;
 const metadataStoreName = "metadata";
 const chaptersStoreName = "chapters";
@@ -17,11 +17,12 @@ const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
 const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
+const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1437";
-const shellAssetVersion = "20261011-workflow-simplification-v847";
+const shellCacheName = "permitext-pro-shell-v1438";
+const shellAssetVersion = "20261011-report-autosave-v848";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -38,6 +39,7 @@ const shellURLs = [
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20260923-chapter-search-v1",
+  "/web/report-autosave.js?v=1",
   "/web/report-export-review.js?v=20261011-report-export-v6",
   "/web/reader-navigation-tree.js?v=20261010-contents-v1",
   "/web/reader-chapter-extent.js?v=20261010-chapter-extent-v2",
@@ -60,18 +62,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261011-workflow-simplification-v847",
+  "/web/styles.css?v=20261011-report-autosave-v848",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261011-workflow-simplification-v847",
+  "/web/app.js?v=20261011-report-autosave-v848",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261011-workflow-simplification-v847",
+  "/web/offline-storage.js?v=20261011-report-autosave-v848",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20261010-project-information-v13",
@@ -140,6 +142,9 @@ function openDatabase() {
       if (!database.objectStoreNames.contains(notebookDraftsStoreName)) {
         database.createObjectStore(notebookDraftsStoreName, { keyPath: "key" });
       }
+      if (!database.objectStoreNames.contains(reportDraftsStoreName)) {
+        database.createObjectStore(reportDraftsStoreName, { keyPath: "key" });
+      }
       if (!database.objectStoreNames.contains(notebookProjectsStoreName)) {
         database.createObjectStore(notebookProjectsStoreName, { keyPath: "key" });
       }
@@ -184,6 +189,33 @@ async function withOfflineStore(storeName, mode, operation, fallbackMessage, acc
   } finally {
     database.close();
   }
+}
+
+// Each editor owns a separate recovery record: two tabs must never overwrite
+// one another's unsynced Report, even when they opened the same server draft.
+export async function saveReportDraftRecovery({ accountUserID, projectID, editorID, draft }) {
+  if (!accountUserID || !projectID || !editorID || !draft || !Array.isArray(draft.blocks)) throw new Error("A Report recovery copy requires an account, Project and editor.");
+  const key = JSON.stringify([accountUserID, projectID, editorID]);
+  const record = { key, accountUserID, projectID, editorID, draft: structuredClone(draft), updatedAt: new Date().toISOString() };
+  return withOfflineStore(reportDraftsStoreName, "readwrite", async store => {
+    await requestResult(store.put(record), "Could not retain this Report on this device.");
+    return record;
+  }, "Could not retain this Report on this device.", accountUserID);
+}
+
+export async function reportDraftRecoveries(accountUserID, projectID) {
+  return withOfflineStore(reportDraftsStoreName, "readonly", async store =>
+    (await requestResult(store.getAll())).filter(record => record.accountUserID === accountUserID && record.projectID === projectID)
+      .sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)), "Could not read retained Reports.", accountUserID);
+}
+
+export async function deleteReportDraftRecovery(accountUserID, key, expectedDraft) {
+  return withOfflineStore(reportDraftsStoreName, "readwrite", async store => {
+    const current = await requestResult(store.get(key));
+    if (!current || current.accountUserID !== accountUserID || JSON.stringify(current.draft) !== JSON.stringify(expectedDraft)) return false;
+    await requestResult(store.delete(key));
+    return true;
+  }, "Could not clear the saved Report recovery copy.", accountUserID);
 }
 
 export async function stageNotebookImage({ accountUserID, projectID, cardID, assetID, blob, name }) {
@@ -1158,7 +1190,7 @@ export async function deleteOfflineAccountData(accountUserID) {
   if (typeof indexedDB === "undefined") return;
   const database = await openDatabase();
   try {
-    const names = [syncSnapshotsStoreName, notebookImagesStoreName, notebookDraftsStoreName, notebookProjectsStoreName];
+    const names = [syncSnapshotsStoreName, notebookImagesStoreName, notebookDraftsStoreName, notebookProjectsStoreName, reportDraftsStoreName];
     const transaction = database.transaction([...names, deletedAccountsStoreName], "readwrite");
     const completion = transactionComplete(transaction, "Could not remove this account's private local work.");
     transaction.objectStore(deletedAccountsStoreName).put({ accountUserID: userID, deletedAt: new Date().toISOString() });

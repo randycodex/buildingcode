@@ -1,3 +1,4 @@
+import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=5";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls } from "./report-library.js?v=20261011-document-minimum-v2";
@@ -77,6 +78,9 @@ import {
 } from "./sync-state.js?v=20260924-empty-clears-v3";
 import {
   acknowledgeNotebookDraft,
+  saveReportDraftRecovery,
+  reportDraftRecoveries,
+  deleteReportDraftRecovery,
   beginNotebookDraftSave,
   disableOfflineFeature,
   deleteOfflineAccountData,
@@ -106,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-workflow-simplification-v847";
+} from "./offline-storage.js?v=20261011-report-autosave-v848";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28238,6 +28242,16 @@ async function renderProjectReportDraft(project) {
   let refreshReportSources = async () => false;
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
+  let autosave = null;
+  let recoveryEditorID = crypto.randomUUID();
+  let recoveredDrafts = [];
+  let restoredRecovery = null;
+  let savePresentation = { state: "saved", error: null, recoverable: false };
+  const beforeReportUnload = event => {
+    if (!dirty) return;
+    event.preventDefault(); event.returnValue = "";
+  };
+  window.addEventListener("beforeunload", beforeReportUnload);
   const reportSourceGroupExpanded = new Map();
   const reportLibraryScroll = { sources: 0, versions: 0 };
   const reportSectionExpanded = (sectionName, fallback = true) => {
@@ -28256,19 +28270,21 @@ async function renderProjectReportDraft(project) {
     getDraftSnapshot: () => structuredClone(activeDraft),
     async addSources(draftID, selectedSources) {
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) throw accountContextChangedError();
-      if (activeDraft.id !== draftID || generatingReport || deletingReport || pendingDraftSave) throw new Error("The Report is busy or has changed. Try adding again.");
+      if (activeDraft.id !== draftID || generatingReport || deletingReport || autosave?.isSaving()) throw new Error("The Report is busy or has changed. Try adding again.");
       appendUniqueReportSources(activeDraft, selectedSources);
       setDirty();
       renderWorkspaceContent();
-      if (!await saveDraft()) throw new Error("The Report could not finish saving. Your added material and edits remain in the Report; use Save draft to retry.");
+      if (!await saveDraft()) throw new Error("The Report could not finish saving. Your added material and edits remain in the Report; use Retry to save them.");
       return structuredClone(activeDraft);
     },
     async confirmDiscardIfNeeded() {
-      if (!dirty) return true;
+      if (!dirty || await saveDraft()) return true;
+      const retained = autosave?.isRecoverable();
       return confirmWebWarning(
-        "Discard unsaved Report changes?",
-        `Your edits to “${activeDraft.title || "Untitled report"}” have not been saved.`,
-        { confirmLabel: "Discard changes" }
+        retained ? "Leave with unsynced Report edits?" : "Discard unsaved Report changes?",
+        retained ? `A recovery copy of “${activeDraft.title || "Untitled report"}” is saved on this device. You can recover it when you return to this Project.`
+          : `Your edits to “${activeDraft.title || "Untitled report"}” could not be saved to the server or this device.`,
+        { confirmLabel: retained ? "Leave Report" : "Discard changes" }
       );
     },
     async refreshSources() {
@@ -28279,6 +28295,8 @@ async function renderProjectReportDraft(project) {
     },
     dispose() {
       disposed = true;
+      autosave?.dispose();
+      window.removeEventListener("beforeunload", beforeReportUnload);
       panel.closest(".report-screen")?.remove();
     }
   };
@@ -28299,60 +28317,64 @@ async function renderProjectReportDraft(project) {
     return panel;
   }
 
+  const paintReportSaveState = () => {
+    const label = shell.querySelector(".report-autosave-status");
+    if (label) label.textContent = savePresentation.state === "saving" ? "Saving…"
+      : savePresentation.state === "pending" ? "Unsaved changes"
+      : savePresentation.state === "error" ? "Not saved" : activeDraft.id ? "Saved" : "";
+    const retry = shell.querySelector(".report-autosave-retry");
+    if (retry) retry.hidden = savePresentation.state !== "error";
+    const copy = shell.querySelector(".report-autosave-copy");
+    if (copy) copy.hidden = savePresentation.error?.payload?.code !== "REPORT_DRAFT_VERSION_CONFLICT";
+  };
+  autosave = createReportAutosave({
+    read: () => activeDraft,
+    isCurrent: () => !disposed && !deletingReport && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
+    retain: draft => saveReportDraftRecovery({ accountUserID, projectID, editorID: recoveryEditorID, draft }),
+    acknowledge: async recovery => {
+      await deleteReportDraftRecovery(accountUserID, recovery.key, recovery.draft);
+      if (restoredRecovery) {
+        const restored = restoredRecovery;
+        await deleteReportDraftRecovery(accountUserID, restored.key, restored.draft);
+        recoveredDrafts = recoveredDrafts.filter(item => item.key !== restored.key);
+        if (restoredRecovery === restored) restoredRecovery = null;
+      }
+    },
+    write: async snapshot => {
+      const payload = await reportRequest("/reports/drafts/save", {
+        projectID, draftID: snapshot.id, clientDraftID: snapshot.clientDraftID, expectedVersion: snapshot.version || 0,
+        title: snapshot.title, reportDate: snapshot.reportDate,
+        introduction: snapshot.introduction, blocks: snapshot.blocks
+      });
+      return payload.draft;
+    },
+    onSaved: saved => {
+      const index = drafts.findIndex(draft => draft.id === saved.id);
+      if (index < 0) drafts.unshift(structuredClone(saved)); else drafts[index] = structuredClone(saved);
+      // Retain the block objects referenced by text-field event handlers.
+      for (const key of ["id", "version", "createdAt", "updatedAt"]) if (saved[key] !== undefined) activeDraft[key] = saved[key];
+      const remove = shell.querySelector(".report-title-delete");
+      if (remove) { remove.disabled = false; remove.title = "Delete Report"; }
+      const createNew = shell.querySelector(".report-draft-version-option.is-create");
+      if (createNew) { createNew.hidden = false; createNew.closest("details").hidden = false; }
+      void notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
+      void refreshProjectReportMembership(projectID, true);
+    },
+    onState: next => {
+      savePresentation = next;
+      dirty = autosave.isDirty();
+      if (next.state === "error") showStatusError(`${next.error?.message || "Report could not be saved."} ${next.recoverable ? "A recovery copy is saved on this device." : "Keep this tab open to retain your edits."} Use Retry to save.`);
+      else clearStatus();
+      paintReportSaveState();
+    }
+  });
   const setDirty = () => {
     dirty = true;
-    clearStatus();
+    activeDraft.clientDraftID ||= crypto.randomUUID();
+    autosave.change();
     void refreshProjectReportMembership(projectID);
   };
-
-  let pendingDraftSave = null;
-  const saveDraft = () => {
-    if (deletingReport) return Promise.resolve(false);
-    if (pendingDraftSave) return pendingDraftSave;
-    const savingDraft = activeDraft;
-    const snapshot = structuredClone(savingDraft);
-    clearStatus();
-    pendingDraftSave = (async () => {
-      try {
-        const payload = await reportRequest("/reports/drafts/save", {
-          projectID,
-          draftID: snapshot.id,
-          expectedVersion: snapshot.version || 0,
-          title: snapshot.title,
-          reportDate: snapshot.reportDate,
-          introduction: snapshot.introduction,
-          blocks: snapshot.blocks
-        });
-        if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
-        const savedDraft = structuredClone(payload.draft);
-        const index = drafts.findIndex((draft) => draft.id === savedDraft.id);
-        if (index === -1) drafts.unshift(savedDraft);
-        else drafts[index] = savedDraft;
-        if (activeDraft !== savingDraft) return false;
-        const changedDuringSave = JSON.stringify(activeDraft) !== JSON.stringify(snapshot);
-        if (changedDuringSave) {
-          // Adopt the server identity/version without replacing newer editor contents.
-          activeDraft.id = savedDraft.id;
-          activeDraft.version = savedDraft.version;
-          dirty = true;
-          showStatusError("Earlier edits saved. Your newer changes are not saved yet. Save draft again before exporting.");
-          return false;
-        }
-        activeDraft = structuredClone(savedDraft);
-        dirty = false;
-        clearStatus();
-        renderWorkspaceContent();
-        await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
-        void refreshProjectReportMembership(projectID, true);
-        return !disposed && isCurrentAccountRequest(requestIdentity) && activeDraft.id === savedDraft.id && !dirty;
-      } catch (error) {
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || activeDraft !== savingDraft) return false;
-        showStatusError(error.message || "The Report could not be saved. Your edits remain here; try Save draft again.");
-        return false;
-      }
-    })().finally(() => { pendingDraftSave = null; });
-    return pendingDraftSave;
-  };
+  const saveDraft = () => { activeDraft.clientDraftID ||= crypto.randomUUID(); return autosave.flush({ force: !activeDraft.id }); };
 
   const reviewReport = (manifest, file) => openReportExportReview({
     mount: panel.querySelector(".report-document"),
@@ -28383,7 +28405,7 @@ async function renderProjectReportDraft(project) {
       if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
       if (dirty) {
-        showStatusError("Your newer changes are not saved yet. Save draft again before exporting.");
+        showStatusError("Your latest changes are still saving. Wait for Saved before exporting.");
         return;
       }
       if (!activeDraft.blocks.length && !activeDraft.introduction) {
@@ -28424,10 +28446,11 @@ async function renderProjectReportDraft(project) {
   const deleteReport = async (trigger) => {
     if (deletingReport || !activeDraft.id || disposed ||
         !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
-    if (pendingDraftSave || generatingReport) {
+    if (autosave?.isSaving() || generatingReport) {
       showStatusError("Wait for the Report to finish saving or exporting before deleting it.");
       return false;
     }
+    autosave.suspend();
     const deletingDraft = activeDraft;
     const draftID = deletingDraft.id;
     const expectedVersion = deletingDraft.version;
@@ -28445,10 +28468,18 @@ async function renderProjectReportDraft(project) {
       clearStatus();
       await reportRequest("/reports/drafts/delete", { projectID, draftID, expectedVersion });
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
+      await autosave.settleRecovery();
+      const copies = await reportDraftRecoveries(accountUserID, projectID).catch(() => []);
+      const ownCopy = copies.find(copy => copy.editorID === recoveryEditorID);
+      if (ownCopy) await deleteReportDraftRecovery(accountUserID, ownCopy.key, ownCopy.draft).catch(() => {});
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
       drafts = drafts.filter((draft) => draft.id !== draftID);
       void refreshProjectReportMembership(projectID, true);
       activeDraft = drafts[0] ? structuredClone(drafts[0]) : emptyProjectReportDraft(identity);
       dirty = false;
+      recoveryEditorID = crypto.randomUUID();
+      deletingReport = false;
+      autosave.reset();
       clearStatus();
       renderWorkspaceContent();
       await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
@@ -28464,6 +28495,7 @@ async function renderProjectReportDraft(project) {
       return false;
     } finally {
       deletingReport = false;
+      autosave.resume();
       shell.inert = false;
       trigger.disabled = false;
     }
@@ -29001,6 +29033,9 @@ async function renderProjectReportDraft(project) {
             drafts.find((draft) => draft.id === draftID) || emptyProjectReportDraft(identity)
           );
       dirty = false;
+      recoveryEditorID = crypto.randomUUID();
+      deletingReport = false;
+      autosave.reset();
       clearStatus();
       renderWorkspaceContent();
     };
@@ -29016,15 +29051,40 @@ async function renderProjectReportDraft(project) {
       choice.addEventListener("click", () => void switchDraft(draft.id));
       versionList.append(choice);
     });
-    if (activeDraft.id) {
+    {
       const createNew = document.createElement("button");
+      createNew.hidden = !activeDraft.id;
       createNew.type = "button";
       createNew.className = "report-draft-version-option is-create";
       createNew.textContent = "Create new Report";
       createNew.addEventListener("click", () => void switchDraft("__new__"));
       versionList.append(createNew);
     }
+    for (const recovery of recoveredDrafts) {
+      const recover = document.createElement("button");
+      recover.type = "button";
+      recover.className = "report-draft-version-option is-recovery";
+      recover.textContent = `Recover edits: ${recovery.draft.title || "Untitled Report"} · ${new Date(recovery.updatedAt).toLocaleString()}`;
+      recover.addEventListener("click", async () => {
+        if (dirty && !await mountState.confirmDiscardIfNeeded()) return;
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+        const remote = drafts.find(draft => draft.id === (recovery.draft.id || recovery.draft.clientDraftID));
+        const changedElsewhere = !remote || remote.version !== recovery.draft.version;
+        if (changedElsewhere && !await confirmWebWarning("Recover as a new Report?", "The server Report has changed or is no longer available. Recovering these edits creates a separate Report and keeps the server version intact.", {confirmLabel:"Recover as new Report"})) return;
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+        activeDraft = structuredClone(recovery.draft);
+        if (changedElsewhere) {
+          activeDraft.id = null; activeDraft.version = 0; activeDraft.clientDraftID = crypto.randomUUID();
+          activeDraft.title = `${activeDraft.title || "Untitled Report"} (recovered)`;
+        }
+        restoredRecovery = recovery;
+        recoveryEditorID = crypto.randomUUID();
+        autosave.reset(); setDirty(); renderWorkspaceContent();
+      });
+      versionList.append(recover);
+    }
     versionList.hidden = versionList.childElementCount <= 1;
+    if (recoveredDrafts.length) { reportMenu.textContent = "Switch or recover report"; versionList.open = true; }
     titleControl.append(titleButton, titleEditor, revisionLabel, deleteButton);
     draftPicker.append(titleControl, versionList);
 
@@ -29155,10 +29215,26 @@ async function renderProjectReportDraft(project) {
     const save = document.createElement("button");
     save.type = "button";
     save.className = "workflow-action workflow-action-secondary";
-    save.textContent = "Save draft";
-    save.title = "Save edits to this draft without creating an exported version";
+    save.classList.add("report-autosave-retry");
+    save.textContent = "Retry";
+    save.title = "Retry saving Report edits";
+    save.hidden = savePresentation.state !== "error";
+    const saveStatus = document.createElement("span");
+    saveStatus.className = "report-autosave-status";
+    saveStatus.setAttribute("role", "status");
     save.addEventListener("click", () => {
       void saveDraft();
+    });
+    const saveCopy = document.createElement("button");
+    saveCopy.type = "button"; saveCopy.className = "report-autosave-copy";
+    saveCopy.textContent = "Save as new Report";
+    saveCopy.hidden = savePresentation.error?.payload?.code !== "REPORT_DRAFT_VERSION_CONFLICT";
+    saveCopy.addEventListener("click", async () => {
+      const records = await reportDraftRecoveries(accountUserID, projectID).catch(() => []);
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+      restoredRecovery = records.find(record => record.editorID === recoveryEditorID) || null;
+      activeDraft = {...structuredClone(activeDraft), id:null, version:0, clientDraftID:crypto.randomUUID(), title:`${activeDraft.title || "Untitled Report"} (copy)`};
+      recoveryEditorID = crypto.randomUUID(); autosave.reset(); setDirty(); renderWorkspaceContent();
     });
     const generate = document.createElement("button");
     generate.type = "button";
@@ -29185,7 +29261,7 @@ async function renderProjectReportDraft(project) {
         snapshot: { label: `Report: ${activeDraft.title || "Untitled Report"}` }
       });
     });
-    primaryActions.append(createReaderToolbarButton(), save, generate, coordinate);
+    primaryActions.append(createReaderToolbarButton(), saveStatus, save, saveCopy, generate, coordinate);
 
     const historyContent = document.createElement("div");
     historyContent.className = "report-history-content";
@@ -29286,8 +29362,9 @@ async function renderProjectReportDraft(project) {
       tools.setAttribute("aria-expanded", String(expanded));
       syncReferenceReaderLayout();
     });
-    primaryActions.insertBefore(tools, save);
+    primaryActions.insertBefore(tools, saveStatus);
     shell.append(primaryActions, library, libraryControls.divider, outline, documentBody);
+    paintReportSaveState();
     if (panel.isConnected) syncReferenceReaderLayout();
   }
 
@@ -29341,14 +29418,23 @@ async function renderProjectReportDraft(project) {
   try {
     const historyPayloadPromise = projectTransitionHubPayload(projectID)
       .then((hubPayload) => hubPayload?.reports || reportRequest("/reports/history/list", { projectID }));
-    const [draftPayload, sourcePayload, historyPayload, optionsPayload] = await Promise.all([
+    const [draftPayload, sourcePayload, historyPayload, optionsPayload, recoveries] = await Promise.all([
       reportRequest("/reports/drafts/list", { projectID }),
       reportRequest("/reports/sources/list", { projectID }),
       historyPayloadPromise,
-      reportRequest("/reports/options", { projectID })
+      reportRequest("/reports/options", { projectID }),
+      reportDraftRecoveries(accountUserID, projectID).catch(() => [])
     ]);
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return panel;
     drafts = draftPayload.drafts || [];
+    const contentIdentity = draft => JSON.stringify([draft.title, draft.reportDate, draft.introduction, draft.blocks]);
+    recoveredDrafts = [];
+    for (const recovery of recoveries) {
+      const serverDraft = drafts.find(draft => draft.id === (recovery.draft.id || recovery.draft.clientDraftID));
+      if (serverDraft && contentIdentity(serverDraft) === contentIdentity(recovery.draft)) {
+        void deleteReportDraftRecovery(accountUserID, recovery.key, recovery.draft).catch(() => {});
+      } else recoveredDrafts.push(recovery);
+    }
     sources = sourcePayload.sources || [];
     sourceWarnings = sourcePayload.warnings || [];
     history = historyPayload.reports || [];

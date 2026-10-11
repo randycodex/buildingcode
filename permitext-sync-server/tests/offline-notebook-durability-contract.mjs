@@ -169,7 +169,7 @@ const projectNoteEdit = await offline.saveNotebookDraft({ ...input(accountB, "pr
 assert.deepEqual(await offline.beginNotebookDraftSave(accountB, projectID, "project-information", projectNoteEdit.revision, { noteID: "new-server-note-id" }), projectNoteJournal, "A retried Project note must keep its original create identity and body.");
 
 const first = await offline.saveNotebookDraft({ ...input(accountA), baseVersion: 0, cardType: "assumption" });
-assert.equal(database.version, 5);
+assert.equal(database.version, 6);
 assert.equal(database.stores.has("deleted-accounts"), true);
 assert.equal(database.stores.get("notebook-drafts").get("upgrade-sentinel").document.text, "Preserve old work", "The v5 upgrade must not wipe old private stores.");
 assert.equal(first.scope, "notebook-card");
@@ -286,7 +286,17 @@ database.stores.get("chapters").set("synthetic-chapter", { key: "synthetic-chapt
 database.stores.get("sections").set("synthetic-section", { key: "synthetic-section" });
 await offline.saveOfflineSyncSnapshot(accountA, { mutations: [{ synthetic: "A" }] });
 await offline.saveOfflineSyncSnapshot(accountB, { mutations: [{ synthetic: "B" }] });
-const privateStoreNames = ["sync-snapshots", "notebook-images", "notebook-drafts", "notebook-projects"];
+const reportInput = {accountUserID:accountA,projectID,editorID:"first-tab",draft:{id:"report",version:1,title:"Local",blocks:[]}};
+const reportRecovery = await offline.saveReportDraftRecovery(reportInput);
+await offline.saveReportDraftRecovery({...reportInput,editorID:"second-tab",draft:{...reportInput.draft,title:"Other tab"}});
+assert.equal((await offline.reportDraftRecoveries(accountA,projectID)).length,2);
+assert.equal((await offline.reportDraftRecoveries(accountB,projectID)).length,0);
+assert.equal((await offline.reportDraftRecoveries(accountA,"other-project")).length,0);
+await offline.saveReportDraftRecovery({...reportInput,draft:{...reportInput.draft,title:"Newer edits"}});
+assert.equal(await offline.deleteReportDraftRecovery(accountA,reportRecovery.key,reportRecovery.draft),false,"Save acknowledgement cannot delete newer local edits");
+assert.equal(await offline.deleteReportDraftRecovery(accountB,reportRecovery.key,{...reportInput.draft,title:"Newer edits"}),false);
+await offline.saveReportDraftRecovery({...reportInput,accountUserID:accountB});
+const privateStoreNames = ["sync-snapshots", "notebook-images", "notebook-drafts", "notebook-projects", "report-drafts"];
 const recoveryA = await offline.offlineAccountRecoverySnapshot(accountA);
 assert.equal(recoveryA.accountUserID, accountA);
 assert.ok(recoveryA.drafts.length > 0);
@@ -346,3 +356,8 @@ assert.ok(await offline.loadNotebookDraft(rollbackAccount, projectID, ""), "Fail
 assert.ok(database.transactions.filter((transaction) => transaction.names.some((name) => privateStoreNames.includes(name))).every((transaction) => transaction.names.includes("deleted-accounts")), "Every private data transaction must include the tombstone store.");
 
 console.log("Permitext offline Notebook durability contract passed (transactional in-memory IndexedDB boundary).");
+
+await assert.rejects(() => offline.saveReportDraftRecovery(reportInput), error=>error.code === "OFFLINE_ACCOUNT_DELETED");
+await assert.rejects(() => offline.reportDraftRecoveries(accountA,projectID), error=>error.code === "OFFLINE_ACCOUNT_DELETED");
+assert.equal((await offline.reportDraftRecoveries(accountB,projectID)).length,1);
+console.log("Report recovery storage passed: editor/account/project isolation, acknowledgement race and account deletion fence.");
