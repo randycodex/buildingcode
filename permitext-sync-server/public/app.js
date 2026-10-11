@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-brand-gap-center-v771";
+} from "./offline-storage.js?v=20261010-project-prompt-button-only-v772";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-brand-gap-center-v771";
+} from "./research-intent-state.js?v=20261010-project-prompt-button-only-v772";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -38682,8 +38682,6 @@ function renderProjectRequiredWorkspace() {
   welcome.className = "workspace-empty-state workspace-empty-guidance";
   welcome.setAttribute("aria-label", "Project required");
   const content = document.createElement("div");
-  const heading = document.createElement("h2");
-  heading.textContent = "Create a Project to open your workspace";
   const actions = document.createElement("div");
   actions.className = "workspace-empty-actions";
   const create = document.createElement("button");
@@ -38691,7 +38689,7 @@ function renderProjectRequiredWorkspace() {
   create.textContent = "Create Project";
   create.addEventListener("click", () => { void createNewWorkspace(); });
   actions.append(create);
-  content.append(heading, actions);
+  content.append(actions);
   welcome.append(content);
   return welcome;
 }
