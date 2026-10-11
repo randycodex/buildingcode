@@ -4294,7 +4294,7 @@ function activePaneIDs() {
   reconcileColumnGroups(paired);
   paired.splice(0, paired.length, ...orderColumnGroups(paired, state.columnGroups));
   paired.splice(0, paired.length, ...pairSavedEvidenceDetails(paired));
-  const criticalWorkflowFirst = pinCriticalWorkflowPanesToLeft(paired);
+  const criticalWorkflowFirst = applyLinkedPanePlacements(pinCriticalWorkflowPanesToLeft(paired));
   state.paneOrder = criticalWorkflowFirst;
   return criticalWorkflowFirst;
 }
@@ -4376,6 +4376,7 @@ function placeSectionDetailAfterSearch(searchID) {
 
 function placeSectionDetailAfterPane(searchID, anchorPaneID) {
   const detailID = paneIDForSectionDetail(searchID);
+  requestLinkedPanePlacement(anchorPaneID, detailID);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== detailID);
   activeIDs.forEach((id) => {
@@ -4390,6 +4391,7 @@ function placeSectionDetailAfterPane(searchID, anchorPaneID) {
 function placeLinkedReaderAfterSectionDetail(searchID, readerID) {
   const readerPaneID = `reader:${readerID}`;
   const detailID = paneIDForSectionDetail(searchID);
+  requestLinkedPanePlacement(detailID, readerPaneID);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== readerPaneID);
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== readerPaneID);
   activeIDs.forEach((id) => {
@@ -4401,7 +4403,32 @@ function placeLinkedReaderAfterSectionDetail(searchID, readerID) {
   state.paneOrder = ordered;
 }
 
+// Apply explicit navigation after default pairing/group/pin order, once the
+// destination is mounted. Later manual column moves remain independent.
+const pendingLinkedPanePlacements = new Map();
+
+function requestLinkedPanePlacement(anchorPaneID, paneID) {
+  if (!anchorPaneID || !paneID || anchorPaneID === paneID) return;
+  pendingLinkedPanePlacements.set(paneID, { anchorPaneID, workspaceID: activeWorkspaceID });
+}
+
+function applyLinkedPanePlacements(paneIDs, consume = false) {
+  const ordered = [...paneIDs];
+  for (const [paneID, placement] of pendingLinkedPanePlacements) {
+    if (placement.workspaceID !== activeWorkspaceID) {
+      pendingLinkedPanePlacements.delete(paneID);
+      continue;
+    }
+    if (!ordered.includes(paneID) || !ordered.includes(placement.anchorPaneID)) continue;
+    ordered.splice(ordered.indexOf(paneID), 1);
+    ordered.splice(ordered.indexOf(placement.anchorPaneID) + 1, 0, paneID);
+    if (consume) pendingLinkedPanePlacements.delete(paneID);
+  }
+  return ordered;
+}
+
 function placePaneAfter(anchorPaneID, paneID) {
+  requestLinkedPanePlacement(anchorPaneID, paneID);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== paneID);
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== paneID);
   activeIDs.forEach((id) => {
@@ -20956,9 +20983,6 @@ async function openResearchConversation(conversationID, options = {}) {
     return conversation;
   }
   const showResearchList = options.showResearchList !== false;
-  const researchSurfaceWasOpen = Boolean(
-    state.utilities.analysis || openResearchConversationPaneIDs().length
-  );
   const researchListScrollTop = track.querySelector(
     '.workspace-panel[data-pane-id="utility:analysis"] .analysis-content'
   )?.scrollTop ?? 0;
@@ -21030,7 +21054,7 @@ async function openResearchConversation(conversationID, options = {}) {
   state.researchConversationID = normalizedConversationID;
   if (showResearchList) {
     state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
-    if (options.anchorPaneID && !researchSurfaceWasOpen) {
+    if (options.anchorPaneID) {
       placePaneAfter(options.anchorPaneID, "utility:analysis");
     }
   }
@@ -26046,7 +26070,7 @@ async function openNotebookReference(project, foundation, reference, selectCard,
     if (!answer?.conversationID) {
       throw new Error("This saved Research reference is unavailable. Reload the Project and try again.");
     }
-    await openResearchConversation(answer.conversationID);
+    await openResearchConversation(answer.conversationID, { anchorPaneID });
     return;
   }
   if (reference.referenceKind === "notebookCard") {
@@ -29295,7 +29319,9 @@ function appendProjectResearchHistory(content, identity, foundation) {
     if (!identity.sharedOnly) {
       card.addEventListener("click", () => {
         researchConversationPaneOpened = true;
-        void openResearchConversation(conversation.id);
+        void openResearchConversation(conversation.id, {
+          anchorPaneID: card.closest(".workspace-panel")?.dataset.paneId
+        });
       });
     }
     body.append(card);
@@ -31199,7 +31225,7 @@ async function renderProjectDetail(detail) {
           toggleSavedEvidenceItem(item);
           return;
         }
-        void openProjectSavedSection(identity, item);
+        void openProjectSavedSection(identity, item, openButton.closest(".workspace-panel")?.dataset.paneId);
       });
       row.append(openButton, selectionIndicator);
       savedEvidenceRows.set(savedEvidenceItemID(item), row);
@@ -31315,7 +31341,7 @@ async function renderProjectSectionText(content, project, item) {
   content.append(wrapper);
 }
 
-async function openProjectSavedSection(project, item) {
+async function openProjectSavedSection(project, item, anchorPaneID = primarySavedPaneID()) {
   const detail = { ...item };
   const { chapter, section } = await resolveSectionDetail(detail);
   const projectKey = projectDetailKey(project);
@@ -31335,7 +31361,7 @@ async function openProjectSavedSection(project, item) {
     reader = newReaderState(readerFields);
     state.readers.push(reader);
   }
-  placePaneAfter(primarySavedPaneID(), paneIDForReader(reader));
+  placePaneAfter(anchorPaneID, paneIDForReader(reader));
   updateBrowserSectionURL(reader.sectionID);
   scheduleContinuitySync(reader);
   saveWorkspaceState();
@@ -34903,6 +34929,7 @@ function readerMatchesSource(reader, detail) {
 
 function readerIsClearlyAvailable(reader) {
   return Boolean(reader) &&
+    !String(reader.chapterID || "").trim() &&
     !String(reader.sectionID || "").trim() &&
     !String(reader.sectionNumber || "").trim() &&
     (!String(reader.title || "").trim() || reader.title === "Reader");
@@ -35080,7 +35107,8 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const fromSearch = options.sourceSurface === "search";
   let reader = fromSearch
     ? reusableSearchReader(state.readers || [], anchorPaneID, options.forceNewReader)
-    : (state.readers || []).find((candidate) => readerMatchesSource(candidate, detail));
+    : (state.readers || []).find((candidate) =>
+      (!anchorPaneID || candidate.sourceAnchorPaneID === anchorPaneID) && readerMatchesSource(candidate, detail));
   if (!reader && !fromSearch) {
     reader = (state.readers || []).find(readerIsClearlyAvailable) || null;
   }
@@ -39378,7 +39406,8 @@ function appendPaneSequence(panes) {
   const pinnedIndex = orderedPanes.findIndex((pane) => pane.dataset.paneId === pinnedPaneID);
   if (pinnedIndex > 0) orderedPanes.unshift(...orderedPanes.splice(pinnedIndex, 1));
   const panesByID = new Map(orderedPanes.map((pane) => [pane.dataset.paneId, pane]));
-  orderedPanes.splice(0, orderedPanes.length, ...pairSavedEvidenceDetails([...panesByID.keys()]).map((id) => panesByID.get(id)));
+  orderedPanes.splice(0, orderedPanes.length, ...applyLinkedPanePlacements(pairSavedEvidenceDetails([...panesByID.keys()]), true).map((id) => panesByID.get(id)));
+  state.paneOrder = orderedPanes.map((pane) => pane.dataset.paneId);
   orderedPanes.forEach((pane) => {
     const pinned = pane.dataset.paneId === pinnedPaneID;
     pane.classList.toggle("is-pinned", pinned);

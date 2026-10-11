@@ -143,7 +143,7 @@ const sourceOpening = sourceBetween(
   "async function openSourceInReader(item, anchorPaneID = \"\", options = {})",
   "\nfunction closeSavedItemDetailsForPane"
 );
-assert.match(sourceOpening, /find\(\(candidate\) => readerMatchesSource\(candidate, detail\)\)/);
+assert.match(sourceOpening, /candidate.sourceAnchorPaneID === anchorPaneID\) && readerMatchesSource\(candidate, detail\)/);
 assert.match(sourceOpening, /find\(readerIsClearlyAvailable\)/);
 assert.match(sourceOpening, /if \(isProAccount\(\) \|\| state\.readers\.length < 2\)/);
 assert.match(sourceOpening, /options\.sourceSurface === "search"/);

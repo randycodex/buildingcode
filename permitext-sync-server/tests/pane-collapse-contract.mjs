@@ -121,6 +121,7 @@ const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID
 const detailID = 'section:detail:evidence';
 const orderState = { utilities: {}, utilityInstances: [], paneOrder: ['reader:one', notebookID, savedID, reportID], collapsedPaneIDs: [notebookID] };
 const orderContext = vm.createContext({
+  applyLinkedPanePlacements: ids => ids, requestLinkedPanePlacement() {},
   state: orderState, Set, normalizeColumnGroups, orderColumnGroups, canGroupColumn,
   defaultActivePaneIDs: () => [savedID, notebookID, reportID, 'reader:one'],
   savedPaneIDs: () => [savedID], primarySavedPaneID: () => savedID,
