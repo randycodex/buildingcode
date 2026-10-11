@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-assistant-handoff-v854";
+} from "./offline-storage.js?v=20261011-note-handoff-v857";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -6163,8 +6163,13 @@ function mountWebWarningBackdrop(backdrop, container, previousFocus) {
       const bounds = warningContainer.getBoundingClientRect();
       backdrop.style.inset = "auto";
       backdrop.style.top = `${bounds.top}px`;
-      backdrop.style.left = `${bounds.left}px`;
-      backdrop.style.width = `${bounds.width}px`;
+      const visibleLeft = Math.max(0, bounds.left);
+      const visibleRight = Math.min(window.innerWidth, bounds.right);
+      const visibleWidth = visibleRight - visibleLeft;
+      const width = visibleWidth >= 280 ? visibleWidth : Math.min(bounds.width, window.innerWidth - 16);
+      const left = visibleWidth >= 280 ? visibleLeft : Math.max(8, Math.min(bounds.left, window.innerWidth - width - 8));
+      backdrop.style.left = `${left}px`;
+      backdrop.style.width = `${width}px`;
       backdrop.style.height = `${bounds.height}px`;
     };
     const panelTrack = warningContainer.closest(".panel-track");
@@ -6199,7 +6204,8 @@ function openWebWarning({
   cancelLabel = "Cancel",
   cancellable = true,
   container = null,
-  choices = []
+  choices = [],
+  choiceLabel = "Destination Report"
 }) {
   activeWebWarningClose?.(false);
   const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -6227,7 +6233,7 @@ function openWebWarning({
   if (choices.length) {
     choice = document.createElement("select");
     choice.className = "report-destination-select";
-    choice.setAttribute("aria-label", "Destination Report");
+    choice.setAttribute("aria-label", choiceLabel);
     choices.forEach(item => choice.append(new Option(item.label, item.value)));
     body.append(choice);
   }
@@ -15861,6 +15867,49 @@ async function saveReaderPassage(panel, section, reader, target, options = {}) {
   return true;
 }
 
+async function addPassageToNotebook(anchor, source, exact) {
+  const project = workspaceProject();
+  if (!project) throw new Error("Create a Project before adding a passage to a Note.");
+  if (!String(exact || "").trim()) throw new Error("The passage is still loading. Try again.");
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const generation = state.workflowNavigationGeneration || 0;
+  const current = () => isCurrentAccountRequest(identity) && anchor.isConnected && activeWorkspaceID === workspaceID &&
+    generation === (state.workflowNavigationGeneration || 0);
+  const projectID = researchProjectID(project);
+  const mount = notebookMounts.get(projectID);
+  const target = mount?.insertionTarget?.();
+  const destination = await openWebWarning({ title: "Add to note", message: "Keep a link to this exact passage and its code edition.",
+    confirmLabel: "Add to note", choiceLabel: "Destination Note", container: anchor.closest(".workspace-panel"),
+    choices: [...(target ? [{ value: "current", label: target.title || "Untitled Note" }] : []), { value: "new", label: "New Note" }] });
+  if (!destination || !current()) return;
+  const label = `${source.codePrefix} · ${researchCodeEdition(source)} · § ${source.sectionNumber} · ${source.title}`;
+  const link = { id: crypto.randomUUID(), label, relationshipRole: "context", projectID,
+    source: { ...source, sourceID: String(source.sectionID), sectionID: String(source.sectionID),
+      sectionTitle: source.title, codeEdition: researchCodeEdition(source), sourceLibraryVersion: source.codeVersion },
+    passages: [{ exact: String(exact).trim() }], createdAt: new Date().toISOString() };
+  const reference = { referenceKind: "selectedPassage", referenceID: link.id, label };
+  if (destination === "current") {
+    await mount.insertLinkedReference(target.id, reference, link);
+    return;
+  }
+  if (navigator.onLine === false) throw new Error("Reconnect to create a Note.");
+  const document = emptyNotebookDocument();
+  document.document = [{ type: "paragraph", content: [{ type: "permitextReference", props: reference }] }];
+  const payload = await postResearch("/notebook/cards/save", { projectID, clientMutationID: `passage-note:${link.id}`,
+    expectedVersion: 0, cardType: "finding", title: source.title.slice(0, 300), document, evidenceLinks: [link] });
+  requireCurrentAccountRequest(identity);
+  await saveNotebookCardSnapshot(identity.userID, projectID, payload.card);
+  if (!current()) return;
+  const paneID = paneIDForProjectNotebook(project);
+  requestLinkedPanePlacement(anchor.closest(".workspace-panel")?.dataset.paneId, paneID);
+  if (!await openProjectNotebook(project) || !current()) return;
+  if (!await whenWorkspacePaneReady(paneID) || !current()) return;
+  const destinationMount = notebookMounts.get(projectID);
+  await destinationMount?.refreshCards?.();
+  if (current()) await destinationMount?.focusCard?.(payload.card.id);
+}
+
 function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
   const gate = options.accessGate || options.panel?.__workspaceAccessGate || null;
   const allowed = () => (!gate || gate.allowed) &&
@@ -15880,6 +15929,22 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   const researchButton = document.createElement("button");
   researchButton.type = "button";
   researchButton.className = "inline-research-toggle";
+  const noteButton = document.createElement("button");
+  noteButton.type = "button";
+  noteButton.className = "workflow-action workflow-action-secondary";
+  noteButton.textContent = "Add to note";
+  noteButton.addEventListener("click", async () => {
+    if (!allowed() || noteButton.disabled) return;
+    noteButton.disabled = true;
+    try {
+      const passage = noteButton.closest(".annotated-code-block") || noteButton.closest(".chapter-section");
+      const copy = passage?.cloneNode(true);
+      copy?.querySelectorAll("[data-research-selection-exclude], .inline-bookmark-toggle").forEach(node => node.remove());
+      await addPassageToNotebook(noteButton, readerPassagePayload(section, reader, target), copy?.textContent);
+    } catch (error) {
+      if (allowed()) await showWebNotice("Passage not added", error.message);
+    } finally { noteButton.disabled = !allowed(); }
+  });
   const updateResearchControl = () => {
     if (!allowed()) return;
     researchButton.innerHTML = researchActionIconSVG();
@@ -15890,6 +15955,8 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   };
   const updatePrivateControls = () => {
     const permitted = allowed();
+    noteButton.hidden = !permitted || !hasCapability("notebook");
+    noteButton.disabled = !permitted;
     bookmarkButton.hidden = !permitted;
     bookmarkButton.disabled = !permitted;
     researchButton.hidden = !permitted;
@@ -15949,7 +16016,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     const passage = researchButton.closest(".annotated-code-block") || sectionWrapper;
     openResearchDestinationMenu(researchButton, readerSectionResearchSelection(sectionWrapper, passage));
   });
-  wrapper.append(bookmarkButton, researchButton);
+  wrapper.append(bookmarkButton, researchButton, noteButton);
   return wrapper;
 }
 
@@ -19643,7 +19710,23 @@ async function renderSectionDetail(searchID, detail) {
   if (pendingAnnotationNoteForTarget(sectionTarget, state.syncConflicts)) renderNoteStatus("conflict");
   else if (restoredPendingNote) renderNoteStatus(restoredPendingNote.lastError ? "error" : "pending");
 
-  content.append(codeLabelElement, chapterLabel, heading, chapterTitle, body, notes);
+  const addNote = document.createElement("button");
+  addNote.type = "button";
+  addNote.className = "workflow-action workflow-action-secondary";
+  addNote.textContent = "Add to note";
+  addNote.hidden = !hasCapability("notebook");
+  addNote.addEventListener("click", async () => {
+    if (!readerPrivateContentAllowed(panel)) return;
+    addNote.disabled = true;
+    try {
+      const passage = sectionTarget.blockID
+        ? body.querySelector(`[data-annotation-block-id="${CSS.escape(sectionTarget.blockID)}"]`) : body;
+      await addPassageToNotebook(addNote, sectionPayload, passage?.textContent);
+    } catch (error) {
+      if (panel.isConnected && readerPrivateContentAllowed(panel)) await showWebNotice("Passage not added", error.message);
+    } finally { addNote.disabled = false; }
+  });
+  content.append(codeLabelElement, chapterLabel, heading, chapterTitle, body, addNote, notes);
   panel.append(chrome, content);
   return panel;
 }
@@ -24771,7 +24854,29 @@ function renderResearchNotebookHandoff(conversation, message) {
     const project = choices.find((item) => researchProjectID(item) === select.value);
     if (!project) return;
     const title = researchAnswerQuestion(conversation, message).slice(0, 300);
-    if (!savedCard && !await confirmWebWarning("Keep this Research reference in Notebook?",
+    const currentMount = notebookMounts.get(researchProjectID(project));
+    const currentNote = currentMount?.insertionTarget?.();
+    if (!savedCard && currentNote) {
+      const destination = await openWebWarning({ title: "Add to note", message: "Choose where to keep this Assistant answer.",
+        confirmLabel: "Add to note", choiceLabel: "Destination Note", container: region,
+        choices: [{ value: "current", label: currentNote.title || "Untitled Note" }, { value: "new", label: "New Note" }] });
+      if (!destination || !originIsCurrent()) return;
+      if (destination === "current") {
+        button.disabled = true;
+        try {
+          await currentMount.insertLinkedReference(currentNote.id, {
+            referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${title}`
+          });
+          if (originIsCurrent()) button.textContent = "Added to note";
+        } catch (error) {
+          if (originIsCurrent()) await showWebNotice("Note not updated", error.message);
+        } finally {
+          if (originIsCurrent()) button.disabled = false;
+        }
+        return;
+      }
+    }
+    if (!savedCard && !currentNote && !await confirmWebWarning("Keep this Research reference in Notebook?",
       `Project: ${readableProjectName(project)}\n\n${title}\n\nThe new Note links to the exact saved answer and its cited sources. Review the answer before writing your own conclusion.`,
       { confirmLabel: "Create reference Note", container: region })) return;
     if (!originIsCurrent()) return;
@@ -24841,6 +24946,7 @@ function renderResearchNotebookHandoff(conversation, message) {
           if (!source) throw new Error("Link this Assistant conversation to the selected Project before adding its answer to a Report.");
           return [source];
         });
+        if (!draft) return;
         if (isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID && reportButton.isConnected) {
           reportButton.textContent = "In Report";
           reportButton.title = `Included in ${draft.title || "Report"}`;
@@ -27159,6 +27265,26 @@ async function renderProjectNotebook(project, options = {}) {
       if (dirty) scheduleNotebookAutosave();
     }
     mountState.focusCard = loadCard;
+    mountState.insertionTarget = () => !disposed && !notebookReadOnly && !saveConflict && activeCard && editorMount
+      ? { id: activeCard.id, title: activeCard.title } : null;
+    mountState.insertLinkedReference = async (cardID, reference, evidenceLink = null) => {
+      requireCurrentAccountRequest(requestIdentity);
+      if (disposed || notebookReadOnly || saveConflict || activeCard?.id !== cardID || !editorMount) {
+        throw new Error("The destination Note changed or is unavailable. Choose it again.");
+      }
+      const previousLinks = activeCard.evidenceLinks || [];
+      if (evidenceLink) activeCard.evidenceLinks = [...previousLinks, evidenceLink];
+      try {
+        if (editorMount.insertReference(reference) === false) throw new Error("The Note editor is still loading. Try again.");
+      } catch (error) {
+        activeCard.evidenceLinks = previousLinks;
+        throw error;
+      }
+      draftDocument = editorMount.getDocument();
+      markNotebookDirty();
+      await persistFocusedDraft();
+    };
+
 
     function scheduleIdleNotebookPrefetch() {
       if (disposed || !isCurrentAccountRequest(requestIdentity) || navigator.onLine === false || cards.length < 2) return;
