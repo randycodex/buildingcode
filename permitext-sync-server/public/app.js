@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-prompt-button-only-v772";
+} from "./offline-storage.js?v=20261010-project-menu-cleanup-v773";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-prompt-button-only-v772";
+} from "./research-intent-state.js?v=20261010-project-menu-cleanup-v773";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -2219,15 +2219,6 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     projectSection.append(button);
   });
-  for (const kind of ["context", "facts"]) {
-    appendMenuAction(projectSection, {
-      label: kind === "context" ? "Context" : "Facts",
-      checked: Boolean(state[projectInformationStateKey(kind)]),
-      separated: kind === "context",
-      disabled: !workspaceProject() || !hasCapability("projects") || projectToolTogglePending,
-      run: () => void toggleProjectInformation(kind)
-    });
-  }
   appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
   appendMenuAction(projectSection, { label: "Manage Projects…", run: () => openProjectManager() });
   if (workspace?.projectID && workspaces.some((candidate) => candidate.id === workspace.id)) {
