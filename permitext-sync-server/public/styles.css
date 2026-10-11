@@ -19241,6 +19241,15 @@ dialog.report-export-review {
   height: 100%; width: 42px; border-inline: 0; border-radius: 0;
 }
 
+.topbar :is(.topbar-actions > button, .workspace-actions-button, .topbar-settings-button, .topbar-layout-menu > summary),
+.topbar :is(.topbar-actions > button, .workspace-actions-button) > span,
+.workflow-toolbar .toolbar-button,
+.workflow-toolbar .toolbar-button > span,
+.project-details-screen .project-details-tabs button,
+.report-workspace-view .report-draft-shell .report-draft-primary-actions > button {
+  text-transform: uppercase;
+}
+
 /* Keep the Account disclaimer on the screen centerline within a 42px footer. */
 .account-workspace-view .settings-panel .settings-footer {
   position: relative; height: 42px; min-height: 42px; box-sizing: border-box;
