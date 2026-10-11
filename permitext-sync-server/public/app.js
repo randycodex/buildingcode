@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-menu-cleanup-v773";
+} from "./offline-storage.js?v=20261010-project-menu-divider-v774";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-menu-cleanup-v773";
+} from "./research-intent-state.js?v=20261010-project-menu-divider-v774";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -2172,6 +2172,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     if (action.separated) {
       const actionDivider = document.createElement("div");
       actionDivider.className = "workspace-context-divider";
+      actionDivider.setAttribute("role", "separator");
       section.append(actionDivider);
     }
     const button = document.createElement("button");
@@ -2220,7 +2221,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     projectSection.append(button);
   });
   appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
-  appendMenuAction(projectSection, { label: "Manage Projects…", run: () => openProjectManager() });
+  appendMenuAction(projectSection, { label: "Manage Projects…", separated: true, run: () => openProjectManager() });
   if (workspace?.projectID && workspaces.some((candidate) => candidate.id === workspace.id)) {
     appendMenuAction(projectSection, { label: "Close Project", run: () => void closeActiveProject() });
     appendMenuAction(projectSection, { label: "Edit Project", run: () => {

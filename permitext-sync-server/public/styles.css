@@ -1082,8 +1082,8 @@ textarea:focus-visible {
 
 .workspace-context-divider {
   height: 1px;
-  margin: 6px 8px;
-  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  margin: 6px -8px;
+  background: var(--border);
 }
 
 .workspace-context-menu button {
