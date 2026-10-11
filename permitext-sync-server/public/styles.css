@@ -19009,3 +19009,8 @@ html body .column-group-menu-button:focus-visible {
 .report-draft-panel .report-full-preview p { display: block; -webkit-line-clamp: unset; overflow: visible; white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .report-draft-block:has(.report-full-preview[open]) > .report-block-summary { display: none; }
+
+.report-full-preview .report-preview-table { overflow-x: auto; margin-block: 12px; }
+.report-full-preview table { width: 100%; border-collapse: collapse; }
+.report-full-preview td { padding: 8px; border: 1px solid var(--border); vertical-align: top; white-space: pre-wrap; }
+.report-full-preview > div > strong { display: block; margin-top: 16px; }

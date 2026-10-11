@@ -1,4 +1,4 @@
-import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v2";
+import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
 import { openReportExportReview } from "./report-export-review.js?v=20261010-report-export-v2";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -28432,16 +28432,24 @@ async function renderProjectReportDraft(project) {
               const result = await postResearch("/reports/sources/preview", {projectID, kind:block.kind, sourceID:block.sourceID});
               requireCurrentAccountRequest(identity);
               body.replaceChildren();
-              for (const item of result.items || []) {
-                // Comments have their own live inclusion controls immediately below.
-                if (item.reportCommentKey) continue;
-                const text = document.createElement("p");
-                text.textContent = item.passageText || item.plainText || item.text ||
-                  [item.address, item.facts].filter(Boolean).join("\n\n") ||
-                  [item.question, item.conclusion, ...(item.supportedPoints || []).map(point => `${point.heading}: ${point.explanation}`),
-                    item.explanation, ...(item.assumptions || []), ...(item.missingFacts || []),
-                    ...(item.limitations || []), ...(item.additionalEvidenceNeeded || [])].filter(Boolean).join("\n\n");
-                body.append(text);
+              for (const part of result.preview || []) {
+                if (part.kind === "table") {
+                  const scroll = document.createElement("div"); scroll.className = "report-preview-table";
+                  const table = document.createElement("table");
+                  for (const cells of part.rows || []) {
+                    const row = document.createElement("tr");
+                    for (const value of cells) {
+                      const cell = document.createElement("td"); cell.textContent = value; row.append(cell);
+                    }
+                    table.append(row);
+                  }
+                  scroll.append(table); body.append(scroll);
+                } else {
+                  if (part.label) {
+                    const heading = document.createElement("strong"); heading.textContent = part.label; body.append(heading);
+                  }
+                  const text = document.createElement("p"); text.textContent = part.text; body.append(text);
+                }
               }
               loaded = true;
             } catch (error) {

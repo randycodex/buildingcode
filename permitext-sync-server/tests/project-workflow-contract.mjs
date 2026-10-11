@@ -37,3 +37,10 @@ const union=uniqueReportItems(overlapBlocks,overlapSources,block=>[
 ]);
 assert.equal(union.filter(item=>item.kind === 'evidence').length,2,'Different editions remain distinct');
 assert.equal(union.filter(item=>item.kind === 'paragraph').length,2,'Comments deduplicate only within their exact edition');
+
+const passageFirst = [overlapBlocks[1], {id:'narrative',kind:'paragraph'}, overlapBlocks[0]];
+const merged = uniqueReportItems(passageFirst,overlapSources,block => block.kind === 'paragraph'
+  ? [{id:block.id,kind:'paragraph',text:'Authored narrative'}]
+  : [{id:block.id,kind:'evidence'},...(block.id === 'passage' ? [{kind:'paragraph',reportCommentKey:'p',text:'Passage-only selected comment'}] : [])]);
+assert.deepEqual(merged.map(item=>item.id || item.text),['narrative','whole','Passage-only selected comment'],
+  'Covered passage comments belong after the full section, even when the passage was earlier and the whole-section copy was excluded');

@@ -155,6 +155,7 @@ try {
   const overlap = await post("/reports/generate", {projectID,draftID:overlapDraft.id,expectedVersion:overlapDraft.version},201);
   assert.equal(overlap.manifest.items.filter(item=>item.kind === "evidence").length,1);
   assert.equal(overlap.manifest.items.filter(item=>item.text === "Only the selected final exception.").length,1);
+  assert.equal(overlap.manifest.items[0].kind,"evidence","Source must precede its merged comments");
   assert.match(overlap.manifest.items.find(item=>item.kind === "evidence").passageText,/Group I-3/);
   const paragraphEvidence = paragraphReport.manifest.items.find(item => item.kind === "evidence");
   assert.match(paragraphEvidence.passageText, /80 feet/);

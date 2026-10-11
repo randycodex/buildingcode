@@ -54,16 +54,45 @@ export function reportEvidenceCoverage(blocks, sources) {
   }).map(block => block.id));
 }
 export function uniqueReportItems(blocks, sources, renderBlock) {
-  const covered = reportEvidenceCoverage(blocks, sources);
   const byKey = new Map(sources.map(source => [`${source.kind}:${source.id}`, source]));
-  const seen = new Set();
-  return blocks.flatMap(block => renderBlock(block).filter(item => {
-    if (item.kind === 'evidence' && covered.has(block.id)) return false;
-    if (!item.reportCommentKey) return true;
-    const source = byKey.get(`evidence:${block.sourceID}`);
-    const key = JSON.stringify([source?.sectionID, source?.sourceLibraryVersion,
-      item.reportCommentKey, item.kind, item.text]);
-    if (seen.has(key)) return false;
-    seen.add(key); return true;
-  }));
+  const sourceFor = block => byKey.get(`evidence:${block.sourceID}`);
+  const sourceIdentity = source => JSON.stringify([source.sectionID, source.sourceLibraryVersion]);
+  const wholeSections = new Map();
+  for (const block of blocks) {
+    const source = sourceFor(block);
+    if (block.kind === 'evidence' && source && !source.selectionBlockID && !wholeSections.has(sourceIdentity(source))) {
+      wholeSections.set(sourceIdentity(source), block);
+    }
+  }
+  const groups = new Map(), owners = new Map();
+  for (const block of blocks) {
+    const source = sourceFor(block);
+    if (block.kind !== 'evidence' || !source) continue;
+    const identity = sourceIdentity(source);
+    const whole = wholeSections.get(identity);
+    const key = JSON.stringify([identity, whole ? '' : source.selectionBlockID]);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(block);
+    owners.set(block.id, whole || groups.get(key)[0]);
+  }
+  // Resolve every block, including covered passages, so unavailable sources
+  // still fail explicitly and each independently selected comment is retained.
+  const rendered = new Map(blocks.map(block => [block.id, renderBlock(block)]));
+  const groupsByOwner = new Map([...groups.values()].map(group => [owners.get(group[0].id).id, group]));
+  return blocks.flatMap(block => {
+    const owner = owners.get(block.id);
+    if (!owner) return rendered.get(block.id);
+    if (owner.id !== block.id) return [];
+    const seen = new Set();
+    const group = groupsByOwner.get(block.id);
+    const comments = group.flatMap(member => rendered.get(member.id).filter(item => {
+      if (!item.reportCommentKey) return false;
+      const key = JSON.stringify([item.reportCommentKey, item.kind, item.text]);
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    }));
+    // Keep comments beside their source even if a selected passage appeared
+    // earlier in the draft than the whole section that now contains it.
+    return [...rendered.get(block.id).filter(item => !item.reportCommentKey), ...comments];
+  });
 }

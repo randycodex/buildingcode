@@ -55,3 +55,41 @@ export function reportEvidenceEdition(item = {}) {
   const year = version.match(/(?:^|\/)(1968|2008|2014|2022|2025)-(?:construction|specialty|building)-codes?\b/i)?.[1];
   return year ? `${year} NYC Codes` : 'Edition not recorded';
 }
+
+// Preview the same source fields that the PDF renders, without trusting HTML.
+export function reportItemPreview(item) {
+  const parts = [];
+  const add = (label, content) => {
+    const value = Array.isArray(content) ? content.filter(Boolean).join('\n\n') : String(content || '');
+    if (value.trim()) parts.push({kind:'text',label,text:value.trim()});
+  };
+  if (item.kind === 'evidence') {
+    let remaining = item.passageText || '';
+    for (const table of item.tables || []) {
+      const position = remaining.indexOf(table.text);
+      if (position < 0) continue;
+      add('',remaining.slice(0,position));
+      parts.push({kind:'table',rows:table.rows});
+      remaining = remaining.slice(position + table.text.length);
+    }
+    add('',remaining);
+  } else if (item.kind === 'researchAnswer') {
+    add('Question',item.question);
+    add('Research basis',[item.authorityLabel || item.authorityStatus,item.codeEdition,item.sourceAsOf,
+      item.codeBasis?.disclosure,item.codeBasis?.limitation]);
+    add('Conclusion',item.conclusion);
+    add('What the selected evidence establishes',(item.supportedPoints || []).map(point=>[point.heading,point.explanation].filter(Boolean).join(': ')));
+    add('Explanation',item.explanation);
+    add('Assumptions',item.assumptions);
+    add('Project facts to verify',item.missingFacts);
+    add('Limits of this answer',item.limitations);
+    add('Additional evidence needed',item.additionalEvidenceNeeded);
+    add('Citations',[...new Set((item.citations || []).map(citation=>reportCitationLabel(citation,item.evidence || [],item.codeEdition)))]);
+    add('Professional-use notice',item.disclaimer);
+  } else if (item.kind === 'projectFacts') {
+    add('Address',item.address); add('Project facts',item.facts);
+  } else {
+    add('',item.plainText || item.text);
+  }
+  return parts;
+}

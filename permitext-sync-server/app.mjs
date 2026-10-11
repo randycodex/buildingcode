@@ -16732,7 +16732,9 @@ async function handleReportSourcePreview(request, response) {
   });
   const source = sources.find(item => item.kind === kind && item.id === sourceID);
   if (!source) return sendError(response, 404, "This Report source is no longer available.");
-  sendJSON(response, 200, { items: source.manifestItems || [source.manifestItem] });
+  const items = source.manifestItems || [source.manifestItem];
+  const { reportItemPreview } = await import("./report-presentation.mjs");
+  sendJSON(response, 200, { items, preview: items.filter(item => !item.reportCommentKey).flatMap(reportItemPreview) });
 }
 
 async function reportConfigurationForProject(userID, projectID) {
