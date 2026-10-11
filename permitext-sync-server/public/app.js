@@ -338,9 +338,9 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis") || (() =
   button.className = "toolbar-button";
   button.id = "toggle-analysis";
   button.type = "button";
-  button.textContent = "Research";
-  button.setAttribute("aria-label", "Research");
-  button.setAttribute("title", "Research");
+  button.textContent = "Assistant";
+  button.setAttribute("aria-label", "Assistant");
+  button.setAttribute("title", "Assistant");
   button.setAttribute("aria-pressed", "false");
   topbarActions?.append(button);
   return button;
@@ -1635,9 +1635,9 @@ function workspaceTransitionPaneLabel(paneID) {
   if (paneID.startsWith("project:context:")) return "Context";
   if (paneID.startsWith("project:facts:")) return "Facts";
   if (paneID === "utility:archive") return "Evidence archive";
-  if (paneID === "utility:analysis") return "Research";
+  if (paneID === "utility:analysis") return "Assistant";
   if (paneID === "utility:settings") return "Account";
-  if (paneID.startsWith("research:conversation:")) return "Research conversation";
+  if (paneID.startsWith("research:conversation:")) return "Assistant conversation";
   if (paneID.startsWith("section:detail:")) return "Code section";
   if (paneID.startsWith("project:notebook:")) return "Notebook";
   if (paneID.startsWith("project:report-draft:")) return "Report";
@@ -23091,7 +23091,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
 }
 
 async function renderResearch(paneID = "utility:analysis") {
-  if (!hasCapability("research")) return renderProLockedPane(paneID, "Research");
+  if (!hasCapability("research")) return renderProLockedPane(paneID, "Assistant");
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
   const draftShowing = researchDraftPaneIDs.has(paneID);
@@ -24873,7 +24873,7 @@ function bindResearchEvidenceDivider(layout, divider, conversationID) {
 }
 
 async function renderResearchConversation(conversationID, options = {}) {
-  if (!hasCapability("research")) return renderProLockedPane(`research:conversation:${conversationID}`, "Research");
+  if (!hasCapability("research")) return renderProLockedPane(`research:conversation:${conversationID}`, "Assistant");
   const ownerInstance = Object.hasOwn(options, "ownerInstance")
     ? options.ownerInstance
     : (state.utilityInstances || []).find((item) => item.key === "analysis" && item.conversationID === conversationID);
@@ -24898,7 +24898,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const headingWrap = document.createElement("div");
   const eyebrow = document.createElement("p");
   eyebrow.className = "eyebrow panel-kind";
-  eyebrow.textContent = "Research";
+  eyebrow.textContent = "Assistant";
   const panelTitle = document.createElement("h2");
   panelTitle.className = "panel-title";
   panelTitle.tabIndex = -1;
@@ -39647,7 +39647,7 @@ function openColumnGroupEditor(panel, existing = null) {
     choices.push({ input, unit });
   }
   if (!choices.some(({ input }) => !input.disabled)) {
-    dialog.querySelector('.column-group-editor-error').textContent = 'Open Reader, Search or Research columns to create a group.';
+    dialog.querySelector('.column-group-editor-error').textContent = 'Open Reader, Search or Assistant columns to create a group.';
   }
   const name = dialog.querySelector('[name="groupName"]');
   name.value = existing?.name || '';
@@ -43707,7 +43707,7 @@ function workspacePaneDescriptors(options = {}) {
   for (const instance of state.utilityInstances || []) {
     const savedFoundationScope = instance.key === "saved" && hasCapability("saved-work") ? foundationScope : null;
     savedFoundationScope?.register(paneIDForUtilityInstance(instance));
-    if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Evidence", analysis: "Research" }[instance.key] || "Column"),
+    if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Evidence", analysis: "Assistant" }[instance.key] || "Column"),
       (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: savedFoundationScope, signal }), () => closeUtilityInstance(instance),
       { foundationScope: savedFoundationScope, deferredFoundationRelease: Boolean(savedFoundationScope), publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
     if (instance.key === "search" || instance.key === "sdc") {
@@ -43719,11 +43719,11 @@ function workspacePaneDescriptors(options = {}) {
         });
     }
   }
-  if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Research", () => renderResearch("utility:analysis"), closeResearchWorkspace,
+  if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Assistant", () => renderResearch("utility:analysis"), closeResearchWorkspace,
     { identity: JSON.stringify(["analysis", state.researchConversationID || "", researchHistoryShowing, researchConversationPaneOpened]) });
   for (const id of supplementalResearchConversationIDs) {
     if ((state.utilityInstances || []).some((item) => item.conversationID === id)) continue;
-    add(paneIDForResearchConversation(id), "Research", () => renderResearchConversation(id, { supplemental: true }), () => closeResearchConversation(id));
+    add(paneIDForResearchConversation(id), "Assistant", () => renderResearchConversation(id, { supplemental: true }), () => closeResearchConversation(id));
   }
   if (state.utilities.settings) add("utility:settings", "Settings", renderSettings, closeAndRender(() => { state.utilities.settings = false; }));
   for (const reader of state.readers) {

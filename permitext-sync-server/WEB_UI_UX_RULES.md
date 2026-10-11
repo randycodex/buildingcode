@@ -24,7 +24,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 
 - Keep the top menu compact, with text actions rather than large pill bubbles.
 - Primary working views are `Research`, `Notebook`, and `Report`.
-- Research tools are `Search`, `Reader`, and `Research`; Notebook tools are `Evidence` and `Notes`.
+- Research tools are `Search`, `Reader`, and `Assistant`; Notebook tools are `Evidence` and `Notes`. Use `Assistant` for the AI conversation column title too.
 - Research history's Project filter and Search's matching options share the Layout menu's surface, padding, corners, shadow, and option styling. Keep keyboard selection, Escape, and outside-click dismissal available.
 - Keep Project selection, `Project details`, `Layout`, and `Account` available across working views, including Project details and Account. Open one working view at a time and keep inactive columns mounted.
 - Center the Permitext brand and plan on the screen in the main navigation across all working views. Keep the navigation and current-view toolbar at 42px, with 12px uppercase button labels: light (300) when inactive and bold (700) when active. Do not add vertical dividers between buttons. The Account footer is also 42px, with its disclaimer centered on one line.
