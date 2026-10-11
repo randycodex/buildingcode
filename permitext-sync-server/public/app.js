@@ -1,5 +1,6 @@
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore } from "./workflow-views.js?v=2";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
+import { createReportLibraryControls } from "./report-library.js?v=20261011-left-library-v1";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
 import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v5";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -29078,7 +29079,8 @@ async function renderProjectReportDraft(project) {
     const library = document.createElement("aside");
     library.className = "report-library";
     library.setAttribute("aria-label", "Report sources and versions");
-    library.append(sourcePicker, historySection);
+    const libraryControls = createReportLibraryControls({ panel, shell, library });
+    library.append(libraryControls.header, sourcePicker, historySection);
     const tools = document.createElement("button");
     tools.type = "button";
     tools.textContent = "Sources & versions";
@@ -29089,7 +29091,7 @@ async function renderProjectReportDraft(project) {
       tools.setAttribute("aria-expanded", String(expanded));
     });
     primaryActions.prepend(tools);
-    shell.append(primaryActions, outline, documentBody, library);
+    shell.append(primaryActions, library, libraryControls.divider, outline, documentBody);
   }
 
   refreshReportSources = async () => {

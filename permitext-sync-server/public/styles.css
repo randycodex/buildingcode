@@ -19065,9 +19065,20 @@ dialog.report-screen {
 .report-screen .report-draft-block { padding: 28px 0; }
 .report-screen .report-draft-blocks-heading { padding-top: 24px; }
 .report-screen .report-draft-add-controls { padding: 16px 0 24px; }
-.report-screen .report-library { display: none; grid-column: 3; grid-row: 2; overflow-y: auto; border-left: 1px solid var(--border); padding: 24px; background: #080808; }
-.report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: 210px minmax(0, 1fr) 330px; }
+.report-screen .report-library { display: none; grid-column: 1; grid-row: 2; min-width: 0; overflow-y: auto; padding: 24px; background: #080808; }
+.report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 850px))) 1px 210px minmax(0, 1fr); }
 .report-screen [data-library-open="true"] .report-library { display: block; }
+.report-screen [data-library-open="true"] .report-outline { grid-column: 3; }
+.report-screen [data-library-open="true"] .report-document { grid-column: 4; }
+.report-library-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+.report-library-header h2 { margin: 0; font-size: 13px; font-weight: 600; }
+.report-library-header button { padding: 4px 0; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font-size: 12px; }
+.report-library-header button:hover { color: var(--text-primary); }
+.report-library-divider { display: none; grid-column: 2; grid-row: 2; position: relative; z-index: 1; background: var(--border); cursor: col-resize; touch-action: none; }
+.report-screen [data-library-open="true"] .report-library-divider { display: block; }
+.report-library-divider::before { content: ''; position: absolute; inset: 0 -5px; }
+.report-library-divider:hover, .report-library-divider:focus-visible { background: var(--text-secondary); outline: none; }
+.report-draft-shell.is-library-resizing { cursor: col-resize; user-select: none; }
 .report-screen .report-source-picker, .report-screen .report-history-section { padding: 0; margin: 0 0 32px; }
 .report-screen .report-source-card { margin: 0; padding: 18px 0; }
 .report-screen .report-source-group { padding: 0; }
@@ -19075,10 +19086,9 @@ dialog.report-screen {
 .report-screen .report-history-entry { padding: 18px 0; }
 .report-screen button:focus-visible { outline: 2px solid var(--focus-ring, #888); outline-offset: 3px; }
 @media (max-width: 1100px) {
-  .report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: minmax(0, 1fr) 300px; }
+  .report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 420px))) 1px minmax(0, 1fr); }
   .report-screen [data-library-open="true"] .report-outline { display: none; }
-  .report-screen [data-library-open="true"] .report-document { grid-column: 1; }
-  .report-screen [data-library-open="true"] .report-library { grid-column: 2; }
+  .report-screen [data-library-open="true"] .report-document { grid-column: 3; }
 }
 @media (max-width: 700px) {
   .report-screen-header { padding: 10px 16px; grid-template-columns: 1fr auto; }
@@ -19090,6 +19100,8 @@ dialog.report-screen {
   .report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: 1fr; }
   .report-screen [data-library-open="true"] .report-document { display: none; }
   .report-screen [data-library-open="true"] .report-library { grid-column: 1; }
+  .report-screen [data-library-open="true"] .report-library-divider,
+  .report-screen .report-library-expand { display: none; }
 }
 /* Typography is sized for reading a document, rather than a compact column. */
 .report-screen .report-draft-shell .report-block-summary,
@@ -19212,7 +19224,7 @@ dialog.report-export-review {
 .account-workspace-view .account-screen-close { --panel-title-control-size: 32px; }
 .topbar :is(#open-project-details, #toggle-settings)[aria-pressed="true"] { color: var(--text-primary); font-weight: 700; background: transparent; }
 
-/* Full-height button separators share the horizontal bar's border token. */
+/* Keep menu controls aligned within each 42px bar. */
 .topbar-actions, .workflow-toolbar > div, .project-details-screen .project-details-tabs { gap: 0; }
 .topbar :is(.topbar-actions, .topbar-end, .topbar-workspaces, .topbar-layout-actions, .topbar-layout-menu),
 .workflow-toolbar > div { height: 100%; }
@@ -19222,11 +19234,11 @@ dialog.report-export-review {
 .project-details-screen .project-details-tabs button,
 .report-workspace-view .report-draft-shell .report-draft-primary-actions > button {
   height: 100%; min-height: 0; box-sizing: border-box; padding: 0 16px;
-  border-inline-end: 1px solid var(--border); border-radius: 0;
+  border-inline-end: 0; border-radius: 0;
 }
 .report-workspace-view .report-draft-shell .report-draft-primary-actions { gap: 0; }
 .account-workspace-view .account-screen-close {
-  height: 100%; width: 42px; border-inline: 1px solid var(--border); border-radius: 0;
+  height: 100%; width: 42px; border-inline: 0; border-radius: 0;
 }
 
 /* Keep the Account disclaimer on the screen centerline within a 42px footer. */
