@@ -65,10 +65,10 @@ const sandbox = vm.createContext({
   refreshColumnGroupPresentation() {}, refreshPinnedPaneDivider() { pinnedDividerRefreshes++; }, updateCollapsedPaneDividers() {}, bindReaderScrollIndicator() {},
   updateReaderScrollIndicator() {}, enhanceSelect() {}, restoreReaderScrollPositions() {}, notifyWorkspaceLayoutChange() {}
 });
-vm.runInContext(`let workspacePaneHydrator=null; const workspacePaneReadyWaiters=new Set(); ${actual("activePinnedPaneID")}\n${actual("finishWorkspacePaneReady")}\n${actual("whenWorkspacePaneReady")}\n${actual("workspacePaneContextIsCurrent")}\n${actual("createWorkspacePaneLoadingShell")}\n${actual("getWorkspacePaneHydrator")}\n${actual("mountWorkspacePanesIndependently")}\n globalThis.mount=(context, options={})=>mountWorkspacePanesIndependently(context,{...options,shellReady:true}); globalThis.whenReady=whenWorkspacePaneReady; globalThis.hydrator=()=>workspacePaneHydrator;`,sandbox);
+vm.runInContext(`let workspacePaneHydrator=null; const workspacePaneReadyWaiters=new Set(); ${actual("activePinnedPaneID")}\n${actual("finishWorkspacePaneReady")}\n${actual("whenWorkspacePaneReady")}\n${actual("workspacePaneContextIsCurrent")}\n${actual("createReportPaneHeader")}\n${actual("createWorkspacePaneLoadingShell")}\n${actual("getWorkspacePaneHydrator")}\n${actual("mountWorkspacePanesIndependently")}\n globalThis.mount=(context, options={})=>mountWorkspacePanesIndependently(context,{...options,shellReady:true}); globalThis.whenReady=whenWorkspacePaneReady; globalThis.hydrator=()=>workspacePaneHydrator;`,sandbox);
 const context = () => ({ key:"account:workspace",workspaceID:"workspace",identity:{},generation });
 const mountAndSettle = async (context, options) => { await sandbox.mount(context, options); await sandbox.hydrator().settled(); };
-const descriptor = (id, load) => ({id,label:id,identity:id,load,close(){}});
+const descriptor = (id, load) => ({id,label:id,identity:id,load,close(){}, ...(id === "report" ? {ownerClass:"report-draft-panel"} : {})});
 
 const editor=pane("notebook"); editor.dataset.workspacePaneIdentity="notebook";
 track.children=[editor]; editor.isConnected=true; editor.parentNode=track;

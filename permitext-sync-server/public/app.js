@@ -27735,6 +27735,29 @@ function reportBlockTitle(block) {
   return block.label || block.title || block.kind;
 }
 
+function createReportPaneHeader(closeReport) {
+  const header = document.createElement("header");
+  header.className = "report-draft-header";
+  const heading = document.createElement("div");
+  heading.className = "report-heading";
+  const title = document.createElement("h2");
+  title.textContent = "Report";
+  title.className = "eyebrow panel-kind";
+  heading.append(title);
+  const close = document.createElement("button");
+  close.className = "icon-button utility-close report-draft-close";
+  close.type = "button";
+  close.title = "Close Report";
+  close.setAttribute("aria-label", "Close Report");
+  close.innerHTML = circleXIconSVG();
+  close.addEventListener("click", () => { void closeReport(); });
+  const actions = document.createElement("div");
+  actions.className = "panel-actions report-draft-header-actions";
+  actions.append(close);
+  header.append(heading, actions);
+  return header;
+}
+
 async function renderProjectReportDraft(project) {
   if (!hasCapability("professional-exports")) return renderProLockedPane(paneIDForProjectReportDraft(project), "Reports");
   const requestIdentity = captureAccountRequest();
@@ -27753,27 +27776,8 @@ async function renderProjectReportDraft(project) {
   panel.style.setProperty("--project-color", identity.color || "#c96410");
   applyPaneWeight(panel, paneID);
 
-  const header = document.createElement("header");
-  header.className = "report-draft-header";
-  const heading = document.createElement("div");
-  heading.className = "report-heading";
-  const headingTitle = document.createElement("h2");
-  headingTitle.textContent = "Report";
-  headingTitle.className = "eyebrow panel-kind";
-  heading.append(headingTitle);
-  const closeButton = document.createElement("button");
-  closeButton.className = "icon-button utility-close report-draft-close";
-  closeButton.type = "button";
-  closeButton.title = "Close Report";
-  closeButton.setAttribute("aria-label", "Close Report");
-  closeButton.innerHTML = circleXIconSVG();
-  closeButton.addEventListener("click", () => {
-    void closeProjectReportDraft(identity);
-  });
-  const actions = document.createElement("div");
-  actions.className = "panel-actions report-draft-header-actions";
-  actions.append(closeButton, createProjectToolDragHandle(identity));
-  header.append(heading, actions);
+  const header = createReportPaneHeader(() => closeProjectReportDraft(identity));
+  header.querySelector(".report-draft-header-actions").append(createProjectToolDragHandle(identity));
 
   const shell = document.createElement("div");
   shell.className = "report-draft-shell";
@@ -42950,19 +42954,22 @@ function createWorkspacePaneLoadingShell(descriptor) {
     root.hidden = true;
     panel.append(root);
   }
-  const header = document.createElement("header");
-  const heading = document.createElement("h2");
-  heading.className = "eyebrow panel-kind";
-  heading.textContent = descriptor.label;
-  const close = document.createElement("button");
-  close.type = "button";
-  close.className = "icon-button utility-close";
-  close.setAttribute("aria-label", `Close ${descriptor.label}`);
-  close.innerHTML = circleXIconSVG();
-  close.addEventListener("click", () => { void descriptor.close(); });
-  header.append(heading, close);
+  const isReport = descriptor.ownerClass === "report-draft-panel";
+  const header = isReport ? createReportPaneHeader(() => descriptor.close()) : document.createElement("header");
+  if (!isReport) {
+    const heading = document.createElement("h2");
+    heading.className = "eyebrow panel-kind";
+    heading.textContent = descriptor.label;
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "icon-button utility-close";
+    close.setAttribute("aria-label", `Close ${descriptor.label}`);
+    close.innerHTML = circleXIconSVG();
+    close.addEventListener("click", () => { void descriptor.close(); });
+    header.append(heading, close);
+  }
   const status = document.createElement("p");
-  status.className = "empty-state workspace-pane-load-status";
+  status.className = `${isReport ? "report-draft-status" : "empty-state"} workspace-pane-load-status`;
   status.setAttribute("role", "status");
   status.textContent = `Loading ${descriptor.label}…`;
   const retry = document.createElement("button");
@@ -42980,7 +42987,14 @@ function createWorkspacePaneLoadingShell(descriptor) {
     status.textContent = `Loading ${descriptor.label}…`;
   });
   panel.setAttribute("aria-busy", "true");
-  panel.append(header, status, retry);
+  if (isReport) {
+    const shell = document.createElement("div");
+    shell.className = "report-draft-shell";
+    shell.append(status, retry);
+    panel.append(header, shell);
+  } else {
+    panel.append(header, status, retry);
+  }
   applyPaneWeight(panel, descriptor.id);
   return panel;
 }
