@@ -39126,6 +39126,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
       applyPaneWeight(pane.pane, pane.id);
       lastAppliedWidths[index] = widths[index];
     });
+    syncReferenceReaderLayout();
     updateAdjacentDividerValue(resizeHandle, widths[previousIndex], widths[nextIndex]);
     const appliedPreviousDelta = widths[previousIndex] - paneData[previousIndex].startWidth;
     const pushedScrollDelta = appliedPreviousDelta - delta;
@@ -39190,6 +39191,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   const startX = event.clientX;
   const startWidth = pane.getBoundingClientRect().width;
   const minWidth = defaultPaneWidthForID(paneID);
+  const isReferenceResize = ["report", "project-details"].includes(currentColumnWorkflowView());
   const edgeAutoResizeThreshold = 32;
   const edgeAutoResizeMaxSpeed = 640;
   let pointerClientX = startX;
@@ -39205,6 +39207,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
     if (Math.abs(nextWidth - lastAppliedWidth) < 0.25) return;
     state.paneWeights[paneID] = nextWidth;
     applyPaneWeight(pane, paneID);
+    syncReferenceReaderLayout();
     resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
     resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
     lastAppliedWidth = nextWidth;
@@ -39220,7 +39223,9 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   const edgeResizeVelocity = () => {
     const trackRect = track.getBoundingClientRect();
     if (edgeSide === "left") {
-      const visibleLeft = Math.max(trackRect.left, 0) + 1;
+      // A reference dock follows the divider; only the screen edge should
+      // trigger continued growth when the pointer stops moving.
+      const visibleLeft = (isReferenceResize ? 0 : Math.max(trackRect.left, 0)) + 1;
       const edgeEnd = visibleLeft + edgeAutoResizeThreshold;
       if (pointerClientX >= edgeEnd) return 0;
       const proximity = Math.min(1, Math.max(0, (edgeEnd - pointerClientX) / edgeAutoResizeThreshold));

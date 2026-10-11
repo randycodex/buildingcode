@@ -52,6 +52,8 @@ try {
     function bindPaneDragging(){}
     function shouldShowFirstUseWelcome(){return false;}
     function notifyWorkspaceLayoutChange(){}
+    function syncReferenceReaderLayout(){}
+    function currentColumnWorkflowView(){return 'research';}
     function appendReaderMenuControls(){}
     function orderWithPaneStepped(){return null;}
     function refreshPaneDividerValue(){}
