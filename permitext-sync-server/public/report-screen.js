@@ -1,8 +1,21 @@
 // Keep workspace columns and the draft mounted across view switches. A native
-// modal makes the background inert without resizing or rebuilding its editors.
-export function createReportScreen({ projectName, load, isCurrent, onClose, onDispose, screenTitle = "Report", screenClass = "", openProjectDetails, backLabel = () => "← Back to workspace" }) {
-  const dialog = document.createElement("dialog");
-  dialog.className = `report-screen ${screenClass}`.trim();
+// modal or embedded view keeps inactive editors inert without rebuilding them.
+export function createReportScreen({ projectName, load, isCurrent, onClose, onDispose, screenTitle = "Report", screenClass = "", mount = null, coveredElements = [], onOpen = () => {}, openProjectDetails, backLabel = () => "← Back to workspace" }) {
+  const dialog = document.createElement(mount ? "section" : "dialog");
+  dialog.className = `report-screen ${mount ? "report-workspace-view" : ""} ${screenClass}`.trim();
+  const coveredState = new Map();
+  if (mount) {
+    dialog.hidden = true;
+    dialog.open = false;
+    dialog.close = () => {
+      if (!dialog.open) return;
+      dialog.open = false;
+      dialog.hidden = true;
+      coveredState.forEach((inert, element) => { element.inert = inert; });
+      coveredState.clear();
+      onClose();
+    };
+  }
   dialog.setAttribute("aria-label", `${screenTitle} workspace`);
   const header = document.createElement("header");
   header.className = "report-screen-header";
@@ -23,8 +36,9 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
   header.append(back, title, project);
   const host = document.createElement("div");
   host.className = "report-screen-host";
-  dialog.append(header, host);
-  document.body.append(dialog);
+  if (!mount) dialog.append(header);
+  dialog.append(host);
+  (mount || document.body).append(dialog);
   let disposed = false;
   let loaded = false;
   let loading = false;
@@ -60,7 +74,7 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
       host.append(retry);
     } finally { loading = false; }
   };
-  dialog.addEventListener("close", onClose);
+  if (!mount) dialog.addEventListener("close", onClose);
   const contextCheck = setInterval(() => { if (!current()) dispose(); }, 200);
   return {
     isCurrent: current,
@@ -68,7 +82,14 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
     open() {
       if (!current()) { dispose(); return; }
       back.textContent = backLabel();
-      if (!dialog.open) dialog.showModal();
+      if (!dialog.open) {
+        if (mount) {
+          coveredElements.forEach(element => { coveredState.set(element, element.inert); element.inert = true; });
+          dialog.hidden = false;
+          dialog.open = true;
+        } else dialog.showModal();
+        onOpen();
+      }
       return hydrate();
     },
     close: () => dialog.close(),

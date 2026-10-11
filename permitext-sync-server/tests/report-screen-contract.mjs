@@ -46,3 +46,24 @@ for (const title of ['Report', 'Project details']) {
   assert.equal(guarded.isOpen(), false, `${title} cannot reopen private content`);
 }
 console.log('Report screen passed: mounted draft and scroll retention, context cleanup, late-load fencing.');
+
+// Embedded Report uses the shared shell without a modal or duplicate header.
+const shell = new Element('main'), columns = new Element('section'), toolbar = new Element('nav');
+columns.inert = false; toolbar.inert = false;
+let embeddedLoads = 0, embeddedCloses = 0;
+const embeddedPanel = new Element('article'); embeddedPanel.draft = 'retained'; embeddedPanel.scrollTop = 450;
+const embedded = context.createReportScreen({projectName:'Project', mount:shell, coveredElements:[columns,toolbar],
+  load:async()=>{embeddedLoads++;return embeddedPanel;},isCurrent:()=>true,onClose:()=>embeddedCloses++,onDispose(){}});
+await embedded.open();
+assert.equal(shell.children[0].tag,'section');
+assert.equal(shell.children[0].children.length,1,'Shared navigation replaces the standalone header');
+assert.equal(columns.inert,true); assert.equal(toolbar.inert,true);
+assert.equal(shell.children[0].hidden,false);
+embedded.close();
+assert.equal(columns.inert,false); assert.equal(toolbar.inert,false);
+assert.equal(shell.children[0].hidden,true);
+await embedded.open();
+assert.equal(embeddedLoads,1); assert.equal(embeddedPanel.scrollTop,450); assert.equal(embeddedPanel.draft,'retained');
+embedded.dispose();
+assert.equal(columns.inert,false); assert.equal(embeddedCloses,2);
+console.log('Embedded Report retains its draft, covers only workspace tools, and restores column interaction on close/disposal.');

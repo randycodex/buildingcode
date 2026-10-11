@@ -70,7 +70,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 
 ## Report
 
-- Report has its own full screen with an outline, editor, and optional source/version panel. Returning preserves the previous view; reopening retains the draft and scroll position.
+- Report is a working view below the shared top menu, with an outline, editor, and optional source/version panel. Research, Notebook, Project selection, Layout, and Account stay accessible. Switching views preserves column positions and drafts; reopening Report retains its editor and scroll position.
 - Use clear section hierarchy and compact text/icon actions, without pills for headings and metadata.
 - Allow review of full passages, tables, notes, and facts before export. Snippets are never the export source.
 - Let users choose which section and passage comments to include.

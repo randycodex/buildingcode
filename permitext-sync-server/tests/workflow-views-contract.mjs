@@ -21,7 +21,7 @@ const reader=pane('reader:one'), notebook=pane('project:notebook:a'); reader.scr
 const panes=[reader,notebook], state={workflowView:'research',workflowMembership:{},workflowScroll:{notebook:70}};
 const track={scrollLeft:110,querySelectorAll:()=>panes};
 let constructions=0, needProject=false;
-const c=vm.createContext({state,track,normalizeWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
+const c=vm.createContext({reportScreen:null,state,track,normalizeWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
   captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},

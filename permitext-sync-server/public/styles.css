@@ -19151,8 +19151,8 @@ dialog.report-export-review {
 .workflow-toolbar .toolbar-button { background: transparent; border: 0; border-radius: 0; padding: 4px 0; color: var(--text-secondary); font-size: 13px; }
 .workflow-toolbar .toolbar-button svg { display: none; }
 .workflow-toolbar .toolbar-button:hover { color: var(--text); }
-.topbar-actions > [data-workflow-view] { background: transparent; border-radius: 0; color: var(--text-secondary); }
-.topbar-actions > [data-workflow-view][aria-pressed="true"] { color: var(--text); font-weight: 700; }
+.topbar-actions > :is([data-workflow-view], #toggle-report) { background: transparent; border-radius: 0; color: var(--text-secondary); }
+.topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text); font-weight: 700; }
 @media (min-width:761px) {
   :root { --header-height: 56px; }
   .topbar { grid-template-columns: max-content minmax(100px, 1fr) max-content; grid-template-rows: 1fr; gap: 12px; padding: 0 24px; }
@@ -19160,7 +19160,15 @@ dialog.report-export-review {
   .topbar-end > * { grid-column: auto; grid-row: auto; }
   .topbar .topbar-actions > .toolbar-button { font-size: 13px !important; padding: 0 10px; }
   .topbar .workspace-actions-button { max-width: 180px; }
-  .topbar-actions > [data-workflow-view] { background: transparent !important; }
+  .topbar-actions > :is([data-workflow-view], #toggle-report) { background: transparent !important; }
 }
 .workflow-toolbar .toolbar-button:hover,
-.topbar-actions > [data-workflow-view][aria-pressed="true"] { color: var(--text-primary); }
+.topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text-primary); }
+
+/* Report shares the workspace navigation; retain column geometry underneath. */
+.report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg, #000); }
+.report-workspace-view[hidden] { display: none; }
+.workspace-shell:has(> .report-workspace-view:not([hidden])) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
+.workspace-shell > .workflow-toolbar { grid-row: 2; grid-column: 1; }
+.workspace-shell > .panel-track { grid-row: 3; grid-column: 1; }
+.workspace-shell:has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 4; }

@@ -1,5 +1,5 @@
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore } from "./workflow-views.js?v=2";
-import { createReportScreen } from "./report-screen.js?v=20261011-report-screen-v4";
+import { createReportScreen } from "./report-screen.js?v=20261011-report-shell-v5";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
 import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v5";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -2727,12 +2727,15 @@ async function openProjectReportDraft(project) {
   const workspaceID = activeWorkspaceID;
   const screen = createReportScreen({
     projectName: identity.name,
+    mount: document.querySelector(".workspace-shell"),
+    coveredElements: [track, document.querySelector(".workflow-toolbar")].filter(Boolean),
+    onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowNavigation(); },
     backLabel: () => `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     openProjectDetails: () => void openProjectDetailsScreen(),
     load: () => renderProjectReportDraft(identity),
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
       hasCapability("professional-exports") && projectDetailMatches(workspaceProject(), identity),
-    onClose: () => syncProjectToolButtonStates(identity),
+    onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncProjectToolButtonStates(identity); syncWorkflowNavigation(); },
     onDispose: () => {
       reportDraftMounts.get(projectID)?.dispose?.();
       reportDraftMounts.delete(projectID);
@@ -4177,7 +4180,7 @@ function workflowPaneIsVisible(paneID) {
   return detachedProjectWindow || paneBelongsToView(paneID, currentWorkflowView(), state.workflowMembership, workflowPaneAnchors());
 }
 function syncWorkflowNavigation() {
-  const view = currentWorkflowView();
+  const view = reportScreen?.isOpen() ? "report" : currentWorkflowView();
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === view));
   });
@@ -4185,6 +4188,7 @@ function syncWorkflowNavigation() {
 }
 async function switchWorkflowView(view) {
   if (notifyProjectRequiredForColumn()) return false;
+  reportScreen?.close();
   view = normalizeWorkflowView(view);
   if (view !== currentWorkflowView()) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
@@ -4729,7 +4733,7 @@ function syncTopbarProjectToolStates() {
       : !identity ? `Choose a Project to open ${label}`
       : !hasCapability(capability) ? `${label} requires Pro`
       : sharedReport ? "Report editing is unavailable for shared-only Projects."
-      : `${opened ? (label === "Notes" ? "Focus" : "Close") : "Open"} ${label} · ${identity.name}`;
+      : `${opened ? (["Notes", "Report"].includes(label) ? "Focus" : "Close") : "Open"} ${label} · ${identity.name}`;
   });
 }
 
@@ -44218,7 +44222,7 @@ function bindImmediateUtilityControls() {
     button.dataset.coldStartBound = "true";
     button.addEventListener("click", () => {
       if (notifyProjectRequiredForColumn()) return;
-      void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : toggleProjectTool(tool));
+      void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : tool === "report" ? openProjectReportDraft(workspaceProject()) : toggleProjectTool(tool));
     });
   });
   if (track.dataset.utilityFocusBound !== "true") {
