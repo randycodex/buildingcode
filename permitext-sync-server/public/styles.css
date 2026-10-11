@@ -16880,7 +16880,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
     min-width: 0;
     flex-basis: auto;
   }
-  .topbar .topbar-actions > .toolbar-button { font-size: 10px !important; }
+  .topbar .topbar-actions > .toolbar-button { font-size: 12px !important; }
 }
 
 @media (min-width: 761px) and (max-width: 1400px) {
@@ -19185,7 +19185,7 @@ dialog.report-export-review {
   .topbar .topbar-brand { display: flex; align-items: baseline; }
   .topbar-end { display: flex; grid-column: 3; grid-row: 1; gap: 0; justify-self: end; min-width: 0; max-width: 100%; }
   .topbar-end > * { grid-column: auto; grid-row: auto; }
-  .topbar .topbar-actions > .toolbar-button { font-size: 13px !important; padding: 0 10px; }
+  .topbar .topbar-actions > .toolbar-button { font-size: 12px !important; padding: 0 10px; }
   .topbar .workspace-actions-button { max-width: 180px; }
   .topbar-actions > :is([data-workflow-view], #toggle-report) { background: transparent !important; }
 }
@@ -19258,7 +19258,17 @@ dialog.report-export-review {
 .workflow-toolbar .toolbar-button > span,
 .project-details-screen .project-details-tabs button,
 .report-workspace-view .report-draft-shell .report-draft-primary-actions > button {
+  font-size: 12px !important;
+  font-weight: var(--top-menu-font-weight, 300) !important;
   text-transform: uppercase;
+}
+
+.topbar :is(.topbar-actions > button, .workspace-actions-button, .topbar-settings-button):is([aria-pressed="true"], [aria-expanded="true"]),
+.topbar .topbar-layout-menu[open] > summary,
+.workflow-toolbar .toolbar-button[aria-pressed="true"],
+.project-details-screen .project-details-tabs button[aria-pressed="true"],
+.report-workspace-view .report-draft-shell .report-draft-primary-actions > button[aria-expanded="true"] {
+  --top-menu-font-weight: 700;
 }
 
 /* Keep the Account disclaimer on the screen centerline within a 42px footer. */
