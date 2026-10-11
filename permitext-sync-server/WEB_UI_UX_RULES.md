@@ -10,25 +10,28 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 
 - Use a fixed top menu with a thin divider below it.
 - Everything below the divider should fill the available height from top to bottom.
-- Reader, search, saved, analysis, and settings panes should use square outer edges.
+- Reader, Search, Evidence, Research, and Notebook columns should use square outer edges.
 - Do not use card-like rounded corners for the main panes.
 - Use vertical dividers between panes.
 - Dividers should be draggable when pane resizing is implemented.
 - On desktop, horizontal scrolling is a consequence of a wide multi-column desk, not the primary navigation model. On narrow screens, use one scroll-snapped full-width pane at a time.
 - Adding a reader should split the workspace proportionally.
 - Each reader should remain independently scrollable.
-- Search, saved, analysis, and settings should open as workspace tools, not permanent default reader panes.
+- Columns are independent tools within the Research or Notebook view. Opening Evidence, Notebook, or Report must not force the others open.
 - Web layout changes must avoid full-screen blink/flicker: do not clear the whole workspace before rebuilding it; preserve existing panes or swap the next pane sequence in one operation.
 
-## Top Menu
+## Top Menu and Working Views
 
-- Keep the top menu compact.
-- Show `permitext` as the brand.
-- Do not show `New York City` in the top menu.
-- Top menu actions should be text/buttons, not large pill bubbles.
-- Keep these actions available and grouped by intent: `Reader`, `Search`, `Saved`, `Research`, and `Settings`.
-- Keep Projects inside the `Saved` workspace entry instead of adding a second top-menu action. The Projects summary appears first in Saved and opens Project details as adjacent workspace columns.
-- Search, saved, and settings should stay visually secondary to reader work.
+- Keep the top menu compact, with text actions rather than large pill bubbles.
+- Primary working views are `Research`, `Notebook`, and `Report`.
+- Research tools are `Search`, `New reader`, and `Conversations`; Notebook tools are `Evidence` and `Notes`.
+- Keep Project selection, `Project details`, `Layout`, and `Account` available across working views.
+- Center the brand in the available gap between the last left navigation action and Project selection as the viewport narrows.
+- Project details contains Context & records and Facts in one dedicated screen. Do not duplicate Context and Facts in the Project menu.
+- Retain mounted editors, drafts, selected sources, column order, and scroll positions when switching views or returning from Report/Project details.
+- Open linked columns beside their origin. Preserve unrelated Readers, including Readers in another working view.
+- Delayed navigation must not focus or scroll a destination after the user switches views or Projects.
+- Without a Project, column actions show a short-lived message below the centered Create Project action; they do not open columns.
 
 ## Readers
 
@@ -56,15 +59,25 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Search should not replace the user's existing reader layout unless explicitly opened as a tool.
 - `Command-K` should expose workspace commands, `Command-F` should target the active Reader search, and `Command-1` through `Command-5` should move among visible panes.
 
-## Saved Work
+## Evidence and Notebook
 
-- Saved sections, projects, tags, and notes should behave consistently with the iOS app.
-- Saved should be available from the top menu.
-- Keep the iOS Saved order: title with sort and PDF export actions, code-book filters, tag filters when tags exist, then code-book and chapter groups.
-- The web Saved column intentionally includes a compact Projects summary before saved-section controls. Project details, Notebook, Report Draft, and Workboards open as adjacent workspace columns.
-- Saved sorting, filtering, PDF export, notes, tags, bookmark status, and open-item behavior should match their iOS counterparts.
-- Present Saved and Projects as coordinated parts of `Your workspace`: Saved is the single top-menu entry and inbox for bookmarks, notes, and tags; its Projects summary organizes job-specific work and Workboards. Keep their data models distinct.
-- Project and saved-section interactions should not require learning a separate web-only workflow unless the web layout makes it clearly better.
+- Evidence is the active Project's saved collection, grouped by code book and chapter, with saved passages and comments.
+- Keep Evidence detail beside its originating column, showing full source text, tables, and editable comments with Reader's design. It must not change an unrelated Reader's place.
+- Add evidence and notes to Report from their own columns. Show the named destination and persistent inclusion status.
+- Notebook supports Conclusion, Supporting evidence, Uncertainty, and Next action. Project details holds the records checklist.
+- Distinguish whole-section and passage comments and retain their exact source identities.
+- Research handoff links to the exact saved answer with its citations and original Project snapshot; it must not silently rewrite or reassign that answer.
+
+## Report
+
+- Report has its own full screen with an outline, editor, and optional source/version panel. Returning preserves the previous view; reopening retains the draft and scroll position.
+- Use clear section hierarchy and compact text/icon actions, without pills for headings and metadata.
+- Allow review of full passages, tables, notes, and facts before export. Snippets are never the export source.
+- Let users choose which section and passage comments to include.
+- Deduplicate overlapping whole sections and saved paragraphs within their exact edition, retaining selected comments and all conditions/exceptions.
+- Save draft and export version are distinct: export creates an immutable snapshot. Preview the actual PDF bytes returned by Download PDF.
+- Render tables as tables, consolidate repeated fact provenance without losing qualifications, and keep comment headings subordinate to code headings.
+- Loading/errors/retry use the Report screen's stable layout and preserve drafts and other columns.
 
 ## Research
 
@@ -84,7 +97,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Main panes should feel like workspace columns, not floating cards.
 - Internal controls can stay lightly rounded only when it helps usability.
 - Match the iOS radius set for shared surfaces: cards use a 14 px radius and compact tiles use a 10 px radius unless a desktop-specific control needs a different value.
-- Notes, comments, and other annotation cards should not use thin border outlines; rely on surface color, spacing, and hierarchy instead.
+- Use surface color, spacing, and hierarchy for annotation cards. The Notebook editor has a very thin neutral edge line, as requested, without changing its background.
 - Use spacing consistently; prefer tight, deliberate spacing over large mobile-style gaps.
 - Search and Saved must remain proportional at the standard 320 px utility-column width: compact header actions, readable rows, and bottom controls that do not crowd the content.
 - Every web confirmation, destructive warning, error alert, and acknowledgement should use the shared Clear-canvas dialog pattern: dimmed backdrop, centered white surface, divided title, concise message, outlined cancel action when applicable, and red confirmation action. Do not use native browser `alert()` or `confirm()` dialogs.

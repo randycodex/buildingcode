@@ -24623,13 +24623,17 @@ function renderResearchNotebookHandoff(conversation, message) {
     const requestIdentity = captureAccountRequest();
     const originPaneID = region.closest(".workspace-panel")?.dataset.paneId;
     const originWorkspaceID = activeWorkspaceID;
+    const originWorkflowGeneration = state.workflowNavigationGeneration || 0;
+    const originIsCurrent = () => isCurrentAccountRequest(requestIdentity) && region.isConnected &&
+      activeWorkspaceID === originWorkspaceID &&
+      originWorkflowGeneration === (state.workflowNavigationGeneration || 0);
     const project = choices.find((item) => researchProjectID(item) === select.value);
     if (!project) return;
     const title = researchAnswerQuestion(conversation, message).slice(0, 300);
     if (!savedCard && !await confirmWebWarning("Keep this Research reference in Notebook?",
       `Project: ${readableProjectName(project)}\n\n${title}\n\nThe new Note links to the exact saved answer and its cited sources. Review the answer before writing your own conclusion.`,
       { confirmLabel: "Create reference Note", container: region })) return;
-    if (!isCurrentAccountRequest(requestIdentity) || !region.isConnected) return;
+    if (!originIsCurrent()) return;
     button.disabled = true;
     select.disabled = true;
     try {
@@ -24646,6 +24650,7 @@ function renderResearchNotebookHandoff(conversation, message) {
         await saveNotebookCardSnapshot(requestIdentity.userID, researchProjectID(project), savedCard);
       }
       requireCurrentAccountRequest(requestIdentity);
+      if (!originIsCurrent()) return;
       pendingNotebookCardByProject.set(researchProjectID(project), savedCard.id);
       if (researchWorkspaceProjectID() !== researchProjectID(project)) {
         reconcileProjectWorkspaces();
@@ -24653,17 +24658,26 @@ function renderResearchNotebookHandoff(conversation, message) {
         if (!target || !await switchWorkspace(target.id, { focus: false })) return;
         requireCurrentAccountRequest(requestIdentity);
       }
+      const destinationWorkspaceID = activeWorkspaceID;
+      const destinationWorkflowGeneration = state.workflowNavigationGeneration || 0;
+      const destinationIsCurrent = () => isCurrentAccountRequest(requestIdentity) &&
+        activeWorkspaceID === destinationWorkspaceID &&
+        destinationWorkflowGeneration === (state.workflowNavigationGeneration || 0);
       if (originWorkspaceID === activeWorkspaceID) requestLinkedPanePlacement(originPaneID, paneIDForProjectNotebook(project));
       if (!await openProjectNotebook(project)) return;
-      if (!await whenWorkspacePaneReady(paneIDForProjectNotebook(project))) return;
+      if (!destinationIsCurrent() || !await whenWorkspacePaneReady(paneIDForProjectNotebook(project)) || !destinationIsCurrent()) return;
       const mount = notebookMounts.get(researchProjectID(project));
       await mount?.refreshCards?.();
+      if (!destinationIsCurrent()) return;
       if (mount?.activeCardID?.() !== savedCard.id) await mount?.focusCard?.(savedCard.id);
       if (mount?.activeCardID?.() === savedCard.id) pendingNotebookCardByProject.delete(researchProjectID(project));
       button.textContent = "Open reference Note";
     } catch (error) {
-      if (isCurrentAccountRequest(requestIdentity)) await showWebNotice("Notebook handoff not completed", error.message);
+      if (originIsCurrent()) await showWebNotice("Notebook handoff not completed", error.message);
     } finally {
+      if (savedCard && !originIsCurrent() && pendingNotebookCardByProject.get(researchProjectID(project)) === savedCard.id) {
+        pendingNotebookCardByProject.delete(researchProjectID(project));
+      }
       if (isCurrentAccountRequest(requestIdentity)) { button.disabled = false; select.disabled = Boolean(savedCard); }
     }
   });
