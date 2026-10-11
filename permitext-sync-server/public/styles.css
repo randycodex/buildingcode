@@ -17806,6 +17806,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 /* Account is a separate screen; each category occupies its own column. */
 .account-dialog.account-screen {
   --account-category-gutter: 24px;
+  --account-category-top-gutter: 32px;
   inset: 0;
   width: 100%;
   height: 100dvh;
@@ -17875,7 +17876,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   height: 100%;
   max-height: clamp(240px, calc(100dvh - 180px), 640px);
   margin: 0;
-  padding: 32px var(--account-category-gutter) 24px;
+  padding: var(--account-category-top-gutter) var(--account-category-gutter) 24px;
   box-sizing: border-box;
   border-inline-end: 1px solid var(--border);
   border-radius: 0;
@@ -17889,14 +17890,18 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-scroll > .settings-card::-webkit-scrollbar-thumb { border-radius: 8px; background: var(--border); }
 .account-screen .settings-section-title {
   justify-self: start;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  padding-bottom: 8px;
-  background: var(--background);
   text-align: left;
 }
-.account-screen .settings-card > .settings-card-heading { position: sticky; top: 0; z-index: 1; background: var(--background); }
+.account-screen .settings-card > :is(.settings-section-title, .settings-card-heading) {
+  position: sticky;
+  top: calc(-1 * var(--account-category-top-gutter));
+  z-index: 1;
+  box-sizing: border-box;
+  width: calc(100% + 2 * var(--account-category-gutter));
+  margin: calc(-1 * var(--account-category-top-gutter)) calc(-1 * var(--account-category-gutter)) 0;
+  padding: var(--account-category-top-gutter) var(--account-category-gutter) 8px;
+  background: var(--background);
+}
 .account-screen :is(.account-identity, .settings-plan-usage, .settings-danger-list, .settings-trash-entry),
 .account-screen .settings-data-card > .settings-danger-button {
   margin-inline: calc(-1 * var(--account-category-gutter));
@@ -17953,18 +17958,18 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 @media (min-width: 1101px) and (max-width: 1999px) {
   .account-screen .settings-scroll > .settings-card:nth-child(n + 4 of .settings-card:not([hidden])) {
     border-top: 1px solid var(--border);
-    padding-block-start: 24px;
+    --account-category-top-gutter: 24px;
   }
 }
 @media (min-width: 701px) and (max-width: 1100px) {
   .account-screen .settings-panel > .settings-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .account-screen .settings-scroll > .settings-card:nth-child(n + 3 of .settings-card:not([hidden])) {
     border-top: 1px solid var(--border);
-    padding-block-start: 24px;
+    --account-category-top-gutter: 24px;
   }
 }
 @media (max-width: 700px) {
-  .account-dialog.account-screen { --account-category-gutter: 20px; }
+  .account-dialog.account-screen { --account-category-gutter: 20px; --account-category-top-gutter: 24px; }
   .account-screen-header { padding: 0 20px; }
   .account-screen .settings-panel > .settings-scroll { grid-template-columns: minmax(0, 1fr); }
   .account-screen .settings-scroll > .settings-card { padding: 24px var(--account-category-gutter); border-inline-end: 0; }
