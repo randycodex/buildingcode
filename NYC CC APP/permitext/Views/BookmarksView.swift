@@ -575,24 +575,6 @@ private var filteredSavedEmptyState: some View {
         .accessibilityElement(children: .combine)
     }
 
-    private func projectTileBackgroundColor(for hex: String) -> Color {
-        let project = PlatformColor(hex: hex) ?? .systemBlue
-        return Color(uiColor: UIColor { traits in
-            var red: CGFloat = 0
-            var green: CGFloat = 0
-            var blue: CGFloat = 0
-            var alpha: CGFloat = 0
-            project.resolvedColor(with: traits).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-            let surface: CGFloat = traits.userInterfaceStyle == .dark ? 0 : 1
-            return UIColor(
-                red: red * 0.42 + surface * 0.58,
-                green: green * 0.42 + surface * 0.58,
-                blue: blue * 0.42 + surface * 0.58,
-                alpha: 1
-            )
-        })
-    }
-
     private func sourceKey(_ bookmark: BookmarkedSection) -> String {
         SavedEvidenceIdentity.source(version: bookmark.codeVersion, codeID: bookmark.codeSectionID, codeName: bookmark.codeSectionName)
     }
@@ -985,6 +967,7 @@ struct ProjectView: View {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
     @State private var sortMode: BookmarkSortMode = .codeOrder
     @State private var removedProjectSections: [BookmarkedSection] = []
@@ -1078,56 +1061,47 @@ struct ProjectView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-                projectHeader
-
-                if isProjectFolder {
-                    projectHub
-
-                    CodeHairline()
-                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-                }
-
-                if !projectBookmarks.isEmpty {
-                    savedEvidenceHeader
-                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-
-                    if visibleProjectBookmarks.isEmpty {
-                        ContentUnavailableView(
-                            "No matching evidence",
-                            systemImage: "bookmark.slash",
-                            description: Text("Change the search to see saved evidence.")
-                        )
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 28)
-                    } else {
-                        LazyVStack(alignment: .leading, spacing: 0) {
-                            ForEach(projectEvidenceGroups) { group in
-                                projectEvidenceGroup(group)
-                            }
+        Group {
+            if isProjectFolder {
+                if dynamicTypeSize.isAccessibilitySize {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            projectHeader
+                            projectSectionCards.frame(height: 600)
                         }
+                        .padding(.horizontal, contentHorizontalInset)
+                        .padding(.top, CodeScreenMetrics.topTitlePadding)
+                        .padding(.bottom, 16)
                     }
+                } else {
+                    VStack(alignment: .leading, spacing: 16) {
+                        projectHeader
+                        projectSectionCards
+                    }
+                    .padding(.horizontal, contentHorizontalInset)
+                    .padding(.top, CodeScreenMetrics.topTitlePadding)
+                    .padding(.bottom, 16)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+            } else {
+                projectEvidenceDestination
             }
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .padding(.horizontal, contentHorizontalInset)
-            .padding(.top, CodeScreenMetrics.topTitlePadding)
-            .padding(.bottom, 40)
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("project-folder-root")
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(
-            text: $evidenceSearchQuery,
-            isPresented: $isEvidenceSearchPresented,
-            prompt: "Search saved evidence"
-        )
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                sortMenu
-                exportButton
+            if isProjectFolder {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Edit project", systemImage: "pencil") {
+                        if let folder { folderEditorTarget = .edit(folder) }
+                    }
+                    .labelStyle(.iconOnly)
+                    .tint(Color.appChrome)
+                    .accessibilityIdentifier("project-edit")
+                }
             }
         }
         .sheet(item: $folderEditorTarget) { target in
@@ -1168,29 +1142,6 @@ struct ProjectView: View {
             }
         }
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
-        .safeAreaInset(edge: .bottom) {
-            if !removedProjectSections.isEmpty {
-                HStack {
-                    Text(undoFailed ? "Could not restore all items. Try Undo again." : "Removed from this project.")
-                        .font(.subheadline)
-                    Spacer()
-                    Button("Undo") {
-                        guard removalSessionID == library.privateSessionID, removalFolderID == folderID else {
-                            removedProjectSections = []
-                            return
-                        }
-                        removedProjectSections = library.restoreProjectSections(removedProjectSections, toFolder: folderID)
-                        undoFailed = !removedProjectSections.isEmpty
-                    }
-                    .frame(minWidth: 44, minHeight: 44)
-                    Button { removedProjectSections = [] } label: { Image(systemName: "xmark") }
-                        .frame(minWidth: 44, minHeight: 44)
-                        .accessibilityLabel("Dismiss Undo")
-                }
-                .padding(.horizontal)
-                .background(.regularMaterial)
-            }
-        }
         .onChange(of: library.privateSessionID) { _, _ in removedProjectSections = [] }
         .onChange(of: folderID) { _, _ in removedProjectSections = [] }
         .refreshable {
@@ -1244,33 +1195,6 @@ struct ProjectView: View {
 
     private var selectedBookmarks: [BookmarkedSection] {
         projectBookmarks.filter { selectedBookmarkRowIDs.contains($0.rowID) }
-    }
-
-    @ViewBuilder
-    private var projectHub: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            CodeEyebrow(text: "Project overview", accent: accentColor)
-
-            projectHubStatus
-
-            if !projectCodeQuestions.isEmpty {
-                projectCodeQuestionSummary
-            }
-
-            DisclosureGroup("More Project details") {
-                VStack(alignment: .leading, spacing: 16) {
-                    if projectCodeQuestions.isEmpty {
-                        projectCodeQuestionSummary
-                    }
-                    Text("Review saved Project work here. Create and manage Code Questions and Reports on Permitext Web.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.top, 8)
-            }
-            .font(.subheadline.weight(.semibold))
-            .tint(.primary)
-        }
     }
 
     @ViewBuilder
@@ -1520,54 +1444,48 @@ struct ProjectView: View {
     private var projectHeader: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
             HStack(alignment: .top, spacing: 10) {
-                Circle()
-                    .fill(accentColor)
-                    .frame(width: 12, height: 12)
+                if !isProjectFolder {
+                    Circle()
+                        .fill(accentColor)
+                        .frame(width: 12, height: 12)
+                }
                 Text(folder?.name ?? (isProjectFolder ? "Project" : "Reference"))
                     .font(.title2.weight(.bold))
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
-                Button {
-                    if let folder {
-                        folderEditorTarget = .edit(folder)
+                if !isProjectFolder {
+                    Button {
+                        if let folder {
+                            folderEditorTarget = .edit(folder)
+                        }
+                    } label: {
+                        Image(systemName: "pencil")
+                            .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                            .foregroundStyle(Color.appChrome)
+                            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                     }
-                } label: {
-                    Image(systemName: "pencil")
-                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                        .foregroundStyle(Color.appChrome)
-                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Edit reference")
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Edit \(isProjectFolder ? "project" : "reference")")
             }
 
-            if isProjectFolder {
-                projectSectionLinks
-            } else if let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),
+            if !isProjectFolder,
+               let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),
                !description.isEmpty {
                 DisclosureGroup("Reference context", isExpanded: $isProjectDescriptionExpanded) {
-                    Text(description)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 6)
+                    Text(description).font(.subheadline).foregroundStyle(.secondary)
                 }
-                .font(.subheadline.weight(.semibold))
                 .tint(.primary)
             }
-
-            projectActionRow
         }
     }
 
-    private var projectSectionLinks: some View {
-        VStack(spacing: 0) {
+    private var projectSectionCards: some View {
+        VStack(spacing: 12) {
             NavigationLink {
                 ProjectContextView(folderID: folderID, accentColor: accentColor)
-            } label: {
-                projectSectionLabel("Project Context", systemImage: "text.alignleft")
-            }
+            } label: { projectSectionCard("Context", systemImage: "text.alignleft") }
             .accessibilityIdentifier("project-section-context")
 
             NavigationLink {
@@ -1584,9 +1502,7 @@ struct ProjectView: View {
                         }
                     }
                 }
-            } label: {
-                projectSectionLabel("Structured Facts", systemImage: "building.2")
-            }
+            } label: { projectSectionCard("Facts", systemImage: "building.2") }
             .accessibilityIdentifier("project-section-structured-facts")
 
             NavigationLink {
@@ -1597,40 +1513,104 @@ struct ProjectView: View {
                         projectHubEmpty("Connect to sync this Project’s Notebook.")
                     }
                 }
-            } label: {
-                projectSectionLabel("Notebook", systemImage: "note.text")
-            }
+            } label: { projectSectionCard("Notes", systemImage: "note.text") }
             .accessibilityIdentifier("project-section-notebook")
+
+            Button {
+                guard let projectID = library.backendProjectID(for: folderID) else { return }
+                library.researchHistoryProjectFilter = projectID
+                library.researchHistoryIsPresented = true
+                library.selectedTab = .research
+            } label: { projectSectionCard("Research", systemImage: "sparkle") }
+            .accessibilityIdentifier("project-section-research")
+
+            NavigationLink { projectEvidenceDestination } label: {
+                projectSectionCard("Evidence", systemImage: "bookmark")
+            }
+            .accessibilityIdentifier("project-section-evidence")
 
             NavigationLink {
                 projectSectionScreen(title: "Reports") {
                     projectHubStatus
                     if projectHubSnapshot != nil || (!isProjectHubLoading && projectHubError == nil) {
                         projectReportSummary
+                        if !projectCodeQuestions.isEmpty { projectCodeQuestionSummary }
                     }
                 }
                 .refreshable { await loadProjectHub() }
-            } label: {
-                projectSectionLabel("Reports", systemImage: "doc.richtext")
-            }
+            } label: { projectSectionCard("Reports", systemImage: "doc.richtext") }
             .accessibilityIdentifier("project-section-reports")
         }
         .buttonStyle(.plain)
         .tint(Color.appChrome)
     }
 
-    private func projectSectionLabel(_ title: String, systemImage: String) -> some View {
-        HStack(spacing: 10) {
-            Label(title, systemImage: systemImage)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
-            Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
+    private func projectSectionCard(_ title: String, systemImage: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.title3.weight(.medium))
+                .frame(width: 24)
+                .accessibilityHidden(true)
+            Text(title)
+                .font(.title3.weight(.semibold))
+                .multilineTextAlignment(.leading)
         }
-        .frame(minHeight: 44)
-        .contentShape(Rectangle())
+        .foregroundStyle(.primary)
+        .padding(16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .background(projectTileBackgroundColor(for: folder?.colorHex ?? CodeFolder.defaultColorHex),
+                    in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var projectEvidenceDestination: some View {
+        projectSectionScreen(title: isProjectFolder ? "Evidence" : folder?.name ?? "Reference") {
+            if !isProjectFolder { projectHeader }
+            savedEvidenceHeader
+            if projectBookmarks.isEmpty {
+                projectHubEmpty("No Saved Evidence yet.")
+            } else if visibleProjectBookmarks.isEmpty {
+                ContentUnavailableView("No matching evidence", systemImage: "bookmark.slash",
+                    description: Text("Change the search to see saved evidence."))
+            } else {
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    ForEach(projectEvidenceGroups) { group in projectEvidenceGroup(group) }
+                }
+            }
+        }
+        .searchable(text: $evidenceSearchQuery, isPresented: $isEvidenceSearchPresented,
+                    prompt: "Search saved evidence")
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) { sortMenu; exportButton }
+        }
+        .safeAreaInset(edge: .bottom) { projectEvidenceUndo }
+        .refreshable { library.refreshBookmarks() }
+    }
+
+    @ViewBuilder
+    private var projectEvidenceUndo: some View {
+        if !removedProjectSections.isEmpty {
+            HStack {
+                Text(undoFailed ? "Could not restore all items. Try Undo again." : "Removed from this project.")
+                    .font(.subheadline)
+                Spacer()
+                Button("Undo") {
+                    guard removalSessionID == library.privateSessionID, removalFolderID == folderID else {
+                        removedProjectSections = []
+                        return
+                    }
+                    removedProjectSections = library.restoreProjectSections(removedProjectSections, toFolder: folderID)
+                    undoFailed = !removedProjectSections.isEmpty
+                }
+                .frame(minWidth: 44, minHeight: 44)
+                Button { removedProjectSections = [] } label: { Image(systemName: "xmark") }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .accessibilityLabel("Dismiss Undo")
+            }
+            .padding(.horizontal)
+            .background(.regularMaterial)
+        }
     }
 
     private func projectSectionScreen<Content: View>(
@@ -1648,43 +1628,6 @@ struct ProjectView: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .tint(Color.appChrome)
-    }
-
-    private var projectActionRow: some View {
-        HStack(spacing: 8) {
-            projectHeaderActionButton(
-                title: isSelecting ? "Done" : "Select",
-                systemImage: isSelecting ? "checkmark.circle.fill" : "checklist",
-                isDisabled: projectBookmarks.isEmpty,
-                action: toggleSelectionMode
-            )
-
-        }
-    }
-
-    private func projectHeaderActionButton(
-        title: String,
-        systemImage: String,
-        isDisabled: Bool = false,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: systemImage)
-                    .font(.caption.weight(.semibold))
-                Text(title)
-                    .font(.caption.weight(.semibold))
-            }
-            .foregroundStyle(isDisabled ? Color.secondary.opacity(0.65) : accentColor)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(accentColor.opacity(isDisabled ? 0.08 : 0.12))
-            )
-        }
-        .buttonStyle(.plain)
-        .disabled(isDisabled)
     }
 
     private var sortMenu: some View {
@@ -2032,3 +1975,21 @@ private enum ProjectFolderEditorTarget: Identifiable {
         .preferredColorScheme(.light)
 }
 #endif
+
+private func projectTileBackgroundColor(for hex: String) -> Color {
+    let project = PlatformColor(hex: hex) ?? .systemBlue
+    return Color(uiColor: UIColor { traits in
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        project.resolvedColor(with: traits).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        let surface: CGFloat = traits.userInterfaceStyle == .dark ? 0 : 1
+        return UIColor(
+            red: red * 0.42 + surface * 0.58,
+            green: green * 0.42 + surface * 0.58,
+            blue: blue * 0.42 + surface * 0.58,
+            alpha: 1
+        )
+    })
+}

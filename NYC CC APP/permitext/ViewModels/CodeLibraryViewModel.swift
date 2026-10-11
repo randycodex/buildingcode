@@ -210,6 +210,8 @@ final class CodeLibraryViewModel: ObservableObject {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             readerSaveDestinationChoice = NativeReaderSaveDestination.load(accountID: signedInAccount?.appUserID, defaults: preferencesDefaults)
             activeProjectID = nil
+            researchHistoryProjectFilter = "all"
+            researchHistoryIsPresented = false
             projectSaveRequest = nil
             reloadActiveCodeSourcePreferences(forceInvalidation: true)
             privateSessionID = UUID()
@@ -316,6 +318,8 @@ final class CodeLibraryViewModel: ObservableObject {
             persistWorkspaceSelection()
         }
     }
+    @Published var researchHistoryProjectFilter = "all"
+    @Published var researchHistoryIsPresented = false
     @Published private(set) var pendingResearchSelections: [ResearchSelectionRequest] = []
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
     private var pendingDeepLinkedCodeVersion: String?

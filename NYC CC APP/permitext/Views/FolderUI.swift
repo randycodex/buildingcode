@@ -469,6 +469,7 @@ struct ProjectContextView: View {
     @State private var editingSessionID: UUID?
     @State private var draft = ""
     @State private var saveError: String?
+    @FocusState private var contextIsFocused: Bool
 
     private var folder: CodeFolder? { library.folder(id: folderID) }
     private var isEditing: Bool { editingFolder != nil }
@@ -476,12 +477,24 @@ struct ProjectContextView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             ZStack(alignment: .topLeading) {
-                ProjectContextTextView(
-                    text: isEditing ? draft : folder?.description ?? "",
-                    isEditing: isEditing,
-                    onBeginEditing: beginEditing,
-                    onTextChange: { draft = $0 }
-                )
+                TextEditor(text: Binding(
+                    get: { isEditing ? draft : folder?.description ?? "" },
+                    set: { value in
+                        guard isEditing || beginEditing() else { return }
+                        draft = value
+                    }
+                ))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .scrollContentBackground(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+                .focused($contextIsFocused)
+                .accessibilityLabel("Project context")
+                .accessibilityHint("Edit Project context")
+                .accessibilityIdentifier(isEditing ? "project-context-editor" : "project-context-text")
+                .onChange(of: contextIsFocused) { _, focused in
+                    if focused && !isEditing && !beginEditing() { contextIsFocused = false }
+                }
                 if !isEditing && (folder?.description.isEmpty ?? true) {
                     Text("Tap to add Project context.")
                         .font(.subheadline)
@@ -549,67 +562,10 @@ struct ProjectContextView: View {
     }
 
     private func finishEditing() {
+        contextIsFocused = false
         editingFolder = nil
         editingSessionID = nil
         draft = ""
         saveError = nil
-    }
-}
-
-/// Keep the same text surface and native tap-to-caret behavior in both modes.
-private struct ProjectContextTextView: UIViewRepresentable {
-    let text: String
-    let isEditing: Bool
-    let onBeginEditing: () -> Bool
-    let onTextChange: (String) -> Void
-
-    func makeUIView(context: Context) -> UITextView {
-        let view = UITextView()
-        view.backgroundColor = .clear
-        view.font = .preferredFont(forTextStyle: .subheadline)
-        view.adjustsFontForContentSizeCategory = true
-        view.textColor = .secondaryLabel
-        view.tintColor = UIColor(Color.appChrome)
-        view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
-        view.textContainer.lineFragmentPadding = 0
-        view.contentInsetAdjustmentBehavior = .never
-        view.keyboardDismissMode = .interactive
-        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-        view.delegate = context.coordinator
-        return view
-    }
-
-    func updateUIView(_ view: UITextView, context: Context) {
-        context.coordinator.parent = self
-        if !isEditing && view.isFirstResponder { view.resignFirstResponder() }
-        // Reassigning text on every SwiftUI update would reset native selection
-        // and scroll position as the keyboard appears or the user types.
-        if view.text != text {
-            let selection = view.selectedRange
-            view.text = text
-            let length = (text as NSString).length
-            let location = min(selection.location, length)
-            view.selectedRange = NSRange(location: location, length: min(selection.length, length - location))
-        }
-        view.accessibilityLabel = "Project context"
-        view.accessibilityHint = "Edit Project context"
-        view.accessibilityIdentifier = isEditing ? "project-context-editor" : "project-context-text"
-    }
-
-    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
-
-    final class Coordinator: NSObject, UITextViewDelegate {
-        var parent: ProjectContextTextView
-
-        init(parent: ProjectContextTextView) { self.parent = parent }
-
-        func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-            parent.isEditing || parent.onBeginEditing()
-        }
-
-        func textViewDidChange(_ textView: UITextView) {
-            parent.onTextChange(textView.text)
-        }
     }
 }

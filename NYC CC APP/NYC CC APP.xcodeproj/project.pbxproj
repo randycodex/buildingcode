@@ -690,7 +690,7 @@
 				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 413;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
 				INFOPLIST_OUTPUT_FORMAT = xml;
@@ -722,7 +722,7 @@
 				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 413;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
 				INFOPLIST_OUTPUT_FORMAT = xml;

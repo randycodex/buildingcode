@@ -37,15 +37,36 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch
         XCTAssertTrue(project.waitForExistence(timeout: 10))
         project.tap()
-        let projectRoot = app.scrollViews["project-folder-root"]
+        let projectRoot = element(in: app, identifier: "project-folder-root")
         XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
         XCTAssertFalse(app.staticTexts["Research History"].exists)
+        let cardIDs = ["context", "structured-facts", "notebook", "research", "evidence", "reports"]
+        let cards = cardIDs.map { app.buttons["project-section-\($0)"] }
+        for card in cards { XCTAssertTrue(card.isHittable) }
+        for card in cards.dropFirst() {
+            XCTAssertEqual(card.frame.width, cards[0].frame.width, accuracy: 2)
+            XCTAssertEqual(card.frame.height, cards[0].frame.height, accuracy: 2)
+        }
+        for index in 1..<cards.count {
+            XCTAssertEqual(cards[index].frame.minX, cards[0].frame.minX, accuracy: 2)
+            XCTAssertGreaterThan(cards[index].frame.minY, cards[index - 1].frame.maxY)
+        }
         keepScreenshot(named: "Project with separate sections", from: app)
+        let dockGap = app.buttons["main-tab-saved"].frame.minY - cards.last!.frame.maxY
+        XCTAssertGreaterThanOrEqual(dockGap, 8)
+        XCTAssertLessThanOrEqual(dockGap, 40)
+        let projectNavigationBar = app.navigationBars.firstMatch
+        let edit = projectNavigationBar.buttons["project-edit"]
+        let back = projectNavigationBar.buttons.element(boundBy: 0)
+        XCTAssertTrue(edit.isHittable)
+        XCTAssertEqual(edit.frame.midY, back.frame.midY, accuracy: 2)
+        XCTAssertGreaterThan(edit.frame.minX, back.frame.maxX)
 
         for (identifier, title) in [
             ("project-section-context", "Project Context"),
             ("project-section-structured-facts", "Structured Facts"),
             ("project-section-notebook", "Notebook"),
+            ("project-section-evidence", "Evidence"),
             ("project-section-reports", "Reports")
         ] {
             let link = element(in: app, identifier: identifier)
@@ -61,13 +82,30 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                 context.tap()
                 let editor = app.textViews["project-context-editor"]
                 XCTAssertTrue(editor.waitForExistence(timeout: 5))
+                editor.tap()
+                XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+                keepScreenshot(named: "Project context keyboard", from: app)
                 editor.typeText(" Updated on iPhone.")
-                app.buttons["project-context-save"].tap()
+                keepScreenshot(named: "Typing Project context", from: app)
+                XCTAssertTrue((editor.value as? String ?? "").contains("Updated on iPhone."),
+                              "Typed context was: \(editor.value ?? "missing")")
+                keepScreenshot(named: "Edited Project context", from: app)
+                let save = app.buttons["project-context-save"]
+                save.tap()
+                // Retry an unregistered toolbar tap only while Save remains.
+                // A failed save still stays in edit mode and fails below.
+                if !context.waitForExistence(timeout: 2), save.exists { save.tap() }
                 XCTAssertTrue(context.waitForExistence(timeout: 5))
-                XCTAssertTrue((context.value as? String ?? "").contains("Updated on iPhone."))
+                keepScreenshot(named: "Saved Project context", from: app)
+                XCTAssertTrue((context.value as? String ?? "").contains("Updated on iPhone."),
+                              "Saved context was: \(context.value ?? "missing")")
                 context.tap()
+                XCTAssertTrue(editor.waitForExistence(timeout: 5))
+                editor.tap()
                 editor.typeText(" Discard this draft.")
+                XCTAssertTrue((editor.value as? String ?? "").contains("Discard this draft."))
                 navigationBar.buttons["Cancel"].tap()
+                XCTAssertTrue(context.waitForExistence(timeout: 5))
                 XCTAssertFalse((context.value as? String ?? "").contains("Discard this draft."))
             }
             keepScreenshot(named: "Separate section: \(title)", from: app)
@@ -79,6 +117,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let context = app.textViews["project-context-text"]
         XCTAssertTrue(context.waitForExistence(timeout: 5))
         XCTAssertTrue((context.value as? String ?? "").contains("Updated on iPhone."))
+        app.navigationBars["Project Context"].buttons.element(boundBy: 0).tap()
+        app.buttons["project-section-research"].tap()
+        let filter = app.buttons["research-history-project-filter"]
+        XCTAssertTrue(filter.waitForExistence(timeout: 10))
+        XCTAssertTrue(filter.label.contains("Acceptance Project"))
+        XCTAssertTrue(app.buttons["New Research"].exists)
+        XCTAssertFalse(app.buttons["Research actions"].exists)
+        keepScreenshot(named: "Research filtered to Project", from: app)
 #endif
     }
 
