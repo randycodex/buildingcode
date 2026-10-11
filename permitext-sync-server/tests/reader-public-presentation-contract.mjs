@@ -33,6 +33,7 @@ const reader={id:"reader",codePrefix:"BC",codeVersion:"2022",chapterID:"chapter"
 const section={id:"section",sectionNumber:"1",title:"Public heading",readerAliasSectionIDs:[],blocks:[{id:"paragraph",plainText:"Complete public enacted text"}]};
 const target={sectionID:"section",codeVersion:"2022",blockID:"paragraph"};
 const context=vm.createContext({
+  hasCapability:()=>true,
   document:{createElement:tag=>new Node(tag)}, window:{setTimeout:fn=>fn()},
   syncCodeVersion:value=>value, syncCodeVersionForPrefix:()=>"2022", markResearchSelectable(){},
   sectionDisplayTitle:(_number,title)=>title, annotatedBlocksForSection:value=>value.blocks,
@@ -55,6 +56,7 @@ const rendered=context.renderReaderChapterSection(panel,reader,section,new Map()
 const body=rendered.querySelector(".annotated-code-block").children[0];
 const bookmark=rendered.querySelector(".reader-section-saved-marker");
 const inline=rendered.querySelector(".inline-comment");const research=inline.querySelector(".inline-research-toggle");
+assert.equal(inline.querySelector(".workflow-action").hidden,true);
 assert.equal(reads,0,"Pending Reader construction must not read saved records or private Research labels.");
 assert.equal(body.textContent,"Complete public enacted text");assert.equal(bookmark.hidden,true);assert.equal(research.hidden,true);
 assert.equal(bookmark.parentNode,rendered.querySelector(".reader-section-heading-row"),"Whole-section extraction retains a real stable bookmark node.");
@@ -65,7 +67,7 @@ await bookmark.click();await research.click();assert.equal(writes,0);
 permitted=true;listeners.forEach(fn=>fn());
 assert.equal(rendered.querySelector(".annotated-code-block").children[0],body,"Upgrade retains the exact enacted-text node.");
 assert.equal(rendered.querySelector(".reader-section-saved-marker"),bookmark,"Upgrade retains the extracted bookmark node.");
-assert.equal(bookmark.hidden,false);assert.equal(bookmark.disabled,false);assert.equal(bookmark.attrs["aria-label"],"Remove section from Saved");
+assert.equal(bookmark.hidden,false);assert.equal(bookmark.disabled,false);assert.equal(bookmark.attrs["aria-label"],"Remove section from Evidence");
 assert.equal(research.hidden,false);assert.match(research.title,/open conversation/);assert.equal(host.hidden,false);
 assert.equal(body.textContent,"Complete public enacted text");
 currentLabel="";await research.click();assert.ok(researchOptions.passage,"Research invocation opens the destination picker with the selected passage.");

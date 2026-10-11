@@ -9,7 +9,7 @@ for(const mode of ['current','new','cancel','changed']) {
  const calls=[]; let complete;
  const pending=new Promise(resolve=>complete=resolve);
  const mount={insertionTarget:()=>({id:'note',title:'Existing writing'}),insertLinkedReference:async(...args)=>calls.push(['insert',...args]),refreshCards:async()=>{},focusCard:async id=>calls.push(['focus',id])};
- const context=vm.createContext({workspaceProject:()=>({id:'p'}),captureAccountRequest:()=>({userID:'u'}),
+ const context=vm.createContext({window:{requestAnimationFrame:()=>{}},workspaceProject:()=>({id:'p'}),captureAccountRequest:()=>({userID:'u'}),
  isCurrentAccountRequest:()=>true,requireCurrentAccountRequest(){},activeWorkspaceID:'w',state:{workflowNavigationGeneration:0},
  researchProjectID:p=>p.id,notebookMounts:new Map([['p',mount]]),openWebWarning:()=>pending,
  crypto:{randomUUID:()=> 'link'},Date,researchCodeEdition:()=> '2014',navigator:{onLine:true},
@@ -50,7 +50,7 @@ for(const changed of [false,true]){
  const nodes=[],insertions=[];let choose;
  const destination=new Promise(resolve=>choose=resolve);
  const element=tag=>{const e={tag,children:[],isConnected:true,value:'',append(...children){this.children.push(...children);if(tag==='select')this.value=children[0].value;},setAttribute(){},addEventListener(type,fn){this[type]=fn;},closest:()=>({dataset:{paneId:'assistant'}})};nodes.push(e);return e;};
- const c=vm.createContext({document:{createElement:element},hasCapability:()=>true,researchProjects:()=>[{id:'p'}],
+ const c=vm.createContext({window:{requestAnimationFrame:()=>{}},document:{createElement:element},hasCapability:()=>true,researchProjects:()=>[{id:'p'}],
  researchProjectID:p=>p.id,readableProjectName:()=> 'Project',crypto:{randomUUID:()=> 'mutation'},
  captureAccountRequest:()=>({userID:'u'}),isCurrentAccountRequest:()=>true,state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',researchAnswerQuestion:()=> 'Question',
  notebookMounts:new Map([['p',{insertionTarget:()=>({id:'existing',title:'My writing'}),insertLinkedReference:async(...args)=>insertions.push(args)}]]),

@@ -25,14 +25,15 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 
 - Keep the top menu compact, with text actions rather than large pill bubbles.
 - Primary working views are `Research`, `Notebook`, and `Report`.
-- Keep toolbar actions in workflow order: Research uses `Reader`, `Search`, `Assistant`; Notebook uses `Reader`, `Notes`, `Evidence`; Report uses `Reader`, `Sources and version`, `Save draft`, `Export PDF version`. Use `Assistant` for the AI conversation column title too.
+- Keep toolbar actions in workflow order: Research uses `Reader`, `Search`, `Assistant`; Notebook uses `Reader`, `Notes`, `Evidence`; Report uses `Reader`, `Sources & versions`, autosave status, `Export PDF version`. Use `Assistant` for the AI conversation column title too.
 - Reader is available in Research, Notebook, Report, and Project details. Open new Readers beside the current work without switching views. Each view retains its own Reader columns, source selections, widths, and scroll positions. Report and Project details use reference columns to the right and regain their full width when those columns close.
 - Research history's Project filter and Search's matching options share the Layout menu's surface, padding, corners, shadow, and option styling. Keep keyboard selection, Escape, and outside-click dismissal available.
 - Keep Project selection, `Project details`, `Layout`, and `Account` available across working views, including Project details and Account. Open one working view at a time and keep inactive columns mounted.
 - Center the Permitext brand and plan on the screen in the main navigation across all working views. Keep the navigation and current-view toolbar at 42px, with 12px uppercase button labels: light (300) when inactive and bold (700) when active. Do not add vertical dividers between buttons. The Account footer is also 42px, with its disclaimer centered on one line.
+- Assistant has a fixed 400px conversation-history rail immediately to its left and a conversation body at least 600px wide. Keep its title and actions aligned with Search.
 - Report's Sources & versions panel opens on the left. Let users expand or resize its width while keeping the document visible and retaining the chosen width when switching views.
 - Resize reference Readers and the adjoining Report or Project details layout together on every drag frame, so the divider follows the pointer before release.
-- Project details contains Context & records and Facts below the shared top menu, with the same 42px toolbar as Research, Notebook, Report, and Account. Do not duplicate Context and Facts in the Project menu.
+- Project details contains Overview, Facts, and Records below the shared top menu, with the same 42px toolbar as Research, Notebook, Report, and Account. Do not duplicate Context and Facts in the Project menu.
 - Retain mounted editors, drafts, selected sources, column order, and scroll positions when switching views or returning from Report/Project details.
 - Open linked columns beside their origin. Preserve unrelated Readers, including Readers in another working view.
 - Delayed navigation must not focus or scroll a destination after the user switches views or Projects.
@@ -71,17 +72,20 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Add evidence and notes to Report from their own columns. Show the named destination and persistent inclusion status.
 - Notebook supports Conclusion, Supporting evidence, Uncertainty, and Next action. Project details holds the records checklist.
 - Distinguish whole-section and passage comments and retain their exact source identities.
-- Research handoff links to the exact saved answer with its citations and original Project snapshot; it must not silently rewrite or reassign that answer.
+- Assistant handoff links to the exact saved answer with its citations and original Project snapshot; it must not silently rewrite or reassign that answer.
+- Reader, Evidence detail, and Assistant offer Add to note with the current Note or a new Note as the destination. Insert through the live editor, preserve existing writing, and reject stale destinations. Passage links retain their exact text and edition.
+- Notes has one Insert menu for Evidence, Assistant answers, Images, and the Finding template.
+- Evidence has one named Report destination; each item has one Add to Report/In Report action. Keep secondary actions compact and Remove in overflow. Bulk actions support Report, Assistant, and removal.
 
 ## Report
 
 - Keep the Report document and Reader columns at least 600px wide. Sources & versions reserves its selected width; hide the optional outline before squeezing the document. Overflow belongs to whole workspace columns, never individual tables. Keep the Report text centered at a maximum 850px reading width.
 - Report is a working view below the shared top menu, with an outline, editor, and optional source/version panel. Research, Notebook, Project selection, Layout, and Account stay accessible. Switching views preserves column positions and drafts; reopening Report retains its editor and scroll position.
-- Use clear section hierarchy and compact text/icon actions, without pills for headings and metadata.
+- Use clear section hierarchy and compact text/icon actions, without pills for headings and metadata. Use Sources and Versions tabs, an optional Outline, and one Add content menu.
 - Allow review of full passages, tables, notes, and facts before export. Snippets are never the export source.
 - Let users choose which section and passage comments to include.
 - Deduplicate overlapping whole sections and saved paragraphs within their exact edition, retaining selected comments and all conditions/exceptions.
-- Save draft and export version are distinct: export creates an immutable snapshot. Preview the actual PDF bytes returned by Download PDF.
+- Drafts autosave with an explicit saving/saved/error state, Retry after failure, and account/project-isolated device recovery. Export creates an immutable snapshot. Preview the actual PDF bytes inline under the shared navigation, preserving the editor and its scroll position.
 - Render tables as tables, consolidate repeated fact provenance without losing qualifications, and keep comment headings subordinate to code headings.
 - Loading/errors/retry use the Report screen's stable layout and preserve drafts and other columns.
 
@@ -126,3 +130,9 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Canonical inline section references remain text-identical while becoming keyboard- and pointer-accessible.
 - Research and private notes carry visible authority labels.
 - Opening, closing, adding, removing, reordering, or resizing panes should not flash the workspace empty.
+
+## Project and Account organization
+
+- Project menus switch Projects and offer New Project and Manage Projects. Keep rename, archive, restore, and delete in Manage Projects.
+- Project details separates Overview, Facts, and Records. Group canonical facts under Property, Building, Work & code basis, Zoning, and Special designations; do not create duplicate fields.
+- Account separates Plan, Profile, Library, Offline, and Data recovery. Keep source selection within Library and recovery actions within Data recovery.

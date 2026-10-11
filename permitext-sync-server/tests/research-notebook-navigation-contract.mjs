@@ -20,7 +20,7 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
       nodes.push(e);return e;
     };
     let activeCard = '';
-    const c = vm.createContext({
+    const c = vm.createContext({window:{requestAnimationFrame:()=>{}},
       state:{workflowNavigationGeneration:0},activeWorkspaceID:'w',
       document:{createElement:element},hasCapability:()=>true,researchProjects:()=>[project],
       researchProjectID:p=>p.id,readableProjectName:p=>p.name,crypto:{randomUUID:()=> 'test-id'},

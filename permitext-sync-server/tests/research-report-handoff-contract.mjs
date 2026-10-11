@@ -10,7 +10,7 @@ for(const mode of ['success','missing','switched','cancel']) {
  const element=tag=>{const e={tag,children:[],isConnected:true,value:'',append(...children){this.children.push(...children);if(tag==='select')this.value=children[0].value;},setAttribute(){},addEventListener(type,fn){this[type]=fn;}};nodes.push(e);return e;};
  let finish;
  const gate=new Promise(resolve=>finish=resolve);
- const c=vm.createContext({document:{createElement:element},hasCapability:()=>true,researchProjects:()=>[project],
+ const c=vm.createContext({window:{requestAnimationFrame:()=>{}},document:{createElement:element},hasCapability:()=>true,researchProjects:()=>[project],
   researchProjectID:p=>p.id,readableProjectName:p=>p.name,crypto:{randomUUID:()=> 'mutation'},
   captureAccountRequest:()=> 'account',isCurrentAccountRequest:()=>true,activeWorkspaceID:'w',
   showWebNotice:async(...args)=>notices.push(args),

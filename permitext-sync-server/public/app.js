@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-note-handoff-v857";
+} from "./offline-storage.js?v=20261011-workflow-review-v858";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -24934,6 +24934,15 @@ function renderResearchNotebookHandoff(conversation, message) {
     reportButton.className = "workflow-action workflow-action-secondary";
     reportButton.textContent = "Add to Report";
     reportButton.disabled = !choices.length;
+    const refreshMembership = () => {
+      reportButton.setAttribute("data-report-membership-mode", "action");
+      reportButton.setAttribute("data-report-membership-project", select.value);
+      reportButton.setAttribute("data-report-source-kind", "researchAnswer");
+      reportButton.setAttribute("data-report-source-id", message.id);
+      window.requestAnimationFrame(() => { if (reportButton.isConnected) void refreshProjectReportMembership(select.value); });
+    };
+    select.addEventListener("change", refreshMembership);
+    refreshMembership();
     reportButton.addEventListener("click", async () => {
       const project = choices.find(item => researchProjectID(item) === select.value);
       if (!project) return;
@@ -28277,7 +28286,8 @@ async function refreshProjectReportMembership(projectID, force = false) {
       host.setAttribute("aria-label", included.length ? `Included in ${host.title}` : host.textContent);
       if (host.dataset.reportMembershipMode === "action") {
         host.textContent = included.length ? "In Report" : "Add to Report";
-        host.setAttribute("aria-label", included.length ? `In Report: ${host.title}. Choose a Report to add this evidence.` : "Add evidence to Report");
+        const sourceLabel = host.dataset.reportSourceKind === "researchAnswer" ? "Assistant answer" : "evidence";
+        host.setAttribute("aria-label", included.length ? `In Report: ${host.title}. Choose a Report to add this ${sourceLabel}.` : `Add ${sourceLabel} to Report`);
       }
     });
   };
@@ -29556,6 +29566,22 @@ async function renderProjectReportDraft(project) {
       syncReferenceReaderLayout();
     });
     primaryActions.insertBefore(tools, saveStatus);
+    const outlineToggle = document.createElement("button");
+    outlineToggle.type = "button";
+    outlineToggle.className = "workflow-action workflow-action-secondary";
+    outlineToggle.textContent = "Outline";
+    const paintOutlineToggle = () => {
+      const shown = panel.dataset.outlineHidden !== "true";
+      outlineToggle.setAttribute("aria-pressed", String(shown));
+      outlineToggle.title = shown ? "Hide Report outline" : "Show Report outline when space allows";
+    };
+    outlineToggle.addEventListener("click", () => {
+      panel.dataset.outlineHidden = String(panel.dataset.outlineHidden !== "true");
+      paintOutlineToggle();
+      syncReferenceReaderLayout();
+    });
+    paintOutlineToggle();
+    primaryActions.insertBefore(outlineToggle, saveStatus);
     shell.append(primaryActions, library, libraryControls.divider, outline, documentBody);
     paintReportSaveState();
     if (panel.isConnected) syncReferenceReaderLayout();

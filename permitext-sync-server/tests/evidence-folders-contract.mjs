@@ -193,7 +193,7 @@ assert.deepEqual(
 const readerChapterSectionSource = functionSource(appSource, "renderReaderChapterSection");
 assert.match(
   readerChapterSectionSource,
-  /savedSectionRecord\(\{[\s\S]*?sectionID: target\.sectionID,[\s\S]*?codeVersion: target\.codeVersion,[\s\S]*?blockID: target\.blockID[\s\S]*?\}\)/,
+  /readerPrivateContentAllowed\(panel\) && isSectionSaved\(\{[\s\S]*?sectionID: target\.sectionID,[\s\S]*?codeVersion: target\.codeVersion,[\s\S]*?blockID: target\.blockID[\s\S]*?\}\)/,
   "Each Reader block must resolve its bookmark state using its own block identity."
 );
 assert.doesNotMatch(
@@ -238,8 +238,8 @@ assert.match(sectionDetailSource, /heading\.addEventListener\("click"[\s\S]*?ope
   "Source Detail must provide an explicit path to its exact enacted source in Reader.");
 assert.match(
   sectionDetailSource,
-  /textarea\.placeholder = "Add a note"/,
-  "The Source Detail opened from Saved must expose the note editor."
+  /textarea\.placeholder = sectionTarget\.blockID \? "Add a comment on the highlighted passage" : "Add a comment on this section"/,
+  "Evidence detail must distinguish passage comments from section comments."
 );
 const setAnnotationNoteValueSource = functionSource(appSource, "setAnnotationNoteValue");
 assert.match(
@@ -309,7 +309,7 @@ assert.deepEqual(
   "Legacy Structured Facts did not migrate without data loss."
 );
 
-assert.match(appSource, /function persistSectionFolderSelection\([\s\S]*?if \(!selectedByID\.size\) return/);
+assert.match(appSource, /function persistSectionFolderSelection\([\s\S]*?if \(!selectedByID\.size \|\| !selectedFolders\.some\(folderIsProject\)\) return/);
 assert.match(appSource, /destinationList\.setAttribute\("aria-multiselectable", "true"\)/);
 assert.match(appSource, /confirmButton\.disabled = selected\.length === 0/);
 assert.match(appSource, /await persistSectionFolderSelection\(sectionPayload, selectedFolders, projects\)/);
@@ -367,7 +367,9 @@ assert.match(appSource, /instance\.collapsedEvidenceFolderIDs = Array\.from\(new
     `${name} must keep Projects, Research, and Settings mounted.`
   );
   assert.match(source, /syncProjectToolButtonStates/);
-  assert.match(source, /transitionWorkspace\("utility"/);
+  if (name === "openProjectReportDraft") assert.match(source, /createReportScreen/);
+  else if (name === "closeProjectReportDraft") assert.match(source, /reportScreen\.close\(\)/);
+  else assert.match(source, /transitionWorkspace\("utility"/);
 });
 const deactivateProjectStudioSource = functionSource(appSource, "deactivateProjectStudio");
 assert.ok(
@@ -383,7 +385,7 @@ assert.match(activateProjectStudioSource, /replaceCurrentProjectOwner[\s\S]*?rea
 assert.match(activateProjectStudioSource, /remapProjectPane\(paneIDForProjectNotebook\(current\), paneIDForProjectNotebook\(identity\)\)[\s\S]*?remapProjectPane\(paneIDForProjectReportDraft\(current\), paneIDForProjectReportDraft\(identity\)\)/);
 assert.match(activateProjectStudioSource, /!projectDetailMatches\(identity, detail\) && \(!current \|\| !projectDetailMatches\(current, detail\)\)/);
 assert.match(functionSource(appSource, "openProjectNotebook"), /openNotebooks\(\)\.filter/);
-assert.match(functionSource(appSource, "openProjectReportDraft"), /openReportDrafts\(\)\.filter/);
+assert.match(functionSource(appSource, "openProjectReportDraft"), /reportScreen\?\.projectID === projectID/);
 assert.ok(
   deactivateProjectStudioSource.indexOf("confirmReportDraftDiscard") <
     deactivateProjectStudioSource.indexOf("closeProjectDetailForProject"),
@@ -477,7 +479,7 @@ foregroundAccountCurrent = false;
 continueForegroundImages();
 await assert.rejects(interruptedForegroundSync, /ACCOUNT_CONTEXT_CHANGED/);
 assert.equal(continuedDraftSyncs, 0, "The prior account's sync must stop before touching the next account's drafts.");
-assert.match(functionSource(appSource, "closeAllColumns"), /state\.coordinations = \[\][\s\S]*?state\.coordinationThreads = \[\][\s\S]*?state\.projectHostPaneID = ""/);
+assert.match(functionSource(appSource, "closeAllColumns"), /filter\(item => workflowPaneIsVisible\(item\.id\)\)[\s\S]*?await descriptor\.close\(\)/);
 assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
 const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanesToLeft");
@@ -523,8 +525,8 @@ assert.match(toggleUtilityPaneSource, /key === "archive"[\s\S]*?placeArchiveAfte
 assert.match(toggleUtilityPaneSource, /else \{[\s\S]*?appendPaneIfMissing\(paneID\)/);
 assert.match(toggleUtilityPaneSource, /if \(willOpen\) \{[\s\S]*?scrollPaneIntoView\(paneID\)/);
 const openResearchConversationSource = functionSource(appSource, "openResearchConversation");
-assert.match(openResearchConversationSource, /researchSurfaceWasOpen/);
-assert.match(openResearchConversationSource, /options\.anchorPaneID && !researchSurfaceWasOpen/);
+assert.match(openResearchConversationSource, /workflowIsCurrent/);
+assert.match(openResearchConversationSource, /if \(options\.anchorPaneID\)[\s\S]*?placePaneAfter\(options\.anchorPaneID, "utility:analysis"\)/);
 assert.match(openResearchConversationSource, /placePaneAfter\(options\.anchorPaneID, "utility:analysis"\)/);
 assert.match(functionSource(appSource, "readerSectionResearchSelection"), /originPaneID: panel\?\.dataset\.paneId/);
 [
@@ -545,9 +547,9 @@ assert.match(functionSource(appSource, "readerSectionResearchSelection"), /origi
 assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
 const projectToolControlOrderSource = functionSource(appSource, "placeProjectToolPaneInControlOrder");
 assert.match(projectToolControlOrderSource, /paneIDForProjectNotebook\(detail\)[\s\S]*?paneIDForProjectReportDraft\(detail\)/, "Project tool placement must follow the Notebook then Report button order.");
-assert.match(projectToolControlOrderSource, /ordered\.splice\([\s\S]*?projectAnchorIndex \+ 1[\s\S]*?\.\.\.controlPaneIDs/, "Notebook and Report must open immediately after their Saved project host.");
+assert.match(projectToolControlOrderSource, /if \(ordered\.includes\(paneID\)\) return;[\s\S]*?ordered\.splice\(insertIndex, 0, paneID\)/, "Opening a tool must preserve existing sibling positions.");
 assert.match(functionSource(appSource, "openProjectNotebook"), /if \(!wasOpen\) placeProjectToolPaneInControlOrder\(identity\)/);
-assert.match(functionSource(appSource, "openProjectReportDraft"), /if \(!wasOpen\) placeProjectToolPaneInControlOrder\(identity\)/);
+assert.match(functionSource(appSource, "openProjectReportDraft"), /coveredElements: \[track/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
 assert.match(savedFolderContextSource, /if \(!folder\)[\s\S]*?inlineFilters\.hidden = !savedInstance\.organizeUnassigned;[\s\S]*?savedContent\.hidden = !savedInstance\.organizeUnassigned;/);
@@ -563,7 +565,7 @@ assert.match(functionSource(appSource, "renderSavedProjects"), /selectButton\.on
 const savedProjectsSource = functionSource(appSource, "renderSavedProjects");
 assert.doesNotMatch(savedProjectsSource, /folderTransition/);
 assert.match(savedProjectsSource, /void requestProjectSelection\(paneID, instance\.id, \{[\s\S]*?kind: nextFolderID \? "project" : "none"/);
-assert.match(savedProjectsSource, /const organizeUnassigned = !instance\.organizeUnassigned;[\s\S]*?void requestProjectSelection\(paneID, instance\.id, \{[\s\S]*?kind: organizeUnassigned \? "unassigned" : "none"/);
+assert.match(savedProjectsSource, /workspaceProject\(workspaceProjects\)[\s\S]*?saved-projects-section[\s\S]*?hidden = true/, "Project workspaces use the main Project switcher rather than a duplicate in Evidence.");
 assert.match(savedProjectsSource, /archiveSelectedButton\.onclick[\s\S]*?archiveProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
 assert.match(savedProjectsSource, /selectionActions\.append\(cancelSelectionButton, archiveSelectedButton, deleteSelectedButton\)[\s\S]*?headingActions\.append\(selectionActions\)/);
 assert.doesNotMatch(savedProjectsSource, /saved-projects-bulk-bar|section\.insertBefore\(bulkBar, list\)/);
@@ -747,7 +749,7 @@ assert.match(projectFactEditorSource, /description\.setAttribute\("aria-label", 
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "projectFacts", false\)/);
 assert.match(projectFactEditorSource, /structuredToggle\.textContent = "Structured facts"/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "structuredFacts", false\)/);
-assert.match(projectFactEditorSource, /projectStructuredFactGroups\.forEach/);
+assert.match(projectFactEditorSource, /presentationGroups\.forEach/);
 assert.doesNotMatch(projectFactEditorSource, /saved-project-structured-suggestion-menu|structuredSuggestionMenus/);
 assert.doesNotMatch(projectFactEditorSource, /setAttribute\("role", "combobox"\)|aria-autocomplete|aria-haspopup/);
 assert.doesNotMatch(projectFactEditorSource, /suggestions/);
@@ -780,7 +782,7 @@ assert.match(stylesSource, /\.saved-project-tile\.is-selected \{[\s\S]*?box-shad
 assert.match(stylesSource, /\.saved-project-tile\.is-selected \.saved-project-count \{[\s\S]*?color: #ffffff;/);
 assert.match(stylesSource, /\.saved-projects-section\.is-selecting \.saved-project-tile\[data-bulk-selectable="true"\] \{[\s\S]*?opacity: 0\.58;/);
 assert.match(stylesSource, /\.saved-project-tile\.is-bulk-selected \{[\s\S]*?opacity: 1 !important;[\s\S]*?box-shadow: none;/);
-assert.match(indexSource, /id="workspace-actions"[^>]*aria-label="Choose Project or Unassigned saves"/);
+assert.match(indexSource, /id="workspace-actions"[^>]*aria-label="Choose Project"/);
 assert.doesNotMatch(indexSource, /id="add-workspace"/);
 assert.match(stylesSource, /\.workspace-add-button,[\s\S]*?\.workspace-actions-button \{[\s\S]*?display: inline-flex;[\s\S]*?padding: 0 11px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-coordination-button \{[^}]*height: 40px;[^}]*min-height: 40px;/);
@@ -794,9 +796,9 @@ assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-f
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-section-motion >[^}]*\.project-section-toggle-chevron \{[^}]*width: 40px;[^}]*height: 40px;[^}]*flex-basis: 40px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project > \.project-studio-section > \.project-studio-section-heading \{[^}]*min-height: 30px;/);
 assert.doesNotMatch(stylesSource, /\.reader-chapter-select-menu \[role="treeitem"\]\[aria-selected="true"\]/);
-assert.match(stylesSource, /\.reader-nav-chapter-row \{[^}]*background: transparent;[^}]*color: var\(--text-secondary\);/);
-assert.match(stylesSource, /\.reader-nav-chapter-row:hover,[\s\S]*?\.reader-nav-section:hover \{[^}]*background: color-mix\(in srgb, var\(--focus-ring\) 8%, transparent\);/);
-assert.match(stylesSource, /\.reader-nav-section\[aria-selected="true"\] \{[^}]*background: transparent;/);
+assert.match(stylesSource, /\.reader-nav-row \{[^}]*color: var\(--text-secondary\);[\s\S]*?\.reader-nav-label,[\s\S]*?background: transparent;/);
+assert.doesNotMatch(stylesSource, /\.reader-nav-chapter-row:hover/, "Removed Reader contents row styling must not return.");
+assert.doesNotMatch(stylesSource, /\.reader-nav-section\[aria-selected="true"\] \{[^}]*background: (?!transparent)[^;]+;/);
 assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?display: none;/, "Deactivating a Project must hide its Saved Evidence list.");
 assert.match(stylesSource, /\.saved-project-fact-description \{[^}]*field-sizing: content;[^}]*height: auto;[^}]*min-height: 0;[^}]*max-height: none;[^}]*overflow: hidden;[^}]*resize: none;/);
 assert.doesNotMatch(appSource, /descriptionResizeHandle/);
@@ -808,7 +810,7 @@ assert.doesNotMatch(functionSource(appSource, "renderReaderChapterSection"), /re
 assert.doesNotMatch(appSource, /description\.addEventListener\("input", resizeDescription\)/);
 assert.doesNotMatch(appSource, /saved-project-facts-status/);
 assert.doesNotMatch(functionSource(appSource, "appendSavedProjectFactEditor"), /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
-assert.match(appSource, /showWebNotice\("Project context not saved", error\.message \|\| "Could not save Project context"\)/);
+assert.match(appSource, /showWebNotice\(factsOnly \? "Project facts not saved" : "Project context not saved", error\.message \|\| "Could not save Project edits"\)/);
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
 assert.match(stylesSource, /\.project-research-history-card:hover,[\s\S]*?\.project-research-history-card:focus-visible \{[\s\S]*?background: transparent;[\s\S]*?color: var\(--project-color\);/, "Project Research history hover should color the text without filling the row.");
 assert.match(stylesSource, /\.project-research-history-card:hover :is\(strong, p, span\),[\s\S]*?color: inherit;/, "Project Research history child text does not follow the row hover color.");
@@ -883,7 +885,7 @@ assert.match(appSource, /const defaultNonReaderPaneWidth = 400;/);
 assert.match(appSource, /const legacyCoordinationPaneWidth = 430;[\s\S]*?const defaultCoordinationPaneWidth = 600;/);
 assert.match(appSource, /const legacyReaderPaneWidth = 520;[\s\S]*?const defaultReaderPaneWidth = 600;/);
 assert.match(appSource, /const legacySourceLinkedReaderPaneWidth = 400;[\s\S]*?const defaultSourceLinkedReaderPaneWidth = 600;/);
-assert.match(appSource, /const defaultResearchPaneWidth = 600;/);
+assert.match(appSource, /const defaultResearchPaneWidth = assistantHistoryWidth \+ 600;/);
 assert.match(appSource, /const defaultCodeDecisionPaneWidth = 600;/);
 assert.match(appSource, /const defaultSearchPaneWidth = 600;/);
 assert.match(appSource, /paneID === "utility:search" \|\| paneID\.startsWith\("utility:search:"\)\) return defaultSearchPaneWidth;/);

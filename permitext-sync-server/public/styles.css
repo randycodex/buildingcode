@@ -19419,3 +19419,12 @@ dialog.report-export-review {
 .saved-row-more[open] > button { position: absolute; right: 0; z-index: 5; min-width: 100px; opacity: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); }
 
 .saved-row-actions button { color: var(--text-secondary); }
+
+/* The optional outline does not reserve space when explicitly hidden. */
+.report-screen .report-draft-panel[data-outline-hidden="true"] .report-outline { display: none; }
+.report-screen .report-draft-panel[data-outline-hidden="true"] .report-draft-shell { grid-template-columns: minmax(600px, 1fr); }
+.report-screen .report-draft-panel[data-outline-hidden="true"] .report-document { grid-column: 1; }
+.report-screen .report-draft-panel[data-outline-hidden="true"][data-library-open="true"] .report-draft-shell {
+  grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 601px))) 1px minmax(600px, 1fr);
+}
+.report-screen .report-draft-panel[data-outline-hidden="true"][data-library-open="true"] .report-document { grid-column: 3; }
