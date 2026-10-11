@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
-import {normalizeWorkflowView, normalizeColumnWorkflowView, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth} from '../public/workflow-views.js';
+import {normalizeWorkflowView, normalizeColumnWorkflowView, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout} from '../public/workflow-views.js';
 import {captureWorkspaceLayout, applyWorkspaceLayout} from '../public/workspace-state.js';
 const membership=linkPaneToView({},'reader:linked','notebook');
 assert.equal(paneBelongsToView('reader:linked','research',membership),false,'A new linked Reader belongs to its originating view');
@@ -24,9 +24,26 @@ for (const view of ['report','project-details']) {
 }
 assert.equal(referenceColumnsWidth([],1920),0);
 assert.equal(referenceColumnsWidth([600],1920),602);
-assert.equal(referenceColumnsWidth([600,800],1920),1403);
-assert.equal(referenceColumnsWidth([1200,1200],1920),1500,'Keep usable document space when Readers exceed available width');
+assert.equal(referenceColumnsWidth([600,800],1920),1320);
+assert.equal(referenceColumnsWidth([1200,1200],1920),1320,'Keep usable document space when Readers exceed available width');
 assert.equal(referenceColumnsWidth([1200,1200],1920,700),1220,'Report reserves space for its toolbar and sources library');
+// Expanded Sources must not take space reserved for a readable Report document.
+for (const libraryWidth of [0,330,640,720]) {
+  for (const readers of [[600],[600,600],[1200,1200]]) {
+    const constraints=reportColumnsLayout(1920,libraryWidth);
+    const dock=referenceColumnsWidth(readers,1920,constraints.minimumWidth);
+    const reportWidth=Math.max(constraints.minimumWidth,1920-dock);
+    const layout=reportColumnsLayout(reportWidth,libraryWidth);
+    const outline=layout.compact?0:libraryWidth?210:230;
+    const document=reportWidth-libraryWidth-(libraryWidth?1:0)-outline;
+    assert.ok(document>=600,`Report remains at least 600px with Sources ${libraryWidth} and Readers ${readers}`);
+    assert.ok(dock>=602,'A Reader retains 600px plus its edge dividers');
+  }
+}
+assert.deepEqual(reportColumnsLayout(1241,640),{minimumWidth:1241,compact:true});
+assert.equal(referenceColumnsWidth([600],1200,931),602,'Narrow desks overflow whole columns instead of shrinking Readers');
+assert.equal(referenceColumnsWidth([48],1200,931),50,'Collapsed Readers keep a compact rail');
+assert.equal(referenceColumnsWidth([972],1920,1241),974,'A manually expanded Reader is visible as a whole column rather than clipped by the reference dock');
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert.ok(start>=0);return source.slice(start,source.indexOf('\n}',start)+2);};
 const pane=id=>({dataset:{paneId:id},scrollTop:0,scrollLeft:0,isConnected:true,querySelectorAll:()=>[],draft:'Unsaved text',hidden:false,classList:{contains(name){return name==='is-workflow-hidden' && panes.find(p=>p.classList===this).hidden;}}});
@@ -75,3 +92,31 @@ c.workspacePaneDescriptors=()=>panes.map(p=>({id:p.dataset.paneId,close:async()=
 vm.runInContext(actual('closeAllColumns'),c);
 await c.closeAllColumns();
 assert.deepEqual(closed,['project:notebook:a'],'Close all only closes this view');
+
+// Exercise the application wiring, including the Sources disclosure/resize path.
+const referenceClasses=new Set(), referenceStyles=new Map();
+const referenceShell={clientWidth:1920,classList:{toggle(name,on){on?referenceClasses.add(name):referenceClasses.delete(name);}},style:{setProperty:(name,value)=>referenceStyles.set(name,value)}};
+const referencePanel={dataset:{libraryOpen:'true',libraryWidth:'640'}};
+const referenceTrack={};let referenceIDs=['reader:reference'],accountOpen=false;
+const referenceContext=vm.createContext({
+  document:{querySelector:selector=>selector==='.workspace-shell'?referenceShell:selector==='.account-screen[open]'?accountOpen?{}:null:referencePanel},
+  state:{paneWeights:{'reader:reference':972}},track:referenceTrack,
+  currentColumnWorkflowView:()=> 'report',defaultActivePaneIDs:()=>referenceIDs,
+  workflowPaneIsVisible:()=>true,paneIsCollapsed:()=>false,minimumPaneWidthForID:()=>600,defaultPaneWidthForID:()=>600,
+  referenceColumnsWidth,reportColumnsLayout
+});
+vm.runInContext(actual('syncReferenceReaderLayout'),referenceContext);
+referenceContext.syncReferenceReaderLayout();
+assert.equal(referenceStyles.get('--reference-document-min-width'),'1241px');
+assert.equal(referenceStyles.get('--reference-readers-width'),'974px');
+assert.ok(referenceClasses.has('has-compact-reference-document'));
+assert.equal(referenceTrack.inert,false);
+referencePanel.dataset.libraryOpen='false';referenceContext.syncReferenceReaderLayout();
+assert.equal(referenceStyles.get('--reference-document-min-width'),'600px');
+assert.equal(referenceClasses.has('has-compact-reference-document'),false,'Closing Sources makes room for the outline again');
+referenceIDs=[];referenceContext.syncReferenceReaderLayout();
+assert.equal(referenceClasses.has('has-reference-readers'),false);
+accountOpen=true;referenceIDs=['reader:reference'];referenceContext.syncReferenceReaderLayout();
+assert.equal(referenceTrack.inert,true,'Account keeps reference columns inactive');
+assert.equal(referenceClasses.has('has-reference-readers'),false);
+console.log('Report constraints passed: 600px document minimum, expanded Sources, complete Reader width, optional outline and Account isolation.');

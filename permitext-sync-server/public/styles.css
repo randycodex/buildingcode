@@ -19063,7 +19063,7 @@ dialog.report-screen {
 }
 .report-screen .report-draft-header { display: none; }
 .report-screen .report-draft-shell {
-  height: 100%; display: grid; grid-template-columns: 230px minmax(0, 1fr);
+  height: 100%; display: grid; grid-template-columns: 230px minmax(600px, 1fr);
   grid-template-rows: auto minmax(0, 1fr); padding: 0; gap: 0; overflow: hidden;
 }
 .report-screen .report-draft-primary-actions {
@@ -19076,7 +19076,7 @@ dialog.report-screen {
 .report-screen .report-outline h2 { margin: 0 0 18px; font-size: 12px; color: var(--text-secondary); }
 .report-screen .report-outline button { display: block; width: 100%; text-align: left; padding: 10px 0; line-height: 1.5; background: none; border: 0; font-size: 12px; color: var(--text-secondary); overflow-wrap: anywhere; }
 .report-screen .report-outline button:hover { color: var(--text-primary); }
-.report-screen .report-document { grid-column: 2; grid-row: 2; overflow-y: auto; padding: 40px max(28px, calc((100% - 850px) / 2)); scroll-padding-top: 32px; }
+.report-screen .report-document { min-width: 600px; grid-column: 2; grid-row: 2; overflow-y: auto; padding: 40px max(28px, calc((100% - 850px) / 2)); scroll-padding-top: 32px; }
 .report-screen .report-title-control { align-items: start; }
 .report-screen .report-title-text, .report-screen .report-title-editor { font-size: 26px; line-height: 1.3; font-weight: 650; white-space: normal; }
 .report-screen .report-title-revision { display: none; }
@@ -19087,7 +19087,7 @@ dialog.report-screen {
 .report-screen .report-draft-blocks-heading { padding-top: 24px; }
 .report-screen .report-draft-add-controls { padding: 16px 0 24px; }
 .report-screen .report-library { display: none; grid-column: 1; grid-row: 2; min-width: 0; overflow-y: auto; padding: 24px; background: #080808; }
-.report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 850px))) 1px 210px minmax(0, 1fr); }
+.report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 811px))) 1px 210px minmax(600px, 1fr); }
 .report-screen [data-library-open="true"] .report-library { display: block; }
 .report-screen [data-library-open="true"] .report-outline { grid-column: 3; }
 .report-screen [data-library-open="true"] .report-document { grid-column: 4; }
@@ -19107,7 +19107,7 @@ dialog.report-screen {
 .report-screen .report-history-entry { padding: 18px 0; }
 .report-screen button:focus-visible { outline: 2px solid var(--focus-ring, #888); outline-offset: 3px; }
 @media (max-width: 1100px) {
-  .report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 420px))) 1px minmax(0, 1fr); }
+  .report-screen [data-library-open="true"] .report-draft-shell { grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 601px))) 1px minmax(600px, 1fr); }
   .report-screen [data-library-open="true"] .report-outline { display: none; }
   .report-screen [data-library-open="true"] .report-document { grid-column: 3; }
 }
@@ -19203,7 +19203,7 @@ dialog.report-export-review {
 .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text-primary); }
 
 /* Report shares the workspace navigation; retain column geometry underneath. */
-.report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg, #000); }
+.report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: var(--reference-document-min-width, 600px); display: flex; flex-direction: column; background: var(--bg, #000); }
 .report-workspace-view[hidden] { display: none; }
 .workspace-shell:has(> .report-workspace-view:not([hidden])) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
 .workspace-shell > .workflow-toolbar { grid-row: 2; grid-column: 1; }
@@ -19213,9 +19213,14 @@ dialog.report-export-review {
 
 /* Reference columns share the retained workspace track beside a document. */
 .workspace-shell.has-reference-readers {
-  grid-template-columns: minmax(0, 1fr) var(--reference-readers-width);
+  grid-template-columns: minmax(var(--reference-document-min-width, 600px), 1fr) var(--reference-readers-width);
 }
-.workspace-shell.has-reference-readers > .topbar { grid-column: 1 / -1; }
+.workspace-shell.has-reference-readers,
+.workspace-shell:has(> .report-workspace-view:not([hidden])) { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.workspace-shell.has-reference-readers::-webkit-scrollbar,
+.workspace-shell:has(> .report-workspace-view:not([hidden]))::-webkit-scrollbar { display: none; }
+.workspace-shell.has-reference-readers > .topbar,
+.workspace-shell:has(> .report-workspace-view:not([hidden])) > .topbar { grid-column: 1 / -1; width: 100vw; position: sticky; left: 0; }
 .workspace-shell.has-reference-readers > .panel-track {
   grid-column: 2; grid-row: 3; z-index: 3;
   width: 100%; min-width: 0; border-left: 1px solid var(--border);
@@ -19229,10 +19234,10 @@ dialog.report-export-review {
   pointer-events: none;
 }
 .workspace-shell.has-compact-reference-document .report-screen .report-outline { display: none; }
-.workspace-shell.has-compact-reference-document .report-screen .report-draft-shell { grid-template-columns: minmax(0, 1fr); }
-.workspace-shell.has-compact-reference-document .report-screen .report-document { grid-column: 1; padding-inline: 28px; }
+.workspace-shell.has-compact-reference-document .report-screen .report-draft-shell { grid-template-columns: minmax(600px, 1fr); }
+.workspace-shell.has-compact-reference-document .report-screen .report-document { grid-column: 1; }
 .workspace-shell.has-compact-reference-document .report-screen [data-library-open="true"] .report-draft-shell {
-  grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 420px))) 1px minmax(0, 1fr);
+  grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 601px))) 1px minmax(600px, 1fr);
 }
 .workspace-shell.has-compact-reference-document .report-screen [data-library-open="true"] .report-document { grid-column: 3; }
 

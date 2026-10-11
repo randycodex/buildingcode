@@ -1,6 +1,6 @@
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth } from "./workflow-views.js?v=3";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=5";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
-import { createReportLibraryControls } from "./report-library.js?v=20261011-left-library-v1";
+import { createReportLibraryControls } from "./report-library.js?v=20261011-document-minimum-v2";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
 import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v5";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -139,7 +139,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261011-workflow-views-v15";
+} from "./workspace-state.js?v=20261011-workflow-views-v17";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2747,6 +2747,7 @@ async function openProjectReportDraft(project) {
   screen.projectID = projectID;
   reportScreen = screen;
   await screen.open();
+  syncReferenceReaderLayout();
   syncProjectToolButtonStates(identity);
   startProjectArtifactCheckpointLoop({ immediate: true });
   return true;
@@ -4179,6 +4180,7 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 }
 
 const workflowScrollStore = createWorkflowScrollStore();
+const referenceWorkspaceScroll = new Map();
 function currentWorkflowView() { return normalizeWorkflowView(state.workflowView); }
 function currentColumnWorkflowView() {
   return projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
@@ -4198,16 +4200,22 @@ function syncReferenceReaderLayout() {
   const screenOpen = view === "report" || view === "project-details";
   const visibleIDs = screenOpen ? defaultActivePaneIDs().filter(workflowPaneIsVisible) : [];
   const widths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : Math.max(minimumPaneWidthForID(id), state.paneWeights[id] || defaultPaneWidthForID(id)));
-  const width = referenceColumnsWidth(widths, shell.clientWidth, view === "report" ? 700 : 420);
+  const reportPanel = document.querySelector(".report-workspace-view:not([hidden]) .report-draft-panel");
+  const libraryWidth = reportPanel?.dataset.libraryOpen === "true" ? Number(reportPanel.dataset.libraryWidth) || 330 : 0;
+  const minimumDocumentWidth = view === "report" ? reportColumnsLayout(shell.clientWidth, libraryWidth).minimumWidth : 600;
+  const width = referenceColumnsWidth(widths, shell.clientWidth, minimumDocumentWidth);
   shell.classList.toggle("has-reference-readers", !accountOpen && width > 0);
   shell.style.setProperty("--reference-readers-width", `${width}px`);
-  shell.classList.toggle("has-compact-reference-document", !accountOpen && screenOpen && shell.clientWidth - width <= 1100);
+  shell.style.setProperty("--reference-document-min-width", `${minimumDocumentWidth}px`);
+  shell.classList.toggle("has-compact-reference-document", !accountOpen && view === "report" && reportColumnsLayout(shell.clientWidth - width, libraryWidth).compact);
   track.inert = accountOpen || screenOpen && !visibleIDs.length;
 }
 function syncWorkflowColumnPresentation() {
   const view = currentColumnWorkflowView();
   const panes = [...track.querySelectorAll(':scope > .workspace-panel')];
   if (view !== presentedColumnWorkflowView) {
+    const shell = document.querySelector(".workspace-shell");
+    if (shell) referenceWorkspaceScroll.set(`${activeWorkspaceID}:${presentedColumnWorkflowView}`, shell.scrollLeft);
     const readerPositions = captureReaderScrollPositions();
     panes.forEach(pane => { if (readerPositions.has(pane.dataset.paneId)) pane._workflowReaderPosition = readerPositions.get(pane.dataset.paneId); });
     workflowScrollStore.capture(panes.filter(pane => !pane.classList.contains('is-workflow-hidden')));
@@ -4226,6 +4234,7 @@ function syncWorkflowColumnPresentation() {
       }
     });
     track.scrollLeft = state.workflowScroll[view] || 0;
+    if (shell) shell.scrollLeft = referenceWorkspaceScroll.get(`${activeWorkspaceID}:${view}`) || 0;
   }
   syncWorkflowNavigation();
 }
@@ -29164,7 +29173,11 @@ async function renderProjectReportDraft(project) {
     const library = document.createElement("aside");
     library.className = "report-library";
     library.setAttribute("aria-label", "Report sources and versions");
-    const libraryControls = createReportLibraryControls({ panel, shell, library });
+    const libraryControls = createReportLibraryControls({
+      panel, shell, library,
+      availableWidth: () => Math.max(shell.clientWidth, document.querySelector(".workspace-shell")?.clientWidth || 0),
+      onResize: syncReferenceReaderLayout
+    });
     library.append(libraryControls.header, sourcePicker, historySection);
     const tools = document.createElement("button");
     tools.type = "button";
@@ -29174,9 +29187,11 @@ async function renderProjectReportDraft(project) {
       const expanded = panel.dataset.libraryOpen !== "true";
       panel.dataset.libraryOpen = String(expanded);
       tools.setAttribute("aria-expanded", String(expanded));
+      syncReferenceReaderLayout();
     });
     primaryActions.prepend(tools);
     shell.append(primaryActions, library, libraryControls.divider, outline, documentBody);
+    if (panel.isConnected) syncReferenceReaderLayout();
   }
 
   refreshReportSources = async () => {

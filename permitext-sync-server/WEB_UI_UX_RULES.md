@@ -74,6 +74,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 
 ## Report
 
+- Keep the Report document and Reader columns at least 600px wide. Sources & versions reserves its selected width; hide the optional outline before squeezing the document. Overflow belongs to whole workspace columns, never individual tables. Keep the Report text centered at a maximum 850px reading width.
 - Report is a working view below the shared top menu, with an outline, editor, and optional source/version panel. Research, Notebook, Project selection, Layout, and Account stay accessible. Switching views preserves column positions and drafts; reopening Report retains its editor and scroll position.
 - Use clear section hierarchy and compact text/icon actions, without pills for headings and metadata.
 - Allow review of full passages, tables, notes, and facts before export. Snippets are never the export source.

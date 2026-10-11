@@ -21,10 +21,18 @@ export function linkPaneToView(membership, paneID, view) {
   const home = /^(?:project:notebook:|utility:saved(?::|$))/.test(paneID) ? ['notebook'] : [];
   return {...membership, [paneID]: [...new Set([...home, ...(membership?.[paneID] || []), normalizeColumnWorkflowView(view)])]};
 }
-export function referenceColumnsWidth(widths, availableWidth, documentWidth = 420) {
+export function referenceColumnsWidth(widths, availableWidth, documentWidth = 600) {
   if (!widths.length) return 0;
   const requested = widths.reduce((sum, width) => sum + width, widths.length + 1);
-  return Math.min(requested, Math.max(320, availableWidth - documentWidth));
+  return Math.min(requested, Math.max(Math.max(...widths) + 2, availableWidth - documentWidth));
+}
+// Sources reserve their chosen width before the Report document shares space
+// with Readers. Hide the optional outline before shrinking the document.
+export function reportColumnsLayout(availableWidth, libraryWidth = 0) {
+  const sourceWidth = libraryWidth > 0 ? Math.max(280, Math.min(720, libraryWidth)) : 0;
+  const minimumWidth = 600 + sourceWidth + (sourceWidth ? 1 : 0);
+  const outlineWidth = sourceWidth ? 210 : 230;
+  return { minimumWidth, compact: availableWidth < minimumWidth + outlineWidth };
 }
 // Keep scroll snapshots per DOM node, not indexes: asynchronous hydration may
 // replace a loading shell while the other view is active.

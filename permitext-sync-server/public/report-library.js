@@ -2,7 +2,7 @@ const defaultWidth = 330;
 const expandedWidth = 640;
 const minimumWidth = 280;
 
-export function createReportLibraryControls({ panel, shell, library }) {
+export function createReportLibraryControls({ panel, shell, library, availableWidth = () => shell.clientWidth, onResize = () => {} }) {
   const header = document.createElement('header');
   header.className = 'report-library-header';
   const title = document.createElement('h2');
@@ -21,9 +21,9 @@ export function createReportLibraryControls({ panel, shell, library }) {
   divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to reset';
 
   const maximumWidth = () => {
-    const available = shell.clientWidth;
+    const available = availableWidth();
     if (!available) return 720;
-    return Math.max(minimumWidth, Math.min(720, available - (available > 1100 ? 850 : 420)));
+    return Math.max(minimumWidth, Math.min(720, available - 601));
   };
   const currentWidth = () => Number(panel.dataset.libraryWidth) || defaultWidth;
   const updateControls = () => {
@@ -41,6 +41,7 @@ export function createReportLibraryControls({ panel, shell, library }) {
     const width = Math.max(minimumWidth, Math.min(maximumWidth(), requested));
     panel.dataset.libraryWidth = String(width);
     panel.style.setProperty('--report-library-width', `${width}px`);
+    onResize();
     updateControls();
   };
   expand.addEventListener('click', () => resize(currentWidth() > defaultWidth ? defaultWidth : expandedWidth));
