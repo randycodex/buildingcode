@@ -1,3 +1,4 @@
+import { reportCommentKey } from "./public/project-workflow.js";
 import { createHash } from "node:crypto";
 import { parseFragment } from "parse5";
 
@@ -180,8 +181,8 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
       if (notes.has(key)) return;
       notes.add(key);
       items.push({ id: `note-label-${sourceIndex}-${index}`, kind: "heading",
-        text: `Your note · ${section.codePrefix} § ${section.sectionNumber}${note.label ? ` · ${note.label}` : ""}` });
-      items.push({ id: `note-${sourceIndex}-${index}`, kind: "paragraph", text: note.body });
+        reportCommentKey: reportCommentKey(note), text: `Your comment · ${section.codePrefix} § ${section.sectionNumber}${note.label ? ` · ${note.label}` : ""}` });
+      items.push({ id: `note-${sourceIndex}-${index}`, kind: "paragraph", reportCommentKey: reportCommentKey(note), text: note.body });
     });
   }
   return { items, sources };
@@ -201,7 +202,7 @@ export function reportSavedSelection(record, annotations = [], savedItems = []) 
   const matching = annotations.filter(note => sameSource(note) &&
     (!blockID || String(note.blockID || "").trim() === blockID));
   const notes = matching.filter(note => String(note.noteBody || "").trim()).map(note => ({
-    blockID: String(note.blockID || "").trim(), label: note.blockID ? "Paragraph note" : "Section note", body: note.noteBody
+    blockID: String(note.blockID || "").trim(), label: note.blockID ? "Passage comment" : "Section comment", body: note.noteBody
   }));
   // A current empty/deleted annotation is authoritative over legacy Saved text.
   const annotationTargets = new Set(annotations.filter(note =>
@@ -210,7 +211,7 @@ export function reportSavedSelection(record, annotations = [], savedItems = []) 
   savedItems.filter(item => sameSource(item) && (!blockID || String(item.blockID || "").trim() === blockID)).forEach(item => {
     const noteBlockID = String(item.blockID || "").trim();
     if (!annotationTargets.has(noteBlockID) && String(item.noteBody || "").trim()) notes.push({
-      blockID: noteBlockID, label: noteBlockID ? "Paragraph note" : "Section note", body: item.noteBody
+      blockID: noteBlockID, label: noteBlockID ? "Passage comment" : "Section comment", body: item.noteBody
     });
   });
   return { sectionID: String(record.sectionID), codeVersion: record.codeVersion, blockID, notes };

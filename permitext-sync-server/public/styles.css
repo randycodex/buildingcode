@@ -18971,3 +18971,35 @@ html body .column-group-menu-button:focus-visible {
 .saved-evidence-add-report-selection { border: 0; border-radius: 999px; padding: 6px 12px; background: var(--surface); color: var(--text-primary); }
 
 .web-warning-dialog.is-report-destination .web-warning-confirm { background: #222; color: var(--text-primary); border-color: transparent; }
+
+/* Project research workflows share action and section hierarchy. */
+.workflow-action { min-height: 32px; padding: 5px 10px; font: inherit; font-size: 12px; border: 0; border-radius: 6px; cursor: pointer; }
+.workflow-action-secondary { color: var(--text-primary); background: transparent; }
+.workflow-action-secondary:hover { background: var(--surface-raised, #191919); }
+.workflow-action:disabled { opacity: .5; cursor: default; }
+.workflow-section { border-top: 1px solid var(--border); margin-top: 24px; padding-top: 24px; }
+.workflow-section h3 { margin: 0 0 10px; font-size: 14px; }
+.workflow-help, .report-membership-status { color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.report-membership-status { margin: 10px 0 0; overflow-wrap: anywhere; }
+.report-membership-status.is-in-report { color: var(--text-primary); }
+.notebook-finding-action { align-self: flex-start; margin: 8px 0; }
+.project-records-row { display: grid; grid-template-columns: minmax(0, 1fr) 140px; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+.project-records-row input, .project-records-row select, .project-records-row textarea { width: 100%; min-width: 0; color: var(--text-primary); background: var(--surface, #111); border: 1px solid var(--border); border-radius: 4px; padding: 8px; font: inherit; font-size: 12px; }
+.project-records-row textarea { grid-column: 1 / -1; resize: vertical; }
+.project-records-row button { justify-self: start; }
+.report-comment-options { margin: 12px 0; font-size: 12px; }
+.report-comment-options summary { color: var(--text-secondary); cursor: pointer; }
+.report-comment-options label { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; line-height: 1.5; }
+.report-draft-panel .report-comment-options input[type="checkbox"] { flex: 0 0 16px; width: 16px; height: 16px; min-height: 0; padding: 0; margin: 3px 0 0; }
+.report-draft-panel .report-comment-options label span { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.report-draft-panel .report-comment-options label,
+.report-draft-panel .report-comment-options label span { text-transform: none; letter-spacing: normal; font-size: 12px; font-weight: 400; color: var(--text-primary); }
+.project-records-checklist > .workflow-action + .workflow-action { margin-left: 8px; }
+.workflow-action-primary { color: var(--text-primary); background: transparent; font-weight: 650; }
+.workflow-action-primary:hover { background: var(--menu-highlight); }
+.workflow-action-icon { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 4px; border: 0; border-radius: 4px; background: transparent; color: var(--text-secondary); }
+.workflow-action-icon:hover { color: var(--text-primary); background: var(--menu-highlight); }
+
+.notebook-source-actions .notebook-finding-action { display: block; text-align: left; }
+.notebook-card-footer:has(.report-membership-status) { flex-direction: column; align-items: stretch; gap: 8px; }
+.notebook-card-footer .report-membership-status { margin: 0; text-align: left; }

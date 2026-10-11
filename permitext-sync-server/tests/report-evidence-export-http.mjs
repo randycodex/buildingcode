@@ -51,12 +51,21 @@ try {
   async function push(mutations) {
     await post("/sync/push", { batch: { user: { id: userID }, mutations } });
   }
-  await push([{ project: { id: "synthetic-project-record", userID, clientID: projectID, name: "Export review Project",
+  const recordsChecklist = [{id:"plans",label:"Approved plans",status:"requested",note:"Request pending"}];
+  await push([{ project: { recordsChecklist, id: "synthetic-project-record", userID, clientID: projectID, name: "Export review Project",
     codeVersion: defaultSyncCodeVersion, colorHex: "#334455", sortOrder: 0, updatedAt } },
     ...savedRecords.map((record, index) => ({ projectSection: { ...record, id: `saved-project-${index}`, userID, updatedAt } })),
     { annotation: { id: "scope-note", userID, sectionID: String(current.id), codeVersion: defaultSyncCodeVersion, blockID: "", noteBody: "Original scope note.", updatedAt } },
     { annotation: { id: "historical-note", userID, sectionID: String(historical.id), codeVersion: historicalConstructionSyncCodeVersion, blockID: "", noteBody: "Historical note stays with 2014.", updatedAt } }
   ]);
+  let syncedProject = (await post("/sync/pull", {})).mutations.find(mutation=>mutation.project?.clientID === projectID).project;
+  assert.deepEqual(syncedProject.recordsChecklist,recordsChecklist);
+  // Older clients do not send this new field: unrelated edits must retain it.
+  const {recordsChecklist: omittedChecklist,...olderProject} = syncedProject;
+  await push([{project:{...olderProject,updatedAt:"2026-10-10T15:01:00.000Z"}}]);
+  syncedProject = (await post("/sync/pull", {})).mutations.find(mutation=>mutation.project?.clientID === projectID).project;
+  assert.deepEqual(syncedProject.recordsChecklist,recordsChecklist);
+  await post("/sync/push", {batch:{user:{id:userID},mutations:[{project:{...syncedProject,updatedAt:"2026-10-10T15:02:00.000Z",recordsChecklist:[{...recordsChecklist[0],status:"verified-fact"}]}}]}},400);
   const adapter = createFileStoreAdapter();
   assert(!(await adapter.listProjectLinks(userID)).some(link => link.targetKind === "canonicalSection"), "Fixture proves Report works before a foundation link has been materialized.");
   let palette = await post("/reports/sources/list", { projectID });
@@ -140,6 +149,15 @@ try {
   assert.match(paragraphEvidence.passageText, /80 feet/);
   assert.doesNotMatch(paragraphEvidence.passageText, /Group I-3|least width/);
   assert(paragraphReport.manifest.items.some(item => item.text === "Only the selected final exception."));
+  const { draft: excludedDraft } = await post("/reports/drafts/save", { projectID,
+    draftID: paragraphDraft.id, expectedVersion: paragraphDraft.version, title: paragraphDraft.title,
+    reportDate: paragraphDraft.reportDate, blocks: paragraphDraft.blocks.map(block => ({...block,excludedCommentKeys:[paragraphID]})) }, 200);
+  assert.deepEqual(excludedDraft.blocks[0].excludedCommentKeys,[paragraphID]);
+  const excludedReport = await post("/reports/generate", {projectID,draftID:excludedDraft.id,expectedVersion:excludedDraft.version},201);
+  assert(!excludedReport.manifest.items.some(item=>item.text === "Only the selected final exception."));
+  assert.equal(excludedReport.manifest.items.find(item=>item.kind === "evidence").passageText,paragraphEvidence.passageText,
+    "Excluding a comment must never alter the enacted passage");
+  assert(paragraphReport.manifest.items.some(item=>item.text === "Only the selected final exception."), "Prior export remains immutable");
   // Keep a real owned Project when testing a downgrade; Free cannot create Projects.
   await post("/admin/lifetime-grants/revoke", { userID }, 200, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   await post("/reports/drafts/save", { projectID, expectedVersion: 0, title: "Free report", reportDate: "2026-10-10", blocks: [] }, 403);

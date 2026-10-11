@@ -1,3 +1,4 @@
+import { reportsContainingSource } from "../public/project-workflow.js";
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
@@ -13,7 +14,7 @@ const draft = { id: 'report-a', title: 'Report A', version: 2, introduction: 'Ke
 function fixture({ drafts = [draft], choice = '0', mount, gate } = {}) {
   let generation = 1;
   const calls = [], dialogs = [], saved = [];
-  const c = vm.createContext({ structuredClone, crypto: { randomUUID }, Date,
+  const c = vm.createContext({ reportsContainingSource, isCurrentAccountRequest:()=>true, track:{querySelectorAll:()=>[]}, structuredClone, crypto: { randomUUID }, Date,
     activeWorkspaceID: 'workspace-a', hasCapability: () => true,
     captureAccountRequest: () => generation,
     requireCurrentAccountRequest: value => { if (value !== generation) throw new Error('Account changed'); },
@@ -54,7 +55,7 @@ assert.equal((await first.run()).id, 'new-id');
 assert.equal(first.saved[0].expectedVersion, 0);
 const duplicate = fixture({ drafts: [{ ...draft, blocks: [{ id: 'existing', kind: 'notebookCard', sourceID: note.id }] }] });
 await duplicate.run();
-assert.equal(duplicate.saved[0].blocks.length, 1);
+assert.equal(duplicate.saved.length, 0, "Adding an included source does not create another revision");
 const legacy = fixture({ drafts: [{ ...draft, blocks: [{ id: 'existing', derivedFrom: { kind: 'notebookCard', id: note.id } }] }] });
 await legacy.run();
 assert.equal(legacy.saved[0].blocks.length, 1);

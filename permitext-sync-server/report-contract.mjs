@@ -181,10 +181,19 @@ export function normalizeReportDraftBlock(block, index = 0) {
     };
   }
   if (!referencedBlockKinds.has(kind)) throw new Error("Unsupported Report source block.");
+  if (kind === "evidence" && block.excludedCommentKeys !== undefined &&
+      (!Array.isArray(block.excludedCommentKeys) || block.excludedCommentKeys.length > 100)) {
+    throw new Error("Select no more than 100 Report comment exclusions.");
+  }
   return {
     ...normalized,
     sourceID: requiredText(block?.sourceID, "Report source ID", 256),
-    label: requiredText(block?.label, "Report source label", 500)
+    label: requiredText(block?.label, "Report source label", 500),
+    ...(kind === "evidence" ? {
+      excludedCommentKeys: Array.isArray(block.excludedCommentKeys)
+        ? [...new Set(block.excludedCommentKeys.map(key => requiredText(key, "Report comment key", 256)))]
+        : []
+    } : {})
   };
 }
 

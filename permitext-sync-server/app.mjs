@@ -1,3 +1,4 @@
+import { normalizeRecordsChecklist, selectedReportEvidenceItems } from "./public/project-workflow.js";
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
 import { researchHistoryOptions, researchHistoryCursor, researchHistoryFileRows, researchHistoryPageQuery } from "./research-history-pagination.mjs";
@@ -16570,9 +16571,9 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
         chapterNumber: evidence.chapter === "unknown" ? "" : evidence.chapter,
         selectionKind: selection.blockID ? "paragraph" : "section",
         previewText: evidence.passageText.replace(/\s+/g, " ").trim().slice(0, 240),
-        notes: selection.notes.map(note => ({ label: note.label, body: note.body })),
+        notes: selection.notes.map(note => ({ blockID: note.blockID, label: note.label, body: note.body })),
         label: `${evidence.codeBook} ${evidence.sectionNumber} · ${evidence.codeEdition}: ${evidence.title}`,
-        summary: `${evidence.passageText.slice(0, 500)}${selection.notes.length ? ` · ${selection.notes.length} saved ${selection.notes.length === 1 ? "note" : "notes"} included` : ""}`,
+        summary: evidence.passageText.slice(0, 500),
         sourceClassification: "published-code", manifestItem: evidence,
         manifestItems: prepared.items, sourceSnapshot: prepared.sources[0]
       });
@@ -17004,7 +17005,7 @@ function reportManifestItemForDraftBlock(block, sourcesByKey) {
 function reportManifestItemsForDraftBlock(block, sourcesByKey) {
   const source = sourcesByKey.get(`${block.kind}:${block.sourceID}`);
   return source?.manifestItems
-    ? source.manifestItems.map((item, index) => ({ ...item, id: index ? `${block.id}-${index}` : block.id }))
+    ? selectedReportEvidenceItems(block, source.manifestItems).map((item, index) => ({ ...item, id: index ? `${block.id}-${index}` : block.id }))
     : [reportManifestItemForDraftBlock(block, sourcesByKey)];
 }
 
@@ -25817,6 +25818,10 @@ function validateMutation(mutation, userID) {
   ) {
     return validationError("Folder type must be project or reference.");
   }
+  if (kind === "project" && record.recordsChecklist !== undefined) {
+    try { normalizeRecordsChecklist(record.recordsChecklist); }
+    catch (error) { return validationError(error.message); }
+  }
   if (kind === "project" && record.structuredFacts !== undefined) {
     if (!Array.isArray(record.structuredFacts) || record.structuredFacts.length > 100) {
       return validationError("Project structured facts must be an array of no more than 100 records.");
@@ -25888,6 +25893,9 @@ function mergeMutations(existing, incoming) {
       }
       if (existingProject?.structuredFacts?.length && incomingProject?.structuredFacts === undefined) {
         mergedIncomingProject = { ...mergedIncomingProject, structuredFacts: existingProject.structuredFacts };
+      }
+      if (existingProject?.recordsChecklist !== undefined && incomingProject?.recordsChecklist === undefined) {
+        mergedIncomingProject = { ...mergedIncomingProject, recordsChecklist: existingProject.recordsChecklist };
       }
       acceptedMutation = { project: mergedIncomingProject };
     }

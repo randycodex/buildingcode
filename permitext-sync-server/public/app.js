@@ -1,3 +1,4 @@
+import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource } from "./project-workflow.js?v=20261010-workflow-v1";
 import { openReportExportReview } from "./report-export-review.js?v=20261010-report-export-v2";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -4740,6 +4741,7 @@ async function refreshProjectSourceConsumers(projects = [], options = {}) {
 }
 
 async function refreshVisibleProjectArtifactSummaries(projectID) {
+  void refreshProjectReportMembership(projectID, true);
   const deferUntilEditorBlur = (paneID, panel) => {
     if (!panel || panel.dataset.projectArtifactRefreshPending === "true") return;
     panel.dataset.projectArtifactRefreshPending = "true";
@@ -8027,7 +8029,7 @@ function isProAccount() {
 function updateReaderPlanControls() {
   const requiresProject = workspaceColumnsRequireProject();
   const limitReached = !isProAccount() && state.readers.length >= 2;
-  const readerLabel = state.readers.length > 0 ? "+ Reader" : "Reader";
+  const readerLabel = state.readers.length > 0 ? "New reader" : "Reader";
   addReaderButton.querySelector("span").textContent = readerLabel;
   addReaderButton.dataset.mobileLabel = readerLabel;
   addReaderButton.hidden = false;
@@ -13014,6 +13016,7 @@ function projectMutationForRecord(project, accountOverride = null) {
       address: project.address || "",
       description: project.description || "",
       structuredFacts: projectStructuredFacts(project),
+      recordsChecklist: project.recordsChecklist || [],
       folderType: folderType(project),
       color,
       colorHex: color,
@@ -13287,6 +13290,8 @@ async function updateProjectFolder(project, details = {}) {
     structuredFacts: hasStructuredFacts
       ? projectStructuredFacts({ structuredFacts: details.structuredFacts })
       : projectStructuredFacts(project),
+    recordsChecklist: Object.prototype.hasOwnProperty.call(details, "recordsChecklist")
+      ? normalizeRecordsChecklist(details.recordsChecklist) : project.recordsChecklist || [],
     folderType: nextFolderType,
     color,
     colorHex: color,
@@ -17563,8 +17568,9 @@ async function renderSearchHistory(panel, instance, options = {}) {
       });
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
-      openNewButton.className = "search-open-new-reader";
-      openNewButton.textContent = "Open in new reader";
+      openNewButton.className = "search-open-new-reader workflow-action workflow-action-secondary";
+      openNewButton.textContent = "New reader";
+      openNewButton.title = "Open this source in an additional Reader beside Search";
       openNewButton.addEventListener("click", () => {
         void openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(instance), {
           sourceSurface: "search", forceNewReader: true
@@ -18390,8 +18396,9 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
 
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
-      openNewButton.className = "search-open-new-reader";
-      openNewButton.textContent = "Open in new reader";
+      openNewButton.className = "search-open-new-reader workflow-action workflow-action-secondary";
+      openNewButton.textContent = "New reader";
+      openNewButton.title = "Open this source in an additional Reader beside Search";
       openNewButton.addEventListener("click", () => {
         recordRecentSearch(query);
         void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {
@@ -19056,13 +19063,13 @@ async function renderSectionDetail(searchID, detail) {
   const backButton = appendDetailIconButton(chrome, {
     title: "Close",
     label: "Close saved item",
-    className: "section-detail-icon section-detail-close",
+    className: "section-detail-icon section-detail-close workflow-action-icon",
     svg: circleXIconSVG()
   });
   const saveButton = appendDetailIconButton(chrome, {
     title: bookmarkActionLabel(saved),
     label: bookmarkActionLabel(saved),
-    className: `section-detail-icon section-detail-save${saved ? " is-saved" : ""}`,
+    className: `section-detail-icon section-detail-save workflow-action-icon${saved ? " is-saved" : ""}`,
     svg: bookmarkIconSVG(saved)
   });
   syncImmediateBookmarkButton(saveButton, saved);
@@ -19182,7 +19189,7 @@ async function renderSectionDetail(searchID, detail) {
   const noteResizeHandle = document.createElement("div");
   noteResizeHandle.className = "section-detail-note-resize-handle";
   noteResizeHandle.setAttribute("role", "separator");
-  noteResizeHandle.setAttribute("aria-label", "Resize note");
+  noteResizeHandle.setAttribute("aria-label", "Resize comment");
   noteResizeHandle.setAttribute("aria-orientation", "horizontal");
   noteResizeHandle.tabIndex = 0;
   const resizeNoteTo = (height) => {
@@ -25712,6 +25719,7 @@ function projectIdentity(project) {
     address: project.address || "",
     description: project.description || "",
     structuredFacts: projectStructuredFacts(project),
+    recordsChecklist: project.recordsChecklist || [],
     folderType: folderType(project),
     color: projectColor(project),
     ...(project.sharedOrganizationID ? {
@@ -27396,7 +27404,7 @@ async function renderProjectNotebook(project, options = {}) {
       });
       const reportButton = document.createElement("button");
       reportButton.type = "button";
-      reportButton.className = "notebook-secondary-action";
+      reportButton.className = "notebook-secondary-action workflow-action workflow-action-secondary";
       reportButton.textContent = "Add to Report";
       reportButton.disabled = notebookReadOnly;
       reportButton.addEventListener("click", async () => {
@@ -27415,10 +27423,26 @@ async function renderProjectNotebook(project, options = {}) {
         finally { if (!disposed) reportButton.disabled = notebookReadOnly; }
       });
       footerActions.append(reportButton, researchButton, coordinateButton);
-      footer.append(footerActions);
+      footer.append(reportMembershipIndicator(projectID, "notebookCard", activeCard), footerActions);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      const focusedContent = [toolbar, editorElement];
+      const findingButton = document.createElement("button");
+      findingButton.type = "button";
+      findingButton.className = "workflow-action workflow-action-secondary notebook-finding-action";
+      findingButton.textContent = "Insert finding template";
+      findingButton.title = "Add Conclusion, Supporting evidence, Uncertainty, and Next action to this Note";
+      findingButton.disabled = notebookReadOnly;
+      findingButton.addEventListener("click", () => {
+        if (!editorMount || notebookReadOnly) return;
+        activeCard.cardType = "finding";
+        draftDocument = appendFindingTemplate(editorMount.getDocument(), () => crypto.randomUUID());
+        editorMount.setDocument(draftDocument);
+        markNotebookDirty();
+      });
+      const notebookTools = document.createElement("div");
+      notebookTools.className = "notebook-source-actions";
+      notebookTools.append(toolbar, findingButton);
+      const focusedContent = [notebookTools, editorElement];
       focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
@@ -27712,12 +27736,19 @@ async function addProjectSourcesToReport(project, selectSources) {
   let target = drafts[0];
   if (drafts.length > 1) {
     const selected = await openWebWarning({ title: "Add to Report", message: "Choose the destination Report.",
-      confirmLabel: "Add", choices: drafts.map((draft, index) => ({ value: String(index), label: draft.title || "Untitled Report" })) });
+      confirmLabel: "Add to Report", choices: drafts.map((draft, index) => ({ value: String(index), label: `${draft.title || "Untitled Report"}${selectedSources.every(source => reportsContainingSource([draft], source.kind, source.id).length) ? " · Already included" : ""}` })) });
     check();
     if (selected === false) return null;
     target = drafts[Number(selected)];
   }
   check();
+  const currentTarget = reportDraftMounts.get(projectID)?.getDraftSnapshot?.();
+  const existingTarget = currentTarget?.id === target.id ? currentTarget : target;
+  if (selectedSources.every(source => (existingTarget.blocks || []).some(block => block.kind === source.kind && block.sourceID === source.id))) {
+    await refreshProjectReportMembership(projectID, true);
+    check();
+    return target;
+  }
   const mount = reportDraftMounts.get(projectID);
   let saved;
   if (mount?.getDraftSnapshot?.().id === target.id) {
@@ -27735,8 +27766,82 @@ async function addProjectSourcesToReport(project, selectSources) {
   }
   check();
   await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
+  await refreshProjectReportMembership(projectID, true);
   check();
   return saved;
+}
+
+const reportMembershipRequests = new Map();
+const reportMembershipCache = new Map();
+
+async function refreshProjectReportMembership(projectID, force = false) {
+  if (!projectID || !hasCapability("professional-exports")) return;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const key = JSON.stringify([identity, workspaceID, projectID]);
+  const paint = data => {
+    if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
+    const drafts = [...data.drafts];
+    const mounted = reportDraftMounts.get(projectID)?.getDraftSnapshot?.();
+    if (mounted) {
+      const index = drafts.findIndex(draft => draft.id === mounted.id);
+      if (index >= 0) drafts[index] = mounted;
+      else drafts.unshift(mounted);
+    }
+    track.querySelectorAll("[data-report-membership-project]").forEach(host => {
+      if (host.dataset.reportMembershipProject !== projectID) return;
+      let sourceID = host.dataset.reportSourceId;
+      if (host.dataset.reportSourceKind === "evidence") {
+        sourceID = data.sources.find(source => source.kind === "evidence" &&
+          String(source.sectionID) === host.dataset.reportSectionId &&
+          source.sourceLibraryVersion === host.dataset.reportEdition &&
+          String(source.selectionBlockID || "") === host.dataset.reportBlockId)?.id;
+      }
+      const included = sourceID ? reportsContainingSource(drafts,host.dataset.reportSourceKind,sourceID) : [];
+      host.classList.toggle("is-in-report", included.length > 0);
+      host.textContent = included.length
+        ? included.length === 1 ? `In Report · ${included[0].title || "Untitled Report"}` : `In ${included.length} Reports`
+        : drafts.length === 1 ? `Destination · ${drafts[0].title || "Untitled Report"}`
+        : drafts.length > 1 ? "Choose a Report when adding" : "Adding creates the first Report";
+      host.title = included.length ? included.map(draft => draft.title || "Untitled Report").join(", ") : host.textContent;
+      host.setAttribute("aria-label", included.length ? `Included in ${host.title}` : host.textContent);
+    });
+  };
+  if (!force && reportMembershipCache.has(key)) { paint(reportMembershipCache.get(key)); return; }
+  if (reportMembershipRequests.has(key)) return reportMembershipRequests.get(key);
+  const request = Promise.all([
+    postResearch("/reports/drafts/list", { projectID }),
+    postResearch("/reports/sources/list", { projectID })
+  ]).then(([drafts,sources]) => {
+    if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
+    const data = {drafts:drafts.drafts || [],sources:sources.sources || []};
+    reportMembershipCache.clear();
+    reportMembershipCache.set(key,data); paint(data);
+  }).catch(() => {
+    if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) return;
+    track.querySelectorAll("[data-report-membership-project]").forEach(host => {
+      if (host.dataset.reportMembershipProject === projectID) host.textContent = "Report status unavailable";
+    });
+  }).finally(() => reportMembershipRequests.delete(key));
+  reportMembershipRequests.set(key,request);
+  return request;
+}
+
+function reportMembershipIndicator(projectID, kind, source) {
+  const status = document.createElement("p");
+  status.className = "report-membership-status";
+  status.setAttribute("role", "status");
+  status.dataset.reportMembershipProject = projectID;
+  status.dataset.reportSourceKind = kind;
+  status.dataset.reportSourceId = source.id || "";
+  if (kind === "evidence") {
+    status.dataset.reportSectionId = String(source.sectionID);
+    status.dataset.reportEdition = syncCodeVersion(source.codeVersion);
+    status.dataset.reportBlockId = source.scope === "section" ? "" : String(source.blockID || "").trim();
+  }
+  status.textContent = "Checking Report…";
+  window.requestAnimationFrame(() => void refreshProjectReportMembership(projectID));
+  return status;
 }
 
 function reportAdditionFeedback(button, draft) {
@@ -27744,10 +27849,9 @@ function reportAdditionFeedback(button, draft) {
   button.dataset.reportActionLabel ||= button.textContent;
   window.clearTimeout(button.reportFeedbackTimer);
   button.setAttribute("aria-live", "polite");
-  button.textContent = `Added to ${draft.title || "Report"}`;
-  button.reportFeedbackTimer = window.setTimeout(() => {
-    if (button.isConnected) button.textContent = button.dataset.reportActionLabel;
-  }, 4000);
+  button.textContent = button.dataset.reportActionLabel;
+  button.title = `Included in ${draft.title || "Report"}. Adding again will not duplicate it.`;
+
 }
 
 async function addSavedEvidenceToReport(project, items) {
@@ -27916,6 +28020,7 @@ async function renderProjectReportDraft(project) {
   const setDirty = () => {
     dirty = true;
     clearStatus();
+    void refreshProjectReportMembership(projectID);
   };
 
   let pendingDraftSave = null;
@@ -27956,6 +28061,7 @@ async function renderProjectReportDraft(project) {
         clearStatus();
         renderWorkspaceContent();
         await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
+        void refreshProjectReportMembership(projectID, true);
         return !disposed && isCurrentAccountRequest(requestIdentity) && activeDraft.id === savedDraft.id && !dirty;
       } catch (error) {
         if (disposed || !isCurrentAccountRequest(requestIdentity) || activeDraft !== savingDraft) return false;
@@ -28057,6 +28163,7 @@ async function renderProjectReportDraft(project) {
       await reportRequest("/reports/drafts/delete", { projectID, draftID, expectedVersion });
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
       drafts = drafts.filter((draft) => draft.id !== draftID);
+      void refreshProjectReportMembership(projectID, true);
       activeDraft = drafts[0] ? structuredClone(drafts[0]) : emptyProjectReportDraft(identity);
       dirty = false;
       clearStatus();
@@ -28258,6 +28365,32 @@ async function renderProjectReportDraft(project) {
           citation.textContent = [source.codePrefix || "Code", savedEvidenceEdition(source)].filter(Boolean).join(" · ");
           row.append(sourceTitle, citation);
         }
+        if (block.kind === "evidence" && source?.notes?.length) {
+          const comments = document.createElement("details");
+          comments.className = "report-comment-options";
+          const summary = document.createElement("summary");
+          const updateLabel = () => {
+            const excluded = new Set(block.excludedCommentKeys || []);
+            const count = source.notes.filter(note => !excluded.has(reportCommentKey(note))).length;
+            summary.textContent = `Comments in this Report · ${count} of ${source.notes.length}`;
+          };
+          updateLabel(); comments.append(summary);
+          source.notes.forEach(note => {
+            const label = document.createElement("label");
+            const checkbox = document.createElement("input"); checkbox.type = "checkbox";
+            const key = reportCommentKey(note);
+            checkbox.checked = !(block.excludedCommentKeys || []).includes(key);
+            const text = document.createElement("span");
+            text.textContent = `${note.blockID ? "Passage comment" : "Section comment"}: ${note.body}`;
+            checkbox.addEventListener("change", () => {
+              const excluded = new Set(block.excludedCommentKeys || []);
+              if (checkbox.checked) excluded.delete(key); else excluded.add(key);
+              block.excludedCommentKeys = [...excluded]; updateLabel(); setDirty();
+            });
+            label.append(checkbox,text); comments.append(label);
+          });
+          row.append(comments);
+        }
         if (source?.summary && block.kind !== "projectFacts") {
           const summary = document.createElement("p");
           summary.textContent = source.summary;
@@ -28266,6 +28399,8 @@ async function renderProjectReportDraft(project) {
         } else if (!sourceTitle.parentElement) {
           row.append(sourceTitle);
         }
+        const commentOptions = row.querySelector(".report-comment-options");
+        if (commentOptions) row.append(commentOptions);
       }
       container.append(row);
     });
@@ -28447,7 +28582,7 @@ async function renderProjectReportDraft(project) {
     revisionLabel.textContent = `Draft revision ${activeDraft.version || 1}`;
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
-    deleteButton.className = "report-title-delete";
+    deleteButton.className = "report-title-delete workflow-action-icon";
     deleteButton.title = activeDraft.id ? "Delete Report" : "Save this Report before deleting it";
     deleteButton.setAttribute("aria-label", "Delete Report");
     deleteButton.innerHTML = trashIconSVG();
@@ -28631,6 +28766,7 @@ async function renderProjectReportDraft(project) {
     primaryActions.className = "report-draft-primary-actions";
     const save = document.createElement("button");
     save.type = "button";
+    save.className = "workflow-action workflow-action-secondary";
     save.textContent = "Save draft";
     save.title = "Save edits to this draft without creating an exported version";
     save.addEventListener("click", () => {
@@ -28638,6 +28774,7 @@ async function renderProjectReportDraft(project) {
     });
     const generate = document.createElement("button");
     generate.type = "button";
+    generate.className = "workflow-action workflow-action-primary";
     generate.textContent = "Export PDF version";
     generate.title = "Save current edits and create a fixed Report version for export";
     generate.addEventListener("click", () => {
@@ -32181,6 +32318,104 @@ function populateSavedEvidenceSection(section, savedInstance, folder, ...childre
   }, { capture: true }));
 }
 
+function appendProjectRecordsChecklist(container, project, identity) {
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  let items = normalizeRecordsChecklist(project.recordsChecklist || []);
+  let saved = JSON.stringify(items);
+  let pending = null;
+  const current = () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID;
+  const section = document.createElement("section");
+  section.className = "project-records-checklist workflow-section";
+  const heading = document.createElement("h3");
+  heading.textContent = "Records checklist";
+  const copy = document.createElement("p");
+  copy.className = "workflow-help";
+  copy.textContent = "Track records to obtain and review. A reviewed record does not automatically confirm a Project fact.";
+  const list = document.createElement("div");
+  const status = document.createElement("p");
+  status.className = "workflow-help";
+  status.setAttribute("role", "status");
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "workflow-action workflow-action-secondary";
+  retry.textContent = "Retry saving checklist";
+  retry.hidden = true;
+  const save = () => {
+    if (pending) return pending;
+    if (!current() || identity.sharedOnly || saved === JSON.stringify(items)) return Promise.resolve();
+    pending = (async () => {
+      while (current() && saved !== JSON.stringify(items)) {
+        const snapshot = normalizeRecordsChecklist(items);
+        const result = await updateProjectFolder(project, { recordsChecklist: snapshot });
+        if (result === false) throw new Error("Checklist could not be saved.");
+        saved = JSON.stringify(snapshot);
+      }
+      if (current()) { status.textContent = ""; retry.hidden = true; }
+    })().catch(error => {
+      if (current()) { status.textContent = "Checklist not saved. Your changes are still here."; retry.hidden = false; }
+      throw error;
+    }).finally(() => { pending = null; });
+    return pending;
+  };
+  const autosave = () => { void save().catch(() => {}); };
+  retry.addEventListener("click", autosave);
+  const render = () => {
+    list.replaceChildren();
+    for (const item of items) {
+      const row = document.createElement("article");
+      row.className = "project-records-row";
+      const label = document.createElement("input");
+      label.value = item.label; label.maxLength = 300;
+      label.setAttribute("aria-label", "Record name");
+      label.addEventListener("change", () => {
+        if (!label.value.trim()) { label.value = item.label; return; }
+        item.label = label.value.trim(); autosave();
+      });
+      const select = document.createElement("select");
+      select.setAttribute("aria-label", `Status for ${item.label}`);
+      for (const value of recordStatuses) {
+        const option = document.createElement("option"); option.value = value;
+        option.textContent = {needed:"Needed",requested:"Requested",received:"Received",reviewed:"Reviewed","not-applicable":"Not applicable"}[value];
+        select.append(option);
+      }
+      select.value = item.status;
+      select.addEventListener("change", () => { item.status = select.value; autosave(); });
+      const note = document.createElement("textarea");
+      note.rows = 2; note.maxLength = 2000; note.value = item.note;
+      note.placeholder = "Source, date, or follow-up";
+      note.setAttribute("aria-label", `Record notes for ${item.label}`);
+      note.addEventListener("input", () => { item.note = note.value; });
+      note.addEventListener("blur", autosave);
+      const remove = document.createElement("button");
+      remove.type = "button"; remove.className = "workflow-action workflow-action-secondary";
+      remove.textContent = "Remove"; remove.setAttribute("aria-label", `Remove record ${item.label}`);
+      remove.addEventListener("click", () => { items = items.filter(candidate => candidate.id !== item.id); render(); autosave(); });
+      for (const input of [label,select,note,remove]) input.disabled = Boolean(identity.sharedOnly);
+      row.append(label, select, note, remove); list.append(row);
+    }
+  };
+  const add = document.createElement("button");
+  add.type = "button"; add.className = "workflow-action workflow-action-secondary";
+  add.textContent = "Add record"; add.disabled = Boolean(identity.sharedOnly);
+  add.addEventListener("click", () => {
+    if (items.length >= 50) { status.textContent = "A checklist can contain up to 50 records."; return; }
+    items.push({id:crypto.randomUUID(),label:"New record",status:"needed",note:""});
+    render(); autosave(); list.lastElementChild?.querySelector("input")?.focus();
+  });
+  const suggested = document.createElement("button");
+  suggested.type = "button"; suggested.className = "workflow-action workflow-action-secondary";
+  suggested.textContent = "Add suggested records"; suggested.disabled = Boolean(identity.sharedOnly);
+  suggested.addEventListener("click", () => {
+    for (const label of suggestedRecords) if (items.length < 50 && !items.some(item => item.label === label)) {
+      items.push({id:crypto.randomUUID(),label,status:"needed",note:""});
+    }
+    render(); autosave();
+  });
+  section.append(heading,copy,list,add,suggested,status,retry); container.append(section); render();
+  return { flush: save };
+}
+
 async function renderProjectInformation(project, kind) {
   const identity = projectIdentity(project);
   const paneID = paneIDForProjectInformation(identity, kind);
@@ -32211,7 +32446,8 @@ async function renderProjectInformation(project, kind) {
   const content = document.createElement("section");
   content.className = "saved-project-summary project-information-content";
   const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind });
-  projectInformationMounts.set(paneID, { panel, ...editor });
+  const checklist = kind === "context" ? appendProjectRecordsChecklist(content, current, identity) : null;
+  projectInformationMounts.set(paneID, { panel, flush: async () => { await editor.flush(); await checklist?.flush(); } });
   panel.append(header, content);
   applyPaneWeight(panel, paneID);
   return panel;
@@ -34667,7 +34903,8 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
     if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("professional-exports")) {
       const reportButton = document.createElement("button");
       reportButton.type = "button";
-      reportButton.className = "saved-add-to-report";
+      reportButton.className = "saved-add-to-report workflow-action workflow-action-secondary";
+      row.append(reportMembershipIndicator(projectDetailKey(projectIdentity(options.reportProject)), "evidence", item));
       reportButton.textContent = "Add to Report";
       reportButton.addEventListener("click", async () => {
         reportButton.disabled = true;
