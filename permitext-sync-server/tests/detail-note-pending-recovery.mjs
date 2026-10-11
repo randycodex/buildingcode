@@ -6,7 +6,7 @@ const source=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
 const helperStart=source.indexOf('function pendingAnnotationNoteForTarget(');
 const helper=source.slice(helperStart,source.indexOf('\nfunction setAnnotationNoteValue',helperStart));
 const start=source.indexOf('  let noteRevision = 0;');
-const editor=source.slice(start,source.indexOf('\n  content.append(codeLabelElement',start));
+const editor=source.slice(start,source.indexOf('\n  const addNote = document.createElement',start));
 class Element {
  constructor(){this.textContent='';this.children=[];this.events={};}
  replaceChildren(){this.children=[];this.textContent='';}

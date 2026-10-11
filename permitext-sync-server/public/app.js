@@ -2705,8 +2705,9 @@ async function openProjectReportDraft(project) {
   closeSharedWorkspaceViews("report");
   const projectID = projectDetailKey(identity);
   if (reportScreen?.projectID === projectID && reportScreen.isCurrent() && !pendingReportDraftByProject.has(projectID)) {
-    reportScreen.open();
+    await reportScreen.open();
     syncProjectToolButtonStates(identity);
+    await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
     return true;
   }
   if (reportScreen) {
@@ -14327,6 +14328,9 @@ function scheduleAnnotationPush(record, onStatus = () => {}) {
       );
       saveWorkspaceState();
       onStatus("synced");
+      if ((record.syncFields || []).includes("noteBody")) {
+        await refreshProjectSourceConsumers([], { refreshNotebookReferences: false }).catch(() => false);
+      }
     } catch {
       if (isCurrentAccountRequest(requestIdentity)) onStatus("error");
       // The local annotation and durable outbox entry remain available for retry.

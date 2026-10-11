@@ -37,3 +37,27 @@ assert.equal(host.children.length,1);
 assert.deepEqual(draft,original,'Refreshing source comments must preserve the unsaved draft and exclusions');
 assert.equal(panel.children[0],row,'Keep the editor node and scroll container mounted');
 console.log('Live Report comment refresh passed: new source text and options, retained disclosure, exclusions and unsaved draft.');
+
+const activation=source.slice(source.indexOf('async function openProjectReportDraft('),source.indexOf('\nasync function closeProjectCoordination('));
+const events=[];
+const activationContext=vm.createContext({projectIdentity:p=>p,hasCapability:()=>true,projectDetailMatches:()=>true,
+ workspaceProject:()=>({}),closeSharedWorkspaceViews:()=>{},projectDetailKey:()=> 'p',
+ reportScreen:{projectID:'p',isCurrent:()=>true,open:async()=>events.push('open')},pendingReportDraftByProject:new Map(),
+ syncProjectToolButtonStates:()=>{},reportDraftMounts:new Map([['p',{refreshSources:async()=>events.push('refresh')}]] )});
+vm.runInContext(activation,activationContext);
+assert.equal(await activationContext.openProjectReportDraft({}),true);
+assert.deepEqual(events,['open','refresh'],'Reopening a retained Report requests current source comments');
+
+const schedule=source.slice(source.indexOf('function scheduleAnnotationPush('),source.indexOf('\nfunction pendingAnnotationNoteForTarget('));
+for(const fail of [false,true]) {
+ let callback,refreshCount=0;
+ const context=vm.createContext({captureAccountRequest:()=> 'a',activeAccount:()=>({}),annotationMutationForRecord:r=>r,
+ enqueueSyncMutation:()=>{},clearTimeout:()=>{},annotationPushTimers:new Map(),window:{setTimeout:fn=>{callback=fn;return 1}},
+ requireCurrentAccountRequest:()=>{},isCurrentAccountRequest:()=>true,pushMutation:async()=>{if(fail)throw Error('Offline')},
+ state:{localAnnotations:[]},saveWorkspaceState:()=>{},refreshOpenSavedPanes:async()=>{},refreshVisibleSyncedDerivedState:()=>{},
+ refreshProjectSourceConsumers:async()=>{refreshCount++}});
+ vm.runInContext(schedule,context);
+ context.scheduleAnnotationPush({id:'n',syncFields:['noteBody']});await callback();
+ assert.equal(refreshCount,fail?0:1,'Only a successful source-comment push refreshes the mounted Report');
+}
+console.log('Report activation and successful annotation sync both refresh mounted source comments.');

@@ -19,7 +19,7 @@ import { codeAssetRevision, codeAssetManifestEntry } from "./code-asset-manifest
 import { withCodeAssetRevision } from "./public/code-asset-identity.js";
 import { searchIndexedReaderChapter, ReaderSearchIndexError } from "./reader-search-index.mjs";
 import { chapterBodyContractResponse, publicCodeCorpusRevision } from "./chapter-body-contract.mjs";
-import { reportEvidenceEdition } from "./report-presentation.mjs";
+import { reportEvidenceEdition, reportResearchPlainText, reportEvidenceDisplayText } from "./report-presentation.mjs";
 import { researchFailureRecovery, researchRecoveryRequestDescription, researchRecoveryHumanContext } from "./public/research-failure-recovery.js";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
@@ -16573,7 +16573,7 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
         previewText: evidence.passageText.replace(/\s+/g, " ").trim().slice(0, 240),
         notes: selection.notes.map(note => ({ blockID: note.blockID, label: note.label, body: note.body })),
         label: `${evidence.codeBook} ${evidence.sectionNumber} · ${evidence.codeEdition}: ${evidence.title}`,
-        summary: evidence.passageText.slice(0, 500),
+        summary: reportEvidenceDisplayText(evidence.passageText).slice(0, 500),
         sourceClassification: "published-code", manifestItem: evidence,
         manifestItems: prepared.items, sourceSnapshot: prepared.sources[0]
       });
@@ -16622,7 +16622,7 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
         id: answer.id,
         kind: "researchAnswer",
         label: answer.question.length > 500 ? `${answer.question.slice(0, 499)}…` : answer.question,
-        summary: (answer.answer?.answerText || answer.answer?.conclusion || "").slice(0, 500),
+        summary: reportResearchPlainText(answer.answer?.answerText || answer.answer?.conclusion || "").slice(0, 500),
         sourceClassification: "ai-assisted",
         updatedAt: answer.createdAt,
         manifestItem: {
