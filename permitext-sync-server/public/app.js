@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-inline-message-v779";
+} from "./offline-storage.js?v=20261010-project-message-timeout-v780";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-inline-message-v779";
+} from "./research-intent-state.js?v=20261010-project-message-timeout-v780";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -708,6 +708,7 @@ const webWarningPositionCleanups = new WeakMap();
 let activeWorkspaceIssueAction = null;
 let activeWorkspaceIssueDismiss = null;
 let projectRequiredColumnNoticeVisible = false;
+let projectRequiredColumnNoticeTimer = null;
 let pendingResearchIntentResumePromise = null;
 let pendingResearchIntentInFlightID = "";
 let localWelcomePreviewPending = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname)
@@ -1755,12 +1756,21 @@ function notifyProjectRequiredForColumn() {
   projectRequiredColumnNoticeVisible = true;
   const message = track.querySelector(".workspace-project-required-message");
   if (message) message.hidden = false;
+  clearTimeout(projectRequiredColumnNoticeTimer);
+  projectRequiredColumnNoticeTimer = setTimeout(() => {
+    projectRequiredColumnNoticeVisible = false;
+    projectRequiredColumnNoticeTimer = null;
+    const currentMessage = track.querySelector(".workspace-project-required-message");
+    if (currentMessage) currentMessage.hidden = true;
+  }, 4000);
   return true;
 }
 
 function enforceProjectRequiredWorkspace() {
   if (!workspaceColumnsRequireProject()) {
     projectRequiredColumnNoticeVisible = false;
+    clearTimeout(projectRequiredColumnNoticeTimer);
+    projectRequiredColumnNoticeTimer = null;
     return false;
   }
   if (state.readers.length || state.utilityInstances.length || openProjectDetails().length ||

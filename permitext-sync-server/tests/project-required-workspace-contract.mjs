@@ -12,9 +12,13 @@ const actual = (name) => {
 let account = { userID: "owner" }, capability = true, projects = [], overlays = [], shared = [];
 let layoutClears = 0, accountOpens = 0, projectCreates = 0, columnAttempts = 0;
 let inlineMessage;
+let timerID = 0;
+const timers = new Map();
 const retainedEvidence = { id: "saved", sectionID: 2416 };
 const state = { ...emptyWorkspaceLayout(), localSavedItems: [retainedEvidence], localProjects: [] };
 const sandbox = vm.createContext({
+  setTimeout: (callback, delay) => { timers.set(++timerID, { callback, delay }); return timerID; },
+  clearTimeout: (id) => timers.delete(id),
   state, syncedContent: { userID: "owner", workspacePresentationAccess: "verified", get summary() { return { projects }; } },
   activeAccount: () => account, hasCapability: () => capability,
   currentContentSummary: () => ({ projects }),
@@ -35,7 +39,7 @@ const sandbox = vm.createContext({
   createNewWorkspace: () => { projectCreates++; },
   presentWorkspaceIssue: () => assert.fail("Project guidance belongs below the central button, not in a banner")
 });
-vm.runInContext("let projectRequiredColumnNoticeVisible = false;", sandbox);
+vm.runInContext("let projectRequiredColumnNoticeVisible = false; let projectRequiredColumnNoticeTimer = null;", sandbox);
 for (const name of ["workspaceColumnsRequireProject", "notifyProjectRequiredForColumn", "enforceProjectRequiredWorkspace", "defaultActivePaneIDs",
   "workspacePaneDescriptors", "toggleUtilityPane", "focusUtility", "openNewResearchColumn",
   "focusRecentUtilityColumn", "openDeepLinkedSectionInReader", "openSourceInReader", "workspaceCommandDefinitions", "renderProjectRequiredWorkspace"])
@@ -118,6 +122,16 @@ assert.equal(columnAttempts, 0);
 assert.equal(projectCreates, 0, "A column click must not create a Project automatically");
 assert.equal(JSON.stringify(state), emptyLayout, "No column opens while showing the message");
 assert.equal(sandbox.renderProjectRequiredWorkspace().children[0].children[1].hidden, false, "A background render preserves the visible message");
+assert.equal(timers.size, 1, "Repeated clicks restart the message timeout");
+const [noticeTimerID, noticeTimer] = [...timers][0];
+assert.equal(noticeTimer.delay, 4000);
+// A background render can replace the message before its timeout expires.
+inlineMessage = sandbox.renderProjectRequiredWorkspace().children[0].children[1];
+timers.delete(noticeTimerID); noticeTimer.callback();
+assert.equal(inlineMessage.hidden, true, "The message disappears after four seconds, even after a render");
+assert.equal(sandbox.renderProjectRequiredWorkspace().children[0].children[1].hidden, true, "Expired guidance stays hidden after rendering");
+await buttons.toggleFactsButton.click();
+assert.equal(inlineMessage.hidden, false, "A later column click shows the message again");
 await actions.children[0].click();
 assert.equal(projectCreates, 1, "The original button uses the existing Project creation flow");
 for (const publicAccount of [null, { userID: "owner" }]) {
@@ -162,6 +176,7 @@ assert.equal(accountOpens, 2, "Account remains accessible for Trash recovery");
 projects = [{ id: "new-project", folderType: "project" }];
 assert.equal(requiresProject(), false, "Creating or restoring a Project unlocks columns");
 assert.equal(sandbox.enforceProjectRequiredWorkspace(), false);
+assert.equal(timers.size, 0, "Opening a Project cancels pending guidance dismissal");
 assert.equal(sandbox.renderProjectRequiredWorkspace().children[0].children[1].hidden, true, "Creating or restoring a Project resets the obsolete notice");
 
 // Exercise the real deletion-to-render transition with a stale open layout.

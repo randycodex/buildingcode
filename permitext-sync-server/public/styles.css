@@ -1284,7 +1284,17 @@ textarea:focus-visible {
   margin-top: 0;
 }
 
+.workspace-empty-guidance > div {
+  position: relative;
+  width: 100%;
+}
+
 .workspace-empty-guidance .workspace-project-required-message {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: min(34rem, 100%);
+  transform: translateX(-50%);
   margin-top: var(--space-3);
   line-height: 1.4;
 }
