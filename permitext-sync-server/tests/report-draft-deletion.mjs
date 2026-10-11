@@ -17,6 +17,7 @@ function harness({ confirmed = true, requestError = null, dirty = true } = {}) {
     current: true, disposed: false, pendingDraftSave: null, generatingReport: false, deletingReport: false,
     shell: { inert: false }, trigger: { disabled: false }, calls: [], confirmations: [], renders: 0,
     message: "", refreshes: 0, notebookMounts: new Map(),
+    refreshProjectReportMembership: async () => {},
     isCurrentAccountRequest: () => c.current,
     confirmWebWarning: async (...args) => { c.confirmations.push(args); return confirmed; },
     reportRequest: async (path, body) => {

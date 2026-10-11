@@ -26,3 +26,5 @@ NYC CC APP/IMG_*.PNG
 .vercel
 
 permitext-sync-server/deployment-public/
+
+permitext-sync-server/public/pdf-preview-assets/

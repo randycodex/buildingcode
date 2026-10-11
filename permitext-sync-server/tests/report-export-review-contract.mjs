@@ -21,8 +21,8 @@ const context = vm.createContext({ document, crypto: { randomUUID: () => "synthe
   setInterval: callback => { timer = callback; return 1; }, clearInterval: () => {},
   URL: { createObjectURL: blob => { createdBlob = blob; urls.add("blob:synthetic"); return "blob:synthetic"; },
     revokeObjectURL: url => urls.delete(url) },
-  Blob, Uint8Array, atob, Error });
-vm.runInContext(source.replace("export function", "function"), context);
+  Blob, Uint8Array, atob, Error, renderReportPDF: async (container, blob) => { createdBlob = blob; const page = new Element("canvas"); container.append(page); return () => {}; } });
+vm.runInContext(source.replace(/^import[^\n]+\n/, "").replace("export function", "function"), context);
 const packet = { filename: "reviewed.pdf", pdfBlob: new Blob(["%PDF-frozen-reviewed-bytes"]),
   manifest: { project: { name: "Review Project" }, reportVersion: 2, sourceVersions: { selections: [{}] },
     items: [{ kind: "evidence", codeBook: "BC", codeEdition: "2022", sectionNumber: "101.2", title: "Scope",
@@ -37,8 +37,9 @@ const [header, status, content, footer] = dialog.children;
 const [retry, download] = footer.children;
 assert.equal(download.disabled, false);
 assert.equal(downloadCount, 0, "Review must not print, open a PDF or download automatically.");
-assert.equal(content.children[0].children[2].textContent, packet.manifest.items[0].passageText);
-assert.equal(content.children[2].textContent, "Private note.");
+assert.equal(content.children[0].tag, "canvas");
+assert.equal(await createdBlob.text(), "%PDF-frozen-reviewed-bytes");
+assert.ok(!status.textContent.includes("Tables included as text"));
 download.click();
 assert.equal(await createdBlob.text(), "%PDF-frozen-reviewed-bytes");
 assert.equal(requests, 1, "Download uses the issued PDF bytes, not a fresh source lookup.");

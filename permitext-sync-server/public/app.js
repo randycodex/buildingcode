@@ -1,5 +1,6 @@
+import { createReportScreen } from "./report-screen.js?v=20261011-report-screen-v2";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
-import { openReportExportReview } from "./report-export-review.js?v=20261010-report-export-v2";
+import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v5";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
@@ -675,6 +676,7 @@ function readNotebookReturnCard(context, cards) {
 
 const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
+let reportScreen = null;
 const legacyHydrationByProject = new Map();
 const coordinationComposerDraftByProject = new Map();
 let projectStudioFolderReconcilePromise = null;
@@ -1615,7 +1617,7 @@ async function confirmWorkspaceTransition() {
   if (!(await flushProjectInformationPanes())) return false;
   for (const project of openProjectDetails()) {
     if (projectHasOpenNotebook(project) && !(await confirmNotebookDiscard(project))) return false;
-    if (projectHasOpenReportDraft(project) && !(await confirmReportDraftDiscard(project))) return false;
+    if (reportDraftMounts.has(projectDetailKey(project)) && !(await confirmReportDraftDiscard(project))) return false;
   }
   return true;
 }
@@ -2468,7 +2470,7 @@ function projectHasOpenNotebook(project) {
 }
 
 function projectHasOpenReportDraft(project) {
-  return openReportDrafts().some((item) => projectDetailMatches(project, item));
+  return Boolean(reportScreen?.isOpen() && reportScreen.projectID === projectDetailKey(project));
 }
 
 function projectHasOpenCoordination(project) {
@@ -2693,35 +2695,46 @@ async function openProjectNotebook(project) {
 }
 
 async function closeProjectReportDraft(project) {
-  if (!(await confirmReportDraftDiscard(project))) return false;
-  const reportDraftID = paneIDForProjectReportDraft(project);
-  state.reportDrafts = openReportDrafts().filter((item) => !projectDetailMatches(project, item));
-  delete state.paneWeights[reportDraftID];
-  state.paneOrder = (state.paneOrder || []).filter((id) => id !== reportDraftID);
+  // Returning to research retains the editor and its unfinished draft.
+  if (reportScreen?.projectID === projectDetailKey(project)) reportScreen.close();
   syncProjectToolButtonStates(project);
-  saveWorkspaceState();
-  await transitionWorkspace("utility");
   return true;
 }
 
 async function openProjectReportDraft(project) {
   const identity = projectIdentity(project);
-  const wasOpen = projectHasOpenReportDraft(identity);
-  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
-    const activated = await activateProjectStudio(identity, { transition: false });
-    if (!activated) return false;
+  if (!hasCapability("professional-exports") || identity.sharedOnly) return false;
+  if (!projectDetailMatches(workspaceProject(), identity)) {
+    if (!await activateProjectStudio(identity)) return false;
   }
-  state.reportDrafts = [
-    ...openReportDrafts().filter((item) => !projectDetailMatches(identity, item)),
-    identity
-  ];
-  const reportDraftID = paneIDForProjectReportDraft(identity);
-  state.paneWeights[reportDraftID] ||= defaultReportDraftPaneWidth;
-  if (!wasOpen) placeProjectToolPaneInControlOrder(identity);
+  const projectID = projectDetailKey(identity);
+  if (reportScreen?.projectID === projectID && reportScreen.isCurrent() && !pendingReportDraftByProject.has(projectID)) {
+    reportScreen.open();
+    syncProjectToolButtonStates(identity);
+    return true;
+  }
+  if (reportScreen) {
+    if (reportScreen.isCurrent() && !await confirmReportDraftDiscard(identity)) return false;
+    reportScreen.dispose();
+  }
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const screen = createReportScreen({
+    projectName: identity.name,
+    load: () => renderProjectReportDraft(identity),
+    isCurrent: () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+      hasCapability("professional-exports") && projectDetailMatches(workspaceProject(), identity),
+    onClose: () => syncProjectToolButtonStates(identity),
+    onDispose: () => {
+      reportDraftMounts.get(projectID)?.dispose?.();
+      reportDraftMounts.delete(projectID);
+      if (reportScreen === screen) reportScreen = null;
+    }
+  });
+  screen.projectID = projectID;
+  reportScreen = screen;
+  await screen.open();
   syncProjectToolButtonStates(identity);
-  saveWorkspaceState();
-  await transitionWorkspace("utility");
-  scrollPaneIntoView(reportDraftID);
   startProjectArtifactCheckpointLoop({ immediate: true });
   return true;
 }
@@ -2943,7 +2956,7 @@ function cleanupInactiveReportDraftMounts(panes) {
     .map((pane) => pane.dataset.projectId)
     .filter(Boolean));
   reportDraftMounts.forEach((mounted, projectID) => {
-    if (activeProjectIDs.has(projectID)) return;
+    if (activeProjectIDs.has(projectID) || mounted.panel?.closest(".report-screen")) return;
     mounted.dispose?.();
     reportDraftMounts.delete(projectID);
   });
@@ -3947,6 +3960,7 @@ async function activateProjectStudio(project, options = {}) {
     await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
   }
   if (options.focusSaved !== false) scrollPaneIntoView(primarySavedPaneID());
+  if (options.openReportDraft) await openProjectReportDraft(identity);
   if (options.outcome) options.outcome.value = "applied";
   return true;
 }
@@ -4119,7 +4133,6 @@ function defaultActivePaneIDs() {
     if (state.projectContextOpen) ids.push(paneIDForProjectInformation(detail, "context"));
     if (state.projectFactsOpen) ids.push(paneIDForProjectInformation(detail, "facts"));
     if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
-    if (projectHasOpenReportDraft(detail)) ids.push(paneIDForProjectReportDraft(detail));
     if (projectHasOpenCoordination(detail)) {
       ids.push(paneIDForProjectCoordination(detail));
       const thread = openCoordinationThreadForProject(detail);
@@ -4148,7 +4161,6 @@ function projectWorkspacePaneIDs(detail) {
     ...(state.projectContextOpen ? [paneIDForProjectInformation(detail, "context")] : []),
     ...(state.projectFactsOpen ? [paneIDForProjectInformation(detail, "facts")] : []),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
-    ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
@@ -4851,7 +4863,6 @@ function placeArchiveAfterProjectsStack() {
   const projectStackIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
-    ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
@@ -4869,7 +4880,6 @@ function restoreProjectsStackOrder(sourcePaneID = "") {
   const detailIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
-    ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
@@ -27944,7 +27954,7 @@ async function renderProjectReportDraft(project) {
   applyPaneWeight(panel, paneID);
 
   const header = createReportPaneHeader(() => closeProjectReportDraft(identity));
-  header.querySelector(".report-draft-header-actions").append(createProjectToolDragHandle(identity));
+  header.hidden = true;
 
   const shell = document.createElement("div");
   shell.className = "report-draft-shell";
@@ -28011,6 +28021,7 @@ async function renderProjectReportDraft(project) {
     },
     dispose() {
       disposed = true;
+      panel.closest(".report-screen")?.remove();
     }
   };
   reportDraftMounts.set(projectID, mountState);
@@ -28534,6 +28545,18 @@ async function renderProjectReportDraft(project) {
       container.append(row);
     };
 
+    for (const [kind, label] of [["evidence", "Evidence"], ["notebookCard", "Notes"]]) {
+      appendSourceGroup(label, "", body => {
+        const items = sources.filter(source => source.kind === kind);
+        items.forEach(source => appendSourceCard(body, source));
+        if (!items.length) {
+          const empty = document.createElement("p");
+          empty.className = "report-workflow-help";
+          empty.textContent = kind === "evidence" ? "Save passages in your workspace to use them here." : "Write notes in Notebook to use them here.";
+          body.append(empty);
+        }
+      });
+    }
     const projectFactsSources = sources.filter((source) => source.kind === "projectFacts");
     appendSourceGroup("Project facts", "", (groupBody) => {
 
@@ -28809,13 +28832,13 @@ async function renderProjectReportDraft(project) {
     renderSourcePalette(sourcePalette);
     const sourcePicker = document.createElement("details");
     sourcePicker.className = "report-source-picker";
-    sourcePicker.open = reportSectionExpanded("Add sources", false);
+    sourcePicker.open = true;
     const sourcePickerToggle = document.createElement("summary");
     sourcePickerToggle.textContent = reportSourcePickerLabel();
     sourcePickerToggle.className = "section-label";
     const sourcePickerHelp = document.createElement("p");
     sourcePickerHelp.className = "report-source-picker-help";
-    sourcePickerHelp.textContent = "Add project facts or Research answers here. Add evidence and notes directly from their columns.";
+    sourcePickerHelp.textContent = "Choose saved material from this project. Added items stay linked to their sources.";
     sourcePicker.addEventListener("toggle", () => {
       persistReportSectionExpanded("Add sources", sourcePicker.open);
     });
@@ -28892,14 +28915,45 @@ async function renderProjectReportDraft(project) {
       "report-history-section",
       "Report history"
     );
-    shell.append(
-      draftPicker,
-      primaryActions,
-      metadata,
-      blocks,
-      sourcePicker,
-      historySection
-    );
+    const documentBody = document.createElement("div");
+    documentBody.className = "report-document";
+    documentBody.append(draftPicker, metadata, blocks);
+    const outline = document.createElement("nav");
+    outline.className = "report-outline";
+    outline.setAttribute("aria-label", "Report outline");
+    const outlineTitle = document.createElement("h2");
+    outlineTitle.textContent = "Outline";
+    outline.append(outlineTitle);
+    const addOutlineLink = (label, target) => {
+      const link = document.createElement("button");
+      link.type = "button";
+      link.textContent = label;
+      link.addEventListener("click", () => {
+        if (target === metadata && introductionLabel.getAttribute("aria-expanded") === "false") introductionLabel.click();
+        if (target !== metadata && blocksTitle.getAttribute("aria-expanded") === "false") blocksTitle.click();
+        requestAnimationFrame(() => target.scrollIntoView({ block: "start", behavior: "smooth" }));
+      });
+      outline.append(link);
+    };
+    addOutlineLink("Introduction", metadata);
+    [...blocksBody.querySelectorAll(".report-draft-block")].forEach((row, index) => {
+      addOutlineLink(`${index + 1}. ${reportBlockTitle(activeDraft.blocks[index])}`, row);
+    });
+    const library = document.createElement("aside");
+    library.className = "report-library";
+    library.setAttribute("aria-label", "Report sources and versions");
+    library.append(sourcePicker, historySection);
+    const tools = document.createElement("button");
+    tools.type = "button";
+    tools.textContent = "Sources & versions";
+    tools.setAttribute("aria-expanded", String(panel.dataset.libraryOpen === "true"));
+    tools.addEventListener("click", () => {
+      const expanded = panel.dataset.libraryOpen !== "true";
+      panel.dataset.libraryOpen = String(expanded);
+      tools.setAttribute("aria-expanded", String(expanded));
+    });
+    primaryActions.prepend(tools);
+    shell.append(primaryActions, outline, documentBody, library);
   }
 
   refreshReportSources = async () => {
@@ -30435,11 +30489,7 @@ async function openCoordinationTarget(identity, foundation, thread) {
   if (thread.targetKind === "reportDraft") {
     pendingReportDraftByProject.set(projectDetailKey(identity), thread.targetID);
     await openProjectReportDraft(identity);
-    await transitionWorkspace("utility", {
-      refreshPaneIDs: [paneIDForProjectReportDraft(identity)]
-    });
-    if (!await whenWorkspacePaneReady(paneIDForProjectReportDraft(identity))) return;
-    scrollPaneIntoView(paneIDForProjectReportDraft(identity));
+    // The standalone Report screen has finished loading the requested draft.
     const focusResult = reportDraftFocusResultByProject.get(projectDetailKey(identity));
     reportDraftFocusResultByProject.delete(projectDetailKey(identity));
     if (!focusResult?.focused) {
@@ -43469,8 +43519,7 @@ function workspacePaneDescriptors(options = {}) {
       add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project, { foundationScope }),
         () => closeProjectNotebook(project), { foundationScope, ownerClass: "notebook-panel", projectID, accessCapabilities: ["notebook"] });
     }
-    if (projectHasOpenReportDraft(project)) add(paneIDForProjectReportDraft(project), "Report", () => renderProjectReportDraft(project),
-      () => closeProjectReportDraft(project), { ownerClass: "report-draft-panel", projectID, accessCapabilities: ["professional-exports"] });
+    // Report owns a separate screen; never insert it into the column track.
     if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)) {
       add(paneIDForProjectCoordination(project), "Coordination", () => renderProjectCoordination(project), () => closeProjectCoordination(project));
       const thread = openCoordinationThreadForProject(project);

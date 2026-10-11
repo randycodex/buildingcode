@@ -41,7 +41,7 @@
     "start:local-research": "zsh scripts/start-local-research.zsh",
     "start:local-pro": "node scripts/start-local-pro-preview.mjs",
     "test:local-pro-persistence": "node tests/local-pro-preview-persistence.mjs",
-    "build:clients": "npm run build:notebook && npm run build:account-verification && npm run build:analytics",
+    "build:clients": "npm run build:notebook && npm run build:account-verification && npm run build:analytics && npm run build:report-preview",
     "build:analytics": "vite build --config vite.analytics.config.js",
     "build:account-verification": "vite build --config vite.account-verification.config.js",
     "prebuild:notebook": "npm run test:notebook-security",
@@ -232,7 +232,9 @@
     "test:research-source-explanation-repair": "node tests/research-source-explanation-revision-contract.mjs && node tests/research-source-explanation-revision-http-contract.mjs",
     "test:research-accuracy": "node tests/research-rule-packets-contract.mjs && node tests/research-accuracy-retrieval-contract.mjs && node tests/research-scenario-continuity-contract.mjs && node tests/research-conversation-recall-contract.mjs && node tests/research-explicit-reference-binding-contract.mjs && node tests/research-clarification-copy-contract.mjs && node tests/research-opening-consistency-http-contract.mjs",
     "test:typesafe-intent": "node --test tests/typesafe-intent.test.mjs",
-    "eval:typesafe-intent": "node scripts/eval-typesafe-intent.mjs"
+    "eval:typesafe-intent": "node scripts/eval-typesafe-intent.mjs",
+    "build:report-preview": "node scripts/build-report-preview.mjs",
+    "test:report-screen": "node tests/report-screen-contract.mjs && node tests/report-export-review-contract.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.54.0",
