@@ -10,7 +10,8 @@ const actual = (name) => {
   return source;
 };
 let account = { userID: "owner" }, capability = true, projects = [], overlays = [], shared = [];
-let layoutClears = 0, accountOpens = 0;
+let layoutClears = 0, accountOpens = 0, projectCreates = 0, columnAttempts = 0;
+const notices = [];
 const retainedEvidence = { id: "saved", sectionID: 2416 };
 const state = { ...emptyWorkspaceLayout(), localSavedItems: [retainedEvidence], localProjects: [] };
 const sandbox = vm.createContext({
@@ -29,9 +30,15 @@ const sandbox = vm.createContext({
   applyStoredWorkspaceLayout: (layout) => { Object.assign(state, layout); layoutClears++; },
   codeQuestionWorkspaceState: () => ({}), closeCodeDecisionContext: (s) => s, setCodeQuestionWorkspaceState() {},
   document: { querySelector: () => null },
-  toggleAccountDialog: () => { accountOpens++; }
+  toggleAccountDialog: () => { accountOpens++; },
+  activeWorkspaceIssueAction: null,
+  createNewWorkspace: () => { projectCreates++; },
+  presentWorkspaceIssue: (message, options) => {
+    notices.push({ message, options }); sandbox.activeWorkspaceIssueAction = options.onAction;
+  },
+  dismissWorkspaceIssue: () => { sandbox.activeWorkspaceIssueAction = null; }
 });
-for (const name of ["workspaceColumnsRequireProject", "enforceProjectRequiredWorkspace", "defaultActivePaneIDs",
+for (const name of ["workspaceColumnsRequireProject", "notifyProjectRequiredForColumn", "enforceProjectRequiredWorkspace", "defaultActivePaneIDs",
   "workspacePaneDescriptors", "toggleUtilityPane", "focusUtility", "openNewResearchColumn",
   "focusRecentUtilityColumn", "openDeepLinkedSectionInReader", "openSourceInReader", "workspaceCommandDefinitions"])
   vm.runInContext(actual(name), sandbox);
@@ -64,6 +71,56 @@ assert.equal(requiresProject(), false, "Anonymous public browsing stays availabl
 account = { userID: "owner" }; capability = false;
 assert.equal(requiresProject(), false, "Free readers are not trapped behind Pro project creation");
 capability = true;
+
+// Exercise the actual top-menu listeners, including Reader, rather than just
+// calling the lower-level layout guards. Every blocked click must explain why.
+function toolbarButton() {
+  const listeners = new Map();
+  const span = { textContent: "" };
+  return { dataset: {}, disabled: true, hidden: false, attributes: {},
+    classList: { toggle() {} }, querySelector: () => span,
+    setAttribute(key, value) { this.attributes[key] = value; },
+    addEventListener(type, handler) { listeners.set(type, handler); },
+    click: () => listeners.get("click")() };
+}
+const buttons = Object.fromEntries(["toggleContextButton", "toggleFactsButton", "toggleNotebookButton", "toggleReportButton",
+  "toggleSearchButton", "toggleAnalysisButton", "toggleSavedButton", "addReaderButton"].map(name => [name, toolbarButton()]));
+Object.assign(sandbox, buttons, {
+  track: { dataset: { utilityFocusBound: "true" } }, releaseSurfaceVisibility: { workboard: false },
+  toggleArchiveButton: null, toggleWorkboardButton: null, toggleSettingsButton: toolbarButton(), collapseReadersButton: toolbarButton(),
+  genericWorkboardIsOpen: () => false, syncTopbarProjectToolStates() {}, isProAccount: () => true,
+  updateWorkspaceLayoutControls() {},
+  toggleProjectInformation: () => { columnAttempts++; }, toggleProjectTool: () => { columnAttempts++; },
+  toggleProjectsColumns: () => { columnAttempts++; }, openReaderCodePicker: () => { columnAttempts++; }
+});
+vm.runInContext(["bindImmediateUtilityControls", "setUtilityButtonStates", "updateReaderPlanControls"].map(actual).join("\n"), sandbox);
+const readerListener = app.match(/addReaderButton\.addEventListener\("click", async \(\) => \{[\s\S]*?\n  \}\);/)?.[0];
+assert.ok(readerListener);
+vm.runInContext(readerListener, sandbox);
+sandbox.bindImmediateUtilityControls();
+sandbox.setUtilityButtonStates(); sandbox.updateReaderPlanControls();
+const emptyLayout = JSON.stringify(state);
+for (const [name, control] of Object.entries(buttons)) {
+  if (["toggleSearchButton", "toggleAnalysisButton", "toggleSavedButton", "addReaderButton"].includes(name))
+    assert.equal(control.disabled, false, `${name} can receive a click`);
+  const previousCount = notices.length;
+  await control.click();
+  assert.equal(notices.length, previousCount + 1, `${name} announces the Project requirement`);
+  assert.match(notices.at(-1).message, /Create a Project first/);
+  assert.equal(notices.at(-1).options.actionLabel, "Create Project");
+}
+assert.equal(columnAttempts, 0);
+assert.equal(projectCreates, 0, "A column click must not create a Project automatically");
+assert.equal(JSON.stringify(state), emptyLayout, "No column opens while showing the message");
+notices.at(-1).options.onAction();
+assert.equal(projectCreates, 1, "The message action uses the existing Project creation flow");
+for (const publicAccount of [null, { userID: "owner" }]) {
+  account = publicAccount; capability = false;
+  const previousCount = notices.length;
+  assert.equal(sandbox.notifyProjectRequiredForColumn(), false);
+  assert.equal(notices.length, previousCount, "Public browsing does not receive a Pro Project requirement");
+}
+account = { userID: "owner" }; capability = true;
 
 state.readers = [{ id: "reader" }];
 state.utilityInstances = [{ key: "saved", id: "evidence" }, { key: "search", id: "search" }];
@@ -99,6 +156,7 @@ assert.equal(accountOpens, 2, "Account remains accessible for Trash recovery");
 projects = [{ id: "new-project", folderType: "project" }];
 assert.equal(requiresProject(), false, "Creating or restoring a Project unlocks columns");
 assert.equal(sandbox.enforceProjectRequiredWorkspace(), false);
+assert.equal(sandbox.activeWorkspaceIssueAction, null, "Creating or restoring a Project removes the obsolete notice");
 
 // Exercise the real deletion-to-render transition with a stale open layout.
 state.readers = [{ id: "open-reader" }];

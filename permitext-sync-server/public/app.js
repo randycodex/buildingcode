@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-account-heading-cover-v777";
+} from "./offline-storage.js?v=20261010-project-required-message-v778";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-account-heading-cover-v777";
+} from "./research-intent-state.js?v=20261010-project-required-message-v778";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1749,8 +1749,20 @@ function workspaceColumnsRequireProject() {
     .some(folderIsProject);
 }
 
-function enforceProjectRequiredWorkspace() {
+function notifyProjectRequiredForColumn() {
   if (!workspaceColumnsRequireProject()) return false;
+  presentWorkspaceIssue("Create a Project first to open workspace columns.", {
+    actionLabel: "Create Project",
+    onAction: createNewWorkspace
+  });
+  return true;
+}
+
+function enforceProjectRequiredWorkspace() {
+  if (!workspaceColumnsRequireProject()) {
+    if (activeWorkspaceIssueAction === createNewWorkspace) dismissWorkspaceIssue();
+    return false;
+  }
   if (state.readers.length || state.utilityInstances.length || openProjectDetails().length ||
       Object.values(state.utilities).some(Boolean) || openCodeQuestionPaneIDs().length ||
       supplementalResearchConversationIDs.length) {
@@ -4549,6 +4561,7 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
 function syncTopbarProjectToolStates() {
   const project = workspacePrivatePresentationAllowed() ? workspaceProject() : null;
   const identity = project ? projectIdentity(project) : null;
+  const requiresProject = workspaceColumnsRequireProject();
   [
     [toggleContextButton, "Context", "projects", () => Boolean(state.projectContextOpen)],
     [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
@@ -4558,9 +4571,10 @@ function syncTopbarProjectToolStates() {
     if (!button) return;
     const opened = Boolean(identity && isOpen(identity));
     const sharedReport = Boolean(label === "Report" && identity?.sharedOnly);
-    button.disabled = projectToolTogglePending || !identity || !hasCapability(capability) || sharedReport;
+    button.disabled = projectToolTogglePending || (!requiresProject && (!identity || !hasCapability(capability) || sharedReport));
     button.setAttribute("aria-pressed", String(opened));
-    button.title = !identity ? `Choose a Project to open ${label}`
+    button.title = requiresProject ? `Create a Project first to open ${label}`
+      : !identity ? `Choose a Project to open ${label}`
       : !hasCapability(capability) ? `${label} requires Pro`
       : sharedReport ? "Report editing is unavailable for shared-only Projects."
       : `${opened ? "Close" : "Open"} ${label} · ${identity.name}`;
@@ -4947,9 +4961,8 @@ function applyPaneWeight(panel, paneID) {
 }
 
 function setUtilityButtonStates() {
-  const requiresProject = workspaceColumnsRequireProject();
   [toggleArchiveButton, toggleSearchButton, toggleSavedButton, toggleAnalysisButton, toggleWorkboardButton]
-    .forEach((button) => { if (button) button.disabled = requiresProject; });
+    .forEach((button) => { if (button) button.disabled = false; });
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   addReaderButton.classList.toggle("has-open-reader", state.readers.length > 0);
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
@@ -7971,11 +7984,11 @@ function updateReaderPlanControls() {
   addReaderButton.querySelector("span").textContent = readerLabel;
   addReaderButton.dataset.mobileLabel = readerLabel;
   addReaderButton.hidden = false;
-  addReaderButton.disabled = requiresProject || limitReached;
-  addReaderButton.title = requiresProject ? "Create a Project to open columns" : limitReached ? "Two Reader limit reached" : readerLabel;
+  addReaderButton.disabled = limitReached;
+  addReaderButton.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "Two Reader limit reached" : readerLabel;
   addReaderButton.setAttribute(
     "aria-label",
-    requiresProject ? "Create a Project to open Reader" : limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
+    limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
   );
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
@@ -43644,7 +43657,10 @@ function bindImmediateUtilityControls() {
   ].forEach(([button, tool]) => {
     if (!button || button.dataset.coldStartBound === "true") return;
     button.dataset.coldStartBound = "true";
-    button.addEventListener("click", () => void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : toggleProjectTool(tool)));
+    button.addEventListener("click", () => {
+      if (notifyProjectRequiredForColumn()) return;
+      void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : toggleProjectTool(tool));
+    });
   });
   if (track.dataset.utilityFocusBound !== "true") {
     track.dataset.utilityFocusBound = "true";
@@ -43658,6 +43674,7 @@ function bindImmediateUtilityControls() {
   if (toggleSearchButton.dataset.coldStartBound !== "true") {
     toggleSearchButton.dataset.coldStartBound = "true";
     toggleSearchButton.addEventListener("click", () => {
+      if (notifyProjectRequiredForColumn()) return;
       void focusRecentUtilityColumn("search");
     });
   }
@@ -43670,12 +43687,14 @@ function bindImmediateUtilityControls() {
   if (toggleAnalysisButton?.dataset.coldStartBound !== "true") {
     toggleAnalysisButton.dataset.coldStartBound = "true";
     toggleAnalysisButton.addEventListener("click", () => {
+      if (notifyProjectRequiredForColumn()) return;
       void focusRecentUtilityColumn("analysis");
     });
   }
   if (toggleSavedButton.dataset.coldStartBound === "true") return;
   toggleSavedButton.dataset.coldStartBound = "true";
   toggleSavedButton.addEventListener("click", () => {
+    if (notifyProjectRequiredForColumn()) return;
     void toggleProjectsColumns();
   });
 }
@@ -43911,7 +43930,7 @@ async function start() {
     localStorage.removeItem("permitext:pendingWorkboardReattach");
   }
   addReaderButton.addEventListener("click", async () => {
-    if (workspaceColumnsRequireProject()) return;
+    if (notifyProjectRequiredForColumn()) return;
     if (!isProAccount() && state.readers.length >= 2) {
       enforceReaderPlanLimit();
       await transitionWorkspace("utility");

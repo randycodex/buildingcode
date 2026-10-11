@@ -28,7 +28,7 @@ const chrome=vm.createContext({workspaceColumnsRequireProject:()=>false,syncTopb
 vm.runInContext(actual('setUtilityButtonStates'),chrome);chrome.setUtilityButtonStates();assert.equal(pressed.analysis,'true');chrome.state.utilityInstances=[];chrome.setUtilityButtonStates();assert.equal(pressed.analysis,'false');chrome.state.utilities.analysis=true;chrome.setUtilityButtonStates();assert.equal(pressed.analysis,'true');
 
 chrome.workspaceColumnsRequireProject=()=>true;chrome.setUtilityButtonStates();
-for(const control of ['toggleSavedButton','toggleSearchButton','toggleAnalysisButton','toggleWorkboardButton'])assert.equal(chrome[control].disabled,true,'Project-less workspace disables column controls');
+for(const control of ['toggleSavedButton','toggleSearchButton','toggleAnalysisButton','toggleWorkboardButton'])assert.equal(chrome[control].disabled,false,'Project-less controls can receive clicks to explain the Project requirement');
 chrome.workspaceColumnsRequireProject=()=>false;chrome.setUtilityButtonStates();
 assert.equal(chrome.toggleSearchButton.disabled,false,'Project creation re-enables column controls');
 

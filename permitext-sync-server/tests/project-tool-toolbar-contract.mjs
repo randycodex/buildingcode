@@ -18,7 +18,7 @@ function button() {
   return { attributes: {}, disabled: false, setAttribute(key, value) { this.attributes[key] = value; } };
 }
 let project = { id: "a", name: "Alpha" };
-let allowed = true, privateAllowed = true, discard = true, heldOpen = null;
+let allowed = true, privateAllowed = true, discard = true, heldOpen = null, requiresProject = false;
 const capabilities = new Set(["projects", "notebook", "professional-exports"]);
 const calls = [];
 const contextButton = button(), factsButton = button(), notebookButton = button(), reportButton = button();
@@ -27,6 +27,7 @@ const c = vm.createContext({
   state, toggleContextButton: contextButton, toggleFactsButton: factsButton, toggleNotebookButton: notebookButton, toggleReportButton: reportButton,
   workspaceProject: () => project,
   workspacePrivatePresentationAllowed: () => privateAllowed,
+  workspaceColumnsRequireProject: () => requiresProject,
   projectIdentity: value => ({ ...value }), projectDetailKey: value => value.id,
   projectDetailMatches: (a, b) => a.id === b.id,
   hasCapability: name => allowed && capabilities.has(name),
@@ -112,6 +113,15 @@ assert.equal(notebookButton.attributes["aria-pressed"], "false");
 const before = calls.length;
 assert.equal(await c.toggleProjectTool("report"), false);
 assert.equal(calls.length, before);
+requiresProject = true; c.syncTopbarProjectToolStates();
+for (const [control, label] of [[contextButton, "Context"], [factsButton, "Facts"], [notebookButton, "Notebook"], [reportButton, "Report"]]) {
+  assert.equal(control.disabled, false, `${label} remains clickable to explain the Project requirement`);
+  assert.equal(control.attributes["aria-pressed"], "false");
+  assert.equal(control.title, `Create a Project first to open ${label}`);
+}
+assert.equal(await c.toggleProjectTool("report"), false);
+assert.equal(calls.length, before, "Enabling the control cannot bypass Project ownership");
+requiresProject = false;
 project = { id: "a", name: "Alpha" }; allowed = false;
 c.syncTopbarProjectToolStates();
 assert.equal(notebookButton.disabled, true);
