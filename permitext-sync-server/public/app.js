@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-workflow-review-v858";
+} from "./offline-storage.js?v=20261011-report-polish-v859";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
