@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-notes-insert-v851";
+} from "./offline-storage.js?v=20261011-evidence-actions-v853";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28117,6 +28117,10 @@ async function refreshProjectReportMembership(projectID, force = false) {
         : drafts.length > 1 ? "Choose a Report when adding" : "Adding creates the first Report";
       host.title = included.length ? included.map(draft => draft.title || "Untitled Report").join(", ") : host.textContent;
       host.setAttribute("aria-label", included.length ? `Included in ${host.title}` : host.textContent);
+      if (host.dataset.reportMembershipMode === "action") {
+        host.textContent = included.length ? "In Report" : "Add to Report";
+        host.setAttribute("aria-label", included.length ? `In Report: ${host.title}. Choose a Report to add this evidence.` : "Add evidence to Report");
+      }
     });
   };
   if (!force && reportMembershipCache.has(key)) { paint(reportMembershipCache.get(key)); return; }
@@ -28139,10 +28143,12 @@ async function refreshProjectReportMembership(projectID, force = false) {
   return request;
 }
 
-function reportMembershipIndicator(projectID, kind, source) {
-  const status = document.createElement("p");
+function reportMembershipIndicator(projectID, kind, source, mode = "status") {
+  const status = document.createElement(mode === "action" ? "button" : "p");
+  if (mode === "action") status.type = "button";
+  status.dataset.reportMembershipMode = mode;
   status.className = "report-membership-status";
-  status.setAttribute("role", "status");
+  if (mode !== "action") status.setAttribute("role", "status");
   status.dataset.reportMembershipProject = projectID;
   status.dataset.reportSourceKind = kind;
   status.dataset.reportSourceId = source.id || "";
@@ -32851,6 +32857,17 @@ function populateSavedEvidenceSection(section, savedInstance, folder, ...childre
   body.className = "saved-project-evidence-body";
   body.id = `saved-evidence-${safeAnnotationIDPart(folderID)}-${safeAnnotationIDPart(savedInstance.id)}`;
   title.setAttribute("aria-controls", body.id);
+  if (folderIsProject(folder)) {
+    title.remove();
+    if (!folder.sharedOnly && hasCapability("professional-exports")) {
+      const destination = reportMembershipIndicator(projectDetailKey(projectIdentity(folder)), "destination", {});
+      destination.classList.add("evidence-report-destination");
+      heading.prepend(destination);
+    }
+    body.append(...children);
+    section.append(heading, body);
+    return;
+  }
   body.append(...children);
   section.append(heading, body);
   const collapsedFolderIDs = new Set(savedInstance.collapsedEvidenceFolderIDs);
@@ -35187,6 +35204,29 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     } catch (error) { await showWebNotice("Could not add to Report", error.message); }
     finally { busy = false; update(); }
   });
+  const researchButton = document.createElement("button");
+  researchButton.type = "button";
+  researchButton.className = "saved-evidence-research-selection";
+  researchButton.textContent = "Ask Assistant";
+  researchButton.hidden = true;
+  cancelButton.before(researchButton);
+  researchButton.addEventListener("click", async () => {
+    if (busy || !selectedIDs.size) return;
+    busy = true;
+    update();
+    try {
+      const passages = [...selectedIDs].map(id => recordByID.get(id)).map(item => ({
+        sectionID: String(item.sectionID),
+        selectedText: String(item.previewText || item.selectedText || item.title || "").trim(),
+        savedItemID: item.savedColumnKind === "bookmark" ? String(item.id || "") : ""
+      }));
+      if (passages.some(passage => !passage.selectedText)) throw new Error("A selected item has no source text. Open it before starting an Assistant conversation.");
+      await startNewResearchFromSelection({passages,
+        projectID: options.reportProject ? projectDetailKey(projectIdentity(options.reportProject)) : "",
+        originPaneID: panel.dataset.paneId || primarySavedPaneID(), originSurface: "saved"});
+    } catch (error) { await showWebNotice("Could not open Assistant", error.message); }
+    finally { busy = false; update(); }
+  });
   const projectPicker = document.createElement("select");
   projectPicker.setAttribute("aria-label", "Add selected evidence to project");
   projectPicker.hidden = true;
@@ -35250,6 +35290,8 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     panel.classList.toggle("is-saved-selecting", active);
     selectButton.setAttribute("aria-pressed", String(active));
     const selectedCount = selectedIDs.size;
+    researchButton.hidden = selectedCount === 0;
+    researchButton.disabled = busy || selectedCount === 0;
     reportButton.hidden = selectedCount === 0;
     reportButton.disabled = busy || selectedCount === 0;
     projectPicker.hidden = options.inbox || !options.allowProjectAssignment || selectedCount === 0;
@@ -35461,10 +35503,8 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
     });
     actions.append(researchButton);
     if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("professional-exports")) {
-      const reportButton = document.createElement("button");
-      reportButton.type = "button";
+      const reportButton = reportMembershipIndicator(projectDetailKey(projectIdentity(options.reportProject)), "evidence", item, "action");
       reportButton.className = "saved-add-to-report workflow-action workflow-action-secondary";
-      row.append(reportMembershipIndicator(projectDetailKey(projectIdentity(options.reportProject)), "evidence", item));
       reportButton.textContent = "Add to Report";
       reportButton.addEventListener("click", async () => {
         reportButton.disabled = true;
@@ -35498,7 +35538,19 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
           await options.onSavedItemRemoved(item);
         }
       });
-      actions.append(removeItemButton);
+      const more = document.createElement("details");
+      more.className = "saved-row-more";
+      const summary = document.createElement("summary");
+      summary.textContent = "⋯";
+      summary.setAttribute("aria-label", "Evidence actions");
+      more.append(summary, removeItemButton);
+      more.addEventListener("keydown", event => {
+        if (event.key === "Escape") { more.open = false; summary.focus(); }
+      });
+      more.addEventListener("focusout", () => requestAnimationFrame(() => {
+        if (!more.contains(document.activeElement)) more.open = false;
+      }));
+      actions.append(more);
     }
     row.append(actions);
   }
