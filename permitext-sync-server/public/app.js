@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-required-v769";
+} from "./offline-storage.js?v=20261010-brand-gap-center-v771";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-project-required-v769";
+} from "./research-intent-state.js?v=20261010-brand-gap-center-v771";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
