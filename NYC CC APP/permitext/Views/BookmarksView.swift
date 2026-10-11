@@ -1007,7 +1007,6 @@ struct ProjectView: View {
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
     @State private var evidenceSearchQuery = ""
     @State private var isEvidenceSearchPresented = false
-    @State private var isStructuredFactsExpanded = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let automaticProjectHubRefreshInterval: TimeInterval = 30
@@ -1116,6 +1115,7 @@ struct ProjectView: View {
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, 40)
         }
+        .accessibilityIdentifier("project-folder-root")
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -1251,62 +1251,16 @@ struct ProjectView: View {
         VStack(alignment: .leading, spacing: 12) {
             CodeEyebrow(text: "Project overview", accent: accentColor)
 
-            if let snapshot = projectHubSnapshot, snapshot.loadedFromCache {
-                Label(
-                    "Saved offline copy from \(projectHubDate(snapshot.cachedAt ?? "")). Connect to check for updates.",
-                    systemImage: "icloud.slash"
-                )
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(10)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(Color.secondary.opacity(0.10))
-                )
-            }
-
-            if isProjectHubLoading && projectHubSnapshot == nil {
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .accessibilityLabel("Loading Project")
-                }
-                .padding(.vertical, 8)
-            }
-
-            if let projectHubError {
-                Text(projectHubError)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(Color.secondary.opacity(0.10))
-                    )
-            }
+            projectHubStatus
 
             if !projectCodeQuestions.isEmpty {
                 projectCodeQuestionSummary
-            }
-            projectNotebookSummary
-            if !(projectHubSnapshot?.researchAnswers.isEmpty ?? true) {
-                projectResearchSummary
-            }
-            if !(projectHubSnapshot?.reports.isEmpty ?? true) {
-                projectReportSummary
             }
 
             DisclosureGroup("More Project details") {
                 VStack(alignment: .leading, spacing: 16) {
                     if projectCodeQuestions.isEmpty {
                         projectCodeQuestionSummary
-                    }
-                    if projectHubSnapshot?.researchAnswers.isEmpty ?? true {
-                        projectResearchSummary
-                    }
-                    if projectHubSnapshot?.reports.isEmpty ?? true {
-                        projectReportSummary
                     }
                     Text("Review saved Project work here. Create and manage Code Questions and Reports on Permitext Web.")
                         .font(.footnote)
@@ -1316,6 +1270,44 @@ struct ProjectView: View {
             }
             .font(.subheadline.weight(.semibold))
             .tint(.primary)
+        }
+    }
+
+    @ViewBuilder
+    private var projectHubStatus: some View {
+        if let snapshot = projectHubSnapshot, snapshot.loadedFromCache {
+            Label(
+                "Saved offline copy from \(projectHubDate(snapshot.cachedAt ?? "")). Connect to check for updates.",
+                systemImage: "icloud.slash"
+            )
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.secondary.opacity(0.10))
+            )
+        }
+
+        if isProjectHubLoading && projectHubSnapshot == nil {
+            HStack(spacing: 8) {
+                ProgressView()
+                    .accessibilityLabel("Loading Project")
+            }
+            .padding(.vertical, 8)
+        }
+
+        if let projectHubError {
+            Text(projectHubError)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color.secondary.opacity(0.10))
+                )
         }
     }
 
@@ -1332,51 +1324,6 @@ struct ProjectView: View {
         }
     }
 
-    @ViewBuilder
-    private var projectNotebookSummary: some View {
-        let cards = (projectHubSnapshot?.notebookCards ?? []).filter {
-            PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"
-        }
-        VStack(alignment: .leading, spacing: 8) {
-            if let projectID = library.backendProjectID(for: folderID) {
-                HStack {
-                    Label("Notebook", systemImage: "note.text")
-                        .font(.subheadline.weight(.bold))
-                    Spacer(minLength: 8)
-                    NavigationLink {
-                        projectNotebookDestination(projectID: projectID, startNewNote: true)
-                    } label: { Label("New Note", systemImage: "plus") }
-                        .font(.subheadline)
-                    NavigationLink("Open") { projectNotebookDestination(projectID: projectID) }
-                        .font(.subheadline)
-                        .accessibilityLabel("Open Project Notebook")
-                }
-                .frame(minHeight: 44)
-            } else {
-                Label("Notebook", systemImage: "note.text")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(.primary)
-            }
-            if cards.isEmpty && !isProjectHubLoading {
-                projectHubEmpty("No Notes yet.")
-            } else {
-                ForEach(cards.prefix(5)) { card in
-                    if let projectID = library.backendProjectID(for: folderID) {
-                        NavigationLink {
-                            projectNotebookDestination(projectID: projectID, cardID: card.id)
-                        } label: {
-                            projectNotebookCardRow(card)
-                        }
-                        .buttonStyle(.plain)
-                    } else {
-                        projectNotebookCardRow(card)
-                    }
-                }
-            }
-        }
-        .padding(.top, 4)
-    }
-
     private func projectNotebookDestination(projectID: String, cardID: String? = nil, startNewNote: Bool = false) -> some View {
         ProjectNotebookView(
             projectID: projectID,
@@ -1390,89 +1337,6 @@ struct ProjectView: View {
         .environmentObject(library)
     }
 
-    private func projectNotebookCardRow(_ card: ProjectNotebookCardSummary) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(projectNotebookCardType(card.cardType))
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(accentColor)
-                Spacer(minLength: 8)
-                Text(projectHubDate(card.updatedAt))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            Text(card.title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
-            if !card.plainText.isEmpty {
-                Text(card.plainText)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(3)
-            }
-            if card.referenceCount > 0 {
-                Text("\(card.referenceCount) linked \(card.referenceCount == 1 ? "item" : "items")")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(accentColor.opacity(0.08))
-        )
-    }
-
-    @ViewBuilder
-    private var projectResearchSummary: some View {
-        let answers = projectHubSnapshot?.researchAnswers ?? []
-        projectHubSection(title: "Research History", systemImage: "text.magnifyingglass") {
-            if answers.isEmpty {
-                projectHubEmpty("No Research answers are linked to this Project yet.")
-            } else {
-                ForEach(answers.prefix(5)) { answer in
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text("READ ONLY")
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(accentColor)
-                            Spacer(minLength: 8)
-                            Text(projectHubDate(answer.createdAt))
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                        Text(answer.question)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
-                        if !answer.conclusion.isEmpty {
-                            Text(answer.conclusion)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(4)
-                        }
-                        Text("\(answer.evidenceCount) approved \(answer.evidenceCount == 1 ? "source" : "sources") · \(projectReviewStatus(answer.reviewStatus))")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                        Button {
-                            library.activeResearchConversationID = answer.conversationID
-                            library.selectedTab = .research
-                        } label: {
-                            Label("Open Research", systemImage: "arrow.up.right")
-                                .font(.subheadline)
-                        }
-                    }
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(accentColor.opacity(0.08))
-                    )
-                }
-            }
-        }
-    }
-
     @ViewBuilder
     private var projectReportSummary: some View {
         let reports = projectHubSnapshot?.reports ?? []
@@ -1480,7 +1344,7 @@ struct ProjectView: View {
             if reports.isEmpty {
                 projectHubEmpty("No immutable Project Reports have been generated yet.")
             } else {
-                ForEach(reports.prefix(8)) { report in
+                ForEach(reports) { report in
                     VStack(alignment: .leading, spacing: 7) {
                         HStack(alignment: .firstTextBaseline) {
                             Text("REPORT V\(report.reportVersion)")
@@ -1575,16 +1439,6 @@ struct ProjectView: View {
             return nil
         }
         return URL(string: value)
-    }
-
-    private func projectNotebookCardType(_ value: String) -> String {
-        switch value {
-        case "missing-information": return "Missing Information"
-        case "coordination-item": return "Coordination Item"
-        case "review-task": return "Review Task"
-        default:
-            return value.replacingOccurrences(of: "-", with: " ").capitalized
-        }
     }
 
     private func projectReviewStatus(_ value: String) -> String {
@@ -1688,9 +1542,11 @@ struct ProjectView: View {
                 .accessibilityLabel("Edit \(isProjectFolder ? "project" : "reference")")
             }
 
-            if let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),
+            if isProjectFolder {
+                projectSectionLinks
+            } else if let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),
                !description.isEmpty {
-                DisclosureGroup(isProjectFolder ? "Project context" : "Reference context", isExpanded: $isProjectDescriptionExpanded) {
+                DisclosureGroup("Reference context", isExpanded: $isProjectDescriptionExpanded) {
                     Text(description)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -1701,26 +1557,97 @@ struct ProjectView: View {
                 .tint(.primary)
             }
 
-            if let facts = folder?.structuredFacts, !facts.isEmpty {
-                DisclosureGroup(isExpanded: $isStructuredFactsExpanded) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        ForEach(facts) { fact in
-                            ProjectStructuredFactRow(fact: fact)
-                            if fact.id != facts.last?.id {
-                                Divider()
+            projectActionRow
+        }
+    }
+
+    private var projectSectionLinks: some View {
+        VStack(spacing: 0) {
+            NavigationLink {
+                ProjectContextView(folderID: folderID, accentColor: accentColor)
+            } label: {
+                projectSectionLabel("Project Context", systemImage: "text.alignleft")
+            }
+            .accessibilityIdentifier("project-section-context")
+
+            NavigationLink {
+                projectSectionScreen(title: "Structured Facts") {
+                    let facts = folder?.structuredFacts ?? []
+                    if facts.isEmpty {
+                        projectHubEmpty("No Structured facts yet.")
+                    } else {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(facts) { fact in
+                                ProjectStructuredFactRow(fact: fact)
+                                if fact.id != facts.last?.id { Divider() }
                             }
                         }
                     }
-                    .padding(.top, 6)
-                } label: {
-                    Label("Structured facts (\(facts.count))", systemImage: "building.2")
-                        .font(.subheadline.weight(.semibold))
                 }
-                .tint(accentColor)
+            } label: {
+                projectSectionLabel("Structured Facts", systemImage: "building.2")
             }
+            .accessibilityIdentifier("project-section-structured-facts")
 
-            projectActionRow
+            NavigationLink {
+                if let projectID = library.backendProjectID(for: folderID) {
+                    projectNotebookDestination(projectID: projectID)
+                } else {
+                    projectSectionScreen(title: "Notebook") {
+                        projectHubEmpty("Connect to sync this Project’s Notebook.")
+                    }
+                }
+            } label: {
+                projectSectionLabel("Notebook", systemImage: "note.text")
+            }
+            .accessibilityIdentifier("project-section-notebook")
+
+            NavigationLink {
+                projectSectionScreen(title: "Reports") {
+                    projectHubStatus
+                    if projectHubSnapshot != nil || (!isProjectHubLoading && projectHubError == nil) {
+                        projectReportSummary
+                    }
+                }
+                .refreshable { await loadProjectHub() }
+            } label: {
+                projectSectionLabel("Reports", systemImage: "doc.richtext")
+            }
+            .accessibilityIdentifier("project-section-reports")
         }
+        .buttonStyle(.plain)
+        .tint(Color.appChrome)
+    }
+
+    private func projectSectionLabel(_ title: String, systemImage: String) -> some View {
+        HStack(spacing: 10) {
+            Label(title, systemImage: systemImage)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+    }
+
+    private func projectSectionScreen<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12, content: content)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, contentHorizontalInset)
+                .padding(.top, CodeScreenMetrics.topTitlePadding)
+                .padding(.bottom, CodeScreenMetrics.tabBarClearance)
+        }
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .tint(Color.appChrome)
     }
 
     private var projectActionRow: some View {

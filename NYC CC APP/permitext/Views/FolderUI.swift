@@ -457,3 +457,159 @@ struct ProjectStructuredFactRow: View {
         .padding(.vertical, 8)
     }
 }
+
+/// Edits the Project's context without replacing its other saved fields.
+struct ProjectContextView: View {
+    let folderID: Int64
+    let accentColor: Color
+
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var editingFolder: CodeFolder?
+    @State private var editingSessionID: UUID?
+    @State private var draft = ""
+    @State private var saveError: String?
+
+    private var folder: CodeFolder? { library.folder(id: folderID) }
+    private var isEditing: Bool { editingFolder != nil }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ZStack(alignment: .topLeading) {
+                ProjectContextTextView(
+                    text: isEditing ? draft : folder?.description ?? "",
+                    isEditing: isEditing,
+                    onBeginEditing: beginEditing,
+                    onTextChange: { draft = $0 }
+                )
+                if !isEditing && (folder?.description.isEmpty ?? true) {
+                    Text("Tap to add Project context.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .allowsHitTesting(false)
+                }
+            }
+            if let saveError {
+                Text(saveError)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+        .padding(.top, CodeScreenMetrics.topTitlePadding)
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle("Project Context")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(isEditing)
+        .tint(Color.appChrome)
+        .toolbar {
+            if isEditing {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel", action: finishEditing)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save", action: save)
+                        .fontWeight(.semibold)
+                        .accessibilityIdentifier("project-context-save")
+                }
+            }
+        }
+        .onChange(of: library.privateSessionID) { _, _ in
+            finishEditing()
+            dismiss()
+        }
+        .onChange(of: folder?.clientID) { _, _ in
+            finishEditing()
+            dismiss()
+        }
+    }
+
+    private func beginEditing() -> Bool {
+        guard let folder, library.requireProjectAccess() else { return false }
+        draft = folder.description
+        editingFolder = folder
+        editingSessionID = library.privateSessionID
+        saveError = nil
+        return true
+    }
+
+    private func save() {
+        guard let editingFolder, let editingSessionID else { return }
+        if library.updateProjectContext(
+            folderID: folderID, description: draft,
+            expectedClientID: editingFolder.clientID,
+            expectedDescription: editingFolder.description,
+            sessionID: editingSessionID
+        ) {
+            finishEditing()
+        } else {
+            saveError = library.statusMessage ?? "Project context could not be saved. Try again."
+        }
+    }
+
+    private func finishEditing() {
+        editingFolder = nil
+        editingSessionID = nil
+        draft = ""
+        saveError = nil
+    }
+}
+
+/// Keep the same text surface and native tap-to-caret behavior in both modes.
+private struct ProjectContextTextView: UIViewRepresentable {
+    let text: String
+    let isEditing: Bool
+    let onBeginEditing: () -> Bool
+    let onTextChange: (String) -> Void
+
+    func makeUIView(context: Context) -> UITextView {
+        let view = UITextView()
+        view.backgroundColor = .clear
+        view.font = .preferredFont(forTextStyle: .subheadline)
+        view.adjustsFontForContentSizeCategory = true
+        view.textColor = .secondaryLabel
+        view.tintColor = UIColor(Color.appChrome)
+        view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
+        view.textContainer.lineFragmentPadding = 0
+        view.contentInsetAdjustmentBehavior = .never
+        view.keyboardDismissMode = .interactive
+        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        view.delegate = context.coordinator
+        return view
+    }
+
+    func updateUIView(_ view: UITextView, context: Context) {
+        context.coordinator.parent = self
+        if !isEditing && view.isFirstResponder { view.resignFirstResponder() }
+        // Reassigning text on every SwiftUI update would reset native selection
+        // and scroll position as the keyboard appears or the user types.
+        if view.text != text {
+            let selection = view.selectedRange
+            view.text = text
+            let length = (text as NSString).length
+            let location = min(selection.location, length)
+            view.selectedRange = NSRange(location: location, length: min(selection.length, length - location))
+        }
+        view.accessibilityLabel = "Project context"
+        view.accessibilityHint = "Edit Project context"
+        view.accessibilityIdentifier = isEditing ? "project-context-editor" : "project-context-text"
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
+
+    final class Coordinator: NSObject, UITextViewDelegate {
+        var parent: ProjectContextTextView
+
+        init(parent: ProjectContextTextView) { self.parent = parent }
+
+        func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+            parent.isEditing || parent.onBeginEditing()
+        }
+
+        func textViewDidChange(_ textView: UITextView) {
+            parent.onTextChange(textView.text)
+        }
+    }
+}

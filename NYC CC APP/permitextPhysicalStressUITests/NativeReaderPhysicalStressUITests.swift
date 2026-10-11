@@ -25,6 +25,63 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         try verifySavedProjectNavigation(largeText: false)
     }
 
+    func testProjectSectionsOpenWithBackNavigation() throws {
+#if !DEBUG
+        throw XCTSkip("Project navigation acceptance uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons["main-tab-saved"].tap()
+        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "Acceptance Project")).firstMatch
+        XCTAssertTrue(project.waitForExistence(timeout: 10))
+        project.tap()
+        let projectRoot = app.scrollViews["project-folder-root"]
+        XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Research History"].exists)
+        keepScreenshot(named: "Project with separate sections", from: app)
+
+        for (identifier, title) in [
+            ("project-section-context", "Project Context"),
+            ("project-section-structured-facts", "Structured Facts"),
+            ("project-section-notebook", "Notebook"),
+            ("project-section-reports", "Reports")
+        ] {
+            let link = element(in: app, identifier: identifier)
+            reveal(link, in: app)
+            XCTAssertTrue(link.isHittable)
+            link.tap()
+            let navigationBar = app.navigationBars[title]
+            XCTAssertTrue(navigationBar.waitForExistence(timeout: 10), "\(title) must be a pushed screen.")
+            XCTAssertFalse(app.sheets.firstMatch.exists)
+            if title == "Project Context" {
+                let context = app.textViews["project-context-text"]
+                XCTAssertTrue(context.waitForExistence(timeout: 5))
+                context.tap()
+                let editor = app.textViews["project-context-editor"]
+                XCTAssertTrue(editor.waitForExistence(timeout: 5))
+                editor.typeText(" Updated on iPhone.")
+                app.buttons["project-context-save"].tap()
+                XCTAssertTrue(context.waitForExistence(timeout: 5))
+                XCTAssertTrue((context.value as? String ?? "").contains("Updated on iPhone."))
+                context.tap()
+                editor.typeText(" Discard this draft.")
+                navigationBar.buttons["Cancel"].tap()
+                XCTAssertFalse((context.value as? String ?? "").contains("Discard this draft."))
+            }
+            keepScreenshot(named: "Separate section: \(title)", from: app)
+            navigationBar.buttons.element(boundBy: 0).tap()
+            XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
+        }
+
+        app.buttons["project-section-context"].tap()
+        let context = app.textViews["project-context-text"]
+        XCTAssertTrue(context.waitForExistence(timeout: 5))
+        XCTAssertTrue((context.value as? String ?? "").contains("Updated on iPhone."))
+#endif
+    }
+
     func testSavedProjectTilesAtAccessibilitySize() throws {
         try verifySavedProjectNavigation(largeText: true)
     }
