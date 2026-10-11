@@ -29,4 +29,20 @@ let resolve; valid=true;
 const pending=context.createReportScreen({projectName:'Pending',load:()=>new Promise(r=>resolve=r),isCurrent:()=>valid,onClose(){},onDispose(){}});
 pending.open(); valid=false; tick(); resolve(panel); await Promise.resolve(); await Promise.resolve();
 assert.equal(pending.isOpen(),false,'A late load cannot reopen private content after a context change');
+// Both dedicated screens must remove retained private content when access is revoked,
+// even while closed. This covers the screen lifecycle outside the column hydrator.
+for (const title of ['Report', 'Project details']) {
+  let allowed = true, removed = 0;
+  const privatePanel = new Element('article');
+  const guarded = context.createReportScreen({
+    projectName: 'Private project', screenTitle: title, load: async () => privatePanel,
+    isCurrent: () => allowed, onClose() {}, onDispose() { removed++; }
+  });
+  await guarded.open(); guarded.close();
+  allowed = false; tick();
+  assert.equal(removed, 1, `${title} disposes its retained editor on access revocation`);
+  assert.equal(guarded.isCurrent(), false);
+  guarded.open();
+  assert.equal(guarded.isOpen(), false, `${title} cannot reopen private content`);
+}
 console.log('Report screen passed: mounted draft and scroll retention, context cleanup, late-load fencing.');

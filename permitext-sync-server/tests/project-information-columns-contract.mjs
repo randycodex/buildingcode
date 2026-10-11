@@ -20,7 +20,7 @@ const copy = value => JSON.parse(JSON.stringify(value));
 const alpha = { id: "alpha", name: "Alpha", description: "Original context", address: "Original address", structuredFacts: [] };
 assert.match(shell, /id="toggle-saved"[^>]*aria-label="Evidence"/);
 assert.doesNotMatch(actual("renderSavedFolderContext"), /appendSavedProjectFactEditor|saved-project-summary/);
-assert.match(actual("openWorkspaceContextMenu"), /for \(const kind of \["context", "facts"\]\)/);
+assert.match(actual("openWorkspaceContextMenu"), /label: "Project details"/);
 
 // Visibility is scoped to each Project layout; legacy layouts start closed.
 assert.equal(emptyWorkspaceLayout().projectContextOpen, false);
@@ -39,57 +39,54 @@ assert.equal(restored.paneWeights["project:context:alpha"], 670);
 assert.ok(restored.collapsedPaneIDs.includes("project:facts:alpha"));
 for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${kind}:alpha`), false);
 
-let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, activation = null;
-let openDetails = [alpha];
-const issues = [], mounts = new Map();
+// Context and Facts now share a retained screen; the same editors and save guards remain.
+let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen;
+const mounts = new Map(), issues = [];
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
+const body = element('body');
 const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
+  document: { createElement: element, body }, setInterval: fn => { tickScreen = fn; return 1; }, clearInterval() {},
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
   workspaceProject: () => current, projectIdentity: value => ({ ...value }), projectDetailKey: value => value.id,
   projectDetailMatches: (a, b) => a?.id === b?.id,
   workspacePrivatePresentationAllowed: () => privateAllowed, hasCapability: () => allowed,
-  openProjectDetails: () => openDetails,
-  activateProjectStudio: async value => { if (activation) await activation.promise; openDetails = [value]; return true; },
-  syncTopbarProjectToolStates() {}, saveWorkspaceState() {}, transitionWorkspace: async () => {},
-  scrollPaneIntoView() {}, defaultPaneWidthForID: () => 600,
-  placeProjectToolPaneLast: (_project, id) => { state.paneOrder = [...state.paneOrder.filter(value => value !== id), id]; },
-  presentWorkspaceIssue: value => issues.push(value)
+  notifyProjectRequiredForColumn: () => !current,
+  presentWorkspaceIssue: value => issues.push(value),
+  renderProjectInformation: async (identity, kind) => {
+    const panel = element('article'); panel.draft = `Draft ${kind}`;
+    mounts.set(`project:${kind}:${identity.id}`, {panel, flush: async () => {}});
+    return panel;
+  }
 });
-vm.runInContext("let projectToolTogglePending = false;\n" + ["projectInformationStateKey", "paneIDForProjectInformation",
-  "flushProjectInformationPanes", "closeProjectInformation", "toggleProjectInformation"].map(actual).join("\n"), c);
-await c.toggleProjectInformation("context");
-await c.toggleProjectInformation("facts");
-assert.equal(state.projectContextOpen, true);
-assert.equal(state.projectFactsOpen, true);
-assert.equal(state.paneWeights["project:facts:alpha"], 600);
-assert.equal(state.paneWeights["project:context:alpha"], 600);
-state.paneWeights["project:context:alpha"] = 670;
-mounts.set("project:context:alpha", { panel: { isConnected: true }, flush: async () => { throw Error("Save failed"); } });
-assert.equal(await c.closeProjectInformation(alpha, "context"), false);
-assert.equal(state.projectContextOpen, true, "Failed save must keep the editor open.");
-const held = deferred();
-mounts.set("project:context:alpha", { panel: { isConnected: true }, flush: () => held.promise });
-const close = c.closeProjectInformation(alpha, "context");
-c.activeWorkspaceID = "beta-workspace";
-held.resolve();
-assert.equal(await close, false, "Late save must not hide another Project's column.");
-c.activeWorkspaceID = "alpha-workspace";
-assert.equal(await c.closeProjectInformation(alpha, "context"), true);
-assert.equal(state.projectFactsOpen, true, "Closing Context preserves Facts.");
-await c.toggleProjectInformation("context");
-assert.equal(state.paneWeights["project:context:alpha"], 670, "Reopening preserves the user's width.");
-allowed = false;
-assert.equal(await c.toggleProjectInformation("facts"), false);
-allowed = true; privateAllowed = false;
-assert.equal(await c.toggleProjectInformation("facts"), false);
-privateAllowed = true; current = null;
-assert.equal(await c.toggleProjectInformation("facts"), false);
-current = alpha; state.projectContextOpen = false; openDetails = []; activation = deferred();
-const opening = c.toggleProjectInformation("context");
-assert.equal(await c.toggleProjectInformation("context"), false, "Repeated clicks cannot start a second activation.");
-accountCurrent = false; activation.resolve();
-assert.equal(await opening, false);
-assert.equal(state.projectContextOpen, false, "Stale activation must not open private content.");
+vm.runInContext('let projectDetailsScreen=null, reportScreen=null;\n'+
+  (await readFile(new URL('../public/report-screen.js',import.meta.url),'utf8')).replace('export function','function')+'\n'+
+  ["projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
+await c.toggleProjectInformation('context');
+const contextPanel = mounts.get('project:context:alpha').panel;
+const factsPanel = mounts.get('project:facts:alpha').panel;
+assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden,true);
+contextPanel.draft='Retained edit'; contextPanel.scrollTop=320;
+vm.runInContext('projectDetailsScreen.close()',c);
+await c.toggleProjectInformation('facts');
+assert.equal(mounts.get('project:context:alpha').panel,contextPanel);
+assert.equal(contextPanel.draft,'Retained edit'); assert.equal(contextPanel.scrollTop,320);
+assert.equal(contextPanel.hidden,true); assert.equal(factsPanel.hidden,false);
+vm.runInContext('projectDetailsScreen.close()',c);
+await c.openProjectDetailsScreen();
+assert.equal(factsPanel.hidden,false,'Reopening keeps the last section');
+allowed=false; tickScreen(); assert.equal(mounts.size,0,'Revoked access releases retained editor mounts');
+assert.equal(await c.toggleProjectInformation('facts'),false);
+allowed=true; privateAllowed=false; assert.equal(await c.toggleProjectInformation('facts'),false);
+privateAllowed=true; current=null; assert.equal(await c.toggleProjectInformation('facts'),false);
+current=alpha; accountCurrent=true;
+const pendingPanel=deferred();
+c.renderProjectInformation=async (identity,kind) => {
+  const panel=await pendingPanel.promise;
+  mounts.set(`project:${kind}:${identity.id}`,{panel,flush:async()=>{}}); return panel;
+};
+const opening=c.toggleProjectInformation('context');
+accountCurrent=false; tickScreen(); pendingPanel.resolve(element('article')); await opening;
+assert.equal(mounts.size,0,'Late loading cannot leak an old-account editor mount');
 
 // Restoring narrow Project information widths respects the minimum with fewer than four columns.
 const factsID = "project:facts:alpha", contextID = "project:context:alpha";
@@ -135,7 +132,11 @@ function element(tag) {
     className: "", classList: { add() {}, remove() {} },
     append(...values) { values.forEach(value => { value.parent = this; this.children.push(value); }); },
     prepend(value) { value.parent = this; this.children.unshift(value); },
-    remove() { if (this.parent) this.parent.children = this.parent.children.filter(value => value !== this); },
+    replaceChildren(...values) { this.children=[]; this.append(...values); },
+    querySelectorAll() { return []; },
+    showModal() { this.open=true; },
+    close() { if (!this.open) return; this.open=false; this.handlers.close?.(); },
+    remove() { this.isConnected=false; if (this.parent) this.parent.children = this.parent.children.filter(value => value !== this); },
     setAttribute(key, value) { this.attributes[key] = value; },
     addEventListener(type, callback) { this.handlers[type] = callback; },
     querySelector(selector) { return this.children.find(value => selector === `.${value.className}`) || null; }
@@ -233,4 +234,4 @@ canonical = mutations[1]; pending[1].resolve(); await second;
 assert.equal(localState.localProjects.length, 0);
 assert.equal(canonical.description, "New narrative");
 assert.equal(canonical.structuredFacts[0].value, "R-2");
-console.log("Project information columns passed: Project layouts, independent toggles, stale/failed saves, split editor patches and concurrent Project updates.");
+console.log("Project details passed: retained sections, access revocation, stale loads, split editor patches and concurrent Project updates.");

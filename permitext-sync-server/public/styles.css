@@ -19116,3 +19116,28 @@ dialog.report-export-review {
 .report-pdf-page { position: relative; max-width: 850px; width: 100%; margin: 0 auto 24px; background: white; box-shadow: 0 2px 12px #0005; color: #111; }
 .report-pdf-page canvas { display: block; width: 100%; height: auto; }
 .report-pdf-accessible-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+/* Project-wide information has a single home, independent of column layouts. */
+#toggle-context, #toggle-facts { display: none !important; }
+.report-screen-header .screen-project-details-link { justify-self: end; color: var(--text-secondary); font-size: 12px; }
+.project-details-content { display: flex; flex-direction: column; height: 100%; max-width: 1080px; margin: 0 auto; }
+.project-details-tabs { display: flex; gap: 24px; padding: 20px 32px; border-bottom: 1px solid var(--border); }
+.project-details-tabs button { background: none; border: 0; color: var(--text-secondary); padding: 8px 0; }
+.project-details-tabs button[aria-pressed="true"] { color: var(--text-primary); font-weight: 600; }
+.project-details-screen .project-information-panel { flex: 1; min-height: 0; min-width: 0; width: 100%; max-width: none; border: 0; overflow-y: auto; padding: 24px 32px; }
+.project-details-screen .project-information-panel[hidden] { display: none; }
+.project-details-screen .project-information-panel > header { display: none; }
+.project-details-screen .project-information-content { max-width: none; padding: 0; }
+@media (max-width:700px) {
+  .project-details-tabs { padding: 12px 20px; }
+  .project-details-screen .project-information-panel { padding: 20px; }
+}
+.project-details-screen .saved-project-structured-fact { display: grid; grid-template-columns: minmax(150px, 240px) minmax(0, 1fr); align-items: start; gap: 12px 24px; padding: 14px 0; }
+.project-details-screen .saved-project-structured-fact-label { padding-top: 8px; font-size: 13px; }
+.project-details-screen input.saved-project-structured-fact-value { width: 100%; max-width: none; min-width: 0; min-height: 36px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; }
+.project-details-screen .saved-project-structured-fact > :not(label):not(input) { grid-column: 2; }
+@media (max-width:700px) {
+ .project-details-screen .saved-project-structured-fact { grid-template-columns: 1fr; gap: 8px; }
+ .project-details-screen .saved-project-structured-fact > :not(label):not(input) { grid-column: 1; }
+}
+
+.project-details-screen .saved-project-structured-fact-value { text-align: left; }

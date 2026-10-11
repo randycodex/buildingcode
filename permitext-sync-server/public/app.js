@@ -1,4 +1,4 @@
-import { createReportScreen } from "./report-screen.js?v=20261011-report-screen-v2";
+import { createReportScreen } from "./report-screen.js?v=20261011-report-screen-v4";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
 import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v5";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -677,6 +677,7 @@ function readNotebookReturnCard(context, cards) {
 const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
 let reportScreen = null;
+let projectDetailsScreen = null;
 const legacyHydrationByProject = new Map();
 const coordinationComposerDraftByProject = new Map();
 let projectStudioFolderReconcilePromise = null;
@@ -2245,6 +2246,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     projectSection.append(button);
   });
+  appendMenuAction(projectSection, { label: "Project details", run: () => void openProjectDetailsScreen() });
   appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
   appendMenuAction(projectSection, { label: "Manage Projects…", separated: true, run: () => openProjectManager() });
   if (workspace?.projectID && workspaces.some((candidate) => candidate.id === workspace.id)) {
@@ -2721,6 +2723,7 @@ async function openProjectReportDraft(project) {
   const workspaceID = activeWorkspaceID;
   const screen = createReportScreen({
     projectName: identity.name,
+    openProjectDetails: () => void openProjectDetailsScreen(),
     load: () => renderProjectReportDraft(identity),
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
       hasCapability("professional-exports") && projectDetailMatches(workspaceProject(), identity),
@@ -3620,37 +3623,75 @@ async function closeProjectInformation(project, kind) {
 }
 
 async function toggleProjectInformation(kind) {
-  if (!["context", "facts"].includes(kind) || projectToolTogglePending ||
-      !workspacePrivatePresentationAllowed() || !hasCapability("projects")) return false;
+  return openProjectDetailsScreen(kind);
+}
+
+async function openProjectDetailsScreen(section = null) {
+  if (notifyProjectRequiredForColumn() || !workspacePrivatePresentationAllowed() || !hasCapability("projects")) return false;
   const project = workspaceProject();
   if (!project) return false;
   const identity = projectIdentity(project);
-  const workspaceID = activeWorkspaceID;
-  const requestIdentity = captureAccountRequest();
-  projectToolTogglePending = true;
-  syncTopbarProjectToolStates();
-  try {
-    if (state[projectInformationStateKey(kind)]) return await closeProjectInformation(identity, kind);
-    if (!openProjectDetails().some(detail => projectDetailMatches(identity, detail))) {
-      if (!(await activateProjectStudio(identity, { transition: false, focusSaved: false }))) return false;
-    }
-    if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(requestIdentity) ||
-        !projectDetailMatches(workspaceProject(), identity)) return false;
-    state[projectInformationStateKey(kind)] = true;
-    const paneID = paneIDForProjectInformation(identity, kind);
-    state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
-    placeProjectToolPaneLast(identity, paneID);
-    saveWorkspaceState();
-    await transitionWorkspace("utility");
-    scrollPaneIntoView(paneID);
+  const projectID = projectDetailKey(identity);
+  if (projectDetailsScreen?.isCurrent()) {
+    await projectDetailsScreen.open();
+    if (section) projectDetailsScreen.selectSection(section);
     return true;
-  } catch (error) {
-    presentWorkspaceIssue(error.message || "Could not update the Project column.");
-    return false;
-  } finally {
-    projectToolTogglePending = false;
-    syncTopbarProjectToolStates();
   }
+  projectDetailsScreen?.dispose();
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const content = document.createElement("div");
+  content.className = "project-details-content";
+  const tabs = document.createElement("nav");
+  tabs.className = "project-details-tabs";
+  tabs.setAttribute("aria-label", "Project details sections");
+  const panels = new Map();
+  const buttons = new Map();
+  const selectSection = (kind) => {
+    for (const [key, panel] of panels) {
+      panel.hidden = key !== kind;
+      buttons.get(key).setAttribute("aria-pressed", String(key === kind));
+    }
+  };
+  const screen = createReportScreen({
+    screenTitle: "Project details", screenClass: "project-details-screen", projectName: identity.name,
+    backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : "← Back to workspace",
+    isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
+      projectDetailMatches(workspaceProject(), identity) && hasCapability("projects"),
+    load: async () => {
+      content.replaceChildren(tabs);
+      tabs.replaceChildren();
+      for (const [kind, label] of [["context", "Context & records"], ["facts", "Facts"]]) {
+        const button = document.createElement("button");
+        button.type = "button"; button.textContent = label;
+        button.addEventListener("click", () => selectSection(kind));
+        buttons.set(kind, button); tabs.append(button);
+        const panel = await renderProjectInformation(identity, kind);
+        if (!screen.isCurrent()) {
+          const key = paneIDForProjectInformation(identity, kind);
+          if (projectInformationMounts.get(key)?.panel === panel) projectInformationMounts.delete(key);
+          return content;
+        }
+        panel.querySelectorAll(".saved-project-structured-fact-value").forEach(input => { input.placeholder = "Not recorded"; });
+        panels.set(kind, panel); content.append(panel);
+      }
+      selectSection(section || "context");
+      return content;
+    },
+    onClose: () => {},
+    onDispose: () => {
+      for (const [kind, panel] of panels) {
+        const key = paneIDForProjectInformation(identity, kind);
+        if (projectInformationMounts.get(key)?.panel === panel) projectInformationMounts.delete(key);
+      }
+      if (projectDetailsScreen === screen) projectDetailsScreen = null;
+    }
+  });
+  screen.projectID = projectID;
+  screen.selectSection = selectSection;
+  projectDetailsScreen = screen;
+  await screen.open();
+  return true;
 }
 
 function isProjectDetailPaneID(paneID) {
@@ -4130,8 +4171,6 @@ function defaultActivePaneIDs() {
   const ids = [];
   if (genericWorkboardIsOpen()) ids.push(paneIDForProjectWorkboard(genericWorkboardIdentity));
   openProjectDetails().forEach((detail) => {
-    if (state.projectContextOpen) ids.push(paneIDForProjectInformation(detail, "context"));
-    if (state.projectFactsOpen) ids.push(paneIDForProjectInformation(detail, "facts"));
     if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
     if (projectHasOpenCoordination(detail)) {
       ids.push(paneIDForProjectCoordination(detail));
@@ -4158,8 +4197,6 @@ function defaultActivePaneIDs() {
 
 function projectWorkspacePaneIDs(detail) {
   const activeIDs = [
-    ...(state.projectContextOpen ? [paneIDForProjectInformation(detail, "context")] : []),
-    ...(state.projectFactsOpen ? [paneIDForProjectInformation(detail, "facts")] : []),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
@@ -24526,6 +24563,8 @@ function renderResearchNotebookHandoff(conversation, message) {
   let savedCard = null;
   button.addEventListener("click", async () => {
     const requestIdentity = captureAccountRequest();
+    const originPaneID = region.closest(".workspace-panel")?.dataset.paneId;
+    const originWorkspaceID = activeWorkspaceID;
     const project = choices.find((item) => researchProjectID(item) === select.value);
     if (!project) return;
     const title = researchAnswerQuestion(conversation, message).slice(0, 300);
@@ -24556,6 +24595,7 @@ function renderResearchNotebookHandoff(conversation, message) {
         if (!target || !await switchWorkspace(target.id, { focus: false })) return;
         requireCurrentAccountRequest(requestIdentity);
       }
+      if (originWorkspaceID === activeWorkspaceID) requestLinkedPanePlacement(originPaneID, paneIDForProjectNotebook(project));
       if (!await openProjectNotebook(project)) return;
       if (!await whenWorkspacePaneReady(paneIDForProjectNotebook(project))) return;
       const mount = notebookMounts.get(researchProjectID(project));
@@ -43509,11 +43549,6 @@ function workspacePaneDescriptors(options = {}) {
   if (genericWorkboardIsOpen()) addWorkboard(genericWorkboardIdentity, closeGenericWorkboard);
   for (const project of openProjectDetails()) {
     const projectID = projectDetailKey(project);
-    for (const kind of ["context", "facts"]) {
-      if (state[projectInformationStateKey(kind)]) add(paneIDForProjectInformation(project, kind), kind === "context" ? "Context" : "Facts",
-        () => renderProjectInformation(project, kind), () => closeProjectInformation(project, kind),
-        { ownerClass: `project-information-panel project-${kind}-panel`, projectID, accessCapabilities: ["projects"] });
-    }
     if (projectHasOpenNotebook(project)) {
       foundationScope.register(paneIDForProjectNotebook(project));
       add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project, { foundationScope }),
@@ -44101,6 +44136,11 @@ function bindWorkspaceKeyboardNavigation() {
 }
 
 function bindImmediateUtilityControls() {
+  const detailsButton = document.querySelector("#open-project-details");
+  if (detailsButton && !detailsButton.dataset.bound) {
+    detailsButton.dataset.bound = "true";
+    detailsButton.addEventListener("click", () => void openProjectDetailsScreen());
+  }
   [
     [toggleContextButton, "context"],
     [toggleFactsButton, "facts"],

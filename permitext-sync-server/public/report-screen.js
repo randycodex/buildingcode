@@ -1,18 +1,24 @@
 // Keep workspace columns and the draft mounted across view switches. A native
 // modal makes the background inert without resizing or rebuilding its editors.
-export function createReportScreen({ projectName, load, isCurrent, onClose, onDispose }) {
+export function createReportScreen({ projectName, load, isCurrent, onClose, onDispose, screenTitle = "Report", screenClass = "", openProjectDetails, backLabel = () => "← Back to workspace" }) {
   const dialog = document.createElement("dialog");
-  dialog.className = "report-screen";
-  dialog.setAttribute("aria-label", "Report workspace");
+  dialog.className = `report-screen ${screenClass}`.trim();
+  dialog.setAttribute("aria-label", `${screenTitle} workspace`);
   const header = document.createElement("header");
   header.className = "report-screen-header";
   const back = document.createElement("button");
   back.type = "button";
-  back.textContent = "← Back to workspace";
+  back.textContent = backLabel();
   back.addEventListener("click", () => dialog.close());
   const title = document.createElement("h1");
-  title.textContent = "Report";
-  const project = document.createElement("span");
+  title.textContent = screenTitle;
+  const project = document.createElement(openProjectDetails ? "button" : "span");
+  if (openProjectDetails) {
+    project.type = "button";
+    project.className = "screen-project-details-link";
+    project.setAttribute("aria-label", "Project details");
+    project.addEventListener("click", openProjectDetails);
+  }
   project.textContent = projectName;
   header.append(back, title, project);
   const host = document.createElement("div");
@@ -37,7 +43,7 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
     const status = document.createElement("p");
     status.className = "report-screen-loading";
     status.setAttribute("role", "status");
-    status.textContent = "Loading Report…";
+    status.textContent = `Loading ${screenTitle}…`;
     host.replaceChildren(status);
     try {
       const panel = await load();
@@ -47,7 +53,7 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
     } catch (error) {
       if (!current()) { dispose(); return; }
       status.setAttribute("role", "alert");
-      status.textContent = error.message || "Could not load Report.";
+      status.textContent = error.message || `Could not load ${screenTitle}.`;
       const retry = document.createElement("button");
       retry.textContent = "Try again";
       retry.addEventListener("click", () => void hydrate());
@@ -61,6 +67,7 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
     isOpen: () => current() && dialog.open,
     open() {
       if (!current()) { dispose(); return; }
+      back.textContent = backLabel();
       if (!dialog.open) dialog.showModal();
       return hydrate();
     },

@@ -167,6 +167,7 @@ const descriptorContext=vm.createContext({
 });
 vm.runInContext('const initialProjectFoundationScopes=new Set();'+actual('createInitialProjectFoundationScope')+actual('projectInformationStateKey')+actual('workspacePaneDescriptors'),descriptorContext);
 descriptors=descriptorContext.workspacePaneDescriptors();generation++;await mountAndSettle(context());
+assert.ok(!descriptors.some(item=>item.paneID === "report"), "Report is a separate screen; its access fence is tested in report-screen-contract");
 const liveEditors=new Map(track.children.map(node=>[node.dataset.paneId,node]));
 for(const [id,node] of liveEditors) node.draft=`Unsaved ${id} text`;
 for(const unrelated of ['research','saved-work','code-question-workspace']) {
@@ -177,7 +178,7 @@ for(const unrelated of ['research','saved-work','code-question-workspace']) {
   assert.equal(editorBuilds.get(id),1,`${unrelated} cannot reconstruct the dirty ${id} controller`);
  }
 }
-for(const [id,required] of [['notebook','notebook'],['report','professional-exports'],['workboard','projects']]) {
+for(const [id,required] of [['notebook','notebook'],['workboard','projects']]) {
  const prior=track.children.find(node=>node.dataset.paneId===id);
  editorCapabilities.set(required,false);generation++;
  await sandbox.mount(context());
