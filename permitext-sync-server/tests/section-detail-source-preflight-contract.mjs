@@ -14,9 +14,9 @@ function fixture() {
     isCurrentActiveCodeSourceContext: () => current, resolveReaderSource: () => pending,
     sectionDetailsBySearch: () => { mutations.push("details"); return details; }, sectionDetailAnchorsBySearch: () => anchors,
     syncCodeVersion: value => value, syncCodeVersionForPrefix: () => "2022", normalizeAnnotationBlockID: value => value || "",
-    updateBrowserSectionURL: () => mutations.push("url"), scheduleContinuitySync() {}, newReaderState: value => value,
+    updateBrowserSectionURL: () => mutations.push("url"), scheduleContinuitySync: () => mutations.push("continuity"), newReaderState: value => value,
     readerFieldsForSectionDetail: value => value, placeSectionDetailAfterPane() {}, paneIDForUtilityInstance: () => "search",
-    updateLinkedReaderForSearch: () => null, saveWorkspaceState: () => mutations.push("save"), transitionWorkspace: async () => {},
+    updateLinkedReaderForSearch: () => { mutations.push("reader"); return null; }, saveWorkspaceState: () => mutations.push("save"), transitionWorkspace: async () => {},
     paneIDForSectionDetail: id => id,
     track: { querySelector: () => null }
   });
@@ -43,6 +43,42 @@ console.log("Detail preflight passed: no mutation before resolution, cancellatio
 
 const savedStart = source.indexOf("async function openSavedItemInReader(");
 const savedEnd = source.indexOf("\nasync function startFocusedResearchFromSavedItem", savedStart);
+// Opening saved evidence owns only its detail, including when that detail already has a linked Reader.
+{
+  const f = fixture();
+  const reader = {id: "linked", chapterID: "original", sectionID: "old", scrollTop: 460};
+  f.c.state.readers = [reader];
+  f.c.state.utilityInstances = [{id: "saved", key: "sdc"}];
+  f.c.savedItemOpeningAttempts = new Map();
+  f.c.resolveReaderSource = async item => ({...item, __activeCodeSourceContext: {}});
+  f.c.updateLinkedReaderForSearch = () => { throw new Error("Saved evidence moved Reader"); };
+  f.c.scrollPaneIntoView = () => {};
+  f.c.newUtilityInstance = () => { throw new Error("Existing Evidence detail was not reused"); };
+  vm.runInContext(source.slice(savedStart, savedEnd) + "\nthis.openSaved = openSavedItemInReader;", f.c);
+  // Seed the existing detail and its Evidence anchor.
+  await f.c.open("saved", {sectionID: "5", codeVersion: "2022"}, {anchorPaneID: "evidence", updateLinkedReader: false});
+  f.mutations.length = 0;
+  for (const blockID of ["paragraph-four", ""]) {
+    await f.c.openSaved({sectionID: "6", codeVersion: "2022", blockID}, "evidence");
+    assert.equal(f.details.saved.sectionID, "6");
+    assert.equal(f.details.saved.blockID, blockID, "Comment scope stays attached to the selected saved target");
+    assert.equal(f.c.state.readers[0], reader);
+    assert.deepEqual(reader, {id: "linked", chapterID: "original", sectionID: "old", scrollTop: 460});
+    assert.ok(!f.mutations.includes("reader"));
+    assert.ok(!f.mutations.includes("continuity"));
+    assert.ok(!f.mutations.includes("url"));
+  }
+}
+// Search retains its intentional linked Reader and continuity navigation.
+{
+  const f = fixture();
+  f.c.resolveReaderSource = async item => ({...item, __activeCodeSourceContext: {}});
+  await f.c.open("search", {sectionID: "6", codeVersion: "2022"});
+  assert.ok(f.mutations.includes("reader"));
+  assert.ok(f.mutations.includes("continuity"));
+  assert.ok(f.mutations.includes("url"));
+}
+console.log("Saved evidence preserves existing Reader identity, chapter, scroll, continuity and URL; section/passage comment targets remain distinct; Search navigation is retained.");
 for (const outcome of [null, "reject"]) {
   const original = { utilityInstances: [{ id: "existing", key: "sdc" }] };
   let created = 0;

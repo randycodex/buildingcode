@@ -4182,29 +4182,37 @@ function isProjectToolPaneID(paneID) {
   return Boolean(projectForToolPaneID(paneID));
 }
 
-function savedProjectColumnGroup(paneIDs) {
+function savedEvidenceColumnGroup(paneID, paneIDs) {
   const active = new Set(paneIDs);
-  return [primarySavedPaneID(), ...openProjectDetails().flatMap((detail) => [
-    paneIDForProjectNotebook(detail), paneIDForProjectReportDraft(detail)
-  ])].filter((id) => active.has(id));
+  for (const savedPaneID of savedPaneIDs()) {
+    if (!active.has(savedPaneID)) continue;
+    const group = [savedPaneID, ...savedItemDetailIDsForPane(savedPaneID).map(paneIDForSectionDetail)]
+      .filter((id) => active.has(id));
+    if (group.includes(paneID)) return group;
+  }
+  return [];
 }
 
-function groupSavedProjectColumns(paneIDs) {
-  const group = savedProjectColumnGroup(paneIDs);
-  if (group.length < 2) return paneIDs;
-  // Saved anchors a previously scattered group; a group without Saved keeps
-  // the position of its first remaining tool.
-  const anchor = paneIDs.includes(primarySavedPaneID()) ? primarySavedPaneID() : group[0];
-  const result = paneIDs.filter((id) => !group.includes(id));
-  const index = paneIDs.slice(0, paneIDs.indexOf(anchor)).filter((id) => !group.includes(id)).length;
-  result.splice(index, 0, ...group);
+function pairSavedEvidenceDetails(paneIDs) {
+  let result = [...paneIDs];
+  for (const savedPaneID of savedPaneIDs()) {
+    const group = savedEvidenceColumnGroup(savedPaneID, result);
+    if (group.length < 2) continue;
+    const index = result.slice(0, result.indexOf(savedPaneID)).filter((id) => !group.includes(id)).length;
+    result = result.filter((id) => !group.includes(id));
+    result.splice(index, 0, ...group);
+  }
   return result;
+}
+
+function canGroupWorkspaceColumn(paneID) {
+  return canGroupColumn(paneID) && !savedEvidenceColumnGroup(paneID, state.paneOrder || []).length;
 }
 
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
   const settingsIsGrouped = (state.columnGroups || []).some((group) => group.paneIDs.includes("utility:settings"));
   const settingsPaneID = state.utilities.settings && !settingsIsGrouped ? "utility:settings" : "";
-  // Saved and its project tools retain the user's chosen positions.
+  // Project columns retain their independently chosen positions.
   return [
     ...paneIDs.filter((paneID) => paneID === settingsPaneID),
     ...paneIDs.filter((paneID) => paneID !== settingsPaneID)
@@ -4283,9 +4291,9 @@ function activePaneIDs() {
       paired.splice(anchorIndex + 1, 0, detailID);
     }
   });
-  paired.splice(0, paired.length, ...groupSavedProjectColumns(paired));
   reconcileColumnGroups(paired);
   paired.splice(0, paired.length, ...orderColumnGroups(paired, state.columnGroups));
+  paired.splice(0, paired.length, ...pairSavedEvidenceDetails(paired));
   const criticalWorkflowFirst = pinCriticalWorkflowPanesToLeft(paired);
   state.paneOrder = criticalWorkflowFirst;
   return criticalWorkflowFirst;
@@ -4344,18 +4352,20 @@ function placeProjectToolPaneInControlOrder(detail) {
     paneIDForProjectReportDraft(detail)
   ].filter((paneID) => active.has(paneID));
   const controls = new Set(controlPaneIDs);
-  const ordered = (state.paneOrder || []).filter((paneID) =>
-    active.has(paneID) && !controls.has(paneID)
-  );
+  const ordered = (state.paneOrder || []).filter((paneID) => active.has(paneID));
   activeIDs.forEach((paneID) => {
     if (!controls.has(paneID) && !ordered.includes(paneID)) ordered.push(paneID);
   });
-  const projectAnchorIndex = ordered.indexOf(primarySavedPaneID());
-  ordered.splice(
-    projectAnchorIndex === -1 ? ordered.length : projectAnchorIndex + 1,
-    0,
-    ...controlPaneIDs
-  );
+  controlPaneIDs.forEach((paneID, index) => {
+    if (ordered.includes(paneID)) return;
+    // Opening one tool must not reset a sibling's independently chosen position.
+    const previous = controlPaneIDs.slice(0, index).findLast((id) => ordered.includes(id));
+    const next = controlPaneIDs.slice(index + 1).find((id) => ordered.includes(id));
+    const anchorIndex = ordered.indexOf(primarySavedPaneID());
+    const insertIndex = previous ? ordered.indexOf(previous) + 1 : next ? ordered.indexOf(next)
+      : anchorIndex === -1 ? ordered.length : anchorIndex + 1;
+    ordered.splice(insertIndex, 0, paneID);
+  });
   state.paneOrder = ordered;
 }
 
@@ -18582,9 +18592,11 @@ async function openSectionDetail(searchID, section, options = {}) {
   if (options.updateURL !== false) {
     updateBrowserSectionURL(sectionID);
   }
-  scheduleContinuitySync(newReaderState(readerFieldsForSectionDetail(details[searchID])));
+  if (options.updateLinkedReader !== false) {
+    scheduleContinuitySync(newReaderState(readerFieldsForSectionDetail(details[searchID])));
+  }
   placeSectionDetailAfterPane(searchID, anchors[searchID] || paneIDForUtilityInstance({ key: "search", id: searchID }));
-  const linkedReader = updateLinkedReaderForSearch(searchID, details[searchID]);
+  const linkedReader = options.updateLinkedReader === false ? null : updateLinkedReaderForSearch(searchID, details[searchID]);
   const liveContent = linkedReader && track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(linkedReader))}"] .reader-content`);
   const canReuseReader = Boolean(liveContent && liveContent.querySelector(
     `.chapter-section[data-section-id="${CSS.escape(sectionID)}"][data-code-version="${CSS.escape(details[searchID].codeVersion)}"]`
@@ -18983,6 +18995,8 @@ async function renderSectionDetail(searchID, detail) {
   panel.dataset.paneId = paneIDForSectionDetail(searchID);
   panel.classList.add(`code-theme-${codeTheme(detail.codePrefix || "BC")}`);
   const detailOwner = (state.utilityInstances || []).find((instance) => instance.id === searchID);
+  const isSavedEvidenceDetail = detailOwner?.key === "sdc";
+  panel.classList.toggle("is-saved-evidence-detail", isSavedEvidenceDetail);
   panel.dataset.projectId = String(detailOwner?.projectID || "");
   applyProjectDerivedPaneTheme(panel, detailOwner?.projectID);
   applyPaneWeight(panel, paneIDForSectionDetail(searchID));
@@ -19008,7 +19022,10 @@ async function renderSectionDetail(searchID, detail) {
   panel.append(accessibleHeading);
 
   const chrome = document.createElement("header");
-  chrome.className = "section-detail-chrome";
+  chrome.className = "panel-header section-detail-chrome";
+  const detailTitle = document.createElement("p");
+  detailTitle.className = "eyebrow panel-kind";
+  detailTitle.textContent = isSavedEvidenceDetail ? "Evidence detail" : "Section detail";
   const backButton = appendDetailIconButton(chrome, {
     title: "Close",
     label: "Close saved item",
@@ -19031,19 +19048,23 @@ async function renderSectionDetail(searchID, detail) {
   projectButton.setAttribute("aria-haspopup", "menu");
   projectButton.setAttribute("aria-expanded", "false");
   projectButton.hidden = !hasCapability("projects");
-  actions.append(projectButton, backButton);
-  chrome.append(saveButton, actions);
+  actions.append(saveButton, projectButton, backButton);
+  chrome.append(detailTitle, actions);
 
   const content = document.createElement("section");
   content.className = "section-detail-content";
 
   const codeLabelElement = document.createElement("p");
   codeLabelElement.className = "section-detail-code-label";
-  codeLabelElement.textContent = codeDisplayLabel(detail.codePrefix || "BC", sectionPayload.codeVersion || detail.codeVersion || "").toUpperCase();
+  codeLabelElement.textContent = readerCodeOptionLabel(codeOptionFor(
+    detail.codePrefix || "BC", sectionPayload.codeVersion || detail.codeVersion || ""
+  )).toUpperCase();
 
   const chapterLabel = document.createElement("p");
-  chapterLabel.className = "section-detail-code-label";
-  chapterLabel.textContent = detail.headerLine ? detail.headerLine.toUpperCase() : "";
+  chapterLabel.className = "section-detail-chapter";
+  chapterLabel.textContent = chapter?.fullTitle || chapter?.displayTitle || detail.headerLine ||
+    (sectionPayload.chapterNumber ? `Chapter ${sectionPayload.chapterNumber}` : "");
+  chapterLabel.hidden = !chapterLabel.textContent;
 
   const heading = document.createElement("button");
   heading.className = "section-detail-heading";
@@ -19063,6 +19084,7 @@ async function renderSectionDetail(searchID, detail) {
   const chapterTitle = document.createElement("p");
   chapterTitle.className = "section-detail-chapter";
   chapterTitle.textContent = detail.headingLine || "";
+  chapterTitle.hidden = !chapterTitle.textContent;
 
   const body = document.createElement("section");
   body.className = "section-detail-body";
@@ -19117,15 +19139,19 @@ async function renderSectionDetail(searchID, detail) {
   notes.hidden = !hasCapability("notes");
   const notesHeader = document.createElement("div");
   notesHeader.className = "section-detail-notes-header";
+  const commentScope = sectionTarget.blockID ? "Passage comment" : "Section comment";
+  const notesTitle = document.createElement("h3");
+  notesTitle.textContent = commentScope;
   const saveState = document.createElement("span");
   saveState.className = "section-detail-note-state";
-  notesHeader.append(saveState);
+  saveState.setAttribute("role", "status");
+  notesHeader.append(notesTitle, saveState);
   const textareaWrap = document.createElement("label");
   textareaWrap.className = "section-detail-note-box";
   const textarea = document.createElement("textarea");
   textarea.value = noteBody;
-  textarea.placeholder = "Add a note";
-  textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
+  textarea.placeholder = sectionTarget.blockID ? "Add a comment on the highlighted passage" : "Add a comment on this section";
+  textarea.setAttribute("aria-label", `${commentScope} for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
   const noteResizeHandle = document.createElement("div");
   noteResizeHandle.className = "section-detail-note-resize-handle";
   noteResizeHandle.setAttribute("role", "separator");
@@ -35155,6 +35181,7 @@ async function openSavedItemInReader(item, savedPaneID) {
       isCurrent,
       anchorPaneID: savedPaneID,
       updateURL: false,
+      updateLinkedReader: false,
       evidenceAnchor: item?.evidenceAnchor || null
     });
     publishedDetail = sectionDetailsBySearch()[detailInstance.id];
@@ -38214,7 +38241,8 @@ function reconcileColumnGroups(paneIDs) {
     });
     const members = new Set(group.paneIDs);
     for (const id of [...members].filter((id) => active.has(id))) basePaneGroupForMove(id, paneIDs).forEach((member) => members.add(member));
-    return { ...group, paneIDs: groupSavedProjectColumns([...members]) };
+    // Evidence details belong to their saved list, outside custom column groups.
+    return { ...group, paneIDs: [...members].filter((id) => !savedEvidenceColumnGroup(id, paneIDs).length) };
   }));
 }
 
@@ -38226,8 +38254,8 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
 function basePaneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
-  const projectGroup = savedProjectColumnGroup(orderedIDs);
-  if (projectGroup.includes(paneID)) return projectGroup;
+  const evidenceGroup = savedEvidenceColumnGroup(paneID, orderedIDs);
+  if (evidenceGroup.length) return evidenceGroup;
   const primaryResearchPaneID = paneIDForResearchConversation();
   if (paneID === "utility:analysis" || (primaryResearchPaneID && paneID === primaryResearchPaneID)) {
     return [...new Set(["utility:analysis", primaryResearchPaneID])].filter((id) => id && active.has(id));
@@ -38261,6 +38289,9 @@ function basePaneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   }
   const linkedSearchID = searchIDForLinkedReaderPane(paneID);
   if (linkedSearchID) {
+    if ((state.utilityInstances || []).some((instance) => instance.id === linkedSearchID && instance.key === "sdc")) {
+      return active.has(paneID) ? [paneID] : [];
+    }
     return [paneIDForUtilityInstance({ key: "search", id: linkedSearchID }), paneIDForSectionDetail(linkedSearchID), paneID].filter((id) => active.has(id));
   }
   return active.has(paneID) ? [paneID] : [];
@@ -38844,13 +38875,21 @@ function orderWithPaneStepped(paneID, direction) {
 
 function activePinnedPaneID() {
   // Retain the saved Pro preference, but never apply it to a Free layout.
-  return isProAccount() ? state.pinnedPaneID : "";
+  if (!isProAccount()) return "";
+  const paneID = state.pinnedPaneID || "";
+  // Pin a saved detail through its Evidence anchor so the pair cannot split.
+  return paneID.startsWith("section:detail:")
+    ? savedEvidenceColumnGroup(paneID, state.paneOrder || [])[0] || paneID
+    : paneID;
 }
 
 function togglePinnedPane(panel) {
   if (!isProAccount()) return;
-  const paneID = panel.dataset.paneId;
-  state.pinnedPaneID = state.pinnedPaneID === paneID ? "" : paneID;
+  const selectedPaneID = panel.dataset.paneId;
+  const paneID = selectedPaneID.startsWith("section:detail:")
+    ? savedEvidenceColumnGroup(selectedPaneID, activePaneIDs())[0] || selectedPaneID
+    : selectedPaneID;
+  state.pinnedPaneID = activePinnedPaneID() === paneID ? "" : paneID;
   if (state.pinnedPaneID) {
     state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => id !== paneID);
   }
@@ -38882,7 +38921,7 @@ function focusColumnGroupControl(group) {
 }
 
 function prepareColumnGroupControls(panel, header, group) {
-  if (!workspacePrivatePresentationAllowed() || !canGroupColumn(panel.dataset.paneId)) group = null;
+  if (!workspacePrivatePresentationAllowed() || !canGroupWorkspaceColumn(panel.dataset.paneId)) group = null;
   let menuButton = header.querySelector('.column-group-menu-button');
   if (!menuButton) {
     header.addEventListener('click', (event) => {
@@ -38928,7 +38967,7 @@ function appendReaderMenuControls(menu, panel) {
 
 function openColumnGroupMenu(panel, anchor) {
   document.querySelector('.column-group-menu')?._close?.();
-  const group = workspacePrivatePresentationAllowed() && canGroupColumn(panel.dataset.paneId) ? columnGroupForPane(panel.dataset.paneId) : null;
+  const group = workspacePrivatePresentationAllowed() && canGroupWorkspaceColumn(panel.dataset.paneId) ? columnGroupForPane(panel.dataset.paneId) : null;
   const menu = document.createElement('div');
   menu.className = 'column-group-menu';
   menu.setAttribute('role', 'menu');
@@ -38955,7 +38994,10 @@ function openColumnGroupMenu(panel, anchor) {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
     });
   }
-  if (isProAccount()) add(activePinnedPaneID() === panel.dataset.paneId ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
+  const pinTarget = panel.dataset.paneId.startsWith("section:detail:")
+    ? savedEvidenceColumnGroup(panel.dataset.paneId, activePaneIDs())[0] || panel.dataset.paneId
+    : panel.dataset.paneId;
+  if (isProAccount()) add(activePinnedPaneID() === pinTarget ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
   add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
   add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
   if (panel.classList.contains("reader-panel")) {
@@ -39035,7 +39077,7 @@ function openColumnGroupEditor(panel, existing = null) {
   const positions = captureReaderScrollPositions();
   for (const id of ids) {
     if (seen.has(id)) continue;
-    const eligible = canGroupColumn(id);
+    const eligible = canGroupWorkspaceColumn(id);
     const unit = [id];
     unit.forEach((member) => seen.add(member));
     const other = unit.map(columnGroupForPane).find((group) => group && group.id !== existing?.id);
@@ -39335,6 +39377,8 @@ function appendPaneSequence(panes) {
   const pinnedPaneID = activePinnedPaneID();
   const pinnedIndex = orderedPanes.findIndex((pane) => pane.dataset.paneId === pinnedPaneID);
   if (pinnedIndex > 0) orderedPanes.unshift(...orderedPanes.splice(pinnedIndex, 1));
+  const panesByID = new Map(orderedPanes.map((pane) => [pane.dataset.paneId, pane]));
+  orderedPanes.splice(0, orderedPanes.length, ...pairSavedEvidenceDetails([...panesByID.keys()]).map((id) => panesByID.get(id)));
   orderedPanes.forEach((pane) => {
     const pinned = pane.dataset.paneId === pinnedPaneID;
     pane.classList.toggle("is-pinned", pinned);
@@ -42955,21 +42999,23 @@ function createWorkspacePaneLoadingShell(descriptor) {
     panel.append(root);
   }
   const isReport = descriptor.ownerClass === "report-draft-panel";
+  const isSectionDetail = (descriptor.ownerClass || "").includes("section-detail-panel");
   const header = isReport ? createReportPaneHeader(() => descriptor.close()) : document.createElement("header");
   if (!isReport) {
+    if (isSectionDetail) header.className = "panel-header section-detail-chrome";
     const heading = document.createElement("h2");
     heading.className = "eyebrow panel-kind";
     heading.textContent = descriptor.label;
     const close = document.createElement("button");
     close.type = "button";
-    close.className = "icon-button utility-close";
+    close.className = isSectionDetail ? "section-detail-icon section-detail-close" : "icon-button utility-close";
     close.setAttribute("aria-label", `Close ${descriptor.label}`);
     close.innerHTML = circleXIconSVG();
     close.addEventListener("click", () => { void descriptor.close(); });
     header.append(heading, close);
   }
   const status = document.createElement("p");
-  status.className = `${isReport ? "report-draft-status" : "empty-state"} workspace-pane-load-status`;
+  status.className = `${isReport ? "report-draft-status" : isSectionDetail ? "section-detail-content" : "empty-state"} workspace-pane-load-status`;
   status.setAttribute("role", "status");
   status.textContent = `Loading ${descriptor.label}…`;
   const retry = document.createElement("button");
@@ -43121,8 +43167,11 @@ function workspacePaneDescriptors(options = {}) {
       { foundationScope: savedFoundationScope, deferredFoundationRelease: Boolean(savedFoundationScope), publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
     if (instance.key === "search" || instance.key === "sdc") {
       const detail = sectionDetailsBySearch()[instance.id];
-      if (detail) add(paneIDForSectionDetail(instance.id), "Section", () => renderSectionDetail(instance.id, detail),
-        closeAndRender(() => removeSectionDetail(instance.id)), { identity: JSON.stringify(detail) });
+      if (detail) add(paneIDForSectionDetail(instance.id), instance.key === "sdc" ? "Evidence detail" : "Section detail", () => renderSectionDetail(instance.id, detail),
+        closeAndRender(() => removeSectionDetail(instance.id)), {
+          ownerClass: `section-detail-panel${instance.key === "sdc" ? " is-saved-evidence-detail" : ""}`,
+          identity: JSON.stringify(detail)
+        });
     }
   }
   if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Research", () => renderResearch("utility:analysis"), closeResearchWorkspace,

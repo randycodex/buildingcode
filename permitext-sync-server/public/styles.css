@@ -3126,7 +3126,9 @@ select option:checked {
   font-size: var(--reader-font-size) !important;
 }
 
-.reader-content > * {
+.reader-content > *,
+.section-detail-content > *,
+.section-detail-body > * {
   width: 100%;
   max-width: 800px;
   margin-right: auto;
@@ -3134,6 +3136,11 @@ select option:checked {
 }
 
 .reader-content > .chapter-section:has(.code-table) {
+  max-width: none;
+}
+
+.section-detail-content > .section-detail-body,
+.section-detail-body > .code-table {
   max-width: none;
 }
 
@@ -3164,10 +3171,15 @@ select option:checked {
 }
 
 .section-detail-chrome {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   justify-content: space-between;
   gap: var(--space-3);
+}
+
+.section-detail-chrome .panel-kind {
+  font-size: var(--chrome-font-size) !important;
 }
 
 .section-detail-icon {
@@ -3226,8 +3238,9 @@ select option:checked {
 
 .section-detail-content {
   min-width: 0;
-  padding: var(--space-4) 0 108px;
-  font-family: var(--ui-font-family);
+  padding: var(--space-4) 0 var(--space-6);
+  font-family: var(--reader-font-family);
+  font-optical-sizing: auto;
   font-size: var(--reader-font-size) !important;
   line-height: var(--reader-line-height);
   overflow-wrap: anywhere;
@@ -3250,9 +3263,10 @@ select option:checked {
   display: block;
   min-width: 0;
   width: 100%;
-  margin: var(--space-6) 0 var(--space-3);
+  margin: var(--space-5) auto var(--space-2);
   padding: 0 34px 0 0;
   border: 0;
+  border-radius: 0;
   background: transparent;
   color: var(--text-primary);
   text-align: left;
@@ -3263,7 +3277,7 @@ select option:checked {
   min-width: 0;
   font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--subsection-title-scale)) !important;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
@@ -3302,7 +3316,7 @@ select option:checked {
 
 .section-detail-body {
   display: grid;
-  gap: var(--space-3);
+  gap: 0;
   min-width: 0;
   margin: 0 0 var(--space-6);
   color: var(--text-primary);
@@ -3342,6 +3356,8 @@ select option:checked {
 .section-detail-notes {
   display: grid;
   gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border);
 }
 
 .section-detail-notes-header {
@@ -3350,14 +3366,10 @@ select option:checked {
   gap: var(--space-3);
 }
 
-.section-detail-notes-header:has(.section-detail-note-state:empty) {
-  display: none;
-}
-
 .section-detail-notes h3 {
   margin: 0;
-  color: var(--text-secondary);
-  font-family: var(--ui-font-family);
+  color: var(--text-primary);
+  font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
   font-weight: 600;
 }
@@ -3366,8 +3378,8 @@ select option:checked {
   margin-left: auto;
   color: var(--text-secondary);
   font-family: var(--ui-font-family);
-  font-size: var(--reader-font-size) !important;
-  font-weight: 600;
+  font-size: var(--chrome-font-size) !important;
+  font-weight: 400;
 }
 
 .section-detail-note-box {
@@ -3384,8 +3396,8 @@ select option:checked {
   resize: none;
   padding: var(--space-4);
   border: 0;
-  border-radius: 18px;
-  background: var(--surface);
+  border-radius: var(--radius-control);
+  background: var(--reader-notes-input-surface);
   color: var(--text-primary);
   font-family: var(--ui-font-family);
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
@@ -15717,8 +15729,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 body .account-screen-header h1,
-body .panel-track > article.workspace-panel:not(.reader-panel),
-body .panel-track > article.workspace-panel:not(.reader-panel) * {
+body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel),
+body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) * {
   font-size: 14px !important;
 }
 
@@ -17777,8 +17789,12 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: color-mix(in srgb, #67b7ff 8%, var(--background));
 }
 
-.section-detail-panel {
+.section-detail-panel:not(.is-saved-evidence-detail) {
   background: color-mix(in srgb, #67b7ff 8%, var(--background));
+}
+
+.section-detail-panel.is-saved-evidence-detail {
+  background: var(--background);
 }
 
 .section-detail-note-box .section-detail-note-resize-handle { display: none; }

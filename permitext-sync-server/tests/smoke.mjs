@@ -2817,7 +2817,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".annotated-code-block:hover > .inline-comment") &&
-        workspaceStyles.text.match(/\.reader-content > \* \{[\s\S]*?width: 100%;[\s\S]*?max-width: 800px;/),
+        workspaceStyles.text.match(/\.reader-content > \*,[\s\S]*?\.section-detail-body > \* \{[\s\S]*?width: 100%;[\s\S]*?max-width: 800px;/),
       "Reader passage actions or the responsive 800-pixel reading measure are missing."
     );
     assert(
@@ -2826,12 +2826,12 @@ async function main() {
       "Reader passage actions no longer use the compact inline Save and Research row."
     );
     assert(
-      workspaceStyles.text.match(/\.section-detail-heading span \{[^}]*font-weight: 400;/) &&
+      workspaceStyles.text.match(/\.section-detail-heading span \{[^}]*font-weight: 600;/) &&
         workspaceStyles.text.match(/\.section-detail-heading \.section-detail-number \{[^}]*font-weight: 700;/) &&
-        workspaceStyles.text.match(/\.section-detail-content \{[^}]*font-family: var\(--ui-font-family\);/) &&
+        workspaceStyles.text.match(/\.section-detail-content \{[^}]*font-family: var\(--reader-font-family\);/) &&
         workspaceStyles.text.match(/\.section-detail-code-label \{[^}]*font-family: var\(--ui-font-family\);/) &&
         workspaceStyles.text.match(/\.section-detail-body \{[^}]*font-family: var\(--reader-font-family\);/),
-      "Section Detail should preserve normal Reader text weight while emphasizing only the section number."
+      "Section Detail should share Reader heading weight and text typography."
     );
     assert(
         workspaceScript.text.includes("function renderAnnotationProjectEditor(container, target, sectionPayload") &&
@@ -3068,11 +3068,11 @@ async function main() {
         workspaceScript.text.includes("if (!wasOpen) placeProjectToolPaneInControlOrder(identity)") &&
         workspaceScript.text.includes("if (!wasOpen) placeProjectToolPaneLast(identity, coordinationID)") &&
         workspaceScript.text.includes("function projectForToolPaneID(paneID)") &&
-        workspaceScript.text.includes("function savedProjectColumnGroup(paneIDs)") &&
-        workspaceScript.text.includes("if (projectGroup.includes(paneID)) return projectGroup;") &&
+        workspaceScript.text.includes("function savedEvidenceColumnGroup(paneID, paneIDs)") &&
+        workspaceScript.text.includes("if (evidenceGroup.length) return evidenceGroup;") &&
         workspaceScript.text.includes("createProjectToolDragHandle(identity)") &&
         workspaceStyles.text.includes(".workboard-panel > .project-tool-pane-drag-handle"),
-      "Notebook and Report should follow their control order and move with Saved as one project-column group."
+      "Notebook and Report should open in control order and move independently of the Evidence detail pair."
     );
     assert(
       workspaceScript.text.includes("coordination: false") &&

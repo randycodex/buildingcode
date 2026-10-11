@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
-import { normalizeColumnGroups, orderColumnGroups, normalizeWorkspaceLayout } from '../public/workspace-state.js';
+import { normalizeColumnGroups, orderColumnGroups, normalizeWorkspaceLayout, canGroupColumn } from '../public/workspace-state.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const actual = name => {
@@ -116,33 +116,81 @@ grip.emit('dragstart', { dataTransfer: { setData: (_type, id) => { transfer = id
 assert.equal(transfer, 'reader:drag', 'Empty header space initiates the same column drag');
 console.log('Header dragging excludes title buttons and other interactive controls.');
 
-// Project columns move as a unit without changing individual collapsed state.
+// Evidence, Notebook and Report move independently; only Evidence detail follows its list.
 const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID = 'project:report-draft:p';
+const detailID = 'section:detail:evidence';
 const orderState = { utilities: {}, utilityInstances: [], paneOrder: ['reader:one', notebookID, savedID, reportID], collapsedPaneIDs: [notebookID] };
 const orderContext = vm.createContext({
-  state: orderState, Set, normalizeColumnGroups, orderColumnGroups,
+  state: orderState, Set, normalizeColumnGroups, orderColumnGroups, canGroupColumn,
   defaultActivePaneIDs: () => [savedID, notebookID, reportID, 'reader:one'],
   savedPaneIDs: () => [savedID], primarySavedPaneID: () => savedID,
+  savedItemDetailIDsForPane: () => [], paneIDForSectionDetail: id => `section:detail:${id}`,
   openProjectDetails: () => [{ id: 'p' }],
   paneIDForProjectNotebook: () => notebookID, paneIDForProjectReportDraft: () => reportID,
   isCodeQuestionPaneID: () => false, openResearchConversationPaneIDs: () => [], openCodeQuestionPaneIDs: () => [],
   isProjectDetailPaneID: () => false, isProjectToolPaneID: () => false,
   searchIDForLinkedReaderPane: () => '', paneIDForResearchConversation: () => ''
 });
-vm.runInContext(['savedProjectColumnGroup', 'groupSavedProjectColumns', 'pinCriticalWorkflowPanesToLeft', 'activePaneIDs', 'columnGroupForPane', 'reconcileColumnGroups', 'basePaneGroupForMove', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
-assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', savedID, notebookID, reportID]);
+vm.runInContext(['savedEvidenceColumnGroup', 'pairSavedEvidenceDetails', 'pinCriticalWorkflowPanesToLeft', 'activePaneIDs', 'columnGroupForPane', 'reconcileColumnGroups', 'basePaneGroupForMove', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
+assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', notebookID, savedID, reportID]);
 for (const member of [savedID, notebookID, reportID]) {
+  orderState.paneOrder = ['reader:one', notebookID, savedID, reportID];
+  assert.deepEqual(Array.from(orderContext.basePaneGroupForMove(member)), [member]);
   orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:one', 'before');
-  assert.deepEqual(Array.from(orderContext.activePaneIDs()), [savedID, notebookID, reportID, 'reader:one']);
-  orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:one', 'after');
-  assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', savedID, notebookID, reportID]);
+  assert.deepEqual(Array.from(orderContext.activePaneIDs()), [member, 'reader:one', ...[notebookID, savedID, reportID].filter(id => id !== member)]);
 }
-assert.equal(orderContext.orderWithPaneMoved(notebookID, reportID, 'after'), null);
-orderState.paneOrder = orderContext.orderWithPaneMoved('reader:one', notebookID, 'after');
-assert.deepEqual(Array.from(orderContext.activePaneIDs()), [savedID, notebookID, reportID, 'reader:one']);
+orderState.paneOrder = ['reader:one', savedID, notebookID, reportID];
+orderState.paneOrder = orderContext.orderWithPaneMoved(notebookID, reportID, 'after');
+assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', savedID, reportID, notebookID]);
 assert.deepEqual(orderState.collapsedPaneIDs, [notebookID]);
-assert.deepEqual(Array.from(orderContext.savedProjectColumnGroup([savedID, reportID])), [savedID, reportID]);
-console.log('Saved, Notebook and Report move together from any member; internal order and individual collapse state are preserved.');
+
+// Previously scattered details, custom groups and linked Readers cannot separate the Evidence pair.
+orderState.utilityInstances = [{id: 'evidence', key: 'sdc'}];
+orderContext.defaultActivePaneIDs = () => [savedID, notebookID, reportID, 'reader:one', detailID];
+orderContext.savedItemDetailIDsForPane = id => id === savedID ? ['evidence'] : [];
+orderContext.paneIDForUtilityInstance = instance => `utility:${instance.key}:${instance.id}`;
+orderContext.sectionDetailsBySearch = () => ({evidence: {sectionID:'5'}});
+orderContext.sectionDetailAnchorsBySearch = () => ({evidence: savedID});
+orderContext.searchIDForLinkedReaderPane = id => id === 'reader:one' ? 'evidence' : '';
+orderState.paneOrder = [savedID, notebookID, 'reader:one', detailID, reportID];
+orderState.columnGroups = [{id:'old',paneIDs:[detailID,'reader:one']}];
+assert.deepEqual(Array.from(orderContext.activePaneIDs()), [savedID, detailID, notebookID, 'reader:one', reportID]);
+assert.deepEqual(Array.from(orderState.columnGroups[0].paneIDs), ['reader:one']);
+vm.runInContext(actual('canGroupWorkspaceColumn'), orderContext);
+assert.equal(orderContext.canGroupWorkspaceColumn(detailID), false, 'Evidence details cannot be detached into a custom group');
+assert.equal(orderContext.canGroupWorkspaceColumn('reader:one'), true);
+for (const member of [savedID, detailID]) {
+  assert.deepEqual(Array.from(orderContext.basePaneGroupForMove(member)), [savedID, detailID]);
+  orderState.paneOrder = orderContext.orderWithPaneMoved(member, reportID, 'after');
+  assert.deepEqual(Array.from(orderContext.activePaneIDs()), [notebookID, 'reader:one', reportID, savedID, detailID]);
+}
+assert.deepEqual(Array.from(orderContext.basePaneGroupForMove('reader:one')), ['reader:one']);
+assert.equal(orderContext.orderWithPaneMoved(detailID, savedID, 'before'), null);
+const restoredPairOrder = [...orderState.paneOrder];
+orderState.paneOrder = JSON.parse(JSON.stringify(restoredPairOrder));
+assert.deepEqual(Array.from(orderContext.activePaneIDs()), restoredPairOrder);
+// A stored detail pin resolves to Evidence, and the rendered order pairs the detail after that pin.
+orderContext.isProAccount = () => true;
+vm.runInContext(actual('activePinnedPaneID'), orderContext);
+orderState.pinnedPaneID = detailID;
+assert.equal(orderContext.activePinnedPaneID(), savedID);
+assert.deepEqual(Array.from(orderContext.pairSavedEvidenceDetails([savedID, notebookID, reportID, detailID])), [savedID, detailID, notebookID, reportID]);
+assert.deepEqual(orderState.collapsedPaneIDs, [notebookID]);
+orderState.pinnedPaneID = '';
+orderState.utilityInstances = [];
+orderState.columnGroups = [];
+orderContext.defaultActivePaneIDs = () => [savedID, notebookID, reportID, 'reader:one'];
+orderContext.savedItemDetailIDsForPane = () => [];
+orderContext.searchIDForLinkedReaderPane = () => '';
+console.log('Evidence, Notebook and Report move independently; saved details stay next to Evidence through moves, group reconciliation, pinning and restored order, without moving Readers.');
+
+vm.runInContext(actual('placeProjectToolPaneInControlOrder'), orderContext);
+orderState.paneOrder = [reportID, 'reader:one', savedID];
+orderContext.placeProjectToolPaneInControlOrder({id:'p'});
+assert.deepEqual(Array.from(orderState.paneOrder).filter(id => id !== notebookID), [reportID, 'reader:one', savedID], 'Opening Notebook preserves Report and other existing column positions');
+orderState.paneOrder = [notebookID, 'reader:one', savedID];
+orderContext.placeProjectToolPaneInControlOrder({id:'p'});
+assert.deepEqual(Array.from(orderState.paneOrder).filter(id => id !== reportID), [notebookID, 'reader:one', savedID], 'Opening Report preserves Notebook and other existing column positions');
 
 vm.runInContext(actual('singleExpandedDividerEdge'), context);
 state.collapsedPaneIDs = ['collapsed'];
@@ -216,7 +264,7 @@ vm.runInContext(actual('orderWithPaneStepped'), orderContext);
 orderState.columnGroups=[];
 orderState.paneOrder=['reader:one',savedID,notebookID,reportID];
 assert.equal(orderContext.orderWithPaneStepped('reader:one',-1),null);
-assert.deepEqual(Array.from(orderContext.orderWithPaneStepped(notebookID,-1)),[savedID,notebookID,reportID,'reader:one']);
+assert.deepEqual(Array.from(orderContext.orderWithPaneStepped(notebookID,-1)),['reader:one',notebookID,savedID,reportID]);
 assert.equal(orderContext.orderWithPaneStepped(reportID,1),null);
 orderState.utilities.settings=true;
 orderContext.defaultActivePaneIDs=()=>['utility:settings',savedID,notebookID,reportID,'reader:one','reader:two'];
@@ -224,9 +272,9 @@ orderState.paneOrder=['utility:settings','reader:one',savedID,notebookID,reportI
 assert.equal(orderContext.orderWithPaneStepped('utility:settings',1),null,'Pinned Settings cannot move right');
 assert.equal(orderContext.orderWithPaneStepped('reader:one',-1),null,'Columns cannot move before pinned Settings');
 orderState.columnGroups=[{id:'readers',paneIDs:['reader:one','reader:two']}];
-assert.deepEqual(Array.from(orderContext.orderWithPaneStepped('reader:two',1)),['utility:settings',savedID,notebookID,reportID,'reader:one','reader:two']);
+assert.deepEqual(Array.from(orderContext.orderWithPaneStepped('reader:two',1)),['utility:settings',savedID,'reader:one','reader:two',notebookID,reportID]);
 assert.deepEqual(orderState.collapsedPaneIDs,[notebookID]);
-console.log('Keyboard column moves preserve linked project/named groups, boundaries and pinned Settings.');
+console.log('Keyboard column moves preserve independent project columns and named groups, boundaries and pinned Settings.');
 
 // Menu activation invokes real movement/collapse helpers without rerendering editors.
 let focused=null, menu=null, mountedPass=null, menuSaves=0, collapsedCall=null;
@@ -259,7 +307,7 @@ const menuContext=vm.createContext({state:menuState,AbortController,isProAccount
   appendReaderMenuControls(){},paneIsCollapsed:()=>false,
   setPaneCollapsed:(...args)=>{collapsedCall=args;menuRail.focus();}
 });
-vm.runInContext(['activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
+vm.runInContext(['canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
 menuState.pinnedPaneID='reader:one';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert.deepEqual(menu.children.map(x=>x.textContent),['Collapse','Move Left','Move Right'],'Free menus omit both Pin and Unpin, even with a stored Pro pin.');
