@@ -60,7 +60,7 @@ for (const mode of ['success', 'dirty', 'failure', 'account']) {
   activeDraft:{id:'d',title:'Local'},message:'Earlier failure',renders:0,
   isCurrentAccountRequest:()=>mode!=='account',panel:{querySelector:()=>null},
   reportRequest:async()=>{if(mode==='failure')throw Error('Offline');return {drafts:[{id:'d',title:'Remote'}],sources:[],reports:[]}},
-  clearStatus:()=>{c.message=''},renderWorkspaceContent:()=>{c.renders++},emptyProjectReportDraft:()=>({})});
+  refreshIncludedReportComments:()=>{},clearStatus:()=>{c.message=''},renderWorkspaceContent:()=>{c.renders++},emptyProjectReportDraft:()=>({})});
  vm.runInContext(refreshImplementation,c);
  if(mode==='failure')await assert.rejects(c.refreshReportArtifacts(),/Offline/);else await c.refreshReportArtifacts();
  assert.equal(c.message,mode==='success'?'':'Earlier failure',mode+' status');

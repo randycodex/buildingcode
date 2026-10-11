@@ -85,13 +85,36 @@ function isRepeatedTableHeader(node) {
 }
 
 function tableText(table) { return tableGrid(table).map(row => row.join(" | ")).join("\n"); }
+function tableHeaderRowCount(table, rows) {
+  // The enacted HTML carries a separate sticky header with multi-row spans.
+  const parent = table.parentNode;
+  const header = (parent?.parentNode?.childNodes || []).find(node =>
+    String(attributes(node).class || '').split(/\s+/).includes('xsl-table--header'));
+  const findTable = node => node?.tagName === 'table' ? node : (node?.childNodes || []).map(findTable).find(Boolean);
+  const headerTable = findTable(header);
+  if (headerTable) {
+    const headings = tableGrid(headerTable);
+    if (JSON.stringify(headings) === JSON.stringify(rows.slice(0,headings.length))) return headings.length;
+  }
+  const head = (table.childNodes || []).find(node => node.tagName === 'thead');
+  if (head) return tableGrid(head).length;
+  const body = (table.childNodes || []).find(node => node.tagName === 'tbody') || table;
+  let count = 0;
+  for (const row of (body.childNodes || []).filter(node => node.tagName === 'tr')) {
+    const cells = (row.childNodes || []).filter(node => ['td','th'].includes(node.tagName));
+    if (!cells.length || !cells.every(node => node.tagName === 'th')) break;
+    count++;
+  }
+  return count;
+}
+
 function selectedTables(body, blockID) {
   const tables = [];
   const visit = node => {
     if (isRepeatedTableHeader(node)) return;
     if (node.tagName === "table") {
       const rows = tableGrid(node);
-      tables.push({ text: rows.map(row => row.join(" | ")).join("\n"), rows });
+      tables.push({ text: rows.map(row => row.join(" | ")).join("\n"), rows, headerRowCount: tableHeaderRowCount(node, rows) });
       return;
     }
     (node.childNodes || []).forEach(visit);

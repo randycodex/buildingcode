@@ -109,6 +109,7 @@ try {
   assert.match(evidence.find(item => item.sectionID === String(deadEnd.id)).passageText, /24\s*384/);
   assert(issued.manifest.sourceVersions.selections.some(source => source.hasTables));
   assert(evidence.find(item => item.sectionID === String(table.id)).tables.length > 0);
+  assert.equal(evidence.find(item => item.sectionID === String(table.id)).tables[0].headerRowCount, 1, "Preserve the enacted public-corridor table header for continuation pages");
   const preview = await post("/reports/sources/preview", {projectID,kind:"evidence",sourceID:reportSavedSourceID(savedRecords[0])});
   assert.equal(preview.items.find(item=>item.kind === "evidence").passageText,
     evidence.find(item=>item.sectionID === String(current.id)).passageText);

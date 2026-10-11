@@ -1,12 +1,21 @@
 // Render only from the immutable manifest. No live source lookup or snapshot rewrite.
 const text = (value) => String(value || '').trim();
 
+// Correct a known whitespace defect in the imported BC 1020.6 display only.
+// Keep the captured enacted-source text and hash unchanged.
+export function reportEvidenceDisplayText(value) {
+  return String(value || '').replaceAll(
+    'intervening rooms.Where the path of egress travel',
+    'intervening rooms. Where the path of egress travel');
+}
+
 export function reportResearchPlainText(value) {
   return String(value || '')
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '$1 ($2)')
     .replace(/(?<!\\)(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, '$2')
     .replace(/(?<![\\\w])([*_])(?=\S)([^\n]*?\S)\1(?!\w)/g, '$2')
     .replace(/`([^`\n]+)`/g, '$1')
+    .replace(/^ {0,3}#{1,6}[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$/gm, '$1')
     .trim();
 }
 
@@ -61,7 +70,7 @@ export function reportItemPreview(item) {
   const parts = [];
   const add = (label, content) => {
     const value = Array.isArray(content) ? content.filter(Boolean).join('\n\n') : String(content || '');
-    if (value.trim()) parts.push({kind:'text',label,text:value.trim()});
+    if (value.trim()) parts.push({kind:'text',label,text:item.kind === 'researchAnswer' ? reportResearchPlainText(value) : item.kind === 'evidence' ? reportEvidenceDisplayText(value.trim()) : value.trim()});
   };
   if (item.kind === 'evidence') {
     let remaining = item.passageText || '';
@@ -87,7 +96,11 @@ export function reportItemPreview(item) {
     add('Citations',[...new Set((item.citations || []).map(citation=>reportCitationLabel(citation,item.evidence || [],item.codeEdition)))]);
     add('Professional-use notice',item.disclaimer);
   } else if (item.kind === 'projectFacts') {
-    add('Address',item.address); add('Project facts',item.facts);
+    add('Address',item.address);
+    const facts = reportFactPresentation(item);
+    add('Project facts',facts.rows.map(row => [row.text,
+      ...[row.qualification,row.source].filter(Boolean).map(id => `[${id}]`)].join(' ')));
+    add('Fact qualifications and sources',facts.notes.map((note,index) => `[${index+1}] ${note.kind}: ${note.text}`));
   } else {
     add('',item.plainText || item.text);
   }

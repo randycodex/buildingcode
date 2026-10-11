@@ -376,7 +376,11 @@ function normalizeEvidenceManifestItem(item, base) {
       }
       const text = table.rows.map(row => row.join(" | ")).join("\n");
       if (text !== table.text || !item.passageText.includes(text)) throw new Error("Report table does not match its source text.");
-      return {text, rows: structuredClone(table.rows)};
+      const headerRowCount = table.headerRowCount ?? 0;
+      if (!Number.isInteger(headerRowCount) || headerRowCount < 0 || headerRowCount > table.rows.length) {
+        throw new Error("Invalid Report table header rows.");
+      }
+      return {text, rows: structuredClone(table.rows), headerRowCount};
     }) } : {}),
     passageTextHash: requiredText(item.passageTextHash, "Report evidence hash", 256),
     sourceLibraryVersion: requiredText(item.sourceLibraryVersion, "Report evidence source version", 1_024)

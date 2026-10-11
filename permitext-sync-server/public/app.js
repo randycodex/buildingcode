@@ -28721,6 +28721,48 @@ async function renderProjectReportDraft(project) {
     });
   }
 
+  function renderReportCommentOptions(row, block, source) {
+    const previous = row.querySelector(".report-comment-options");
+    const wasOpen = previous?.open || false;
+    previous?.remove();
+    if (block.kind === "evidence" && source?.notes?.length) {
+      const comments = document.createElement("details");
+      comments.className = "report-comment-options";
+      const summary = document.createElement("summary");
+      const updateLabel = () => {
+        const excluded = new Set(block.excludedCommentKeys || []);
+        const count = source.notes.filter(note => !excluded.has(reportCommentKey(note))).length;
+        summary.textContent = `Comments in this Report · ${count} of ${source.notes.length}`;
+      };
+      updateLabel(); comments.append(summary);
+      source.notes.forEach(note => {
+        const label = document.createElement("label");
+        const checkbox = document.createElement("input"); checkbox.type = "checkbox";
+        const key = reportCommentKey(note);
+        checkbox.checked = !(block.excludedCommentKeys || []).includes(key);
+        const text = document.createElement("span");
+        text.textContent = `${note.blockID ? "Passage comment" : "Section comment"}: ${note.body}`;
+        checkbox.addEventListener("change", () => {
+          const excluded = new Set(block.excludedCommentKeys || []);
+          if (checkbox.checked) excluded.delete(key); else excluded.add(key);
+          block.excludedCommentKeys = [...excluded]; updateLabel(); setDirty(); renderIncludedReportComments(panel);
+        });
+        label.append(checkbox,text); comments.append(label);
+      });
+      comments.open = wasOpen;
+      row.append(comments);
+    }
+  }
+
+  function refreshIncludedReportComments() {
+    for (const block of activeDraft.blocks) {
+      const row = [...panel.querySelectorAll(".report-draft-block")].find(row => row.dataset.blockId === block.id);
+      if (row) renderReportCommentOptions(row, block,
+        sources.find(source => source.kind === block.kind && source.id === block.sourceID));
+    }
+    renderIncludedReportComments(panel);
+  }
+
   function renderBlockEditor(container) {
     if (!activeDraft.blocks.length) {
       return;
@@ -28900,32 +28942,7 @@ async function renderProjectReportDraft(project) {
           citation.textContent = [source.codePrefix || "Code", savedEvidenceEdition(source)].filter(Boolean).join(" · ");
           row.append(sourceTitle, citation);
         }
-        if (block.kind === "evidence" && source?.notes?.length) {
-          const comments = document.createElement("details");
-          comments.className = "report-comment-options";
-          const summary = document.createElement("summary");
-          const updateLabel = () => {
-            const excluded = new Set(block.excludedCommentKeys || []);
-            const count = source.notes.filter(note => !excluded.has(reportCommentKey(note))).length;
-            summary.textContent = `Comments in this Report · ${count} of ${source.notes.length}`;
-          };
-          updateLabel(); comments.append(summary);
-          source.notes.forEach(note => {
-            const label = document.createElement("label");
-            const checkbox = document.createElement("input"); checkbox.type = "checkbox";
-            const key = reportCommentKey(note);
-            checkbox.checked = !(block.excludedCommentKeys || []).includes(key);
-            const text = document.createElement("span");
-            text.textContent = `${note.blockID ? "Passage comment" : "Section comment"}: ${note.body}`;
-            checkbox.addEventListener("change", () => {
-              const excluded = new Set(block.excludedCommentKeys || []);
-              if (checkbox.checked) excluded.delete(key); else excluded.add(key);
-              block.excludedCommentKeys = [...excluded]; updateLabel(); setDirty(); renderIncludedReportComments(container);
-            });
-            label.append(checkbox,text); comments.append(label);
-          });
-          row.append(comments);
-        }
+        renderReportCommentOptions(row, block, source);
         if (!sourceTitle.parentElement) row.append(sourceTitle);
         if (source) {
           if (reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id)) {
@@ -29593,6 +29610,7 @@ async function renderProjectReportDraft(project) {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
     sources = payload.sources || [];
     sourceWarnings = payload.warnings || [];
+    refreshIncludedReportComments();
     const sourcePalette = panel.querySelector(".report-source-palette");
     if (!sourcePalette) return false;
     sourcePalette.replaceChildren();
@@ -29613,6 +29631,7 @@ async function renderProjectReportDraft(project) {
     sourceWarnings = sourcePayload.warnings || [];
     history = historyPayload.reports || [];
     if (dirty) {
+      refreshIncludedReportComments();
       const sourcePalette = panel.querySelector(".report-source-palette");
       if (sourcePalette) {
         sourcePalette.replaceChildren();

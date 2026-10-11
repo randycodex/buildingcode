@@ -1,6 +1,6 @@
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "node:url";
-import { reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation } from "./report-presentation.mjs";
+import { reportEvidenceDisplayText, reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation } from "./report-presentation.mjs";
 
 const colors = Object.freeze({
   ink: "#171717",
@@ -124,6 +124,43 @@ function drawList(document, title, values) {
   document.moveDown(0.25);
 }
 
+// Paginate complete rows explicitly: PDFKit's automatic table breaks do not
+// repeat headers. Measure using the same font, width and padding as rendering.
+export function drawReportTable(document, table, startX, contentWidth) {
+  const rows = table.rows || [];
+  if (!rows.length) return;
+  const columns = Math.max(...rows.map(row => row.length));
+  const width = contentWidth / columns;
+  const headers = rows.slice(0, table.headerRowCount || 0);
+  const measure = row => Math.max(...row.map(value =>
+    document.heightOfString(value, {width: width - 10, lineGap: 0}))) + 12;
+  const heights = rows.map(measure);
+  const headerHeight = heights.slice(0,headers.length).reduce((sum,height) => sum + height,0);
+  let position = headers.length;
+  while (position < rows.length || position === headers.length && position === rows.length) {
+    const bottom = document.page.height - document.page.margins.bottom - 2;
+    if (document.y + headerHeight + (heights[position] || 0) > bottom) document.addPage();
+    let height = headerHeight;
+    const pageRows = [...headers];
+    const pageHeights = heights.slice(0,headers.length);
+    while (position < rows.length) {
+      const next = heights[position];
+      if (document.y + height + next > bottom) {
+        if (pageRows.length === headers.length) throw new Error("A Report table row is too tall for a PDF page. Narrow the selection before exporting.");
+        break;
+      }
+      pageRows.push(rows[position]); pageHeights.push(next); height += next; position++;
+    }
+    document.table({position:{x:startX},maxWidth:contentWidth,
+      defaultStyle:{border:0.5,borderColor:colors.rule,padding:5,textOptions:{lineGap:0}},
+      rowStyles:index => ({height:pageHeights[index], ...(index < headers.length ? {backgroundColor:'#f0f0f0'} : {})}),
+      data:pageRows});
+    document.x = startX;
+    if (position >= rows.length) break;
+    document.addPage();
+  }
+}
+
 function drawSourceItem(document, item, projectMaterialBySourceID, presentation, showClassification = true) {
   ensureVerticalSpace(document, 105);
   const startX = document.x;
@@ -147,19 +184,15 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
     for (const table of item.tables || []) {
       const index = remaining.indexOf(table.text);
       if (index < 0) continue;
-      if (remaining.slice(0,index).trim()) document.text(remaining.slice(0,index).trim(), {width:contentWidth,lineGap:2,paragraphGap:8});
+      if (remaining.slice(0,index).trim()) document.text(reportEvidenceDisplayText(remaining.slice(0,index).trim()), {width:contentWidth,lineGap:2,paragraphGap:8});
       ensureVerticalSpace(document, 90);
       document.font("Report-Regular").fontSize(8);
-      document.table({
-        position: {x:startX}, maxWidth: contentWidth,
-        defaultStyle: {border:0.5, borderColor:colors.rule, padding:5},
-        data: table.rows
-      });
+      drawReportTable(document, table, startX, contentWidth);
       document.x = startX;
       document.moveDown(0.7).font("Report-Regular").fontSize(9.5);
       remaining = remaining.slice(index + table.text.length);
     }
-    if (remaining.trim()) document.text(remaining.trim(), {width:contentWidth,lineGap:2,paragraphGap:8});
+    if (remaining.trim()) document.text(reportEvidenceDisplayText(remaining.trim()), {width:contentWidth,lineGap:2,paragraphGap:8});
   } else if (item.kind === "notebookCard") {
     document
       .fillColor(colors.ink)
