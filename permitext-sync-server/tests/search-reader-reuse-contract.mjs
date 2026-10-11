@@ -5,7 +5,8 @@ const source=readFileSync(new URL('../public/app.js', import.meta.url),'utf8');
 const code=source.slice(source.indexOf('function reusableSearchReader('),source.indexOf('\nfunction removeSectionDetail(',source.indexOf('function reusableSearchReader(')));
 let serial=0;
 const state={readers:[{id:'manual',sectionID:'1'}],paneWeights:{}};
-const context={state,workspaceColumnsRequireProject:()=>false,captureAccountRequest:()=>({}),isCurrentAccountRequest:()=>true,activeWorkspaceID:"test",whenWorkspacePaneReady:async()=>true,resolveReaderSource:async x=>x,searchResultDetail:x=>x,readerFieldsForSectionDetail:(x,o)=>({...x,...o}),normalizeAnnotationBlockID:x=>x,readerMatchesSource:(r,d)=>r.sectionID===d.sectionID,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,newReaderState:x=>({id:`new-${++serial}`,...x}),paneIDForReader:r=>r.id,defaultPaneWidthForID:()=>600,placePaneAfter(){},appendPaneIfMissing(){},updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){},transitionWorkspace:async()=>{},revealReaderSourceTarget(){},scrollPaneIntoView(){}};
+const hidden=new Set();
+const context={state,workflowPaneIsVisible:id=>!hidden.has(id),workspaceColumnsRequireProject:()=>false,captureAccountRequest:()=>({}),isCurrentAccountRequest:()=>true,activeWorkspaceID:"test",whenWorkspacePaneReady:async()=>true,resolveReaderSource:async x=>x,searchResultDetail:x=>x,readerFieldsForSectionDetail:(x,o)=>({...x,...o}),normalizeAnnotationBlockID:x=>x,readerMatchesSource:(r,d)=>r.sectionID===d.sectionID,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,newReaderState:x=>({id:`new-${++serial}`,...x}),paneIDForReader:r=>r.id,defaultPaneWidthForID:()=>600,placePaneAfter(){},appendPaneIfMissing(){},updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){},transitionWorkspace:async()=>{},revealReaderSourceTarget(){},scrollPaneIntoView(){}};
 vm.createContext(context);vm.runInContext(code,context);
 const open=(sectionID,extra={})=>context.openSourceInReader({sectionID},'search-a',{sourceSurface:'search',...extra});
 const first=await open('2');const second=await open('3');assert.equal(first.id,second.id);assert.equal(state.readers.length,2);assert.equal(state.readers[0].sectionID,'1');
@@ -19,3 +20,8 @@ const notebook = await context.openSourceInReader({sectionID:'1'},'notebook');
 assert.notEqual(notebook.id, 'manual', 'Notebook links preserve a matching unrelated Reader');
 assert.equal(state.readers[0].sectionID,'1');
 assert.equal((await context.openSourceInReader({sectionID:'8'},'notebook')).id, notebook.id);
+
+hidden.add(notebook.id);
+const independent = await context.openSourceInReader({sectionID:'9'},'notebook');
+assert.notEqual(independent.id,notebook.id,'A link cannot move a hidden Reader in another view');
+assert.equal(notebook.sectionID,'8');

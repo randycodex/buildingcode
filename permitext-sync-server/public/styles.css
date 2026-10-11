@@ -19141,3 +19141,26 @@ dialog.report-export-review {
 }
 
 .project-details-screen .saved-project-structured-fact-value { text-align: left; }
+
+/* Working views keep their inactive editors mounted without consuming width. */
+.workspace-shell { grid-template-rows: var(--header-height) 42px minmax(0, 1fr); }
+.workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: var(--header-height) 42px auto minmax(0, 1fr); }
+.workflow-toolbar { display: flex; align-items: center; padding: 0 clamp(22px, 3vw, 46px); border-bottom: 1px solid var(--border); }
+.workflow-toolbar > div { display: flex; align-items: center; gap: 20px; }
+.workflow-toolbar > [hidden], .panel-track > .is-workflow-hidden { display: none !important; }
+.workflow-toolbar .toolbar-button { background: transparent; border: 0; border-radius: 0; padding: 4px 0; color: var(--text-secondary); font-size: 13px; }
+.workflow-toolbar .toolbar-button svg { display: none; }
+.workflow-toolbar .toolbar-button:hover { color: var(--text); }
+.topbar-actions > [data-workflow-view] { background: transparent; border-radius: 0; color: var(--text-secondary); }
+.topbar-actions > [data-workflow-view][aria-pressed="true"] { color: var(--text); font-weight: 700; }
+@media (min-width:761px) {
+  :root { --header-height: 56px; }
+  .topbar { grid-template-columns: max-content minmax(100px, 1fr) max-content; grid-template-rows: 1fr; gap: 12px; padding: 0 24px; }
+  .topbar-end { display: flex; grid-column: 3; grid-row: 1; gap: 16px; }
+  .topbar-end > * { grid-column: auto; grid-row: auto; }
+  .topbar .topbar-actions > .toolbar-button { font-size: 13px !important; padding: 0 10px; }
+  .topbar .workspace-actions-button { max-width: 180px; }
+  .topbar-actions > [data-workflow-view] { background: transparent !important; }
+}
+.workflow-toolbar .toolbar-button:hover,
+.topbar-actions > [data-workflow-view][aria-pressed="true"] { color: var(--text-primary); }

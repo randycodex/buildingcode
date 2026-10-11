@@ -1,13 +1,14 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {linkPaneToView} from '../public/workflow-views.js';
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const actual = name => {
   const start = source.indexOf(`function ${name}(`);
   assert.ok(start >= 0);
   return source.slice(start, source.indexOf('\n}', start) + 2);
 };
-const context = vm.createContext({activeWorkspaceID:'project-a', pendingLinkedPanePlacements:new Map()});
+const context = vm.createContext({state:{}, linkPaneToView, currentWorkflowView:()=> 'notebook',activeWorkspaceID:'project-a', pendingLinkedPanePlacements:new Map()});
 vm.runInContext(['readerIsClearlyAvailable','requestLinkedPanePlacement','applyLinkedPanePlacements'].map(actual).join('\n'),context);
 for (const origin of ['notebook','report','research','search','reader','evidence-detail']) {
   const original = ['evidence', origin, 'unrelated', 'destination'];

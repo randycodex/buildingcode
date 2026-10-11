@@ -10,13 +10,16 @@ function actual(name) {
   assert.ok(start >= 0 && end > start, name);
   return app.slice(start, end + 2);
 }
-const menuIDs = ["toggle-saved", "add-reader", "toggle-search", "toggle-analysis", "toggle-context", "toggle-facts", "toggle-notebook", "toggle-report"];
-assert.deepEqual(menuIDs.map(id => shell.indexOf(`id="${id}"`)).slice().sort((a, b) => a - b), menuIDs.map(id => shell.indexOf(`id="${id}"`)));
+const topNavigation = shell.match(/<nav class="topbar-actions"[\s\S]*?<\/nav>/)[0];
+assert.match(topNavigation,/data-workflow-view="research"[\s\S]*data-workflow-view="notebook"[\s\S]*id="toggle-report"/);
+assert.doesNotMatch(topNavigation,/id="toggle-(?:saved|search|analysis|notebook)"/);
+assert.match(shell,/data-workflow-tools="research"[\s\S]*id="toggle-search"[\s\S]*id="add-reader"[\s\S]*id="toggle-analysis"/);
 assert.doesNotMatch(actual("renderSavedFolderContext"), /project-notebook-button|project-report-draft-button/);
 
 function button() {
   return { attributes: {}, disabled: false, setAttribute(key, value) { this.attributes[key] = value; } };
 }
+let reportOpen = false;
 let project = { id: "a", name: "Alpha" };
 let allowed = true, privateAllowed = true, discard = true, heldOpen = null, requiresProject = false;
 const capabilities = new Set(["projects", "notebook", "professional-exports"]);
@@ -33,13 +36,14 @@ const c = vm.createContext({
   hasCapability: name => allowed && capabilities.has(name),
   openNotebooks: () => state.notebooks, openReportDrafts: () => state.reportDrafts,
   projectHasOpenNotebook: value => state.notebooks.some(item => item.id === value.id),
-  projectHasOpenReportDraft: value => state.reportDrafts.some(item => item.id === value.id),
+  projectHasOpenReportDraft: () => reportOpen,
+  reportScreen: {get projectID(){return project?.id;},close(){reportOpen=false;}},
   paneIDForProjectNotebook: value => `notebook:${value.id}`,
   paneIDForProjectReportDraft: value => `report:${value.id}`,
   confirmNotebookDiscard: async () => discard, confirmReportDraftDiscard: async () => discard,
   syncProjectToolButtonStates: () => c.syncTopbarProjectToolStates(),
   async openProjectNotebook(value) { calls.push(["notebook", value.id]); state.notebooks.push(value); if (heldOpen) await heldOpen; return true; },
-  async openProjectReportDraft(value) { calls.push(["report", value.id]); state.reportDrafts.push(value); return true; },
+  async openProjectReportDraft(value) { calls.push(["report", value.id]); state.reportDrafts.push(value); reportOpen=true; return true; },
   saveWorkspaceState() {}, transitionWorkspace: async () => {},
   presentWorkspaceIssue: message => calls.push(["error", message])
 });
@@ -73,7 +77,7 @@ assert.equal(reportButton.attributes["aria-pressed"], "true");
 // Top-menu closure and the column's own close action preserve discard decisions.
 discard = false;
 assert.equal(await c.toggleProjectTool("notebook"), false);
-assert.equal(await c.toggleProjectTool("report"), false);
+assert.equal(await c.toggleProjectTool("report"), true,"Returning from Report retains its unsaved editor");
 assert.equal(state.notebooks.length, 1);
 assert.equal(state.reportDrafts.length, 1);
 assert.equal(notebookButton.attributes["aria-pressed"], "true");
@@ -88,7 +92,7 @@ assert.equal(reportButton.attributes["aria-pressed"], "false");
 project = { id: "b", name: "Beta" };
 await c.toggleProjectTool("notebook");
 assert.deepEqual(calls.at(-1), ["notebook", "b"]);
-assert.equal(notebookButton.title, "Close Notebook · Beta");
+assert.equal(notebookButton.title, "Focus Notes · Beta");
 await c.closeProjectNotebook(project);
 let release;
 heldOpen = new Promise(resolve => { release = resolve; });
@@ -114,7 +118,7 @@ const before = calls.length;
 assert.equal(await c.toggleProjectTool("report"), false);
 assert.equal(calls.length, before);
 requiresProject = true; c.syncTopbarProjectToolStates();
-for (const [control, label] of [[contextButton, "Context"], [factsButton, "Facts"], [notebookButton, "Notebook"], [reportButton, "Report"]]) {
+for (const [control, label] of [[contextButton, "Context"], [factsButton, "Facts"], [notebookButton, "Notes"], [reportButton, "Report"]]) {
   assert.equal(control.disabled, false, `${label} remains clickable to explain the Project requirement`);
   assert.equal(control.attributes["aria-pressed"], "false");
   assert.equal(control.title, `Create a Project first to open ${label}`);

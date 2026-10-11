@@ -45,6 +45,7 @@ const mounts = new Map(), issues = [];
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
 const body = element('body');
 const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
+  currentWorkflowView:()=>"research",
   document: { createElement: element, body }, setInterval: fn => { tickScreen = fn; return 1; }, clearInterval() {},
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
   workspaceProject: () => current, projectIdentity: value => ({ ...value }), projectDetailKey: value => value.id,

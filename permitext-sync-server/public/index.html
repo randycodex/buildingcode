@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261010-definition-text-v88">
-    <link rel="stylesheet" href="/web/styles.css?v=20261011-workflow-details-v803">
+    <link rel="stylesheet" href="/web/styles.css?v=20261011-workflow-views-v813">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -39,54 +39,12 @@
     </main>
     <main class="workspace-shell">
       <header class="topbar">
-        <nav class="topbar-actions" aria-label="Workspace tools">
-          <button class="toolbar-button" id="toggle-saved" type="button" aria-label="Evidence" title="Evidence" aria-pressed="false" data-mobile-label="Evidence">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
-              <circle cx="12" cy="13" r="1"></circle>
-            </svg>
-            <span>Evidence</span>
-          </button>
-          <button class="toolbar-button" id="add-reader" type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
-              <path d="m9 9.5 2 2 4-4"></path>
-            </svg>
-            <span>Reader</span>
-          </button>
-          <button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m21 21-4.34-4.34"></path>
-              <circle cx="11" cy="11" r="8"></circle>
-            </svg>
-            <span>Search</span>
-          </button>
-          <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Research" title="Research" aria-pressed="false" data-mobile-label="Research">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 18V5"></path>
-              <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"></path>
-              <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"></path>
-              <path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"></path>
-              <path d="M18 18a4 4 0 0 0 2-7.464"></path>
-              <path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"></path>
-              <path d="M6 18a4 4 0 0 1-2-7.464"></path>
-              <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path>
-            </svg>
-            <span>Research</span>
-          </button>
-          <button class="toolbar-button" id="toggle-context" type="button" aria-label="Context" title="Choose a Project to open Context" aria-pressed="false" disabled>
-            <span>Context</span>
-          </button>
-          <button class="toolbar-button" id="toggle-facts" type="button" aria-label="Facts" title="Choose a Project to open Facts" aria-pressed="false" disabled>
-            <span>Facts</span>
-          </button>
-          <button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notebook" title="Choose a Project to open Notebook" aria-pressed="false" disabled>
-            <span>Notebook</span>
-          </button>
-          <button class="toolbar-button" id="toggle-report" type="button" aria-label="Report" title="Choose a Project to open Report" aria-pressed="false" disabled>
+        <nav class="topbar-actions" aria-label="Working views">
+<button class="toolbar-button" type="button" data-workflow-view="research" aria-pressed="true">Research</button>
+<button class="toolbar-button" type="button" data-workflow-view="notebook" aria-pressed="false">Notebook</button>
+<button class="toolbar-button" id="toggle-report" type="button" aria-label="Report" title="Choose a Project to open Report" aria-pressed="false" disabled>
             <span>Report</span>
-          </button>
-          <button class="mobile-more-button" id="mobile-more" type="button" aria-label="More" title="More" aria-haspopup="dialog" aria-expanded="false" data-mobile-label="More">
+          </button><button class="mobile-more-button" id="mobile-more" type="button" aria-label="More" title="More" aria-haspopup="dialog" aria-expanded="false" data-mobile-label="More">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="5" cy="12" r="1.5"></circle>
               <circle cx="12" cy="12" r="1.5"></circle>
@@ -94,7 +52,7 @@
             </svg>
             <span>More</span>
           </button>
-        </nav>
+</nav>
         <div class="topbar-end">
           <div class="topbar-workspaces" aria-label="Projects">
             <span class="connection-status" id="connection-status" role="status" aria-live="polite" data-state="clean"><span class="connection-status-label">Online</span></span>
@@ -111,7 +69,7 @@
                 <button id="fit-columns" type="button" title="Restore default panel widths">Reset layout</button>
                 <button id="collapse-all-columns" type="button">Collapse all</button>
                 <button id="expand-all-columns" type="button">Expand all</button>
-                <button id="collapse-readers" type="button" title="Close all columns">Close all</button>
+                <button id="collapse-readers" type="button" title="Close columns in this working view">Close all</button>
               </div>
             </details>
           </div>
@@ -124,6 +82,43 @@
           </div>
         </div>
       </header>
+<nav class="workflow-toolbar" aria-label="Tools for current view"><div data-workflow-tools="research"><button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21 21-4.34-4.34"></path>
+              <circle cx="11" cy="11" r="8"></circle>
+            </svg>
+            <span>Search</span>
+          </button><button class="toolbar-button" id="add-reader" type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
+              <path d="m9 9.5 2 2 4-4"></path>
+            </svg>
+            <span>Reader</span>
+          </button><button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Research conversations" title="Research" aria-pressed="false" data-mobile-label="Research">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 18V5"></path>
+              <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"></path>
+              <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"></path>
+              <path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"></path>
+              <path d="M18 18a4 4 0 0 0 2-7.464"></path>
+              <path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"></path>
+              <path d="M6 18a4 4 0 0 1-2-7.464"></path>
+              <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path>
+            </svg>
+            <span>Conversations</span>
+          </button></div><div data-workflow-tools="notebook" hidden><button class="toolbar-button" id="toggle-saved" type="button" aria-label="Evidence" title="Evidence" aria-pressed="false" data-mobile-label="Evidence">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+              <circle cx="12" cy="13" r="1"></circle>
+            </svg>
+            <span>Evidence</span>
+          </button><button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notes" title="Choose a Project to open Notebook" aria-pressed="false" disabled>
+            <span>Notes</span>
+          </button></div><div hidden><button class="toolbar-button" id="toggle-context" type="button" aria-label="Context" title="Choose a Project to open Context" aria-pressed="false" disabled>
+            <span>Context</span>
+          </button><button class="toolbar-button" id="toggle-facts" type="button" aria-label="Facts" title="Choose a Project to open Facts" aria-pressed="false" disabled>
+            <span>Facts</span>
+          </button></div></nav>
       <aside class="workspace-issue" id="workspace-issue" role="alert" hidden>
         <p class="workspace-issue-copy"></p>
         <div class="workspace-issue-actions">
@@ -599,6 +594,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261011-workflow-details-v803" type="module"></script>
+    <script src="/web/app.js?v=20261011-workflow-views-v813" type="module"></script>
   </body>
 </html>

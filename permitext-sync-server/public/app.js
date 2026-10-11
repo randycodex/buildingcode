@@ -1,3 +1,4 @@
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore } from "./workflow-views.js?v=2";
 import { createReportScreen } from "./report-screen.js?v=20261011-report-screen-v4";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
 import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v5";
@@ -137,7 +138,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261010-project-information-v13";
+} from "./workspace-state.js?v=20261011-workflow-views-v14";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -912,6 +913,9 @@ function loadWorkspaceState(accountOverride) {
       detachedWorkboards: releaseSurfaceVisibility.workboard || detachedProjectWindow
         ? normalizeProjectIdentities(saved.detachedWorkboards)
         : [],
+      workflowView: normalizeWorkflowView(saved.workflowView),
+      workflowMembership: normalizeWorkflowMembership(saved.workflowMembership),
+      workflowScroll: saved.workflowScroll || {},
       trackScrollLeft: Number.isFinite(Number(saved.trackScrollLeft)) ? Math.max(0, Number(saved.trackScrollLeft)) : 0,
       // Professional Code Question records are restored only from the
       // authenticated account-scoped cache after the general layout loads.
@@ -2723,6 +2727,7 @@ async function openProjectReportDraft(project) {
   const workspaceID = activeWorkspaceID;
   const screen = createReportScreen({
     projectName: identity.name,
+    backLabel: () => `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     openProjectDetails: () => void openProjectDetailsScreen(),
     load: () => renderProjectReportDraft(identity),
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
@@ -3655,7 +3660,7 @@ async function openProjectDetailsScreen(section = null) {
   };
   const screen = createReportScreen({
     screenTitle: "Project details", screenClass: "project-details-screen", projectName: identity.name,
-    backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : "← Back to workspace",
+    backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects"),
     load: async () => {
@@ -4163,6 +4168,54 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
   };
 }
 
+const workflowScrollStore = createWorkflowScrollStore();
+function currentWorkflowView() { return normalizeWorkflowView(state.workflowView); }
+function workflowPaneAnchors() {
+  return Object.fromEntries(Object.entries(sectionDetailAnchorsBySearch()).map(([id, anchor]) => [paneIDForSectionDetail(id), anchor]));
+}
+function workflowPaneIsVisible(paneID) {
+  return detachedProjectWindow || paneBelongsToView(paneID, currentWorkflowView(), state.workflowMembership, workflowPaneAnchors());
+}
+function syncWorkflowNavigation() {
+  const view = currentWorkflowView();
+  document.querySelectorAll('[data-workflow-view]').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.workflowView === view));
+  });
+  document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
+}
+async function switchWorkflowView(view) {
+  if (notifyProjectRequiredForColumn()) return false;
+  view = normalizeWorkflowView(view);
+  if (view !== currentWorkflowView()) {
+    const panes = [...track.querySelectorAll(':scope > .workspace-panel')];
+    const readerPositions = captureReaderScrollPositions();
+    panes.forEach(pane => { if (readerPositions.has(pane.dataset.paneId)) pane._workflowReaderPosition = readerPositions.get(pane.dataset.paneId); });
+    workflowScrollStore.capture(panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId)));
+    state.workflowScroll ||= {};
+    state.workflowScroll[currentWorkflowView()] = track.scrollLeft;
+    state.workflowView = view;
+    appendPaneSequence(panes);
+    workflowScrollStore.restore(panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId)));
+    restoreReaderScrollPositions(new Map(panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId) && pane._workflowReaderPosition)
+      .map(pane => [pane.dataset.paneId, pane._workflowReaderPosition])));
+    panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId)).forEach(pane => {
+      const target = pane._workflowPendingReaderTarget;
+      if (target?.isConnected) {
+        delete pane._workflowPendingReaderTarget;
+        requestAnimationFrame(() => stabilizeReaderSectionAtHeader(pane.querySelector('.reader-content'), target, 'auto'));
+      }
+    });
+    track.scrollLeft = state.workflowScroll[view] || 0;
+  }
+  syncWorkflowNavigation();
+  saveWorkspaceState();
+  if (!defaultActivePaneIDs().some(workflowPaneIsVisible)) {
+    if (view === 'notebook') await openProjectNotebook(workspaceProject());
+    else await focusRecentUtilityColumn('search');
+  }
+  return true;
+}
+
 function defaultActivePaneIDs() {
   if (workspaceColumnsRequireProject()) return [];
   if (detachedProjectWindow && detachedProject) {
@@ -4459,6 +4512,7 @@ const pendingLinkedPanePlacements = new Map();
 
 function requestLinkedPanePlacement(anchorPaneID, paneID) {
   if (!anchorPaneID || !paneID || anchorPaneID === paneID) return;
+  state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, currentWorkflowView());
   pendingLinkedPanePlacements.set(paneID, { anchorPaneID, workspaceID: activeWorkspaceID });
 }
 
@@ -4662,7 +4716,7 @@ function syncTopbarProjectToolStates() {
   [
     [toggleContextButton, "Context", "projects", () => Boolean(state.projectContextOpen)],
     [toggleFactsButton, "Facts", "projects", () => Boolean(state.projectFactsOpen)],
-    [toggleNotebookButton, "Notebook", "notebook", projectHasOpenNotebook],
+    [toggleNotebookButton, "Notes", "notebook", projectHasOpenNotebook],
     [toggleReportButton, "Report", "professional-exports", projectHasOpenReportDraft]
   ].forEach(([button, label, capability, isOpen]) => {
     if (!button) return;
@@ -4674,7 +4728,7 @@ function syncTopbarProjectToolStates() {
       : !identity ? `Choose a Project to open ${label}`
       : !hasCapability(capability) ? `${label} requires Pro`
       : sharedReport ? "Report editing is unavailable for shared-only Projects."
-      : `${opened ? "Close" : "Open"} ${label} · ${identity.name}`;
+      : `${opened ? (label === "Notes" ? "Focus" : "Close") : "Open"} ${label} · ${identity.name}`;
   });
 }
 
@@ -6747,9 +6801,10 @@ function shouldSkipSearchHighlightNode(node) {
 
 function scrollReaderContentToNode(content, target, behavior = "auto") {
   if (!content || !target) return;
+  const panel = content.closest(".reader-panel");
+  if (panel?.classList.contains("is-workflow-hidden")) { panel._workflowPendingReaderTarget = target; return; }
   const contentRect = content.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
-  const panel = content.closest(".reader-panel");
   const anchorRect = panel?.getBoundingClientRect() || contentRect;
   const headerOffset = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
   const offset = Number.isFinite(headerOffset) ? headerOffset : 0;
@@ -35491,15 +35546,16 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     sourceBlockID: normalizeAnnotationBlockID(detail.blockID)
   });
   const fromSearch = options.sourceSurface === "search";
+  const visibleReaders = (state.readers || []).filter(candidate => workflowPaneIsVisible(paneIDForReader(candidate)));
   let reader = fromSearch
-    ? reusableSearchReader(state.readers || [], anchorPaneID, options.forceNewReader)
-    : (state.readers || []).find((candidate) =>
+    ? reusableSearchReader(visibleReaders, anchorPaneID, options.forceNewReader)
+    : visibleReaders.find((candidate) =>
       (!anchorPaneID || candidate.sourceAnchorPaneID === anchorPaneID) && readerMatchesSource(candidate, detail));
   if (!reader && !fromSearch) {
-    reader = (state.readers || []).find(readerIsClearlyAvailable) || null;
+    reader = visibleReaders.find(readerIsClearlyAvailable) || null;
   }
   if (!reader && anchorPaneID && options.sourceSurface !== "search") {
-    reader = (state.readers || []).find((candidate) => candidate.sourceAnchorPaneID === anchorPaneID);
+    reader = visibleReaders.find((candidate) => candidate.sourceAnchorPaneID === anchorPaneID);
   }
   if (!reader) {
     if (isProAccount() || state.readers.length < 2) {
@@ -35511,7 +35567,9 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
       if (!confirmed || !navigationIsCurrent()) return null;
       reader = replacement;
     } else {
-      reader = state.readers.find((candidate) => paneIDForReader(candidate) !== anchorPaneID) || state.readers[0];
+      const replacement = visibleReaders.find(candidate => paneIDForReader(candidate) !== anchorPaneID) || state.readers[0];
+      if (!await confirmSearchReaderReplacement(replacement, detail, anchorPaneID) || !navigationIsCurrent()) return null;
+      reader = replacement;
     }
   }
   Object.assign(reader, sourceFields);
@@ -39762,7 +39820,7 @@ let pinnedPaneResizeObserver = null;
 
 function refreshPinnedPaneDivider() {
   pinnedPaneResizeObserver?.disconnect();
-  const pinned = track.querySelector(':scope > .workspace-panel.is-pinned');
+  const pinned = track.querySelector(':scope > .workspace-panel.is-pinned:not(.is-workflow-hidden)');
   const divider = pinned?.nextElementSibling;
   track.querySelectorAll(':scope > .pane-divider').forEach((node) => {
     node.classList.toggle('is-pinned-divider', node === divider);
@@ -39813,20 +39871,23 @@ function appendPaneSequence(panes) {
   cleanupInactiveNotebookMounts(orderedPanes);
   cleanupInactiveReportDraftMounts(orderedPanes);
   bindPaneDragging(orderedPanes);
-  if (orderedPanes.length) {
-    const firstPaneID = orderedPanes[0].dataset.paneId;
+  const visiblePanes = orderedPanes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId));
+  orderedPanes.forEach(pane => pane.classList.toggle('is-workflow-hidden', !visiblePanes.includes(pane)));
+  syncWorkflowNavigation();
+  if (visiblePanes.length) {
+    const firstPaneID = visiblePanes[0].dataset.paneId;
     nodes.push(existingDividers.get(dividerKey("", firstPaneID)) || createDivider("", firstPaneID));
   }
-  orderedPanes.forEach((pane, index) => {
+  visiblePanes.forEach((pane, index) => {
     if (index > 0) {
-      const previousPaneID = orderedPanes[index - 1].dataset.paneId;
+      const previousPaneID = visiblePanes[index - 1].dataset.paneId;
       const nextPaneID = pane.dataset.paneId;
       nodes.push(existingDividers.get(dividerKey(previousPaneID, nextPaneID)) || createDivider(previousPaneID, nextPaneID));
     }
     nodes.push(pane);
   });
-  if (orderedPanes.length) {
-    const lastPaneID = orderedPanes.at(-1).dataset.paneId;
+  if (visiblePanes.length) {
+    const lastPaneID = visiblePanes.at(-1).dataset.paneId;
     const edgeResizer = existingDividers.get(dividerKey(lastPaneID, "")) || createDivider(lastPaneID, "");
     nodes.push(edgeResizer);
   }
@@ -39835,6 +39896,7 @@ function appendPaneSequence(panes) {
   } else if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
     nodes.push(renderFirstUseWelcome());
   }
+  nodes.push(...orderedPanes.filter(pane => !visiblePanes.includes(pane)));
   const desiredNodes = new Set(nodes);
   Array.from(track.children).forEach((node) => {
     if (!desiredNodes.has(node)) node.remove();
@@ -39872,13 +39934,18 @@ let pendingWorkspacePaneRevealID = "";
 function scrollPaneIntoView(paneID, behavior = "smooth") {
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
+  if (!workflowPaneIsVisible(paneID)) {
+    state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, currentWorkflowView());
+    appendPaneSequence([...track.querySelectorAll(':scope > .workspace-panel')]);
+    saveWorkspaceState();
+  }
   pendingWorkspacePaneRevealID = pane.dataset.workspacePaneLoading ? paneID : "";
   if (paneIsCollapsed(paneID)) setPaneCollapsed(pane, false);
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
   const visibleRight = trackRect.right;
   const paneRight = paneRect.right - visibleRight;
-  const pinned = track.querySelector(':scope > .workspace-panel.is-pinned');
+  const pinned = track.querySelector(':scope > .workspace-panel.is-pinned:not(.is-workflow-hidden)');
   if (pinned === pane && window.matchMedia('(min-width: 761px)').matches) return;
   const pinnedWidth = pinned && window.matchMedia('(min-width: 761px)').matches
     ? pinned.getBoundingClientRect().width : 0;
@@ -39923,6 +39990,10 @@ function readerScrollPositionFor(reader, position, sections) {
 function captureReaderScrollPositions() {
   const positions = new Map();
   track.querySelectorAll('.workspace-panel[data-pane-id^="reader:"]').forEach((panel) => {
+    if (panel.classList.contains("is-workflow-hidden")) {
+      if (panel._workflowReaderPosition) positions.set(panel.dataset.paneId, panel._workflowReaderPosition);
+      return;
+    }
     if (panel.classList.contains("is-collapsed")) {
       if (panel._collapsedReaderPosition) positions.set(panel.dataset.paneId, panel._collapsedReaderPosition);
       return;
@@ -39985,6 +40056,7 @@ function cancelReaderScrollRestore(content) {
 }
 
 function applyReaderScrollPosition(panel, position) {
+  if (panel?.classList.contains("is-workflow-hidden")) { panel._workflowReaderPosition = position; return; }
   const content = panel?.querySelector(".reader-content");
   if (!content || !panel.isConnected || panel.dataset.readerContentKey !== position?.contentKey) {
     cancelReaderScrollRestore(content);
@@ -43478,6 +43550,7 @@ function getWorkspacePaneHydrator() {
       ensureWorkspacePanelAccessibleName(pane);
       preparePaneCollapse(pane);
       bindPaneDragging([pane]);
+      pane.classList.toggle("is-workflow-hidden", !workflowPaneIsVisible(job.id));
       shell.replaceWith(pane);
       // The new header is prepared above; retained editors and menus need no rebuild.
       refreshColumnGroupPresentation({ preparePanels: false });
@@ -43821,70 +43894,32 @@ async function toggleUtilityPane(key) {
 }
 
 async function resetVisibleColumnWidths() {
+  const paneIDs = new Set(activePaneIDs().filter(workflowPaneIsVisible));
   for (const group of state.columnGroups || []) {
-    for (const [id, column] of Object.entries(group.columns || {})) column.width = defaultPaneWidthForID(id);
+    for (const [id, column] of Object.entries(group.columns || {})) if (paneIDs.has(id)) column.width = defaultPaneWidthForID(id);
   }
-  track.querySelectorAll(":scope > .workspace-panel").forEach((panel) => {
-    panel._collapseAnimation?.cancel();
-    panel._restoreCollapseChildWidths?.();
+  track.querySelectorAll(":scope > .workspace-panel:not(.is-workflow-hidden)").forEach(panel => {
+    panel._collapseAnimation?.cancel(); panel._restoreCollapseChildWidths?.();
   });
   const currentLeft = track.scrollLeft;
-  const paneIDs = activePaneIDs();
-  state.paneWeights = paneIDs.reduce((weights, paneID) => {
-    weights[paneID] = defaultPaneWidthForID(paneID);
-    return weights;
-  }, {});
+  for (const id of paneIDs) state.paneWeights[id] = defaultPaneWidthForID(id);
   saveWorkspaceState();
   await transitionWorkspace("utility");
-  requestAnimationFrame(() => {
-    track.scrollLeft = Math.min(currentLeft, Math.max(0, track.scrollWidth - track.clientWidth));
-  });
+  requestAnimationFrame(() => { track.scrollLeft = Math.min(currentLeft, Math.max(0, track.scrollWidth - track.clientWidth)); });
 }
 
 async function closeAllColumns() {
-  if (!(await confirmWorkspaceTransition())) return false;
-  captureColumnGroupContents();
-  projectStudioTransitionGeneration += 1;
-  researchOpenGeneration += 1;
-  state.readers = [];
-  state.searchResultReader = null;
-  state.sectionDetail = null;
-  state.sectionDetails = {};
-  state.sectionDetailAnchors = {};
-  state.searchLinkedReaders = {};
-  setOpenProjectDetails([]);
-  state.projectContextOpen = false;
-  state.projectFactsOpen = false;
-  state.workboards = [];
-  state.notebooks = [];
-  state.reportDrafts = [];
-  state.coordinations = [];
-  state.coordinationThreads = [];
-  state.projectHostPaneID = "";
-  Object.keys(state.utilities).forEach((key) => {
-    state.utilities[key] = false;
-  });
-  state.utilityInstances = [];
-  state.researchConversationID = "";
-  researchConversationPaneOpened = false;
-  researchHistoryShowing = false;
-  researchDraftPaneIDs.clear();
-  researchNewChatDrafts.clear();
-  activeResearchConversation = null;
-  supplementalResearchConversationIDs.length = 0;
-  supplementalResearchConversations.clear();
-  setCodeQuestionWorkspaceState(
-    closeCodeDecisionContext(codeQuestionWorkspaceState()),
-    { activeProjectID: "", syncDeepLink: true }
-  );
-  document.querySelector(".code-decision-context-bar")?.remove();
-  state.paneOrder = [];
-  state.paneWeights = {};
-  state.collapsedPaneIDs = [];
-  state.trackScrollLeft = 0;
-  saveWorkspaceState();
-  await transitionWorkspace("utility");
-  track.scrollTo({ left: 0, behavior: "smooth" });
+  // Each surface retains its own unsaved-edit guard. Never close a retained
+  // column in the other working view as a side effect of this view's action.
+  const workspaceID = activeWorkspaceID;
+  const identity = captureAccountRequest();
+  const allDescriptors = workspacePaneDescriptors();
+  allDescriptors.forEach(item => item.foundationScope?.release(item.id));
+  const descriptors = allDescriptors.filter(item => workflowPaneIsVisible(item.id)).reverse();
+  for (const descriptor of descriptors) {
+    if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return false;
+    if (await descriptor.close() === false) return false;
+  }
   return true;
 }
 
@@ -43951,7 +43986,7 @@ async function focusRecentUtilityColumn(key) {
   const instance = instances.find((item) => paneIDForUtilityInstance(item) === recent) || instances.at(-1);
   if (!instance) {
     if (key === "analysis" && state.utilities.analysis) return focusUtility(key);
-    return key === "search" ? openNewSearchColumn() : openNewResearchColumn();
+    return key === "saved" ? focusUtility("saved") : key === "search" ? openNewSearchColumn() : openNewResearchColumn();
   }
   const paneID = paneIDForUtilityInstance(instance);
   rememberUtilityColumn(paneID);
@@ -43997,7 +44032,7 @@ function workspaceCommandDefinitions() {
     { label: "Open Account", hint: "Plan, account, sync, and privacy", run: () => focusUtility("settings") },
     { label: "Reset Layout", hint: "Restore default panel widths", run: () => resetVisibleColumnWidths() },
     ...(defaultActivePaneIDs().length
-      ? [{ label: "Close All", hint: "Close every column in the current workspace", run: () => closeAllColumns() }]
+      ? [{ label: "Close All", hint: "Close columns in this working view", run: () => closeAllColumns() }]
       : [])
   ];
 }
@@ -44114,7 +44149,7 @@ function bindWorkspaceKeyboardNavigation() {
       return;
     }
     if (commandModifier && event.key.toLowerCase() === "f" && !event.target.closest("input, textarea, [contenteditable='true']")) {
-      const readerPanel = track.querySelector(".reader-panel");
+      const readerPanel = track.querySelector(".reader-panel:not(.is-workflow-hidden)");
       const searchToggle = readerPanel?.querySelector(".reader-internal-search-toggle");
       if (searchToggle) {
         event.preventDefault();
@@ -44124,7 +44159,7 @@ function bindWorkspaceKeyboardNavigation() {
       return;
     }
     if (commandModifier && /^[1-5]$/.test(event.key)) {
-      const pane = track.querySelectorAll(":scope > .workspace-panel")[Number(event.key) - 1];
+      const pane = track.querySelectorAll(":scope > .workspace-panel:not(.is-workflow-hidden)")[Number(event.key) - 1];
       if (pane?.dataset.paneId) {
         event.preventDefault();
         scrollPaneIntoView(pane.dataset.paneId);
@@ -44136,6 +44171,11 @@ function bindWorkspaceKeyboardNavigation() {
 }
 
 function bindImmediateUtilityControls() {
+  document.querySelectorAll('[data-workflow-view]').forEach(button => {
+    if (button.dataset.bound) return;
+    button.dataset.bound = 'true';
+    button.addEventListener('click', () => void switchWorkflowView(button.dataset.workflowView));
+  });
   const detailsButton = document.querySelector("#open-project-details");
   if (detailsButton && !detailsButton.dataset.bound) {
     detailsButton.dataset.bound = "true";
@@ -44151,7 +44191,7 @@ function bindImmediateUtilityControls() {
     button.dataset.coldStartBound = "true";
     button.addEventListener("click", () => {
       if (notifyProjectRequiredForColumn()) return;
-      void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : toggleProjectTool(tool));
+      void (["context", "facts"].includes(tool) ? toggleProjectInformation(tool) : tool === "notebook" ? openProjectNotebook(workspaceProject()) : toggleProjectTool(tool));
     });
   });
   if (track.dataset.utilityFocusBound !== "true") {
@@ -44187,7 +44227,7 @@ function bindImmediateUtilityControls() {
   toggleSavedButton.dataset.coldStartBound = "true";
   toggleSavedButton.addEventListener("click", () => {
     if (notifyProjectRequiredForColumn()) return;
-    void toggleProjectsColumns();
+    void focusRecentUtilityColumn("saved");
   });
 }
 
@@ -44459,7 +44499,7 @@ async function start() {
     resetVisibleColumnWidths();
   });
   const setAllColumnsCollapsed = (collapsed) => {
-    const panels = [...track.querySelectorAll(":scope > .workspace-panel")];
+    const panels = [...track.querySelectorAll(":scope > .workspace-panel:not(.is-workflow-hidden)")];
     panels.forEach((panel) => {
       if (paneIsCollapsed(panel.dataset.paneId) !== collapsed ||
           (!collapsed && columnGroupForPane(panel.dataset.paneId)?.collapsed)) {

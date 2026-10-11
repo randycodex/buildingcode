@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { webcrypto } from "node:crypto";
 import vm from "node:vm";
+import { normalizeWorkflowView, normalizeWorkflowMembership } from "../public/workflow-views.js";
 import * as workspace from "../public/workspace-state.js";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
@@ -13,7 +14,7 @@ function declaration(name, kind = "function") {
   assert.ok(end > index, marker);
   return { index, text: source.slice(index, end + (kind === "function" ? 2 : 1)) };
 }
-const functions = ["loadWorkspaceState", "loadPersistedAccount", "normalizeUtilityInstances", "newUtilityInstance",
+const functions = ["retireUnassignedLayout", "loadWorkspaceState", "loadPersistedAccount", "normalizeUtilityInstances", "newUtilityInstance",
   "normalizeProjectIdentities", "projectIdentity", "projectStructuredFacts", "normalizeProjectStructuredFact",
   "projectColor", "folderType", "projectDetailMatches", "workboardProjectID", "projectDetailKey",
   "clampNumber", "normalizeReaderSettings", "normalizeSearchCodeFilters", "normalizeSearchResultSources", "normalizeSearchHistorySplitRatio",
@@ -25,7 +26,7 @@ const constants = ["projectColorOptions", "projectStructuredFactStatuses", "repe
 const initialize = { index: source.indexOf("let state = loadWorkspaceState(initialPersistedAccount);"),
   text: "let state = loadWorkspaceState(initialPersistedAccount); globalThis.restored = state;" };
 assert.ok(initialize.index > 0);
-const layout = { ...workspace.emptyWorkspaceLayout(),
+const layout = { ...workspace.emptyWorkspaceLayout(), workflowView:"notebook", workflowMembership:{"reader:linked":["notebook"]}, workflowScroll:{notebook:123},
   utilityInstances: [{ id: "saved-pane", key: "saved", selectedFolderID: "project" }, { id: "search-pane", key: "search", query: "ramps" }],
   projectDetails: [{ id: "project", name: "Synthetic Project", structuredFacts: [{ key: "stories", label: "Stories", value: "3", status: "confirmed" }] }],
   notebooks: [{ id: "project", name: "Synthetic Project", structuredFacts: [{ key: "stories", label: "Stories", value: "3", status: "confirmed" }] }],
@@ -38,7 +39,7 @@ function restore({ layoutJSON = JSON.stringify(layout), regressOrder = false, st
   const records = new Map([["shared", JSON.stringify({ localProjects: [{ id: "project" }], syncOutbox: [{ accountUserID: "account", mutation: { id: "pending" } }] })], ["registry", JSON.stringify(registry)], ["layout:workspace", storedLayout]]);
   const initialRecords = JSON.stringify([...records]);
   const storage = { getItem: (key) => records.get(key) ?? null, setItem: (key, value) => records.set(key, value), removeItem: (key) => records.delete(key) };
-  const context = vm.createContext({ ...workspace, crypto: webcrypto,
+  const context = vm.createContext({ ...workspace, normalizeWorkflowView, normalizeWorkflowMembership, crypto: webcrypto,
     console: { error: (...values) => logs.push(values) }, localStorage: storage,
     sessionStorage: { getItem: () => null, setItem() {}, removeItem() {} },
     initialPersistedAccount: { userID: "account" }, detachedProjectWindow: false,
@@ -63,6 +64,9 @@ for (const storedColor of [false, true]) {
 }
 const after = restore();
 assert.equal(after.context.restoreFailure(), null);
+assert.equal(after.context.restored.workflowView,"notebook");
+assert.equal(after.context.restored.workflowScroll.notebook,123);
+assert.deepEqual(Array.from(after.context.restored.workflowMembership["reader:linked"]),["notebook"]);
 assert.deepEqual(Array.from(after.context.restored.utilityInstances, (item) => item.key), ["saved", "search"]);
 assert.equal(after.context.restored.notebooks.length, 1);
 assert.equal(after.context.restored.notebooks[0].color, "#6674c8");
