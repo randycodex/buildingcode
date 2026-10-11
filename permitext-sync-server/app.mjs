@@ -1,4 +1,4 @@
-import { normalizeRecordsChecklist, selectedReportEvidenceItems } from "./public/project-workflow.js";
+import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
 import { researchHistoryOptions, researchHistoryCursor, researchHistoryFileRows, researchHistoryPageQuery } from "./research-history-pagination.mjs";
@@ -13160,7 +13160,7 @@ async function ownedProjectTargetExists(userID, targetKind, targetID) {
     return Boolean(await storedResearchConversation(userID, normalizedTargetID));
   }
   if (targetKind === "researchAnswer") {
-    return (await listStoredResearchAnswers(userID)).some((answer) => answer.id === normalizedTargetID);
+    return (await listStoredResearchAnswers(userID, { ids: [normalizedTargetID], idsOnly: true })).some((answer) => answer.id === normalizedTargetID);
   }
   if (targetKind === "approvedEvidence") {
     return (await listStoredResearchAnswers(userID))
@@ -16621,7 +16621,7 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
       sources.push({
         id: answer.id,
         kind: "researchAnswer",
-        label: answer.question,
+        label: answer.question.length > 500 ? `${answer.question.slice(0, 499)}…` : answer.question,
         summary: (answer.answer?.answerText || answer.answer?.conclusion || "").slice(0, 500),
         sourceClassification: "ai-assisted",
         updatedAt: answer.createdAt,
@@ -16716,6 +16716,23 @@ async function handleReportSourceList(request, response) {
     sources: sources.map(reportSourceClientSummary),
     warnings
   });
+}
+
+async function handleReportSourcePreview(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const access = await requireProjectPermission(response, context.userID,
+    String(context.body.projectID || "").trim(), organizationPermissions.reportDownload);
+  if (!access) return;
+  const kind = String(context.body.kind || "");
+  const sourceID = String(context.body.sourceID || "");
+  const { sources } = await reportSourcesForProject(access.storageOwnerUserID, access.projectID, {
+    evidenceSourceIDs: kind === "evidence" ? [sourceID] : [],
+    researchAnswerIDs: kind === "researchAnswer" ? [sourceID] : []
+  });
+  const source = sources.find(item => item.kind === kind && item.id === sourceID);
+  if (!source) return sendError(response, 404, "This Report source is no longer available.");
+  sendJSON(response, 200, { items: source.manifestItems || [source.manifestItem] });
 }
 
 async function reportConfigurationForProject(userID, projectID) {
@@ -17170,7 +17187,7 @@ async function handleReportGenerate(request, response) {
       ...(draft.payload.introduction
         ? [{ id: `${draft.envelope.id}-introduction`, kind: "paragraph", text: draft.payload.introduction }]
         : []),
-      ...draft.payload.blocks.flatMap(block => reportManifestItemsForDraftBlock(block, sourcesByKey))
+      ...uniqueReportItems(draft.payload.blocks, sources, block => reportManifestItemsForDraftBlock(block, sourcesByKey))
     ];
     const evidenceCharacters = items.reduce((sum, item) => sum + (item.passageText || item.text || "").length, 0);
     if (evidenceCharacters > 1_000_000) throw new Error("The Report is too large. Remove some sources and try again.");
@@ -33471,6 +33488,7 @@ const handlers = {
   "notebook/assets/read": handleNotebookAssetRead,
   "notebook/assets/delete": handleNotebookAssetDelete,
   "reports/sources/list": handleReportSourceList,
+  "reports/sources/preview": handleReportSourcePreview,
   "reports/options": handleReportOptions,
   "reports/drafts/list": handleReportDraftList,
   "reports/drafts/get": handleReportDraftGet,

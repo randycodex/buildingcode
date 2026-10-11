@@ -100,21 +100,8 @@ function ensureVerticalSpace(document, height = 72) {
 }
 
 function drawClassification(document, classification) {
-  const label = classificationLabels[classification] || "Project material";
-  const renderedLabel = label.toUpperCase();
-  const fill = classificationColors[classification] || colors.projectMaterial;
-  document
-    .font("Report-Bold")
-    .fontSize(7.5);
-  const width = Math.min(190, document.widthOfString(renderedLabel) + 18);
-  const x = document.x;
-  const y = document.y;
-  document.roundedRect(x, y, width, 18, 9).fill(fill);
-  document
-    .fillColor(colors.ink)
-    .text(renderedLabel, x + 9, y + 5, { width: width - 18, lineBreak: false });
-  document.x = x;
-  document.y = y + 27;
+  document.font("Report-Regular").fontSize(7.5).fillColor(colors.muted)
+    .text((classificationLabels[classification] || "Project material").toUpperCase(), {paragraphGap:6});
 }
 
 function drawList(document, title, values) {
@@ -137,7 +124,7 @@ function drawList(document, title, values) {
   document.moveDown(0.25);
 }
 
-function drawSourceItem(document, item, projectMaterialBySourceID, presentation) {
+function drawSourceItem(document, item, projectMaterialBySourceID, presentation, showClassification = true) {
   ensureVerticalSpace(document, 105);
   const startX = document.x;
   const contentWidth = document.page.width - document.page.margins.left - document.page.margins.right;
@@ -145,7 +132,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
   document.save();
   document.roundedRect(startX - 10, top - 10, contentWidth + 20, 1, 7).fill(colors.paper);
   document.restore();
-  drawClassification(document, item.sourceClassification);
+  if (showClassification) drawClassification(document, item.sourceClassification);
 
   if (item.kind === "evidence") {
     document
@@ -155,28 +142,24 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
       .text(`${item.codeBook} ${item.sectionNumber}: ${item.title}`, { paragraphGap: 4 });
     document.font("Report-Regular").fontSize(9).fillColor(colors.muted)
       .text(`Edition: ${reportEvidenceEdition(item)}`, { paragraphGap: 8 });
-    const passageX = document.x + 12;
-    const passageWidth = contentWidth - 12;
-    const passageY = document.y;
-    document
-      .moveTo(document.x, passageY)
-      .lineTo(document.x, passageY + Math.max(28, document.heightOfString(item.passageText, {
-        width: passageWidth,
-        font: "Report-Regular",
-        fontSize: 9.5
-      })))
-      .lineWidth(2)
-      .strokeColor(presentation.accent)
-      .stroke();
-    document
-      .fillColor(colors.ink)
-      .font("Report-Regular")
-      .fontSize(9.5)
-      .text(item.passageText, passageX, passageY, {
-        width: passageWidth,
-        lineGap: 2,
-        paragraphGap: 8
+    document.font("Report-Regular").fontSize(9.5).fillColor(colors.ink);
+    let remaining = item.passageText;
+    for (const table of item.tables || []) {
+      const index = remaining.indexOf(table.text);
+      if (index < 0) continue;
+      if (remaining.slice(0,index).trim()) document.text(remaining.slice(0,index).trim(), {width:contentWidth,lineGap:2,paragraphGap:8});
+      ensureVerticalSpace(document, 90);
+      document.font("Report-Regular").fontSize(8);
+      document.table({
+        position: {x:startX}, maxWidth: contentWidth,
+        defaultStyle: {border:0.5, borderColor:colors.rule, padding:5},
+        data: table.rows
       });
+      document.x = startX;
+      document.moveDown(0.7).font("Report-Regular").fontSize(9.5);
+      remaining = remaining.slice(index + table.text.length);
+    }
+    if (remaining.trim()) document.text(remaining.trim(), {width:contentWidth,lineGap:2,paragraphGap:8});
   } else if (item.kind === "notebookCard") {
     document
       .fillColor(colors.ink)
@@ -249,9 +232,9 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
     drawList(
       document,
       "Citations",
-      (item.citations || []).map((citation) =>
+      [...new Set((item.citations || []).map((citation) =>
         reportCitationLabel(citation, item.evidence || [], item.codeEdition)
-      )
+      ))]
     );
     drawList(document, "Professional-use notice", [item.disclaimer].filter(Boolean));
   } else {
@@ -355,14 +338,15 @@ function drawCover(document, manifest) {
 function drawBody(document, manifest, projectMaterialBySourceID) {
   const presentation = reportPresentation(manifest);
   document.addPage();
+  let previousSourceClassification = null;
   (manifest.items || []).forEach((item) => {
     if (item.kind === "heading") {
       ensureVerticalSpace(document, 70);
       document
         .fillColor(colors.ink)
         .font("Report-Bold")
-        .fontSize(17)
-        .text(item.text, { paragraphGap: 10 });
+        .fontSize(item.presentationRole === "comment" ? 9 : 17)
+        .text(item.text, { paragraphGap: item.presentationRole === "comment" ? 4 : 10 });
       return;
     }
     if (item.kind === "paragraph") {
@@ -421,7 +405,9 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       document.moveDown(0.8);
       return;
     }
-    drawSourceItem(document, item, projectMaterialBySourceID, presentation);
+    drawSourceItem(document, item, projectMaterialBySourceID, presentation,
+      previousSourceClassification !== item.sourceClassification);
+    previousSourceClassification = item.sourceClassification;
   });
 
   ensureVerticalSpace(document, 130);
@@ -448,13 +434,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       .fontSize(8)
       .text(value, { lineGap: 2, paragraphGap: 5 });
   });
-  document
-    .font("Report-Regular")
-    .fontSize(7)
-    .text(
-      `Manifest ${manifest.id} / ${manifest.generatorVersion} / SHA-256 ${manifest.contentHash}`,
-      { lineGap: 2 }
-    );
+
 }
 
 function drawPageFooters(document, manifest) {

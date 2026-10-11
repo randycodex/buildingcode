@@ -12,7 +12,7 @@ function harness() {
     drafts: [], dirty:true, disposed:false, deletingReport:false, projectID:'p', requestIdentity:'a', current:true,
     isCurrentAccountRequest:()=>context.current, calls:[], renders:0, message:'',
     clearStatus:()=>{context.message='';}, showStatusError:m=>{context.message=m;},
-    renderWorkspaceContent:()=>{context.renders++;}, notebookMounts:new Map(),
+    renderWorkspaceContent:()=>{context.renders++;}, notebookMounts:new Map(), refreshProjectReportMembership:async()=>{},
     reportRequest:(path, body)=>{context.calls.push(structuredClone(body)); return new Promise((yes,no)=>{resolve=yes; reject=no;});}
   });
   vm.runInContext(implementation+'\nglobalThis.save = saveDraft;', context);

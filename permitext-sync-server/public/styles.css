@@ -19003,3 +19003,9 @@ html body .column-group-menu-button:focus-visible {
 .notebook-source-actions .notebook-finding-action { display: block; text-align: left; }
 .notebook-card-footer:has(.report-membership-status) { flex-direction: column; align-items: stretch; gap: 8px; }
 .notebook-card-footer .report-membership-status { margin: 0; text-align: left; }
+
+.report-draft-panel .report-full-preview { margin-top: 12px; }
+.report-draft-panel .report-full-preview summary { cursor: pointer; color: var(--text-secondary); }
+.report-draft-panel .report-full-preview p { display: block; -webkit-line-clamp: unset; overflow: visible; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.report-draft-block:has(.report-full-preview[open]) > .report-block-summary { display: none; }

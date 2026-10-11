@@ -1,4 +1,4 @@
-import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource } from "./project-workflow.js?v=20261010-workflow-v1";
+import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v2";
 import { openReportExportReview } from "./report-export-review.js?v=20261010-report-export-v2";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -13621,8 +13621,10 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     });
     requireCurrentAccountRequest(requestIdentity);
   }
+  // Persist the outbox before any rendering/network await can interrupt this save.
+  if (account) enqueueSyncMutation(mutation, account);
   if (saved && targetProject) await persistSectionInProject(targetProject, sectionPayload);
-  if (options.refreshSavedPanes !== false) await refreshOpenSavedPanes();
+  if (options.refreshSavedPanes !== false) void refreshOpenSavedPanes().catch(() => {});
   requireCurrentAccountRequest(requestIdentity);
   if (!account) {
     if (!saved) offerUndo();
@@ -13655,8 +13657,9 @@ async function persistSectionInProject(project, sectionPayload) {
   const mutation = projectSectionMutationForSection(project, sectionPayload);
   const current = (state.localProjectSections || []).filter((item) => item.id !== record.id);
   state.localProjectSections = [...current, record];
+  if (account) enqueueSyncMutation(mutation, account);
   saveWorkspaceState();
-  await refreshProjectMembershipPanes(project);
+  void refreshProjectMembershipPanes(project).catch(() => {});
   requireCurrentAccountRequest(requestIdentity);
   if (!account) return true;
   try {
@@ -13670,7 +13673,7 @@ async function persistSectionInProject(project, sectionPayload) {
     // Keep the local project link and queued mutation available while sync recovers.
   }
   requireCurrentAccountRequest(requestIdentity);
-  await refreshProjectSourceConsumers([project]);
+  void refreshProjectSourceConsumers([project]).catch(() => {});
   requireCurrentAccountRequest(requestIdentity);
   return true;
 }
@@ -15576,6 +15579,11 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
     message.textContent = `Saved to ${project.name || project.title || "Project"}`;
     projectButton.textContent = "Manage Projects";
   }
+  const queued = (state.syncOutbox || []).some(entry => {
+    const {kind, record} = mutationKindAndRecord(entry.mutation);
+    return ["savedItem", "projectSection"].includes(kind) && savedEvidenceKey(record) === savedEvidenceKey(sectionPayload);
+  });
+  if (queued) message.textContent = "Saved on this device · waiting to sync";
   confirmation.append(message, projectButton);
   panel.append(confirmation);
   let removeTimer = null;
@@ -15664,6 +15672,8 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     if (!allowed() || bookmarkButton.disabled) return;
     const removingSavedPassage = bookmarkButton.classList.contains("is-saved");
     bookmarkButton.disabled = true;
+    bookmarkButton.setAttribute("aria-busy", "true");
+    bookmarkButton.title = removingSavedPassage ? "Removing…" : "Saving…";
     try {
       if (removingSavedPassage) {
         const payload = readerPassagePayload(section, reader, target);
@@ -15679,7 +15689,10 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       const label = options.sectionMarker ? "Remove section from Evidence" : bookmarkActionLabel(true);
       bookmarkButton.setAttribute("aria-label", label);
       bookmarkButton.title = label;
+    } catch (error) {
+      if (allowed()) presentWorkspaceIssue(error.message || "Could not save this passage. Try again.");
     } finally {
+      bookmarkButton.removeAttribute("aria-busy");
       bookmarkButton.disabled = !allowed();
     }
   });
@@ -28393,11 +28406,49 @@ async function renderProjectReportDraft(project) {
         }
         if (source?.summary && block.kind !== "projectFacts") {
           const summary = document.createElement("p");
+          summary.className = "report-block-summary";
           summary.textContent = source.summary;
           if (sourceTitle.parentElement) row.append(summary);
           else row.append(sourceTitle, summary);
         } else if (!sourceTitle.parentElement) {
           row.append(sourceTitle);
+        }
+        if (source) {
+          if (reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id)) {
+            const notice = document.createElement("p");
+            notice.textContent = "Passage text is included in the whole section. Selected comments appear once in the export.";
+            row.append(notice);
+          }
+          const preview = document.createElement("details");
+          preview.className = "report-full-preview";
+          const toggle = document.createElement("summary"); toggle.textContent = "Review full content";
+          const body = document.createElement("div"); preview.append(toggle, body);
+          let loaded = false, loading = false;
+          preview.addEventListener("toggle", async () => {
+            if (!preview.open || loaded || loading) return;
+            loading = true; body.textContent = "Loading complete source…";
+            const identity = captureAccountRequest();
+            try {
+              const result = await postResearch("/reports/sources/preview", {projectID, kind:block.kind, sourceID:block.sourceID});
+              requireCurrentAccountRequest(identity);
+              body.replaceChildren();
+              for (const item of result.items || []) {
+                // Comments have their own live inclusion controls immediately below.
+                if (item.reportCommentKey) continue;
+                const text = document.createElement("p");
+                text.textContent = item.passageText || item.plainText || item.text ||
+                  [item.address, item.facts].filter(Boolean).join("\n\n") ||
+                  [item.question, item.conclusion, ...(item.supportedPoints || []).map(point => `${point.heading}: ${point.explanation}`),
+                    item.explanation, ...(item.assumptions || []), ...(item.missingFacts || []),
+                    ...(item.limitations || []), ...(item.additionalEvidenceNeeded || [])].filter(Boolean).join("\n\n");
+                body.append(text);
+              }
+              loaded = true;
+            } catch (error) {
+              if (isCurrentAccountRequest(identity)) body.textContent = `${error.message} Close and reopen to retry.`;
+            } finally { loading = false; }
+          });
+          row.append(preview);
         }
         const commentOptions = row.querySelector(".report-comment-options");
         if (commentOptions) row.append(commentOptions);

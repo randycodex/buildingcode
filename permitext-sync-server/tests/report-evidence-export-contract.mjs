@@ -29,6 +29,13 @@ assert.equal(savedExportSourceText(htmlBody, "last"), "Second paragraph. Excepti
 assert.match(savedExportSourceText(htmlBody), /Occupancy \| Hours\nR \| 1/);
 assert.equal(savedExportSourceText({ blocks: [{ kind: "html", html: '<table><tr><th rowspan="2">Occupancy</th><th colspan="2">Hours</th></tr><tr><th>Without sprinklers</th><th>With sprinklers</th></tr><tr><td>R</td><td>1</td><td>0</td></tr></table>' }] }),
   "Occupancy | Hours | Hours\nOccupancy | Without sprinklers | With sprinklers\nR | 1 | 0");
+const stickyTableBody = {blocks:[{kind:"html",html:'<div><div class="xsl-table--header"><table><tr><th>Use</th><th>Value</th></tr></table></div><div class="xsl-table--body"><table><tr><th>Use</th><th>Value</th></tr><tr><td>R</td><td>1</td></tr><tr><td></td><td></td></tr></table></div></div>'}]};
+assert.equal(savedExportSourceText(stickyTableBody),"Use | Value\nR | 1","Only matching sticky header copies and empty layout rows are removed");
+const structuredTable = await prepareSavedEvidenceItems({selections:[{sectionID:"table",codeVersion:"2022"}],resolveSource:async()=>({
+  section:{id:"table",sectionNumber:"1",title:"Table",codePrefix:"BC"},body:stickyTableBody,
+  source:{canonicalEdition:"2022",editionLabel:"2022"}
+})});
+assert.deepEqual(structuredTable.items[0].tables[0].rows,[["Use","Value"],["R","1"]]);
 assert.throws(() => savedExportSourceText(htmlBody, "missing"), /paragraph is no longer available/);
 assert.throws(() => savedExportSourceText({ blocks: [], previewText: "short fallback" }), /complete source text is unavailable/i);
 assert.throws(() => savedExportSourceText({ blocks: [{ kind: "image", id: "figure" }] }), /figure/);

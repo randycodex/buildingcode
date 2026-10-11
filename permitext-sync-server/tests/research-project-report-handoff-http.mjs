@@ -222,6 +222,21 @@ try {
     assert.equal(steady.foundation.migrationCheckpoint.completedAt, foundation.migrationCheckpoint.completedAt);
     assert.equal((await adapter.listResearchAnswers(userID)).filter(answer => answer.id === legacyMessageID).length, 1);
   }
+  const longQuestion = "Review the project assumptions and source boundaries. ".repeat(25);
+  const longAnswer = {...answerA,id:"long-question-answer",question:longQuestion};
+  await adapter.saveResearchAnswer(userID,longAnswer);
+  const longSource = (await request("/reports/sources/list",{projectID:"handoff-a"})).sources.find(source=>source.id === longAnswer.id);
+  assert.equal(longSource.label.length,500);
+  const {card:referenceCard} = await request("/notebook/cards/save",{projectID:"handoff-a",expectedVersion:0,
+    clientMutationID:"long-answer-reference",cardType:"finding",title:"Research reference",
+    document:{schema:"permitext-notebook-card",schemaVersion:1,format:"tiptap-json",document:{type:"doc",content:[
+      {type:"paragraph",content:[{type:"permitextReference",attrs:{referenceKind:"researchAnswer",referenceID:longAnswer.id,label:"Research reference"}}]}
+    ]}}},201);
+  assert(referenceCard.id);
+  const {draft:longDraft} = await request("/reports/drafts/save",{projectID:"handoff-a",expectedVersion:0,
+    title:"Long question",reportDate:"2026-10-10",blocks:[{id:"long-answer",kind:"researchAnswer",sourceID:longAnswer.id,label:longQuestion}]},201);
+  const longReport = await request("/reports/generate",{projectID:"handoff-a",draftID:longDraft.id,expectedVersion:longDraft.version},201);
+  assert.equal(longReport.manifest.items.find(item=>item.kind === "researchAnswer").question,longQuestion.trim());
   const finalStore = await adapter.read();
   assert.deepEqual(finalStore.researchUsageByUserID?.[userID] || [], [], "Saved-Project summaries must not consume Research turns.");
   assert.equal(externalAttempts, 0);

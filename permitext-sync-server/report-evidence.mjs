@@ -38,7 +38,7 @@ function findNode(node, id) {
   return null;
 }
 
-function tableText(table) {
+function tableGrid(table) {
   const rows = [];
   const collect = node => {
     if (node !== table && node.tagName === "table") throw new Error("Nested tables are not supported by this text export.");
@@ -68,12 +68,47 @@ function tableText(table) {
     }
   });
   // Repeat spanning headers/cells so each text row retains its column basis.
-  return grid.map(row => row.map(value => value || "").join(" | ")).join("\n");
+  return grid.map(row => row.map(value => value || "")).filter(row => row.some(Boolean));
+}
+
+// Reader HTML may contain a separate sticky header copy. Omit it only when
+// the actual body table repeats exactly the same opening rows.
+function isRepeatedTableHeader(node) {
+  if (!String(attributes(node).class || "").split(/\s+/).includes("xsl-table--header")) return false;
+  const findTable = root => root?.tagName === "table" ? root : (root?.childNodes || []).map(findTable).find(Boolean);
+  const header = findTable(node);
+  const body = (node.parentNode?.childNodes || []).find(sibling => String(attributes(sibling).class || "").split(/\s+/).includes("xsl-table--body"));
+  const actual = findTable(body);
+  if (!header || !actual) return false;
+  const rows = tableGrid(header), actualRows = tableGrid(actual);
+  return rows.length > 0 && JSON.stringify(rows) === JSON.stringify(actualRows.slice(0, rows.length));
+}
+
+function tableText(table) { return tableGrid(table).map(row => row.join(" | ")).join("\n"); }
+function selectedTables(body, blockID) {
+  const tables = [];
+  const visit = node => {
+    if (isRepeatedTableHeader(node)) return;
+    if (node.tagName === "table") {
+      const rows = tableGrid(node);
+      tables.push({ text: rows.map(row => row.join(" | ")).join("\n"), rows });
+      return;
+    }
+    (node.childNodes || []).forEach(visit);
+  };
+  for (const block of body.blocks || []) {
+    if (!block.html) continue;
+    const root = parseFragment(block.html);
+    const node = blockID && String(block.id || block.tableID || "") !== blockID ? findNode(root, blockID) : root;
+    if (node) visit(node);
+  }
+  return tables;
 }
 
 // Retain row/cell boundaries in a text export instead of concatenating table
 // values into an ambiguous single sentence. Never use a Saved preview here.
 function nodeText(node) {
+  if (isRepeatedTableHeader(node)) return "";
   if (node.nodeName === "#text") return node.value;
   if (["script", "style"].includes(node.tagName)) return "";
   if (node.tagName === "img") {
@@ -163,6 +198,7 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
       passageTextHash: createHash("sha256").update(passageText).digest("hex")
     });
     const chunks = fullTextChunks(passageText);
+    const tables = selectedTables(body, selection.blockID);
     const sectionTitle = String(section.title || "Section");
     const titlePrefix = `${section.sectionNumber} `;
     const title = sectionTitle.startsWith(titlePrefix) ? sectionTitle.slice(titlePrefix.length) : sectionTitle;
@@ -172,7 +208,7 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
       codeBook: section.codePrefix, codeEdition: source.editionLabel,
       chapter: String(section.chapterNumber || "unknown"),
       title: `${title}${selection.blockID ? " · Selected paragraph" : ""}${chunks.length > 1 ? ` · Part ${index + 1} of ${chunks.length}` : ""}`,
-      passageText: chunk, passageTextHash: createHash("sha256").update(chunk).digest("hex"),
+      passageText: chunk, tables: tables.filter(table => chunk.includes(table.text)), passageTextHash: createHash("sha256").update(chunk).digest("hex"),
       sourceLibraryVersion: selection.codeVersion
     }));
     const notes = new Set();
@@ -181,7 +217,7 @@ export async function prepareSavedEvidenceItems({ selections, resolveSource }) {
       if (notes.has(key)) return;
       notes.add(key);
       items.push({ id: `note-label-${sourceIndex}-${index}`, kind: "heading",
-        reportCommentKey: reportCommentKey(note), text: `Your comment · ${section.codePrefix} § ${section.sectionNumber}${note.label ? ` · ${note.label}` : ""}` });
+        reportCommentKey: reportCommentKey(note), presentationRole: "comment", text: `Your comment · ${section.codePrefix} § ${section.sectionNumber}${note.label ? ` · ${note.label}` : ""}` });
       items.push({ id: `note-${sourceIndex}-${index}`, kind: "paragraph", reportCommentKey: reportCommentKey(note), text: note.body });
     });
   }

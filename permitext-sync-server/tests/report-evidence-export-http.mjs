@@ -93,13 +93,18 @@ try {
   assert.match(evidence.find(item => item.sectionID === String(table.id)).passageText, /Occupancy \| Required Fire Resistance Rating/);
   assert.match(evidence.find(item => item.sectionID === String(deadEnd.id)).passageText, /24\s*384/);
   assert(issued.manifest.sourceVersions.selections.some(source => source.hasTables));
+  assert(evidence.find(item => item.sectionID === String(table.id)).tables.length > 0);
+  const preview = await post("/reports/sources/preview", {projectID,kind:"evidence",sourceID:reportSavedSourceID(savedRecords[0])});
+  assert.equal(preview.items.find(item=>item.kind === "evidence").passageText,
+    evidence.find(item=>item.sectionID === String(current.id)).passageText);
+  await post("/reports/sources/preview", {projectID:"another-project",kind:"evidence",sourceID:reportSavedSourceID(savedRecords[0])},404);
   const file = issued.generatedReport.file;
   const response = await fetch(`${base}/reports/files/read`, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
     body: JSON.stringify({ auth: { accountUserID: userID }, projectID, generatedReportID: file.generatedReportID }) });
   assert.equal(response.status, 200);
   const pdf = Buffer.from(await response.arrayBuffer());
   assert.equal(pdf.subarray(0, 5).toString(), "%PDF-");
-  if (process.env.PERMITEXT_EXPORT_QA_PDF) await writeFile(process.env.PERMITEXT_EXPORT_QA_PDF, pdf);
+  if (process.env.PERMITEXT_EXPORT_QA_PDF) { await writeFile(process.env.PERMITEXT_EXPORT_QA_PDF, pdf); await writeFile(`${process.env.PERMITEXT_EXPORT_QA_PDF}.json`, JSON.stringify(issued.manifest,null,2)); }
   await push([{ annotation: { id: "scope-note", userID, sectionID: String(current.id), codeVersion: defaultSyncCodeVersion, blockID: "", noteBody: "Revised scope note.", updatedAt: "2026-10-10T16:00:00.000Z" } }]);
   const reissued = await post("/reports/generate", { projectID, draftID: draft.id, expectedVersion: draft.version }, 201);
   assert.equal(reissued.manifest.reportVersion, 2);
@@ -145,6 +150,12 @@ try {
   const { draft: paragraphDraft } = await post("/reports/drafts/save", { projectID, expectedVersion: 0,
     title: "Selected paragraph report", reportDate: "2026-10-10", blocks: [{ id: "selected-p", kind: "evidence", sourceID: paragraphSourceID, label: "Final exception" }] }, 201);
   const paragraphReport = await post("/reports/generate", { projectID, draftID: paragraphDraft.id, expectedVersion: paragraphDraft.version }, 201);
+  const overlapBlocks = [...paragraphDraft.blocks, {id:"whole-dead-end",kind:"evidence",sourceID:String(deadEnd.id),label:"Whole section"}];
+  const {draft:overlapDraft} = await post("/reports/drafts/save", {projectID,expectedVersion:0,title:"Overlap",reportDate:"2026-10-10",blocks:overlapBlocks},201);
+  const overlap = await post("/reports/generate", {projectID,draftID:overlapDraft.id,expectedVersion:overlapDraft.version},201);
+  assert.equal(overlap.manifest.items.filter(item=>item.kind === "evidence").length,1);
+  assert.equal(overlap.manifest.items.filter(item=>item.text === "Only the selected final exception.").length,1);
+  assert.match(overlap.manifest.items.find(item=>item.kind === "evidence").passageText,/Group I-3/);
   const paragraphEvidence = paragraphReport.manifest.items.find(item => item.kind === "evidence");
   assert.match(paragraphEvidence.passageText, /80 feet/);
   assert.doesNotMatch(paragraphEvidence.passageText, /Group I-3|least width/);

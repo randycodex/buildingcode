@@ -39,3 +39,31 @@ export function reportsContainingSource(drafts, kind, sourceID) {
     (block.kind === kind && block.sourceID === sourceID) ||
     (kind === 'notebookCard' && block.derivedFrom?.kind === kind && block.derivedFrom.id === sourceID)));
 }
+
+// A whole section already contains each of its passages. Comments are unioned
+// independently so excluding one copy never discards another selected comment.
+export function reportEvidenceCoverage(blocks, sources) {
+  const byKey = new Map(sources.map(source => [`${source.kind}:${source.id}`, source]));
+  const identity = source => JSON.stringify([source.sectionID, source.sourceLibraryVersion]);
+  const whole = new Set(blocks.filter(block => block.kind === 'evidence')
+    .map(block => byKey.get(`evidence:${block.sourceID}`))
+    .filter(source => source && !source.selectionBlockID).map(identity));
+  return new Set(blocks.filter(block => {
+    const source = byKey.get(`evidence:${block.sourceID}`);
+    return block.kind === 'evidence' && source?.selectionBlockID && whole.has(identity(source));
+  }).map(block => block.id));
+}
+export function uniqueReportItems(blocks, sources, renderBlock) {
+  const covered = reportEvidenceCoverage(blocks, sources);
+  const byKey = new Map(sources.map(source => [`${source.kind}:${source.id}`, source]));
+  const seen = new Set();
+  return blocks.flatMap(block => renderBlock(block).filter(item => {
+    if (item.kind === 'evidence' && covered.has(block.id)) return false;
+    if (!item.reportCommentKey) return true;
+    const source = byKey.get(`evidence:${block.sourceID}`);
+    const key = JSON.stringify([source?.sectionID, source?.sourceLibraryVersion,
+      item.reportCommentKey, item.kind, item.text]);
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  }));
+}

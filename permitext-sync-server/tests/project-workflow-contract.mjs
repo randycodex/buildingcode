@@ -22,3 +22,18 @@ assert.deepEqual(selectedReportEvidenceItems({...evidence,excludedCommentKeys:[]
 assert.equal(reportsContainingSource([{blocks:[evidence]}],'evidence','section').length,1);
 assert.equal(reportsContainingSource([{blocks:[{kind:'paragraph',derivedFrom:{kind:'notebookCard',id:'note'}}]}],'notebookCard','note').length,1);
 console.log('Workflow data passed: finding schema/export, checklist validation, exact comment exclusions and persistent source membership.');
+
+const {uniqueReportItems,reportEvidenceCoverage}=await import('../public/project-workflow.js');
+const overlapSources=[
+  {id:'whole',kind:'evidence',sectionID:'s',sourceLibraryVersion:'2022',selectionBlockID:''},
+  {id:'passage',kind:'evidence',sectionID:'s',sourceLibraryVersion:'2022',selectionBlockID:'p'},
+  {id:'historical',kind:'evidence',sectionID:'s',sourceLibraryVersion:'2014',selectionBlockID:'p'}
+];
+const overlapBlocks=overlapSources.map(source=>({id:source.id,kind:'evidence',sourceID:source.id}));
+assert.deepEqual([...reportEvidenceCoverage(overlapBlocks,overlapSources)],['passage']);
+const union=uniqueReportItems(overlapBlocks,overlapSources,block=>[
+  {kind:'evidence',id:block.id},
+  {kind:'paragraph',reportCommentKey:'p',text:'Selected comment'}
+]);
+assert.equal(union.filter(item=>item.kind === 'evidence').length,2,'Different editions remain distinct');
+assert.equal(union.filter(item=>item.kind === 'paragraph').length,2,'Comments deduplicate only within their exact edition');

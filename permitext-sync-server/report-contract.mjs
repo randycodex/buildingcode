@@ -188,7 +188,7 @@ export function normalizeReportDraftBlock(block, index = 0) {
   return {
     ...normalized,
     sourceID: requiredText(block?.sourceID, "Report source ID", 256),
-    label: requiredText(block?.label, "Report source label", 500),
+    label: requiredText(block?.label, "Report source label", kind === "researchAnswer" ? 2_000 : 500).slice(0, 500),
     ...(kind === "evidence" ? {
       excludedCommentKeys: Array.isArray(block.excludedCommentKeys)
         ? [...new Set(block.excludedCommentKeys.map(key => requiredText(key, "Report comment key", 256)))]
@@ -369,6 +369,15 @@ function normalizeEvidenceManifestItem(item, base) {
     chapter: requiredText(item.chapter || "unknown", "Report evidence chapter", 256),
     title: requiredText(item.title, "Report evidence title", 1_000),
     passageText: requiredText(item.passageText, "Report evidence passage", 50_000),
+    ...(Array.isArray(item.tables) && item.tables.length ? { tables: item.tables.map(table => {
+      if (!Array.isArray(table.rows) || !table.rows.length || table.rows.length > 1000 ||
+          table.rows.some(row => !Array.isArray(row) || !row.length || row.length > 100 || row.some(cell => typeof cell !== "string"))) {
+        throw new Error("Invalid Report evidence table.");
+      }
+      const text = table.rows.map(row => row.join(" | ")).join("\n");
+      if (text !== table.text || !item.passageText.includes(text)) throw new Error("Report table does not match its source text.");
+      return {text, rows: structuredClone(table.rows)};
+    }) } : {}),
     passageTextHash: requiredText(item.passageTextHash, "Report evidence hash", 256),
     sourceLibraryVersion: requiredText(item.sourceLibraryVersion, "Report evidence source version", 1_024)
   };
@@ -451,7 +460,7 @@ export function normalizeReportManifestItem(item, index = 0) {
     order: index,
     sourceClassification: manifestSourceClassification(kind)
   };
-  if (authoredBlockKinds.has(kind)) return { ...base, ...normalizeAuthoredBlock(item, kind) };
+  if (authoredBlockKinds.has(kind)) return { ...base, ...normalizeAuthoredBlock(item, kind), ...(kind === "heading" && item.presentationRole === "comment" ? {presentationRole: "comment"} : {}) };
   if (kind === "evidence") return normalizeEvidenceManifestItem(item, base);
   if (kind === "projectFacts") return normalizeProjectFactsManifestItem(item, base);
   if (kind === "notebookCard") return normalizeNotebookManifestItem(item, base);
