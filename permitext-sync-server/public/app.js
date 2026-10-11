@@ -8150,7 +8150,7 @@ function isProAccount() {
 function updateReaderPlanControls() {
   const requiresProject = workspaceColumnsRequireProject();
   const limitReached = !isProAccount() && state.readers.length >= 2;
-  const readerLabel = state.readers.length > 0 ? "New reader" : "Reader";
+  const readerLabel = "Reader";
   addReaderButton.querySelector("span").textContent = readerLabel;
   addReaderButton.dataset.mobileLabel = readerLabel;
   addReaderButton.hidden = false;
