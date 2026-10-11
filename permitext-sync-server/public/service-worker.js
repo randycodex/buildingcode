@@ -1,8 +1,8 @@
-const shellCacheName = "permitext-pro-shell-v1435";
+const shellCacheName = "permitext-pro-shell-v1437";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
-  "/web/project-workflow.js?v=20261010-workflow-v3",
+  "/web/project-workflow.js?v=20261011-workflow-v4",
   "/web/search-words.js",
   "/web/nyc-property-facts.js?v=20261004-zola-facts-v1",
   "/web/active-code-sources.js",
@@ -14,7 +14,7 @@ const shellURLs = [
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20260923-chapter-search-v1",
-  "/web/report-export-review.js?v=20261010-report-export-v2",
+  "/web/report-export-review.js?v=20261011-report-export-v6",
   "/web/reader-navigation-tree.js?v=20261010-contents-v1",
   "/web/reader-chapter-extent.js?v=20261010-chapter-extent-v2",
   "/web/sync-identity.js",
@@ -36,19 +36,19 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261011-notebook-border-v795",
+  "/web/styles.css?v=20261011-workflow-simplification-v847",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261011-notebook-border-v795",
+  "/web/app.js?v=20261011-workflow-simplification-v847",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261011-notebook-border-v795",
-  "/web/research-intent-state.js?v=20261011-notebook-border-v795",
+  "/web/offline-storage.js?v=20261011-workflow-simplification-v847",
+  "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20261010-project-information-v13",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -64,7 +64,13 @@ const shellURLs = [
   "/web/sync-identity.js?v=20260901-2014-code-v7",
   "/web/private-workspace-state.js?v=20260912-account-recovery-v8",
   "/web/legacy-workspace-restore.js?v=20261008-pinned-restore-v4",
-  "/web/sync-state.js?v=20260924-empty-clears-v3"
+  "/web/sync-state.js?v=20260924-empty-clears-v3",
+  "/web/workflow-views.js?v=5",
+  "/web/report-screen.js?v=20261011-shared-shell-v6",
+  "/web/report-library.js?v=20261011-document-minimum-v2",
+  "/web/report-pdf-preview.js?v=20261011-report-preview-v2",
+  "/web/pdf-preview-assets/pdf.min.js",
+  "/web/pdf-preview-assets/pdf.worker.min.js"
 ];
 
 // Only retain HTML whose entry point belongs to this shell generation.

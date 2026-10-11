@@ -3,14 +3,15 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 
 class Element {
-  constructor(tag) { this.tag = tag; this.children = []; this.events = {}; this.attributes = {}; }
-  append(...children) { this.children.push(...children); }
+  constructor(tag) { this.tag = tag; this.children = []; this.events = {}; this.attributes = {}; this.isConnected = true; this.classList = { add() {}, remove() {} }; }
+  focus() { document.activeElement = this; }
+  append(...children) { this.children.push(...children); children.forEach(child => { child.parentElement = this; }); }
   replaceChildren(...children) { this.children = children; }
   setAttribute(name, value) { this.attributes[name] = value; }
   addEventListener(name, handler) { this.events[name] = handler; }
   showModal() { this.open = true; }
   close() { this.open = false; this.events.close?.(); }
-  remove() { this.removed = true; }
+  remove() { this.removed = true; this.isConnected = false; if (this.parentElement) this.parentElement.children = this.parentElement.children.filter(child => child !== this); }
   click() { if (this.tag === "a") downloadCount++; this.events.click?.(); }
 }
 const source = await readFile(new URL("../public/report-export-review.js", import.meta.url), "utf8");
@@ -71,3 +72,30 @@ await flush();
 assert.equal(dialog.children[3].children[1].disabled, false);
 dialog.close();
 console.log("Export review passed: frozen byte download, complete preview and notes, no automatic print, context-change disposal and recoverable loading errors.");
+
+const mount = new Element("article");
+const editor = new Element("textarea"), initiallyHidden = new Element("section");
+editor.value = "Retained report edits"; editor.hidden = false; initiallyHidden.hidden = true;
+mount.append(editor, initiallyHidden); mount.scrollTop = 318;
+document.activeElement = editor;
+let inline = context.openReportExportReview({...args, mount});
+await flush();
+assert.equal(inline.tag, "section");
+assert.equal(inline.parentElement, mount);
+assert.equal(editor.hidden, true);
+assert.equal(mount.scrollTop, 0);
+inline.children[0].children[1].click();
+assert.equal(editor.hidden, false);
+assert.equal(initiallyHidden.hidden, true);
+assert.equal(editor.value, "Retained report edits");
+assert.equal(mount.scrollTop, 318);
+assert.equal(document.activeElement, editor);
+inline = context.openReportExportReview({...args, mount});
+await flush();
+const replacement = context.openReportExportReview({...args, mount});
+await flush();
+assert.equal(inline.removed, true, "Only one inline preview owns the document");
+replacement.children[0].children[1].click();
+assert.equal(editor.hidden, false);
+assert.equal(mount.scrollTop, 318);
+console.log("Inline PDF preview passed: shared screen, retained editor/scroll/focus and replacement cleanup.");

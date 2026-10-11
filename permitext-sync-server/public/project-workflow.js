@@ -96,3 +96,22 @@ export function uniqueReportItems(blocks, sources, renderBlock) {
     return [...rendered.get(block.id).filter(item => !item.reportCommentKey), ...comments];
   });
 }
+
+// Use the export's ownership and union rules for the document's visible comments.
+export function reportCommentPresentation(blocks, sources) {
+  const byKey = new Map(sources.map(source => [`${source.kind}:${source.id}`, source]));
+  const items = uniqueReportItems(blocks, sources, block => {
+    const source = byKey.get(`${block.kind}:${block.sourceID}`);
+    return [{ kind: 'comment-owner', blockID: block.id }, ...selectedReportEvidenceItems(block,
+      block.kind === 'evidence' ? (source?.notes || []).map(note => ({
+        kind: 'paragraph', reportCommentKey: reportCommentKey(note), text: note.body
+      })) : [])];
+  });
+  const result = new Map();
+  let owner = null;
+  for (const item of items) {
+    if (item.kind === 'comment-owner') { owner = item.blockID; result.set(owner, []); }
+    else if (owner && item.reportCommentKey) result.get(owner).push(item);
+  }
+  return result;
+}

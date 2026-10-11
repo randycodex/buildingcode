@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261010-definition-text-v88">
-    <link rel="stylesheet" href="/web/styles.css?v=20261011-live-reference-resize-v840">
+    <link rel="stylesheet" href="/web/styles.css?v=20261011-workflow-simplification-v847">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -494,7 +494,7 @@
           <button class="settings-link-button account-plan-secondary" type="button">Restore Purchases</button>
         </section>
         <section class="settings-card account-connector" aria-labelledby="settings-account-title">
-          <h3 id="settings-account-title" class="section-label settings-section-title">Account</h3>
+          <h3 id="settings-account-title" class="section-label settings-section-title">Profile</h3>
           <dl class="account-identity" aria-label="Signed-in account" hidden>
             <div class="account-identity-editable" data-profile-edit="displayName"><dt>Name</dt><dd class="account-identity-name"></dd></div>
             <div class="account-identity-editable account-identity-username-row" data-profile-edit="publicUsername"><dt>Username</dt><dd class="account-identity-username"></dd></div>
@@ -508,7 +508,7 @@
           <button class="settings-secondary-button settings-destructive-secondary account-delete" type="button">Delete Account</button>
         </section>
         <section class="settings-card settings-active-sources-card" aria-labelledby="settings-active-sources-title" hidden>
-          <h3 id="settings-active-sources-title" class="section-label settings-section-title">Active code sources</h3>
+          <h3 id="settings-active-sources-title" class="section-label settings-section-title">Library</h3>
           <p class="settings-card-copy settings-active-sources-scope"></p>
           <p class="settings-card-copy">Choose what appears in Search and chapter browsing. Turning a source off keeps installed content, saved references, and passages already open. Sources are enabled by default.</p>
           <p class="settings-card-copy settings-active-sources-status" role="status"></p>
@@ -522,7 +522,7 @@
         </section>
         <section class="settings-card settings-offline-card" aria-labelledby="settings-offline-title">
           <div class="settings-card-heading">
-            <h3 id="settings-offline-title" class="section-label settings-section-title">Offline Access</h3>
+            <h3 id="settings-offline-title" class="section-label settings-section-title">Offline</h3>
           </div>
           <p class="settings-card-copy settings-offline-copy">Download the complete searchable enacted-code library and the Permitext app for use without internet.</p>
           <div class="settings-offline-status" role="status">Checking offline storage…</div>
@@ -532,13 +532,8 @@
             <button class="settings-link-button settings-offline-remove" type="button" hidden>Remove Download</button>
           </div>
         </section>
-        <section class="settings-card settings-archived-projects-card" aria-labelledby="settings-archived-projects-title">
-          <h3 id="settings-archived-projects-title" class="section-label settings-section-title">Archived Projects</h3>
-          <div class="settings-archived-projects-list"></div>
-          <p class="settings-archived-projects-status" role="status"></p>
-        </section>
         <section class="settings-card settings-data-card" aria-labelledby="settings-data-title">
-          <h3 id="settings-data-title" class="section-label settings-section-title">Data &amp; Storage</h3>
+          <h3 id="settings-data-title" class="section-label settings-section-title">Data recovery</h3>
               <button class="settings-danger-button" type="button" data-clear-action="searches">
               <span aria-hidden="true">&#8981;</span>
               Clear Recent Searches
@@ -596,6 +591,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261011-live-reference-resize-v840" type="module"></script>
+    <script src="/web/app.js?v=20261011-workflow-simplification-v847" type="module"></script>
   </body>
 </html>

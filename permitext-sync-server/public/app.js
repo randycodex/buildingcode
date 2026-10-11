@@ -1,8 +1,8 @@
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=5";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls } from "./report-library.js?v=20261011-document-minimum-v2";
-import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
-import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v5";
+import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
+import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v6";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
@@ -106,7 +106,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-project-message-timeout-v780";
+} from "./offline-storage.js?v=20261011-workflow-simplification-v847";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -439,7 +439,8 @@ const defaultReportDraftPaneWidth = 600;
 const defaultCoordinationPaneWidth = 600;
 const defaultCoordinationThreadPaneWidth = 520;
 const defaultSettingsPaneWidth = 600;
-const defaultResearchPaneWidth = 600;
+const assistantHistoryWidth = 400;
+const defaultResearchPaneWidth = assistantHistoryWidth + 600;
 const defaultCodeDecisionPaneWidth = 600;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
@@ -1153,6 +1154,7 @@ function newUtilityInstance(key, overrides = {}) {
     instance.historyShowing = overrides.historyShowing ?? !instance.conversationID;
     instance.draft = String(overrides.draft || "");
     instance.historyQuery = String(overrides.historyQuery || "");
+    instance.historyScrollTop = Math.max(0, Number(overrides.historyScrollTop) || 0);
     instance.historyProjectID = overrides.historyProjectID === undefined ? null : overrides.historyProjectID;
   } else if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
@@ -1639,7 +1641,7 @@ function workspaceTransitionPaneLabel(paneID) {
   if (paneID === "utility:settings") return "Account";
   if (paneID.startsWith("research:conversation:")) return "Assistant conversation";
   if (paneID.startsWith("section:detail:")) return "Code section";
-  if (paneID.startsWith("project:notebook:")) return "Notebook";
+  if (paneID.startsWith("project:notebook:")) return "Notes";
   if (paneID.startsWith("project:report-draft:")) return "Report";
   if (paneID.startsWith("project:workboard:")) return "Workboard";
   if (paneID.startsWith("project:coordination-thread:")) return "Coordination thread";
@@ -2251,27 +2253,9 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     projectSection.append(button);
   });
-  appendMenuAction(projectSection, { label: "Project details", run: () => void openProjectDetailsScreen() });
   appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
   appendMenuAction(projectSection, { label: "Manage Projects…", separated: true, run: () => openProjectManager() });
-  if (workspace?.projectID && workspaces.some((candidate) => candidate.id === workspace.id)) {
-    appendMenuAction(projectSection, { label: "Close Project", run: () => void closeActiveProject() });
-    appendMenuAction(projectSection, { label: "Edit Project", run: () => {
-      const project = workspaceProject();
-      if (project) showProjectCreateSheet(track, project);
-    } });
-    appendMenuAction(projectSection, { label: "Archive Project", danger: true, separated: true, run: async () => {
-      const project = workspaceProject();
-      if (!project || !(await archiveProject(project))) return;
-      const main = defaultReadingWorkspace();
-      if (main) await switchWorkspace(main.id, { focus: false });
-      if (!state.projectArchiveNoticeSeen) {
-        state.projectArchiveNoticeSeen = true;
-        saveWorkspaceState();
-        await showWebNotice("Project archived", "Restore it from Account → Archived Projects.");
-      }
-    } });
-  }
+
   menu.append(projectSection);
   document.body.append(menu);
   workspaceContextMenu = menu;
@@ -3676,16 +3660,34 @@ async function openProjectDetailsScreen(section = null) {
     load: async () => {
       content.replaceChildren(tabs);
       tabs.replaceChildren();
-      for (const [kind, label] of [["context", "Context & records"], ["facts", "Facts"]]) {
+      for (const [kind, label] of [["context", "Overview"], ["facts", "Facts"], ["records", "Records"]]) {
         const button = document.createElement("button");
         button.type = "button"; button.textContent = label;
         button.addEventListener("click", () => selectSection(kind));
         buttons.set(kind, button); tabs.append(button);
-        const panel = await renderProjectInformation(identity, kind);
+        const panel = kind === "records" ? document.createElement("article") : await renderProjectInformation(identity, kind);
+        if (kind === "records") {
+          panel.className = "workspace-panel project-information-panel project-records-panel";
+          const checklist = panels.get("context")?.querySelector(".project-records-checklist");
+          if (checklist) panel.append(checklist);
+        }
         if (!screen.isCurrent()) {
           const key = paneIDForProjectInformation(identity, kind);
           if (projectInformationMounts.get(key)?.panel === panel) projectInformationMounts.delete(key);
           return content;
+        }
+        if (kind === "context") {
+          const overview = document.createElement("header");
+          overview.className = "project-overview-identity";
+          const name = document.createElement("h2");
+          name.textContent = workspaceProject()?.name || identity.name;
+          const address = document.createElement("p");
+          address.textContent = workspaceProject()?.address || "No address recorded";
+          const edit = document.createElement("button");
+          edit.type = "button"; edit.textContent = "Edit project";
+          edit.addEventListener("click", () => showProjectCreateSheet(panel, workspaceProject()));
+          overview.append(name, address, edit);
+          panel.querySelector(".project-information-content")?.prepend(overview);
         }
         panel.querySelectorAll(".saved-project-structured-fact-value").forEach(input => { input.placeholder = "Not recorded"; });
         panels.set(kind, panel); content.append(panel);
@@ -4053,6 +4055,7 @@ function defaultPaneWidthForID(paneID) {
 }
 
 function minimumPaneWidthForID(paneID) {
+  if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return assistantHistoryWidth + 600;
   if (paneID?.startsWith("reader:") ||
     paneID === "utility:saved" || paneID?.startsWith("utility:saved:") ||
     paneID === "utility:search" || paneID?.startsWith("utility:search:") ||
@@ -13187,6 +13190,28 @@ const projectStructuredFactGroups = [
   }
 ];
 
+// Presentation groups retain the canonical fact keys used by sync, imports,
+// Assistant context and report exports.
+function projectFactPresentationGroups(groups = projectStructuredFactGroups) {
+  const fields = groups.flatMap(group => group.fields);
+  const property = new Set(["address", "bbl", "borough", "block", "tax-lots", "zip-code", "tax-lot-area", "land-use-code", "community-district"]);
+  const work = new Set(["project-status", "work-filing-type", "code-basis"]);
+  const building = new Set(groups.find(group => group.key === "buildingCode")?.fields.map(field => field.key));
+  const special = new Set(["special-purpose-district", ...nycMappedFactFields.map(field => field.key)]);
+  const sections = [
+    { key: "property", label: "Property", fields: [] },
+    { key: "building", label: "Building", fields: [] },
+    { key: "work", label: "Work & code basis", fields: [] },
+    { key: "zoning", label: "Zoning", fields: [] },
+    { key: "designations", label: "Special designations", fields: [] }
+  ];
+  for (const field of fields) {
+    const index = property.has(field.key) ? 0 : work.has(field.key) ? 2 : building.has(field.key) ? 1 : special.has(field.key) ? 4 : 3;
+    sections[index].fields.push(field);
+  }
+  return sections;
+}
+
 const projectStructuredFactAliases = new Map([
   ["stories", ["stories-above-grade", "Stories Above Grade"]],
   ["sprinkler-status", ["sprinkler-protection", "Sprinkler Protection"]],
@@ -21165,6 +21190,7 @@ async function openSupplementalResearchConversation(conversationID) {
   if (!supplementalResearchConversationIDs.includes(normalizedConversationID)) {
     supplementalResearchConversationIDs.push(normalizedConversationID);
   }
+  restoreAssistantConversationOwners();
   const paneID = paneIDForResearchConversation(normalizedConversationID);
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
@@ -23183,7 +23209,8 @@ async function renderResearch(paneID = "utility:analysis") {
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
   const draftShowing = researchDraftPaneIDs.has(paneID);
-  const historyShowing = !draftShowing && (!conversationOpen || (instance ? instance.historyShowing : researchHistoryShowing));
+  // History is always available beside this Assistant, including while composing.
+  const historyShowing = true;
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-list-panel");
   const projectScopedResearch = Boolean(activeProjectIDForCodeQuestions());
@@ -23228,45 +23255,40 @@ async function renderResearch(paneID = "utility:analysis") {
   panelActions?.prepend(cancelSelectionButton, selectAllButton, deleteSelectedButton, selectHistoryButton);
   const content = panel.querySelector(".analysis-content");
 
-  panel.classList.toggle("research-clean-start", Boolean(activeAccount()) && hasCapability("research"));
-  const historyButton = document.createElement("button");
-  historyButton.type = "button";
-  historyButton.className = "ghost-button research-history-toggle";
-  historyButton.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 5-7 7 7 7M5 12h14"/></svg>';
-  historyButton.setAttribute("aria-label", "Back to history");
-  historyButton.setAttribute("aria-expanded", "false");
-  historyButton.addEventListener("click", () => {
-    researchDraftPaneIDs.delete(paneID);
-    if (instance) instance.historyShowing = true;
-    else researchHistoryShowing = true;
-    saveWorkspaceState();
-    void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-  });
-  if (draftShowing && activeAccount() && hasCapability("research")) {
-    panelActions?.prepend(historyButton);
+  panel.classList.add("assistant-workspace", "research-clean-start", "is-history-open");
+  const historyRail = document.createElement("aside");
+  historyRail.className = "assistant-history-rail";
+  historyRail.setAttribute("aria-label", "Assistant conversations");
+  const historyHeading = document.createElement("h2");
+  historyHeading.textContent = "Conversations";
+  historyRail.append(historyHeading, content);
+  const assistantBody = document.createElement("section");
+  assistantBody.className = "assistant-body";
+  assistantBody.setAttribute("aria-label", "Assistant conversation");
+  panel.append(historyRail, assistantBody);
+  content.addEventListener("scroll", () => {
+    historyState.historyScrollTop = content.scrollTop;
+    scheduleResearchDraftPersistence();
+  }, { passive: true });
+  if (conversationOpen && !draftShowing) {
+    panel.classList.add("has-inline-conversation");
+    assistantBody.append(await renderResearchConversation(instance?.conversationID || state.researchConversationID, {
+      embedded: true, supplemental: Boolean(instance), ownerInstance: instance, paneID
+    }));
+  } else {
     panel.classList.add("has-research-composer", "is-new-research-chat");
     const welcome = document.createElement("div");
     welcome.className = "research-chat-welcome";
     const heading = document.createElement("h3");
-    heading.textContent = "New chat";
+    heading.textContent = "New conversation";
     const context = document.createElement("p");
     context.textContent = workspaceProject()?.name || "Unassigned Research";
     welcome.append(heading, context);
-    panel.append(welcome);
-    renderNewResearchComposer(panel, true, instance);
-    requestAnimationFrame(() => panel.querySelector(".research-question-input")?.focus({ preventScroll: true }));
-    return panel;
-  }
-  if (conversationOpen && !historyShowing) {
-    panelActions?.prepend(historyButton);
-    panel.classList.add("has-inline-conversation");
-    content.remove();
-    panel.append(await renderResearchConversation(instance?.conversationID || state.researchConversationID, { embedded: true, supplemental: Boolean(instance), ownerInstance: instance, paneID }));
-    return panel;
-  }
-  if (historyShowing) {
-    panel.classList.add("is-history-open");
-    historyButton.setAttribute("aria-expanded", "true");
+    const progress = document.createElement("div");
+    progress.className = "analysis-content assistant-start-progress";
+    assistantBody.append(welcome, progress);
+    renderNewResearchComposer(assistantBody, true, instance);
+    if (draftShowing) requestAnimationFrame(() => assistantBody.querySelector(".research-question-input")?.focus({ preventScroll: true }));
   }
 
   const updateConversationSelection = () => {
@@ -23275,7 +23297,7 @@ async function renderResearch(paneID = "utility:analysis") {
     cancelSelectionButton.hidden = !selectingConversations;
     selectAllButton.hidden = !selectingConversations;
     deleteSelectedButton.hidden = !selectingConversations;
-    selectHistoryButton.hidden = selectingConversations || visibleHistoryConversations().length === 0;
+    selectHistoryButton.hidden = !releaseSurfaceVisibility.researchHistoryManagement || selectingConversations || visibleHistoryConversations().length === 0;
     const allSelected = visibleHistoryConversations().length > 0 &&
       selectedConversationIDs.size === visibleHistoryConversations().length;
     selectAllButton.textContent = allSelected ? "Clear all" : "Select all";
@@ -23380,7 +23402,7 @@ async function renderResearch(paneID = "utility:analysis") {
       void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
     });
     panel.classList.add("has-research-history-footer");
-    panel.append(newChatButton);
+    historyRail.append(newChatButton);
   }
 
   const renderingIdentity = captureAccountRequest();
@@ -23489,7 +23511,7 @@ async function renderResearch(paneID = "utility:analysis") {
       historyCursor = payload.hasMore ? payload.nextCursor : null;
       clear(content);
       conversationRows.clear();
-      selectHistoryButton.hidden = visibleHistoryConversations().length === 0;
+      selectHistoryButton.hidden = !releaseSurfaceVisibility.researchHistoryManagement || visibleHistoryConversations().length === 0;
     } catch (error) {
       if (!current()) return;
       if (!append) clear(content);
@@ -23639,9 +23661,11 @@ async function renderResearch(paneID = "utility:analysis") {
     conversationRows.set(conversation.id, row);
     const renderRow = () => {
       clear(row);
-      row.classList.toggle("is-active", state.researchConversationID === conversation.id);
+      const selected = !draftShowing && conversation.id === (instance?.conversationID || state.researchConversationID);
+      row.classList.toggle("is-active", selected);
       const openButton = document.createElement("button");
       openButton.className = "research-conversation-open";
+      if (selected) openButton.setAttribute("aria-current", "true");
       openButton.type = "button";
       const title = document.createElement("strong");
       title.textContent = researchConversationTitle(conversation);
@@ -23980,6 +24004,7 @@ async function renderResearch(paneID = "utility:analysis") {
     list.append(group);
   });
   content.append(list);
+  requestAnimationFrame(() => { if (isCurrent()) panel.querySelector(".assistant-history-rail > .analysis-content").scrollTop = Math.max(0, Number(historyState.historyScrollTop) || 0); });
   if (historyCursor) {
     const more = document.createElement("button");
     more.type = "button";
@@ -26474,7 +26499,7 @@ async function appendNotebookDeviceRecovery(container, projectID, identity) {
 }
 
 async function renderProjectNotebook(project, options = {}) {
-  if (!hasCapability("notebook")) return renderProLockedPane(paneIDForProjectNotebook(project), "Notebook");
+  if (!hasCapability("notebook")) return renderProLockedPane(paneIDForProjectNotebook(project), "Notes");
   const requestIdentity = captureAccountRequest();
   const accountUserID = requestIdentity.userID;
   const notebookRequest = (path, values) => {
@@ -26498,15 +26523,15 @@ async function renderProjectNotebook(project, options = {}) {
   const heading = document.createElement("div");
   heading.className = "notebook-heading";
   const headingTitle = document.createElement("h2");
-  headingTitle.textContent = "Notebook";
+  headingTitle.textContent = "Notes";
   headingTitle.className = "eyebrow panel-kind";
   heading.append(headingTitle);
   const dragHandle = createProjectToolDragHandle(identity);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close notebook-close";
   closeButton.type = "button";
-  closeButton.title = "Close notebook";
-  closeButton.setAttribute("aria-label", "Close notebook");
+  closeButton.title = "Close notes";
+  closeButton.setAttribute("aria-label", "Close notes");
   closeButton.innerHTML = circleXIconSVG();
   closeButton.addEventListener("click", () => {
     void closeProjectNotebook(identity);
@@ -28198,6 +28223,7 @@ async function renderProjectReportDraft(project) {
 
   let drafts = [];
   let sources = [];
+  const sourcePreviewRequests = new Map();
   let sourceWarnings = [];
   let history = [];
   let reportOptions = {
@@ -28213,6 +28239,7 @@ async function renderProjectReportDraft(project) {
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
   const reportSourceGroupExpanded = new Map();
+  const reportLibraryScroll = { sources: 0, versions: 0 };
   const reportSectionExpanded = (sectionName, fallback = true) => {
     const currentSessionValue = reportSourceGroupExpanded.get(sectionName);
     return typeof currentSessionValue === "boolean"
@@ -28328,6 +28355,7 @@ async function renderProjectReportDraft(project) {
   };
 
   const reviewReport = (manifest, file) => openReportExportReview({
+    mount: panel.querySelector(".report-document"),
     isCurrent: () => !disposed && panel.isConnected && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
     prepare: async () => ({ manifest, ...(await readProjectReportFile(projectID, file, manifest.title)) })
   });
@@ -28440,6 +28468,23 @@ async function renderProjectReportDraft(project) {
       trigger.disabled = false;
     }
   };
+
+  function renderIncludedReportComments(container) {
+    const comments = reportCommentPresentation(activeDraft.blocks, sources);
+    container.querySelectorAll("[data-report-comments-for]").forEach(host => {
+      host.replaceChildren();
+      const included = comments.get(host.dataset.reportCommentsFor) || [];
+      host.hidden = included.length === 0;
+      for (const item of included) {
+        const comment = document.createElement("p");
+        const scope = document.createElement("span");
+        scope.className = "report-comment-scope";
+        scope.textContent = item.reportCommentKey === "section" ? "Section comment" : "Passage comment";
+        comment.append(scope, document.createTextNode(item.text || ""));
+        host.append(comment);
+      }
+    });
+  }
 
   function renderBlockEditor(container) {
     if (!activeDraft.blocks.length) {
@@ -28640,21 +28685,13 @@ async function renderProjectReportDraft(project) {
             checkbox.addEventListener("change", () => {
               const excluded = new Set(block.excludedCommentKeys || []);
               if (checkbox.checked) excluded.delete(key); else excluded.add(key);
-              block.excludedCommentKeys = [...excluded]; updateLabel(); setDirty();
+              block.excludedCommentKeys = [...excluded]; updateLabel(); setDirty(); renderIncludedReportComments(container);
             });
             label.append(checkbox,text); comments.append(label);
           });
           row.append(comments);
         }
-        if (source?.summary && block.kind !== "projectFacts") {
-          const summary = document.createElement("p");
-          summary.className = "report-block-summary";
-          summary.textContent = source.summary;
-          if (sourceTitle.parentElement) row.append(summary);
-          else row.append(sourceTitle, summary);
-        } else if (!sourceTitle.parentElement) {
-          row.append(sourceTitle);
-        }
+        if (!sourceTitle.parentElement) row.append(sourceTitle);
         if (source) {
           if (reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id)) {
             const notice = document.createElement("p");
@@ -28663,16 +28700,25 @@ async function renderProjectReportDraft(project) {
           }
           const preview = document.createElement("details");
           preview.className = "report-full-preview";
-          const toggle = document.createElement("summary"); toggle.textContent = "Review full content";
-          const body = document.createElement("div"); preview.append(toggle, body);
+          const toggle = document.createElement("summary"); toggle.textContent = "Source text";
+          const body = document.createElement("div"); body.className = "report-full-preview-body"; preview.append(toggle, body);
+          preview.open = !reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id);
           let loaded = false, loading = false;
-          preview.addEventListener("toggle", async () => {
+          const loadPreview = async () => {
             if (!preview.open || loaded || loading) return;
             loading = true; body.textContent = "Loading complete source…";
             const identity = captureAccountRequest();
             try {
-              const result = await postResearch("/reports/sources/preview", {projectID, kind:block.kind, sourceID:block.sourceID});
+              const key = JSON.stringify([block.kind, block.sourceID, source]);
+              let request = sourcePreviewRequests.get(key);
+              if (!request) {
+                request = postResearch("/reports/sources/preview", {projectID, kind:block.kind, sourceID:block.sourceID});
+                sourcePreviewRequests.set(key, request);
+                request.catch(() => { if (sourcePreviewRequests.get(key) === request) sourcePreviewRequests.delete(key); });
+              }
+              const result = await request;
               requireCurrentAccountRequest(identity);
+              if (disposed || requestWorkspaceID !== activeWorkspaceID) return;
               body.replaceChildren();
               for (const part of result.preview || []) {
                 if (part.kind === "table") {
@@ -28697,14 +28743,23 @@ async function renderProjectReportDraft(project) {
             } catch (error) {
               if (isCurrentAccountRequest(identity)) body.textContent = `${error.message} Close and reopen to retry.`;
             } finally { loading = false; }
-          });
+          };
+          preview.addEventListener("toggle", loadPreview);
           row.append(preview);
+          void loadPreview();
+        }
+        if (block.kind === "evidence") {
+          const includedComments = document.createElement("div");
+          includedComments.className = "report-included-comments";
+          includedComments.dataset.reportCommentsFor = block.id;
+          row.append(includedComments);
         }
         const commentOptions = row.querySelector(".report-comment-options");
         if (commentOptions) row.append(commentOptions);
       }
       container.append(row);
     });
+    renderIncludedReportComments(container);
   }
 
   function reportSourcePickerLabel() {
@@ -28714,8 +28769,8 @@ async function renderProjectReportDraft(project) {
   }
 
   function renderSourcePalette(container) {
-    const pickerSummary = panel.querySelector(".report-source-picker > summary");
-    if (pickerSummary) pickerSummary.textContent = reportSourcePickerLabel();
+    const pickerSummary = panel.querySelector(".report-source-picker > .section-label");
+    if (pickerSummary) { pickerSummary.textContent = reportSourcePickerLabel(); pickerSummary.hidden = !sourceWarnings.length; }
     const appendSourceGroup = (label, description, renderBody) => {
       const section = document.createElement("section");
       section.className = "report-source-group";
@@ -29002,8 +29057,20 @@ async function renderProjectReportDraft(project) {
       { onChange(expanded) { persistReportSectionExpanded("Report introduction", expanded); } });
     metadata.append(introductionSection);
 
-    const addControls = document.createElement("div");
-    addControls.className = "report-draft-add-controls";
+    const addControls = document.createElement("details");
+    addControls.className = "report-draft-add-controls report-add-menu";
+    const addToggle = document.createElement("summary");
+    addToggle.textContent = "Add content";
+    addControls.append(addToggle);
+    const addOptions = document.createElement("div");
+    addOptions.className = "report-add-options";
+    addControls.append(addOptions);
+    addControls.addEventListener("keydown", event => {
+      if (event.key === "Escape") { addControls.open = false; addToggle.focus(); }
+    });
+    addControls.addEventListener("focusout", event => {
+      if (!addControls.contains(event.relatedTarget)) addControls.open = false;
+    });
     [
       { kind: "heading", label: "Add heading", value: { text: "Report section" } },
       { kind: "paragraph", label: "Add paragraph", value: { text: "" } },
@@ -29022,8 +29089,19 @@ async function renderProjectReportDraft(project) {
         setDirty();
         renderWorkspaceContent();
       });
-      addControls.append(button);
+      addOptions.append(button);
     });
+    const addSource = document.createElement("button");
+    addSource.type = "button";
+    addSource.textContent = "Add source";
+    addSource.addEventListener("click", () => {
+      addControls.open = false;
+      panel.dataset.libraryOpen = "true";
+      panel.dataset.libraryTab = "sources";
+      renderWorkspaceContent();
+      panel.querySelector('.report-library-tabs [data-tab="sources"]')?.focus();
+    });
+    addOptions.append(addSource);
 
     const blocks = document.createElement("section");
     blocks.className = "report-draft-blocks";
@@ -29040,7 +29118,7 @@ async function renderProjectReportDraft(project) {
     if (!activeDraft.blocks.length) {
       const empty = document.createElement("p");
       empty.className = "report-workflow-help";
-      empty.textContent = "Start writing above, or use Add to Report in Evidence and Notebook.";
+      empty.textContent = "Choose Add content to start writing, or add saved material from Sources.";
       blocksBody.append(empty);
     }
     renderBlockEditor(blocksBody);
@@ -29061,18 +29139,15 @@ async function renderProjectReportDraft(project) {
     const sourcePalette = document.createElement("section");
     sourcePalette.className = "report-source-palette";
     renderSourcePalette(sourcePalette);
-    const sourcePicker = document.createElement("details");
+    const sourcePicker = document.createElement("section");
     sourcePicker.className = "report-source-picker";
-    sourcePicker.open = true;
-    const sourcePickerToggle = document.createElement("summary");
+    const sourcePickerToggle = document.createElement("p");
     sourcePickerToggle.textContent = reportSourcePickerLabel();
     sourcePickerToggle.className = "section-label";
+    sourcePickerToggle.hidden = !sourceWarnings.length;
     const sourcePickerHelp = document.createElement("p");
     sourcePickerHelp.className = "report-source-picker-help";
     sourcePickerHelp.textContent = "Choose saved material from this project. Added items stay linked to their sources.";
-    sourcePicker.addEventListener("toggle", () => {
-      persistReportSectionExpanded("Add sources", sourcePicker.open);
-    });
     sourcePicker.append(sourcePickerToggle, sourcePickerHelp, sourcePalette);
 
     const primaryActions = document.createElement("div");
@@ -29112,40 +29187,15 @@ async function renderProjectReportDraft(project) {
     });
     primaryActions.append(createReaderToolbarButton(), save, generate, coordinate);
 
-    const appendOutputDisclosure = (label, body, className, stateKey = label) => {
-      const section = document.createElement("section");
-      section.className = `report-output-section ${className}`;
-      const heading = document.createElement("div");
-      heading.className = "report-output-heading project-collapsible-heading";
-      const title = document.createElement("button");
-      title.type = "button";
-      title.className = "project-section-toggle-label section-label report-output-toggle";
-      title.textContent = label;
-      heading.append(title);
-      const disclosureBody = document.createElement("div");
-      disclosureBody.className = "report-output-body";
-      disclosureBody.append(body);
-      section.append(heading, disclosureBody);
-      const initiallyExpanded = reportSectionExpanded(stateKey);
-      wireProjectSectionMotion(section, disclosureBody, [title], label, initiallyExpanded, {
-        onChange(expanded) {
-          persistReportSectionExpanded(stateKey, expanded);
-        }
-      });
-      return section;
-    };
     const historyContent = document.createElement("div");
     historyContent.className = "report-history-content";
     const historyBody = document.createElement("div");
     historyBody.className = "report-history";
     renderHistory(historyBody);
     historyContent.append(historyBody);
-    const historySection = appendOutputDisclosure(
-      "Exported versions",
-      historyContent,
-      "report-history-section",
-      "Report history"
-    );
+    const historySection = document.createElement("section");
+    historySection.className = "report-history-section";
+    historySection.append(historyContent);
     const documentBody = document.createElement("div");
     documentBody.className = "report-document";
     documentBody.append(draftPicker, metadata, blocks);
@@ -29178,10 +29228,57 @@ async function renderProjectReportDraft(project) {
       availableWidth: () => Math.max(shell.clientWidth, document.querySelector(".workspace-shell")?.clientWidth || 0),
       onResize: syncReferenceReaderLayout
     });
-    library.append(libraryControls.header, sourcePicker, historySection);
+    const libraryTabs = document.createElement("div");
+    libraryTabs.className = "report-library-tabs";
+    libraryTabs.setAttribute("role", "tablist");
+    libraryTabs.setAttribute("aria-label", "Report library");
+    const tabButtons = [];
+    const selectLibraryTab = (name) => {
+      for (const [key, body] of [["sources", sourcePicker], ["versions", historySection]]) {
+        if (body.isConnected && !body.hidden) reportLibraryScroll[key] = body.scrollTop;
+      }
+      panel.dataset.libraryTab = name;
+      sourcePicker.hidden = name !== "sources";
+      historySection.hidden = name !== "versions";
+      requestAnimationFrame(() => {
+        const body = name === "sources" ? sourcePicker : historySection;
+        if (body.isConnected && !body.hidden) body.scrollTop = reportLibraryScroll[name];
+      });
+      tabButtons.forEach(button => {
+        const selected = button.dataset.tab === name;
+        button.setAttribute("aria-selected", String(selected));
+        button.tabIndex = selected ? 0 : -1;
+      });
+    };
+    for (const [name, label, body] of [["sources", "Sources", sourcePicker], ["versions", "Versions", historySection]]) {
+      const tab = document.createElement("button");
+      tab.type = "button";
+      tab.textContent = label;
+      tab.dataset.tab = name;
+      tab.id = `report-library-${projectID}-${name}-tab`;
+      tab.setAttribute("role", "tab");
+      body.id = `report-library-${projectID}-${name}`;
+      body.setAttribute("role", "tabpanel");
+      body.addEventListener("scroll", () => {
+        if (!body.hidden) reportLibraryScroll[name] = body.scrollTop;
+      }, { passive: true });
+      body.setAttribute("aria-labelledby", tab.id);
+      tab.setAttribute("aria-controls", body.id);
+      tab.addEventListener("click", () => selectLibraryTab(name));
+      tab.addEventListener("keydown", event => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        const next = event.key === "Home" ? tabButtons[0] : event.key === "End" ? tabButtons[1] : tabButtons.find(button => button !== tab);
+        selectLibraryTab(next.dataset.tab); next.focus();
+      });
+      tabButtons.push(tab); libraryTabs.append(tab);
+    }
+    selectLibraryTab(panel.dataset.libraryTab || "sources");
+    library.append(libraryControls.header, libraryTabs, sourcePicker, historySection);
     const tools = document.createElement("button");
     tools.type = "button";
-    tools.textContent = "Sources and version";
+    tools.textContent = "Sources";
+    tools.title = "Show Report sources and versions";
     tools.setAttribute("aria-expanded", String(panel.dataset.libraryOpen === "true"));
     tools.addEventListener("click", () => {
       const expanded = panel.dataset.libraryOpen !== "true";
@@ -32958,7 +33055,8 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
   };
 
   const groupLists = new Map();
-  projectStructuredFactGroups.forEach((group, groupIndex) => {
+  const presentationGroups = factsOnly ? projectFactPresentationGroups() : projectStructuredFactGroups;
+  presentationGroups.forEach((group, groupIndex) => {
     const groupSection = document.createElement("section");
     groupSection.className = `saved-project-structured-group is-${group.key}`;
     const groupHeading = document.createElement("div");
@@ -33001,7 +33099,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
   const renderStructuredFacts = () => {
     groupLists.forEach((list) => clear(list));
     const factsByKey = new Map(structuredFacts.map((fact) => [fact.key, fact]));
-    projectStructuredFactGroups.forEach((group) => {
+    presentationGroups.forEach((group) => {
       group.fields.filter(field => field.key !== "transit-zone" || factsByKey.has(field.key))
         .forEach((field) => appendDefaultFactField(groupLists.get(group.key), field, factsByKey));
     });
@@ -36979,60 +37077,6 @@ function wireSettingsCardCollapsing(panel) {
   });
 }
 
-function renderAccountArchivedProjects(panel, requestIdentity) {
-  const list = panel.querySelector(".settings-archived-projects-list");
-  const projects = archivedProjectRecords(currentContentSummary().projects || []).filter(folderIsProject);
-  clear(list);
-  if (!projects.length) {
-    const empty = document.createElement("p");
-    empty.className = "settings-archived-projects-empty";
-    empty.textContent = "No archived projects.";
-    list.append(empty);
-    return;
-  }
-  projects.forEach((project) => {
-    const row = document.createElement("div");
-    row.className = "settings-project-row settings-archived-project-row";
-    row.style.setProperty("--project-color", projectColor(project));
-    const copy = document.createElement("span");
-    copy.className = "settings-project-copy";
-    const name = document.createElement("strong");
-    name.textContent = readableProjectName(project);
-    const date = document.createElement("span");
-    const archivedAt = new Date(project.archivedAt);
-    date.textContent = project.archivedAt && Number.isFinite(archivedAt.getTime())
-      ? `Archived ${archivedAt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}`
-      : "Archived";
-    copy.append(name, date);
-    const restore = document.createElement("button");
-    restore.type = "button";
-    restore.className = "settings-link-button";
-    restore.textContent = "Restore";
-    restore.setAttribute("aria-label", `Restore ${project.name}`);
-    const status = panel.querySelector(".settings-archived-projects-status");
-    restore.addEventListener("click", async () => {
-      if (!isCurrentAccountRequest(requestIdentity)) return;
-      restore.disabled = true;
-      try {
-        await restoreArchivedProject(project);
-        if (!isCurrentAccountRequest(requestIdentity)) return;
-        reconcileProjectWorkspaces();
-        renderWorkspaceTabs();
-        const livePanel = panel.isConnected ? panel : track.querySelector('.settings-archived-projects-card')?.closest('.workspace-panel');
-        if (livePanel) {
-          renderAccountArchivedProjects(livePanel, requestIdentity);
-          livePanel.querySelector('.settings-archived-projects-status').textContent = `${project.name} restored. Open it from the workspace picker.`;
-        }
-      } catch (error) {
-        if (!isCurrentAccountRequest(requestIdentity)) return;
-        restore.disabled = false;
-        status.textContent = error.message || "Could not restore this Project. Try again.";
-      }
-    });
-    row.append(copy, restore);
-    list.append(row);
-  });
-}
 
 function profileNeedsName(account) {
   return !String(account?.displayName || "").trim() || ["Permitext account", "Apple account", "Web browser"].includes(account.displayName);
@@ -37494,7 +37538,7 @@ function renderSettings({ upgrade = false } = {}) {
   const panel = renderTemplate(settingsTemplate);
   wireSettingsActiveCodeSources(panel, { enabled: true });
   applyPaneWeight(panel, "utility:settings");
-  renderAccountArchivedProjects(panel, settingsIdentity);
+
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
   const accountIdentity = panel.querySelector(".account-identity");
@@ -43753,7 +43797,31 @@ function getWorkspacePaneHydrator() {
   return workspacePaneHydrator;
 }
 
+function restoreAssistantConversationOwners() {
+  // Older layouts kept comparison chats as standalone panes. Give each one an
+  // Assistant owner so its fixed history rail follows every move and resize.
+  state.utilityInstances ||= [];
+  for (const conversationID of supplementalResearchConversationIDs) {
+    if (researchConversationPaneIsOpen() && conversationID === state.researchConversationID) continue;
+    if (state.utilityInstances.some(item => item.key === "analysis" && item.conversationID === conversationID)) continue;
+    const oldID = `research:conversation:${conversationID}`;
+    const instance = newUtilityInstance("analysis", { id: `conversation-${conversationID}`, conversationID });
+    state.utilityInstances.push(instance);
+    const nextID = paneIDForUtilityInstance(instance);
+    state.paneOrder = (state.paneOrder || []).map(id => id === oldID ? nextID : id);
+    if (state.paneWeights?.[oldID]) { state.paneWeights[nextID] = state.paneWeights[oldID]; delete state.paneWeights[oldID]; }
+    state.collapsedPaneIDs = (state.collapsedPaneIDs || []).map(id => id === oldID ? nextID : id);
+    if (state.pinnedPaneID === oldID) state.pinnedPaneID = nextID;
+    if (state.workflowMembership?.[oldID]) { state.workflowMembership[nextID] = state.workflowMembership[oldID]; delete state.workflowMembership[oldID]; }
+    for (const group of state.columnGroups || []) {
+      group.paneIDs = group.paneIDs.map(id => id === oldID ? nextID : id);
+      if (group.columns?.[oldID]) { group.columns[nextID] = { kind: "utility", value: instance }; delete group.columns[oldID]; }
+    }
+  }
+}
+
 function workspacePaneDescriptors(options = {}) {
+  restoreAssistantConversationOwners();
   if (workspaceColumnsRequireProject()) return [];
   const foundationScope = createInitialProjectFoundationScope();
   const descriptors = [];
@@ -43788,7 +43856,7 @@ function workspacePaneDescriptors(options = {}) {
     const projectID = projectDetailKey(project);
     if (projectHasOpenNotebook(project)) {
       foundationScope.register(paneIDForProjectNotebook(project));
-      add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project, { foundationScope }),
+      add(paneIDForProjectNotebook(project), "Notes", () => renderProjectNotebook(project, { foundationScope }),
         () => closeProjectNotebook(project), { foundationScope, ownerClass: "notebook-panel", projectID, accessCapabilities: ["notebook"] });
     }
     // Report owns a separate screen; never insert it into the column track.

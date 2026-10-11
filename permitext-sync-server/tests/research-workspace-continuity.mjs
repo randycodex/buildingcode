@@ -87,6 +87,7 @@ Object.assign(context, {
   researchProjectContextPreview: () => element('preview'),
   researchComposerDisclosure: () => element('disclosure'),
   researchChatPlaceholder: 'Question', bindResearchSendShortcut() {},
+  flushResearchDraftPersistence() {}, scheduleResearchDraftPersistence() { context.saveWorkspaceState(); },
   requestAnimationFrame: callback => callback(),
   saveWorkspaceState() { writes += 1; context.captureResearchWorkspaceState(); },
   paneIDForUtilityInstance: instance => `utility:analysis:${instance.id}`,
