@@ -19399,7 +19399,7 @@ dialog.report-export-review {
 .report-export-inline > header { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 42px; }
 .report-export-inline > header h2 { font-size: 14px; margin: 0; }
 
-.report-autosave-status { color: var(--text-secondary); font-size: 11px; align-self: center; }
+.report-autosave-status { color: var(--text-secondary); font-size: 11px; align-self: center; margin-inline-start: auto; white-space: nowrap; text-transform: uppercase; }
 .report-draft-primary-actions .report-autosave-retry[hidden], .report-draft-primary-actions .report-autosave-copy[hidden] { display: none; }
 .report-draft-version-option.is-recovery { border-top: 1px solid var(--border); }
 

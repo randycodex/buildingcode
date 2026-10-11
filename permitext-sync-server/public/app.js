@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-polish-v859";
+} from "./offline-storage.js?v=20261011-report-actions-v860";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28528,7 +28528,7 @@ async function renderProjectReportDraft(project) {
     const label = shell.querySelector(".report-autosave-status");
     if (label) label.textContent = savePresentation.state === "saving" ? "Saving…"
       : savePresentation.state === "pending" ? "Unsaved changes"
-      : savePresentation.state === "error" ? "Not saved" : activeDraft.id ? "Saved" : "";
+      : savePresentation.state === "error" ? "Not saved" : activeDraft.id ? "SAVED" : "";
     const retry = shell.querySelector(".report-autosave-retry");
     if (retry) retry.hidden = savePresentation.state !== "error";
     const copy = shell.querySelector(".report-autosave-copy");
