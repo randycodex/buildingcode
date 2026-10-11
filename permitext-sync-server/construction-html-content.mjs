@@ -203,7 +203,14 @@ export function officialBodyHasUnboundImages(preparedBody, officialBody) {
 
 function bodyFromHeadingSlice(section, source, headings, selectedIndex, { includeOfficialSourceBinding = false } = {}) {
   const start = headings[selectedIndex].contentStart;
-  const end = selectedIndex + 1 < headings.length ? headings[selectedIndex + 1].wrapperStart : source.html.length;
+  let end = selectedIndex + 1 < headings.length ? headings[selectedIndex + 1].wrapperStart : source.html.length;
+  // Major section banners are not leaf catalog entries (e.g. Section BC 1021),
+  // but still end the preceding provision. Keep their title out of that body's
+  // Reader/export text without dropping any intervening conditions/exceptions.
+  const banner = allChapterHeadings(source).find(heading =>
+    heading.headingStart >= start && heading.wrapperStart < end &&
+    /^Section\s+[A-Z]+\s+\d+(?:[.-]\d+)*\s*:/i.test(heading.headingText));
+  if (banner && banner.wrapperStart >= start) end = banner.wrapperStart;
   if (start >= end) {
     return {
       body: null,

@@ -25,11 +25,13 @@ const codeBySectionID = new Map([
 ]);
 
 const minimumHTMLCoverageByPrefix = Object.freeze({
-  BC: 6_694,
+  // Reserved provisions whose only "body" was the next section banner are empty.
+  // See construction-section-boundary-contract for all sixteen exact source cases.
+  BC: 6_690,
   AC: 1_269,
-  FGC: 772,
-  MC: 1_369,
-  PC: 1_140
+  FGC: 767,
+  MC: 1_368,
+  PC: 1_137
 });
 
 function assert(condition, message) {
