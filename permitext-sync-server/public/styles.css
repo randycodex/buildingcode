@@ -14351,6 +14351,10 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   }
 }
 
+.notebook-panel .notebook-editor-surface {
+  border: 1px solid var(--border);
+}
+
 .notebook-panel .notebook-editor-surface,
 .notebook-panel .notebook-editor-surface .bn-container,
 .notebook-panel .notebook-editor-surface .bn-editor {
