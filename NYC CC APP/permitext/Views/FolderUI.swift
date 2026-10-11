@@ -457,3 +457,115 @@ struct ProjectStructuredFactRow: View {
         .padding(.vertical, 8)
     }
 }
+
+/// Edits the Project's context without replacing its other saved fields.
+struct ProjectContextView: View {
+    let folderID: Int64
+    let accentColor: Color
+
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var editingFolder: CodeFolder?
+    @State private var editingSessionID: UUID?
+    @State private var draft = ""
+    @State private var saveError: String?
+    @FocusState private var contextIsFocused: Bool
+
+    private var folder: CodeFolder? { library.folder(id: folderID) }
+    private var isEditing: Bool { editingFolder != nil }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: Binding(
+                    get: { isEditing ? draft : folder?.description ?? "" },
+                    set: { value in
+                        guard isEditing || beginEditing() else { return }
+                        draft = value
+                    }
+                ))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .scrollContentBackground(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+                .focused($contextIsFocused)
+                .accessibilityLabel("Project context")
+                .accessibilityHint("Edit Project context")
+                .accessibilityIdentifier(isEditing ? "project-context-editor" : "project-context-text")
+                .onChange(of: contextIsFocused) { _, focused in
+                    if focused && !isEditing && !beginEditing() { contextIsFocused = false }
+                }
+                if !isEditing && (folder?.description.isEmpty ?? true) {
+                    Text("Tap to add Project context.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .allowsHitTesting(false)
+                }
+            }
+            if let saveError {
+                Text(saveError)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+        .padding(.top, CodeScreenMetrics.topTitlePadding)
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle("Project Context")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(isEditing)
+        .tint(Color.appChrome)
+        .toolbar {
+            if isEditing {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel", action: finishEditing)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save", action: save)
+                        .fontWeight(.semibold)
+                        .accessibilityIdentifier("project-context-save")
+                }
+            }
+        }
+        .onChange(of: library.privateSessionID) { _, _ in
+            finishEditing()
+            dismiss()
+        }
+        .onChange(of: folder?.clientID) { _, _ in
+            finishEditing()
+            dismiss()
+        }
+    }
+
+    private func beginEditing() -> Bool {
+        guard let folder, library.requireProjectAccess() else { return false }
+        draft = folder.description
+        editingFolder = folder
+        editingSessionID = library.privateSessionID
+        saveError = nil
+        return true
+    }
+
+    private func save() {
+        guard let editingFolder, let editingSessionID else { return }
+        if library.updateProjectContext(
+            folderID: folderID, description: draft,
+            expectedClientID: editingFolder.clientID,
+            expectedDescription: editingFolder.description,
+            sessionID: editingSessionID
+        ) {
+            finishEditing()
+        } else {
+            saveError = library.statusMessage ?? "Project context could not be saved. Try again."
+        }
+    }
+
+    private func finishEditing() {
+        contextIsFocused = false
+        editingFolder = nil
+        editingSessionID = nil
+        draft = ""
+        saveError = nil
+    }
+}

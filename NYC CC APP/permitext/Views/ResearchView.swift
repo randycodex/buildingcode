@@ -468,7 +468,6 @@ private struct ResearchSessionView: View {
     @State private var historyPreviews: [String: String] = [:]
     @State private var historyPreviewRevisions: [String: String] = [:]
     @State private var historyQuery = ""
-    @State private var historyProjectFilter = "all"
     @State private var historyNextCursor: String?
     @State private var historyHasMore = false
     @State private var historyLegacySummaries: [ResearchConversationSummary]?
@@ -538,7 +537,7 @@ private struct ResearchSessionView: View {
                             buttonTitle: "View Plans",
                             section: .plan
                         )
-                    } else if let conversation, conversation.id == library.activeResearchConversationID {
+                    } else if !library.researchHistoryIsPresented, let conversation, conversation.id == library.activeResearchConversationID {
                         conversationView(conversation)
                     } else {
                         historyView
@@ -549,7 +548,7 @@ private struct ResearchSessionView: View {
             .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
             .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
             .overlay(alignment: .top) {
-                if conversation == nil || conversation?.id != library.activeResearchConversationID {
+                if library.researchHistoryIsPresented || conversation == nil || conversation?.id != library.activeResearchConversationID {
                     researchScreenHeader
                 }
             }
@@ -678,6 +677,7 @@ private struct ResearchSessionView: View {
             }
             .onChange(of: library.activeResearchConversationID) { previousID, id in
                 guard isCurrentOwner else { return }
+                library.researchHistoryIsPresented = false
                 if conversation?.id != id { conversation = nil }
                 conversationLoadID = nil
                 isLoadingConversation = false
@@ -765,7 +765,7 @@ private struct ResearchSessionView: View {
 
     private var researchHeaderButtons: some View {
         HStack(spacing: 0) {
-            if conversation != nil {
+            if conversation != nil && !library.researchHistoryIsPresented {
                 Button {
                     library.activeResearchConversationID = nil
                     self.conversation = nil
@@ -781,7 +781,7 @@ private struct ResearchSessionView: View {
                 .accessibilityLabel("Research history")
             }
 
-            if conversation == nil,
+            if conversation == nil || library.researchHistoryIsPresented,
                library.signedInAccount != nil,
                library.hasResearchAccess {
                 Button {
@@ -797,7 +797,7 @@ private struct ResearchSessionView: View {
                 .accessibilityLabel("New Research")
             }
 
-            if let conversation {
+            if let conversation, !library.researchHistoryIsPresented {
                 Menu {
                     Button("Rename", systemImage: "pencil") {
                         draftTitle = conversation.title
@@ -817,12 +817,12 @@ private struct ResearchSessionView: View {
             }
         }
         .foregroundStyle(Color.appChrome)
-        .padding(.horizontal, conversation == nil ? 0 : 4)
+        .padding(.horizontal, conversation == nil || library.researchHistoryIsPresented ? 0 : 4)
     }
 
     @ViewBuilder
     private var researchHeaderActions: some View {
-        if conversation == nil {
+        if conversation == nil || library.researchHistoryIsPresented {
             researchHeaderButtons
                 .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                 .codeLiquidGlassCircle()
@@ -837,7 +837,7 @@ private struct ResearchSessionView: View {
 
     @ViewBuilder
     private var researchScreenHeader: some View {
-        if let conversation {
+        if let conversation, !library.researchHistoryIsPresented {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center, spacing: 6) {
                     Menu {
@@ -985,6 +985,7 @@ private struct ResearchSessionView: View {
                         .listRowSeparator(.hidden)
                 }
                 Button {
+                    library.researchHistoryIsPresented = false
                     library.activeResearchConversationID = item.id
                 } label: {
                     VStack(alignment: .leading, spacing: 8) {
@@ -1048,7 +1049,7 @@ private struct ResearchSessionView: View {
     }
 
     private var historyProjectID: String? {
-        historyProjectFilter == "all" ? nil : historyProjectFilter == "unassigned" ? "" : historyProjectFilter
+        library.researchHistoryProjectFilter == "all" ? nil : library.researchHistoryProjectFilter == "unassigned" ? "" : library.researchHistoryProjectFilter
     }
 
     private var historyIsFiltered: Bool {
@@ -1056,7 +1057,7 @@ private struct ResearchSessionView: View {
     }
 
     private var historyFilterKey: String {
-        "\(historyProjectFilter.utf8.count):\(historyProjectFilter):\(historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
+        "\(library.researchHistoryProjectFilter.utf8.count):\(library.researchHistoryProjectFilter):\(historyQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
     }
 
     private func boundedHistoryQuery(_ value: String) -> String {
@@ -1087,7 +1088,7 @@ private struct ResearchSessionView: View {
             .padding(12)
             .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
             Menu {
-                Picker("Project", selection: $historyProjectFilter) {
+                Picker("Project", selection: $library.researchHistoryProjectFilter) {
                     Text("All Projects").tag("all")
                     Text("Unassigned").tag("unassigned")
                     ForEach(library.folders.filter { $0.folderType == .project }) { project in
@@ -1926,6 +1927,7 @@ private struct ResearchSessionView: View {
             )
             guard isCurrent(identity) else { return false }
             conversation = created
+            library.researchHistoryIsPresented = false
             library.activeResearchConversationID = created.id
             identity = library.researchRequestIdentity ?? identity
             failedQuestionAttempt = nil

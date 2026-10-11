@@ -2103,6 +2103,45 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         #endif
     }
 
+    @MainActor
+    func testProjectContextSavePreservesLatestOtherFieldsAndRejectsStaleDrafts() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("project-context-\(UUID().uuidString).sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
+        let store = try UserDataStore(databaseURL: url)
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let library = CodeLibraryViewModel(userContentRepository: store, preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        for _ in 0..<600 where !library.isInitialContentLoaded {
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertTrue(library.isInitialContentLoaded)
+        let fact = ProjectStructuredFact(id: "area", key: "area", label: "Area", value: "12000", status: "stated",
+                                         source: "user", sourceText: "Owner provided", updatedAt: nil)
+        let original = try XCTUnwrap(library.createFolder(name: "Original", address: "1 Centre Street",
+            description: "Original context", colorHex: CodeFolder.defaultColorHex))
+        let sessionID = library.privateSessionID
+        XCTAssertTrue(library.updateFolder(original, name: "Renamed", address: "2 Centre Street",
+            description: original.description, structuredFacts: [fact], colorHex: CodeFolder.presetColorHexes[1]))
+        XCTAssertTrue(library.updateProjectContext(folderID: original.id, description: "Revised context",
+            expectedClientID: original.clientID, expectedDescription: original.description, sessionID: sessionID))
+        let updated = try XCTUnwrap(library.folder(id: original.id))
+        XCTAssertEqual(updated.name, "Renamed")
+        XCTAssertEqual(updated.address, "2 Centre Street")
+        XCTAssertEqual(updated.structuredFacts, [fact])
+        XCTAssertEqual(updated.colorHex, CodeFolder.presetColorHexes[1])
+        XCTAssertEqual(updated.description, "Revised context")
+        XCTAssertEqual(try store.folders(codeVersion: updated.codeVersion).first?.description, "Revised context")
+        XCTAssertFalse(library.updateProjectContext(folderID: original.id, description: "Stale draft",
+            expectedClientID: original.clientID, expectedDescription: original.description, sessionID: sessionID))
+        XCTAssertFalse(library.updateProjectContext(folderID: original.id, description: "Wrong session",
+            expectedClientID: original.clientID, expectedDescription: updated.description, sessionID: UUID()))
+        XCTAssertFalse(library.updateProjectContext(folderID: original.id, description: "Wrong Project",
+            expectedClientID: "other-client", expectedDescription: updated.description, sessionID: sessionID))
+        XCTAssertEqual(library.folder(id: original.id)?.description, "Revised context")
+    }
+
     func testProjectStructuredFactsRoundTripThroughSQLiteAndSync() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-property-facts-\(UUID().uuidString).sqlite")
