@@ -1,54 +1,63 @@
-import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import vm from "node:vm";
-import { randomUUID } from "node:crypto";
-import * as syncIdentity from "../public/sync-identity.js";
-const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
-function between(start, end) {
-  const a = source.indexOf(start), b = source.indexOf(end, a + start.length);
-  assert.ok(a >= 0 && b > a, `Missing production source: ${start}`);
-  return source.slice(a, b);
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+import {randomUUID} from 'node:crypto';
+import * as syncIdentity from '../public/sync-identity.js';
+import {linkPaneToView} from '../public/workflow-views.js';
+const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+function actual(name) {
+  const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));
+  assert.ok(start>=0,name);
+  return source.slice(start,source.indexOf('\n}',start)+2);
 }
-const registration = between('  addReaderButton.addEventListener("click", async () => {', '  toggleArchiveButton?.addEventListener');
-const factory = between("function newReaderState(", "function sectionRouteIDFromLocation(");
-// Execute the production callback with unresolved catalog/render work. Previously
-// concurrent clicks passed the limit against a stale count before catalog completion.
-async function check(pro) {
-  let click, resolveCatalog, resolveRender;
-  let requests = 0, renders = 0, limits = 0;
-  const catalog = new Promise(resolve => { resolveCatalog = resolve; });
-  const rendering = new Promise(resolve => { resolveRender = resolve; });
-  const state = { readers: [] }, scrolled = [];
-  const context = vm.createContext({
-    ...syncIdentity, crypto: { randomUUID }, state,
-    addReaderButton: { addEventListener(type, callback) { assert.equal(type, "click"); click = callback; } },
-    isProAccount: () => pro,
-    enforceReaderPlanLimit: () => { limits++; assert.ok(state.readers.length <= 2); },
-    firstChapterIDForCode: () => { requests++; return catalog; },
-    saveWorkspaceState() {},
-    transitionWorkspace: () => { renders++; return rendering; },
-    paneIDForReader: reader => reader.id,
-    scrollPaneIntoView: id => scrolled.push(id)
+function fixture({pro=true,view='notebook'}={}) {
+  let finishRender;
+  const rendering=new Promise(resolve=>{finishRender=resolve;});
+  const pickers=[], scrolled=[];
+  const c=vm.createContext({
+    ...syncIdentity,crypto:{randomUUID},state:{readers:[],workflowNavigationGeneration:0},
+    activeWorkspaceID:'project-a',view,accountCurrent:true,needsProject:false,
+    isProAccount:()=>pro,
+    notifyProjectRequiredForColumn:()=>c.needsProject,
+    workspaceColumnsRequireProject:()=>c.needsProject,
+    captureAccountRequest:()=>1,isCurrentAccountRequest:()=>c.accountCurrent,
+    currentColumnWorkflowView:()=>c.view,
+    openReaderCodePicker:(button,pick)=>pickers.push(pick),
+    codeOptionVersion:code=>code.version,paneIDForReader:reader=>`reader:${reader.id}`,
+    linkPaneToView,saveWorkspaceState(){},enforceReaderPlanLimit(){},
+    transitionWorkspace:()=>rendering,scrollPaneIntoView:id=>scrolled.push(id)
   });
-  vm.runInContext(`${factory}\n${registration}`, context);
-  const pending = [click(), click(), click()];
-  assert.equal(requests, 0, "Adding a Reader must mount before catalog completion.");
-  assert.equal(state.readers.length, pro ? 3 : 2, "Concurrent clicks reserve slots synchronously.");
-  assert.equal(renders, 3, "Accepted actions and limit responses reach rendering with catalog unresolved.");
-  assert.equal(limits, pro ? 0 : 1);
-  assert.equal(new Set(state.readers.map(reader => reader.id)).size, state.readers.length);
-  for (const reader of state.readers) {
-    assert.equal(reader.codePrefix, "BC");
-    assert.equal(reader.codeVersion, syncIdentity.defaultSyncCodeVersion);
-    assert.equal(reader.chapterID, "", "Cancellable Reader navigation selects the first chapter.");
-  }
-  resolveRender();
-  await Promise.all(pending);
-  assert.equal(scrolled.length, state.readers.length);
-  resolveCatalog("unused-late-chapter");
-  await Promise.resolve();
-  assert.ok(state.readers.every(reader => reader.chapterID === ""));
+  vm.runInContext(actual('newReaderState')+'\n'+actual('openReaderFromToolbar'),c);
+  return {c,pickers,scrolled,finishRender};
 }
-await check(false);
-await check(true);
-console.log("Reader add: immediate insertion, default edition and concurrent plan limits passed.");
+const code={prefix:'PC',version:'2022'};
+for (const view of ['research','notebook','report','project-details']) {
+  const f=fixture({view});
+  await f.c.openReaderFromToolbar({});
+  assert.equal(f.c.state.readers.length,0,'Wait for an explicit code selection');
+  const pending=f.pickers[0](code);
+  const reader=f.c.state.readers[0];
+  assert.equal(reader.codePrefix,'PC');assert.equal(reader.codeVersion,'2022');
+  assert.equal(reader.chapterID,'','Navigation resolves the first chapter asynchronously');
+  assert.deepEqual(Array.from(f.c.state.workflowMembership[`reader:${reader.id}`]),[view]);
+  f.finishRender();await pending;
+  assert.deepEqual(f.scrolled,[`reader:${reader.id}`]);
+}
+// A menu opened before a context change must not insert a Reader into the new view.
+for (const change of [c=>{c.view='report';},c=>{c.activeWorkspaceID='project-b';},c=>{c.accountCurrent=false;},c=>{c.needsProject=true;},c=>{c.state.workflowNavigationGeneration+=2;}]) {
+  const f=fixture();await f.c.openReaderFromToolbar({});change(f.c);
+  await f.pickers[0](code);assert.equal(f.c.state.readers.length,0);
+}
+// Reserve slots synchronously so overlapping menu selections respect plan limits.
+for (const pro of [false,true]) {
+  const f=fixture({pro});
+  await Promise.all([f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({}),f.c.openReaderFromToolbar({})]);
+  const pending=f.pickers.map(pick=>pick(code));
+  assert.equal(f.c.state.readers.length,pro?3:2);
+  assert.equal(new Set(f.c.state.readers.map(r=>r.id)).size,f.c.state.readers.length);
+  f.c.view='research';f.finishRender();await Promise.all(pending);
+  assert.equal(f.scrolled.length,0,'Late rendering must not reveal a pane over another selected view');
+}
+const guarded=fixture();guarded.c.needsProject=true;
+assert.equal(await guarded.c.openReaderFromToolbar({}),false);assert.equal(guarded.pickers.length,0);
+console.log('Readers passed: explicit source selection, four working views, project/account/navigation guards, concurrent plan limits and late-render fencing.');

@@ -1,4 +1,4 @@
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore } from "./workflow-views.js?v=2";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth } from "./workflow-views.js?v=3";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls } from "./report-library.js?v=20261011-left-library-v1";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
@@ -139,7 +139,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261011-workflow-views-v14";
+} from "./workspace-state.js?v=20261011-workflow-views-v15";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2731,13 +2731,13 @@ async function openProjectReportDraft(project) {
     projectName: identity.name,
     mount: document.querySelector(".workspace-shell"),
     coveredElements: [track, document.querySelector(".workflow-toolbar")].filter(Boolean),
-    onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowNavigation(); },
+    onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
     backLabel: () => `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     openProjectDetails: () => void openProjectDetailsScreen(),
     load: () => renderProjectReportDraft(identity),
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
       hasCapability("professional-exports") && projectDetailMatches(workspaceProject(), identity),
-    onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncProjectToolButtonStates(identity); syncWorkflowNavigation(); },
+    onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncProjectToolButtonStates(identity); syncWorkflowColumnPresentation(); },
     onDispose: () => {
       reportDraftMounts.get(projectID)?.dispose?.();
       reportDraftMounts.delete(projectID);
@@ -3668,7 +3668,7 @@ async function openProjectDetailsScreen(section = null) {
     screenTitle: "Project details", screenClass: "project-details-screen", projectName: identity.name,
     mount: document.querySelector(".workspace-shell"),
     coveredElements: [track, document.querySelector(".workflow-toolbar")].filter(Boolean),
-    onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowNavigation(); },
+    onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
     backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects"),
@@ -3689,10 +3689,11 @@ async function openProjectDetailsScreen(section = null) {
         panel.querySelectorAll(".saved-project-structured-fact-value").forEach(input => { input.placeholder = "Not recorded"; });
         panels.set(kind, panel); content.append(panel);
       }
+      tabs.append(createReaderToolbarButton());
       selectSection(section || "context");
       return content;
     },
-    onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowNavigation(); },
+    onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
     onDispose: () => {
       for (const [kind, panel] of panels) {
         const key = paneIDForProjectInformation(identity, kind);
@@ -4179,11 +4180,54 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 
 const workflowScrollStore = createWorkflowScrollStore();
 function currentWorkflowView() { return normalizeWorkflowView(state.workflowView); }
+function currentColumnWorkflowView() {
+  return projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
+}
+let presentedColumnWorkflowView = currentWorkflowView();
 function workflowPaneAnchors() {
   return Object.fromEntries(Object.entries(sectionDetailAnchorsBySearch()).map(([id, anchor]) => [paneIDForSectionDetail(id), anchor]));
 }
 function workflowPaneIsVisible(paneID) {
-  return detachedProjectWindow || paneBelongsToView(paneID, currentWorkflowView(), state.workflowMembership, workflowPaneAnchors());
+  return detachedProjectWindow || paneBelongsToView(paneID, currentColumnWorkflowView(), state.workflowMembership, workflowPaneAnchors());
+}
+function syncReferenceReaderLayout() {
+  const shell = document.querySelector(".workspace-shell");
+  if (!shell) return;
+  const view = currentColumnWorkflowView();
+  const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
+  const screenOpen = view === "report" || view === "project-details";
+  const visibleIDs = screenOpen ? defaultActivePaneIDs().filter(workflowPaneIsVisible) : [];
+  const widths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : Math.max(minimumPaneWidthForID(id), state.paneWeights[id] || defaultPaneWidthForID(id)));
+  const width = referenceColumnsWidth(widths, shell.clientWidth, view === "report" ? 700 : 420);
+  shell.classList.toggle("has-reference-readers", !accountOpen && width > 0);
+  shell.style.setProperty("--reference-readers-width", `${width}px`);
+  shell.classList.toggle("has-compact-reference-document", !accountOpen && screenOpen && shell.clientWidth - width <= 1100);
+  track.inert = accountOpen || screenOpen && !visibleIDs.length;
+}
+function syncWorkflowColumnPresentation() {
+  const view = currentColumnWorkflowView();
+  const panes = [...track.querySelectorAll(':scope > .workspace-panel')];
+  if (view !== presentedColumnWorkflowView) {
+    const readerPositions = captureReaderScrollPositions();
+    panes.forEach(pane => { if (readerPositions.has(pane.dataset.paneId)) pane._workflowReaderPosition = readerPositions.get(pane.dataset.paneId); });
+    workflowScrollStore.capture(panes.filter(pane => !pane.classList.contains('is-workflow-hidden')));
+    state.workflowScroll ||= {};
+    state.workflowScroll[presentedColumnWorkflowView] = track.scrollLeft;
+    presentedColumnWorkflowView = view;
+    appendPaneSequence(panes);
+    workflowScrollStore.restore(panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId)));
+    restoreReaderScrollPositions(new Map(panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId) && pane._workflowReaderPosition)
+      .map(pane => [pane.dataset.paneId, pane._workflowReaderPosition])));
+    panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId)).forEach(pane => {
+      const target = pane._workflowPendingReaderTarget;
+      if (target?.isConnected) {
+        delete pane._workflowPendingReaderTarget;
+        requestAnimationFrame(() => stabilizeReaderSectionAtHeader(pane.querySelector('.reader-content'), target, 'auto'));
+      }
+    });
+    track.scrollLeft = state.workflowScroll[view] || 0;
+  }
+  syncWorkflowNavigation();
 }
 function closeSharedWorkspaceViews(except = "") {
   if (except !== "report") reportScreen?.close();
@@ -4199,6 +4243,8 @@ function syncWorkflowNavigation() {
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === view));
   });
   document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
+  syncReferenceReaderLayout();
+  document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
 }
 async function switchWorkflowView(view) {
   closeSharedWorkspaceViews();
@@ -4206,27 +4252,9 @@ async function switchWorkflowView(view) {
   view = normalizeWorkflowView(view);
   if (view !== currentWorkflowView()) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
-    const panes = [...track.querySelectorAll(':scope > .workspace-panel')];
-    const readerPositions = captureReaderScrollPositions();
-    panes.forEach(pane => { if (readerPositions.has(pane.dataset.paneId)) pane._workflowReaderPosition = readerPositions.get(pane.dataset.paneId); });
-    workflowScrollStore.capture(panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId)));
-    state.workflowScroll ||= {};
-    state.workflowScroll[currentWorkflowView()] = track.scrollLeft;
     state.workflowView = view;
-    appendPaneSequence(panes);
-    workflowScrollStore.restore(panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId)));
-    restoreReaderScrollPositions(new Map(panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId) && pane._workflowReaderPosition)
-      .map(pane => [pane.dataset.paneId, pane._workflowReaderPosition])));
-    panes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId)).forEach(pane => {
-      const target = pane._workflowPendingReaderTarget;
-      if (target?.isConnected) {
-        delete pane._workflowPendingReaderTarget;
-        requestAnimationFrame(() => stabilizeReaderSectionAtHeader(pane.querySelector('.reader-content'), target, 'auto'));
-      }
-    });
-    track.scrollLeft = state.workflowScroll[view] || 0;
   }
-  syncWorkflowNavigation();
+  syncWorkflowColumnPresentation();
   saveWorkspaceState();
   if (!defaultActivePaneIDs().some(workflowPaneIsVisible)) {
     if (view === 'notebook') await openProjectNotebook(workspaceProject());
@@ -4531,7 +4559,7 @@ const pendingLinkedPanePlacements = new Map();
 
 function requestLinkedPanePlacement(anchorPaneID, paneID) {
   if (!anchorPaneID || !paneID || anchorPaneID === paneID) return;
-  state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, currentWorkflowView());
+  state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, currentColumnWorkflowView());
   pendingLinkedPanePlacements.set(paneID, { anchorPaneID, workspaceID: activeWorkspaceID });
 }
 
@@ -5133,7 +5161,7 @@ function setUtilityButtonStates() {
   [toggleArchiveButton, toggleSearchButton, toggleSavedButton, toggleAnalysisButton, toggleWorkboardButton]
     .forEach((button) => { if (button) button.disabled = false; });
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
-  addReaderButton.classList.toggle("has-open-reader", state.readers.length > 0);
+  document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
@@ -8151,21 +8179,75 @@ function isProAccount() {
   return currentPlan() === "pro";
 }
 
-function updateReaderPlanControls() {
+function syncReaderToolbarButton(button) {
   const requiresProject = workspaceColumnsRequireProject();
   const limitReached = !isProAccount() && state.readers.length >= 2;
   const readerLabel = "Reader";
-  addReaderButton.querySelector("span").textContent = readerLabel;
-  addReaderButton.dataset.mobileLabel = readerLabel;
-  addReaderButton.hidden = false;
-  addReaderButton.disabled = limitReached;
-  addReaderButton.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "Two Reader limit reached" : readerLabel;
-  addReaderButton.setAttribute(
+  button.querySelector("span").textContent = readerLabel;
+  button.dataset.mobileLabel = readerLabel;
+  button.hidden = false;
+  button.disabled = !requiresProject && limitReached;
+  button.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "Two Reader limit reached" : "Open a Reader beside this view";
+  button.classList.toggle("has-open-reader", state.readers.some(reader => workflowPaneIsVisible(paneIDForReader(reader))));
+  button.setAttribute(
     "aria-label",
-    limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
+    !requiresProject && limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
   );
+}
+
+function updateReaderPlanControls() {
+  document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
+}
+
+function readerToolbarButtonForCurrentView() {
+  return [...document.querySelectorAll('[data-open-reader]')].find(button => button.getClientRects().length) || addReaderButton;
+}
+
+function createReaderToolbarButton() {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "toolbar-button";
+  button.dataset.openReader = "";
+  const label = document.createElement("span");
+  button.append(label);
+  syncReaderToolbarButton(button);
+  bindReaderToolbarButton(button);
+  return button;
+}
+
+function bindReaderToolbarButton(button) {
+  if (button.dataset.readerBound === "true") return;
+  button.dataset.readerBound = "true";
+  button.addEventListener("click", () => void openReaderFromToolbar(button));
+}
+
+async function openReaderFromToolbar(button) {
+  if (notifyProjectRequiredForColumn()) return false;
+  if (!isProAccount() && state.readers.length >= 2) {
+    enforceReaderPlanLimit();
+    await transitionWorkspace("utility");
+    return false;
+  }
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const view = currentColumnWorkflowView();
+  const generation = state.workflowNavigationGeneration || 0;
+  const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    currentColumnWorkflowView() === view && (state.workflowNavigationGeneration || 0) === generation;
+  openReaderCodePicker(button, async code => {
+    if (!isCurrent() || workspaceColumnsRequireProject()) return;
+    // Reserve a slot before asynchronous rendering, including late picker clicks.
+    if (!isProAccount() && state.readers.length >= 2) return;
+    const reader = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
+    state.readers.push(reader);
+    state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(reader), view);
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+    if (isCurrent()) scrollPaneIntoView(paneIDForReader(reader));
+  });
+  return true;
 }
 
 function enforceReaderPlanLimit() {
@@ -29019,7 +29101,7 @@ async function renderProjectReportDraft(project) {
         snapshot: { label: `Report: ${activeDraft.title || "Untitled Report"}` }
       });
     });
-    primaryActions.append(save, generate, coordinate);
+    primaryActions.append(save, generate, coordinate, createReaderToolbarButton());
 
     const appendOutputDisclosure = (label, body, className, stateKey = label) => {
       const section = document.createElement("section");
@@ -39183,6 +39265,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
 }
 
 function notifyWorkspaceLayoutChange() {
+  syncReferenceReaderLayout();
   track.dispatchEvent(new Event("permitext:workspace-layout-change"));
 }
 
@@ -39933,6 +40016,7 @@ function appendPaneSequence(panes) {
   bindPaneDragging(orderedPanes);
   const visiblePanes = orderedPanes.filter(pane => workflowPaneIsVisible(pane.dataset.paneId));
   orderedPanes.forEach(pane => pane.classList.toggle('is-workflow-hidden', !visiblePanes.includes(pane)));
+  presentedColumnWorkflowView = currentColumnWorkflowView();
   syncWorkflowNavigation();
   if (visiblePanes.length) {
     const firstPaneID = visiblePanes[0].dataset.paneId;
@@ -39995,7 +40079,7 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
   if (!workflowPaneIsVisible(paneID)) {
-    state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, currentWorkflowView());
+    state.workflowMembership = linkPaneToView(state.workflowMembership, paneID, currentColumnWorkflowView());
     appendPaneSequence([...track.querySelectorAll(':scope > .workspace-panel')]);
     saveWorkspaceState();
   }
@@ -44086,7 +44170,7 @@ function workspaceCommandDefinitions() {
     { label: "Open Search", hint: "Find sections across all codes", run: () => openNewSearchColumn() },
     { label: "Open Research", hint: "Ask a cited building-code question", run: () => focusUtility("analysis", ".research-question-input") },
     ...(isProAccount() || state.readers.length < 2
-      ? [{ label: "New Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
+      ? [{ label: "New Reader", hint: "Open another code column", run: () => readerToolbarButtonForCurrentView().click() }]
       : []),
     { label: "Open Evidence and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open Account", hint: "Plan, account, sync, and privacy", run: () => focusUtility("settings") },
@@ -44358,6 +44442,7 @@ async function start() {
   window.addEventListener("resize", repositionActiveCustomSelect);
   window.addEventListener("resize", keepFocusedWorkspacePaneVisible, { passive: true });
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
+  window.addEventListener("resize", syncReferenceReaderLayout, { passive: true });
   track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates);
   bindWorkspaceKeyboardNavigation();
   window.addEventListener("storage", (event) => {
@@ -44521,22 +44606,7 @@ async function start() {
   } catch {
     localStorage.removeItem("permitext:pendingWorkboardReattach");
   }
-  addReaderButton.addEventListener("click", async () => {
-    if (notifyProjectRequiredForColumn()) return;
-    if (!isProAccount() && state.readers.length >= 2) {
-      enforceReaderPlanLimit();
-      await transitionWorkspace("utility");
-      return;
-    }
-    openReaderCodePicker(addReaderButton, async (code) => {
-      if (workspaceColumnsRequireProject()) return;
-      const reader = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
-      state.readers.push(reader);
-      saveWorkspaceState();
-      await transitionWorkspace("utility");
-      scrollPaneIntoView(paneIDForReader(reader));
-    });
-  });
+  document.querySelectorAll('[data-open-reader]').forEach(bindReaderToolbarButton);
   toggleArchiveButton?.addEventListener("click", () => {
     toggleUtilityPane("archive");
   });

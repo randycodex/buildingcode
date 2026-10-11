@@ -1,10 +1,12 @@
 // View membership is presentation state. Editors stay mounted and keep their
 // canonical data; a linked destination may be visible in both working views.
 export function normalizeWorkflowView(value) { return value === 'notebook' ? 'notebook' : 'research'; }
+export const columnWorkflowViews = ['research', 'notebook', 'report', 'project-details'];
+export function normalizeColumnWorkflowView(value) { return columnWorkflowViews.includes(value) ? value : 'research'; }
 export function normalizeWorkflowMembership(value) {
   return Object.fromEntries(Object.entries(value && typeof value === 'object' ? value : {})
     .filter(([id, views]) => id && Array.isArray(views))
-    .map(([id, views]) => [id, [...new Set(views.filter(view => ['research', 'notebook'].includes(view)))]]));
+    .map(([id, views]) => [id, [...new Set(views.filter(view => columnWorkflowViews.includes(view)))]]));
 }
 export function workflowHome(paneID, anchors = {}) {
   if (/^(?:project:notebook:|utility:saved(?::|$))/.test(paneID)) return 'notebook';
@@ -17,7 +19,12 @@ export function paneBelongsToView(paneID, view, membership, anchors) {
 }
 export function linkPaneToView(membership, paneID, view) {
   const home = /^(?:project:notebook:|utility:saved(?::|$))/.test(paneID) ? ['notebook'] : [];
-  return {...membership, [paneID]: [...new Set([...home, ...(membership?.[paneID] || []), normalizeWorkflowView(view)])]};
+  return {...membership, [paneID]: [...new Set([...home, ...(membership?.[paneID] || []), normalizeColumnWorkflowView(view)])]};
+}
+export function referenceColumnsWidth(widths, availableWidth, documentWidth = 420) {
+  if (!widths.length) return 0;
+  const requested = widths.reduce((sum, width) => sum + width, widths.length + 1);
+  return Math.min(requested, Math.max(320, availableWidth - documentWidth));
 }
 // Keep scroll snapshots per DOM node, not indexes: asynchronous hydration may
 // replace a loading shell while the other view is active.

@@ -19211,6 +19211,31 @@ dialog.report-export-review {
 .workspace-shell:has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 4; }
 .workspace-shell > .workspace-issue { grid-column: 1; grid-row: 3; }
 
+/* Reference columns share the retained workspace track beside a document. */
+.workspace-shell.has-reference-readers {
+  grid-template-columns: minmax(0, 1fr) var(--reference-readers-width);
+}
+.workspace-shell.has-reference-readers > .topbar { grid-column: 1 / -1; }
+.workspace-shell.has-reference-readers > .panel-track {
+  grid-column: 2; grid-row: 3; z-index: 3;
+  width: 100%; min-width: 0; border-left: 1px solid var(--border);
+}
+.workspace-shell.has-reference-readers:has(> .report-workspace-view:not([hidden])) > .panel-track {
+  visibility: visible;
+}
+.workspace-shell.has-reference-readers::after {
+  content: ""; grid-column: 2; grid-row: 2; z-index: 3;
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  pointer-events: none;
+}
+.workspace-shell.has-compact-reference-document .report-screen .report-outline { display: none; }
+.workspace-shell.has-compact-reference-document .report-screen .report-draft-shell { grid-template-columns: minmax(0, 1fr); }
+.workspace-shell.has-compact-reference-document .report-screen .report-document { grid-column: 1; padding-inline: 28px; }
+.workspace-shell.has-compact-reference-document .report-screen [data-library-open="true"] .report-draft-shell {
+  grid-template-columns: min(var(--report-library-width, 330px), max(280px, calc(100% - 420px))) 1px minmax(0, 1fr);
+}
+.workspace-shell.has-compact-reference-document .report-screen [data-library-open="true"] .report-document { grid-column: 3; }
+
 /* Match the shared Research and Notebook toolbar without column spacing. */
 .report-workspace-view .workspace-panel.report-draft-panel { padding: 0; }
 .report-workspace-view .workspace-panel.report-draft-panel .report-draft-shell {
@@ -19276,6 +19301,9 @@ dialog.report-export-review {
 .topbar :is(.topbar-actions > button, .workspace-actions-button, .topbar-settings-button):is([aria-pressed="true"], [aria-expanded="true"]),
 .topbar .topbar-layout-menu[open] > summary,
 .workflow-toolbar .toolbar-button[aria-pressed="true"],
+.workflow-toolbar .toolbar-button.has-open-reader,
+.project-details-screen [data-open-reader].has-open-reader,
+.report-workspace-view [data-open-reader].has-open-reader,
 .project-details-screen .project-details-tabs button[aria-pressed="true"],
 .report-workspace-view .report-draft-shell .report-draft-primary-actions > button[aria-expanded="true"] {
   --top-menu-font-weight: 700;

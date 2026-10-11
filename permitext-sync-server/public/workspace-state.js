@@ -1,4 +1,4 @@
-import { normalizeWorkflowView, normalizeWorkflowMembership } from "./workflow-views.js?v=2";
+import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=3";
 const workspaceRegistryVersion = 3;
 const defaultWorkspaceName = "General";
 const maximumWorkspaceNameLength = 40;
@@ -379,7 +379,7 @@ export function normalizeWorkspaceLayout(value = {}) {
     : {};
   layout.workflowView = normalizeWorkflowView(source.workflowView);
   layout.workflowMembership = normalizeWorkflowMembership(source.workflowMembership);
-  layout.workflowScroll = Object.fromEntries(['research', 'notebook'].map(view =>
+  layout.workflowScroll = Object.fromEntries(columnWorkflowViews.map(view =>
     [view, Math.max(0, Number(source.workflowScroll?.[view]) || 0)]));
   layout.trackScrollLeft = Number.isFinite(Number(source.trackScrollLeft))
     ? Math.max(0, Number(source.trackScrollLeft))
