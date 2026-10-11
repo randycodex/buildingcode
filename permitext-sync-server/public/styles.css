@@ -19232,14 +19232,14 @@ dialog.report-export-review {
 /* Keep the Account disclaimer on the screen centerline within a 42px footer. */
 .account-workspace-view .settings-panel .settings-footer {
   position: relative; height: 42px; min-height: 42px; box-sizing: border-box;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr); gap: 0 16px;
   padding: 4px 24px; font-size: 11.5px; line-height: 1.3;
 }
 .account-workspace-view .settings-footer > .settings-feedback-link { grid-column: 1; grid-row: 1; }
 .account-workspace-view .settings-panel .settings-footer .settings-disclaimer {
-  grid-column: 2; grid-row: 1; width: 100%; max-width: 760px;
-  justify-self: center; margin: 0; text-align: center;
+  grid-column: 2; grid-row: 1; width: max-content; max-width: none;
+  align-self: center; justify-self: center; margin: 0; text-align: center; white-space: nowrap;
 }
 .account-workspace-view .settings-footer-links { grid-column: 3; grid-row: 1; margin: 0; gap: 0 12px; }
 .account-workspace-view .settings-panel .settings-footer > .settings-status-message:not(:empty) {
