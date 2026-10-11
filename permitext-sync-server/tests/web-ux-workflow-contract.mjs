@@ -24,8 +24,13 @@ assert.match(actual('renderResearch'),/historySearch.maxLength = 200/);
 assert.match(actual('readResearchHistoryPage'),/q: boundedResearchHistoryQuery/);
 
 const pressed={};const button=name=>({setAttribute:(key,value)=>pressed[name]=value,classList:{toggle(){}}});
-const chrome=vm.createContext({state:{readers:[],utilityInstances:[{key:'analysis'}],utilities:{analysis:false}},addReaderButton:button('reader'),toggleArchiveButton:button('archive'),toggleSearchButton:button('search'),toggleSavedButton:button('saved'),toggleAnalysisButton:button('analysis'),toggleWorkboardButton:button('workboard'),toggleSettingsButton:button('settings'),hasCapability:()=>true,genericWorkboardIsOpen:()=>false});
+const chrome=vm.createContext({workspaceColumnsRequireProject:()=>false,syncTopbarProjectToolStates(){},state:{readers:[],utilityInstances:[{key:'analysis'}],utilities:{analysis:false}},addReaderButton:button('reader'),toggleArchiveButton:button('archive'),toggleSearchButton:button('search'),toggleSavedButton:button('saved'),toggleAnalysisButton:button('analysis'),toggleWorkboardButton:button('workboard'),toggleSettingsButton:button('settings'),hasCapability:()=>true,genericWorkboardIsOpen:()=>false});
 vm.runInContext(actual('setUtilityButtonStates'),chrome);chrome.setUtilityButtonStates();assert.equal(pressed.analysis,'true');chrome.state.utilityInstances=[];chrome.setUtilityButtonStates();assert.equal(pressed.analysis,'false');chrome.state.utilities.analysis=true;chrome.setUtilityButtonStates();assert.equal(pressed.analysis,'true');
+
+chrome.workspaceColumnsRequireProject=()=>true;chrome.setUtilityButtonStates();
+for(const control of ['toggleSavedButton','toggleSearchButton','toggleAnalysisButton','toggleWorkboardButton'])assert.equal(chrome[control].disabled,true,'Project-less workspace disables column controls');
+chrome.workspaceColumnsRequireProject=()=>false;chrome.setUtilityButtonStates();
+assert.equal(chrome.toggleSearchButton.disabled,false,'Project creation re-enables column controls');
 
 // Invoke the real Report handoff click handler, including failed remote save and races.
 const reportStart=source.indexOf('reportButton.addEventListener("click", async () => {');
@@ -37,7 +42,7 @@ assert.equal((await reviewReport()).promotions.length,1,'Only acknowledged clean
 
 let account='owner',opened=0;const focused=[],scrolled=[],expanded=[];
 const state={utilityInstances:[{id:'first',key:'search',query:'stairs'},{id:'second',key:'search',query:'fire'},{id:'research',key:'analysis',draft:'unsent',conversationID:'answer'}],utilities:{},paneOrder:[]};
-const c=vm.createContext({state,activeWorkspaceID:'one',activeAccount:()=>({userID:account}),paneIDForUtilityInstance:i=>i.id,whenWorkspacePaneReady:async()=>true,CSS:{escape:s=>s},track:{querySelector:selector=>{const id=selector.match(/data-pane-id="([^"]+)"/)[1];return {dataset:{paneId:id},querySelector:()=>({focus:()=>focused.push(id)})};}},columnGroupForPane:id=>id==='first'?{collapsed:true}:null,setColumnGroupCollapsed:()=>expanded.push('group'),paneIsCollapsed:id=>id==='first',setPaneCollapsed:()=>expanded.push('pane'),scrollPaneIntoView:id=>scrolled.push(id),openNewSearchColumn:async()=>opened++,openNewResearchColumn:async()=>opened++,focusUtility:async()=>{}});
+const c=vm.createContext({workspaceColumnsRequireProject:()=>false,state,activeWorkspaceID:'one',activeAccount:()=>({userID:account}),paneIDForUtilityInstance:i=>i.id,whenWorkspacePaneReady:async()=>true,CSS:{escape:s=>s},track:{querySelector:selector=>{const id=selector.match(/data-pane-id="([^"]+)"/)[1];return {dataset:{paneId:id},querySelector:()=>({focus:()=>focused.push(id)})};}},columnGroupForPane:id=>id==='first'?{collapsed:true}:null,setColumnGroupCollapsed:()=>expanded.push('group'),paneIsCollapsed:id=>id==='first',setPaneCollapsed:()=>expanded.push('pane'),scrollPaneIntoView:id=>scrolled.push(id),openNewSearchColumn:async()=>opened++,openNewResearchColumn:async()=>opened++,focusUtility:async()=>{}});
 vm.runInContext('const recentUtilityColumns=new Map();'+actual('rememberUtilityColumn')+actual('focusRecentUtilityColumn'),c);
 await c.focusRecentUtilityColumn('search');assert.equal(focused.at(-1),'second');
 c.rememberUtilityColumn('first');await c.focusRecentUtilityColumn('search');assert.equal(focused.at(-1),'first');assert.deepEqual(expanded,['group','pane']);

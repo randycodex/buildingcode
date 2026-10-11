@@ -20,7 +20,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  captureAccountRequest:()=>({account}),isCurrentAccountRequest:id=>id.account===account,activeAccount:()=>({userID:account}),
  ensureSyncedContentForRender:async()=>{pulls++;if(!syncResult)await sync.promise;return syncResult;},
  loadSyncedContent:async()=>{forcePulls++;return forceResult;},
- reconcileProjectWorkspaces:noop,scopeSavedInstanceToWorkspace:noop,enforceReaderPlanLimit:noop,
+ reconcileProjectWorkspaces:noop,enforceProjectRequiredWorkspace:noop,workspaceColumnsRequireProject:()=>false,scopeSavedInstanceToWorkspace:noop,enforceReaderPlanLimit:noop,
  closeDeletedProjectDetails:()=>{if(removeNotebookOnVerify)desired=desired.filter(d=>d.id!=="notebook");},
  restoreResearchWorkspaceState:noop,captureReaderScrollPositions:()=>new Map(),updateReaderPlanControls:noop,
  renderWorkspaceTabs:noop,renderCodeQuestionShellChrome:noop,normalizePaneWeights:noop,activePaneIDs:()=>desired.map(d=>d.id),setUtilityButtonStates:noop,

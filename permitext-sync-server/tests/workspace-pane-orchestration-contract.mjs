@@ -155,6 +155,7 @@ const buildEditor = (id, required) => {
 };
 const noop=()=>{};
 const descriptorContext=vm.createContext({
+  workspaceColumnsRequireProject:()=>false,
   captureAccountRequest:()=>({}), activeWorkspaceID:"workspace", isCurrentAccountRequest:()=>true,
   state:{utilities:{},utilityInstances:[],readers:[]},detachedProjectWindow:false,
   genericWorkboardIsOpen:()=>true,genericWorkboardIdentity:{id:'board'},

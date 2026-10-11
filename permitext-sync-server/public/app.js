@@ -102,7 +102,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261010-report-status-removed-v768";
+} from "./offline-storage.js?v=20261010-project-required-v769";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -140,7 +140,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261010-report-status-removed-v768";
+} from "./research-intent-state.js?v=20261010-project-required-v769";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1737,6 +1737,31 @@ function workspaceProject(projects = null) {
   const id = activeWorkspaceRecord()?.projectID;
   return id ? activeFolderRecords(mergeProjectsWithOrganizationAccess(visibleProjectRecords(projects ?? currentContentSummary().projects ?? [])))
     .find((project) => projectRecordID(project) === id) || null : null;
+}
+
+function workspaceColumnsRequireProject() {
+  const account = activeAccount();
+  // Public reading remains available. Only an authoritative project-capable
+  // account snapshot can establish that the last Project is gone.
+  if (!account || !hasCapability("projects") || syncedContent?.userID !== account.userID ||
+      !["verified", "permitted-offline"].includes(syncedContent?.workspacePresentationAccess)) return false;
+  return !activeFolderRecords(mergeProjectsWithOrganizationAccess(syncedContent.summary?.projects || []))
+    .some(folderIsProject);
+}
+
+function enforceProjectRequiredWorkspace() {
+  if (!workspaceColumnsRequireProject()) return false;
+  if (state.readers.length || state.utilityInstances.length || openProjectDetails().length ||
+      Object.values(state.utilities).some(Boolean) || openCodeQuestionPaneIDs().length ||
+      supplementalResearchConversationIDs.length) {
+    // Clear the open layout, preserving account data and the retired Project's
+    // saved snapshot so Trash recovery remains available.
+    applyStoredWorkspaceLayout(emptyWorkspaceLayout());
+    setCodeQuestionWorkspaceState(closeCodeDecisionContext(codeQuestionWorkspaceState()),
+      { activeProjectID: "", syncDeepLink: true });
+    document.querySelector(".code-decision-context-bar")?.remove();
+  }
+  return true;
 }
 
 function reconcileProjectWorkspaces() {
@@ -4069,6 +4094,7 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 }
 
 function defaultActivePaneIDs() {
+  if (workspaceColumnsRequireProject()) return [];
   if (detachedProjectWindow && detachedProject) {
     return [paneIDForProjectWorkboard(detachedProject)];
   }
@@ -4929,6 +4955,9 @@ function applyPaneWeight(panel, paneID) {
 }
 
 function setUtilityButtonStates() {
+  const requiresProject = workspaceColumnsRequireProject();
+  [toggleArchiveButton, toggleSearchButton, toggleSavedButton, toggleAnalysisButton, toggleWorkboardButton]
+    .forEach((button) => { if (button) button.disabled = requiresProject; });
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   addReaderButton.classList.toggle("has-open-reader", state.readers.length > 0);
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
@@ -7944,16 +7973,17 @@ function isProAccount() {
 }
 
 function updateReaderPlanControls() {
+  const requiresProject = workspaceColumnsRequireProject();
   const limitReached = !isProAccount() && state.readers.length >= 2;
   const readerLabel = state.readers.length > 0 ? "+ Reader" : "Reader";
   addReaderButton.querySelector("span").textContent = readerLabel;
   addReaderButton.dataset.mobileLabel = readerLabel;
   addReaderButton.hidden = false;
-  addReaderButton.disabled = limitReached;
-  addReaderButton.title = limitReached ? "Two Reader limit reached" : readerLabel;
+  addReaderButton.disabled = requiresProject || limitReached;
+  addReaderButton.title = requiresProject ? "Create a Project to open columns" : limitReached ? "Two Reader limit reached" : readerLabel;
   addReaderButton.setAttribute(
     "aria-label",
-    limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
+    requiresProject ? "Create a Project to open Reader" : limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
   );
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
@@ -34782,10 +34812,12 @@ function appendEmptySaved(container, title, message) {
 }
 
 async function openDeepLinkedSectionInReader(item) {
+  if (workspaceColumnsRequireProject()) return;
   const requestIdentity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   let navigationItem;
   const isCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    !workspaceColumnsRequireProject() &&
     (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext));
   navigationItem = await resolveReaderSource(item, {isCurrent});
   if (!navigationItem || !isCurrent()) return;
@@ -34978,10 +35010,12 @@ function reusableSearchReader(readers, anchorPaneID, forceNewReader = false) {
 }
 
 async function openSourceInReader(item, anchorPaneID = "", options = {}) {
+  if (workspaceColumnsRequireProject()) return null;
   const requestIdentity = captureAccountRequest();
   const sourceWorkspaceID = activeWorkspaceID;
   let navigationItem;
   const navigationIsCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === sourceWorkspaceID &&
+    !workspaceColumnsRequireProject() &&
     (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext));
   try {
     navigationItem = await resolveReaderSource(item, {isCurrent: navigationIsCurrent});
@@ -38643,6 +38677,25 @@ function completeFirstUseWelcome() {
   }
 }
 
+function renderProjectRequiredWorkspace() {
+  const welcome = document.createElement("section");
+  welcome.className = "workspace-empty-state workspace-empty-guidance";
+  welcome.setAttribute("aria-label", "Project required");
+  const content = document.createElement("div");
+  const heading = document.createElement("h2");
+  heading.textContent = "Create a Project to open your workspace";
+  const actions = document.createElement("div");
+  actions.className = "workspace-empty-actions";
+  const create = document.createElement("button");
+  create.type = "button";
+  create.textContent = "Create Project";
+  create.addEventListener("click", () => { void createNewWorkspace(); });
+  actions.append(create);
+  content.append(heading, actions);
+  welcome.append(content);
+  return welcome;
+}
+
 function renderFirstUseWelcome() {
   const welcome = document.createElement("section");
   welcome.className = "workspace-empty-state workspace-first-use";
@@ -39296,7 +39349,9 @@ function appendPaneSequence(panes) {
     const edgeResizer = existingDividers.get(dividerKey(lastPaneID, "")) || createDivider(lastPaneID, "");
     nodes.push(edgeResizer);
   }
-  if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
+  if (!orderedPanes.length && workspaceColumnsRequireProject()) {
+    nodes.push(renderProjectRequiredWorkspace());
+  } else if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
     nodes.push(renderFirstUseWelcome());
   }
   const desiredNodes = new Set(nodes);
@@ -42969,6 +43024,7 @@ function getWorkspacePaneHydrator() {
 }
 
 function workspacePaneDescriptors(options = {}) {
+  if (workspaceColumnsRequireProject()) return [];
   const foundationScope = createInitialProjectFoundationScope();
   const descriptors = [];
   const add = (id, label, load, close, extra = {}) => descriptors.push({
@@ -43138,16 +43194,18 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
 async function renderWorkspace(options = {}) {
   restoreResearchWorkspaceState();
   const renderGeneration = ++workspaceRenderGeneration;
-  const accessGate = workspaceAccessGateForRender();
-  const context = workspacePaneRenderContext(renderGeneration);
+  let accessGate = workspaceAccessGateForRender();
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
   if (accessGate.allowed) {
     reconcileProjectWorkspaces();
+    accessGate = workspaceAccessGateForRender();
+    enforceProjectRequiredWorkspace();
     (state.utilityInstances || []).filter((item) => item.key === "saved").forEach(scopeSavedInstanceToWorkspace);
     enforceReaderPlanLimit();
     closeDeletedProjectDetails();
     renderCodeQuestionShellChrome();
   }
+  const context = workspacePaneRenderContext(renderGeneration);
   updateReaderPlanControls();
   renderWorkspaceTabs();
   normalizePaneWeights(activePaneIDs());
@@ -43161,13 +43219,16 @@ async function renderWorkspace(options = {}) {
 async function renderUtilityWorkspace(options = {}) {
   restoreResearchWorkspaceState();
   const renderGeneration = ++workspaceRenderGeneration;
-  const accessGate = workspaceAccessGateForRender();
-  const context = workspacePaneRenderContext(renderGeneration);
+  let accessGate = workspaceAccessGateForRender();
   if (accessGate.allowed) {
+    if (!options.skipDeletedProjectCleanup || workspaceColumnsRequireProject()) reconcileProjectWorkspaces();
+    accessGate = workspaceAccessGateForRender();
+    enforceProjectRequiredWorkspace();
     enforceReaderPlanLimit();
     if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails();
     renderCodeQuestionShellChrome();
   }
+  const context = workspacePaneRenderContext(renderGeneration);
   updateReaderPlanControls();
   renderWorkspaceTabs();
   normalizePaneWeights(activePaneIDs());
@@ -43191,6 +43252,7 @@ async function transitionWorkspace(mode = "default", options = {}) {
 
 async function toggleUtilityPane(key) {
   if (key === "settings") { toggleAccountDialog(); return; }
+  if (workspaceColumnsRequireProject()) return;
   if (key === "analysis" && state.utilities.analysis) {
     await closeResearchWorkspace();
     return;
@@ -43338,6 +43400,7 @@ async function closeAllColumns() {
 
 async function focusUtility(key, selector = "") {
   if (key === "settings") { if (!document.querySelector(".account-dialog")) toggleAccountDialog(); return; }
+  if (workspaceColumnsRequireProject()) return;
   let paneID = "";
   if (repeatableUtilityKeys.has(key)) {
     let instance = (state.utilityInstances || []).find((item) => item.key === key &&
@@ -43380,6 +43443,7 @@ function rememberUtilityColumn(paneID) {
 }
 
 async function openNewResearchColumn() {
+  if (workspaceColumnsRequireProject()) return;
   const instance = newUtilityInstance("analysis");
   state.utilityInstances.push(instance);
   const paneID = paneIDForUtilityInstance(instance);
@@ -43391,6 +43455,7 @@ async function openNewResearchColumn() {
 }
 
 async function focusRecentUtilityColumn(key) {
+  if (workspaceColumnsRequireProject()) return;
   const instances = (state.utilityInstances || []).filter((item) => item.key === key);
   const recent = recentUtilityColumns.get(`${activeAccount()?.userID || "public"}:${activeWorkspaceID}:${key}`);
   const instance = instances.find((item) => paneIDForUtilityInstance(item) === recent) || instances.at(-1);
@@ -43428,6 +43493,10 @@ async function toggleProjectsColumns() {
 }
 
 function workspaceCommandDefinitions() {
+  if (workspaceColumnsRequireProject()) return [
+    { label: "Create Project", hint: "Start a project workspace", run: () => createNewWorkspace() },
+    { label: "Open Account", hint: "Plan, account, sync, and privacy", run: () => focusUtility("settings") }
+  ];
   return [
     { label: "Open Search", hint: "Find sections across all codes", run: () => openNewSearchColumn() },
     { label: "Open Research", hint: "Ask a cited building-code question", run: () => focusUtility("analysis", ".research-question-input") },
@@ -43852,12 +43921,14 @@ async function start() {
     localStorage.removeItem("permitext:pendingWorkboardReattach");
   }
   addReaderButton.addEventListener("click", async () => {
+    if (workspaceColumnsRequireProject()) return;
     if (!isProAccount() && state.readers.length >= 2) {
       enforceReaderPlanLimit();
       await transitionWorkspace("utility");
       return;
     }
     openReaderCodePicker(addReaderButton, async (code) => {
+      if (workspaceColumnsRequireProject()) return;
       const reader = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
       state.readers.push(reader);
       saveWorkspaceState();
