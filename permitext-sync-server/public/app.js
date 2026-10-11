@@ -1,5 +1,5 @@
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore } from "./workflow-views.js?v=2";
-import { createReportScreen } from "./report-screen.js?v=20261011-report-shell-v5";
+import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage } from "./project-workflow.js?v=20261010-workflow-v3";
 import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v5";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -2713,6 +2713,7 @@ async function openProjectReportDraft(project) {
   if (!projectDetailMatches(workspaceProject(), identity)) {
     if (!await activateProjectStudio(identity)) return false;
   }
+  closeSharedWorkspaceViews("report");
   const projectID = projectDetailKey(identity);
   if (reportScreen?.projectID === projectID && reportScreen.isCurrent() && !pendingReportDraftByProject.has(projectID)) {
     reportScreen.open();
@@ -3639,6 +3640,7 @@ async function openProjectDetailsScreen(section = null) {
   const project = workspaceProject();
   if (!project) return false;
   const identity = projectIdentity(project);
+  closeSharedWorkspaceViews("project-details");
   const projectID = projectDetailKey(identity);
   if (projectDetailsScreen?.isCurrent()) {
     await projectDetailsScreen.open();
@@ -3663,6 +3665,9 @@ async function openProjectDetailsScreen(section = null) {
   };
   const screen = createReportScreen({
     screenTitle: "Project details", screenClass: "project-details-screen", projectName: identity.name,
+    mount: document.querySelector(".workspace-shell"),
+    coveredElements: [track, document.querySelector(".workflow-toolbar")].filter(Boolean),
+    onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowNavigation(); },
     backLabel: () => reportScreen?.isOpen() ? "← Back to Report" : `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects"),
@@ -3686,7 +3691,7 @@ async function openProjectDetailsScreen(section = null) {
       selectSection(section || "context");
       return content;
     },
-    onClose: () => {},
+    onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowNavigation(); },
     onDispose: () => {
       for (const [kind, panel] of panels) {
         const key = paneIDForProjectInformation(identity, kind);
@@ -4179,16 +4184,24 @@ function workflowPaneAnchors() {
 function workflowPaneIsVisible(paneID) {
   return detachedProjectWindow || paneBelongsToView(paneID, currentWorkflowView(), state.workflowMembership, workflowPaneAnchors());
 }
+function closeSharedWorkspaceViews(except = "") {
+  if (except !== "report") reportScreen?.close();
+  if (except !== "project-details") projectDetailsScreen?.close();
+  if (except !== "account") document.querySelector(".account-screen[open]")?.close();
+}
 function syncWorkflowNavigation() {
-  const view = reportScreen?.isOpen() ? "report" : currentWorkflowView();
+  const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
+  const view = accountOpen ? "account" : projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
+  toggleSettingsButton?.setAttribute("aria-pressed", String(accountOpen));
+  document.querySelector("#open-project-details")?.setAttribute("aria-pressed", String(view === "project-details"));
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === view));
   });
   document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
 }
 async function switchWorkflowView(view) {
+  closeSharedWorkspaceViews();
   if (notifyProjectRequiredForColumn()) return false;
-  reportScreen?.close();
   view = normalizeWorkflowView(view);
   if (view !== currentWorkflowView()) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
@@ -5125,7 +5138,7 @@ function setUtilityButtonStates() {
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
   toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis || activeRepeatableKeys.has("analysis")));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
-  toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
+  toggleSettingsButton.setAttribute("aria-pressed", String(Boolean(document.querySelector(".account-screen[open]"))));
   syncTopbarProjectToolStates();
 }
 
@@ -37134,45 +37147,56 @@ function mountAccountScreenContent(dialog, panel) {
   close.title = "Close Account";
   close.setAttribute("aria-label", "Close Account");
   close.addEventListener("click", () => dialog.close());
-  header.append(title, close, topbarBrand.cloneNode(true));
+  header.append(title, close);
   dialog.replaceChildren(header, panel);
 }
 
 function toggleAccountDialog({ upgrade = false } = {}) {
-  const existing = document.querySelector(".account-dialog");
-  if (existing) { existing.close(); return; }
-  const dialog = document.createElement("dialog");
+  const existing = document.querySelector(".account-screen[open]");
+  if (existing) return;
+  closeSharedWorkspaceViews("account");
+  const dialog = document.createElement("section");
   dialog.className = "account-dialog account-screen";
+  dialog.classList.add("account-workspace-view");
   let closedWithKeyboard = false;
-  dialog.addEventListener("cancel", () => { closedWithKeyboard = true; });
+  let closed = false;
+  const requestIdentity = captureAccountRequest();
+  const coveredState = new Map();
+  const contextCheck = setInterval(() => { if (!isCurrentAccountRequest(requestIdentity)) dialog.close(); }, 200);
+  dialog.open = true;
+  dialog.setAttribute("open", "");
+  dialog.close = () => {
+    if (closed) return;
+    closed = true;
+    clearInterval(contextCheck);
+    if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
+    dialog.open = false;
+    dialog.remove();
+    coveredState.forEach((inert, element) => { element.inert = inert; });
+    state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
+    syncWorkflowNavigation();
+    if (closedWithKeyboard) toggleSettingsButton.focus({ preventScroll: true });
+    else toggleSettingsButton.blur();
+  };
   dialog.addEventListener("keydown", (event) => {
-    if (event.defaultPrevented) return;
+    if (event.defaultPrevented || event.key !== "Escape") return;
+    event.preventDefault();
     closedWithKeyboard = true;
-    trapWebModalFocus(dialog, event);
+    dialog.close();
   });
-  dialog.addEventListener("pointerdown", () => { closedWithKeyboard = false; });
-  dialog.setAttribute("aria-label", "Account");
+  dialog.setAttribute("aria-label", "Account workspace");
   const panel = activeAccount() ? renderSettings({ upgrade }) : renderAccountWelcome(dialog);
   if (upgrade && !activeAccount()) {
     panel.querySelector("h1").textContent = "Continue to Pro.";
     panel.querySelector("h1 + p").textContent = "Sign in or create an account to connect your subscription. Then continue to secure checkout.";
   }
   mountAccountScreenContent(dialog, panel);
-  dialog.addEventListener("close", () => {
-    if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
-    dialog.remove();
-    toggleSettingsButton.setAttribute("aria-pressed", "false");
-    if (closedWithKeyboard) toggleSettingsButton.focus({ preventScroll: true });
-    else toggleSettingsButton.blur();
+  [track, document.querySelector(".workflow-toolbar")].filter(Boolean).forEach(element => {
+    coveredState.set(element, element.inert); element.inert = true;
   });
-  dialog.addEventListener("click", (event) => {
-    if (event.target !== dialog) return;
-    const rect = dialog.getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
-  });
-  document.body.append(dialog);
-  toggleSettingsButton.setAttribute("aria-pressed", "true");
-  dialog.showModal();
+  document.querySelector(".workspace-shell").append(dialog);
+  state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
+  syncWorkflowNavigation();
 }
 
 function openSearchCodeSourceSettings(panel) {

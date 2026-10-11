@@ -59,7 +59,7 @@ assert.equal(shell.children[0].tag,'section');
 assert.equal(shell.children[0].children.length,1,'Shared navigation replaces the standalone header');
 assert.equal(columns.inert,true); assert.equal(toolbar.inert,true);
 assert.equal(shell.children[0].hidden,false);
-embedded.close();
+shell.children[0].events.keydown({key:'Escape',defaultPrevented:false,preventDefault(){}});
 assert.equal(columns.inert,false); assert.equal(toolbar.inert,false);
 assert.equal(shell.children[0].hidden,true);
 await embedded.open();

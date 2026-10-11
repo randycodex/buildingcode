@@ -21,15 +21,15 @@ const reader=pane('reader:one'), notebook=pane('project:notebook:a'); reader.scr
 const panes=[reader,notebook], state={workflowView:'research',workflowMembership:{},workflowScroll:{notebook:70}};
 const track={scrollLeft:110,querySelectorAll:()=>panes};
 let constructions=0, needProject=false;
-const c=vm.createContext({reportScreen:null,state,track,normalizeWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
+const c=vm.createContext({reportScreen:null,projectDetailsScreen:null,toggleSettingsButton:null,state,track,normalizeWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
-  document:{querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
+  document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
   captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
   defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
   appendPaneSequence(actualPanes){actualPanes.forEach((p,i)=>assert.equal(p,panes[i]));for(const p of actualPanes)p.scrollTop=0;},
   openProjectNotebook(){constructions++;},focusRecentUtilityColumn(){constructions++;}
 });
-vm.runInContext(['currentWorkflowView','workflowPaneAnchors','workflowPaneIsVisible','syncWorkflowNavigation','switchWorkflowView'].map(actual).join('\n'),c);
+vm.runInContext(['currentWorkflowView','workflowPaneAnchors','workflowPaneIsVisible','closeSharedWorkspaceViews','syncWorkflowNavigation','switchWorkflowView'].map(actual).join('\n'),c);
 await c.switchWorkflowView('notebook'); assert.equal(track.scrollLeft,70);
 notebook.scrollTop=450; track.scrollLeft=200;
 await c.switchWorkflowView('research');

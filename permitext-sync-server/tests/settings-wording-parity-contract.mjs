@@ -61,9 +61,9 @@ assert(webApp.includes("signInButton.hidden = Boolean(account)"));
 assert(!webApp.includes('signInButton.textContent = "Link Apple"'));
 assert(webApp.includes('panel.querySelector(".panel-header")?.remove()'));
 assert(webApp.includes('dialog.className = "account-dialog account-screen"'));
-assert(webApp.includes('back.setAttribute("aria-label", "Back to reading")'));
+assert(webApp.includes('dialog.setAttribute("aria-label", "Account workspace")'));
 assert(!webApp.includes("account-welcome-close"));
-assert(webApp.includes("if (event.target !== dialog) return;"));
+assert(webApp.includes('document.querySelector(".workspace-shell").append(dialog)'));
 
 const lifetimePro = settingsPlanCopy({ pro: true, source: "lifetimeGrant" });
 assert.equal(lifetimePro.title, "Lifetime Pro");

@@ -19185,3 +19185,24 @@ dialog.report-export-review {
 .report-workspace-view .report-draft-shell .report-draft-primary-actions > button {
   min-height: 0; height: 40px; padding-block: 4px;
 }
+
+/* Project details and Account use the same shared navigation and toolbar row. */
+.workspace-shell:has(> .account-workspace-view[open]) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
+.project-details-screen .project-details-content { max-width: none; }
+.project-details-screen .project-details-tabs {
+  height: 42px; min-height: 42px; flex: 0 0 42px; box-sizing: border-box;
+  align-items: center; padding: 0 clamp(22px, 3vw, 46px);
+}
+.project-details-screen .project-details-tabs button { padding: 4px 0; font-size: 13px; }
+.project-details-screen .project-information-panel { max-width: 1080px; margin-inline: auto; }
+.workspace-shell > .account-workspace-view {
+  grid-column: 1; grid-row: 2 / -1; z-index: 2;
+  width: 100%; height: auto; min-width: 0; min-height: 0; margin: 0;
+  border-radius: 0; display: flex; flex-direction: column; background: var(--bg, #000);
+}
+.account-workspace-view .account-screen-header {
+  height: 42px; min-height: 42px; padding: 0 clamp(22px, 3vw, 46px);
+}
+.account-workspace-view .account-screen-header h1 { font-size: 13px; color: var(--text-secondary); font-weight: 500; letter-spacing: normal; }
+.account-workspace-view .account-screen-close { --panel-title-control-size: 32px; }
+.topbar :is(#open-project-details, #toggle-settings)[aria-pressed="true"] { color: var(--text-primary); font-weight: 700; background: transparent; }

@@ -7,6 +7,11 @@ export function createReportScreen({ projectName, load, isCurrent, onClose, onDi
   if (mount) {
     dialog.hidden = true;
     dialog.open = false;
+    dialog.addEventListener("keydown", event => {
+      if (event.defaultPrevented || event.key !== "Escape") return;
+      event.preventDefault();
+      dialog.close();
+    });
     dialog.close = () => {
       if (!dialog.open) return;
       dialog.open = false;
