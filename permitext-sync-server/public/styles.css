@@ -19172,3 +19172,16 @@ dialog.report-export-review {
 .workspace-shell > .workflow-toolbar { grid-row: 2; grid-column: 1; }
 .workspace-shell > .panel-track { grid-row: 3; grid-column: 1; }
 .workspace-shell:has(> .workspace-issue:not([hidden])) > .panel-track { grid-row: 4; }
+
+/* Match the shared Research and Notebook toolbar without column spacing. */
+.report-workspace-view .workspace-panel.report-draft-panel { padding: 0; }
+.report-workspace-view .workspace-panel.report-draft-panel .report-draft-shell {
+  width: 100%; margin: 0; gap: 0; grid-template-rows: 42px minmax(0, 1fr);
+}
+.report-workspace-view .report-draft-shell .report-draft-primary-actions {
+  height: 42px; min-height: 0; padding: 0 clamp(22px, 3vw, 46px);
+  flex-wrap: nowrap; align-items: center;
+}
+.report-workspace-view .report-draft-shell .report-draft-primary-actions > button {
+  min-height: 0; height: 40px; padding-block: 4px;
+}
