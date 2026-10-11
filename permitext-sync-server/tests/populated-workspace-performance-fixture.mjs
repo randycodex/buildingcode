@@ -26,6 +26,11 @@ const secondAccountEnabled = secondAccountOption === "true";
 const researchHistoryOption = option("--research-history", "false");
 assert.ok(["true", "false"].includes(researchHistoryOption), "Use --research-history true or false");
 const researchHistoryEnabled = researchHistoryOption === "true";
+// Opt-in interaction checks may write local conversations. The fetch guard below
+// still rejects every external/provider request, and credentials remain cleared.
+const researchWorkflowOption = option("--research-workflow", "false");
+assert.ok(["true", "false"].includes(researchWorkflowOption));
+const researchWorkflowEnabled = researchWorkflowOption === "true";
 const outageSelfTest = option("--self-test-outage", "false");
 assert.ok(["true", "false"].includes(outageSelfTest));
 const imageProfile = option("--image-profile", "tiny");
@@ -257,7 +262,7 @@ const server = createServer(async (request, response) => {
       response.writeHead(200, {"content-type":"text/javascript", "cache-control":"no-store", "x-content-type-options":"nosniff"});
       return response.end(clientEntry);
     }
-    if (ready && canonicalPath.startsWith("research/") && request.method === "POST" &&
+    if (ready && !researchWorkflowEnabled && canonicalPath.startsWith("research/") && request.method === "POST" &&
         !(researchHistoryEnabled && ["research/conversations/list", "research/conversations/get", "research/usage"].includes(canonicalPath))) {
       return json(response, 403, { error: "Research disabled in performance fixture" });
     }
@@ -481,7 +486,7 @@ async function seedFixture() {
   ready = true;
   // Verify guards with unauthenticated empty bodies, so even a failed guard
   // cannot mutate a Research record. Absolute-form targets exercise normalization.
-  for (const path of ["/research/conversations/message", `${base}//research/conversations/message`]) {
+  for (const path of researchWorkflowEnabled ? [] : ["/research/conversations/message", `${base}//research/conversations/message`]) {
     const blocked = await new Promise((resolve, reject) => {
       const probe = httpRequest({ hostname: "127.0.0.1", port, path, method: "POST", headers: { "content-type": "application/json" } }, response => {
         let body = "";

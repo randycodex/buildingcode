@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-evidence-actions-v853";
+} from "./offline-storage.js?v=20261011-assistant-handoff-v854";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -24744,7 +24744,7 @@ function renderResearchNotebookHandoff(conversation, message) {
   region.className = "research-notebook-handoff";
   const projects = researchProjects();
   const select = document.createElement("select");
-  select.setAttribute("aria-label", "Notebook Project for this Research reference");
+  select.setAttribute("aria-label", "Project for this Assistant answer");
   const projectID = String(conversation.primaryProjectID || "");
   const choices = projectID ? projects.filter((project) => researchProjectID(project) === projectID) : projects;
   choices.forEach((project) => {
@@ -24755,7 +24755,7 @@ function renderResearchNotebookHandoff(conversation, message) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "ghost-button";
-  button.textContent = "Review in Notebook";
+  button.textContent = "Add to note";
   button.disabled = !choices.length;
   if (!choices.length) button.title = "Create or restore a Project to keep this Research reference in Notebook.";
   const mutationID = `research-reference:${crypto.randomUUID()}`;
@@ -24823,6 +24823,38 @@ function renderResearchNotebookHandoff(conversation, message) {
     }
   });
   region.append(select, button);
+  if (hasCapability("professional-exports")) {
+    const reportButton = document.createElement("button");
+    reportButton.type = "button";
+    reportButton.className = "workflow-action workflow-action-secondary";
+    reportButton.textContent = "Add to Report";
+    reportButton.disabled = !choices.length;
+    reportButton.addEventListener("click", async () => {
+      const project = choices.find(item => researchProjectID(item) === select.value);
+      if (!project) return;
+      const requestIdentity = captureAccountRequest();
+      const workspaceID = activeWorkspaceID;
+      reportButton.disabled = true;
+      try {
+        const draft = await addProjectSourcesToReport(project, sources => {
+          const source = sources.find(item => item.kind === "researchAnswer" && item.id === message.id);
+          if (!source) throw new Error("Link this Assistant conversation to the selected Project before adding its answer to a Report.");
+          return [source];
+        });
+        if (isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID && reportButton.isConnected) {
+          reportButton.textContent = "In Report";
+          reportButton.title = `Included in ${draft.title || "Report"}`;
+        }
+      } catch (error) {
+        if (isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID && region.isConnected) {
+          await showWebNotice("Report handoff not completed", error.message);
+        }
+      } finally {
+        if (isCurrentAccountRequest(requestIdentity) && reportButton.isConnected) reportButton.disabled = !choices.length;
+      }
+    });
+    region.append(reportButton);
+  }
   return region;
 }
 
