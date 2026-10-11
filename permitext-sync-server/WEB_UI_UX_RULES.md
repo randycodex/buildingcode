@@ -98,7 +98,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Main panes should feel like workspace columns, not floating cards.
 - Internal controls can stay lightly rounded only when it helps usability.
 - Match the iOS radius set for shared surfaces: cards use a 14 px radius and compact tiles use a 10 px radius unless a desktop-specific control needs a different value.
-- Use surface color, spacing, and hierarchy for annotation cards. The Notebook editor has a very thin neutral edge line, as requested, without changing its background.
+- Use surface color, spacing, and hierarchy for annotation cards. The Notebook editor has only thin neutral top and bottom lines spanning the full column width, without changing its background.
 - Use spacing consistently; prefer tight, deliberate spacing over large mobile-style gaps.
 - Search and Saved must remain proportional at the standard 320 px utility-column width: compact header actions, readable rows, and bottom controls that do not crowd the content.
 - Every web confirmation, destructive warning, error alert, and acknowledgement should use the shared Clear-canvas dialog pattern: dimmed backdrop, centered white surface, divided title, concise message, outlined cancel action when applicable, and red confirmation action. Do not use native browser `alert()` or `confirm()` dialogs.
