@@ -93,3 +93,27 @@ export function reportItemPreview(item) {
   }
   return parts;
 }
+
+// Compact only the known fact-projection envelope. Unrecognized/legacy prose
+// remains verbatim; every qualification and source string stays in the snapshot.
+export function reportFactPresentation(item) {
+  const notes = [];
+  const reference = (kind, value) => {
+    if (!value) return null;
+    let index = notes.findIndex(note => note.kind === kind && note.text === value);
+    if (index < 0) { index = notes.length; notes.push({ kind, text: value }); }
+    return index + 1;
+  };
+  const rows = String(item.facts || '').split(/\n\n/).map(original => {
+    if (!/^(?:Unknown: )?(?:Building \/ Code|Zoning|Custom) Fact — /.test(original)) return { text: original };
+    const marker = ' Original user/source wording: ';
+    const position = original.indexOf(marker);
+    const source = position < 0 ? '' : original.slice(position + marker.length);
+    const line = position < 0 ? original : original.slice(0, position);
+    const match = line.match(/ \(([^()]*)\)\.$/);
+    if (!match) return { text: original };
+    return { text: line.slice(0, match.index),
+      qualification: reference('Qualification', match[1]), source: reference('Original user/source wording', source) };
+  });
+  return { rows, notes };
+}

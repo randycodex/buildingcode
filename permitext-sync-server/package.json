@@ -234,7 +234,7 @@
     "test:typesafe-intent": "node --test tests/typesafe-intent.test.mjs",
     "eval:typesafe-intent": "node scripts/eval-typesafe-intent.mjs",
     "build:report-preview": "node scripts/build-report-preview.mjs",
-    "test:report-screen": "node tests/report-screen-contract.mjs && node tests/report-export-review-contract.mjs"
+    "test:report-screen": "node tests/report-screen-contract.mjs && node tests/report-export-review-contract.mjs && node tests/report-fact-presentation.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.54.0",

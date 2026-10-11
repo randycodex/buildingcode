@@ -1,6 +1,6 @@
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "node:url";
-import { reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition } from "./report-presentation.mjs";
+import { reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation } from "./report-presentation.mjs";
 
 const colors = Object.freeze({
   ink: "#171717",
@@ -398,10 +398,20 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
         .font("Report-Bold")
         .fontSize(12)
         .text(item.title || "Project facts", { paragraphGap: 7 });
-      document
-        .font("Report-Regular")
-        .fontSize(9.5)
-        .text([item.address, item.facts].filter(Boolean).join(" / "), { lineGap: 2, paragraphGap: 8 });
+      const facts = reportFactPresentation(item);
+      if (item.address) document.font("Report-Regular").fontSize(9.5).text(item.address, { paragraphGap: 8 });
+      for (const row of facts.rows) {
+        const references = [row.qualification, row.source].filter(Boolean).map(id => `[${id}]`).join(" ");
+        document.fillColor(colors.ink).font("Report-Regular").fontSize(9.5)
+          .text([row.text, references].filter(Boolean).join(" "), { lineGap: 2, paragraphGap: 8 });
+      }
+      if (facts.notes.length) {
+        ensureVerticalSpace(document, 45);
+        document.fillColor(colors.muted).font("Report-Bold").fontSize(9)
+          .text("Fact qualifications and sources", { paragraphGap: 6 });
+        facts.notes.forEach((note, index) => document.font("Report-Regular").fontSize(8)
+          .text(`[${index + 1}] ${note.kind}: ${note.text}`, { lineGap: 2, paragraphGap: 5 }));
+      }
       document.moveDown(0.8);
       return;
     }
@@ -410,7 +420,14 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     previousSourceClassification = item.sourceClassification;
   });
 
-  ensureVerticalSpace(document, 130);
+  // Reserve the measured notice, not a fixed 130pt block that can force an
+  // otherwise unnecessary final page for a short notice.
+  document.font("Report-Bold").fontSize(10);
+  const noticeHeadingHeight = document.heightOfString("Professional-use notice", { paragraphGap: 6 });
+  document.font("Report-Regular").fontSize(8);
+  const noticeHeight = stringList(manifest.disclaimers).reduce((height, value) =>
+    height + document.heightOfString(value, { lineGap: 2, paragraphGap: 5 }), noticeHeadingHeight + 28);
+  ensureVerticalSpace(document, noticeHeight);
   document
     .moveDown(1)
     .strokeColor(colors.rule)

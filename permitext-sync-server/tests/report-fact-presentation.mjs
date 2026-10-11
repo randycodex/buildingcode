@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { reportFactPresentation } from '../report-presentation.mjs';
+const source='NYC Planning inventory. Verify current official records; does not establish approved occupancy.';
+const qualification='sourced data; verify current official records';
+const originals=['Stories: 14','Year built: 2025','Building count: 1'].map(value=>`Building / Code Fact — ${value} (${qualification}). Original user/source wording: ${source}`);
+originals.push('Custom Fact — Occupancy: unknown (unknown; not established).');
+originals.push('Additional Project facts (user wording; not independently verified): Do not assume compliance.');
+const {rows,notes}=reportFactPresentation({facts:originals.join('\n\n')});
+assert.equal(notes.length,3);
+const restored=rows.map(row=>row.qualification ? `${row.text} (${notes[row.qualification-1].text}).${row.source ? ` Original user/source wording: ${notes[row.source-1].text}` : ''}` : row.text);
+assert.deepEqual(restored,originals,'All original fact values, qualification text, and provenance remain recoverable exactly');
+assert.equal(rows[0].source,rows[2].source);
+assert.notEqual(rows[0].qualification,rows[3].qualification);
+assert.deepEqual(reportFactPresentation({facts:'Legacy facts with (parentheses).'}),{rows:[{text:'Legacy facts with (parentheses).'}],notes:[]});
+console.log('Fact presentation: shared notes deduplicated, unknown status distinct, all snapshot text preserved.');
