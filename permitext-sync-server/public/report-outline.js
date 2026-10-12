@@ -24,6 +24,7 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   contents.className = "report-outline-contents reader-nav-tree";
   const links = [];
   const rows = [];
+  const entries = new Map();
   let dragged = null;
   let scrollFrame = 0;
   let pointerDrag = null;
@@ -125,7 +126,7 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
     handle.addEventListener("keydown", event => {
       if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
       event.preventDefault();
-      onMove(block, index + (event.key === "ArrowUp" ? -1 : 1), "outline");
+      onMove(block, blocks.indexOf(block) + (event.key === "ArrowUp" ? -1 : 1), "outline");
     });
     const link = makeLink(targets[index], "");
     const number = document.createElement("span");
@@ -164,13 +165,14 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
       if (!dragged) return;
       event.preventDefault();
       const moved = dragged;
-      const targetIndex = reportDropIndex(blocks.indexOf(moved), index,
+      const targetIndex = reportDropIndex(blocks.indexOf(moved), rows.indexOf(row),
         event.clientY > row.getBoundingClientRect().top + row.offsetHeight / 2);
       dragged = null;
       clearDrag();
       onMove(moved, targetIndex, "outline");
     });
     rows.push(row);
+    entries.set(block, {row, link, target: targets[index]});
     contents.append(row);
   });
   refreshLabels();
@@ -191,6 +193,17 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   documentBody.addEventListener("scroll", onScroll);
   onScroll();
   return { element: outline, refreshLabels,
+    reorder() {
+      const scroll = outline.scrollTop;
+      rows.splice(0, rows.length, ...blocks.map(block => entries.get(block).row));
+      targets.splice(0, targets.length, ...blocks.map(block => entries.get(block).target));
+      links.splice(1, links.length - 1, ...blocks.map(block => entries.get(block).link));
+      rows.forEach((row, index) => { row.querySelector(".report-outline-number").textContent = `${index + 1}.`; });
+      contents.append(...rows);
+      refreshLabels();
+      outline.scrollTop = scroll;
+      onScroll();
+    },
     announce: message => { status.textContent = message; },
     dispose() { documentBody.removeEventListener("scroll", onScroll); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(dragFrame); }
   };

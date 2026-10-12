@@ -1,4 +1,4 @@
-import { createReportOutline, moveReportBlock, reportDropIndex } from "./report-outline.js?v=20261011-outline-v3";
+import { createReportOutline, moveReportBlock, reportDropIndex } from "./report-outline.js?v=20261011-outline-v4";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=6";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-outline-v868";
+} from "./offline-storage.js?v=20261011-report-outline-v869";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28780,6 +28780,7 @@ async function renderProjectReportDraft(project) {
     activeDraft.blocks.forEach((block, index) => {
       const row = document.createElement("article");
       row.className = `report-draft-block report-draft-block-${block.kind}`;
+      row._reportBlock = block;
       row.dataset.blockId = block.id || `${block.kind}-${index}`;
       const top = document.createElement("div");
       top.className = "report-draft-block-top";
@@ -28808,7 +28809,7 @@ async function renderProjectReportDraft(project) {
       dragHandle.addEventListener("keydown", (event) => {
         if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
         event.preventDefault();
-        reorderBlock(index + (event.key === "ArrowUp" ? -1 : 1), true);
+        reorderBlock(activeDraft.blocks.indexOf(block) + (event.key === "ArrowUp" ? -1 : 1), true);
       });
       dragHandle.addEventListener("dragstart", (event) => {
         draggedReportBlock = block;
@@ -28839,12 +28840,13 @@ async function renderProjectReportDraft(project) {
       });
       row.addEventListener("drop", (event) => {
         const sourceIndex = activeDraft.blocks.indexOf(draggedReportBlock);
-        if (sourceIndex < 0 || sourceIndex === index) return;
+        const targetIndex = activeDraft.blocks.indexOf(block);
+        if (sourceIndex < 0 || sourceIndex === targetIndex) return;
         event.preventDefault();
         const after = event.clientY > row.getBoundingClientRect().top + row.offsetHeight / 2;
         const moved = draggedReportBlock;
         draggedReportBlock = null;
-        reorderDraftBlock(moved, reportDropIndex(sourceIndex, index, after));
+        reorderDraftBlock(moved, reportDropIndex(sourceIndex, targetIndex, after));
       });
       actions.append(dragHandle);
       const remove = document.createElement("button");
@@ -28854,7 +28856,7 @@ async function renderProjectReportDraft(project) {
       remove.setAttribute("aria-label", "Remove Report item");
       remove.innerHTML = trashIconSVG();
       remove.addEventListener("click", () => {
-        activeDraft.blocks.splice(index, 1);
+        activeDraft.blocks.splice(activeDraft.blocks.indexOf(block), 1);
         setDirty();
         renderWorkspaceContent();
       });
@@ -29171,8 +29173,15 @@ async function renderProjectReportDraft(project) {
 
   function reorderDraftBlock(block, targetIndex, focusArea = null) {
     if (!moveReportBlock(activeDraft.blocks, activeDraft.blocks.indexOf(block), targetIndex)) return;
+    const documentBody = shell.querySelector(".report-document");
+    const scroll = documentBody.scrollTop;
+    const rows = [...documentBody.querySelectorAll(".report-draft-block")];
+    const rowByBlock = new Map(rows.map(row => [row._reportBlock, row]));
+    rows[0].parentElement.append(...activeDraft.blocks.map(item => rowByBlock.get(item)));
+    outlineController.reorder();
+    renderIncludedReportComments(panel);
+    documentBody.scrollTop = scroll;
     setDirty();
-    renderWorkspaceContent();
     outlineController.announce(`${reportBlockTitle(block)} moved to position ${targetIndex + 1}.`);
     if (focusArea) requestAnimationFrame(() => {
       const blockID = block.id || `${block.kind}-${targetIndex}`;

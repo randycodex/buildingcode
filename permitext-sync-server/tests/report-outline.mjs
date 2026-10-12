@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {moveReportBlock, reportDropIndex, createReportOutline} from '../public/report-outline.js';
 import {createReportAutosave} from '../public/report-autosave.js';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
 
 // Test every source/target boundary, including adjacent no-op drops and both ends.
 for (let from = 0; from < 5; from++) for (let to = 0; to < 5; to++) for (const after of [false, true]) {
@@ -21,7 +23,7 @@ for (const indices of [[-1, 0], [0, -1], [0, 2], [0, 0], [0, 0.5]]) {
 
 class Element {
   constructor() { this.children = []; this.attributes = {}; this.dataset = {}; this.events = {}; this.offsetHeight = 50; this.classList = {add() {}, remove() {}}; }
-  append(...children) { this.children.push(...children); }
+  append(...children) { for (const child of children) { if (child.parentElement) child.parentElement.children.splice(child.parentElement.children.indexOf(child), 1); child.parentElement = this; this.children.push(child); } }
   setAttribute(key, value) { this.attributes[key] = value; }
   removeAttribute(key) { delete this.attributes[key]; }
   addEventListener(key, fn) { this.events[key] = fn; }
@@ -43,12 +45,15 @@ const autosave = createReportAutosave({read: () => draft, isCurrent: () => true,
 const moves = [], navigations = [], body = new Element(), introduction = new Element(), targets = blocks.map(() => new Element());
 const controller = createReportOutline({blocks, introduction, targets, documentBody: body,
   describe: block => ({title: block.id}), dragIcon: '', onNavigate: target => navigations.push(target),
-  onMove: (block, index, area) => { moves.push({id: block.id, index, area}); if (moveReportBlock(blocks, blocks.indexOf(block), index)) autosave.change(); }});
+  onMove: (block, index, area) => { moves.push({id: block.id, index, area}); if (moveReportBlock(blocks, blocks.indexOf(block), index)) { controller.reorder(); autosave.change(); } }});
 const rows = controller.element.children[3].children;
 rows[1].querySelector('.report-outline-drag').events.keydown({key: 'ArrowDown', preventDefault() {}});
 assert.deepEqual(moves[0], {id: 'b', index: 2, area: 'outline'});
 await autosave.flush();
 assert.deepEqual(writes[0].blocks.map(block => block.id), ['a', 'c', 'b'], 'Outline movement reaches the saved report payload');
+assert.deepEqual(rows.map(row => row.dataset.blockId), ['a', 'c', 'b']);
+rows[2].querySelector('.report-outline-drag').events.keydown({key: 'ArrowUp', preventDefault() {}});
+assert.deepEqual(blocks.map(block => block.id), ['a', 'b', 'c'], 'Repeated moves use current positions');
 // Drop handler uses the dragged block identity, rather than the position captured before a move.
 rows[1].events.dragstart({dataTransfer: {setData() {}}});
 rows[0].events.drop({clientY: 0, preventDefault() {}});
@@ -61,6 +66,24 @@ controller.element.children[2].events.click();
 assert.equal(controller.element.children[3].hidden, true);
 controller.dispose();
 assert.equal(body.events.scroll, undefined, 'Detach old scroll listeners when rebuilding or leaving the report');
+
+// Exercise the actual app integration: reorder mounted rows without recreating previews/editors.
+const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+const reorderStart = app.indexOf('  function reorderDraftBlock(');
+const activeDraft = {blocks: [{id: 'x'}, {id: 'y'}, {id: 'z'}]};
+const documentBody = new Element(), documentRows = activeDraft.blocks.map(block => Object.assign(new Element(), {_reportBlock: block}));
+const blockBody = new Element(); blockBody.append(...documentRows);
+documentBody.scrollTop = 1706;
+documentBody.querySelectorAll = () => [...blockBody.children];
+const calls = [];
+const context = vm.createContext({activeDraft, shell: {querySelector: () => documentBody}, moveReportBlock,
+  outlineController: {reorder: () => calls.push('outline'), announce() {}}, reportBlockTitle: b => b.id,
+  renderIncludedReportComments: () => calls.push('comments'), panel: {}, setDirty: () => calls.push('dirty')});
+vm.runInContext(app.slice(reorderStart, app.indexOf('  function renderWorkspaceContent()', reorderStart)), context);
+context.reorderDraftBlock(activeDraft.blocks[2], 0);
+assert.deepEqual(blockBody.children, [documentRows[2], documentRows[0], documentRows[1]], 'Move the mounted editors and source previews');
+assert.equal(documentBody.scrollTop, 1706, 'Reordering keeps the document scroll position');
+assert.deepEqual(calls, ['outline', 'comments', 'dirty']);
 
 const pointerMoves = [], pointerBlocks = [{id: '1'}, {id: '2'}, {id: '3'}];
 const pointer = createReportOutline({blocks: pointerBlocks, introduction, targets, documentBody: body,
