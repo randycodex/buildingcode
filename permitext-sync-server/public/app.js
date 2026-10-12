@@ -3,7 +3,7 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261011-sidebar-width-v5";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition } from "./report-comparison.js?v=20261011-comparison-v4";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition } from "./report-comparison.js?v=20261011-comparison-v5";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-comparison-v888";
+} from "./offline-storage.js?v=20261011-report-comparison-v889";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,

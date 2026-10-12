@@ -40,7 +40,13 @@ host.document = Object.assign(new Element(), {value: 'Unsubmitted draft text', s
 let current = true, resized = 0;
 const reviews = [];
 const comparison = createReportComparison({panel, columns: () => host, isCurrent: () => current,
-  onResize: () => resized++, renderReview: args => {
+  onResize: () => {
+    resized++;
+    if (panel.dataset.comparisonOpen !== 'true' && comparison.preview.content) {
+      comparison.preview.content.scrollTop = 0;
+      comparison.versionBody.scrollTop = 0;
+    }
+  }, renderReview: args => {
     const review = {args, disposed: false, dispose() { this.disposed = true; }};
     reviews.push(review); return review;
   }});
@@ -59,8 +65,11 @@ const position = comparison.capturePosition();
 host.scrollLeft = 180;
 comparison.toggle();
 assert.equal(host.scrollLeft, 0, 'Closing comparison restores the previous Sources/Outline position');
+assert.deepEqual(comparison.capturePosition(), position, 'Hidden-page layout clamping must not overwrite the retained PDF position');
 comparison.toggle();
 assert.equal(host.scrollLeft, 180, 'Reopening comparison keeps its horizontal position');
+assert.equal(comparison.preview.content.scrollTop, 942, 'Reopening restores the PDF position after hidden pages clamp their scroll');
+assert.equal(comparison.versionBody.scrollTop, 127, 'Reopening restores the version-list position too');
 comparison.select({id: 'first'}, prepare);
 assert.equal(reviews.length, 1, 'Reopening the same version keeps its loaded PDF and page position');
 assert.equal(comparison.preview.content.scrollTop, 942);

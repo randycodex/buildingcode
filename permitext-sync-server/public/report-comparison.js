@@ -42,6 +42,15 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
   versions.append(versionBody);
   let selectedID = null, review = null, generation = 0, disposed = false;
   let closedColumnsScroll = 0, openColumnsScroll = null;
+  let closedPosition = null;
+  const readPosition = () => ({versions: versionBody.scrollTop,
+    pdf: preview.querySelector('.report-export-content')?.scrollTop || 0});
+  const restorePosition = position => {
+    if (!position) return;
+    versionBody.scrollTop = position.versions;
+    const content = preview.querySelector('.report-export-content');
+    if (content) content.scrollTop = position.pdf;
+  };
   const current = () => !disposed && isCurrent();
   const paintSelection = () => versions.querySelectorAll('[data-report-preview]').forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.reportPreview === selectedID));
@@ -65,8 +74,15 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
       if (open) closedColumnsScroll = host.scrollLeft;
       else openColumnsScroll = host.scrollLeft;
     }
+    // Hidden PDF pages lose their layout height, which can clamp scrollTop.
+    // Keep the visible position and restore it after the columns have reopened.
+    if (!open && wasOpen) closedPosition = readPosition();
     panel.dataset.comparisonOpen = String(open);
     onResize();
+    if (open && !wasOpen) {
+      restorePosition(closedPosition);
+      closedPosition = null;
+    }
     if (open !== wasOpen && host) host.scrollLeft = open
       ? openColumnsScroll ?? Math.max(0, host.scrollWidth - host.clientWidth)
       : closedColumnsScroll;
@@ -117,12 +133,11 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) divider.addEventListener(event, finish);
   return {
     preview, versions, versionBody, divider, update,
-    capturePosition() { return {versions: versionBody.scrollTop, pdf: preview.querySelector('.report-export-content')?.scrollTop || 0}; },
+    capturePosition() { return closedPosition || readPosition(); },
     restorePosition(position) {
       if (!position) return;
-      versionBody.scrollTop = position.versions;
-      const content = preview.querySelector('.report-export-content');
-      if (content) content.scrollTop = position.pdf;
+      if (panel.dataset.comparisonOpen !== 'true') closedPosition = position;
+      restorePosition(position);
     },
     get selectedID() { return selectedID; },
     toggle: () => setOpen(panel.dataset.comparisonOpen !== 'true'),
