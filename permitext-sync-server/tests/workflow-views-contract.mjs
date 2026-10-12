@@ -60,7 +60,7 @@ let reportOpen=false, detailsOpen=false;
 const c=vm.createContext({reportScreen:{isOpen:()=>reportOpen,close(){reportOpen=false;}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){detailsOpen=false;}},toggleSettingsButton:null,state,track,normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
-  syncReaderToolbarButton(){},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
+  syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
   defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
   appendPaneSequence(actualPanes){actualPanes.forEach((p,i)=>assert.equal(p,panes[i]));for(const p of actualPanes){p.hidden=!c.workflowPaneIsVisible(p.dataset.paneId);p.scrollTop=0;}},
   openProjectNotebook(){constructions++;},focusRecentUtilityColumn(){constructions++;}
@@ -125,3 +125,44 @@ accountOpen=true;referenceIDs=['reader:reference'];referenceContext.syncReferenc
 assert.equal(referenceTrack.inert,true,'Account keeps reference columns inactive');
 assert.equal(referenceClasses.has('has-reference-readers'),false);
 console.log('Report constraints passed: 600px document minimum, expanded Sources, 300px optional outline, retained hidden Readers and Account isolation.');
+
+// Layout follows the visible Report, never the retained Research/Notebook track.
+let menuReportOpen = true, reportReady = true, reportResets = 0, savedLayouts = 0, workspaceTransitions = 0;
+const fit = {}, closeColumns = {}, workspaceOnly = [{}, {}, {}];
+const layoutTrack = {scrollLeft: 220, scrollWidth: 1000, clientWidth: 700, querySelectorAll: () => []};
+const reportPanel = {querySelector: () => reportReady ? {} : null};
+const layoutState = {paneWeights: {'reader:one': 900, 'project:notebook:a': 730}, columnGroups: []};
+const layoutContext = vm.createContext({
+  reportScreen: {isOpen: () => menuReportOpen}, fitColumnsButton: fit, collapseReadersButton: closeColumns,
+  document: {querySelector: selector => selector.endsWith('.report-draft-panel') ? reportPanel : reportReady ? {} : null,
+    querySelectorAll: () => workspaceOnly},
+  defaultActivePaneIDs: () => [], activePaneIDs: () => ['reader:one', 'project:notebook:a'],
+  workflowPaneIsVisible: id => id === 'reader:one', defaultPaneWidthForID: () => 600,
+  resetReportColumnWidths: panel => {assert.equal(panel, reportPanel); reportResets++;},
+  syncReferenceReaderLayout() {}, state: layoutState, track: layoutTrack,
+  saveWorkspaceState: () => savedLayouts++, transitionWorkspace: async () => workspaceTransitions++, requestAnimationFrame: callback => callback()
+});
+vm.runInContext([actual('updateWorkspaceLayoutControls'), actual('resetVisibleColumnWidths')].join('\n'), layoutContext);
+layoutContext.updateWorkspaceLayoutControls();
+assert.equal(fit.hidden, false, 'Report reset stays available even when no Research columns are open');
+assert.equal(fit.disabled, false);
+assert.equal(fit.title, 'Restore default Report column widths');
+assert.ok(workspaceOnly.every(button => button.hidden), 'Report does not expose actions that operate on another view');
+assert.equal(closeColumns.hidden, true);
+await layoutContext.resetVisibleColumnWidths();
+assert.equal(reportResets, 1);
+assert.equal(layoutState.paneWeights['reader:one'], 900);
+assert.equal(savedLayouts, 0);
+assert.equal(workspaceTransitions, 0, 'Report reset does not rebuild or change the retained working views');
+reportReady = false; layoutContext.updateWorkspaceLayoutControls();
+assert.equal(fit.disabled, true, 'Wait for the Report columns to finish loading');
+await layoutContext.resetVisibleColumnWidths();
+assert.equal(reportResets, 1, 'A loading Report does not fall through to resetting another view');
+menuReportOpen = false; layoutContext.updateWorkspaceLayoutControls();
+assert.ok(workspaceOnly.every(button => !button.hidden), 'Research/Notebook restore their existing Layout actions');
+await layoutContext.resetVisibleColumnWidths();
+assert.equal(layoutState.paneWeights['reader:one'], 600);
+assert.equal(layoutState.paneWeights['project:notebook:a'], 730, 'The other view retains its width');
+assert.equal(savedLayouts, 1); assert.equal(workspaceTransitions, 1);
+assert.equal(layoutTrack.scrollLeft, 220);
+console.log('Layout reset passed: Report-aware controls and reset, loading guard, retained working views and existing Research/Notebook behavior.');

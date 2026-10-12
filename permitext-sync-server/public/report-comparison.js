@@ -41,6 +41,18 @@ export function preservePDFReadingPosition(container, change) {
   container.scrollTop = after ? container.scrollTop + after.top - top + fraction * after.height : scroll;
 }
 
+export function resetReportColumnWidths(panel, onResize) {
+  preservePDFReadingPosition(panel.querySelector('.report-export-content'), () => {
+    for (const key of ['libraryWidth', 'outlineWidth', 'versionsWidth', 'reportComparisonWidth', 'pdfComparisonWidth']) {
+      delete panel.dataset[key];
+    }
+    for (const kind of ['library', 'outline', 'versions']) panel.style.removeProperty(`--report-${kind}-width`);
+    onResize();
+  });
+  panel._reportSidebarControls?.forEach(control => control.update());
+  panel.querySelector('.report-workspace-columns').scrollLeft = 0;
+}
+
 // The PDF has its own mount. Selecting or hiding a saved version never replaces
 // the editable draft, its fields, or its scroll position.
 export function createReportComparison({ panel, columns, isCurrent, onResize,

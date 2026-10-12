@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {reportComparisonLayout, createReportComparison, preserveReportReadingPosition, preservePDFReadingPosition} from '../public/report-comparison.js';
+import {reportComparisonLayout, createReportComparison, preserveReportReadingPosition, preservePDFReadingPosition, resetReportColumnWidths} from '../public/report-comparison.js';
 
 const full = reportComparisonLayout(1920, {sources: 330, outline: 300, comparing: true, reportWidth: 900});
 assert.equal(full.minimumWidth, 2434, 'Scroll the complete column row rather than clamping a resized document to the viewport');
@@ -30,6 +30,22 @@ const pdfPosition = {scrollTop: 1300, getBoundingClientRect: () => ({top: 100}),
 ]};
 preservePDFReadingPosition(pdfPosition, () => {pdfExpanded = true;});
 assert.equal(pdfPosition.scrollTop, 1300, 'Keep the same point on the PDF page when its width and height scale');
+
+const resetColumns = {scrollLeft: 1700}, removedStyles = [], controlsUpdated = [];
+const resetPanel = {dataset: {libraryWidth: '640', outlineWidth: '640', versionsWidth: '640',
+  reportComparisonWidth: '600', pdfComparisonWidth: '2400', libraryOpen: 'true', outlineHidden: 'false',
+  comparisonOpen: 'true', versionsCollapsed: 'true'},
+  style: {removeProperty: name => removedStyles.push(name)},
+  querySelector: selector => selector === '.report-workspace-columns' ? resetColumns : pdfPosition,
+  _reportSidebarControls: [ {update: () => controlsUpdated.push('sidebar')}, {update: () => controlsUpdated.push('comparison')} ]};
+let layoutResets = 0;
+resetReportColumnWidths(resetPanel, () => { layoutResets++; });
+assert.deepEqual(resetPanel.dataset, {libraryOpen: 'true', outlineHidden: 'false', comparisonOpen: 'true', versionsCollapsed: 'true'},
+  'Reset all widths without closing the Sources, Outline, selected PDF or collapsed Versions rail');
+assert.equal(resetColumns.scrollLeft, 0);
+assert.equal(layoutResets, 1, 'Reset the complete layout together without rebuilding the editor or PDF');
+assert.deepEqual(removedStyles, ['--report-library-width', '--report-outline-width', '--report-versions-width']);
+assert.deepEqual(controlsUpdated, ['sidebar', 'comparison']);
 
 class Element {
   constructor() { this.children = []; this.dataset = {}; this.attributes = {}; this.events = {}; this.scrollTop = 0; this.clientWidth = 1920; }

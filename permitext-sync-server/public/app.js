@@ -3,7 +3,7 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261011-sidebar-width-v5";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition } from "./report-comparison.js?v=20261011-comparison-v9";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261011-comparison-v10";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-resize-v897";
+} from "./offline-storage.js?v=20261011-report-layout-v898";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2310,11 +2310,16 @@ function renderWorkspaceTabs() {
 }
 
 function updateWorkspaceLayoutControls() {
+  const inReport = Boolean(reportScreen?.isOpen());
+  const reportReady = Boolean(document.querySelector(".report-workspace-view:not([hidden]) .report-workspace-columns"));
   const hasColumns = defaultActivePaneIDs().length > 0;
-  fitColumnsButton.hidden = !hasColumns;
-  collapseReadersButton.hidden = !hasColumns;
-  fitColumnsButton.disabled = !hasColumns;
-  collapseReadersButton.disabled = !hasColumns;
+  fitColumnsButton.hidden = !inReport && !hasColumns;
+  fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns;
+  fitColumnsButton.title = inReport ? "Restore default Report column widths" : "Restore default panel widths";
+  collapseReadersButton.hidden = inReport || !hasColumns;
+  collapseReadersButton.disabled = inReport || !hasColumns;
+  document.querySelectorAll("#open-column-groups, #collapse-all-columns, #expand-all-columns")
+    .forEach(button => { button.hidden = inReport; });
 }
 
 function normalizeProjectIdentities(value, legacyWorkboard = null) {
@@ -2708,6 +2713,7 @@ async function openProjectReportDraft(project) {
   if (reportScreen?.projectID === projectID && reportScreen.isCurrent() && !pendingReportDraftByProject.has(projectID)) {
     await reportScreen.open();
     syncProjectToolButtonStates(identity);
+    updateWorkspaceLayoutControls();
     await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
     return true;
   }
@@ -2737,6 +2743,7 @@ async function openProjectReportDraft(project) {
   screen.projectID = projectID;
   reportScreen = screen;
   await screen.open();
+  updateWorkspaceLayoutControls();
   syncReferenceReaderLayout();
   syncProjectToolButtonStates(identity);
   startProjectArtifactCheckpointLoop({ immediate: true });
@@ -4269,6 +4276,7 @@ function syncWorkflowNavigation() {
   document.querySelectorAll('[data-workflow-tools]').forEach(tools => { tools.hidden = tools.dataset.workflowTools !== view; });
   syncReferenceReaderLayout();
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
+  updateWorkspaceLayoutControls();
 }
 async function switchWorkflowView(view) {
   closeSharedWorkspaceViews();
@@ -44582,6 +44590,11 @@ async function toggleUtilityPane(key) {
 }
 
 async function resetVisibleColumnWidths() {
+  if (reportScreen?.isOpen()) {
+    const panel = document.querySelector(".report-workspace-view:not([hidden]) .report-draft-panel");
+    if (panel?.querySelector(".report-workspace-columns")) resetReportColumnWidths(panel, syncReferenceReaderLayout);
+    return;
+  }
   const paneIDs = new Set(activePaneIDs().filter(workflowPaneIsVisible));
   for (const group of state.columnGroups || []) {
     for (const [id, column] of Object.entries(group.columns || {})) if (paneIDs.has(id)) column.width = defaultPaneWidthForID(id);

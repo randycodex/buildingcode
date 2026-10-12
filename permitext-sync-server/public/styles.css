@@ -19270,7 +19270,7 @@ dialog.report-export-review {
 .workspace-shell.has-reference-readers::-webkit-scrollbar,
 .workspace-shell:has(> .report-workspace-view:not([hidden]))::-webkit-scrollbar { display: none; }
 .workspace-shell.has-reference-readers > .topbar,
-.workspace-shell:has(> .report-workspace-view:not([hidden])) > .topbar { grid-column: 1 / -1; width: 100vw; position: sticky; left: 0; }
+.workspace-shell:has(> .report-workspace-view:not([hidden])) > .topbar { grid-column: 1 / -1; width: 100vw; position: sticky; left: 0; z-index: 4; }
 .workspace-shell.has-reference-readers > .panel-track {
   grid-column: 2; grid-row: 3; z-index: 3;
   width: 100%; min-width: 0; border-left: 1px solid var(--border);
