@@ -19017,7 +19017,44 @@ html body .column-group-menu-button:focus-visible {
 }
 
 .report-destination-select { display: block; width: 100%; margin-top: var(--space-3); padding: var(--space-2); color: var(--text-primary); background: var(--surface); border: 0; border-radius: 8px; }
-.saved-evidence-add-report-selection { border: 0; border-radius: 999px; padding: 6px 12px; background: var(--surface); color: var(--text-primary); }
+/* Bulk text actions use the same flat treatment as the Evidence toolbar. */
+.saved-evidence-add-report-selection,
+.saved-evidence-research-selection,
+.saved-evidence-cancel-selection {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: calc(var(--saved-font-size) * 0.8) !important;
+  font-weight: 400;
+  line-height: 1.25;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.saved-evidence-add-report-selection:hover,
+.saved-evidence-add-report-selection:focus-visible,
+.saved-evidence-research-selection:hover,
+.saved-evidence-research-selection:focus-visible {
+  color: var(--text-primary);
+}
+.saved-evidence-add-report-selection:disabled,
+.saved-evidence-research-selection:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.saved-evidence-add-report-selection[hidden],
+.saved-evidence-research-selection[hidden],
+.saved-evidence-cancel-selection[hidden] {
+  display: none;
+}
 
 .web-warning-dialog.is-report-destination .web-warning-confirm { background: #222; color: var(--text-primary); border-color: transparent; }
 

@@ -113,7 +113,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-saved-batch-v935";
+} from "./offline-storage.js?v=20261012-saved-batch-v936";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
