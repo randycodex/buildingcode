@@ -17667,7 +17667,12 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 
 /* Keep Saved tools fixed; evidence owns the remaining scrollable space. */
 .saved-panel > .saved-column-scroll { display: flex; flex-direction: column; overflow: hidden; }
-.saved-panel > .saved-column-scroll > * { flex-shrink: 0; }
+.saved-panel > .saved-column-scroll > * {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 600px;
+  margin-inline: auto;
+}
 .saved-panel > .saved-column-scroll > .saved-folder-context.is-project { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding-bottom: 0; }
 .saved-panel .saved-folder-context.is-project > * { flex-shrink: 0; }
 .saved-panel .saved-folder-context.is-project > .saved-project-evidence-section { display: flex; flex-direction: column; min-height: 0; }
