@@ -19140,6 +19140,9 @@ dialog.report-screen {
 .report-screen .report-source-picker, .report-screen .report-history-section { padding: 0; margin: 0 0 32px; }
 .report-screen .report-source-card { margin: 0; padding: 18px 0; }
 .report-screen .report-source-group { padding: 0; }
+.report-screen .report-source-picker > .report-source-palette { margin-inline: calc(-1 * var(--panel-padding)); width: calc(100% + (2 * var(--panel-padding))); }
+.report-screen .report-source-palette > .report-source-group { padding-inline: var(--panel-padding); border-bottom: 1px solid var(--border); }
+.report-screen .report-source-group-body > .report-source-card:last-child { border-bottom: 0; }
 .report-screen .report-source-picker-help { line-height: 1.5; }
 .report-screen .report-history-entry { padding: 18px 0; }
 .report-screen button:focus-visible { outline: 2px solid var(--focus-ring, #888); outline-offset: 3px; }
@@ -19484,7 +19487,7 @@ dialog.report-export-review {
 .report-screen .report-draft-panel .report-document-columns > .report-outline { grid-column: 1; display: block; }
 .report-screen .report-draft-panel .report-document-columns > .report-outline-divider { grid-column: 2; display: block; }
 .report-screen .report-draft-panel .report-document-columns > .report-document { grid-column: 3; display: block; }
-.report-screen .report-library > .report-source-picker { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0; padding: 24px; }
+.report-screen .report-library > .report-source-picker { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0; padding: var(--panel-padding); }
 .report-comparison-divider, .report-versions-divider {
   position: relative; z-index: 1; background: var(--border); cursor: col-resize; touch-action: none;
 }

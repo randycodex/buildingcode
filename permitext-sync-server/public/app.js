@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-report-content-v914";
+} from "./offline-storage.js?v=20261012-report-categories-v915";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29208,6 +29208,11 @@ async function renderProjectReportDraft(project, resume = null) {
       container.append(row);
     };
 
+    const projectFactsSources = sources.filter((source) => source.kind === "projectFacts");
+    appendSourceGroup("Project facts", "", (groupBody) => {
+      projectFactsSources.forEach((source) => appendSourceCard(groupBody, source));
+    });
+
     for (const [kind, label] of [["evidence", "Evidence"], ["notebookCard", "Notes"]]) {
       appendSourceGroup(label, "", body => {
         const items = sources.filter(source => source.kind === kind);
@@ -29220,12 +29225,6 @@ async function renderProjectReportDraft(project, resume = null) {
         }
       });
     }
-    const projectFactsSources = sources.filter((source) => source.kind === "projectFacts");
-    appendSourceGroup("Project facts", "", (groupBody) => {
-
-      projectFactsSources.forEach((source) => appendSourceCard(groupBody, source));
-    });
-
     const researchSources = sources.filter((source) => source.kind === "researchAnswer");
     appendSourceGroup("Research", "", (groupBody) => {
 
