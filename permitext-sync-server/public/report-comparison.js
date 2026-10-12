@@ -1,4 +1,4 @@
-import { openReportExportReview } from './report-export-review.js?v=20261011-report-export-v9';
+import { openReportExportReview } from './report-export-review.js?v=20261011-report-export-v10';
 
 export function preserveReportReadingPosition(container, change) {
   const top = container.getBoundingClientRect().top + 33;
@@ -11,20 +11,34 @@ export function preserveReportReadingPosition(container, change) {
 }
 
 export function reportComparisonLayout(available, { sources = 0, outline = 0, versions = 300,
-  comparing = false, reportWidth = 0 } = {}) {
+  comparing = false, reportWidth = 0, pdfWidth = 0 } = {}) {
   const sidebars = sources + outline + (comparing ? versions : 0);
   const dividers = Number(sources > 0) + Number(outline > 0) + (comparing ? 2 : 0);
   const pairWidth = Math.max(1200, available - sidebars - dividers);
-  const maximumReportWidth = pairWidth - 600;
-  const chosen = reportWidth ? Math.max(600, Math.min(maximumReportWidth, reportWidth)) : 0;
+  const chosenReport = reportWidth ? Math.max(600, reportWidth) : 0;
+  const chosenPDF = pdfWidth ? Math.max(600, pdfWidth) : 0;
   return {
     template: [sources ? `${sources}px` : '0px', sources ? '1px' : '0px',
       outline ? `${outline}px` : '0px', outline ? '1px' : '0px',
-      comparing && chosen ? `${chosen}px` : 'minmax(600px, 1fr)',
-      comparing ? '1px' : '0px', comparing ? 'minmax(600px, 1fr)' : '0px',
+      comparing && chosenReport ? `${chosenReport}px` : 'minmax(600px, 1fr)',
+      comparing ? '1px' : '0px', comparing ? chosenPDF ? `${chosenPDF}px` : 'minmax(600px, 1fr)' : '0px',
       comparing ? '1px' : '0px', comparing ? `${versions}px` : '0px'].join(' '),
-    minimumWidth: sidebars + dividers + (comparing ? 1200 : 600), maximumReportWidth
+    minimumWidth: sidebars + dividers + (comparing ? (chosenReport || 600) + (chosenPDF || 600) : 600),
+    balancedDocumentWidth: pairWidth / 2
   };
+}
+
+export function preservePDFReadingPosition(container, change) {
+  if (!container) { change(); return; }
+  const top = container.getBoundingClientRect().top;
+  const pages = [...container.querySelectorAll('.report-pdf-page')];
+  const anchor = pages.find(page => page.getBoundingClientRect().bottom > top) || pages.at(-1);
+  const before = anchor?.getBoundingClientRect();
+  const fraction = before?.height ? (top - before.top) / before.height : 0;
+  const scroll = container.scrollTop;
+  change();
+  const after = anchor?.getBoundingClientRect();
+  container.scrollTop = after ? container.scrollTop + after.top - top + fraction * after.height : scroll;
 }
 
 // The PDF has its own mount. Selecting or hiding a saved version never replaces
@@ -94,40 +108,63 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
   divider.setAttribute('aria-label', 'Resize Report and PDF Preview');
   divider.setAttribute('aria-orientation', 'vertical');
   divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to balance';
-  const maximumWidth = () => reportComparisonLayout(columns()?.clientWidth || 0, {
+  const balancedWidth = () => reportComparisonLayout(columns()?.clientWidth || 0, {
     sources: panel.dataset.libraryOpen === 'true' ? Number(panel.dataset.libraryWidth) || 330 : 0,
     outline: panel.dataset.outlineHidden === 'true' ? 0 : Number(panel.dataset.outlineWidth) || 300,
     versions: panel.dataset.versionsCollapsed === 'true' ? 48 : Number(panel.dataset.versionsWidth) || 300, comparing: true
-  }).maximumReportWidth;
+  }).balancedDocumentWidth;
+  const widths = () => ({
+    report: columns()?.querySelector('.report-document')?.getBoundingClientRect().width || 600,
+    pdf: preview.getBoundingClientRect().width || 600
+  });
   const update = () => {
-    const width = columns()?.querySelector('.report-document')?.getBoundingClientRect().width || 600;
-    divider.setAttribute('aria-valuemin', '600');
-    divider.setAttribute('aria-valuemax', String(maximumWidth()));
-    divider.setAttribute('aria-valuenow', String(Math.round(width)));
-    divider.setAttribute('aria-valuetext', `${Math.round(width)} pixels for the Report`);
+    const { report, pdf } = widths();
+    divider.setAttribute('aria-valuemin', '0');
+    divider.setAttribute('aria-valuemax', '100');
+    divider.setAttribute('aria-valuenow', String(Math.round(100 * report / (report + pdf))));
+    divider.setAttribute('aria-valuetext', `Report ${Math.round(report)} pixels; PDF preview ${Math.round(pdf)} pixels`);
     paintSelection();
   };
-  const resize = value => {
-    panel.dataset.reportComparisonWidth = String(Math.max(600, Math.min(maximumWidth(), value)));
-    onResize(); update();
+  const resize = (report, pdf) => {
+    panel.dataset.reportComparisonWidth = String(Math.max(600, report));
+    panel.dataset.pdfComparisonWidth = String(Math.max(600, pdf));
+    preservePDFReadingPosition(preview.querySelector('.report-export-content'), onResize);
+    update();
   };
-  divider.addEventListener('dblclick', () => { delete panel.dataset.reportComparisonWidth; onResize(); update(); });
+  divider.addEventListener('dblclick', () => {
+    delete panel.dataset.reportComparisonWidth;
+    delete panel.dataset.pdfComparisonWidth;
+    preservePDFReadingPosition(preview.querySelector('.report-export-content'), onResize);
+    update();
+  });
   divider.addEventListener('keydown', event => {
-    const width = columns().querySelector('.report-document').getBoundingClientRect().width;
+    const { report, pdf } = widths();
     const step = event.shiftKey ? 80 : 24;
-    const sizes = {ArrowLeft: width - step, ArrowRight: width + step, Home: 600, End: maximumWidth()};
-    if (!(event.key in sizes)) return;
-    event.preventDefault(); resize(sizes[event.key]);
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const delta = event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step :
+      event.key === 'Home' ? 600 - report : 0;
+    if (event.key === 'End') resize(balancedWidth(), balancedWidth());
+    else {
+      const scroll = columns().scrollLeft;
+      resize(report + delta, pdf - delta);
+      columns().scrollLeft = scroll + Math.max(600, report + delta) - report - delta;
+    }
   });
   let drag = null;
   divider.addEventListener('pointerdown', event => {
     if (event.button !== 0) return;
     event.preventDefault(); divider.focus({preventScroll: true});
-    drag = {id: event.pointerId, x: event.clientX, width: columns().querySelector('.report-document').getBoundingClientRect().width};
+    drag = {id: event.pointerId, x: event.clientX, ...widths(), scroll: columns().scrollLeft};
     divider.setPointerCapture(event.pointerId);
   });
   divider.addEventListener('pointermove', event => {
-    if (drag?.id === event.pointerId) resize(drag.width + event.clientX - drag.x);
+    if (drag?.id !== event.pointerId) return;
+    const delta = event.clientX - drag.x;
+    resize(drag.report + delta, drag.pdf - delta);
+    // Once the Report reaches its minimum, keep the boundary under the pointer
+    // by scrolling the whole row while the PDF continues growing to the left.
+    columns().scrollLeft = drag.scroll + Math.max(600, drag.report + delta) - drag.report - delta;
   });
   const finish = () => { drag = null; };
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) divider.addEventListener(event, finish);

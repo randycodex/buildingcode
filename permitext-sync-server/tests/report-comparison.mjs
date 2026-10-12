@@ -1,13 +1,17 @@
 import assert from 'node:assert/strict';
-import {reportComparisonLayout, createReportComparison, preserveReportReadingPosition} from '../public/report-comparison.js';
+import {reportComparisonLayout, createReportComparison, preserveReportReadingPosition, preservePDFReadingPosition} from '../public/report-comparison.js';
 
 const full = reportComparisonLayout(1920, {sources: 330, outline: 300, comparing: true, reportWidth: 900});
-assert.equal(full.minimumWidth, 2134, 'Scroll the complete column row rather than squeezing either document below 600px');
-assert.equal(full.maximumReportWidth, 600);
-assert.equal(full.template, '330px 1px 300px 1px 600px 1px minmax(600px, 1fr) 1px 300px');
+assert.equal(full.minimumWidth, 2434, 'Scroll the complete column row rather than clamping a resized document to the viewport');
+assert.equal(full.balancedDocumentWidth, 600);
+assert.equal(full.template, '330px 1px 300px 1px 900px 1px minmax(600px, 1fr) 1px 300px');
 const focused = reportComparisonLayout(1920, {comparing: true, reportWidth: 4000});
-assert.equal(focused.maximumReportWidth, 1018);
-assert.ok(focused.template.includes('1018px 1px minmax(600px, 1fr)'));
+assert.equal(focused.balancedDocumentWidth, 809);
+assert.ok(focused.template.includes('4000px 1px minmax(600px, 1fr)'));
+const expandedPDF = reportComparisonLayout(1606, {outline: 300, comparing: true, reportWidth: 600, pdfWidth: 4000});
+assert.ok(expandedPDF.template.includes('600px 1px 4000px'));
+assert.equal(expandedPDF.minimumWidth, 5203, 'PDF expansion has no viewport or page-width ceiling');
+assert.ok(reportComparisonLayout(1606, {comparing: true, reportWidth: 10, pdfWidth: 20}).template.includes('600px 1px 600px'));
 assert.equal(reportComparisonLayout(1920, {comparing: false}).minimumWidth, 600);
 assert.equal(reportComparisonLayout(1920, {comparing: true, versions: 48}).minimumWidth, 1250);
 let changedWidth = false;
@@ -20,6 +24,12 @@ const positionContainer = {scrollTop: 731, getBoundingClientRect: () => ({top: 8
   ]};
 preserveReportReadingPosition(positionContainer, () => { changedWidth = true; });
 assert.equal(positionContainer.scrollTop, 875, 'Column changes preserve the current report item and its offset as earlier text reflows');
+let pdfExpanded = false;
+const pdfPosition = {scrollTop: 1300, getBoundingClientRect: () => ({top: 100}), querySelectorAll: () => [
+  {getBoundingClientRect: () => ({top: pdfExpanded ? 20 : 60, bottom: 1100, height: pdfExpanded ? 1800 : 900})}
+]};
+preservePDFReadingPosition(pdfPosition, () => {pdfExpanded = true;});
+assert.equal(pdfPosition.scrollTop, 1300, 'Keep the same point on the PDF page when its width and height scale');
 
 class Element {
   constructor() { this.children = []; this.dataset = {}; this.attributes = {}; this.events = {}; this.scrollTop = 0; this.clientWidth = 1920; }
@@ -29,7 +39,7 @@ class Element {
   addEventListener(name, callback) { this.events[name] = callback; }
   querySelectorAll() { return this.buttons || []; }
   querySelector(selector) { return selector === '.report-export-content' ? this.content : selector === '.report-document' ? this.document : null; }
-  getBoundingClientRect() { return {width: 809}; }
+  getBoundingClientRect() { return {width: this.width || 809, top: 100}; }
   focus() {}
   setPointerCapture() {}
 }
@@ -42,6 +52,8 @@ const reviews = [];
 const comparison = createReportComparison({panel, columns: () => host, isCurrent: () => current,
   onResize: () => {
     resized++;
+    if (panel.dataset.reportComparisonWidth) host.document.width = Number(panel.dataset.reportComparisonWidth);
+    if (panel.dataset.pdfComparisonWidth) comparison.preview.width = Number(panel.dataset.pdfComparisonWidth);
     if (panel.dataset.comparisonOpen !== 'true' && comparison.preview.content) {
       comparison.preview.content.scrollTop = 0;
       comparison.versionBody.scrollTop = 0;
@@ -87,14 +99,33 @@ assert.equal(host.document.scrollTop, 731, 'Choosing, closing or hiding the PDF 
 panel.dataset.outlineHidden = 'true';
 comparison.divider.events.keydown({key: 'Home', preventDefault() {}});
 assert.equal(panel.dataset.reportComparisonWidth, '600');
+assert.equal(panel.dataset.pdfComparisonWidth, '1018');
 comparison.divider.events.pointerdown({button: 0, pointerId: 1, clientX: 800, preventDefault() {}});
 comparison.divider.events.pointermove({pointerId: 1, clientX: 1000});
-assert.equal(panel.dataset.reportComparisonWidth, '1009', 'Dragging right widens the Report and moves the divider during the drag');
+assert.equal(panel.dataset.reportComparisonWidth, '800', 'Dragging right widens the Report and moves the divider during the drag');
+assert.equal(panel.dataset.pdfComparisonWidth, '818');
 comparison.divider.events.pointercancel();
 comparison.divider.events.pointermove({pointerId: 1, clientX: 1100});
-assert.equal(panel.dataset.reportComparisonWidth, '1009');
+assert.equal(panel.dataset.reportComparisonWidth, '800');
+host.scrollLeft = 180;
+comparison.divider.events.pointerdown({button: 0, pointerId: 2, clientX: 800, preventDefault() {}});
+comparison.divider.events.pointermove({pointerId: 2, clientX: -2400});
+assert.equal(panel.dataset.reportComparisonWidth, '600');
+assert.equal(panel.dataset.pdfComparisonWidth, '4018', 'Dragging left keeps expanding the PDF after the Report reaches 600px');
+assert.equal(host.scrollLeft, 3180, 'The whole row scrolls so the boundary follows the pointer instead of sticking at the Report minimum');
+comparison.divider.events.pointerup();
+comparison.divider.events.keydown({key: 'ArrowLeft', shiftKey: true, preventDefault() {}});
+assert.equal(panel.dataset.pdfComparisonWidth, '4098', 'Keyboard expansion has no maximum either');
+assert.equal(host.scrollLeft, 3260);
+assert.equal(comparison.divider.attributes['aria-valuetext'], 'Report 600 pixels; PDF preview 4098 pixels');
+assert.equal(comparison.divider.attributes['aria-valuenow'], '13', 'Expose a valid proportional separator range while announcing the actual document widths');
+assert.equal(comparison.divider.attributes['aria-valuemax'], '100');
+comparison.divider.events.keydown({key: 'End', preventDefault() {}});
+assert.equal(panel.dataset.reportComparisonWidth, '809');
+assert.equal(panel.dataset.pdfComparisonWidth, '809', 'End restores balanced documents');
 comparison.divider.events.dblclick();
 assert.equal(panel.dataset.reportComparisonWidth, undefined);
+assert.equal(panel.dataset.pdfComparisonWidth, undefined);
 current = false;
 comparison.select({id: 'third'}, prepare);
 assert.equal(reviews.length, 2, 'Changed account context cannot open a private PDF');

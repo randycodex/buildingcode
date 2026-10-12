@@ -1,9 +1,9 @@
-import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v10";
+import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261011-sidebar-width-v5";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition } from "./report-comparison.js?v=20261011-comparison-v6";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition } from "./report-comparison.js?v=20261011-comparison-v9";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-workspace-actions-v894";
+} from "./offline-storage.js?v=20261011-report-resize-v897";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29652,7 +29652,8 @@ async function renderProjectReportDraft(project) {
       const template = reportComparisonLayout(columns.clientWidth || shell.clientWidth, {
         sources: sourceWidth, outline: outlineWidth, comparing,
         versions: collapsedVersions ? 48 : Number(panel.dataset.versionsWidth) || 300,
-        reportWidth: Number(panel.dataset.reportComparisonWidth) || 0
+        reportWidth: Number(panel.dataset.reportComparisonWidth) || 0,
+        pdfWidth: Number(panel.dataset.pdfComparisonWidth) || 0
       }).template;
       if (columns.style.gridTemplateColumns !== template) preserveReportReadingPosition(documentBody,
         () => { columns.style.gridTemplateColumns = template; });

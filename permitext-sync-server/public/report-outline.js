@@ -64,6 +64,9 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   title.textContent = "Outline";
   const contents = document.createElement("div");
   contents.className = "report-outline-contents reader-nav-tree";
+  const dragImage = document.createElement("span");
+  dragImage.className = "report-outline-drag-image";
+  dragImage.setAttribute("aria-hidden", "true");
   const links = [];
   const rows = [];
   const entries = new Map();
@@ -164,6 +167,7 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
       pointerDrag.y = event.clientY;
       if (!pointerDrag.started && Math.abs(event.clientY - pointerDrag.startY) > 4) {
         pointerDrag.started = true;
+        outline.classList.add("is-reordering");
         paintPointerDrop();
       }
     });
@@ -172,6 +176,7 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
       pointerDrag = null;
       cancelAnimationFrame(dragFrame);
       clearDrag();
+      outline.classList.remove("is-reordering");
       if (!cancelled && move?.started) onMove(move.block, move.index, "outline");
     };
     handle.addEventListener("pointerup", () => endPointerDrag(false));
@@ -220,11 +225,15 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
     }
     row.addEventListener("dragstart", event => {
       dragged = block;
+      outline.classList.add("is-reordering");
       row.classList.add("is-dragging");
       event.dataTransfer?.setData("text/plain", row.dataset.blockId);
+      // The insertion line communicates the destination; avoid a boxed native
+      // drag image following the pointer over the Outline.
+      event.dataTransfer?.setDragImage?.(dragImage, 0, 0);
       if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
     });
-    row.addEventListener("dragend", () => { dragged = null; clearDrag(); });
+    row.addEventListener("dragend", () => { dragged = null; clearDrag(); outline.classList.remove("is-reordering"); });
     row.addEventListener("dragover", event => {
       if (!dragged || dragged === block) return;
       event.preventDefault();
@@ -245,6 +254,7 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
         event.clientY > row.getBoundingClientRect().top + row.offsetHeight / 2);
       dragged = null;
       clearDrag();
+      outline.classList.remove("is-reordering");
       onMove(moved, targetIndex, "outline");
     });
     rows.push(row);
@@ -273,7 +283,7 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   const status = document.createElement("span");
   status.className = "sr-only";
   status.setAttribute("role", "status");
-  outline.append(title, introRow, contents, status);
+  outline.append(title, introRow, contents, status, dragImage);
   const updateCurrent = () => {
     scrollFrame = 0;
     const top = documentBody.getBoundingClientRect().top + 48;

@@ -46,7 +46,12 @@ await navigateReportOutline({requests: [Promise.reject(Error('Preview unavailabl
 assert.equal(navigated, 1, 'New navigation, manual scrolling, reordering and account changes cancel stale jumps');
 
 class Element {
-  constructor() { this.children = []; this.attributes = {}; this.dataset = {}; this.events = {}; this.offsetHeight = 50; this.classList = {add() {}, remove() {}}; }
+  constructor() {
+    this.children = []; this.attributes = {}; this.dataset = {}; this.events = {}; this.offsetHeight = 50;
+    const classes = new Set();
+    this.classList = {add: (...names) => names.forEach(name => classes.add(name)),
+      remove: (...names) => names.forEach(name => classes.delete(name)), contains: name => classes.has(name)};
+  }
   append(...children) { for (const child of children) { if (child.parentElement) child.parentElement.children.splice(child.parentElement.children.indexOf(child), 1); child.parentElement = this; this.children.push(child); } }
   replaceChildren(...children) { this.children.forEach(child => { child.parentElement = null; }); this.children = []; this.append(...children); }
   setAttribute(key, value) { this.attributes[key] = value; }
@@ -84,8 +89,12 @@ rows[2].querySelector('.report-outline-drag').events.keydown({key: 'ArrowUp', pr
 assert.deepEqual(blocks.map(block => block.id), ['a', 'b', 'c'], 'Repeated moves use current positions');
 rows = getRows();
 // Drop handler uses the dragged block identity, rather than the position captured before a move.
-rows[1].events.dragstart({dataTransfer: {setData() {}}});
+let nativeDragImage;
+rows[1].events.dragstart({dataTransfer: {setData() {}, setDragImage: image => {nativeDragImage = image;}}});
+assert.equal(nativeDragImage, controller.element.querySelector('.report-outline-drag-image'), 'Native row drags use the transparent image instead of a boxed row ghost');
+assert.equal(controller.element.classList.contains('is-reordering'), true);
 rows[0].events.drop({clientY: 0, preventDefault() {}});
+assert.equal(controller.element.classList.contains('is-reordering'), false);
 assert.deepEqual(blocks.map(block => block.id), ['b', 'a', 'c']);
 await autosave.flush();
 assert.deepEqual(writes.at(-1).blocks.map(block => block.id), ['b', 'a', 'c']);
@@ -134,11 +143,16 @@ pointerRows.forEach((row, index) => { row.rect = {top: 100 + index * 50, bottom:
 const pointerHandle = pointerRows[2].querySelector('.report-outline-drag');
 pointerHandle.events.pointerdown({button: 0, pointerId: 1, clientY: 225, preventDefault() {}});
 pointerHandle.events.pointermove({clientY: 105});
+assert.equal(pointer.element.classList.contains('is-reordering'), true);
+assert.equal(pointerRows[0].classList.contains('is-drop-before'), true, 'Mark the actual insertion boundary before releasing the pointer');
 pointerHandle.events.pointerup();
+assert.equal(pointerRows[0].classList.contains('is-drop-before'), false, 'Release clears the insertion line');
+assert.equal(pointer.element.classList.contains('is-reordering'), false);
 assert.deepEqual(pointerMoves, [['3', 0]], 'Captured pointer dragging works across row buttons');
 pointerHandle.events.pointerdown({button: 0, pointerId: 1, clientY: 225, preventDefault() {}});
 pointerHandle.events.pointermove({clientY: 105});
 pointerHandle.events.pointercancel();
+assert.equal(pointerRows[0].classList.contains('is-drop-before'), false, 'Cancellation clears the insertion line too');
 assert.equal(pointerMoves.length, 1, 'Cancelled dragging must not alter the draft');
 pointer.dispose();
 
