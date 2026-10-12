@@ -1,4 +1,4 @@
-import { createReportOutline, moveReportBlock, reportDropIndex } from "./report-outline.js?v=20261011-outline-v4";
+import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle } from "./report-outline.js?v=20261011-outline-v5";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=6";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-outline-v870";
+} from "./offline-storage.js?v=20261011-report-outline-v871";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29192,7 +29192,7 @@ async function renderProjectReportDraft(project) {
         ? `.report-outline-item[data-block-id="${escapedID}"] .report-outline-drag`
         : `.report-draft-block[data-block-id="${escapedID}"] .report-draft-block-drag-handle`);
       handle?.focus({ preventScroll: true });
-      if (focusArea === "outline") handle?.scrollIntoView({ block: "nearest" });
+      if (focusArea === "outline" && handle) revealOutlineHandle(outlineController.element, handle);
     });
   }
 
@@ -29544,7 +29544,7 @@ async function renderProjectReportDraft(project) {
       onNavigate: target => {
         if (target === metadata && introductionLabel.getAttribute("aria-expanded") === "false") introductionLabel.click();
         if (target !== metadata && blocksTitle.getAttribute("aria-expanded") === "false") blocksTitle.click();
-        requestAnimationFrame(() => target.scrollIntoView({ block: "start", behavior: "smooth" }));
+        requestAnimationFrame(() => scrollReportTarget(documentBody, target));
       },
       onMove: reorderDraftBlock
     });

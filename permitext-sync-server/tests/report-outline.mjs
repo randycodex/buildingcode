@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {moveReportBlock, reportDropIndex, createReportOutline} from '../public/report-outline.js';
+import {moveReportBlock, reportDropIndex, createReportOutline, scrollReportTarget, revealOutlineHandle} from '../public/report-outline.js';
 import {createReportAutosave} from '../public/report-autosave.js';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -20,6 +20,12 @@ for (const indices of [[-1, 0], [0, -1], [0, 2], [0, 0], [0, 0.5]]) {
   assert.equal(moveReportBlock(blocks, ...indices), false);
   assert.deepEqual(blocks, before);
 }
+const navigationScrolls = [];
+const scrollContainer = {scrollTop: 100, getBoundingClientRect: () => ({top: 84, bottom: 1080}), scrollTo: value => navigationScrolls.push(value)};
+scrollReportTarget(scrollContainer, {getBoundingClientRect: () => ({top: 316})});
+assert.deepEqual(navigationScrolls, [{top: 300, behavior: 'smooth'}], 'Navigation scrolls only the document, preserving outer toolbars');
+revealOutlineHandle(scrollContainer, {getBoundingClientRect: () => ({top: 1060, bottom: 1090})});
+assert.equal(scrollContainer.scrollTop, 118, 'Keyboard focus scrolls only the outline');
 
 class Element {
   constructor() { this.children = []; this.attributes = {}; this.dataset = {}; this.events = {}; this.offsetHeight = 50; this.classList = {add() {}, remove() {}}; }

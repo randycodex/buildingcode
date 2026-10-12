@@ -13,6 +13,19 @@ export function moveReportBlock(blocks, sourceIndex, targetIndex) {
   return true;
 }
 
+export function scrollReportTarget(container, target) {
+  container.scrollTo({
+    top: Math.max(0, container.scrollTop + target.getBoundingClientRect().top - container.getBoundingClientRect().top - 32),
+    behavior: "smooth"
+  });
+}
+
+export function revealOutlineHandle(container, handle) {
+  const bounds = container.getBoundingClientRect(), item = handle.getBoundingClientRect();
+  if (item.top < bounds.top + 8) container.scrollTop -= bounds.top + 8 - item.top;
+  else if (item.bottom > bounds.bottom - 8) container.scrollTop += item.bottom - bounds.bottom + 8;
+}
+
 export function createReportOutline({ blocks, introduction, targets, documentBody, describe,
   onNavigate, onMove, dragIcon, expanded = true, onExpanded = () => {} }) {
   const outline = document.createElement("nav");
