@@ -1,4 +1,4 @@
-import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle } from "./report-outline.js?v=20261011-outline-v5";
+import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v6";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=6";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-outline-v871";
+} from "./offline-storage.js?v=20261011-report-outline-v872";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28456,6 +28456,7 @@ async function renderProjectReportDraft(project) {
   let outlineController = null;
   let outlineExpanded = true;
   let renderedDraftKey = null;
+  let outlineNavigationGeneration = 0;
   let autosave = null;
   let recoveryEditorID = crypto.randomUUID();
   let recoveredDrafts = [];
@@ -29175,6 +29176,7 @@ async function renderProjectReportDraft(project) {
 
   function reorderDraftBlock(block, targetIndex, focusArea = null) {
     if (!moveReportBlock(activeDraft.blocks, activeDraft.blocks.indexOf(block), targetIndex)) return;
+    outlineNavigationGeneration += 1;
     const documentBody = shell.querySelector(".report-document");
     const scroll = documentBody.scrollTop;
     const rows = [...documentBody.querySelectorAll(".report-draft-block")];
@@ -29198,6 +29200,7 @@ async function renderProjectReportDraft(project) {
 
   function renderWorkspaceContent() {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+    outlineNavigationGeneration += 1;
     const draftKey = activeDraft.id || activeDraft.clientDraftID;
     const keepPosition = renderedDraftKey === draftKey;
     const oldDocument = shell.querySelector(".report-document");
@@ -29544,7 +29547,16 @@ async function renderProjectReportDraft(project) {
       onNavigate: target => {
         if (target === metadata && introductionLabel.getAttribute("aria-expanded") === "false") introductionLabel.click();
         if (target !== metadata && blocksTitle.getAttribute("aria-expanded") === "false") blocksTitle.click();
-        requestAnimationFrame(() => scrollReportTarget(documentBody, target));
+        const navigation = ++outlineNavigationGeneration;
+        const isCurrent = () => !disposed && isCurrentAccountRequest(requestIdentity) &&
+          navigation === outlineNavigationGeneration && target.isConnected && panel.closest(".report-screen")?.open;
+        void navigateReportOutline({
+          requests: sourcePreviewRequests.values(),
+          isCurrent,
+          navigate: () => requestAnimationFrame(() => {
+            if (isCurrent()) scrollReportTarget(documentBody, target);
+          })
+        });
       },
       onMove: reorderDraftBlock
     });
@@ -29640,6 +29652,8 @@ async function renderProjectReportDraft(project) {
     documentBody.scrollTop = documentScroll;
     outline.scrollTop = outlineScroll;
     documentBody.addEventListener("input", () => outlineController.refreshLabels());
+    documentBody.addEventListener("wheel", () => { outlineNavigationGeneration += 1; }, { passive: true });
+    documentBody.addEventListener("pointerdown", () => { outlineNavigationGeneration += 1; });
     paintReportSaveState();
     if (panel.isConnected) syncReferenceReaderLayout();
   }

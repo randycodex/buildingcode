@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {moveReportBlock, reportDropIndex, createReportOutline, scrollReportTarget, revealOutlineHandle} from '../public/report-outline.js';
+import {moveReportBlock, reportDropIndex, createReportOutline, scrollReportTarget, revealOutlineHandle, navigateReportOutline} from '../public/report-outline.js';
 import {createReportAutosave} from '../public/report-autosave.js';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -26,6 +26,14 @@ scrollReportTarget(scrollContainer, {getBoundingClientRect: () => ({top: 316})})
 assert.deepEqual(navigationScrolls, [{top: 300, behavior: 'smooth'}], 'Navigation scrolls only the document, preserving outer toolbars');
 revealOutlineHandle(scrollContainer, {getBoundingClientRect: () => ({top: 1060, bottom: 1090})});
 assert.equal(scrollContainer.scrollTop, 118, 'Keyboard focus scrolls only the outline');
+let completePreview, navigationCurrent = true, navigated = 0;
+const previewReady = new Promise(resolve => { completePreview = resolve; });
+const pendingNavigation = navigateReportOutline({requests: [previewReady], isCurrent: () => navigationCurrent, navigate: () => navigated++});
+await Promise.resolve(); assert.equal(navigated, 0, 'Do not measure a destination while earlier previews are still changing height');
+completePreview(); await pendingNavigation; assert.equal(navigated, 1);
+navigationCurrent = false;
+await navigateReportOutline({requests: [Promise.reject(Error('Preview unavailable'))], isCurrent: () => navigationCurrent, navigate: () => navigated++});
+assert.equal(navigated, 1, 'New navigation, manual scrolling, reordering and account changes cancel stale jumps');
 
 class Element {
   constructor() { this.children = []; this.attributes = {}; this.dataset = {}; this.events = {}; this.offsetHeight = 50; this.classList = {add() {}, remove() {}}; }
@@ -83,7 +91,7 @@ documentBody.scrollTop = 1706;
 documentBody.querySelectorAll = () => [...blockBody.children];
 const calls = [];
 const context = vm.createContext({activeDraft, shell: {querySelector: () => documentBody}, moveReportBlock,
-  outlineController: {reorder: () => calls.push('outline'), announce() {}}, reportBlockTitle: b => b.id,
+  outlineNavigationGeneration: 0, outlineController: {reorder: () => calls.push('outline'), announce() {}}, reportBlockTitle: b => b.id,
   renderIncludedReportComments: () => calls.push('comments'), panel: {}, setDirty: () => calls.push('dirty')});
 vm.runInContext(app.slice(reorderStart, app.indexOf('  function renderWorkspaceContent()', reorderStart)), context);
 context.reorderDraftBlock(activeDraft.blocks[2], 0);

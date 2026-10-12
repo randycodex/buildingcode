@@ -26,6 +26,12 @@ export function revealOutlineHandle(container, handle) {
   else if (item.bottom > bounds.bottom - 8) container.scrollTop += item.bottom - bounds.bottom + 8;
 }
 
+export async function navigateReportOutline({ requests, isCurrent, navigate }) {
+  // Preview responses change the height of earlier items; measure after they render.
+  await Promise.allSettled([...requests]);
+  if (isCurrent()) navigate();
+}
+
 export function createReportOutline({ blocks, introduction, targets, documentBody, describe,
   onNavigate, onMove, dragIcon, expanded = true, onExpanded = () => {} }) {
   const outline = document.createElement("nav");
