@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {moveReportBlock, reportDropIndex, createReportOutline, scrollReportTarget, revealOutlineHandle, navigateReportOutline} from '../public/report-outline.js';
+import {moveReportBlock, reportDropIndex, reportOutlineDropIndex, groupReportOutline, createReportOutline, scrollReportTarget, revealOutlineHandle, navigateReportOutline} from '../public/report-outline.js';
 import {createReportAutosave} from '../public/report-autosave.js';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -20,6 +20,15 @@ for (const indices of [[-1, 0], [0, -1], [0, 2], [0, 0], [0, 0.5]]) {
   assert.equal(moveReportBlock(blocks, ...indices), false);
   assert.deepEqual(blocks, before);
 }
+const orderedSources = ['evidence', 'heading', 'heading', 'notebookCard', 'evidence', 'heading', 'researchAnswer']
+  .map((kind, id) => ({kind, id: String(id), excludedCommentKeys: ['private']}));
+const groups = groupReportOutline(orderedSources);
+assert.deepEqual(groups.map(group => [group.block.id, group.children.map(block => block.id)]),
+  [['0', []], ['1', []], ['2', ['3', '4']], ['5', ['6']]], 'Only actual headings group subsequent items, including consecutive headings');
+assert.deepEqual(groups.flatMap(group => [group.block, ...group.children]), orderedSources, 'Preserve source order and live identities');
+assert.deepEqual(groupReportOutline([]), []);
+assert.equal(reportOutlineDropIndex(orderedSources, 0, 2, true, true), 4, 'Drop below a collapsed heading after its hidden contents');
+assert.equal(reportOutlineDropIndex(orderedSources, 0, 2, true, false), 2, 'An expanded heading exposes its first insertion boundary');
 const navigationScrolls = [];
 const scrollContainer = {scrollTop: 100, getBoundingClientRect: () => ({top: 84, bottom: 1080}), scrollTo: value => navigationScrolls.push(value)};
 scrollReportTarget(scrollContainer, {getBoundingClientRect: () => ({top: 316})});
@@ -38,6 +47,7 @@ assert.equal(navigated, 1, 'New navigation, manual scrolling, reordering and acc
 class Element {
   constructor() { this.children = []; this.attributes = {}; this.dataset = {}; this.events = {}; this.offsetHeight = 50; this.classList = {add() {}, remove() {}}; }
   append(...children) { for (const child of children) { if (child.parentElement) child.parentElement.children.splice(child.parentElement.children.indexOf(child), 1); child.parentElement = this; this.children.push(child); } }
+  replaceChildren(...children) { this.children.forEach(child => { child.parentElement = null; }); this.children = []; this.append(...children); }
   setAttribute(key, value) { this.attributes[key] = value; }
   removeAttribute(key) { delete this.attributes[key]; }
   addEventListener(key, fn) { this.events[key] = fn; }
@@ -46,6 +56,7 @@ class Element {
   focus() {}
   setPointerCapture() {}
   querySelector(selector) { return this.children.find(child => child.className?.split(' ').includes(selector.slice(1))) || this.children.map(child => child.querySelector(selector)).find(Boolean); }
+  querySelectorAll(selector) { return this.children.flatMap(child => [...(child.className?.split(' ').includes(selector.slice(1)) ? [child] : []), ...child.querySelectorAll(selector)]); }
   contains(element) { return this.children.includes(element); }
 }
 globalThis.document = {createElement: () => new Element()};
@@ -60,14 +71,17 @@ const moves = [], navigations = [], body = new Element(), introduction = new Ele
 const controller = createReportOutline({blocks, introduction, targets, documentBody: body,
   describe: block => ({title: block.id}), dragIcon: '', onNavigate: target => navigations.push(target),
   onMove: (block, index, area) => { moves.push({id: block.id, index, area}); if (moveReportBlock(blocks, blocks.indexOf(block), index)) { controller.reorder(); autosave.change(); } }});
-const rows = controller.element.children[3].children;
+const getRows = () => controller.element.querySelectorAll('.report-outline-item');
+let rows = getRows();
 rows[1].querySelector('.report-outline-drag').events.keydown({key: 'ArrowDown', preventDefault() {}});
 assert.deepEqual(moves[0], {id: 'b', index: 2, area: 'outline'});
 await autosave.flush();
 assert.deepEqual(writes[0].blocks.map(block => block.id), ['a', 'c', 'b'], 'Outline movement reaches the saved report payload');
+rows = getRows();
 assert.deepEqual(rows.map(row => row.dataset.blockId), ['a', 'c', 'b']);
 rows[2].querySelector('.report-outline-drag').events.keydown({key: 'ArrowUp', preventDefault() {}});
 assert.deepEqual(blocks.map(block => block.id), ['a', 'b', 'c'], 'Repeated moves use current positions');
+rows = getRows();
 // Drop handler uses the dragged block identity, rather than the position captured before a move.
 rows[1].events.dragstart({dataTransfer: {setData() {}}});
 rows[0].events.drop({clientY: 0, preventDefault() {}});
@@ -76,8 +90,7 @@ await autosave.flush();
 assert.deepEqual(writes.at(-1).blocks.map(block => block.id), ['b', 'a', 'c']);
 controller.element.children[1].children[0].events.click();
 assert.equal(navigations[0], introduction);
-controller.element.children[2].events.click();
-assert.equal(controller.element.children[3].hidden, true);
+assert.equal(controller.element.querySelector('.report-outline-toggle'), undefined, 'No artificial Contents group');
 controller.dispose();
 assert.equal(body.events.scroll, undefined, 'Detach old scroll listeners when rebuilding or leaving the report');
 
@@ -115,7 +128,7 @@ const pointerMoves = [], pointerBlocks = [{id: '1'}, {id: '2'}, {id: '3'}];
 const pointer = createReportOutline({blocks: pointerBlocks, introduction, targets, documentBody: body,
   describe: block => ({title: block.id}), dragIcon: '', onNavigate() {},
   onMove: (block, index) => pointerMoves.push([block.id, index])});
-const pointerRows = pointer.element.children[3].children;
+const pointerRows = pointer.element.querySelectorAll('.report-outline-item');
 pointerRows.forEach((row, index) => { row.rect = {top: 100 + index * 50, bottom: 150 + index * 50}; });
 const pointerHandle = pointerRows[2].querySelector('.report-outline-drag');
 pointerHandle.events.pointerdown({button: 0, pointerId: 1, clientY: 225, preventDefault() {}});
@@ -127,5 +140,40 @@ pointerHandle.events.pointermove({clientY: 105});
 pointerHandle.events.pointercancel();
 assert.equal(pointerMoves.length, 1, 'Cancelled dragging must not alter the draft');
 pointer.dispose();
+
+// Folded groups retain their state, never become invisible drag targets, and reveal focused children.
+const sectionExpansion = new Map(), sectionBlocks = orderedSources.slice(), sectionTargets = sectionBlocks.map(() => new Element());
+const sectionMoves = [], sectionNavigations = [];
+const options = {blocks: sectionBlocks, introduction, targets: sectionTargets, documentBody: body, sectionExpansion,
+  describe: block => ({title: block.id}), dragIcon: '', onNavigate: target => sectionNavigations.push(target),
+  onMove: (block, index) => sectionMoves.push([block.id, index])};
+const grouped = createReportOutline(options);
+const section = grouped.element.querySelectorAll('.report-outline-section')[1];
+const headingRow = section.children[0], childGroup = section.children[1];
+const sectionToggle = headingRow.querySelector('.report-outline-section-toggle');
+childGroup.children[0].querySelector('.report-outline-link').events.click();
+assert.equal(sectionNavigations[0], sectionTargets[3]);
+sectionToggle.events.click();
+assert.equal(childGroup.hidden, true);
+assert.equal(headingRow.querySelector('.report-outline-link').attributes['aria-current'], 'location', 'A folded heading represents its current child');
+grouped.reorder();
+assert.equal(childGroup.hidden, true, 'Reordering keeps folded headings folded');
+const sectionRows = grouped.element.querySelectorAll('.report-outline-item');
+sectionRows.forEach((row, index) => { row.rect = {top: 100 + index * 50, bottom: 150 + index * 50}; });
+sectionRows[3].rect = sectionRows[4].rect = {top: 0, bottom: 0};
+sectionRows[5].rect = {top: 250, bottom: 300};
+sectionRows[6].rect = {top: 300, bottom: 350};
+const sectionHandle = sectionRows[0].querySelector('.report-outline-drag');
+sectionHandle.events.pointerdown({button: 0, pointerId: 1, clientY: 125, preventDefault() {}});
+sectionHandle.events.pointermove({clientY: 245});
+sectionHandle.events.pointerup();
+assert.deepEqual(sectionMoves, [['0', 4]], 'Pointer drops below a folded heading skip its hidden rows');
+grouped.reveal(sectionBlocks[3]);
+assert.equal(childGroup.hidden, false, 'Reordering focus can reveal a newly nested item');
+sectionToggle.events.click();
+grouped.dispose();
+const remounted = createReportOutline({...options, blocks: sectionBlocks.map(block => ({...block}))});
+assert.equal(remounted.element.querySelectorAll('.report-outline-section-items')[1].hidden, true, 'Fold state survives refreshed draft objects');
+remounted.dispose();
 autosave.dispose();
-console.log('Report outline passed: all insertion boundaries, live object identity, keyboard and drag handlers, autosaved order, navigation and cleanup.');
+console.log('Report outline passed: ordered heading groups, fold state, insertion boundaries, keyboard/pointer dragging, autosave, navigation and cleanup.');

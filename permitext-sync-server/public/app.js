@@ -1,4 +1,4 @@
-import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v6";
+import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v9";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-outline-width-v873";
+} from "./offline-storage.js?v=20261011-outline-groups-v877";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28456,7 +28456,7 @@ async function renderProjectReportDraft(project) {
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
   let outlineController = null;
-  let outlineExpanded = true;
+  const outlineSectionExpansion = new Map();
   let renderedDraftKey = null;
   let outlineNavigationGeneration = 0;
   let autosave = null;
@@ -29190,6 +29190,7 @@ async function renderProjectReportDraft(project) {
     setDirty();
     outlineController.announce(`${reportBlockTitle(block)} moved to position ${targetIndex + 1}.`);
     if (focusArea) requestAnimationFrame(() => {
+      if (focusArea === "outline") outlineController.reveal(block);
       const blockID = block.id || `${block.kind}-${targetIndex}`;
       const escapedID = CSS.escape(blockID);
       const handle = shell.querySelector(focusArea === "outline"
@@ -29536,8 +29537,7 @@ async function renderProjectReportDraft(project) {
     outlineController = createReportOutline({
       blocks: activeDraft.blocks, introduction: metadata,
       targets: [...blocksBody.querySelectorAll(".report-draft-block")], documentBody,
-      dragIcon: paneDragHandleSVG(), expanded: outlineExpanded,
-      onExpanded: expanded => { outlineExpanded = expanded; },
+      dragIcon: paneDragHandleSVG(), sectionExpansion: outlineSectionExpansion,
       describe: block => {
         const source = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
         if (block.kind === "evidence" && source) return {

@@ -19075,10 +19075,13 @@ dialog.report-screen {
 .report-screen .report-outline h2 { margin: 0 0 18px 8px; font-size: 12px; color: var(--text-secondary); }
 .report-outline button { border: 0; background: transparent; color: var(--text-secondary); font-size: 12px; line-height: 1.35; box-shadow: none; }
 .report-outline-introduction { padding: 0 8px; }
-.report-outline .report-outline-toggle { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 8px 8px; text-align: left; font-weight: 600; cursor: pointer; }
-.report-outline-toggle svg { width: 12px; height: 12px; flex: 0 0 12px; }
-.report-outline-toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
-.report-outline-contents { gap: 2px; }
+.report-outline-contents { gap: 2px; margin-top: 8px; }
+.report-outline-section-space { order: -1; }
+.report-outline .report-outline-section-toggle { order: -1; padding: 5px 0; cursor: pointer; }
+.report-outline-section-toggle svg { width: 12px; height: 12px; }
+.report-outline-section-toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
+.report-outline .report-outline-section-items { margin: 0 0 4px 24px; }
+.report-outline :is(.report-outline-section-items, .report-outline-section-space, .report-outline-section-toggle)[hidden] { display: none; }
 .report-outline-item { position: relative; gap: 4px; padding: 4px 0; border-radius: var(--radius-control); }
 .report-outline-item:hover { background: var(--menu-surface); }
 .report-outline .report-outline-drag { display: grid; place-items: center; width: 20px; min-width: 20px; padding: 5px 0; cursor: grab; touch-action: none; opacity: 0.45; }

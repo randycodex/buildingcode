@@ -32,8 +32,30 @@ export async function navigateReportOutline({ requests, isCurrent, navigate }) {
   if (isCurrent()) navigate();
 }
 
+// Derive sections from the authored headings without sorting or changing sources.
+export function groupReportOutline(blocks) {
+  const groups = [];
+  let section = null;
+  for (const block of blocks) {
+    if (block.kind === "heading") {
+      section = { block, children: [] };
+      groups.push(section);
+    } else if (section) section.children.push(block);
+    else groups.push({ block, children: [] });
+  }
+  return groups;
+}
+
+export function reportOutlineDropIndex(blocks, sourceIndex, targetIndex, after, collapsed) {
+  // Dropping below a folded heading means after its hidden contents.
+  if (after && collapsed && blocks[targetIndex]?.kind === "heading") {
+    while (targetIndex + 1 < blocks.length && blocks[targetIndex + 1].kind !== "heading") targetIndex++;
+  }
+  return reportDropIndex(sourceIndex, targetIndex, after);
+}
+
 export function createReportOutline({ blocks, introduction, targets, documentBody, describe,
-  onNavigate, onMove, dragIcon, expanded = true, onExpanded = () => {} }) {
+  onNavigate, onMove, dragIcon, sectionExpansion = new Map() }) {
   const outline = document.createElement("nav");
   outline.className = "report-outline";
   outline.setAttribute("aria-label", "Report outline");
@@ -44,14 +66,23 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   const links = [];
   const rows = [];
   const entries = new Map();
+  const parents = new Map();
+  const sectionKey = block => block.id || block;
+  const isExpanded = block => sectionExpansion.get(sectionKey(block)) !== false;
   let dragged = null;
   let scrollFrame = 0;
   let pointerDrag = null;
   let dragFrame = 0;
-  const markCurrent = link => links.forEach(candidate => {
-    if (candidate === link) candidate.setAttribute("aria-current", "location");
-    else candidate.removeAttribute("aria-current");
-  });
+  let currentLink = null;
+  const markCurrent = link => {
+    currentLink = link;
+    const parent = parents.get(blocks[links.indexOf(link) - 1]);
+    if (parent && !isExpanded(parent)) link = entries.get(parent).link;
+    links.forEach(candidate => {
+      if (candidate === link) candidate.setAttribute("aria-current", "location");
+      else candidate.removeAttribute("aria-current");
+    });
+  };
   const makeLink = (target, label) => {
     const link = document.createElement("button");
     link.type = "button";
@@ -65,19 +96,17 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
   introRow.className = "reader-nav-row report-outline-introduction";
   const intro = makeLink(introduction, "Introduction");
   introRow.append(intro);
-  const toggle = document.createElement("button");
-  toggle.type = "button";
-  toggle.className = "report-outline-toggle";
-  toggle.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"></path></svg>';
-  const toggleLabel = document.createElement("span");
-  toggleLabel.textContent = `Contents · ${blocks.length}`;
-  toggle.append(toggleLabel);
-  const paintExpanded = () => {
-    toggle.setAttribute("aria-expanded", String(expanded));
-    contents.hidden = !expanded;
+  const paintSection = block => {
+    const { toggle, children } = entries.get(block);
+    toggle.setAttribute("aria-expanded", String(isExpanded(block)));
+    children.hidden = !isExpanded(block);
+    if (currentLink) markCurrent(currentLink);
   };
-  toggle.addEventListener("click", () => { expanded = !expanded; paintExpanded(); onExpanded(expanded); });
-  paintExpanded();
+  const dropIndex = (block, row, after) => {
+    const targetIndex = rows.indexOf(row);
+    return reportOutlineDropIndex(blocks, blocks.indexOf(block), targetIndex, after,
+      !isExpanded(blocks[targetIndex]));
+  };
   const clearDrag = () => rows.forEach(row => row.classList.remove("is-dragging", "is-drop-before", "is-drop-after"));
   const paintPointerDrop = () => {
     if (!pointerDrag?.started) return;
@@ -85,10 +114,13 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
     const bounds = outline.getBoundingClientRect();
     const scroll = y < bounds.top + 36 ? -10 : y > bounds.bottom - 36 ? 10 : 0;
     if (scroll) outline.scrollTop += scroll;
-    const target = rows.find(row => row.getBoundingClientRect().bottom > y) || rows.at(-1);
-    const index = rows.indexOf(target);
-    pointerDrag.index = reportDropIndex(blocks.indexOf(block), index,
-      y > target.getBoundingClientRect().top + target.offsetHeight / 2);
+    const visibleRows = rows.filter((row, index) => {
+      const parent = parents.get(blocks[index]);
+      return !parent || isExpanded(parent);
+    });
+    const target = visibleRows.find(row => row.getBoundingClientRect().bottom > y) || visibleRows.at(-1);
+    if (!target) return;
+    pointerDrag.index = dropIndex(block, target, y > target.getBoundingClientRect().top + target.offsetHeight / 2);
     clearDrag();
     rows[blocks.indexOf(block)]?.classList.add("is-dragging");
     if (target !== rows[blocks.indexOf(block)]) target.classList.add(
@@ -103,6 +135,8 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
     caption.hidden = !detail;
     row.querySelector(".report-outline-link").title = [title, detail].filter(Boolean).join(" · ");
     row.querySelector(".report-outline-drag").setAttribute("aria-label", `Reorder ${title}`);
+    const toggle = entries.get(blocks[index]).toggle;
+    if (toggle) toggle.setAttribute("aria-label", `Expand or collapse ${title}`);
   });
   blocks.forEach((block, index) => {
     const row = document.createElement("div");
@@ -160,7 +194,29 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
     detail.className = "report-outline-item-detail";
     label.append(name, detail);
     link.append(number, label);
-    row.append(handle, link);
+    const spacer = document.createElement("span");
+    spacer.className = "reader-nav-chevron-space report-outline-section-space";
+    spacer.setAttribute("aria-hidden", "true");
+    row.append(spacer, handle, link);
+    const entry = {row, link, spacer, target: targets[index]};
+    if (block.kind === "heading") {
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "reader-nav-chevron report-outline-section-toggle";
+      toggle.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"></path></svg>';
+      const children = document.createElement("div");
+      children.className = "reader-nav-section-group report-outline-section-items";
+      children.id = `report-outline-section-${row.dataset.blockId}`;
+      toggle.setAttribute("aria-controls", children.id);
+      toggle.addEventListener("click", () => {
+        sectionExpansion.set(sectionKey(block), !isExpanded(block));
+        paintSection(block);
+      });
+      row.replaceChildren(toggle, spacer, handle, link);
+      const section = document.createElement("div");
+      section.className = "reader-nav-chapter report-outline-section";
+      Object.assign(entry, {toggle, children, section});
+    }
     row.addEventListener("dragstart", event => {
       dragged = block;
       row.classList.add("is-dragging");
@@ -184,21 +240,39 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
       if (!dragged) return;
       event.preventDefault();
       const moved = dragged;
-      const targetIndex = reportDropIndex(blocks.indexOf(moved), rows.indexOf(row),
+      const targetIndex = dropIndex(moved, row,
         event.clientY > row.getBoundingClientRect().top + row.offsetHeight / 2);
       dragged = null;
       clearDrag();
       onMove(moved, targetIndex, "outline");
     });
     rows.push(row);
-    entries.set(block, {row, link, target: targets[index]});
-    contents.append(row);
+    entries.set(block, entry);
   });
+  const renderGroups = () => {
+    parents.clear();
+    contents.replaceChildren();
+    for (const { block, children } of groupReportOutline(blocks)) {
+      const entry = entries.get(block);
+      if (!entry.section) { contents.append(entry.row); continue; }
+      entry.children.replaceChildren(...children.map(child => {
+        parents.set(child, block);
+        return entries.get(child).row;
+      }));
+      entry.toggle.hidden = !children.length;
+      entry.spacer.hidden = Boolean(children.length);
+      entry.section.append(entry.row, entry.children);
+      contents.append(entry.section);
+      paintSection(block);
+    }
+    if (currentLink) markCurrent(currentLink);
+  };
+  renderGroups();
   refreshLabels();
   const status = document.createElement("span");
   status.className = "sr-only";
   status.setAttribute("role", "status");
-  outline.append(title, introRow, toggle, contents, status);
+  outline.append(title, introRow, contents, status);
   const updateCurrent = () => {
     scrollFrame = 0;
     const top = documentBody.getBoundingClientRect().top + 48;
@@ -218,10 +292,17 @@ export function createReportOutline({ blocks, introduction, targets, documentBod
       targets.splice(0, targets.length, ...blocks.map(block => entries.get(block).target));
       links.splice(1, links.length - 1, ...blocks.map(block => entries.get(block).link));
       rows.forEach((row, index) => { row.querySelector(".report-outline-number").textContent = `${index + 1}.`; });
-      contents.append(...rows);
+      renderGroups();
       refreshLabels();
       outline.scrollTop = scroll;
       onScroll();
+    },
+    reveal(block) {
+      const parent = parents.get(block);
+      if (parent && !isExpanded(parent)) {
+        sectionExpansion.set(sectionKey(parent), true);
+        paintSection(parent);
+      }
     },
     announce: message => { status.textContent = message; },
     dispose() { documentBody.removeEventListener("scroll", onScroll); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(dragFrame); }
