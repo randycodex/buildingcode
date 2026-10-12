@@ -51,12 +51,13 @@ const context=vm.createContext({
   readerProjectsForSection(){reads++;return [];},isSectionSaved(){reads++;return true;},readerSectionHasNote(){reads++;return false;}
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
-vm.runInContext(subscriptionLifecycle + ["readerPrivateContentAllowed","renderReaderChapterSection","renderAnnotatedCodeBlock","renderInlineCommentBox","renderReaderSectionProjectContext"].map(actual).join("\n"),context);
+vm.runInContext(subscriptionLifecycle + ["noteAddIconSVG","readerPrivateContentAllowed","renderReaderChapterSection","renderAnnotatedCodeBlock","renderInlineCommentBox","renderReaderSectionProjectContext"].map(actual).join("\n"),context);
 const rendered=context.renderReaderChapterSection(panel,reader,section,new Map());panel.append(rendered);
 const body=rendered.querySelector(".annotated-code-block").children[0];
 const bookmark=rendered.querySelector(".reader-section-saved-marker");
 const inline=rendered.querySelector(".inline-comment");const research=inline.querySelector(".inline-research-toggle");
-assert.equal(inline.querySelector(".workflow-action").hidden,true);
+const addNote=inline.querySelector(".inline-note-toggle");
+assert.equal(addNote.hidden,true);
 assert.equal(reads,0,"Pending Reader construction must not read saved records or private Research labels.");
 assert.equal(body.textContent,"Complete public enacted text");assert.equal(bookmark.hidden,true);assert.equal(research.hidden,true);
 assert.equal(bookmark.parentNode,rendered.querySelector(".reader-section-heading-row"),"Whole-section extraction retains a real stable bookmark node.");
@@ -69,10 +70,11 @@ assert.equal(rendered.querySelector(".annotated-code-block").children[0],body,"U
 assert.equal(rendered.querySelector(".reader-section-saved-marker"),bookmark,"Upgrade retains the extracted bookmark node.");
 assert.equal(bookmark.hidden,false);assert.equal(bookmark.disabled,false);assert.equal(bookmark.attrs["aria-label"],"Remove section from Evidence");
 assert.equal(research.hidden,false);assert.match(research.title,/open conversation/);assert.equal(host.hidden,false);
+assert.equal(addNote.hidden,false);assert.equal(addNote.attrs['aria-label'],'Add to note');
 assert.equal(body.textContent,"Complete public enacted text");
 currentLabel="";await research.click();assert.ok(researchOptions.passage,"Research invocation opens the destination picker with the selected passage.");
-const writesBefore=writes,readsBefore=reads;permitted=false;bookmark.disabled=false;research.disabled=false;
-await bookmark.click();await research.click();assert.equal(writes,writesBefore,"Revoked gate blocks private mutations even if control is still enabled.");assert.equal(reads,readsBefore);
+const writesBefore=writes,readsBefore=reads;permitted=false;bookmark.disabled=false;research.disabled=false;addNote.disabled=false;
+await bookmark.click();await research.click();await addNote.click();assert.equal(writes,writesBefore,"Revoked gate blocks private mutations even if control is still enabled.");assert.equal(reads,readsBefore);
 
 // Null gate retains existing explicit bookmark behavior without a new saved read.
 const legacyReads=reads;const legacy=context.renderInlineCommentBox(section,reader,target,{showBookmark:true});

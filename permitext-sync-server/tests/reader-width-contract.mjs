@@ -16,7 +16,7 @@ const context = vm.createContext({
   isProAccount() { throw new Error('Reader layout must not depend on subscription'); }
 });
 vm.runInContext([
-  ...source.matchAll(/const (?:legacy|default)\w*PaneWidth = [^;]+;/g)
+  ...source.matchAll(/const (?:(?:legacy|default)\w*PaneWidth|assistantHistoryWidth) = [^;]+;/g)
 ].map(match => match[0]).join('\n') + '\n' + [
   'isProjectNotebookPaneID', 'isProjectReportDraftPaneID', 'defaultPaneWidthForID',
   'minimumPaneWidthForID', 'migrateLegacyPaneWidth', 'normalizePaneWeights',
@@ -55,18 +55,19 @@ const mainPaneIDs = [
   'project:context:alpha', 'project:facts:alpha', 'project:notebook:alpha', 'project:report-draft:alpha'
 ];
 for (const id of mainPaneIDs) {
+  const minimum = /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 1000 : 600;
   for (const count of [1, 2, 3, 4, 8]) {
     const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];
     for (const restoredWidth of [400, 550, 600, 850]) {
       context.paneIDs = ids;
       context.state.paneWeights = { [id]: restoredWidth };
       context.normalizePaneWeights(ids);
-      assert.equal(context.state.paneWeights[id], Math.max(600, restoredWidth), `${id} restores its minimum with ${count} columns`);
+      assert.equal(context.state.paneWeights[id], Math.max(minimum, restoredWidth), `${id} restores its minimum with ${count} columns`);
       const style = layout(id, ids, restoredWidth);
-      assert.equal(style['--pane-default-min-width'], '600px', `${id} enforces its rendered minimum`);
-      assert.equal(context.state.paneWeights[id], Math.max(600, restoredWidth), `${id} also clamps widths when mounted directly`);
+      assert.equal(style['--pane-default-min-width'], `${minimum}px`, `${id} enforces its rendered minimum`);
+      assert.equal(context.state.paneWeights[id], Math.max(minimum, restoredWidth), `${id} also clamps widths when mounted directly`);
       if (count <= 3) {
-        const basis = id.startsWith('reader:') && count === 1 ? 600 : Math.max(600, restoredWidth);
+        const basis = id.startsWith('reader:') && count === 1 ? 600 : Math.max(minimum, restoredWidth);
         assert.equal(style.flex, `1 1 ${basis}px`, `${id} fills available space with ${count} columns`);
       }
     }

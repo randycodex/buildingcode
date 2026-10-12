@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-comparison-v891";
+} from "./offline-storage.js?v=20261011-workspace-actions-v892";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -15942,8 +15942,10 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   researchButton.className = "inline-research-toggle";
   const noteButton = document.createElement("button");
   noteButton.type = "button";
-  noteButton.className = "workflow-action workflow-action-secondary";
-  noteButton.textContent = "Add to note";
+  noteButton.className = "inline-note-toggle";
+  noteButton.innerHTML = noteAddIconSVG();
+  noteButton.setAttribute("aria-label", "Add to note");
+  noteButton.title = "Add this passage to a Note";
   noteButton.addEventListener("click", async () => {
     if (!allowed() || noteButton.disabled) return;
     noteButton.disabled = true;
@@ -18695,12 +18697,6 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       citation.className = "result-chapter";
       citation.id = `search-result-citation-${crypto.randomUUID()}`;
       citation.textContent = presentation.citation;
-      if (searchInstance.matchMode === "words") {
-        const kind = document.createElement("span");
-        kind.className = "search-match-kind";
-        kind.textContent = result.matchKind === "exact" ? "Exact phrase" : "All words";
-        citation.append(kind);
-      }
       mainButton.setAttribute("aria-describedby", citation.id);
       const heading = document.createElement("strong");
       heading.className = "result-heading";
@@ -19154,6 +19150,10 @@ function researchActionIconSVG() {
       <path d="M12.983 21.186a1 1 0 0 1-1.966 0 10 10 0 0 0-8.203-8.203 1 1 0 0 1 0-1.966 10 10 0 0 0 8.203-8.203 1 1 0 0 1 1.966 0 10 10 0 0 0 8.203 8.203 1 1 0 0 1 0 1.966 10 10 0 0 0-8.203 8.203"></path>
     </svg>
   `;
+}
+
+function noteAddIconSVG() {
+  return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7M7 8h10M7 12h5M18 14v8M14 18h8"></path></svg>`;
 }
 
 function checkActionIconSVG() {
@@ -23357,9 +23357,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const historyRail = document.createElement("aside");
   historyRail.className = "assistant-history-rail";
   historyRail.setAttribute("aria-label", "Assistant conversations");
-  const historyHeading = document.createElement("h2");
-  historyHeading.textContent = "Conversations";
-  historyRail.append(historyHeading, content);
+  historyRail.append(content);
   const assistantBody = document.createElement("section");
   assistantBody.className = "assistant-body";
   assistantBody.setAttribute("aria-label", "Assistant conversation");
@@ -23511,12 +23509,8 @@ async function renderResearch(paneID = "utility:analysis") {
   const historyHost = document.createElement("div");
   const filters = document.createElement("div");
   filters.className = "research-history-filters";
-  const historySearch = document.createElement("input");
-  historySearch.type = "search";
-  historySearch.maxLength = 200;
-  historySearch.placeholder = "Search history";
-  historySearch.setAttribute("aria-label", "Search Research history");
-  historySearch.value = boundedResearchHistoryQuery(historyState.historyQuery);
+  // Removing the search control also clears its old, now invisible filter.
+  historyState.historyQuery = "";
   const projectFilter = document.createElement("select");
   projectFilter.className = "research-history-project-select";
   projectFilter.setAttribute("aria-label", "Filter Research history by Project");
@@ -23530,17 +23524,13 @@ async function renderResearch(paneID = "utility:analysis") {
   const refreshFilters = () => {
     clearTimeout(historyTimer);
     historyGeneration += 1;
-    historySearch.value = boundedResearchHistoryQuery(historySearch.value);
-    historyState.historyQuery = historySearch.value;
     historyState.historyProjectID = projectFilter.value;
     scheduleResearchDraftPersistence();
     selectedConversationIDs.clear();
     historyTimer = setTimeout(() => { if (isCurrent()) void loadHistory(false); }, 200);
   };
-  historySearch.addEventListener("input", refreshFilters);
-  historySearch.addEventListener("search", refreshFilters);
   projectFilter.addEventListener("change", refreshFilters);
-  filters.append(historySearch, projectFilter);
+  filters.append(projectFilter);
   content.append(usageHost, filters, historyHost);
   enhanceSelect(projectFilter);
   const loading = document.createElement("p");
@@ -23600,7 +23590,7 @@ async function renderResearch(paneID = "utility:analysis") {
       content.append(status);
     }
     try {
-      const payload = await readResearchHistoryPage({ q: historySearch.value, projectID: projectFilter.value,
+      const payload = await readResearchHistoryPage({ projectID: projectFilter.value,
         cursor: append ? historyCursor : null }, { reuseRecent });
       if (!current()) return;
       const byID = new Map((append ? historyConversations : []).map((item) => [item.id, item]));
@@ -23716,7 +23706,7 @@ async function renderResearch(paneID = "utility:analysis") {
   if (!visibleHistoryConversations().length) {
     const empty = document.createElement("div");
     empty.className = "research-conversation-empty";
-    empty.textContent = historySearch.value.trim() || projectFilter.value !== "*" ? "No conversations match these filters." : "Your previous chats will appear here.";
+    empty.textContent = projectFilter.value !== "*" ? "No conversations in this Project." : "Your previous chats will appear here.";
     content.append(empty);
     return panel;
   }

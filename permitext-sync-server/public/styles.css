@@ -3519,8 +3519,8 @@ select option:checked {
   align-self: end;
   justify-content: flex-end;
   gap: var(--space-1);
-  min-width: 68px;
-  width: 68px;
+  min-width: 0;
+  width: max-content;
   min-height: 30px;
   margin-bottom: var(--space-4);
   padding-left: var(--space-1);
@@ -3540,7 +3540,8 @@ select option:checked {
 }
 
 .inline-bookmark-toggle,
-.inline-research-toggle {
+.inline-research-toggle,
+.inline-note-toggle {
   display: inline-flex;
   min-width: 28px;
   width: 28px;
@@ -3561,16 +3562,19 @@ select option:checked {
 }
 
 .inline-bookmark-toggle,
-.inline-research-toggle {
+.inline-research-toggle,
+.inline-note-toggle {
   flex: 0 0 28px;
 }
 
-.inline-research-toggle:disabled {
+.inline-research-toggle:disabled,
+.inline-note-toggle:disabled {
   opacity: 0.64;
 }
 
 .inline-bookmark-toggle svg,
-.inline-research-toggle svg {
+.inline-research-toggle svg,
+.inline-note-toggle svg {
   width: 15px;
   height: 15px;
 }
@@ -3579,7 +3583,9 @@ select option:checked {
 .inline-bookmark-toggle:focus-visible,
 .inline-bookmark-toggle.is-saved,
 .inline-research-toggle:hover,
-.inline-research-toggle:focus-visible {
+.inline-research-toggle:focus-visible,
+.inline-note-toggle:hover,
+.inline-note-toggle:focus-visible {
   color: var(--text-primary);
   outline: 0;
 }
@@ -3597,6 +3603,8 @@ select option:checked {
   opacity: 0.55;
   cursor: wait;
 }
+
+.inline-comment > button[hidden] { display: none; }
 
 .reader-save-confirmation {
   position: absolute;
@@ -18813,7 +18821,7 @@ html body .column-group-menu-button:focus-visible {
   padding: 7px 0; border-bottom: 1px solid var(--border);
   font: inherit; font-size: inherit !important;
 }
-.research-history-custom-select .custom-select-trigger::after { content: "⌄"; color: var(--text-secondary); }
+.research-history-custom-select .custom-select-trigger::after { content: none; }
 .research-history-more { display: block; margin: var(--space-3) auto; }
 .research-notebook-handoff {
   display: flex;
@@ -18917,7 +18925,6 @@ html body .column-group-menu-button:focus-visible {
 .search-options { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; color: var(--text-secondary); font-size: 12px; }
 .search-sources-button { display: inline-flex; align-items: center; box-sizing: border-box; line-height: 1.4; padding: 4px 0; min-height: 30px; border: 0; background: transparent; color: var(--text-secondary); font: inherit; cursor: pointer; }
 .search-sources-button:hover { color: var(--text-primary); }
-.search-match-kind { display: inline-block; white-space: nowrap; margin-left: 10px; color: var(--text-secondary); font-size: 11px; font-weight: 400; }
 .search-panel .result-title { color: var(--text-primary); font-weight: 550; }
 .search-panel .result-row-main > p { color: var(--text-secondary); line-height: 1.55; }
 .research-origin-edition { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 12px; }
@@ -19384,13 +19391,12 @@ dialog.report-export-review {
 .assistant-workspace > .panel-header { grid-column: 2; grid-row: 1; padding: var(--panel-padding) var(--panel-padding) 0; }
 .assistant-workspace > .assistant-history-rail {
   grid-column: 1; grid-row: 1 / -1;
-  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  display: grid; grid-template-rows: minmax(0, 1fr) auto;
   width: 400px; min-width: 400px; max-width: 400px;
   min-height: 0; box-sizing: border-box; padding: 0;
   border-right: 1px solid var(--border); overflow: hidden;
 }
-.assistant-history-rail > h2 { margin: 0; padding: 28px 20px 18px; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
-.assistant-history-rail > .analysis-content { display: block; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 0 20px; margin: 0; width: auto; }
+.assistant-history-rail > .analysis-content { display: block; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: var(--panel-padding) 20px 0; margin: 0; width: auto; }
 .assistant-history-rail .research-history-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 .assistant-history-rail .research-history-filters > * { min-width: 0; width: 100%; max-width: 100%; }
 .assistant-history-rail .research-conversation-list { margin: 0; width: 100%; }
