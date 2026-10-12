@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-sources-minimum-v923";
+} from "./offline-storage.js?v=20261012-report-add-hover-v924";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,

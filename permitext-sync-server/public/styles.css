@@ -18386,6 +18386,10 @@ body .panel-track > article.workspace-panel.report-draft-panel :is(.report-intro
   font-size: 12px;
   text-align: center;
 }
+.workspace-panel.report-draft-panel .report-draft-add-controls button:hover {
+  background: var(--menu-highlight);
+  color: var(--text-primary);
+}
 body .panel-track > article.workspace-panel.report-draft-panel .report-draft-classification {
   font-size: 11px !important;
   text-transform: none;
