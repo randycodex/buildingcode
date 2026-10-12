@@ -1,3 +1,4 @@
+import { planSavedEvidenceDelete, validateSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
@@ -1104,6 +1105,24 @@ export function createFileStoreAdapter() {
         await writeUnlocked(store);
         return {...merge,rejectedMutationIDs:[...merge.rejectedMutationIDs,...plan.rejectedMutationIDs],rejectionReasons:plan.rejectionReasons,
           latestEventID:Number(store.syncRevisionsByUserID[userID] || 0),entitlement:store.entitlements[userID] || null};
+      });
+    },
+    async deleteSavedEvidence(userID, input) {
+      return withFileStoreLock(dataPath, async () => {
+        const store = await readUnlocked();
+        const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
+        const plan = planSavedEvidenceDelete(userID, existing, input);
+        const merge = mergeMutations(existing, plan.mutations);
+        if (merge.rejectedMutationIDs.length) throw new Error("Saved evidence changed. Refresh and retry.");
+        const batch = captureTrash(userID, existing, plan.mutations);
+        store.trashByUserID ||= {};
+        const entries = (store.trashByUserID[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
+        if (batch && !entries.some(b => b.id === batch.id)) entries.push(batch);
+        store.trashByUserID[userID] = entries;
+        store.mutationsByUserID[userID] = merge.mutations;
+        if (merge.acceptedMutationIDs.length) store.syncRevisionsByUserID[userID] = Number(store.syncRevisionsByUserID[userID] || 0) + 1;
+        await writeUnlocked(store);
+        return {...plan, latestEventID: Number(store.syncRevisionsByUserID[userID] || 0)};
       });
     },
     async trashAction(userID, action, id) {
@@ -6171,6 +6190,11 @@ async function createPostgresStoreAdapter() {
     async saveMembershipWithinSeatLimit(membership, seatLimit) {
       await ensureSchema();
       return organizationRepository.saveMembershipWithinSeatLimit(membership, seatLimit);
+    },
+    async deleteSavedEvidence(userID, input) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return syncRepository.deleteSavedEvidence(userID, input);
     },
     async trashAction(userID, action, id) {
       await ensureSchema();
@@ -27915,6 +27939,22 @@ async function handlePush(request, response) {
   });
 }
 
+async function handleSavedEvidenceDeleteBatch(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  if (!userID) return sendError(response, 400, "Missing user ID.");
+  if (!await authenticatedUserContext(request, response, userID)) return;
+  try { validateSavedEvidenceDelete(body); }
+  catch (error) { return sendError(response, 400, error.message); }
+  try {
+    const result = await (await storeAdapter()).deleteSavedEvidence(userID, body);
+    sendJSON(response, 200, result);
+  } catch (error) {
+    if (error?.code && !["22012", "40001"].includes(error.code)) throw error;
+    sendError(response, 409, error.code ? "Saved evidence changed during deletion. Refresh and retry." : error.message);
+  }
+}
+
 async function handleContentTrash(request, response) {
   const body = await readJSON(request);
   const userID = body.auth?.accountUserID;
@@ -33649,6 +33689,7 @@ const handlers = {
   "sync/push": handlePush,
   "sync/checkpoint": handleSyncCheckpoint,
   "content/trash": handleContentTrash,
+  "saved/evidence/delete-batch": handleSavedEvidenceDeleteBatch,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,
   "admin/lifetime-grants/revoke": handleLifetimeGrantDelete,

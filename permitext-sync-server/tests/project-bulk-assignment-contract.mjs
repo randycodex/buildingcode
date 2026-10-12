@@ -113,3 +113,13 @@ const beforeSwitch=removed.length;
 context.confirmWebWarning=async()=>{context.identity='B';return true;};
 await assert.rejects(remove.events.click(),/Account changed/);
 assert.equal(removed.length,beforeSwitch,'Account switch during confirmation cannot authorize deletion');
+
+context.identity='A';
+let batchCalls=0;
+context.confirmWebWarning=async()=>{prompts++;return true;};
+controller=context.createSavedBulkSelectionController(panel,records,{
+  removeBatchAction:async(items,onProgress)=>{batchCalls++;assert.equal(items.length,3);onProgress(3);return 3;},
+  removeAction:()=>{throw Error('Per-item path must not run');}
+});
+select.events.click();records.forEach(item=>controller.toggle(item));
+await remove.events.click();assert.equal(batchCalls,1,'All selected items go through one batch action');

@@ -113,7 +113,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-saved-window-v934";
+} from "./offline-storage.js?v=20261012-saved-batch-v935";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -14222,6 +14222,56 @@ async function removeSectionFromProject(project, item, options = {}) {
   }
   if (options.refreshPanes !== false) await refreshProjectSourceConsumers([project]);
   requireCurrentAccountRequest(requestIdentity);
+}
+
+async function deleteSavedEvidenceBatch(items, project = null, onProgress = () => {}) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in before deleting saved evidence.");
+  // Finish durable local saves before the server decides which destinations remain.
+  await flushSyncOutbox({ refresh: false });
+  requireCurrentAccountRequest(requestIdentity);
+  if ((state.syncOutbox || []).some(entry => entry.accountUserID === account.userID) ||
+      (state.syncConflicts || []).some(entry => entry.accountUserID === account.userID)) {
+    throw new Error("Finish syncing or resolve pending sync conflicts before deleting saved evidence.");
+  }
+  const projectID = project ? syncProjectIdentity(project.clientID || project.id, account.userID) ||
+    (project.localFolderID == null ? null : `legacy-project-${project.localFolderID}`) : null;
+  if (project && !projectID) throw new Error("Refresh the Project before deleting saved evidence.");
+  let deletedCount = 0;
+  for (let offset = 0; offset < items.length; offset += 200) {
+    requireCurrentAccountRequest(requestIdentity);
+    const payload = await postJSON("/saved/evidence/delete-batch", {
+      auth: { accountUserID: account.userID },
+      projectID,
+      items: items.slice(offset, offset + 200).map(item => ({
+        codeVersion: syncCodeVersion(item.codeVersion),
+        sectionID: Number(item.sectionID),
+        blockID: normalizeAnnotationBlockID(item.blockID)
+      }))
+    }, { token: account.sessionToken });
+    requireCurrentAccountRequest(requestIdentity);
+    const mutations = mergeSyncedMutations(syncedContent?.mutations || [], payload.mutations || []);
+    // Keep the previous sync cursor: unrelated concurrent changes must still pull.
+    syncedContent = { ...syncedContent, mutations, summary: summarizeMutations(mutations) };
+    for (const mutation of payload.mutations || []) {
+      const { kind, record } = mutationKindAndRecord(mutation);
+      const field = kind === "savedItem" ? "localSavedItems" : kind === "projectSection" ? "localProjectSections" : null;
+      if (field) state[field] = (state[field] || []).filter(local =>
+        String(local.id) !== String(record.id) || Date.parse(local.updatedAt || 0) > Date.parse(record.updatedAt));
+      if (kind === "savedItem") {
+        setLocalSectionSaved(record, false, record.codeVersion);
+        syncReaderNoteBookmarkButtons(record.sectionID, false, record.codeVersion);
+      }
+    }
+    saveWorkspaceState();
+    deletedCount += Number(payload.deletedCount || 0);
+    onProgress(deletedCount);
+  }
+  await loadSyncedContent({ force: true });
+  requireCurrentAccountRequest(requestIdentity);
+  return deletedCount;
 }
 
 async function unlinkEvidenceFromFolder(folder, item, container = null, options = {}) {
@@ -34570,6 +34620,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         removeConfirmationDetail: selectedFolder
           ? "Evidence linked to another Project will remain there. Items with no remaining destination will also have their saved record deleted. Notes and source history are not reassigned."
           : "This deletes the selected saved records.",
+        removeBatchAction: (items, onProgress) => deleteSavedEvidenceBatch(items, selectedFolder, onProgress),
         removeAction: (item, removalOptions) => selectedFolder ? unlinkEvidenceFromFolder(
           selectedFolder,
           (summary.projectSections || []).find((link) =>
@@ -35937,7 +35988,10 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     update();
     let removedCount = 0;
     try {
-      for (const item of selectedItems) {
+      if (typeof options.removeBatchAction === "function") {
+        removedCount = await options.removeBatchAction(selectedItems, count => { removedCount = count; });
+        requireCurrentAccountRequest(requestIdentity);
+      } else for (const item of selectedItems) {
         requireCurrentAccountRequest(requestIdentity);
         const removed = typeof options.removeAction === "function"
           ? await options.removeAction(item, { confirmedFinalDestinationRemoval: true })
@@ -35945,6 +35999,8 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
         if (removed === false) continue;
         removedCount += 1;
       }
+      await refreshOpenSavedPanes();
+      requireCurrentAccountRequest(requestIdentity);
       await showWebNotice(
         "Saved evidence deleted",
         `${removedCount} saved ${removedCount === 1 ? "item was" : "items were"} deleted.`

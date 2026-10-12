@@ -1,3 +1,4 @@
+import { planSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
 import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { freePlanMutationDecision } from "./entitlement-contract.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
@@ -522,8 +523,9 @@ export function createPostgresSyncRepository(sql) {
     };
   }
 
-  async function push(userID, mutations, recoveryBatch = null) {
-    const needsRecovery = recoveryBatch || mutations.some(m => m.codeVersionClear || Object.values(m).some(r => r?.deletedAt || (m.annotation && !String(r?.noteBody || "").trim())));
+  async function push(userID, mutations, recoveryBatch = null, deleteInput = null) {
+    let deletePlan = null;
+    const needsRecovery = deleteInput || recoveryBatch || mutations.some(m => m.codeVersionClear || Object.values(m).some(r => r?.deletedAt || (m.annotation && !String(r?.noteBody || "").trim())));
     let original = [], expectedEvent = 0, captured = null, skipped = 0;
     if (needsRecovery) {
       const [rows, events] = await sql.transaction([
@@ -532,6 +534,10 @@ export function createPostgresSyncRepository(sql) {
       ], {isolationLevel:"RepeatableRead",readOnly:true});
       original = rows.map(row => safeJSON(row.mutation,{}));
       expectedEvent = Number(events[0]?.latest_event_id || 0);
+      if (deleteInput) {
+        deletePlan = planSavedEvidenceDelete(userID, original, deleteInput);
+        mutations = deletePlan.mutations;
+      }
       if (recoveryBatch) {
         const plan = restoreTrash(recoveryBatch, original);
         mutations = plan.mutations;
@@ -574,13 +580,13 @@ export function createPostgresSyncRepository(sql) {
           JOIN permitext_user_content_records accepted ON accepted.user_id = ${userID} AND accepted.mutation = trigger_mutation
         ) HAVING count(*) > 0 ON CONFLICT(id) DO NOTHING`);
     }
-    if (recoveryBatch) {
-      // A rejected restore must retain the recovery copy and roll back every write.
+    if (recoveryBatch || deleteInput) {
+      // A rejected restore or batch deletion must roll back every write.
       for (const mutation of standardMutations) queries.push(sql`SELECT 1 / CASE WHEN EXISTS(
         SELECT 1 FROM permitext_user_content_records WHERE user_id = ${userID}
         AND record_id = ${mutationRecordID(mutation)} AND mutation = ${JSON.stringify(mutation)}::jsonb
       ) THEN 1 ELSE 0 END AS restore_guard`);
-      queries.push(sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id}`);
+      if (recoveryBatch) queries.push(sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id}`);
     }
     if (needsRecovery) queries.push(sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND expires_at <= CURRENT_TIMESTAMP`);
     let results;
@@ -632,6 +638,7 @@ export function createPostgresSyncRepository(sql) {
       acceptedMutationIDs,
       rejectedMutationIDs,
       rejectionReasons,
+      ...(deletePlan ? deletePlan : {}),
       skippedCount: skipped,
       latestEventID: Number(finalLatestRows?.[0]?.latest_event_id || 0),
       entitlement: finalEntitlementRows?.[0]?.entitlement
@@ -741,5 +748,15 @@ export function createPostgresSyncRepository(sql) {
     const rows = await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} ORDER BY expires_at DESC`;
     return {entries:rows.map(row => trashSummary(safeJSON(row.batch,{}))),restoredCount,skippedCount};
   }
-  return { push, pull, trashAction };
+  async function deleteSavedEvidence(userID, input) {
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      try { return await push(userID, [], null, input); }
+      catch (error) {
+        // Re-read and rebuild the plan after a competing sync write. Never retry
+        // stale final-destination decisions against a different snapshot.
+        if (!["22012", "40001"].includes(error?.code) || attempt === 3) throw error;
+      }
+    }
+  }
+  return { push, pull, trashAction, deleteSavedEvidence };
 }
