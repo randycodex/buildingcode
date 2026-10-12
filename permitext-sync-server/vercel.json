@@ -293,6 +293,10 @@
       "destination": "/api/index"
     },
     {
+      "source": "/saved/evidence/delete-batch",
+      "destination": "/api/index"
+    },
+    {
       "source": "/sync/:path*",
       "destination": "/api/index"
     },

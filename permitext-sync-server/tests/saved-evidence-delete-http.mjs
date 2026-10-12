@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+const deploymentConfig = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8"));
+assert(deploymentConfig.rewrites.some(route => route.source === "/saved/evidence/delete-batch" && route.destination === "/api/index"), "Production must route batch deletion to the backend");
 const directory = await mkdtemp(join(tmpdir(), "permitext-trash-test-"));
 Object.assign(process.env, { NODE_ENV: "test", VERCEL: "", VERCEL_ENV: "",
   PERMITEXT_SYNC_DATA_PATH: join(directory, "sync.json"),
