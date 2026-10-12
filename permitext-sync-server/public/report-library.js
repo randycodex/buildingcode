@@ -33,7 +33,7 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
     const width = Math.max(minimumWidth, Math.min(maximumWidth(), requested));
     panel.dataset[`${kind}Width`] = String(width);
     panel.style.setProperty(`--report-${kind}-width`, `${width}px`);
-    onResize();
+    onResize(drag);
     updateControls();
   };
   divider.addEventListener('focus', updateControls);
@@ -54,7 +54,7 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   divider.addEventListener('pointerdown', event => {
     if (event.button !== 0) return;
     event.preventDefault();
-    divider.focus();
+    divider.focus({preventScroll: true});
     drag = { pointerID: event.pointerId, x: event.clientX, width: element.getBoundingClientRect().width };
     divider.setPointerCapture(event.pointerId);
     shell.classList.add(`is-${kind}-resizing`);

@@ -161,7 +161,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
       columns().scrollLeft = scroll + Math.max(600, report + delta) - report - delta;
     }
   });
-  let drag = null;
+  let drag = null, versionsResize = null;
   divider.addEventListener('pointerdown', event => {
     if (event.button !== 0) return;
     event.preventDefault(); divider.focus({preventScroll: true});
@@ -180,6 +180,25 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) divider.addEventListener(event, finish);
   return {
     preview, versions, versionBody, divider, update,
+    resizeVersions(gesture) {
+      const host = columns();
+      if (!host) { onResize(); return; }
+      if (!gesture || versionsResize?.gesture !== gesture) {
+        const rect = versions.getBoundingClientRect();
+        versionsResize = {gesture, width: rect.width, right: rect.right, ...widths()};
+      }
+      const origin = versionsResize;
+      if (selectedID && panel.dataset.comparisonOpen === 'true') {
+        const delta = (Number(panel.dataset.versionsWidth) || 300) - origin.width;
+        panel.dataset.reportComparisonWidth = String(Math.max(600, origin.report));
+        panel.dataset.pdfComparisonWidth = String(Math.max(600, origin.pdf - delta));
+      }
+      preservePDFReadingPosition(preview.querySelector('.report-export-content'), onResize);
+      // Keep Versions' right edge fixed. Once the adjacent document reaches its
+      // minimum, scroll the whole row so the divider still follows the pointer.
+      host.scrollLeft += versions.getBoundingClientRect().right - origin.right;
+      update();
+    },
     capturePosition() { return closedPosition || readPosition(); },
     restorePosition(position) {
       if (!position) return;

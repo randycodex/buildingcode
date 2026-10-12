@@ -2,8 +2,8 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
-import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261011-sidebar-width-v6";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261011-comparison-v13";
+import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v7";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v14";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-headers-v903";
+} from "./offline-storage.js?v=20261012-versions-divider-v904";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29592,7 +29592,8 @@ async function renderProjectReportDraft(project) {
     sourcePicker.scrollTop = reportLibraryScroll.sources;
     library.append(libraryControls.header, sourcePicker);
     const versionsControls = createReportVersionsControls({
-      panel, shell, versions: comparison.versions, availableWidth: () => 0, onResize: syncReferenceReaderLayout
+      panel, shell, versions: comparison.versions, availableWidth: () => 0,
+      onResize: gesture => comparison.resizeVersions(gesture)
     });
     const versionsTitle = document.createElement("button");
     versionsTitle.type = "button";

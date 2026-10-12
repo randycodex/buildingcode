@@ -76,6 +76,7 @@ const comparison = createReportComparison({panel, columns: () => host, isCurrent
     resized++;
     if (panel.dataset.reportComparisonWidth) host.document.width = Number(panel.dataset.reportComparisonWidth);
     if (panel.dataset.pdfComparisonWidth) comparison.preview.width = Number(panel.dataset.pdfComparisonWidth);
+    if (panel.dataset.versionsWidth) comparison.versions.width = Number(panel.dataset.versionsWidth);
     if (panel.dataset.comparisonOpen !== 'true' && comparison.preview.content) {
       comparison.preview.content.scrollTop = 0;
       comparison.versionBody.scrollTop = 0;
@@ -166,6 +167,36 @@ assert.equal(panel.dataset.pdfComparisonWidth, '809', 'End restores balanced doc
 comparison.divider.events.dblclick();
 assert.equal(panel.dataset.reportComparisonWidth, undefined);
 assert.equal(panel.dataset.pdfComparisonWidth, undefined);
+
+host.document.width = comparison.preview.width = 809;
+comparison.preview.content = Object.assign(new Element(), {scrollTop: 942});
+comparison.versions.width = 300;
+host.scrollLeft = 0;
+comparison.versions.getBoundingClientRect = () => ({width: comparison.versions.width,
+  right: host.document.width + comparison.preview.width + 2 + comparison.versions.width - host.scrollLeft});
+const versionsRight = comparison.versions.getBoundingClientRect().right;
+const versionsGesture = {};
+panel.dataset.versionsWidth = '420';
+comparison.resizeVersions(versionsGesture);
+assert.equal(panel.dataset.reportComparisonWidth, '809', 'Resizing Versions leaves the Report width in place');
+assert.equal(panel.dataset.pdfComparisonWidth, '689', 'Versions grows into the adjacent PDF instead of beyond the right edge');
+assert.equal(comparison.versions.getBoundingClientRect().right, versionsRight);
+assert.equal(host.scrollLeft, 0, 'No workspace scrolling is needed while the PDF has space to yield');
+assert.equal(comparison.preview.content.scrollTop, 942, 'Versions resizing keeps the current PDF reading position');
+panel.dataset.versionsWidth = '720';
+comparison.resizeVersions(versionsGesture);
+assert.equal(panel.dataset.pdfComparisonWidth, '600', 'The PDF keeps its readable minimum');
+assert.equal(host.scrollLeft, 211, 'At the minimum, the whole row scrolls to keep Versions anchored');
+assert.equal(comparison.versions.getBoundingClientRect().right, versionsRight);
+panel.dataset.versionsWidth = '300';
+comparison.resizeVersions(versionsGesture);
+assert.equal(panel.dataset.pdfComparisonWidth, '809', 'Reversing the same drag restores the starting PDF width even after reaching its minimum');
+assert.equal(host.scrollLeft, 0);
+assert.equal(comparison.versions.getBoundingClientRect().right, versionsRight);
+panel.dataset.versionsWidth = '324';
+comparison.resizeVersions();
+assert.equal(panel.dataset.pdfComparisonWidth, '785', 'A keyboard adjustment starts from the current document widths');
+assert.equal(comparison.versions.getBoundingClientRect().right, versionsRight);
 current = false;
 comparison.select({id: 'third'}, prepare);
 assert.equal(reviews.length, 4, 'Changed account context cannot open a private PDF');

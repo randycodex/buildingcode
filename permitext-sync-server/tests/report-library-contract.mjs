@@ -7,7 +7,7 @@ class Element {
   append(...nodes) { this.children.push(...nodes); }
   setAttribute(key, value) { this.attributes[key] = value; }
   addEventListener(name, handler) { this.events[name] = handler; }
-  focus() { this.events.focus?.(); }
+  focus(options) { this.focusOptions = options; this.events.focus?.(); }
   setPointerCapture(id) { this.capture = id; }
   hasPointerCapture(id) { return this.capture === id; }
   releasePointerCapture() { this.capture = null; }
@@ -111,6 +111,7 @@ const versions = {getBoundingClientRect: () => ({width: Number(panel.dataset.ver
 const versionControls = c.createReportVersionsControls({panel, shell, versions, availableWidth: () => 0});
 assert.equal(versionControls.header.children.length, 1, 'Versions has no Compact/Expand width button');
 versionControls.divider.events.pointerdown(pointer(4, 1400));
+assert.equal(versionControls.divider.focusOptions.preventScroll, true, 'Starting a Versions drag does not scroll its edge away from the pointer');
 versionControls.divider.events.pointermove(pointer(4, 1300));
 assert.equal(panel.dataset.versionsWidth, '400', 'The right-hand Versions column expands to the left while dragging its left divider');
 versionControls.divider.events.pointercancel(pointer(4, 1300));
