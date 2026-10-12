@@ -19515,7 +19515,7 @@ dialog.report-export-review {
 .assistant-history-rail .research-conversation-open strong { white-space: normal; overflow-wrap: anywhere; font-size: 12px; font-weight: 400; line-height: 1.5; }
 .assistant-history-rail .research-conversation-open[aria-current="true"] strong { color: var(--text-primary); font-weight: 700; }
 .assistant-history-rail :is(.research-conversation-date, .research-conversation-project-pill, .research-conversation-preview) { display: none; }
-.assistant-history-rail .research-new-chat { width: calc(100% - 40px); margin: 12px 20px; min-height: 32px; height: auto; padding: 8px 0; border-radius: 0; background: transparent; font-size: 12px; text-align: left; }
+.assistant-history-rail .research-new-chat { width: calc(100% - 40px); margin: 12px 20px; min-height: 32px; height: auto; padding: 8px 0; border-radius: 0; background: transparent; font-size: 12px; text-align: right; }
 .assistant-workspace > .assistant-body { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; overflow: hidden; display: grid; }
 .assistant-body > .research-conversation-embedded { min-height: 0; display: grid; overflow: hidden; }
 .assistant-workspace.is-new-research-chat > .assistant-body { grid-template-rows: minmax(0, 1fr) auto auto; padding-inline: var(--panel-padding); }
