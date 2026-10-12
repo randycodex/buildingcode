@@ -6,7 +6,7 @@ const privateSource = await readFile(new URL("../public/private-workspace-state.
 assert.match(privateSource, /key.startsWith\(prefix\).*storage.removeItem\(key\)/, "Account cleanup removes every account-workspace child key");
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const start = source.indexOf("const notebookReturnScrollPositions = new Map();");
-const end = source.indexOf("\nconst notebookCardMenuOpenByProject", start);
+const end = source.indexOf("\nconst reportDraftMounts", start);
 assert.ok(start >= 0 && end > start);
 const helpers = source.slice(start, end);
 const storage = new Map();

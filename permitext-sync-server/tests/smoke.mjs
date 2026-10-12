@@ -1654,23 +1654,23 @@ async function main() {
         !workspaceStyles.text.includes(".notebook-tiptap-editor {") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-rail-actions {") &&
-        workspaceScript.text.includes('rail.className = "notebook-card-rail code-filter-menu notebook-card-menu"') &&
-        workspaceScript.text.includes('railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";') &&
-        workspaceScript.text.includes('if (!cardMenuState.cardsMenuOpen && showingArchivedCards)') &&
-        workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false") &&
-        workspaceScript.text.includes('const setNotesExpanded = wireProjectSectionMotion(rail, cardList, [railToggle], "Project notes"') &&
+        workspaceScript.text.includes("const noteMenu = createNotebookNoteMenu({") &&
+        workspaceScript.text.includes('railLabel.textContent = showingArchivedCards ? "Archive" : "Notes";') &&
+        workspaceScript.text.includes("noteMenu.render({ cards, activeCard, showingArchivedCards, selectingCards, selectedCardIDs,") &&
+        workspaceScript.text.includes("shell.append(noteMenu.element, focus)") &&
+        workspaceScript.text.includes('.notebook-note-menu[open]') &&
         workspaceScript.text.includes('closeButton.className = "icon-button utility-close notebook-close";') &&
-        workspaceScript.text.includes('closeButton.setAttribute("aria-label", "Close notebook");') &&
+        workspaceScript.text.includes('closeButton.setAttribute("aria-label", "Close notes");') &&
         workspaceScript.text.includes("closeButton.innerHTML = circleXIconSVG();") &&
         workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);") &&
-        workspaceStyles.text.includes(".notebook-card-rail.is-open {\n  padding-bottom: 0;") &&
-        workspaceStyles.text.includes(".notebook-card-menu-toggle {\n  width: 100%;\n  min-height: 40px;\n  background: var(--menu-surface);") &&
+        workspaceStyles.text.includes(".notebook-title-control { display: grid;") &&
+        workspaceStyles.text.includes(".notebook-note-menu > summary { display: flex;") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-flow: row;") &&
-        workspaceStyles.text.includes(".notebook-card-menu.project-section-motion > .notebook-card-list {\n  max-height: 0;\n  overflow: hidden;\n  padding-bottom: 0;") &&
+        workspaceStyles.text.includes(".notebook-note-menu-items { position: absolute;") &&
         workspaceStyles.text.includes("padding-inline: var(--space-3);\n  border-radius: var(--radius-control);\n  background-color: var(--menu-surface);") &&
         workspaceStyles.text.includes("background-color: var(--menu-surface);\n  background-image: none;") &&
-        workspaceStyles.text.includes(".notebook-card-menu.project-section-motion.is-open > .notebook-card-list {\n  max-height: var(--project-section-body-height, 0px);\n  padding-bottom: var(--space-2);") &&
-        workspaceStyles.text.includes(".notebook-card-menu.project-section-motion.is-open.is-settled > .notebook-card-list {\n  max-height: none;") &&
+        workspaceStyles.text.includes(".notebook-note-menu-footer { display: flex;") &&
+        workspaceStyles.text.includes(".notebook-note-menu .notebook-card-tile[aria-current='true'] > span { font-weight: 700;") &&
         !workspaceScript.text.includes("cardListResizeHandle") &&
         workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;") &&
         workspaceStyles.text.includes(".notebook-reference-menu .notebook-reference-list {\n  background-image: none;") &&

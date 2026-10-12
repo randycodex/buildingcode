@@ -4,7 +4,7 @@ import vm from "node:vm";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const helpersStart = source.indexOf("const notebookReturnScrollPositions = new Map();");
-const helpersEnd = source.indexOf("\nconst notebookCardMenuOpenByProject", helpersStart);
+const helpersEnd = source.indexOf("\nconst reportDraftMounts", helpersStart);
 assert.ok(helpersStart >= 0 && helpersEnd > helpersStart);
 const helpers = source.slice(helpersStart, helpersEnd);
 const c = vm.createContext({ accountRuntimeGeneration: 1 });

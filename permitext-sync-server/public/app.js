@@ -1,3 +1,4 @@
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261012-note-menu-v3";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
@@ -112,7 +113,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-outline-hover-type-v925";
+} from "./offline-storage.js?v=20261012-notebook-menu-v929";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -683,7 +684,6 @@ function readNotebookReturnCard(context, cards) {
   return "";
 }
 
-const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
 let reportScreen = null;
 let projectDetailsScreen = null;
@@ -8163,7 +8163,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   workboardMounts.forEach((mount) => mount.dispose?.());
   workboardMounts.clear();
   [legacyHydrationByProject, coordinationComposerDraftByProject, pendingNotebookCardByProject,
-    pendingReportDraftByProject, reportDraftFocusResultByProject, notebookCardMenuOpenByProject,
+    pendingReportDraftByProject, reportDraftFocusResultByProject,
     projectArtifactRevisions, accountArtifactRevisions, projectSelectionControllers].forEach((map) => map.clear());
   annotationPushTimers.forEach((timer) => clearTimeout(timer));
   annotationPushTimers.clear();
@@ -27025,30 +27025,29 @@ async function renderProjectNotebook(project, options = {}) {
       shell.append(accessNote);
     }
 
-    const rail = document.createElement("aside");
-    rail.className = "notebook-card-rail code-filter-menu notebook-card-menu";
-    const railHeader = document.createElement("div");
-    railHeader.className = "notebook-card-rail-header";
-    const railToggle = document.createElement("button");
-    railToggle.className = "code-filter-menu-toggle notebook-card-menu-toggle";
-    railToggle.type = "button";
-    const railLabel = document.createElement("span");
-    railLabel.className = "code-filter-menu-label";
-    railLabel.textContent = "Notes";
-    railToggle.append(railLabel);
-    const newButton = document.createElement("button");
-    newButton.className = "notebook-card-add-action";
-    newButton.type = "button";
-    newButton.title = "New Note";
-    newButton.setAttribute("aria-label", "New Note");
-    newButton.innerHTML = `
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 5v14"></path>
-        <path d="M5 12h14"></path>
-      </svg>
-      <span>New Note</span>
-    `;
-    newButton.disabled = notebookReadOnly;
+    const noteMenu = createNotebookNoteMenu({
+      onSelect(card) {
+        if (selectingCards) {
+          if (selectedCardIDs.has(card.id)) selectedCardIDs.delete(card.id);
+          else selectedCardIDs.add(card.id);
+          updateNotebookCardManagement();
+          return;
+        }
+        void loadCard(card.id).catch((error) => showWebNotice("Note not opened", error.message));
+      },
+      onTitleChange(value) {
+        if (disposed || notebookReadOnly || !isCurrentAccountRequest(requestIdentity) || !activeCard) return;
+        activeCard.title = value;
+        const summary = cards.find((card) => card.id && card.id === activeCard.id);
+        if (summary) summary.title = value;
+        markNotebookDirty();
+      }
+    });
+    const rail = noteMenu.menu;
+    const railHeader = noteMenu.footer;
+    const railLabel = noteMenu.label;
+    const newButton = noteMenu.createButton;
+    const cardList = noteMenu.list;
     const archiveButton = document.createElement("button");
     archiveButton.className = "notebook-card-archive-action";
     archiveButton.type = "button";
@@ -27081,49 +27080,21 @@ async function renderProjectNotebook(project, options = {}) {
     deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
     deleteSelectedButton.innerHTML = trashIconSVG();
     deleteSelectedButton.hidden = true;
-    const railActions = document.createElement("div");
-    railActions.className = "notebook-card-rail-actions";
+    const railActions = noteMenu.management;
     railActions.append(
       cancelSelectionButton,
-      newButton,
       archiveButton,
       archiveSelectedButton,
       deleteSelectedButton,
       selectButton
     );
-    railHeader.append(railToggle, railActions);
-    const cardList = document.createElement("div");
-    cardList.className = "notebook-card-list";
-    rail.append(railHeader, cardList);
-    let showingArchivedCards = false;
-    const cardMenuState = {
-      cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false
-    };
-    const updateNotesMenu = () => {
-      railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
-      railToggle.setAttribute("aria-label", `${cardMenuState.cardsMenuOpen ? "Collapse" : "Expand"} Project notes`);
-    };
-    const setNotesExpanded = wireProjectSectionMotion(rail, cardList, [railToggle], "Project notes",
-      cardMenuState.cardsMenuOpen, { onChange(expanded) {
-        cardMenuState.cardsMenuOpen = expanded;
-        updateNotesMenu();
-      } });
-    railToggle.addEventListener("click", () => {
-      notebookCardMenuOpenByProject.set(projectID, cardMenuState.cardsMenuOpen);
-      if (!cardMenuState.cardsMenuOpen && showingArchivedCards) {
-        showingArchivedCards = false;
-        selectingCards = false;
-        selectedCardIDs.clear();
-        renderCardList();
-      }
-    });
-
     const focus = document.createElement("section");
     focus.className = "notebook-focus";
-    shell.append(rail, focus);
+    shell.append(noteMenu.element, focus);
     panel.append(draftStatus);
 
     let notebookAutosaveTask = null;
+    let showingArchivedCards = false;
     let selectingCards = false;
     let cardSelectionBusy = false;
     const selectedCardIDs = new Set();
@@ -27526,7 +27497,7 @@ async function renderProjectNotebook(project, options = {}) {
       railHeader.hidden = false;
       rail.classList.toggle("is-selecting-cards", selectingCards);
       rail.classList.toggle("is-showing-archived-cards", showingArchivedCards);
-      railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
+      railLabel.textContent = showingArchivedCards ? "Archive" : "Notes";
       selectButton.setAttribute("aria-pressed", String(selectingCards));
       archiveButton.setAttribute("aria-pressed", String(showingArchivedCards));
       archiveButton.title = showingArchivedCards ? "Show active notes" : "Show archived notes";
@@ -27534,7 +27505,7 @@ async function renderProjectNotebook(project, options = {}) {
       archiveButton.innerHTML = showingArchivedCards ? activeProjectsIconSVG() : archiveIconSVG();
       cancelSelectionButton.hidden = !selectingCards;
       newButton.hidden = selectingCards || showingArchivedCards;
-      archiveButton.hidden = selectingCards;
+      archiveButton.hidden = selectingCards || !cards.length;
       archiveSelectedButton.hidden = !selectingCards;
       deleteSelectedButton.hidden = !selectingCards;
       selectButton.hidden = visibleCards.length === 0;
@@ -27555,103 +27526,9 @@ async function renderProjectNotebook(project, options = {}) {
     };
 
     function renderCardList() {
-      const focusedTitleEditor = document.activeElement?.classList.contains("notebook-card-list-title-editor")
-        ? {
-            cardID: document.activeElement.dataset.cardId || "",
-            selectionStart: document.activeElement.selectionStart,
-            selectionEnd: document.activeElement.selectionEnd
-          }
-        : null;
-      cardList.replaceChildren();
-      const unsavedActiveCard = !showingArchivedCards && activeCard && !activeCard.id ? activeCard : null;
-      rail.hidden = false;
-      if (!cards.length && !unsavedActiveCard) {
-        setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
-      updateNotesMenu();
-        updateNotebookCardManagement();
-        return;
-      }
-      const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
-      if (unsavedActiveCard) visibleCards.unshift(unsavedActiveCard);
-      if (!visibleCards.length) {
-        if (showingArchivedCards) {
-          const empty = document.createElement("p");
-          empty.className = "notebook-card-list-empty";
-          empty.textContent = "No archived notes.";
-          cardList.append(empty);
-        }
-        setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
-      updateNotesMenu();
-        updateNotebookCardManagement();
-        return;
-      }
-      visibleCards.forEach((card) => {
-        const row = document.createElement("article");
-        row.className = "notebook-card-row";
-        row.dataset.cardId = card.id;
-        const isActiveCard = activeCard === card || (Boolean(card.id) && activeCard?.id === card.id);
-        if (isActiveCard && !selectingCards && !showingArchivedCards) {
-          row.classList.add("is-active-title");
-          const titleEditor = document.createElement("input");
-          titleEditor.className = "notebook-card-list-title-editor";
-          titleEditor.type = "text";
-          titleEditor.maxLength = 300;
-          titleEditor.placeholder = "Note title";
-          titleEditor.value = card.title || "";
-          titleEditor.dataset.cardId = card.id || "";
-          titleEditor.setAttribute("aria-label", "Edit Note title");
-          titleEditor.disabled = notebookReadOnly;
-          const meta = document.createElement("small");
-          meta.textContent = card.id
-            ? `${card.referenceCount || 0} linked · ${researchRelativeDate(card.updatedAt)}`
-            : "New note";
-          titleEditor.addEventListener("input", () => {
-            if (disposed || !isCurrentAccountRequest(requestIdentity) || activeCard !== card && activeCard?.id !== card.id) return;
-            card.title = titleEditor.value;
-            activeCard.title = titleEditor.value;
-            markNotebookDirty();
-          });
-          titleEditor.addEventListener("keydown", (event) => {
-            if (event.key !== "Enter") return;
-            event.preventDefault();
-            titleEditor.blur();
-          });
-          row.append(titleEditor, meta);
-          cardList.append(row);
-          return;
-        }
-        const button = document.createElement("button");
-        button.className = "notebook-card-tile";
-        button.type = "button";
-        button.setAttribute("aria-pressed", String(activeCard?.id === card.id));
-        const cardTitle = document.createElement("strong");
-        cardTitle.textContent = card.title;
-        const meta = document.createElement("small");
-        meta.textContent = `${card.referenceCount || 0} linked · ${researchRelativeDate(card.updatedAt)}`;
-        button.append(cardTitle, meta);
-        button.addEventListener("click", () => {
-          if (selectingCards) {
-            if (selectedCardIDs.has(card.id)) selectedCardIDs.delete(card.id);
-            else selectedCardIDs.add(card.id);
-            updateNotebookCardManagement();
-            return;
-          }
-          void loadCard(card.id).catch((error) => showWebNotice("Note not opened", error.message));
-        });
-        row.append(button);
-        cardList.append(row);
-      });
-      setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
-      updateNotesMenu();
+      noteMenu.render({ cards, activeCard, showingArchivedCards, selectingCards, selectedCardIDs,
+        readOnly: notebookReadOnly });
       updateNotebookCardManagement();
-      if (focusedTitleEditor) {
-        const titleEditor = Array.from(cardList.querySelectorAll(".notebook-card-list-title-editor"))
-          .find((input) => input.dataset.cardId === focusedTitleEditor.cardID);
-        if (titleEditor) {
-          titleEditor.focus({ preventScroll: true });
-          titleEditor.setSelectionRange(focusedTitleEditor.selectionStart, focusedTitleEditor.selectionEnd);
-        }
-      }
     }
 
     refreshNotebookCards = async () => {
@@ -28079,7 +27956,7 @@ async function renderProjectNotebook(project, options = {}) {
         onOpenReference: null
       });
       if (!notebookReadOnly && !activeCard.id) {
-        cardList.querySelector(".notebook-card-list-title-editor")?.focus({ preventScroll: true });
+        noteMenu.editTitle();
       }
       researchButton.addEventListener("click", async () => {
         const bodyText = String(editorElement.innerText || activeCard.plainText || "").trim();
@@ -45514,7 +45391,7 @@ document.addEventListener("keydown", (event) => {
 
 // Close workspace disclosures when clicking elsewhere.
 document.addEventListener("pointerdown", event => {
-  document.querySelectorAll(".search-match-control[open], .report-draft-version-list[open]").forEach(control => {
+  document.querySelectorAll(".search-match-control[open], .report-draft-version-list[open], .notebook-note-menu[open]").forEach(control => {
     if (!control.contains(event.target)) control.open = false;
   });
 });
