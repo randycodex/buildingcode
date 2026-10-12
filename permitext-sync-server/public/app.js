@@ -113,7 +113,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-deep-web-v933";
+} from "./offline-storage.js?v=20261012-saved-window-v934";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
