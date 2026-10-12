@@ -19377,7 +19377,7 @@ dialog.report-export-review {
 .topbar-actions, .workflow-toolbar > div, .project-details-screen .project-details-tabs { gap: 0; }
 .topbar :is(.topbar-actions, .topbar-end, .topbar-workspaces, .topbar-layout-actions, .topbar-layout-menu),
 .workflow-toolbar > div { height: 100%; }
-.topbar .workspace-actions-button { min-width: 0; }
+.topbar .workspace-actions-button { min-width: 0; flex-shrink: 1; max-width: min(180px, 100%); }
 .topbar :is(.topbar-actions > button, .workspace-actions-button, .topbar-settings-button, .topbar-layout-menu > summary),
 .workflow-toolbar .toolbar-button,
 .project-details-screen .project-details-tabs button,

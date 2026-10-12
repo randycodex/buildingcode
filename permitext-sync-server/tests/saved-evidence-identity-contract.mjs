@@ -346,6 +346,6 @@ assert.match(
 );
 assert.match(
   functionSource(appSource, "consolidatedSavedAnnotations"),
-  /annotationForTarget\(annotation\)/,
+  /annotationForTarget\(annotation, "", "", \{/,
   "Saved consolidation must pass the annotation's edition into note resolution."
 );

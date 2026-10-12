@@ -1,3 +1,4 @@
+import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -27,8 +28,6 @@ export const zoningSyncCodeVersion =
 let cachedBundle = null;
 let cachedManifest = null;
 let cachedSourceManifest = null;
-let cachedCatalog = null;
-let cachedSearchIndex = null;
 const cachedChapters = new Map();
 const cachedSections = new Map();
 
@@ -128,8 +127,7 @@ function flattenedChapterSections(chapter) {
   );
 }
 
-export async function zoningSectionCatalog() {
-  if (cachedCatalog) return cachedCatalog;
+export const zoningSectionCatalog = createRetryableLazyLoader(async () => {
   const chapters = await zoningChapterIndex();
   const summaries = [];
   for (const summary of chapters) {
@@ -149,9 +147,8 @@ export async function zoningSectionCatalog() {
       });
     }
   }
-  cachedCatalog = summaries;
-  return cachedCatalog;
-}
+  return summaries;
+});
 
 export async function zoningSectionSummary(sectionID) {
   const key = String(sectionID || "").trim();
@@ -173,18 +170,15 @@ export async function zoningSection(sectionID) {
   }
 }
 
-export async function zoningSearchIndex() {
-  if (!cachedSearchIndex) {
-    const payload = await readJSON(join(preparedRoot, "searchIndex.json"));
-    cachedSearchIndex = new Map(
-      Object.entries(payload.tokens || {}).map(([token, ids]) => [
-        token,
-        normalizedSortedPostingList(ids)
-      ])
-    );
-  }
-  return cachedSearchIndex;
-}
+export const zoningSearchIndex = createRetryableLazyLoader(async () => {
+  const payload = await readJSON(join(preparedRoot, "searchIndex.json"));
+  return new Map(
+    Object.entries(payload.tokens || {}).map(([token, ids]) => [
+      token,
+      normalizedSortedPostingList(ids)
+    ])
+  );
+});
 
 export async function zoningAssetFilePath(fileName) {
   const normalized = String(fileName || "").trim();

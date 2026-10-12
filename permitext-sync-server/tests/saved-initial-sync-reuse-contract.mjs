@@ -33,6 +33,7 @@ function fixture() {
     renderSavedProjects() { calls.projects++; },
     consolidatedSavedAnnotations: values => values,
     hasCapability: () => true,
+    workspaceProject: () => ({ id: "synthetic-project" }),
     normalizeSavedInstance: value => value,
     scopeSavedInstanceToWorkspace: value => value,
     paneIDForUtilityInstance: () => "saved:synthetic",

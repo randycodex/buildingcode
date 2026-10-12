@@ -299,8 +299,19 @@ assert(
   webAppSource.includes("hubPayload?.foundation && hubPayload?.notebook") &&
     webAppSource.includes('hubPayload?.reports || reportRequest("/reports/history/list", { projectID })') &&
     webAppSource.includes('const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };') &&
-    webAppSource.includes("foundation = hubPayload?.foundation ||"),
-  "Notebook, Report history, and Saved do not share the Project transition bootstrap payload."
+    webAppSource.includes("foundationPayload = hubPayload.foundation;") &&
+    webAppSource.includes("cardPayload = {\n          ...hubPayload.notebook,"),
+  "Notebook and Report history do not share the Project transition bootstrap payload."
+);
+// Saved now renders synced evidence directly; it no longer needs a foundation
+// request or a share of the Project hub payload to mount its folder context.
+const savedFolderContextSource = webAppSource.slice(
+  webAppSource.indexOf("async function renderSavedFolderContext("),
+  webAppSource.indexOf("\nfunction ", webAppSource.indexOf("async function renderSavedFolderContext("))
+);
+assert(
+  !/postResearch\(|loadInitialProjectFoundation\(|projectTransitionHubPayload\(/.test(savedFolderContextSource),
+  "Saved folder presentation unexpectedly requests Project foundation data."
 );
 // PERF-11 publishes each project tool independently: a batch Promise.all is
 // no longer sufficient because it can withhold a fast pane behind a slow peer.

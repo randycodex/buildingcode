@@ -1,3 +1,4 @@
+import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
@@ -560,13 +561,11 @@ const databaseURL =
 
 let cachedStoreAdapter = null;
 let cachedStoreAdapterPromise = null;
-let cachedChapterIndex = null;
 let cachedChapterManifest = null;
 let cachedCanonicalSectionIDs = null;
 const cachedCanonicalBlockIDsBySectionID = new Map();
 let cachedSectionCatalog = null;
 let cachedSectionCatalogPromise = null;
-let cachedShippedSearchIndex = null;
 let cachedAllSectionCatalogByID = null;
 let cachedAllSectionCatalogByIDPromise = null;
 let cachedAppleJWKS = null;
@@ -579,20 +578,7 @@ const maximumResearchVisualEvidenceBytes = 4 * 1024 * 1024;
 const maximumResearchConversationVisualSources = 8;
 const maximumResearchConversationVisualEvidenceBytes = 8 * 1024 * 1024;
 
-export function createRetryableLazyLoader(loader) {
-  let loadPromise = null;
-  return function load() {
-    if (!loadPromise) {
-      loadPromise = Promise.resolve()
-        .then(loader)
-        .catch((error) => {
-          loadPromise = null;
-          throw error;
-        });
-    }
-    return loadPromise;
-  };
-}
+export { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 
 export function createSingleFlightInitializer(initializer) {
   let initialized = false;
@@ -8113,10 +8099,7 @@ function fullTitleForChapter(chapter, displayTitle, codePrefix = "") {
   return heading || displayTitle;
 }
 
-async function chapterIndex() {
-  if (cachedChapterIndex) {
-    return cachedChapterIndex;
-  }
+const chapterIndex = createRetryableLazyLoader(async () => {
   const files = await readdir(chapterContentPath);
   const manifest = await chapterManifest();
   const chaptersByKey = new Map();
@@ -8149,13 +8132,12 @@ async function chapterIndex() {
       chaptersByKey.set(canonicalKey, chapterSummary);
     }
   }
-  cachedChapterIndex = Array.from(chaptersByKey.values()).sort((left, right) =>
+  return Array.from(chaptersByKey.values()).sort((left, right) =>
     String(left.codePrefix).localeCompare(String(right.codePrefix)) ||
     compareChapterNumbers(left.chapterNumber, right.chapterNumber) ||
     Number(left.id) - Number(right.id)
   );
-  return cachedChapterIndex;
-}
+});
 
 function flattenChapterSections(chapter) {
   return (chapter.groups || []).flatMap((group) =>
@@ -8221,18 +8203,15 @@ async function buildSectionCatalog() {
   return sectionSummaries;
 }
 
-async function shippedSearchIndex() {
-  if (!cachedShippedSearchIndex) {
-    const payload = await readJSONFile(shippedSearchIndexPath);
-    cachedShippedSearchIndex = new Map(
-      Object.entries(payload.tokens || {}).map(([token, sectionIDs]) => [
-        token,
-        normalizedSortedPostingList(sectionIDs)
-      ])
-    );
-  }
-  return cachedShippedSearchIndex;
-}
+const shippedSearchIndex = createRetryableLazyLoader(async () => {
+  const payload = await readJSONFile(shippedSearchIndexPath);
+  return new Map(
+    Object.entries(payload.tokens || {}).map(([token, sectionIDs]) => [
+      token,
+      normalizedSortedPostingList(sectionIDs)
+    ])
+  );
+});
 
 let cachedResearchCorpusRegistry = null;
 const cachedResearchCorpusResources = new Map();

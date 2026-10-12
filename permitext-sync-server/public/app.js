@@ -113,7 +113,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-notebook-toolbar-order-v930";
+} from "./offline-storage.js?v=20261012-speed-ux-v932";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -34296,6 +34296,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       ) || null
     : await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
   if (!panel.isConnected) return;
+  const annotatedItems = consolidatedSavedAnnotations(summary.annotations || []);
   if (preserveProjectChrome) {
     panel.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
       const project = workspaceProjects.find((item) => projectRecordID(item) === tile.dataset.projectId);
@@ -34313,7 +34314,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         summary.savedItems || [],
         summary.projectSections || [],
         workspaceProjects,
-        consolidatedSavedAnnotations(summary.annotations || [])
+        annotatedItems
       ).size;
       unassignedCountLabel.textContent = String(unassignedCount);
       unassignedCountLabel.title = unassignedCount === 1
@@ -34329,7 +34330,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       workspaceProjects,
       summary.projectSections || [],
       summary.savedItems || [],
-      consolidatedSavedAnnotations(summary.annotations || [])
+      annotatedItems
     );
   }
   const showingUnassigned = !selectedFolder && savedInstance.organizeUnassigned;
@@ -34346,8 +34347,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     return;
   }
 
-  const { savedItems, annotations } = summary;
-  const annotatedItems = consolidatedSavedAnnotations(annotations || []);
+  const { savedItems } = summary;
   const combinedItems = mergeSavedColumnItems(savedItems, annotatedItems);
   const unassignedSectionIDs = renderUnassignedEvidenceNotice(
     panel,
@@ -35381,6 +35381,24 @@ function annotationEvidenceIsVisible(annotation) {
 }
 
 function consolidatedSavedAnnotations(annotations = []) {
+  if (!annotations.length) return [];
+  // This is one synchronous render pass. Read authoritative overlays once, then
+  // index by edition, section and passage; never retain this snapshot across edits.
+  const annotationSnapshot = {
+    localIDs: new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || ""))),
+    clearRecords: currentBulkClearRecords()
+  };
+  const recordsByTarget = new Map();
+  const targetKey = (annotation) => [
+    syncCodeVersion(annotation?.codeVersion),
+    String(annotation?.sectionID || ""),
+    normalizeAnnotationBlockID(annotation?.blockID || annotation?.anchorID || annotation?.contentBlockID)
+  ].join(":");
+  (currentContentSummary().annotations || []).forEach((annotation) => {
+    const key = targetKey(annotation);
+    if (!recordsByTarget.has(key)) recordsByTarget.set(key, []);
+    recordsByTarget.get(key).push(annotation);
+  });
   const latestByTarget = new Map();
   annotations.forEach((annotation) => {
     if (!annotation || annotation.deletedAt || !annotation.sectionID) return;
@@ -35391,8 +35409,11 @@ function consolidatedSavedAnnotations(annotations = []) {
       latestByTarget.set(key, { ...annotation, blockID, codeVersion: syncCodeVersion(annotation.codeVersion) });
     }
   });
-  return Array.from(latestByTarget.values()).flatMap((annotation) => {
-    const merged = annotationForTarget(annotation);
+  return Array.from(latestByTarget.entries()).flatMap(([key, annotation]) => {
+    const merged = annotationForTarget(annotation, "", "", {
+      ...annotationSnapshot,
+      annotations: recordsByTarget.get(key) || []
+    });
     if (!annotationEvidenceIsVisible(merged)) return [];
     return [{
       ...annotation,
@@ -39962,6 +39983,30 @@ function completeFirstUseWelcome() {
   }
 }
 
+function renderEmptyResearchWorkspace() {
+  const welcome = document.createElement("section");
+  welcome.className = "workspace-empty-state workspace-empty-research";
+  welcome.setAttribute("aria-label", "Research tools");
+  const content = document.createElement("div");
+  const message = document.createElement("p");
+  message.textContent = "Open a Reader, search the codes, or start with the Assistant.";
+  const actions = document.createElement("div");
+  actions.className = "workspace-empty-actions";
+  const reader = createReaderToolbarButton();
+  const search = document.createElement("button");
+  search.type = "button";
+  search.textContent = "Search";
+  search.addEventListener("click", () => { void focusRecentUtilityColumn("search"); });
+  const assistant = document.createElement("button");
+  assistant.type = "button";
+  assistant.textContent = "Assistant";
+  assistant.addEventListener("click", () => { void focusRecentUtilityColumn("analysis"); });
+  actions.append(reader, search, assistant);
+  content.append(message, actions);
+  welcome.append(content);
+  return welcome;
+}
+
 function renderProjectRequiredWorkspace() {
   const welcome = document.createElement("section");
   welcome.className = "workspace-empty-state workspace-empty-guidance";
@@ -40659,6 +40704,8 @@ function appendPaneSequence(panes) {
     nodes.push(renderProjectRequiredWorkspace());
   } else if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
     nodes.push(renderFirstUseWelcome());
+  } else if (!visiblePanes.length && !detachedProjectWindow && currentColumnWorkflowView() === "research") {
+    nodes.push(renderEmptyResearchWorkspace());
   }
   nodes.push(...orderedPanes.filter(pane => !visiblePanes.includes(pane)));
   const desiredNodes = new Set(nodes);

@@ -2033,14 +2033,16 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func loadSectionDetailsAsync(sectionIDs: [Int64]) async -> [ReaderSectionDetail] {
-        guard !sectionIDs.isEmpty else { return [] }
+        guard !Task.isCancelled, !sectionIDs.isEmpty else { return [] }
+        let requestedVersion = selectedVersionFileName
 
         var orderedDetails: [Int64: ReaderSectionDetail] = [:]
         var missingIDs: [Int64] = []
+        var seenMissingIDs = Set<Int64>()
         for sectionID in sectionIDs {
             if let cached = cachedSectionDetail(for: sectionID) {
                 orderedDetails[sectionID] = cached
-            } else {
+            } else if seenMissingIDs.insert(sectionID).inserted {
                 missingIDs.append(sectionID)
             }
         }
@@ -2048,9 +2050,24 @@ final class CodeLibraryViewModel: ObservableObject {
         if let authoredCodeStore, !missingIDs.isEmpty {
             // Pull all missing details in a single detached batch so we only pay
             // one MainActor hop per chapter open instead of N.
-            let loaded = await Task.detached(priority: .userInitiated) { () -> [ReaderSectionDetail] in
-                missingIDs.compactMap { authoredCodeStore.sectionDetail(sectionID: $0) }
-            }.value
+            let requestedIDs = missingIDs
+            let work = Task.detached(priority: .userInitiated) { () -> [ReaderSectionDetail] in
+                var details: [ReaderSectionDetail] = []
+                for sectionID in requestedIDs {
+                    guard !Task.isCancelled else { return [] }
+                    if let detail = authoredCodeStore.sectionDetail(sectionID: sectionID) {
+                        details.append(detail)
+                    }
+                }
+                return details
+            }
+            let loaded = await withTaskCancellationHandler {
+                await work.value
+            } onCancel: {
+                work.cancel()
+            }
+            guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                  self.authoredCodeStore === authoredCodeStore else { return [] }
             for detail in loaded {
                 storeSectionDetailInCache(detail, sectionID: detail.id)
                 orderedDetails[detail.id] = detail
@@ -2061,11 +2078,15 @@ final class CodeLibraryViewModel: ObservableObject {
         if !missingIDs.isEmpty, let sqliteChapterLoader {
             do {
                 let loadedDetails = try await sqliteChapterLoader.sectionDetails(sectionIDs: missingIDs)
+                guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                      self.sqliteChapterLoader === sqliteChapterLoader else { return [] }
                 for detail in loadedDetails {
                     storeSectionDetailInCache(detail, sectionID: detail.id)
                     orderedDetails[detail.id] = detail
                 }
             } catch {
+                guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                      self.sqliteChapterLoader === sqliteChapterLoader else { return [] }
                 statusMessage = error.localizedDescription
             }
         }
@@ -7849,7 +7870,8 @@ private actor SQLiteChapterLoader {
 
     func sectionDetails(sectionIDs: [Int64]) throws -> [ReaderSectionDetail] {
         try sectionIDs.compactMap { sectionID in
-            try database.sectionDetail(sectionID: sectionID)
+            try Task.checkCancellation()
+            return try database.sectionDetail(sectionID: sectionID)
         }
     }
 

@@ -1,0 +1,235 @@
+{
+  "baselineCommit": "f42d79991a3c70aedea96e6ef423aebb120d4663",
+  "environment": "Local Node.js v24.18.0, loopback HTTP, fresh Node process for each sample, existing host filesystem cache, no Production or database connections",
+  "workloads": "construction = four chapter selectors plus four exact searches; historical = eight distinct 2014 exact searches; all requests concurrent",
+  "limits": "One saved before/after sample per workload. Timing is diagnostic, not a production p95 or hardware-independent speed claim. Work counts and exact response hashes are the primary evidence. New caches are process-local; each new server instance still performs one load.",
+  "reproduce": "From permitext-sync-server, node scripts/benchmark-public-content-cold.mjs (or add --historical). Run sequentially in baseline and candidate checkouts.",
+  "measurements": {
+    "construction": {
+      "before": {
+        "totalMs": 893.3,
+        "reads": 760,
+        "uniqueFiles": 164,
+        "chapterJSONReads": 708,
+        "searchIndexReads": [
+          {
+            "path": "2022-construction-codes/prepared/searchIndex.json",
+            "count": 4
+          }
+        ],
+        "maxRepeatedFileReads": 6,
+        "values": [
+          {
+            "path": "/code/chapters?code=BC&view=startup",
+            "ms": 356.7,
+            "hash": "07eb218153ad59e8ce649302bb37959f93ed0e33a38fa4498de90c19a6234042"
+          },
+          {
+            "path": "/code/chapters?code=PC&view=startup",
+            "ms": 354.2,
+            "hash": "7138c540b56496e4cd46dea2633740f340982feb8777a22f976433ceb5db0b27"
+          },
+          {
+            "path": "/code/chapters?code=MC&view=startup",
+            "ms": 349.9,
+            "hash": "855a90d51eab45694730a8df92bc6f27038e2215ac44fd4d999eaa3cad28396f"
+          },
+          {
+            "path": "/code/chapters?code=AC&view=startup",
+            "ms": 353.6,
+            "hash": "4b891b6dc49a4de6ba0111518bf486d2d9729a4ee1462248334f8c4294cc6fac"
+          },
+          {
+            "path": "/code/search?q=concrete&code=BC&match=exact&candidateOffset=0&limit=5",
+            "ms": 889.5,
+            "hash": "67d914c67c501cd068d08087bc9e14babefece96e35a2f40580712730189a311"
+          },
+          {
+            "path": "/code/search?q=fire&code=BC&match=exact&candidateOffset=0&limit=5",
+            "ms": 754.1,
+            "hash": "0370eedfa53415abeeb3d84c0c1451d4aa86e069238b2a9a3693361586179835"
+          },
+          {
+            "path": "/code/search?q=egress&code=BC&match=exact&candidateOffset=0&limit=5",
+            "ms": 753.7,
+            "hash": "7e17d9e536ab3548a4efdae7cf4ab34f4a578a5c575e92571bd6a24160e0bc5f"
+          },
+          {
+            "path": "/code/search?q=ramp&code=BC&match=exact&candidateOffset=0&limit=5",
+            "ms": 889.3,
+            "hash": "bc2a6593715baa078770641db0647b3d98ddea0c8e4948cff12a0efa966a21e5"
+          }
+        ]
+      },
+      "after": {
+        "totalMs": 673.3,
+        "reads": 282,
+        "uniqueFiles": 164,
+        "chapterJSONReads": 236,
+        "searchIndexReads": [
+          {
+            "path": "2022-construction-codes/prepared/searchIndex.json",
+            "count": 1
+          }
+        ],
+        "maxRepeatedFileReads": 2,
+        "values": [
+          {
+            "path": "/code/chapters?code=BC&view=startup",
+            "ms": 124.5,
+            "hash": "07eb218153ad59e8ce649302bb37959f93ed0e33a38fa4498de90c19a6234042"
+          },
+          {
+            "path": "/code/chapters?code=PC&view=startup",
+            "ms": 122,
+            "hash": "7138c540b56496e4cd46dea2633740f340982feb8777a22f976433ceb5db0b27"
+          },
+          {
+            "path": "/code/chapters?code=MC&view=startup",
+            "ms": 122,
+            "hash": "855a90d51eab45694730a8df92bc6f27038e2215ac44fd4d999eaa3cad28396f"
+          },
+          {
+            "path": "/code/chapters?code=AC&view=startup",
+            "ms": 122.1,
+            "hash": "4b891b6dc49a4de6ba0111518bf486d2d9729a4ee1462248334f8c4294cc6fac"
+          },
+          {
+            "path": "/code/search?q=concrete&code=BC&match=exact&candidateOffset=0&limit=5",
+            "ms": 669.3,
+            "hash": "67d914c67c501cd068d08087bc9e14babefece96e35a2f40580712730189a311"
+          },
+          {
+            "path": "/code/search?q=fire&code=BC&match=exact&candidateOffset=0&limit=5",
+            "ms": 542.8,
+            "hash": "0370eedfa53415abeeb3d84c0c1451d4aa86e069238b2a9a3693361586179835"
+          },
+          {
+            "path": "/code/search?q=egress&code=BC&match=exact&candidateOffset=0&limit=5",
+            "ms": 539,
+            "hash": "7e17d9e536ab3548a4efdae7cf4ab34f4a578a5c575e92571bd6a24160e0bc5f"
+          },
+          {
+            "path": "/code/search?q=ramp&code=BC&match=exact&candidateOffset=0&limit=5",
+            "ms": 669.1,
+            "hash": "bc2a6593715baa078770641db0647b3d98ddea0c8e4948cff12a0efa966a21e5"
+          }
+        ]
+      },
+      "responseByteParity": true
+    },
+    "historical": {
+      "before": {
+        "totalMs": 745.2,
+        "reads": 953,
+        "uniqueFiles": 180,
+        "chapterJSONReads": 863,
+        "searchIndexReads": [
+          {
+            "path": "2014-construction-codes/prepared/searchIndex.json",
+            "count": 8
+          }
+        ],
+        "maxRepeatedFileReads": 8,
+        "values": [
+          {
+            "path": "/code/search?q=concrete&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 745.2,
+            "hash": "79d552aed3dbab6964f7169e3b8f35d8d4e4d5f3b11b19ff007fbb51330f75fe"
+          },
+          {
+            "path": "/code/search?q=fire&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 733.8,
+            "hash": "79cd03941f37d23d5dfcbd60a72f984c66c3bb3e380ba7dea7b3ac662d3ceca2"
+          },
+          {
+            "path": "/code/search?q=door&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 731.6,
+            "hash": "b5c04eda1eda90917ea495a63b96fef3b210c3c0e651a7c4b17944f789500ab1"
+          },
+          {
+            "path": "/code/search?q=403.1&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 732.9,
+            "hash": "fa7a973ca73c21deb27e6cd59e92cd2bc6ab3d14516ffce7600f84fe48376d21"
+          },
+          {
+            "path": "/code/search?q=egress&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 735.4,
+            "hash": "cbac9f1e9890124e3618ead11ebd8de3840166f29ec9ec59028409151798cd4c"
+          },
+          {
+            "path": "/code/search?q=ramp&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 733.3,
+            "hash": "eef24aa1a44d66c2b826377b235c0872f40567cd083d434e0e57aa266f1af286"
+          },
+          {
+            "path": "/code/search?q=wall&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 740.9,
+            "hash": "225a360ccc1afbe450a2feff94c07efc8189830a1b869c789709705fb3d1ecca"
+          },
+          {
+            "path": "/code/search?q=exit&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 741,
+            "hash": "57cd628472b23fbc58a26dafd8f194a48ec1e9c0508eaf25d632fb88d4b57791"
+          }
+        ]
+      },
+      "after": {
+        "totalMs": 183.6,
+        "reads": 180,
+        "uniqueFiles": 180,
+        "chapterJSONReads": 111,
+        "searchIndexReads": [
+          {
+            "path": "2014-construction-codes/prepared/searchIndex.json",
+            "count": 1
+          }
+        ],
+        "maxRepeatedFileReads": 1,
+        "values": [
+          {
+            "path": "/code/search?q=concrete&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 181.9,
+            "hash": "79d552aed3dbab6964f7169e3b8f35d8d4e4d5f3b11b19ff007fbb51330f75fe"
+          },
+          {
+            "path": "/code/search?q=fire&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 178.1,
+            "hash": "79cd03941f37d23d5dfcbd60a72f984c66c3bb3e380ba7dea7b3ac662d3ceca2"
+          },
+          {
+            "path": "/code/search?q=door&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 178.4,
+            "hash": "b5c04eda1eda90917ea495a63b96fef3b210c3c0e651a7c4b17944f789500ab1"
+          },
+          {
+            "path": "/code/search?q=403.1&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 178.6,
+            "hash": "fa7a973ca73c21deb27e6cd59e92cd2bc6ab3d14516ffce7600f84fe48376d21"
+          },
+          {
+            "path": "/code/search?q=egress&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 178.9,
+            "hash": "cbac9f1e9890124e3618ead11ebd8de3840166f29ec9ec59028409151798cd4c"
+          },
+          {
+            "path": "/code/search?q=ramp&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 178.4,
+            "hash": "eef24aa1a44d66c2b826377b235c0872f40567cd083d434e0e57aa266f1af286"
+          },
+          {
+            "path": "/code/search?q=wall&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 178.9,
+            "hash": "225a360ccc1afbe450a2feff94c07efc8189830a1b869c789709705fb3d1ecca"
+          },
+          {
+            "path": "/code/search?q=exit&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2014-construction-codes%2Fbundle.json%231&match=exact&candidateOffset=0&limit=5",
+            "ms": 179,
+            "hash": "57cd628472b23fbc58a26dafd8f194a48ec1e9c0508eaf25d632fb88d4b57791"
+          }
+        ]
+      },
+      "responseByteParity": true
+    }
+  }
+}
