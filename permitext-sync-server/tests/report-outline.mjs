@@ -85,6 +85,18 @@ assert.deepEqual(blockBody.children, [documentRows[2], documentRows[0], document
 assert.equal(documentBody.scrollTop, 1706, 'Reordering keeps the document scroll position');
 assert.deepEqual(calls, ['outline', 'comments', 'dirty']);
 
+// Initial sync may clean up workspace columns while the screen's editor is still loading.
+const cleanups = [], mounts = new Map([['report', {dispose: () => cleanups.push('report')}], ['other', {dispose: () => cleanups.push('other') }]]);
+let current = true;
+const cleanupContext = vm.createContext({reportDraftMounts: mounts, reportScreen: {projectID: 'report', isCurrent: () => current}});
+const cleanupStart = app.indexOf('function cleanupInactiveReportDraftMounts(');
+vm.runInContext(app.slice(cleanupStart, app.indexOf('\nfunction disposeProjectWorkboardMount(', cleanupStart)), cleanupContext);
+cleanupContext.cleanupInactiveReportDraftMounts([]);
+assert.deepEqual(cleanups, ['other'], 'A loading report stays owned by its current screen before DOM attachment');
+current = false;
+cleanupContext.cleanupInactiveReportDraftMounts([]);
+assert.deepEqual(cleanups, ['other', 'report'], 'Changed account/workspace screens still release stale editors');
+
 const pointerMoves = [], pointerBlocks = [{id: '1'}, {id: '2'}, {id: '3'}];
 const pointer = createReportOutline({blocks: pointerBlocks, introduction, targets, documentBody: body,
   describe: block => ({title: block.id}), dragIcon: '', onNavigate() {},

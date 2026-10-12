@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-outline-v869";
+} from "./offline-storage.js?v=20261011-report-outline-v870";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -2960,7 +2960,9 @@ function cleanupInactiveReportDraftMounts(panes) {
     .map((pane) => pane.dataset.projectId)
     .filter(Boolean));
   reportDraftMounts.forEach((mounted, projectID) => {
-    if (activeProjectIDs.has(projectID) || mounted.panel?.closest(".report-screen")) return;
+    // The screen owns its loading editor before the async panel is attached.
+    const ownedByReportScreen = reportScreen?.projectID === projectID && reportScreen.isCurrent();
+    if (activeProjectIDs.has(projectID) || mounted.panel?.closest(".report-screen") || ownedByReportScreen) return;
     mounted.dispose?.();
     reportDraftMounts.delete(projectID);
   });
