@@ -2,6 +2,8 @@
   "date": "2026-10-12",
   "baselineCommit": "f42d79991a3c70aedea96e6ef423aebb120d4663",
   "branch": "codex/speed-ux-review",
+  "recordStatus": "Historical local audit; release scope and current checks are recorded in WEB_BACKEND_RELEASE_CHECKS_2026-10-12.json.",
+  "nativeExcludedFromRelease": true,
   "scope": "Local implementation and validation of bounded web, backend and native performance improvements plus rendered web UX review.",
   "changes": [
     {
@@ -28,6 +30,7 @@
     },
     {
       "area": "Native detail loading",
+      "releaseStatus": "Excluded from the web/backend release; retained only in the separate local review branch.",
       "result": "Cancel obsolete batches between section reads, deduplicate requested IDs, reject stale edition/store results and errors.",
       "validation": "Actual changed Swift methods compiled and executed in deterministic fixture races, plus active-code-source contracts.",
       "limit": "No full iOS build or physical-device timing in this task."
