@@ -40218,8 +40218,6 @@ function renderEmptyResearchWorkspace() {
   welcome.className = "workspace-empty-state workspace-empty-research";
   welcome.setAttribute("aria-label", "Research tools");
   const content = document.createElement("div");
-  const message = document.createElement("p");
-  message.textContent = "Open a Reader, search the codes, or start with the Assistant.";
   const actions = document.createElement("div");
   actions.className = "workspace-empty-actions";
   const reader = createReaderToolbarButton();
@@ -40232,7 +40230,7 @@ function renderEmptyResearchWorkspace() {
   assistant.textContent = "Assistant";
   assistant.addEventListener("click", () => { void focusRecentUtilityColumn("analysis"); });
   actions.append(reader, search, assistant);
-  content.append(message, actions);
+  content.append(actions);
   welcome.append(content);
   return welcome;
 }
