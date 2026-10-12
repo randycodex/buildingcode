@@ -4612,6 +4612,12 @@ select option:checked {
   overflow: hidden;
 }
 
+.search-panel > :is(.search-dock, .search-results, .search-code-source-menu) {
+  width: 100%;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
 .search-panel::before {
   content: none;
 }
