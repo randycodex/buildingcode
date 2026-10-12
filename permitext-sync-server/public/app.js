@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-report-sources-v910";
+} from "./offline-storage.js?v=20261012-report-warning-v911";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -6258,28 +6258,30 @@ function resolveWebWarningContainer(container, previousFocus = document.activeEl
     (previousFocus instanceof HTMLElement ? previousFocus.closest(".workspace-panel") : null);
 }
 
-function mountWebWarningBackdrop(backdrop, container, previousFocus) {
+function mountWebWarningBackdrop(backdrop, container, previousFocus, scope = null) {
   const warningContainer = resolveWebWarningContainer(container, previousFocus);
+  const warningScope = scope instanceof HTMLElement ? scope : warningContainer;
   backdrop.classList.toggle("is-column-scoped", Boolean(warningContainer));
   warningContainer?.classList.add("has-web-warning");
   (warningContainer || document.body).append(backdrop);
   if (warningContainer) {
+    const panelTrack = warningScope.closest(".report-document-columns, .panel-track");
     const syncPosition = () => {
-      const bounds = warningContainer.getBoundingClientRect();
+      const bounds = warningScope.getBoundingClientRect();
+      const clipBounds = scope ? panelTrack?.getBoundingClientRect() : null;
       backdrop.style.inset = "auto";
       backdrop.style.top = `${bounds.top}px`;
-      const visibleLeft = Math.max(0, bounds.left);
-      const visibleRight = Math.min(window.innerWidth, bounds.right);
-      const visibleWidth = visibleRight - visibleLeft;
-      const width = visibleWidth >= 280 ? visibleWidth : Math.min(bounds.width, window.innerWidth - 16);
-      const left = visibleWidth >= 280 ? visibleLeft : Math.max(8, Math.min(bounds.left, window.innerWidth - width - 8));
+      const visibleLeft = Math.max(0, bounds.left, clipBounds?.left ?? 0);
+      const visibleRight = Math.min(window.innerWidth, bounds.right, clipBounds?.right ?? window.innerWidth);
+      const visibleWidth = Math.max(0, visibleRight - visibleLeft);
+      const width = scope || visibleWidth >= 280 ? visibleWidth : Math.min(bounds.width, window.innerWidth - 16);
+      const left = scope || visibleWidth >= 280 ? visibleLeft : Math.max(8, Math.min(bounds.left, window.innerWidth - width - 8));
       backdrop.style.left = `${left}px`;
       backdrop.style.width = `${width}px`;
       backdrop.style.height = `${bounds.height}px`;
     };
-    const panelTrack = warningContainer.closest(".panel-track");
     const positionObserver = new ResizeObserver(syncPosition);
-    positionObserver.observe(warningContainer);
+    positionObserver.observe(warningScope);
     if (panelTrack) positionObserver.observe(panelTrack);
     window.addEventListener("resize", syncPosition);
     panelTrack?.addEventListener("scroll", syncPosition, { passive: true });
@@ -6309,6 +6311,7 @@ function openWebWarning({
   cancelLabel = "Cancel",
   cancellable = true,
   container = null,
+  scope = null,
   choices = [],
   choiceLabel = "Destination Report"
 }) {
@@ -6359,7 +6362,7 @@ function openWebWarning({
   actions.append(confirmButton);
   dialog.append(heading, body, actions);
   backdrop.append(dialog);
-  const warningContainer = mountWebWarningBackdrop(backdrop, container, previousFocus);
+  const warningContainer = mountWebWarningBackdrop(backdrop, container, previousFocus, scope);
 
   return new Promise((resolve) => {
     let settled = false;
@@ -28802,7 +28805,7 @@ async function renderProjectReportDraft(project, resume = null) {
       const confirmed = await confirmWebWarning(
         "Delete Report?",
         `“${deletingDraft.title || "Untitled Report"}” will be deleted.${dirty ? " Unsaved edits will also be discarded." : ""} Exported versions stay available.`,
-        { confirmLabel: "Delete Report" }
+        { confirmLabel: "Delete Report", container: panel, scope: trigger.closest(".report-document") }
       );
       if (!confirmed || disposed || !isCurrentAccountRequest(requestIdentity) ||
           requestWorkspaceID !== activeWorkspaceID || activeDraft !== deletingDraft) return false;
