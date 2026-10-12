@@ -29,6 +29,7 @@ assert.deepEqual(groups.flatMap(group => [group.block, ...group.children]), orde
 assert.deepEqual(groupReportOutline([]), []);
 assert.equal(reportOutlineDropIndex(orderedSources, 0, 2, true, true), 4, 'Drop below a collapsed heading after its hidden contents');
 assert.equal(reportOutlineDropIndex(orderedSources, 0, 2, true, false), 2, 'An expanded heading exposes its first insertion boundary');
+assert.equal(reportOutlineDropIndex(orderedSources, 2, 2, true, true), 2, 'Dropping a folded heading onto itself does not move it past its own children');
 const navigationScrolls = [];
 const scrollContainer = {scrollTop: 100, getBoundingClientRect: () => ({top: 84, bottom: 1080}), scrollTo: value => navigationScrolls.push(value)};
 scrollReportTarget(scrollContainer, {getBoundingClientRect: () => ({top: 316})});

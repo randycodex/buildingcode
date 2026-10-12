@@ -47,6 +47,7 @@ export function groupReportOutline(blocks) {
 }
 
 export function reportOutlineDropIndex(blocks, sourceIndex, targetIndex, after, collapsed) {
+  if (sourceIndex === targetIndex) return sourceIndex;
   // Dropping below a folded heading means after its hidden contents.
   if (after && collapsed && blocks[targetIndex]?.kind === "heading") {
     while (targetIndex + 1 < blocks.length && blocks[targetIndex + 1].kind !== "heading") targetIndex++;
