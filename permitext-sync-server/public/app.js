@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-report-headers-v913";
+} from "./offline-storage.js?v=20261012-report-content-v914";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29550,13 +29550,7 @@ async function renderProjectReportDraft(project, resume = null) {
 
     const blocks = document.createElement("section");
     blocks.className = "report-draft-blocks";
-    const blocksHeading = document.createElement("div");
-    blocksHeading.className = "report-draft-blocks-heading project-collapsible-heading";
-    const blocksTitle = document.createElement("button");
-    blocksTitle.type = "button";
-    blocksTitle.className = "project-section-toggle-label section-label report-draft-blocks-toggle";
-    blocksTitle.textContent = `Contents · ${activeDraft.blocks.length} ${activeDraft.blocks.length === 1 ? "item" : "items"}`;
-    blocksHeading.append(blocksTitle);
+    blocks.setAttribute("aria-label", "Report content");
     const blocksBody = document.createElement("div");
     blocksBody.className = "report-draft-blocks-body";
     blocksBody.append(addControls);
@@ -29567,20 +29561,7 @@ async function renderProjectReportDraft(project, resume = null) {
       blocksBody.append(empty);
     }
     renderBlockEditor(blocksBody);
-    blocks.append(blocksHeading, blocksBody);
-    const blocksExpanded = reportSectionExpanded("Report content");
-    wireProjectSectionMotion(
-      blocks,
-      blocksBody,
-      [blocksTitle],
-      "Report content",
-      blocksExpanded,
-      {
-        onChange(expanded) {
-          persistReportSectionExpanded("Report content", expanded);
-        }
-      }
-    );
+    blocks.append(blocksBody);
     const sourcePalette = document.createElement("section");
     sourcePalette.className = "report-source-palette";
     renderSourcePalette(sourcePalette);
@@ -29668,7 +29649,6 @@ async function renderProjectReportDraft(project, resume = null) {
       },
       onNavigate: target => {
         if (target === metadata && introductionLabel.getAttribute("aria-expanded") === "false") introductionLabel.click();
-        if (target !== metadata && blocksTitle.getAttribute("aria-expanded") === "false") blocksTitle.click();
         const navigation = ++outlineNavigationGeneration;
         const isCurrent = () => !disposed && isCurrentAccountRequest(requestIdentity) &&
           navigation === outlineNavigationGeneration && target.isConnected && panel.closest(".report-screen")?.open;
