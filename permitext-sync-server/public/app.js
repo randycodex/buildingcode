@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-source-labels-v916";
+} from "./offline-storage.js?v=20261012-report-picker-v919";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29407,8 +29407,35 @@ async function renderProjectReportDraft(project, resume = null) {
     const versionList = document.createElement("details");
     versionList.className = "report-draft-version-list";
     const reportMenu = document.createElement("summary");
-    reportMenu.textContent = "Switch or create report";
-    versionList.append(reportMenu);
+    reportMenu.textContent = "Reports";
+    reportMenu.setAttribute("aria-label", "Choose report");
+    const reportOptions = document.createElement("div");
+    reportOptions.className = "workspace-menu report-draft-menu-items";
+    reportOptions.setAttribute("role", "group");
+    reportOptions.setAttribute("aria-label", "Available reports");
+    versionList.append(reportMenu, reportOptions);
+    versionList.addEventListener("keydown", event => {
+      if (event.key === "Escape" && versionList.open) {
+        event.preventDefault();
+        event.stopPropagation();
+        versionList.open = false;
+        reportMenu.focus({ preventScroll: true });
+        return;
+      }
+      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+      if (event.target === reportMenu && !["ArrowDown", "ArrowUp"].includes(event.key)) return;
+      event.preventDefault();
+      versionList.open = true;
+      const options = webFocusableElements(reportOptions);
+      const current = options.indexOf(document.activeElement);
+      const next = event.key === "Home" ? 0 : event.key === "End" ? options.length - 1 :
+        current < 0 ? event.key === "ArrowUp" ? options.length - 1 : 0 :
+        (current + (event.key === "ArrowUp" ? -1 : 1) + options.length) % options.length;
+      options[next]?.focus({ preventScroll: true });
+    });
+    versionList.addEventListener("focusout", event => {
+      if (event.relatedTarget && !versionList.contains(event.relatedTarget)) versionList.open = false;
+    });
     const switchDraft = async (draftID) => {
       if (deletingReport) return;
       if (dirty && !(await mountState.confirmDiscardIfNeeded())) return;
@@ -29423,27 +29450,38 @@ async function renderProjectReportDraft(project, resume = null) {
       autosave.reset();
       clearStatus();
       renderWorkspaceContent();
+      shell.querySelector(".report-draft-version-list > summary")?.focus({ preventScroll: true });
     };
-    drafts.filter((draft) => draft.id !== activeDraft.id).forEach((draft) => {
+    drafts.forEach((draft) => {
+      const current = draft.id === activeDraft.id;
       const choice = document.createElement("button");
       choice.type = "button";
       choice.className = "report-draft-version-option";
+      if (current) choice.setAttribute("aria-current", "true");
       const choiceTitle = document.createElement("span");
-      choiceTitle.textContent = draft.title || "Untitled Report";
+      choiceTitle.textContent = (current ? activeDraft.title : draft.title) || "Untitled Report";
       const choiceRevision = document.createElement("small");
-      choiceRevision.textContent = `Revision ${draft.version || 1}`;
+      choiceRevision.textContent = current ? "Current" : `Revision ${draft.version || 1}`;
       choice.append(choiceTitle, choiceRevision);
-      choice.addEventListener("click", () => void switchDraft(draft.id));
-      versionList.append(choice);
+      choice.addEventListener("click", () => {
+        versionList.open = false;
+        if (current) reportMenu.focus({ preventScroll: true });
+        else void switchDraft(draft.id);
+      });
+      reportOptions.append(choice);
     });
     {
       const createNew = document.createElement("button");
       createNew.hidden = !activeDraft.id;
       createNew.type = "button";
       createNew.className = "report-draft-version-option is-create";
-      createNew.textContent = "Create new Report";
-      createNew.addEventListener("click", () => void switchDraft("__new__"));
-      versionList.append(createNew);
+      createNew.textContent = "+ New report";
+      createNew.setAttribute("aria-label", "New report");
+      createNew.addEventListener("click", () => {
+        versionList.open = false;
+        void switchDraft("__new__");
+      });
+      reportOptions.append(createNew);
     }
     for (const recovery of recoveredDrafts) {
       const recover = document.createElement("button");
@@ -29466,12 +29504,12 @@ async function renderProjectReportDraft(project, resume = null) {
         recoveryEditorID = crypto.randomUUID();
         autosave.reset(); setDirty(); renderWorkspaceContent();
       });
-      versionList.append(recover);
+      reportOptions.append(recover);
     }
-    versionList.hidden = versionList.childElementCount <= 1;
-    if (recoveredDrafts.length) { reportMenu.textContent = "Switch or recover report"; versionList.open = true; }
-    titleControl.append(titleButton, titleEditor, revisionLabel, deleteButton);
-    draftPicker.append(titleControl, versionList);
+    versionList.hidden = !activeDraft.id && !drafts.length && !recoveredDrafts.length;
+    if (recoveredDrafts.length) { reportMenu.title = "Recovered edits are available"; versionList.open = true; }
+    titleControl.append(titleButton, titleEditor, revisionLabel, versionList, deleteButton);
+    draftPicker.append(titleControl);
 
     const metadata = document.createElement("div");
     metadata.className = "report-draft-metadata";
@@ -45423,9 +45461,9 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-// Close Search matching alternatives when clicking elsewhere in the workspace.
+// Close workspace disclosures when clicking elsewhere.
 document.addEventListener("pointerdown", event => {
-  document.querySelectorAll(".search-match-control[open]").forEach(control => {
+  document.querySelectorAll(".search-match-control[open], .report-draft-version-list[open]").forEach(control => {
     if (!control.contains(event.target)) control.open = false;
   });
 });
