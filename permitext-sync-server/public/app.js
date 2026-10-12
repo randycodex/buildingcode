@@ -8319,7 +8319,7 @@ function syncReaderToolbarButton(button) {
   button.hidden = false;
   button.disabled = !requiresProject && limitReached;
   button.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "Two Reader limit reached" : "Open a Reader beside this view";
-  button.classList.toggle("has-open-reader", state.readers.some(reader => workflowPaneIsVisible(paneIDForReader(reader))));
+  button.classList.toggle("has-open-reader", state.readers.length > 0);
   button.setAttribute(
     "aria-label",
     !requiresProject && limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
