@@ -113,7 +113,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-notebook-menu-v929";
+} from "./offline-storage.js?v=20261012-notebook-toolbar-order-v930";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
