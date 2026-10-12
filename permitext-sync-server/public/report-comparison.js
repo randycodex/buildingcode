@@ -225,6 +225,11 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
       });
     },
     get selectedID() { return selectedID; },
+    removeVersion(manifestID) {
+      if (!current() || selectedID !== manifestID) return false;
+      closePreview();
+      return true;
+    },
     toggle: () => setOpen(panel.dataset.comparisonOpen !== 'true'),
     select(report, prepare, {toggle = false} = {}) {
       if (!current()) return;

@@ -216,6 +216,10 @@ button {
   padding: var(--panel-padding);
 }
 
+.web-warning-backdrop.is-report-version-warning {
+  container-type: inline-size;
+}
+
 .has-web-warning {
   position: relative;
 }
@@ -19544,6 +19548,15 @@ dialog.report-export-review {
 .report-versions-panel .report-history-card[aria-pressed="true"] strong, .report-versions-panel .report-history-card:hover strong { color: var(--text-primary); }
 .report-screen .report-versions-panel .report-history-entry { padding: 18px 0; }
 .report-screen .report-versions-panel .report-history-files button { font-size: 12px; }
+.report-versions-panel .report-history-files { align-items: center; }
+.report-versions-panel .report-history-files .report-history-delete {
+  flex: 0 0 28px;
+  margin-inline-start: auto;
+  padding: 4px;
+  border-radius: 0;
+  background: transparent;
+}
+.report-versions-panel .report-history-delete svg { width: 16px; height: 16px; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-panel { padding: 24px 8px; align-items: center; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-header { border: 0; margin: 0; padding: 0; height: auto; min-height: 0; flex-basis: auto; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-collapse { writing-mode: vertical-rl; text-transform: uppercase; letter-spacing: 1px; }

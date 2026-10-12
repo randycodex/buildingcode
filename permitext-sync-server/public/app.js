@@ -3,7 +3,7 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v7";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v17";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v18";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261012-refresh-v1";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-report-add-actions-v920";
+} from "./offline-storage.js?v=20261012-report-version-delete-v921";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -6262,6 +6262,7 @@ function mountWebWarningBackdrop(backdrop, container, previousFocus, scope = nul
   const warningContainer = resolveWebWarningContainer(container, previousFocus);
   const warningScope = scope instanceof HTMLElement ? scope : warningContainer;
   backdrop.classList.toggle("is-column-scoped", Boolean(warningContainer));
+  backdrop.classList.toggle("is-report-version-warning", Boolean(warningScope?.classList.contains("report-versions-panel")));
   warningContainer?.classList.add("has-web-warning");
   (warningContainer || document.body).append(backdrop);
   if (warningContainer) {
@@ -28735,7 +28736,10 @@ async function renderProjectReportDraft(project, resume = null) {
 
   let generatingReport = false;
   let deletingReport = false;
+  let deletingVersionID = null;
+  let historyMutationGeneration = 0;
   const paintExportState = () => {
+    panel.querySelectorAll(".report-history-delete").forEach((button) => { button.disabled = generatingReport; });
     const button = panel.querySelector('[data-report-export]');
     if (!button) return;
     button.disabled = generatingReport;
@@ -29233,7 +29237,53 @@ async function renderProjectReportDraft(project, resume = null) {
 
   }
 
+  async function deleteVersion(report, trigger) {
+    if (disposed || generatingReport || deletingReport || deletingVersionID || !isCurrentAccountRequest(requestIdentity) ||
+        requestWorkspaceID !== activeWorkspaceID) return false;
+    deletingVersionID = report.id;
+    historyMutationGeneration += 1;
+    const wasInert = shell.inert;
+    shell.inert = true;
+    trigger.disabled = true;
+    try {
+      const confirmed = await confirmWebWarning("Delete version?",
+        `“${report.title} · Version ${report.reportVersion}” will be removed from Versions. The editable Report stays available.`,
+        { confirmLabel: "Delete", container: panel, scope: trigger.closest(".report-versions-panel") });
+      if (!confirmed || disposed || !isCurrentAccountRequest(requestIdentity) ||
+          requestWorkspaceID !== activeWorkspaceID) return false;
+      clearStatus();
+      await reportRequest("/reports/history/delete", { projectID, manifestID: report.id });
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
+      history = history.filter((version) => version.id !== report.id);
+      comparisonController?.removeVersion(report.id);
+      const historyBody = panel.querySelector(".report-history");
+      if (historyBody) {
+        const scroll = historyBody.scrollTop;
+        historyBody.replaceChildren();
+        renderHistory(historyBody);
+        historyBody.scrollTop = scroll;
+      }
+      clearStatus();
+      return true;
+    } catch (error) {
+      if (!disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID) {
+        showStatusError(error.message || "The Report version could not be deleted. Try again.");
+      }
+      return false;
+    } finally {
+      deletingVersionID = null;
+      shell.inert = wasInert;
+      trigger.disabled = false;
+      if (!disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID) {
+        if (trigger.isConnected) trigger.focus({ preventScroll: true });
+        else panel.querySelector(".report-history-card, .report-versions-collapse")?.focus({ preventScroll: true });
+      }
+    }
+  }
+
   function renderHistory(container) {
+    const selectedID = comparisonController?.selectedID;
+    if (selectedID && !history.some((version) => version.id === selectedID)) comparisonController.removeVersion(selectedID);
     if (!history.length) {
       const empty = document.createElement("p");
       empty.className = "report-workflow-help";
@@ -29295,6 +29345,17 @@ async function renderProjectReportDraft(project, resume = null) {
           });
           fileActions.append(download);
         });
+      }
+      if (report.deletable !== false && (!identity.sharedOrganizationID || identity.sharedPermissions?.includes("project.edit"))) {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "report-history-delete workflow-action-icon";
+        remove.title = `Delete version ${report.reportVersion}`;
+        remove.setAttribute("aria-label", `Delete ${report.title}, version ${report.reportVersion}`);
+        remove.innerHTML = trashIconSVG();
+        remove.disabled = generatingReport;
+        remove.addEventListener("click", () => void deleteVersion(report, remove));
+        fileActions.append(remove);
       }
       container.append(entry);
     });
@@ -29860,13 +29921,14 @@ async function renderProjectReportDraft(project, resume = null) {
   };
 
   refreshReportArtifacts = async (options = {}) => {
-    if (disposed || deletingReport || !isCurrentAccountRequest(requestIdentity)) return false;
+    if (disposed || deletingReport || deletingVersionID || !isCurrentAccountRequest(requestIdentity)) return false;
+    const historyGeneration = historyMutationGeneration;
     const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
       reportRequest("/reports/drafts/list", { projectID }),
       reportRequest("/reports/sources/list", { projectID }),
       reportRequest("/reports/history/list", { projectID })
     ]);
-    if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
+    if (disposed || deletingVersionID || historyGeneration !== historyMutationGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
     drafts = draftPayload.drafts || [];
     sources = sourcePayload.sources || [];
     sourceWarnings = sourcePayload.warnings || [];

@@ -55,7 +55,7 @@ console.log('Report autosave integration passed: edits during save, live editor 
 const refreshStart = source.indexOf('  refreshReportArtifacts = async');
 const refreshImplementation = source.slice(refreshStart, source.indexOf('\n  try {', refreshStart));
 for (const mode of ['success', 'dirty', 'failure', 'account']) {
- const c = vm.createContext({structuredClone, disposed:false, deletingReport:false, dirty:mode==='dirty',
+ const c = vm.createContext({structuredClone, disposed:false, deletingReport:false, deletingVersionID:null, historyMutationGeneration:0, dirty:mode==='dirty',
   requestIdentity:'a',projectID:'p',identity:{},drafts:[],sources:[],sourceWarnings:[],history:[],
   activeDraft:{id:'d',title:'Local'},message:'Earlier failure',renders:0,
   isCurrentAccountRequest:()=>mode!=='account',panel:{querySelector:()=>null},
@@ -68,3 +68,16 @@ for (const mode of ['success', 'dirty', 'failure', 'account']) {
  assert.equal(c.activeDraft.title,mode==='success'?'Remote':'Local',mode+' draft');
 }
 console.log('Report refresh status passed: successful clean recovery clears errors; dirty, failed and changed-account paths preserve state.');
+
+{
+ let resolveRefresh;
+ const response = new Promise(resolve=>{resolveRefresh=resolve;});
+ const c = vm.createContext({disposed:false,deletingReport:false,deletingVersionID:null,historyMutationGeneration:0,
+   requestIdentity:'a',projectID:'p',isCurrentAccountRequest:()=>true,
+   reportRequest:()=>response});
+ vm.runInContext(refreshImplementation,c);
+ const pending=c.refreshReportArtifacts();
+ c.historyMutationGeneration++;
+ resolveRefresh({reports:[{id:'deleted-version'}]});
+ assert.equal(await pending,false,'A refresh started before deletion cannot restore the deleted version afterward');
+}

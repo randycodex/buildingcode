@@ -52,7 +52,7 @@ for (const [, type] of cases) {
 
 function legacy(type, includeDeleted = false) {
   const ids = new Set(links
-    .filter(link => !link.deletedAt && link.projectID === "target" && link.targetKind === type)
+    .filter(link => (type === "reportManifest" && includeDeleted || !link.deletedAt) && link.projectID === "target" && link.targetKind === type)
     .map(link => link.targetID));
   const result = artifacts.filter(artifact =>
     artifact.envelope.type === type &&
@@ -107,14 +107,15 @@ for (const adapterKind of ["file", "postgres"]) {
   vm.runInContext(cases.map(([name]) => actual(name)).join("\n"), context);
 
   for (const [name, type] of cases) {
-    for (const includeDeleted of type === "reportDraft" ? [false, true] : [false]) {
+    for (const includeDeleted of type !== "generatedReport" ? [false, true] : [false]) {
       calls.length = 0;
       const result = await context[name]("storage-owner", "target", { includeDeleted });
       assert.deepEqual(JSON.parse(JSON.stringify(result)), legacy(type, includeDeleted));
       assert.deepEqual(calls[0], ["links", "storage-owner", { projectID: "target", targetKind: type }]);
       assert.equal(calls[1][0], "artifacts");
       assert.equal(calls[1][1], "storage-owner");
-      assert.ok(calls[1][2].ids.every(id => !id.endsWith("-other") && !id.endsWith("-unlinked")));
+      assert.ok(calls[1][2].ids.every(id => !id.endsWith("-other") &&
+        (type === "reportManifest" && includeDeleted || !id.endsWith("-unlinked"))));
     }
     calls.length = 0;
     assert.deepEqual(Array.from(await context[name]("storage-owner", "empty")), []);

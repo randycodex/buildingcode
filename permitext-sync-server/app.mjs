@@ -13528,6 +13528,7 @@ async function reportHistorySummariesForProject(storageOwnerUserID, projectID) {
   const files = await reportFilesForProject(storageOwnerUserID, projectID);
   return manifests.map((artifact) => ({
     ...reportManifestSummary(artifact.payload),
+    deletable: !artifact.payload.questionSnapshot,
     files: files.filter((file) => file.manifestID === artifact.envelope.id)
   }));
 }
@@ -17047,11 +17048,11 @@ function reportManifestItemsForDraftBlock(block, sourcesByKey) {
     : [reportManifestItemForDraftBlock(block, sourcesByKey)];
 }
 
-async function projectReportManifests(userID, projectID) {
+async function projectReportManifests(userID, projectID, { includeDeleted = false } = {}) {
   const linkedManifestIDs = new Set(
     (await listStoredProjectLinks(userID, { projectID, targetKind: "reportManifest" }))
       .filter((link) =>
-        !link.deletedAt &&
+        (includeDeleted || !link.deletedAt) &&
         link.projectID === projectID &&
         link.targetKind === "reportManifest"
       )
@@ -17061,7 +17062,7 @@ async function projectReportManifests(userID, projectID) {
   return (await listStoredFoundationArtifacts(userID, { ids: [...linkedManifestIDs] }))
     .filter((artifact) =>
       artifact.envelope?.type === "reportManifest" &&
-      !artifact.envelope?.deletedAt &&
+      (includeDeleted || !artifact.envelope?.deletedAt) &&
       linkedManifestIDs.has(artifact.envelope.id)
     )
     .sort((left, right) =>
@@ -17193,7 +17194,7 @@ async function handleReportGenerate(request, response) {
         .map((block) => block.sourceID)
     });
     const sourcesByKey = new Map(sources.map((source) => [`${source.kind}:${source.id}`, source]));
-    const priorManifests = await projectReportManifests(storageOwnerUserID, access.projectID);
+    const priorManifests = await projectReportManifests(storageOwnerUserID, access.projectID, { includeDeleted: true });
     const reportVersion = Math.max(
       0,
       ...priorManifests.map((artifact) => Number(artifact.payload?.reportVersion || 0))
@@ -17404,6 +17405,78 @@ async function handleReportHistoryList(request, response) {
     projectID: access.projectID,
     reports: await reportHistorySummariesForProject(access.storageOwnerUserID, access.projectID)
   });
+}
+
+async function handleReportHistoryDelete(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const manifestID = String(context.body.manifestID || "").trim();
+  if (!projectID || !manifestID) {
+    sendError(response, 400, "Missing Report version identity.");
+    return;
+  }
+  // Existing exports remain manageable after a personal subscription downgrade.
+  const access = await requireProjectPermission(
+    response, context.userID, projectID, organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  const ownerID = access.storageOwnerUserID;
+  let manifest = (await projectReportManifests(ownerID, access.projectID, { includeDeleted: true }))
+    .find((artifact) => artifact.envelope.id === manifestID && artifact.payload.project?.id === access.projectID);
+  if (!manifest) {
+    sendError(response, 404, "Report version not found.");
+    return;
+  }
+  if (manifest.payload.questionSnapshot) {
+    sendJSON(response, 409, {
+      error: "Issued Code Question records must be superseded from their Code Question.",
+      code: "REPORT_ISSUED_RECORD_DELETE_UNAVAILABLE"
+    });
+    return;
+  }
+  const now = new Date().toISOString();
+  // Keep immutable snapshots and numbering, but revoke access before cleaning up
+  // file descriptors. Retrying also completes an interrupted cleanup.
+  if (!manifest.envelope.deletedAt) {
+    try {
+      manifest = await saveStoredFoundationArtifactCompareAndSwap(ownerID, {
+        ...manifest,
+        envelope: artifactEnvelope({ ...manifest.envelope, updatedAt: now, deletedAt: now,
+          version: manifest.envelope.version + 1 })
+      }, manifest.envelope.version);
+    } catch (error) {
+      if (error.code !== "CODE_QUESTION_VERSION_CONFLICT") throw error;
+      manifest = (await projectReportManifests(ownerID, access.projectID, { includeDeleted: true }))
+        .find((artifact) => artifact.envelope.id === manifestID);
+      if (!manifest?.envelope.deletedAt) {
+        sendError(response, 409, "The Report version changed. Refresh Versions and try again.");
+        return;
+      }
+    }
+  }
+  const deletedAt = manifest.envelope.deletedAt;
+  const links = await listStoredProjectLinks(ownerID, { projectID: access.projectID });
+  const fileIDs = links.filter((link) => link.targetKind === "generatedReport").map((link) => link.targetID);
+  const files = fileIDs.length ? (await listStoredFoundationArtifacts(ownerID, { ids: fileIDs }))
+    .filter((artifact) => artifact.envelope.type === "generatedReport" && artifact.payload.manifestID === manifestID) : [];
+  for (const artifact of files.filter((file) => !file.envelope.deletedAt)) {
+    await saveStoredFoundationArtifact(ownerID, {
+      ...artifact,
+      envelope: artifactEnvelope({ ...artifact.envelope, updatedAt: deletedAt, deletedAt,
+        version: artifact.envelope.version + 1 })
+    });
+  }
+  const deletedIDs = new Set([manifestID, ...files.map((file) => file.envelope.id)]);
+  for (const link of links.filter((link) => !link.deletedAt &&
+    ["reportManifest", "generatedReport"].includes(link.targetKind) && deletedIDs.has(link.targetID))) {
+    await saveStoredProjectLink(ownerID, projectLinkRecord({
+      ...link, updatedAt: deletedAt, deletedAt, version: link.version + 1
+    }));
+  }
+  const artifactRevisions = await bumpStoredArtifactRevisions(ownerID,
+    projectArtifactRevisionChange(access.projectID, ["report", "foundation"]));
+  sendJSON(response, 200, { manifestID, deletedAt, artifactRevisions });
 }
 
 async function handleProjectHubBootstrap(request, response) {
@@ -17747,9 +17820,13 @@ async function handleReportFileRead(request, response) {
   if (!access) return;
   const artifact = (await projectGeneratedReports(access.storageOwnerUserID, projectID))
     .find((candidate) => candidate.envelope.id === generatedReportID);
+  const manifest = artifact && (await listStoredFoundationArtifacts(access.storageOwnerUserID,
+    { ids: [artifact.payload.manifestID] })).find((candidate) =>
+    candidate.envelope.type === "reportManifest" && !candidate.envelope.deletedAt);
   const file = artifact?.payload?.file;
   if (
     !artifact ||
+    !manifest || manifest.payload.project?.id !== projectID ||
     !file?.pathname ||
     file.contentType !== "application/pdf" ||
     !reportFilePathBelongsToProject(file.pathname, projectID)
@@ -33517,6 +33594,7 @@ const handlers = {
   "reports/drafts/delete": handleReportDraftDelete,
   "reports/generate": handleReportGenerate,
   "reports/history/list": handleReportHistoryList,
+  "reports/history/delete": handleReportHistoryDelete,
   "reports/manifests/get": handleReportManifestGet,
   "reports/files/upload": handleReportFileUpload,
   "reports/files/read": handleReportFileRead,

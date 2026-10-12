@@ -69,6 +69,7 @@ export const rateLimitPolicies = new Map([
   ["reports/drafts/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["reports/generate", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["reports/history/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["reports/history/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["reports/manifests/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
   ["reports/files/upload", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["reports/files/read", { limit: 240, windowMs: 60 * 60 * 1000 }],
