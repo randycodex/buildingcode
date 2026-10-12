@@ -82,3 +82,34 @@ afterPersist = () => { context.identity = "B"; };
 await assert.rejects(menuOptions.onAssign(project), /Account changed/);
 assert.equal(controller.isActive(), true);
 console.log("Project bulk assignment passed: global recency, active-Project bulk assignment, additive edition/block/notes, partial retry and account fencing.");
+
+// Bulk removal confirms once, preserves other destinations, and fences accounts.
+let prompts=0, individualPrompts=0, removed=[], approve=true;
+context.identity='A';
+context.currentContentSummary=()=>({projects:[project],projectSections:[{...oldEdition,folderClientID:'other'}]});
+context.savedEvidenceKey=item=>`${item.codeVersion}:${item.sectionID}:${item.blockID}`;
+context.projectSectionBelongsToProject=(item,folder)=>item.folderClientID===folder.id;
+context.openWebWarning=async()=>{individualPrompts++;return true;};
+context.removeSectionFromProject=async(folder,item,options)=>{removed.push({id:item.id,...options});};
+context.confirmWebWarning=async()=>{prompts++;return approve;};
+context.showWebNotice=async()=>{};
+context.refreshVisibleSyncedDerivedState=()=>{};
+context.refreshProjectSourceConsumers=async()=>{};
+vm.runInContext('async '+actual('unlinkEvidenceFromFolder'),context);
+controller=context.createSavedBulkSelectionController(panel,records,{
+  removeConfirmationDetail:'Unlinked records are deleted; other destinations remain.',
+  removeAction:(item,options)=>context.unlinkEvidenceFromFolder(project,item,null,{...options,refreshPanes:false})
+});
+select.events.click(); records.forEach(item=>controller.toggle(item));
+approve=false; await remove.events.click(); assert.equal(removed.length,0,'Cancel makes no mutations');
+approve=true; await remove.events.click();
+assert.equal(prompts,2,'Exactly one prompt per bulk attempt'); assert.equal(individualPrompts,0);
+assert.equal(removed.length,3); assert.equal(removed[0].removeBookmark,false,'Other destination preserves saved record');
+assert.equal(removed[1].removeBookmark,true); assert.equal(removed[2].removeBookmark,true);
+await context.unlinkEvidenceFromFolder(project,currentEdition);
+assert.equal(individualPrompts,1,'Single-item removal still warns');
+console.log('Bulk deletion passed one confirmation, cancel, final-destination cleanup and shared-evidence preservation.');
+const beforeSwitch=removed.length;
+context.confirmWebWarning=async()=>{context.identity='B';return true;};
+await assert.rejects(remove.events.click(),/Account changed/);
+assert.equal(removed.length,beforeSwitch,'Account switch during confirmation cannot authorize deletion');

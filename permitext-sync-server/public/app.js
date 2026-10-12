@@ -14231,7 +14231,7 @@ async function unlinkEvidenceFromFolder(folder, item, container = null, options 
     !projectSectionBelongsToProject(candidate, folder)
   );
   if (!remainingLinks.length) {
-    const confirmed = await openWebWarning({
+    const confirmed = options.confirmedFinalDestinationRemoval === true || await openWebWarning({
       title: "Remove final destination?",
       message: "This is the last destination containing this evidence. Removing it will also delete the saved record. Notes, source metadata, and evidence history are not silently reassigned.",
       confirmLabel: "Remove and delete",
@@ -28398,6 +28398,8 @@ async function refreshProjectReportMembership(projectID, force = false) {
   return request;
 }
 
+const scheduledReportMembershipProjects = new Set();
+
 function reportMembershipIndicator(projectID, kind, source, mode = "status") {
   const status = document.createElement(mode === "action" ? "button" : "p");
   if (mode === "action") status.type = "button";
@@ -28413,7 +28415,13 @@ function reportMembershipIndicator(projectID, kind, source, mode = "status") {
     status.dataset.reportBlockId = source.scope === "section" ? "" : String(source.blockID || "").trim();
   }
   status.textContent = "Checking Report…";
-  window.requestAnimationFrame(() => void refreshProjectReportMembership(projectID));
+  if (!scheduledReportMembershipProjects.has(projectID)) {
+    scheduledReportMembershipProjects.add(projectID);
+    window.requestAnimationFrame(() => {
+      scheduledReportMembershipProjects.delete(projectID);
+      void refreshProjectReportMembership(projectID);
+    });
+  }
   return status;
 }
 
@@ -34559,14 +34567,17 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         reportProject: selectedFolder && folderIsProject(selectedFolder) ? selectedFolder : null,
         allowProjectAssignment: showingUnassigned || !workspaceProject(),
         inbox: showingUnassigned,
-        removeAction: (item) => selectedFolder ? unlinkEvidenceFromFolder(
+        removeConfirmationDetail: selectedFolder
+          ? "Evidence linked to another Project will remain there. Items with no remaining destination will also have their saved record deleted. Notes and source history are not reassigned."
+          : "This deletes the selected saved records.",
+        removeAction: (item, removalOptions) => selectedFolder ? unlinkEvidenceFromFolder(
           selectedFolder,
           (summary.projectSections || []).find((link) =>
             savedEvidenceKey(link) === savedEvidenceKey(item) &&
             projectSectionBelongsToProject(link, selectedFolder)
           ) || item,
           panel,
-          { refreshPanes: false }
+          { refreshPanes: false, confirmedFinalDestinationRemoval: removalOptions?.confirmedFinalDestinationRemoval === true }
         ) : persistSectionBookmark(item, false, { refreshSavedPanes: false })
       })
     : null;
@@ -35598,6 +35609,31 @@ function savedSectionIsNestedListParagraph(chapter, section) {
   return sectionNumber !== parentNumber && !sectionNumber.startsWith(`${parentNumber}.`);
 }
 
+async function resolveSavedSectionDetail(detail) {
+  // Reuse revision-validated chapter windows instead of one HTTP request per
+  // saved row. Stable windows also survive closing/reopening the Evidence pane.
+  if (detail.chapterID && detail.sectionID) {
+    try {
+      const chapter = await fetchChapter(detail.chapterID);
+      if (chapter.bodyContract === 2 && sectionRecordMatchesRequestedEdition(detail, chapter)) {
+        const index = (chapter.sections || []).findIndex(section =>
+          String(section.id) === String(detail.sectionID));
+        if (index >= 0) {
+          const start = Math.floor(index / 50) * 50;
+          const windowChapter = await fetchChapterBodyWindow(detail.chapterID, start, 50, chapter);
+          const section = readerSectionWithWindowBody(chapter.sections[index], windowChapter);
+          if (Array.isArray(section.blocks) && sectionRecordMatchesRequestedEdition(detail, section)) {
+            return { chapter, section };
+          }
+        }
+      }
+    } catch {
+      // Missing legacy metadata or a changed corpus retains exact-section recovery.
+    }
+  }
+  return resolveSectionDetail(detail);
+}
+
 async function hydrateSavedColumnItems(items = []) {
   const sectionPromises = new Map();
   const resolveItemSection = (item) => {
@@ -35613,7 +35649,7 @@ async function hydrateSavedColumnItems(items = []) {
         sectionNumber: item.sectionNumber || "",
         title: item.title || "Section"
       };
-      sectionPromises.set(key, resolveSectionDetail(detail).then(({ chapter, section }) => ({ chapter, section, detail })));
+      sectionPromises.set(key, resolveSavedSectionDetail(detail).then(({ chapter, section }) => ({ chapter, section, detail })));
     }
     return sectionPromises.get(key);
   };
@@ -35868,7 +35904,11 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
       indicator.setAttribute("aria-hidden", "true");
       indicator.innerHTML = selectionIndicatorIconSVG();
       row.prepend(indicator);
-      update();
+      const selected = selectedIDs.has(id);
+      row.classList.toggle("is-selected", selected);
+      const rowButton = row.querySelector(".saved-section-open");
+      if (active) rowButton?.setAttribute("aria-pressed", String(selected));
+      else rowButton?.removeAttribute("aria-pressed");
     },
     toggle(item) {
       if (!active || busy) return;
@@ -35885,19 +35925,22 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     const selectedItems = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
     const count = selectedItems.length;
     if (!count) return;
+    const requestIdentity = captureAccountRequest();
     const confirmed = await confirmWebWarning(
       "Delete saved evidence",
-      `Delete ${count} selected ${count === 1 ? "item" : "items"}?`,
+      `Delete ${count} selected ${count === 1 ? "item" : "items"}?${options.removeConfirmationDetail ? `\n\n${options.removeConfirmationDetail}` : ""}`,
       { confirmLabel: "Delete" }
     );
     if (!confirmed) return;
+    requireCurrentAccountRequest(requestIdentity);
     busy = true;
     update();
     let removedCount = 0;
     try {
       for (const item of selectedItems) {
+        requireCurrentAccountRequest(requestIdentity);
         const removed = typeof options.removeAction === "function"
-          ? await options.removeAction(item)
+          ? await options.removeAction(item, { confirmedFinalDestinationRemoval: true })
           : await persistSectionBookmark(item, false, { refreshSavedPanes: false });
         if (removed === false) continue;
         removedCount += 1;
