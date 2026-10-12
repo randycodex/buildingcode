@@ -1,4 +1,4 @@
-import { openReportExportReview } from './report-export-review.js?v=20261011-report-export-v11';
+import { openReportExportReview } from './report-export-review.js?v=20261012-report-export-v12';
 
 export function preserveReportReadingPosition(container, change) {
   const top = container.getBoundingClientRect().top + 33;
@@ -217,6 +217,12 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
       if (!position) return;
       if (panel.dataset.comparisonOpen !== 'true') closedPosition = position;
       restorePosition(position);
+      const selectedReview = review, request = generation;
+      void Promise.resolve(selectedReview?.ready).then(() => {
+        if (current() && review === selectedReview && generation === request && panel.dataset.comparisonOpen === 'true') {
+          restorePosition(position);
+        }
+      });
     },
     get selectedID() { return selectedID; },
     toggle: () => setOpen(panel.dataset.comparisonOpen !== 'true'),

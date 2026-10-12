@@ -3,7 +3,8 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v7";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v16";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v17";
+import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261012-refresh-v1";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -111,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-report-sidebars-v906";
+} from "./offline-storage.js?v=20261012-workspace-resume-v909";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -686,6 +687,7 @@ const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
 let reportScreen = null;
 let projectDetailsScreen = null;
+let workspaceResumeReady = false;
 const legacyHydrationByProject = new Map();
 const coordinationComposerDraftByProject = new Map();
 let projectStudioFolderReconcilePromise = null;
@@ -2702,7 +2704,7 @@ async function closeProjectReportDraft(project) {
   return true;
 }
 
-async function openProjectReportDraft(project) {
+async function openProjectReportDraft(project, {resume = null} = {}) {
   const identity = projectIdentity(project);
   if (!hasCapability("professional-exports") || identity.sharedOnly) return false;
   if (!projectDetailMatches(workspaceProject(), identity)) {
@@ -2730,7 +2732,7 @@ async function openProjectReportDraft(project) {
     onOpen: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
     backLabel: () => `← Back to ${currentWorkflowView() === "notebook" ? "Notebook" : "Research"}`,
     openProjectDetails: () => void openProjectDetailsScreen(),
-    load: () => renderProjectReportDraft(identity),
+    load: () => renderProjectReportDraft(identity, resume),
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
       hasCapability("professional-exports") && projectDetailMatches(workspaceProject(), identity),
     onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncProjectToolButtonStates(identity); syncWorkflowColumnPresentation(); },
@@ -3658,7 +3660,9 @@ async function openProjectDetailsScreen(section = null) {
   tabs.setAttribute("aria-label", "Project details sections");
   const panels = new Map();
   const buttons = new Map();
+  let selectedSection = "context";
   const selectSection = (kind) => {
+    selectedSection = kind;
     for (const [key, panel] of panels) {
       panel.hidden = key !== kind;
       buttons.get(key).setAttribute("aria-pressed", String(key === kind));
@@ -3722,6 +3726,16 @@ async function openProjectDetailsScreen(section = null) {
   });
   screen.projectID = projectID;
   screen.selectSection = selectSection;
+  screen.getPresentationState = () => ({section: selectedSection,
+    scroll: panels.get(selectedSection)?.scrollTop || 0,
+    contentScroll: panels.get(selectedSection)?.querySelector(".project-information-content")?.scrollTop || 0});
+  screen.restorePresentation = snapshot => {
+    selectSection(snapshot.section);
+    const panel = panels.get(snapshot.section);
+    if (panel) panel.scrollTop = snapshot.scroll;
+    const body = panel?.querySelector(".project-information-content");
+    if (body) body.scrollTop = snapshot.contentScroll;
+  };
   projectDetailsScreen = screen;
   await screen.open();
   return true;
@@ -4200,6 +4214,81 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 const workflowScrollStore = createWorkflowScrollStore();
 const referenceWorkspaceScroll = new Map();
 function currentWorkflowView() { return normalizeWorkflowView(state.workflowView); }
+function workspaceResumeContext() {
+  const project = workspaceProject();
+  return {userID: state.account?.userID || "", workspaceID: activeWorkspaceID,
+    projectID: project ? projectDetailKey(project) : ""};
+}
+function saveWorkspaceResumeForRefresh() {
+  if (!workspaceResumeReady || workspaceRestoreError || detachedProjectWindow) return;
+  const context = workspaceResumeContext();
+  const account = document.querySelector(".account-screen[open]");
+  const view = account ? "account" : currentColumnWorkflowView();
+  const report = reportDraftMounts.get(context.projectID)?.getPresentationState?.();
+  if (view === "report" && !report) return;
+  writeWorkspaceResume(sessionStorage, tabWorkspaceKey, context, {
+    view, workflowView: currentWorkflowView(), report,
+    details: projectDetailsScreen?.getPresentationState?.(),
+    account: {scroll: account?.querySelector(".settings-scroll")?.scrollTop || 0,
+      cards: [...account?.querySelectorAll(".settings-card") || []].map(card => ({
+        id: card.getAttribute("aria-labelledby"), scroll: card.scrollTop
+      }))}
+  });
+  try { saveWorkspaceState(); } catch { /* A presentation snapshot never blocks refresh. */ }
+}
+async function restoreWorkspaceAfterRefresh(skip = false) {
+  if (detachedProjectWindow) return;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const navigation = state.workflowNavigationGeneration || 0;
+  try {
+    if (skip) return;
+    // The Project can still be absent from the initial shell while its private
+    // descriptors hydrate. Read the scoped snapshot only after that identity is known.
+    if (state.account?.userID) await workspaceAccessGateForRender().ready;
+    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+        (state.workflowNavigationGeneration || 0) !== navigation) return;
+    const context = workspaceResumeContext();
+    const snapshot = readWorkspaceResume(sessionStorage, tabWorkspaceKey, context);
+    const sameContext = () => isCurrentAccountRequest(identity) &&
+      activeWorkspaceID === context.workspaceID && workspaceResumeContext().projectID === context.projectID;
+    await restoreWorkspaceResume(snapshot, {
+      isCurrent: () => sameContext() && (state.workflowNavigationGeneration || 0) === navigation,
+      waitForAccess: async () => {
+        const gate = workspaceAccessGateForRender();
+        await gate.ready;
+        return gate.allowed;
+      },
+      openWorkflow: view => switchWorkflowView(view),
+      openReport: async report => {
+        state.workflowView = snapshot.workflowView;
+        if (!await openProjectReportDraft(workspaceProject(), {resume: report}) || !sameContext() || !reportScreen?.isOpen()) return false;
+        await reportDraftMounts.get(context.projectID)?.restorePresentation?.(report);
+        return true;
+      },
+      openDetails: async details => {
+        state.workflowView = snapshot.workflowView;
+        if (!await openProjectDetailsScreen(details.section) || !sameContext() || !projectDetailsScreen?.isOpen()) return false;
+        projectDetailsScreen.restorePresentation(details);
+        return true;
+      },
+      openAccount: async account => {
+        state.workflowView = snapshot.workflowView;
+        toggleAccountDialog();
+        const dialog = document.querySelector(".account-screen[open]");
+        const panel = dialog?.querySelector(".settings-panel");
+        await panel?.__refreshActiveCodeSources?.().catch(() => {});
+        if (!sameContext() || !dialog?.isConnected) return false;
+        const scroll = dialog.querySelector(".settings-scroll");
+        if (scroll) scroll.scrollTop = account.scroll;
+        dialog.querySelectorAll(".settings-card").forEach(card => {
+          card.scrollTop = account.cards.find(item => item.id === card.getAttribute("aria-labelledby"))?.scroll || 0;
+        });
+        return true;
+      }
+    });
+  } finally { workspaceResumeReady = true; }
+}
 function currentColumnWorkflowView() {
   return projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
 }
@@ -28407,7 +28496,7 @@ function createReportPaneHeader(closeReport) {
   return header;
 }
 
-async function renderProjectReportDraft(project) {
+async function renderProjectReportDraft(project, resume = null) {
   if (!hasCapability("professional-exports")) return renderProLockedPane(paneIDForProjectReportDraft(project), "Reports");
   const requestIdentity = captureAccountRequest();
   const requestWorkspaceID = activeWorkspaceID;
@@ -28459,6 +28548,10 @@ async function renderProjectReportDraft(project) {
   const outlineSectionExpansion = new Map();
   let renderedDraftKey = null;
   let outlineNavigationGeneration = 0;
+  let reportPresentationInteraction = 0;
+  for (const event of ["pointerdown", "wheel", "keydown"]) {
+    panel.addEventListener(event, () => { reportPresentationInteraction += 1; }, {passive: true});
+  }
   let autosave = null;
   let recoveryEditorID = crypto.randomUUID();
   let recoveredDrafts = [];
@@ -28483,6 +28576,26 @@ async function renderProjectReportDraft(project) {
   };
   const mountState = {
     panel,
+    getPresentationState: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID && renderedDraftKey ? captureReportResume(panel, {
+      draftID: activeDraft.id || "", versionID: comparisonController?.selectedID || "",
+      comparisonScroll: comparisonController?.capturePosition(), outlineSections: [...outlineSectionExpansion]
+    }) : null,
+    async restorePresentation(snapshot) {
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+      for (const [key, expanded] of snapshot.outlineSections) outlineSectionExpansion.set(key, expanded);
+      applyReportResumeLayout(panel, snapshot);
+      renderWorkspaceContent();
+      if (snapshot.versionID && history.some(report => report.id === snapshot.versionID)) await openHistoricalReport(snapshot.versionID);
+      applyReportResumeLayout(panel, snapshot);
+      syncReferenceReaderLayout();
+      comparisonController?.restorePosition(snapshot.comparisonScroll);
+      restoreReportResumeScroll(panel, snapshot);
+      const interaction = reportPresentationInteraction;
+      await navigateReportOutline({requests: sourcePreviewRequests.values(),
+        isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID &&
+          reportScreen?.isOpen() && reportPresentationInteraction === interaction,
+        navigate: () => restoreReportResumeScroll(panel, snapshot)});
+    },
     hasUnsavedChanges: () => dirty,
     getDraftSnapshot: () => structuredClone(activeDraft),
     async addSources(draftID, selectedSources) {
@@ -29697,6 +29810,8 @@ async function renderProjectReportDraft(project) {
       versionsTitle.setAttribute("aria-expanded", String(!collapsedVersions));
       versionsTitle.setAttribute("aria-label", `${collapsedVersions ? "Expand" : "Collapse"} Versions list`);
       versionsToggle.setAttribute("aria-pressed", String(comparing));
+      tools.setAttribute("aria-expanded", String(Boolean(sourceWidth)));
+      paintOutlineToggle();
       libraryControls.update(); versionsControls.update();
     };
     shell.append(primaryActions, columns);
@@ -29710,6 +29825,13 @@ async function renderProjectReportDraft(project) {
     });
     documentBody.scrollTop = documentScroll;
     outline.scrollTop = outlineScroll;
+    if (keepPosition && documentScroll) {
+      const interaction = reportPresentationInteraction;
+      void navigateReportOutline({requests: sourcePreviewRequests.values(),
+        isCurrent: () => !disposed && documentBody.isConnected && isCurrentAccountRequest(requestIdentity) &&
+          requestWorkspaceID === activeWorkspaceID && reportPresentationInteraction === interaction,
+        navigate: () => { documentBody.scrollTop = documentScroll; }});
+    }
     documentBody.addEventListener("input", () => outlineController.refreshLabels());
     documentBody.addEventListener("wheel", () => { outlineNavigationGeneration += 1; }, { passive: true });
     documentBody.addEventListener("pointerdown", () => { outlineNavigationGeneration += 1; });
@@ -29797,7 +29919,7 @@ async function renderProjectReportDraft(project) {
       "permitext-standard";
     const pendingDraftID = pendingReportDraftByProject.get(projectID);
     const exactDraft = pendingDraftID ? drafts.find((draft) => draft.id === pendingDraftID) : null;
-    const requestedDraft = exactDraft || drafts[0];
+    const requestedDraft = exactDraft || drafts.find(draft => draft.id === resume?.draftID) || drafts[0];
     if (pendingDraftID) {
       reportDraftFocusResultByProject.set(projectID, {
         threadTargetID: pendingDraftID,
@@ -45143,6 +45265,8 @@ async function start() {
   window.addEventListener("pagehide", flushSearchQueryPersistence);
   window.addEventListener("pagehide", flushResearchDraftPersistence);
   window.addEventListener("pagehide", stopForegroundSyncLoop);
+  window.addEventListener("pagehide", saveWorkspaceResumeForRefresh);
+  window.addEventListener("beforeunload", saveWorkspaceResumeForRefresh);
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   bindHorizontalWheelScroll(track);
@@ -45251,6 +45375,7 @@ async function start() {
       window.history.replaceState({}, "", "/");
     }
   }
+  await restoreWorkspaceAfterRefresh(Boolean(deepLinkedSectionID || organizationInvitationTokenFromURL()));
   void flushPendingSyncAndRender().catch(() => {});
   void flushCodeQuestionOutbox().catch(() => {});
   startForegroundSyncLoop();

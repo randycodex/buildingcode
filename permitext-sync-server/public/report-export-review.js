@@ -126,7 +126,7 @@ export function openReportExportReview({ prepare, isCurrent, mount = null,
       retry.hidden = false;
     }
   };
-  retry.addEventListener("click", () => void load());
+  retry.addEventListener("click", () => { dialog.ready = load(); });
   download.addEventListener("click", () => {
     if (!current()) { closeReview(); dispose(); return; }
     if (!packet) return;
@@ -141,7 +141,7 @@ export function openReportExportReview({ prepare, isCurrent, mount = null,
   (mount || document.body).append(dialog);
   if (mount) { activeInlineReviews.set(mount, dispose); (showClose ? close : themeToggle).focus({ preventScroll: true }); }
   else dialog.showModal();
-  void load();
+  dialog.ready = load();
   dialog.dispose = dispose;
   return dialog;
 }
