@@ -1,4 +1,3 @@
-const expandedWidth = 640;
 const maximumSidebarWidth = 720;
 
 function createReportSidebarControls({ panel, shell, element, kind, label, defaultWidth, minimumWidth,
@@ -7,10 +6,7 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   header.className = `report-${kind}-header`;
   const title = document.createElement('h2');
   title.textContent = label;
-  const expand = document.createElement('button');
-  expand.type = 'button';
-  expand.className = `report-${kind}-expand`;
-  header.append(title, expand);
+  header.append(title);
 
   const divider = document.createElement('div');
   divider.className = `report-${kind}-divider`;
@@ -28,10 +24,6 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   const currentWidth = () => Number(panel.dataset[`${kind}Width`]) || defaultWidth;
   const updateControls = () => {
     const width = Math.min(currentWidth(), maximumWidth());
-    const expanded = width > defaultWidth;
-    expand.textContent = expanded ? 'Compact' : 'Expand';
-    expand.setAttribute('aria-label', `${expanded ? 'Compact' : 'Expand'} ${label}`);
-    expand.setAttribute('aria-pressed', String(expanded));
     divider.setAttribute('aria-valuemin', String(minimumWidth));
     divider.setAttribute('aria-valuemax', String(maximumWidth()));
     divider.setAttribute('aria-valuenow', String(Math.round(width)));
@@ -44,7 +36,6 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
     onResize();
     updateControls();
   };
-  expand.addEventListener('click', () => resize(currentWidth() > defaultWidth ? defaultWidth : expandedWidth));
   divider.addEventListener('focus', updateControls);
   divider.addEventListener('dblclick', () => resize(defaultWidth));
   divider.addEventListener('keydown', event => {

@@ -2,7 +2,7 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
-import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261011-sidebar-width-v5";
+import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261011-sidebar-width-v6";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261011-comparison-v13";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-version-toggle-v901";
+} from "./offline-storage.js?v=20261011-report-headers-v903";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,

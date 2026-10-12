@@ -19127,16 +19127,12 @@ dialog.report-screen {
 .report-screen .report-draft-add-controls { padding: 16px 0 24px; }
 .report-screen .report-library { display: none; grid-column: 1; grid-row: 2; min-width: 0; overflow-y: auto; padding: 24px; background: #080808; }
 .report-library-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
-.report-library-header h2 { margin: 0; font-size: 13px; font-weight: 600; }
-.report-library-header button { padding: 4px 0; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font-size: 12px; }
-.report-library-header button:hover { color: var(--text-primary); }
+.report-library-header h2 { display: flex; align-items: center; min-height: 32px; margin: 0; font-size: 13px; font-weight: 600; }
 .report-library-divider { display: none; grid-column: 2; grid-row: 2; position: relative; z-index: 1; background: var(--border); cursor: col-resize; touch-action: none; }
 .report-library-divider::before { content: ''; position: absolute; inset: 0 -5px; }
 .report-library-divider:hover, .report-library-divider:focus-visible { background: var(--text-secondary); outline: none; }
 .report-outline-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 8px 18px; }
-.report-screen .report-outline-header h2 { margin: 0; }
-.report-outline .report-outline-expand { padding: 4px 0; cursor: pointer; font-size: 12px; }
-.report-outline .report-outline-expand:hover { color: var(--text-primary); }
+.report-screen .report-outline-header h2 { display: flex; align-items: center; min-height: 32px; margin: 0; }
 .report-outline-divider { grid-column: 2; grid-row: 2; position: relative; z-index: 1; background: var(--border); cursor: col-resize; touch-action: none; }
 .report-outline-divider::before { content: ''; position: absolute; inset: 0 -5px; }
 .report-outline-divider:hover, .report-outline-divider:focus-visible { background: var(--text-secondary); outline: none; }
@@ -19525,4 +19521,4 @@ dialog.report-export-review {
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-panel { padding: 24px 8px; align-items: center; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-header { border: 0; margin: 0; padding: 0; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-collapse { writing-mode: vertical-rl; text-transform: uppercase; letter-spacing: 1px; }
-.report-draft-panel[data-versions-collapsed="true"] :is(.report-versions-expand, .report-versions-panel > .report-history) { display: none; }
+.report-draft-panel[data-versions-collapsed="true"] .report-versions-panel > .report-history { display: none; }
