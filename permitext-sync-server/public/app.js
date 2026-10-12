@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-version-titles-v912";
+} from "./offline-storage.js?v=20261012-report-headers-v913";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
