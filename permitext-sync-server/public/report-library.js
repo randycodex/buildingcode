@@ -2,7 +2,7 @@ const expandedWidth = 640;
 const maximumSidebarWidth = 720;
 
 function createReportSidebarControls({ panel, shell, element, kind, label, defaultWidth, minimumWidth,
-  availableWidth = () => shell.clientWidth, reservedWidth = () => 0, onResize = () => {} }) {
+  availableWidth = () => shell.clientWidth, reservedWidth = () => 0, onResize = () => {}, resizeDirection = 1 }) {
   const header = document.createElement('header');
   header.className = `report-${kind}-header`;
   const title = document.createElement('h2');
@@ -50,8 +50,8 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   divider.addEventListener('keydown', event => {
     const step = event.shiftKey ? 80 : 24;
     const requests = {
-      ArrowLeft: currentWidth() - step,
-      ArrowRight: currentWidth() + step,
+      ArrowLeft: currentWidth() - resizeDirection * step,
+      ArrowRight: currentWidth() + resizeDirection * step,
       Home: minimumWidth,
       End: maximumWidth()
     };
@@ -69,7 +69,7 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
     shell.classList.add(`is-${kind}-resizing`);
   });
   divider.addEventListener('pointermove', event => {
-    if (drag?.pointerID === event.pointerId) resize(drag.width + event.clientX - drag.x);
+    if (drag?.pointerID === event.pointerId) resize(drag.width + resizeDirection * (event.clientX - drag.x));
   });
   const finishDrag = event => {
     if (drag?.pointerID !== event.pointerId) return;
@@ -87,10 +87,15 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
 
 export function createReportLibraryControls(options) {
   return createReportSidebarControls({ ...options, element: options.library, kind: 'library',
-    label: 'Sources & versions', defaultWidth: 330, minimumWidth: 280 });
+    label: 'Sources', defaultWidth: 330, minimumWidth: 280 });
 }
 
 export function createReportOutlineControls(options) {
   return createReportSidebarControls({ ...options, element: options.outline, kind: 'outline',
     label: 'Outline', defaultWidth: 300, minimumWidth: 300 });
+}
+
+export function createReportVersionsControls(options) {
+  return createReportSidebarControls({ ...options, element: options.versions, kind: 'versions',
+    label: 'Versions', defaultWidth: 300, minimumWidth: 300, resizeDirection: -1 });
 }

@@ -2,9 +2,9 @@ import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarg
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
-import { createReportLibraryControls, createReportOutlineControls } from "./report-library.js?v=20261011-sidebar-width-v3";
+import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261011-sidebar-width-v5";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition } from "./report-comparison.js?v=20261011-comparison-v4";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
-import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v6";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-outline-groups-v879";
+} from "./offline-storage.js?v=20261011-report-comparison-v888";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4222,6 +4222,7 @@ function syncReferenceReaderLayout() {
   shell.style.setProperty("--reference-document-min-width", `${minimumDocumentWidth}px`);
   shell.classList.toggle("has-compact-reference-document", !accountOpen && view === "report" && reportColumnsLayout(shell.clientWidth - width, libraryWidth, outlineWidth).compact);
   reportPanel?._reportSidebarControls?.forEach(controls => controls.update());
+  reportPanel?._updateReportColumns?.();
   track.inert = accountOpen || view === "report" || screenOpen && !visibleIDs.length;
 }
 function syncWorkflowColumnPresentation() {
@@ -28456,6 +28457,7 @@ async function renderProjectReportDraft(project) {
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
   let outlineController = null;
+  let comparisonController = null;
   const outlineSectionExpansion = new Map();
   let renderedDraftKey = null;
   let outlineNavigationGeneration = 0;
@@ -28470,7 +28472,7 @@ async function renderProjectReportDraft(project) {
   };
   window.addEventListener("beforeunload", beforeReportUnload);
   const reportSourceGroupExpanded = new Map();
-  const reportLibraryScroll = { sources: 0, versions: 0 };
+  const reportLibraryScroll = { sources: 0 };
   const reportSectionExpanded = (sectionName, fallback = true) => {
     const currentSessionValue = reportSourceGroupExpanded.get(sectionName);
     return typeof currentSessionValue === "boolean"
@@ -28513,6 +28515,7 @@ async function renderProjectReportDraft(project) {
     dispose() {
       disposed = true;
       outlineController?.dispose();
+      comparisonController?.dispose();
       autosave?.dispose();
       window.removeEventListener("beforeunload", beforeReportUnload);
       panel.closest(".report-screen")?.remove();
@@ -28594,31 +28597,39 @@ async function renderProjectReportDraft(project) {
   };
   const saveDraft = () => { activeDraft.clientDraftID ||= crypto.randomUUID(); return autosave.flush({ force: !activeDraft.id }); };
 
-  const reviewReport = (manifest, file) => openReportExportReview({
-    mount: panel.querySelector(".report-document"),
+  const ensureComparison = () => comparisonController ||= createReportComparison({
+    panel, columns: () => shell.querySelector(".report-workspace-columns"),
     isCurrent: () => !disposed && panel.isConnected && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
-    prepare: async () => ({ manifest, ...(await readProjectReportFile(projectID, file, manifest.title)) })
+    onResize: () => { panel._updateReportColumns?.(); if (panel.isConnected) syncReferenceReaderLayout(); }
   });
+  const reviewReport = (manifest, file) => ensureComparison().select(manifest,
+    async () => ({ manifest, ...(await readProjectReportFile(projectID, file, manifest.title)) }));
 
   const openHistoricalReport = async (manifestID) => {
     clearStatus();
-    try {
+    const report = history.find(report => report.id === manifestID);
+    if (!report) return;
+    ensureComparison().select(report, async () => {
       const payload = await reportRequest("/reports/manifests/get", { manifestID });
-      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
-      const file = history.find(report => report.id === manifestID)?.files?.find(file => file.format === "web-pdf");
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) throw accountContextChangedError();
+      const file = report.files?.find(file => file.format === "web-pdf");
       if (!file) throw new Error("The stored Report PDF is unavailable. Its saved version remains in history.");
-      reviewReport(payload.manifest, file);
-    } catch (error) {
-      if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
-      showStatusError(error.message || "The historical Report could not be opened.");
-    }
+      return {manifest: payload.manifest, ...(await readProjectReportFile(projectID, file, report.title))};
+    });
   };
 
   let generatingReport = false;
   let deletingReport = false;
+  const paintExportState = () => {
+    const button = panel.querySelector('[data-report-export]');
+    if (!button) return;
+    button.disabled = generatingReport;
+    button.textContent = generatingReport ? "Exporting PDF…" : "Export PDF version";
+  };
   const generateReport = async () => {
     if (generatingReport || deletingReport) return;
     generatingReport = true;
+    paintExportState();
     try {
       if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
@@ -28658,7 +28669,7 @@ async function renderProjectReportDraft(project) {
           ? "A Report item exceeds the supported text length. Shorten that item and try again."
           : error.message || "The Report could not be generated.");
       }
-    } finally { generatingReport = false; }
+    } finally { generatingReport = false; paintExportState(); }
   };
 
   const deleteReport = async (trigger) => {
@@ -29119,8 +29130,13 @@ async function renderProjectReportDraft(project) {
     history.forEach((report) => {
       const entry = document.createElement("article");
       entry.className = "report-history-entry";
-      const button = document.createElement("div");
+      const button = document.createElement("button");
+      button.type = "button";
       button.className = "report-history-card";
+      button.dataset.reportPreview = report.id;
+      button.setAttribute("aria-label", `Preview ${report.title}, version ${report.reportVersion}`);
+      button.setAttribute("aria-pressed", String(comparisonController?.selectedID === report.id));
+      button.addEventListener("click", () => void openHistoricalReport(report.id));
       const heading = document.createElement("strong");
       heading.textContent = `${report.title} · Version ${report.reportVersion}`;
       const meta = document.createElement("span");
@@ -29140,14 +29156,8 @@ async function renderProjectReportDraft(project) {
       ].filter(Boolean).join(" · ");
       button.append(heading, meta);
       entry.append(button);
-      const preview = document.createElement("button");
-      preview.type = "button";
-      preview.textContent = "Preview";
-      preview.setAttribute("aria-label", `Preview ${report.title}, version ${report.reportVersion}`);
-      preview.addEventListener("click", () => void openHistoricalReport(report.id));
       const fileActions = document.createElement("div");
       fileActions.className = "report-history-files";
-      fileActions.append(preview);
       entry.append(fileActions);
       const files = Array.isArray(report.files) ? report.files : [];
       if (files.length) {
@@ -29208,11 +29218,13 @@ async function renderProjectReportDraft(project) {
     const keepPosition = renderedDraftKey === draftKey;
     const oldDocument = shell.querySelector(".report-document");
     const oldOutline = shell.querySelector(".report-outline");
+    const columnsScroll = shell.querySelector(".report-workspace-columns")?.scrollLeft || 0;
+    const comparisonScroll = comparisonController?.capturePosition();
     const documentScroll = keepPosition ? oldDocument?.scrollTop || 0 : 0;
     const outlineScroll = keepPosition ? oldOutline?.scrollTop || 0 : 0;
     const disclosures = new Map(keepPosition ? [...shell.querySelectorAll(".report-draft-block")].map(row =>
       [row.dataset.blockId, [...row.querySelectorAll("details")].map(detail => detail.open)]) : []);
-    for (const [key, selector] of [["sources", ".report-source-picker"], ["versions", ".report-history-section"]]) {
+    for (const [key, selector] of [["sources", ".report-source-picker"]]) {
       const body = shell.querySelector(selector);
       if (keepPosition && body && !body.hidden) reportLibraryScroll[key] = body.scrollTop;
     }
@@ -29416,9 +29428,8 @@ async function renderProjectReportDraft(project) {
     addSource.addEventListener("click", () => {
       addControls.open = false;
       panel.dataset.libraryOpen = "true";
-      panel.dataset.libraryTab = "sources";
       renderWorkspaceContent();
-      panel.querySelector('.report-library-tabs [data-tab="sources"]')?.focus();
+      panel.querySelector('.report-library-header button')?.focus({preventScroll: true});
     });
     addOptions.append(addSource);
 
@@ -29498,7 +29509,9 @@ async function renderProjectReportDraft(project) {
     const generate = document.createElement("button");
     generate.type = "button";
     generate.className = "workflow-action workflow-action-primary";
-    generate.textContent = "Export PDF version";
+    generate.dataset.reportExport = "true";
+    generate.disabled = generatingReport;
+    generate.textContent = generatingReport ? "Exporting PDF…" : "Export PDF version";
     generate.title = "Save current edits and create a fixed Report version for export";
     generate.addEventListener("click", () => {
       void generateReport();
@@ -29522,15 +29535,10 @@ async function renderProjectReportDraft(project) {
     });
     primaryActions.append(saveStatus, save, saveCopy, generate, coordinate);
 
-    const historyContent = document.createElement("div");
-    historyContent.className = "report-history-content";
-    const historyBody = document.createElement("div");
-    historyBody.className = "report-history";
+    const comparison = ensureComparison();
+    const historyBody = comparison.versionBody;
+    historyBody.replaceChildren();
     renderHistory(historyBody);
-    historyContent.append(historyBody);
-    const historySection = document.createElement("section");
-    historySection.className = "report-history-section";
-    historySection.append(historyContent);
     const documentBody = document.createElement("div");
     documentBody.className = "report-document";
     documentBody.append(draftPicker, metadata, blocks);
@@ -29565,8 +29573,9 @@ async function renderProjectReportDraft(project) {
     const outline = outlineController.element;
     const library = document.createElement("aside");
     library.className = "report-library";
-    library.setAttribute("aria-label", "Report sources and versions");
-    const availableSidebarWidth = () => Math.max(shell.clientWidth, document.querySelector(".workspace-shell")?.clientWidth || 0);
+    library.setAttribute("aria-label", "Report sources");
+    const availableSidebarWidth = () => panel.dataset.comparisonOpen === "true" ? 0 :
+      Math.max(shell.clientWidth, document.querySelector(".workspace-shell")?.clientWidth || 0);
     const libraryControls = createReportLibraryControls({
       panel, shell, library, availableWidth: availableSidebarWidth,
       reservedWidth: () => panel.dataset.outlineHidden === "true" || availableSidebarWidth() <= 1100 ||
@@ -29580,54 +29589,29 @@ async function renderProjectReportDraft(project) {
       onResize: syncReferenceReaderLayout
     });
     outline.querySelector("h2").replaceWith(outlineControls.header);
-    panel._reportSidebarControls = [libraryControls, outlineControls];
-    const libraryTabs = document.createElement("div");
-    libraryTabs.className = "report-library-tabs";
-    libraryTabs.setAttribute("role", "tablist");
-    libraryTabs.setAttribute("aria-label", "Report library");
-    const tabButtons = [];
-    const selectLibraryTab = (name) => {
-      for (const [key, body] of [["sources", sourcePicker], ["versions", historySection]]) {
-        if (body.isConnected && !body.hidden) reportLibraryScroll[key] = body.scrollTop;
+    sourcePicker.setAttribute("aria-label", "Report sources");
+    sourcePicker.addEventListener("scroll", () => { reportLibraryScroll.sources = sourcePicker.scrollTop; }, {passive: true});
+    sourcePicker.scrollTop = reportLibraryScroll.sources;
+    library.append(libraryControls.header, sourcePicker);
+    const versionsControls = createReportVersionsControls({
+      panel, shell, versions: comparison.versions, availableWidth: () => 0, onResize: syncReferenceReaderLayout
+    });
+    const versionsTitle = document.createElement("button");
+    versionsTitle.type = "button";
+    versionsTitle.className = "report-versions-collapse";
+    versionsTitle.textContent = "Versions";
+    versionsTitle.addEventListener("click", () => {
+      panel.dataset.versionsCollapsed = String(panel.dataset.versionsCollapsed !== "true");
+      syncReferenceReaderLayout();
+      if (panel.dataset.versionsCollapsed !== "true") {
+        const row = shell.querySelector(".report-workspace-columns");
+        row.scrollLeft = Math.max(0, row.scrollWidth - row.clientWidth);
       }
-      panel.dataset.libraryTab = name;
-      sourcePicker.hidden = name !== "sources";
-      historySection.hidden = name !== "versions";
-      requestAnimationFrame(() => {
-        const body = name === "sources" ? sourcePicker : historySection;
-        if (body.isConnected && !body.hidden) body.scrollTop = reportLibraryScroll[name];
-      });
-      tabButtons.forEach(button => {
-        const selected = button.dataset.tab === name;
-        button.setAttribute("aria-selected", String(selected));
-        button.tabIndex = selected ? 0 : -1;
-      });
-    };
-    for (const [name, label, body] of [["sources", "Sources", sourcePicker], ["versions", "Versions", historySection]]) {
-      const tab = document.createElement("button");
-      tab.type = "button";
-      tab.textContent = label;
-      tab.dataset.tab = name;
-      tab.id = `report-library-${projectID}-${name}-tab`;
-      tab.setAttribute("role", "tab");
-      body.id = `report-library-${projectID}-${name}`;
-      body.setAttribute("role", "tabpanel");
-      body.addEventListener("scroll", () => {
-        if (!body.hidden) reportLibraryScroll[name] = body.scrollTop;
-      }, { passive: true });
-      body.setAttribute("aria-labelledby", tab.id);
-      tab.setAttribute("aria-controls", body.id);
-      tab.addEventListener("click", () => selectLibraryTab(name));
-      tab.addEventListener("keydown", event => {
-        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-        event.preventDefault();
-        const next = event.key === "Home" ? tabButtons[0] : event.key === "End" ? tabButtons[1] : tabButtons.find(button => button !== tab);
-        selectLibraryTab(next.dataset.tab); next.focus();
-      });
-      tabButtons.push(tab); libraryTabs.append(tab);
-    }
-    selectLibraryTab(panel.dataset.libraryTab || "sources");
-    library.append(libraryControls.header, libraryTabs, sourcePicker, historySection);
+    });
+    versionsControls.header.querySelector("h2").replaceChildren(versionsTitle);
+    comparison.versions.querySelector(".report-versions-header")?.remove();
+    comparison.versions.prepend(versionsControls.header);
+    panel._reportSidebarControls = [libraryControls, outlineControls, versionsControls, comparison];
     const tools = document.createElement("button");
     tools.type = "button";
     tools.textContent = "Sources";
@@ -29656,7 +29640,46 @@ async function renderProjectReportDraft(project) {
     });
     paintOutlineToggle();
     primaryActions.insertBefore(outlineToggle, saveStatus);
-    shell.append(primaryActions, library, libraryControls.divider, outline, outlineControls.divider, documentBody);
+    const versionsToggle = document.createElement("button");
+    versionsToggle.type = "button";
+    versionsToggle.textContent = "Versions";
+    versionsToggle.title = "Compare saved PDF versions beside the current Report";
+    versionsToggle.addEventListener("click", () => comparison.toggle());
+    primaryActions.insertBefore(versionsToggle, saveStatus);
+    const columns = document.createElement("div");
+    columns.className = "report-workspace-columns";
+    columns.setAttribute("role", "region");
+    columns.setAttribute("aria-label", "Report columns");
+    columns.append(library, libraryControls.divider, outline, outlineControls.divider, documentBody,
+      comparison.divider, comparison.preview, versionsControls.divider, comparison.versions);
+    panel._updateReportColumns = () => {
+      const comparing = panel.dataset.comparisonOpen === "true";
+      const sourceWidth = panel.dataset.libraryOpen === "true" ? Number(panel.dataset.libraryWidth) || 330 : 0;
+      const outlineShown = panel.dataset.outlineHidden !== "true" && (comparing ||
+        !document.querySelector(".workspace-shell")?.classList.contains("has-compact-reference-document"));
+      const outlineWidth = outlineShown ? Number(panel.dataset.outlineWidth) || 300 : 0;
+      const collapsedVersions = panel.dataset.versionsCollapsed === "true";
+      const template = reportComparisonLayout(columns.clientWidth || shell.clientWidth, {
+        sources: sourceWidth, outline: outlineWidth, comparing,
+        versions: collapsedVersions ? 48 : Number(panel.dataset.versionsWidth) || 300,
+        reportWidth: Number(panel.dataset.reportComparisonWidth) || 0
+      }).template;
+      if (columns.style.gridTemplateColumns !== template) preserveReportReadingPosition(documentBody,
+        () => { columns.style.gridTemplateColumns = template; });
+      library.hidden = libraryControls.divider.hidden = !sourceWidth;
+      outline.hidden = outlineControls.divider.hidden = !outlineShown;
+      comparison.preview.hidden = comparison.versions.hidden = comparison.divider.hidden = versionsControls.divider.hidden = !comparing;
+      versionsControls.divider.tabIndex = collapsedVersions ? -1 : 0;
+      versionsControls.divider.setAttribute("aria-disabled", String(collapsedVersions));
+      versionsTitle.setAttribute("aria-expanded", String(!collapsedVersions));
+      versionsTitle.setAttribute("aria-label", `${collapsedVersions ? "Expand" : "Collapse"} Versions list`);
+      versionsToggle.setAttribute("aria-pressed", String(comparing));
+    };
+    shell.append(primaryActions, columns);
+    panel._updateReportColumns();
+    columns.scrollLeft = keepPosition ? columnsScroll : 0;
+    sourcePicker.scrollTop = reportLibraryScroll.sources;
+    comparison.restorePosition(comparisonScroll);
     blocksBody.querySelectorAll(".report-draft-block").forEach(row => {
       const previous = disclosures.get(row.dataset.blockId);
       if (previous) row.querySelectorAll("details").forEach((detail, index) => { detail.open = previous[index] || false; });
@@ -29705,8 +29728,10 @@ async function renderProjectReportDraft(project) {
       }
       const historyBody = panel.querySelector(".report-history");
       if (historyBody) {
+        const scroll = historyBody.scrollTop;
         historyBody.replaceChildren();
         renderHistory(historyBody);
+        historyBody.scrollTop = scroll;
       }
       return true;
     }

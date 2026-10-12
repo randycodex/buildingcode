@@ -101,3 +101,15 @@ assert.equal(classes.size, 0);
 outlineKey('Home');
 assert.equal(panel.dataset.outlineWidth, '300');
 console.log('Outline width passed: matching expansion and maximum, retained independent widths, readable report reservation, drag, keyboard, compact and cancellation.');
+
+const versions = {getBoundingClientRect: () => ({width: Number(panel.dataset.versionsWidth) || 300})};
+const versionControls = c.createReportVersionsControls({panel, shell, versions, availableWidth: () => 0});
+versionControls.divider.events.pointerdown(pointer(4, 1400));
+versionControls.divider.events.pointermove(pointer(4, 1300));
+assert.equal(panel.dataset.versionsWidth, '400', 'The right-hand Versions column expands to the left while dragging its left divider');
+versionControls.divider.events.pointercancel(pointer(4, 1300));
+versionControls.divider.events.pointermove(pointer(4, 1200));
+assert.equal(panel.dataset.versionsWidth, '400');
+versionControls.divider.events.keydown({key: 'ArrowLeft', preventDefault() {}});
+assert.equal(panel.dataset.versionsWidth, '424', 'Keyboard left moves the right-hand column boundary left');
+console.log('Versions width passed: left-edge drag direction and cancellation.');
