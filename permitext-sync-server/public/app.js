@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-workspace-actions-v892";
+} from "./offline-storage.js?v=20261011-workspace-actions-v894";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -16766,7 +16766,7 @@ function linkInlineCodeReferences(root, panel, reader) {
       if (!node.nodeValue?.trim() || inlineCodeReferencePhrases(node.nodeValue).length === 0) {
         return NodeFilter.FILTER_REJECT;
       }
-      if (node.parentElement?.closest("a, button, input, textarea, select, script, style, .reader-note-control")) {
+      if (node.parentElement?.closest("a, button, input, textarea, select, script, style, .reader-note-control, .authored-section-label, .reader-section-title")) {
         return NodeFilter.FILTER_REJECT;
       }
       return NodeFilter.FILTER_ACCEPT;

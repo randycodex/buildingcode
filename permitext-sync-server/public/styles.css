@@ -5133,7 +5133,7 @@ select option:checked {
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: 0;
   background: transparent;
   color: var(--text-secondary);
   box-shadow: none;
@@ -5142,8 +5142,10 @@ select option:checked {
 .search-result-save:hover,
 .search-result-save:focus-visible,
 .search-result-save.is-saved {
-  background: color-mix(in srgb, var(--focus-ring) 10%, transparent);
+  background: transparent;
   color: var(--text-primary);
+  outline: 0 !important;
+  box-shadow: none !important;
 }
 
 .search-result-save svg {
@@ -5151,6 +5153,8 @@ select option:checked {
   height: 18px;
 }
 
+.search-result-save:hover svg,
+.search-result-save:focus-visible svg,
 .search-result-save.is-saved svg {
   fill: currentColor;
 }
@@ -16906,7 +16910,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
   .topbar-layout-actions { grid-column: 2; grid-row: 2; justify-self: end; }
   .topbar-settings-button { grid-column: 3; grid-row: 2; }
   .topbar-account-state { display: contents; }
-  .topbar-workspaces .connection-status { max-width: 40vw; }
+  .topbar-end > .connection-status { max-width: 40vw; }
   .topbar .topbar-actions > .toolbar-button,
   .topbar .topbar-layout-actions > .toolbar-button,
   .topbar .workspace-actions-button,
@@ -17786,7 +17790,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   outline: 0;
 }
 .workspace-menu .workspace-menu-option[aria-selected="true"] { font-weight: 600; }
-.topbar-workspaces .connection-status { background: transparent; border: 0; box-shadow: none; }
+.topbar-end > .connection-status { background: transparent; border: 0; box-shadow: none; }
 
 .saved-folder-context.is-project .saved-project-tool-controls :is(.project-notebook-button, .project-report-draft-button) {
   background: color-mix(in srgb, var(--project-color) 68%, var(--surface));
