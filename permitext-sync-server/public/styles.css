@@ -19142,6 +19142,8 @@ dialog.report-screen {
 .report-screen .report-source-group { padding: 0; }
 .report-screen .report-source-picker > .report-source-palette { margin-inline: calc(-1 * var(--panel-padding)); width: calc(100% + (2 * var(--panel-padding))); }
 .report-screen .report-source-palette > .report-source-group { padding-inline: var(--panel-padding); border-bottom: 1px solid var(--border); }
+.report-screen .report-source-palette .report-source-group-heading { align-items: flex-start; height: auto; min-height: 0; padding: 0; }
+.report-screen .report-source-palette .report-source-group-toggle { height: auto; min-height: 0; padding: 0; }
 .report-screen .report-source-group-body > .report-source-card:last-child { border-bottom: 0; }
 .report-screen .report-source-picker-help { line-height: 1.5; }
 .report-screen .report-history-entry { padding: 18px 0; }
