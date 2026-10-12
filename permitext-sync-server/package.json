@@ -224,6 +224,7 @@
     "test:report-evidence-export": "node tests/report-evidence-export-contract.mjs && node tests/report-export-review-contract.mjs && node tests/report-evidence-export-http.mjs",
     "test:report-editions": "node tests/report-edition-contract.mjs && node tests/notebook-historical-reference-http.mjs",
     "test:report-save-continuity": "node tests/report-save-continuity.mjs",
+    "test:report-outline": "node tests/report-outline.mjs",
     "test:offline-active-sources:browser": "node tests/offline-active-source-browser.mjs",
     "test:offline-full-corpus:browser": "node tests/offline-full-corpus-browser.mjs",
     "test:offline-full-network:browser": "node tests/offline-full-network-browser.mjs",

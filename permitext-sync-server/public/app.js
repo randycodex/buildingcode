@@ -1,3 +1,4 @@
+import { createReportOutline, moveReportBlock, reportDropIndex } from "./report-outline.js?v=20261011-outline-v3";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=6";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
@@ -110,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-menu-order-v864";
+} from "./offline-storage.js?v=20261011-report-outline-v868";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28450,6 +28451,9 @@ async function renderProjectReportDraft(project) {
   let refreshReportSources = async () => false;
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
+  let outlineController = null;
+  let outlineExpanded = true;
+  let renderedDraftKey = null;
   let autosave = null;
   let recoveryEditorID = crypto.randomUUID();
   let recoveredDrafts = [];
@@ -28503,6 +28507,7 @@ async function renderProjectReportDraft(project) {
     },
     dispose() {
       disposed = true;
+      outlineController?.dispose();
       autosave?.dispose();
       window.removeEventListener("beforeunload", beforeReportUnload);
       panel.closest(".report-screen")?.remove();
@@ -28790,22 +28795,8 @@ async function renderProjectReportDraft(project) {
       label.textContent = `${kindLabel} · ${label.textContent}`;
       const actions = document.createElement("div");
       actions.className = "report-draft-block-actions";
-      const reorderBlock = (targetIndex, focusHandle = false) => {
-        if (targetIndex === index || targetIndex < 0 || targetIndex >= activeDraft.blocks.length) return;
-        const [moved] = activeDraft.blocks.splice(index, 1);
-        activeDraft.blocks.splice(targetIndex, 0, moved);
-        setDirty();
-        renderWorkspaceContent();
-        if (focusHandle) {
-          requestAnimationFrame(() => {
-            const blockID = block.id || `${block.kind}-${targetIndex}`;
-            const escapedID = globalThis.CSS?.escape ? CSS.escape(blockID) : blockID;
-            shell.querySelector(
-              `.report-draft-block[data-block-id="${escapedID}"] .report-draft-block-drag-handle`
-            )?.focus({ preventScroll: true });
-          });
-        }
-      };
+      const reorderBlock = (targetIndex, focusHandle = false) =>
+        reorderDraftBlock(block, targetIndex, focusHandle ? "document" : null);
       const dragHandle = document.createElement("button");
       dragHandle.type = "button";
       dragHandle.className = "report-draft-block-drag-handle";
@@ -28851,13 +28842,9 @@ async function renderProjectReportDraft(project) {
         if (sourceIndex < 0 || sourceIndex === index) return;
         event.preventDefault();
         const after = event.clientY > row.getBoundingClientRect().top + row.offsetHeight / 2;
-        let insertionIndex = index + (after ? 1 : 0);
-        const [moved] = activeDraft.blocks.splice(sourceIndex, 1);
-        if (insertionIndex > sourceIndex) insertionIndex -= 1;
-        activeDraft.blocks.splice(insertionIndex, 0, moved);
+        const moved = draggedReportBlock;
         draggedReportBlock = null;
-        setDirty();
-        renderWorkspaceContent();
+        reorderDraftBlock(moved, reportDropIndex(sourceIndex, index, after));
       });
       actions.append(dragHandle);
       const remove = document.createElement("button");
@@ -29182,8 +29169,38 @@ async function renderProjectReportDraft(project) {
     });
   }
 
+  function reorderDraftBlock(block, targetIndex, focusArea = null) {
+    if (!moveReportBlock(activeDraft.blocks, activeDraft.blocks.indexOf(block), targetIndex)) return;
+    setDirty();
+    renderWorkspaceContent();
+    outlineController.announce(`${reportBlockTitle(block)} moved to position ${targetIndex + 1}.`);
+    if (focusArea) requestAnimationFrame(() => {
+      const blockID = block.id || `${block.kind}-${targetIndex}`;
+      const escapedID = CSS.escape(blockID);
+      const handle = shell.querySelector(focusArea === "outline"
+        ? `.report-outline-item[data-block-id="${escapedID}"] .report-outline-drag`
+        : `.report-draft-block[data-block-id="${escapedID}"] .report-draft-block-drag-handle`);
+      handle?.focus({ preventScroll: true });
+      if (focusArea === "outline") handle?.scrollIntoView({ block: "nearest" });
+    });
+  }
+
   function renderWorkspaceContent() {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+    const draftKey = activeDraft.id || activeDraft.clientDraftID;
+    const keepPosition = renderedDraftKey === draftKey;
+    const oldDocument = shell.querySelector(".report-document");
+    const oldOutline = shell.querySelector(".report-outline");
+    const documentScroll = keepPosition ? oldDocument?.scrollTop || 0 : 0;
+    const outlineScroll = keepPosition ? oldOutline?.scrollTop || 0 : 0;
+    const disclosures = new Map(keepPosition ? [...shell.querySelectorAll(".report-draft-block")].map(row =>
+      [row.dataset.blockId, [...row.querySelectorAll("details")].map(detail => detail.open)]) : []);
+    for (const [key, selector] of [["sources", ".report-source-picker"], ["versions", ".report-history-section"]]) {
+      const body = shell.querySelector(selector);
+      if (keepPosition && body && !body.hidden) reportLibraryScroll[key] = body.scrollTop;
+    }
+    renderedDraftKey = draftKey;
+    outlineController?.dispose();
     resetEnhancedSelects(shell);
     shell.querySelectorAll(":scope > :not(.report-draft-status)").forEach((element) => element.remove());
 
@@ -29500,27 +29517,27 @@ async function renderProjectReportDraft(project) {
     const documentBody = document.createElement("div");
     documentBody.className = "report-document";
     documentBody.append(draftPicker, metadata, blocks);
-    const outline = document.createElement("nav");
-    outline.className = "report-outline";
-    outline.setAttribute("aria-label", "Report outline");
-    const outlineTitle = document.createElement("h2");
-    outlineTitle.textContent = "Outline";
-    outline.append(outlineTitle);
-    const addOutlineLink = (label, target) => {
-      const link = document.createElement("button");
-      link.type = "button";
-      link.textContent = label;
-      link.addEventListener("click", () => {
+    outlineController = createReportOutline({
+      blocks: activeDraft.blocks, introduction: metadata,
+      targets: [...blocksBody.querySelectorAll(".report-draft-block")], documentBody,
+      dragIcon: paneDragHandleSVG(), expanded: outlineExpanded,
+      onExpanded: expanded => { outlineExpanded = expanded; },
+      describe: block => {
+        const source = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
+        if (block.kind === "evidence" && source) return {
+          title: [source.sectionNumber, stripLeadingSectionNumber(source.title || "", source.sectionNumber)].filter(Boolean).join(" "),
+          detail: [source.codePrefix || "Code", savedEvidenceEdition(source), source.selectionBlockID ? "Passage" : "Section"].filter(Boolean).join(" · ")
+        };
+        return { title: reportBlockTitle(block), detail: ({ heading: "Heading", paragraph: block.derivedFrom?.kind === "notebookCard" ? "Notebook note" : "Paragraph", list: "List", notebookCard: "Notebook note", researchAnswer: "Research answer", projectFacts: "Project facts" })[block.kind] || "Source" };
+      },
+      onNavigate: target => {
         if (target === metadata && introductionLabel.getAttribute("aria-expanded") === "false") introductionLabel.click();
         if (target !== metadata && blocksTitle.getAttribute("aria-expanded") === "false") blocksTitle.click();
         requestAnimationFrame(() => target.scrollIntoView({ block: "start", behavior: "smooth" }));
-      });
-      outline.append(link);
-    };
-    addOutlineLink("Introduction", metadata);
-    [...blocksBody.querySelectorAll(".report-draft-block")].forEach((row, index) => {
-      addOutlineLink(`${index + 1}. ${reportBlockTitle(activeDraft.blocks[index])}`, row);
+      },
+      onMove: reorderDraftBlock
     });
+    const outline = outlineController.element;
     const library = document.createElement("aside");
     library.className = "report-library";
     library.setAttribute("aria-label", "Report sources and versions");
@@ -29605,6 +29622,13 @@ async function renderProjectReportDraft(project) {
     paintOutlineToggle();
     primaryActions.insertBefore(outlineToggle, saveStatus);
     shell.append(primaryActions, library, libraryControls.divider, outline, documentBody);
+    blocksBody.querySelectorAll(".report-draft-block").forEach(row => {
+      const previous = disclosures.get(row.dataset.blockId);
+      if (previous) row.querySelectorAll("details").forEach((detail, index) => { detail.open = previous[index] || false; });
+    });
+    documentBody.scrollTop = documentScroll;
+    outline.scrollTop = outlineScroll;
+    documentBody.addEventListener("input", () => outlineController.refreshLabels());
     paintReportSaveState();
     if (panel.isConnected) syncReferenceReaderLayout();
   }
