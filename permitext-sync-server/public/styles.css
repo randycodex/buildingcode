@@ -19064,7 +19064,7 @@ dialog.report-screen {
 .report-screen .report-draft-header { display: none; }
 .report-screen .report-draft-shell {
   height: 100%; display: grid; grid-template-columns: min(var(--report-outline-width, 300px), max(300px, calc(100% - 601px))) 1px minmax(600px, 1fr);
-  grid-template-rows: auto minmax(0, 1fr); padding: 0; gap: 0; overflow: hidden;
+  grid-template-rows: auto minmax(0, 1fr); padding: 0; gap: 0; overflow: clip;
 }
 .report-screen .report-draft-primary-actions {
   grid-column: 1 / -1; grid-row: 1; display: flex; justify-content: flex-start;

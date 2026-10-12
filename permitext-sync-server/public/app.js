@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-outline-groups-v878";
+} from "./offline-storage.js?v=20261011-outline-groups-v879";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
