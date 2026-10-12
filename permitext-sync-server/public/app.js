@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-workspace-resume-v909";
+} from "./offline-storage.js?v=20261012-report-sources-v910";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29209,10 +29209,10 @@ async function renderProjectReportDraft(project, resume = null) {
       appendSourceGroup(label, "", body => {
         const items = sources.filter(source => source.kind === kind);
         items.forEach(source => appendSourceCard(body, source));
-        if (!items.length) {
+        if (!items.length && kind === "evidence") {
           const empty = document.createElement("p");
           empty.className = "report-workflow-help";
-          empty.textContent = kind === "evidence" ? "Save passages in your workspace to use them here." : "Write notes in Notebook to use them here.";
+          empty.textContent = "Save passages in your workspace to use them here.";
           body.append(empty);
         }
       });
@@ -29587,10 +29587,7 @@ async function renderProjectReportDraft(project, resume = null) {
     sourcePickerToggle.textContent = reportSourcePickerLabel();
     sourcePickerToggle.className = "section-label";
     sourcePickerToggle.hidden = !sourceWarnings.length;
-    const sourcePickerHelp = document.createElement("p");
-    sourcePickerHelp.className = "report-source-picker-help";
-    sourcePickerHelp.textContent = "Choose saved material from this project. Added items stay linked to their sources.";
-    sourcePicker.append(sourcePickerToggle, sourcePickerHelp, sourcePalette);
+    sourcePicker.append(sourcePickerToggle, sourcePalette);
 
     const primaryActions = document.createElement("div");
     primaryActions.className = "report-draft-primary-actions";
