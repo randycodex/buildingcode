@@ -32,11 +32,11 @@ export function referenceColumnsWidth(widths, availableWidth, documentWidth = 60
 }
 // Sources reserve their chosen width beside the Report document.
 // Hide the optional outline before shrinking the document.
-export function reportColumnsLayout(availableWidth, libraryWidth = 0) {
+export function reportColumnsLayout(availableWidth, libraryWidth = 0, requestedOutlineWidth = 300) {
   const sourceWidth = libraryWidth > 0 ? Math.max(280, Math.min(720, libraryWidth)) : 0;
   const minimumWidth = 600 + sourceWidth + (sourceWidth ? 1 : 0);
-  const outlineWidth = 300;
-  return { minimumWidth, compact: availableWidth < minimumWidth + outlineWidth };
+  const outlineWidth = requestedOutlineWidth > 0 ? Math.max(300, Math.min(720, requestedOutlineWidth)) : 0;
+  return { minimumWidth, compact: availableWidth < minimumWidth + outlineWidth + (outlineWidth ? 1 : 0) };
 }
 // Keep scroll snapshots per DOM node, not indexes: asynchronous hydration may
 // replace a loading shell while the other view is active.

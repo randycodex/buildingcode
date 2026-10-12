@@ -1,8 +1,8 @@
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v6";
 import { createReportAutosave } from "./report-autosave.js?v=1";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=6";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
-import { createReportLibraryControls } from "./report-library.js?v=20261011-document-minimum-v2";
+import { createReportLibraryControls, createReportOutlineControls } from "./report-library.js?v=20261011-sidebar-width-v3";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { openReportExportReview } from "./report-export-review.js?v=20261011-report-export-v6";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-outline-v872";
+} from "./offline-storage.js?v=20261011-outline-width-v873";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -4214,12 +4214,14 @@ function syncReferenceReaderLayout() {
   const widths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : Math.max(minimumPaneWidthForID(id), state.paneWeights[id] || defaultPaneWidthForID(id)));
   const reportPanel = document.querySelector(".report-workspace-view:not([hidden]) .report-draft-panel");
   const libraryWidth = reportPanel?.dataset.libraryOpen === "true" ? Number(reportPanel.dataset.libraryWidth) || 330 : 0;
-  const minimumDocumentWidth = view === "report" ? reportColumnsLayout(shell.clientWidth, libraryWidth).minimumWidth : 600;
+  const outlineWidth = reportPanel?.dataset.outlineHidden === "true" ? 0 : Number(reportPanel?.dataset.outlineWidth) || 300;
+  const minimumDocumentWidth = view === "report" ? reportColumnsLayout(shell.clientWidth, libraryWidth, outlineWidth).minimumWidth : 600;
   const width = referenceColumnsWidth(widths, shell.clientWidth, minimumDocumentWidth);
   shell.classList.toggle("has-reference-readers", !accountOpen && width > 0);
   shell.style.setProperty("--reference-readers-width", `${width}px`);
   shell.style.setProperty("--reference-document-min-width", `${minimumDocumentWidth}px`);
-  shell.classList.toggle("has-compact-reference-document", !accountOpen && view === "report" && reportColumnsLayout(shell.clientWidth - width, libraryWidth).compact);
+  shell.classList.toggle("has-compact-reference-document", !accountOpen && view === "report" && reportColumnsLayout(shell.clientWidth - width, libraryWidth, outlineWidth).compact);
+  reportPanel?._reportSidebarControls?.forEach(controls => controls.update());
   track.inert = accountOpen || view === "report" || screenOpen && !visibleIDs.length;
 }
 function syncWorkflowColumnPresentation() {
@@ -29564,11 +29566,21 @@ async function renderProjectReportDraft(project) {
     const library = document.createElement("aside");
     library.className = "report-library";
     library.setAttribute("aria-label", "Report sources and versions");
+    const availableSidebarWidth = () => Math.max(shell.clientWidth, document.querySelector(".workspace-shell")?.clientWidth || 0);
     const libraryControls = createReportLibraryControls({
-      panel, shell, library,
-      availableWidth: () => Math.max(shell.clientWidth, document.querySelector(".workspace-shell")?.clientWidth || 0),
+      panel, shell, library, availableWidth: availableSidebarWidth,
+      reservedWidth: () => panel.dataset.outlineHidden === "true" || availableSidebarWidth() <= 1100 ||
+        document.querySelector(".workspace-shell")?.classList.contains("has-compact-reference-document")
+        ? 0 : (Number(panel.dataset.outlineWidth) || 300) + 1,
       onResize: syncReferenceReaderLayout
     });
+    const outlineControls = createReportOutlineControls({
+      panel, shell, outline, availableWidth: availableSidebarWidth,
+      reservedWidth: () => panel.dataset.libraryOpen === "true" ? (Number(panel.dataset.libraryWidth) || 330) + 1 : 0,
+      onResize: syncReferenceReaderLayout
+    });
+    outline.querySelector("h2").replaceWith(outlineControls.header);
+    panel._reportSidebarControls = [libraryControls, outlineControls];
     const libraryTabs = document.createElement("div");
     libraryTabs.className = "report-library-tabs";
     libraryTabs.setAttribute("role", "tablist");
@@ -29644,7 +29656,7 @@ async function renderProjectReportDraft(project) {
     });
     paintOutlineToggle();
     primaryActions.insertBefore(outlineToggle, saveStatus);
-    shell.append(primaryActions, library, libraryControls.divider, outline, documentBody);
+    shell.append(primaryActions, library, libraryControls.divider, outline, outlineControls.divider, documentBody);
     blocksBody.querySelectorAll(".report-draft-block").forEach(row => {
       const previous = disclosures.get(row.dataset.blockId);
       if (previous) row.querySelectorAll("details").forEach((detail, index) => { detail.open = previous[index] || false; });

@@ -1,36 +1,36 @@
-const defaultWidth = 330;
 const expandedWidth = 640;
-const minimumWidth = 280;
+const maximumSidebarWidth = 720;
 
-export function createReportLibraryControls({ panel, shell, library, availableWidth = () => shell.clientWidth, onResize = () => {} }) {
+function createReportSidebarControls({ panel, shell, element, kind, label, defaultWidth, minimumWidth,
+  availableWidth = () => shell.clientWidth, reservedWidth = () => 0, onResize = () => {} }) {
   const header = document.createElement('header');
-  header.className = 'report-library-header';
+  header.className = `report-${kind}-header`;
   const title = document.createElement('h2');
-  title.textContent = 'Sources & versions';
+  title.textContent = label;
   const expand = document.createElement('button');
   expand.type = 'button';
-  expand.className = 'report-library-expand';
+  expand.className = `report-${kind}-expand`;
   header.append(title, expand);
 
   const divider = document.createElement('div');
-  divider.className = 'report-library-divider';
+  divider.className = `report-${kind}-divider`;
   divider.tabIndex = 0;
   divider.setAttribute('role', 'separator');
   divider.setAttribute('aria-orientation', 'vertical');
-  divider.setAttribute('aria-label', 'Resize Sources & versions');
+  divider.setAttribute('aria-label', `Resize ${label}`);
   divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to reset';
 
   const maximumWidth = () => {
     const available = availableWidth();
-    if (!available) return 720;
-    return Math.max(minimumWidth, Math.min(720, available - 601));
+    if (!available) return maximumSidebarWidth;
+    return Math.max(minimumWidth, Math.min(maximumSidebarWidth, available - reservedWidth() - 601));
   };
-  const currentWidth = () => Number(panel.dataset.libraryWidth) || defaultWidth;
+  const currentWidth = () => Number(panel.dataset[`${kind}Width`]) || defaultWidth;
   const updateControls = () => {
     const width = Math.min(currentWidth(), maximumWidth());
     const expanded = width > defaultWidth;
     expand.textContent = expanded ? 'Compact' : 'Expand';
-    expand.setAttribute('aria-label', `${expanded ? 'Compact' : 'Expand'} Sources & versions`);
+    expand.setAttribute('aria-label', `${expanded ? 'Compact' : 'Expand'} ${label}`);
     expand.setAttribute('aria-pressed', String(expanded));
     divider.setAttribute('aria-valuemin', String(minimumWidth));
     divider.setAttribute('aria-valuemax', String(maximumWidth()));
@@ -39,8 +39,8 @@ export function createReportLibraryControls({ panel, shell, library, availableWi
   };
   const resize = requested => {
     const width = Math.max(minimumWidth, Math.min(maximumWidth(), requested));
-    panel.dataset.libraryWidth = String(width);
-    panel.style.setProperty('--report-library-width', `${width}px`);
+    panel.dataset[`${kind}Width`] = String(width);
+    panel.style.setProperty(`--report-${kind}-width`, `${width}px`);
     onResize();
     updateControls();
   };
@@ -64,9 +64,9 @@ export function createReportLibraryControls({ panel, shell, library, availableWi
     if (event.button !== 0) return;
     event.preventDefault();
     divider.focus();
-    drag = { pointerID: event.pointerId, x: event.clientX, width: library.getBoundingClientRect().width };
+    drag = { pointerID: event.pointerId, x: event.clientX, width: element.getBoundingClientRect().width };
     divider.setPointerCapture(event.pointerId);
-    shell.classList.add('is-library-resizing');
+    shell.classList.add(`is-${kind}-resizing`);
   });
   divider.addEventListener('pointermove', event => {
     if (drag?.pointerID === event.pointerId) resize(drag.width + event.clientX - drag.x);
@@ -74,13 +74,23 @@ export function createReportLibraryControls({ panel, shell, library, availableWi
   const finishDrag = event => {
     if (drag?.pointerID !== event.pointerId) return;
     drag = null;
-    shell.classList.remove('is-library-resizing');
+    shell.classList.remove(`is-${kind}-resizing`);
     if (divider.hasPointerCapture(event.pointerId)) divider.releasePointerCapture(event.pointerId);
   };
   divider.addEventListener('pointerup', finishDrag);
   divider.addEventListener('pointercancel', finishDrag);
   divider.addEventListener('lostpointercapture', finishDrag);
-  shell.classList.remove('is-library-resizing');
+  shell.classList.remove(`is-${kind}-resizing`);
   updateControls();
-  return { header, divider };
+  return { header, divider, update: updateControls };
+}
+
+export function createReportLibraryControls(options) {
+  return createReportSidebarControls({ ...options, element: options.library, kind: 'library',
+    label: 'Sources & versions', defaultWidth: 330, minimumWidth: 280 });
+}
+
+export function createReportOutlineControls(options) {
+  return createReportSidebarControls({ ...options, element: options.outline, kind: 'outline',
+    label: 'Outline', defaultWidth: 300, minimumWidth: 300 });
 }

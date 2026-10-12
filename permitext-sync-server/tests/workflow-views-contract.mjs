@@ -41,6 +41,11 @@ for (const libraryWidth of [0,330,640,720]) {
   }
 }
 assert.deepEqual(reportColumnsLayout(1241,640),{minimumWidth:1241,compact:true});
+assert.equal(reportColumnsLayout(1920,640,640).compact,false,'Both expanded sidebars fit beside a readable report');
+assert.equal(reportColumnsLayout(1881,640,640).compact,true,'Hide the optional outline before reducing the 600px document');
+assert.equal(reportColumnsLayout(1882,640,640).compact,false,'Allow both expanded sidebars at their exact fitting boundary');
+assert.equal(reportColumnsLayout(1920,640,678).compact,false,'Dragging to the available maximum keeps the document readable');
+assert.equal(reportColumnsLayout(901,0,300).compact,false,'The compact outline and its divider fit with a 600px document');
 assert.equal(referenceColumnsWidth([600],1200,931),602,'Narrow desks overflow whole columns instead of shrinking Readers');
 assert.equal(referenceColumnsWidth([48],1200,931),50,'Collapsed Readers keep a compact rail');
 assert.equal(referenceColumnsWidth([972],1920,1241),974,'A manually expanded Reader is visible as a whole column rather than clipped by the reference dock');

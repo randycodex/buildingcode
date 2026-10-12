@@ -13,7 +13,7 @@ class Element {
   releasePointerCapture() { this.capture = null; }
 }
 const c = vm.createContext({ document: { createElement: () => new Element() } });
-vm.runInContext((await readFile(new URL('../public/report-library.js', import.meta.url), 'utf8')).replace('export function', 'function'), c);
+vm.runInContext((await readFile(new URL('../public/report-library.js', import.meta.url), 'utf8')).replaceAll('export function', 'function'), c);
 let widthProperty;
 const panel = { dataset: {}, style: { setProperty: (key, value) => { widthProperty = value; } } };
 const classes = new Set();
@@ -65,3 +65,39 @@ button().events.click();
 assert.equal(widthProperty,'640px','Sources can expand by yielding Reader space in the full workspace');
 assert.equal(resized,1,'Resizing asks the workspace to recalculate its column constraints');
 console.log('Report library passed: expansion, width retention, keyboard and pointer bounds, narrow document space, and cancellation.');
+
+shell.clientWidth = 1920;
+panel.dataset.libraryOpen = 'false';
+const outline = { getBoundingClientRect: () => ({ width: Number(panel.dataset.outlineWidth) || 300 }) };
+let outlineControls = c.createReportOutlineControls({panel, shell, outline,
+  reservedWidth: () => panel.dataset.libraryOpen === 'true' ? Number(panel.dataset.libraryWidth) + 1 : 0});
+assert.equal(outlineControls.header.children[0].textContent, 'Outline');
+assert.equal(outlineControls.divider.attributes['aria-valuenow'], '300');
+assert.equal(outlineControls.divider.attributes['aria-label'], 'Resize Outline');
+outlineControls.header.children[1].events.click();
+assert.equal(panel.dataset.outlineWidth, '640', 'Outline matches Sources expansion');
+assert.equal(outlineControls.header.children[1].attributes['aria-label'], 'Compact Outline');
+outlineControls = c.createReportOutlineControls({panel, shell, outline,
+  reservedWidth: () => panel.dataset.libraryOpen === 'true' ? Number(panel.dataset.libraryWidth) + 1 : 0});
+assert.equal(outlineControls.divider.attributes['aria-valuenow'], '640', 'Rebuilding retains Outline width');
+const outlineKey = key => outlineControls.divider.events.keydown({key, preventDefault() {}});
+outlineKey('End');
+assert.equal(panel.dataset.outlineWidth, '720', 'Outline matches Sources maximum width');
+panel.dataset.libraryOpen = 'true';
+panel.dataset.libraryWidth = '640';
+outlineKey('End');
+assert.equal(panel.dataset.outlineWidth, '678', 'Both sidebars leave 600px and both dividers for the report');
+assert.equal(panel.dataset.libraryWidth, '640', 'Outline resizing preserves the Sources preference');
+outlineControls.header.children[1].events.click();
+assert.equal(panel.dataset.outlineWidth, '300', 'Compact restores the requested 300px outline');
+outlineControls.divider.events.pointerdown(pointer(3, 300));
+outlineControls.divider.events.pointermove(pointer(3, 520));
+assert.equal(panel.dataset.outlineWidth, '520');
+assert.ok(classes.has('is-outline-resizing'));
+outlineControls.divider.events.pointercancel(pointer(3, 520));
+outlineControls.divider.events.pointermove(pointer(3, 700));
+assert.equal(panel.dataset.outlineWidth, '520');
+assert.equal(classes.size, 0);
+outlineKey('Home');
+assert.equal(panel.dataset.outlineWidth, '300');
+console.log('Outline width passed: matching expansion and maximum, retained independent widths, readable report reservation, drag, keyboard, compact and cancellation.');
