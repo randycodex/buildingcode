@@ -79,7 +79,7 @@ async function main() {
       PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "1",
       PERMITEXT_RESEARCH_PRICING_VERSION: "research-billing-e2e",
       PERMITEXT_RESEARCH_FAST_MODEL: "",
-      STRIPE_SECRET_KEY: "sk_test_research_billing_e2e",
+      STRIPE_SECRET_KEY: "sk_test_fixture", // Synthetic configuration marker; never authenticates to Stripe.
       STRIPE_RESEARCH_TURNS_25_PRICE_ID: stripePackPriceID,
       STRIPE_RESEARCH_TURNS_100_PRICE_ID: "",
       STRIPE_WEBHOOK_SECRET: stripeWebhookSecret

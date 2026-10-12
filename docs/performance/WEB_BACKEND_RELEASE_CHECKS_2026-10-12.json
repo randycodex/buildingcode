@@ -64,7 +64,8 @@
   },
   "precheckRemainder": {
     "commands": 208,
-    "initialPassed": 201,
+    "initialPassed": 200,
+    "initialSkipped": 1,
     "initialFailed": 7,
     "followup": "Billing lifecycle fixture repaired; stale commit rejects without mutating store; exact once-charge/idempotency/refund checks pass.",
     "remainingFailures": [
