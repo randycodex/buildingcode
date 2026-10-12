@@ -3,7 +3,7 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v7";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v14";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v16";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-versions-divider-v904";
+} from "./offline-storage.js?v=20261012-report-sidebars-v906";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28596,7 +28596,8 @@ async function renderProjectReportDraft(project) {
   const saveDraft = () => { activeDraft.clientDraftID ||= crypto.randomUUID(); return autosave.flush({ force: !activeDraft.id }); };
 
   const ensureComparison = () => comparisonController ||= createReportComparison({
-    panel, columns: () => shell.querySelector(".report-workspace-columns"),
+    panel, columns: () => shell.querySelector(".report-document-columns"),
+    availableWidth: () => shell.querySelector(".report-workspace-columns")?.clientWidth || 0,
     isCurrent: () => !disposed && panel.isConnected && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
     onResize: () => { panel._updateReportColumns?.(); if (panel.isConnected) syncReferenceReaderLayout(); }
   });
@@ -29216,7 +29217,7 @@ async function renderProjectReportDraft(project) {
     const keepPosition = renderedDraftKey === draftKey;
     const oldDocument = shell.querySelector(".report-document");
     const oldOutline = shell.querySelector(".report-outline");
-    const columnsScroll = shell.querySelector(".report-workspace-columns")?.scrollLeft || 0;
+    const columnsScroll = shell.querySelector(".report-document-columns")?.scrollLeft || 0;
     const comparisonScroll = comparisonController?.capturePosition();
     const documentScroll = keepPosition ? oldDocument?.scrollTop || 0 : 0;
     const outlineScroll = keepPosition ? oldOutline?.scrollTop || 0 : 0;
@@ -29575,8 +29576,10 @@ async function renderProjectReportDraft(project) {
     const availableSidebarWidth = () => panel.dataset.comparisonOpen === "true" ? 0 :
       Math.max(shell.clientWidth, document.querySelector(".workspace-shell")?.clientWidth || 0);
     const libraryControls = createReportLibraryControls({
-      panel, shell, library, availableWidth: availableSidebarWidth,
-      reservedWidth: () => panel.dataset.outlineHidden === "true" || availableSidebarWidth() <= 1100 ||
+      panel, shell, library,
+      availableWidth: () => Math.max(shell.clientWidth, document.querySelector(".workspace-shell")?.clientWidth || 0),
+      reservedWidth: () => panel.dataset.comparisonOpen === "true" ? (panel.dataset.versionsCollapsed === "true" ? 48 : Number(panel.dataset.versionsWidth) || 300) + 1 :
+        panel.dataset.outlineHidden === "true" || availableSidebarWidth() <= 1100 ||
         document.querySelector(".workspace-shell")?.classList.contains("has-compact-reference-document")
         ? 0 : (Number(panel.dataset.outlineWidth) || 300) + 1,
       onResize: syncReferenceReaderLayout
@@ -29592,7 +29595,8 @@ async function renderProjectReportDraft(project) {
     sourcePicker.scrollTop = reportLibraryScroll.sources;
     library.append(libraryControls.header, sourcePicker);
     const versionsControls = createReportVersionsControls({
-      panel, shell, versions: comparison.versions, availableWidth: () => 0,
+      panel, shell, versions: comparison.versions, availableWidth: () => shell.clientWidth,
+      reservedWidth: () => panel.dataset.libraryOpen === "true" ? (Number(panel.dataset.libraryWidth) || 330) + 1 : 0,
       onResize: gesture => comparison.resizeVersions(gesture)
     });
     const versionsTitle = document.createElement("button");
@@ -29603,7 +29607,7 @@ async function renderProjectReportDraft(project) {
       panel.dataset.versionsCollapsed = String(panel.dataset.versionsCollapsed !== "true");
       syncReferenceReaderLayout();
       if (panel.dataset.versionsCollapsed !== "true") {
-        const row = shell.querySelector(".report-workspace-columns");
+        const row = shell.querySelector(".report-document-columns");
         row.scrollLeft = Math.max(0, row.scrollWidth - row.clientWidth);
       }
     });
@@ -29649,8 +29653,13 @@ async function renderProjectReportDraft(project) {
     columns.className = "report-workspace-columns";
     columns.setAttribute("role", "region");
     columns.setAttribute("aria-label", "Report columns");
-    columns.append(library, libraryControls.divider, outline, outlineControls.divider, documentBody,
-      comparison.divider, comparison.preview, versionsControls.divider, comparison.versions);
+    const documents = document.createElement("div");
+    documents.className = "report-document-columns";
+    documents.setAttribute("role", "region");
+    documents.setAttribute("aria-label", "Report documents");
+    documents.tabIndex = 0;
+    documents.append(outline, outlineControls.divider, documentBody, comparison.divider, comparison.preview);
+    columns.append(library, libraryControls.divider, documents, versionsControls.divider, comparison.versions);
     panel._updateReportColumns = () => {
       const comparing = panel.dataset.comparisonOpen === "true";
       const previewing = comparing && Boolean(comparison.selectedID);
@@ -29659,14 +29668,26 @@ async function renderProjectReportDraft(project) {
         !document.querySelector(".workspace-shell")?.classList.contains("has-compact-reference-document"));
       const outlineWidth = outlineShown ? Number(panel.dataset.outlineWidth) || 300 : 0;
       const collapsedVersions = panel.dataset.versionsCollapsed === "true";
-      const template = reportComparisonLayout(columns.clientWidth || shell.clientWidth, {
+      const layout = reportComparisonLayout(columns.clientWidth || shell.clientWidth, {
         sources: sourceWidth, outline: outlineWidth, comparing, previewing,
         versions: collapsedVersions ? 48 : Number(panel.dataset.versionsWidth) || 300,
         reportWidth: Number(panel.dataset.reportComparisonWidth) || 0,
         pdfWidth: Number(panel.dataset.pdfComparisonWidth) || 0
-      }).template;
-      if (columns.style.gridTemplateColumns !== template) preserveReportReadingPosition(documentBody,
-        () => { columns.style.gridTemplateColumns = template; });
+      });
+      if (sourceWidth && layout.sourcesWidth !== sourceWidth) {
+        panel.dataset.libraryWidth = String(layout.sourcesWidth);
+        panel.style.setProperty("--report-library-width", `${layout.sourcesWidth}px`);
+      }
+      if (comparing && !collapsedVersions && layout.versionsWidth !== (Number(panel.dataset.versionsWidth) || 300)) {
+        panel.dataset.versionsWidth = String(layout.versionsWidth);
+        panel.style.setProperty("--report-versions-width", `${layout.versionsWidth}px`);
+      }
+      if (columns.style.gridTemplateColumns !== layout.template || documents.style.gridTemplateColumns !== layout.documentTemplate) {
+        preserveReportReadingPosition(documentBody, () => {
+          columns.style.gridTemplateColumns = layout.template;
+          documents.style.gridTemplateColumns = layout.documentTemplate;
+        });
+      }
       library.hidden = libraryControls.divider.hidden = !sourceWidth;
       outline.hidden = outlineControls.divider.hidden = !outlineShown;
       comparison.preview.hidden = comparison.divider.hidden = !previewing;
@@ -29676,10 +29697,11 @@ async function renderProjectReportDraft(project) {
       versionsTitle.setAttribute("aria-expanded", String(!collapsedVersions));
       versionsTitle.setAttribute("aria-label", `${collapsedVersions ? "Expand" : "Collapse"} Versions list`);
       versionsToggle.setAttribute("aria-pressed", String(comparing));
+      libraryControls.update(); versionsControls.update();
     };
     shell.append(primaryActions, columns);
     panel._updateReportColumns();
-    columns.scrollLeft = keepPosition ? columnsScroll : 0;
+    documents.scrollLeft = keepPosition ? columnsScroll : 0;
     sourcePicker.scrollTop = reportLibraryScroll.sources;
     comparison.restorePosition(comparisonScroll);
     blocksBody.querySelectorAll(".report-draft-block").forEach(row => {

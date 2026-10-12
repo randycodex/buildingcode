@@ -2,24 +2,34 @@ import assert from 'node:assert/strict';
 import {reportComparisonLayout, createReportComparison, preserveReportReadingPosition, preservePDFReadingPosition, resetReportColumnWidths} from '../public/report-comparison.js';
 
 const full = reportComparisonLayout(1920, {sources: 330, outline: 300, comparing: true, reportWidth: 900});
-assert.equal(full.minimumWidth, 2434, 'Scroll the complete column row rather than clamping a resized document to the viewport');
+assert.equal(full.minimumWidth, 2434, 'Retain document minimums while their viewport owns overflow');
 assert.equal(full.balancedDocumentWidth, 600);
-assert.equal(full.template, '330px 1px 300px 1px 900px 1px minmax(600px, 1fr) 1px 300px');
+assert.equal(full.template, '330px 1px minmax(0, 1fr) 1px 300px', 'Sources and Versions stay outside the scrolling document tracks');
+assert.equal(full.documentTemplate, '300px 1px 900px 1px minmax(600px, 1fr)');
 const focused = reportComparisonLayout(1920, {comparing: true, reportWidth: 4000});
 assert.equal(focused.balancedDocumentWidth, 809);
-assert.ok(focused.template.includes('4000px 1px minmax(600px, 1fr)'));
+assert.ok(focused.documentTemplate.includes('4000px 1px minmax(600px, 1fr)'));
 const expandedPDF = reportComparisonLayout(1606, {outline: 300, comparing: true, reportWidth: 600, pdfWidth: 4000});
-assert.ok(expandedPDF.template.includes('600px 1px 4000px'));
+assert.ok(expandedPDF.documentTemplate.includes('600px 1px 4000px'));
 assert.equal(expandedPDF.minimumWidth, 5203, 'PDF expansion has no viewport or page-width ceiling');
-assert.ok(reportComparisonLayout(1606, {comparing: true, reportWidth: 10, pdfWidth: 20}).template.includes('600px 1px 600px'));
+assert.ok(reportComparisonLayout(1606, {comparing: true, reportWidth: 10, pdfWidth: 20}).documentTemplate.includes('600px 1px 600px'));
 assert.equal(reportComparisonLayout(1920, {comparing: false}).minimumWidth, 600);
 assert.equal(reportComparisonLayout(1920, {comparing: true, versions: 48}).minimumWidth, 1250);
 const versionsOnly = reportComparisonLayout(1920, {sources: 330, outline: 300, comparing: true,
   previewing: false, reportWidth: 600, pdfWidth: 4000});
 assert.equal(versionsOnly.minimumWidth, 1533, 'Closing a PDF removes its entire column and divider, while Versions remains available');
-assert.equal(versionsOnly.template, '330px 1px 300px 1px minmax(600px, 1fr) 0px 0px 1px 300px');
+assert.equal(versionsOnly.template, '330px 1px minmax(0, 1fr) 1px 300px');
+assert.equal(versionsOnly.documentTemplate, '300px 1px minmax(600px, 1fr) 0px 0px');
 assert.equal(reportComparisonLayout(1920, {comparing: false, previewing: true}).minimumWidth, 600,
   'The Versions toolbar still hides both PDF and Versions even with a retained selection');
+const wideSidebars = reportComparisonLayout(1920, {sources: 720, versions: 720, comparing: true});
+assert.equal(wideSidebars.sourcesWidth + wideSidebars.versionsWidth + 2, 1320,
+  'Expanded sidebars fit the screen and leave a 600px central viewport');
+const narrowSidebars = reportComparisonLayout(900, {sources: 720, versions: 720, comparing: true});
+assert.equal(narrowSidebars.sourcesWidth, 280);
+assert.equal(narrowSidebars.versionsWidth, 300);
+assert.ok(narrowSidebars.sourcesWidth + narrowSidebars.versionsWidth + 2 < 900,
+  'On smaller desktop viewports, sidebar minimums leave room for horizontally scrolling documents');
 let changedWidth = false;
 const positionContainer = {scrollTop: 731, getBoundingClientRect: () => ({top: 84}),
   querySelectorAll: () => [
@@ -42,7 +52,7 @@ const resetPanel = {dataset: {libraryWidth: '640', outlineWidth: '640', versions
   reportComparisonWidth: '600', pdfComparisonWidth: '2400', libraryOpen: 'true', outlineHidden: 'false',
   comparisonOpen: 'true', versionsCollapsed: 'true'},
   style: {removeProperty: name => removedStyles.push(name)},
-  querySelector: selector => selector === '.report-workspace-columns' ? resetColumns : pdfPosition,
+  querySelector: selector => selector === '.report-document-columns' ? resetColumns : pdfPosition,
   _reportSidebarControls: [ {update: () => controlsUpdated.push('sidebar')}, {update: () => controlsUpdated.push('comparison')} ]};
 let layoutResets = 0;
 resetReportColumnWidths(resetPanel, () => { layoutResets++; });
@@ -69,14 +79,19 @@ globalThis.document = {createElement: () => new Element()};
 const panel = new Element(), host = new Element();
 host.scrollLeft = 0; host.scrollWidth = 2134;
 host.document = Object.assign(new Element(), {value: 'Unsubmitted draft text', scrollTop: 731});
-let current = true, resized = 0;
+let current = true, resized = 0, sidebarsAnchored = false;
 const reviews = [];
 const comparison = createReportComparison({panel, columns: () => host, isCurrent: () => current,
+  availableWidth: () => 1920,
   onResize: () => {
     resized++;
     if (panel.dataset.reportComparisonWidth) host.document.width = Number(panel.dataset.reportComparisonWidth);
     if (panel.dataset.pdfComparisonWidth) comparison.preview.width = Number(panel.dataset.pdfComparisonWidth);
     if (panel.dataset.versionsWidth) comparison.versions.width = Number(panel.dataset.versionsWidth);
+    if (sidebarsAnchored) {
+      host.clientWidth = 1920 - comparison.versions.width - 1;
+      host.scrollWidth = host.document.width + comparison.preview.width + 1;
+    }
     if (panel.dataset.comparisonOpen !== 'true' && comparison.preview.content) {
       comparison.preview.content.scrollTop = 0;
       comparison.versionBody.scrollTop = 0;
@@ -91,7 +106,7 @@ comparison.versions.buttons = [first, second];
 const prepare = async () => ({pdfBlob: 'Frozen version bytes'});
 comparison.select({id: 'first'}, prepare);
 assert.equal(panel.dataset.comparisonOpen, 'true');
-assert.equal(host.scrollLeft, 214, 'First opening reveals the right-hand Versions column without squeezing documents');
+assert.equal(host.scrollLeft, 214, 'First opening reveals the PDF in the document viewport');
 assert.equal(first.attributes['aria-pressed'], 'true');
 assert.equal(reviews[0].args.mount, comparison.preview, 'The PDF owns a separate mount, never the draft');
 assert.equal(reviews[0].args.showClose, false, 'The Report comparison omits the dedicated Close PDF preview button');
@@ -125,7 +140,7 @@ assert.equal(comparison.versionBody.scrollTop, 127);
 comparison.select({id: 'first'}, prepare);
 assert.equal(reviews.length, 2, 'Clicking the closed title opens its PDF again');
 assert.equal(first.attributes['aria-pressed'], 'true');
-assert.equal(host.scrollLeft, 214, 'Opening a PDF keeps its title reachable for the second-click close');
+assert.equal(host.scrollLeft, 214, 'Opening a PDF reveals its document while the version title stays in its separate sidebar');
 comparison.select({id: 'second'}, prepare);
 assert.equal(reviews[1].disposed, true);
 assert.equal(reviews[1].args.isCurrent(), false, 'A slow previous selection cannot paint over the new PDF');
@@ -171,9 +186,10 @@ assert.equal(panel.dataset.pdfComparisonWidth, undefined);
 host.document.width = comparison.preview.width = 809;
 comparison.preview.content = Object.assign(new Element(), {scrollTop: 942});
 comparison.versions.width = 300;
+sidebarsAnchored = true;
+host.clientWidth = host.scrollWidth = 1619;
 host.scrollLeft = 0;
-comparison.versions.getBoundingClientRect = () => ({width: comparison.versions.width,
-  right: host.document.width + comparison.preview.width + 2 + comparison.versions.width - host.scrollLeft});
+comparison.versions.getBoundingClientRect = () => ({width: comparison.versions.width, right: 1920});
 const versionsRight = comparison.versions.getBoundingClientRect().right;
 const versionsGesture = {};
 panel.dataset.versionsWidth = '420';
@@ -186,7 +202,8 @@ assert.equal(comparison.preview.content.scrollTop, 942, 'Versions resizing keeps
 panel.dataset.versionsWidth = '720';
 comparison.resizeVersions(versionsGesture);
 assert.equal(panel.dataset.pdfComparisonWidth, '600', 'The PDF keeps its readable minimum');
-assert.equal(host.scrollLeft, 211, 'At the minimum, the whole row scrolls to keep Versions anchored');
+assert.equal(host.scrollWidth - host.clientWidth, 211, 'At the minimum, excess document width stays in the central viewport');
+assert.equal(host.scrollLeft, 0, 'Resizing a sidebar no longer scrolls Sources or Versions');
 assert.equal(comparison.versions.getBoundingClientRect().right, versionsRight);
 panel.dataset.versionsWidth = '300';
 comparison.resizeVersions(versionsGesture);
@@ -197,6 +214,9 @@ panel.dataset.versionsWidth = '324';
 comparison.resizeVersions();
 assert.equal(panel.dataset.pdfComparisonWidth, '785', 'A keyboard adjustment starts from the current document widths');
 assert.equal(comparison.versions.getBoundingClientRect().right, versionsRight);
+comparison.divider.events.keydown({key: 'End', preventDefault() {}});
+assert.equal(panel.dataset.reportComparisonWidth, '797', 'Balancing uses the full workspace width, without subtracting anchored sidebars twice');
+assert.equal(panel.dataset.pdfComparisonWidth, '797');
 current = false;
 comparison.select({id: 'third'}, prepare);
 assert.equal(reviews.length, 4, 'Changed account context cannot open a private PDF');

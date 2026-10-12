@@ -13,17 +13,29 @@ export function preserveReportReadingPosition(container, change) {
 export function reportComparisonLayout(available, { sources = 0, outline = 0, versions = 300,
   comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0 } = {}) {
   const showPDF = comparing && previewing;
+  const minimumSources = sources ? 280 : 0;
+  const minimumVersions = comparing ? Math.min(300, versions) : 0;
+  const sidebarBudget = Math.max(minimumSources + minimumVersions,
+    available - 600 - Number(sources > 0) - Number(comparing));
+  const requestedVersions = comparing ? versions : 0;
+  if (sources + requestedVersions > sidebarBudget) {
+    const extra = sidebarBudget - minimumSources - minimumVersions;
+    const requestedExtra = sources + requestedVersions - minimumSources - minimumVersions;
+    sources = minimumSources + Math.floor(extra * (sources - minimumSources) / requestedExtra);
+    versions = Math.min(requestedVersions, sidebarBudget - sources);
+  }
   const sidebars = sources + outline + (comparing ? versions : 0);
   const dividers = Number(sources > 0) + Number(outline > 0) + Number(comparing) + Number(showPDF);
   const pairWidth = Math.max(1200, available - sidebars - dividers);
   const chosenReport = reportWidth ? Math.max(600, reportWidth) : 0;
   const chosenPDF = pdfWidth ? Math.max(600, pdfWidth) : 0;
   return {
+    sourcesWidth: sources, versionsWidth: comparing ? versions : 0,
     template: [sources ? `${sources}px` : '0px', sources ? '1px' : '0px',
-      outline ? `${outline}px` : '0px', outline ? '1px' : '0px',
+      'minmax(0, 1fr)', comparing ? '1px' : '0px', comparing ? `${versions}px` : '0px'].join(' '),
+    documentTemplate: [outline ? `${outline}px` : '0px', outline ? '1px' : '0px',
       showPDF && chosenReport ? `${chosenReport}px` : 'minmax(600px, 1fr)',
-      showPDF ? '1px' : '0px', showPDF ? chosenPDF ? `${chosenPDF}px` : 'minmax(600px, 1fr)' : '0px',
-      comparing ? '1px' : '0px', comparing ? `${versions}px` : '0px'].join(' '),
+      showPDF ? '1px' : '0px', showPDF ? chosenPDF ? `${chosenPDF}px` : 'minmax(600px, 1fr)' : '0px'].join(' '),
     minimumWidth: sidebars + dividers + (showPDF ? (chosenReport || 600) + (chosenPDF || 600) : 600),
     balancedDocumentWidth: pairWidth / 2
   };
@@ -51,12 +63,13 @@ export function resetReportColumnWidths(panel, onResize) {
     onResize();
   });
   panel._reportSidebarControls?.forEach(control => control.update());
-  panel.querySelector('.report-workspace-columns').scrollLeft = 0;
+  panel.querySelector('.report-document-columns').scrollLeft = 0;
 }
 
 // The PDF has its own mount. Selecting or hiding a saved version never replaces
 // the editable draft, its fields, or its scroll position.
 export function createReportComparison({ panel, columns, isCurrent, onResize,
+  availableWidth = () => columns()?.clientWidth || 0,
   renderReview = openReportExportReview }) {
   const preview = document.createElement('section');
   preview.className = 'report-pdf-preview-panel';
@@ -118,7 +131,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
   divider.setAttribute('aria-label', 'Resize Report and PDF Preview');
   divider.setAttribute('aria-orientation', 'vertical');
   divider.title = 'Drag to resize · Arrow keys to adjust · Double-click to balance';
-  const balancedWidth = () => reportComparisonLayout(columns()?.clientWidth || 0, {
+  const balancedWidth = () => reportComparisonLayout(availableWidth(), {
     sources: panel.dataset.libraryOpen === 'true' ? Number(panel.dataset.libraryWidth) || 330 : 0,
     outline: panel.dataset.outlineHidden === 'true' ? 0 : Number(panel.dataset.outlineWidth) || 300,
     versions: panel.dataset.versionsCollapsed === 'true' ? 48 : Number(panel.dataset.versionsWidth) || 300, comparing: true
@@ -173,7 +186,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
     const delta = event.clientX - drag.x;
     resize(drag.report + delta, drag.pdf - delta);
     // Once the Report reaches its minimum, keep the boundary under the pointer
-    // by scrolling the whole row while the PDF continues growing to the left.
+    // by scrolling the documents while the PDF continues growing to the left.
     columns().scrollLeft = drag.scroll + Math.max(600, drag.report + delta) - drag.report - delta;
   });
   const finish = () => { drag = null; };
@@ -195,7 +208,7 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
       }
       preservePDFReadingPosition(preview.querySelector('.report-export-content'), onResize);
       // Keep Versions' right edge fixed. Once the adjacent document reaches its
-      // minimum, scroll the whole row so the divider still follows the pointer.
+      // minimum, any overflow stays inside the document viewport.
       host.scrollLeft += versions.getBoundingClientRect().right - origin.right;
       update();
     },

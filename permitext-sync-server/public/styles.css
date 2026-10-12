@@ -19249,7 +19249,7 @@ dialog.report-export-review {
 .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text-primary); }
 
 /* Report shares the workspace navigation; retain column geometry underneath. */
-.report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: var(--reference-document-min-width, 600px); display: flex; flex-direction: column; background: var(--bg, #000); }
+.report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg, #000); }
 .report-workspace-view[hidden] { display: none; }
 .workspace-shell:has(> .report-workspace-view:not([hidden])) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
 .workspace-shell > .workflow-toolbar { grid-row: 2; grid-column: 1; }
@@ -19263,6 +19263,7 @@ dialog.report-export-review {
 }
 .workspace-shell.has-reference-readers,
 .workspace-shell:has(> .report-workspace-view:not([hidden])) { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.workspace-shell:has(> .report-workspace-view:not([hidden])) { overflow-x: hidden; }
 .workspace-shell.has-reference-readers::-webkit-scrollbar,
 .workspace-shell:has(> .report-workspace-view:not([hidden]))::-webkit-scrollbar { display: none; }
 .workspace-shell.has-reference-readers > .topbar,
@@ -19471,26 +19472,28 @@ dialog.report-export-review {
 .report-screen .report-draft-panel .report-draft-shell { grid-template-columns: minmax(0, 1fr); }
 .report-workspace-columns {
   grid-row: 2; grid-column: 1; display: grid; grid-template-rows: minmax(0, 1fr);
-  min-width: 0; min-height: 0; overflow-x: auto; overflow-y: hidden;
+  min-width: 0; min-height: 0; overflow: hidden;
 }
+.report-document-columns { grid-column: 3; display: grid; grid-template-rows: minmax(0, 1fr); min-width: 0; min-height: 0; overflow-x: auto; overflow-y: hidden; }
 .report-screen .report-workspace-columns > * { grid-row: 1; min-height: 0; box-sizing: border-box; }
-.report-screen .report-draft-panel .report-workspace-columns > [hidden] { display: none !important; }
+.report-screen .report-document-columns > * { grid-row: 1; min-height: 0; box-sizing: border-box; }
+.report-screen .report-draft-panel :is(.report-workspace-columns, .report-document-columns) > [hidden] { display: none !important; }
 .report-screen .report-draft-panel .report-workspace-columns > .report-library { grid-column: 1; display: flex; flex-direction: column; overflow: hidden; }
 .report-screen .report-draft-panel .report-workspace-columns > .report-library-divider { grid-column: 2; display: block; }
-.report-screen .report-draft-panel .report-workspace-columns > .report-outline { grid-column: 3; display: block; }
-.report-screen .report-draft-panel .report-workspace-columns > .report-outline-divider { grid-column: 4; display: block; }
-.report-screen .report-draft-panel .report-workspace-columns > .report-document { grid-column: 5; display: block; }
+.report-screen .report-draft-panel .report-document-columns > .report-outline { grid-column: 1; display: block; }
+.report-screen .report-draft-panel .report-document-columns > .report-outline-divider { grid-column: 2; display: block; }
+.report-screen .report-draft-panel .report-document-columns > .report-document { grid-column: 3; display: block; }
 .report-library > .report-source-picker { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0; }
 .report-comparison-divider, .report-versions-divider {
   position: relative; z-index: 1; background: var(--border); cursor: col-resize; touch-action: none;
 }
-.report-comparison-divider { grid-column: 6; }
-.report-versions-divider { grid-column: 8; }
+.report-comparison-divider { grid-column: 4; }
+.report-versions-divider { grid-column: 4; }
 .report-comparison-divider::before, .report-versions-divider::before { content: ''; position: absolute; inset: 0 -5px; }
 .report-comparison-divider:hover, .report-versions-divider:hover,
 .report-comparison-divider:focus-visible, .report-versions-divider:focus-visible { background: var(--text-secondary); outline: none; }
 .report-versions-divider[aria-disabled="true"] { pointer-events: none; cursor: default; }
-.report-pdf-preview-panel { grid-column: 7; min-width: 600px; overflow: hidden; background: #000; }
+.report-pdf-preview-panel { grid-column: 5; min-width: 600px; overflow: hidden; background: #000; }
 .report-pdf-preview-panel .report-pdf-page { max-width: none; }
 .report-pdf-preview-panel > .report-workflow-help { padding: 0 24px; line-height: 1.6; }
 .report-comparison-header { padding: 24px; }
@@ -19505,7 +19508,7 @@ dialog.report-export-review {
 .report-pdf-preview-panel .report-export-status { font-size: 12px; margin: 0; padding: 12px 20px; }
 .report-pdf-preview-panel .report-export-inline > footer { height: 42px; padding: 0 20px; display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
 .report-pdf-preview-panel .report-export-inline > footer button { border: 0; background: transparent; padding: 4px 0; font-size: 12px; }
-.report-versions-panel { grid-column: 9; min-width: 0; display: flex; flex-direction: column; padding: 24px; background: #080808; overflow: hidden; }
+.report-versions-panel { grid-column: 5; min-width: 0; display: flex; flex-direction: column; padding: 24px; background: #080808; overflow: hidden; }
 .report-versions-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
 .report-versions-header h2 { margin: 0; font-size: 13px; }
 .report-versions-header button { padding: 4px 0; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font-size: 12px; cursor: pointer; }
