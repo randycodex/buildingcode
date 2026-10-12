@@ -17,6 +17,8 @@ const edition = directory => `CodeContent/authored/new-york-city/${directory}/bu
 const old = await findActiveCodeSource({ canonicalEdition: edition("2026-enacted-administrative-code"), codePrefix: "BC68" });
 const gas = await findActiveCodeSource({ canonicalEdition: edition("2022-construction-codes"), codePrefix: "FGC" });
 assert.deepEqual([old.jurisdictionID, old.codeID, old.categoryID], [1, 1, 4]);
+assert.equal(old.editionLabel, "1968 NYC Building Code", "The combined enacted package date must not relabel the historical Building Code");
+assert.equal(old.canonicalEdition, edition("2026-enacted-administrative-code"), "Display labels cannot change canonical package identity");
 assert.deepEqual([gas.jurisdictionID, gas.codeID, gas.categoryID], [1, 1, 4]);
 assert.notEqual(codeSourceKey(old), codeSourceKey(gas));
 const bc2014 = await findActiveCodeSource({ canonicalEdition: edition("2014-construction-codes"), codePrefix: "BC" });

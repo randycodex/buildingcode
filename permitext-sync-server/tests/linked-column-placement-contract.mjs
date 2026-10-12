@@ -8,7 +8,7 @@ const actual = name => {
   assert.ok(start >= 0);
   return source.slice(start, source.indexOf('\n}', start) + 2);
 };
-const context = vm.createContext({state:{}, linkPaneToView, currentWorkflowView:()=> 'notebook',activeWorkspaceID:'project-a', pendingLinkedPanePlacements:new Map()});
+const context = vm.createContext({state:{}, linkPaneToView, currentColumnWorkflowView:()=> 'notebook',activeWorkspaceID:'project-a', pendingLinkedPanePlacements:new Map()});
 vm.runInContext(['readerIsClearlyAvailable','requestLinkedPanePlacement','applyLinkedPanePlacements'].map(actual).join('\n'),context);
 for (const origin of ['notebook','report','research','search','reader','evidence-detail']) {
   const original = ['evidence', origin, 'unrelated', 'destination'];

@@ -52,7 +52,7 @@ const context = vm.createContext({
     return true;
   },
   refreshOpenSavedPanes: async () => {}, selectionIndicatorIconSVG: () => "", folderAddIconSVG: () => "",
-  compareSavedCodeOrder: (left, right) => left.id.localeCompare(right.id), Date
+  compareSavedCodeOrder: (left, right) => left.id.localeCompare(right.id), searchCodeFilterOptions: () => [], Date
 });
 vm.runInContext(["savedItemSelectionID", "sortSavedItems", "createSavedBulkSelectionController"].map(actual).join("\n"), context);
 assert.deepEqual(Array.from(context.sortSavedItems(records, "recentlySaved"), item => item.id), ["current", "note", "old"],

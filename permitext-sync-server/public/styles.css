@@ -11452,7 +11452,8 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   font-weight: 650;
 }
 
-.project-sheet-field .project-property-lookup-status {
+.project-sheet-field .project-property-lookup-status,
+.project-create-sheet > .project-property-lookup-status {
   min-height: 1.2em;
   padding: var(--space-1) var(--space-2) 0;
   color: var(--text-secondary);
@@ -19111,7 +19112,7 @@ dialog.report-screen {
 .report-outline-drag svg { width: 12px; height: 12px; }
 .report-outline-item:hover .report-outline-drag, .report-outline-drag:focus-visible { opacity: 1; }
 .report-outline .report-outline-link { display: flex; align-items: flex-start; gap: 6px; padding: 5px 8px 5px 0; }
-.report-outline-number { flex: 0 0 20px; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+.report-outline-number { flex: 0 0 auto; min-width: 20px; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
 .report-outline-item-label { display: block; min-width: 0; }
 .report-outline-item-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 .report-outline-item-detail { display: block; margin-top: 3px; font-size: 10px; font-weight: 400; color: var(--text-tertiary, var(--text-secondary)); }

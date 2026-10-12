@@ -1,0 +1,319 @@
+{
+  "schema": "permitext-web-ux-audit-v1",
+  "date": "2026-10-12",
+  "scope": [
+    "web UX and reliability",
+    "web performance regression review",
+    "local fixture instrumentation"
+  ],
+  "native_included": false,
+  "workspace": "/Users/randy/.codex/worktrees/speed-ux-review/Building Code",
+  "base_commit": "e650a1c69dafe4d7b7dd59983883f08099e245f9",
+  "source_state": "Uncommitted shared worktree candidate; source may change after this record. No deployment or production acceptance is implied.",
+  "fixed_issues": [
+    {
+      "issue": "PDF preview failure leaked observers, render tasks and worker resources",
+      "files": [
+        "permitext-sync-server/public/report-pdf-preview.js",
+        "permitext-sync-server/tests/report-pdf-preview.mjs"
+      ],
+      "evidence": "Loading-task rejection and later page-metadata rejection release resources; clean retry and repeated disposal pass."
+    },
+    {
+      "issue": "Project creation continued after Cancel while address lookup was pending; duplicate submission and hidden errors",
+      "files": [
+        "permitext-sync-server/public/app.js",
+        "permitext-sync-server/tests/project-create-sheet-race.mjs"
+      ],
+      "evidence": "Actual handler cancellation, Escape, account/workspace/detachment fences, single submission, input locking, inline retained error and retry pass. Once persistence starts, Cancel/Escape cannot imply undo."
+    },
+    {
+      "issue": "Notebook selection and New Note async responses could replace a newer selection or lose edits made during loading",
+      "files": [
+        "permitext-sync-server/public/app.js",
+        "permitext-sync-server/tests/notebook-card-selection-race.mjs"
+      ],
+      "evidence": "Actual handlers pass A-B-A, draft/assets suspension, account/workspace/disposal, edits during final save, first server-ID acknowledgement, and same-note refresh retaining visible newer edits/version."
+    },
+    {
+      "issue": "Project Saved eagerly hydrated all source bodies",
+      "files": [
+        "permitext-sync-server/public/app.js",
+        "permitext-sync-server/tests/saved-project-pagination-performance.mjs"
+      ],
+      "evidence": "For 1000 candidates with sort metadata, first page uses 49 body reads and 48 rows; expansion uses 97 reads/96 rows. Source-text search reaches late candidates; complete selection eligibility retained. Legacy missing sort metadata is hydrated before ordering."
+    },
+    {
+      "issue": "Saved Show more removed the focused button without a focus destination",
+      "files": [
+        "permitext-sync-server/public/app.js",
+        "permitext-sync-server/tests/saved-project-pagination-performance.mjs"
+      ],
+      "evidence": "Actual hydration tests retain focus on first newly exposed visible row, skip collapsed rows, preserve moved focus, reject stale query/unmounted publication, and use a code-group toggle when a final 60-row expansion has only collapsed new rows. Bookmark/annotation normalization across a page boundary preserves note text and fills the page."
+    },
+    {
+      "issue": "New Note storage read failures lacked visible recovery feedback",
+      "files": [
+        "permitext-sync-server/public/app.js",
+        "permitext-sync-server/tests/notebook-card-selection-race.mjs"
+      ],
+      "evidence": "Current IndexedDB read rejection preserves exact current card/document without publication or autosave and exposes recovery status; stale account/workspace/disposal/selection failures remain silent."
+    }
+  ],
+  "fixture_validation": {
+    "opt_in": "Explicit audit flag and correct capability required for workspace/app injection and telemetry routes; ordinary URLs remain uninstrumented.",
+    "http_readback": "Disabled small/default fixture: 12 saves, 6 memberships, 3 in Project 1. Enabled large/concentrated fixture: 1,000 saves, 500 memberships, all 500 in Project 1.",
+    "measurement_limit": "Attribution around async functions records synchronous entry work, not total awaited completion. Sample envelope is bounded; it is not a comprehensive telemetry schema validation."
+  },
+  "test_fixture_drift_fixed": [
+    {
+      "file": "permitext-sync-server/tests/report-comment-refresh.mjs",
+      "change": "Added missing updateWorkspaceLayoutControls VM callback; no corresponding runtime defect."
+    },
+    {
+      "file": "permitext-sync-server/tests/report-draft-deletion.mjs",
+      "change": "Added current panel and trigger.closest DOM fixture fields; no corresponding runtime defect."
+    }
+  ],
+  "coverage": [
+    {
+      "area": "Report lifecycle and recovery",
+      "evidence": "executed local web contracts; synthetic dependencies except fixture HTTP",
+      "tests": [
+        {
+          "command": "node tests/report-screen-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-autosave.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-save-continuity.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-hydration-failure-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-comment-refresh.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-comment-presentation.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-draft-deletion.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-version-deletion.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "area": "Report editing and export",
+      "evidence": "executed local web contracts; synthetic dependencies except fixture HTTP",
+      "tests": [
+        {
+          "command": "node tests/report-outline.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-library-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-comparison.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-pdf-preview.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/report-export-review-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "area": "Notebook navigation and persistence",
+      "evidence": "executed local web contracts; synthetic dependencies except fixture HTTP",
+      "tests": [
+        {
+          "command": "node tests/notebook-card-selection-race.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/notebook-note-menu.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/notebook-editing-position.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/web-notebook-durability-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/offline-notebook-durability-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/notebook-return-scroll-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/notebook-return-card-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/notebook-reference-availability-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/notebook-direct-handoff-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "area": "Project forms and management",
+      "evidence": "executed local web contracts; synthetic dependencies except fixture HTTP",
+      "tests": [
+        {
+          "command": "node tests/project-create-sheet-race.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/project-manager-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/project-trash-confirmation.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/project-save-policy-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/project-information-durability-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "area": "Account and keyboard navigation",
+      "evidence": "executed local web contracts; synthetic dependencies except fixture HTTP",
+      "tests": [
+        {
+          "command": "node tests/account-screen-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/account-profile-client-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/active-source-dialog-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/workspace-divider-keyboard.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/reader-navigation-menu-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "area": "Saved performance and audit instrumentation",
+      "evidence": "executed local web contracts; synthetic dependencies except fixture HTTP",
+      "tests": [
+        {
+          "command": "node tests/saved-project-pagination-performance.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        },
+        {
+          "command": "node tests/web-audit-fixture-contract.mjs",
+          "exit_code": 0,
+          "result": "passed"
+        }
+      ]
+    }
+  ],
+  "source_only_review": [
+    "Custom dialog focus traps/ARIA and background isolation",
+    "Empty/error/loading and retry surfaces not explicitly named by executable contracts"
+  ],
+  "pending_independent_validation": [
+    "Root owns rendered browser confirmation, Project inline error appearance and final candidate freshness."
+  ],
+  "limitations": [
+    "No native code or native tests included in this pass.",
+    "No browser, VoiceOver, touch-device, or rendered screenshot validation performed by this reviewer.",
+    "Offline tests use controlled local persistence/network fixtures; not actual browser airplane mode.",
+    "No production latency, hosted deployment, paid provider generation, billing mutation, or live user-data mutation tested.",
+    "No commit, push or deployment performed by this reviewer."
+  ],
+  "independent_final_review": {
+    "same_note_refresh": "Passed actual-handler regressions for intervening edits remaining visible/persisted and clean acknowledgement version advance.",
+    "saved_show_more": "Passed actual-hydration tests for first new row focus, preventScroll, collapsed-row skip, moved focus, changed query, removed panel, final collapsed-page toggle fallback, and bookmark/annotation normalization across batch boundaries.",
+    "new_note_storage_failure": "Passed actual-handler regression for visible current error, retained editor and silent stale failure."
+  },
+  "remaining_source_only_findings": [],
+  "final_focused_commands": [
+    "node tests/notebook-card-selection-race.mjs",
+    "node tests/saved-project-pagination-performance.mjs",
+    "node --check public/app.js",
+    "git diff --check"
+  ],
+  "final_focused_result": "All passed after the final same-note, storage failure and Show more focus changes.",
+  "source_sha256_at_report_completion": {
+    "public/app.js": "0848a73f3358231dd40ce90a19116a782a78ba101b9eb50d96417b8def14cbaf",
+    "public/report-pdf-preview.js": "6b1725c3af1b7435cea7260accb74971bc7c14636818b4cee2388c053cfe1f85",
+    "tests/notebook-card-selection-race.mjs": "3fad1da2f8373792a68413d4571ef9e05e4fd787725ed5a5b9834c3f5c6380e2",
+    "tests/saved-project-pagination-performance.mjs": "e208aac7e7574fa0ca533b6e2f55c3048891aaabb73588bf75ccdaeda5510d61"
+  }
+}

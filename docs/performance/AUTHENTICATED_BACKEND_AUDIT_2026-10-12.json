@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-12",
+  "baseCommit": "e650a1c69",
+  "scope": "Web/backend isolated fixtures. No native, production access, paid AI, deployment, database migration or commits.",
+  "interpretation": [
+    "Work counts are records returned by synthetic adapters executing actual application functions, not physical database rows scanned or hosted latency.",
+    "Adapter tests execute actual file/PostgreSQL method bodies with isolated records and captured tagged-SQL calls. SQL shape is checked; no live PostgreSQL query plan measured.",
+    "Notebook byte counts are serialized adapter results before client summary mapping, not network response size. Client summaries are exactly equal.",
+    "The file adapter still reads/parses its full JSON store before filtering; these counts do not demonstrate reduced file-store disk I/O. PostgreSQL transport/decoding reductions follow the narrower selected records and fields, pending hosted measurement."
+  ],
+  "measurements": {
+    "before": {
+      "baseline": true,
+      "fixture": {
+        "artifacts": 5055,
+        "mutations": 5001,
+        "links": 5002
+      },
+      "measurements": {
+        "openOneImage": {
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 5055
+          }
+        },
+        "openOneDraft": {
+          "links": {
+            "calls": 1,
+            "returnedRecords": 5002
+          },
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 5055
+          }
+        },
+        "openOneManifest": {
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 5055
+          }
+        },
+        "sharedImageAuthorization": {
+          "artifacts": {
+            "calls": 2,
+            "returnedRecords": 10110
+          },
+          "links": {
+            "calls": 1,
+            "returnedRecords": 5002
+          }
+        },
+        "validate50ArtifactReferences": {
+          "mutations": {
+            "calls": 50,
+            "returnedRecords": 250050
+          },
+          "artifacts": {
+            "calls": 50,
+            "returnedRecords": 252750
+          }
+        },
+        "validate100SavedReferences": {
+          "mutations": {
+            "calls": 100,
+            "returnedRecords": 500100
+          }
+        },
+        "projectFoundation": {
+          "mutations": {
+            "calls": 2,
+            "returnedRecords": 10002
+          },
+          "links": {
+            "calls": 2,
+            "returnedRecords": 5004
+          },
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 2
+          },
+          "conversations": {
+            "calls": 1,
+            "returnedRecords": 1
+          }
+        },
+        "reportSources": {
+          "links": {
+            "calls": 1,
+            "returnedRecords": 0
+          },
+          "mutations": {
+            "calls": 2,
+            "returnedRecords": 10002
+          }
+        }
+      }
+    },
+    "after": {
+      "baseline": false,
+      "fixture": {
+        "artifacts": 5055,
+        "mutations": 5001,
+        "links": 5002
+      },
+      "measurements": {
+        "openOneImage": {
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 1
+          }
+        },
+        "openOneDraft": {
+          "links": {
+            "calls": 1,
+            "returnedRecords": 1
+          },
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 1
+          }
+        },
+        "openOneManifest": {
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 1
+          }
+        },
+        "sharedImageAuthorization": {
+          "artifacts": {
+            "calls": 2,
+            "returnedRecords": 2
+          },
+          "links": {
+            "calls": 1,
+            "returnedRecords": 1
+          }
+        },
+        "validate50ArtifactReferences": {
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 50
+          }
+        },
+        "validate100SavedReferences": {
+          "mutations": {
+            "calls": 1,
+            "returnedRecords": 5001
+          }
+        },
+        "projectFoundation": {
+          "migrationMutations": {
+            "calls": 1,
+            "returnedRecords": 1
+          },
+          "links": {
+            "calls": 2,
+            "returnedRecords": 5004
+          },
+          "projects": {
+            "calls": 1,
+            "returnedRecords": 1
+          },
+          "artifacts": {
+            "calls": 1,
+            "returnedRecords": 2
+          },
+          "conversations": {
+            "calls": 1,
+            "returnedRecords": 1
+          }
+        },
+        "reportSources": {
+          "links": {
+            "calls": 1,
+            "returnedRecords": 0
+          },
+          "mutations": {
+            "calls": 1,
+            "returnedRecords": 5001
+          }
+        }
+      }
+    },
+    "notebookProjection": {
+      "syntheticNotebookCards": 61,
+      "fullArtifactBytes": 5956946,
+      "summaryArtifactBytes": 115690,
+      "unchangedClientSummary": true,
+      "migrationRecordsBefore": 5007,
+      "migrationRecordsAfter": 4
+    }
+  },
+  "coverage": [
+    {
+      "area": "Project foundation and hub",
+      "status": "changed and tested",
+      "findings": "Migration reads only project/projectSection/workboard mutations; project lookup reads only Projects. Checkpoint delta semantics retained. Hub uses projected Notebook summaries.",
+      "remaining": "Migration still inventories owner links and answer IDs for deltas. Foundation returns complete linked artifacts. No cross-request cache added."
+    },
+    {
+      "area": "Artifact checkpoints",
+      "status": "inspected; unchanged; tests passed",
+      "findings": "Existing request-local owner/project lookup and revision reads are scoped; tests cover owner separation and historical/reference/deleted project identity."
+    },
+    {
+      "area": "Sync pull/push",
+      "status": "inspected; unchanged; scoped tests passed",
+      "findings": "PostgreSQL pull uses repeatable-read for deltas, project dependencies, latest cursor and entitlement; push retains existing serializable write path. Event indexes declared.",
+      "remaining": "No live PostgreSQL concurrency or query-plan test. File store tests are not hosted performance evidence."
+    },
+    {
+      "area": "Notebook list/get/save",
+      "status": "changed and tested",
+      "findings": "List query omits editable document, evidence links, image IDs and save receipt, preserving client summary fields. Get/save replay and conflict paths scope links. Full edit payloads, version conflicts, replay recovery and session revocation retained.",
+      "remaining": "List still returns all linked project summaries and existing full plainText; pagination/API changes deferred."
+    },
+    {
+      "area": "Notebook references and image authorization",
+      "status": "changed and tested",
+      "findings": "Exact artifact IDs and request-local batched validation remove repeated inventories. Cross-project image access queries linked project cards. Owner/type/deleted/link rejection, cross-owner cache isolation, retry and later-request deletion tested.",
+      "remaining": "Saved/note/workboard validation still loads owner mutations once; selected passages/approved evidence load owner conversations/answers once per validation. Orphan cleanup retains broad reference checks."
+    },
+    {
+      "area": "Report source/draft/manifest/file paths",
+      "status": "changed and tested",
+      "findings": "Exact draft/manifest artifact and link filters; one shared source mutation snapshot preserves clear/tombstone and edition semantics. Export retains text, tables, notes, citation identities, immutable hashes and auth guards.",
+      "remaining": "Draft/history lists stay project-wide. File read finds one file among project generated reports. Manifest authorization traverses candidate accessible projects. Remote blob latency unmeasured."
+    },
+    {
+      "area": "Historical source labels",
+      "status": "changed and tested",
+      "findings": "BC68 label corrected to 1968 NYC Building Code using authored category; canonical package/version IDs and text unchanged. Historical Notebook and mixed-edition Report regression passes."
+    },
+    {
+      "area": "Research history and usage",
+      "status": "inspected; unchanged; tests passed",
+      "findings": "Cursor history uses compact summaries, owner/project binding, capped pages and declared visible-history indexes. Usage filters month and expires reservations after 15 minutes; file credit/reservation concurrency tests pass.",
+      "remaining": "Credits retain owner ledger reads. Firm allowance fans out per active member. Live providers and generated-answer timing unmeasured."
+    },
+    {
+      "area": "Database indexes and deadlines",
+      "status": "source inspected; hosted behavior untested",
+      "findings": "Schema declares primary artifact ID, owner/project link, owner/target link, history cursor, usage timestamp and sync-event indexes. Fixture counts alone do not justify another index. Neon client has no explicit application DB deadline.",
+      "remaining": "Verify deployed index presence and representative staging plans/latency before adding indexes or deadline policy; driver/platform defaults unmeasured."
+    }
+  ],
+  "passedTests": [
+    "node --check app.mjs",
+    "node tests/authenticated-read-scaling-contract.mjs",
+    "node tests/authenticated-read-scaling-contract.mjs --baseline <e650a1c69 app.mjs>",
+    "node tests/authenticated-read-adapter-contract.mjs",
+    "node tests/project-foundation-migration-steady-state.mjs",
+    "node --test tests/project-checkpoint-scoped-read.mjs",
+    "node tests/artifact-revision-checkpoint.mjs",
+    "node tests/research-notebook-concurrency-http.mjs",
+    "node tests/research-project-report-handoff-http.mjs",
+    "node tests/report-evidence-export-http.mjs",
+    "node tests/report-evidence-export-contract.mjs",
+    "node tests/report-project-query-scope.mjs",
+    "node tests/research-history-pagination.mjs",
+    "node tests/scoped-sync-research-reads.mjs",
+    "node tests/account-private-assets-http.mjs",
+    "node tests/file-research-usage-concurrency-contract.mjs",
+    "node tests/research-reference-bounded-contract.mjs",
+    "node tests/active-code-source-catalog-contract.mjs",
+    "node tests/notebook-historical-reference-http.mjs",
+    "node tests/web-account-mutation-isolation-contract.mjs"
+  ],
+  "recommendation": "Deploy server code changes through normal review after local acceptance, then measure authenticated staging routes and PostgreSQL plans. No database migration/configuration change was made or established as necessary.",
+  "fixtureRepairs": [
+    {
+      "test": "tests/web-account-mutation-isolation-contract.mjs",
+      "baseline": "Exact e650a1c69 app, test and private-workspace-state module reproduced the line 112 failure in a temporary isolated harness.",
+      "cause": "The fixture assumed rendering blocks all dispatch. Existing nonblocking rendering dispatched an A-owned projectSection mutation synchronously before the account switch; no later mutation or B write occurred.",
+      "repair": "Capture and assert owner A for pre-switch dispatches, then require exact unchanged calls, AbortError and unchanged replacement state after A-to-B and A-to-B-to-A. Existing deferred-response, stale-token, queue and account recovery checks remain and pass."
+    }
+  ],
+  "broaderGateLimitations": [
+    {
+      "command": "npm run check",
+      "blockingTest": "tests/research-web-overlap-verification-http-contract.mjs:93",
+      "baseline": "Exact e650a1c69 app/test and changed server/public dependencies in an isolated mirror reproduce same failure. All provider responses mocked; no paid calls.",
+      "actualPhases": [
+        "web_support",
+        "permitext_code_interpretation",
+        "permitext_code_interpretation"
+      ],
+      "expectedRejectedPhases": [
+        "web_support",
+        "permitext_code_interpretation",
+        "permitext_research_verification",
+        "permitext_code_interpretation",
+        "permitext_research_verification"
+      ],
+      "failureCode": "INVALID_RESEARCH_CITATION",
+      "interpretation": "Recorded replay fails citation-selection validation before semantic verification. This audit did not change routing or weaken the substantive gate. Full broad check is not claimed passing."
+    }
+  ]
+}

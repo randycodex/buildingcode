@@ -88,8 +88,9 @@ function harness(overrides = {}) {
 }
 const isAbort = (error) => error?.name === "AbortError";
 
-// Account change during local UI hydration: A's durable overlay remains in A,
-// while the operation never creates a request or touches B's current state.
+// Account change during local UI hydration: A's durable overlay remains in A.
+// Nonblocking rendering may allow an A-owned request before the switch, but
+// the obsolete operation cannot dispatch anything later or touch B's state.
 for (const roundTrip of [false, true]) {
   for (const [name, args, adapter, localField] of [
     ["persistProjectOrder", [[project], "synthetic-pane"], "transitionWorkspace", "localProjects"],
@@ -104,12 +105,17 @@ for (const roundTrip of [false, true]) {
     h.c.pushMutationBatch = async (mutations) => h.calls.push(mutations);
     const pending = h.c[name](...args);
     assert.ok(h.saves.at(-1)[localField].length, name + " saves A's work before waiting");
+    const dispatchedBeforeSwitch = clone(h.calls);
+    for (const mutation of h.calls.flat()) {
+      assert.equal(Object.values(mutation)[0]?.userID, A.userID,
+        name + " can only dispatch A's mutation before the account switch");
+    }
     h.switchTo();
     if (roundTrip) h.switchTo(A);
     const newState = clone(h.c.state);
     gate.resolve();
     await assert.rejects(pending, isAbort, name + " rejects an obsolete operation");
-    assert.equal(h.calls.length, 0, name + " must not issue a later mutation");
+    assert.deepEqual(clone(h.calls), dispatchedBeforeSwitch, name + " must not issue a later mutation");
     assert.deepEqual(clone(h.c.state), newState);
   }
 }

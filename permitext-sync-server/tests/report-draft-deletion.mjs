@@ -19,7 +19,7 @@ function harness({ confirmed = true, requestError = null, dirty = true } = {}) {
     history: [{ id: "export-a", draftID: "draft-a" }], identity: {}, projectID: "project-a",
     requestIdentity: "account-a", requestWorkspaceID: "workspace-a", activeWorkspaceID: "workspace-a",
     current: true, disposed: false, pendingDraftSave: null, generatingReport: false, deletingReport: false,
-    shell: { inert: false }, trigger: { disabled: false }, calls: [], confirmations: [], renders: 0,
+    shell: { inert: false }, panel: {}, trigger: { disabled: false, closest: () => null }, calls: [], confirmations: [], renders: 0,
     message: "", refreshes: 0, notebookMounts: new Map(),
     refreshProjectReportMembership: async () => {},
     isCurrentAccountRequest: () => c.current,

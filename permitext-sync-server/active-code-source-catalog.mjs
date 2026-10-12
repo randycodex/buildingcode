@@ -65,7 +65,11 @@ export function buildActiveCodeSourceOptions(metadata, canonicalEdition, prefixe
     if (!code || !jurisdiction || !codePrefix || prefixSet.has(codePrefix) || !category.name || !code.name) throw new Error("Code source category mapping is unavailable.");
     prefixSet.add(codePrefix);
     const identity = codeSourceIdentity({ canonicalEdition, jurisdictionID: jurisdiction.id, codeID: code.id, categoryID: category.id });
-    return Object.freeze({ ...identity, categoryLabel: category.name, editionLabel: code.name, codePrefix });
+    // The enacted package contains several laws. Its packaging/consolidation
+    // date must not replace the historical edition explicitly named by BC68.
+    const editionLabel = codePrefix === "BC68" && /^1968\s+BUILDING\s+CODE$/i.test(category.name.trim())
+      ? "1968 NYC Building Code" : code.name;
+    return Object.freeze({ ...identity, categoryLabel: category.name, editionLabel, codePrefix });
   });
 }
 

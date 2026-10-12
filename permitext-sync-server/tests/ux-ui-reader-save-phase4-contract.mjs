@@ -37,7 +37,7 @@ const searchResults = sourceBetween(
   "\nfunction appendSearchLoadMore"
 );
 const searchSaveControl = sourceBetween("function createSearchResultSaveButton(", "\nasync function renderSearch(");
-assert.match(searchResults, /createSearchResultSaveButton\(panel, detail\)/);
+assert.match(searchResults, /createSearchResultSaveButton\(panel, detail, \{/);
 assert.match(searchSaveControl, /saveButton\.className = "search-result-save"/);
 assert.match(searchSaveControl, /persistSectionBookmark\(detail, !shouldRemove/);
 assert.match(searchSaveControl, /showReaderSaveConfirmation\(panel, detail/);

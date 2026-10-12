@@ -1178,6 +1178,11 @@ export function createFileStoreAdapter() {
       const store = await this.read();
       return store.mutationsByUserID?.[userID] || [];
     },
+    async listFoundationMigrationMutations(userID) {
+      const store = await this.read();
+      return (store.mutationsByUserID?.[userID] || []).filter((mutation) =>
+        mutation.project || mutation.projectSection || mutation.workboard);
+    },
     async accountProfilesForUserIDs(userIDs) {
       const ids = [...new Set(userIDs.filter(Boolean))];
       if (!ids.length) return {};
@@ -1485,9 +1490,10 @@ export function createFileStoreAdapter() {
         : null;
       if (ids && ids.length === 0) return [];
       const idSet = ids ? new Set(ids) : null;
-      return (store.foundationArtifactsByUserID?.[userID] || [])
+      const artifacts = (store.foundationArtifactsByUserID?.[userID] || [])
         .filter((item) => !idSet || idSet.has(item.envelope?.id))
         .slice();
+      return options.notebookSummaryOnly ? artifacts.map(notebookListArtifact) : artifacts;
     },
     async saveFoundationArtifact(userID, artifact) {
       return this.withMutation((store) => {
@@ -3847,6 +3853,22 @@ async function createPostgresStoreAdapter() {
       `;
       return rows.map((row) => safeJSON(row.mutation, {}));
     },
+    async listFoundationMigrationMutations(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      const rows = await sql`
+        SELECT mutation FROM (
+          SELECT mutation, record_id FROM permitext_projects WHERE user_id = ${userID}
+          UNION ALL
+          SELECT mutation, record_id FROM permitext_project_items WHERE user_id = ${userID}
+          UNION ALL
+          SELECT mutation, record_id FROM permitext_user_content_records
+          WHERE user_id = ${userID} AND entity_kind = 'workboard'
+        ) AS foundation_content
+        ORDER BY record_id
+      `;
+      return rows.map((row) => safeJSON(row.mutation, {}));
+    },
     async accountProfilesForUserIDs(userIDs) {
       const ids = [...new Set(userIDs.filter(Boolean))];
       if (!ids.length) return {};
@@ -4537,6 +4559,16 @@ async function createPostgresStoreAdapter() {
         ? options.ids.map((value) => String(value || "").trim()).filter(Boolean)
         : null;
       if (ids && ids.length === 0) return [];
+      if (options.notebookSummaryOnly) {
+        const rows = await sql`
+          SELECT envelope,
+            payload - ARRAY['document', 'evidenceLinks', 'imageAssets', '_saveReceipt']::text[] AS payload
+          FROM permitext_foundation_artifacts
+          WHERE user_id = ${userID} AND (${ids === null} OR id = ANY(${ids || []}))
+          ORDER BY updated_at DESC
+        `;
+        return rows.map(row => ({ envelope: safeJSON(row.envelope, {}), payload: safeJSON(row.payload, {}) }));
+      }
       const rows = ids
         ? await sql`
             SELECT envelope, payload
@@ -13120,8 +13152,25 @@ async function organizationCapabilityAccess(userID) {
   };
 }
 
-async function ownedProjectTargetExists(userID, targetKind, targetID) {
+const projectArtifactTargetTypes = Object.freeze({
+  notebookCard: ["notebookCard"],
+  workboardPreview: ["workboardPreview"],
+  attachment: ["attachment"],
+  reportDraft: ["reportDraft"],
+  reportManifest: ["reportManifest"],
+  generatedReport: ["generatedReport"]
+});
+
+async function ownedProjectTargetExists(userID, targetKind, targetID, validationReads = null) {
   const normalizedTargetID = String(targetID || "").trim();
+  // This cache exists only for one reference validation, never for a session.
+  // Include the owner in the key so no caller can reuse another owner's data.
+  const read = (kind, loader) => {
+    if (!validationReads) return loader();
+    const key = JSON.stringify([userID, kind]);
+    if (!validationReads.has(key)) validationReads.set(key, Promise.resolve().then(loader));
+    return validationReads.get(key);
+  };
   if (targetKind === "canonicalSection") {
     try {
       // A saved reference is an explicit selection, including historical and
@@ -13132,7 +13181,7 @@ async function ownedProjectTargetExists(userID, targetKind, targetID) {
     }
   }
   if (targetKind === "selectedPassage") {
-    return (await listStoredResearchConversations(userID))
+    return (await read("conversations", () => listStoredResearchConversations(userID)))
       .some((conversation) => (conversation.sources || []).some((source) => source.id === normalizedTargetID));
   }
   if (targetKind === "researchConversation") {
@@ -13142,10 +13191,11 @@ async function ownedProjectTargetExists(userID, targetKind, targetID) {
     return (await listStoredResearchAnswers(userID, { ids: [normalizedTargetID], idsOnly: true })).some((answer) => answer.id === normalizedTargetID);
   }
   if (targetKind === "approvedEvidence") {
-    return (await listStoredResearchAnswers(userID))
+    return (await read("answers", () => listStoredResearchAnswers(userID)))
       .some((answer) => (answer.evidence || []).some((snapshot) => snapshot.id === normalizedTargetID));
   }
-  const mutations = await userContentMutations(userID);
+  const mutations = ["savedItem", "note", "workboard"].includes(targetKind)
+    ? await read("mutations", () => userContentMutations(userID)) : [];
   if (targetKind === "savedItem") {
     return mutations.some((mutation) => {
       const { kind, record } = mutationKindAndRecord(mutation);
@@ -13170,18 +13220,13 @@ async function ownedProjectTargetExists(userID, targetKind, targetID) {
         [record?.id, normalizedMutationRecordID(mutation)].includes(normalizedTargetID);
     });
   }
-  const artifact = (await listStoredFoundationArtifacts(userID))
+  if (!Object.hasOwn(projectArtifactTargetTypes, targetKind)) return false;
+  const artifact = (await read("artifacts", () => listStoredFoundationArtifacts(userID, {
+    ids: validationReads?.artifactIDs || [normalizedTargetID]
+  })))
     .find((item) => item.envelope?.id === normalizedTargetID && !item.envelope?.deletedAt);
   if (!artifact) return false;
-  const permittedTypes = {
-    notebookCard: ["notebookCard"],
-    workboardPreview: ["workboardPreview"],
-    attachment: ["attachment"],
-    reportDraft: ["reportDraft"],
-    reportManifest: ["reportManifest"],
-    generatedReport: ["generatedReport"]
-  };
-  return (permittedTypes[targetKind] || []).includes(artifact.envelope.type);
+  return projectArtifactTargetTypes[targetKind].includes(artifact.envelope.type);
 }
 
 function deterministicFoundationLinkID(userID, projectID, targetKind, targetID) {
@@ -13217,7 +13262,7 @@ async function migrateLegacyProjectFoundation(userID) {
   const checkpointName = `project-foundation-v${projectFoundationSchemaVersion}`;
   const existingCheckpoint = await storedMigrationCheckpoint(userID, checkpointName);
 
-  const mutations = await userContentMutations(userID);
+  const mutations = await (await storeAdapter()).listFoundationMigrationMutations(userID);
   const referenceProjectIDs = new Set(mutations
     .map((mutation) => mutationKindAndRecord(mutation))
     .filter(({ kind, record }) =>
@@ -13361,7 +13406,7 @@ async function projectFoundationStateForStorageOwner(
   options = {}
 ) {
   const checkpoint = await migrateLegacyProjectFoundation(storageOwnerUserID);
-  const allProjects = (await userContentMutations(storageOwnerUserID))
+  const allProjects = (await (await storeAdapter()).listOwnedProjectMutations(storageOwnerUserID))
     .map((mutation) => mutationKindAndRecord(mutation))
     .filter(({ kind, record }) =>
       kind === "project" &&
@@ -13473,6 +13518,11 @@ async function projectFoundationStateForStorageOwner(
   };
 }
 
+function notebookListArtifact(artifact) {
+  const { document, evidenceLinks, imageAssets, _saveReceipt, ...payload } = artifact.payload || {};
+  return { ...artifact, payload };
+}
+
 async function notebookCardSummariesForProject(storageOwnerUserID, projectID) {
   const links = await listStoredProjectLinks(storageOwnerUserID, {
     projectID,
@@ -13482,7 +13532,7 @@ async function notebookCardSummariesForProject(storageOwnerUserID, projectID) {
     links.filter((link) => !link.deletedAt).map((link) => link.targetID).filter(Boolean)
   ));
   if (linkedCardIDs.length === 0) return [];
-  return (await listStoredFoundationArtifacts(storageOwnerUserID, { ids: linkedCardIDs }))
+  return (await listStoredFoundationArtifacts(storageOwnerUserID, { ids: linkedCardIDs, notebookSummaryOnly: true }))
     .filter((artifact) =>
       artifact.envelope?.type === "notebookCard" &&
       !artifact.envelope?.deletedAt
@@ -15776,7 +15826,7 @@ async function ownedNotebookArtifact(userID, cardID, options = {}) {
 
 async function ownedNotebookImageAsset(userID, assetID, options = {}) {
   const normalizedAssetID = String(assetID || "").trim();
-  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+  return (await listStoredFoundationArtifacts(userID, { ids: [normalizedAssetID] })).find((artifact) =>
     artifact.envelope?.id === normalizedAssetID &&
     artifact.envelope?.type === "notebookImageAsset" &&
     (options.includeDeleted || !artifact.envelope?.deletedAt)
@@ -15785,7 +15835,7 @@ async function ownedNotebookImageAsset(userID, assetID, options = {}) {
 
 async function notebookArtifactWithIdentity(userID, artifactID) {
   const normalizedID = String(artifactID || "").trim();
-  return (await listStoredFoundationArtifacts(userID)).find(
+  return (await listStoredFoundationArtifacts(userID, { ids: [normalizedID] })).find(
     (artifact) => artifact.envelope?.id === normalizedID
   ) || null;
 }
@@ -15817,21 +15867,18 @@ async function notebookImageAccessibleFromProject(userID, projectID, assetID) {
   const asset = await ownedNotebookImageAsset(userID, assetID);
   if (!asset) return false;
   if (asset.payload?.projectID === projectID) return true;
-  const artifacts = await listStoredFoundationArtifacts(userID);
-  const referencingCardIDs = new Set(artifacts
+  const linkedCardIDs = Array.from(new Set((await listStoredProjectLinks(userID, {
+    projectID, targetKind: "notebookCard"
+  })).filter(link => !link.deletedAt).map(link => link.targetID)));
+  if (!linkedCardIDs.length) return false;
+  const artifacts = await listStoredFoundationArtifacts(userID, { ids: linkedCardIDs });
+  return artifacts
     .filter((artifact) =>
       artifact.envelope?.type === "notebookCard" &&
       !artifact.envelope?.deletedAt &&
       (artifact.payload?.imageAssets || []).includes(assetID)
     )
-    .map((artifact) => artifact.envelope.id));
-  if (!referencingCardIDs.size) return false;
-  return (await listStoredProjectLinks(userID)).some((link) =>
-    !link.deletedAt &&
-    link.projectID === projectID &&
-    link.targetKind === "notebookCard" &&
-    referencingCardIDs.has(link.targetID)
-  );
+    .some(artifact => linkedCardIDs.includes(artifact.envelope.id));
 }
 
 async function validateNotebookImageAssets(userID, projectID, imageAssets) {
@@ -15914,6 +15961,10 @@ async function validateNotebookReferences(userID, references, evidenceLinks = []
     throw new Error("Notebook cards are limited to 100 linked references.");
   }
   const embeddedPassageIDs = new Set((evidenceLinks || []).map((link) => link.id));
+  const validationReads = new Map();
+  validationReads.artifactIDs = Array.from(new Set(references
+    .filter(reference => Object.hasOwn(projectArtifactTargetTypes, reference.referenceKind))
+    .map(reference => String(reference.referenceID || "").trim())));
   for (const reference of references) {
     if (
       reference.referenceKind === "selectedPassage" &&
@@ -15922,7 +15973,8 @@ async function validateNotebookReferences(userID, references, evidenceLinks = []
     if (!await ownedProjectTargetExists(
       userID,
       reference.referenceKind,
-      reference.referenceID
+      reference.referenceID,
+      validationReads
     )) {
       throw new Error(`Notebook reference is unavailable: ${reference.label}`);
     }
@@ -15970,7 +16022,7 @@ async function handleNotebookCardGet(request, response) {
     return;
   }
   const projectIDs = (await listStoredProjectLinks(access.storageOwnerUserID, {
-    targetKind: "notebookCard"
+    targetKind: "notebookCard", targetIDs: [artifact.envelope.id]
   }))
     .filter((link) =>
       !link.deletedAt &&
@@ -16035,7 +16087,7 @@ async function handleNotebookCardSave(request, response) {
   const existing = await ownedNotebookArtifact(storageOwnerUserID, cardID, { includeDeleted: true });
   const replaySavedMutation = async (current) => {
     if (!receipt) return false;
-    const replay = notebookMutationReplay(current, await listStoredProjectLinks(storageOwnerUserID), receipt);
+    const replay = notebookMutationReplay(current, await listStoredProjectLinks(storageOwnerUserID, { projectID, targetKind: "notebookCard", targetIDs: [cardID] }), receipt);
     if (!replay) return false;
     sendJSON(response, 200, { card: notebookCardForClient(replay.artifact, [projectID]), link: replay.link, replayed: true });
     return true;
@@ -16045,7 +16097,7 @@ async function handleNotebookCardSave(request, response) {
     sendError(response, 404, "Notebook card not found.");
     return;
   }
-  const links = await listStoredProjectLinks(storageOwnerUserID);
+  const links = await listStoredProjectLinks(storageOwnerUserID, { projectID, targetKind: "notebookCard", targetIDs: [cardID] });
   const activeProjectLink = existing
     ? links.find((link) =>
         !link.deletedAt &&
@@ -16156,7 +16208,7 @@ async function handleNotebookCardSave(request, response) {
     if (error?.code === "NOTEBOOK_VERSION_CONFLICT") {
       const current = await ownedNotebookArtifact(storageOwnerUserID, cardID, { includeDeleted: true });
       if (await replaySavedMutation(current)) return;
-      const currentIsLinked = current && (await listStoredProjectLinks(storageOwnerUserID)).some((link) =>
+      const currentIsLinked = current && (await listStoredProjectLinks(storageOwnerUserID, { projectID, targetKind: "notebookCard", targetIDs: [cardID] })).some((link) =>
         !link.deletedAt && link.projectID === projectID && link.targetKind === "notebookCard" && link.targetID === cardID);
       sendJSON(response, 409, { error: error.message, code: error.code,
         ...(currentIsLinked ? { card: notebookCardForClient(current, [projectID]) } : {}) });
@@ -16399,14 +16451,16 @@ async function reportProjectAccess(context, response, permission) {
 
 async function linkedProjectArtifact(userID, projectID, targetKind, artifactType, artifactID, options = {}) {
   const normalizedArtifactID = String(artifactID || "").trim();
-  const linked = (await listStoredProjectLinks(userID)).some((link) =>
+  const linked = (await listStoredProjectLinks(userID, {
+    projectID, targetKind, targetIDs: [normalizedArtifactID]
+  })).some((link) =>
     !link.deletedAt &&
     link.projectID === projectID &&
     link.targetKind === targetKind &&
     link.targetID === normalizedArtifactID
   );
   if (!linked) return null;
-  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+  return (await listStoredFoundationArtifacts(userID, { ids: [normalizedArtifactID] })).find((artifact) =>
     artifact.envelope?.id === normalizedArtifactID &&
     artifact.envelope?.type === artifactType &&
     (options.includeDeleted || !artifact.envelope?.deletedAt)
@@ -16426,7 +16480,7 @@ async function reportDraftArtifact(userID, projectID, draftID, options = {}) {
 
 async function reportManifestArtifact(userID, manifestID) {
   const normalizedManifestID = String(manifestID || "").trim();
-  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+  return (await listStoredFoundationArtifacts(userID, { ids: [normalizedManifestID] })).find((artifact) =>
     artifact.envelope?.id === normalizedManifestID &&
     artifact.envelope?.type === "reportManifest" &&
     !artifact.envelope?.deletedAt
@@ -16472,8 +16526,8 @@ function latestContentMutationsByID(mutations) {
   return Array.from(latestByID.values());
 }
 
-async function currentProjectSectionRecords(userID, projectID) {
-  const mutations = latestContentMutationsByID(await userContentMutations(userID));
+async function currentProjectSectionRecords(userID, projectID, currentMutations = null) {
+  const mutations = currentMutations ?? latestContentMutationsByID(await userContentMutations(userID));
   const clearRecords = mutations
     .map((mutation) => mutationKindAndRecord(mutation))
     .filter(({ kind, record }) => kind === "codeVersionClear" && record)
@@ -16522,9 +16576,9 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
     });
   }
 
-  const currentProjectSections = await currentProjectSectionRecords(userID, projectID);
-  const { prepareSavedEvidenceItems, reportSavedSourceID, reportSavedSelection } = await import("./report-evidence.mjs");
   const mutations = latestContentMutationsByID(await userContentMutations(userID));
+  const currentProjectSections = await currentProjectSectionRecords(userID, projectID, mutations);
+  const { prepareSavedEvidenceItems, reportSavedSourceID, reportSavedSelection } = await import("./report-evidence.mjs");
   const notes = mutations.map(mutationKindAndRecord).filter(({ kind, record }) => kind === "annotation" && record?.noteBody !== undefined)
     .map(({ record }) => ({ ...record, codeVersion: canonicalCodeVersion(record.codeVersion) }));
   const savedItems = mutations.map(mutationKindAndRecord).filter(({ kind, record }) => kind === "savedItem" && record)
@@ -17097,7 +17151,7 @@ async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
       .map((item) => item.sourceID)
   );
   if (!requestedIDs.size) return new Map();
-  const artifacts = await listStoredFoundationArtifacts(userID);
+  const artifacts = await listStoredFoundationArtifacts(userID, { ids: [...requestedIDs] });
   const material = new Map();
   for (const artifact of artifacts) {
     if (

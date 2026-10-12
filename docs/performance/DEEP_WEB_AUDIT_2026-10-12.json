@@ -1,0 +1,675 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-12",
+  "scope": "Deep web and backend performance and UX audit with implementation; iOS app excluded",
+  "baselineCommit": "e650a1c69dafe4d7b7dd59983883f08099e245f9",
+  "branch": "codex/speed-ux-review",
+  "delivery": {
+    "localChanges": true,
+    "pushed": false,
+    "deployed": false,
+    "databaseMigrationRequired": false,
+    "note": "No schema change established as necessary. Deploy server and versioned web assets together; measure hosted query plans and p95 before deciding on further indexes."
+  },
+  "sourceSHA256": {
+    "active-code-source-catalog.mjs": "7c0fed19e7ad6c8a73472f32decf43887309440b0baf2547ac519ea3b67e3339",
+    "app.mjs": "3f9a3702ed86901f920570adbfee746cf8cfe870b322ed1758c5f42a0e57295b",
+    "public/app.js": "42c2c156ed83a20cb07239fb1dac418a27dc39fde796174d43d4b47b3968e0b2",
+    "public/index.html": "09efba6dca82f6f65816b5745866c9491bdeb8072d0863a3c4aa5048a9ee8f9e",
+    "public/offline-storage.js": "f43b39d291cc5f8b438838655e8c2e533cd069b6b69cc1d2ece8e34c59bdc90a",
+    "public/report-comparison.js": "8824fb7e64c66b1dc625c57c3a0dabc7a092235a9ff2db65c79f1f12ee7a5331",
+    "public/report-export-review.js": "ffc29806d59ee12a7dfaa397a2d119eeafc97155dd73e7d378944a48791210bc",
+    "public/report-pdf-preview.js": "6b1725c3af1b7435cea7260accb74971bc7c14636818b4cee2388c053cfe1f85",
+    "public/service-worker.js": "8bd45de7691062a50113453d389216b26d13ab066e5c5c641b6a30d8937086f1",
+    "public/styles.css": "34dfe287b5c22cac9433b9edea597009006d6ef1ed9f9be1476b3f9cb492053e"
+  },
+  "coverage": [
+    {
+      "area": "Startup, bundle, cache and offline shell",
+      "evidence": "Fresh isolated browser starts; actual bundled build; cache/header/offline generation and workspace restore contracts."
+    },
+    {
+      "area": "Saved Evidence",
+      "evidence": "500 saved memberships in one browser Project; 48 initial rows; Show more keyboard focus; full-project text search beyond first page; bulk selection scope; 1000/5000-row deterministic contracts."
+    },
+    {
+      "area": "Search and Reader",
+      "evidence": "Same all-source means of egress query, 75 results, exact 2022 BC107.5 link and Chapter10 navigation before/after; real access gate and edition/project/block identity tests; removal/cancellation/progressive recovery."
+    },
+    {
+      "area": "Notebook",
+      "evidence": "60-note list and long 100-paragraph Note with six tiny synthetic images; small real browser edit with dropped application transport; restored server readback; selection, refresh, first-ID, local draft failures and pending-save contracts."
+    },
+    {
+      "area": "Report",
+      "evidence": "100-block Report, outline navigation to block100 and three-digit number layout; six-page PDF export/preview in local synthetic browser; autosave, export integrity, retry, worker cleanup and versions contracts."
+    },
+    {
+      "area": "Projects",
+      "evidence": "Actual delayed property lookup canceled in browser, no created Project afterward; account/workspace/disposal/duplicate-submission failure contracts; existing Project management and facts durability."
+    },
+    {
+      "area": "Research",
+      "evidence": "Existing synthetic saved history restored without model generation; history pagination/scoped reads and recovery contracts. Full npm check replay failure documented separately."
+    },
+    {
+      "area": "Account, privacy and workspace UX",
+      "evidence": "Pending/private presentation, account switch mutation isolation, keyboard divider/menu and layout contracts; populated multi-pane browser at1600 and1280 CSS pixels."
+    },
+    {
+      "area": "Backend",
+      "evidence": "Actual extracted helpers, HTTP handlers and both adapter branches with synthetic workloads; auth, owner, deletion, concurrency, retry and Report identity checks. See backend audit."
+    }
+  ],
+  "implemented": [
+    "Bound Project Saved body hydration/rendering to48 rows with progressive expansion and cancellable complete search; preserve legacy canonical ordering, merged annotations, full bulk scope and keyboard focus.",
+    "Build Saved sort metadata and numeric collator once per sort.",
+    "Share initial private saved-state snapshots per Reader section and Search result append; avoid duplicate eager gate initialization; keep later gate/write/page updates fresh.",
+    "Immediately cancel and dispose removed Reader work while retaining intentionally hidden workflow panes.",
+    "Guard Notebook card selection, same-card refresh, New Note creation, first-server-ID acknowledgments and storage failures so stale asynchronous work cannot overwrite edits or another account/workspace.",
+    "Make Project creation cancelable during property lookup with guarded single submission and recoverable inline errors.",
+    "Destroy failed PDF loads/renders/observers on error or disposal; keep three-digit Report outline numbers on one line.",
+    "Scope exact backend artifact/project-link reads; batch reference reads within one owner-scoped request; project Notebook list payloads before returning database rows; narrow foundation migration mutations; reuse Report source mutation snapshot.",
+    "Correct historical1968 Building Code source title while preserving canonical identity and code text.",
+    "Version web shell and lazy preview/export/comparison modules coherently; keep audit telemetry entirely opt-in in loopback fixtures."
+  ],
+  "browserComparison": {
+    "method": "Single controlled local in-app browser runs, synthetic accounts and current backend, immutable baseline/current app entry.1600x900 CSS pixels.1000 saved records,12 Projects,500 saved memberships in selected Project,60 Notes,100 Report blocks. No remote/model calls. Not hosted p95, a device benchmark or a statistically repeated speed guarantee.",
+    "baselineEntrySHA256": "cd0289c827a1956a341aa0da0158e7a9792204745b33d6f243277471a5e5b460",
+    "currentEntrySHA256": "42c2c156ed83a20cb07239fb1dac418a27dc39fde796174d43d4b47b3968e0b2",
+    "projectEvidence": {
+      "totalSavedMemberships": 500,
+      "beforeInitialRows": 500,
+      "afterInitialRows": 48,
+      "beforeDOMElements": 8652,
+      "afterDOMElements": 998,
+      "beforeLongestObservedInitialTaskMs": 1028,
+      "afterLongestObservedInitialTaskMs": 54,
+      "firstRowEvidence": "Baseline250ms sample had no Saved rows,1859ms sample had500. Candidate252ms sample had48. These are coarse observation times, not exact first paint."
+    },
+    "search": {
+      "query": "means of egress",
+      "resultCount": 75,
+      "before": {
+        "calls": 316,
+        "synchronousMilliseconds": 1366.9,
+        "longestObservedTaskMs": 1915
+      },
+      "after": {
+        "calls": 15,
+        "synchronousMilliseconds": 71.5,
+        "longestObservedTaskMs": 162
+      }
+    },
+    "chapterReader": {
+      "target": "Building Code2022 Chapter10 Means of Egress",
+      "before": {
+        "calls": 696,
+        "synchronousMilliseconds": 3005.1,
+        "longestObservedTaskMs": 3520
+      },
+      "after": {
+        "calls": 17,
+        "synchronousMilliseconds": 81.1,
+        "longestObservedTaskMs": 173
+      }
+    },
+    "samples": {
+      "baselineSaved": {
+        "run": "ffce1980-7ac6-4db9-aeee-f7e035e93140",
+        "sequence": 3,
+        "trigger": "click",
+        "eventAt": 12352.899999976158,
+        "at": 14940.200000047684,
+        "viewport": {
+          "width": 1600,
+          "height": 900
+        },
+        "stats": {
+          "summarizeMutations": {
+            "count": 3,
+            "totalMs": 17.99999988079071,
+            "maxMs": 9.5
+          },
+          "currentContentSummary": {
+            "count": 21,
+            "totalMs": 113.40000033378601,
+            "maxMs": 8.100000023841858
+          },
+          "appendPaneSequence": {
+            "count": 7,
+            "totalMs": 30.00000023841858,
+            "maxMs": 7.300000071525574
+          },
+          "consolidatedSavedAnnotations": {
+            "count": 2,
+            "totalMs": 0.10000002384185791,
+            "maxMs": 0.10000002384185791
+          }
+        },
+        "dom": {
+          "all": 8652,
+          "panes": 0,
+          "saved": 500,
+          "notes": 0,
+          "readerSections": 0,
+          "searchInputs": 0,
+          "loading": 0
+        },
+        "longTasksDuringAction": [
+          {
+            "name": "self",
+            "start": 12418.100000023842,
+            "duration": 57
+          },
+          {
+            "name": "self",
+            "start": 13105.299999952316,
+            "duration": 50
+          },
+          {
+            "name": "self",
+            "start": 13157.100000023842,
+            "duration": 1028
+          }
+        ]
+      },
+      "currentSaved": {
+        "run": "445d3afd-1304-4897-9030-f270b32c7a24",
+        "sequence": 3,
+        "trigger": "click",
+        "eventAt": 13242.700000047684,
+        "at": 14744.399999976158,
+        "viewport": {
+          "width": 1600,
+          "height": 900
+        },
+        "stats": {
+          "summarizeMutations": {
+            "count": 3,
+            "totalMs": 16.100000023841858,
+            "maxMs": 9.5
+          },
+          "currentContentSummary": {
+            "count": 21,
+            "totalMs": 99.89999997615814,
+            "maxMs": 5.799999952316284
+          },
+          "appendPaneSequence": {
+            "count": 7,
+            "totalMs": 29.600000143051147,
+            "maxMs": 8.100000023841858
+          },
+          "consolidatedSavedAnnotations": {
+            "count": 2,
+            "totalMs": 0.10000002384185791,
+            "maxMs": 0.10000002384185791
+          }
+        },
+        "dom": {
+          "all": 998,
+          "panes": 0,
+          "saved": 48,
+          "notes": 0,
+          "readerSections": 0,
+          "searchInputs": 0,
+          "loading": 0
+        },
+        "longTasksDuringAction": [
+          {
+            "name": "self",
+            "start": 13302.799999952316,
+            "duration": 54
+          }
+        ]
+      },
+      "baselineSearch": {
+        "run": "ffce1980-7ac6-4db9-aeee-f7e035e93140",
+        "sequence": 6,
+        "trigger": "input",
+        "eventAt": 76820.89999997616,
+        "at": 81823.29999995232,
+        "viewport": {
+          "width": 1600,
+          "height": 900
+        },
+        "stats": {
+          "summarizeMutations": {
+            "count": 5,
+            "totalMs": 29.899999856948853,
+            "maxMs": 9.5
+          },
+          "currentContentSummary": {
+            "count": 346,
+            "totalMs": 1522.6000008583069,
+            "maxMs": 14.300000071525574
+          },
+          "appendPaneSequence": {
+            "count": 10,
+            "totalMs": 236.5000001192093,
+            "maxMs": 161.79999995231628
+          },
+          "consolidatedSavedAnnotations": {
+            "count": 3,
+            "totalMs": 0.10000002384185791,
+            "maxMs": 0.10000002384185791
+          },
+          "renderSearchResults": {
+            "count": 3,
+            "totalMs": 1.100000023841858,
+            "maxMs": 0.3999999761581421
+          }
+        },
+        "dom": {
+          "all": 9877,
+          "panes": 1,
+          "saved": 500,
+          "notes": 0,
+          "readerSections": 0,
+          "searchInputs": 1,
+          "loading": 0
+        },
+        "longTasksDuringAction": [
+          {
+            "name": "self",
+            "start": 77454.20000004768,
+            "duration": 1915
+          }
+        ]
+      },
+      "currentSearch": {
+        "run": "445d3afd-1304-4897-9030-f270b32c7a24",
+        "sequence": 6,
+        "trigger": "input",
+        "eventAt": 25867,
+        "at": 30868.200000047684,
+        "viewport": {
+          "width": 1600,
+          "height": 900
+        },
+        "stats": {
+          "summarizeMutations": {
+            "count": 5,
+            "totalMs": 29,
+            "maxMs": 9.5
+          },
+          "currentContentSummary": {
+            "count": 39,
+            "totalMs": 188.0000001192093,
+            "maxMs": 6.200000047683716
+          },
+          "appendPaneSequence": {
+            "count": 10,
+            "totalMs": 59.60000014305115,
+            "maxMs": 20.5
+          },
+          "consolidatedSavedAnnotations": {
+            "count": 3,
+            "totalMs": 0.10000002384185791,
+            "maxMs": 0.10000002384185791
+          },
+          "renderSearchResults": {
+            "count": 3,
+            "totalMs": 1.1999999284744263,
+            "maxMs": 0.5
+          }
+        },
+        "dom": {
+          "all": 2223,
+          "panes": 1,
+          "saved": 48,
+          "notes": 0,
+          "readerSections": 0,
+          "searchInputs": 1,
+          "loading": 0
+        },
+        "longTasksDuringAction": [
+          {
+            "name": "self",
+            "start": 26510.100000023842,
+            "duration": 72
+          },
+          {
+            "name": "self",
+            "start": 27118.799999952316,
+            "duration": 162
+          }
+        ]
+      },
+      "baselineChapter": {
+        "run": "ffce1980-7ac6-4db9-aeee-f7e035e93140",
+        "sequence": 10,
+        "trigger": "click",
+        "eventAt": 124154.39999997616,
+        "at": 129265.89999997616,
+        "viewport": {
+          "width": 1600,
+          "height": 900
+        },
+        "stats": {
+          "summarizeMutations": {
+            "count": 9,
+            "totalMs": 53.99999976158142,
+            "maxMs": 9.5
+          },
+          "currentContentSummary": {
+            "count": 1189,
+            "totalMs": 5185.300000309944,
+            "maxMs": 14.300000071525574
+          },
+          "appendPaneSequence": {
+            "count": 12,
+            "totalMs": 266.60000026226044,
+            "maxMs": 161.79999995231628
+          },
+          "consolidatedSavedAnnotations": {
+            "count": 4,
+            "totalMs": 0.20000004768371582,
+            "maxMs": 0.10000002384185791
+          },
+          "renderSearchResults": {
+            "count": 3,
+            "totalMs": 1.100000023841858,
+            "maxMs": 0.3999999761581421
+          },
+          "renderSectionContent": {
+            "count": 2,
+            "totalMs": 0.2999999523162842,
+            "maxMs": 0.19999992847442627
+          }
+        },
+        "dom": {
+          "all": 13222,
+          "panes": 2,
+          "saved": 500,
+          "notes": 0,
+          "readerSections": 0,
+          "searchInputs": 1,
+          "loading": 0
+        },
+        "longTasksDuringAction": [
+          {
+            "name": "self",
+            "start": 124389.60000002384,
+            "duration": 402
+          },
+          {
+            "name": "self",
+            "start": 124859.10000002384,
+            "duration": 3520
+          },
+          {
+            "name": "self",
+            "start": 128777.39999997616,
+            "duration": 69
+          }
+        ]
+      },
+      "currentChapter": {
+        "run": "445d3afd-1304-4897-9030-f270b32c7a24",
+        "sequence": 10,
+        "trigger": "click",
+        "eventAt": 57710.700000047684,
+        "at": 62712.89999997616,
+        "viewport": {
+          "width": 1600,
+          "height": 900
+        },
+        "stats": {
+          "summarizeMutations": {
+            "count": 7,
+            "totalMs": 43.700000047683716,
+            "maxMs": 9.5
+          },
+          "currentContentSummary": {
+            "count": 64,
+            "totalMs": 312.8000000715256,
+            "maxMs": 7.699999928474426
+          },
+          "appendPaneSequence": {
+            "count": 11,
+            "totalMs": 67.30000019073486,
+            "maxMs": 20.5
+          },
+          "consolidatedSavedAnnotations": {
+            "count": 3,
+            "totalMs": 0.10000002384185791,
+            "maxMs": 0.10000002384185791
+          },
+          "renderSearchResults": {
+            "count": 3,
+            "totalMs": 1.1999999284744263,
+            "maxMs": 0.5
+          },
+          "renderSectionContent": {
+            "count": 2,
+            "totalMs": 0.6000001430511475,
+            "maxMs": 0.40000009536743164
+          }
+        },
+        "dom": {
+          "all": 5572,
+          "panes": 2,
+          "saved": 48,
+          "notes": 0,
+          "readerSections": 17,
+          "searchInputs": 1,
+          "loading": 0
+        },
+        "longTasksDuringAction": [
+          {
+            "name": "self",
+            "start": 57905.10000002384,
+            "duration": 83
+          },
+          {
+            "name": "self",
+            "start": 58020.5,
+            "duration": 173
+          }
+        ]
+      }
+    },
+    "limits": [
+      "Function attribution measures synchronous work only; nested function timings overlap and must not be summed.",
+      "Accessibility/DOM collection can perturb main-thread timing. Unrelated10-second inspection-associated tasks were not attributed to application actions.",
+      "Earlier baseline observer used a stale Reader selector, so baseline readerSections is unavailable rather than truly zero. Current observer records17 sections.",
+      "Final complete app snapshot matches working app SHA. Earlier8806 browser focus/Report pass lacks only final New Note error handling and Search optimization; those have separate final-source executable coverage.",
+      "Images in these fresh deep-audit browser fixtures are tiny synthetic placeholders; no realistic-photo-decode gain is claimed."
+    ]
+  },
+  "recoveryEvidence": {
+    "projectCancel": "Delayed local property lookup10s; Save disabled and Cancel enabled; canceled before completion; original2-project menu unchanged after completion. Failure injected locally prevents external lookup.",
+    "offlineNote": "Local transport dropped GET/POST requests. Edited Synthetic Note2 retained exact text and showed Offline1pending. Restored transport, reopened same Note through UI; canonical readback version2 contained exact edit and pending indicator cleared. This is transport-loss recovery with explicit reopen, not automatic browser online-event or airplane-mode evidence.",
+    "noteReadback": {
+      "version": 2,
+      "text": "Synthetic offline recovery audit 2026-10-12. This disposable note verifies retained edits."
+    },
+    "keyboardExpansion": "Enter on Show more moved focus to first newly exposed5.21 paragraph; independent regression covers final collapsed-page fallback and changed query/focus."
+  },
+  "build": {
+    "command": "buildWorkspaceEntry(public, temporary output directory)",
+    "sourceBytes": 2065743,
+    "bundleBytes": 1428696,
+    "gzipBytes": 366207,
+    "eagerRequests": 1,
+    "bundledModules": 57,
+    "result": "passed"
+  },
+  "validation": {
+    "distinctPassingTargetedWebBackendSuites": 96,
+    "passedSuites": [
+      "tests/account-private-assets-http.mjs",
+      "tests/account-profile-client-contract.mjs",
+      "tests/account-screen-contract.mjs",
+      "tests/active-code-source-catalog-contract.mjs",
+      "tests/active-source-dialog-contract.mjs",
+      "tests/artifact-revision-checkpoint.mjs",
+      "tests/authenticated-read-adapter-contract.mjs",
+      "tests/authenticated-read-scaling-contract.mjs",
+      "tests/chapter-opening-fast-path-contract.mjs",
+      "tests/completed-search-coordinator-contract.mjs",
+      "tests/evidence-folders-contract.mjs",
+      "tests/file-research-usage-concurrency-contract.mjs",
+      "tests/linked-column-placement-contract.mjs",
+      "tests/notebook-card-selection-race.mjs",
+      "tests/notebook-contract.mjs",
+      "tests/notebook-direct-handoff-contract.mjs",
+      "tests/notebook-editing-position.mjs",
+      "tests/notebook-historical-reference-http.mjs",
+      "tests/notebook-note-menu.mjs",
+      "tests/notebook-reference-availability-contract.mjs",
+      "tests/notebook-return-card-contract.mjs",
+      "tests/notebook-return-scroll-contract.mjs",
+      "tests/offline-notebook-durability-contract.mjs",
+      "tests/offline-shell-coherence.mjs",
+      "tests/project-bulk-assignment-contract.mjs",
+      "tests/project-checkpoint-scoped-read.mjs",
+      "tests/project-create-sheet-race.mjs",
+      "tests/project-foundation-migration-steady-state.mjs",
+      "tests/project-information-durability-contract.mjs",
+      "tests/project-manager-contract.mjs",
+      "tests/project-required-workspace-contract.mjs",
+      "tests/project-save-policy-contract.mjs",
+      "tests/project-trash-confirmation.mjs",
+      "tests/reader-add-critical-path-contract.mjs",
+      "tests/reader-bookmark-render-performance-contract.mjs",
+      "tests/reader-chapter-extent-contract.mjs",
+      "tests/reader-navigation-menu-contract.mjs",
+      "tests/reader-navigation-race-contract.mjs",
+      "tests/reader-progressive-revision-recovery-contract.mjs",
+      "tests/reader-public-presentation-contract.mjs",
+      "tests/reader-removal-cleanup-contract.mjs",
+      "tests/reader-scroll-continuity-contract.mjs",
+      "tests/reader-search-client-contract.mjs",
+      "tests/reader-search-recovery-contract.mjs",
+      "tests/reader-target-ready-contract.mjs",
+      "tests/report-autosave.mjs",
+      "tests/report-comment-presentation.mjs",
+      "tests/report-comment-refresh.mjs",
+      "tests/report-comparison.mjs",
+      "tests/report-draft-deletion.mjs",
+      "tests/report-evidence-export-contract.mjs",
+      "tests/report-evidence-export-http.mjs",
+      "tests/report-export-review-contract.mjs",
+      "tests/report-hydration-failure-contract.mjs",
+      "tests/report-library-contract.mjs",
+      "tests/report-outline.mjs",
+      "tests/report-pdf-preview.mjs",
+      "tests/report-project-query-scope.mjs",
+      "tests/report-save-continuity.mjs",
+      "tests/report-screen-contract.mjs",
+      "tests/report-version-deletion.mjs",
+      "tests/research-client-context-recovery-contract.mjs",
+      "tests/research-history-pagination.mjs",
+      "tests/research-notebook-concurrency-http.mjs",
+      "tests/research-project-report-handoff-http.mjs",
+      "tests/research-reference-bounded-contract.mjs",
+      "tests/research-refresh-performance.mjs",
+      "tests/saved-annotation-consolidation-performance-contract.mjs",
+      "tests/saved-annotation-render-performance-contract.mjs",
+      "tests/saved-evidence-identity-contract.mjs",
+      "tests/saved-initial-sync-reuse-contract.mjs",
+      "tests/saved-project-pagination-performance.mjs",
+      "tests/saved-sort-performance.mjs",
+      "tests/scoped-sync-research-reads.mjs",
+      "tests/search-active-scope-ui-contract.mjs",
+      "tests/search-bookmark-render-performance-contract.mjs",
+      "tests/search-group-expansion.mjs",
+      "tests/search-group-pagination-client.mjs",
+      "tests/search-position-state.mjs",
+      "tests/search-private-presentation-contract.mjs",
+      "tests/search-reader-reuse-contract.mjs",
+      "tests/search-request-cancellation-contract.mjs",
+      "tests/startup-critical-path-contract.mjs",
+      "tests/web-account-isolation-contract.mjs",
+      "tests/web-account-mutation-isolation-contract.mjs",
+      "tests/web-audit-fixture-contract.mjs",
+      "tests/web-notebook-durability-contract.mjs",
+      "tests/web-research-recovery-contract.mjs",
+      "tests/web-shell-cache-contract.mjs",
+      "tests/workflow-navigation-race-contract.mjs",
+      "tests/workflow-views-contract.mjs",
+      "tests/workspace-access-subscription-lifecycle-contract.mjs",
+      "tests/workspace-bundle-contract.mjs",
+      "tests/workspace-divider-keyboard.mjs",
+      "tests/workspace-pane-orchestration-contract.mjs",
+      "tests/workspace-startup-restore-contract.mjs"
+    ],
+    "syntaxAndDiffChecks": "passed",
+    "independentReview": "Backend and frontend agents cross-reviewed current Search, Reader, Notebook and Saved changes; no remaining actionable finding.",
+    "broadGate": {
+      "command": "npm run check",
+      "result": "failed",
+      "location": "tests/research-web-overlap-verification-http-contract.mjs:93",
+      "baselineReproduction": "Exact e650a1c69 reproduces identical missing verification phases; fixture fails citation validation before verifier. No substantive model routing or assertion weakened."
+    },
+    "otherExistingGateLimitations": [
+      {
+        "test": "tests/reader-chapter-extent-contract.mjs",
+        "evidence": "Exact e650 original app/test/helper bytes fail before changes: mock panel lacks classList.contains used by existing workflow handling. Added mock only; all original behavioral assertions retained."
+      },
+      {
+        "test": "tests/reader-target-ready-contract.mjs",
+        "evidence": "Exact e650 original app/test bytes fail before changes: mock lacks currentColumnWorkflowView. Added Research view mock only; readiness, source decline, stale workspace and linked detail behavior assertions retained."
+      },
+      {
+        "test": "tests/saved-annotation-render-performance-contract.mjs",
+        "evidence": "New evidence-key data attribute required actual savedEvidenceKey helper and DOM dataset in fake row; added dependencies, preserving annotation identity/freshness assertions."
+      },
+      {
+        "test": "tests/project-save-policy-contract.mjs",
+        "evidence": "Included new actual workspaceSavedEvidenceKeys helper dependency."
+      },
+      {
+        "test": "tests/project-bulk-assignment-contract.mjs",
+        "evidence": "Added code source catalog fixture used by one-per-sort index."
+      },
+      {
+        "test": "tests/evidence-folders-contract.mjs",
+        "evidence": "Updated source-shape assertions for bounded Project hydration and shared Reader snapshot, and sentinel batch expected count; identity/query behavior retained."
+      },
+      {
+        "test": "tests/ux-ui-reader-save-phase4-contract.mjs",
+        "evidence": "Updated Search save-control source assertion for the added initial-state options. Full legacy contract independently fails on exact e650 app/styles/test bytes at line59, requiring outdated Source Detail action ordering. Unrelated UI assertions remain unchanged; this existing failing suite is excluded from35 passing tests."
+      }
+    ],
+    "countNote": "Distinct script names, not summed overlapping agent totals. Excludes failing legacy/native fixtures and baseline comparison invocations.",
+    "visualLimits": "Project busy/cancel and retained editor states were rendered; forced Project persistence-error appearance was reviewed in CSS and actual-handler tests, not separately captured in browser."
+  },
+  "remaining": [
+    {
+      "priority": "next deployment",
+      "item": "Ship server and versioned client together; collect authenticated hosted query plans and p50/p95 for real accounts. No production speed claim or database migration is established by this local audit."
+    },
+    {
+      "priority": "next measured backend increment",
+      "item": "Canonical Saved sorting metadata and batched exact-ID preview/body retrieval can further reduce cold-body request fanout and legacy upfront hydration; preserve exact source identity and full-project search."
+    },
+    {
+      "priority": "staging profile",
+      "item": "Foundation retains legacy link/answer inventories; Report draft/history lists and selected-passage/evidence ownership still include broad reads. File store still parses complete JSON. Consider narrower indexes/projections only after hosted plans."
+    },
+    {
+      "priority": "bundle follow-up",
+      "item": "Initial workspace bundle remains~366KB gzip; further lazy splitting is a separate measured change. Paid AI response latency, hosted database/network latency and realistic image decoding were not benchmarked in this pass."
+    },
+    {
+      "priority": "release gate",
+      "item": "Repair/replay pre-existing Research overlap fixture independently before claiming full npm check green."
+    }
+  ],
+  "details": [
+    "AUTHENTICATED_BACKEND_AUDIT_2026-10-12.json",
+    "WEB_FRONTEND_AUDIT_2026-10-12.json",
+    "WEB_UX_AUDIT_2026-10-12.json"
+  ],
+  "screenshots": [
+    "deep-search-reader.jpg",
+    "deep-report-outline.jpg",
+    "deep-notebook-offline.jpg",
+    "deep-notebook-recovered.jpg"
+  ],
+  "screenshotsDirectory": "/Users/randy/.codex/visualizations/2026/10/12/01a13140-f35c-7311-b939-da6a97fc6d7b",
+  "scopeBoundary": "No iOS app changes or device testing. A legacy test with a broad web-like name accidentally invoked a Swift fixture; stopped scope expansion, left untouched, excluded from web pass counts. No push, merge, deployment, real-account writes or paid model calls."
+}

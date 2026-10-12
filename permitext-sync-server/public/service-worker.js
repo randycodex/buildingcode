@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v1522";
+const shellCacheName = "permitext-pro-shell-v1523";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -16,8 +16,8 @@ const shellURLs = [
   "/web/reader-search-match.js?v=20260923-chapter-search-v1",
   "/web/report-autosave.js?v=1",
   "/web/report-outline.js?v=20261011-outline-v11",
-  "/web/report-export-review.js?v=20261012-report-export-v12",
-  "/web/report-comparison.js?v=20261012-comparison-v19",
+  "/web/report-export-review.js?v=20261012-report-export-v13",
+  "/web/report-comparison.js?v=20261012-comparison-v20",
   "/web/workspace-resume.js?v=20261012-refresh-v1",
   "/web/reader-navigation-tree.js?v=20261010-contents-v1",
   "/web/reader-chapter-extent.js?v=20261010-chapter-extent-v2",
@@ -40,18 +40,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261012-speed-ux-v932",
+  "/web/styles.css?v=20261012-deep-web-v933",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261012-speed-ux-v932",
+  "/web/app.js?v=20261012-deep-web-v933",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261012-speed-ux-v932",
+  "/web/offline-storage.js?v=20261012-deep-web-v933",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20261010-project-information-v13",
@@ -73,7 +73,7 @@ const shellURLs = [
   "/web/report-screen.js?v=20261011-shared-shell-v6",
   "/web/report-library.js?v=20261012-sidebar-width-v8",
   "/web/notebook-note-menu.js?v=20261012-note-menu-v3",
-  "/web/report-pdf-preview.js?v=20261011-report-preview-v3",
+  "/web/report-pdf-preview.js?v=20261012-report-preview-v4",
   "/web/pdf-preview-assets/pdf.min.js",
   "/web/pdf-preview-assets/pdf.worker.min.js"
 ];

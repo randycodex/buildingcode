@@ -43,7 +43,7 @@ const events=[];
 const activationContext=vm.createContext({projectIdentity:p=>p,hasCapability:()=>true,projectDetailMatches:()=>true,
  workspaceProject:()=>({}),closeSharedWorkspaceViews:()=>{},projectDetailKey:()=> 'p',
  reportScreen:{projectID:'p',isCurrent:()=>true,open:async()=>events.push('open')},pendingReportDraftByProject:new Map(),
- syncProjectToolButtonStates:()=>{},reportDraftMounts:new Map([['p',{refreshSources:async()=>events.push('refresh')}]] )});
+ syncProjectToolButtonStates:()=>{},updateWorkspaceLayoutControls:()=>{},reportDraftMounts:new Map([['p',{refreshSources:async()=>events.push('refresh')}]] )});
 vm.runInContext(activation,activationContext);
 assert.equal(await activationContext.openProjectReportDraft({}),true);
 assert.deepEqual(events,['open','refresh'],'Reopening a retained Report requests current source comments');

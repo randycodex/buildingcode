@@ -4,7 +4,7 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v19";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261012-refresh-v1";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
@@ -113,7 +113,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-speed-ux-v932";
+} from "./offline-storage.js?v=20261012-deep-web-v933";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -13705,11 +13705,15 @@ async function updateProjectFolder(project, details = {}) {
   return true;
 }
 
-function isSectionSaved(section, codeVersion = "") {
-  const project = workspaceProject();
-  if (project) return (currentContentSummary().projectSections || []).some((item) =>
-    savedEvidenceKey(item) === savedEvidenceKey(section, codeVersion) && projectSectionBelongsToProject(item, project));
-  return false;
+function workspaceSavedEvidenceKeys(summary = currentContentSummary()) {
+  const project = workspaceProject(summary.projects || []);
+  return new Set(project ? (summary.projectSections || [])
+    .filter((item) => projectSectionBelongsToProject(item, project))
+    .map((item) => savedEvidenceKey(item)) : []);
+}
+
+function isSectionSaved(section, codeVersion = "", savedKeys = null) {
+  return (savedKeys || workspaceSavedEvidenceKeys()).has(savedEvidenceKey(section, codeVersion));
 }
 
 function savedSectionRecord(section, codeVersion = "") {
@@ -15374,14 +15378,18 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
   const blocks = annotatedBlocksForSection(section);
-  const savedWholeSectionRecord = readerPrivateContentAllowed(panel) && isSectionSaved({
+  // This render is synchronous. Share one fresh snapshot across its controls,
+  // without retaining private state for later access-gate or bookmark updates.
+  const privateContentAllowed = readerPrivateContentAllowed(panel);
+  const savedKeys = privateContentAllowed ? workspaceSavedEvidenceKeys() : null;
+  const savedWholeSectionRecord = privateContentAllowed && isSectionSaved({
     sectionID: section.id,
     codeVersion: reader.codeVersion,
     blockID: ""
-  });
+  }, "", savedKeys);
   const savedSection = Boolean(savedWholeSectionRecord);
   const savedMarker = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
-    showBookmark: savedSection, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
+    showBookmark: savedSection, bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
   }).querySelector('.inline-bookmark-toggle');
   savedMarker.classList.add('reader-section-saved-marker');
   savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Evidence' : 'Save section');
@@ -15391,13 +15399,13 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
 
   blocks.forEach((block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
-    const savedBlockRecord = readerPrivateContentAllowed(panel) && isSectionSaved({
+    const savedBlockRecord = privateContentAllowed && isSectionSaved({
       sectionID: target.sectionID,
       codeVersion: target.codeVersion,
       blockID: target.blockID
-    });
+    }, "", savedKeys);
     sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
-      showBookmark: Boolean(savedBlockRecord), panel, accessGate: panel.__workspaceAccessGate
+      showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate
     }));
   });
   linkInlineCodeReferences(sectionWrapper, panel, reader);
@@ -15447,6 +15455,17 @@ function stopReaderProgressiveHydration(content) {
     delete content._readerProgressiveCleanup;
     cancelReaderScrollRestore(content);
   }
+}
+
+function cancelReaderPanelRequests(panel) {
+  panel._readerNavigationAbort?.abort();
+  cancelReaderInternalSearch(panel);
+  const token = crypto.randomUUID();
+  panel.dataset.readerNavigationToken = token;
+  panel.dataset.readerRenderToken = token;
+  panel.dataset.readerSearchToken = token;
+  stopReaderProgressiveHydration(panel.querySelector(".reader-content"));
+  disposeWorkspaceNodeAccess(panel);
 }
 
 async function progressivelyRenderReaderChapter(
@@ -16067,7 +16086,8 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     researchButton.title = "Start research or add this passage to an open conversation";
     researchButton.disabled = false;
   };
-  const updatePrivateControls = () => {
+  let subscribingToAccess = true;
+  const updatePrivateControls = (initialRender = false) => {
     const permitted = allowed();
     noteButton.hidden = !permitted || !hasCapability("notebook");
     noteButton.disabled = !permitted;
@@ -16076,7 +16096,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     researchButton.hidden = !permitted;
     researchButton.disabled = !permitted;
     if (!permitted) return;
-    const saved = gate ? Boolean(isSectionSaved({
+    const saved = gate && !(options.bookmarkStateResolved && (initialRender === true || subscribingToAccess)) ? Boolean(isSectionSaved({
       sectionID: target.sectionID || section.id,
       codeVersion: target.codeVersion,
       blockID: target.blockID || ""
@@ -16091,8 +16111,9 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     bookmarkButton.title = bookmarkLabel;
     updateResearchControl();
   };
-  updatePrivateControls();
+  updatePrivateControls(true);
   if (gate) subscribeWorkspaceNodeAccess(bookmarkButton, gate, updatePrivateControls, options.panel || wrapper);
+  subscribingToAccess = false;
 
   bookmarkButton.addEventListener("click", async () => {
     if (!allowed() || bookmarkButton.disabled) return;
@@ -18133,21 +18154,27 @@ function bindHorizontalWheelScroll(element, options = {}) {
 }
 
 
-function createSearchResultSaveButton(panel, detail) {
+function createSearchResultSaveButton(panel, detail, options = {}) {
   const saveButton = document.createElement("button");
   saveButton.type = "button";
   saveButton.className = "search-result-save";
   saveButton.dataset.savedEvidenceKey = savedEvidenceKey(detail);
+  let initializing = true;
+  let initialized = false;
   const initialize = () => {
+    if (initializing && initialized) return;
     if (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed) return;
     saveButton.hidden = false;
     saveButton.disabled = false;
-    syncImmediateBookmarkButton(saveButton, isSectionSaved(detail));
+    const saved = initializing && options.bookmarkStateResolved ? options.showBookmark : isSectionSaved(detail);
+    syncImmediateBookmarkButton(saveButton, Boolean(saved));
+    initialized = true;
   };
   saveButton.hidden = Boolean(panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed);
   saveButton.disabled = saveButton.hidden;
   if (panel.__workspaceAccessGate) subscribeWorkspaceNodeAccess(saveButton, panel.__workspaceAccessGate, initialize, panel);
   if (!saveButton.hidden) initialize();
+  initializing = false;
   saveButton.addEventListener("click", async () => {
     if (saveButton.disabled || (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed)) return;
     const shouldRemove = saveButton.classList.contains("is-saved");
@@ -18704,6 +18731,10 @@ function applyInitialSearchGroupExpansion(instance, matches, sourceScope, { hasM
 
 function appendSearchResultGroups(results, searchResults, query, searchInstance) {
   const panel = results.closest(".search-panel");
+  // This append is synchronous; use one fresh Project snapshot for its results.
+  // Later pages and access notifications resolve their own current state.
+  const privateContentAllowed = !panel.__workspaceAccessGate || panel.__workspaceAccessGate.allowed;
+  const savedKeys = privateContentAllowed ? workspaceSavedEvidenceKeys() : null;
   const groups = new Map();
   const resultGroupsAreCollapsible = true;
   searchResults.forEach((result) => {
@@ -18823,7 +18854,10 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         });
       });
 
-      const saveButton = createSearchResultSaveButton(panel, detail);
+      const saveButton = createSearchResultSaveButton(panel, detail, {
+        bookmarkStateResolved: true,
+        showBookmark: privateContentAllowed && isSectionSaved(detail, "", savedKeys)
+      });
 
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
@@ -26806,6 +26840,17 @@ async function renderProjectNotebook(project, options = {}) {
   let captureNotebookReturnScroll = () => {};
   let releaseNotebookReturnScroll = () => {};
   let editorRenderSequence = 0;
+  let notebookCardLoadGeneration = 0;
+  const notebookCardIdentities = new WeakMap();
+  function notebookCardIdentity(card) {
+    if (!card) return null;
+    if (!notebookCardIdentities.has(card)) notebookCardIdentities.set(card, {});
+    return notebookCardIdentities.get(card);
+  }
+  function retainNotebookCardIdentity(previous, next) {
+    notebookCardIdentities.set(next, notebookCardIdentity(previous));
+    return next;
+  }
   let cards = [];
   let foundation = { links: [], researchAnswers: [] };
   let activeCard = null;
@@ -27146,8 +27191,8 @@ async function renderProjectNotebook(project, options = {}) {
           // Change the local identity before scheduling the acknowledgement. Later edits capture
           // the accepted card ID; already queued writes finish before its atomic rekey.
           if (ownsFocusedCard) {
-            activeCard = { ...payload.card, title: activeCard.title, document: draftDocument,
-              evidenceLinks: activeCard.evidenceLinks || [] };
+            activeCard = retainNotebookCardIdentity(activeCard, { ...payload.card, title: activeCard.title, document: draftDocument,
+              evidenceLinks: activeCard.evidenceLinks || [] });
           }
           const acceptedFocusedCard = ownsFocusedCard ? activeCard : null;
           const acknowledgement = draftWriteQueue.then(async () => {
@@ -27172,7 +27217,7 @@ async function renderProjectNotebook(project, options = {}) {
             saveConflict = true;
             dirty = true;
             if (ownsFocusedCard && activeCard === acceptedFocusedCard) {
-              activeCard = { ...activeCard, id: acknowledged.draft.cardID || "", version: acknowledged.draft.baseVersion };
+              activeCard = retainNotebookCardIdentity(activeCard, { ...activeCard, id: acknowledged.draft.cardID || "", version: acknowledged.draft.baseVersion });
               // The other tab may own the database's current text. Retain it
               // as a separate version before checkpointing this editor again.
               persistedCardID = null;
@@ -27188,7 +27233,7 @@ async function renderProjectNotebook(project, options = {}) {
           if (disposed || !isCurrentAccountRequest(requestIdentity) || !ownsFocusedCard || activeCard !== acceptedFocusedCard) return false;
           const changedDuringSave = hasNewerDeviceDraft || notebookRevision !== revisionAtStart;
           if (!changedDuringSave) {
-            activeCard = payload.card;
+            activeCard = retainNotebookCardIdentity(activeCard, payload.card);
             draftDocument = payload.card.document;
             persistedDraft = null;
             persistedRevision = -1;
@@ -27243,7 +27288,7 @@ async function renderProjectNotebook(project, options = {}) {
                   const rebased = await rebaseNotebookDraftAfterReview(accountUserID, projectID,
                     activeCard.id || "", reviewed.revision, latest);
                   requireCurrentAccountRequest(requestIdentity);
-                  activeCard = { ...activeCard, id: rebased.cardID, version: rebased.baseVersion };
+                  activeCard = retainNotebookCardIdentity(activeCard, { ...activeCard, id: rebased.cardID, version: rebased.baseVersion });
                   persistedDraft = rebased;
                   persistedCardID = rebased.cardID;
                   persistedRevision = notebookRevision;
@@ -27278,6 +27323,11 @@ async function renderProjectNotebook(project, options = {}) {
     };
 
     async function loadCard(cardID) {
+      const loadGeneration = ++notebookCardLoadGeneration;
+      const workspaceID = activeWorkspaceID;
+      const isCurrent = () => loadGeneration === notebookCardLoadGeneration && !disposed &&
+        isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
+      if (!isCurrent()) return;
       captureNotebookReturnScroll();
       if (activeCard?.id && editorMount) {
         notebookEditingPositions.set(activeCard.id, {
@@ -27286,55 +27336,84 @@ async function renderProjectNotebook(project, options = {}) {
           shellScrollTop: shell.scrollTop
         });
       }
-      if (dirty && activeCard && !(await flushNotebookAutosave())) {
+      const preserveFocusedChanges = async () => {
+        if (!dirty || !activeCard) return isCurrent();
+        const saved = await flushNotebookAutosave();
+        if (!isCurrent()) return false;
+        if (saved) return true;
         const confirmed = await confirmWebWarning(
           "Discard unsaved Notebook changes?",
           "Your edits to the focused card have not been saved.",
           { confirmLabel: "Discard changes" }
         );
-        if (!confirmed) return;
-      }
+        return isCurrent() && confirmed;
+      };
+      if (!(await preserveFocusedChanges()) || !isCurrent()) return;
+      let outgoingCard = activeCard;
+      const outgoingIdentity = notebookCardIdentity(outgoingCard);
+      const outgoingIsCurrent = () => activeCard === outgoingCard ||
+        (outgoingIdentity && notebookCardIdentity(activeCard) === outgoingIdentity);
+      let outgoingRevision = notebookRevision;
+      let outgoingChangedDuringLoad = false;
       let payload;
       try {
         payload = await notebookRequest("/notebook/cards/get", { projectID, cardID });
+        if (!isCurrent()) return;
         await saveNotebookCardSnapshot(
           accountUserID,
           projectID,
           payload.card
         ).catch(() => {});
+        if (!isCurrent()) return;
       } catch (networkError) {
+        if (!isCurrent()) return;
         requireCurrentAccountRequest(requestIdentity);
         if (!privateCacheFallbackAllowed(networkError)) throw networkError;
         const cached = await loadNotebookProjectSnapshot(
           accountUserID,
           projectID
         ).catch(() => null);
+        if (!isCurrent()) return;
         const cachedCard = cached?.cardDocuments?.[cardID];
         if (!cachedCard) throw networkError;
         payload = { card: cachedCard };
       }
-      requireCurrentAccountRequest(requestIdentity);
-      if (disposed) return;
-      activeCard = payload.card;
-      saveConflict = false;
+      if (!isCurrent()) return;
+      const candidateCard = { ...payload.card };
       const localDraft = await loadNotebookDraft(accountUserID, projectID, cardID).catch(() => null);
-      requireCurrentAccountRequest(requestIdentity);
+      if (!isCurrent()) return;
       const useLocalDraft = Boolean(localDraft);
       const reconciledDocument = await reconcileNotebookDocumentAssets(
-        useLocalDraft ? localDraft.document : activeCard.document,
+        useLocalDraft ? localDraft.document : candidateCard.document,
         projectID,
         requestIdentity
       );
-      const currentCardLabels = notebookDocumentWithCurrentCardLabels(reconciledDocument, cards);
-      draftDocument = currentCardLabels.document;
-      if (useLocalDraft) {
-        activeCard.version = localDraft.baseVersion;
-        activeCard.title = localDraft.title || "";
-        activeCard.evidenceLinks = localDraft.evidenceLinks || activeCard.evidenceLinks || [];
+      if (!isCurrent()) return;
+      // The old editor remains usable while the next Note loads. Persist any
+      // intervening edits before replacing it, including edits during a save.
+      while (outgoingIsCurrent() && notebookRevision !== outgoingRevision) {
+        outgoingChangedDuringLoad = true;
+        outgoingRevision = notebookRevision;
+        if (!(await preserveFocusedChanges()) || !isCurrent() || !outgoingIsCurrent()) return;
+        outgoingCard = activeCard;
       }
+      if (!outgoingIsCurrent() || !isCurrent()) return;
+      // Refreshing the selected Note may have fetched its old version before
+      // the visible editor saved newer work. Keep that newer focused state.
+      if (activeCard?.id === candidateCard.id && (outgoingChangedDuringLoad ||
+          Number(activeCard.version || 0) > Number(candidateCard.version || 0))) return;
+      const currentCardLabels = notebookDocumentWithCurrentCardLabels(reconciledDocument, cards);
+      if (useLocalDraft) {
+        candidateCard.version = localDraft.baseVersion;
+        candidateCard.title = localDraft.title || "";
+        candidateCard.evidenceLinks = localDraft.evidenceLinks || candidateCard.evidenceLinks || [];
+      }
+      activeCard = candidateCard;
+      draftDocument = currentCardLabels.document;
+      saveConflict = false;
       dirty = useLocalDraft || currentCardLabels.changed;
       persistedDraft = localDraft || null;
-      persistedCardID = activeCard.id || "";
+      persistedCardID = candidateCard.id || "";
       persistedRevision = localDraft ? notebookRevision : -1;
       if (currentCardLabels.changed) notebookRevision += 1;
       if (!showNotebookRecoveryConflict(localDraft)) {
@@ -27344,7 +27423,7 @@ async function renderProjectNotebook(project, options = {}) {
       }
       renderCardList();
       await renderFocusedCard();
-      if (dirty) scheduleNotebookAutosave();
+      if (isCurrent() && activeCard === candidateCard && dirty) scheduleNotebookAutosave();
     }
     mountState.focusCard = loadCard;
     mountState.insertionTarget = () => !disposed && !notebookReadOnly && !saveConflict && activeCard && editorMount
@@ -28029,22 +28108,51 @@ async function renderProjectNotebook(project, options = {}) {
     });
 
     newButton.addEventListener("click", async () => {
-      if (dirty && activeCard && !(await flushNotebookAutosave())) {
+      const loadGeneration = ++notebookCardLoadGeneration;
+      const workspaceID = activeWorkspaceID;
+      const isCurrent = () => loadGeneration === notebookCardLoadGeneration && !disposed &&
+        isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
+      const preserveFocusedChanges = async () => {
+        if (!dirty || !activeCard) return isCurrent();
+        const saved = await flushNotebookAutosave();
+        if (!isCurrent()) return false;
+        if (saved) return true;
         const confirmed = await confirmWebWarning(
           "Discard unsaved Notebook changes?",
           "Your edits to the focused card have not been saved.",
           { confirmLabel: "Discard changes" }
         );
-        if (!confirmed) return;
+        return isCurrent() && confirmed;
+      };
+      if (!(await preserveFocusedChanges()) || !isCurrent()) return;
+      let outgoingCard = activeCard;
+      const outgoingIdentity = notebookCardIdentity(outgoingCard);
+      const outgoingIsCurrent = () => activeCard === outgoingCard ||
+        (outgoingIdentity && notebookCardIdentity(activeCard) === outgoingIdentity);
+      let outgoingRevision = notebookRevision;
+      let pendingNewDraft;
+      try {
+        pendingNewDraft = await loadNotebookDraft(accountUserID, projectID, "");
+      } catch (error) {
+        if (isCurrent()) showDraftStatus(`Could not check the saved new Note draft: ${error.message}. Try New Note again.`);
+        return;
       }
-      requireCurrentAccountRequest(requestIdentity);
-      const pendingNewDraft = await loadNotebookDraft(accountUserID, projectID, "");
-      requireCurrentAccountRequest(requestIdentity);
+      if (!isCurrent()) return;
+      const candidateDocument = pendingNewDraft
+        ? await reconcileNotebookDocumentAssets(pendingNewDraft.document, projectID, requestIdentity)
+        : emptyNotebookDocument();
+      if (!isCurrent()) return;
+      while (outgoingIsCurrent() && notebookRevision !== outgoingRevision) {
+        outgoingRevision = notebookRevision;
+        if (!(await preserveFocusedChanges()) || !isCurrent() || !outgoingIsCurrent()) return;
+        outgoingCard = activeCard;
+      }
+      if (!outgoingIsCurrent() || !isCurrent()) return;
       if (pendingNewDraft) {
         activeCard = { id: "", version: pendingNewDraft.baseVersion ?? 0,
           cardType: pendingNewDraft.cardType || "finding", title: pendingNewDraft.title || "",
           references: [], evidenceLinks: pendingNewDraft.evidenceLinks || [] };
-        draftDocument = await reconcileNotebookDocumentAssets(pendingNewDraft.document, projectID, requestIdentity);
+        draftDocument = candidateDocument;
         dirty = true;
         persistedDraft = pendingNewDraft;
         persistedCardID = "";
@@ -28053,7 +28161,7 @@ async function renderProjectNotebook(project, options = {}) {
         if (!showNotebookRecoveryConflict(pendingNewDraft)) showDraftStatus("Recovered device draft · finish syncing this Note before creating another");
         renderCardList();
         await renderFocusedCard();
-        scheduleNotebookAutosave();
+        if (isCurrent()) scheduleNotebookAutosave();
         return;
       }
       persistedDraft = null;
@@ -28069,7 +28177,7 @@ async function renderProjectNotebook(project, options = {}) {
         references: [],
         evidenceLinks: []
       };
-      draftDocument = emptyNotebookDocument();
+      draftDocument = candidateDocument;
       dirty = false;
       renderCardList();
       await renderFocusedCard();
@@ -32706,6 +32814,11 @@ function openProjectManager() {
 function showProjectCreateSheet(panel, project = null, options = {}) {
   panel.querySelector(".project-sheet-overlay")?.remove();
   const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  let closed = false;
+  let submitting = false;
+  let mutationStarted = false;
   const isEditing = Boolean(project);
   const identity = isEditing ? projectIdentity(project) : null;
   const selectedFolderType = isEditing && folderType(project) === "reference" ? "reference" : "project";
@@ -32714,6 +32827,8 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", isEditing ? `Edit ${folderTypeLabel(project)}` : selectedFolderType === "reference" ? "New saved collection" : "New Project");
+  const isCurrent = () => !closed && overlay.isConnected &&
+    isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
 
   const sheet = document.createElement("form");
   sheet.className = "project-create-sheet";
@@ -32728,6 +32843,10 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   saveButton.textContent = "Save";
   saveButton.disabled = !isEditing;
   header.append(cancelButton, saveButton);
+  const saveStatus = document.createElement("p");
+  saveStatus.className = "project-property-lookup-status";
+  saveStatus.setAttribute("role", "alert");
+  saveStatus.hidden = true;
 
   const syncFolderTypeControls = () => {
     sheet.classList.toggle("is-reference-folder", selectedFolderType === "reference");
@@ -32828,7 +32947,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     propertyLookupStatus.textContent = "Looking up official NYC property data…";
     propertyLookupPromise = postResearch("/projects/property/lookup", { address })
       .then((payload) => {
-        if (requestID !== propertyLookupRequestID) return null;
+        if (requestID !== propertyLookupRequestID || !isCurrent()) return null;
         const property = payload?.property || null;
         if (!property?.structuredFacts?.length) throw new Error("No property facts were returned.");
         propertyLookupResult = property;
@@ -32844,7 +32963,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         return property;
       })
       .catch((error) => {
-        if (requestID !== propertyLookupRequestID) return null;
+        if (requestID !== propertyLookupRequestID || !isCurrent()) return null;
         propertyLookupResult = null;
         propertyLookupStatus.dataset.state = "warning";
         if (error?.code === "NYC_PROPERTY_NOT_FOUND" || error?.code === "NYC_PROPERTY_DATA_NOT_FOUND") {
@@ -32863,7 +32982,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   };
 
   nameInput.addEventListener("input", () => {
-    saveButton.disabled = !nameInput.value.trim();
+    saveButton.disabled = submitting || !nameInput.value.trim();
   });
   addressInput.addEventListener("input", () => {
     if (addressInput.value.trim() !== propertyLookupAddress) {
@@ -32883,29 +33002,36 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       ?.focus({ preventScroll: true });
   };
   const closeSheet = ({ restoreFocus = true } = {}) => {
+    closed = true;
+    propertyLookupRequestID += 1;
     overlay.remove();
     if (restoreFocus) restoreSheetFocus();
   };
-  cancelButton.addEventListener("click", () => closeSheet());
+  cancelButton.addEventListener("click", () => { if (!mutationStarted) closeSheet(); });
   overlay.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
-      closeSheet();
+      if (!mutationStarted) closeSheet();
       return;
     }
     trapWebModalFocus(sheet, event);
   });
   sheet.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!nameInput.value.trim()) return;
+    if (submitting || !isCurrent() || !nameInput.value.trim()) return;
+    submitting = true;
     saveButton.disabled = true;
+    saveStatus.hidden = true;
+    const fields = [nameInput, addressInput, descriptionInput, ...colorRail.querySelectorAll("button")];
+    fields.forEach(field => { field.disabled = true; });
     try {
       const submittedAddress = addressInput.value.trim();
       const addressChanged = isEditing && submittedAddress !== originalProjectAddress;
       const property = selectedFolderType === "project" && submittedAddress && (!isEditing || addressChanged)
         ? await lookupPropertyContext()
         : null;
+      if (!isCurrent()) return;
       const details = {
         name: nameInput.value,
         address: selectedFolderType === "reference" ? "" : property?.normalizedAddress || addressInput.value,
@@ -32918,15 +33044,19 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         // while ordinary name/description edits must preserve them.
         details.structuredFacts = property?.structuredFacts || [];
       }
+      mutationStarted = true;
+      cancelButton.disabled = true;
       if (isEditing) {
         await updateProjectFolder(project, details);
+        if (!isCurrent()) return;
       } else {
         const createdProject = await createProjectFolder(details);
+        if (!isCurrent()) return;
         if (!createdProject) {
-          saveButton.disabled = false;
           return;
         }
         await options.onCreated?.(createdProject);
+        if (closed || !isCurrentAccountRequest(requestIdentity)) return;
       }
       closeSheet({ restoreFocus: false });
       await transitionWorkspace("utility", {
@@ -32934,18 +33064,27 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
           isEditing ? paneIDForProjectDetail(identity) : ""
         )
       });
+      if (!isCurrentAccountRequest(requestIdentity)) return;
       refreshOpenAnnotationProjectEditors();
       restoreSheetFocus();
       options.onSaved?.();
       if (options.onSaved) panel.querySelector(".project-manager header button")?.focus();
     } catch (error) {
-      saveButton.disabled = false;
-      const content = panel.querySelector(".projects-content, .saved-project-list");
-      if (content) appendMutedRow(content, "Item not synced", error.message || "Could not save the Project or saved collection.");
+      if (!isCurrent()) return;
+      saveStatus.textContent = error.message || "Could not save the Project or saved collection. Try again.";
+      saveStatus.hidden = false;
+    } finally {
+      submitting = false;
+      mutationStarted = false;
+      if (isCurrent()) {
+        fields.forEach(field => { field.disabled = false; });
+        cancelButton.disabled = false;
+        saveButton.disabled = !nameInput.value.trim();
+      }
     }
   });
 
-  sheet.append(header, nameLabel, addressLabel, descriptionLabel, colorGroup);
+  sheet.append(header, saveStatus, nameLabel, addressLabel, descriptionLabel, colorGroup);
   overlay.append(sheet);
   panel.append(overlay);
   syncFolderTypeControls();
@@ -33068,42 +33207,37 @@ function savedItemTitle(item) {
   return sectionTitleWithoutNumber({ sectionNumber, title: item.title || "Section" }) || "Section";
 }
 
-function compareSavedCodeOrder(left, right) {
-  const prefixOrder = new Map(searchCodeFilterOptions().map((option, index) => [option.prefix, index]));
+function compareSavedCodeOrder(left, right, sortContext = null) {
+  const prefixOrder = sortContext?.prefixOrder || new Map(searchCodeFilterOptions().map((option, index) => [option.prefix, index]));
+  const compareText = sortContext?.compareText || ((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
   const leftPrefix = left.codePrefix || left.code || "BC";
   const rightPrefix = right.codePrefix || right.code || "BC";
   const codeOrder = (prefixOrder.get(leftPrefix) ?? 999) - (prefixOrder.get(rightPrefix) ?? 999);
   if (codeOrder) return codeOrder;
-  const chapterOrder = String(left.chapterNumber || left.chapterID || "").localeCompare(
-    String(right.chapterNumber || right.chapterID || ""),
-    undefined,
-    { numeric: true, sensitivity: "base" }
-  );
+  const chapterOrder = compareText(String(left.chapterNumber || left.chapterID || ""), String(right.chapterNumber || right.chapterID || ""));
   if (chapterOrder) return chapterOrder;
-  return String(left.sectionNumber || left.sectionID || "").localeCompare(
-    String(right.sectionNumber || right.sectionID || ""),
-    undefined,
-    { numeric: true, sensitivity: "base" }
-  );
+  return compareText(String(left.sectionNumber || left.sectionID || ""), String(right.sectionNumber || right.sectionID || ""));
 }
 
 function sortSavedItems(items, mode) {
+  // A collator and code-family catalog belong to the sort, not each comparison.
+  const sortContext = {
+    prefixOrder: new Map(searchCodeFilterOptions().map((option, index) => [option.prefix, index])),
+    compareText: new Intl.Collator(undefined, { numeric: true, sensitivity: "base" }).compare
+  };
   return [...items].sort((left, right) => {
     if (mode === "recentlySaved") {
       const recentOrder = Date.parse(right.bookmarkedAt || right.createdAt || right.updatedAt || 0) - Date.parse(left.bookmarkedAt || left.createdAt || left.updatedAt || 0);
       if (Number.isFinite(recentOrder) && recentOrder) return recentOrder;
     } else if (mode === "codeBook") {
-      const codeOrder = codeDisplayLabel(left.codePrefix || left.code || "BC").localeCompare(
-        codeDisplayLabel(right.codePrefix || right.code || "BC"),
-        undefined,
-        { numeric: true, sensitivity: "base" }
-      );
+      const codeOrder = sortContext.compareText(codeDisplayLabel(left.codePrefix || left.code || "BC"),
+        codeDisplayLabel(right.codePrefix || right.code || "BC"));
       if (codeOrder) return codeOrder;
     } else if (mode === "title") {
-      const titleOrder = savedItemTitle(left).localeCompare(savedItemTitle(right), undefined, { numeric: true, sensitivity: "base" });
+      const titleOrder = sortContext.compareText(savedItemTitle(left), savedItemTitle(right));
       if (titleOrder) return titleOrder;
     }
-    return compareSavedCodeOrder(left, right);
+    return compareSavedCodeOrder(left, right, sortContext);
   });
 }
 
@@ -34236,7 +34370,7 @@ async function resolveSavedSearchPage(options = {}) {
     if (!shouldContinue()) {
       return { items: [], hasMore: false, scannedCount, exhausted: false, cancelled: true };
     }
-    const batch = candidates.slice(scannedCount, scannedCount + batchSize);
+    const batch = candidates.slice(scannedCount, scannedCount + Math.min(batchSize, targetCount - normalizedMatches.length));
     scannedCount += batch.length;
     const hydratedBatch = await hydrateItems(batch);
     if (!shouldContinue()) {
@@ -34403,15 +34537,21 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
           : item
         )
     : combinedItems;
-  const resolvedFolderItems = selectedFolder
-    ? mergeEquivalentSavedColumnRows(await hydrateItems(folderHydrationItems))
-    : null;
+  // Keep the complete collection for filtering and selection, but load source
+  // bodies only for the visible page. A Project may contain thousands of saves.
+  // Older saves may lack the canonical numbers needed to order all pages. Fill
+  // those exceptions before choosing a page so a late row cannot sort first.
+  const missingSortMetadata = selectedFolder && !showingUnassigned
+    ? folderHydrationItems.filter((item) => !item.chapterNumber || !item.sectionNumber)
+    : [];
+  const resolvedSortMetadata = await hydrateItems(missingSortMetadata);
   if (!panel.isConnected) return;
+  const resolvedSortItems = new Map(missingSortMetadata.map((item, index) => [item, resolvedSortMetadata[index]]));
+  resolvedSortMetadata.forEach((item) => hydratedItemPromises.set(item, Promise.resolve(item)));
+  const savedCandidates = sortSavedItems(folderHydrationItems.map((item) => resolvedSortItems.get(item) || item),
+    showingUnassigned ? "recentlySaved" : "codeOrder");
   const removableSavedItems = selectedFolder && !savedInstance.showAllSaved
-    ? resolvedFolderItems.filter((item) => (summary.projectSections || []).some((link) =>
-        savedEvidenceKey(link) === savedEvidenceKey(item) &&
-        projectSectionBelongsToProject(link, selectedFolder)
-      ))
+    ? folderHydrationItems.filter((item) => selectedFolderEvidenceKeys.has(savedEvidenceKey(item)))
     : showingUnassigned ? combinedItems.filter((item) => unassignedSectionIDs.has(savedEvidenceKey(item)))
     : !workspaceProject() ? combinedItems : [];
   const selectionController = removableSavedItems.length
@@ -34436,7 +34576,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
   let savedSearchContentMinHeight = 0;
   let previousViewSignature = "";
   let viewGeneration = 0;
-  const applySavedView = async () => {
+  const applySavedView = async (viewOptions = {}) => {
     const generation = ++viewGeneration;
     const query = savedInstance.folderQuery.trim();
     const searchActive = Boolean(query);
@@ -34465,42 +34605,23 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     }
     const matchesView = (item, options = {}) => {
       const itemSectionID = savedEvidenceKey(item);
-      const folderMatches = !selectedFolder || savedInstance.showAllSaved || (summary.projectSections || []).some((link) =>
-        savedEvidenceKey(link) === itemSectionID &&
-        projectSectionBelongsToProject(link, selectedFolder)
-      );
+      const folderMatches = !selectedFolder || savedInstance.showAllSaved || selectedFolderEvidenceKeys.has(itemSectionID);
       const queryMatches = options.ignoreQuery || savedEvidenceMatchesQuery(item, query);
       const organizationMatches = !savedInstance.organizeUnassigned || unassignedSectionIDs.has(itemSectionID);
       return folderMatches && queryMatches && organizationMatches;
     };
-    let resolvedItems;
-    let hasMore;
-    if (!selectedFolder && searchActive) {
-      const searchPage = await resolveSavedSearchPage({
-        candidates: sortSavedItems(combinedItems.filter((item) => matchesView(item, { ignoreQuery: true })),
-          showingUnassigned ? "recentlySaved" : "codeOrder"),
-        limit: allSavedLimit,
-        batchSize: savedItemsPageSize,
-        hydrateItems,
-        matchesItem: (item) => matchesView(item),
-        normalizeMatches: mergeEquivalentSavedColumnRows,
-        shouldContinue: () => generation === viewGeneration && panel.isConnected
-      });
-      if (searchPage.cancelled) return;
-      resolvedItems = searchPage.items;
-      hasMore = searchPage.hasMore;
-    } else {
-      const rawCandidates = selectedFolder
-        ? resolvedFolderItems
-        : sortSavedItems(combinedItems.filter((item) => matchesView(item)), showingUnassigned ? "recentlySaved" : "codeOrder");
-      hasMore = !selectedFolder && rawCandidates.length > allSavedLimit;
-      const pageCandidates = selectedFolder
-        ? rawCandidates
-        : rawCandidates.slice(0, allSavedLimit);
-      resolvedItems = selectedFolder
-        ? pageCandidates
-        : mergeEquivalentSavedColumnRows(await hydrateItems(pageCandidates));
-    }
+    const page = await resolveSavedSearchPage({
+      candidates: savedCandidates.filter((item) => matchesView(item, { ignoreQuery: true })),
+      limit: allSavedLimit,
+      batchSize: savedItemsPageSize,
+      hydrateItems,
+      matchesItem: (item) => matchesView(item),
+      normalizeMatches: mergeEquivalentSavedColumnRows,
+      shouldContinue: () => generation === viewGeneration && panel.isConnected
+    });
+    if (page.cancelled) return;
+    const resolvedItems = page.items;
+    const hasMore = page.hasMore;
     if (generation !== viewGeneration || !panel.isConnected) return;
     const filteredItems = resolvedItems.filter((item) => matchesView(item));
     const orderedItems = sortSavedItems(filteredItems, showingUnassigned ? "recentlySaved" : "codeOrder");
@@ -34509,6 +34630,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     const previousContentHeight = options.animateContentUpdate
       ? content.getBoundingClientRect().height
       : 0;
+    const restoreExpansionFocus = viewOptions.focusOrigin && document.activeElement === viewOptions.focusOrigin;
     clear(content);
     content.setAttribute("aria-busy", "false");
     if (orderedItems.length > 0) {
@@ -34588,7 +34710,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       button.addEventListener("click", () => {
         allSavedLimit += savedItemsPageSize;
         content.setAttribute("aria-busy", "true");
-        void applySavedView();
+        void applySavedView({ focusOrigin: button, previousEvidenceKeys: new Set(orderedItems.map((item) => savedEvidenceKey(item))) });
       });
       footer.append(status, button);
       content.append(footer);
@@ -34597,9 +34719,16 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       animateSavedMembershipUpdate(content, previousContentHeight);
     }
     if (scrollContainer) scrollContainer.scrollTop = preservedScrollTop;
+    if (restoreExpansionFocus) {
+      const nextRow = Array.from(content.querySelectorAll(".saved-section-row")).find((row) =>
+        !viewOptions.previousEvidenceKeys.has(row.dataset.savedEvidenceKey) && !row.closest(".is-collapsed"));
+      const focusTarget = nextRow?.querySelector(".saved-section-open") || content.querySelector(".saved-load-more-button") ||
+        content.querySelector(".saved-code-toggle");
+      focusTarget?.focus({ preventScroll: true });
+    }
   };
   panel.__applySavedView = applySavedView;
-  renderSavedFilters(panel, savedInstance, resolvedFolderItems || combinedItems, () => {
+  renderSavedFilters(panel, savedInstance, folderHydrationItems, () => {
     content.setAttribute("aria-busy", "true");
     void applySavedView();
   });
@@ -35732,6 +35861,7 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     },
     register(row, item) {
       const id = savedItemSelectionID(item);
+      if (recordByID.has(id)) recordByID.set(id, item);
       rows.set(id, row);
       const indicator = document.createElement("span");
       indicator.className = "saved-selection-check";
@@ -35799,6 +35929,7 @@ function folderAddIconSVG() {
 function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnapshot) {
   const row = document.createElement("article");
   row.className = `saved-row saved-section-row code-theme-${codeTheme(item.codePrefix || item.code || "BC")}`;
+  row.dataset.savedEvidenceKey = savedEvidenceKey(item);
   if (item.isNestedListParagraph) {
     row.classList.add("is-list-paragraph");
   }
@@ -40651,6 +40782,9 @@ function appendPaneSequence(panes) {
   track.querySelectorAll(":scope > .search-panel").forEach((panel) => {
     if (!retainedNodes.has(panel)) cancelSearchPanelRequest(panel);
   });
+  track.querySelectorAll(":scope > .reader-panel").forEach((panel) => {
+    if (!retainedNodes.has(panel)) cancelReaderPanelRequests(panel);
+  });
   const activeIDs = new Set(orderedPanes.map((pane) => pane.dataset.paneId));
   state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => activeIDs.has(id));
   if (state.pinnedPaneID && !activeIDs.has(state.pinnedPaneID)) state.pinnedPaneID = "";
@@ -44276,7 +44410,7 @@ function disposeUnpublishedWorkspacePane(pane) {
       mounts.delete(id);
     }
   }
-  if (pane.classList.contains("reader-panel")) beginReaderNavigation(pane);
+  if (pane.classList.contains("reader-panel")) cancelReaderPanelRequests(pane);
 }
 
 function createWorkspacePaneLoadingShell(descriptor) {

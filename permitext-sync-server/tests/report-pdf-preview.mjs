@@ -73,8 +73,46 @@ assert.equal(tasks.length, 4);
 current = false; tasks[3].finish(); await flush();
 assert.equal(pages[1].children.length, 0, 'A stale account/version cannot replace preview content');
 dispose();
+dispose();
 assert.equal(intersection.disconnected, true);
 assert.equal(resize.disconnected, true);
 assert.equal(timer, null);
 assert.equal(destroyed, 1);
 console.log('PDF preview passed: responsive sharpness, lazy pages, coalesced replacements, retained page/text, bounded raster memory and stale-context cleanup.');
+
+// Fail after one page has mounted and started rendering. Retry must not retain
+// that attempt's observers, rendering task, or PDF worker.
+current = true; destroyed = 0; pages.length = 0;
+const originalGetPage = pdf.getPage;
+let rejectPage;
+pdf.getPage = number => number === 1 ? originalGetPage() : new Promise((resolve, reject) => { rejectPage = reject; });
+const failedContainer = new Element();
+const failed = context.preview(failedContainer, {arrayBuffer: async () => new ArrayBuffer(1)}, () => current);
+await flush();
+const failedIntersection = intersection, failedResize = resize;
+assert.equal(pages.length, 1);
+failedIntersection.callback([{target: pages[0], isIntersecting: true}]);
+const abandonedRender = tasks.at(-1);
+rejectPage(new Error('Page metadata unavailable'));
+await assert.rejects(failed, /Page metadata unavailable/);
+await flush();
+assert.equal(failedIntersection.disconnected, true, 'A failed setup releases its intersection observer');
+assert.equal(failedResize.disconnected, true, 'A failed setup releases its resize observer');
+assert.equal(abandonedRender.cancelled, true, 'A failed setup cancels already-started page work');
+assert.equal(destroyed, 1, 'A failed setup destroys its PDF exactly once');
+assert.equal(pages[0].children.length, 0, 'Canceled work cannot publish after failure');
+pdf.getPage = originalGetPage;
+const beforeRetry = pages.length;
+const retryDispose = await context.preview(failedContainer, {arrayBuffer: async () => new ArrayBuffer(1)}, () => current);
+assert.equal(pages.length, beforeRetry + 2, 'A fresh attempt can mount all pages after failure');
+retryDispose(); retryDispose();
+assert.equal(destroyed, 2, 'Each attempt owns a single idempotent cleanup');
+
+let loadingTaskDestroyed = 0;
+context.loadPDF = async () => ({GlobalWorkerOptions: {}, getDocument: () => ({
+  promise: Promise.reject(new Error('PDF parsing failed')),
+  async destroy() { loadingTaskDestroyed++; }
+})});
+await assert.rejects(context.preview(new Element(), {arrayBuffer: async () => new ArrayBuffer(1)}, () => true), /PDF parsing failed/);
+assert.equal(loadingTaskDestroyed, 1, 'A rejected document load releases its worker before a PDF proxy exists');
+console.log('PDF failure recovery passed: page-setup rejection releases observers/rendering/worker, clean retry succeeds, repeated disposal is safe, and rejected parsing releases its loading task.');
