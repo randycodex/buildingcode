@@ -56,7 +56,7 @@ const context = vm.createContext({
   upsertLocalAnnotation: item => { context.state.localAnnotations.push(item); events.push('annotation'); },
   scheduleAnnotationPush() {}, refreshVisiblePlanUsage() {},
 });
-vm.runInContext([actual('persistSectionBookmark'), actual('setAnnotationNoteValue'), actual('isSectionSaved')].join('\n'), context);
+vm.runInContext([actual('persistSectionBookmark'), actual('setAnnotationNoteValue'), actual('workspaceSavedEvidenceKeys'), actual('isSectionSaved')].join('\n'), context);
 const save = options => context.persistSectionBookmark(payload, true, options);
 assert.equal(await save({ attachToWorkspaceProject: false }), false);
 assert.equal(context.state.localSavedItems.length, 0);

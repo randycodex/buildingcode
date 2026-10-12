@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { createRolloutFixture } from "./populated-rollout-fixture.mjs";
 import { fileURLToPath } from "node:url";
 import { summaryAttributionPrelude } from "./populated-summary-attribution.mjs";
+import { webAuditAttributionPrelude } from "./web-audit-attribution.mjs";
 import { createServer, request as httpRequest } from "node:http";
 import { mkdtemp, mkdir, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -31,15 +32,20 @@ const researchHistoryEnabled = researchHistoryOption === "true";
 const researchWorkflowOption = option("--research-workflow", "false");
 assert.ok(["true", "false"].includes(researchWorkflowOption));
 const researchWorkflowEnabled = researchWorkflowOption === "true";
+const auditObserverOption = option("--audit-observer", "false");
+assert.ok(["true", "false"].includes(auditObserverOption));
+const auditObserverEnabled = auditObserverOption === "true";
+const auditSamples = [];
 const outageSelfTest = option("--self-test-outage", "false");
 assert.ok(["true", "false"].includes(outageSelfTest));
 const imageProfile = option("--image-profile", "tiny");
 assert.ok(["tiny", "photo-size"].includes(imageProfile));
 const visibleWorkload = option("--visible-workload", "default");
-assert.ok(["default", "matched"].includes(visibleWorkload));
+assert.ok(["default", "matched", "concentrated"].includes(visibleWorkload));
 const seedSelfTest = option("--self-test-seed", "false");
 assert.ok(["true", "false"].includes(seedSelfTest));
 const matchedWorkload = visibleWorkload === "matched";
+const concentratedWorkload = visibleWorkload === "concentrated";
 // Compare an immutable source or deployment entry against the same backend and
 // synthetic workload. This override exists only in this loopback test server.
 const clientEntryPath = option("--client-entry", "");
@@ -126,7 +132,7 @@ let transportOffUntil = 0;
 const transportFailures = [];
 const timings = [];
 const benchmarkSamples = [];
-const controlledRoutes = new Set(["/notebook/cards/save", "/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list"]);
+const controlledRoutes = new Set(["/projects/property/lookup", "/notebook/cards/save", "/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list"]);
 const json = (response, status, value) => response.writeHead(status, {
   "content-type": "application/json", "cache-control": "no-store"
 }).end(JSON.stringify(value));
@@ -170,7 +176,18 @@ const server = createServer(async (request, response) => {
     if (url.pathname.startsWith("/fixture/")) {
       if (url.searchParams.get("key") !== capability) return json(response, 403, { error: "Fixture capability required" });
       if (!ready) return json(response, 503, { error: "Seeding" });
-      if (url.pathname === "/fixture/metrics") return json(response, 200, { receipt, requests: timings, control: nextControl, transportOff: Date.now() < transportOffUntil, transportFailures, benchmarkSamples });
+      if (url.pathname === "/fixture/metrics") return json(response, 200, { receipt, requests: timings, control: nextControl, transportOff: Date.now() < transportOffUntil, transportFailures, benchmarkSamples, auditSamples });
+      if (url.pathname === "/fixture/audit.js" && request.method === "GET" && auditObserverEnabled) {
+        response.writeHead(200, {"content-type":"text/javascript", "cache-control":"no-store", "x-content-type-options":"nosniff"});
+        return response.end(await readFile(new URL("./web-audit-observer.js", import.meta.url), "utf8"));
+      }
+      if (url.pathname === "/fixture/audit" && request.method === "POST" && auditObserverEnabled) {
+        const sample = await readJSON(request, 131072);
+        if (!sample || typeof sample.run !== "string" || !Number.isFinite(sample.at) || !Array.isArray(sample.resources) || sample.resources.length > 300) return json(response, 400, {error:"Invalid audit sample"});
+        auditSamples.push(sample);
+        if (auditSamples.length > 200) auditSamples.shift();
+        return json(response, 200, {accepted:true});
+      }
       if (url.pathname === "/fixture/transport" && request.method === "POST") {
         const control = await readJSON(request);
         if (Object.keys(control).length !== 1 || !Number.isInteger(control.seconds) || control.seconds < 0 || control.seconds > 300) {
@@ -221,7 +238,7 @@ const server = createServer(async (request, response) => {
           : { userID, sessionToken: token, authProvider: "apple", displayName: "Synthetic populated workspace", entitlement: account.entitlement };
         response.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store",
           "content-security-policy": "default-src 'self'; script-src 'unsafe-inline'; object-src 'none'; base-uri 'none'" });
-        return response.end(`<!doctype html><meta charset="utf-8"><title>Synthetic workspace</title><script>localStorage.setItem('permitext:webAccount:v1',${JSON.stringify(JSON.stringify(stored))});location.replace('/workspace');</script>`);
+        return response.end(`<!doctype html><meta charset="utf-8"><title>Synthetic workspace</title><script>localStorage.setItem('permitext:webAccount:v1',${JSON.stringify(JSON.stringify(stored))});location.replace(${JSON.stringify(auditObserverEnabled ? `/workspace?fixtureAudit=${capability}` : "/workspace")});</script>`);
       }
       return json(response, 404, { error: "Unknown fixture route" });
     }
@@ -232,6 +249,25 @@ const server = createServer(async (request, response) => {
       if (transportFailures.length > 500) transportFailures.shift();
       response.destroy();
       return;
+    }
+    if (url.pathname === "/workspace" && url.searchParams.has("fixtureAudit")) {
+      if (!ready || !auditObserverEnabled || url.searchParams.get("fixtureAudit") !== capability) return json(response, 403, {error:"Audit fixture capability required"});
+      const originalEnd = response.end.bind(response);
+      response.end = (body, ...args) => {
+        response.end = originalEnd;
+        const html = String(body);
+        const injection = `<script src="/fixture/audit.js?key=${encodeURIComponent(capability)}"></script>`;
+        return originalEnd(html.replace("<head>", `<head>${injection}`).replace(/(src="\/web\/app\.js\?[^"\s]*)"/, `$1&fixtureAudit=${encodeURIComponent(capability)}"`), ...args);
+      };
+    }
+    if (url.pathname === "/web/app.js" && url.searchParams.has("fixtureAudit")) {
+      if (!ready || !auditObserverEnabled || url.searchParams.get("fixtureAudit") !== capability) return json(response, 403, {error:"Audit fixture capability required"});
+      const originalEnd = response.end.bind(response);
+      response.end = (body, ...args) => {
+        response.end = originalEnd;
+        const text = String(body);
+        return originalEnd(webAuditAttributionPrelude(text) + text, ...args);
+      };
     }
     if (url.pathname === "/workspace" && url.searchParams.has("fixtureBenchmark")) {
       if (!ready || !matchedWorkload || url.searchParams.get("fixtureBenchmark") !== capability) return json(response, 403, {error: "Matched fixture capability required"});
@@ -267,7 +303,7 @@ const server = createServer(async (request, response) => {
       return json(response, 403, { error: "Research disabled in performance fixture" });
     }
     const started = performance.now();
-    if (ready && controlledRoutes.has(url.pathname)) {
+    if (ready && (controlledRoutes.has(url.pathname) || auditObserverEnabled)) {
       response.once("finish", () => {
         timings.push({ route: url.pathname, status: response.statusCode, milliseconds: Number((performance.now() - started).toFixed(2)) });
         if (timings.length > 500) timings.shift();
@@ -369,8 +405,8 @@ async function seedFixture() {
   } })));
   mutations.push(...savedSections.slice(0, target.saved / 2).map((section, index) => ({ projectSection: {
     id: `${userID}:membership:${index}`, userID, codeVersion: section.codeVersion,
-    folderClientID: projectIDs[matchedWorkload ? (index < 3 ? 0 : 1 + (index - 3) % (projectIDs.length - 1)) : index % projectIDs.length],
-    localFolderID: (matchedWorkload ? (index < 3 ? 0 : 1 + (index - 3) % (projectIDs.length - 1)) : index % projectIDs.length) + 1,
+    folderClientID: projectIDs[concentratedWorkload ? 0 : matchedWorkload ? (index < 3 ? 0 : 1 + (index - 3) % (projectIDs.length - 1)) : index % projectIDs.length],
+    localFolderID: (concentratedWorkload ? 0 : matchedWorkload ? (index < 3 ? 0 : 1 + (index - 3) % (projectIDs.length - 1)) : index % projectIDs.length) + 1,
     sectionID: Number(section.id), scope: "manual", updatedAt
   } })));
   for (let offset = 0; offset < mutations.length; offset += 100) {

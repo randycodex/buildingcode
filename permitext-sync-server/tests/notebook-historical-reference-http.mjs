@@ -96,13 +96,17 @@ try {
   assert.equal((await request("/projects/foundation/state", { projectID: "project-b" })).status, 200);
   const mixedSources = (await request("/reports/sources/list", { projectID: "project-b" })).json.sources.filter(source => source.kind === "evidence");
   assert.equal(mixedSources.length, 2);
-  assert.deepEqual(mixedSources.map(source => source.codeEdition).sort(), ["2014 NYC Codes", "2022 New York City Construction Codes"]);
+  assert.match(mixedSources.find(source => source.sourceLibraryVersion === historicalConstructionSyncCodeVersion)?.codeEdition || "", /2014.*Construction Codes/i);
+  assert.match(mixedSources.find(source => source.sourceLibraryVersion === codeVersion)?.codeEdition || "", /2022.*Construction Codes/i);
   const draftResponse = await request("/reports/drafts/save", { projectID: "project-b", expectedVersion: 0, title: "Mixed actual editions", reportDate: "2026-09-22", blocks: mixedSources.map((source,index) => ({ id: `block-${index}`, kind: "evidence", sourceID: source.id, label: source.label })) });
   assert.equal(draftResponse.status, 201, JSON.stringify(draftResponse));
   const draft = draftResponse.json.draft;
   const generated = await request("/reports/generate", { projectID: "project-b", draftID: draft.id, expectedVersion: draft.version });
   assert.equal(generated.status, 201, JSON.stringify(generated));
-  assert.deepEqual(generated.json.manifest.items.filter(item => item.kind === "evidence").map(item => item.codeEdition).sort(), ["2014 NYC Codes", "2022 New York City Construction Codes"]);
+  assert.deepEqual(generated.json.manifest.items.filter(item => item.kind === "evidence")
+    .map(item => [item.sourceLibraryVersion, item.codeEdition]).sort(),
+    mixedSources.map(source => [source.sourceLibraryVersion, source.codeEdition]).sort(),
+    "The immutable manifest must retain each selected source's actual edition identity and label");
   console.log("Historical Note references and actual mixed 2014/2022 Report source-to-manifest HTTP checks passed.");
 } finally {
   globalThis.fetch = originalFetch;

@@ -193,7 +193,7 @@ assert.deepEqual(
 const readerChapterSectionSource = functionSource(appSource, "renderReaderChapterSection");
 assert.match(
   readerChapterSectionSource,
-  /readerPrivateContentAllowed\(panel\) && isSectionSaved\(\{[\s\S]*?sectionID: target\.sectionID,[\s\S]*?codeVersion: target\.codeVersion,[\s\S]*?blockID: target\.blockID[\s\S]*?\}\)/,
+  /privateContentAllowed && isSectionSaved\(\{[\s\S]*?sectionID: target\.sectionID,[\s\S]*?codeVersion: target\.codeVersion,[\s\S]*?blockID: target\.blockID[\s\S]*?\}, "", savedKeys\)/,
   "Each Reader block must resolve its bookmark state using its own block identity."
 );
 assert.doesNotMatch(
@@ -644,7 +644,7 @@ assert.doesNotMatch(
 );
 assert.match(
   savedHydrationSource,
-  /const selectedFolderEvidenceKeys = selectedFolder[\s\S]*?projectSectionBelongsToProject\(link, selectedFolder\)[\s\S]*?const folderHydrationItems = selectedFolder && !savedInstance\.showAllSaved[\s\S]*?hydrateItems\(folderHydrationItems\)/,
+  /const selectedFolderEvidenceKeys = selectedFolder[\s\S]*?projectSectionBelongsToProject\(link, selectedFolder\)[\s\S]*?const folderHydrationItems = selectedFolder && !savedInstance\.showAllSaved[\s\S]*?const savedCandidates = sortSavedItems\(folderHydrationItems/,
   "Selected Projects should hydrate only their linked evidence instead of the full Saved corpus."
 );
 assert.match(
@@ -654,7 +654,7 @@ assert.match(
 );
 assert.match(
   savedHydrationSource,
-  /if \(!selectedFolder && searchActive\) \{[\s\S]*?resolveSavedSearchPage\(\{[\s\S]*?batchSize: savedItemsPageSize[\s\S]*?\} else \{[\s\S]*?rawCandidates\.slice\(0, allSavedLimit\)/,
+  /resolveSavedSearchPage\(\{[\s\S]*?candidates: savedCandidates\.filter[\s\S]*?limit: allSavedLimit[\s\S]*?batchSize: savedItemsPageSize/,
   "Search must scan bounded hydrated batches while the non-search view remains lazily paginated."
 );
 assert.doesNotMatch(savedHydrationSource, /savedItems\.slice\(0, 48\)|annotatedItems\.slice\(0, 48\)/);
@@ -715,7 +715,7 @@ assert.equal(commonMatchSearchPage.hasMore, true);
 assert.equal(commonMatchSearchPage.exhausted, false);
 assert.deepEqual(
   commonMatchBatchSizes,
-  [48, 48],
+  [48, 1],
   "Saved search should stop scanning once it has a visible page plus a has-more sentinel."
 );
 assert.doesNotMatch(appSource, /bookmarkIcon\.setAttribute\("aria-label", "Bookmarked"\)/);

@@ -1,3 +1,4 @@
+import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,8 +27,6 @@ export const historicalConstructionSyncCodeVersion =
 let cachedBundle;
 let cachedManifest;
 let cachedSourceManifest;
-let cachedCatalog;
-let cachedSearchIndex;
 const cachedChapters = new Map();
 const cachedSections = new Map();
 
@@ -124,8 +123,7 @@ function flattenedSections(chapter) {
   );
 }
 
-export async function historicalConstructionSectionCatalog() {
-  if (cachedCatalog) return cachedCatalog;
+export const historicalConstructionSectionCatalog = createRetryableLazyLoader(async () => {
   const chapters = await historicalConstructionChapterIndex();
   const result = [];
   for (const chapterSummary of chapters) {
@@ -146,9 +144,8 @@ export async function historicalConstructionSectionCatalog() {
       });
     }
   }
-  cachedCatalog = result;
-  return cachedCatalog;
-}
+  return result;
+});
 
 export async function historicalConstructionSectionSummary(sectionID) {
   const key = String(sectionID || "").trim();
@@ -166,15 +163,12 @@ export async function historicalConstructionSection(sectionID) {
   return cachedSections.get(key);
 }
 
-export async function historicalConstructionSearchIndex() {
-  if (!cachedSearchIndex) {
-    const payload = await readJSON(join(preparedRoot, "searchIndex.json"));
-    cachedSearchIndex = new Map(
-      Object.entries(payload.tokens || {}).map(([token, ids]) => [
-        token,
-        normalizedSortedPostingList(ids)
-      ])
-    );
-  }
-  return cachedSearchIndex;
-}
+export const historicalConstructionSearchIndex = createRetryableLazyLoader(async () => {
+  const payload = await readJSON(join(preparedRoot, "searchIndex.json"));
+  return new Map(
+    Object.entries(payload.tokens || {}).map(([token, ids]) => [
+      token,
+      normalizedSortedPostingList(ids)
+    ])
+  );
+});

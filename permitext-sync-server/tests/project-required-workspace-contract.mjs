@@ -30,6 +30,7 @@ const sandbox = vm.createContext({
   },
   folderIsProject: (p) => p.folderType === "project",
   openProjectDetails: () => state.projectDetails, openCodeQuestionPaneIDs: () => [],
+  restoreAssistantConversationOwners() {},
   supplementalResearchConversationIDs: [], emptyWorkspaceLayout,
   applyStoredWorkspaceLayout: (layout) => { Object.assign(state, layout); layoutClears++; },
   codeQuestionWorkspaceState: () => ({}), closeCodeDecisionContext: (s) => s, setCodeQuestionWorkspaceState() {},
@@ -95,10 +96,12 @@ Object.assign(sandbox, buttons, {
   toggleProjectInformation: () => { columnAttempts++; }, toggleProjectTool: () => { columnAttempts++; },
   toggleProjectsColumns: () => { columnAttempts++; }, openReaderCodePicker: () => { columnAttempts++; }
 });
-vm.runInContext(["bindImmediateUtilityControls", "setUtilityButtonStates", "updateReaderPlanControls"].map(actual).join("\n"), sandbox);
-const readerListener = app.match(/addReaderButton\.addEventListener\("click", async \(\) => \{[\s\S]*?\n  \}\);/)?.[0];
-assert.ok(readerListener);
-vm.runInContext(readerListener, sandbox);
+sandbox.document.querySelectorAll = (selector) => selector === "[data-open-reader]" ? [buttons.addReaderButton] : [];
+vm.runInContext(["bindImmediateUtilityControls", "setUtilityButtonStates", "updateReaderPlanControls",
+  "syncReaderToolbarButton", "bindReaderToolbarButton", "openReaderFromToolbar"].map(actual).join("\n"), sandbox);
+assert.match(app, /document\.querySelectorAll\('\[data-open-reader\]'\)\.forEach\(bindReaderToolbarButton\)/,
+  "Startup binds every Reader toolbar through the shared opening guard");
+sandbox.bindReaderToolbarButton(buttons.addReaderButton);
 sandbox.bindImmediateUtilityControls();
 sandbox.setUtilityButtonStates(); sandbox.updateReaderPlanControls();
 const guidance = sandbox.renderProjectRequiredWorkspace();

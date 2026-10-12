@@ -1,0 +1,417 @@
+{
+  "date": "2026-10-12",
+  "scope": "Web frontend only; local candidate based on e650a1c69. Root agent owns browser traces and final shell version/build/deployment status.",
+  "baseline_commit": "e650a1c69",
+  "app_sha256_at_report": "42c2c156ed83a20cb07239fb1dac418a27dc39fde796174d43d4b47b3968e0b2",
+  "implemented": [
+    {
+      "area": "Project Saved scaling",
+      "change": "All Project/collection views use existing48-row bounded hydration/search pagination with a one-row sentinel. Full eligible collection retained for selection; source-text search scans beyond visible page; per-render hydrated body promises reused. Legacy rows missing chapter/section numbers are enriched before selecting the page to preserve global order.",
+      "measured_work": {
+        "fixture_records": 1000,
+        "initial_hydrated": 49,
+        "initial_rendered": 48,
+        "expanded_hydrated_total": 97,
+        "expanded_rendered": 96
+      },
+      "correctness": [
+        "Full eligible selection scope1000",
+        "Search finds1000th clause",
+        "Query cancellation",
+        "Stable recorded scroll",
+        "Legacy canonical sort order",
+        "Bookmark/annotation merge across48-row boundary",
+        "Displayed row replaces raw record in bulk-action lookup",
+        "Keyboard focus enters newly exposed visible row, respects user focus movement, and falls back to code-group toggle on collapsed final page"
+      ]
+    },
+    {
+      "area": "Saved sorting CPU",
+      "change": "One source-prefix index and Intl.Collator per sort instead of rebuilding both for each comparison.",
+      "correctness": [
+        "Exact previous ordering for numeric/accented titles, missing data, historical ties and all sort modes",
+        "Input immutable",
+        "Fresh source ordering each sort"
+      ]
+    },
+    {
+      "area": "Reader per-passage private state",
+      "change": "One fresh Project saved-key snapshot per synchronous section render; controls reuse initial resolved status including eager settled-gate subscription notification. Later access updates derive fresh state.",
+      "measured_work": {
+        "fixture_blocks": 500,
+        "fixture_project_links": 1002,
+        "initial_summary_reads": 1
+      },
+      "correctness": [
+        "Full enacted text unchanged",
+        "Exact Project/client-ID, edition and block identity parity",
+        "No private summary reads with real pending gate",
+        "Real settled gate eager subscribe tested",
+        "Later pending-to-verified update uses fresh state",
+        "Fresh writes and workspace switch reflected"
+      ]
+    },
+    {
+      "area": "Reader lifecycle",
+      "change": "Removing a Reader immediately aborts navigation, chapter search and progressive hydration; invalidates publication tokens; releases pending scroll restoration and private access subscriptions. Hidden retained workflow panes continue unchanged.",
+      "correctness": [
+        "Same pane-ID replacement owns independent work",
+        "Late body/search result token rejected",
+        "Repeated progressive teardown is idempotent",
+        "Unpublished late Reader uses same teardown"
+      ]
+    },
+    {
+      "area": "Notebook async ownership",
+      "change": "Stage incoming card/draft/assets locally, check request generation plus account/workspace/disposal after each await, preserve edits made while candidate loads, and publish atomically. Stable weak identity tokens retain ownership across first server-ID acknowledgement. Same-card reload cannot replace newer edits or acknowledgement; New Note storage errors preserve editor and show retry status.",
+      "correctness": [
+        "A-B and A-B-A latest selection",
+        "New-to-existing, repeated New and existing-to-New",
+        "Snapshot/draft/assets suspension",
+        "Account/workspace/disposal fences",
+        "Intervening edits including final-save typing",
+        "Unrelated draft replacement during save",
+        "First server-ID navigation completion",
+        "Same-note edited/acknowledged state not rolled back",
+        "Current storage failure visible; stale failure silent"
+      ]
+    },
+    {
+      "area": "Search result bookmark rendering",
+      "change": "One fresh Project saved-key snapshot per synchronous result append. Each control receives its resolved initial boolean; eager settled-gate subscription and explicit initialization paint once. Later pages and access callbacks read fresh state.",
+      "measured_work": {
+        "fixture_results": 80,
+        "initial_summary_reads": 1,
+        "initial_bookmark_paints": 80
+      },
+      "correctness": [
+        "Real eager settled gate and real pending-to-verified gate",
+        "Exact edition, block and Project/client-ID membership",
+        "Unchanged citation, heading and target identity",
+        "Duplicate suppression across subsequent pages",
+        "Fresh later page saved state",
+        "Later access callback recomputes current state",
+        "No private reads under revoked account/workspace authority"
+      ]
+    }
+  ],
+  "coverage_matrix": [
+    {
+      "area": "Startup critical path and assets",
+      "coverage": "Source inspected; independent pane, bundle and project-required startup contracts pass. Root owns measured cold/warm browser flow.",
+      "finding": "Immediate utility controls bind before optional public catalogs. Startup chapter and trust catalog requests run concurrently without blocking private auth restoration. Workboard/Notebook editor code and styles are imported on demand; Workboard prewarms only pointer/focus intent; Notebook idle card prefetch is bounded at2 and disposed on close.",
+      "followup": "The main app remains large and statically imports several Report modules. A separately scoped cold-launch profile and module extraction could reduce parse/transfer; not changed speculatively."
+    },
+    {
+      "area": "Workspace switching/hydration",
+      "coverage": "Actual independent-pane orchestration, workflow views, project-required workspace and source-readiness contracts pass.",
+      "finding": "New notebook ownership and Reader disposal fixes address concrete switching races. Hidden panes remain retained; targeted readiness waits do not block on unrelated editors."
+    },
+    {
+      "area": "Reader/search DOM and cancellation",
+      "coverage": "Navigation race, scroll continuity, chapter extent, target readiness, corpus-revision recovery, chapter search client/recovery and private presentation contracts pass.",
+      "finding": "Initial text remains bounded by a chapter section window; source IDs/editions and complete enacted bodies preserved. Search uses AbortControllers and generation/context checks. Removed Reader requests now cancel immediately."
+    },
+    {
+      "area": "Large-account Saved",
+      "coverage": "Measured actual hydration/sort/annotation functions and full collection semantics across search, selection, expansion, ordering, merging and focus.",
+      "finding": "DOM scales with visible page instead of all Project records. Full search can still require all source bodies before certifying no matches; pagination never claims a partial search exhausted."
+    },
+    {
+      "area": "Notes and editor cleanup",
+      "coverage": "Actual loadCard/New handlers under controlled promises plus notebook/reference contracts. Separate UX agent owns Note menu and Project create sheet.",
+      "finding": "Editor render sequence alone did not protect shared card/draft before mount; new request-generation and stable acknowledgement identity do. Notebook disposal already clears autosave/idle timers, destroys editor, revokes object URLs and removes upload listener."
+    },
+    {
+      "area": "Cache/listener cleanup",
+      "coverage": "Reader removal regression and access lifecycle4000removed-controls test pass; source inspection of public revision cache reset.",
+      "finding": "Public revision changes invalidate chapter lists/bodies/summary caches. Existing weak subscription registry sweeps detached controls; new Reader teardown aborts immediately. Main chapter Maps have no explicit capacity bound; no measured leak established."
+    },
+    {
+      "area": "Report/export",
+      "coverage": "Separate UX agent owns PDF export resource lifecycle and tests; root owns rendered Report/PDF checks.",
+      "finding": "No additional Report app edits by frontend agent."
+    }
+  ],
+  "synthetic_measurements": [
+    {
+      "test": "tests/reader-bookmark-render-performance-contract.mjs",
+      "blocks": 500,
+      "projectLinks": 1002,
+      "currentSummaryReads": 1,
+      "currentRenderMS": 9.38
+    },
+    {
+      "test": "tests/saved-sort-performance.mjs",
+      "savedRows": 1000,
+      "beforeMS": 32.37,
+      "afterMS": 3.82,
+      "beforeCatalogReads": 8579,
+      "afterCatalogReads": 1
+    },
+    {
+      "test": "tests/saved-sort-performance.mjs",
+      "savedRows": 5000,
+      "beforeMS": 201.47,
+      "afterMS": 25.08,
+      "beforeCatalogReads": 53642,
+      "afterCatalogReads": 1
+    },
+    {
+      "test": "tests/saved-annotation-consolidation-performance-contract.mjs",
+      "workload": "1,000 saved passages + 1,000 annotations + 100 local overlays",
+      "identicalRows": 1000,
+      "beforeMS": 1383.28,
+      "afterMS": 7.59,
+      "beforeSummaryBuilds": 1000,
+      "afterSummaryBuilds": 1
+    },
+    {
+      "test": "tests/search-bookmark-render-performance-contract.mjs",
+      "results": 80,
+      "initialSummaryReads": 1,
+      "initialBookmarkPaints": 80,
+      "renderMS": 19.57
+    }
+  ],
+  "asset_bytes": {
+    "app_js": 2065743,
+    "app_js_gzip": 432408,
+    "styles_css": 501757,
+    "styles_css_gzip": 70811
+  },
+  "backend_followups": [
+    {
+      "priority": "medium",
+      "finding": "Saved source text hydration currently resolves full /code/sections/:id bodies. Rich text search may scan every saved record; per-call sectionPromises only deduplicate within one batch, so multiple saved blocks for the same section across batches can repeat work.",
+      "recommendation": "Consider a version-aware batched Saved preview/search endpoint or account-scoped searchable projection retaining full exact edition/section/block identity. Measure request fanout and backend rich-source CPU before implementation."
+    },
+    {
+      "priority": "medium",
+      "finding": "Legacy synced saves can lack canonical chapterNumber or sectionNumber. Client now enriches those exceptions before global paging order; a legacy-heavy collection still performs many initial body reads although DOM stays48rows.",
+      "recommendation": "Normalize canonical navigation/sort metadata in saved summaries, or expose a lightweight batched metadata lookup. Do not infer governing section/edition from display numbering."
+    },
+    {
+      "priority": "follow-up",
+      "finding": "Fresh pending-to-verified Reader/Search access updates still read current saved state separately per control. The optimization covers synchronous settled-gate rendering; no long-lived private snapshot was introduced.",
+      "recommendation": "If real authenticated launch traces identify this as material, batch the gate notification at section/window scope while preserving account/workspace authority and fresh bookmark writes."
+    }
+  ],
+  "tests": {
+    "passed": 35,
+    "failed": 0,
+    "results": [
+      {
+        "test": "tests/reader-bookmark-render-performance-contract.mjs",
+        "status": "passed",
+        "output": "{\"blocks\":500,\"projectLinks\":1002,\"currentSummaryReads\":1,\"currentRenderMS\":8.26}\nReader bookmark rendering passed: exact block/edition/Project membership parity, complete enacted text, pending privacy, fresh access callbacks, workspace changes and fresh subsequent writes.\nReader access tests use actual subscribeWorkspaceNodeAccess and real settled/pending gates, including eager subscription notification and later private upgrade."
+      },
+      {
+        "test": "tests/reader-removal-cleanup-contract.mjs",
+        "status": "passed",
+        "output": "Reader removal passed: immediate navigation/search/progressive abort, render-token invalidation, scroll/access cleanup, retained workflow panes, same-ID replacement isolation and idempotent progressive teardown."
+      },
+      {
+        "test": "tests/reader-public-presentation-contract.mjs",
+        "status": "passed",
+        "output": "Reader public presentation passed: no pending saved/research/project reads, complete public text, extracted bookmark identity, in-place private upgrade, dynamic Research target and revoked mutation guard."
+      },
+      {
+        "test": "tests/workspace-access-subscription-lifecycle-contract.mjs",
+        "status": "passed",
+        "output": "Workspace access subscription lifecycle passed: detached construction, extracted bookmark, 4000 removed controls, single observer, explicit unpublished disposal and panel closure; no finalizer required."
+      },
+      {
+        "test": "tests/reader-navigation-race-contract.mjs",
+        "status": "passed",
+        "output": "Reader navigation recovery passed: immediate clearing, A-B-A selection, delayed catalog/detail/body, stale failure, retry, section metadata and removal."
+      },
+      {
+        "test": "tests/reader-scroll-continuity-contract.mjs",
+        "status": "passed",
+        "output": "Reader scroll continuity passed: independent progressive anchors, unchanged citations, edition/navigation guards and real render wiring.\nReader revision recovery passed: fresh manifest, recomputed target offsets, disappeared target guard and bounded retry."
+      },
+      {
+        "test": "tests/reader-chapter-extent-contract.mjs",
+        "status": "passed",
+        "output": "Reader chapter extent passed: full reserved range, bounded thumb jumps, passage anchoring, resize, deep links, cancellation and retry."
+      },
+      {
+        "test": "tests/reader-target-ready-contract.mjs",
+        "status": "passed",
+        "output": "Reader target readiness passed: source and deep-link navigation wait selectively, suppress closed/stale targets.\nDeep-link cancellation and stale workspace guards passed.\nDetail heading actual handler waits for linked Reader, scrolls offscreen destination into view, and preserves occupied Reader."
+      },
+      {
+        "test": "tests/reader-progressive-revision-recovery-contract.mjs",
+        "status": "passed",
+        "output": "Progressive revision recovery passed: restores captured anchor once and suppresses recovery errors after newer navigation or closure."
+      },
+      {
+        "test": "tests/reader-search-client-contract.mjs",
+        "status": "passed",
+        "output": "Reader search client passed: complete offline fallback, edition/identity checks, abort propagation, and Find position restoration."
+      },
+      {
+        "test": "tests/reader-search-recovery-contract.mjs",
+        "status": "passed",
+        "output": "Reader recovery passed: find preservation/retry, visible saved-citation failure, exact-source reopening, and stale-account suppression."
+      },
+      {
+        "test": "tests/search-private-presentation-contract.mjs",
+        "status": "passed",
+        "output": "Search private presentation passed: no private reads while pending; existing control upgrade; revoked mutation suppression; history boundary."
+      },
+      {
+        "test": "tests/saved-project-pagination-performance.mjs",
+        "status": "passed",
+        "output": "Project Saved pagination passed: 1,000 initial body reads/rows reduced to 49 reads and 48 rows; 96-row expansion uses 97 total reads; late-source-text search, full selection scope, query cancellation and scroll preservation.\nProject Saved pagination also passed canonical legacy-order recovery and keyboard focus preservation across expansion, collapsed groups, query changes, moved focus and panel removal.\nSaved page boundary normalization and final collapsed-page focus fallback passed."
+      },
+      {
+        "test": "tests/saved-sort-performance.mjs",
+        "status": "passed",
+        "output": "{\"savedRows\":1000,\"beforeMS\":32.37,\"afterMS\":3.82,\"beforeCatalogReads\":8579,\"afterCatalogReads\":1}\n{\"savedRows\":5000,\"beforeMS\":201.47,\"afterMS\":25.08,\"beforeCatalogReads\":53642,\"afterCatalogReads\":1}\nSaved sorting passed: numeric and accented labels, historical ties, missing metadata, recency, immutable records, live source ordering and exact previous-order parity."
+      },
+      {
+        "test": "tests/saved-annotation-consolidation-performance-contract.mjs",
+        "status": "passed",
+        "output": "{\"workload\":\"1,000 saved passages + 1,000 annotations + 100 local overlays\",\"identicalRows\":1000,\"beforeMS\":1383.28,\"afterMS\":7.59,\"beforeSummaryBuilds\":1000,\"afterSummaryBuilds\":1}\nSaved annotation consolidation passed: same-edition/block identity, newest/local ties, tombstones, bulk clears, fresh snapshots, authoritative subset resolution and matched-workload parity."
+      },
+      {
+        "test": "tests/saved-annotation-render-performance-contract.mjs",
+        "status": "passed",
+        "output": "Saved annotation render passed: snapshot/default parity, edition/block aliases, newest/local ties, deletion/bulk clears,48to1summary reads and fresh account state per render."
+      },
+      {
+        "test": "tests/saved-evidence-identity-contract.mjs",
+        "status": "passed",
+        "output": ""
+      },
+      {
+        "test": "tests/evidence-folders-contract.mjs",
+        "status": "passed",
+        "output": "permitext evidence folder contract passed"
+      },
+      {
+        "test": "tests/project-bulk-assignment-contract.mjs",
+        "status": "passed",
+        "output": "Project bulk assignment passed: global recency, active-Project bulk assignment, additive edition/block/notes, partial retry and account fencing."
+      },
+      {
+        "test": "tests/project-save-policy-contract.mjs",
+        "status": "passed",
+        "output": "Project-save policy passed: cancellation, direct saves, account fencing, note membership, legacy layout retirement, duplicate creation and late callbacks."
+      },
+      {
+        "test": "tests/saved-initial-sync-reuse-contract.mjs",
+        "status": "passed",
+        "output": "Saved initial sync reuse passed: real initial option wiring, verified reuse, explicit refresh freshness, pending synchronization and detached/account-change suppression."
+      },
+      {
+        "test": "tests/notebook-card-selection-race.mjs",
+        "status": "passed",
+        "output": "Notebook selection passed: A-B and A-B-A latest-request ownership; snapshot/draft/assets staging; account/workspace/disposal fences; draft identity isolation; and edits retained during loading.\nNew Note races passed: New-to-existing, repeated New, existing-to-New, account/workspace/disposal fences and intervening edit preservation.\nNew Note acknowledgement passed: first server ID assignment preserves outgoing edits and completes the requested navigation.\nSame-note refresh passed: intervening edits remain visible and retained, and clean acknowledgement version advances cannot be rolled back.\nNew Note storage recovery passed: current failures preserve the editor and show recovery guidance; stale failures stay silent."
+      },
+      {
+        "test": "tests/project-create-sheet-race.mjs",
+        "status": "passed",
+        "output": "Project sheet passed: pending lookup cancellation/context fences, single submission, frozen input, write boundary, inline error retention and explicit retry."
+      },
+      {
+        "test": "tests/notebook-contract.mjs",
+        "status": "passed",
+        "output": "Permitext BlockNote Notebook contract passed."
+      },
+      {
+        "test": "tests/notebook-reference-availability-contract.mjs",
+        "status": "passed",
+        "output": "Notebook reference availability contract passed."
+      },
+      {
+        "test": "tests/workspace-pane-orchestration-contract.mjs",
+        "status": "passed",
+        "output": "Workspace pane orchestration contract passed: actual mounting/publication helpers, independent completion, editor identity, refresh, close/reopen, retry, transition and account guards."
+      },
+      {
+        "test": "tests/workspace-bundle-contract.mjs",
+        "status": "passed",
+        "output": "Workspace bundle retains query-versioned module identity, lazy literal/template editor imports, and rejects undeployed additional assets."
+      },
+      {
+        "test": "tests/workflow-views-contract.mjs",
+        "status": "passed",
+        "output": "Workflow views passed: independent visibility, linked destinations, layout persistence, retained editors, nested scroll and project guard.\nReport constraints passed: 600px document minimum, expanded Sources, 300px optional outline, retained hidden Readers and Account isolation.\nLayout reset passed: Report-aware controls and reset, loading guard, retained working views and existing Research/Notebook behavior."
+      },
+      {
+        "test": "tests/project-required-workspace-contract.mjs",
+        "status": "passed",
+        "output": "Project-required workspace: deletion, offline authority, restoration, rendering, commands and recovery passed."
+      },
+      {
+        "test": "tests/search-bookmark-render-performance-contract.mjs",
+        "status": "passed",
+        "output": "{\"results\":80,\"initialSummaryReads\":1,\"initialBookmarkPaints\":80,\"renderMS\":19.57}\nSearch bookmark render passed: real eager and pending gates, one summary per append, fresh later pages/access updates, exact edition/block/Project identity, duplicate suppression, unchanged citation/title/target output, and revoked account/workspace privacy."
+      },
+      {
+        "test": "tests/search-active-scope-ui-contract.mjs",
+        "status": "passed",
+        "output": "Web Search active scope passed: first/page URL binding, stale first/page responses ignored, stale cursor blocked, corrupt preference never sends unrestricted API.\nActual app/controller scope helpers passed: lazy all-enabled, disabled scope, pending account switch, corrupt preferences preserved and rejected."
+      },
+      {
+        "test": "tests/search-request-cancellation-contract.mjs",
+        "status": "passed",
+        "output": "Search cancellation passed: superseded query, edition/account/close guards, obsolete errors/load-more, physical abort signal and offline/status isolation."
+      },
+      {
+        "test": "tests/search-position-state.mjs",
+        "status": "passed",
+        "output": "Search position survives application normalization and resets on query/filter changes; result identity includes edition and paragraph.\nSearch pagination retry counts rendered pages and rejects obsolete requests and late responses."
+      },
+      {
+        "test": "tests/search-group-expansion.mjs",
+        "status": "passed",
+        "output": "Search group defaults: explicit edition and complete single-source only, mixed/partial pages, remembered sources, collapse/reload, pagination, retry, scope changes and legacy persistence passed."
+      },
+      {
+        "test": "tests/search-group-pagination-client.mjs",
+        "status": "passed",
+        "output": "Scoped Search client passed: independent code/edition state, request scope, retry cursor, source rejection, double-click guard, offline cursor handoff and late-response isolation."
+      }
+    ]
+  },
+  "fixture_repairs": [
+    {
+      "test": "tests/reader-chapter-extent-contract.mjs",
+      "evidence": "Exact e650 original app/test/helper bytes fail before changes: mock panel lacks classList.contains used by existing workflow handling. Added mock only; all original behavioral assertions retained."
+    },
+    {
+      "test": "tests/reader-target-ready-contract.mjs",
+      "evidence": "Exact e650 original app/test bytes fail before changes: mock lacks currentColumnWorkflowView. Added Research view mock only; readiness, source decline, stale workspace and linked detail behavior assertions retained."
+    },
+    {
+      "test": "tests/saved-annotation-render-performance-contract.mjs",
+      "evidence": "New evidence-key data attribute required actual savedEvidenceKey helper and DOM dataset in fake row; added dependencies, preserving annotation identity/freshness assertions."
+    },
+    {
+      "test": "tests/project-save-policy-contract.mjs",
+      "evidence": "Included new actual workspaceSavedEvidenceKeys helper dependency."
+    },
+    {
+      "test": "tests/project-bulk-assignment-contract.mjs",
+      "evidence": "Added code source catalog fixture used by one-per-sort index."
+    },
+    {
+      "test": "tests/evidence-folders-contract.mjs",
+      "evidence": "Updated source-shape assertions for bounded Project hydration and shared Reader snapshot, and sentinel batch expected count; identity/query behavior retained."
+    },
+    {
+      "test": "tests/ux-ui-reader-save-phase4-contract.mjs",
+      "evidence": "Updated Search save-control source assertion for the added initial-state options. Full legacy contract independently fails on exact e650 app/styles/test bytes at line59, requiring outdated Source Detail action ordering. Unrelated UI assertions remain unchanged; this existing failing suite is excluded from35 passing tests."
+    }
+  ],
+  "limits": [
+    "CPU values are synthetic local Node/fake-DOM timings and fluctuate; work counts and identity parity are deterministic. Browser metrics belong to root report.",
+    "No hosted deployment, paid AI calls, production mutations or iOS source changes performed by this agent.",
+    "A broadly named search-reader-saved-deferral-contract was attempted before discovering it compiles a Swift fixture; it fails for missing readerSaveDestinationChoice fixture property, remains untouched and is excluded from the passing web-suite count.",
+    "No claim that every possible user/device/network path was measured."
+  ]
+}

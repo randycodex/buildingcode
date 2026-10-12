@@ -9,7 +9,7 @@ for (const name of ["openSourceInReader", "openDeepLinkedSectionInReader"]) {
     let resolve;
     const gate = new Promise(done => { resolve=done; });
     const calls=[];
-    const c=vm.createContext({
+    const c=vm.createContext({currentColumnWorkflowView:()=>"research",
       workspaceColumnsRequireProject: () => false, workflowPaneIsVisible: () => true,
       activeWorkspaceID: "workspace-a", captureAccountRequest: () => 1, isCurrentAccountRequest: () => true,
       state:{readers:[],paneWeights:{}}, resolveReaderSource:async item=>item,
@@ -37,7 +37,7 @@ console.log("Reader target readiness passed: source and deep-link navigation wai
 // Declining enablement must leave the Reader untouched.
 {
   const state={readers:[],paneWeights:{}};
-  const c=vm.createContext({workspaceColumnsRequireProject:()=>false,state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:async()=>null});
+  const c=vm.createContext({currentColumnWorkflowView:()=>"research",workspaceColumnsRequireProject:()=>false,state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:async()=>null});
   vm.runInContext(functions,c);
   await c.openDeepLinkedSectionInReader({sectionID:42});
   assert.equal(state.readers.length,0);
@@ -46,7 +46,7 @@ console.log("Reader target readiness passed: source and deep-link navigation wai
 {
   let finish;
   const state={readers:[],paneWeights:{}};
-  const c=vm.createContext({workspaceColumnsRequireProject:()=>false,state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:()=>new Promise(resolve=>{finish=resolve;})});
+  const c=vm.createContext({currentColumnWorkflowView:()=>"research",workspaceColumnsRequireProject:()=>false,state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:()=>new Promise(resolve=>{finish=resolve;})});
   vm.runInContext(functions,c);
   const pending=c.openDeepLinkedSectionInReader({sectionID:42});
   c.activeWorkspaceID='b';
@@ -82,7 +82,7 @@ for (const ready of [true, false]) {
     getBoundingClientRect:()=>({left:0,right:1280}),
     scrollTo(options){calls.push(['scroll',options.left,options.behavior]);this.scrollLeft=options.left;}
   };
-  const c=vm.createContext({workflowPaneIsVisible:()=>true,state,track,CSS:{escape:id=>id},
+  const c=vm.createContext({currentColumnWorkflowView:()=>"research",workflowPaneIsVisible:()=>true,state,track,CSS:{escape:id=>id},
     heading:{addEventListener(type,fn){assert.equal(type,'click');handler=fn;}},
     searchID:'search-a',detail:{sectionID:42,chapterID:'target-chapter'},chapter:null,
     sectionPayload:{sectionNumber:'403.2.3.3',title:'Concrete and masonry walls'},

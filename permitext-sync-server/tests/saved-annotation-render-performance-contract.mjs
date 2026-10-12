@@ -14,6 +14,7 @@ function actual(name) {
 class Element {
   constructor() {
     this.children = [];
+    this.dataset = {};
     this.classList = { add() {}, toggle() {} };
   }
   append(...children) { this.children.push(...children); }
@@ -35,7 +36,7 @@ const context = vm.createContext({
   savedEvidenceEdition: item => item.codeVersion
 });
 vm.runInContext([
-  "normalizeAnnotationBlockID", "normalizeAnnotationTags", "annotationRecordsForTarget",
+  "normalizeAnnotationBlockID", "normalizeAnnotationTags", "savedEvidenceKey", "annotationRecordsForTarget",
   "annotationForTarget", "appendSavedEvidenceRow", "renderSavedItemsByCode"
 ].map(actual).join("\n"), context);
 const plain = value => JSON.parse(JSON.stringify(value));

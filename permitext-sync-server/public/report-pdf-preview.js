@@ -4,12 +4,28 @@ export async function renderReportPDF(container, blob, current) {
   if (!current()) return () => {};
   pdfjs.GlobalWorkerOptions.workerSrc = '/web/pdf-preview-assets/pdf.worker.min.js';
   const task = pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()), isEvalSupported: false });
-  const pdf = await task.promise;
+  let pdf;
+  try { pdf = await task.promise; }
+  catch (error) {
+    // A rejected loading task has no PDF proxy to hand back for disposal.
+    await task.destroy().catch(() => {});
+    throw error;
+  }
   if (!current()) { await pdf.destroy(); return () => {}; }
   let disposed = false;
   const renders = new Set();
   const visible = new Set(), pages = new Map();
   let resizeTimer;
+  let observer, resizeObserver;
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    observer?.disconnect();
+    resizeObserver?.disconnect();
+    clearTimeout(resizeTimer);
+    renders.forEach(render => render.cancel());
+    void pdf.destroy().catch(() => {});
+  };
   const paint = async item => {
     if (disposed || !current()) return;
     const record = pages.get(item);
@@ -54,41 +70,40 @@ export async function renderReportPDF(container, blob, current) {
       if (record.pending) { record.pending = false; void paint(item); }
     }
   };
-  const observer = new IntersectionObserver(entries => {
-    for (const entry of entries) {
-      const item = entry.target;
-      if (!entry.isIntersecting) { visible.delete(item); continue; }
-      visible.add(item);
-      void paint(item);
+  try {
+    observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        const item = entry.target;
+        if (!entry.isIntersecting) { visible.delete(item); continue; }
+        visible.add(item);
+        void paint(item);
+      }
+    }, { root: container, rootMargin: '600px' });
+    resizeObserver = new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => visible.forEach(item => { void paint(item); }), 120);
+    });
+    resizeObserver.observe(container);
+    container.replaceChildren();
+    for (let number = 1; number <= pdf.numPages; number++) {
+      const page = await pdf.getPage(number);
+      if (disposed || !current()) break;
+      const viewport = page.getViewport({ scale: 1 });
+      const item = document.createElement('section');
+      item.className = 'report-pdf-page';
+      item.dataset.page = String(number);
+      item.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
+      item.setAttribute('aria-label', `Page ${number}`);
+      pages.set(item, {page, base: viewport, scale: 0});
+      container.append(item);
+      observer.observe(item);
     }
-  }, { root: container, rootMargin: '600px' });
-  const resizeObserver = new ResizeObserver(() => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => visible.forEach(item => { void paint(item); }), 120);
-  });
-  resizeObserver.observe(container);
-  container.replaceChildren();
-  for (let number = 1; number <= pdf.numPages; number++) {
-    const page = await pdf.getPage(number);
-    if (disposed || !current()) break;
-    const viewport = page.getViewport({ scale: 1 });
-    const item = document.createElement('section');
-    item.className = 'report-pdf-page';
-    item.dataset.page = String(number);
-    item.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
-    item.setAttribute('aria-label', `Page ${number}`);
-    pages.set(item, {page, base: viewport, scale: 0});
-    container.append(item);
-    observer.observe(item);
+  } catch (error) {
+    // Page metadata can fail after observers and earlier page renders exist.
+    // Release those resources before the caller offers a fresh preview retry.
+    dispose();
+    throw error;
   }
-  const dispose = () => {
-    disposed = true;
-    observer.disconnect();
-    resizeObserver.disconnect();
-    clearTimeout(resizeTimer);
-    renders.forEach(render => render.cancel());
-    void pdf.destroy();
-  };
   if (!current()) dispose();
   return dispose;
 }

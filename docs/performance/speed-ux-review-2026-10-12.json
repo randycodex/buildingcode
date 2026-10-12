@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-12",
+  "baselineCommit": "f42d79991a3c70aedea96e6ef423aebb120d4663",
+  "branch": "codex/speed-ux-review",
+  "scope": "Local implementation and validation of bounded web, backend and native performance improvements plus rendered web UX review.",
+  "changes": [
+    {
+      "area": "Saved annotations",
+      "result": "One authoritative summary and indexed annotation lookup per synchronous consolidation; reused within hydration.",
+      "fixture": {
+        "savedPassages": 1000,
+        "annotations": 1000,
+        "localOverlays": 100,
+        "identicalOutputRows": 1000,
+        "beforeMs": 1366.3,
+        "afterMs": 8.11,
+        "summaryRebuildsBefore": 1000,
+        "summaryRebuildsAfter": 1
+      },
+      "limit": "Isolated synthetic CPU test, not full app latency."
+    },
+    {
+      "area": "Backend public content",
+      "result": "Concurrent cold catalog and search-index requests share in-flight work; rejected loads remain retryable.",
+      "evidence": "public-content-cold-benchmark-2026-10-12.json",
+      "deploymentRequired": true,
+      "databaseMigrationRequired": false
+    },
+    {
+      "area": "Native detail loading",
+      "result": "Cancel obsolete batches between section reads, deduplicate requested IDs, reject stale edition/store results and errors.",
+      "validation": "Actual changed Swift methods compiled and executed in deterministic fixture races, plus active-code-source contracts.",
+      "limit": "No full iOS build or physical-device timing in this task."
+    },
+    {
+      "area": "Empty Research view",
+      "result": "Reader, Search and Assistant entry actions replace a blank workspace after the final visible column closes. Existing navigation and source/account guards retained."
+    },
+    {
+      "area": "Project menu layout",
+      "result": "Project title truncates inside available width instead of overlapping Project details.",
+      "renderedBounds": {
+        "beforeProjectRight": 774.3945,
+        "projectDetailsLeft": 719.9707,
+        "afterProjectRight": 719.9707
+      },
+      "limit": "Viewport override requested 768x1024; application enforces a 960 CSS-pixel workspace minimum."
+    }
+  ],
+  "browserChecks": {
+    "environment": "Isolated loopback populated fixture, synthetic projects and notes, external/provider requests disabled.",
+    "verified": [
+      "Search concrete across source groups",
+      "Open BC 403.2.3.3 with surrounding enacted text and table",
+      "Project switching",
+      "Evidence rows",
+      "Populated Notes",
+      "Report outline and content",
+      "Empty Research Reader source picker",
+      "Empty Research Search action",
+      "Empty Research Assistant history and composer without generation",
+      "Narrow viewport project control no overlap"
+    ],
+    "consoleErrors": 0,
+    "knownFixtureWarning": "Policy/profile setup unavailable in the synthetic local preview; not production authentication evidence."
+  },
+  "passed": [
+    "Client builds (generated Notebook rebuild outputs excluded from commit)",
+    "test:public-code-timing, including both new real-corpus concurrency/retry contracts",
+    "test:saved-render-performance",
+    "Saved initial sync reuse and evidence identity",
+    "Project-required workspace and backend performance contracts",
+    "Workspace pane orchestration and scoped sync/Research reads",
+    "All 11 test:active-code-sources contracts",
+    "Active-source HTTP, chapter body parity, and public content cache HTTP checks",
+    "Offline shell coherence, JS syntax, diff whitespace, UX added-line audit",
+    "Independent review: no actionable issue"
+  ],
+  "broaderSuiteLimits": [
+    {
+      "suite": "node tests/smoke.mjs",
+      "failure": "Legacy topbar order assertion at line 410.",
+      "baselineEvidence": "Exact unchanged baseline HTML and assertion reproduce failure."
+    },
+    {
+      "suite": "npm run test:ux-alignment",
+      "failure": "column-failure-recovery VM fixture missing hasCapability.",
+      "baselineEvidence": "Test and both extracted source slices are byte-identical to baseline."
+    },
+    {
+      "suite": "npm run test:smooth-performance",
+      "failure": "native-research-refresh-freshness Swift fixture Library missing researchHistoryProjectFilter.",
+      "baselineEvidence": "Test, ResearchView.swift and ResearchNotebookModels.swift are unchanged from baseline; preceding four suites pass."
+    }
+  ],
+  "followUpsNotMeasured": [
+    "Profile hosted project-foundation reads: legacy migration and Project selection appear to read account mutations separately. No database migration or infrastructure purchase justified by this source finding alone.",
+    "Profile native MainActor workspace-continuity/cache file writes with populated device data before moving persistence to an ordered background writer.",
+    "Review native Manage code sources destination naming: currently opens Account settings at Sources."
+  ],
+  "deliveryLimits": [
+    "Local branch only; no push, merge or deployment.",
+    "No production database/configuration/account changes.",
+    "No paid AI calls.",
+    "No physical-device, TestFlight or App Store performance acceptance.",
+    "Current source checkout and unrelated local work preserved."
+  ]
+}
