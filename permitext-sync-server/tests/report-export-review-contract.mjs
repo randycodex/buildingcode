@@ -114,6 +114,29 @@ assert.equal(editor.hidden, false);
 assert.equal(mount.scrollTop, 318);
 console.log("Inline PDF preview passed: shared screen, retained editor/scroll/focus and replacement cleanup.");
 
+let externallyClosed = 0;
+const titleControlled = context.openReportExportReview({...args, mount, showClose: false, onClose: () => externallyClosed++});
+await flush();
+assert.equal(titleControlled.children[0].children.length, 2, 'Title-controlled previews have only the PDF title and theme switch in the header');
+assert.equal(document.activeElement, titleControlled.children[0].children[1], 'Focus a visible control when the Close button is absent');
+titleControlled.children[0].children[1].click();
+assert.equal(titleControlled.children[2].children.length, 1, 'The theme still works without a Close button');
+titleControlled.events.keydown({key: 'Escape', preventDefault() {}});
+assert.equal(titleControlled.removed, true);
+assert.equal(externallyClosed, 1, 'Keyboard dismissal still informs the owning PDF column');
+assert.equal(document.activeElement, editor);
+assert.equal(editor.value, 'Retained report edits');
+console.log('Title-controlled PDF preview passed: no Close button, visible focus, retained theme and Escape dismissal.');
+
+let finishClosedLoad;
+const closedWhileLoading = context.openReportExportReview({...args, mount, showClose: false,
+  prepare: () => new Promise(resolve => {finishClosedLoad = resolve;})});
+closedWhileLoading.dispose();
+finishClosedLoad(packet); await flush();
+assert.equal(closedWhileLoading.removed, true);
+assert.equal(closedWhileLoading.children[2].children.length, 0, 'A late PDF response cannot restore a title-closed preview');
+assert.equal(editor.hidden, false);
+
 storageBlocked = true;
 const privatePreview = context.openReportExportReview({...args, mount});
 await flush();

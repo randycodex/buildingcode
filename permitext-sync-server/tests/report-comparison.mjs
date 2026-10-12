@@ -14,6 +14,12 @@ assert.equal(expandedPDF.minimumWidth, 5203, 'PDF expansion has no viewport or p
 assert.ok(reportComparisonLayout(1606, {comparing: true, reportWidth: 10, pdfWidth: 20}).template.includes('600px 1px 600px'));
 assert.equal(reportComparisonLayout(1920, {comparing: false}).minimumWidth, 600);
 assert.equal(reportComparisonLayout(1920, {comparing: true, versions: 48}).minimumWidth, 1250);
+const versionsOnly = reportComparisonLayout(1920, {sources: 330, outline: 300, comparing: true,
+  previewing: false, reportWidth: 600, pdfWidth: 4000});
+assert.equal(versionsOnly.minimumWidth, 1533, 'Closing a PDF removes its entire column and divider, while Versions remains available');
+assert.equal(versionsOnly.template, '330px 1px 300px 1px minmax(600px, 1fr) 0px 0px 1px 300px');
+assert.equal(reportComparisonLayout(1920, {comparing: false, previewing: true}).minimumWidth, 600,
+  'The Versions toolbar still hides both PDF and Versions even with a retained selection');
 let changedWidth = false;
 const positionContainer = {scrollTop: 731, getBoundingClientRect: () => ({top: 84}),
   querySelectorAll: () => [
@@ -50,7 +56,7 @@ assert.deepEqual(controlsUpdated, ['sidebar', 'comparison']);
 class Element {
   constructor() { this.children = []; this.dataset = {}; this.attributes = {}; this.events = {}; this.scrollTop = 0; this.clientWidth = 1920; }
   append(...elements) { this.children.push(...elements); }
-  replaceChildren(...elements) { this.children = elements; }
+  replaceChildren(...elements) { this.children = elements; delete this.content; }
   setAttribute(name, value) { this.attributes[name] = value; }
   addEventListener(name, callback) { this.events[name] = callback; }
   querySelectorAll() { return this.buttons || []; }
@@ -87,6 +93,7 @@ assert.equal(panel.dataset.comparisonOpen, 'true');
 assert.equal(host.scrollLeft, 214, 'First opening reveals the right-hand Versions column without squeezing documents');
 assert.equal(first.attributes['aria-pressed'], 'true');
 assert.equal(reviews[0].args.mount, comparison.preview, 'The PDF owns a separate mount, never the draft');
+assert.equal(reviews[0].args.showClose, false, 'The Report comparison omits the dedicated Close PDF preview button');
 comparison.preview.content = Object.assign(new Element(), {scrollTop: 942});
 comparison.versionBody.scrollTop = 127;
 const position = comparison.capturePosition();
@@ -98,20 +105,37 @@ comparison.toggle();
 assert.equal(host.scrollLeft, 180, 'Reopening comparison keeps its horizontal position');
 assert.equal(comparison.preview.content.scrollTop, 942, 'Reopening restores the PDF position after hidden pages clamp their scroll');
 assert.equal(comparison.versionBody.scrollTop, 127, 'Reopening restores the version-list position too');
-comparison.select({id: 'first'}, prepare);
 assert.equal(reviews.length, 1, 'Reopening the same version keeps its loaded PDF and page position');
 assert.equal(comparison.preview.content.scrollTop, 942);
 comparison.restorePosition(position);
 assert.equal(comparison.versionBody.scrollTop, 127);
-comparison.select({id: 'second'}, prepare);
+comparison.select({id: 'first'}, prepare);
+assert.equal(comparison.selectedID, 'first', 'Programmatic selection keeps an existing export preview open');
+assert.equal(reviews.length, 1);
+assert.equal(comparison.preview.content.scrollTop, 942);
+comparison.select({id: 'first'}, prepare, {toggle: true});
+assert.equal(comparison.selectedID, null, 'Clicking the selected title a second time closes the PDF');
+assert.equal(panel.dataset.comparisonOpen, 'true', 'Keep the Versions list open when its selected PDF closes');
 assert.equal(reviews[0].disposed, true);
-assert.equal(reviews[0].args.isCurrent(), false, 'A slow previous selection cannot paint over the new PDF');
+assert.equal(reviews[0].args.isCurrent(), false, 'Closing also invalidates a pending PDF response');
+assert.equal(first.attributes['aria-pressed'], 'false');
+assert.equal(comparison.preview.children.length, 0, 'No empty PDF placeholder remains');
+assert.equal(comparison.versionBody.scrollTop, 127);
+comparison.select({id: 'first'}, prepare);
+assert.equal(reviews.length, 2, 'Clicking the closed title opens its PDF again');
+assert.equal(first.attributes['aria-pressed'], 'true');
+assert.equal(host.scrollLeft, 214, 'Opening a PDF keeps its title reachable for the second-click close');
+comparison.select({id: 'second'}, prepare);
+assert.equal(reviews[1].disposed, true);
+assert.equal(reviews[1].args.isCurrent(), false, 'A slow previous selection cannot paint over the new PDF');
 assert.equal(second.attributes['aria-pressed'], 'true');
 assert.equal(first.attributes['aria-pressed'], 'false');
-reviews[1].args.onClose();
+reviews[2].args.onClose();
 assert.equal(comparison.selectedID, null);
+assert.equal(panel.dataset.comparisonOpen, 'true', 'Escape closes only the preview, leaving Versions usable');
 assert.equal(host.document.value, 'Unsubmitted draft text');
 assert.equal(host.document.scrollTop, 731, 'Choosing, closing or hiding the PDF never changes draft scroll or text');
+comparison.select({id: 'second'}, prepare);
 panel.dataset.outlineHidden = 'true';
 comparison.divider.events.keydown({key: 'Home', preventDefault() {}});
 assert.equal(panel.dataset.reportComparisonWidth, '600');
@@ -144,7 +168,7 @@ assert.equal(panel.dataset.reportComparisonWidth, undefined);
 assert.equal(panel.dataset.pdfComparisonWidth, undefined);
 current = false;
 comparison.select({id: 'third'}, prepare);
-assert.equal(reviews.length, 2, 'Changed account context cannot open a private PDF');
+assert.equal(reviews.length, 4, 'Changed account context cannot open a private PDF');
 comparison.dispose();
 assert.ok(resized > 0);
 console.log('Report comparison passed: five-column order, document minimums, separate PDF mount, retained draft/page state, stale-selection fences, resizing and cleanup.');

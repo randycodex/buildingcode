@@ -1,4 +1,4 @@
-import { openReportExportReview } from './report-export-review.js?v=20261011-report-export-v10';
+import { openReportExportReview } from './report-export-review.js?v=20261011-report-export-v11';
 
 export function preserveReportReadingPosition(container, change) {
   const top = container.getBoundingClientRect().top + 33;
@@ -11,19 +11,20 @@ export function preserveReportReadingPosition(container, change) {
 }
 
 export function reportComparisonLayout(available, { sources = 0, outline = 0, versions = 300,
-  comparing = false, reportWidth = 0, pdfWidth = 0 } = {}) {
+  comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0 } = {}) {
+  const showPDF = comparing && previewing;
   const sidebars = sources + outline + (comparing ? versions : 0);
-  const dividers = Number(sources > 0) + Number(outline > 0) + (comparing ? 2 : 0);
+  const dividers = Number(sources > 0) + Number(outline > 0) + Number(comparing) + Number(showPDF);
   const pairWidth = Math.max(1200, available - sidebars - dividers);
   const chosenReport = reportWidth ? Math.max(600, reportWidth) : 0;
   const chosenPDF = pdfWidth ? Math.max(600, pdfWidth) : 0;
   return {
     template: [sources ? `${sources}px` : '0px', sources ? '1px' : '0px',
       outline ? `${outline}px` : '0px', outline ? '1px' : '0px',
-      comparing && chosenReport ? `${chosenReport}px` : 'minmax(600px, 1fr)',
-      comparing ? '1px' : '0px', comparing ? chosenPDF ? `${chosenPDF}px` : 'minmax(600px, 1fr)' : '0px',
+      showPDF && chosenReport ? `${chosenReport}px` : 'minmax(600px, 1fr)',
+      showPDF ? '1px' : '0px', showPDF ? chosenPDF ? `${chosenPDF}px` : 'minmax(600px, 1fr)' : '0px',
       comparing ? '1px' : '0px', comparing ? `${versions}px` : '0px'].join(' '),
-    minimumWidth: sidebars + dividers + (comparing ? (chosenReport || 600) + (chosenPDF || 600) : 600),
+    minimumWidth: sidebars + dividers + (showPDF ? (chosenReport || 600) + (chosenPDF || 600) : 600),
     balancedDocumentWidth: pairWidth / 2
   };
 }
@@ -79,20 +80,17 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
   };
   const current = () => !disposed && isCurrent();
   const paintSelection = () => versions.querySelectorAll('[data-report-preview]').forEach(button => {
-    button.setAttribute('aria-pressed', String(button.dataset.reportPreview === selectedID));
+    const selected = button.dataset.reportPreview === selectedID;
+    button.setAttribute('aria-pressed', String(selected));
+    button.title = selected ? 'Click again to close PDF preview' : 'Open PDF preview';
   });
-  const emptyPreview = () => {
-    const header = document.createElement('header');
-    header.className = 'report-comparison-header';
-    const title = document.createElement('h2');
-    title.textContent = 'PDF preview';
-    header.append(title);
-    const help = document.createElement('p');
-    help.className = 'report-workflow-help';
-    help.textContent = 'Choose a saved version on the right to compare its PDF with the current Report.';
-    preview.replaceChildren(header, help);
+  const closePreview = () => {
+    generation++;
+    review?.dispose();
+    review = null; selectedID = null; closedPosition = null;
+    preview.replaceChildren();
+    onResize(); paintSelection();
   };
-  emptyPreview();
   const setOpen = open => {
     const host = columns();
     const wasOpen = panel.dataset.comparisonOpen === 'true';
@@ -190,22 +188,31 @@ export function createReportComparison({ panel, columns, isCurrent, onResize,
     },
     get selectedID() { return selectedID; },
     toggle: () => setOpen(panel.dataset.comparisonOpen !== 'true'),
-    select(report, prepare) {
+    select(report, prepare, {toggle = false} = {}) {
       if (!current()) return;
-      setOpen(true);
-      if (selectedID === report.id && review) return;
+      if (selectedID === report.id && review) {
+        // The Versions toolbar restores a retained comparison; the selected
+        // version title itself toggles the PDF column off while the list stays.
+        if (toggle && panel.dataset.comparisonOpen === 'true') closePreview();
+        else setOpen(true);
+        return;
+      }
+      const position = closedPosition || readPosition();
+      const hadPreview = selectedID !== null;
       generation++;
       const request = generation;
       review?.dispose();
       selectedID = report.id;
+      closedPosition = panel.dataset.comparisonOpen !== 'true' ? {...position, pdf: 0} : null;
+      setOpen(true);
+      if (!hadPreview && columns()) columns().scrollLeft = Math.max(0, columns().scrollWidth - columns().clientWidth);
       paintSelection();
       review = renderReview({ mount: preview, prepare,
         isCurrent: () => current() && request === generation,
-        closeLabel: 'Close PDF preview',
+        showClose: false,
         onClose: () => {
           if (request !== generation || !current()) return;
-          review = null; selectedID = null;
-          emptyPreview(); paintSelection();
+          closePreview();
         }
       });
     },

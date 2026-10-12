@@ -3,7 +3,7 @@ import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261011-sidebar-width-v5";
-import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261011-comparison-v10";
+import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261011-comparison-v13";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -111,7 +111,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-report-layout-v898";
+} from "./offline-storage.js?v=20261011-version-toggle-v901";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -28613,7 +28613,7 @@ async function renderProjectReportDraft(project) {
       const file = report.files?.find(file => file.format === "web-pdf");
       if (!file) throw new Error("The stored Report PDF is unavailable. Its saved version remains in history.");
       return {manifest: payload.manifest, ...(await readProjectReportFile(projectID, file, report.title))};
-    });
+    }, {toggle: true});
   };
 
   let generatingReport = false;
@@ -29652,13 +29652,14 @@ async function renderProjectReportDraft(project) {
       comparison.divider, comparison.preview, versionsControls.divider, comparison.versions);
     panel._updateReportColumns = () => {
       const comparing = panel.dataset.comparisonOpen === "true";
+      const previewing = comparing && Boolean(comparison.selectedID);
       const sourceWidth = panel.dataset.libraryOpen === "true" ? Number(panel.dataset.libraryWidth) || 330 : 0;
       const outlineShown = panel.dataset.outlineHidden !== "true" && (comparing ||
         !document.querySelector(".workspace-shell")?.classList.contains("has-compact-reference-document"));
       const outlineWidth = outlineShown ? Number(panel.dataset.outlineWidth) || 300 : 0;
       const collapsedVersions = panel.dataset.versionsCollapsed === "true";
       const template = reportComparisonLayout(columns.clientWidth || shell.clientWidth, {
-        sources: sourceWidth, outline: outlineWidth, comparing,
+        sources: sourceWidth, outline: outlineWidth, comparing, previewing,
         versions: collapsedVersions ? 48 : Number(panel.dataset.versionsWidth) || 300,
         reportWidth: Number(panel.dataset.reportComparisonWidth) || 0,
         pdfWidth: Number(panel.dataset.pdfComparisonWidth) || 0
@@ -29667,7 +29668,8 @@ async function renderProjectReportDraft(project) {
         () => { columns.style.gridTemplateColumns = template; });
       library.hidden = libraryControls.divider.hidden = !sourceWidth;
       outline.hidden = outlineControls.divider.hidden = !outlineShown;
-      comparison.preview.hidden = comparison.versions.hidden = comparison.divider.hidden = versionsControls.divider.hidden = !comparing;
+      comparison.preview.hidden = comparison.divider.hidden = !previewing;
+      comparison.versions.hidden = versionsControls.divider.hidden = !comparing;
       versionsControls.divider.tabIndex = collapsedVersions ? -1 : 0;
       versionsControls.divider.setAttribute("aria-disabled", String(collapsedVersions));
       versionsTitle.setAttribute("aria-expanded", String(!collapsedVersions));
