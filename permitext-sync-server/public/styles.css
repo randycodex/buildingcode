@@ -19516,9 +19516,9 @@ dialog.report-export-review {
 .report-versions-header .report-versions-collapse { font-size: 13px; font-weight: 600; text-align: left; }
 .report-versions-panel > .report-history { display: block; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0; }
 .report-versions-panel .report-history-card { display: block; width: 100%; text-align: left; border: 0; border-radius: 0; padding: 0; background: transparent; color: var(--text-secondary); cursor: pointer; }
-.report-versions-panel .report-history-card strong { display: block; font-size: 13px; font-weight: 400; line-height: 1.5; overflow-wrap: anywhere; }
+.report-versions-panel .report-history-card strong { display: block; font-size: 13px; font-weight: 700; line-height: 1.5; overflow-wrap: anywhere; }
 .report-versions-panel .report-history-card span { display: block; margin-top: 6px; font-size: 11px; line-height: 1.5; }
-.report-versions-panel .report-history-card[aria-pressed="true"] strong, .report-versions-panel .report-history-card:hover strong { color: var(--text-primary); font-weight: 700; }
+.report-versions-panel .report-history-card[aria-pressed="true"] strong, .report-versions-panel .report-history-card:hover strong { color: var(--text-primary); }
 .report-screen .report-versions-panel .report-history-entry { padding: 18px 0; }
 .report-screen .report-versions-panel .report-history-files button { font-size: 12px; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-panel { padding: 24px 8px; align-items: center; }
