@@ -19506,7 +19506,7 @@ dialog.report-export-review {
 .report-screen .report-draft-panel .report-document-columns > .report-outline { grid-column: 1; display: block; }
 .report-screen .report-draft-panel .report-document-columns > .report-outline-divider { grid-column: 2; display: block; }
 .report-screen .report-draft-panel .report-document-columns > .report-document { grid-column: 3; display: block; }
-.report-screen .report-library > .report-source-picker { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0; padding: var(--panel-padding); }
+.report-screen .report-library > .report-source-picker { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0; padding: 0 var(--panel-padding) var(--panel-padding); }
 .report-comparison-divider, .report-versions-divider {
   position: relative; z-index: 1; background: var(--border); cursor: col-resize; touch-action: none;
 }

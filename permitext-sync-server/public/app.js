@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-report-version-delete-v921";
+} from "./offline-storage.js?v=20261012-source-category-spacing-v922";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
