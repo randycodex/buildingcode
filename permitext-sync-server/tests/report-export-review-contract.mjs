@@ -18,7 +18,13 @@ const source = await readFile(new URL("../public/report-export-review.js", impor
 const document = { body: new Element("body"), createElement: tag => new Element(tag) };
 let timer, createdBlob, downloadCount = 0, requests = 0, current = true, resolveRequest;
 const urls = new Set();
+const preferences = new Map();
+let storageBlocked = false;
 const context = vm.createContext({ document, crypto: { randomUUID: () => "synthetic" },
+  localStorage: {
+    getItem: key => { if (storageBlocked) throw Error('Storage unavailable'); return preferences.get(key); },
+    setItem: (key, value) => { if (storageBlocked) throw Error('Storage unavailable'); preferences.set(key, value); }
+  },
   setInterval: callback => { timer = callback; return 1; }, clearInterval: () => {},
   URL: { createObjectURL: blob => { createdBlob = blob; urls.add("blob:synthetic"); return "blob:synthetic"; },
     revokeObjectURL: url => urls.delete(url) },
@@ -39,16 +45,24 @@ const [retry, download] = footer.children;
 assert.equal(download.disabled, false);
 assert.equal(downloadCount, 0, "Review must not print, open a PDF or download automatically.");
 assert.equal(content.children[0].tag, "canvas");
+const canvas = content.children[0];
+const themeToggle = header.children[1];
+assert.equal(themeToggle.attributes['aria-checked'], 'false');
+themeToggle.click();
+assert.equal(themeToggle.attributes['aria-checked'], 'true');
+assert.equal(dialog.attributes['data-preview-theme'], 'dark');
+assert.equal(content.children[0], canvas, 'Changing theme keeps the existing rendered PDF pages');
 assert.equal(await createdBlob.text(), "%PDF-frozen-reviewed-bytes");
 assert.ok(!status.textContent.includes("Tables included as text"));
 download.click();
 assert.equal(await createdBlob.text(), "%PDF-frozen-reviewed-bytes");
 assert.equal(requests, 1, "Download uses the issued PDF bytes, not a fresh source lookup.");
-header.children[1].click();
+header.children[2].click();
 assert.equal(dialog.removed, true);
 assert.equal(urls.size, 0, "Release private object URLs when the review closes.");
 
 dialog = context.openReportExportReview({ ...args, prepare: () => new Promise(resolve => { resolveRequest = resolve; }) });
+assert.equal(dialog.attributes['data-preview-theme'], 'dark', 'The next saved version remembers the preview preference');
 current = false;
 timer();
 resolveRequest(packet);
@@ -84,7 +98,7 @@ assert.equal(inline.tag, "section");
 assert.equal(inline.parentElement, mount);
 assert.equal(editor.hidden, true);
 assert.equal(mount.scrollTop, 0);
-inline.children[0].children[1].click();
+inline.children[0].children[2].click();
 assert.equal(editor.hidden, false);
 assert.equal(initiallyHidden.hidden, true);
 assert.equal(editor.value, "Retained report edits");
@@ -95,7 +109,17 @@ await flush();
 const replacement = context.openReportExportReview({...args, mount});
 await flush();
 assert.equal(inline.removed, true, "Only one inline preview owns the document");
-replacement.children[0].children[1].click();
+replacement.children[0].children[2].click();
 assert.equal(editor.hidden, false);
 assert.equal(mount.scrollTop, 318);
 console.log("Inline PDF preview passed: shared screen, retained editor/scroll/focus and replacement cleanup.");
+
+storageBlocked = true;
+const privatePreview = context.openReportExportReview({...args, mount});
+await flush();
+privatePreview.children[0].children[1].click();
+assert.equal(privatePreview.attributes['data-preview-theme'], 'dark', 'Preview theme remains usable when preference storage is blocked');
+assert.equal(mount.scrollTop, 0);
+privatePreview.children[0].children[2].click();
+assert.equal(mount.scrollTop, 318);
+console.log('PDF theme passed: accessible toggle, preference retention, original download bytes, unchanged pages and blocked-storage fallback.');

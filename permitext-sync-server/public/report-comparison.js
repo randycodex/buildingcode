@@ -1,4 +1,4 @@
-import { openReportExportReview } from './report-export-review.js?v=20261011-report-export-v8';
+import { openReportExportReview } from './report-export-review.js?v=20261011-report-export-v9';
 
 export function preserveReportReadingPosition(container, change) {
   const top = container.getBoundingClientRect().top + 33;

@@ -19163,6 +19163,24 @@ dialog.report-export-review {
 .report-export-review .report-export-content { overflow-y: auto; background: #252525; padding: 24px; }
 .report-pdf-page { position: relative; max-width: 850px; width: 100%; margin: 0 auto 24px; background: white; box-shadow: 0 2px 12px #0005; color: #111; }
 .report-pdf-page canvas { display: block; width: 100%; height: auto; }
+.report-export-review > header h2, .report-export-review.report-export-inline > header h2 { margin-inline-end: auto; }
+.report-preview-theme-toggle {
+  display: inline-flex; align-items: center; gap: 7px; padding: 4px 0;
+  background: transparent; color: var(--text-secondary); font-size: 12px;
+  font-weight: 300; text-transform: uppercase; white-space: nowrap;
+}
+.report-preview-theme-toggle::before {
+  content: ''; width: 24px; height: 12px; flex: none; border: 1px solid var(--border); border-radius: var(--radius-pill);
+  background: radial-gradient(circle at 6px 50%, var(--text-secondary) 4px, transparent 4.5px) var(--toolbar-active);
+}
+.report-preview-theme-toggle[aria-checked="true"] { color: var(--text-primary); font-weight: 700; }
+.report-preview-theme-toggle[aria-checked="true"]::before {
+  background: radial-gradient(circle at 18px 50%, var(--text-primary) 4px, transparent 4.5px) var(--toolbar-active);
+}
+.report-preview-theme-toggle:hover { color: var(--text-primary); }
+.report-export-review[data-preview-theme="dark"] .report-export-content { background: #0c0c0c; }
+.report-export-review[data-preview-theme="dark"] .report-pdf-page { background: #141414; color: var(--text-primary); }
+.report-export-review[data-preview-theme="dark"] .report-pdf-page canvas { filter: invert(0.92) hue-rotate(180deg); }
 .report-pdf-accessible-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 /* Project-wide information has a single home, independent of column layouts. */
 #toggle-context, #toggle-facts { display: none !important; }
