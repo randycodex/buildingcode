@@ -19115,7 +19115,8 @@ dialog.report-screen {
 .report-outline-item-label { display: block; min-width: 0; }
 .report-outline-item-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 .report-outline-item-detail { display: block; margin-top: 3px; font-size: 10px; font-weight: 400; color: var(--text-tertiary, var(--text-secondary)); }
-.report-outline .report-outline-link[aria-current="location"], .report-outline .report-outline-link:hover, .report-outline .is-heading .report-outline-item-title { color: var(--text-primary); font-weight: 600; }
+.report-outline .report-outline-link[aria-current="location"], .report-outline .report-outline-link:hover { color: var(--text-primary); }
+.report-outline .is-heading .report-outline-item-title { color: var(--text-primary); font-weight: 600; }
 .report-outline button:focus-visible { outline: 1px solid var(--text-secondary); outline-offset: 2px; }
 .report-outline-item.is-dragging { opacity: 0.45; }
 .report-outline.is-reordering :is(.report-outline-item, button) { outline: none !important; box-shadow: none; }

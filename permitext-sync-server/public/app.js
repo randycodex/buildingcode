@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-report-add-hover-v924";
+} from "./offline-storage.js?v=20261012-outline-hover-type-v925";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
