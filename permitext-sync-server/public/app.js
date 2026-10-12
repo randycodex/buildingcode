@@ -110,7 +110,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261011-menu-hover-v863";
+} from "./offline-storage.js?v=20261011-menu-order-v864";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
