@@ -26,10 +26,12 @@ const wideSidebars = reportComparisonLayout(1920, {sources: 720, versions: 720, 
 assert.equal(wideSidebars.sourcesWidth + wideSidebars.versionsWidth + 2, 1320,
   'Expanded sidebars fit the screen and leave a 600px central viewport');
 const narrowSidebars = reportComparisonLayout(900, {sources: 720, versions: 720, comparing: true});
-assert.equal(narrowSidebars.sourcesWidth, 280);
+assert.equal(narrowSidebars.sourcesWidth, 300);
 assert.equal(narrowSidebars.versionsWidth, 300);
 assert.ok(narrowSidebars.sourcesWidth + narrowSidebars.versionsWidth + 2 < 900,
   'On smaller desktop viewports, sidebar minimums leave room for horizontally scrolling documents');
+assert.equal(reportComparisonLayout(2671, {sources:280, comparing:true}).sourcesWidth, 300,
+  'A saved Sources width from before the new minimum is restored at 300px');
 let changedWidth = false;
 const positionContainer = {scrollTop: 731, getBoundingClientRect: () => ({top: 84}),
   querySelectorAll: () => [

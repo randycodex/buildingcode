@@ -13,7 +13,8 @@ export function preserveReportReadingPosition(container, change) {
 export function reportComparisonLayout(available, { sources = 0, outline = 0, versions = 300,
   comparing = false, previewing = comparing, reportWidth = 0, pdfWidth = 0 } = {}) {
   const showPDF = comparing && previewing;
-  const minimumSources = sources ? 280 : 0;
+  const minimumSources = sources ? 300 : 0;
+  sources = Math.max(minimumSources, sources);
   const minimumVersions = comparing ? Math.min(300, versions) : 0;
   const sidebarBudget = Math.max(minimumSources + minimumVersions,
     available - 600 - Number(sources > 0) - Number(comparing));

@@ -38,7 +38,12 @@ const key = (name, shiftKey = false) => {
 assert.equal(key('ArrowRight'), true);
 assert.equal(widthProperty, '354px');
 key('ArrowLeft', true);
-assert.equal(widthProperty, '280px', 'Keyboard resizing respects the readable minimum');
+assert.equal(widthProperty, '300px', 'Keyboard resizing respects the Sources minimum');
+assert.equal(controls.divider.attributes['aria-valuemin'], '300');
+controls.divider.events.pointerdown(pointer(7, 300));
+controls.divider.events.pointermove(pointer(7, -500));
+controls.divider.events.pointerup(pointer(7, -500));
+assert.equal(widthProperty, '300px', 'Dragging Sources left stops at 300px');
 key('End');
 assert.equal(widthProperty, '720px');
 shell.clientWidth = 1024;

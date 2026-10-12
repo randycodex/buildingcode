@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v1512";
+const shellCacheName = "permitext-pro-shell-v1513";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -17,7 +17,7 @@ const shellURLs = [
   "/web/report-autosave.js?v=1",
   "/web/report-outline.js?v=20261011-outline-v11",
   "/web/report-export-review.js?v=20261012-report-export-v12",
-  "/web/report-comparison.js?v=20261012-comparison-v18",
+  "/web/report-comparison.js?v=20261012-comparison-v19",
   "/web/workspace-resume.js?v=20261012-refresh-v1",
   "/web/reader-navigation-tree.js?v=20261010-contents-v1",
   "/web/reader-chapter-extent.js?v=20261010-chapter-extent-v2",
@@ -40,18 +40,18 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261012-source-category-spacing-v922",
+  "/web/styles.css?v=20261012-sources-minimum-v923",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261012-source-category-spacing-v922",
+  "/web/app.js?v=20261012-sources-minimum-v923",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261012-source-category-spacing-v922",
+  "/web/offline-storage.js?v=20261012-sources-minimum-v923",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20261010-project-information-v13",
@@ -71,7 +71,7 @@ const shellURLs = [
   "/web/sync-state.js?v=20260924-empty-clears-v3",
   "/web/workflow-views.js?v=7",
   "/web/report-screen.js?v=20261011-shared-shell-v6",
-  "/web/report-library.js?v=20261012-sidebar-width-v7",
+  "/web/report-library.js?v=20261012-sidebar-width-v8",
   "/web/report-pdf-preview.js?v=20261011-report-preview-v3",
   "/web/pdf-preview-assets/pdf.min.js",
   "/web/pdf-preview-assets/pdf.worker.min.js"

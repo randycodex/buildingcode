@@ -23,7 +23,7 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
   };
   const currentWidth = () => Number(panel.dataset[`${kind}Width`]) || defaultWidth;
   const updateControls = () => {
-    const width = Math.min(currentWidth(), maximumWidth());
+    const width = Math.max(minimumWidth, Math.min(currentWidth(), maximumWidth()));
     divider.setAttribute('aria-valuemin', String(minimumWidth));
     divider.setAttribute('aria-valuemax', String(maximumWidth()));
     divider.setAttribute('aria-valuenow', String(Math.round(width)));
@@ -78,7 +78,7 @@ function createReportSidebarControls({ panel, shell, element, kind, label, defau
 
 export function createReportLibraryControls(options) {
   return createReportSidebarControls({ ...options, element: options.library, kind: 'library',
-    label: 'Sources', defaultWidth: 330, minimumWidth: 280 });
+    label: 'Sources', defaultWidth: 330, minimumWidth: 300 });
 }
 
 export function createReportOutlineControls(options) {
