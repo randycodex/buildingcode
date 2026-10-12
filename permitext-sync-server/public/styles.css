@@ -19589,3 +19589,7 @@ dialog.report-export-review {
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-header { border: 0; margin: 0; padding: 0; height: auto; min-height: 0; flex-basis: auto; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-collapse { writing-mode: vertical-rl; text-transform: uppercase; letter-spacing: 1px; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-panel > .report-history { display: none; }
+.reader-large-section > .annotated-code-block {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 120px;
+}

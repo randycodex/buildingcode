@@ -10,7 +10,7 @@ for (const name of ["openSourceInReader", "openDeepLinkedSectionInReader"]) {
     const gate = new Promise(done => { resolve=done; });
     const calls=[];
     const c=vm.createContext({
-      workspaceColumnsRequireProject: () => false, workflowPaneIsVisible: () => true,
+      workspaceColumnsRequireProject: () => false, workflowPaneIsVisible: () => true, currentColumnWorkflowView: () => "research", resolvedReaderSourceNavigations: new WeakMap(), searchReaderOpeningAttempts: new Map(),
       activeWorkspaceID: "workspace-a", captureAccountRequest: () => 1, isCurrentAccountRequest: () => true,
       state:{readers:[],paneWeights:{}}, resolveReaderSource:async item=>item,
       searchResultDetail:item=>item, readerFieldsForSectionDetail:item=>item,
@@ -37,7 +37,7 @@ console.log("Reader target readiness passed: source and deep-link navigation wai
 // Declining enablement must leave the Reader untouched.
 {
   const state={readers:[],paneWeights:{}};
-  const c=vm.createContext({workspaceColumnsRequireProject:()=>false,state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:async()=>null});
+  const c=vm.createContext({workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=>"research",state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:async()=>null});
   vm.runInContext(functions,c);
   await c.openDeepLinkedSectionInReader({sectionID:42});
   assert.equal(state.readers.length,0);
@@ -46,7 +46,7 @@ console.log("Reader target readiness passed: source and deep-link navigation wai
 {
   let finish;
   const state={readers:[],paneWeights:{}};
-  const c=vm.createContext({workspaceColumnsRequireProject:()=>false,state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:()=>new Promise(resolve=>{finish=resolve;})});
+  const c=vm.createContext({workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=>"research",state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:()=>new Promise(resolve=>{finish=resolve;})});
   vm.runInContext(functions,c);
   const pending=c.openDeepLinkedSectionInReader({sectionID:42});
   c.activeWorkspaceID='b';

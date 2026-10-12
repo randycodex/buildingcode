@@ -34,7 +34,7 @@ function harness({ delayChapters = false } = {}) {
     cancelReaderInternalSearch(panel) { panel._readerSearchAbort?.abort(); panel.dataset.readerSearchToken = "cancelled"; },
     captureAccountRequest: () => ({generation: 1}),
     isCurrentAccountRequest: identity => identity.generation === 1,
-    activeWorkspaceID: "navigation-race-fixture",
+    activeWorkspaceID: "navigation-race-fixture", publicCodeRevision: {generation: 1},
     guardReaderChapterSource: async () => ({context: {generation: 1}}),
     activeCodeSourcesController: {isCurrent: context => context.generation === 1},
     AbortController, crypto: { randomUUID }, document: { createElement: node },
@@ -64,7 +64,7 @@ function harness({ delayChapters = false } = {}) {
     sectionTitleFromID: (_id, value) => ({ sectionNumber: value.sections[0].id, title: value.sections[0].id }),
     updateBrowserSectionURL() {}, navigateReaderToSection() {}
   });
-  vm.runInContext("const readerResolvedWorkspaceIdentities = new WeakMap();\n" + [
+  vm.runInContext("const readerResolvedWorkspaceIdentities = new WeakMap(); const resolvedReaderSourceNavigations = new WeakMap();\n" + [
     "workspaceReaderContentIdentity", "setResolvedReaderChapter", "emptyReader", "resolveReaderNavigationChapterID", "beginReaderNavigation", "changeReaderCode", "refreshReaderContent",
     "populateReaderSelectors", "renderSectionContent", "selectReaderNavigation", "readerContentScrollKey", "readerScrollPositionFor"
   ].map(actual).join("\n"), context);

@@ -105,7 +105,7 @@ try {
   const restoration = vm.createContext({CSS:{escape:value=>value},cancelReaderScrollRestore(){},updateReaderScrollIndicator(){}});
   vm.runInContext(source.slice(restoreStart,restoreEnd),restoration);
   content.scrollTop = 0;
-  restoration.applyReaderScrollPosition({isConnected:true,dataset:{readerContentKey:pendingPosition.contentKey},querySelector:()=>content},pendingPosition);
+  restoration.applyReaderScrollPosition({isConnected:true,classList:{contains:()=>false},dataset:{readerContentKey:pendingPosition.contentKey},querySelector:()=>content},pendingPosition);
   assert.equal(target.getBoundingClientRect().top,-75,"Actual viewport restoration resolves an unloaded estimated position against the measured source section");
   const start = source.indexOf("async function progressivelyRenderReaderChapter("), end = source.indexOf("\n}", start) + 2;
   for (const mode of ["current", "new-navigation", "stopped", "closed", "failed"]) {
