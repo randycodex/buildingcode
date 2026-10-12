@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-12",
+  "phase": "local-release-preflight",
+  "baselineCommit": "f42d79991a3c70aedea96e6ef423aebb120d4663",
+  "releaseBranch": "codex/web-performance-release",
+  "scope": {
+    "web": true,
+    "backend": true,
+    "nativeAppChanged": false,
+    "nativeBuildOrDeviceTest": false,
+    "canonicalContentChanged": false,
+    "frozenEvaluationsChanged": false,
+    "paidProviderCalls": 0,
+    "databaseMigrations": []
+  },
+  "researchCheck": {
+    "command": "npm run test:research-chat",
+    "exitCode": 0,
+    "scope": "Full chained Research HTTP/replay/source/verification suite; mocked providers; not a new live semantic evaluation."
+  },
+  "fixes": [
+    "Rebind historical replay source IDs only to matching current supplied evidence; retain invalid-source and final-verifier rejection controls.",
+    "Normalize the known historical PC 412.4 next-section banner only in the test expectation, retaining exact provision matching.",
+    "Preserve the real 8000-character Zoning evidence budget and explicit missing-dependency gap; independently test complete number-only dependency resolution.",
+    "Update stale web, writer-policy, recovery-copy and billing-revision fixtures without changing production Research behavior or frozen evaluation records.",
+    "Add explicit web-only smoke mode retaining native checks by default and shared HTTP/security/sync checks in web-only runs.",
+    "Align current workspace/legacy recovery imports with the offline cache, bump changed module versions, and deduplicate shared dependencies in the startup bundle."
+  ],
+  "build": {
+    "clientBuild": "passed",
+    "deployContentPresence": "passed",
+    "preparedResearchAssets": "passed",
+    "bundleBytes": 1415925,
+    "gzipBytes": 363145,
+    "bundledModules": 55,
+    "eagerRequests": 1,
+    "productionEnvironmentKeyGroups": {
+      "required": 28,
+      "present": 28,
+      "valuesInspected": false
+    }
+  },
+  "checkBody": {
+    "commands": 174,
+    "initial": {
+      "passed": 171,
+      "skipped": 1,
+      "failed": 2
+    },
+    "followup": "Offline contract repaired and passed with full import-graph, lifecycle and recovery coverage; frozen retrieval version guard remains failing.",
+    "remainingFailures": [
+      {
+        "command": "node tests/evidence-retrieval-evals.mjs",
+        "classification": "baseline-frozen-evaluation-drift"
+      }
+    ],
+    "databaseIntegration": "Skipped without an explicitly configured test database.",
+    "current": {
+      "passed": 172,
+      "skipped": 1,
+      "baselineFailures": 1
+    }
+  },
+  "precheckRemainder": {
+    "commands": 208,
+    "initialPassed": 201,
+    "initialFailed": 7,
+    "followup": "Billing lifecycle fixture repaired; stale commit rejects without mutating store; exact once-charge/idempotency/refund checks pass.",
+    "remainingFailures": [
+      {
+        "command": "node tests/research-zoning-architecture-v2-contract.mjs",
+        "classification": "reproduced-on-exact-production-baseline"
+      },
+      {
+        "command": "node tests/research-zoning-architecture-v21-regressions.mjs",
+        "classification": "reproduced-on-exact-production-baseline"
+      },
+      {
+        "command": "node scripts/preflight-zoning-architecture-v2.mjs --architecture-v21 --source-selection --source-boundary --snapshot zoning-temporal-application-no-cost-preflight-2026-09-08.json --check",
+        "classification": "reproduced-on-exact-production-baseline"
+      },
+      {
+        "command": "node tests/research-multiturn-adversarial-contract.mjs",
+        "classification": "reproduced-on-exact-production-baseline"
+      },
+      {
+        "command": "node tests/research-benchmark-retrieval-contract.mjs",
+        "classification": "reproduced-on-exact-production-baseline"
+      },
+      {
+        "command": "node tests/research-benchmark-distinct-retrieval-contract.mjs",
+        "classification": "reproduced-on-exact-production-baseline"
+      }
+    ],
+    "current": {
+      "passed": 201,
+      "skipped": 1,
+      "baselineFailures": 6
+    }
+  },
+  "smoke": {
+    "directWebBackend": "passed",
+    "aggregate": "failed",
+    "remainingFailure": "tests/content-integrity.mjs exact authoritative equality: 51 unchanged shared native-resource section bodies differ from current extractor.",
+    "evidence": "SHARED_CONTENT_BASELINE_DRIFT_2026-10-12.json",
+    "otherAggregateCommands": "All commands outside that content check passed across scoped runs after two web fixture repairs."
+  },
+  "limitations": [
+    "Full npm run check is not claimed green: frozen evaluation versions, retained expected verdicts and retrieval benchmarks still fail separately.",
+    "Full aggregate smoke is not claimed green: unchanged shared CodeContent assets remain outside the requested native-free release.",
+    "Hosted latency, paid model answer quality and live PostgreSQL integration are not established by these local checks.",
+    "The user requested no focus highlight; visible keyboard-focus limitation is documented, while keyboard navigation/modal semantics remain checked."
+  ],
+  "baselineComparison": {
+    "commit": "f42d79991a3c70aedea96e6ef423aebb120d4663",
+    "zoning": {
+      "result": "All three failures reproduced; complete computed preflight JSON byte-identical.",
+      "computedSHA256": "1d562d67e168ade675dded43a9c7d454da0b01fec9dee0c808072240eb2d70d1",
+      "baselineModuleCount": 41
+    },
+    "retrievalDataset": {
+      "result": "Exact baseline validator reproduces retained v29 vs implementation v68 mismatch; relevant implementation/test/dataset bytes unchanged."
+    },
+    "benchmarks": {
+      "result": "All three failures reproduced on exact baseline; distinct-retrieval printed result byte-identical.",
+      "baselineGraphFiles": 172,
+      "multiturnPassed": 9,
+      "multiturnExpected": 10,
+      "candidateRecall": 0.9272727272727272,
+      "distinctCandidateRecall": 0.9565217391304348,
+      "distinctEvidenceRecall": "86/92",
+      "distinctFullyRecalled": "32/36"
+    },
+    "classification": "Inherited test/evaluation debt; no thresholds, frozen answers, snapshots, source corpus or acceptance authorizations changed."
+  }
+}

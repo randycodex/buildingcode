@@ -3,10 +3,11 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { targetedZoningContextExcerpt, refreshZoningContextEvidence } from "../research-zoning-context-excerpts.mjs";
 import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
+import { targetedDefinitionExcerpt } from "../research-definition-excerpts.mjs";
 import { planZoningResearchQuestion } from "../research-zoning-planner.mjs";
 import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
 import { ownerResearchScopeInput } from "../evals/research-owner-scope-input.mjs";
-import { assembledResearchEvidenceForTurn, researchCorpusPlanForTurn } from "../app.mjs";
+import { assembledResearchEvidenceForTurn, researchCorpusPlanForTurn, researchCorpusResources, resolveResearchAssemblySection } from "../app.mjs";
 import { immutableEvidenceSnapshot } from "../project-foundation-contract.mjs";
 import { researchTopicDependencyPlan } from "../research-topic-dependencies.mjs";
 import { zoningStorageBranchObligations } from "../research-zoning-storage-branches.mjs";
@@ -120,10 +121,47 @@ assert.equal(partial.sources[0].text, partialText);
 assert.equal(partial.sources[0].pinnedSelectionExact, true);
 assert.equal(partial.sources[0].targetedZoningContext, undefined);
 
-// Chat supplies no hand-picked passages. This catches number-only resolution
-// accidentally matching an empty webSectionID in the first catalog record.
+// Since 41330fa (2026-10-03), complete requested definitions are reserved
+// before incidental expansion. The real planner cannot fit those definitions,
+// Appendix J, the scoped 42-192 text and both dependencies inside 8,000 chars.
+// Preserve the complete definitions and explicit gap, not a clipped rule or
+// a larger production budget. This unresolved property question permits no AI.
 const chatInput = { ...input, pinnedEvidence: [], originSurface: "chat" };
-const chat = await assembledResearchEvidenceForTurn({ ...chatInput, corpusPlan: await researchCorpusPlanForTurn(chatInput), zoningPlan: plan });
+const boundedChat = await assembledResearchEvidenceForTurn({ ...chatInput, corpusPlan: await researchCorpusPlanForTurn(chatInput), zoningPlan: plan });
+const reservedDefinition = boundedChat.sources.find(item => item.requestedDefinitionReservation);
+assert(reservedDefinition);
+assert.deepEqual(reservedDefinition.targetedDefinition.labels, ["lot area", "self-service storage facility"]);
+const exactDefinitions = targetedDefinitionExcerpt({ ...await zoningSection(reservedDefinition.sectionID), codePrefix: "ZR" }, input.question,
+  { completeDefinitionLabels: reservedDefinition.targetedDefinition.labels });
+assert.equal(reservedDefinition.text, exactDefinitions.text);
+assert.equal(reservedDefinition.truncated, false);
+assert(boundedChat.limitations.some(item => item.kind === "topic-dependency-coverage-gap" && /42-193/.test(item.text)));
+assert(!boundedChat.sources.some(item => item.sectionNumber === "42-193"));
+assert.equal(boundedChat.usage.resolverFailureCount, 0);
+assert(boundedChat.usage.characterCount <= 8_000);
+assert.equal(plan.disposition, "deterministic_boundary");
+assert.equal(plan.callPolicy.maximumProviderCalls, 0);
+
+// Independently exercise the complete dependency packet with controlled
+// discovery and the actual catalog resolver. Neither dependency supplies an
+// ID: number-only lookup must not match an empty webSectionID on another row.
+const { catalog } = await researchCorpusResources(await researchCorpusPlanForTurn(chatInput));
+const dependencyRequests = [];
+const chat = await assembleResearchEvidence({
+  question: input.question, questionPlan: plan, limits: plan.evidenceLimits,
+  discover: async () => ({ candidates: boundedChat.sources.filter(item => ["APPENDIX J", "42-192"].includes(item.sectionNumber)) }),
+  resolveSection: request => {
+    if (["42-191", "42-193"].includes(request.sectionNumber)) {
+      assert(!request.sectionID, "Dependencies must be resolved by number and corpus identity.");
+      dependencyRequests.push(request.sectionNumber);
+    }
+    return resolveResearchAssemblySection(request, catalog);
+  }
+});
+assert.deepEqual([...new Set(dependencyRequests)].sort(), ["42-191", "42-193"]);
+assert(reservedDefinition.text.length + ["APPENDIX J", "42-192", "42-191", "42-193"]
+  .reduce((total, number) => total + chat.sources.find(item => item.sectionNumber === number).text.length, 0) > 8_000,
+  "The real-planner gap must reflect the unchanged budget, not a missing or mismatched source.");
 assert.equal(chat.sources.find((item) => item.sectionNumber === "42-192").text, excerpt.text);
 for (const number of ["42-191", "42-193"]) {
   const dependency = chat.sources.find((item) => item.sectionNumber === number);

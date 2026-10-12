@@ -7,6 +7,11 @@ import { join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const port = 8794;
+const smokeArguments = process.argv.slice(2);
+const webOnly = smokeArguments.includes("--web-only");
+if (smokeArguments.some((argument) => argument !== "--web-only")) {
+  throw new Error("Usage: node tests/smoke.mjs [--web-only]");
+}
 const baseURL = `http://127.0.0.1:${port}`;
 const adminToken = "smoke-admin-token";
 const grantAdminToken = "smoke-grant-admin-token";
@@ -25,6 +30,17 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+// The default smoke still verifies native source contracts. A web/backend release
+// can opt out explicitly without reading native files or skipping shared HTTP,
+// entitlement, evidence, privacy, or web accessibility contracts.
+function assertNative(condition, message) {
+  if (!webOnly) assert(condition, message);
+}
+
+function readNativeSource(url, encoding) {
+  return webOnly ? Promise.resolve("") : readFile(url, encoding);
 }
 
 function mutationKind(mutation) {
@@ -174,55 +190,55 @@ async function main() {
     `${JSON.stringify(evaluationRun, null, 2)}\n`
   );
   const notebookEditorSource = await readFile(new URL("../src/notebook-editor.js", import.meta.url), "utf8");
-  const iosUserDataStoreSource = await readFile(
+  const iosUserDataStoreSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Data/UserDataStore.swift", import.meta.url),
     "utf8"
   );
-  const iosSyncEngineSource = await readFile(
+  const iosSyncEngineSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Diagnostics/Signposts.swift", import.meta.url),
     "utf8"
   );
-  const iosSettingsSource = await readFile(
+  const iosSettingsSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Views/SettingsView.swift", import.meta.url),
     "utf8"
   );
-  const iosBrowseSource = await readFile(
+  const iosBrowseSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Views/BrowseView.swift", import.meta.url),
     "utf8"
   );
-  const iosBrowserContextSource = await readFile(
+  const iosBrowserContextSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Models/BrowserContext.swift", import.meta.url),
     "utf8"
   );
-  const iosAppSource = await readFile(
+  const iosAppSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/PermitextApp.swift", import.meta.url),
     "utf8"
   );
-  const iosLibraryViewModelSource = await readFile(
+  const iosLibraryViewModelSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", import.meta.url),
     "utf8"
   );
-  const iosCodeModelsSource = await readFile(
+  const iosCodeModelsSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Models/CodeModels.swift", import.meta.url),
     "utf8"
   );
-  const iosPrivacyManifestSource = await readFile(
+  const iosPrivacyManifestSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/PrivacyInfo.xcprivacy", import.meta.url),
     "utf8"
   );
-  const iosInfoPlistSource = await readFile(
+  const iosInfoPlistSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Info.plist", import.meta.url),
     "utf8"
   );
-  const iosBookmarksSource = await readFile(
+  const iosBookmarksSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Views/BookmarksView.swift", import.meta.url),
     "utf8"
   );
-  const iosExportBuilderSource = await readFile(
+  const iosExportBuilderSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Data/BookmarkExportBuilder.swift", import.meta.url),
     "utf8"
   );
-  const iosOrganizationProjectHubSource = await readFile(
+  const iosOrganizationProjectHubSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Views/OrganizationProjectHubView.swift", import.meta.url),
     "utf8"
   );
@@ -336,14 +352,14 @@ async function main() {
     assert(webRoot.response.headers.get("content-type")?.includes("text/html"), "Web root did not return HTML.");
     assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
-    assert(
+    assertNative(
       iosPrivacyManifestSource.includes("<key>NSPrivacyTracking</key>") &&
         iosPrivacyManifestSource.includes("<key>NSPrivacyAccessedAPITypes</key>") &&
         iosPrivacyManifestSource.includes("<string>CA92.1</string>") &&
         iosPrivacyManifestSource.includes("<string>NSPrivacyCollectedDataTypeUserID</string>"),
       "The iOS privacy manifest no longer declares tracking state and required-reason API use."
     );
-    assert(
+    assertNative(
       iosInfoPlistSource.includes("<key>ITSAppUsesNonExemptEncryption</key>") &&
         iosInfoPlistSource.includes("<false/>"),
       "The iOS export-compliance declaration is missing."
@@ -376,7 +392,7 @@ async function main() {
         !privacyPolicy.text.includes('class="back-link"') &&
         webRoot.text.includes('href="/privacy"') &&
         webRoot.text.includes('href="/privacy" target="_blank" rel="noopener noreferrer"') &&
-        iosSettingsSource.includes("https://permitext.com/privacy"),
+        (webOnly || iosSettingsSource.includes("https://permitext.com/privacy")),
       "The privacy policy or its web/iOS links no longer identify the operator and contact."
     );
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
@@ -396,39 +412,65 @@ async function main() {
     );
     const topbarGroupOrder = [
       'class="topbar-actions"',
-      'id="toggle-saved"',
-      'id="add-reader"',
-      'id="toggle-search"',
-      'id="toggle-analysis"',
-      'class="topbar-workspaces"',
+      'data-workflow-view="research"',
+      'data-workflow-view="notebook"',
+      'id="toggle-report"',
       'class="topbar-layout-actions"',
       'id="fit-columns"',
       'id="collapse-readers"',
+      'class="topbar-workspaces"',
+      'id="workspace-actions"',
+      'id="open-project-details"',
       'id="toggle-settings"',
       'class="topbar-brand"'
     ].map((marker) => topbarSource.indexOf(marker));
     assert(
       topbarGroupOrder.every((index, position) => index >= 0 && (position === 0 || index > topbarGroupOrder[position - 1])),
-      "Web topbar tools or right-side workspace controls are no longer in their intended order."
+      "Working views, layout, Projects and Account controls are no longer in their intended topbar order."
     );
+    const tagWithID = (html, id) => html.match(new RegExp(`<[^>]+\\bid="${id}"[^>]*>`))?.[0] || "";
+    const workflowStart = webRoot.text.indexOf('<nav class="workflow-toolbar"');
+    const workflowSource = webRoot.text.slice(workflowStart, webRoot.text.indexOf("</nav>", workflowStart));
+    const workflowOrder = ['data-workflow-tools="research"', 'id="add-reader"', 'id="toggle-search"',
+      'id="toggle-analysis"', 'data-workflow-tools="notebook"', 'id="add-notebook-reader"', 'id="toggle-saved"', 'id="toggle-notebook"']
+      .map(marker => workflowSource.indexOf(marker));
     assert(
-      topbarSource.includes('id="toggle-saved" type="button" aria-label="Saved" title="Saved" aria-pressed="false" data-mobile-label="Saved">'),
-      "The Saved toolbar control no longer exposes its visible and accessible label."
+      workflowStart >= 0 && workflowOrder.every((index, position) => index >= 0 && (position === 0 || index > workflowOrder[position - 1])),
+      "Research tools must remain Reader, Search, Assistant; Notebook tools must remain Reader, Evidence, Notes."
     );
+    for (const [id, label] of [["add-reader", "Reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
+      ["add-notebook-reader", "Reader"], ["toggle-saved", "Evidence"], ["toggle-notebook", "Notes"]]) {
+      const tag = tagWithID(workflowSource, id);
+      assert(tag.includes('type="button"') && tag.includes(`aria-label="${label}"`), `${label} tool lost button semantics or its accessible label.`);
+      if (id.startsWith("toggle-")) assert(tag.includes('aria-pressed="false"'), `${label} tool lost its initial toggle state.`);
+    }
+    assert(tagWithID(topbarSource, "workspace-actions").includes('aria-haspopup="menu"') &&
+      tagWithID(topbarSource, "workspace-actions").includes('aria-expanded="false"') &&
+      tagWithID(topbarSource, "toggle-settings").includes('aria-label="Account"'),
+    "Projects menu or Account navigation lost accessible semantics.");
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
       webRoot.text.indexOf('<script src="/web/app.js')
     );
     const settingsSectionOrder = [
-      '>Plan</h3>',
-      '>Account</h3>',
-      '>Offline Access</h3>',
-      '>Data &amp; Storage</h3>'
+      'id="settings-plan-title"',
+      'id="settings-account-title"',
+      'id="settings-active-sources-title"',
+      'id="settings-sync-conflicts-title"',
+      'id="settings-offline-title"',
+      'id="settings-data-title"'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
     assert(
       settingsSectionOrder.every((index, position) => index >= 0 && (position === 0 || index > settingsSectionOrder[position - 1])),
-      "Web Settings groups do not match the iOS Settings order."
+      "Account template groups no longer retain Plan, Profile, Library, Sync Conflicts, Offline and Data recovery order."
     );
+    for (const [id, label] of [["settings-plan-title", "Plan"], ["settings-account-title", "Profile"],
+      ["settings-active-sources-title", "Library"], ["settings-sync-conflicts-title", "Sync Conflicts"],
+      ["settings-offline-title", "Offline"], ["settings-data-title", "Data recovery"]]) {
+      assert(settingsTemplateSource.includes(`aria-labelledby="${id}"`) &&
+        new RegExp(`<h3[^>]*id="${id}"[^>]*>${label}</h3>`).test(settingsTemplateSource),
+      `${label} Account group lost its linked heading.`);
+    }
     assert(
       settingsTemplateSource.includes('class="icon-button utility-close settings-close-button"'),
       "Settings should use the same close-column control as the other workspace columns."
@@ -473,12 +515,12 @@ async function main() {
         settingsTemplateSource.includes("100 AI-assisted Research turns each month") &&
         !settingsTemplateSource.includes("Research Add-On") &&
         !settingsTemplateSource.includes("account-research-checkout") &&
-        !iosSettingsSource.includes("planFeatureRow(") &&
+        (webOnly || (!iosSettingsSource.includes("planFeatureRow(") &&
         iosSettingsSource.includes('CodeEyebrow(text: "Plan"') &&
         iosSettingsSource.includes('Label(currentPlanTitle, systemImage: "checkmark.circle.fill")') &&
         iosSettingsSource.includes('Text(planSummaryText)') &&
         iosSettingsSource.includes('return "Lifetime Pro"') &&
-        iosSettingsSource.includes("100 AI-assisted Research turns each month") &&
+        iosSettingsSource.includes("100 AI-assisted Research turns each month"))) &&
         !settingsTemplateSource.includes('class="settings-billing-line"'),
       "Settings lost the single $20 Pro plan with included Research or restored a separate Research add-on."
     );
@@ -486,8 +528,8 @@ async function main() {
       !settingsTemplateSource.includes('>Code Preferences</h3>') &&
         !settingsTemplateSource.includes('settings-jurisdiction-select') &&
         !settingsTemplateSource.includes('settings-version-select') &&
-        !iosSettingsSource.includes('Text("NYC Zoning Resolution")') &&
-        !iosSettingsSource.includes('localizedCaseInsensitiveContains("zoning")'),
+        (webOnly || (!iosSettingsSource.includes('Text("NYC Zoning Resolution")') &&
+        !iosSettingsSource.includes('localizedCaseInsensitiveContains("zoning")'))),
       "Settings should omit jurisdiction and version pickers; code selection belongs in the Reader."
     );
     assert(
@@ -566,9 +608,9 @@ async function main() {
     assert(workspaceStateScript.response.ok, "Named workspace state module did not load.");
     assert(
       webRoot.text.includes('id="workspace-actions"') &&
-        webRoot.text.includes('class="workspace-current-name">Main</span>') &&
+        webRoot.text.includes('class="workspace-current-name">Projects</span>') &&
         !webRoot.text.includes('id="add-workspace"') &&
-        webRoot.text.includes('id="collapse-readers" type="button" title="Close all columns">Close all</button>') &&
+        tagWithID(webRoot.text, "collapse-readers").includes('title="Close columns in this working view"') &&
         !webRoot.text.includes(">One Reader</button>") &&
         workspaceScript.text.includes('let workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
         workspaceScript.text.includes('privateWorkspaceKeys') &&
@@ -593,8 +635,10 @@ async function main() {
         workspaceScript.text.includes("await waitForWorkspaceTransitionPaint()") &&
         workspaceScript.text.includes('track.removeAttribute("aria-busy")') &&
         workspaceScript.text.includes("async function closeAllColumns()") &&
-        workspaceScript.text.includes("fitColumnsButton.hidden = !hasColumns") &&
-        workspaceScript.text.includes("collapseReadersButton.hidden = !hasColumns") &&
+        workspaceScript.text.includes("fitColumnsButton.hidden = !inReport && !hasColumns") &&
+        workspaceScript.text.includes("fitColumnsButton.disabled = inReport ? !reportReady : !hasColumns") &&
+        workspaceScript.text.includes("collapseReadersButton.hidden = inReport || !hasColumns") &&
+        workspaceScript.text.includes("collapseReadersButton.disabled = inReport || !hasColumns") &&
         workspaceScript.text.includes("async function openDeepLinkedSectionInReader") &&
         workspaceStyles.text.match(/\.topbar-workspaces\s*\{[^}]*display:\s*flex;[^}]*flex:\s*0 1 auto;[^}]*margin-left:\s*auto;/) &&
         workspaceStyles.text.includes('.workspace-actions-button .workspace-current-name') &&
@@ -616,20 +660,22 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("async function openNewSearchColumn()") &&
-        workspaceScript.text.includes('toggleSearchButton.addEventListener("click", () => {\n      void focusRecentUtilityColumn("search");') &&
+        /toggleSearchButton\.addEventListener\("click", \(\) => \{\s*if \(notifyProjectRequiredForColumn\(\)\) return;\s*void focusRecentUtilityColumn\("search"\);/.test(workspaceScript.text) &&
         workspaceScript.text.includes('add("New search column", () => void openNewSearchColumn())') &&
         workspaceScript.text.includes('run: () => openNewSearchColumn()') &&
         !workspaceScript.text.match(/async function openNewSearchColumn\(\)[\s\S]*?\.search-input[`"]\)\s*\?\.focus/),
       "Search should focus an existing column from the toolbar and retain explicit new-column actions."
     );
     assert(
-      workspaceScript.text.includes("async function toggleProjectsColumns()") &&
-        workspaceScript.text.includes('void toggleProjectsColumns();') &&
+      /toggleAnalysisButton\.addEventListener\("click", \(\) => \{\s*if \(notifyProjectRequiredForColumn\(\)\) return;\s*void focusRecentUtilityColumn\("analysis"\);/.test(workspaceScript.text) &&
+        /toggleSavedButton\.addEventListener\("click", \(\) => \{\s*if \(notifyProjectRequiredForColumn\(\)\) return;\s*void focusRecentUtilityColumn\("saved"\);/.test(workspaceScript.text) &&
+        workspaceScript.text.includes("async function openNewResearchColumn()") &&
+        workspaceScript.text.includes('add("New research column", () => void openNewResearchColumn())') &&
         workspaceScript.text.includes('const instance = newUtilityInstance("analysis");') &&
         workspaceScript.text.includes("state.utilityInstances.push(instance);") &&
         workspaceScript.text.includes('if (key === "settings") { toggleAccountDialog(); return; }') &&
         workspaceScript.text.includes('toggleSettingsButton.addEventListener("click", () => {\n    toggleUtilityPane("settings");'),
-      "Projects, repeatable Research columns, and the Account dialog must remain wired to their toolbar controls."
+      "Evidence and Research toolbar controls must focus recent columns, retain explicit new Research actions, and open Account from Settings."
     );
     const syncStateScript = await request("/web/sync-state.js");
     const evidenceDiscoveryClientSource = workspaceScript.text.slice(
@@ -700,12 +746,12 @@ async function main() {
         !workspaceScript.text.includes("const addZoningReaderButton") &&
         !workspaceScript.text.includes('label: "Open ZR Reader"') &&
         workspaceScript.text.includes('item.classList.toggle("is-indented", indented)') &&
-        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.construction2022)') &&
+        (webOnly || (iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.construction2022)') &&
         iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.codes2025)') &&
         iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.existingAndHistorical)') &&
         iosBrowseSource.includes('codeSectionName: "Zoning Resolution"') &&
         iosBrowserContextSource.includes("storedVersionFileName") &&
-        iosBrowserContextSource.includes("persistVersionFileName"),
+        iosBrowserContextSource.includes("persistVersionFileName"))),
       "Web Reader pickers should organize all enacted code collections, including Zoning Resolution."
     );
     assert(
@@ -812,11 +858,11 @@ async function main() {
         savedTemplateSource.includes('class="saved-projects-section code-filter-menu saved-projects-menu"') &&
         savedTemplateSource.includes('class="saved-project-list"') &&
         !workspaceScript.text.includes("No Projects yet. Use New to create one.") &&
-        workspaceScript.text.includes("if (!showingArchived && unassignedCount > 0) {") &&
+        /if \(workspaceProject\(workspaceProjects\)\) \{\s*panel\.querySelector\("\.saved-projects-section"\)\.hidden = true;\s*return;\s*\}\s*projects = projects\.filter\(\(project\) => !folderIsProject\(project\)\);/.test(workspaceScript.text) &&
         savedTemplateSource.includes('class="code-filter-menu-toggle saved-projects-menu-toggle"') &&
         !savedTemplateSource.includes('class="saved-project-pages"') &&
         !savedTemplateSource.includes('class="saved-project-page-dots"') &&
-        savedTemplateSource.includes('aria-label="Add Project or saved collection"') &&
+        savedTemplateSource.includes('class="saved-projects-add-button" type="button" title="New Project" aria-label="New Project"') &&
         savedTemplateSource.includes('class="saved-evidence-search"') &&
         savedTemplateSource.includes('class="saved-evidence-search-input"') &&
         savedTemplateSource.includes('class="saved-evidence-search-close"') &&
@@ -827,7 +873,7 @@ async function main() {
         !topbarSource.includes('id="toggle-projects"') &&
         !savedTemplateSource.includes('aria-label="Saved text size"') &&
         !projectsTemplateSource.includes('aria-label="Saved text size"'),
-      "Saved and Projects no longer follow the combined iOS hierarchy."
+      "Evidence must retain accessible project and search controls while keeping the collection picker scoped outside an active Project."
     );
     assert(
       workspaceScript.text.includes("function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [], annotations = [], workspaceProjects = null)") &&
@@ -906,20 +952,21 @@ async function main() {
         workspaceStyles.text.includes(".project-collaboration-notes-body[hidden]") &&
         !workspaceScript.text.includes("Select saved project items") &&
         !workspaceScript.text.includes("createProjectSectionSelectionController") &&
-        workspaceScript.text.includes("function printReportManifestAsPDF(manifest)") &&
+        workspaceScript.text.includes('reportRequest("/reports/generate", {') &&
+        workspaceScript.text.includes("reviewReport(payload.manifest, payload.generatedReport.file)") &&
         workspaceScript.text.includes("function renderFirmStandardsEditor") &&
         workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
         workspaceScript.text.includes('reportRequest("/reports/options"') &&
         workspaceScript.text.includes('const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };') &&
         workspaceScript.text.includes('versionList.className = "report-draft-version-list"') &&
         workspaceScript.text.includes('choice.className = "report-draft-version-option"') &&
-        workspaceScript.text.includes('choiceRevision.textContent = `Revision ${draft.version || 1}`') &&
-        workspaceScript.text.includes('createNew.textContent = "Create new Report"') &&
+        workspaceScript.text.includes('choiceRevision.textContent = current ? "Current" : `Revision ${draft.version || 1}`') &&
+        workspaceScript.text.includes('createNew.textContent = "+ New report"') &&
         workspaceScript.text.includes('const switchDraft = async (draftID) =>') &&
         workspaceScript.text.includes('titleControl.className = "report-title-control"') &&
         workspaceScript.text.includes('titleButton.className = "report-title-text"') &&
         workspaceScript.text.includes('titleEditor.setAttribute("aria-label", "Edit Report title")') &&
-        workspaceScript.text.includes('revisionLabel.textContent = `Revision ${activeDraft.version || 1}`') &&
+        workspaceScript.text.includes('revisionLabel.textContent = `Draft revision ${activeDraft.version || 1}`') &&
         !workspaceScript.text.includes('titleInput.setAttribute("aria-label", "Report title")') &&
         !workspaceScript.text.includes('select.className = "report-draft-select"') &&
         !workspaceScript.text.includes('templateSelect.className = "report-template-select"') &&
@@ -935,18 +982,18 @@ async function main() {
         !workspaceScript.text.includes('previewMeta.textContent = `${identity.name} · Date and time added automatically on export`') &&
         workspaceScript.text.includes('appendSourceGroup("Project facts", ""') &&
         !workspaceScript.text.includes("Add a paragraph, heading, list, or Project source to begin the professional narrative.") &&
-        workspaceScript.text.includes('appendSourceGroup("Saved evidence", ""') &&
-        workspaceScript.text.includes('codeGroup.className = `report-evidence-code-group code-theme-${codeTheme(prefix)}`') &&
-        workspaceScript.text.includes('codeTitle.textContent = prefix === "Other" ? "Other enacted codes" : codeLabel(prefix)') &&
-        workspaceScript.text.includes('const groupKey = `Saved evidence:${prefix}`') &&
+        workspaceScript.text.includes('[["evidence", "Evidence"], ["notebookCard", "Notes"]]') &&
+        workspaceScript.text.includes('appendSourceGroup(label, "", body => {') &&
+        workspaceScript.text.includes('const items = sources.filter(source => source.kind === kind)') &&
+        workspaceScript.text.includes('add.setAttribute("aria-label", `${add.disabled ? "Already included" : "Add to Report"}: ${source.label || heading.textContent}`)') &&
         workspaceScript.text.includes('{ numeric: true, sensitivity: "base" }') &&
         workspaceScript.text.includes('`code-theme-${codeTheme(source.codePrefix)}`') &&
-        workspaceScript.text.includes('heading.textContent = [source.codePrefix || "Code", sectionNumber, savedEvidenceEdition(source)]') &&
+        workspaceScript.text.includes('heading.textContent = source.label') &&
         workspaceScript.text.includes('block.kind === "evidence" && source') &&
-        workspaceScript.text.includes('[source.codePrefix || "Code", source.sectionNumber, savedEvidenceEdition(source)]') &&
+        workspaceScript.text.includes('[source.sectionNumber, stripLeadingSectionNumber(source.title || "", source.sectionNumber)]') &&
+        workspaceScript.text.includes('[source.codePrefix || "Code", savedEvidenceEdition(source)]') &&
         workspaceScript.text.includes('appendSourceGroup("Research", ""') &&
-        workspaceScript.text.includes('appendSourceGroup("Notebook notes", ""') &&
-        workspaceScript.text.includes('heading.textContent = `${report.title} · VERSION ${report.reportVersion}`') &&
+        workspaceScript.text.includes('heading.textContent = `${report.title} · Version ${report.reportVersion}`') &&
         workspaceScript.text.includes('`${generatedDate} at ${generatedTime}`') &&
         workspaceScript.text.includes('`${report.itemCount} included ${report.itemCount === 1 ? "item" : "items"}`') &&
         workspaceScript.text.includes('minute: "2-digit"') &&
@@ -954,9 +1001,10 @@ async function main() {
         !workspaceScript.text.includes("Generated reports will appear here as dated, immutable versions.") &&
         workspaceScript.text.includes('dragHandle.className = "report-draft-block-drag-handle"') &&
         workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title], label, initiallyExpanded') &&
-        workspaceScript.text.includes('appendOutputDisclosure(') &&
+        workspaceScript.text.includes('button.setAttribute("aria-label", `Preview ${report.title}, version ${report.reportVersion}`)') &&
+        workspaceScript.text.includes('button.setAttribute("aria-pressed", String(comparisonController?.selectedID === report.id))') &&
         !workspaceScript.text.includes('"Permitext Project Report",\n      preview,') &&
-        workspaceScript.text.includes('"Report history"') &&
+        workspaceScript.text.includes('versionsTitle.textContent = "Versions"') &&
         workspaceStyles.text.includes(".report-source-group-body") &&
         workspaceStyles.text.includes(".report-evidence-code-heading") &&
         workspaceStyles.text.includes(".report-evidence-code-body") &&
@@ -966,8 +1014,8 @@ async function main() {
         workspaceScript.text.includes('source.kind === "notebookCard"') &&
         workspaceScript.text.includes("reportTemplateID: selectedReportTemplateID") &&
         workspaceScript.text.includes("sourceWarnings = sourcePayload.warnings || []") &&
-        workspaceScript.text.includes("linked code ${sourceWarnings.length === 1 ? \"source is\" : \"sources are\"} unavailable") &&
-        workspaceScript.text.includes("The unavailable source was omitted so you can continue editing this Report.") &&
+        workspaceScript.text.includes('`Add sources — ${sourceWarnings.length} unavailable`') &&
+        workspaceScript.text.includes('pickerSummary.textContent = reportSourcePickerLabel()') &&
         workspaceScript.text.includes("function notebookResearchAnswers(foundation)") &&
         workspaceScript.text.includes("notebookResearchAnswers(foundation).forEach((answer) =>") &&
         workspaceScript.text.includes("Array.isArray(document?.document?.content) ? document.document.content : []") &&
@@ -994,13 +1042,15 @@ async function main() {
         workspaceScript.text.includes('selectButton.innerHTML = selectionModeIconSVG()') &&
         !workspaceScript.text.includes('deleteButton.className = "notebook-danger-action"') &&
         workspaceScript.text.includes('referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle"') &&
-        workspaceScript.text.includes("railToggle.append(railLabel)") &&
+        workspaceScript.text.includes("const railLabel = noteMenu.label") &&
+        workspaceScript.text.includes("createNotebookNoteMenu({") &&
         workspaceScript.text.includes("referenceToggle.append(referenceLabel)") &&
         !workspaceScript.text.includes("const railIcon = document.createElement") &&
         !workspaceScript.text.includes("const referenceIcon = document.createElement") &&
         workspaceScript.text.includes('referenceList.className = "notebook-reference-list"') &&
         workspaceScript.text.includes('option.className = "notebook-reference-option"') &&
-        workspaceScript.text.includes('label: "Insert evidence or Research"') &&
+        workspaceScript.text.includes('menuName: "Insert into note"') &&
+        workspaceScript.text.includes('label: "Insert"') &&
         workspaceScript.text.includes("async function notebookReferenceCandidates") &&
         workspaceScript.text.includes("function compareNotebookReferences(left, right)") &&
         workspaceScript.text.includes(".sort(compareNotebookReferences)") &&
@@ -1029,7 +1079,7 @@ async function main() {
         workspaceScript.text.includes("expectedVersion: submittedDraft.baseVersion"),
       "Web Project Studio no longer switches its Project overview, Notebook, Research history, and Report as one guarded workspace."
     );
-    assert(
+    assertNative(
       (
         iosSyncEngineSource.includes("transport.projectHubBootstrap") ||
         iosSyncEngineSource.includes("async let foundation = transport.projectFoundation")
@@ -1067,7 +1117,7 @@ async function main() {
         !iosOrganizationProjectHubSource.includes("Workboard preview"),
       "iOS Project Hub must show account-wide Project evidence without exposing the web-only Workboard."
     );
-    assert(
+    assertNative(
       iosLibraryViewModelSource.includes("private var startupWarmupTask: Task<Void, Never>?") &&
         iosLibraryViewModelSource.includes("startupWarmupTask?.cancel()") &&
         iosLibraryViewModelSource.includes("startupFirstUsableDurationMilliseconds") &&
@@ -1105,8 +1155,8 @@ async function main() {
         workspaceScript.text.includes('"projectArchiveNoticeSeen",') &&
         workspaceScript.text.includes("saved.projectArchiveNoticeSeen ||") &&
         workspaceScript.text.includes("Array.isArray(saved.archivedProjectIDs) && saved.archivedProjectIDs.length > 0") &&
-        workspaceScript.text.includes("if (!state.projectArchiveNoticeSeen)") &&
-        workspaceScript.text.includes("state.projectArchiveNoticeSeen = true") &&
+        workspaceScript.text.includes("async function archiveProjects(projects, options = {})") &&
+        workspaceScript.text.includes("state.archivedProjectIDs = Array.from(archived)") &&
         workspaceScript.text.includes("async function migrateLegacyArchivedProjects()") &&
         workspaceScript.text.includes("if (await migrateLegacyArchivedProjects())"),
       "Project archive and restore state no longer syncs or migrates from legacy browser storage."
@@ -1167,7 +1217,8 @@ async function main() {
         workspaceScript.text.includes("Notes require Pro") &&
         !workspaceScript.text.includes("Tags require Pro") &&
         workspaceScript.text.includes("Projects require Pro") &&
-        workspaceScript.text.includes("PDF export requires Pro") &&
+        workspaceScript.text.includes('[toggleReportButton, "Report", "professional-exports", projectHasOpenReportDraft]') &&
+        workspaceScript.text.includes('!hasCapability(capability) ? `${label} requires Pro`') &&
         workspaceScript.text.includes("Workboards require Pro") &&
         serverSource.includes('code: "WORKBOARD_RETIRED"') &&
         syncRepositorySource.includes("lower(plan) = 'pro'") &&
@@ -1207,7 +1258,7 @@ async function main() {
         workspaceScript.text.includes("recentSearchesJSON"),
       "Web foreground sync no longer applies iOS bulk clears or recent-search continuity."
     );
-    assert(
+    assertNative(
       iosUserDataStoreSource.includes("pendingBulkClearUpdatedAt(for: localizedMutation)") &&
         iosSyncEngineSource.includes("removingFieldsSuperseded(by: bulkClears)") &&
         iosSyncEngineSource.includes('supersededScopes.contains("notes")') &&
@@ -1230,13 +1281,13 @@ async function main() {
       !webContinuitySource.includes("state.settingsCodePrefix =") &&
         !webContinuitySource.includes("readerFieldsForSectionDetail") &&
         !webContinuitySource.includes("lastOpenedChapterID") &&
-        iosContinuitySource.includes("selectedVersionFileName: existingContext.selectedVersionFileName") &&
+        (webOnly || (iosContinuitySource.includes("selectedVersionFileName: existingContext.selectedVersionFileName") &&
         iosContinuitySource.includes("selectedCodeSectionID: existingContext.selectedCodeSectionID") &&
         iosContinuitySource.includes("activeProjectID: existingContext.activeProjectID") &&
-        !iosRefreshContinuitySource.includes("openSelectedContent()"),
+        !iosRefreshContinuitySource.includes("openSelectedContent()"))),
       "Remote continuity can still steer another device's active reader, code version, or project."
     );
-    assert(
+    assertNative(
       iosUserDataStoreSource.includes("private func folderSectionSyncTargets") &&
         iosUserDataStoreSource.includes('"folderClientID": target.folderClientID') &&
         iosUserDataStoreSource.includes('"folderType": target.folderType.rawValue') &&
@@ -1246,7 +1297,7 @@ async function main() {
         !iosUserDataStoreSource.includes('values: ["scope": "allFolders"]'),
       "iOS project membership removals are no longer durable project-specific tombstones."
     );
-    assert(
+    assertNative(
       iosSettingsSource.includes("private var dataAndStorageCard") &&
         iosSettingsSource.includes("private var projectManagementSection") &&
         iosSettingsSource.includes('selectedProjectIDs = Set(library.folders.map(\\.id))') &&
@@ -1307,7 +1358,9 @@ async function main() {
     assert(
       resetColumnWidthsStart >= 0 &&
         resetColumnWidthsEnd > resetColumnWidthsStart &&
-        resetColumnWidthsSource.includes("weights[paneID] = defaultPaneWidthForID(paneID)") &&
+        resetColumnWidthsSource.includes("state.paneWeights[id] = defaultPaneWidthForID(id)") &&
+        resetColumnWidthsSource.includes("activePaneIDs().filter(workflowPaneIsVisible)") &&
+        resetColumnWidthsSource.includes("resetReportColumnWidths(panel, syncReferenceReaderLayout)") &&
         resetColumnWidthsSource.includes("const currentLeft = track.scrollLeft") &&
         !resetColumnWidthsSource.includes("state.paneOrder") &&
         !resetColumnWidthsSource.includes("scrollTo({ left: 0"),
@@ -1331,7 +1384,7 @@ async function main() {
       "Section details still include their retired share control."
     );
     assert(
-      workspaceScript.text.includes("chrome.append(saveButton, backButton)") &&
+      workspaceScript.text.includes("actions.append(saveButton, projectButton, backButton)") &&
         workspaceScript.text.includes('label: "Close saved item"'),
       "Saved-item details no longer place the bookmark on the left and close control on the right."
     );
@@ -1348,7 +1401,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("const searchResultPageSize = 25;") &&
         workspaceScript.text.includes("function appendSearchLoadMore") &&
-        workspaceScript.text.includes("&match=exact&limit=${searchResultPageSize}&offset=0") &&
+        workspaceScript.text.includes("&match=${matchMode}&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true") &&
         workspaceScript.text.includes("offset=${encodeURIComponent(String(options.nextOffset))}"),
       "Search no longer opens with 25 results and supports explicit pagination."
     );
@@ -1366,7 +1419,8 @@ async function main() {
         workspaceScript.text.includes("if (hydrationCompleted && status.isConnected) maybeHydrate();") &&
         workspaceScript.text.includes('updateStatus();\n  maybeHydrate();\n}') &&
         !workspaceScript.text.includes("The current section is available, but the rest of this chapter could not be loaded.") &&
-        workspaceScript.text.includes("status.remove();\n      cleanup();\n      return;") &&
+        workspaceScript.text.includes("content._readerProgressiveCleanup = cleanup") &&
+        workspaceScript.text.includes("if (content._readerChapterExtent === extent) delete content._readerChapterExtent;\n    status.remove();") &&
         workspaceScript.text.includes('content.dataset.chapterFullyLoaded = "true"'),
       "Reader chapters no longer open with a selected-section window before progressive loading."
     );
@@ -1406,7 +1460,7 @@ async function main() {
         !workspaceScript.text.includes('function openSearchResultInReader') &&
         !workspaceScript.text.includes('function openSearchResultInNewReader') &&
         !workspaceScript.text.includes('newReaderButton') &&
-        !workspaceScript.text.includes('New reader') &&
+        workspaceScript.text.includes('openNewButton.textContent = "New reader"') &&
         workspaceScript.text.includes('void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {') &&
         workspaceScript.text.includes('sourceSurface: "search"') &&
         workspaceScript.text.includes("function updateSearchDock") &&
@@ -1680,7 +1734,7 @@ async function main() {
         workspaceScript.text.includes('introductionHeading.className = "report-introduction-heading project-collapsible-heading"') &&
         workspaceScript.text.includes("wireProjectSectionMotion(introductionSection, introductionBody") &&
         !workspaceScript.text.includes("introductionResizeHandle") &&
-        workspaceStyles.text.includes("background: color-mix(in srgb, var(--project-color) 9%, var(--surface-muted));\n  font-size: 12px;") &&
+        workspaceStyles.text.includes(".report-introduction-section textarea {\n  field-sizing: content;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
         !workspaceScript.text.includes('list.addEventListener("animationend", finishSwitch, { once: true })') &&
@@ -1766,13 +1820,13 @@ async function main() {
       "Saved Evidence items should open or reuse an exact-passage Reader beside Saved."
     );
     assert(
-      savedTemplateSource.includes('<p class="eyebrow panel-kind">Saved</p>') &&
-        savedTemplateSource.includes('<h2 class="panel-title">Saved</h2>') &&
+      savedTemplateSource.includes('<p class="eyebrow panel-kind">Evidence</p>') &&
+        savedTemplateSource.includes('<h2 class="panel-title">Evidence</h2>') &&
         savedTemplateSource.includes('<span class="code-filter-menu-label">Projects</span>'),
-      "The Saved column should retain Projects as its internal section label."
+      "The Evidence column should retain Projects as its internal section label."
     );
     assert(
-      workspaceStyles.text.includes(".topbar {\n  position: relative;\n  display: flex;") &&
+      workspaceStyles.text.includes(".topbar {\n  position: relative;\n  display: grid;") &&
         workspaceStyles.text.includes("border-bottom: 1px solid var(--border);\n  text-transform: none;") &&
         workspaceStyles.text.includes(".topbar-brand-name {") &&
         workspaceStyles.text.includes("letter-spacing: -0.03em;\n  text-transform: none;") &&
@@ -1923,8 +1977,7 @@ async function main() {
         workspaceScript.text.includes('persistProjectSectionExpansion(folder, "savedEvidence", expanded)') &&
         workspaceScript.text.includes('projectSectionExpanded(identity, "projectFacts", false)') &&
         workspaceScript.text.includes('persistProjectSectionExpansion(identity, "projectFacts", expanded)') &&
-        workspaceScript.text.includes('projectSectionExpanded(identity, "research", false)') &&
-        workspaceScript.text.includes('persistProjectSectionExpansion(identity, "research", expanded)') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], "Research history", false)') &&
         workspaceScript.text.includes("wireProjectSectionMotion(") &&
         workspaceScript.text.includes('title.className = "saved-evidence-section-toggle section-label"') &&
         !workspaceScript.text.includes("saved-evidence-collapse-toggle") &&
@@ -2049,20 +2102,20 @@ async function main() {
       "Project context guidance should live at the bottom of its active Project Studio rather than in Research Conversation."
     );
     assert(
-      workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel),") &&
-        workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel) * {") &&
+      workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel),") &&
+        workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) * {") &&
         workspaceStyles.text.includes("font-size: 14px !important;"),
-      "Non-Reader workspace columns should use a consistent 14px text size."
+      "Workspace tools outside Reader and section detail should use a consistent 14px text size."
     );
     assert(
       !webRoot.text.includes("settings-code-section-select") &&
         !webRoot.text.includes(">Code Section</span>") &&
         !workspaceScript.text.includes("settingsCodePrefix") &&
-        !iosSettingsSource.includes("codeSectionPicker") &&
-        !iosSettingsSource.includes('settingsMenuRow(label: "Code Section")'),
+        (webOnly || (!iosSettingsSource.includes("codeSectionPicker") &&
+        !iosSettingsSource.includes('settingsMenuRow(label: "Code Section")'))),
       "Settings should not duplicate the code picker already available in each Reader"
     );
-    assert(
+    assertNative(
       !iosSettingsSource.includes("syncCard") &&
         !iosSettingsSource.includes('CodeEyebrow(text: "Sync"') &&
         !iosSettingsSource.includes("Sync Now") &&
@@ -2101,7 +2154,7 @@ async function main() {
         workspaceScript.text.includes('postResearch("/research/conversations/candidate-disposition"') &&
         !workspaceScript.text.includes("Selected for exploratory Research") &&
         workspaceScript.text.includes("(embeddedEvidenceNoticeRegion || evidenceScroll).append(warning)") &&
-        workspaceScript.text.includes("panel.append(await renderResearchConversation(instance?.conversationID || state.researchConversationID, { embedded: true, supplemental: Boolean(instance), ownerInstance: instance, paneID }))") &&
+        /assistantBody\.append\(await renderResearchConversation\(instance\?\.conversationID \|\| state\.researchConversationID, \{\s*embedded: true, supplemental: Boolean\(instance\), ownerInstance: instance, paneID\s*\}\)\)/.test(workspaceScript.text) &&
         !workspaceScript.text.includes('panel.classList.add("has-research-composer")') &&
         workspaceScript.text.includes("input.style.height = `${Math.min(180, Math.max(48, input.scrollHeight))}px`") &&
         workspaceScript.text.includes("research-selected-evidence-notices") &&
@@ -2164,7 +2217,7 @@ async function main() {
         workspaceScript.text.includes("function showWebNotice") &&
         workspaceScript.text.includes("function resolveWebWarningContainer") &&
         workspaceScript.text.includes('previousFocus.closest(".workspace-panel")') &&
-        workspaceScript.text.includes("mountWebWarningBackdrop(backdrop, container, previousFocus)") &&
+        workspaceScript.text.includes("mountWebWarningBackdrop(backdrop, container, previousFocus, scope)") &&
         workspaceScript.text.includes("mountWebWarningBackdrop(backdrop, null, previousFocus)") &&
         workspaceScript.text.includes("function openStripeRestoreDialog") &&
         workspaceScript.text.includes("function stripeRestoreIDError") &&
@@ -2188,9 +2241,9 @@ async function main() {
     assert(
       workspaceScript.text.includes("function enforceReaderPlanLimit") &&
         workspaceScript.text.includes("if (isProAccount() || state.readers.length <= 2) return false") &&
-        workspaceScript.text.includes("addReaderButton.disabled = limitReached") &&
-        workspaceScript.text.includes('addReaderButton.title = limitReached ? "Two Reader limit reached" : readerLabel') &&
-        workspaceScript.text.includes("collapseReadersButton.disabled = !hasColumns") &&
+        workspaceScript.text.includes("button.disabled = !requiresProject && limitReached") &&
+        workspaceScript.text.includes('button.title = requiresProject ? "Create a Project first to open Reader" : limitReached ? "Two Reader limit reached" : "Open a Reader beside this view"') &&
+        workspaceScript.text.includes("collapseReadersButton.disabled = inReport || !hasColumns") &&
         workspaceScript.text.includes("const canAddReader = isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("if (!isProAccount() && state.readers.length >= 2)"),
@@ -2211,7 +2264,7 @@ async function main() {
         workspaceScript.text.includes("const defaultNotebookPaneWidth = 600") &&
         workspaceScript.text.includes("const defaultReportDraftPaneWidth = 600") &&
         workspaceScript.text.includes("const defaultSettingsPaneWidth = 600") &&
-        workspaceScript.text.includes("const defaultResearchPaneWidth = 600") &&
+        workspaceScript.text.includes("const defaultResearchPaneWidth = assistantHistoryWidth + 600") &&
         workspaceScript.text.includes("const defaultCodeDecisionPaneWidth = 600") &&
         workspaceScript.text.includes("return defaultNonReaderPaneWidth"),
       "Code Decision workflow columns no longer preserve their intended defaults."
@@ -2262,7 +2315,7 @@ async function main() {
       workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         workspaceScript.text.includes('track.querySelectorAll(".section-detail-panel")') &&
         workspaceScript.text.match(/closeSheet\(\{ restoreFocus: false \}\);\s+await transitionWorkspace\("utility", \{\s+refreshPaneIDs: projectOverviewRefreshPaneIDs\(/) &&
-        workspaceScript.text.match(/refreshPaneIDs: projectOverviewRefreshPaneIDs\([\s\S]*?\);\s+refreshOpenAnnotationProjectEditors\(\);/),
+        workspaceScript.text.match(/refreshPaneIDs: projectOverviewRefreshPaneIDs\([\s\S]*?\);\s+if \(!isCurrentAccountRequest\(requestIdentity\)\) return;\s+refreshOpenAnnotationProjectEditors\(\);/),
       "Creating or editing a Project should refresh Project pills in open section details."
     );
     assert(
@@ -2304,7 +2357,7 @@ async function main() {
     assert(
       workspaceScript.text.includes('const researchChatPlaceholder = "Ask a Research question…"') &&
         (workspaceScript.text.match(/input\.placeholder = researchChatPlaceholder;/g) || []).length === 1 &&
-        workspaceScript.text.includes('input.placeholder = "Ask a follow-up…"') &&
+        workspaceScript.text.includes('input.placeholder = conversation.messages.length ? "Ask a follow-up…" : displayedSources.length ? "Ask about this evidence…" : "Ask a question…"') &&
         workspaceScript.text.includes("Private notes are not included") &&
         !workspaceScript.text.includes('research-trust-notice') &&
         !workspaceScript.text.includes("appendTrustNotice") &&
@@ -2326,7 +2379,7 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function renderInlineCommentBox") &&
-        workspaceScript.text.includes("wrapper.append(bookmarkButton, researchButton)") &&
+        workspaceScript.text.includes("wrapper.append(bookmarkButton, researchButton, noteButton)") &&
         workspaceScript.text.includes("bookmarkButton.innerHTML = bookmarkIconSVG(saved)") &&
         workspaceScript.text.includes("researchButton.innerHTML = researchActionIconSVG()") &&
         workspaceScript.text.includes("openResearchSelectionDestinations()") &&
@@ -2359,7 +2412,7 @@ async function main() {
       const end = workspaceScript.text.indexOf("\n}", start) + 2;
       assert(start >= 0 && end > start, "Research movement helper is unavailable.");
       let primary = "research:conversation:primary";
-      const grouping = new Function("savedProjectColumnGroup", "paneIDForResearchConversation",
+      const grouping = new Function("savedEvidenceColumnGroup", "paneIDForResearchConversation",
         workspaceScript.text.slice(start, end) + "\nreturn basePaneGroupForMove;")(() => [], () => primary);
       const order = ["utility:analysis", primary, "research:conversation:supplemental"];
       assert(JSON.stringify(grouping("utility:analysis", order)) === JSON.stringify(order.slice(0, 2)) &&
@@ -2412,7 +2465,7 @@ async function main() {
         workspaceScript.text.includes('remove.className = "saved-evidence-delete-selection"') &&
         workspaceScript.text.includes('cancel.className = "saved-evidence-cancel-selection"') &&
         workspaceScript.text.includes("selectionController?.beginRender()") &&
-        workspaceScript.text.includes("removeButton.hidden = selectedCount === 0") &&
+        workspaceScript.text.includes("removeButton.hidden = options.inbox || selectedCount === 0") &&
         !workspaceScript.text.includes('removeButton.className = "saved-row-remove"') &&
         workspaceStyles.text.includes(".saved-evidence-heading-actions"),
       "Saved Evidence bulk deletion controls are missing."
@@ -2427,9 +2480,11 @@ async function main() {
         workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
         workspaceScript.text.includes("item.annotationBlockID") &&
         workspaceScript.text.includes("const combinedItems = mergeSavedColumnItems(savedItems, annotatedItems)") &&
-        workspaceScript.text.includes("rawCandidates.slice(0, allSavedLimit)") &&
+        workspaceScript.text.includes("const page = await resolveSavedSearchPage({") &&
+        workspaceScript.text.includes("limit: allSavedLimit,") &&
+        workspaceScript.text.includes("shouldContinue: () => generation === viewGeneration && panel.isConnected") &&
         !workspaceScript.text.includes("savedItems.slice(0, 48)") &&
-        workspaceScript.text.includes("const applySavedView = async () =>") &&
+        workspaceScript.text.includes("const applySavedView = async (viewOptions = {}) =>") &&
         workspaceScript.text.includes('button.className = "saved-load-more-button"') &&
         workspaceScript.text.includes("function savedEvidenceMatchesQuery(item, query)") &&
         workspaceScript.text.includes("codeDisplayLabel(prefix)") &&
@@ -2454,12 +2509,12 @@ async function main() {
         !workspaceScript.text.includes('folders.className = "saved-row-folders"') &&
         !workspaceStyles.text.includes(".saved-row-folders") &&
         workspaceStyles.text.includes(".saved-section-row.is-list-paragraph .saved-section-title") &&
-        workspaceScript.text.includes('sortSavedItems(filteredItems, "codeOrder")') &&
+        workspaceScript.text.includes('sortSavedItems(filteredItems, showingUnassigned ? "recentlySaved" : "codeOrder")') &&
         workspaceScript.text.includes("const commonRenderOptions = {") &&
         workspaceScript.text.includes("renderSavedItemsByCode(content, orderedItems, paneID, commonRenderOptions)") &&
         workspaceScript.text.includes("const removableSavedItems = selectedFolder && !savedInstance.showAllSaved") &&
         workspaceScript.text.includes("removableSavedItems: Boolean(selectionController)"),
-      "Saved rows no longer match the iOS code, chapter, and code-order structure."
+      "Saved rows must preserve bounded hydration, chapter grouping, and code order with recent-first Inbox ordering."
     );
     assert(
       workspaceScript.text.includes("async function saveReaderPassage(panel, section, reader, target, options = {})") &&
@@ -2481,7 +2536,7 @@ async function main() {
         workspaceScript.text.includes('await persistSectionBookmark(payload, false, { undoPaneID: bookmarkButton.closest(".workspace-panel")?.dataset.paneId });') &&
         !workspaceScript.text.includes('if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;') &&
         workspaceScript.text.includes("savedMarker.classList.add('reader-section-saved-marker')") &&
-        workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Saved" : "Save section")') &&
+        workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Evidence" : "Save section")') &&
         workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&
         workspaceScript.text.includes('const blockID = normalizeAnnotationBlockID(record.blockID || record.anchorID || record.contentBlockID)') &&
         workspaceScript.text.includes('return `${version}:${sectionID}:${blockID}`') &&
@@ -2553,7 +2608,7 @@ async function main() {
         workspaceScript.text.includes("if (scrollContainer) scrollContainer.scrollTop = scrollTop") &&
         workspaceScript.text.includes("return (snapshot?.annotations ?? currentContentSummary().annotations)") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
-        workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Saved" : "Save section")'),
+        workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Evidence" : "Save section")'),
       "Local-first notes or project saves can be replaced by stale sync data or leave stale Reader bookmark labels."
     );
     assert(
@@ -2804,10 +2859,10 @@ async function main() {
       workspaceStyles.text.match(/\.account-checkout\.is-pro-active,[\s\S]*?background: var\(--pro-active-background\);[\s\S]*?color: #001014;[\s\S]*?opacity: 1;/) &&
         workspaceStyles.text.includes("--pro-active-background: #66d9f2;") &&
         workspaceStyles.text.includes("--pro-active-background: #00b9e8;") &&
-        iosSettingsSource.includes("Color(red: 0, green: 185 / 255, blue: 232 / 255)") &&
+        (webOnly || (iosSettingsSource.includes("Color(red: 0, green: 185 / 255, blue: 232 / 255)") &&
         iosSettingsSource.includes(".opacity(library.isStoreKitBusy ? 0.55 : 1)") &&
         !iosSettingsSource.includes("hasResearchAccess") &&
-        !iosSettingsSource.includes('return "Research Active"'),
+        !iosSettingsSource.includes('return "Research Active"'))),
       "Active Pro buttons no longer share the requested full-opacity cyan treatment on web and iOS."
     );
     assert(
@@ -2822,7 +2877,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.annotated-code-block \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;/) &&
-        workspaceStyles.text.match(/\.inline-bookmark-toggle,[\s\S]*?\.inline-research-toggle \{[\s\S]*?display: inline-flex;/),
+        workspaceStyles.text.match(/\.inline-bookmark-toggle,[\s\S]*?\.inline-research-toggle,\s*\.inline-note-toggle \{[\s\S]*?display: inline-flex;/),
       "Reader passage actions no longer use the compact inline Save and Research row."
     );
     assert(
@@ -2865,13 +2920,16 @@ async function main() {
         !workspaceStyles.text.includes(".result-reader-action"),
       "Search results still include styling for the retired Reader action buttons."
     );
+    // The current user-requested no-highlight style suppresses focus outlines.
+    // This is a visual accessibility limitation, not evidence of visible focus;
+    // retain the independent keyboard navigation and modal semantics contract.
     assert(
-      workspaceStyles.text.includes("html body :is(input, textarea, select, button, a[href], summary, [tabindex], [contenteditable], [role]):focus-visible") &&
-        workspaceStyles.text.match(/:focus-visible \{\s*outline: 2px solid var\(--focus-ring\) !important;/) &&
-        workspaceStyles.text.includes("html body .search-box:has(.search-input:focus-visible)") &&
-        workspaceStyles.text.match(/\.reader-internal-search:has\(\.reader-internal-search-input:focus-visible\) \{\s*outline: 2px solid var\(--focus-ring\) !important;/) &&
-        !workspaceStyles.text.match(/body input:focus-visible,[\s\S]*?body textarea:focus-visible,[\s\S]*?outline:\s*0 !important;/),
-      "Keyboard focus must remain visible on fields and composite Search controls (UX06)."
+      workspaceScript.text.includes("function trapWebModalFocus(dialog, event)") &&
+        workspaceScript.text.includes("trapWebModalFocus(dialog, event);") &&
+        workspaceScript.text.includes('dialog.setAttribute("aria-modal", "true")') &&
+        workspaceScript.text.includes('if (event.key === "Tab") focusAdjacentDocumentControl(select._customSelectTrigger, event.shiftKey)') &&
+        workspaceScript.text.includes('if (event.key === "Escape") { close(); anchor.focus({ preventScroll: true }); }'),
+      "Keyboard navigation, modal focus containment, or menu focus restoration regressed."
     );
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
@@ -2898,7 +2956,7 @@ async function main() {
         workspaceStyles.text.includes(".web-warning-cancel") &&
         workspaceStyles.text.includes(".web-warning-confirm") &&
         workspaceStyles.text.includes("background: #df6464;") &&
-        workspaceScript.text.includes("const bounds = warningContainer.getBoundingClientRect();") &&
+        workspaceScript.text.includes("const bounds = warningScope.getBoundingClientRect();") &&
         workspaceScript.text.includes('backdrop.style.top = `${bounds.top}px`;') &&
         workspaceScript.text.includes('backdrop.style.height = `${bounds.height}px`;') &&
         workspaceScript.text.includes("webWarningPositionCleanups.get(backdrop)?.();"),
@@ -2997,7 +3055,8 @@ async function main() {
       workspaceScript.text.includes("async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft)") &&
         workspaceScript.text.includes('activePaneIDs().filter((paneID) => paneID !== "utility:settings")') &&
         workspaceScript.text.includes('track.querySelector(\'.workspace-panel[data-pane-id="utility:settings"]\')') &&
-        workspaceScript.text.includes("settingsPanel.scrollTop = Math.min(") &&
+        workspaceScript.text.includes('const settingsScroller = settingsPanel?.querySelector(".settings-scroll") || settingsPanel') &&
+        workspaceScript.text.includes("settingsScroller.scrollTop = Math.min(") &&
         workspaceScript.text.includes("await refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft)") &&
         workspaceScript.text.includes("await flushSyncOutbox({ refresh: true }).catch(() => {})"),
       "Settings clear-all actions no longer preserve the Settings column's position while refreshing affected panes."
@@ -3078,9 +3137,9 @@ async function main() {
       workspaceScript.text.includes("coordination: false") &&
         workspaceScript.text.includes("if (!releaseSurfaceVisibility.coordination) return false;") &&
         workspaceScript.text.includes("releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)") &&
-        iosLibraryViewModelSource.includes("static let coordination = false") &&
+        (webOnly || (iosLibraryViewModelSource.includes("static let coordination = false") &&
         iosOrganizationProjectHubSource.includes("if PermitextReleaseSurfaceVisibility.coordination {") &&
-        iosBookmarksSource.includes('PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"'),
+        iosBookmarksSource.includes('PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"'))),
       "Deferred Coordination must stay hidden and blocked on web and iOS while its implementation remains preserved."
     );
 
@@ -8933,7 +8992,9 @@ async function main() {
 
 main().then(
   () => {
-    console.log("permitext-sync smoke passed");
+    console.log(webOnly
+      ? "permitext-sync web/backend smoke passed (native source assertions excluded)"
+      : "permitext-sync smoke passed");
   },
   (error) => {
     console.error(error);

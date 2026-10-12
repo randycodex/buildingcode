@@ -3,6 +3,7 @@ import { zoningSection } from '../zoning-content.mjs';
 import { targetedDefinitionExcerpt } from '../research-definition-excerpts.mjs';
 import {allSectionCatalogByID, researchBodyForCatalogSection} from '../app.mjs';
 import {assembleResearchEvidence} from '../research-evidence-assembly.mjs';
+import {constructionHTMLBodyForSection} from '../construction-html-content.mjs';
 
 globalThis.fetch = () => { throw Error('Network/provider access forbidden'); };
 const zoning = {...await zoningSection('20018523'), codePrefix:'ZR'};
@@ -40,13 +41,29 @@ assert.equal(targetedDefinitionExcerpt({...synthetic,truncated:true},query,{pref
 assert.deepEqual(targetedDefinitionExcerpt(synthetic,query,{maximumCharacters:platform.text.length})?.labels,['ACCESSIBLE MEANS OF EGRESS'], 'Unconfigured callers retain ordinary context selection.');
 
 const mechanicalCatalog=(await allSectionCatalogByID()).get('10280');
-const mechanical={...mechanicalCatalog,sectionID:mechanicalCatalog.id,body:await researchBodyForCatalogSection(mechanicalCatalog)};
+const precedingMechanical={...mechanicalCatalog,sectionID:mechanicalCatalog.id,body:await researchBodyForCatalogSection(mechanicalCatalog)};
+assert.equal(targetedDefinitionExcerpt(precedingMechanical,'direct-vent appliances',{
+  completeDefinitionLabels:['DIRECT-VENT APPLIANCES']}),null,
+  'MC 201.4 must not acquire the following MC 202 dictionary across its source-section boundary.');
+// Since c39482551 (2026-10-11), the preceding 201.4 provision no longer
+// contains the 202 banner/body. Exercise matching against the official 202
+// body under an explicit test-only identity, not a relabeled catalog source.
+const mechanicalDescriptor={...mechanicalCatalog,id:'requested-definition-mc202-fixture',webSectionID:undefined,
+  sectionNumber:'202',title:'Section MC 202: General Definitions'};
+const mechanicalBody=await constructionHTMLBodyForSection(mechanicalDescriptor,{includeOfficialSourceBinding:true});
+assert(mechanicalBody?.officialSourceBinding);
+assert.equal(mechanicalBody.sectionNumber,'202');
+const mechanical={...mechanicalDescriptor,sectionID:mechanicalDescriptor.id,body:mechanicalBody};
 const direct=targetedDefinitionExcerpt(mechanical,'direct-vent appliances',{completeDefinitionLabels:['DIRECT-VENT APPLIANCES']});
+assert(direct);
 const shorthand='If a heater sends its fumes outdoors but takes combustion air from the room, is that enough to call it direct-vent?';
 const requested=targetedDefinitionExcerpt(mechanical,shorthand,{preferredQuery:shorthand});
 assert(requested.labels.includes('DIRECT-VENT APPLIANCES'));
 assert.equal(requested.passages[requested.labels.indexOf('DIRECT-VENT APPLIANCES')],direct.passages[0]);
-assert(requested.canonicalEntryBindings.some(binding=>binding.label==='DIRECT-VENT APPLIANCES'));
+assert.equal(requested.sectionID,mechanicalDescriptor.id);
+assert.equal(requested.sectionNumber,'202');
+assert(mechanicalBody.blocks.map(block=>block.plainText||'').join(' ').replace(/\s+/g,' ')
+  .includes(direct.passages[0].replace(/\s+/g,' ')), 'The selected definition is an exact complete span of its own official source.');
 const ambiguous={...synthetic,body:{blocks:[{html:[
   '<div class="Normal-Level">DIRECT-VENT APPLIANCES. Complete first definition.</div>',
   '<div class="Normal-Level">DIRECT-VENT EQUIPMENT. Complete different definition.</div>'

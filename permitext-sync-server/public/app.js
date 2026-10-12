@@ -20,7 +20,7 @@ import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261010
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
-import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20261008-pinned-restore-v4";
+import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20261012-workflow-cache-v5";
 import {
   accountContextChangedError,
   accountRequestIdentity,
@@ -146,7 +146,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261011-workflow-views-v17";
+} from "./workspace-state.js?v=20261012-workflow-views-v18";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,

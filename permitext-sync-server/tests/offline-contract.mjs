@@ -18,7 +18,14 @@ const [html, app, offlineStorage, serviceWorker, manifest] = await Promise.all([
 ]);
 
 assert(html.includes('rel="manifest"'), "Web app does not advertise its install manifest.");
-assert(html.includes("Offline Access"), "Settings does not expose the offline-access card.");
+const offlineCard = html.match(/<section\b[^>]*\bclass="[^"]*\bsettings-offline-card\b[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0];
+assert(offlineCard, "Settings does not expose the offline-access card.");
+assert.match(offlineCard, /aria-labelledby="settings-offline-title"/, "The offline-access card has no accessible heading reference.");
+assert.match(offlineCard, /<h3\b[^>]*\bid="settings-offline-title"[^>]*>Offline<\/h3>/, "The offline-access card does not expose its current heading.");
+assert.match(offlineCard, /class="settings-offline-status" role="status"/, "Offline download status is not announced.");
+for (const action of ["download", "remove"]) {
+  assert.match(offlineCard, new RegExp(`<button\\b[^>]*\\bclass="[^"]*\\bsettings-offline-${action}\\b[^"]*"[^>]*\\btype="button"[^>]*>[^<]+<\\/button>`), `The offline-access card has no labelled ${action} button.`);
+}
 assert(!html.includes('class="settings-pro-badge"'), "Offline access still renders a redundant Pro feature badge.");
 assert(app.includes('offlineStatus.textContent = "Available with Pro."'), "Free users are not told that offline access requires Pro.");
 assert.match(app, /offlineDownload\.hidden = !pro;[\s\S]*?if \(!pro\)[\s\S]*?Available with Pro\.[\s\S]*?return;/, "Free users should see a Pro availability notice without a duplicate upgrade button.");
@@ -215,7 +222,7 @@ navigationFetchOptions.length = 0;
 assert(shellPrecacheURLs.includes("/workspace") && shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes(`/web/app.js?v=${offlineFeatureMetadata.shellAssetVersion}`));
 assert(shellPrecacheURLs.includes("/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3"));
 assert(shellPrecacheURLs.includes(`/web/styles.css?v=${offlineFeatureMetadata.shellAssetVersion}`));
-assert(shellPrecacheURLs.includes(`/web/research-intent-state.js?v=${offlineFeatureMetadata.shellAssetVersion}`));
+assert(shellPrecacheURLs.includes(`/web/${app.match(/"\.\/(research-intent-state\.js\?v=[^"\s]+)"/)[1]}`));
 assert(shellPrecacheURLs.includes(`/web/research-progress.js?v=${researchProgressVersion}`));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260923-request-cancellation-v2"));
 assert(shellPrecacheURLs.includes(`/web/${app.match(/"\.\/(workspace-state\.js\?v=[^"\s]+)"/)[1]}`));

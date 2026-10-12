@@ -7,6 +7,7 @@ import { randomUUID } from "node:crypto";
 import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createResearchCorpusRegistry } from "../research-corpus-registry.mjs";
 const run = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-fountain-expansion-2026-09-08.json", import.meta.url)));
 assert.equal(run.providerCalls.length, 15);
 const recent = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json", import.meta.url)));
@@ -20,6 +21,8 @@ const fanDraft = JSON.parse(fanRun.providerCalls.find(call => call.caseID === "M
 const occupancyRun = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json", import.meta.url)));
 const occupancyDraft = JSON.parse(occupancyRun.providerCalls.find(call => call.caseID === "GAP-14" && call.phase === "permitext_code_interpretation")
   .output.flatMap(message => message.content || []).find(content => content.type === "output_text").text);
+const recordedRuns = [run, recent, cafeRun, fanRun, occupancyRun];
+const originalRecords = JSON.stringify(recordedRuns);
 const scratch = await mkdtemp(join(tmpdir(), "permitext-plumbing-repairs-"));
 for (const name of Object.keys(process.env)) {
   if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(name)) delete process.env[name];
@@ -57,6 +60,30 @@ let accept;
 let phases = [];
 let reviewed;
 let providerDoubleError;
+let canonicalSections;
+let checkedRebindingNegatives = false;
+function currentPassageID(sectionID, input) {
+  const canonical = canonicalSections.get(String(sectionID));
+  assert(canonical, `The recorded section ${sectionID} must belong to the current 2022 corpus.`);
+  const matches = [...String(input).matchAll(/^PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)/gm)];
+  const passages = matches.map((match, index) => ({ id: match[1], sectionID: match[2],
+    block: String(input).slice(match.index, matches[index + 1]?.index) }));
+  const selected = passages.filter(passage => passage.sectionID === String(sectionID) &&
+    (passage.block.includes(`\nCODE: ${canonical.codePrefix}\nSECTION: ${canonical.sectionNumber}\n`) ||
+      passage.block.includes(`\nSECTION: ${canonical.codePrefix} ${canonical.sectionNumber}\n`)) &&
+    passage.block.includes(`\nCODE_EDITION: ${canonical.codeEdition}\nCODE_VERSION: ${canonical.codeVersion}\n`));
+  assert.equal(selected.length, 1, `Replay ${activeID} requires one same-section, same-edition passage for ${sectionID}.`);
+  return selected[0].id;
+}
+function currentRecordedDraft(draft, input) {
+  const replay = structuredClone(draft);
+  for (const row of [...replay.supportedPoints, ...replay.citations]) row.sourceIDs = row.sourceIDs.map(id => {
+    const sectionID = /^research-permitext_(?:discovered|cross_reference)-id:(\d+)-\d+$/.exec(id)?.[1];
+    assert(sectionID, `Unknown recorded source identity: ${id}`);
+    return currentPassageID(sectionID, input);
+  });
+  return replay;
+}
 globalThis.fetch = async (url, options) => {
  try {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
@@ -94,13 +121,14 @@ globalThis.fetch = async (url, options) => {
       assert.match(citation.supportingPassages[0].selectedText, /serving not more than one floor/);
       assert(citation.codeEdition && citation.codeVersion && citation.corpusID);
     } else if (activeID === "PC-01") {
+      const reboundCafe = currentRecordedDraft(cafeDraft, body.input);
       assert.deepEqual(reviewed.supportedPoints[2].sourceIDs, [
-        ...cafeDraft.supportedPoints[2].sourceIDs, "research-permitext_cross_reference-id:11923-4"
+        ...reboundCafe.supportedPoints[2].sourceIDs, currentPassageID("11923", body.input)
       ]);
       assert.equal(reviewed.supportedPoints[2].explanation, cafeDraft.supportedPoints[2].explanation);
       assert.equal(reviewed.answerText, cafeDraft.answerText);
       assert.deepEqual(reviewed.citations.map(({ sectionID, sourceIDs }) => ({ sectionID, sourceIDs })),
-        cafeDraft.citations.map(({ sectionID, sourceIDs }) => ({ sectionID, sourceIDs })));
+        reboundCafe.citations.map(({ sectionID, sourceIDs }) => ({ sectionID, sourceIDs })));
       assert.match(body.input, /Required public facilities shall be designated by a legible sign/);
       assert.match(body.instructions, /Fail with incorrect_citation if a claim lacks support in that point's bound passages/);
     } else if (activeID === "PC-03" && activeRun === recent) {
@@ -110,7 +138,7 @@ globalThis.fetch = async (url, options) => {
       assert.match(reviewed.answerText, /Each replacement bottle-filling fixture.*at least 10 inches \(254 mm\) high/);
     } else {
       const point = reviewed.supportedPoints.find((point) => /lint strainers/i.test(point.explanation));
-      assert.deepEqual(point.sourceIDs, ["research-permitext_discovered-id:11967-2", "research-permitext_discovered-id:11968-1"]);
+      assert.deepEqual(point.sourceIDs, [currentPassageID("11967", body.input), currentPassageID("11968", body.input)]);
     }
     const value = accept ? { pass: true, issues: [] } : {
       pass: false, issues: [{ type: activeID === "GAP-14" ? "incorrect_citation" : "unsupported_requirement",
@@ -122,14 +150,28 @@ globalThis.fetch = async (url, options) => {
     output=[{type:"message",content:[{type:"output_text",text:JSON.stringify({edits:[],bindingAdditions:[],pointRemovals:[],citationRemovals:[]})}]}];
   } else {
     assert.equal(phase, "permitext_code_interpretation");
-    output = activeRun.providerCalls.find((call) => call.caseID === activeID && call.phase === phase).output;
+    output = structuredClone(activeRun.providerCalls.find((call) => call.caseID === activeID && call.phase === phase).output);
+    for (const item of output) for (const content of item.content || []) {
+      if (content.type !== "output_text") continue;
+      const draft = JSON.parse(content.text);
+      content.text = JSON.stringify(currentRecordedDraft(draft, body.input));
+      if (!checkedRebindingNegatives) {
+        assert.throws(() => currentRecordedDraft(draft, ""), /one same-section, same-edition/);
+        assert.throws(() => currentRecordedDraft(draft, body.input.replaceAll("CODE_EDITION: 2022 New York City Construction Codes", "CODE_EDITION: 2014 New York City Construction Codes")), /one same-section, same-edition/);
+        assert.throws(() => currentRecordedDraft(draft, `${body.input}\n${body.input}`), /one same-section, same-edition/);
+        checkedRebindingNegatives = true;
+      }
+    }
   }
   return Response.json(withSyntheticMaterialScopeProviderResponse(body, { model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output }));
  } catch(error) { providerDoubleError=error; throw error; }
 };
 let server;
 try {
-  const { handleRequest } = await import("../app.mjs");
+  const { handleRequest, researchCorpusResources } = await import("../app.mjs");
+  const corpus = createResearchCorpusRegistry().find(item => item.id === "nyc-2022-construction-codes");
+  const { catalog } = await researchCorpusResources({ selected: [corpus] });
+  canonicalSections = new Map(catalog.map(section => [String(section.id), section]));
   server = createServer(handleRequest);
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const request = async (path, body, token) => {
@@ -144,7 +186,7 @@ try {
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const auth = { accountUserID: account.appUserID };
   for (const [id, recordedRun] of [["PC-03", run], ["PC-04", run], ["PC-03", recent], ["PC-01", cafeRun], ["MC-05", fanRun], ["GAP-14", occupancyRun]]) for (const accepted of (id === "GAP-14" ? [false] : [false, true])) {
-    activeRun = recordedRun; activeID = id; accept = accepted; phases = []; reviewed = null;
+    activeRun = recordedRun; activeID = id; accept = accepted; phases = []; reviewed = null; providerDoubleError = undefined;
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
     const authoredCase = activeRun.cases.find((item) => item.id === id) || activeRun.results.find(item => item.id === id);
@@ -177,6 +219,7 @@ try {
       }
     }
   }
+  assert.equal(JSON.stringify(recordedRuns), originalRecords, "Request-local replay bindings must not mutate historical records.");
   console.log("Plumbing HTTP replay passed: final verifier sees repairs on initial/revised answers; rejection blocks save/charge; accepted reviewed content persists with no extra provider call. All provider responses mocked.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

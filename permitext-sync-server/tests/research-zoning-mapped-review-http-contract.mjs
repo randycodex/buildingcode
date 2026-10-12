@@ -132,7 +132,11 @@ try {
       assert.equal(clarification.charged, false);
     }
     const earlyStop = ["missing_branches", "explicit_property", "wrong_binding"].includes(mode);
-    assert.deepEqual(phases, earlyStop ? ["permitext_code_interpretation", "permitext_research_targeted_revision"] : mode === "accept" ? ["permitext_code_interpretation", "permitext_research_verification"] : ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_targeted_revision", "permitext_research_verification"], mode);
+    // Only the narrow citation rejection permits a targeted patch. An absent,
+    // stale or unresolved map-scope review requires one full rewrite and must
+    // still fail unless the complete fresh review establishes support.
+    const revisionPhase = mode === "semantic_reject" ? "permitext_research_targeted_revision" : "permitext_code_interpretation";
+    assert.deepEqual(phases, earlyStop ? ["permitext_code_interpretation", revisionPhase] : mode === "accept" ? ["permitext_code_interpretation", "permitext_research_verification"] : ["permitext_code_interpretation", "permitext_research_verification", revisionPhase, "permitext_research_verification"], mode);
     const telemetry = await request("/internal/evaluations/data", { auth }, token);
     const operations = telemetry.body.researchSpend.operationMetrics.filter((operation) => !seen.has(operation.id));
     assert.equal(operations.length, 1); const operation = operations[0]; seen.add(operation.id);

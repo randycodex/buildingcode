@@ -8,7 +8,7 @@ import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { ownerResearchScopeInput } from "../evals/research-owner-scope-input.mjs";
-import { conditionalFixtureAnswer } from "./research-zoning-conditional-fixtures.mjs";
+import { conditionalFixtureAnswer, conditionalFixtures } from "./research-zoning-conditional-fixtures.mjs";
 
 const scratch = await mkdtemp(join(tmpdir(), "permitext-conditional-http-"));
 for (const name of Object.keys(process.env)) {
@@ -31,6 +31,30 @@ Object.assign(process.env, {
 });
 const nativeFetch = globalThis.fetch;
 let activeID, surface, mode, phases, proposed, doubleError;
+// Requested definitions now share the fixed 8,000-character discovery budget.
+// The unpinned storage request omits 42-193 explicitly; its handwritten answer
+// must describe only supplied rules and retain that unresolved evidence gap.
+function currentConditionalFixtureAnswer(evidence) {
+  if (activeID !== "ZR-06" || surface !== "chat") return conditionalFixtureAnswer(activeID, evidence);
+  assert(!evidence.some(source => source.sectionNumber === "42-193"));
+  for (const number of ["12-10", "42-191", "42-192", "APPENDIX J"])
+    assert(evidence.some(source => source.sectionNumber === number), `Missing bounded storage source: ${number}`);
+  const fixture = conditionalFixtures[activeID];
+  const rules = [...fixture.rules, ...fixture.additionalRules].filter(([number]) => number !== "42-193");
+  const supportedPoints = rules.map(([number, heading, explanation]) => {
+    const sources = evidence.filter(source => source.sectionNumber === number);
+    assert(sources.length);
+    return { heading, explanation, sectionID: sources[0].sectionID, sourceIDs: sources.map(source => source.sourceID) };
+  });
+  const limitation = "The supplied evidence omits ZR 42-193, so its performance requirements remain unresolved and must be checked before determining complete compliance.";
+  return {
+    answerText: [fixture.lead, ...supportedPoints.map(point => point.explanation), fixture.application, limitation].join("\n\n"),
+    supportedPoints,
+    citations: supportedPoints.map(({ sectionID, sourceIDs, heading }) => ({ sectionID, sourceIDs, relevance: heading })),
+    assumptions: [], missingFacts: [...fixture.missingFacts], followUpQuestions: [],
+    evidenceLimitations: [fixture.limitation, limitation], additionalEvidenceNeeded: ["ZR 42-193 performance requirements"], supportingSourceUses: []
+  };
+}
 const respondWithDouble = async (url, options) => {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
   const body = JSON.parse(options.body);
@@ -57,7 +81,7 @@ const respondWithDouble = async (url, options) => {
     assert([1, 2, 3].includes(phases.length));
     const evidence = Array.from(input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)\nCODE: [^\n]+\nSECTION: ([^\n]+)/g),
       ([, sourceID, sectionID, sectionNumber]) => ({ sourceID, sectionID, sectionNumber }));
-    proposed = conditionalFixtureAnswer(activeID, evidence);
+    proposed = currentConditionalFixtureAnswer(evidence);
     if (mode.startsWith("binding_")) {
       proposed.supportedPoints[0].explanation += " Separately, ZR 42-193 requires performance standards.";
       assert(!proposed.supportedPoints[0].sourceIDs.some((id) => proposed.supportedPoints[1].sourceIDs.includes(id)));
@@ -116,7 +140,8 @@ try {
     [activeID, surface] = scenario;
     const input = await ownerResearchScopeInput(key.cases.find((item) => item.id === activeID), { original: true, zoningSummary: zoningSectionSummary });
     // Reader cases select whole canonical sections. Chat supplies no selected
-    // sources, so retrieval must find the closing conditions and dependencies.
+    // sources, so retrieval must retain closing conditions and explicitly expose
+    // a dependency that cannot fit beside the reserved definitions.
     const selectedIDs = surface === "chat" ? [] : activeID === "ZR-06" ? [20022473, 20022474] : activeID === "ZR-07" ? [20018425] : [20018060];
     const selections = (await Promise.all(selectedIDs.map(async (sectionID) => {
       const section = await zoningSection(sectionID);
@@ -166,7 +191,12 @@ try {
             assert.equal(source.provenance.pinnedSelectionExcerpted, true);
             assert.equal(source.provenance.pinnedSelectionExact, false);
           } else {
-            for (const number of ["42-191", "42-193"]) assert(saved.body.answer.evidence.some((item) => item.sectionNumber === number));
+            for (const number of ["12-10", "42-191"]) assert(saved.body.answer.evidence.some((item) => item.sectionNumber === number));
+            assert(!saved.body.answer.evidence.some(item => item.sectionNumber === "42-193"));
+            assert(!message.answer.citations.some(item => item.sectionNumber === "42-193"));
+            assert(message.answer.evidenceLimitations.some(text => /omits ZR 42-193/.test(text)));
+            assert(message.answer.additionalEvidenceNeeded.some(text => /42-193/.test(text)));
+            assert.doesNotMatch(message.answer.answerText, /42-193 subjects uses|performance standards in ZR 42-40/);
           }
         }
       } else {

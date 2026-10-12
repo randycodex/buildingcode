@@ -338,7 +338,7 @@ const researchInterpretationSource = workspaceScript.slice(
   workspaceScript.indexOf("function renderResearchInterpretation"),
   workspaceScript.indexOf("async function renderUtilityInstance")
 );
-assert.match(researchInterpretationSource, /appendResearchAnswerNarrative\(card, result\)/);
+assert.match(researchInterpretationSource, /appendResearchAnswerNarrative\(card, result, recoveryQuestion, Boolean\(reportMessage\?\.id && options\.conversationID\)\)/);
 assert.match(researchInterpretationSource, /result\.disclaimer \|\| "AI-generated research assistance, not an official code determination\."/);
 assert.match(researchInterpretationSource, /parsedSourceAsOf\.toISOString\(\)\.slice\(0, 10\)/);
 assert.match(researchInterpretationSource, /Research details/);
@@ -350,7 +350,7 @@ assert.match(researchInterpretationSource, /Based on.*enacted/);
 assert.match(researchInterpretationSource, /evidenceReviewed\.open = Boolean\(options\.detailsOpen\)[\s\S]*?evidenceReviewedBody\.append\(details\);[\s\S]*?card\.append\(evidenceReviewed\);[\s\S]*?container\.append\(card\)/);
 assert.match(workspaceScript, /renderResearchInterpretation\(bubble, message\.answer, \{[\s\S]*?message,[\s\S]*?conversationID,[\s\S]*?conversation,[\s\S]*?anchorPaneID: paneID/);
 assert.doesNotMatch(researchInterpretationSource, /answerHeading|Practical application/);
-assert.match(workspaceScript, /renderResearchInterpretation\(exactAnswer, answerRecord\.answer, \{ detailsOpen: true \}\)/);
+assert.match(workspaceScript, /renderResearchInterpretation\(exactAnswer, answerRecord\.answer, \{ detailsOpen: true, recordQuestion: answerRecord\.question,[\s\S]*?recordMessage: researchAnswerHasVerificationRecovery\(answerRecord\.answer\) \? \{ id: answerRecord\.id, answer: answerRecord\.answer \} : null, conversationID: answerRecord\.conversationID \}\)/);
 
 const workspaceStyles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
 const workspaceHTML = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
@@ -422,7 +422,7 @@ assert.match(workspaceScript, /reviewControls\.append\(actions, navigation\)[\s\
 assert.match(workspaceStyles, /\.evidence-discovery \{\s*display: grid;\s*gap: var\(--space-3\);\s*margin-top: var\(--space-4\);\s*\}/);
 assert.match(workspaceScript, /const researchSurfaceIDs = \[[\s\S]*?state\.utilities\.analysis \? "utility:analysis" : "",[\s\S]*?\.\.\.openResearchConversationPaneIDs\(\)[\s\S]*?\]\.filter\(Boolean\)/);
 assert.match(functionSource(workspaceScript, "defaultActivePaneIDs"), /openResearchConversationPaneIDs/);
-assert.match(workspaceScript, /panel\.append\(await renderResearchConversation\(instance\?\.conversationID \|\| state\.researchConversationID, \{ embedded: true, supplemental: Boolean\(instance\), ownerInstance: instance, paneID \}\)\)/);
+assert.match(workspaceScript, /assistantBody\.append\(await renderResearchConversation\(instance\?\.conversationID \|\| state\.researchConversationID, \{\s*embedded: true, supplemental: Boolean\(instance\), ownerInstance: instance, paneID\s*\}\)\)/);
 assert.doesNotMatch(workspaceScript, /panes\.push\(await renderResearchConversation\(state\.researchConversationID\)\)/);
 assert.match(workspaceScript, /scrollPaneIntoView\(conversationPaneID\)/);
 assert.match(workspaceScript, /const resizeComposerInput = \(\) => \{[\s\S]*?input\.style\.height = "auto";[\s\S]*?input\.style\.height = `\$\{Math\.min\(180, Math\.max\(48, input\.scrollHeight\)\)\}px`;/);

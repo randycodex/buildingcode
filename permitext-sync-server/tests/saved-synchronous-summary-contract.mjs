@@ -18,7 +18,7 @@ const panel = {classList:{add(){}},querySelector:selector=>{
 const c = vm.createContext({
   currentContentSummary:()=>{reads++;return account === 'a' ? snapshot : {projects:[{id:'project-b',name:'Project B'}],savedItems:[],projectSections:[],annotations:[]};},
   activeWorkspaceRecord:()=>({projectID:currentProjectID}),
-  activeFolderRecords:projects=>projects,mergeProjectsWithOrganizationAccess:projects=>{mergeInputs.push(projects);return [...projects];},
+  activeFolderRecords:projects=>projects,visibleProjectRecords:projects=>projects,mergeProjectsWithOrganizationAccess:projects=>{mergeInputs.push(projects);return [...projects];},
   projectRecordID:project=>project.id,folderIsProject:()=>true,
   hasCapability:()=>true,normalizeSavedInstance:i=>i,paneIDForUtilityInstance:()=> 'saved',
   savedTemplate:{},renderTemplate:()=>panel,applyPaneWeight(){},clear(){},renderSavedPlanUsage(){},

@@ -1,4 +1,4 @@
-import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=5";
+import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=7";
 const workspaceRegistryVersion = 3;
 const defaultWorkspaceName = "General";
 const maximumWorkspaceNameLength = 40;

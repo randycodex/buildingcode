@@ -345,10 +345,17 @@ async function main() {
         evidence: [],
         createdAt: committedAt
       };
+      // The preceding failed attempt is persisted and advances the revision.
+      // A successful commit must start from the locked current conversation,
+      // preserving that history instead of replaying its creation snapshot.
+      const currentConversation = persistedStore.researchConversationsByUserID[owner.userID]
+        .find(conversation => conversation.id === conversationCreate.json.conversation.id);
+      assert(currentConversation);
+      assert.notEqual(currentConversation.revision, conversationCreate.json.conversation.revision);
       committedConversation = {
-        ...conversationCreate.json.conversation,
+        ...currentConversation,
         messages: [
-          ...(conversationCreate.json.conversation.messages || []),
+          ...(currentConversation.messages || []),
           {
             id: `${messageIdentity}:question`,
             role: "user",
@@ -380,6 +387,13 @@ async function main() {
         conversation: committedConversation,
         events: []
       };
+      const beforeStaleCommit = JSON.stringify(persistedStore);
+      assert.throws(() => applyResearchConversationMessageCommit(persistedStore, owner.userID, {
+        ...commitPayload,
+        conversation: { ...committedConversation, revision: conversationCreate.json.conversation.revision }
+      }), error => error.code === "RESEARCH_CONVERSATION_CHANGED" && error.statusCode === 409);
+      assert.equal(JSON.stringify(persistedStore), beforeStaleCommit,
+        "A stale conversation commit must not charge a turn, replace history or save an answer.");
       assert.equal(
         applyResearchConversationMessageCommit(
           persistedStore,

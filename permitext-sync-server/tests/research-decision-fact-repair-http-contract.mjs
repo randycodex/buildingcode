@@ -8,6 +8,7 @@ import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 const recorded = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-compact-confirmation-2026-09-08.json", import.meta.url)));
+const originalRecorded = JSON.stringify(recorded);
 const laundryVerification = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json", import.meta.url)));
 const panVerification = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json", import.meta.url)));
 const scratch = await mkdtemp(join(tmpdir(), "permitext-decision-fact-http-"));
@@ -32,8 +33,18 @@ let firstProposed;
 let secondProposed;
 let providerDoubleError;
 let reboundHistoricalAnswer;
+// This recorded citation predates the source-boundary correction: its saved
+// supporting passage included the next section's banner. Normalize only that
+// known historical expectation; the answer, claims and citation metadata stay
+// unchanged, and today's complete selected provision must still match exactly.
+function currentRecordedPassageText(citation, selectedText) {
+  if (citation.sectionID !== "11968" || citation.codePrefix !== "PC" || citation.sectionNumber !== "412.4") return selectedText;
+  const nextSectionBanner = " Section PC 413: Food Waste Disposer Units";
+  assert(selectedText.endsWith(nextSectionBanner), "The historical PC 412.4 fixture must contain exactly its known next-section suffix.");
+  return selectedText.slice(0, -nextSectionBanner.length);
+}
 // Current retrieval may assign new passage IDs. Rebind this provider double
-// only when the supplied section, code, edition, version and exact saved text
+// only when the supplied section, code, edition, version and full provision text
 // all match. This is fixture compatibility, never a production binding bypass.
 function rebindRecordedDraft(body, draft) {
   const passages = body.input.split("\n\n---\n\n").map(block => {
@@ -42,24 +53,58 @@ function rebindRecordedDraft(body, draft) {
   }).filter(passage => passage.sourceID);
   const bindings = new Map();
   for (const citation of active.answer.citations) for (const passage of citation.supportingPassages) {
+    const selectedText = currentRecordedPassageText(citation, passage.selectedText);
     const matches = passages.filter(({ block }) =>
       block.includes(`SECTION_ID: ${citation.sectionID}\nCODE: ${citation.codePrefix}\nSECTION: ${citation.sectionNumber}\n`) &&
       block.includes(`CODE_EDITION: ${citation.codeEdition}\nCODE_VERSION: ${citation.codeVersion}\n`) &&
-      block.match(/(?:^|\n)ENACTED_TEXT: ([^\n]+)/)?.[1] === passage.selectedText);
-    assert.equal(matches.length, 1, "Rebinding requires one exact enacted passage in the current request.");
-    bindings.set(passage.sourceID, matches[0].sourceID);
+      block.match(/(?:^|\n)ENACTED_TEXT: ([^\n]+)/)?.[1] === selectedText);
+    assert.equal(matches.length, 1, `Rebinding ${active.id}/${citation.sectionID} requires one exact enacted passage in the current request.`);
+    bindings.set(passage.sourceID, {sourceID: matches[0].sourceID, selectedText});
   }
   const rebind = answer => {
     const copy = structuredClone(answer);
     for (const item of [...copy.supportedPoints, ...copy.citations]) {
-      item.sourceIDs = item.sourceIDs.map(id => { assert(bindings.has(id)); return bindings.get(id); });
-      for (const passage of item.supportingPassages || []) passage.sourceID = bindings.get(passage.sourceID);
+      item.sourceIDs = item.sourceIDs.map(id => { assert(bindings.has(id)); return bindings.get(id).sourceID; });
+      for (const passage of item.supportingPassages || []) {
+        const binding = bindings.get(passage.sourceID);
+        assert(binding, "Every historical supporting passage must have an exact current binding.");
+        passage.sourceID = binding.sourceID;
+        passage.selectedText = binding.selectedText;
+      }
     }
     return copy;
   };
   reboundHistoricalAnswer = rebind(active.answer);
   return rebind(draft);
 }
+// Fixture-only controls: accepting an old source ID never licenses changed
+// enacted text, a different identity/edition, duplicate matches or extra text.
+for (const record of recorded.results) {
+  active = record;
+  const blocks = record.answer.citations.flatMap(citation => citation.supportingPassages.map((passage, index) =>
+    `PASSAGE_ID: current-${citation.sectionID}-${index}\nSECTION_ID: ${citation.sectionID}\nCODE: ${citation.codePrefix}\nSECTION: ${citation.sectionNumber}\nCODE_EDITION: ${citation.codeEdition}\nCODE_VERSION: ${citation.codeVersion}\nENACTED_TEXT: ${currentRecordedPassageText(citation, passage.selectedText)}\n`
+  ));
+  const input = blocks.join("\n\n---\n\n");
+  const rebound = rebindRecordedDraft({input}, record.answer);
+  assert.equal(rebound.answerText, record.answer.answerText);
+  for (let index = 0; index < rebound.citations.length; index += 1) {
+    const {sourceIDs, supportingPassages, ...metadata} = rebound.citations[index];
+    const {sourceIDs: oldIDs, supportingPassages: oldPassages, ...oldMetadata} = record.answer.citations[index];
+    assert.deepEqual(metadata, oldMetadata, "All historical citation metadata must remain unchanged.");
+    assert.deepEqual(supportingPassages.map(({sourceID, selectedText, ...fields}) => fields),
+      oldPassages.map(({sourceID, selectedText, ...fields}) => fields));
+  }
+  for (const invalidInput of ["", `${input}\n\n---\n\n${blocks[0]}`,
+    input.replace("SECTION_ID: ", "SECTION_ID: wrong-"), input.replace("CODE: PC", "CODE: MC"),
+    input.replace("SECTION: ", "SECTION: wrong-"), input.replace("CODE_EDITION: ", "CODE_EDITION: wrong-"),
+    input.replace("CODE_VERSION: ", "CODE_VERSION: wrong-"), input.replace("ENACTED_TEXT: ", "ENACTED_TEXT: Changed ")]) {
+    assert.throws(() => rebindRecordedDraft({input: invalidInput}, record.answer), /requires one exact enacted passage/);
+  }
+  if (record.id === "PC-04") {
+    assert.throws(() => rebindRecordedDraft({input: input.replace("lint strainers.", "lint strainers. Section PC 413: Food Waste Disposer Units")}, record.answer), /requires one exact enacted passage/);
+  }
+}
+assert.equal(JSON.stringify(recorded), originalRecorded, "Adapting provider doubles must not alter the frozen recorded run.");
 // The recorded run predates canonical chapter/scope metadata. Compare every
 // historical citation field exactly, and separately require today's metadata
 // to remain present and explicitly avoid establishing project applicability.
@@ -196,4 +241,5 @@ try {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   await rm(scratch, { recursive: true, force: true });
 }
+assert.equal(JSON.stringify(recorded), originalRecorded, "HTTP replay must leave the frozen historical run unchanged.");
 console.log("Decision-fact HTTP replays passed: four flows, recorded verdict fixtures and certified field-only candidates, preserved answer/citations, synthetic final rejection blocks saving/charging, fresh full-answer verification, recorded usage under the local $1.50 turn cap.");

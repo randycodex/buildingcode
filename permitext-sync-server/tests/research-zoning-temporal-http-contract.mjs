@@ -1,13 +1,12 @@
 import { withSyntheticMaterialScopeProviderResponse } from "./research-applicability-response-double.mjs";
 // Actual Research HTTP and verification path, with retained draft text and
-// synthetic repair patches. No provider traffic or Project workflow.
+// synthetic bounded rewrites. No provider traffic or Project workflow.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
 import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { researchRevisionTargets } from "../research-targeted-revision.mjs";
 const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-zoning-expansion-2026-09-08.json", import.meta.url)));
 const record = retained.results.find((item) => item.id === "ZR-18");
 const draft = JSON.parse(retained.providerCalls.find((item) => item.caseID === record.id).output[0].content[0].text);
@@ -43,12 +42,6 @@ globalThis.fetch = async (url, options) => {
       proposed = JSON.parse(JSON.stringify(draft), (key, value) => typeof value === "string" && replacements.has(value) ? replacements.get(value) : value);
       if (mode === "correct-draft" || (phases.length === 2 && mode === "correct-repair")) proposed.supportedPoints[1] = correctedPoint(proposed.supportedPoints[1]);
       output = proposed;
-    } else if (phase === "permitext_research_targeted_revision") {
-      assert.equal(phases.length, 2);
-      const targets = researchRevisionTargets(proposed).filter(target => target.path === "supportedPoints/1/explanation");
-      output = { edits: mode === "correct-repair" ? targets.map((target, index) => ({
-        targetID: target.id, after: index === 0 ? correctedPoint(proposed.supportedPoints[1]).explanation : "", remove: index > 0
-      })) : [], bindingAdditions: [], pointRemovals: [], citationRemovals: [] };
     } else {
       assert(["correct-repair", "correct-draft"].includes(mode));
       assert.equal(phases.length, mode === "correct-draft" ? 2 : 3);
@@ -82,9 +75,11 @@ try {
     const created = await request("/research/conversations/create", { auth, selections, originSurface: "reader" }, token); assert.equal(created.status, 201);
     const response = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question: record.question, requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;
+    // Temporal application is substantive: without a completed noncategorical
+    // review it requires one full rewrite, followed by fresh verification.
     assert.deepEqual(phases, mode === "correct-draft" ? ["permitext_code_interpretation", "permitext_research_verification"] : mode === "correct-repair"
-      ? ["permitext_code_interpretation", "permitext_research_targeted_revision", "permitext_research_verification"]
-      : ["permitext_code_interpretation", "permitext_research_targeted_revision"]);
+      ? ["permitext_code_interpretation", "permitext_code_interpretation", "permitext_research_verification"]
+      : ["permitext_code_interpretation", "permitext_code_interpretation"]);
     if (mode === "bad-repair") { assert.equal(response.status, 200); const answer = response.body.conversation.messages.at(-1).answer; assert.equal(answer.mode, "clarification"); assert.equal(answer.charged, false); }
     else {
       assert.equal(response.status, 200, JSON.stringify(response.body));

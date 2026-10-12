@@ -38,7 +38,7 @@ assert.equal(fixture.schema, "permitext-research-product-examples-v1");
 assert.equal(fixture.paidModelCallsAuthorized, false);
 assert.equal(fixture.cases.length, 7);
 assert.equal(new Set(fixture.cases.map((item) => item.id)).size, fixture.cases.length);
-assert.equal(researchAnswerPresentationVersion, "20261001-scenario-comparison-scope-v20");
+assert.equal(researchAnswerPresentationVersion, "20261004-source-supported-answer-completeness-v24");
 
 const manySources = Array.from({ length: 15 }, (_, i) => ({ sectionID: `source-${i}` }));
 for (const question of [

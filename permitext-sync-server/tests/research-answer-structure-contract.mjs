@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateResearchInterpretation } from "../app.mjs";
+import { researchWriterInstructions } from "../research-writer-policy.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const [serverSource, clientSource] = await Promise.all([
@@ -69,25 +70,26 @@ assert.match(complex.explanation, /cannot determine the second/);
 assert.match(serverSource, /answerText: \{ type: "string" \}/);
 assert.doesNotMatch(serverSource, /Write the conclusion as a concise professional answer of one to three sentences/);
 assert.doesNotMatch(serverSource, /write conclusion and explanation so they read consecutively/);
-assert.match(serverSource, /Do not target a fixed number of paragraphs or sentences/);
-assert.match(serverSource, /Write answerText as the shortest complete, reliable user-facing answer/);
-assert.match(serverSource, /Never omit a material qualification, applicability issue, conflicting provision or evidence limitation/);
-assert.match(serverSource, /open-ended request for design requirements/);
-assert.match(serverSource, /Do not let a narrow exception, a specialized ramp or equipment type/);
-assert.match(serverSource, /Avoid fixed report templates/);
-assert.match(serverSource, /tables for genuine side-by-side comparisons/);
-assert.match(serverSource, /Honor requested brevity without dropping material qualifications/);
-assert.match(serverSource, /researchAnswerPresentationContract\(\{/);
-assert.match(serverSource, /QUESTION-SPECIFIC ANSWER PRESENTATION CONTRACT/);
-assert.match(serverSource, /Presentation never permits unsupported claims or omitted material qualifications/);
-assert.match(serverSource, /never silently correct or normalize them/);
+// The general writer policy replaced the old inline answer-template prompt.
+// Exercise the actual policy used by the request builder, retaining its scope,
+// formatting, qualification and source-boundary obligations.
+const writerPolicy = researchWriterInstructions({ question: "What are the requirements?" });
+assert.match(serverSource, /instructions: researchWriterInstructions\(\{ question, options \}\)/);
+assert.match(writerPolicy, /leading with the strongest conclusion supported by the evidence/);
+assert.match(writerPolicy, /choose paragraphs, lists or a table to suit the question without a fixed template/);
+assert.match(writerPolicy, /every exception material to the conclusion/);
+assert.match(writerPolicy, /State important qualifications at the affected claim/);
+assert.match(writerPolicy, /distinguish it from a similar component covered by a different supplied rule or exception/);
+assert.match(writerPolicy, /never expand a partial finding into overall compliance/);
+assert.match(writerPolicy, /Do not invent facts, requirements, citations or source contents/);
+assert.match(writerPolicy, /exact selection boundaries and governing ancestor conditions/);
+assert.match(writerPolicy, /Treat supplied user facts as discussion premises/);
+assert.match(writerPolicy, /cumulative or alternative conditions/);
+assert.match(writerPolicy, /Keep claims and qualifications consistent across all fields/);
 assert.match(serverSource, /RELATIONSHIP: \$\{section\.relationship/);
 assert.match(serverSource, /USER_SELECTED_TEXT is the exact model-visible focus and citation target/);
 assert.doesNotMatch(serverSource, /`CANONICAL_SECTION_CONTEXT:/);
-assert.match(serverSource, /Do not add generic headings or redundant parent restatements/);
-assert.match(serverSource, /Preserve cumulative and alternative conditions exactly/);
 assert.match(serverSource, /A and B must not be restated as A or B/);
-assert.match(serverSource, /Accept facts supplied in the current question or established by the user earlier in the active topic as premises/);
 assert.match(serverSource, /Ordinary internal corpus exclusions are not user-facing evidence limitations/);
 assert.match(serverSource, /When the question names a code edition or year, verify every legal claim/);
 assert.match(serverSource, /Never borrow similarly numbered text from another edition/);
@@ -95,7 +97,7 @@ assert.match(serverSource, /fail with wrong_attribution if any legal claim or hu
 assert.match(serverSource, /codeVersion: source\.codeVersion \|\| defaultSyncCodeVersion/);
 assert.match(serverSource, /researchCorpusByPrefix\(registry, source\?\.codePrefix, source\)/);
 assert.doesNotMatch(serverSource, /`EXCLUDED_CORPORA:/);
-assert.match(clientSource, /function appendResearchAnswerNarrative\(container, result\)/);
+assert.match(clientSource, /function appendResearchAnswerNarrative\(container, result, question = "", includeRecoveryAction = true\)/);
 assert.match(clientSource, /function researchAnswerTable\(block\)/);
 assert.match(clientSource, /research-answer-table/);
 assert.match(clientSource, /appendResearchInlineFormatting/);
