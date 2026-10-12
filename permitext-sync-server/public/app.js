@@ -112,7 +112,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-report-picker-v919";
+} from "./offline-storage.js?v=20261012-report-add-actions-v920";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -29540,20 +29540,10 @@ async function renderProjectReportDraft(project, resume = null) {
       { onChange(expanded) { persistReportSectionExpanded("Report introduction", expanded); } });
     metadata.append(introductionSection);
 
-    const addControls = document.createElement("details");
-    addControls.className = "report-draft-add-controls report-add-menu";
-    const addToggle = document.createElement("summary");
-    addToggle.textContent = "Add content";
-    addControls.append(addToggle);
-    const addOptions = document.createElement("div");
-    addOptions.className = "report-add-options";
-    addControls.append(addOptions);
-    addControls.addEventListener("keydown", event => {
-      if (event.key === "Escape") { addControls.open = false; addToggle.focus(); }
-    });
-    addControls.addEventListener("focusout", event => {
-      if (!addControls.contains(event.relatedTarget)) addControls.open = false;
-    });
+    const addControls = document.createElement("div");
+    addControls.className = "report-draft-add-controls";
+    addControls.setAttribute("role", "group");
+    addControls.setAttribute("aria-label", "Add report content");
     [
       { kind: "heading", label: "Add heading", value: { text: "Report section" } },
       { kind: "paragraph", label: "Add paragraph", value: { text: "" } },
@@ -29572,18 +29562,17 @@ async function renderProjectReportDraft(project, resume = null) {
         setDirty();
         renderWorkspaceContent();
       });
-      addOptions.append(button);
+      addControls.append(button);
     });
     const addSource = document.createElement("button");
     addSource.type = "button";
     addSource.textContent = "Add source";
     addSource.addEventListener("click", () => {
-      addControls.open = false;
       panel.dataset.libraryOpen = "true";
       renderWorkspaceContent();
-      panel.querySelector('.report-library-header button')?.focus({preventScroll: true});
+      panel.querySelector('.report-source-group-toggle')?.focus({preventScroll: true});
     });
-    addOptions.append(addSource);
+    addControls.append(addSource);
 
     const blocks = document.createElement("section");
     blocks.className = "report-draft-blocks";
@@ -29594,7 +29583,7 @@ async function renderProjectReportDraft(project, resume = null) {
     if (!activeDraft.blocks.length) {
       const empty = document.createElement("p");
       empty.className = "report-workflow-help";
-      empty.textContent = "Choose Add content to start writing, or add saved material from Sources.";
+      empty.textContent = "Add a heading, paragraph, list, or saved source to start your report.";
       blocksBody.append(empty);
     }
     renderBlockEditor(blocksBody);

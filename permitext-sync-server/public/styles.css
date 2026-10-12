@@ -18370,13 +18370,17 @@ body .panel-track > article.workspace-panel.report-draft-panel :is(.report-intro
   min-height: 56px;
 }
 .workspace-panel.report-draft-panel .report-draft-add-controls {
-  padding: 0 var(--panel-padding) 16px;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0;
+  gap: 0;
   border-bottom: 1px solid var(--border);
 }
 .workspace-panel.report-draft-panel .report-draft-add-controls button {
+  width: 100%;
   color: var(--text-secondary);
   font-size: 12px;
+  text-align: center;
 }
 body .panel-track > article.workspace-panel.report-draft-panel .report-draft-classification {
   font-size: 11px !important;
@@ -19441,11 +19445,6 @@ dialog.report-export-review {
 
 
 .report-library > .report-library-header { flex: 0 0 auto; }
-.report-add-menu { position: relative; display: block; }
-.report-add-menu > summary { width: fit-content; cursor: pointer; color: var(--text-secondary); font-size: 12px; padding: 8px 0; }
-.report-add-options { display: flex; flex-direction: column; align-items: stretch; position: absolute; top: 100%; left: 0; z-index: 4; min-width: 180px; padding: 8px; border: 1px solid var(--border); border-radius: 10px; background: #111; }
-.report-add-options button { text-align: left; padding: 10px 12px; border: 0; border-radius: 4px; background: transparent; }
-.report-add-options button:hover, .report-add-options button:focus-visible { background: #222; }
 
 .project-overview-identity { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
 .project-overview-identity h2 { margin: 0 0 8px; font-size: 18px; }
