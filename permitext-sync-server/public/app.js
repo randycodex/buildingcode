@@ -40317,7 +40317,8 @@ function refreshColumnGroupPresentation({ preparePanels = true } = {}) {
   if (preparePanels) panels.forEach(preparePaneCollapse);
   const hidden = new Set();
   for (const group of state.columnGroups || []) {
-    if (group.collapsed) group.paneIDs.filter((id) => id !== activePinnedPaneID() && panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
+    if (columnGroupIsCollapsed(group)) group.paneIDs.filter((id) => id !== activePinnedPaneID() &&
+      workflowPaneIsVisible(id) && panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
   }
   panels.forEach((panel) => panel.classList.toggle('is-group-hidden', hidden.has(panel.dataset.paneId)));
   track.querySelectorAll(':scope > .pane-divider').forEach((divider) => {
@@ -40327,6 +40328,7 @@ function refreshColumnGroupPresentation({ preparePanels = true } = {}) {
 }
 
 function setColumnGroupCollapsed(group, collapsed) {
+  if (!columnGroupCanCollapse(group)) return;
   const panels = [...track.querySelectorAll(':scope > .workspace-panel')]
     .filter((panel) => panel.dataset.paneId !== activePinnedPaneID() && group.paneIDs.includes(panel.dataset.paneId));
   panels.forEach((panel) => {
@@ -40505,7 +40507,7 @@ function openColumnGroupMenu(panel, anchor) {
   if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
   if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
-  if (!group?.collapsed) {
+  if (paneCanCollapse(panel.dataset.paneId) && !columnGroupIsCollapsed(group)) {
     add(paneIsCollapsed(panel.dataset.paneId) ? 'Expand' : 'Collapse', () => {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
     });
@@ -40524,7 +40526,7 @@ function openColumnGroupMenu(panel, anchor) {
     appendReaderMenuControls(menu, panel);
   }
   if (group) {
-    add(group.collapsed ? 'Expand group' : 'Collapse group', () => {
+    if (columnGroupCanCollapse(group)) add(group.collapsed ? 'Expand group' : 'Collapse group', () => {
       setColumnGroupCollapsed(group, !group.collapsed);
       focusColumnGroupControl(group);
     });
@@ -40664,8 +40666,22 @@ function openColumnGroupEditor(panel, existing = null) {
 }
 
 // Collapse keeps the live column DOM (including unsaved editors) in place.
+function paneCanCollapse(paneID) {
+  return currentColumnWorkflowView() !== "notebook" || paneID.startsWith("reader:");
+}
+
+function columnGroupCanCollapse(group) {
+  if (currentColumnWorkflowView() !== "notebook") return true;
+  const visibleIDs = group.paneIDs.filter(workflowPaneIsVisible);
+  return visibleIDs.length > 0 && visibleIDs.every(paneCanCollapse);
+}
+
+function columnGroupIsCollapsed(group) {
+  return Boolean(group?.collapsed) && columnGroupCanCollapse(group);
+}
+
 function paneIsCollapsed(paneID) {
-  return (paneID !== activePinnedPaneID() && Boolean(columnGroupForPane(paneID)?.collapsed)) || (state.collapsedPaneIDs || []).includes(paneID);
+  return paneCanCollapse(paneID) && ((paneID !== activePinnedPaneID() && columnGroupIsCollapsed(columnGroupForPane(paneID))) || (state.collapsedPaneIDs || []).includes(paneID));
 }
 
 function applyPaneCollapsedState(panel) {
@@ -40698,8 +40714,9 @@ function applyPaneCollapsedState(panel) {
 
 function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
   const paneID = panel.dataset.paneId;
+  if (!paneCanCollapse(paneID)) return;
   const group = columnGroupForPane(paneID);
-  if (!collapsed && group?.collapsed) setColumnGroupCollapsed(group, false);
+  if (!collapsed && columnGroupIsCollapsed(group)) setColumnGroupCollapsed(group, false);
   const startWidth = panel.getBoundingClientRect().width;
   const startPadding = getComputedStyle(panel).paddingInline;
   panel._collapseAnimation?.cancel();
@@ -40761,9 +40778,24 @@ function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
   }
 }
 
+function setAllColumnsCollapsed(collapsed) {
+  const panels = [...track.querySelectorAll(":scope > .workspace-panel:not(.is-workflow-hidden)")];
+  panels.filter(panel => paneCanCollapse(panel.dataset.paneId)).forEach(panel => {
+    if (paneIsCollapsed(panel.dataset.paneId) !== collapsed ||
+        (!collapsed && columnGroupIsCollapsed(columnGroupForPane(panel.dataset.paneId)))) {
+      setPaneCollapsed(panel, collapsed);
+    }
+  });
+}
+
 function preparePaneCollapse(panel) {
   const header = panel.querySelector(":scope > header");
   if (!header || detachedProjectWindow) return;
+  if (!paneCanCollapse(panel.dataset.paneId)) {
+    panel._collapseAnimation?.cancel();
+    delete panel._collapseAnimation;
+    panel._restoreCollapseChildWidths?.();
+  }
   const codeSelect = header.querySelector(".code-select");
   const codeLabel = codeSelect?.selectedOptions?.[0]?.textContent?.trim();
   const chapterLabel = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent?.trim();
@@ -40782,6 +40814,15 @@ function preparePaneCollapse(panel) {
   }
   header.querySelectorAll(".panel-kind, .panel-title, h2").forEach((titleNode) => {
     if (titleNode.closest("button, a, summary") || titleNode.querySelector("button, a, input, select, textarea, summary, [contenteditable]")) return;
+    if (!paneCanCollapse(panel.dataset.paneId)) {
+      for (const [name, value] of titleNode._collapseTitleAttributes || []) {
+        if (value === null) titleNode.removeAttribute(name);
+        else titleNode.setAttribute(name, value);
+      }
+      return;
+    }
+    titleNode._collapseTitleAttributes ||= ["tabindex", "role", "aria-label", "aria-expanded", "title"]
+      .map(name => [name, titleNode.getAttribute(name)]);
     titleNode.tabIndex = 0;
     titleNode.setAttribute("role", "button");
     titleNode.setAttribute("aria-label", `Collapse ${label}`);
@@ -40790,6 +40831,7 @@ function preparePaneCollapse(panel) {
     if (titleNode.dataset.collapseTitleBound === "true") return;
     titleNode.dataset.collapseTitleBound = "true";
     const collapse = (event) => {
+      if (!paneCanCollapse(panel.dataset.paneId)) return;
       event.preventDefault();
       event.stopPropagation();
       setPaneCollapsed(panel, true, { focus: true });
@@ -40810,7 +40852,7 @@ function preparePaneCollapse(panel) {
     rail.addEventListener("click", (event) => {
       if (event.detail !== 0 && Date.now() < (rail._suppressExpandUntil || 0)) return;
       const group = workspacePrivatePresentationAllowed() ? columnGroupForPane(panel.dataset.paneId) : null;
-      if (group?.collapsed) {
+      if (columnGroupIsCollapsed(group)) {
         setColumnGroupCollapsed(group, false);
         focusColumnGroupControl(group);
       } else {
@@ -40841,11 +40883,11 @@ function preparePaneCollapse(panel) {
   rail.title = `Expand ${label}`;
   rail.setAttribute("aria-label", rail.title);
   const group = workspacePrivatePresentationAllowed() ? columnGroupForPane(panel.dataset.paneId) : null;
-  if (group?.collapsed) {
+  if (columnGroupIsCollapsed(group)) {
     rail.title = `Expand group ${group.name}`;
     rail.setAttribute("aria-label", rail.title);
   }
-  rail.querySelector("span").textContent = group?.collapsed ? `${group.name} · ${group.paneIDs.length}` : label;
+  rail.querySelector("span").textContent = columnGroupIsCollapsed(group) ? `${group.name} · ${group.paneIDs.length}` : label;
   prepareColumnGroupControls(panel, header, group);
   applyPaneCollapsedState(panel);
 }
@@ -45566,15 +45608,6 @@ async function start() {
   fitColumnsButton.addEventListener("click", () => {
     resetVisibleColumnWidths();
   });
-  const setAllColumnsCollapsed = (collapsed) => {
-    const panels = [...track.querySelectorAll(":scope > .workspace-panel:not(.is-workflow-hidden)")];
-    panels.forEach((panel) => {
-      if (paneIsCollapsed(panel.dataset.paneId) !== collapsed ||
-          (!collapsed && columnGroupForPane(panel.dataset.paneId)?.collapsed)) {
-        setPaneCollapsed(panel, collapsed);
-      }
-    });
-  };
   document.querySelector("#collapse-all-columns").addEventListener("click", () => setAllColumnsCollapsed(true));
   document.querySelector("#expand-all-columns").addEventListener("click", () => setAllColumnsCollapsed(false));
   collapseReadersButton.addEventListener("click", () => {

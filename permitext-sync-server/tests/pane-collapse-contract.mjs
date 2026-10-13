@@ -32,6 +32,7 @@ let reducedMotion = false;
 let saves = 0;
 const context = vm.createContext({
   state, Set, Map, Array, Object, isProAccount:()=>false,
+  currentColumnWorkflowView:()=> 'research', workflowPaneIsVisible:()=>true,
   columnGroupForPane: id => state.columnGroups?.find(group => group.paneIDs.includes(id)),
   track: { querySelectorAll: () => [] },
   window: { matchMedia: () => ({ matches: reducedMotion }) },
@@ -40,7 +41,7 @@ const context = vm.createContext({
   applyPaneWeight() {}, closeActiveCustomSelect() {}, notifyWorkspaceLayoutChange() {},
   saveWorkspaceState: () => saves++
 });
-vm.runInContext(['activePinnedPaneID', 'paneIsCollapsed', 'applyPaneCollapsedState', 'updateCollapsedPaneDividers', 'setPaneCollapsed'].map(actual).join('\n'), context);
+vm.runInContext(['activePinnedPaneID', 'paneCanCollapse', 'columnGroupCanCollapse', 'columnGroupIsCollapsed', 'paneIsCollapsed', 'applyPaneCollapsedState', 'updateCollapsedPaneDividers', 'setPaneCollapsed'].map(actual).join('\n'), context);
 context.setPaneCollapsed(panel, true);
 assert.equal(context.paneIsCollapsed(panel.dataset.paneId), true);
 assert.equal(rail.hidden, false);
@@ -217,6 +218,7 @@ console.log('Saved, Notebook and Report are excluded from active and persisted c
 const resetState = { paneWeights: { a: 950, b: 820 }, collapsedPaneIDs: ['a'], columnGroups: [{ id: 'g', paneIDs: ['b'], collapsed: true }] };
 const resetContext = vm.createContext({
   state: resetState, track: { scrollLeft: 0, scrollWidth: 1200, clientWidth: 1000, querySelectorAll: () => [] },
+  reportScreen: null, workflowPaneIsVisible:()=>true,
   activePaneIDs: () => ['a', 'b'], defaultPaneWidthForID: () => 600,
   saveWorkspaceState() {}, async transitionWorkspace() {}, requestAnimationFrame: fn => fn()
 });
@@ -296,7 +298,7 @@ const menuPanel={dataset:{paneId:'reader:one'},editor:retainedEditor,
 const peerPanel={dataset:{paneId:'reader:two'}};
 let menuOrder=['reader:one','reader:two'], menuPro=false;
 const menuState={paneOrder:menuOrder,columnGroups:[]};
-const menuContext=vm.createContext({state:menuState,AbortController,isProAccount:()=>menuPro,
+const menuContext=vm.createContext({state:menuState,AbortController,isProAccount:()=>menuPro,currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,
   document:{querySelector:()=>null,createElement:tag=>menuNode(tag),body:{append:n=>{menu=n;}},addEventListener(){},get activeElement(){return focused;}},
   window:{innerWidth:1200,innerHeight:800},
   track:{querySelectorAll:()=>[menuPanel,peerPanel]},
@@ -308,7 +310,7 @@ const menuContext=vm.createContext({state:menuState,AbortController,isProAccount
   appendReaderMenuControls(){},paneIsCollapsed:()=>false,
   setPaneCollapsed:(...args)=>{collapsedCall=args;menuRail.focus();}
 });
-vm.runInContext(['canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
+vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
 menuState.pinnedPaneID='reader:one';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert.deepEqual(menu.children.map(x=>x.textContent),['Collapse','Move Left','Move Right'],'Free menus omit both Pin and Unpin, even with a stored Pro pin.');
@@ -335,6 +337,12 @@ menuContext.openColumnGroupMenu(menuPanel,anchor);menu.children[0].listeners.cli
 assert.equal(collapsedCall[0],menuPanel);assert.equal(collapsedCall[1],true);assert.equal(collapsedCall[2].focus,true);assert.equal(focused,menuRail);
 menuContext.openColumnGroupMenu(menuPanel,anchor);menu.listeners.keydown({key:'Escape',preventDefault(){}});
 assert.equal(focused,anchor);assert.equal(anchor.attrs['aria-expanded'],'false');
+menuContext.currentColumnWorkflowView=()=> 'notebook';
+menuPanel.dataset.paneId='utility:saved:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
+assert(!menu.children.some(item=>['Collapse','Expand'].includes(item.textContent)), 'Notebook Evidence menus do not offer collapse or expansion.');
+menuPanel.dataset.paneId='reader:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
+assert(menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Reader menus retain collapse.');
+menuContext.currentColumnWorkflowView=()=> 'research';
 // Named-group focus restoration selects the first visible member, never hidden siblings.
 const groupRail=menuNode(),groupAnchor=menuNode();
 const groupPanel={dataset:{paneId:'a'},classList:{contains:()=>false},querySelector:s=>s.includes('pane-collapsed-tab')?groupRail:groupAnchor};
