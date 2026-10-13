@@ -23,7 +23,7 @@ for (const name of ['openSavedItemInReader', 'openResearchConversation', 'startN
       activeProjectIDForCodeQuestions: () => 'project', postResearch: () => gate,
       fetchAuthoritativeResearchConversation: () => gate,
       researchDraftPaneIDs: new Set(), paneIDForUtilityInstance: i => i.id,
-      researchOpenGeneration: 0, track: {querySelector: () => null},
+      researchOpenGeneration: 0, researchConversationOpeningAttempts: new Map(), track: {querySelector: () => null},
       newUtilityInstance: () => {calls.push('created');return {};},
       activeResearchConversation: null,
       refreshResearchConversationList: () => {calls.push('refresh');},

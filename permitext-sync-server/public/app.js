@@ -706,6 +706,7 @@ let researchHistoryShowing = false;
 const researchDraftPaneIDs = new Set();
 const researchNewChatDrafts = new Map();
 const researchThreadScrollPositions = new Map();
+const researchConversationOpeningAttempts = new Map();
 const pendingGroupReaderPositions = new Map();
 // Additional Research views are restored from the owning workspace layout.
 const supplementalResearchConversationIDs = [];
@@ -21447,6 +21448,48 @@ async function openSupplementalResearchConversation(conversationID) {
   return conversation;
 }
 
+function researchAssistantContentIdentity(instance = null) {
+  return JSON.stringify(instance
+    ? [instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]
+    : ["analysis", state.researchConversationID || "", researchHistoryShowing, researchConversationPaneOpened]);
+}
+
+async function refreshResearchConversationInPlace(paneID, conversationID, instance = null) {
+  const panel = track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneID)}"]`);
+  const body = panel?.querySelector(":scope > .assistant-body");
+  if (!body || panel.dataset.workspacePaneLoading || !hasCapability("research")) return "unavailable";
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const workflowGeneration = state.workflowNavigationGeneration || 0;
+  const generation = (panel._researchConversationRefreshGeneration || 0) + 1;
+  panel._researchConversationRefreshGeneration = generation;
+  const current = () => panel.isConnected && panel.parentNode === track &&
+    isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID &&
+    workflowGeneration === (state.workflowNavigationGeneration || 0) &&
+    generation === panel._researchConversationRefreshGeneration &&
+    !researchDraftPaneIDs.has(paneID) && hasCapability("research") &&
+    conversationID === (instance
+      ? (state.utilityInstances || []).find(item => item.key === "analysis" && item.id === instance.id)?.conversationID
+      : state.researchConversationID);
+  const conversation = await renderResearchConversation(conversationID, {
+    embedded: true, supplemental: Boolean(instance), ownerInstance: instance, paneID
+  });
+  if (!current()) return "stale";
+  // Publish a complete conversation in one swap; history, filters and focus stay mounted.
+  body.replaceChildren(conversation);
+  panel.classList.remove("has-research-composer", "is-new-research-chat");
+  panel.classList.add("has-inline-conversation");
+  panel.dataset.workspacePaneIdentity = researchAssistantContentIdentity(instance);
+  panel.querySelectorAll(".assistant-history-rail .research-conversation-row").forEach(row => {
+    const selected = row.dataset.conversationId === conversationID;
+    row.classList.toggle("is-active", selected);
+    const button = row.querySelector(".research-conversation-open");
+    if (selected) button?.setAttribute("aria-current", "true");
+    else button?.removeAttribute("aria-current");
+  });
+  return "updated";
+}
+
 async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
@@ -21457,8 +21500,13 @@ async function openResearchConversation(conversationID, options = {}) {
     const instanceID = options.instance.id;
     const workspaceID = activeWorkspaceID;
     const identity = captureAccountRequest();
+    const attemptKey = `${workspaceID}:${instanceID}`;
+    const attempt = {};
+    researchConversationOpeningAttempts.set(attemptKey, attempt);
     const conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
-    if (!workflowIsCurrent() || workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return null;
+    if (!workflowIsCurrent() || workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity) ||
+        researchDraftPaneIDs.has(paneIDForUtilityInstance(options.instance)) ||
+        researchConversationOpeningAttempts.get(attemptKey) !== attempt) return null;
     const instance = (state.utilityInstances || []).find((item) => item.key === "analysis" && item.id === instanceID);
     if (!instance) return null;
     const previousConversationID = instance.conversationID;
@@ -21481,7 +21529,10 @@ async function openResearchConversation(conversationID, options = {}) {
     supplementalResearchConversations.set(normalizedConversationID, conversation);
     if (!supplementalResearchConversationIDs.includes(normalizedConversationID)) supplementalResearchConversationIDs.push(normalizedConversationID);
     saveWorkspaceState();
-    await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForUtilityInstance(instance)] });
+    const paneID = paneIDForUtilityInstance(instance);
+    const refreshed = await refreshResearchConversationInPlace(paneID, normalizedConversationID, instance);
+    if (refreshed === "stale") return null;
+    await transitionWorkspace("utility", { refreshPaneIDs: refreshed === "updated" ? [] : [paneID] });
     return conversation;
   }
   const showResearchList = options.showResearchList !== false;
@@ -21504,7 +21555,7 @@ async function openResearchConversation(conversationID, options = {}) {
     await showWebNotice("Could not open Research", error.message || "The conversation could not be loaded.");
     return null;
   }
-  if (!workflowIsCurrent() || !researchOpenContextIsCurrent(openingContext)) return null;
+  if (!workflowIsCurrent() || !researchOpenContextIsCurrent(openingContext) || researchDraftPaneIDs.has("utility:analysis")) return null;
   // Every explicit entry point (including Note references) must reveal the
   // conversation. Setting only its ID loads History but leaves the answer hidden.
   researchConversationPaneOpened = true;
@@ -21570,10 +21621,11 @@ async function openResearchConversation(conversationID, options = {}) {
   appendPaneIfMissing(conversationPaneID);
   saveWorkspaceState();
   const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
+  const refreshed = await refreshResearchConversationInPlace(conversationPaneID, normalizedConversationID);
+  if (refreshed === "stale") return null;
   await transitionWorkspace("utility", {
     refreshPaneIDs: [
-      ...(showResearchList ? ["utility:analysis"] : []),
-      conversationPaneID,
+      ...(refreshed === "updated" ? [] : [conversationPaneID]),
       ...projectPaneIDs
     ]
   });
@@ -23892,7 +23944,7 @@ async function renderResearch(paneID = "utility:analysis") {
     conversationRows.set(conversation.id, row);
     const renderRow = () => {
       clear(row);
-      const selected = !draftShowing && conversation.id === (instance?.conversationID || state.researchConversationID);
+      const selected = !researchDraftPaneIDs.has(paneID) && conversation.id === (instance?.conversationID || state.researchConversationID);
       row.classList.toggle("is-active", selected);
       const openButton = document.createElement("button");
       openButton.className = "research-conversation-open";
@@ -44670,7 +44722,8 @@ function workspacePaneDescriptors(options = {}) {
     savedFoundationScope?.register(paneIDForUtilityInstance(instance));
     if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Evidence", analysis: "Assistant" }[instance.key] || "Column"),
       (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: savedFoundationScope, signal }), () => closeUtilityInstance(instance),
-      { foundationScope: savedFoundationScope, deferredFoundationRelease: Boolean(savedFoundationScope), publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
+      { foundationScope: savedFoundationScope, deferredFoundationRelease: Boolean(savedFoundationScope), publicContent: instance.key === "search", identity: instance.key === "analysis"
+        ? researchAssistantContentIdentity(instance) : JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
     if (instance.key === "search" || instance.key === "sdc") {
       const detail = sectionDetailsBySearch()[instance.id];
       if (detail) add(paneIDForSectionDetail(instance.id), instance.key === "sdc" ? "Evidence detail" : "Section detail", () => renderSectionDetail(instance.id, detail),
@@ -44681,7 +44734,7 @@ function workspacePaneDescriptors(options = {}) {
     }
   }
   if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Assistant", () => renderResearch("utility:analysis"), closeResearchWorkspace,
-    { identity: JSON.stringify(["analysis", state.researchConversationID || "", researchHistoryShowing, researchConversationPaneOpened]) });
+    { identity: researchAssistantContentIdentity() });
   for (const id of supplementalResearchConversationIDs) {
     if ((state.utilityInstances || []).some((item) => item.conversationID === id)) continue;
     add(paneIDForResearchConversation(id), "Assistant", () => renderResearchConversation(id, { supplemental: true }), () => closeResearchConversation(id));

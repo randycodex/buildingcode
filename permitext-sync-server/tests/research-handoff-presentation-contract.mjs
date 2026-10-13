@@ -59,7 +59,7 @@ function harness({ unavailable=false, stale=false }={}) {
     paneIDForResearchConversation:(id=state.researchConversationID)=>id?`research:${id}`:'',
     defaultPaneWidthForID:()=>600, primarySavedPaneID:()=> 'saved', saveWorkspaceState(){},
     appendPaneIfMissing:id=>{if(!state.paneOrder.includes(id)) state.paneOrder.push(id);},
-    openProjectDetails:()=>[], transitionWorkspace:async()=>seen.push(context.researchConversationPaneIsOpen()),
+    openProjectDetails:()=>[], refreshResearchConversationInPlace:async()=> 'unavailable', transitionWorkspace:async()=>seen.push(context.researchConversationPaneIsOpen()),
     scrollPaneIntoView:id=>seen.push(id),requestAnimationFrame(){},
     supplementalResearchConversationIDs:[],
     notebookResearchAnswers:foundation=>foundation.researchAnswers||[],

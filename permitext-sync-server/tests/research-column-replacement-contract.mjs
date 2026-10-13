@@ -7,7 +7,7 @@ const fn=source.slice(start,source.indexOf('\n}',start)+2);
 function setup(otherOwner=false){
  const instance={id:'column-a',key:'analysis',conversationID:'old',draft:'unfinished follow-up'};
  const state={utilityInstances:[instance,...(otherOwner?[{id:'column-b',key:'analysis',conversationID:'old'}]:[])],researchConversationID:'',paneOrder:['utility:analysis:column-a','research:conversation:old'],paneWeights:{'research:conversation:old':400}};
- const context=vm.createContext({state,activeWorkspaceID:'project-workspace',researchDraftPaneIDs:new Set(['utility:analysis:column-a']),researchNewChatDrafts:new Map(),supplementalResearchConversationIDs:['old','other'],supplementalResearchConversations:new Map([['old',{id:'old'}],['other',{id:'other'}]]),paneIDForUtilityInstance:i=>'utility:analysis:'+i.id,researchConversationPaneIsOpen:()=>false,captureAccountRequest:()=>({}),isCurrentAccountRequest:()=>true,fetchAuthoritativeResearchConversation:async id=>({id}),saveWorkspaceState(){},transitionWorkspace:async()=>{}});
+ const context=vm.createContext({state,activeWorkspaceID:'project-workspace',researchConversationOpeningAttempts:new Map(),researchDraftPaneIDs:new Set(['utility:analysis:column-a']),researchNewChatDrafts:new Map(),supplementalResearchConversationIDs:['old','other'],supplementalResearchConversations:new Map([['old',{id:'old'}],['other',{id:'other'}]]),paneIDForUtilityInstance:i=>'utility:analysis:'+i.id,researchConversationPaneIsOpen:()=>false,captureAccountRequest:()=>({}),isCurrentAccountRequest:()=>true,fetchAuthoritativeResearchConversation:async id=>({id}),refreshResearchConversationInPlace:async()=> 'unavailable',saveWorkspaceState(){},transitionWorkspace:async()=>{}});
  vm.runInContext(fn,context);return {context,instance};
 }
 for(const otherOwner of [false,true]){
@@ -27,3 +27,23 @@ assert.equal(instance.conversationID,'old','A stale fetch must not replace a col
 console.log('Research column replacement: no ghost chat; other owners, drafts and workspace races preserved.');
 
 for(const open of [false,true]) { const {context:c,instance}=setup(); c.state.researchConversationID='old'; c.researchConversationPaneIsOpen=()=>open; await c.openResearchConversation('new',{instance}); assert.equal(c.supplementalResearchConversationIDs.includes('old'),open,'A remembered but closed primary chat must not reappear.'); }
+
+const switching=setup(); const pending=new Map(), transitions=[];
+switching.context.fetchAuthoritativeResearchConversation=id=>new Promise(resolve=>pending.set(id,resolve));
+switching.context.refreshResearchConversationInPlace=async()=> 'updated';
+switching.context.transitionWorkspace=async(mode,options)=>transitions.push(options);
+const first=switching.context.openResearchConversation('first',{instance:switching.instance});
+const second=switching.context.openResearchConversation('second',{instance:switching.instance});
+pending.get('second')({id:'second'}); await second;
+pending.get('first')({id:'first'}); assert.equal(await first,null);
+assert.equal(switching.instance.conversationID,'second','The most recently clicked conversation wins even when an earlier fetch finishes last.');
+assert.equal(transitions.length,1);
+assert.deepEqual(Array.from(transitions[0].refreshPaneIDs),[],'A successfully updated Assistant is retained during workspace reconciliation.');
+assert.equal(switching.context.researchNewChatDrafts.get('followup:old'),'unfinished follow-up');
+console.log('Assistant switching retains the column, preserves drafts, and rejects out-of-order conversation fetches.');
+
+const drafting=setup(); let finish;
+drafting.context.fetchAuthoritativeResearchConversation=()=>new Promise(resolve=>{finish=resolve;});
+const loading=drafting.context.openResearchConversation('next',{instance:drafting.instance});
+drafting.context.researchDraftPaneIDs.add('utility:analysis:column-a'); finish({id:'next'});
+assert.equal(await loading,null); assert.equal(drafting.instance.conversationID,'old', 'New chat opened during a pending switch remains selected.');
