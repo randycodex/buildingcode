@@ -23620,8 +23620,11 @@ function codeSearchSectionVersion(section) {
 }
 
 async function codeSearchResults(hits, query, matchMode = "exact") {
+  const { findActiveCodeSource } = await import("./active-code-source-catalog.mjs");
   return Promise.all(hits.map(async ({ section, plainText: matchedPlainText }) => {
     const plainText = matchedPlainText ?? await searchableSectionPlainText(section);
+    const codeSource = await findActiveCodeSource({ canonicalEdition: codeSearchSectionVersion(section),
+      categoryID: section.codeSectionID, codePrefix: section.codePrefix }).catch(() => null);
     return {
       id: section.id,
       chapterID: section.chapterID,
@@ -23629,6 +23632,7 @@ async function codeSearchResults(hits, query, matchMode = "exact") {
       navigationChapterID: section.navigationChapterID || section.chapterID,
       codePrefix: section.codePrefix,
       codeVersion: codeSearchSectionVersion(section),
+      codeSource,
       chapterNumber: section.chapterNumber,
       sectionNumber: section.sectionNumber,
       title: section.title,

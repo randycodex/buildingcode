@@ -1,4 +1,6 @@
 import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261012-note-menu-v3";
+import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
+import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
@@ -113,7 +115,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-saved-batch-v936";
+} from "./offline-storage.js?v=20261012-reconciled-v942";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -535,6 +537,7 @@ try {
   workspaceMigrationError = error;
 }
 configurePrivateWorkspace(initialPersistedAccount);
+startSearchQuerySession(sessionStorage, tabWorkspaceKey, performance.getEntriesByType("navigation")[0]?.type === "reload");
 let state = loadWorkspaceState(initialPersistedAccount);
 activeCodeSourcesController = createActiveCodeSourceController({
   storage: localStorage,
@@ -803,7 +806,7 @@ function loadWorkspaceState(accountOverride) {
       });
       sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
     }
-    saved = retireUnassignedLayout(saved);
+    saved = restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID, retireUnassignedLayout(saved));
     const utilityInstances = normalizeUtilityInstances(saved);
     const projectDetails = (Array.isArray(saved.projectDetails)
       ? saved.projectDetails.filter((detail) => detail && typeof detail === "object")
@@ -1532,6 +1535,7 @@ function saveWorkspaceState() {
   if (workspaceRestoreError) return;
   restoreResearchWorkspaceState();
   captureResearchWorkspaceState();
+  writeSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID, state);
   if (!detachedProjectWindow) {
     persistCodeQuestionAccountState();
     captureColumnGroupContents();
@@ -1541,7 +1545,7 @@ function saveWorkspaceState() {
     state.trackScrollLeft = layout.trackScrollLeft;
     localStorage.setItem(
       workspaceSnapshotKey(activeWorkspaceID),
-      JSON.stringify(workspaceLayoutWithoutCodeQuestionData(layout))
+      JSON.stringify(withoutPersistentSearchQueries(workspaceLayoutWithoutCodeQuestionData(layout)))
     );
     if (workspaceRegistry) {
       const now = new Date().toISOString();
@@ -1555,7 +1559,7 @@ function saveWorkspaceState() {
       persistWorkspaceRegistry();
     }
     const globalState = Object.fromEntries(globalWorkspaceStateKeys.map((key) => [key, state[key]]));
-    localStorage.setItem(baseWorkspaceKey, JSON.stringify(globalState));
+    localStorage.setItem(baseWorkspaceKey, JSON.stringify(withoutPersistentSearchQueries(globalState)));
     sessionStorage.removeItem(tabWorkspaceKey);
     updateConnectionStatus();
     return;
@@ -1575,7 +1579,7 @@ function saveWorkspaceState() {
   } = persistableState;
   localStorage.setItem(
     workspaceKey,
-    JSON.stringify(workspaceLayoutWithoutCodeQuestionData(persistableWorkspaceState))
+    JSON.stringify(withoutPersistentSearchQueries(workspaceLayoutWithoutCodeQuestionData(persistableWorkspaceState)))
   );
   updateConnectionStatus();
   try {
@@ -1692,7 +1696,8 @@ function waitForWorkspaceTransitionPaint() {
 
 function applyStoredWorkspaceLayout(layout) {
   projectStudioTransitionGeneration += 1;
-  applyWorkspaceLayout(state, retireUnassignedLayout(workspaceLayoutWithoutCodeQuestionData(layout)));
+  applyWorkspaceLayout(state, restoreSearchQuerySession(sessionStorage, tabWorkspaceKey, activeWorkspaceID,
+    retireUnassignedLayout(workspaceLayoutWithoutCodeQuestionData(layout))));
   loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
   state.utilityInstances = normalizeUtilityInstances(state);
   setOpenProjectDetails(state.projectDetails);
@@ -4802,6 +4807,8 @@ function searchResultDetail(result) {
   return {
     codePrefix,
     codeVersion: syncCodeVersion(result.codeVersion || syncCodeVersionForPrefix(codePrefix)),
+    codeSource: result.codeSource,
+    navigationChapterID: result.navigationChapterID || result.chapterID || "",
     chapterID: result.navigationChapterID || result.chapterID || "",
     chapterNumber: result.chapterNumber || "",
     sectionID: result.id || result.sectionID,
@@ -5823,6 +5830,7 @@ async function api(path, options = {}) {
       serverReachable = false;
       updateConnectionStatus();
     }
+    if (networkError && typeof networkError === "object") networkError.isNetworkFailure = true;
     throw networkError;
   }
   if (!response.ok) {
@@ -14930,6 +14938,7 @@ function splitAnnotatedCodeBlock(block, blockIndex = 0) {
 // identity stable only while its fields equal this internally resolved snapshot;
 // an explicit navigation change immediately produces a different identity.
 const readerResolvedWorkspaceIdentities = new WeakMap();
+const resolvedReaderSourceNavigations = new WeakMap();
 
 function workspaceReaderContentIdentity(reader) {
   const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
@@ -15350,7 +15359,7 @@ function openResearchDestinationMenu(anchor, selection) {
   menu.querySelector('button')?.focus();
 }
 
-function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection) {
+function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection, options = {}) {
   const sectionWrapper = document.createElement("section");
   sectionWrapper.className = "chapter-section";
   sectionWrapper.dataset.sectionId = String(section.id);
@@ -15406,17 +15415,29 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.append(sectionHeading, savedMarker);
   sectionWrapper.append(headingRow);
 
-  blocks.forEach((block, index) => {
+  const appendBlock = (block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
     const savedBlockRecord = privateContentAllowed && isSectionSaved({
       sectionID: target.sectionID,
       codeVersion: target.codeVersion,
       blockID: target.blockID
     }, "", savedKeys);
-    sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
+    const node = renderAnnotatedCodeBlock(block, section, reader, target, {
       showBookmark: Boolean(savedBlockRecord), bookmarkStateResolved: true, panel, accessGate: panel.__workspaceAccessGate
-    }));
-  });
+    });
+    sectionWrapper.append(node);
+    if (blocks.length > 96) {
+      linkInlineCodeReferences(node, panel, reader);
+      decorateReaderDefinitions(node, reader);
+    }
+  };
+  if (blocks.length > 96) {
+    sectionWrapper.classList.add("reader-large-section");
+    linkInlineCodeReferences(sectionWrapper, panel, reader);
+    sectionWrapper._readerBlocksReady = renderReaderBlockBatches(blocks, appendBlock, options.isCurrent || (() => true));
+    return sectionWrapper;
+  }
+  blocks.forEach(appendBlock);
   linkInlineCodeReferences(sectionWrapper, panel, reader);
   decorateReaderDefinitions(sectionWrapper, reader);
   return sectionWrapper;
@@ -15550,9 +15571,12 @@ async function progressivelyRenderReaderChapter(
           panel,
           reader,
           readerSectionWithWindowBody(section, windowChapter),
-          groupLabelsByFirstSection
+          groupLabelsByFirstSection,
+          { isCurrent: () => !stopped && panel.isConnected && panel.dataset.readerRenderToken === renderToken }
         )
       );
+      await Promise.all(nodes.map(node => node._readerBlocksReady));
+      if (stopped || !panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
       extent.replace(start, nodes, () => collapseRepeatedReaderCatalogAliases(content));
       hydrationCompleted = true;
       if (extent.loadedCount === sections.length) {
@@ -15647,6 +15671,7 @@ async function renderSectionContent(panel, reader, options = {}) {
   stopReaderProgressiveHydration(content);
   content?.classList.remove("is-searching-reader");
   delete panel.dataset.readerContentKey;
+  delete panel.dataset.readerPublicCorpusGeneration;
   if (content) delete content.dataset.chapterFullyLoaded;
   if (!reader.chapterID) {
     blankReader(content);
@@ -15669,6 +15694,13 @@ async function renderSectionContent(panel, reader, options = {}) {
       emptyReader(content, "Code text changed", "Search this chapter again to open a match in the updated text.");
       return;
     }
+  }
+  if ((chapter.codePrefix && chapter.codePrefix !== reader.codePrefix) ||
+      (chapter.codeVersion && syncCodeVersion(chapter.codeVersion) !==
+        syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix)))) {
+    const error = new Error("The chapter does not belong to the selected code source.");
+    error.code = "READER_SOURCE_MISMATCH";
+    throw error;
   }
   setReaderDefinitionContext(reader, chapter, syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix)));
   // Window offsets belong to the complete manifest. Collapsing aliases before
@@ -15711,24 +15743,29 @@ async function renderSectionContent(panel, reader, options = {}) {
     throw error;
   }
   if (panel.dataset.readerRenderToken !== renderToken) return;
+  const acceptedPublicGeneration = publicCodeRevision.generation;
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
   clear(content);
   const initialSections = sections.slice(initialStart, initialEnd).map((section) =>
     readerSectionWithWindowBody(section, initialChapter)
   );
-  initialSections.forEach((section) => {
-    content.append(
-      renderReaderChapterSection(
+  const initialNodes = initialSections.map((section) => {
+    const node = renderReaderChapterSection(
         panel,
         reader,
         section,
-        groupLabelsByFirstSection
-      )
-    );
+        groupLabelsByFirstSection,
+        { isCurrent: () => panel.dataset.readerRenderToken === renderToken && !panel._readerNavigationAbort?.signal.aborted }
+      );
+    content.append(node);
+    return node;
   });
+  await Promise.all(initialNodes.map(node => node._readerBlocksReady));
+  if (panel.dataset.readerRenderToken !== renderToken) return;
   cacheRecentlyViewedReaderPreview(reader, initialSections[targetIndex - initialStart]);
   collapseRepeatedReaderCatalogAliases(content);
   panel.dataset.readerContentKey = readerContentScrollKey(reader);
+  panel.dataset.readerPublicCorpusGeneration = String(acceptedPublicGeneration);
 
   if (reader.sectionID && !scrollPosition) {
     requestAnimationFrame(() => {
@@ -15776,7 +15813,7 @@ function scrollReaderContentToSection(content, sectionID, behavior = "auto", sec
   stabilizeReaderSectionAtHeader(content, target, behavior);
 }
 
-function savedReaderTarget(content, item) {
+function savedReaderTarget(content, item, options = {}) {
   if (!content || !item) return null;
   const sectionID = String(item.sectionID || item.id || "").trim();
   const sectionNumber = String(item.sectionNumber || "").trim();
@@ -15795,7 +15832,7 @@ function savedReaderTarget(content, item) {
     (numberSelector ? content.querySelector(numberSelector) : null);
   // Whole-section bookmarks target the heading and all of its content.
   // Paragraph bookmarks continue through the exact block lookup below.
-  if (!blockID && sectionTarget) return sectionTarget;
+  if (!blockID && sectionTarget && !options.preferPassage) return sectionTarget;
   if (blockID) {
     const sectionBlockSelector = sectionID
       ? `.annotated-code-block[data-section-id="${CSS.escape(sectionID)}"][data-block-id="${CSS.escape(blockID)}"]`
@@ -15806,6 +15843,10 @@ function savedReaderTarget(content, item) {
     if (blockTarget) return blockTarget;
   }
   const savedTitle = String(item.title || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
+  // Catalog title aliases can name a numbered list item inside a larger source
+  // section. Its authored HTML generates the list number outside textContent.
+  const passageTitle = options.preferPassage && sectionTarget?.dataset.sectionAliases?.split(/\s+/).includes(sectionID)
+    ? savedTitle.replace(/^\d+(?:\.\d+)*\.?\s+/, "") : savedTitle;
   const sectionTitle = String(
     readerSectionTitleNode(sectionTarget)?.textContent || sectionTarget?.dataset.sectionTitle || ""
   ).replace(/\s+/g, " ").trim().toLocaleLowerCase();
@@ -15825,8 +15866,8 @@ function savedReaderTarget(content, item) {
         ":scope > .section-block, :scope > .section-html, :scope > .code-table, :scope > .code-media"
       ) || candidate;
       const candidateText = String(codeBody.textContent || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
-      return candidateText.length >= 12 &&
-        (candidateText.includes(savedTitle) || savedTitle.includes(candidateText));
+      return candidateText.length >= 12 && passageTitle.length >= 12 &&
+        (candidateText.includes(passageTitle) || passageTitle.includes(candidateText));
     });
     if (exactTextBlock) return exactTextBlock;
   }
@@ -16690,6 +16731,17 @@ async function changeReaderCode(panel, reader, selectedCode) {
   }
 }
 
+async function prefetchReaderSourceWindow(source, signal) {
+  const chapter = await fetchChapter(source.chapterID, {signal});
+  if (chapter.codePrefix !== source.codePrefix || chapter.codeVersion !== source.codeVersion) return;
+  const sections = (chapter.sections || []).map(section => ({...section, readerAliasSectionIDs: []}));
+  const target = readerTargetSectionIndex(sections, source);
+  if (target < 0) return;
+  const start = Math.min(Math.max(0, target - Math.floor(readerInitialSectionWindowSize / 2)),
+    Math.max(0, sections.length - readerInitialSectionWindowSize));
+  await fetchChapterBodyWindow(source.chapterID, start, Math.min(readerInitialSectionWindowSize, sections.length - start), chapter, {signal});
+}
+
 async function refreshReaderContent(panel, reader, options = {}) {
   panel.dataset.workspacePaneIdentity = workspaceReaderContentIdentity(reader);
   const navigationToken = beginReaderNavigation(panel);
@@ -16700,10 +16752,29 @@ async function refreshReaderContent(panel, reader, options = {}) {
   resetEnhancedSelects(panel);
   if (saveButton) saveButton.disabled = true;
   try {
+    const sourceNavigation = resolvedReaderSourceNavigations.get(reader);
+    const exactSource = sourceNavigation && sourceNavigation.chapterID === reader.chapterID &&
+      sourceNavigation.sectionID === reader.sectionID && sourceNavigation.codePrefix === reader.codePrefix &&
+      sourceNavigation.codeVersion === reader.codeVersion;
+    if (exactSource) {
+      // Warm the exact text in parallel. Publication still waits for the catalog
+      // to accept its navigation chapter and for the normal edition checks.
+      void prefetchReaderSourceWindow(sourceNavigation, panel._readerNavigationAbort?.signal).catch(() => {});
+    }
     if (!await populateReaderSelectors(panel, reader, navigationToken)) return false;
     await renderSectionContent(panel, reader, options);
   } catch (error) {
     if (panel.dataset.readerNavigationToken !== navigationToken) return false;
+    if (error.name === "AbortError") return false;
+    const transient = error.code === "PUBLIC_CORPUS_CHANGED" || error.isNetworkFailure ||
+      [500, 502, 503, 504].includes(error.status);
+    if (transient && !options.openingRetry) {
+      await new Promise(resolve => window.setTimeout(resolve, 150));
+      if (panel.dataset.readerNavigationToken !== navigationToken) return false;
+      return refreshReaderContent(panel, reader, { ...options, openingRetry: true });
+    }
+    console.warn("Reader opening failed", { code: error.code || error.name, status: error.status,
+      chapterID: reader.chapterID, codePrefix: reader.codePrefix });
     const content = panel.querySelector(".reader-content");
     clear(content);
     emptyReader(content, "Couldn’t open this chapter", "Check your connection and try again.");
@@ -18572,7 +18643,7 @@ async function renderSearchResults(panel, instance) {
       return;
     }
     payload = await api(
-      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=${matchMode}&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true${sourceScope.querySuffix}`, { signal: controller.signal }
+      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=${matchMode}&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true${sourceScope.querySuffix}`, { signal: controller.signal }
     );
   } catch (error) {
     if (!isCurrent()) return;
@@ -18933,7 +19004,7 @@ function appendSearchGroupLoadMore(results, page, options) {
       const source = encodeURIComponent(JSON.stringify({ codePrefix: page.codePrefix, codeVersion: page.codeVersion }));
       const payload = await api(`/code/search?q=${encodeURIComponent(options.query)}` +
         `&code=${encodeURIComponent(page.codePrefix)}&version=all&resultSource=${source}&match=${options.matchMode || "exact"}` +
-        `&limit=${searchResultPageSize}&offset=${page.nextOffset}` +
+        `&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=${page.nextOffset}` +
         `${page.cursorKind === "candidate" ? `&candidateOffset=${page.candidateOffset}` : ""}${options.sourceScope.querySuffix}`,
         { signal: options.controller.signal });
       if (!options.isCurrent()) return false;
@@ -19004,7 +19075,7 @@ function appendSearchLoadMore(results, options) {
     try {
       const payload = await api(
         `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=${options.matchMode || "exact"}` +
-        `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
+        `&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
         `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}${options.sourceScope.querySuffix}`,
         { signal: options.controller.signal }
       );
@@ -36462,7 +36533,7 @@ async function confirmSearchReaderReplacement(reader, detail, anchorPaneID = "")
   );
 }
 
-function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
+function revealReaderSourceTarget(reader, item, evidenceAnchor = null, options = {}) {
   const paneID = paneIDForReader(reader);
   const revealToken = crypto.randomUUID();
   reader.sourceRevealToken = revealToken;
@@ -36471,7 +36542,7 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
       if (reader.sourceRevealToken !== revealToken) return;
       const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`);
       const content = panel?.querySelector(".reader-content");
-      const target = savedReaderTarget(content, item);
+      const target = savedReaderTarget(content, item, options);
       if (!content || !target) return;
       content.querySelectorAll(".is-source-target").forEach((candidate) => {
         candidate.classList.remove("is-source-target");
@@ -36481,7 +36552,8 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
       if (evidenceAnchor?.passages?.length) {
         revealNotebookEvidencePassages(target, evidenceAnchor);
       }
-      scrollReaderContentToNode(content, target, "auto");
+      if (options.preferPassage) stabilizeReaderSectionAtHeader(content, target, "auto");
+      else scrollReaderContentToNode(content, target, "auto");
     }, delay);
   });
 }
@@ -36574,6 +36646,21 @@ function reusableSearchReader(readers, anchorPaneID, forceNewReader = false) {
   return readers.find((reader) => reader.searchPreviewPaneID === anchorPaneID) || null;
 }
 
+const searchReaderOpeningAttempts = new Map();
+
+function retainReaderForSource(reader, detail) {
+  if (!reader || String(reader.chapterID) !== String(detail.chapterID) ||
+      reader.codePrefix !== detail.codePrefix || reader.codeVersion !== detail.codeVersion) return null;
+  const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`);
+  const content = panel?.querySelector(".reader-content");
+  if (!content || panel.dataset.workspacePaneLoading || content.classList.contains("is-searching-reader") ||
+      panel.dataset.readerPublicCorpusGeneration !== String(publicCodeRevision.generation)) return null;
+  const section = [...content.querySelectorAll(".chapter-section")].find(node =>
+    node.dataset.sectionId === String(detail.sectionID) ||
+    node.dataset.sectionAliases?.split(/\s+/).includes(String(detail.sectionID)));
+  return section && savedReaderTarget(content, detail, {preferPassage: true}) ? panel : null;
+}
+
 async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (workspaceColumnsRequireProject()) return null;
   if (currentColumnWorkflowView() === "report") {
@@ -36583,10 +36670,14 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const requestIdentity = captureAccountRequest();
   const sourceWorkspaceID = activeWorkspaceID;
   const workflowGeneration = state.workflowNavigationGeneration || 0;
+  const searchOpening = options.sourceSurface === "search" && !options.forceNewReader;
+  const openingAttempt = searchOpening ? Symbol() : null;
+  if (searchOpening) searchReaderOpeningAttempts.set(anchorPaneID, openingAttempt);
   let navigationItem;
   const navigationIsCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === sourceWorkspaceID &&
     !workspaceColumnsRequireProject() && workflowGeneration === (state.workflowNavigationGeneration || 0) &&
-    (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext));
+    (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext)) &&
+    (!searchOpening || searchReaderOpeningAttempts.get(anchorPaneID) === openingAttempt);
   try {
     navigationItem = await resolveReaderSource(item, {isCurrent: navigationIsCurrent});
   } catch (error) {
@@ -36629,7 +36720,10 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
       reader = replacement;
     }
   }
+  const retainedPanel = fromSearch && !options.forceNewReader ? retainReaderForSource(reader, detail) : null;
   Object.assign(reader, sourceFields);
+  resolvedReaderSourceNavigations.set(reader, {chapterID: reader.chapterID, sectionID: reader.sectionID,
+    sectionNumber: reader.sectionNumber, codePrefix: reader.codePrefix, codeVersion: reader.codeVersion});
   if (fromSearch) reader.searchPreviewPaneID = options.forceNewReader ? "" : anchorPaneID;
   const paneID = paneIDForReader(reader);
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
@@ -36638,9 +36732,15 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
   scheduleContinuitySync(reader);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  if (retainedPanel) {
+    retainedPanel.dataset.workspacePaneIdentity = workspaceReaderContentIdentity(reader);
+    retainedPanel.dataset.readerContentKey = readerContentScrollKey(reader);
+    retainedPanel.querySelector(".section-select").value = reader.sectionID || "";
+    setTitle(retainedPanel, reader);
+  }
+  await transitionWorkspace("utility", { refreshPaneIDs: retainedPanel ? [] : [paneID] });
   if (!navigationIsCurrent() || !await whenWorkspacePaneReady(paneID) || !navigationIsCurrent()) return null;
-  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor);
+  revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {preferPassage: fromSearch});
   scrollPaneIntoView(paneID);
   return reader;
 }

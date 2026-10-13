@@ -9,8 +9,8 @@ for (const name of ["openSourceInReader", "openDeepLinkedSectionInReader"]) {
     let resolve;
     const gate = new Promise(done => { resolve=done; });
     const calls=[];
-    const c=vm.createContext({currentColumnWorkflowView:()=>"research",
-      workspaceColumnsRequireProject: () => false, workflowPaneIsVisible: () => true,
+    const c=vm.createContext({
+      workspaceColumnsRequireProject: () => false, workflowPaneIsVisible: () => true, currentColumnWorkflowView: () => "research", resolvedReaderSourceNavigations: new WeakMap(), searchReaderOpeningAttempts: new Map(),
       activeWorkspaceID: "workspace-a", captureAccountRequest: () => 1, isCurrentAccountRequest: () => true,
       state:{readers:[],paneWeights:{}}, resolveReaderSource:async item=>item,
       searchResultDetail:item=>item, readerFieldsForSectionDetail:item=>item,

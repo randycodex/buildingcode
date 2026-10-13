@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { renderReaderBlockBatches } from "../public/reader-render-batches.js";
 import { readFile } from "node:fs/promises";
 import { performance } from "node:perf_hooks";
 import vm from "node:vm";
@@ -44,7 +45,7 @@ await settledGate.ready;
 const gate = { get allowed() { return settledGate.allowed; }, subscribe(listener) { listeners.push(listener); return settledGate.subscribe(listener); } };
 const panel = new Node("article"); panel.__workspaceAccessGate = gate; panel.connected = true;
 const context = vm.createContext({
-  document: { createElement: tag => new Node(tag) }, syncCodeVersion, defaultSyncCodeVersion,
+  document: { createElement: tag => new Node(tag) }, syncCodeVersion, defaultSyncCodeVersion, renderReaderBlockBatches,
   currentContentSummary() { reads++; return structuredClone({ projects: [project], projectSections: links }); },
   workspaceProject: projects => projects.find(item => item.id === selected) || null,
   syncCodeVersionForPrefix: () => defaultSyncCodeVersion, markResearchSelectable() {},
@@ -69,6 +70,7 @@ function checkRendered(rendered) {
 }
 const start = performance.now();
 let rendered = context.renderReaderChapterSection(panel, reader, section, new Map());
+await rendered._readerBlocksReady;
 const afterMS = performance.now() - start;
 checkRendered(rendered);
 assert.equal(reads, 1, "500 block controls plus the whole-section marker share exactly one fresh summary even when the real settled gate eagerly notifies on subscribe");
@@ -80,12 +82,15 @@ checkRendered(rendered);
 links = [{ sectionID: "section", codeVersion: defaultSyncCodeVersion, blockID: "paragraph-7", folderID: "p1" }];
 reads = 0;
 rendered = context.renderReaderChapterSection(panel, reader, section, new Map());
+await rendered._readerBlocksReady;
 checkRendered(rendered); assert.equal(reads, 1, "A subsequent render sees new writes");
 selected = "other-project";
 rendered = context.renderReaderChapterSection(panel, reader, section, new Map());
+await rendered._readerBlocksReady;
 checkRendered(rendered);
 permitted = false; reads = 0;
 rendered = context.renderReaderChapterSection(panel, reader, section, new Map());
+await rendered._readerBlocksReady;
 assert.equal(reads, 0, "Public or pending content never reads private summary state");
 assert.equal(rendered.querySelector(".reader-section-saved-marker").hidden, true);
 console.log(JSON.stringify({ blocks: 500, projectLinks: 1002, currentSummaryReads: 1, currentRenderMS: +afterMS.toFixed(2) }));
@@ -96,6 +101,7 @@ let releaseVerification;
 const pendingGate = createWorkspaceAccessGate({ isCurrent: () => permitted, verify: () => new Promise(resolve => { releaseVerification = resolve; }) });
 panel.__workspaceAccessGate = pendingGate; reads = 0;
 rendered = context.renderReaderChapterSection(panel, reader, section, new Map());
+await rendered._readerBlocksReady;
 assert.equal(reads, 0, "The real pending gate does not read private state during construction");
 assert.equal(rendered.querySelector(".reader-section-saved-marker").hidden, true);
 await Promise.resolve(); releaseVerification("verified"); await pendingGate.ready;

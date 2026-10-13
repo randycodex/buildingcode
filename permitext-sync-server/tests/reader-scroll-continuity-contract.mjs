@@ -40,7 +40,7 @@ function sectionNode(content, section) {
 }
 const context = vm.createContext({
     cancelReaderInternalSearch(panel) { panel._readerSearchAbort?.abort(); panel.dataset.readerSearchToken = "cancelled"; },
-  Map, AbortController, CSS: { escape: value => value }, crypto: { randomUUID },
+  Map, AbortController, CSS: { escape: value => value }, crypto: { randomUUID }, publicCodeRevision: {generation: 1},
   track: { querySelectorAll: () => panels, querySelector: selector => panels.find(p => selector.includes(`"${p.dataset.paneId}"`)) },
   requestAnimationFrame: callback => frames.push(callback), updateReaderScrollIndicator() {},
   clear: content => { content.children = []; content.scrollTop = 0; }, stopReaderProgressiveHydration() {},
