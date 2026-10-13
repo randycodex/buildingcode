@@ -36,6 +36,7 @@ struct BrowseView: View {
     @State private var showsCodeSources = false
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollRestingOffset: CGFloat?
+    @State private var browseHeading: ReaderBrowseHeading = .chapters
     @State private var openedChapter: CodeChapter?
     @State private var handoffInitialSection: CodeSectionSummary?
     @ObservedObject private var readerHandoff = NativeReaderHandoff.shared
@@ -100,11 +101,15 @@ struct BrowseView: View {
         }
         .preference(key: ReaderSessionSummaryKey.self, value: [browserContext: ReaderSessionSummary(
             source: selectedCodeSectionName + " · " + selectedVersionName,
-            location: openedChapter?.displayLabel ?? "Chapters",
+            location: openedChapter?.displayLabel ?? browseHeading.rawValue,
             versionFileName: hasSeededBrowseSection && library.isInitialContentLoaded ? library.selectedVersionFileName : nil,
             codeSectionID: browseCodeSectionID
         )])
         .coordinateSpace(name: "browseScroll")
+        .onPreferenceChange(ReaderBrowseHeadingPreferenceKey.self) { boundaries in
+            let heading = ReaderBrowseHeaderSelection.heading(at: boundaries)
+            if heading != browseHeading { browseHeading = heading }
+        }
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
             DispatchQueue.main.async {
                 guard let restingOffset = scrollRestingOffset else {
@@ -219,22 +224,26 @@ struct BrowseView: View {
                         selectedCodeSectionName: codeSectionName
                     )
 
-                    LazyVStack(alignment: .leading, spacing: 12) {
+                    // Keep section boundaries in the layout even when their cards
+                    // are offscreen, so scrolling back restores the right heading.
+                    VStack(alignment: .leading, spacing: 12) {
                         ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
-                            if codeSectionName == "All Sections" {
-                                codeSectionGroupHeader(
-                                    title: group.title,
-                                    color: group.palette.chapterTitleColor
-                                )
-                                .padding(.top, index == 0 ? 0 : 8)
-                            }
-
                             if !group.chapterItems.isEmpty {
-                                LazyVGrid(columns: columns, spacing: 12) {
-                                    ForEach(group.chapterItems) { chapter in
-                                        chapterOpeningButton(chapter, kind: .chapter)
+                                VStack(alignment: .leading, spacing: 12) {
+                                    if codeSectionName == "All Sections" {
+                                        codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
+                                            .padding(.top, index == 0 ? 0 : 8)
+                                    }
+                                    LazyVGrid(columns: columns, spacing: 12) {
+                                        ForEach(group.chapterItems) { chapter in
+                                            chapterOpeningButton(chapter, kind: .chapter)
+                                        }
                                     }
                                 }
+                                .background(headingBoundary(.chapters, order: index * 2))
+                            } else if codeSectionName == "All Sections" {
+                                codeSectionGroupHeader(title: group.title, color: group.palette.chapterTitleColor)
+                                    .padding(.top, index == 0 ? 0 : 8)
                             }
 
                             if !group.appendixItems.isEmpty {
@@ -243,6 +252,7 @@ struct BrowseView: View {
                                     .foregroundStyle(.primary)
                                     .padding(.top, 8)
                                     .accessibilityAddTraits(.isHeader)
+                                    .background(headingBoundary(.appendix, order: index * 2 + 1))
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
                                         chapterOpeningButton(chapter, kind: .appendix)
@@ -391,6 +401,19 @@ struct BrowseView: View {
         }
     }
 
+    private func headingBoundary(_ heading: ReaderBrowseHeading, order: Int) -> some View {
+        GeometryReader { proxy in
+            Color.clear.preference(
+                key: ReaderBrowseHeadingPreferenceKey.self,
+                value: [ReaderBrowseHeadingBoundary(
+                    order: order,
+                    heading: heading,
+                    minY: proxy.frame(in: .named("browseScroll")).minY
+                )]
+            )
+        }
+    }
+
     private var libraryHeader: some View {
         Color.clear.frame(height: 44)
             .accessibilityHidden(true)
@@ -398,7 +421,7 @@ struct BrowseView: View {
 
     private var pinnedReaderHeader: some View {
         HStack(spacing: 12) {
-            Text("Chapters")
+            Text(browseHeading.rawValue)
                 .font(CodeTypography.screenTitle)
                 .foregroundStyle(.primary)
                 .accessibilityAddTraits(.isHeader)
@@ -1460,6 +1483,17 @@ extension View {
         }
     }
 
+    /// Growing text controls keep fixed corners instead of becoming an oval.
+    @ViewBuilder
+    func codeLiquidGlassRoundedRectangle(cornerRadius: CGFloat) -> some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        if #available(iOS 26.0, *) {
+            glassEffect(.regular, in: shape)
+        } else {
+            background(.regularMaterial, in: shape)
+        }
+    }
+
     /// A circular floating action that lets iOS control the Liquid Glass
     /// translucency and interaction response.
     @ViewBuilder
@@ -1501,6 +1535,16 @@ extension EnvironmentValues {
 }
 
 enum CodeScreenMetrics {
+    static let searchFieldHorizontalPadding: CGFloat = 14
+    static let researchComposerCornerRadius: CGFloat = 24
+    static let researchComposerRowSpacing: CGFloat = 4
+    static let bottomSearchContentClearance: CGFloat = bottomControlHeight + (rowVerticalPadding * 2)
+    static let projectEvidenceHeadingHeight: CGFloat = 36
+    static let readerPassageActionSpacing: CGFloat = 8
+    static let readerPassageActionGap: CGFloat = 12
+    static var readerPassageActionTrayWidth: CGFloat { toolbarButtonSize * 2 + readerPassageActionSpacing }
+    static var readerPassageRevealWidth: CGFloat { readerPassageActionTrayWidth + readerPassageActionGap }
+    static let readerPassageLeadingEdgeExclusion: CGFloat = 32
     static let screenHorizontalPadding: CGFloat = 16
     /// Floating controls immediately above the system tab bar align to the
     /// tab bar's visible outer edge rather than the wider content grid.
@@ -1938,3 +1982,80 @@ private struct ChapterSectionsPreviewContainer: View {
     ChapterSectionsPreviewContainer()
 }
 #endif
+
+
+struct CodeMainScreenToolbarTitle: ToolbarContent {
+    let title: String
+    var animatesChanges = false
+
+    @ToolbarContentBuilder
+    var body: some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            titleItem.sharedBackgroundVisibility(.hidden)
+        } else {
+            titleItem
+        }
+    }
+
+    private var titleItem: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            CodeMainScreenTitleLabel(title: title, animatesChanges: animatesChanges)
+        }
+    }
+}
+
+
+struct CodeMainScreenTitleLabel: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let title: String
+    let animatesChanges: Bool
+
+    var body: some View {
+        ZStack(alignment: .leading) {
+            Text(title)
+                .font(CodeTypography.screenTitle)
+                .foregroundStyle(.primary)
+                .accessibilityIdentifier("screen-title-\(title)")
+                .accessibilityAddTraits(.isHeader)
+                .id(title)
+                .transition(.asymmetric(
+                    insertion: .move(edge: title == ReaderBrowseHeading.appendix.rawValue ? .bottom : .top).combined(with: .opacity),
+                    removal: .move(edge: title == ReaderBrowseHeading.appendix.rawValue ? .bottom : .top).combined(with: .opacity)
+                ))
+        }
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(height: CodeScreenMetrics.toolbarButtonSize, alignment: .bottom)
+        .clipped()
+        .animation(animatesChanges && !reduceMotion ? .easeInOut(duration: 0.2) : nil, value: title)
+    }
+}
+
+
+enum ReaderBrowseHeading: String {
+    case chapters = "Chapters"
+    case appendix = "Appendix"
+}
+
+
+struct ReaderBrowseHeadingBoundary: Equatable {
+    let order: Int
+    let heading: ReaderBrowseHeading
+    let minY: CGFloat
+}
+
+enum ReaderBrowseHeaderSelection {
+    static func heading(at boundaries: [ReaderBrowseHeadingBoundary]) -> ReaderBrowseHeading {
+        let ordered = boundaries.sorted { $0.order < $1.order }
+        return ordered.last(where: { $0.minY <= 0 })?.heading
+            ?? ordered.first?.heading
+            ?? .chapters
+    }
+}
+
+private struct ReaderBrowseHeadingPreferenceKey: PreferenceKey {
+    static var defaultValue: [ReaderBrowseHeadingBoundary] = []
+
+    static func reduce(value: inout [ReaderBrowseHeadingBoundary], nextValue: () -> [ReaderBrowseHeadingBoundary]) {
+        value.append(contentsOf: nextValue())
+    }
+}

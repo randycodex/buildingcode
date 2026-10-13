@@ -1499,6 +1499,8 @@ struct ProjectView: View {
                                 ProjectStructuredFactRow(fact: fact)
                                 if fact.id != facts.last?.id { Divider() }
                             }
+                            ProjectStructuredFactsSources(facts: facts)
+                                .padding(.top, 16)
                         }
                     }
                 }

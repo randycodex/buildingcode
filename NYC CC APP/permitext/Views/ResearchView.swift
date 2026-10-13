@@ -186,6 +186,39 @@ enum ResearchConversationDeletionRoute {
     }
 }
 
+struct ResearchDeletionBatchResult: Equatable {
+    var deletedIDs: [String] = []
+    var failedIDs: [String] = []
+}
+
+enum ResearchDeletionBatch {
+    /// Keep deletions serial and stop when the owning private session changes.
+    /// Each success is published separately so a later failure can be retried.
+    @MainActor
+    static func run(
+        conversationIDs: [String],
+        canContinue: () -> Bool,
+        delete: (String) async throws -> Void,
+        didDelete: (String) -> Void
+    ) async -> ResearchDeletionBatchResult {
+        var result = ResearchDeletionBatchResult()
+        var attempted: Set<String> = []
+        for id in conversationIDs where !id.isEmpty && attempted.insert(id).inserted {
+            guard canContinue(), !Task.isCancelled else { break }
+            do {
+                try await delete(id)
+                guard canContinue(), !Task.isCancelled else { break }
+                result.deletedIDs.append(id)
+                didDelete(id)
+            } catch {
+                guard canContinue(), !Task.isCancelled else { break }
+                result.failedIDs.append(id)
+            }
+        }
+        return result
+    }
+}
+
 struct ResearchProjectContextDisclosure: Equatable {
     let isAssigned: Bool
     let facts: [String]
@@ -250,8 +283,10 @@ private struct PendingResearchVisualReview: Identifiable, Equatable {
 }
 
 private struct PendingResearchDeletion: Identifiable, Equatable {
-    let id: String
+    let conversationIDs: [String]
     let title: String
+    var id: String { conversationIDs.joined(separator: "|") }
+    var isMultiple: Bool { conversationIDs.count > 1 }
 }
 
 private struct PendingResearchFeedbackReport: Identifiable, Equatable {
@@ -498,6 +533,9 @@ private struct ResearchSessionView: View {
     @State private var showingAssignmentConfirmation = false
     @State private var showingProjectCreator = false
     @State private var pendingDeletion: PendingResearchDeletion?
+    @State private var isSelectingHistory = false
+    @State private var selectedHistoryIDs: Set<String> = []
+    @State private var isDeletingHistoryBatch = false
     @State private var deletingConversationID: String?
     @State private var showingSettings = false
     @State private var recoverySettingsSection: SettingsSection = .account
@@ -637,22 +675,30 @@ private struct ResearchSessionView: View {
                 Text("Permitext Research will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
             }
             .alert(
-                "Delete Research conversation?",
+                pendingDeletion?.isMultiple == true ? "Delete selected Research conversations?" : "Delete Research conversation?",
                 isPresented: Binding(
                     get: { pendingDeletion != nil },
                     set: { if !$0 { pendingDeletion = nil } }
                 ),
                 presenting: pendingDeletion
             ) { pending in
-                Button("Delete Conversation", role: .destructive) {
+                Button(pending.isMultiple ? "Delete \(pending.conversationIDs.count) Conversations" : "Delete Conversation", role: .destructive) {
                     pendingDeletion = nil
-                    Task { await deleteConversation(id: pending.id) }
+                    Task {
+                        if isSelectingHistory {
+                            await deleteSelectedConversations(ids: pending.conversationIDs)
+                        } else if let id = pending.conversationIDs.first {
+                            await deleteConversation(id: id)
+                        }
+                    }
                 }
                 Button("Cancel", role: .cancel) {
                     pendingDeletion = nil
                 }
             } message: { pending in
-                Text("\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
+                Text(pending.isMultiple
+                     ? "\(pending.conversationIDs.count) conversations and their answers will be permanently deleted from Permitext. This cannot be undone."
+                     : "\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
             }
             .task(id: "\(library.privateSessionID):\(library.hasResearchAccess)") {
                 guard isCurrentOwner else { return }
@@ -765,6 +811,28 @@ private struct ResearchSessionView: View {
 
     private var researchHeaderButtons: some View {
         HStack(spacing: 0) {
+            if conversation == nil || library.researchHistoryIsPresented, !summaries.isEmpty {
+                if isSelectingHistory {
+                    Button("Cancel") { isSelectingHistory = false; selectedHistoryIDs = [] }
+                        .disabled(isDeletingHistoryBatch)
+                    Menu {
+                        Button("Select All", systemImage: "checkmark.circle") { selectedHistoryIDs = Set(summaries.map(\.id)) }
+                        Button("Deselect All", systemImage: "circle") { selectedHistoryIDs = [] }
+                    } label: { Image(systemName: "checklist").frame(width: 44, height: 44) }
+                    .disabled(isDeletingHistoryBatch)
+                    Button(role: .destructive) { requestSelectedDeletion() } label: {
+                        Image(systemName: "trash").frame(width: 44, height: 44)
+                    }
+                    .disabled(selectedHistoryIDs.isEmpty || isDeletingHistoryBatch)
+                    .accessibilityLabel("Delete selected conversations")
+                } else {
+                    Button { isSelectingHistory = true; selectedHistoryIDs = [] } label: {
+                        Image(systemName: "checklist").frame(width: 44, height: 44)
+                    }
+                    .accessibilityLabel("Select conversations")
+                }
+            }
+
             if conversation != nil && !library.researchHistoryIsPresented {
                 Button {
                     library.activeResearchConversationID = nil
@@ -783,7 +851,7 @@ private struct ResearchSessionView: View {
 
             if conversation == nil || library.researchHistoryIsPresented,
                library.signedInAccount != nil,
-               library.hasResearchAccess {
+               library.hasResearchAccess, !isSelectingHistory {
                 Button {
                     Task { await createConversation(selections: []) }
                 } label: {
@@ -824,8 +892,8 @@ private struct ResearchSessionView: View {
     private var researchHeaderActions: some View {
         if conversation == nil || library.researchHistoryIsPresented {
             researchHeaderButtons
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                .codeLiquidGlassCircle()
+                .frame(width: isSelectingHistory ? 164 : (summaries.isEmpty ? 44 : 88), height: CodeScreenMetrics.toolbarButtonSize)
+                .codeLiquidGlassCapsule()
         } else if #available(iOS 26.0, *) {
             researchHeaderButtons
                 .glassEffect(.regular.interactive(), in: Capsule())
@@ -985,15 +1053,25 @@ private struct ResearchSessionView: View {
                         .listRowSeparator(.hidden)
                 }
                 Button {
-                    library.researchHistoryIsPresented = false
-                    library.activeResearchConversationID = item.id
+                    if isSelectingHistory {
+                        if selectedHistoryIDs.contains(item.id) { selectedHistoryIDs.remove(item.id) }
+                        else { selectedHistoryIDs.insert(item.id) }
+                    } else {
+                        library.researchHistoryIsPresented = false
+                        library.activeResearchConversationID = item.id
+                    }
                 } label: {
                     VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .top, spacing: 12) {
+                            if isSelectingHistory {
+                                Image(systemName: selectedHistoryIDs.contains(item.id) ? "checkmark.circle.fill" : "circle")
+                            }
                         Text(researchTitle(for: item))
                             .font(.body.weight(.semibold))
                             .foregroundStyle(.primary)
                             .multilineTextAlignment(.leading)
                             .lineLimit(2)
+                        }
                         if let preview = (historyPreviews[item.id] ?? item.starterQuestion)?.trimmingCharacters(in: .whitespacesAndNewlines),
                            !preview.isEmpty, preview != researchTitle(for: item) {
                             Text(preview)
@@ -1013,7 +1091,8 @@ private struct ResearchSessionView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.plain)
-                .disabled(deletingConversationID == item.id)
+                .disabled(deletingConversationID == item.id || isDeletingHistoryBatch)
+                .accessibilityValue(isSelectingHistory ? (selectedHistoryIDs.contains(item.id) ? "Selected" : "Not selected") : "")
                 .accessibilityIdentifier("research-history-row")
                 .task(id: item.updatedAt) { await loadHistoryPreview(item) }
                 .listRowInsets(EdgeInsets(top: 12, leading: 18, bottom: 12, trailing: 18))
@@ -1162,12 +1241,12 @@ private struct ResearchSessionView: View {
                     }
                     .padding(.top, 76)
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 132 + floatingNavigationClearance)
+                    .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
                 }
 
                 researchScreenHeader
             }
-            .overlay(alignment: .bottom) {
+            .safeAreaInset(edge: .bottom, spacing: 0) {
                 researchComposer
                     .padding(.bottom, floatingNavigationClearance)
             }
@@ -1186,7 +1265,7 @@ private struct ResearchSessionView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            HStack(alignment: .bottom, spacing: 0) {
+            VStack(alignment: .trailing, spacing: CodeScreenMetrics.researchComposerRowSpacing) {
                 TextField("Ask", text: Binding(
                     get: { question },
                     set: { text in
@@ -1195,54 +1274,55 @@ private struct ResearchSessionView: View {
                     }
                 ), axis: .vertical)
                     .textFieldStyle(.plain)
+                    .font(.body)
                     .lineLimit(1...6)
-                    .padding(.leading, 14)
-                    .padding(.trailing, 6)
-                    .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-                    .frame(
-                        minHeight: CodeScreenMetrics.bottomControlHeight,
-                        alignment: .center
-                    )
+                    .padding(.horizontal, CodeScreenMetrics.cardPadding)
+                    .padding(.top, CodeScreenMetrics.rowVerticalPadding)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
-                if isSending {
-                    Button {
-                        cancelActiveResearchRequest()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.title3.weight(.semibold))
-                            .frame(
-                                width: CodeScreenMetrics.bottomControlHeight,
-                                height: CodeScreenMetrics.bottomControlHeight
-                            )
-                            .contentShape(Rectangle())
+                HStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    if isSending {
+                        Button {
+                            cancelActiveResearchRequest()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.title3.weight(.semibold))
+                                .frame(
+                                    width: CodeScreenMetrics.toolbarButtonSize,
+                                    height: CodeScreenMetrics.toolbarButtonSize
+                                )
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Cancel Research request")
+                        .accessibilityIdentifier("research-cancel-request")
+                    } else {
+                        Button {
+                            startQuestionRequest()
+                        } label: {
+                            Image(systemName: "arrow.up")
+                                .font(.title3.weight(.bold))
+                                .foregroundStyle(.primary)
+                                .frame(
+                                    width: CodeScreenMetrics.toolbarButtonSize,
+                                    height: CodeScreenMetrics.toolbarButtonSize
+                                )
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(
+                            question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
+                            researchSendIsBlocked
+                        )
+                        .accessibilityLabel("Send Research question")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Cancel Research request")
-                    .accessibilityIdentifier("research-cancel-request")
-                } else {
-                    Button {
-                        startQuestionRequest()
-                    } label: {
-                        Image(systemName: "arrow.up")
-                            .font(.title3.weight(.bold))
-                            .foregroundStyle(.primary)
-                            .frame(
-                                width: CodeScreenMetrics.bottomControlHeight,
-                                height: CodeScreenMetrics.bottomControlHeight
-                            )
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(
-                        question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
-                        researchSendIsBlocked
-                    )
-                    .accessibilityLabel("Send Research question")
                 }
+                .padding(.trailing, 8)
+                .padding(.bottom, 8)
             }
-            .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
-            .codeLiquidGlassCapsule()
+            .codeLiquidGlassRoundedRectangle(cornerRadius: CodeScreenMetrics.researchComposerCornerRadius)
         }
         .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
         .padding(.bottom, 8)
@@ -1596,9 +1676,19 @@ private struct ResearchSessionView: View {
             ? "\(displayTitle.prefix(79))…"
             : displayTitle
         pendingDeletion = PendingResearchDeletion(
-            id: id,
+            conversationIDs: [id],
             title: confirmationTitle
         )
+    }
+
+    private func requestSelectedDeletion() {
+        guard !isDeletingHistoryBatch, deletingConversationID == nil else { return }
+        let ids = summaries.filter { selectedHistoryIDs.contains($0.id) }.map(\.id)
+        guard !ids.isEmpty else { return }
+        let title = ids.count == 1
+            ? summaries.first(where: { $0.id == ids[0] }).map { researchTitle(for: $0) } ?? "Research conversation"
+            : "Selected Research"
+        pendingDeletion = PendingResearchDeletion(conversationIDs: ids, title: title)
     }
 
     private var isLoading: Bool { isLoadingHistory || isLoadingConversation }
@@ -1631,8 +1721,8 @@ private struct ResearchSessionView: View {
         questionErrorMessage = nil
     }
 
-    private func loadHistory(forceNetwork: Bool = false) async {
-        guard isCurrentOwner, let owner else { return }
+    private func loadHistory(forceNetwork: Bool = false, allowDuringDeletion: Bool = false) async {
+        guard isCurrentOwner, let owner, !isDeletingHistoryBatch || allowDuringDeletion else { return }
         let loadID = UUID()
         let filterKey = historyFilterKey
         historyLoadID = loadID
@@ -1695,7 +1785,7 @@ private struct ResearchSessionView: View {
     }
 
     private func loadMoreHistory() async {
-        guard isCurrentOwner, let owner, let loadID = historyLoadID,
+        guard isCurrentOwner, !isDeletingHistoryBatch, let owner, let loadID = historyLoadID,
               historyHasMore, !isLoadingHistory, !isLoadingMoreHistory,
               historyLoadedFilterKey == historyFilterKey else { return }
         if let legacy = historyLegacySummaries {
@@ -2248,6 +2338,38 @@ private struct ResearchSessionView: View {
         }
     }
 
+    private func deleteSelectedConversations(ids: [String]) async {
+        guard isCurrentOwner, let owner, !isDeletingHistoryBatch, deletingConversationID == nil else { return }
+        isDeletingHistoryBatch = true
+        defer { isDeletingHistoryBatch = false }
+        // A list refresh started before deletion must not restore deleted rows.
+        historyLoadID = nil
+        isLoadingHistory = false
+        isLoadingMoreHistory = false
+        let result = await ResearchDeletionBatch.run(
+            conversationIDs: ids,
+            canContinue: { isCurrentOwner },
+            delete: { id in try await library.deleteResearchConversation(id: id) },
+            didDelete: { id in
+                try? ResearchConversationCacheLifecycle.removeDeletedConversation(
+                    cache: cache, accountID: owner.accountID, conversationID: id
+                )
+                selectedHistoryIDs.remove(id)
+                removeHistoryConversation(id: id, accountID: owner.accountID)
+            }
+        )
+        guard isCurrentOwner, !Task.isCancelled else { return }
+        await loadHistory(forceNetwork: true, allowDuringDeletion: true)
+        guard isCurrentOwner else { return }
+        selectedHistoryIDs.formIntersection(Set(summaries.map(\.id)))
+        if result.failedIDs.isEmpty {
+            isSelectingHistory = false
+            selectedHistoryIDs = []
+        } else {
+            errorMessage = "Deleted \(result.deletedIDs.count) of \(ids.count) conversations. \(result.failedIDs.count) couldn’t be deleted and remain selected. Try again."
+        }
+    }
+
     private func cacheHistory(_ history: [ResearchConversationSummary], accountID: String, replacingAll: Bool = false) {
         guard isCurrentOwner, owner?.accountID == accountID, !historyIsFiltered else { return }
         let existing = (try? cache.load(
@@ -2271,6 +2393,7 @@ private struct ResearchSessionView: View {
         isLoadingHistory = false
         isLoadingMoreHistory = false
         summaries.removeAll { $0.id == id }
+        selectedHistoryIDs.remove(id)
         historyLegacySummaries?.removeAll { $0.id == id }
         historyPreviews.removeValue(forKey: id)
         historyPreviewRevisions.removeValue(forKey: id)
@@ -2818,7 +2941,7 @@ private struct ResearchAnswerView: View {
                 .accessibilityValue(showsSourcesAndDetails ? "Expanded" : "Collapsed")
                 .accessibilityIdentifier("research-answer-details-toggle")
                 Button(didCopy ? "Copied" : ResearchTrustCopy.copyAnswerAction, systemImage: didCopy ? "checkmark" : "doc.on.doc") {
-                    UIPasteboard.general.string = answer.structuredCopyText(sourceStatus: sourceStatus)
+                    UIPasteboard.general.string = primaryNarrative
                     didCopy = true
                 }
                 Button("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup") {
@@ -2942,14 +3065,7 @@ private struct ResearchAnswerView: View {
     }
 
     private var primaryNarrative: String {
-        if let answerText = answer.answerText?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !answerText.isEmpty {
-            return answerText
-        }
-        return [answer.conclusion, answer.explanation]
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-            .joined(separator: "\n\n")
+        answer.narrativeText
     }
 
     private var basisText: String? {

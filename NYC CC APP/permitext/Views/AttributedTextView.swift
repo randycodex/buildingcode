@@ -2,6 +2,61 @@ import SwiftUI
 import UIKit
 import os.signpost
 
+enum ReaderPassageSwipeEvent {
+    case began
+    case changed(translation: CGFloat)
+    case ended(translation: CGFloat, velocity: CGFloat)
+    case cancelled
+}
+
+struct ReaderPassageSwipeState {
+    let revealWidth: CGFloat
+    private(set) var offset: CGFloat = 0
+    private(set) var isDragging = false
+    private var startingOffset: CGFloat = 0
+    private(set) var isSaveArmed = false
+
+    var revealProgress: CGFloat { -offset / revealWidth }
+    var isOpen: Bool { !isDragging && offset == -revealWidth }
+
+    init(revealWidth: CGFloat) { self.revealWidth = max(revealWidth, 1) }
+
+    static func canBegin(horizontalVelocity: CGFloat, verticalVelocity: CGFloat, hasSelection: Bool) -> Bool {
+        !hasSelection && abs(horizontalVelocity) > abs(verticalVelocity) * 1.25
+    }
+
+    // A full swipe is deliberate travel from a closed tray, never a fast flick.
+    func shouldSave(on event: ReaderPassageSwipeEvent) -> Bool {
+        guard case .ended(let translation, _) = event else { return false }
+        return isDragging && startingOffset == 0 && translation <= -max(revealWidth * 2, 200)
+    }
+
+    mutating func apply(_ event: ReaderPassageSwipeEvent) {
+        switch event {
+        case .began:
+            startingOffset = offset
+            isDragging = true
+            isSaveArmed = false
+        case .changed(let translation):
+            isSaveArmed = startingOffset == 0 && translation <= -max(revealWidth * 2, 200)
+            offset = min(0, max(-revealWidth, startingOffset + translation))
+        case .ended(let translation, let velocity):
+            offset = min(0, max(-revealWidth, startingOffset + translation))
+            let projectedOffset = offset + velocity * 0.12
+            offset = projectedOffset < -revealWidth * 0.5 ? -revealWidth : 0
+            isDragging = false
+            isSaveArmed = false
+        case .cancelled:
+            offset = startingOffset
+            isDragging = false
+            isSaveArmed = false
+        }
+    }
+
+    mutating func open() { isSaveArmed = false; offset = -revealWidth; startingOffset = offset; isDragging = false }
+    mutating func close() { isSaveArmed = false; offset = 0; startingOffset = 0; isDragging = false }
+}
+
 extension Notification.Name {
     static let nycccClearRichTextSelection = Notification.Name("nycccClearRichTextSelection")
 }
@@ -41,6 +96,7 @@ struct AttributedTextView: View {
     var onSelectionChange: ((Bool) -> Void)? = nil
     var onOpenLink: ((URL) -> Void)? = nil
     var onResearchSelection: ((String) -> Void)? = nil
+    var onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
     @Environment(\.readerDefinitionContext) private var definitionContext
     @Environment(\.openURL) private var openExternalURL
     @State private var definitionPresentation: ReaderDefinitionPresentation?
@@ -68,7 +124,8 @@ struct AttributedTextView: View {
         onContentTap: (() -> Void)? = nil,
         onSelectionChange: ((Bool) -> Void)? = nil,
         onOpenLink: ((URL) -> Void)? = nil,
-        onResearchSelection: ((String) -> Void)? = nil
+        onResearchSelection: ((String) -> Void)? = nil,
+        onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
     ) {
         self.attributedText = attributedText
         self.onOpenImage = onOpenImage
@@ -76,6 +133,7 @@ struct AttributedTextView: View {
         self.onSelectionChange = onSelectionChange
         self.onOpenLink = onOpenLink
         self.onResearchSelection = onResearchSelection
+        self.onPassageSwipe = onPassageSwipe
     }
 
     var body: some View {
@@ -91,7 +149,8 @@ struct AttributedTextView: View {
                         onContentTap: onContentTap,
                         onSelectionChange: onSelectionChange,
                         onOpenLink: definitionContext == nil ? onOpenLink : openReaderLink,
-                        onResearchSelection: onResearchSelection
+                        onResearchSelection: onResearchSelection,
+                        onPassageSwipe: onPassageSwipe
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -253,6 +312,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
     var onSelectionChange: ((Bool) -> Void)?
     var onOpenLink: ((URL) -> Void)?
     var onResearchSelection: ((String) -> Void)?
+    var onPassageSwipe: ((ReaderPassageSwipeEvent) -> Void)? = nil
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
@@ -286,6 +346,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
             context.coordinator.onSelectionChange?(hasSelection)
         }
         textView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
+        textView.passageSwipeHandler = onPassageSwipe
         return textView
     }
 
@@ -305,6 +366,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
             context.coordinator.onSelectionChange?(hasSelection)
         }
         uiView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
+        uiView.passageSwipeHandler = onPassageSwipe
         uiView.linkTextAttributes = ReaderEnactedTextLinkStyle.textViewAttributes
         updateAccessibility(for: uiView)
 
@@ -582,6 +644,20 @@ private final class RichTextView: UITextView {
     var attachmentTapHandler: ((UIImage) -> Void)?
     var contentTapHandler: (() -> Void)?
     var selectionChangeHandler: ((Bool) -> Void)?
+    var passageSwipeHandler: ((ReaderPassageSwipeEvent) -> Void)? {
+        didSet {
+            passagePanRecognizer.isEnabled = passageSwipeHandler != nil
+        }
+    }
+    private lazy var passageSwipeDelegate = ReaderPassageSwipeDelegate(textView: self)
+    private lazy var passagePanRecognizer: UIPanGestureRecognizer = {
+        let recognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePassagePan(_:)))
+        recognizer.maximumNumberOfTouches = 1
+        recognizer.cancelsTouchesInView = false
+        recognizer.delegate = passageSwipeDelegate
+        recognizer.isEnabled = false
+        return recognizer
+    }()
     var isAuxiliaryTapHandlingEnabled: Bool {
         get { auxiliaryTapRecognizer.isEnabled }
         set { auxiliaryTapRecognizer.isEnabled = newValue }
@@ -595,6 +671,7 @@ private final class RichTextView: UITextView {
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
         addGestureRecognizer(auxiliaryTapRecognizer)
+        addGestureRecognizer(passagePanRecognizer)
         selectionObserver = NotificationCenter.default.addObserver(
             forName: .nycccClearRichTextSelection,
             object: nil,
@@ -609,6 +686,7 @@ private final class RichTextView: UITextView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         addGestureRecognizer(auxiliaryTapRecognizer)
+        addGestureRecognizer(passagePanRecognizer)
         selectionObserver = NotificationCenter.default.addObserver(
             forName: .nycccClearRichTextSelection,
             object: nil,
@@ -623,6 +701,24 @@ private final class RichTextView: UITextView {
     deinit {
         if let selectionObserver {
             NotificationCenter.default.removeObserver(selectionObserver)
+        }
+    }
+
+    @objc private func handlePassagePan(_ recognizer: UIPanGestureRecognizer) {
+        guard selectedRange.length == 0 else {
+            passageSwipeHandler?(.cancelled)
+            return
+        }
+        switch recognizer.state {
+        case .began: passageSwipeHandler?(.began)
+        case .changed: passageSwipeHandler?(.changed(translation: recognizer.translation(in: self).x))
+        case .ended:
+            passageSwipeHandler?(.ended(
+                translation: recognizer.translation(in: self).x,
+                velocity: recognizer.velocity(in: self).x
+            ))
+        case .cancelled, .failed: passageSwipeHandler?(.cancelled)
+        default: break
         }
     }
 
@@ -687,6 +783,41 @@ private final class RichTextView: UITextView {
         }
 
         return nil
+    }
+}
+
+private final class ReaderPassageSwipeDelegate: NSObject, UIGestureRecognizerDelegate {
+    weak var textView: RichTextView?
+
+    init(textView: RichTextView) { self.textView = textView }
+
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let textView, textView.passageSwipeHandler != nil,
+              let pan = gestureRecognizer as? UIPanGestureRecognizer else { return false }
+        let velocity = pan.velocity(in: textView)
+        return ReaderPassageSwipeState.canBegin(
+            horizontalVelocity: velocity.x,
+            verticalVelocity: velocity.y,
+            hasSelection: textView.selectedRange.length > 0
+        )
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        guard let textView else { return false }
+        // Leave text selection and the navigation controller's leading-edge swipe alone.
+        return textView.passageSwipeHandler != nil
+            && textView.selectedRange.length == 0
+            && touch.location(in: textView.window).x >= CodeScreenMetrics.readerPassageLeadingEdgeExclusion
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let textView, let otherView = otherGestureRecognizer.view,
+              otherGestureRecognizer is UIPanGestureRecognizer,
+              otherView !== textView else { return false }
+        // The enclosing ScrollView must not cancel the horizontal passage drag.
+        // The velocity check above lets vertical gestures use only its scroll pan.
+        return textView.isDescendant(of: otherView)
     }
 }
 

@@ -2103,6 +2103,32 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         #endif
     }
 
+    func testProjectFactSourcesDeduplicateMessagesWithoutLosingDatesOrFactAssociation() {
+        let firstDate = Date(timeIntervalSince1970: 100)
+        let secondDate = Date(timeIntervalSince1970: 200)
+        func fact(_ label: String, text: String = "", source: String = "", date: Date? = nil) -> ProjectStructuredFact {
+            ProjectStructuredFact(id: label, key: label, label: label, value: "", status: "unknown",
+                                  source: source, sourceText: text, updatedAt: date)
+        }
+        let notes = ProjectFactSourceNote.grouped(from: [
+            fact("BBL", text: " NYC Planning MapPLUTO ", date: secondDate),
+            fact("Building area", text: "NYC Planning MapPLUTO", date: firstDate),
+            fact("BBL", text: "NYC Planning MapPLUTO", date: firstDate),
+            fact("Zoning", text: "Mapped zoning layers", date: firstDate),
+            fact("Unknown"),
+            fact("Agency", source: "nyc-planning"),
+            fact("Date only", date: secondDate)
+        ])
+        XCTAssertEqual(notes.count, 4)
+        XCTAssertEqual(notes[0].message, "NYC Planning MapPLUTO")
+        XCTAssertEqual(notes[0].factLabels, ["BBL", "Building area"])
+        XCTAssertEqual(notes[0].updatedDates, [firstDate, secondDate])
+        XCTAssertEqual(notes[1].factLabels, ["Zoning"])
+        XCTAssertEqual(notes[2].message, "NYC Department of City Planning")
+        XCTAssertEqual(notes[3].message, "Source not recorded.")
+        XCTAssertEqual(notes[3].updatedDates, [secondDate])
+    }
+
     @MainActor
     func testProjectContextSavePreservesLatestOtherFieldsAndRejectsStaleDrafts() async throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("project-context-\(UUID().uuidString).sqlite")
@@ -11224,5 +11250,42 @@ final class NativeNotebookRefreshDecisionTests: XCTestCase {
         XCTAssertTrue(acknowledged.hasUnsynchronizedChanges)
         XCTAssertEqual(acknowledged.document, saved.document)
         XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: acknowledged, serverVersion: 7, serverContent: saved), .applyServer)
+    }
+}
+
+
+final class ReaderBrowseHeaderSelectionTests: XCTestCase {
+    func testAppendixReplacesChaptersAtTheViewportBoundaryAndRestoresOnScrollBack() {
+        func boundaries(appendixY: CGFloat) -> [ReaderBrowseHeadingBoundary] {
+            [
+                .init(order: 0, heading: .chapters, minY: -600),
+                .init(order: 1, heading: .appendix, minY: appendixY)
+            ]
+        }
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries(appendixY: 1)), .chapters)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries(appendixY: 0)), .appendix)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries(appendixY: -40)), .appendix)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries(appendixY: 1)), .chapters)
+    }
+
+    func testNextCodeGroupRestoresChaptersRegardlessOfPreferenceDeliveryOrder() {
+        let boundaries: [ReaderBrowseHeadingBoundary] = [
+            .init(order: 3, heading: .appendix, minY: 900),
+            .init(order: 1, heading: .appendix, minY: -350),
+            .init(order: 2, heading: .chapters, minY: 0),
+            .init(order: 0, heading: .chapters, minY: -1000)
+        ]
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: boundaries), .chapters)
+    }
+
+    func testAppendixOnlyAndNewSourceHaveNoStaleChapterHeading() {
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: [
+            .init(order: 1, heading: .appendix, minY: 16)
+        ]), .appendix)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: []), .chapters)
+        XCTAssertEqual(ReaderBrowseHeaderSelection.heading(at: [
+            .init(order: 0, heading: .chapters, minY: 16),
+            .init(order: 1, heading: .appendix, minY: 1000)
+        ]), .chapters)
     }
 }

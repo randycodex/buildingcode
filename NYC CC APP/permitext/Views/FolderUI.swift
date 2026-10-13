@@ -131,10 +131,12 @@ struct FolderEditorSheet: View {
                     }
                 }
 
-                Section("Description (optional)") {
-                    TextField("Short description", text: $description, axis: .vertical)
-                        .accessibilityIdentifier("project-editor-description")
-                        .lineLimit(2...4)
+                if folderType == .reference {
+                    Section("Description (optional)") {
+                        TextField("Short description", text: $description, axis: .vertical)
+                            .accessibilityIdentifier("project-editor-description")
+                            .lineLimit(2...4)
+                    }
                 }
 
                 if folderType == .project {
@@ -259,7 +261,10 @@ struct FolderEditorSheet: View {
         let addressChanged = savedAddress.trimmingCharacters(in: .whitespacesAndNewlines) !=
             (existing?.address.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
         let savedFacts = property?.structuredFacts ?? (addressChanged ? [] : existing?.structuredFacts ?? [])
-        onSave(trimmedName, savedAddress, description, savedFacts, colorHex, folderType)
+        let savedDescription = folderType == .project
+            ? existing.flatMap { library.folder(id: $0.id) }?.description ?? existing?.description ?? ""
+            : description
+        onSave(trimmedName, savedAddress, savedDescription, savedFacts, colorHex, folderType)
         dismiss()
     }
 
@@ -407,57 +412,6 @@ extension CodeFolder {
 }
 
 
-/// Keeps provenance inspectable without expanding every imported fact by default.
-struct ProjectStructuredFactRow: View {
-    let fact: ProjectStructuredFact
-
-    private var statusLabel: String {
-        switch fact.status.lowercased() {
-        case "sourced": return "Sourced"
-        case "confirmed": return "Confirmed"
-        case "stated": return "Stated"
-        case "rejected": return "Rejected"
-        default: return "Unknown"
-        }
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(fact.label)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-            Text(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not provided" : fact.value)
-                .font(.subheadline)
-                .fixedSize(horizontal: false, vertical: true)
-            Text(statusLabel)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            if !fact.sourceText.isEmpty || !fact.source.isEmpty || fact.updatedAt != nil {
-                DisclosureGroup("Source details") {
-                    VStack(alignment: .leading, spacing: 6) {
-                        if !fact.sourceText.isEmpty {
-                            Text(fact.sourceText)
-                                .textSelection(.enabled)
-                        } else if !fact.source.isEmpty {
-                            Text(fact.source == "nyc-planning" ? "NYC Department of City Planning" : fact.source)
-                        }
-                        if let updatedAt = fact.updatedAt {
-                            Text("Updated \(updatedAt.formatted(date: .abbreviated, time: .omitted))")
-                        }
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 4)
-                }
-                .font(.caption)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 8)
-    }
-}
-
 /// Edits the Project's context without replacing its other saved fields.
 struct ProjectContextView: View {
     let folderID: Int64
@@ -469,7 +423,6 @@ struct ProjectContextView: View {
     @State private var editingSessionID: UUID?
     @State private var draft = ""
     @State private var saveError: String?
-    @FocusState private var contextIsFocused: Bool
 
     private var folder: CodeFolder? { library.folder(id: folderID) }
     private var isEditing: Bool { editingFolder != nil }
@@ -477,24 +430,12 @@ struct ProjectContextView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             ZStack(alignment: .topLeading) {
-                TextEditor(text: Binding(
-                    get: { isEditing ? draft : folder?.description ?? "" },
-                    set: { value in
-                        guard isEditing || beginEditing() else { return }
-                        draft = value
-                    }
-                ))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .scrollContentBackground(.hidden)
-                .scrollDismissesKeyboard(.interactively)
-                .focused($contextIsFocused)
-                .accessibilityLabel("Project context")
-                .accessibilityHint("Edit Project context")
-                .accessibilityIdentifier(isEditing ? "project-context-editor" : "project-context-text")
-                .onChange(of: contextIsFocused) { _, focused in
-                    if focused && !isEditing && !beginEditing() { contextIsFocused = false }
-                }
+                ProjectContextTextView(
+                    text: isEditing ? draft : folder?.description ?? "",
+                    isEditing: isEditing,
+                    onBeginEditing: beginEditing,
+                    onTextChange: { draft = $0 }
+                )
                 if !isEditing && (folder?.description.isEmpty ?? true) {
                     Text("Tap to add Project context.")
                         .font(.subheadline)
@@ -562,10 +503,136 @@ struct ProjectContextView: View {
     }
 
     private func finishEditing() {
-        contextIsFocused = false
         editingFolder = nil
         editingSessionID = nil
         draft = ""
         saveError = nil
     }
 }
+
+/// Keep the same text surface and native tap-to-caret behavior in both modes.
+private struct ProjectContextTextView: UIViewRepresentable {
+    let text: String
+    let isEditing: Bool
+    let onBeginEditing: () -> Bool
+    let onTextChange: (String) -> Void
+
+    func makeUIView(context: Context) -> UITextView {
+        let view = UITextView()
+        view.backgroundColor = .clear
+        view.font = .preferredFont(forTextStyle: .subheadline)
+        view.adjustsFontForContentSizeCategory = true
+        view.textColor = .secondaryLabel
+        view.tintColor = UIColor(Color.appChrome)
+        view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
+        view.textContainer.lineFragmentPadding = 0
+        view.contentInsetAdjustmentBehavior = .never
+        view.keyboardDismissMode = .interactive
+        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        view.delegate = context.coordinator
+        return view
+    }
+
+    func updateUIView(_ view: UITextView, context: Context) {
+        context.coordinator.parent = self
+        if !isEditing && view.isFirstResponder { view.resignFirstResponder() }
+        // Reassigning text on every SwiftUI update would reset native selection
+        // and scroll position as the keyboard appears or the user types.
+        if view.text != text {
+            let selection = view.selectedRange
+            view.text = text
+            let length = (text as NSString).length
+            let location = min(selection.location, length)
+            view.selectedRange = NSRange(location: location, length: min(selection.length, length - location))
+        }
+        view.accessibilityLabel = "Project context"
+        view.accessibilityHint = "Edit Project context"
+        view.accessibilityIdentifier = isEditing ? "project-context-editor" : "project-context-text"
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
+
+    final class Coordinator: NSObject, UITextViewDelegate {
+        var parent: ProjectContextTextView
+
+        init(parent: ProjectContextTextView) { self.parent = parent }
+
+        func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+            parent.isEditing || parent.onBeginEditing()
+        }
+
+        func textViewDidChange(_ textView: UITextView) {
+            parent.onTextChange(textView.text)
+        }
+    }
+}
+
+/// Shows shared provenance once, beneath the fact list.
+struct ProjectStructuredFactsSources: View {
+    let facts: [ProjectStructuredFact]
+
+    var body: some View {
+        let notes = ProjectFactSourceNote.grouped(from: facts)
+        if !notes.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Source information")
+                    .font(.caption.weight(.semibold))
+                ForEach(notes) { note in
+                    VStack(alignment: .leading, spacing: 4) {
+                        if notes.count > 1 {
+                            Text(note.factLabels.joined(separator: ", "))
+                                .fontWeight(.semibold)
+                        }
+                        Text(note.message)
+                            .textSelection(.enabled)
+                        let dates = note.updatedDates.reduce(into: [String]()) { result, date in
+                            let text = date.formatted(date: .abbreviated, time: .omitted)
+                            if !result.contains(text) { result.append(text) }
+                        }
+                        if !dates.isEmpty {
+                            Text("Updated \(dates.joined(separator: "; "))")
+                        }
+                    }
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.top, 16)
+            .accessibilityIdentifier("project-facts-sources")
+        }
+    }
+}
+
+struct ProjectStructuredFactRow: View {
+    let fact: ProjectStructuredFact
+
+    private var statusLabel: String {
+        switch fact.status.lowercased() {
+        case "sourced": return "Sourced"
+        case "confirmed": return "Confirmed"
+        case "stated": return "Stated"
+        case "rejected": return "Rejected"
+        default: return "Unknown"
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(fact.label)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not provided" : fact.value)
+                .font(.subheadline)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(statusLabel)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 8)
+    }
+}
+
+/// Edits the Project's context without replacing its other saved fields.

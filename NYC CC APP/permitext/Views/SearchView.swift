@@ -122,11 +122,13 @@ struct SearchReaderRoute: Hashable {
 
 /// Prepared offscreen without changing either main Reader's edition or viewport.
 @MainActor
-struct PreparedSearchReaderDestination {
+struct PreparedSearchReaderDestination: Identifiable {
     let library: CodeLibraryViewModel
     let chapter: CodeChapter
     let section: CodeSectionSummary
     let nativeOpening: NativeReaderPreparedOpening?
+
+    nonisolated var id: ObjectIdentifier { ObjectIdentifier(library) }
 
     static func prepare(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel, prepareChapter: Bool = true) async throws -> Self {
         try Task.checkCancellation()
@@ -215,6 +217,7 @@ struct SearchView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.dismiss) private var dismiss
     @State private var historyCollection: HistoryCollection?
+    @State private var isHistorySheetPresented = false
     private enum HistoryCollection: String, Identifiable {
         case recent = "Recent searches", pinned = "Pinned searches", viewed = "Last opened"
         var id: String { rawValue }
@@ -229,7 +232,8 @@ struct SearchView: View {
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
     @State private var preparedDestinations: [SearchReaderRoute: PreparedSearchReaderDestination] = [:]
-    @State private var showsPassageDetail = false
+    @State private var passageDetail: PreparedSearchReaderDestination?
+    @State private var pendingPassageDetail: PreparedSearchReaderDestination?
     @State private var openingRoute: SearchReaderRoute?
     @State private var openingQuery: String?
     @State private var openingFilters: Set<Int64>?
@@ -245,6 +249,7 @@ struct SearchView: View {
         let globalProgress: Bool
     }
     @State private var showsCodeSources = false
+    @AppStorage("SearchView.recentlyOpenedOrder") private var recentlyOpenedOrderRaw = RecentlyOpenedOrder.date.rawValue
     @State private var allInstalledSourcesDisabled: Bool?
     @State private var sourceEnablePrompt: SourceEnablePrompt?
     @State private var deepLinkError: String?
@@ -298,7 +303,8 @@ struct SearchView: View {
 
     private var isHistoryVisible: Bool { query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     private var positionReady: Bool {
-        restoredSessionScope == sessionScope && (isHistoryVisible || (!isSearchRequestPending && !library.isSearchInProgress && !cachedFilteredResults.isEmpty))
+        openingRoute == nil && passageDetail == nil && pendingPassageDetail == nil &&
+            restoredSessionScope == sessionScope && (isHistoryVisible || (!isSearchRequestPending && !library.isSearchInProgress && !cachedFilteredResults.isEmpty))
     }
     private var scrollPositionBinding: Binding<String?> {
         Binding(get: { scrollTargetID }, set: { value in
@@ -486,6 +492,7 @@ struct SearchView: View {
             .onChange(of: library.allEditionSearchSections) { _, _ in
                 rebuildSearchCaches()
             }
+            .onChange(of: recentlyOpenedOrderRaw) { _, _ in rebuildJumpBackInCache() }
             .onChange(of: library.recentlyViewedSections) { _, _ in
                 rebuildJumpBackInCache()
             }
@@ -576,7 +583,7 @@ struct SearchView: View {
                 SettingsView(initialSection: .sources)
                     .environmentObject(library.codeSourceSettingsLibrary)
             }
-            .sheet(item: $historyCollection) { collection in
+            .sheet(item: $historyCollection, onDismiss: historySheetDidDismiss) { collection in
                 NavigationStack {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 16) {
@@ -598,16 +605,16 @@ struct SearchView: View {
                     }
                     .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
                 }
+                .onAppear { isHistorySheetPresented = true }
             }
-            .sheet(isPresented: $showsPassageDetail) {
-                if let prepared = preparedDestinations.values.first {
-                    NavigationStack {
-                        SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library, showsDetail: true)
-                            .toolbar {
-                                ToolbarItem(placement: .topBarLeading) {
-                                    Button("Close") { showsPassageDetail = false }
-                                        .accessibilityLabel("Close passage")
-                                }
+            .sheet(item: $passageDetail) { prepared in
+                NavigationStack {
+                    SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library, showsDetail: true)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button("Close") { passageDetail = nil }
+                                    .accessibilityLabel("Close passage")
+                            }
                                 ToolbarItem(placement: .topBarTrailing) {
                                     Menu {
                                         Button("Open in Reader 1") { handoffSearchPreview(prepared, to: .primary) }
@@ -617,15 +624,14 @@ struct SearchView: View {
                                     }
                                     .accessibilityLabel("Open passage in a permanent Reader")
                                 }
-                            }
-                    }
-                    // A new explicit destination must replace the sheet's
-                    // StateObject and loaded passage, even while it is presented.
-                    .id(ObjectIdentifier(prepared.library))
-                    .environment(\.codeTopFadeEnabled, false)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
+                        }
                 }
+                // A new explicit destination must replace the sheet's
+                // StateObject and loaded passage, even while it is presented.
+                .id(prepared.id)
+                .environment(\.codeTopFadeEnabled, false)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
             }
             .navigationDestination(for: SearchReaderRoute.self) { route in
                 if let prepared = preparedDestinations[route] {
@@ -648,7 +654,8 @@ struct SearchView: View {
     private func handoffSearchPreview(_ prepared: PreparedSearchReaderDestination, to destination: BrowserContextID) {
         guard let source = prepared.library.selectedVersion?.codeVersion else { return }
         let route = SearchReaderRoute(sectionID: prepared.section.id, sourceVersion: source)
-        showsPassageDetail = false
+        passageDetail = nil
+        pendingPassageDetail = nil
         NativeReaderHandoff.shared.open(route, in: destination, library: library)
     }
 
@@ -687,13 +694,15 @@ struct SearchView: View {
         // Initial appearance may already have opened a pending deep link.
         // Only discard navigation when replacing an existing account/edition.
         if restoredSessionScope != nil {
-            showsPassageDetail = false
+            passageDetail = nil
+            pendingPassageDetail = nil
             searchNavigationPath = NavigationPath()
         }
         let requestedScope = sessionScope
         let requestedAccountID = sessionAccountID
         let originalQuery = query
         let originalQueryGeneration = queryEditGeneration
+        let originalOpeningGeneration = openingGeneration
         let deletionGeneration = RunningSearchSessions.deletionGenerations[requestedAccountID, default: 0]
         restoredSessionScope = nil
         needsPositionReset = false
@@ -711,9 +720,11 @@ struct SearchView: View {
         }
         guard !Task.isCancelled, sessionScope == requestedScope,
               RunningSearchSessions.deletionGenerations[requestedAccountID, default: 0] == deletionGeneration else { return }
-        // A user can type while the disk read is pending. Preserve that input.
+        // Typing or opening a recent passage while disk restoration is pending
+        // must win over the old query, which would cancel that opening.
         if !SearchSessionSnapshot.canRestoreQuery(original: originalQuery, current: query,
-            originalGeneration: originalQueryGeneration, currentGeneration: queryEditGeneration) {
+            originalGeneration: originalQueryGeneration, currentGeneration: queryEditGeneration) ||
+            originalOpeningGeneration != openingGeneration {
             restoredSessionScope = requestedScope
             persistSearchSession()
             scheduleSearch()
@@ -812,7 +823,19 @@ struct SearchView: View {
     }
 
     private func rebuildJumpBackInCache() {
-        cachedRecentEntries = library.recentlyViewedSections
+        cachedRecentEntries = recentlyOpenedOrder.ordered(library.recentlyViewedSections)
+    }
+
+    private var recentlyOpenedOrder: RecentlyOpenedOrder {
+        RecentlyOpenedOrder(rawValue: recentlyOpenedOrderRaw) ?? .date
+    }
+
+    private func recentlyOpenedGroup(_ entry: RecentlyViewedEntry) -> String? {
+        switch recentlyOpenedOrder {
+        case .recent: return nil
+        case .date: return viewedDateGroup(entry.viewedAt)
+        case .code: return "\(entry.codeSectionName) · \(NativeReaderEditionLabel.label(for: entry.sourceVersion))"
+        }
     }
 
     private var searchResultSummary: some View {
@@ -1063,8 +1086,8 @@ struct SearchView: View {
         let entries = Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count))
         return LazyVStack(alignment: .leading, spacing: 0) {
             ForEach(Array(entries.enumerated()), id: \.element.historyIdentity) { index, entry in
-                if index == 0 || viewedDateGroup(entry.viewedAt) != viewedDateGroup(entries[index - 1].viewedAt) {
-                    Text(viewedDateGroup(entry.viewedAt))
+                if let group = recentlyOpenedGroup(entry), index == 0 || group != recentlyOpenedGroup(entries[index - 1]) {
+                    Text(group)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.secondary)
                         .padding(.top, index == 0 ? 8 : 28)
@@ -1239,7 +1262,6 @@ struct SearchView: View {
     private func searchResultLink(_ result: CodeSearchResult, groupID: String) -> some View {
         VStack(spacing: 0) {
             Button {
-                releaseScrollAnchorForPassageDetail()
                 selectedResultID = result.id
                 selectedResultIdentity = result.searchIdentity
                 persistSearchSession()
@@ -1280,7 +1302,7 @@ struct SearchView: View {
     }
 
     private var previewsEnabled: Bool {
-        library.selectedTab == .search && openingRoute == nil && !showsPassageDetail
+        library.selectedTab == .search && openingRoute == nil && passageDetail == nil && pendingPassageDetail == nil
     }
 
     private var previewRequestID: String {
@@ -1289,15 +1311,40 @@ struct SearchView: View {
 
     private func releaseScrollAnchorForPassageDetail() {
         // `scrollPosition(id:anchor:)` otherwise keeps realigning its last
-        // family/result ID to the top while the loading state and detail sheet
+        // history/family/result ID to the top while the loading state and detail sheet
         // change layout. Preserve the recorded return position, but detach the
         // live anchor so the visible list stays exactly where the user tapped.
         if let scrollTargetID {
-            resultPositionID = scrollTargetID
+            if isHistoryVisible {
+                historyPositionID = scrollTargetID
+            } else {
+                resultPositionID = scrollTargetID
+            }
         }
         pendingScrollTargetID = nil
         needsPositionReset = false
         scrollTargetID = nil
+    }
+
+    private func presentPassageDetail(_ prepared: PreparedSearchReaderDestination) {
+        // A warm corpus can finish before the history sheet's dismissal animation.
+        // Present only once its presenter is free, using the prepared item itself.
+        if isHistorySheetPresented {
+            pendingPassageDetail = prepared
+            historyCollection = nil
+        } else {
+            pendingPassageDetail = nil
+            passageDetail = prepared
+        }
+    }
+
+    private func historySheetDidDismiss() {
+        isHistorySheetPresented = false
+        guard let prepared = pendingPassageDetail else { return }
+        pendingPassageDetail = nil
+        guard library.selectedTab == .search, openingScope == sessionScope,
+              openingSourceRevision == library.activeCodeSourceRevision else { return }
+        passageDetail = prepared
     }
 
     @ViewBuilder
@@ -1340,10 +1387,13 @@ struct SearchView: View {
         openingError = nil
         failedOpeningRoute = nil
         showsGlobalOpeningProgress = false
+        pendingPassageDetail = nil
     }
 
     private func openReader(_ route: SearchReaderRoute, globalProgress: Bool = false) {
         cancelReaderOpening()
+        releaseScrollAnchorForPassageDetail()
+        persistSearchSession()
         deepLinkError = nil
         #if PERMITEXT_LOCAL_PERFORMANCE
         LocalPerformanceRecorder.record(.searchResultOpenRequested)
@@ -1395,7 +1445,8 @@ struct SearchView: View {
                 #endif
                 os_signpost(.event, log: AppSignpost.reader, name: "searchResultDestinationPrepared")
                 preparedDestinations = [route: prepared]
-                showsPassageDetail = true
+                showsOpeningIndicator = false
+                presentPassageDetail(prepared)
             } catch PreparedSearchReaderDestination.PreparationError.requiresEnable(let target) {
                 guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope,
                       let sourceContext, library.captureCodeSourceNavigationContext() == sourceContext else { return }

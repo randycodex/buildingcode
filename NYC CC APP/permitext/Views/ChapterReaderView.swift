@@ -681,6 +681,7 @@ struct ReaderCurrentSectionBookmarkButton: View {
     let sectionID: Int64?
     let accentColor: Color
     var style: ReaderBookmarkButtonStyle = .standard
+    var accessibilityID: String = "reader-current-section-bookmark"
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var displayedIsBookmarked = false
@@ -721,7 +722,7 @@ struct ReaderCurrentSectionBookmarkButton: View {
         }
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
-        .accessibilityIdentifier("reader-current-section-bookmark")
+        .accessibilityIdentifier(accessibilityID)
         .accessibilityLabel(sectionID.map { library.readerSaveActionLabel(sectionID: $0) } ?? "Save passage")
         .accessibilityValue("\(displayedIsBookmarked ? "Saved" : "Not saved") · \(library.readerSaveDestinationName)")
         .contextMenu {

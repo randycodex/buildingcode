@@ -170,6 +170,61 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         project.tap()
         XCTAssertTrue(app.staticTexts["Acceptance Project"].waitForExistence(timeout: 10))
         keepScreenshot(named: "Existing project contents", from: app)
+        let projectRoot = app.scrollViews["project-folder-root"]
+        XCTAssertTrue(projectRoot.exists)
+        XCTAssertFalse(app.staticTexts["Phase 3 entitled Research acceptance"].exists,
+                       "Project Context should open on its own screen.")
+        XCTAssertFalse(app.staticTexts["No Notes yet."].exists,
+                       "Notebook previews should not remain inline in the Project.")
+        XCTAssertFalse(app.buttons["Select"].exists)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label ==[c] %@", "Project Hub")).firstMatch.exists)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Structured Facts (")).firstMatch.exists)
+        for (identifier, title) in [
+            ("project-section-context", "Project Context"),
+            ("project-section-structured-facts", "Structured Facts"),
+            ("project-section-notebook", "Notebook"),
+            ("project-section-research-history", "Research History")
+        ] {
+            let section = element(in: app, identifier: identifier)
+            reveal(section, in: app)
+            XCTAssertTrue(section.isHittable, "\(title) must be reachable in the Project.")
+            section.tap()
+            XCTAssertTrue(app.navigationBars[title].waitForExistence(timeout: 10),
+                          "\(title) should push a titled destination onto the navigation stack.")
+            XCTAssertFalse(projectRoot.isHittable, "The Project page must be behind the destination.")
+            if title == "Project Context" {
+                let context = app.textViews["project-context-text"]
+                XCTAssertTrue(context.exists)
+                XCTAssertEqual(context.value as? String, "Phase 3 entitled Research acceptance")
+                context.coordinate(withNormalizedOffset: .zero)
+                    .withOffset(CGVector(dx: 12, dy: 12)).tap()
+                let editor = app.textViews["project-context-editor"]
+                XCTAssertTrue(editor.waitForExistence(timeout: 5))
+                editor.typeText(" Updated on iPhone.")
+                app.buttons["project-context-save"].tap()
+                XCTAssertTrue(context.waitForExistence(timeout: 5))
+                let savedContext = context.value as? String ?? ""
+                XCTAssertTrue(savedContext.contains("Updated on iPhone."))
+                XCTAssertFalse(savedContext.hasSuffix(" Updated on iPhone."),
+                               "Editing must begin at the tapped text, rather than at the end.")
+                context.tap()
+                XCTAssertTrue(editor.waitForExistence(timeout: 5))
+                editor.typeText(" Discard this draft.")
+                app.navigationBars[title].buttons["Cancel"].tap()
+                XCTAssertEqual(context.value as? String, savedContext)
+            }
+            keepScreenshot(named: "Project section: \(title)", from: app)
+            app.navigationBars[title].buttons.element(boundBy: 0).tap()
+            XCTAssertTrue(projectRoot.waitForExistence(timeout: 10))
+        }
+        let contextLink = element(in: app, identifier: "project-section-context")
+        reveal(contextLink, in: app)
+        contextLink.tap()
+        let reopenedContext = app.textViews["project-context-text"]
+        XCTAssertTrue(reopenedContext.waitForExistence(timeout: 5))
+        XCTAssertTrue((reopenedContext.value as? String ?? "").contains("Updated on iPhone."),
+                      "Saved context must survive leaving and reopening the screen.")
+        app.navigationBars["Project Context"].buttons.element(boundBy: 0).tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()
         let allSaved = element(in: app, identifier: "all-saved-link")
         reveal(allSaved, in: app)
@@ -1032,18 +1087,26 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
         var positions: [CGFloat] = []
+        var controlPositions: [CGFloat] = []
         for (tab, title) in [("main-tab-saved", "Saved"), ("main-tab-research", "Research"),
                              ("main-tab-reader-1", "reader-main-title"), ("main-tab-reader-2", "reader-main-title")] {
             app.buttons[tab].tap()
             let heading = title == "reader-main-title"
-                ? app.buttons["reader-code-picker"].firstMatch
+                ? app.staticTexts["screen-title-Chapters"].firstMatch
                 : app.staticTexts["screen-title-\(title)"].firstMatch
             XCTAssertTrue(heading.waitForExistence(timeout: 15), app.debugDescription)
             positions.append(heading.frame.midY)
+            let controlLabel = title == "reader-main-title" ? "reader-code-picker"
+                : title == "Saved" ? "New project" : "New Research"
+            let control = app.buttons[controlLabel].firstMatch
+            XCTAssertTrue(control.isHittable, app.debugDescription)
+            controlPositions.append(control.frame.midY)
             print("TITLE_POSITION \(tab) \(heading.frame)")
             keepScreenshot(named: "Title alignment \(tab)", from: app)
         }
         XCTAssertLessThanOrEqual((positions.max() ?? 0) - (positions.min() ?? 0), 1)
+        XCTAssertLessThanOrEqual((controlPositions.max() ?? 0) - (controlPositions.min() ?? 0), 1,
+                                 "Top controls must share the native navigation row across screens.")
     }
 
     func testUnifiedReaderSwitchingSearchReturnAndRelaunch() {

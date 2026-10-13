@@ -683,6 +683,40 @@ struct ProjectStructuredFact: Codable, Hashable, Identifiable, Sendable {
     let updatedAt: Date?
 }
 
+struct ProjectFactSourceNote: Identifiable, Equatable {
+    var id: String { message }
+    let message: String
+    var factLabels: [String]
+    var updatedDates: [Date]
+
+    static func grouped(from facts: [ProjectStructuredFact]) -> [Self] {
+        var notes: [Self] = []
+        for fact in facts {
+            let sourceText = fact.sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let source = fact.source.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !sourceText.isEmpty || !source.isEmpty || fact.updatedAt != nil else { continue }
+            let message = !sourceText.isEmpty ? sourceText :
+                (source == "nyc-planning" ? "NYC Department of City Planning" :
+                    (source.isEmpty ? "Source not recorded." : source))
+            let index: Int
+            if let existing = notes.firstIndex(where: { $0.message == message }) {
+                index = existing
+            } else {
+                notes.append(Self(message: message, factLabels: [], updatedDates: []))
+                index = notes.count - 1
+            }
+            if !notes[index].factLabels.contains(fact.label) {
+                notes[index].factLabels.append(fact.label)
+            }
+            if let date = fact.updatedAt, !notes[index].updatedDates.contains(date) {
+                notes[index].updatedDates.append(date)
+                notes[index].updatedDates.sort()
+            }
+        }
+        return notes
+    }
+}
+
 struct ServerProjectRecord: Codable, Hashable, Sendable {
     let id: String
     let userID: String
@@ -4357,6 +4391,33 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
     ]
 
     static let defaultColorHex: String = presetColorHexes[0]
+}
+
+enum RecentlyOpenedOrder: String, CaseIterable, Identifiable {
+    case recent, date, code
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .recent: return "Recent first"
+        case .date: return "By date"
+        case .code: return "By code"
+        }
+    }
+
+    func ordered(_ entries: [RecentlyViewedEntry]) -> [RecentlyViewedEntry] {
+        entries.sorted { lhs, rhs in
+            if self == .code {
+                let left = Self.codeGroupID(lhs), right = Self.codeGroupID(rhs)
+                if left != right { return left.localizedStandardCompare(right) == .orderedAscending }
+            }
+            if lhs.viewedAt != rhs.viewedAt { return lhs.viewedAt > rhs.viewedAt }
+            return lhs.historyIdentity < rhs.historyIdentity
+        }
+    }
+
+    static func codeGroupID(_ entry: RecentlyViewedEntry) -> String {
+        "\(entry.codeSectionName)|\(entry.sourceVersion ?? "legacy")"
+    }
 }
 
 struct RecentlyViewedEntry: Identifiable, Codable, Hashable, Sendable {
