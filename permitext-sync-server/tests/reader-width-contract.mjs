@@ -80,7 +80,8 @@ context.normalizePaneWeights(context.paneIDs);
 assert.equal(context.state.paneWeights['utility:archive'], 600, 'Other main columns also enforce the 600px minimum');
 console.log('Main column minimums passed: all main kinds, repeated utilities, saved narrow/wider widths, one through eight columns, and collapse.');
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
-assert.match(css, /\.reader-content > \*[^{}]*\{[^}]*max-width: 800px;[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the existing centered text measure');
+assert.match(css, /--workspace-content-max-width: 800px;/, 'Workspace reading content retains the 800px measure');
+assert.match(css, /\.reader-content > \*[^{}]*\{[^}]*max-width: var\(--workspace-content-max-width\);[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the shared centered text measure');
 console.log('Reader width contract passed: sole/restored/linked Readers, sharing, minimums, manual resizing, and text measure.');
 
 function scrollElement(width = 400, scrollWidth = 900) {
