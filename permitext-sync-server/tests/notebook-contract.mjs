@@ -319,3 +319,8 @@ assert.equal(manifest.references[0].sourceClassification, "published-code");
 assert.equal(manifest.plainText, payload.plainText);
 
 console.log("Permitext BlockNote Notebook contract passed.");
+
+const strikeNote = structuredClone(linkedDocument);
+strikeNote.document[0].content[0].styles.strike = true;
+assert.equal(validateNotebookDocument(strikeNote).document.document[0].content[0].styles.strike, true);
+assert.match(renderNotebookDocumentHTML(strikeNote), /<s><strong>Verify <\/strong><\/s>/);

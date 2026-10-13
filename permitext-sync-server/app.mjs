@@ -1,3 +1,4 @@
+import { notebookQuestionsText } from "./public/notebook-questions.js";
 import { planSavedEvidenceDelete, validateSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
@@ -13568,6 +13569,7 @@ async function notebookCardSummariesForProject(storageOwnerUserID, projectID) {
       title: artifact.payload.title,
       plainText: artifact.payload.plainText,
       referenceCount: artifact.payload.references?.length || 0,
+      openQuestions: artifact.payload.openQuestions || [],
       sourceClassification: artifact.payload.sourceClassification,
       createdAt: artifact.envelope.createdAt,
       updatedAt: artifact.envelope.updatedAt,
@@ -16105,7 +16107,8 @@ async function handleNotebookCardSave(request, response) {
     fingerprint: createHash("sha256").update(canonicalJSONString({
       actorUserID: context.userID, projectID, requestedCardID, expectedVersion,
       cardType: context.body.cardType, title: context.body.title,
-      document: context.body.document, evidenceLinks: context.body.evidenceLinks || []
+      document: context.body.document, evidenceLinks: context.body.evidenceLinks || [],
+      ...(Object.hasOwn(context.body, "openQuestions") ? {openQuestions: context.body.openQuestions} : {})
     })).digest("hex")
   } : null;
   const existing = await ownedNotebookArtifact(storageOwnerUserID, cardID, { includeDeleted: true });
@@ -16157,6 +16160,7 @@ async function handleNotebookCardSave(request, response) {
       title: context.body.title,
       document: context.body.document,
       evidenceLinks: context.body.evidenceLinks,
+      openQuestions: context.body.openQuestions === undefined ? existing?.payload?.openQuestions || [] : context.body.openQuestions,
       createdBy: existing?.payload?.createdBy || context.userID,
       updatedBy: context.userID
     });
@@ -16530,6 +16534,7 @@ function reportSourceClientSummary(source) {
       previewText: source.previewText || "",
       notes: source.notes || []
     } : {}),
+    ...(source.kind === "notebookCard" ? { openQuestions: source.openQuestions || [], version: source.version } : {}),
     sourceClassification: source.sourceClassification,
     updatedAt: source.updatedAt || null
   };
@@ -16654,6 +16659,8 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
       sources.push({
         id: artifact.envelope.id,
         kind: "notebookCard",
+        openQuestions: artifact.payload.openQuestions || [],
+        version: artifact.envelope.version,
         label: artifact.payload.title,
         summary: artifact.payload.plainText?.slice(0, 500) || "",
         sourceClassification: "user-authored",
@@ -16663,9 +16670,9 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
           cardID: artifact.envelope.id,
           cardType: artifact.payload.cardType,
           title: artifact.payload.title,
-          plainText: artifact.payload.document
+          plainText: [artifact.payload.document
             ? notebookPlainText(artifact.payload.document)
-            : (artifact.payload.plainText || ""),
+            : (artifact.payload.plainText || ""), notebookQuestionsText(artifact.payload.openQuestions || [])].filter(Boolean).join("\n\n"),
           references: artifact.payload.references || []
         }
       });

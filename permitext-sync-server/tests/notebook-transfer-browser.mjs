@@ -91,7 +91,7 @@ const handlers = names.map(name => {
 }).join("\n");
 const routes = new Map([
   ["/", new URL("./fixtures/notebook-transfer.html", import.meta.url)],
-  ...["offline-storage", "sync-identity"].map(name => [`/${name}.js`, new URL(`../public/${name}.js`, import.meta.url)])
+  ...["offline-storage", "sync-identity", "notebook-questions"].map(name => [`/${name}.js`, new URL(`../public/${name}.js`, import.meta.url)])
 ]);
 function json(response, body) { response.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" }).end(JSON.stringify(body)); }
 const frontend = createServer(async (request, response) => {

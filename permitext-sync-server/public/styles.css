@@ -15771,7 +15771,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 body .account-screen-header h1,
 body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel),
-body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) * {
+body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) *:not(.bn-editor, .bn-editor *) {
   font-size: 14px !important;
 }
 
@@ -19114,7 +19114,6 @@ html body .column-group-menu-button:focus-visible {
 .workflow-action-icon:hover { color: var(--text-primary); background: var(--menu-highlight); }
 
 .notebook-source-actions .notebook-finding-action { display: block; text-align: left; }
-.notebook-card-footer:has(.report-membership-status) { flex-direction: column; align-items: stretch; gap: 8px; }
 .notebook-card-footer .report-membership-status { margin: 0; text-align: left; }
 
 .report-draft-panel .report-full-preview { margin-top: 12px; }
@@ -19655,3 +19654,69 @@ dialog.report-export-review {
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-header { border: 0; margin: 0; padding: 0; height: auto; min-height: 0; flex-basis: auto; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-collapse { writing-mode: vertical-rl; text-transform: uppercase; letter-spacing: 1px; }
 .report-draft-panel[data-versions-collapsed="true"] .report-versions-panel > .report-history { display: none; }
+
+/* Supporting note and project controls use the existing workspace hierarchy. */
+.workspace-view-options { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
+.workspace-view-options > summary { cursor: pointer; padding: 8px 12px; }
+.notebook-questions { border-top: 1px solid var(--border); padding: 12px 0; }
+.notebook-questions > summary { cursor: pointer; }
+.notebook-questions-hint { color: var(--text-secondary); font-size: 12px; }
+.notebook-question { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.notebook-question p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.notebook-question button, .notebook-question-form button { margin-right: 12px; }
+.notebook-question-form { display: grid; gap: 10px; padding-top: 12px; }
+.notebook-question-form label { display: grid; gap: 4px; }
+.notebook-question-form textarea { width: 100%; box-sizing: border-box; resize: vertical; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--border); padding: 8px; }
+.notebook-question-filter[aria-pressed="true"] { font-weight: 700; }
+.project-facts-filter { margin: 0 0 12px; }
+
+/* Legacy layout controls remain mounted for saved layouts and keyboard commands. */
+.topbar-layout-actions[hidden] { display: none; }
+
+.saved-project-structured-fact[hidden], .saved-project-structured-group[hidden] { display: none; }
+
+/* The writing page takes the available height above one standard action row. */
+.workspace-panel.notebook-panel { padding-bottom: 0; }
+.notebook-panel > .notebook-shell { margin-bottom: 0; }
+.notebook-panel .notebook-focus {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(220px, 1fr) 42px;
+  row-gap: 0;
+}
+.notebook-panel .notebook-card-footer {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  height: 42px;
+  min-height: 42px;
+  gap: 16px;
+  padding: 0;
+}
+.notebook-panel .notebook-card-footer > div { display: flex; flex-wrap: nowrap; }
+.notebook-card-footer .report-membership-status {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.notebook-card-footer > div:last-child { margin-inline-start: auto; flex: 0 0 auto; }
+.notebook-card-footer .notebook-questions { flex: 0 0 auto; border: 0; padding: 0; color: var(--text-secondary); font-size: 12px; }
+.notebook-card-footer .notebook-questions > summary { display: flex; align-items: center; height: 42px; list-style: none; }
+.notebook-card-footer .notebook-questions > summary::-webkit-details-marker { display: none; }
+.notebook-card-footer .notebook-questions > div {
+  position: absolute;
+  bottom: 42px;
+  inset-inline: 0;
+  max-height: min(65vh, 560px);
+  overflow-y: auto;
+  z-index: 5;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  padding: 16px;
+}

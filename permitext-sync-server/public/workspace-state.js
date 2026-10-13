@@ -1,3 +1,4 @@
+import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
 import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=7";
 const workspaceRegistryVersion = 3;
 const defaultWorkspaceName = "General";
@@ -33,6 +34,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "coordinationFilters",
   "trackScrollLeft",
   "workflowView",
+  "workflowVisitedViews",
   "workflowMembership",
   "workflowScroll",
   "codeQuestionWorkspace"
@@ -263,6 +265,7 @@ export function emptyWorkspaceLayout() {
     coordinationFilters: {},
     trackScrollLeft: 0,
     workflowView: "research",
+    workflowVisitedViews: [],
     workflowMembership: {},
     workflowScroll: {},
     codeQuestionWorkspace: emptyCodeQuestionWorkspaceLayout()
@@ -378,6 +381,7 @@ export function normalizeWorkspaceLayout(value = {}) {
       )
     : {};
   layout.workflowView = normalizeWorkflowView(source.workflowView);
+  layout.workflowVisitedViews = normalizeVisitedWorkflowViews(source);
   layout.workflowMembership = normalizeWorkflowMembership(source.workflowMembership);
   layout.workflowScroll = Object.fromEntries(columnWorkflowViews.map(view =>
     [view, Math.max(0, Number(source.workflowScroll?.[view]) || 0)]));

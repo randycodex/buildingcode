@@ -1,3 +1,4 @@
+import { openNotebookQuestions } from "./notebook-questions.js";
 export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
   const element = document.createElement('div');
   element.className = 'notebook-title-control';
@@ -37,7 +38,13 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
   const management = document.createElement('div');
   management.className = 'notebook-card-rail-actions';
   footer.append(createButton, management);
-  popup.append(list, footer);
+  const questionFilter = document.createElement('button');
+  questionFilter.type = 'button';
+  questionFilter.className = 'notebook-question-filter';
+  questionFilter.setAttribute('aria-pressed', 'false');
+  let onlyOpenQuestions = false;
+  questionFilter.addEventListener('click', () => { onlyOpenQuestions = !onlyOpenQuestions; render(state); });
+  popup.append(questionFilter, list, footer);
   menu.append(toggle, popup);
   element.append(title, titleEditor, menu);
   let state = { activeCard: null, readOnly: false, selectingCards: false };
@@ -97,7 +104,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
     const previousCard = state.activeCard;
     const keepTitleEditing = !titleEditor.hidden && activeCard && (previousCard === activeCard ||
       previousCard?.id === activeCard.id || previousCard && !previousCard.id && activeCard.id);
-    state = { activeCard, readOnly, selectingCards };
+    state = { cards, activeCard, showingArchivedCards, selectedCardIDs, readOnly, selectingCards };
     title.textContent = activeCard?.title || 'Untitled Note';
     title.disabled = titleEditor.disabled = readOnly;
     titleEditor.dataset.cardId = activeCard?.id || '';
@@ -110,9 +117,15 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
     toggle.setAttribute('aria-label', showingArchivedCards ? 'Choose archived note' : 'Choose note');
     createButton.disabled = readOnly;
     list.replaceChildren();
-    const visibleCards = cards.filter(card => Boolean(card.archivedAt) === showingArchivedCards &&
+    const displayedCard = card => card.id && card.id === activeCard?.id ? activeCard : card;
+    const count = cards.filter(card => Boolean(card.archivedAt) === showingArchivedCards)
+      .reduce((sum, card) => sum + openNotebookQuestions(displayedCard(card)).length, 0)
+      + (!activeCard?.id ? openNotebookQuestions(activeCard).length : 0);
+    questionFilter.textContent = `${count} open ${count === 1 ? 'question' : 'questions'}`;
+    questionFilter.setAttribute('aria-pressed', String(onlyOpenQuestions));
+    const visibleCards = cards.filter(card => (!onlyOpenQuestions || openNotebookQuestions(displayedCard(card)).length) && Boolean(card.archivedAt) === showingArchivedCards &&
       !(activeCard && !activeCard.id && !card.id));
-    if (!showingArchivedCards && activeCard && !activeCard.id) visibleCards.unshift(activeCard);
+    if (!showingArchivedCards && activeCard && !activeCard.id && (!onlyOpenQuestions || openNotebookQuestions(activeCard).length)) visibleCards.unshift(activeCard);
     if (showingArchivedCards && !visibleCards.length) {
       const empty = document.createElement('p');
       empty.className = 'notebook-card-list-empty';
@@ -135,7 +148,8 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
       const name = document.createElement('span');
       name.textContent = (current ? activeCard.title : card.title) || 'Untitled Note';
       const revision = document.createElement('small');
-      revision.textContent = current ? 'Current' : `Revision ${card.version || 1}`;
+      const openCount = openNotebookQuestions(displayedCard(card)).length;
+      revision.textContent = (current ? 'Current' : `Revision ${card.version || 1}`) + (openCount ? ` · ${openCount} open` : '');
       choice.append(name, revision);
       choice.addEventListener('click', () => {
         if (!state.selectingCards) {

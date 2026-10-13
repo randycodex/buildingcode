@@ -1,3 +1,4 @@
+import { normalizeNotebookQuestions } from "./public/notebook-questions.js";
 import {
   emptyNotebookDocument as emptyVersionedNotebookDocument,
   notebookBlockTypes,
@@ -35,7 +36,7 @@ const maximumNotebookTextLength = 50_000;
 const maximumNotebookJSONLength = 500_000;
 const maximumNotebookBlocks = 500;
 const maximumNotebookDepth = 8;
-const permittedStyleNames = new Set(["bold", "italic"]);
+const permittedStyleNames = new Set(["bold", "italic", "strike"]);
 const notebookEvidenceRoles = new Set(["context", "supports", "conflicts", "unresolved"]);
 const maximumNotebookEvidenceLinks = 100;
 const maximumNotebookEvidencePassages = 24;
@@ -422,6 +423,7 @@ function renderInlineHTML(content) {
     let html = escapeHTML(node.text);
     if (node.styles.bold) html = `<strong>${html}</strong>`;
     if (node.styles.italic) html = `<em>${html}</em>`;
+    if (node.styles.strike) html = `<s>${html}</s>`;
     return html;
   }).join("");
 }
@@ -479,6 +481,7 @@ export function normalizeNotebookCardPayload({
   title,
   document,
   evidenceLinks = [],
+  openQuestions = [],
   createdBy,
   updatedBy
 }) {
@@ -505,6 +508,7 @@ export function normalizeNotebookCardPayload({
     document: validated.document,
     references: validated.references,
     evidenceLinks: normalizedEvidenceLinks,
+    openQuestions: normalizeNotebookQuestions(openQuestions),
     imageAssets: validated.imageAssets,
     plainText,
     renderedHTML: renderNotebookDocumentHTML(validated.document),

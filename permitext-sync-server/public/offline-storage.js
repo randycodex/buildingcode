@@ -323,7 +323,7 @@ function draftMatches(record, accountUserID, projectID, cardID) {
   return record?.accountUserID === accountUserID && record.projectID === projectID && record.cardID === (cardID || "");
 }
 
-export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document, evidenceLinks = [], baseVersion, cardType, scope, expectedRevision }) {
+export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document, evidenceLinks = [], openQuestions, baseVersion, cardType, scope, expectedRevision }) {
   if (!String(accountUserID || "").trim() || !String(projectID || "").trim()) {
     throw new Error("A Notebook draft must belong to an account and Project.");
   }
@@ -345,6 +345,7 @@ export async function saveNotebookDraft({ accountUserID, projectID, cardID, titl
     }
     const record = {
       key, accountUserID, projectID, cardID: cardID || "", title: String(title || ""), document, evidenceLinks,
+      ...(openQuestions !== undefined ? {openQuestions} : {}),
       baseVersion: localConflict ? baseVersion ?? (cardID ? null : 0)
         : Number.isSafeInteger(previous?.baseVersion) && Number.isSafeInteger(baseVersion)
         ? Math.max(previous.baseVersion, baseVersion)
@@ -425,6 +426,7 @@ export async function beginNotebookDraftSave(accountUserID, projectID, cardID, r
       ...(Object.hasOwn(prepared, "noteID") ? { noteID: prepared.noteID } : {}),
       document: Object.hasOwn(prepared, "document") ? prepared.document : current.document,
       evidenceLinks: current.evidenceLinks || [],
+      ...(current.openQuestions !== undefined ? {openQuestions: current.openQuestions} : {}),
       updatedAt: current.updatedAt
     };
     store.put({ ...current, pendingSave });

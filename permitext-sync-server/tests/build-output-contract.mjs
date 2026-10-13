@@ -39,11 +39,18 @@ assert(
   "The Notebook editor is not built from the open-source BlockNote packages."
 );
 assert(
-  notebookEditor.includes("FormattingToolbarController") &&
-    notebookEditor.includes("BlockTypeSelect") &&
-    notebookEditor.includes('BasicTextStyleButton, { key: "bold", basicTextStyle: "bold" }') &&
-    notebookEditor.includes('BasicTextStyleButton, { key: "italic", basicTextStyle: "italic" }') &&
-    notebookEditor.includes("CreateLinkButton") &&
+  notebookEditor.includes("BlockNoteViewEditor") &&
+    notebookEditor.includes('"aria-label": "Note formatting"') &&
+    notebookEditor.includes('"aria-label": "Text style"') &&
+    notebookEditor.includes("sideMenu: false") &&
+    notebookEditor.includes("slashMenu: false") &&
+    !notebookEditor.includes("FormattingToolbarController") &&
+    notebookEditor.includes('styleButton("bold", "Bold"') &&
+    notebookEditor.includes('styleButton("italic", "Italic"') &&
+    notebookEditor.includes('styleButton("strike", "Strikethrough"') &&
+    notebookEditor.includes("editor.toggleStyles") &&
+    notebookEditor.includes("editor.createLink") &&
+    notebookEditor.includes('"aria-label":"Link URL"') &&
     !notebookEditor.includes('type: "fontSize"') &&
     !notebookEditor.includes('type: "textSize"'),
   "The shared Notebook editor must keep the same basic formatting surface as native iOS."
@@ -66,7 +73,7 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "", requestIdentity = captureAccountRequest())') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL, requestIdentity = captureAccountRequest())") &&
-    /const notebookClientVersion = "[0-9]{8}-notebook-[a-z]+(?:-[a-z]+)*-v[0-9]+";/.test(webClient),
+    /const notebookClientVersion = "[0-9]{8}-(?:[a-z]+-)*notebook(?:-[a-z]+)*-v[0-9]+";/.test(webClient),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

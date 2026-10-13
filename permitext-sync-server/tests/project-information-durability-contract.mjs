@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { webcrypto } from "node:crypto";
 import vm from "node:vm";
+import { notebookQuestionsText } from "../public/notebook-questions.js";
 
 const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const offline = await readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8");
@@ -20,7 +21,7 @@ function harness() {
   const requests = [], mounts = [], elements = [], timers = new Map(); let timerID = 0;
   const identity = { userID: "synthetic-owner", generation: 1 };
   const sandbox = {
-    structuredClone, crypto: webcrypto, Date, Map, Set, Promise, console,
+    structuredClone, crypto: webcrypto, Date, Map, Set, Promise, console, notebookQuestionsText,
     notebookDraftsStoreName: "drafts", requestResult: async (value) => clone(value),
     withOfflineStore(_store, mode, callback) {
       const operation = tail.then(async () => {

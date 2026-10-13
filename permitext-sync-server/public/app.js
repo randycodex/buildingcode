@@ -1,4 +1,6 @@
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261012-note-menu-v3";
+import { createNotebookQuestionsEditor, openNotebookQuestions, notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
+import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261012-minimal-workflow-v950";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
@@ -113,7 +115,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-saved-batch-v936";
+} from "./offline-storage.js?v=20261012-minimal-workflow-v950";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -146,7 +148,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261012-workflow-views-v18";
+} from "./workspace-state.js?v=20261012-minimal-workflow-v950";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -319,7 +321,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261011-notebook-insert-v21";
+const notebookClientVersion = "20261012-continuous-notebook-v27";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -924,6 +926,7 @@ function loadWorkspaceState(accountOverride) {
         ? normalizeProjectIdentities(saved.detachedWorkboards)
         : [],
       workflowView: normalizeWorkflowView(saved.workflowView),
+      workflowVisitedViews: normalizeVisitedWorkflowViews(saved),
       workflowMembership: normalizeWorkflowMembership(saved.workflowMembership),
       workflowScroll: saved.workflowScroll || {},
       trackScrollLeft: Number.isFinite(Number(saved.trackScrollLeft)) ? Math.max(0, Number(saved.trackScrollLeft)) : 0,
@@ -1761,13 +1764,9 @@ function workspaceProject(projects = null) {
 }
 
 function workspaceColumnsRequireProject() {
-  const account = activeAccount();
-  // Public reading remains available. Only an authoritative project-capable
-  // account snapshot can establish that the last Project is gone.
-  if (!account || !hasCapability("projects") || syncedContent?.userID !== account.userID ||
-      !["verified", "permitted-offline"].includes(syncedContent?.workspacePresentationAccess)) return false;
-  return !activeFolderRecords(mergeProjectsWithOrganizationAccess(syncedContent.summary?.projects || []))
-    .some(folderIsProject);
+  // Reading and searching do not require a Project. Private actions retain
+  // their own project, account and capability checks at the point of use.
+  return false;
 }
 
 function notifyProjectRequiredForColumn() {
@@ -2191,24 +2190,25 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   // The chooser belongs to the account, not to the workspace being replaced.
   // Validate the synced account snapshot without depending on a selected pane gate.
   const identity = captureAccountRequest();
-  let content = await ensureSyncedContentForRender();
-  if (isCurrentAccountRequest(identity) && !["verified", "permitted-offline"].includes(content?.workspacePresentationAccess)) {
-    content = await loadSyncedContent({ force: true });
+  let content = null;
+  if (activeAccount()?.userID) {
+    try {
+      content = await ensureSyncedContentForRender();
+      if (isCurrentAccountRequest(identity) && !["verified", "permitted-offline"].includes(content?.workspacePresentationAccess)) {
+        content = await loadSyncedContent({ force: true });
+      }
+    } catch { /* Public view controls remain available when private sync cannot load. */ }
   }
   if (!isCurrentAccountRequest(identity)) return;
-  if (!activeAccount()?.userID || content?.userID !== activeAccount().userID ||
-      !["verified", "permitted-offline"].includes(content?.workspacePresentationAccess)) {
-    await showWebNotice("Projects could not be loaded", "Permitext could not finish checking workspace access. Your saved projects are preserved. Try opening the workspace selector again.");
-    return;
-  }
-  reconcileProjectWorkspaces();
+  const projectsAvailable = Boolean(activeAccount()?.userID && content?.userID === activeAccount().userID &&
+    ["verified", "permitted-offline"].includes(content?.workspacePresentationAccess));
+  if (projectsAvailable) reconcileProjectWorkspaces();
   closeWorkspaceContextMenu();
-  const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
-  const workspaces = visibleWorkspaceRecords();
+  const workspaces = projectsAvailable ? visibleWorkspaceRecords() : [];
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu";
   menu.setAttribute("role", "menu");
-  menu.setAttribute("aria-label", "Project menu");
+  menu.setAttribute("aria-label", projectsAvailable ? "Project menu" : "Workspace menu");
   const appendMenuAction = (section, action) => {
     if (action.separated) {
       const actionDivider = document.createElement("div");
@@ -2261,10 +2261,34 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     projectSection.append(button);
   });
-  appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
-  appendMenuAction(projectSection, { label: "Manage Projects…", separated: true, run: () => openProjectManager() });
-
+  if (projectsAvailable) {
+    appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
+    appendMenuAction(projectSection, { label: "Manage Projects…", separated: true, run: () => openProjectManager() });
+  } else {
+    appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
+  }
   menu.append(projectSection);
+  const viewOptions = document.createElement("details");
+  viewOptions.className = "workspace-view-options";
+  viewOptions.open = !projectsAvailable;
+  const viewSummary = document.createElement("summary");
+  viewSummary.textContent = "View options";
+  viewOptions.append(viewSummary);
+  const layoutActions = document.createElement("div");
+  layoutActions.setAttribute("role", "group");
+  layoutActions.setAttribute("aria-label", "View options");
+  updateWorkspaceLayoutControls();
+  for (const id of ["fit-columns", "collapse-all-columns", "expand-all-columns", "collapse-readers"]) {
+    const control = document.getElementById(id);
+    if (control && !control.hidden) appendMenuAction(layoutActions, {
+      label: control.textContent, disabled: control.disabled, run: () => control.click()
+    });
+  }
+  if (projectsAvailable && state.columnGroups?.length) appendMenuAction(layoutActions, {
+    label: "Saved groups…", run: () => openSavedColumnGroupsMenu(workspaceActionsButton)
+  });
+  viewOptions.append(layoutActions);
+  menu.append(viewOptions);
   document.body.append(menu);
   workspaceContextMenu = menu;
   workspaceActionsButton?.setAttribute("aria-expanded", "true");
@@ -2293,10 +2317,10 @@ function renderWorkspaceTabs() {
   if (detachedProjectWindow) return;
   if (!workspacePrivatePresentationAllowed()) {
     const label = workspaceActionsButton.querySelector(".workspace-current-name");
-    if (label) label.textContent = "Projects";
-    workspaceActionsButton.title = "Projects";
-    workspaceActionsButton.setAttribute("aria-label", "Projects");
-    workspaceActionsButton.disabled = true;
+    if (label) label.textContent = "Workspace";
+    workspaceActionsButton.title = "Workspace and view options";
+    workspaceActionsButton.setAttribute("aria-label", "Workspace and view options");
+    workspaceActionsButton.disabled = false;
     return;
   }
   const workspace = activeWorkspaceRecord();
@@ -4366,16 +4390,21 @@ async function switchWorkflowView(view) {
   closeSharedWorkspaceViews();
   if (notifyProjectRequiredForColumn()) return false;
   view = normalizeWorkflowView(view);
+  const initializeNotebook = shouldOpenNotebookByDefault(view, state.workflowVisitedViews || []);
   if (view !== currentWorkflowView()) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     state.workflowView = view;
   }
   syncWorkflowColumnPresentation();
   saveWorkspaceState();
-  if (!defaultActivePaneIDs().some(workflowPaneIsVisible)) {
+  if (initializeNotebook || !defaultActivePaneIDs().some(workflowPaneIsVisible)) {
     if (view === 'notebook') await openProjectNotebook(workspaceProject());
     else await focusRecentUtilityColumn('search');
   }
+  if (view === currentWorkflowView() && defaultActivePaneIDs().some(workflowPaneIsVisible)) {
+    state.workflowVisitedViews = [...new Set([...(state.workflowVisitedViews || []), view])];
+  }
+  saveWorkspaceState();
   return true;
 }
 
@@ -11106,6 +11135,11 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
   if (draft.accountUserID !== requestIdentity.userID) throw accountContextChangedError();
   if (draft.recoveryConflict || (draft.scope && draft.scope !== "notebook-card")) return null;
   const pending = draft.pendingSave || draft;
+  // Incomplete question input stays in the device draft. Validate before
+  // freezing a retry receipt: a rejected immutable receipt would otherwise
+  // keep replaying after the user corrected the question. An already pending
+  // valid receipt still completes before newer local edits are synchronized.
+  normalizeNotebookQuestions(pending.openQuestions || []);
   if (!Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0 || !String(pending.title || "").trim()) return null;
   const document = await reconcileNotebookDocumentAssets(pending.document, pending.projectID, requestIdentity);
   requireCurrentAccountRequest(requestIdentity);
@@ -11122,7 +11156,8 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
     cardType: submittedDraft.cardType || "finding",
     title: submittedDraft.title,
     document: submittedDocument,
-    evidenceLinks: submittedDraft.evidenceLinks || []
+    evidenceLinks: submittedDraft.evidenceLinks || [],
+    ...(submittedDraft.openQuestions !== undefined ? {openQuestions: submittedDraft.openQuestions} : {})
   });
   requireCurrentAccountRequest(requestIdentity);
   if (!options.deferAcknowledgement) {
@@ -26769,7 +26804,7 @@ function appendNotebookDraftCopyReview(container, draft, identity, onResolve) {
     title.textContent = `${index === 0 ? "Current editor version" : `Other device version ${index}`} · ${copy.title || "Untitled"}`;
     const text = document.createElement("pre");
     text.style.whiteSpace = "pre-wrap";
-    text.textContent = notebookRecoveryPlainText(copy.document) || "This version contains structured content. Download the recovery file to inspect it.";
+    text.textContent = [notebookRecoveryPlainText(copy.document), notebookQuestionsText(copy.openQuestions || [])].filter(Boolean).join("\n\n") || "This version contains structured content. Download the recovery file to inspect it.";
     versions.append(title, text);
   }
   const keep = document.createElement("button");
@@ -26810,7 +26845,7 @@ async function appendNotebookDeviceRecovery(container, projectID, identity) {
       const summary = document.createElement("summary");
       summary.textContent = draft.title || (draft.scope === "collaboration-note" ? "Project information draft" : "Untitled Note");
       const text = document.createElement("pre");
-      text.textContent = notebookRecoveryPlainText(draft.document) || "This draft contains images or structured content. Download the recovery file to preserve all of it.";
+      text.textContent = [notebookRecoveryPlainText(draft.document), notebookQuestionsText(draft.openQuestions || [])].filter(Boolean).join("\n\n") || "This draft contains images or structured content. Download the recovery file to preserve all of it.";
       details.append(summary, text);
       region.append(details);
     }
@@ -26928,7 +26963,7 @@ async function renderProjectNotebook(project, options = {}) {
   panel.append(draftStatus);
   const showDraftStatus = (message) => {
     if (!isCurrentAccountRequest(requestIdentity)) return;
-    const statusMessage = message === "Synced" ? "" : String(message || "").trim();
+    const statusMessage = message === "Synced" ? "Saved" : String(message || "").trim();
     draftStatus.replaceChildren();
     draftStatus.title = statusMessage;
     if (!statusMessage) return;
@@ -26955,6 +26990,7 @@ async function renderProjectNotebook(project, options = {}) {
           originalCardID: draft.cardID || "", acceptedCardID: draft.acceptedCardID || "",
           title: activeCard?.title || draft.title || "", document: structuredClone(draftDocument),
           evidenceLinks: structuredClone(activeCard?.evidenceLinks || draft.evidenceLinks || []),
+          openQuestions: structuredClone(activeCard?.openQuestions ?? draft.openQuestions ?? []),
           recoveryCopies: structuredClone(draft.recoveryCopies || []), deviceRecovery };
         downloadCodeMemoBlob(new Blob([JSON.stringify(recovery, null, 2)], { type: "application/json" }), "permitext-notebook-recovery.json");
       } catch (error) {
@@ -26988,7 +27024,8 @@ async function renderProjectNotebook(project, options = {}) {
       accountUserID, projectID, cardID, scope: "notebook-card",
       baseVersion: activeCard.version, cardType: activeCard.cardType || "finding",
       title: activeCard.title || "", document: structuredClone(draftDocument),
-      evidenceLinks: structuredClone(activeCard.evidenceLinks || [])
+      evidenceLinks: structuredClone(activeCard.evidenceLinks || []),
+      openQuestions: structuredClone(activeCard.openQuestions || [])
     };
     const write = draftWriteQueue.catch(() => {}).then(async () => {
       // A write captured while acknowledgement was rekeying a new Note may
@@ -27211,6 +27248,7 @@ async function renderProjectNotebook(project, options = {}) {
       title: card.title,
       plainText: savedCard.plainText,
       referenceCount: savedCard.references?.length || 0,
+      openQuestions: card.openQuestions || [],
       createdAt: savedCard.createdAt,
       updatedAt: savedCard.updatedAt,
       archivedAt: savedCard.archivedAt || null
@@ -27252,7 +27290,7 @@ async function renderProjectNotebook(project, options = {}) {
           // the accepted card ID; already queued writes finish before its atomic rekey.
           if (ownsFocusedCard) {
             activeCard = retainNotebookCardIdentity(activeCard, { ...payload.card, title: activeCard.title, document: draftDocument,
-              evidenceLinks: activeCard.evidenceLinks || [] });
+              evidenceLinks: activeCard.evidenceLinks || [], openQuestions: activeCard.openQuestions || [] });
           }
           const acceptedFocusedCard = ownsFocusedCard ? activeCard : null;
           const acknowledgement = draftWriteQueue.then(async () => {
@@ -27320,6 +27358,7 @@ async function renderProjectNotebook(project, options = {}) {
           if (disposed) return true;
           showDraftStatus(dirty ? "Saved on this device · newer edits waiting to sync" : "Synced");
           renderCardList();
+          void refreshNotebookReportStatus().catch(() => false);
           if (dirty) scheduleNotebookAutosave(180);
           void reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
           return !dirty;
@@ -27339,7 +27378,7 @@ async function renderProjectNotebook(project, options = {}) {
               review.textContent = "Review save conflict";
               review.addEventListener("click", async () => {
                 const confirmed = await confirmWebWarning("Review the current Note",
-                  `Current saved Note: ${latest.title}\n\n${latest.plainText || "(No plain text)"}\n\nYour local draft remains in the editor. Save your draft as the next version only after comparing these changes.`,
+                  `Current saved Note: ${latest.title}\n\n${[latest.plainText, notebookQuestionsText(latest.openQuestions || [])].filter(Boolean).join("\n\n") || "(No plain text)"}\n\nYour local draft remains in the editor. Save your draft as the next version only after comparing these changes.`,
                   { confirmLabel: "Save my draft as next version" });
                 if (!confirmed || disposed || !isCurrentAccountRequest(requestIdentity)) return;
                 try {
@@ -27467,6 +27506,7 @@ async function renderProjectNotebook(project, options = {}) {
         candidateCard.version = localDraft.baseVersion;
         candidateCard.title = localDraft.title || "";
         candidateCard.evidenceLinks = localDraft.evidenceLinks || candidateCard.evidenceLinks || [];
+        candidateCard.openQuestions = localDraft.openQuestions ?? candidateCard.openQuestions ?? [];
       }
       activeCard = candidateCard;
       draftDocument = currentCardLabels.document;
@@ -27751,6 +27791,7 @@ async function renderProjectNotebook(project, options = {}) {
         return;
       }
       const focusedCardID = activeCard.id;
+      const focusedCardIdentity = notebookCardIdentity(activeCard);
 
       const toolbar = document.createElement("div");
       toolbar.className = "notebook-toolbar code-filter-menu notebook-reference-menu";
@@ -28031,13 +28072,21 @@ async function renderProjectNotebook(project, options = {}) {
         finally { if (!disposed) reportButton.disabled = notebookReadOnly; }
       });
       footerActions.append(reportButton, researchButton, coordinateButton);
-      footer.append(reportMembershipIndicator(projectID, "notebookCard", activeCard), footerActions);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      const notebookTools = document.createElement("div");
-      notebookTools.className = "notebook-source-actions";
-      notebookTools.append(toolbar);
-      const focusedContent = [notebookTools, editorElement];
+      // The indicator paints connected hosts on the next frame. Schedule it
+      // only after loading the editor, immediately before attaching the footer.
+      const reportMembership = reportMembershipIndicator(projectID, "notebookCard", activeCard);
+      refreshNotebookReportStatus = async () => {
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence ||
+            notebookCardIdentity(activeCard) !== focusedCardIdentity) return false;
+        reportMembership.dataset.reportSourceId = activeCard.id || "";
+        await refreshProjectReportMembership(projectID);
+        return true;
+      };
+      footer.append(reportMembership, footerActions);
+      const focusedContent = [editorElement];
+      if (notebookReadOnly) panel.append(draftStatus);
       focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
@@ -28062,6 +28111,8 @@ async function renderProjectNotebook(project, options = {}) {
         document: draftDocument,
         autofocus: false,
         editable: !notebookReadOnly,
+        toolbarInsertElement: toolbar,
+        toolbarStatusElement: draftStatus,
         uploadFile: (file) => uploadNotebookAsset(projectID, file, activeCard.id, requestIdentity).catch((error) => {
           void showWebNotice("Image not added", error.message);
           throw error;
@@ -28092,11 +28143,20 @@ async function renderProjectNotebook(project, options = {}) {
         },
         onOpenReference: null
       });
+      footer.prepend(createNotebookQuestionsEditor({
+        questions: activeCard.openQuestions || [], readOnly: notebookReadOnly,
+        onChange(questions) {
+          if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || notebookCardIdentity(activeCard) !== focusedCardIdentity) throw new Error("Reopen this Note before changing its questions.");
+          activeCard.openQuestions = questions;
+          markNotebookDirty();
+          renderCardList();
+        }
+      }));
       if (!notebookReadOnly && !activeCard.id) {
         noteMenu.editTitle();
       }
       researchButton.addEventListener("click", async () => {
-        const bodyText = String(editorElement.innerText || activeCard.plainText || "").trim();
+        const bodyText = notebookRecoveryPlainText(editorMount?.getDocument() || draftDocument).trim();
         researchQuestionDraft = bodyText || activeCard.title;
         const researchWasOpen = Boolean(state.utilities.analysis);
         await focusUtility("analysis");
@@ -28209,7 +28269,7 @@ async function renderProjectNotebook(project, options = {}) {
       if (pendingNewDraft) {
         activeCard = { id: "", version: pendingNewDraft.baseVersion ?? 0,
           cardType: pendingNewDraft.cardType || "finding", title: pendingNewDraft.title || "",
-          references: [], evidenceLinks: pendingNewDraft.evidenceLinks || [] };
+          references: [], evidenceLinks: pendingNewDraft.evidenceLinks || [], openQuestions: pendingNewDraft.openQuestions || [] };
         draftDocument = candidateDocument;
         dirty = true;
         persistedDraft = pendingNewDraft;
@@ -28252,7 +28312,8 @@ async function renderProjectNotebook(project, options = {}) {
         title: unsavedDraft.title || "",
         plainText: "",
         references: [],
-        evidenceLinks: unsavedDraft.evidenceLinks || []
+        evidenceLinks: unsavedDraft.evidenceLinks || [],
+        openQuestions: unsavedDraft.openQuestions || []
       };
       draftDocument = await reconcileNotebookDocumentAssets(unsavedDraft.document, projectID, requestIdentity);
       dirty = true;
@@ -28326,8 +28387,7 @@ function appendUniqueReportSources(draft, sources) {
     const legacyIndex = source.kind === "notebookCard" ? draft.blocks.findIndex(block =>
       block.derivedFrom?.kind === "notebookCard" && block.derivedFrom.id === source.id) : -1;
     if (legacyIndex >= 0) {
-      draft.blocks[legacyIndex] = { id: draft.blocks[legacyIndex].id, kind: source.kind,
-        sourceID: source.id, label: source.label, sourceClassification: source.sourceClassification };
+      // An existing edited snapshot is already included. Updating it is explicit.
       continue;
     }
     draft.blocks.push({ id: crypto.randomUUID(), kind: source.kind, sourceID: source.id,
@@ -28953,8 +29013,11 @@ async function renderProjectReportDraft(project, resume = null) {
   function refreshIncludedReportComments() {
     for (const block of activeDraft.blocks) {
       const row = [...panel.querySelectorAll(".report-draft-block")].find(row => row.dataset.blockId === block.id);
-      if (row) renderReportCommentOptions(row, block,
-        sources.find(source => source.kind === block.kind && source.id === block.sourceID));
+      if (row) {
+        renderReportCommentOptions(row, block,
+          sources.find(source => source.kind === block.kind && source.id === block.sourceID));
+        row.refreshLinkedNoteState?.();
+      }
     }
     renderIncludedReportComments(panel);
   }
@@ -29077,6 +29140,42 @@ async function renderProjectReportDraft(project, resume = null) {
           const provenanceLabel = document.createElement("p");
           provenanceLabel.textContent = `Snapshot of Note: ${block.derivedFrom.title}`;
           provenance.append(provenanceLabel);
+          let latestSource;
+          const warning = document.createElement("p");
+          provenance.append(warning);
+          const updateNote = document.createElement("button");
+          updateNote.type = "button";
+          row.refreshLinkedNoteState = () => {
+            latestSource = sources.find(source => source.kind === "notebookCard" && source.id === block.derivedFrom.id);
+            const questions = openNotebookQuestions(latestSource);
+            warning.hidden = !questions.length;
+            warning.textContent = questions.length ? `${questions.length} open ${questions.length === 1 ? "question" : "questions"} in the linked Note · ${questions.map(question => question.text).join("; ")}` : "";
+            updateNote.textContent = latestSource?.version > block.derivedFrom.version ? "Review updated Note" : "Review linked Note";
+            updateNote.disabled = !latestSource;
+          };
+          row.refreshLinkedNoteState();
+          updateNote.addEventListener("click", async () => {
+            updateNote.disabled = true;
+            const draftID = activeDraft.id;
+            try {
+              const { card } = await postResearch("/notebook/cards/get", { projectID, cardID: block.derivedFrom.id });
+              requireCurrentAccountRequest(requestIdentity);
+              if (disposed || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
+              const text = [card.plainText, notebookQuestionsText(card.openQuestions || [])].filter(Boolean).join("\n\n");
+              if (text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note before updating this paragraph.");
+              const accepted = await confirmWebWarning("Update this Report paragraph?",
+                `Latest Note: ${card.title} · version ${card.version}\n\n${text}\n\nThis replaces this paragraph’s report-specific text. Saved PDF versions stay unchanged.`,
+                { confirmLabel: "Replace with reviewed Note" });
+              if (!accepted || disposed || !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
+              block.text = text;
+              block.derivedFrom = {kind: "notebookCard", id: card.id, title: card.title, version: card.version};
+              block.sourceSnapshotAt = new Date().toISOString();
+              block.evidenceLinks = structuredClone(card.evidenceLinks || []);
+              setDirty(); renderWorkspaceContent();
+            } catch (error) { if (isCurrentAccountRequest(requestIdentity)) showStatusError(error.message); }
+            finally { updateNote.disabled = !latestSource; }
+          });
+          provenance.append(updateNote);
           (block.evidenceLinks || []).forEach((evidenceLink) => {
             const sourceButton = document.createElement("button");
             sourceButton.type = "button";
@@ -29106,7 +29205,7 @@ async function renderProjectReportDraft(project, resume = null) {
         });
         row.append(textarea);
       } else {
-        const source = sources.find((item) => item.kind === block.kind && item.id === block.sourceID);
+        let source = sources.find((item) => item.kind === block.kind && item.id === block.sourceID);
         if (block.kind === "evidence" && source) {
           row.classList.add(`code-theme-${codeTheme(source.codePrefix)}`);
         }
@@ -29125,6 +29224,41 @@ async function renderProjectReportDraft(project, resume = null) {
         renderReportCommentOptions(row, block, source);
         if (!sourceTitle.parentElement) row.append(sourceTitle);
         if (source) {
+          if (block.kind === "notebookCard") {
+            const warning = document.createElement("p");
+            row.append(warning);
+            row.refreshLinkedNoteState = () => {
+              const latest = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
+              const questions = openNotebookQuestions(latest);
+              warning.hidden = !questions.length;
+              warning.textContent = questions.length ? `${questions.length} open ${questions.length === 1 ? "question" : "questions"} · ${questions.map(question => question.text).join("; ")}` : "";
+            };
+            row.refreshLinkedNoteState();
+          }
+          if (block.kind === "notebookCard") {
+            const explanation = document.createElement("p");
+            explanation.className = "report-workflow-help";
+            explanation.textContent = "Linked Note uses its latest saved content. Create an editable snapshot to keep report-specific wording.";
+            const snapshot = document.createElement("button"); snapshot.type = "button";
+            snapshot.textContent = "Create editable snapshot";
+            snapshot.addEventListener("click", async () => {
+              const draftID = activeDraft.id;
+              snapshot.disabled = true;
+              try {
+                const { card } = await postResearch("/notebook/cards/get", {projectID, cardID: block.sourceID});
+                requireCurrentAccountRequest(requestIdentity);
+                if (disposed || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
+                const text = [card.plainText, notebookQuestionsText(card.openQuestions || [])].filter(Boolean).join("\n\n");
+                if (text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note first.");
+                Object.assign(block, {kind: "paragraph", text, derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
+                  sourceSnapshotAt: new Date().toISOString(), evidenceLinks: structuredClone(card.evidenceLinks || [])});
+                delete block.sourceID;
+                setDirty(); renderWorkspaceContent();
+              } catch (error) { if (isCurrentAccountRequest(requestIdentity)) showStatusError(error.message); }
+              finally { snapshot.disabled = false; }
+            });
+            row.append(explanation, snapshot);
+          }
           if (reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id)) {
             const notice = document.createElement("p");
             notice.textContent = "Passage text is included in the whole section. Selected comments appear once in the export.";
@@ -29136,8 +29270,10 @@ async function renderProjectReportDraft(project, resume = null) {
           const body = document.createElement("div"); body.className = "report-full-preview-body"; preview.append(toggle, body);
           preview.open = !reportEvidenceCoverage(activeDraft.blocks, sources).has(block.id);
           let loaded = false, loading = false;
+          let previewRevision = 0;
           const loadPreview = async () => {
             if (!preview.open || loaded || loading) return;
+            const revision = previewRevision;
             loading = true; body.textContent = "Loading complete source…";
             const identity = captureAccountRequest();
             try {
@@ -29150,7 +29286,7 @@ async function renderProjectReportDraft(project, resume = null) {
               }
               const result = await request;
               requireCurrentAccountRequest(identity);
-              if (disposed || requestWorkspaceID !== activeWorkspaceID) return;
+              if (disposed || requestWorkspaceID !== activeWorkspaceID || revision !== previewRevision) return;
               body.replaceChildren();
               for (const part of result.preview || []) {
                 if (part.kind === "table") {
@@ -29173,9 +29309,25 @@ async function renderProjectReportDraft(project, resume = null) {
               }
               loaded = true;
             } catch (error) {
-              if (isCurrentAccountRequest(identity)) body.textContent = `${error.message} Close and reopen to retry.`;
-            } finally { loading = false; }
+              if (isCurrentAccountRequest(identity) && revision === previewRevision) body.textContent = `${error.message} Close and reopen to retry.`;
+            } finally {
+              loading = false;
+              if (revision !== previewRevision && !disposed) void loadPreview();
+            }
           };
+          if (block.kind === "notebookCard") {
+            const refreshNoteState = row.refreshLinkedNoteState;
+            row.refreshLinkedNoteState = () => {
+              refreshNoteState?.();
+              const latest = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
+              if (!latest || JSON.stringify(latest) === JSON.stringify(source)) return;
+              source = latest;
+              sourceTitle.textContent = latest.title || latest.label || reportBlockTitle(block);
+              previewRevision += 1;
+              loaded = false;
+              void loadPreview();
+            };
+          }
           preview.addEventListener("toggle", loadPreview);
           row.append(preview);
           void loadPreview();
@@ -29240,12 +29392,17 @@ async function renderProjectReportDraft(project, resume = null) {
       const summary = document.createElement("p");
       summary.textContent = source.summary || "Project source";
       copy.append(heading, summary);
+      const openQuestions = openNotebookQuestions(source);
+      if (openQuestions.length) {
+        const warning = document.createElement("p");
+        warning.className = "report-workflow-help";
+        warning.textContent = `${openQuestions.length} open ${openQuestions.length === 1 ? "question" : "questions"} · Review before export`;
+        copy.append(warning);
+      }
       const add = document.createElement("button");
       add.type = "button";
       add.textContent = "Add";
-      add.disabled = activeDraft.blocks.some((block) =>
-        block.kind === source.kind && block.sourceID === source.id
-      );
+      add.disabled = reportsContainingSource([activeDraft], source.kind, source.id).length > 0;
       add.textContent = add.disabled ? "Added" : "Add";
       add.setAttribute("aria-label", `${add.disabled ? "Already included" : "Add to Report"}: ${source.label || heading.textContent}`);
       add.addEventListener("click", () => {
@@ -29307,6 +29464,7 @@ async function renderProjectReportDraft(project, resume = null) {
       if (disposed || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return false;
       history = history.filter((version) => version.id !== report.id);
       comparisonController?.removeVersion(report.id);
+      panel._updateReportColumns?.();
       const historyBody = panel.querySelector(".report-history");
       if (historyBody) {
         const scroll = historyBody.scrollTop;
@@ -29858,6 +30016,9 @@ async function renderProjectReportDraft(project, resume = null) {
       syncReferenceReaderLayout();
     });
     primaryActions.insertBefore(tools, saveStatus);
+    if (panel.dataset.outlineHidden === undefined) {
+      panel.dataset.outlineHidden = String(!reportSectionExpanded("Outline column", !initialReportOutlineHidden(activeDraft.blocks)));
+    }
     const outlineToggle = document.createElement("button");
     outlineToggle.type = "button";
     outlineToggle.className = "workflow-action workflow-action-secondary";
@@ -29869,6 +30030,7 @@ async function renderProjectReportDraft(project, resume = null) {
     };
     outlineToggle.addEventListener("click", () => {
       panel.dataset.outlineHidden = String(panel.dataset.outlineHidden !== "true");
+      persistReportSectionExpanded("Outline column", panel.dataset.outlineHidden !== "true");
       paintOutlineToggle();
       syncReferenceReaderLayout();
     });
@@ -29877,6 +30039,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const versionsToggle = document.createElement("button");
     versionsToggle.type = "button";
     versionsToggle.textContent = "Versions";
+    versionsToggle.hidden = history.length === 0;
     versionsToggle.title = "Compare saved PDF versions beside the current Report";
     versionsToggle.addEventListener("click", () => comparison.toggle());
     primaryActions.insertBefore(versionsToggle, saveStatus);
@@ -29892,6 +30055,7 @@ async function renderProjectReportDraft(project, resume = null) {
     documents.append(outline, outlineControls.divider, documentBody, comparison.divider, comparison.preview);
     columns.append(library, libraryControls.divider, documents, versionsControls.divider, comparison.versions);
     panel._updateReportColumns = () => {
+      versionsToggle.hidden = history.length === 0;
       const comparing = panel.dataset.comparisonOpen === "true";
       const previewing = comparing && Boolean(comparison.selectedID);
       const sourceWidth = panel.dataset.libraryOpen === "true" ? Number(panel.dataset.libraryWidth) || 330 : 0;
@@ -29998,6 +30162,7 @@ async function renderProjectReportDraft(project, resume = null) {
         renderHistory(historyBody);
         historyBody.scrollTop = scroll;
       }
+      panel._updateReportColumns?.();
       return true;
     }
     const nextActiveDraft = drafts.find((draft) => draft.id === (options.draftID || activeDraft.id)) || drafts[0];
@@ -33743,6 +33908,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     const { key, label: fieldLabel, projectAddress = false } = field;
     const row = document.createElement("article");
     row.className = "saved-project-structured-fact";
+    row.dataset.factKey = key;
     const label = document.createElement("label");
     label.className = "saved-project-structured-fact-label";
     label.textContent = fieldLabel;
@@ -33755,10 +33921,12 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     if (fact?.sourceText) value.title = fact.sourceText;
     label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
     row.append(label, value);
-    if (fact?.status === "unknown") {
+    if (fact) {
       const review = document.createElement("small");
       review.className = "project-fact-review-status";
-      review.textContent = "Needs review";
+      review.textContent = ({unknown: "Needs review", assumed: "Assumption", confirmed: "Confirmed", stated: "Stated", sourced: "Sourced", rejected: "Rejected"})[fact.status] || fact.status;
+      if (fact.source && fact.source !== "user") review.textContent += ` · ${fact.source}`;
+      if (fact.sourceText) review.title = fact.sourceText;
       row.append(review);
     }
     value.addEventListener("input", () => {
@@ -33773,6 +33941,31 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
 
   const groupLists = new Map();
   const presentationGroups = factsOnly ? projectFactPresentationGroups() : projectStructuredFactGroups;
+  let showAllFacts = false;
+  const factFilter = document.createElement("button");
+  factFilter.type = "button";
+  factFilter.className = "ghost-button project-facts-filter";
+  factFilter.textContent = "All facts";
+  factFilter.setAttribute("aria-pressed", "false");
+  const applyFactVisibility = () => {
+    if (!factsOnly) return;
+    const factsByKey = new Map(structuredFacts.map(fact => [fact.key, fact]));
+    for (const group of presentationGroups) {
+      const list = groupLists.get(group.key);
+      for (const row of list.children) {
+        const field = group.fields.find(field => field.key === row.dataset.factKey);
+        row.hidden = !showProjectFact(field, factsByKey.get(field.key), {all: showAllFacts, address: address.value});
+      }
+      list.closest(".saved-project-structured-group").hidden = ![...list.children].some(row => !row.hidden);
+    }
+  };
+  factFilter.addEventListener("click", () => {
+    showAllFacts = !showAllFacts;
+    factFilter.textContent = showAllFacts ? "Recorded & core facts" : "All facts";
+    factFilter.setAttribute("aria-pressed", String(showAllFacts));
+    applyFactVisibility();
+  });
+  if (factsOnly) structuredBody.prepend(factFilter);
   presentationGroups.forEach((group, groupIndex) => {
     const groupSection = document.createElement("section");
     groupSection.className = `saved-project-structured-group is-${group.key}`;
@@ -33820,6 +34013,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
       group.fields.filter(field => field.key !== "transit-zone" || factsByKey.has(field.key))
         .forEach((field) => appendDefaultFactField(groupLists.get(group.key), field, factsByKey));
     });
+    applyFactVisibility();
   };
   renderStructuredFacts();
   let refreshFacts = null;
@@ -39666,10 +39860,9 @@ async function restoreSavedColumnGroup(groupID) {
   if (first) track.scrollTo({ left: track.scrollLeft + first.getBoundingClientRect().left - track.getBoundingClientRect().left, behavior: 'smooth' });
 }
 
-function openSavedColumnGroupsMenu() {
+function openSavedColumnGroupsMenu(anchor = workspaceActionsButton) {
   if (!workspacePrivatePresentationAllowed()) return;
   document.querySelector('.column-group-menu')?._close?.();
-  const anchor = document.querySelector('#open-column-groups');
   const menu = document.createElement('div');
   menu.className = 'column-group-menu saved-column-groups-menu';
   menu.setAttribute('role', 'menu');
@@ -39686,13 +39879,7 @@ function openSavedColumnGroupsMenu() {
     button.addEventListener('click', () => { close(); void restoreSavedColumnGroup(group.id); });
     menu.append(button);
   }
-  const create = document.createElement('button');
-  create.type = 'button';
-  create.setAttribute('role', 'menuitem');
-  create.textContent = 'Create group';
-  create.className = 'saved-group-create-button';
-  create.addEventListener('click', () => { close(); openColumnGroupEditor(null); });
-  menu.append(create);
+  // Existing groups remain recoverable; new work uses automatic view restoration.
   document.body.append(menu);
   const rect = anchor.getBoundingClientRect();
   menu.style.left = `${Math.max(8, Math.min(rect.left + (rect.width - menu.offsetWidth) / 2, window.innerWidth - menu.offsetWidth - 8))}px`;
@@ -45604,7 +45791,7 @@ async function start() {
   window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {
     if (!event.matches) closeMobileMoreSheet({ restoreFocus: false });
   });
-  document.querySelector("#open-column-groups")?.addEventListener("click", openSavedColumnGroupsMenu);
+  document.querySelector("#open-column-groups")?.addEventListener("click", () => openSavedColumnGroupsMenu());
   fitColumnsButton.addEventListener("click", () => {
     resetVisibleColumnWidths();
   });

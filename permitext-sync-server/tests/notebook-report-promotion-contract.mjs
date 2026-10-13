@@ -56,12 +56,13 @@ assert.equal(first.saved[0].expectedVersion, 0);
 const duplicate = fixture({ drafts: [{ ...draft, blocks: [{ id: 'existing', kind: 'notebookCard', sourceID: note.id }] }] });
 await duplicate.run();
 assert.equal(duplicate.saved.length, 0, "Adding an included source does not create another revision");
-const legacy = fixture({ drafts: [{ ...draft, blocks: [{ id: 'existing', derivedFrom: { kind: 'notebookCard', id: note.id } }] }] });
+const legacy = fixture({ drafts: [{ ...draft, blocks: [{ id: 'existing', kind:'paragraph', text:'Keep my report-specific edits', derivedFrom: { kind: 'notebookCard', id: note.id } }] }] });
 await legacy.run();
 assert.equal(legacy.saved[0].blocks.length, 1);
 assert.equal(legacy.saved[0].blocks[0].id, "existing");
-assert.equal(legacy.saved[0].blocks[0].kind, "notebookCard");
-assert.equal(legacy.saved[0].blocks[0].sourceID, note.id);
+assert.equal(legacy.saved[0].blocks[0].kind, "paragraph");
+assert.equal(legacy.saved[0].blocks[0].text, "Keep my report-specific edits");
+assert.equal(legacy.saved[0].blocks[0].derivedFrom.id, note.id);
 let mountedAdds = 0;
 const mounted = fixture({ mount: { getDraftSnapshot: () => draft, hasUnsavedChanges: () => true,
   async addSources(id, sources) { assert.equal(id, draft.id); assert.equal(sources[0].id, note.id); mountedAdds++; return draft; } } });
