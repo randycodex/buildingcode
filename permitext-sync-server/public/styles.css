@@ -4630,6 +4630,10 @@ select option:checked {
   margin-inline: auto;
 }
 
+.search-panel > .search-dock {
+  padding-inline: 0;
+}
+
 .search-panel::before {
   content: none;
 }
@@ -19529,9 +19533,9 @@ dialog.report-export-review {
 .assistant-history-rail .research-conversation-open[aria-current="true"] strong { color: var(--text-primary); font-weight: 700; }
 .assistant-history-rail :is(.research-conversation-date, .research-conversation-project-pill, .research-conversation-preview) { display: none; }
 .assistant-history-rail .research-new-chat { width: calc(100% - 40px); margin: 12px 20px; min-height: 32px; height: auto; padding: 8px 0; border-radius: 0; background: transparent; font-size: 12px; text-align: right; }
-.assistant-workspace > .assistant-body { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; overflow: hidden; display: grid; }
+.assistant-workspace > .assistant-body { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; overflow: hidden; display: grid; padding-inline: var(--panel-padding); }
 .assistant-body > .research-conversation-embedded { min-height: 0; display: grid; overflow: hidden; }
-.assistant-workspace.is-new-research-chat > .assistant-body { grid-template-rows: minmax(0, 1fr) auto auto; padding-inline: var(--panel-padding); }
+.assistant-workspace.is-new-research-chat > .assistant-body { grid-template-rows: minmax(0, 1fr) auto auto; }
 .assistant-body > .research-chat-welcome { align-self: center; text-align: center; }
 .assistant-body > .assistant-start-progress:empty { display: none; }
 .assistant-workspace.is-collapsed { display: flex; }
