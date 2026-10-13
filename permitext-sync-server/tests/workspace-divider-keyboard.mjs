@@ -14,7 +14,7 @@ const state = {paneWeights:{}};
 let saves=0, layouts=0, indicators=0;
 const track = {scrollLeft:0, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
 const context = vm.createContext({state, track, CSS:{escape:x=>x},isProAccount:()=>false,
-  paneIsCollapsed:id=>collapsed.has(id), defaultPaneWidthForID:()=>600,
+  paneIsCollapsed:id=>collapsed.has(id), defaultPaneWidthForID:()=>600, minimumPaneWidthForID:()=>600,
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,

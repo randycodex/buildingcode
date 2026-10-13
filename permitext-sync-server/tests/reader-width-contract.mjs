@@ -8,11 +8,11 @@ const context = vm.createContext({
   paneIDs: [],
   activePaneIDs() { return context.paneIDs; },
   detachedProjectWindow: false,
-  isProjectWorkboardPaneID: () => false,
+  isProjectWorkboardPaneID: id => id.startsWith('project:workboard:'),
   isCodeQuestionPaneID: () => false,
-  isProjectCoordinationThreadPaneID: () => false,
-  isProjectCoordinationPaneID: () => false,
-  isProjectDetailPaneID: () => false,
+  isProjectCoordinationThreadPaneID: id => id.startsWith('project:coordination-thread:'),
+  isProjectCoordinationPaneID: id => id.startsWith('project:coordination:'),
+  isProjectDetailPaneID: id => id.startsWith('project:detail:'),
   isProAccount() { throw new Error('Reader layout must not depend on subscription'); }
 });
 vm.runInContext([
@@ -36,7 +36,7 @@ function layout(id, ids, storedWidth = 600, linked = false, collapsed = false) {
 }
 for (const storedWidth of [600, 1000]) {
   for (const linked of [false, true]) {
-    assert.equal(layout('reader:a', ['reader:a'], storedWidth, linked).flex, '1 1 600px', 'A sole Reader must fill the viewport, including restored/source-linked Readers');
+    assert.equal(layout('reader:a', ['reader:a'], storedWidth, linked).flex, `1 1 ${Math.max(600, storedWidth)}px`, 'A sole Reader must fill the viewport, including restored/source-linked Readers');
   }
 }
 for (const ids of [['reader:a','reader:b'], ['reader:a','reader:b','reader:c'], ['reader:a','utility:search']]) {
@@ -45,14 +45,16 @@ for (const ids of [['reader:a','reader:b'], ['reader:a','reader:b','reader:c'], 
   assert.equal(style['--pane-default-min-width'], '600px', 'Readers stop shrinking at 600px even with fewer than four columns');
 }
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900).flex, '1 1 900px', 'Small layouts fill available space while retaining the saved width as their basis');
-assert.equal(layout('reader:a', ['reader:a','reader:b','utility:search','utility:saved'], 900).flex, '0 0 900px', 'Larger layouts retain fixed manual Reader widths');
+assert.equal(layout('reader:a', ['reader:a','reader:b','utility:search','utility:saved'], 900).flex, '1 1 900px', 'Saved larger widths can shrink to the 600px minimum before scrolling');
 assert.equal(layout('utility:search', ['utility:search','reader:a']).flex, '1 1 600px', 'Search shares available space in small layouts');
-assert.equal(layout('utility:search', ['utility:search','reader:a','utility:saved','utility:analysis']).flex, '0 0 600px', 'Larger layouts retain fixed utility widths');
+assert.equal(layout('utility:search', ['utility:search','reader:a','utility:saved','utility:analysis']).flex, '1 1 600px', 'Utilities keep sharing available space beyond three columns');
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900, false, true).flex, '0 0 48px', 'Collapsed columns retain their compact width');
 const mainPaneIDs = [
   'utility:saved', 'utility:saved:instance', 'reader:a', 'utility:search', 'utility:search:instance',
   'utility:analysis', 'utility:analysis:instance', 'research:conversation:conversation',
-  'project:context:alpha', 'project:facts:alpha', 'project:notebook:alpha', 'project:report-draft:alpha'
+  'project:context:alpha', 'project:facts:alpha', 'project:notebook:alpha', 'project:report-draft:alpha',
+  'utility:archive', 'utility:settings', 'project:coordination:alpha', 'project:coordination-thread:alpha',
+  'project:workboard:alpha', 'project:detail:alpha', 'section:detail:one'
 ];
 for (const id of mainPaneIDs) {
   const minimum = /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 1000 : 600;
@@ -66,10 +68,8 @@ for (const id of mainPaneIDs) {
       const style = layout(id, ids, restoredWidth);
       assert.equal(style['--pane-default-min-width'], `${minimum}px`, `${id} enforces its rendered minimum`);
       assert.equal(context.state.paneWeights[id], Math.max(minimum, restoredWidth), `${id} also clamps widths when mounted directly`);
-      if (count <= 3) {
-        const basis = id.startsWith('reader:') && count === 1 ? 600 : Math.max(minimum, restoredWidth);
-        assert.equal(style.flex, `1 1 ${basis}px`, `${id} fills available space with ${count} columns`);
-      }
+      const basis = Math.max(minimum, restoredWidth);
+      assert.equal(style.flex, `1 1 ${basis}px`, `${id} fills available space with ${count} columns`);
     }
   }
   assert.equal(layout(id, [id], 600, false, true).flex, '0 0 48px', `${id} keeps its collapsed width`);
@@ -77,8 +77,8 @@ for (const id of mainPaneIDs) {
 context.paneIDs = ['utility:archive'];
 context.state.paneWeights = { 'utility:archive': 350 };
 context.normalizePaneWeights(context.paneIDs);
-assert.equal(context.state.paneWeights['utility:archive'], 350, 'Unrelated column widths stay unchanged');
-console.log('Main column minimums passed: all eight kinds, repeated utilities, saved narrow/wider widths, one through eight columns, and collapse.');
+assert.equal(context.state.paneWeights['utility:archive'], 600, 'Other main columns also enforce the 600px minimum');
+console.log('Main column minimums passed: all main kinds, repeated utilities, saved narrow/wider widths, one through eight columns, and collapse.');
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
 assert.match(css, /\.reader-content > \*[^{}]*\{[^}]*max-width: 800px;[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the existing centered text measure');
 console.log('Reader width contract passed: sole/restored/linked Readers, sharing, minimums, manual resizing, and text measure.');

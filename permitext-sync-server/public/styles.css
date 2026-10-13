@@ -1468,7 +1468,8 @@ body.is-detached-workboard-window .topbar {
 
 body.is-detached-workboard-window .panel-track {
   width: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 body.is-detached-workboard-window .workboard-panel {
@@ -1817,6 +1818,17 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 
 .pane-edge-resizer {
   z-index: 13;
+}
+
+.pane-left-edge-resizer::after {
+  left: 0;
+  transform: none;
+}
+
+.pane-right-edge-resizer::after {
+  right: 0;
+  left: auto;
+  transform: none;
 }
 
 .panel-header {

@@ -80,7 +80,7 @@ for (const [view, sourcesWidth] of [['project-details', 0]]) {
   f.context.startPaneEdgeResize(f.event(startX), 'reader:0', 'left');
   f.move(startX - 160); f.frame();
   assert.equal(f.panes[0].width, 960);
-  assert.equal(f.dockWidth(), 962, `${view}: the reference dock grows while the mouse is held`);
+  assert.equal(f.dockWidth(), 963, `${view}: the reference dock grows while the mouse is held`);
   assert.equal(f.reportWidth(), originalReportWidth - 160, `${view}: the document gives up the same width immediately`);
   assert.equal(f.saves, 0, 'Pointer frames do not persist every intermediate width');
   assert.ok(f.trackClasses.has('is-resizing'));
@@ -88,7 +88,7 @@ for (const [view, sourcesWidth] of [['project-details', 0]]) {
   f.frame(32); assert.equal(f.panes[0].width, 960);
   f.move(startX + 260); f.frame(48);
   assert.equal(f.panes[0].width, 600, 'Dragging right retains the Reader minimum');
-  assert.equal(f.dockWidth(), 602, 'The dock contracts before release too');
+  assert.equal(f.dockWidth(), 603, 'The dock contracts before release too');
   f.finish('pointercancel', startX + 260);
   assert.equal(f.saves, 1); assert.equal(f.released, 1);
   assert.equal(f.handlers.size, 0); assert.equal(f.frames.size, 0);

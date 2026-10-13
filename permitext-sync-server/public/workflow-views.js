@@ -25,10 +25,13 @@ export function linkPaneToView(membership, paneID, view) {
   const home = /^(?:project:notebook:|utility:saved(?::|$))/.test(paneID) ? ['notebook'] : [];
   return {...membership, [paneID]: [...new Set([...home, ...(membership?.[paneID] || []), normalizeColumnWorkflowView(view)])]};
 }
-export function referenceColumnsWidth(widths, availableWidth, documentWidth = 600) {
+export function referenceColumnsWidth(widths, availableWidth, documentWidth = 600, minimumWidths = []) {
   if (!widths.length) return 0;
-  const requested = widths.reduce((sum, width) => sum + width, widths.length + 1);
-  return Math.min(requested, Math.max(Math.max(...widths) + 2, availableWidth - documentWidth));
+  const dividersAndBorder = widths.length + 2;
+  const requested = widths.reduce((sum, width) => sum + width, dividersAndBorder);
+  const minimum = widths.reduce((sum, width, index) =>
+    sum + (minimumWidths[index] ?? (width <= 48 ? width : 600)), dividersAndBorder);
+  return Math.max(minimum, Math.min(requested, availableWidth - documentWidth));
 }
 // Sources reserve their chosen width beside the Report document.
 // Hide the optional outline before shrinking the document.

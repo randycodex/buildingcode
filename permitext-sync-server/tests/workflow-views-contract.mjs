@@ -23,7 +23,7 @@ for (const view of ['report','project-details']) {
   assert.equal(layout.workflowScroll[view],320);
 }
 assert.equal(referenceColumnsWidth([],1920),0);
-assert.equal(referenceColumnsWidth([600],1920),602);
+assert.equal(referenceColumnsWidth([600],1920),603);
 assert.equal(referenceColumnsWidth([600,800],1920),1320);
 assert.equal(referenceColumnsWidth([1200,1200],1920),1320,'Keep usable document space when Readers exceed available width');
 assert.equal(referenceColumnsWidth([1200,1200],1920,700),1220,'Report reserves space for its toolbar and sources library');
@@ -46,9 +46,12 @@ assert.equal(reportColumnsLayout(1881,640,640).compact,true,'Hide the optional o
 assert.equal(reportColumnsLayout(1882,640,640).compact,false,'Allow both expanded sidebars at their exact fitting boundary');
 assert.equal(reportColumnsLayout(1920,640,678).compact,false,'Dragging to the available maximum keeps the document readable');
 assert.equal(reportColumnsLayout(901,0,300).compact,false,'The compact outline and its divider fit with a 600px document');
-assert.equal(referenceColumnsWidth([600],1200,931),602,'Narrow desks overflow whole columns instead of shrinking Readers');
-assert.equal(referenceColumnsWidth([48],1200,931),50,'Collapsed Readers keep a compact rail');
-assert.equal(referenceColumnsWidth([972],1920,1241),974,'A manually expanded Reader is visible as a whole column rather than clipped by the reference dock');
+assert.equal(referenceColumnsWidth([600],1200,931),603,'Narrow desks overflow whole columns instead of shrinking Readers');
+assert.equal(referenceColumnsWidth([48],1200,931),51,'Collapsed Readers keep a compact rail');
+assert.equal(referenceColumnsWidth([972],1920,1241),679,'A restored larger Reader shrinks to fit before horizontal scrolling');
+assert.equal(referenceColumnsWidth([900],1300),700,'Reference Readers shrink before creating early workspace overflow');
+assert.equal(referenceColumnsWidth([600,600],1600),1204,'Horizontal overflow begins when the 600px columns no longer fit');
+assert.equal(referenceColumnsWidth([1000],1400,600,[1000]),1003,'Assistant history retains its existing additional width');
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert.ok(start>=0);return source.slice(start,source.indexOf('\n}',start)+2);};
 const pane=id=>({dataset:{paneId:id},scrollTop:0,scrollLeft:0,isConnected:true,querySelectorAll:()=>[],draft:'Unsaved text',hidden:false,classList:{contains(name){return name==='is-workflow-hidden' && panes.find(p=>p.classList===this).hidden;}}});

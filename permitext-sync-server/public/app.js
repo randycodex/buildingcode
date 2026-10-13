@@ -4085,14 +4085,7 @@ function defaultPaneWidthForID(paneID) {
 
 function minimumPaneWidthForID(paneID) {
   if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return assistantHistoryWidth + 600;
-  if (paneID?.startsWith("reader:") ||
-    paneID === "utility:saved" || paneID?.startsWith("utility:saved:") ||
-    paneID === "utility:search" || paneID?.startsWith("utility:search:") ||
-    paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") ||
-    paneID?.startsWith("research:conversation:") ||
-    paneID?.startsWith("project:context:") || paneID?.startsWith("project:facts:") ||
-    isProjectNotebookPaneID(paneID) || isProjectReportDraftPaneID(paneID)) return 600;
-  return 0;
+  return 600;
 }
 
 function migrateLegacyPaneWidth(paneID, value) {
@@ -4312,7 +4305,8 @@ function syncReferenceReaderLayout() {
   const libraryWidth = reportPanel?.dataset.libraryOpen === "true" ? Number(reportPanel.dataset.libraryWidth) || 330 : 0;
   const outlineWidth = reportPanel?.dataset.outlineHidden === "true" ? 0 : Number(reportPanel?.dataset.outlineWidth) || 300;
   const minimumDocumentWidth = view === "report" ? reportColumnsLayout(shell.clientWidth, libraryWidth, outlineWidth).minimumWidth : 600;
-  const width = referenceColumnsWidth(widths, shell.clientWidth, minimumDocumentWidth);
+  const minimumWidths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : minimumPaneWidthForID(id));
+  const width = referenceColumnsWidth(widths, shell.clientWidth, minimumDocumentWidth, minimumWidths);
   shell.classList.toggle("has-reference-readers", !accountOpen && width > 0);
   shell.style.setProperty("--reference-readers-width", `${width}px`);
   shell.style.setProperty("--reference-document-min-width", `${minimumDocumentWidth}px`);
@@ -5201,13 +5195,12 @@ async function closeArchiveColumn() {
 
 function normalizePaneWeights(ids) {
   const current = state.paneWeights || {};
-  const hasManyColumns = ids.length >= 4;
   const migrateQuestionIndexWidth = Number(state.paneWidthDefaultsVersion || 0) < 3;
   const migrateSettingsWidth = Number(state.paneWidthDefaultsVersion || 0) < 4;
   const migrateReportWidth = Number(state.paneWidthDefaultsVersion || 0) < 5;
   state.paneWeights = ids.reduce((weights, id) => {
     const value = migrateLegacyPaneWidth(id, Number(current[id]));
-    const defaultWidth = defaultPaneWidthForID(id);
+    const defaultWidth = Math.max(minimumPaneWidthForID(id), defaultPaneWidthForID(id));
     const isQuestionIndex = isCodeQuestionPaneID(id) &&
       parseQuestionPaneKey(id)?.paneRole === "question-index";
     weights[id] = migrateQuestionIndexWidth && isQuestionIndex
@@ -5217,7 +5210,7 @@ function normalizePaneWeights(ids) {
       : migrateReportWidth && isProjectReportDraftPaneID(id) && value < defaultReportDraftPaneWidth
         ? defaultReportDraftPaneWidth
       : Number.isFinite(value) && value > 40
-      ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
+      ? value
       : defaultWidth;
     return weights;
   }, {});
@@ -5230,51 +5223,16 @@ function applyPaneWeight(panel, paneID) {
     panel.style.flex = "0 0 48px";
     return;
   }
-  const defaultWidth = defaultPaneWidthForID(paneID);
+  const minimumWidth = minimumPaneWidthForID(paneID);
+  const defaultWidth = Math.max(minimumWidth, defaultPaneWidthForID(paneID));
   const storedValue = Number(state.paneWeights[paneID]);
   const value = migrateLegacyPaneWidth(paneID, storedValue);
   if (value !== storedValue) state.paneWeights[paneID] = value;
-  const hasManyColumns = activePaneIDs().length >= 4;
-  const flexibleReader = isFlexibleReaderPaneID(paneID);
-  const explicitlyResizedReader = flexibleReader &&
-    Number.isFinite(value) &&
-    value > defaultWidth + 0.5;
   const width = Number.isFinite(value) && value > 40
-    ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
+    ? value
     : defaultWidth;
-  panel.style.setProperty(
-    "--pane-resized-min-width",
-    `${flexibleReader && !explicitlyResizedReader ? defaultWidth : width}px`
-  );
-  const minimumWidth = Math.max(
-    minimumPaneWidthForID(paneID),
-    flexibleReader || hasManyColumns ? defaultWidth : 0
-  );
+  panel.style.setProperty("--pane-resized-min-width", `${width}px`);
   panel.style.setProperty("--pane-default-min-width", `${minimumWidth}px`);
-  if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
-    panel.style.flex = `1 1 ${width}px`;
-    return;
-  }
-  if (flexibleReader && activePaneIDs().length === 1) {
-    panel.style.flex = `1 1 ${defaultWidth}px`;
-    return;
-  }
-  if (!hasManyColumns) {
-    panel.style.flex = `1 1 ${width}px`;
-    return;
-  }
-  if (isFixedWidthPaneID(paneID)) {
-    panel.style.flex = `0 0 ${width}px`;
-    return;
-  }
-  if (paneID?.startsWith("reader:")) {
-    if (flexibleReader && !explicitlyResizedReader) {
-      panel.style.flex = `1 1 ${width}px`;
-      return;
-    }
-    panel.style.flex = `0 0 ${width}px`;
-    return;
-  }
   panel.style.flex = `1 1 ${width}px`;
 }
 
@@ -39466,8 +39424,8 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   const nextWidth = nextPane.getBoundingClientRect().width;
   const scrollLeft = track.scrollLeft;
   const widths = [
-    Math.max(defaultPaneWidthForID(previousPaneID), previousWidth + delta),
-    Math.max(defaultPaneWidthForID(nextPaneID), nextWidth - delta)
+    Math.max(minimumPaneWidthForID(previousPaneID), previousWidth + delta),
+    Math.max(minimumPaneWidthForID(nextPaneID), nextWidth - delta)
   ];
   state.paneWeights[previousPaneID] = widths[0];
   state.paneWeights[nextPaneID] = widths[1];
@@ -39494,7 +39452,7 @@ function refreshPaneDividerValue(divider) {
     const pane = edge.paneID === previousID ? previousPane : nextPane;
     if (!pane) return;
     const width = Math.round(pane.getBoundingClientRect().width);
-    divider.setAttribute("aria-valuemin", String(Math.round(defaultPaneWidthForID(edge.paneID))));
+    divider.setAttribute("aria-valuemin", String(Math.round(minimumPaneWidthForID(edge.paneID))));
     divider.removeAttribute("aria-valuemax");
     divider.setAttribute("aria-valuenow", String(width));
     divider.setAttribute("aria-valuetext", `Column width ${width} pixels`);
@@ -39531,7 +39489,7 @@ function createDivider(previousPaneID, nextPaneID) {
         : "Resize adjacent columns"
   );
   if (isLeftEdge || isRightEdge) {
-    divider.setAttribute("aria-valuemin", String(Math.round(defaultPaneWidthForID(edgePaneID))));
+    divider.setAttribute("aria-valuemin", String(Math.round(minimumPaneWidthForID(edgePaneID))));
   }
   divider.addEventListener("focus", () => refreshPaneDividerValue(divider));
   divider.addEventListener("keydown", (event) => {
@@ -39947,7 +39905,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     id: pane.dataset.paneId,
     pane,
     startWidth: pane.getBoundingClientRect().width,
-    minWidth: defaultPaneWidthForID(pane.dataset.paneId)
+    minWidth: minimumPaneWidthForID(pane.dataset.paneId)
   }));
   const previousIndex = paneData.findIndex((pane) => pane.id === previousPaneID);
   const nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
@@ -40019,7 +39977,7 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
   if (paneIsCollapsed(paneID)) return;
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
-  const minWidth = defaultPaneWidthForID(paneID);
+  const minWidth = minimumPaneWidthForID(paneID);
   const currentWidth = pane.getBoundingClientRect().width;
   const nextWidth = Math.max(minWidth, currentWidth + delta);
   state.paneWeights[paneID] = nextWidth;
@@ -40041,7 +39999,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   track.classList.add("is-resizing");
   const startX = event.clientX;
   const startWidth = pane.getBoundingClientRect().width;
-  const minWidth = defaultPaneWidthForID(paneID);
+  const minWidth = minimumPaneWidthForID(paneID);
   const isReferenceResize = ["report", "project-details"].includes(currentColumnWorkflowView());
   const edgeAutoResizeThreshold = 32;
   const edgeAutoResizeMaxSpeed = 640;

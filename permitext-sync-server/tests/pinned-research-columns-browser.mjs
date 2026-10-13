@@ -58,6 +58,7 @@ try {
     function orderWithPaneStepped(){return null;}
     function refreshPaneDividerValue(){}
     function defaultPaneWidthForID(){return 300;}
+    function minimumPaneWidthForID(){return 300;}
     function applyPaneWeight(panel,id){panel.style.flex='0 0 '+(paneIsCollapsed(id)?48:state.paneWeights[id]||360)+'px';}
     function scheduleVisibleReaderScrollIndicatorUpdates(){}
     function captureAccountRequest(){return identity;}
