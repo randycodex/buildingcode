@@ -27741,14 +27741,12 @@ async function renderProjectNotebook(project, options = {}) {
       if (!activeCard) {
         const welcome = document.createElement("div");
         welcome.className = "notebook-welcome";
-        const welcomeCopy = document.createElement("p");
-        welcomeCopy.textContent = "Develop your reasoning in a Note, link enacted evidence or Research when useful, and add the finished analysis to the Report.";
         const welcomeAction = document.createElement("button");
         welcomeAction.className = "notebook-primary-action";
         welcomeAction.type = "button";
         welcomeAction.textContent = "Create first Note";
         welcomeAction.addEventListener("click", () => newButton.click());
-        welcome.append(welcomeCopy, welcomeAction);
+        welcome.append(welcomeAction);
         replaceFocusedContent(welcome);
         return;
       }

@@ -670,7 +670,8 @@ assert.doesNotMatch(clientSource, /projectOwnership/, "Notebook or Report still 
 assert.doesNotMatch(clientSource, /Professional analysis/, "Notebook still repeats Project context beneath its title.");
 const noteMenuSource = await readFile(join(root, "../public/notebook-note-menu.js"), "utf8");
 assert.match(noteMenuSource, /createButton\.type = 'button'[\s\S]*?createButton\.textContent = '\+ New note'[\s\S]*?createButton\.setAttribute\('aria-label', 'New Note'\)/, "Notebook's shared Note menu must retain its labeled creation action.");
-assert.match(clientSource, /const newButton = noteMenu\.createButton[\s\S]*?welcomeCopy\.textContent = "Develop your reasoning in a Note, link enacted evidence or Research when useful, and add the finished analysis to the Report\."[\s\S]*?welcomeAction\.textContent = "Create first Note"[\s\S]*?welcomeAction\.addEventListener\("click", \(\) => newButton\.click\(\)\)/, "Notebook does not present Notes as its primary authored object or wire its empty state to Note creation.");
+assert.match(clientSource, /const newButton = noteMenu\.createButton[\s\S]*?welcomeAction\.textContent = "Create first Note"[\s\S]*?welcomeAction\.addEventListener\("click", \(\) => newButton\.click\(\)\)/, "Notebook does not wire its empty state to Note creation.");
+assert.doesNotMatch(clientSource, /Develop your reasoning in a Note/, "The removed Notes welcome message must stay absent.");
 assert.doesNotMatch(clientSource, /welcomeTitle\.textContent = "Write your professional analysis"/, "Notebook still renders the removed welcome heading.");
 assert.doesNotMatch(clientSource, /notebook-authorship|Work in any order/, "An active Notebook Note still presents persistent workflow instructions above the writing surface.");
 assert.match(clientSource, /referenceLabel\.textContent = "Insert"[\s\S]*?"Assistant answer"[\s\S]*?"Other Notes"/, "Notebook does not offer a clearly grouped insertion path for evidence and optional Research answers.");
