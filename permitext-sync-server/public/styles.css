@@ -19511,6 +19511,7 @@ dialog.report-export-review {
 .assistant-history-rail .research-history-filters > * { min-width: 0; width: 100%; max-width: 100%; }
 .assistant-history-rail .research-conversation-list { margin: 0; width: 100%; }
 .assistant-history-rail .research-conversation-row { padding: 0; border: 0; }
+.assistant-history-rail .research-conversation-row + .research-conversation-row { border-top: 1px solid var(--border); }
 .assistant-history-rail .research-conversation-open { display: block; padding: 10px 0; }
 .assistant-history-rail .research-conversation-open strong { white-space: normal; overflow-wrap: anywhere; font-size: 12px; font-weight: 400; line-height: 1.5; }
 .assistant-history-rail .research-conversation-open[aria-current="true"] strong { color: var(--text-primary); font-weight: 700; }
