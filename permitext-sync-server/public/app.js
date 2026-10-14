@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-search-count-weight-v969";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-source-dropdown-v971";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261013-search-count-weight-v969";
+} from "./offline-storage.js?v=20261014-source-dropdown-v971";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261013-search-count-weight-v969";
+} from "./workspace-state.js?v=20261014-source-dropdown-v971";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -18450,6 +18450,7 @@ async function renderSearch(instance, options = {}) {
   });
   const sourcesButton = panel.querySelector(".search-sources-button");
   sourcesButton.setAttribute("aria-expanded", "false");
+  sourcesButton.setAttribute("aria-haspopup", "menu");
   sourcesButton.addEventListener("click", () => openSearchCodeSourceSettings(panel));
   const clearButton = panel.querySelector(".search-clear-button");
   applyPaneWeight(panel, paneID);
@@ -38453,42 +38454,79 @@ function toggleAccountDialog({ upgrade = false } = {}) {
 
 function openSearchCodeSourceSettings(panel) {
   const existing = panel.querySelector(".search-code-source-menu");
-  if (existing) { existing.__close(); return; }
+  if (existing) { existing._close(); return; }
+  document.querySelector(".column-group-menu")?._close?.();
   const trigger = panel.querySelector(".search-sources-button");
-  const results = panel.querySelector(".search-results");
+  const dock = panel.querySelector(".search-dock");
   const menu = document.createElement("section");
-  menu.className = "search-code-source-menu";
+  menu.className = "column-group-menu search-code-source-menu";
   menu.id = `search-code-sources-${crypto.randomUUID()}`;
-  menu.setAttribute("role", "region");
+  menu.setAttribute("role", "menu");
   menu.setAttribute("aria-label", "Code sources & editions");
+  const controller = new AbortController();
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const observer = new MutationObserver(() => {
+    if (!panel.isConnected || !isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID) dismiss(false);
+  });
   const card = settingsTemplate.content.querySelector(".settings-active-sources-card").cloneNode(true);
   card.removeAttribute("aria-labelledby");
   card.setAttribute("aria-label", "Code sources & editions");
   card.querySelector(".settings-section-title").remove();
   card.querySelectorAll(".settings-card-copy:not(.settings-active-sources-status)").forEach(copy => copy.remove());
-  const dismiss = () => {
+  card.querySelector(".settings-active-sources-retry").setAttribute("role", "menuitem");
+  const dismiss = (restoreFocus = true) => {
+    controller.abort();
+    observer.disconnect();
     if (panel.__refreshActiveCodeSources === refresh) delete panel.__refreshActiveCodeSources;
     menu.remove();
-    results.hidden = false;
     trigger.setAttribute("aria-expanded", "false");
     trigger.removeAttribute("aria-controls");
-    trigger.removeEventListener("keydown", onEscape);
-    if (trigger.isConnected) trigger.focus({ preventScroll: true });
+    if (restoreFocus && trigger.isConnected) trigger.focus({ preventScroll: true });
   };
-  const onEscape = event => {
-    if (event.key !== "Escape") return;
-    event.preventDefault();
-    event.stopPropagation();
-    dismiss();
+  const items = () => [...menu.querySelectorAll('input:not(:disabled), button:not(:disabled)')]
+    .filter(item => !item.hidden && item.getClientRects().length > 0);
+  const onKeydown = event => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      dismiss();
+    } else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+      const options = items();
+      if (!options.length) return;
+      event.preventDefault();
+      const index = options.indexOf(document.activeElement);
+      const next = event.key === "Home" ? 0 : event.key === "End" ? options.length - 1
+        : event.key === "ArrowDown" ? (index + 1) % options.length
+        : index <= 0 ? options.length - 1 : index - 1;
+      options[next].focus();
+    }
   };
-  menu.__close = dismiss;
-  menu.addEventListener("keydown", onEscape);
-  trigger.addEventListener("keydown", onEscape);
+  const position = () => {
+    const rect = trigger.getBoundingClientRect();
+    const dockRect = dock.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    menu.style.top = `${rect.bottom - dockRect.top + 6}px`;
+    menu.style.right = `${Math.max(0, dockRect.right - rect.right)}px`;
+    menu.style.maxHeight = `${Math.max(0, Math.min(560, window.innerHeight - rect.bottom - 14, panelRect.bottom - rect.bottom - 14))}px`;
+  };
+  menu._close = dismiss;
   menu.append(card);
-  results.hidden = true;
-  panel.append(menu);
+  dock.append(menu);
+  position();
   trigger.setAttribute("aria-expanded", "true");
   trigger.setAttribute("aria-controls", menu.id);
+  menu.addEventListener("keydown", onKeydown, { signal: controller.signal });
+  trigger.addEventListener("keydown", onKeydown, { signal: controller.signal });
+  menu.addEventListener("focusout", event => {
+    if (event.relatedTarget && !menu.contains(event.relatedTarget) && event.relatedTarget !== trigger) dismiss(false);
+  }, { signal: controller.signal });
+  document.addEventListener("pointerdown", event => {
+    if (!menu.contains(event.target) && !trigger.contains(event.target)) dismiss(false);
+  }, { signal: controller.signal, capture: true });
+  window.addEventListener("resize", position, { signal: controller.signal });
+  track.addEventListener("permitext:workspace-layout-change", position, { signal: controller.signal });
+  observer.observe(track, { childList: true, subtree: true });
   wireSettingsActiveCodeSources(menu, { enabled: true, readerMenu: true });
   const refresh = () => menu.__refreshActiveCodeSources?.();
   panel.__refreshActiveCodeSources = refresh;
@@ -38582,6 +38620,7 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
         label.className = "settings-active-source-row";
         const input = document.createElement("input");
         input.type = "checkbox";
+        if (readerMenu) input.setAttribute("role", "menuitemcheckbox");
         const text = document.createElement("span");
         text.textContent = shortLabel || `${source.categoryLabel} — ${source.editionLabel}`;
         if (readerMenu) label.title = `${source.categoryLabel} — ${source.editionLabel}`;
@@ -38607,6 +38646,7 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
     for (const row of rows) {
       row.token = activeCodeSourcesController.captureContext();
       row.input.checked = snapshot.preferences.isEnabled(row.source);
+      if (readerMenu) row.input.setAttribute("aria-checked", String(row.input.checked));
       row.input.disabled = false;
     }
     retry.hidden = true;

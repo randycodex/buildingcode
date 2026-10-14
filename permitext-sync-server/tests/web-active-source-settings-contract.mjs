@@ -5,11 +5,13 @@ import {createActiveCodeSourceController} from '../public/active-code-source-con
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const implementation=app.slice(app.indexOf('function activeCodeSourceMenuRows('),app.indexOf('\nfunction renderSettings('));
 class Element {
-  hidden=true; children=[]; events=new Map(); textContent=''; disabled=false;
+  hidden=true; children=[]; events=new Map(); attributes=new Map(); textContent=''; disabled=false;
   append(...nodes){this.children.push(...nodes);}
   replaceChildren(...nodes){this.children=[...nodes];}
   addEventListener(name,handler){this.events.set(name,handler);}
   fire(name){return this.events.get(name)?.();}
+  setAttribute(name,value){this.attributes.set(name,String(value));}
+  getAttribute(name){return this.attributes.get(name)??null;}
 }
 const sources=[2022,2014].map((year,index)=>({canonicalEdition:`edition:${year}`,jurisdictionID:1,codeID:index+1,categoryID:index+3,categoryLabel:'Building Code',editionLabel:String(year)}));
 function fixture({catalog=async()=>sources,stored=null,readerMenu=false}={}){
@@ -53,7 +55,11 @@ const grouped=fixture({catalog:async()=>reversed,readerMenu:true});grouped.wire(
 const groupedChildren=grouped.nodes.get('list').children;
 assert.deepEqual(groupedChildren.map(node=>node.textContent || node.children[1].textContent),['2022 Construction Codes','Building Code (2022)','2014 Construction Codes (Historical)','Building Code (2014)']);
 assert.match(groupedChildren[1].title,/Building Code — 2022/);
-const grouped2022=groupedChildren[1].children[0];grouped2022.checked=false;grouped2022.fire('change');
+const grouped2022=groupedChildren[1].children[0];
+assert.equal(grouped2022.getAttribute('role'),'menuitemcheckbox');
+assert.equal(grouped2022.getAttribute('aria-checked'),'true');
+grouped2022.checked=false;grouped2022.fire('change');
+assert.equal(grouped2022.getAttribute('aria-checked'),'false');
 assert.equal(grouped.controller.state.preferences.isEnabled(reversed[1]),false,'Reordered labels still toggle the exact 2022 source');
 assert.equal(grouped.controller.state.preferences.isEnabled(reversed[0]),true,'The historical edition stays enabled');
 assert.equal(grouped.nodes.get('list').children[1],groupedChildren[1],'Grouped source changes retain row identity and focus');
