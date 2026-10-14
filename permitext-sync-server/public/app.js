@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-hover-252525-v967";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-search-menu-copy-v968";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261013-hover-252525-v967";
+} from "./offline-storage.js?v=20261013-search-menu-copy-v968";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261013-hover-252525-v967";
+} from "./workspace-state.js?v=20261013-search-menu-copy-v968";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17895,13 +17895,6 @@ function searchRecentlyViewedEntries() {
     .slice(0, recentViewLimit);
 }
 
-function searchHistoryIconSVG(kind) {
-  if (kind === "pin") {
-    return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3 21 10l-3 1-4 4-1 6-2-2 1-5-5-5-4 1 7-7 4 0Z"></path></svg>`;
-  }
-  return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l3 2"></path></svg>`;
-}
-
 function searchProgressLabel(count, options = {}) {
   if (options.status === "unavailable") return "Search unavailable";
   if (options.status === "typing") return "Keep typing";
@@ -18088,9 +18081,6 @@ function renderSearchRecentPopover(panel, instance) {
     setSearchRecentPopoverOpen(panel, false);
     return;
   }
-  const heading = document.createElement("p");
-  heading.className = "section-label search-recent-popover-heading";
-  heading.textContent = "Recent Searches";
   const list = document.createElement("div");
   list.className = "search-recent-popover-list";
   queries.forEach((query) => {
@@ -18099,7 +18089,7 @@ function renderSearchRecentPopover(panel, instance) {
     const applyButton = document.createElement("button");
     applyButton.type = "button";
     applyButton.className = "search-history-apply";
-    applyButton.innerHTML = `${searchHistoryIconSVG("recent")}<span></span>`;
+    applyButton.innerHTML = "<span></span>";
     applyButton.querySelector("span").textContent = query;
     applyButton.addEventListener("click", () => {
       instance.query = query;
@@ -18123,7 +18113,7 @@ function renderSearchRecentPopover(panel, instance) {
     row.append(applyButton, removeButton);
     list.append(row);
   });
-  popover.append(heading, list);
+  popover.append(list);
   if (wasOpen) setSearchRecentPopoverOpen(panel, true);
 }
 
