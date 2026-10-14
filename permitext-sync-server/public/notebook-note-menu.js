@@ -97,7 +97,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
     const previousCard = state.activeCard;
     const keepTitleEditing = !titleEditor.hidden && activeCard && (previousCard === activeCard ||
       previousCard?.id === activeCard.id || previousCard && !previousCard.id && activeCard.id);
-    state = { activeCard, readOnly, selectingCards };
+    state = { cards, activeCard, showingArchivedCards, selectedCardIDs, readOnly, selectingCards };
     title.textContent = activeCard?.title || 'Untitled Note';
     title.disabled = titleEditor.disabled = readOnly;
     titleEditor.dataset.cardId = activeCard?.id || '';

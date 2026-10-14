@@ -1,3 +1,4 @@
+import { normalizeNotebookQuestions } from "/notebook-questions.js";
 import { stageNotebookImage, markNotebookImageUploaded, markNotebookImageUploadError, notebookImageRecord,
   saveNotebookDraft, beginNotebookDraftSave, offlineAccountRecoverySnapshot, acknowledgeNotebookDraft,
   saveNotebookCardSnapshot } from "/offline-storage.js";

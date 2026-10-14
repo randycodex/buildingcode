@@ -15788,7 +15788,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 body .account-screen-header h1,
 body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel),
-body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) * {
+body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) *:not(.bn-editor, .bn-editor *) {
   font-size: 14px !important;
 }
 
@@ -19131,7 +19131,6 @@ html body .column-group-menu-button:focus-visible {
 .workflow-action-icon:hover { color: var(--text-primary); background: var(--menu-highlight); }
 
 .notebook-source-actions .notebook-finding-action { display: block; text-align: left; }
-.notebook-card-footer:has(.report-membership-status) { flex-direction: column; align-items: stretch; gap: 8px; }
 .notebook-card-footer .report-membership-status { margin: 0; text-align: left; }
 
 .report-draft-panel .report-full-preview { margin-top: 12px; }
@@ -19683,3 +19682,44 @@ dialog.report-export-review {
   content-visibility: auto;
   contain-intrinsic-block-size: auto 120px;
 }
+
+/* Supporting note and project controls use the existing workspace hierarchy. */
+.workspace-view-options { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
+.workspace-view-options > summary { cursor: pointer; padding: 8px 12px; }
+.project-facts-filter { margin: 0 0 12px; }
+
+/* Legacy layout controls remain mounted for saved layouts and keyboard commands. */
+.topbar-layout-actions[hidden] { display: none; }
+
+.saved-project-structured-fact[hidden], .saved-project-structured-group[hidden] { display: none; }
+
+/* The writing page takes the available height above one standard action row. */
+.workspace-panel.notebook-panel { padding-bottom: 0; }
+.notebook-panel > .notebook-shell { margin-bottom: 0; }
+.notebook-panel .notebook-focus {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(220px, 1fr) 42px;
+  row-gap: 0;
+}
+.notebook-panel .notebook-card-footer {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  height: 42px;
+  min-height: 42px;
+  gap: 16px;
+  padding: 0;
+}
+.notebook-panel .notebook-card-footer > div { display: flex; flex-wrap: nowrap; }
+.notebook-card-footer .report-membership-status {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.notebook-card-footer > div:last-child { margin-inline-start: auto; flex: 0 0 auto; }

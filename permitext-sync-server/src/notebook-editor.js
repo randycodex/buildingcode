@@ -9,13 +9,11 @@ import {
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import "./notebook.css";
+import { en } from "@blocknote/core/locales";
 import {
   createReactInlineContentSpec,
-  BasicTextStyleButton,
-  BlockTypeSelect,
-  CreateLinkButton,
-  FormattingToolbar,
-  FormattingToolbarController,
+  BlockNoteViewEditor,
+  useEditorState,
   useCreateBlockNote
 } from "@blocknote/react";
 import {
@@ -140,18 +138,123 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
   },
   styleSpecs: {
     bold: defaultStyleSpecs.bold,
-    italic: defaultStyleSpecs.italic
+    italic: defaultStyleSpecs.italic,
+    strike: defaultStyleSpecs.strike
   }
 });
 
-function PermitextFormattingToolbar() {
-  return React.createElement(
-    FormattingToolbar,
-    null,
-    React.createElement(BlockTypeSelect, { key: "block-type" }),
-    React.createElement(BasicTextStyleButton, { key: "bold", basicTextStyle: "bold" }),
-    React.createElement(BasicTextStyleButton, { key: "italic", basicTextStyle: "italic" }),
-    React.createElement(CreateLinkButton, { key: "link" })
+function PermitextFormattingToolbar({ editor, options }) {
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkURL, setLinkURL] = useState("");
+  const [linkText, setLinkText] = useState("");
+  const [linkError, setLinkError] = useState("");
+  const linkSelection = useRef(null);
+  const captureSelection = () => {
+    const state = editor._tiptapEditor.state;
+    return {from: state.selection.from, to: state.selection.to, document: state.doc, text: editor.getSelectedText()};
+  };
+  const restoreSelection = selection => {
+    if (!selection || selection.document !== editor._tiptapEditor.state.doc) return false;
+    const current = editor._tiptapEditor.state.selection;
+    if (current.from !== selection.from || current.to !== selection.to) {
+      editor._tiptapEditor.commands.setTextSelection({from: selection.from, to: selection.to});
+    }
+    return true;
+  };
+  const state = useEditorState({
+    editor,
+    selector: ({ editor }) => ({
+      editable: editor.isEditable,
+      styles: editor.getActiveStyles(),
+      blocks: editor.getSelection()?.blocks || [editor.getTextCursorPosition().block]
+    })
+  });
+  const textBlocks = state.blocks.filter(block => ["paragraph", "heading", "bulletListItem", "numberedListItem"].includes(block.type));
+  const first = textBlocks[0];
+  const type = first?.type === "heading" ? `heading-${first.props.level}` : "paragraph";
+  const setBlockType = (type, props = {}) => {
+    editor.focus();
+    editor.transact(() => textBlocks.forEach(block => editor.updateBlock(block, {type, props})));
+  };
+  const styleButton = (style, label, glyph) => React.createElement("button", {
+    key: style, type: "button", className: `notebook-format-button notebook-format-${style}`,
+    title: label, "aria-label": label, "aria-pressed": !!state.styles[style],
+    disabled: !state.editable || !textBlocks.length,
+    onMouseDown: event => event.preventDefault(),
+    onClick: () => { editor.focus(); editor.toggleStyles({[style]: true}); }
+  }, glyph);
+  const icon = paths => React.createElement("svg", {viewBox:"0 0 20 20", width:18, height:18, fill:"none", stroke:"currentColor", strokeWidth:1.4, "aria-hidden":"true"},
+    ...paths.map((d,index)=>React.createElement("path", {key:index,d})));
+  const openLink = () => {
+    linkSelection.current = captureSelection();
+    setLinkURL(editor.getSelectedLinkUrl() || "");
+    setLinkText(editor.getSelectedText());
+    setLinkError("");
+    setLinkOpen(true);
+  };
+  const submitLink = event => {
+    event.preventDefault();
+    let parsed;
+    try { parsed = new URL(linkURL.trim()); } catch { setLinkError("Enter a valid HTTP, HTTPS, or mailto URL."); return; }
+    if (!["https:", "http:", "mailto:"].includes(parsed.protocol)) { setLinkError("Use an HTTP, HTTPS, or mailto URL."); return; }
+    if (!restoreSelection(linkSelection.current)) { setLinkError("The Note changed. Close this form and select the link location again."); return; }
+    const selected = linkSelection.current;
+    const text = linkText.trim();
+    editor.focus();
+    // Mark existing selected text without replacing its mixed formatting.
+    // At an empty caret a label is required or createLink would mark no text.
+    editor.createLink(parsed.href, selected.from === selected.to ? text || parsed.href : text && text !== selected.text ? text : undefined);
+    setLinkOpen(false);
+  };
+  const listButton = (type, label, glyph) => React.createElement("button", {
+    key: type, type: "button", className: "notebook-format-button",
+    title: label, "aria-label": label, "aria-pressed": first?.type === type,
+    disabled: !state.editable || !textBlocks.length,
+    onMouseDown: event => event.preventDefault(),
+    onClick: () => setBlockType(first?.type === type ? "paragraph" : type)
+  }, glyph);
+  const insertActions = [["evidence", "Evidence"], ["research", "Assistant answer"], ["image", "Image"], ["template", "Finding template"]]
+    .filter(([kind]) => !options.insertItems || options.insertItems.includes(kind));
+  return React.createElement("div", {className: "notebook-format-toolbar", role: "toolbar", "aria-label": "Note formatting"},
+    styleButton("bold", "Bold", React.createElement("strong", null, "B")),
+    styleButton("italic", "Italic", React.createElement("em", null, "I")),
+    styleButton("strike", "Strikethrough", React.createElement("s", null, "S")),
+    React.createElement("select", {
+      className: "notebook-format-style", "aria-label": "Text style", value: type,
+      disabled: !state.editable || !textBlocks.length,
+      onChange: event => event.target.value.startsWith("heading-")
+        ? setBlockType("heading", {level: Number(event.target.value.slice(-1))}) : setBlockType("paragraph")
+    }, ...[["paragraph", "Body"], ["heading-1", "Heading 1"], ["heading-2", "Heading 2"], ["heading-3", "Heading 3"]]
+      .map(([value, label]) => React.createElement("option", {key:value, value}, label))),
+    listButton("bulletListItem", "Bulleted list", icon(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])),
+    listButton("numberedListItem", "Numbered list", icon(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])),
+    React.createElement("span", {className:"notebook-format-link"},
+      React.createElement("button", {type:"button", className:"notebook-format-button", title:"Link", "aria-label":"Link", "aria-expanded":linkOpen,
+        disabled:!state.editable || !textBlocks.length, onMouseDown:event=>event.preventDefault(), onClick:openLink},
+        icon(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"])),
+      linkOpen && React.createElement("form", {className:"notebook-format-link-form", onSubmit:submitLink,
+        onKeyDown:event=>{if(event.key==="Escape"){event.preventDefault();setLinkOpen(false);if(restoreSelection(linkSelection.current)) editor.focus();}}},
+        React.createElement("label", null, "URL", React.createElement("input", {autoFocus:true, type:"text", value:linkURL, "aria-label":"Link URL", placeholder:"https://", onChange:event=>setLinkURL(event.target.value)})),
+        React.createElement("label", null, "Text", React.createElement("input", {type:"text", value:linkText, "aria-label":"Link text", onChange:event=>setLinkText(event.target.value)})),
+        linkError && React.createElement("p", {role:"alert"}, linkError),
+        React.createElement("div", null,
+          React.createElement("button", {type:"submit"}, "Apply link"),
+          React.createElement("button", {type:"button", onClick:()=>{setLinkOpen(false);if(restoreSelection(linkSelection.current)) editor.focus();}}, "Cancel")))) ,
+    options.toolbarInsertElement ? React.createElement("span", {className: "notebook-format-insert-slot",
+      ref: element => { if (element && options.toolbarInsertElement.parentElement !== element) element.append(options.toolbarInsertElement); }})
+      : options.onInsert && React.createElement("details", {className: "notebook-format-insert"},
+        React.createElement("summary", null, "Insert"),
+        React.createElement("div", {className: "notebook-format-insert-menu"}, ...insertActions.map(([kind, label]) =>
+          React.createElement("button", {type:"button", key:kind, disabled: !state.editable,
+            onMouseDown:event=>event.preventDefault(), onClick:event=>{
+              event.currentTarget.closest("details").open = false;
+              options.onInsert(kind);
+            }}, label)))),
+    React.createElement("span", {className:"notebook-format-save-status", role:"status",
+      ref:element=>{
+        if (element && options.toolbarStatusElement && options.toolbarStatusElement.parentElement !== element) element.append(options.toolbarStatusElement);
+        options.onStatusMount?.(element);
+      }}, options.toolbarStatusElement ? null : options.status || "")
   );
 }
 
@@ -188,6 +291,7 @@ function PermitextNotebookEditor({ options, controllerRef }) {
   );
   const editor = useCreateBlockNote({
     schema: permitextNotebookSchema,
+    dictionary: { ...en, placeholders: { ...en.placeholders, default: "Start writing…", emptyDocument: "Start writing…" } },
     domAttributes: {
       editor: { "aria-label": options.ariaLabel || "Note body", "aria-multiline": "true" }
     },
@@ -236,13 +340,14 @@ function PermitextNotebookEditor({ options, controllerRef }) {
       editable: options.editable !== false,
       theme,
       formattingToolbar: false,
-      portalElements: { slashMenu: null },
+      sideMenu: false,
+      slashMenu: false,
+      renderEditor: false,
       onChange: () => options.onChange?.(wrappedDocument(editor.document)),
       "aria-label": options.ariaLabel || "Notebook card"
     },
-    React.createElement(FormattingToolbarController, {
-      formattingToolbar: PermitextFormattingToolbar
-    })
+    options.toolbar !== false && options.editable !== false && React.createElement(PermitextFormattingToolbar, {editor, options}),
+    React.createElement(BlockNoteViewEditor)
   );
 }
 
@@ -256,9 +361,20 @@ export function mountPermitextNotebookEditor(element, options = {}) {
     (key, value) => key === "id" ? undefined : value);
   const controllerRef = { current: null };
   const root = createRoot(element);
-  root.render(React.createElement(PermitextNotebookEditor, { options, controllerRef }));
+  let statusElement = null;
+  const mountedOptions = {...options, onStatusMount: element => { statusElement = element; }};
+  root.render(React.createElement(PermitextNotebookEditor, { options: mountedOptions, controllerRef }));
 
   return {
+    setStatus(text) {
+      mountedOptions.status = String(text || "");
+      if (statusElement && !options.toolbarStatusElement) statusElement.textContent = mountedOptions.status;
+    },
+    setEditable(editable) {
+      mountedOptions.editable = Boolean(editable);
+      if (controllerRef.current) controllerRef.current.isEditable = mountedOptions.editable;
+      root.render(React.createElement(PermitextNotebookEditor, {options: {...mountedOptions}, controllerRef}));
+    },
     getDocument() {
       return wrappedDocument(controllerRef.current?.document || options.document?.document || []);
     },

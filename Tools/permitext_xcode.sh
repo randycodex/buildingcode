@@ -17,6 +17,7 @@ usage() {
   print '  ./Tools/permitext_xcode.sh build-simulator [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh capture-simulator <simulator-identifier> [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh test-physical <device-identifier> [xcodebuild arguments]'
+  print '  ./Tools/permitext_xcode.sh test-ui-physical <device-identifier> [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh archive [xcodebuild arguments]'
 }
 
@@ -90,16 +91,20 @@ case "$action" in
       CODE_SIGNING_ALLOWED=NO \
       "$@" || command_status=$?
     ;;
-  test-physical)
+  test-physical|test-ui-physical)
     if (( $# == 0 )); then
       usage
       exit 2
     fi
     readonly device_identifier="$1"
     shift
+    test_scheme=permitext
+    if [[ "$action" == test-ui-physical ]]; then
+      test_scheme=permitextPhysicalStress
+    fi
     xcodebuild test \
       -project "$project_path" \
-      -scheme permitext \
+      -scheme "$test_scheme" \
       -destination "platform=iOS,id=${device_identifier}" \
       -derivedDataPath "$derived_data_path" \
       -parallel-testing-enabled NO \

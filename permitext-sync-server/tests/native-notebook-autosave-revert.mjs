@@ -15,12 +15,12 @@ function block(source, marker, indent = '') {
  assert.ok(end > start);
  return source.slice(start, end + indent.length + 2);
 }
-const declarations = models.slice(models.indexOf('struct NotebookCard:')) + '\n' +
+const declarations = models.slice(models.indexOf('struct NotebookQuestion:')) + '\n' +
  ['NativeNotebookDraft', 'NativeNotebookSaveAttempt', 'NativeNotebookEditableContent', 'NativeNotebookEditObservation']
  .map(name => block(editor, `struct ${name}`)).join('\n');
 const methods = ['private func scheduleAutosave()', 'private func saveNow()', 'private var currentDraft:',
  'private func cacheDraft()', 'private var editableContent:', 'private func editableContent(for card:',
- 'private func normalizedTitle(', 'private func apply(_ card:', 'private func completeSave(']
+ 'private func normalizedTitle(', 'private func apply(_ card:', 'private func apply(_ draft:', 'private func editableContent(for draft:', 'private func completeSave(']
  .map(marker => (marker === 'private func cacheDraft()' ? '    @discardableResult\n' : '') + block(editor, `    ${marker}`, '    ')).join('\n');
 const fixture = await read('./fixtures/native-notebook-autosave-revert.swift');
 const source = 'import Foundation\n' + declarations + '\n' + fixture.replace('// PRODUCTION_METHODS', methods);
@@ -38,4 +38,12 @@ try {
  assert.throws(() => execFileSync(join(dir, 'mutant'), [join(dir, 'mutant.json')], {stdio:'pipe'}),
   error => error.status === 1 && error.stderr.toString().includes('Reverting before debounce must clear Saving'));
  console.log('PASS: temporary compiled pre-fix mutant fails the status regression.');
+ const omission = 'openQuestions: attempt.preservesServerQuestions == true ? nil : attempt.content.openQuestions';
+ assert.ok(source.includes(omission));
+ const questionMutant = source.replace(omission, 'openQuestions: attempt.content.openQuestions');
+ await writeFile(join(dir, 'question-mutant.swift'), questionMutant);
+ execFileSync('xcrun', ['swiftc', '-parse-as-library', join(dir, 'question-mutant.swift'), '-o', join(dir, 'question-mutant')], {stdio:'pipe'});
+ assert.throws(() => execFileSync(join(dir, 'question-mutant'), [join(dir, 'question-mutant.json')], {stdio:'pipe'}),
+  error => error.status === 1 && error.stderr.toString().includes('Ordinary note saves must omit hidden question updates'));
+ console.log('PASS: sending hidden metadata fails the ordinary note-save compatibility regression.');
 } finally { await rm(dir, {recursive:true, force:true}); }

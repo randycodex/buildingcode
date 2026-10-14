@@ -8,6 +8,11 @@ struct NativeNotebookReferenceCandidate: Identifiable, Hashable, Sendable {
     let referenceID: String
     let label: String
     let detail: String
+    var conversationID: String? = nil
+    var sectionID: String? = nil
+    var codeVersion: String? = nil
+    var source: NotebookEvidenceSource? = nil
+    var passages: [NotebookEvidencePassage] = []
 
     var id: String { "\(kind):\(referenceID)" }
 }
@@ -286,8 +291,8 @@ private struct ProjectNotebookSessionView: View {
         }
         .onAppear { isVisible = true }
         .onDisappear { isVisible = false }
-        .sheet(item: $editorRoute) { route in
-            NavigationStack {
+        .navigationDestination(item: $editorRoute) { route in
+            Group {
                 NotebookCardEditorView(
                     projectID: projectID,
                     projectName: projectName,
@@ -543,6 +548,7 @@ private struct NativeNotebookConflictPreview: View {
             var text = AttributedString(value.text ?? value.props?.label ?? "")
             if value.styles?.bold == true { text.inlinePresentationIntent = .stronglyEmphasized }
             if value.styles?.italic == true { text.inlinePresentationIntent = (text.inlinePresentationIntent ?? []).union(.emphasized) }
+            if value.styles?.strike == true { text.strikethroughStyle = .single }
             result.append(text)
             if let children = value.content { result.append(inlineText(children)) }
             if let href = value.href { result.append(AttributedString(" (\(href))")) }
@@ -556,13 +562,14 @@ struct NativeNotebookDraft: Codable, Hashable, Sendable {
     var title: String
     var document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink]
+    var openQuestions: [NotebookQuestion]? = nil
     var editedAt: Date? = nil
     var clientMutationID: String? = nil
     var pendingSave: NativeNotebookSaveAttempt? = nil
     var baseContent: NativeNotebookEditableContent? = nil
 
     var hasUnsynchronizedChanges: Bool {
-        pendingSave != nil || baseContent != NativeNotebookEditableContent(title: title, document: document, evidenceLinks: evidenceLinks)
+        pendingSave != nil || baseContent != NativeNotebookEditableContent(title: title, document: document, evidenceLinks: evidenceLinks, openQuestions: openQuestions)
     }
 }
 
@@ -573,12 +580,15 @@ struct NativeNotebookSaveAttempt: Codable, Hashable, Sendable {
     let cardID: String?
     let expectedVersion: Int
     let content: NativeNotebookEditableContent
+    // Missing on older receipts: replay their original question field unchanged.
+    var preservesServerQuestions: Bool? = nil
 }
 
 struct NativeNotebookEditableContent: Codable, Hashable, Sendable {
     var title: String
     var document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink]
+    var openQuestions: [NotebookQuestion]? = nil
 }
 
 /// Decide from the live draft after a refresh completes, never a snapshot made
@@ -592,7 +602,7 @@ enum NativeNotebookRefreshDecision: Equatable {
         if draft.pendingSave != nil { return .preservePending }
         if draft.version != serverVersion { return .reviewConflict }
         let current = NativeNotebookEditableContent(title: draft.title, document: draft.document,
-                                                    evidenceLinks: draft.evidenceLinks)
+                                                    evidenceLinks: draft.evidenceLinks, openQuestions: draft.openQuestions)
         return current == serverContent ? .applyServer : .preserveDraft
     }
 }
@@ -617,13 +627,17 @@ private struct NotebookLinkEditor: Identifiable {
     let id: String
 }
 
-private struct NotebookImagePickerTarget: Identifiable {
-    let id: String
-}
-
 private struct NotebookCardEditorView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var documentEditor = NotebookDocumentEditorController()
+    @State private var editorHeight: CGFloat = 360
+    @State private var showingPhotoPicker = false
+    @State private var referenceRoute: NativeNotebookReferenceRoute?
+    @State private var isLeaving = false
+    @State private var isEditorVisible = false
+    @State private var restoreCaretOnReturn = false
 
     let projectID: String
     let projectName: String
@@ -647,6 +661,7 @@ private struct NotebookCardEditorView: View {
     @State private var title = "Untitled Note"
     @State private var document = NotebookDocument.empty
     @State private var evidenceLinks: [NotebookEvidenceLink] = []
+    @State private var openQuestions: [NotebookQuestion] = []
     @State private var isLoading = false
     @State private var isSaving = false
     @State private var isDeleting = false
@@ -658,10 +673,13 @@ private struct NotebookCardEditorView: View {
     @State private var showingReferencePicker = false
     @State private var linkedNoteRoute: NativeNotebookEditorRoute?
     @State private var selectedPhoto: PhotosPickerItem?
-    @State private var isUploadingImage = false
+    @State private var imageUploadCount = 0
+    private var isUploadingImage: Bool { imageUploadCount > 0 }
     @State private var linkEditor: NotebookLinkEditor?
     @State private var linkLabel = ""
     @State private var linkURL = ""
+    @State private var linkError: String?
+    @State private var pendingLinkInsertion: (url: String, text: String)?
     @State private var showingDeleteConfirmation = false
     @State private var lastSyncedContent: NativeNotebookEditableContent?
     @State private var lastLocalEditAt: Date?
@@ -677,7 +695,7 @@ private struct NotebookCardEditorView: View {
 
     var body: some View {
         Group {
-            if isLoading && !hasLoaded {
+            if !hasLoaded && (isLoading || errorMessage == nil) {
                 ProgressView("Loading Note…")
             } else if !hasLoaded, let errorMessage {
                 NativeNotebookLoadFailureView(message: errorMessage) {
@@ -689,6 +707,13 @@ private struct NotebookCardEditorView: View {
                         TextField("Note title", text: $title)
                             .font(.title3.weight(.semibold))
                             .disabled(editingReadOnly)
+
+                        if !statusMessage.isEmpty {
+                            Text(statusMessage)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
 
                         if let errorMessage {
                             Text(errorMessage)
@@ -705,20 +730,50 @@ private struct NotebookCardEditorView: View {
                                 .accessibilityIdentifier("native-notebook-review-conflict")
                         }
 
-                        ForEach(Array(document.document.enumerated()), id: \.element.id) { index, block in
-                            notebookBlock(block, at: index)
+                        #if DEBUG
+                        if ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") && ProcessInfo.processInfo.arguments.contains("--native-notebook-input-diagnostics") {
+                            Text("Synthetic input diagnostics")
+                                .font(.caption2)
+                                .accessibilityIdentifier("native-notebook-input-diagnostics")
+                                .accessibilityValue(documentEditor.inputDiagnostics)
                         }
+                        if ProcessInfo.processInfo.arguments.contains("--native-notebook-layout-diagnostics") {
+                            Text("Note layout diagnostics")
+                                .font(.caption2)
+                                .accessibilityIdentifier("native-notebook-layout-diagnostics")
+                                .accessibilityValue(documentEditor.layoutDiagnostics)
+                        }
+                        #endif
 
-                        if !editingReadOnly {
-                            addBlockBar
-                        }
+                        NotebookDocumentEditor(
+                            document: $document, isReadOnly: editingReadOnly || !isCurrentOwner,
+                            sessionID: editorSessionID, controller: documentEditor,
+                            onHeightChange: { editorHeight = max(300, $0) },
+                            onOpenReference: { reference in Task { await openReference(reference) } },
+                            onRequestInsertReference: { Task { await prepareReferencePicker() } },
+                            onRequestInsertImage: { showingPhotoPicker = true },
+                            onError: { errorMessage = $0 },
+                            onReplacementConflict: { retained, _ in
+                                guard isCurrentOwner else { return }
+                                saveTask?.cancel()
+                                saveTask = nil
+                                requiresConflictReview = true
+                                conflictingCard = nil
+                                document = retained
+                                lastLocalEditAt = Date()
+                                errorMessage = "You edited while a saved version was arriving. Your writing is preserved; review the latest Note before syncing."
+                                statusMessage = "Draft kept on this iPhone; review the latest version"
+                                _ = cacheDraft()
+                            },
+                            resolveAsset: { url in try await resolveEditorAsset(url) },
+                            uploadImage: { data, _, _ in try await uploadEditorImageData(data) }
+                        )
+                        .id(editorSessionID)
+                        .frame(height: editorHeight)
+                        .accessibilityIdentifier("native-notebook-continuous-page")
 
-                        if !statusMessage.isEmpty {
-                            Text(statusMessage)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
+
+
                     }
                     .padding(18)
                 }
@@ -726,24 +781,33 @@ private struct NotebookCardEditorView: View {
         }
         .navigationTitle(projectName)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Done") { dismiss() }
+            ToolbarItem(placement: .topBarLeading) {
+                Button { Task { await leaveEditor() } } label: { Label("Back", systemImage: "chevron.left") }
+                    .disabled(isLeaving || isUploadingImage)
             }
-            if canPerformNetworkWrites && hasLoaded {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    if currentCardID != nil {
-                        Button("Delete", systemImage: "trash", role: .destructive) {
-                            showingDeleteConfirmation = true
-                        }
-                        .disabled(isSaving || isDeleting)
-                    }
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if hasLoaded && !editingReadOnly {
+                    Button("Done") { Task { await finishEditing() } }
+                        .accessibilityIdentifier("native-notebook-done")
+                }
+                if canPerformNetworkWrites && hasLoaded && currentCardID != nil {
+                    Menu {
+                        Button("Delete Note", systemImage: "trash", role: .destructive) { showingDeleteConfirmation = true }
+                            .accessibilityIdentifier("native-notebook-delete")
+                            .disabled(isSaving || isDeleting)
+                    } label: { Image(systemName: "ellipsis") }
+                    .accessibilityLabel("Note actions")
                 }
             }
         }
+        .modifier(NotebookKeyboardToolbar(isVisible: hasLoaded && !editingReadOnly) {
+            formattingBar.tint(accentColor)
+        })
         .tint(accentColor)
-        .sheet(item: $linkedNoteRoute) { route in
-            NavigationStack {
+        .navigationDestination(item: $linkedNoteRoute) { route in
+            Group {
                 NotebookCardEditorView(
                     projectID: projectID, projectName: projectName,
                     routeID: route.id, cardID: route.cardID, readOnly: true,
@@ -752,6 +816,13 @@ private struct NotebookCardEditorView: View {
                 )
                 .environmentObject(library)
             }
+        }
+        .navigationDestination(item: $referenceRoute) { route in
+            NativeNotebookReferenceDestination(route: route, projectID: projectID, sharedLibrary: library)
+        }
+        .photosPicker(isPresented: $showingPhotoPicker, selection: $selectedPhoto, matching: .images)
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { Task { if await flushEditorDraft(finalizeEditing: true) { await saveNow() } } }
         }
         .sheet(isPresented: $showingConflictReview) {
             NavigationStack {
@@ -779,9 +850,26 @@ private struct NotebookCardEditorView: View {
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Keep draft") { showingConflictReview = false } } }
             }
         }
-        .task { await loadCard() }
+        .task { await loadCard(); await restoreEditorCaretIfNeeded() }
+        .onAppear {
+            isEditorVisible = true
+            Task { await restoreEditorCaretIfNeeded() }
+        }
+        .onChange(of: isLoading) { _, loading in
+            if !loading { Task { await restoreEditorCaretIfNeeded() } }
+        }
+        .onChange(of: documentEditor.isReady) { _, ready in
+            if ready { Task { await restoreEditorCaretIfNeeded() } }
+        }
+        .onChange(of: referenceRoute) { previous, current in
+            if previous != nil && current == nil { Task { await restoreEditorCaretIfNeeded() } }
+        }
+        .onChange(of: linkedNoteRoute) { previous, current in
+            if previous != nil && current == nil { Task { await restoreEditorCaretIfNeeded() } }
+        }
         .onChange(of: title) { _, _ in scheduleAutosave() }
         .onChange(of: document) { _, _ in scheduleAutosave() }
+        .onChange(of: openQuestions) { _, _ in scheduleAutosave() }
         .onChange(of: selectedPhoto) { _, item in
             guard let item else { return }
             Task { await uploadImage(item) }
@@ -790,10 +878,8 @@ private struct NotebookCardEditorView: View {
             NavigationStack {
                 List(referenceCandidates) { candidate in
                     Button {
-                        document.document.append(
-                            .reference(kind: candidate.kind, id: candidate.referenceID, label: candidate.label)
-                        )
                         showingReferencePicker = false
+                        Task { await insertReferenceCandidate(candidate) }
                     } label: {
                         VStack(alignment: .leading, spacing: 5) {
                             Text(candidate.label)
@@ -813,24 +899,49 @@ private struct NotebookCardEditorView: View {
                 }
             }
         }
-        .alert("Add link", isPresented: Binding(
-            get: { linkEditor != nil },
-            set: { if !$0 { linkEditor = nil } }
-        )) {
-            TextField("Link text", text: $linkLabel)
-            TextField("https://", text: $linkURL)
-                .textInputAutocapitalization(.never)
-                .keyboardType(.URL)
-            Button("Cancel", role: .cancel) { linkEditor = nil }
-            Button("Add") { applyLink() }
-        } message: {
-            Text("Links must use HTTPS, HTTP, or mailto.")
+        .sheet(item: $linkEditor, onDismiss: {
+            guard let insertion = pendingLinkInsertion else { return }
+            pendingLinkInsertion = nil
+            Task {
+                await performEditorCommand {
+                    try await documentEditor.createLink(url: insertion.url, text: insertion.text)
+                }
+            }
+        }) { _ in
+            NavigationStack {
+                Form {
+                    Section {
+                        TextField("Link text", text: $linkLabel)
+                            .accessibilityIdentifier("native-notebook-link-label")
+                        TextField("https://", text: $linkURL)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .keyboardType(.URL)
+                            .accessibilityIdentifier("native-notebook-link-url")
+                    } footer: {
+                        Text(linkError ?? "Links must use HTTPS, HTTP, or mailto.")
+                            .foregroundStyle(linkError == nil ? Color.secondary : Color.red)
+                    }
+                }
+                .navigationTitle("Add link")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { linkEditor = nil }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Add") { applyLink() }
+                            .accessibilityIdentifier("native-notebook-confirm-link")
+                    }
+                }
+            }
         }
-        .confirmationDialog("Delete this Note?", isPresented: $showingDeleteConfirmation) {
+        .alert("Delete this Note?", isPresented: $showingDeleteConfirmation) {
             Button("Delete Note", role: .destructive) { Task { await deleteCard() } }
             Button("Cancel", role: .cancel) {}
         }
         .onDisappear {
+            isEditorVisible = false
             saveTask?.cancel()
             if hasLoaded && !editingReadOnly {
                 cacheDraft()
@@ -839,164 +950,208 @@ private struct NotebookCardEditorView: View {
         }
     }
 
-    @ViewBuilder
-    private func notebookBlock(_ block: NotebookBlock, at index: Int) -> some View {
-        if block.type == "image" {
-            VStack(alignment: .leading, spacing: 8) {
-                NotebookAssetImage(projectID: projectID, url: block.props.url ?? "")
-                    .environmentObject(library)
-                if editingReadOnly {
-                    if let caption = block.props.caption, !caption.isEmpty {
-                        Text(caption).font(.caption).foregroundStyle(.secondary)
-                    }
-                } else {
-                    TextField("Image caption", text: Binding(
-                        get: { document.document[safe: index]?.props.caption ?? "" },
-                        set: { document.document[index].props.caption = $0 }
-                    ))
-                    .font(.caption)
-                    Button("Remove image", systemImage: "trash", role: .destructive) {
-                        document.document.remove(at: index)
-                    }
-                    .font(.caption)
-                }
-            }
-            .padding(12)
-            .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
-        } else if (block.content ?? []).contains(where: { $0.type == "permitextReference" }) {
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(Array((block.content ?? []).enumerated()), id: \.offset) { inlineIndex, inline in
-                    if inline.type == "permitextReference", let reference = inline.props {
-                        HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: reference.referenceKind == "researchAnswer" ? "sparkles" : reference.referenceKind == "notebookCard" ? "note.text" : "text.quote")
-                                .foregroundStyle(accentColor)
-                            VStack(alignment: .leading, spacing: 4) {
-                                if reference.referenceKind == "notebookCard", !reference.referenceID.isEmpty {
-                                    Button {
-                                        linkedNoteRoute = NativeNotebookEditorRoute(cardID: reference.referenceID)
-                                    } label: {
-                                        Text(reference.label).font(.subheadline.weight(.semibold))
-                                            .multilineTextAlignment(.leading)
-                                            .frame(minHeight: 44, alignment: .leading)
-                                    }
-                                    .accessibilityLabel("Open linked Note: \(reference.label)")
-                                } else {
-                                    Text(referenceCandidates.first(where: {
-                                        $0.kind == reference.referenceKind && $0.referenceID == reference.referenceID
-                                    })?.label ?? reference.label).font(.subheadline.weight(.semibold))
-                                }
-                                Text(reference.referenceKind == "researchAnswer" ? "Permitext Research" : reference.referenceKind == "notebookCard" ? "Notebook Note" : "Saved Evidence")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            if !editingReadOnly {
-                                Button("Remove reference", systemImage: "xmark") {
-                                    guard document.document.indices.contains(index),
-                                          document.document[index].content?.indices.contains(inlineIndex) == true else { return }
-                                    document.document[index].content?.remove(at: inlineIndex)
-                                }
-                                .labelStyle(.iconOnly)
-                            }
-                        }
-                        .padding(12)
-                        .background(accentColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
-                    } else if editingReadOnly || inline.type != "text" {
-                        Text(blockText(NotebookBlock(id: block.id, type: block.type, props: block.props, content: [inline], children: [])))
-                            .font(blockFont(block))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    } else {
-                        TextEditor(text: Binding(
-                            get: { document.document[safe: index]?.content?[safe: inlineIndex]?.text ?? "" },
-                            set: { value in
-                                guard document.document.indices.contains(index),
-                                      document.document[index].content?.indices.contains(inlineIndex) == true else { return }
-                                document.document[index].content?[inlineIndex].text = value
-                            }
-                        ))
-                        .font(blockFont(block))
-                        .frame(minHeight: 52)
-                        .scrollContentBackground(.hidden)
-                    }
-                }
-            }
-        } else {
-            VStack(alignment: .leading, spacing: 8) {
-                if !editingReadOnly {
-                    HStack(spacing: 8) {
-                        Menu(blockTypeLabel(block.type)) {
-                            Button("Text") { setBlockType("paragraph", at: index) }
-                            Button("Heading") { setBlockType("heading", at: index) }
-                            Button("Bulleted list") { setBlockType("bulletListItem", at: index) }
-                            Button("Numbered list") { setBlockType("numberedListItem", at: index) }
-                        }
-                        .font(.caption.weight(.semibold))
-                        Spacer()
-                        Button("Bold", systemImage: "bold") { toggleStyle(\.bold, at: index) }
-                            .labelStyle(.iconOnly)
-                            .foregroundStyle(blockStyle(at: index).bold == true ? accentColor : .secondary)
-                        Button("Italic", systemImage: "italic") { toggleStyle(\.italic, at: index) }
-                            .labelStyle(.iconOnly)
-                            .foregroundStyle(blockStyle(at: index).italic == true ? accentColor : .secondary)
-                        Button("Add link", systemImage: "link") { beginLink(at: index) }
-                            .labelStyle(.iconOnly)
-                        Button("Remove block", systemImage: "trash", role: .destructive) {
-                            document.document.remove(at: index)
-                        }
-                        .labelStyle(.iconOnly)
-                    }
-                }
+    private var editorSessionID: String { "\(owner?.accountID ?? ""):\(projectID):\(routeID)" }
 
-                if editingReadOnly {
-                    Text(blockText(block))
-                        .font(blockFont(block))
-                        .fontWeight(blockStyle(at: index).bold == true ? .bold : nil)
-                        .italic(blockStyle(at: index).italic == true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } else {
-                    TextEditor(text: Binding(
-                        get: { blockText(document.document[safe: index] ?? block) },
-                        set: { setBlockText($0, at: index) }
-                    ))
-                    .font(blockFont(block))
-                    .fontWeight(blockStyle(at: index).bold == true ? .bold : nil)
-                    .italic(blockStyle(at: index).italic == true)
-                    .frame(minHeight: block.type == "heading" ? 52 : 88)
-                    .scrollContentBackground(.hidden)
+    private var formattingBar: some View {
+        HStack(spacing: 22) {
+            Menu {
+                Button("Bold", systemImage: "bold") { Task { await performEditorCommand { try await documentEditor.toggleStyle("bold") } } }
+                Button("Italic", systemImage: "italic") { Task { await performEditorCommand { try await documentEditor.toggleStyle("italic") } } }
+                Button("Strikethrough", systemImage: "strikethrough") { Task { await performEditorCommand { try await documentEditor.toggleStyle("strike") } } }
+                Divider()
+                Button("Body") { Task { await performEditorCommand { try await documentEditor.setBlockType("paragraph") } } }
+                ForEach(1...3, id: \.self) { level in
+                    Button("Heading \(level)") { Task { await performEditorCommand { try await documentEditor.setBlockType("heading", level: level) } } }
                 }
+            } label: { Text("Aa").font(.system(size: 19, weight: .medium)) }
+            .accessibilityLabel("Text formatting")
+            .accessibilityValue(documentEditor.formatting.blockType)
+            Menu {
+                Button("Bulleted list", systemImage: "list.bullet") { Task { await performEditorCommand { try await documentEditor.setBlockType("bulletListItem") } } }
+                Button("Numbered list", systemImage: "list.number") { Task { await performEditorCommand { try await documentEditor.setBlockType("numberedListItem") } } }
+            } label: { Image(systemName: "list.bullet") }
+            .accessibilityLabel("Lists")
+            Button {
+                Task {
+                    await captureEditorSelection()
+                    showingPhotoPicker = true
+                }
+            } label: { Image(systemName: isUploadingImage ? "arrow.up.circle" : "photo") }
+            .accessibilityLabel(isUploadingImage ? "Uploading image" : "Insert image")
+            .disabled(isUploadingImage || !canPerformNetworkWrites)
+            Menu {
+                Button("Evidence or Assistant answer", systemImage: "text.quote") { Task { await prepareReferencePicker() } }
+                    .disabled(referenceCandidates.isEmpty)
+                Button("Web link", systemImage: "link") { Task { await prepareLinkEditor() } }
+            } label: { Image(systemName: "link") }
+            .accessibilityLabel("Insert link")
+            Spacer(minLength: 0)
+            Menu {
+                Button("Undo", systemImage: "arrow.uturn.backward") { Task { await performEditorCommand { try await documentEditor.undo() } } }
+                Button("Redo", systemImage: "arrow.uturn.forward") { Task { await performEditorCommand { try await documentEditor.redo() } } }
+            } label: { Image(systemName: "arrow.uturn.backward") }
+            .accessibilityLabel("Undo and redo")
+        }
+        .font(.system(size: 18))
+        .padding(.horizontal, 22).padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
+        .background(.bar)
+        .disabled(!documentEditor.isReady || isLeaving || !isCurrentOwner)
+        .accessibilityIdentifier("native-notebook-formatting-toolbar")
+    }
+
+    @MainActor
+    private func performEditorCommand(_ command: () async throws -> Void) async {
+        guard isCurrentOwner, !editingReadOnly else { return }
+        do {
+            try await command()
+            guard isCurrentOwner else { return }
+            _ = cacheDraft()
+        } catch { if isCurrentOwner { errorMessage = nativeNotebookRequestErrorMessage(error) } }
+    }
+
+    @MainActor
+    private func captureEditorSelection() async {
+        guard documentEditor.isReady, isCurrentOwner else { return }
+        do { try await documentEditor.captureSelection() }
+        catch { errorMessage = nativeNotebookRequestErrorMessage(error) }
+    }
+
+    @MainActor
+    @discardableResult
+    private func flushEditorDraft(finalizeEditing: Bool = false) async -> Bool {
+        guard hasLoaded, isCurrentOwner, !editingReadOnly else { return true }
+        if documentEditor.isReady {
+            do { document = try await documentEditor.flush(finalizeEditing: finalizeEditing) }
+            catch { errorMessage = nativeNotebookRequestErrorMessage(error); return false }
+        }
+        return cacheDraft()
+    }
+
+    @MainActor
+    private func finishEditing() async {
+        guard await flushEditorDraft(finalizeEditing: true) else { return }
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        await saveNow()
+    }
+
+    @MainActor
+    private func leaveEditor() async {
+        guard !isLeaving else { return }
+        isLeaving = true
+        guard await flushEditorDraft(finalizeEditing: true) else { isLeaving = false; return }
+        saveTask?.cancel()
+        dismiss()
+        Task { await saveNow() }
+    }
+
+    @MainActor
+    private func prepareReferencePicker() async {
+        await captureEditorSelection()
+        showingReferencePicker = true
+    }
+
+    @MainActor
+    private func insertReferenceCandidate(_ candidate: NativeNotebookReferenceCandidate) async {
+        await performEditorCommand {
+            guard candidate.kind == "canonicalSection" else {
+                try await documentEditor.insertReference(NotebookReferenceProps(
+                    referenceKind: candidate.kind, referenceID: candidate.referenceID, label: candidate.label))
+                return
             }
-            .padding(12)
-            .background(Color.secondary.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
+            // A bookmark preview is not an exact quotation. Read the saved edition
+            // independently, without switching the user's current Reader.
+            guard let savedVersion = candidate.codeVersion, !savedVersion.isEmpty,
+                  let sectionID = candidate.sectionID.flatMap(Int64.init) else {
+                throw NotebookReferenceEvidencePreparer.Failure.unavailable
+            }
+            let reader = library.makeSearchReaderLibrary(sourceVersion: savedVersion)
+            guard await reader.prepareCodeVersionForEvidence(savedVersion),
+                  case .loaded(let detail) = await reader.loadSectionDetailResultAsync(sectionID: sectionID),
+                  let category = reader.codeSections.first(where: { $0.id == detail.codeSectionID }) else {
+                throw NotebookReferenceEvidencePreparer.Failure.unavailable
+            }
+            let link = try NotebookReferenceEvidencePreparer.makeLink(
+                label: candidate.label, projectID: projectID, cardID: currentCardID ?? "",
+                codeName: category.name, codeVersion: UserContentSyncCodeVersion.server(savedVersion),
+                codeEdition: NativeReaderEditionLabel.label(for: savedVersion),
+                sectionID: String(detail.id), sectionNumber: detail.sectionNumber,
+                sectionTitle: detail.title, officialText: detail.officialText)
+            guard isCurrentOwner, !editingReadOnly, !isLeaving, !Task.isCancelled else { throw CancellationError() }
+            guard evidenceLinks.count < 100 else { throw NotebookReferenceEvidencePreparer.Failure.tooManyLinks }
+            // Persist metadata before the chip can emit an autosavable change.
+            // Keep it if the bridge acknowledgement is uncertain: an unused
+            // evidence link is safe, whereas a chip without its edition is not.
+            evidenceLinks.append(link)
+            guard cacheDraft() else { evidenceLinks.removeAll { $0.id == link.id }; return }
+            try await documentEditor.insertReference(NotebookReferenceProps(
+                referenceKind: "selectedPassage", referenceID: link.id, label: candidate.label))
+            scheduleAutosave()
         }
     }
 
-    private var addBlockBar: some View {
-        HStack(spacing: 10) {
-            Menu {
-                Button("Text", systemImage: "text.alignleft") { document.document.append(.paragraph()) }
-                Button("Heading", systemImage: "textformat.size") { document.document.append(.textBlock(type: "heading", level: 2)) }
-                Button("Bulleted list", systemImage: "list.bullet") { document.document.append(.textBlock(type: "bulletListItem")) }
-                Button("Numbered list", systemImage: "list.number") { document.document.append(.textBlock(type: "numberedListItem")) }
-            } label: {
-                Label("Add text", systemImage: "plus")
-            }
-            .buttonStyle(.bordered)
+    @MainActor
+    private func prepareLinkEditor() async {
+        await captureEditorSelection()
+        // Transfer focus out of WebKit before UIKit presents editable fields.
+        // Keeping both editors active can leave the alert laid out against a
+        // keyboard that has already moved and discard pending composed input.
+        guard await flushEditorDraft(finalizeEditing: true), isCurrentOwner else { return }
+        linkLabel = documentEditor.formatting.selectedText
+        linkURL = documentEditor.formatting.linkURL.isEmpty ? "https://" : documentEditor.formatting.linkURL
+        linkError = nil
+        pendingLinkInsertion = nil
+        linkEditor = NotebookLinkEditor(id: UUID().uuidString)
+    }
 
-            Button("Link evidence", systemImage: "link") { showingReferencePicker = true }
-                .buttonStyle(.bordered)
-                .disabled(referenceCandidates.isEmpty)
-
-            PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                Label(isUploadingImage ? "Uploading" : "Image", systemImage: "photo")
-            }
-            .buttonStyle(.bordered)
-            .disabled(isUploadingImage || !canPerformNetworkWrites)
+    @MainActor
+    private func openReference(_ reference: NotebookReferenceProps) async {
+        guard isCurrentOwner else { return }
+        await captureEditorSelection()
+        guard await flushEditorDraft(finalizeEditing: true), isCurrentOwner else { return }
+        restoreCaretOnReturn = !editingReadOnly
+        if reference.referenceKind == "notebookCard" {
+            linkedNoteRoute = NativeNotebookEditorRoute(cardID: reference.referenceID)
+            return
         }
-        .font(.caption.weight(.semibold))
+        // A legacy numeric section ID carries no edition. A newly saved
+        // bookmark with the same ID cannot supply that missing identity.
+        let candidate = NativeNotebookReferenceIdentity.acceptsCandidateMetadata(kind: reference.referenceKind, referenceID: reference.referenceID)
+            ? referenceCandidates.first { $0.kind == reference.referenceKind && $0.referenceID == reference.referenceID } : nil
+        let evidence = evidenceLinks.first { $0.id == reference.referenceID }
+        referenceRoute = NativeNotebookReferenceRoute(
+            referenceKind: reference.referenceKind, referenceID: candidate?.sectionID ?? reference.referenceID,
+            label: reference.label, conversationID: candidate?.conversationID,
+            source: evidence?.source ?? candidate?.source, passages: evidence?.passages ?? candidate?.passages ?? [],
+            codeVersion: evidence?.source.codeVersion ?? candidate?.codeVersion)
+    }
+
+    @MainActor
+    private func restoreEditorCaretIfNeeded() async {
+        guard restoreCaretOnReturn, isEditorVisible, !isLoading, isCurrentOwner, !editingReadOnly,
+              referenceRoute == nil, linkedNoteRoute == nil, documentEditor.isReady else { return }
+        do {
+            try await documentEditor.focus()
+            restoreCaretOnReturn = false
+        } catch { if isCurrentOwner { errorMessage = nativeNotebookRequestErrorMessage(error) } }
+    }
+
+    @MainActor
+    private func resolveEditorAsset(_ url: String) async throws -> Data {
+        guard isCurrentOwner else { throw CancellationError() }
+        let data: Data
+        if url.hasPrefix("permitext-notebook-asset:") {
+            data = try await library.notebookAsset(projectID: projectID, assetID: String(url.dropFirst("permitext-notebook-asset:".count)))
+        } else if let remote = URL(string: url), remote.scheme == "https" {
+            (data, _) = try await URLSession.shared.data(from: remote)
+        } else { throw NotebookDocumentEditorError.assetUnavailable }
+        guard isCurrentOwner, !Task.isCancelled else { throw CancellationError() }
+        return data
     }
 
     private func loadCard(forceNetwork: Bool = false) async {
         guard isCurrentOwner, !isLoading else { return }
+        if hasLoaded && documentEditor.isReady { guard await flushEditorDraft() else { return } }
         guard let accountID = owner?.accountID else { return }
         isLoading = true
         var refreshSucceeded = false
@@ -1080,6 +1235,7 @@ private struct NotebookCardEditorView: View {
         title = card.title
         document = card.document
         evidenceLinks = card.evidenceLinks
+        openQuestions = card.openQuestions ?? []
         lastSyncedContent = editableContent(for: card)
         lastLocalEditAt = nil
         hasLoaded = true
@@ -1099,6 +1255,7 @@ private struct NotebookCardEditorView: View {
         title = draft.title
         document = draft.document
         evidenceLinks = draft.evidenceLinks
+        openQuestions = draft.openQuestions ?? []
         lastSyncedContent = draft.baseContent
         lastLocalEditAt = draft.editedAt
         draftMutationID = draft.clientMutationID ?? UUID().uuidString.lowercased()
@@ -1194,7 +1351,7 @@ private struct NotebookCardEditorView: View {
             }
         }
         let attempt = pendingSave ?? NativeNotebookSaveAttempt(
-            clientMutationID: draftMutationID, cardID: currentCardID, expectedVersion: version, content: editableContent
+            clientMutationID: draftMutationID, cardID: currentCardID, expectedVersion: version, content: editableContent, preservesServerQuestions: true
         )
         pendingSave = attempt
         guard cacheDraft() else { return }
@@ -1202,7 +1359,8 @@ private struct NotebookCardEditorView: View {
             let saved = try await library.saveNotebookCard(
                 projectID: projectID, cardID: attempt.cardID, expectedVersion: attempt.expectedVersion,
                 title: normalizedTitle(attempt.content.title), document: attempt.content.document,
-                evidenceLinks: attempt.content.evidenceLinks, clientMutationID: attempt.clientMutationID
+                evidenceLinks: attempt.content.evidenceLinks, clientMutationID: attempt.clientMutationID,
+                openQuestions: attempt.preservesServerQuestions == true ? nil : attempt.content.openQuestions
             )
             guard isCurrentOwner, !Task.isCancelled else { return }
             pendingSave = nil
@@ -1210,6 +1368,17 @@ private struct NotebookCardEditorView: View {
         } catch let error as PermitextBackendHTTPError where error.statusCode == 409 {
             guard isCurrentOwner else { return }
             await reconcileVersionConflict(error)
+        } catch let error as PermitextBackendHTTPError where error.statusCode == 400 && attempt.preservesServerQuestions != true && NotebookQuestion.validationMessage(in: attempt.content.openQuestions ?? []) != nil {
+            // An older app may have persisted an invalid question attempt.
+            // This definitive rejection permits a corrected body with a new
+            // identity; timeouts and other uncertain outcomes keep the receipt.
+            guard isCurrentOwner else { return }
+            pendingSave = nil
+            draftMutationID = UUID().uuidString.lowercased()
+            guard cacheDraft() else { return }
+            statusMessage = "Draft kept on this iPhone"
+            errorMessage = nil
+            needsSave = true
         } catch {
             guard isCurrentOwner else { return }
             guard cacheDraft() else { return }
@@ -1251,7 +1420,7 @@ private struct NotebookCardEditorView: View {
 
     private var currentDraft: NativeNotebookDraft {
         NativeNotebookDraft(cardID: currentCardID, version: version, title: title, document: document,
-            evidenceLinks: evidenceLinks, editedAt: lastLocalEditAt, clientMutationID: draftMutationID, pendingSave: pendingSave, baseContent: lastSyncedContent)
+            evidenceLinks: evidenceLinks, openQuestions: editableContent.openQuestions, editedAt: lastLocalEditAt, clientMutationID: draftMutationID, pendingSave: pendingSave, baseContent: lastSyncedContent)
     }
 
     @discardableResult
@@ -1263,6 +1432,15 @@ private struct NotebookCardEditorView: View {
         }
         hasLocalDraft = editableContent != lastSyncedContent || pendingSave != nil
         do {
+            // Questions are no longer editable here. Retain unsent legacy metadata
+            // separately before a normal note save restores the server metadata.
+            // Use the receipt identity so a rejected old request remains recoverable.
+            if editableContent.openQuestions != lastSyncedContent?.openQuestions ||
+                (pendingSave?.preservesServerQuestions != true && pendingSave?.content.openQuestions != nil) {
+                let recoveryID = pendingSave?.clientMutationID ?? draftMutationID
+                try cache.store(currentDraft, accountID: accountID, projectID: projectID,
+                    scope: "native-notebook-legacy-metadata:\(routeID):\(recoveryID)")
+            }
             try cache.store(currentDraft, accountID: accountID, projectID: projectID, scope: "native-notebook-draft:\(routeID)")
             return true
         } catch {
@@ -1284,6 +1462,7 @@ private struct NotebookCardEditorView: View {
     }
 
     private func reviewLatestVersion() async {
+        guard await flushEditorDraft() else { return }
         guard isCurrentOwner else { return }
         let id = currentCardID ?? pendingSave?.cardID ?? conflictingCard?.id
         guard let id else {
@@ -1345,7 +1524,10 @@ private struct NotebookCardEditorView: View {
         NativeNotebookEditableContent(
             title: title,
             document: document,
-            evidenceLinks: evidenceLinks
+            evidenceLinks: evidenceLinks,
+            // Omission preserves existing server questions. An explicit empty
+            // array removes the last saved (or still-pending) question.
+            openQuestions: openQuestions.isEmpty && (lastSyncedContent?.openQuestions ?? []).isEmpty && (pendingSave?.content.openQuestions ?? []).isEmpty ? nil : openQuestions
         )
     }
 
@@ -1353,7 +1535,8 @@ private struct NotebookCardEditorView: View {
         NativeNotebookEditableContent(
             title: card.title,
             document: card.document,
-            evidenceLinks: card.evidenceLinks
+            evidenceLinks: card.evidenceLinks,
+            openQuestions: card.openQuestions?.isEmpty == false ? card.openQuestions : nil
         )
     }
 
@@ -1361,7 +1544,8 @@ private struct NotebookCardEditorView: View {
         NativeNotebookEditableContent(
             title: draft.title,
             document: draft.document,
-            evidenceLinks: draft.evidenceLinks
+            evidenceLinks: draft.evidenceLinks,
+            openQuestions: (draft.openQuestions ?? []).isEmpty && (draft.baseContent?.openQuestions ?? []).isEmpty && (draft.pendingSave?.content.openQuestions ?? []).isEmpty ? nil : (draft.openQuestions ?? [])
         )
     }
 
@@ -1389,9 +1573,9 @@ private struct NotebookCardEditorView: View {
     private func uploadImage(_ item: PhotosPickerItem) async {
         guard canPerformNetworkWrites else { return }
         guard isCurrentOwner else { return }
-        isUploadingImage = true
+        imageUploadCount += 1
         defer {
-            isUploadingImage = false
+            imageUploadCount -= 1
             selectedPhoto = nil
         }
         do {
@@ -1399,123 +1583,55 @@ private struct NotebookCardEditorView: View {
                 throw NotebookUploadImagePreparer.PreparationError.invalidImage
             }
             guard isCurrentOwner, !Task.isCancelled else { return }
-            let preparation = Task.detached(priority: .userInitiated) {
-                try NotebookUploadImagePreparer.prepare(originalData)
-            }
-            let prepared = try await withTaskCancellationHandler {
-                try await preparation.value
-            } onCancel: { preparation.cancel() }
+            let asset = try await prepareAndUploadNotebookImage(originalData)
             guard isCurrentOwner, !Task.isCancelled else { return }
-            let asset = try await library.uploadNotebookAsset(
-                projectID: projectID,
-                data: prepared.data,
-                contentType: "image/jpeg",
-                width: prepared.width,
-                height: prepared.height
-            )
-            guard isCurrentOwner, !Task.isCancelled else { return }
-            document.document.append(
-                .image(
-                    url: asset.url,
-                    name: "Notebook image",
-                    width: asset.width
-                )
-            )
+            try await documentEditor.insertImage(.image(url: asset.url, name: "Notebook image", width: asset.width))
+            _ = cacheDraft()
         } catch {
             guard isCurrentOwner else { return }
             errorMessage = nativeNotebookRequestErrorMessage(error)
         }
     }
 
-    private func blockText(_ block: NotebookBlock) -> String {
-        (block.content ?? []).map { inline in
-            if inline.type == "text" { return inline.text ?? "" }
-            if inline.type == "link" {
-                return (inline.content ?? []).map { $0.text ?? "" }.joined()
-            }
-            return inline.props?.label ?? ""
-        }.joined()
+    @MainActor
+    private func uploadEditorImageData(_ originalData: Data) async throws -> String {
+        guard canPerformNetworkWrites, isCurrentOwner, !Task.isCancelled else { throw NotebookDocumentEditorError.unavailable }
+        imageUploadCount += 1
+        defer { imageUploadCount -= 1 }
+        return try await prepareAndUploadNotebookImage(originalData).url
     }
 
-    private func setBlockText(_ value: String, at index: Int) {
-        guard document.document.indices.contains(index) else { return }
-        let style = blockStyle(at: index)
-        if document.document[index].content?.count == 1,
-           document.document[index].content?.first?.type == "link" {
-            document.document[index].content?[0].content = [
-                NotebookInlineContent(type: "text", text: value, styles: style)
-            ]
-        } else {
-            document.document[index].content = [
-                NotebookInlineContent(type: "text", text: value, styles: style)
-            ]
+    @MainActor
+    private func prepareAndUploadNotebookImage(_ originalData: Data) async throws -> NotebookImageAsset {
+        guard canPerformNetworkWrites, isCurrentOwner, !Task.isCancelled else { throw NotebookDocumentEditorError.unavailable }
+        let preparation = Task.detached(priority: .userInitiated) {
+            try NotebookUploadImagePreparer.prepare(originalData)
         }
+        let prepared = try await withTaskCancellationHandler {
+            try await preparation.value
+        } onCancel: { preparation.cancel() }
+        guard canPerformNetworkWrites, isCurrentOwner, !Task.isCancelled else { throw CancellationError() }
+        let asset = try await library.uploadNotebookAsset(
+            projectID: projectID, data: prepared.data, contentType: "image/jpeg",
+            width: prepared.width, height: prepared.height)
+        guard canPerformNetworkWrites, isCurrentOwner, !Task.isCancelled else { throw CancellationError() }
+        return asset
     }
 
-    private func blockStyle(at index: Int) -> NotebookTextStyles {
-        guard let inline = document.document[safe: index]?.content?.first else { return NotebookTextStyles() }
-        if inline.type == "link" { return inline.content?.first?.styles ?? NotebookTextStyles() }
-        return inline.styles ?? NotebookTextStyles()
-    }
-
-    private func toggleStyle(_ keyPath: WritableKeyPath<NotebookTextStyles, Bool?>, at index: Int) {
-        var style = blockStyle(at: index)
-        style[keyPath: keyPath] = style[keyPath: keyPath] == true ? nil : true
-        guard document.document.indices.contains(index) else { return }
-        if document.document[index].content?.first?.type == "link" {
-            document.document[index].content?[0].content?[0].styles = style
-        } else if document.document[index].content?.isEmpty == false {
-            document.document[index].content?[0].styles = style
-        } else {
-            document.document[index].content = [.text("", bold: style.bold == true, italic: style.italic == true)]
-        }
-    }
-
-    private func setBlockType(_ type: String, at index: Int) {
-        guard document.document.indices.contains(index) else { return }
-        document.document[index].type = type
-        document.document[index].props.level = type == "heading" ? 2 : nil
-        document.document[index].props.isToggleable = type == "heading" ? false : nil
-    }
-
-    private func blockTypeLabel(_ type: String) -> String {
-        switch type {
-        case "heading": return "Heading"
-        case "bulletListItem": return "Bulleted list"
-        case "numberedListItem": return "Numbered list"
-        default: return "Text"
-        }
-    }
-
-    private func blockFont(_ block: NotebookBlock) -> Font {
-        block.type == "heading" ? .title3.weight(.semibold) : .body
-    }
-
-    private func beginLink(at index: Int) {
-        guard let block = document.document[safe: index] else { return }
-        linkLabel = blockText(block)
-        linkURL = block.content?.first?.type == "link" ? (block.content?.first?.href ?? "") : "https://"
-        linkEditor = NotebookLinkEditor(id: block.id)
-    }
-
+    @MainActor
     private func applyLink() {
-        guard let blockID = linkEditor?.id,
-              let index = document.document.firstIndex(where: { $0.id == blockID }),
-              let url = URL(string: linkURL),
-              ["https", "http", "mailto"].contains(url.scheme?.lowercased() ?? "") else {
-            errorMessage = "Enter an HTTPS, HTTP, or mailto link."
+        let destination = linkURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard isCurrentOwner, !editingReadOnly,
+              destination.utf16.count <= 2000, let url = URL(string: destination),
+              ["https", "http", "mailto"].contains(url.scheme?.lowercased() ?? ""),
+              (url.scheme?.lowercased() == "mailto" ? !url.path.isEmpty : url.host?.isEmpty == false) else {
+            linkError = "Enter a valid HTTPS, HTTP, or mailto link."
             return
         }
-        let style = blockStyle(at: index)
-        document.document[index].content = [
-            NotebookInlineContent(
-                type: "link",
-                href: linkURL,
-                content: [NotebookInlineContent(type: "text", text: linkLabel, styles: style)]
-            )
-        ]
+        pendingLinkInsertion = (destination, linkLabel)
         linkEditor = nil
     }
+
 }
 
 /// ImageIO downsamples before decoding; a full-resolution camera bitmap never
@@ -1686,5 +1802,51 @@ private struct NotebookAssetImage: View {
 private extension Array {
     subscript(safe index: Index) -> Element? {
         indices.contains(index) ? self[index] : nil
+    }
+}
+
+
+/// Captures the complete authored section with its exact edition. Never turns a
+/// bookmark search preview into a claimed exact passage or guesses a code book.
+private enum NotebookReferenceEvidencePreparer {
+    enum Failure: LocalizedError {
+        case unavailable, unsupportedCode, passageTooLarge, tooManyLinks
+        var errorDescription: String? {
+            switch self {
+            case .unavailable: return "This saved source's exact edition or section is unavailable. Open it in Reader before linking it."
+            case .unsupportedCode: return "This source's code identity could not be verified. No link was inserted."
+            case .passageTooLarge: return "This section is too long to attach as one source. Select a shorter passage in Reader."
+            case .tooManyLinks: return "This Note already has 100 evidence links."
+            }
+        }
+    }
+
+    static func codePrefix(for name: String) throws -> String {
+        let name = name.uppercased()
+        let identities = [("FUEL GAS", "FGC"), ("EXISTING BUILDING", "EBC"),
+            ("ENERGY", "ECC"), ("ELECTRICAL", "EC"), ("FIRE CODE", "FC"),
+            ("MECHANICAL", "MC"), ("PLUMBING", "PC"), ("ZONING", "ZR"),
+            ("HOUSING MAINTENANCE", "HMC"), ("TITLE 24", "T24"),
+            ("TITLE 25", "T25"), ("TITLE 26", "T26"), ("TITLE 28", "T28"),
+            ("LOCAL LAW", "LL"), ("GENERAL ADMIN", "AC"), ("1968 BUILDING", "BC68"), ("BUILDING CODE", "BC")]
+        guard let match = identities.first(where: { name.contains($0.0) }) else { throw Failure.unsupportedCode }
+        return match.1
+    }
+
+    static func makeLink(label: String, projectID: String, cardID: String, codeName: String,
+                         codeVersion: String, codeEdition: String, sectionID: String, sectionNumber: String,
+                         sectionTitle: String, officialText: String) throws -> NotebookEvidenceLink {
+        guard !codeVersion.isEmpty, !sectionID.isEmpty, !sectionNumber.isEmpty,
+              !officialText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw Failure.unavailable }
+        guard officialText.utf16.count <= 50_000 else { throw Failure.passageTooLarge }
+        let source = NotebookEvidenceSource(jurisdiction: "New York City", codePrefix: try codePrefix(for: codeName),
+            codeEdition: codeEdition, codeVersion: codeVersion, sourceID: sectionID, sectionID: sectionID,
+            sectionNumber: sectionNumber, sectionTitle: sectionTitle.isEmpty ? "Section" : sectionTitle,
+            sourceLibraryVersion: codeVersion)
+        return NotebookEvidenceLink(id: UUID().uuidString.lowercased(), label: label, relationshipRole: "context",
+            projectID: projectID, notebookCardID: cardID, source: source,
+            passages: [NotebookEvidencePassage(exact: officialText, prefix: "", suffix: "", start: nil, end: nil)],
+            createdAt: ISO8601DateFormatter().string(from: Date()),
+            noteTarget: NotebookEvidenceNoteTarget(scope: "card", blockID: "", exact: ""))
     }
 }

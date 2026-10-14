@@ -1804,6 +1804,7 @@ struct ProjectNotebookCardSummary: Codable, Hashable, Identifiable, Sendable {
     let referenceCount: Int
     let createdAt: String
     let updatedAt: String
+    var openQuestions: [NotebookQuestion]? = nil
 }
 
 struct BackendProjectNotebookCardsResponse: Codable, Hashable, Sendable {
@@ -2253,6 +2254,7 @@ struct ProjectCodeQuestionReadinessCheck: Codable, Hashable, Identifiable, Senda
 }
 
 struct ProjectFoundationArtifactPayload: Codable, Hashable, Sendable {
+    var openQuestions: [NotebookQuestion]? = nil
     let schemaVersion: Int?
     let id: String?
     let projectID: String?
@@ -2396,7 +2398,8 @@ struct ProjectFoundationArtifact: Codable, Hashable, Identifiable, Sendable {
             plainText: payload.plainText ?? "",
             referenceCount: payload.referenceCount ?? 0,
             createdAt: payload.createdAt ?? envelope.createdAt,
-            updatedAt: payload.updatedAt ?? envelope.updatedAt
+            updatedAt: payload.updatedAt ?? envelope.updatedAt,
+            openQuestions: payload.openQuestions
         )
     }
 
@@ -3893,7 +3896,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         if let card = notebookFixtureCard {
             return NotebookCardListResponse(schemaVersion: 1, projectID: request.projectID,
                 cards: [ProjectNotebookCardSummary(id: card.id, version: card.version, cardType: card.cardType, title: card.title,
-                    plainText: card.plainText, referenceCount: 0, createdAt: card.createdAt, updatedAt: card.updatedAt)],
+                    plainText: card.plainText, referenceCount: 0, createdAt: card.createdAt, updatedAt: card.updatedAt, openQuestions: card.openQuestions)],
                 access: NotebookAccess(role: "owner", readOnly: false))
         }
         #endif
@@ -3947,6 +3950,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             card.title = request.title
             card.document = request.document
             card.evidenceLinks = request.evidenceLinks
+            card.openQuestions = request.openQuestions ?? card.openQuestions
             notebookFixtureCard = card
             return NotebookCardResponse(card: card)
         }
@@ -5456,7 +5460,8 @@ protocol AccountBackendClient {
         title: String,
         document: NotebookDocument,
         evidenceLinks: [NotebookEvidenceLink],
-        clientMutationID: String?
+        clientMutationID: String?,
+        openQuestions: [NotebookQuestion]?
     ) async throws -> NotebookCard
     func deleteNotebookCard(
         account: SignedInAccount,

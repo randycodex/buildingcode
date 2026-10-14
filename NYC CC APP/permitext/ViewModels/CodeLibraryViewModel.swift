@@ -18,6 +18,27 @@ enum PermitextReleaseSurfaceVisibility {
     static let coordination = false
 }
 
+/// Presentation only. Checking a plan never grants a capability.
+enum InitialEntitlementPresentation: Equatable {
+    case checking, resolved, unavailable
+
+    func confirmingStoreKitAccess(authorizedPro: Bool) -> Self {
+        authorizedPro ? .resolved : self
+    }
+
+    func confirmingBackendAccess(hasPro: Bool, storeKitPending: Bool) -> Self {
+        hasPro || !storeKitPending ? .resolved : self
+    }
+
+    func afterStoreKitTimeout(requestID: UUID, currentRequestID: inout UUID?) -> Self {
+        guard currentRequestID == requestID else { return self }
+        // Release the presentation wait, not StoreKit authorization. A fresh
+        // account retry can now resolve without waiting on a stalled request.
+        currentRequestID = nil
+        return self == .checking ? .unavailable : self
+    }
+}
+
 func permitextUpgradeCallToActionTitle(
     isStoreKitTestProActive: Bool,
     currentPlan: AppPlan,
@@ -196,6 +217,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published private(set) var currentEntitlementSource: EntitlementSource
     @Published private(set) var currentCapabilityContract: PermitextCapabilityContract? = nil
+    @Published private(set) var initialEntitlementPresentation: InitialEntitlementPresentation = .resolved
+    private var initialBackendEntitlementResolved = false
+    private var initialStoreKitPresentationRequestID: UUID?
     @Published private(set) var entitlementPrompt: EntitlementRequirement? {
         didSet {
             if let entitlementPrompt { sharedAccountLibrary?.entitlementPrompt = entitlementPrompt }
@@ -215,6 +239,9 @@ final class CodeLibraryViewModel: ObservableObject {
             projectSaveRequest = nil
             reloadActiveCodeSourcePreferences(forceInvalidation: true)
             privateSessionID = UUID()
+            initialEntitlementPresentation = signedInAccount == nil ? .resolved : .checking
+            initialBackendEntitlementResolved = signedInAccount == nil
+            initialStoreKitPresentationRequestID = nil
             contentTrashEntries = []
             contentTrashMessage = nil
             isContentTrashBusy = false
@@ -563,6 +590,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.currentPlan = entitlementService.currentPlan
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
         self.signedInAccount = loadedSignedInAccount
+        self.initialEntitlementPresentation = loadedSignedInAccount != nil && entitlementService.currentPlan != .pro ? .checking : .resolved
         self.readerSaveDestinationChoice = NativeReaderSaveDestination.load(accountID: loadedSignedInAccount?.appUserID, defaults: preferencesDefaults)
         self.userContentSyncCheckpoint = syncEngine.checkpoint(account: loadedSignedInAccount)
         self.readerTheme = readerThemeStore.load()
@@ -1767,6 +1795,7 @@ final class CodeLibraryViewModel: ObservableObject {
         currentPlan = sharedLibrary.currentPlan
         currentEntitlementSource = sharedLibrary.currentEntitlementSource
         currentCapabilityContract = sharedLibrary.currentCapabilityContract
+        initialEntitlementPresentation = sharedLibrary.initialEntitlementPresentation
         accountAuthorizedStoreKitPlan = sharedLibrary.accountAuthorizedStoreKitPlan
         activeStoreKitResearch = sharedLibrary.activeStoreKitResearch
         isStoreKitResearchActive = sharedLibrary.isStoreKitResearchActive
@@ -3778,7 +3807,8 @@ final class CodeLibraryViewModel: ObservableObject {
         title: String,
         document: NotebookDocument,
         evidenceLinks: [NotebookEvidenceLink],
-        clientMutationID: String? = nil
+        clientMutationID: String? = nil,
+        openQuestions: [NotebookQuestion]? = nil
     ) async throws -> NotebookCard {
         try await performPrivateAccountRequest { account in
             try await accountBackendClient.saveNotebookCard(
@@ -3789,7 +3819,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 title: title,
                 document: document,
                 evidenceLinks: evidenceLinks,
-                clientMutationID: clientMutationID
+                clientMutationID: clientMutationID,
+                openQuestions: openQuestions
             )
         }
     }
@@ -4029,6 +4060,7 @@ final class CodeLibraryViewModel: ObservableObject {
         case .allowed:
             return false
         case .denied(let requirement):
+            if deferUnconfirmedEntitlementPrompt() { return true }
             entitlementPrompt = requirement
             statusMessage = requirement.message
             return true
@@ -4090,6 +4122,35 @@ final class CodeLibraryViewModel: ObservableObject {
 
     var hasProjectAccess: Bool {
         hasCapability(.projects)
+    }
+
+    var defersEntitlementPresentation: Bool {
+        let owner = sharedAccountLibrary ?? self
+        return owner.signedInAccount != nil && owner.currentPlan != .pro && owner.initialEntitlementPresentation != .resolved
+    }
+
+    private func deferUnconfirmedEntitlementPrompt() -> Bool {
+        guard defersEntitlementPresentation else { return false }
+        let owner = sharedAccountLibrary ?? self
+        owner.statusMessage = owner.initialEntitlementPresentation == .checking
+            ? "Checking your plan…" : "Your plan could not be checked. Open Account to retry."
+        return true
+    }
+
+    func retryInitialEntitlementCheck() async {
+        if let sharedAccountLibrary { await sharedAccountLibrary.retryInitialEntitlementCheck(); return }
+        guard signedInAccount != nil, !isAccountBusy else { return }
+        let identity = privateRequestIdentity
+        if currentPlan != .pro { initialEntitlementPresentation = .checking }
+        await pullRemoteUserContentIfPossible(skipIfUnchanged: false)
+        finishUnconfirmedEntitlementCheck(for: identity)
+    }
+
+    private func finishUnconfirmedEntitlementCheck(for identity: NativePrivateRequestIdentity?) {
+        guard identity != nil, identity == privateRequestIdentity,
+              currentPlan != .pro, initialEntitlementPresentation == .checking else { return }
+        if initialBackendEntitlementResolved && initialStoreKitPresentationRequestID != nil { return }
+        initialEntitlementPresentation = .unavailable
     }
 
     var hasResearchAccess: Bool {
@@ -4171,6 +4232,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @discardableResult
     func requireSavedWorkAccess() -> Bool {
         guard !hasCapability(.savedWork) else { return true }
+        guard !deferUnconfirmedEntitlementPrompt() else { return false }
         let requirement = EntitlementRequirement(
             feature: .unlimitedSavedItems, requiredPlan: .pro,
             message: "Upgrade to Pro to save sections and organize your work. Existing saved work is preserved."
@@ -4183,6 +4245,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @discardableResult
     func requireProjectAccess() -> Bool {
         guard !hasCapability(.projects) else { return true }
+        guard !deferUnconfirmedEntitlementPrompt() else { return false }
         let requirement = EntitlementRequirement(
             feature: .unlimitedProjects,
             requiredPlan: .pro,
@@ -4194,6 +4257,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func showUpgradePlaceholder() {
+        guard !deferUnconfirmedEntitlementPrompt() else { return }
         entitlementPrompt = EntitlementRequirement(
             feature: .unlimitedSavedItems,
             requiredPlan: .pro,
@@ -4201,9 +4265,35 @@ final class CodeLibraryViewModel: ObservableObject {
         )
     }
 
-    func refreshStoreKitEntitlements() async {
+    func refreshStoreKitEntitlements(reservedPresentationRequestID: UUID? = nil) async {
+        let identity = privateRequestIdentity
+        let presentationRequestID: UUID?
+        if let reservedPresentationRequestID,
+           initialStoreKitPresentationRequestID == reservedPresentationRequestID {
+            presentationRequestID = reservedPresentationRequestID
+        } else {
+            presentationRequestID = defersEntitlementPresentation && initialStoreKitPresentationRequestID == nil ? UUID() : nil
+        }
+        if let presentationRequestID { initialStoreKitPresentationRequestID = presentationRequestID }
+        // Product metadata or StoreKit diagnostics can stall. Keep an unknown
+        // plan neutral, but replace the spinner with retry guidance after 10s.
+        let presentationTimeout = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(10))
+            guard !Task.isCancelled, let self, let presentationRequestID,
+                  self.privateRequestIdentity == identity,
+                  self.initialStoreKitPresentationRequestID == presentationRequestID else { return }
+            self.initialEntitlementPresentation = self.initialEntitlementPresentation.afterStoreKitTimeout(
+                requestID: presentationRequestID, currentRequestID: &self.initialStoreKitPresentationRequestID)
+        }
+        defer { presentationTimeout.cancel() }
         let snapshot = await storeKitSubscriptionService.snapshot()
+        guard identity == privateRequestIdentity else { return }
         _ = await authorizeStoreKitSnapshot(snapshot, allowsNewTestBinding: false)
+        guard identity == privateRequestIdentity else { return }
+        if let presentationRequestID, initialStoreKitPresentationRequestID == presentationRequestID {
+            initialStoreKitPresentationRequestID = nil
+            if initialBackendEntitlementResolved { initialEntitlementPresentation = .resolved }
+        }
         await refreshResearchTurnAllowance(recoverUnfinishedPurchases: true, showsErrors: false)
     }
 
@@ -4938,8 +5028,8 @@ final class CodeLibraryViewModel: ObservableObject {
         Self.saveSignedInAccount(account)
         prepareCanonicalCodeVersionMigration(for: account)
         refreshUserContentSyncCheckpoint()
-        applyBackendEntitlement(backendRecord.entitlement)
-        await refreshStoreKitEntitlements()
+        let presentationRequestID = prepareSignInEntitlementForStoreKitCheck(backendRecord.entitlement)
+        await refreshStoreKitEntitlements(reservedPresentationRequestID: presentationRequestID)
         await attachLocalDataIfNeeded()
         await pullRemoteUserContentIfPossible()
         await syncPendingUserContentIfPossible()
@@ -4952,6 +5042,19 @@ final class CodeLibraryViewModel: ObservableObject {
             resumePendingProSave()
             accountAuthenticationCompletionID = UUID()
         }
+    }
+
+    // Sign-in receives the backend result before starting the Apple check.
+    // Reserve that check first so a backend Free result cannot briefly show
+    // upgrade prompts for an account whose bound Apple subscription is pending.
+    func prepareSignInEntitlementForStoreKitCheck(_ entitlement: AppEntitlement?) -> UUID? {
+        let requestID = signedInAccount == nil ? nil : UUID()
+        initialStoreKitPresentationRequestID = requestID
+        if requestID != nil {
+            initialEntitlementPresentation = .checking
+        }
+        applyBackendEntitlement(entitlement)
+        return requestID
     }
 
     private static let accountAuthenticationLogger = Logger(
@@ -5007,12 +5110,14 @@ final class CodeLibraryViewModel: ObservableObject {
     @discardableResult
     func syncPendingUserContentIfPossible() async -> Int {
         guard !isAccountBusy else { return 0 }
+        let identity = privateRequestIdentity
         isAccountBusy = true
         defer { isAccountBusy = false }
 
         do {
             let startedAt = Date()
             let report = try await syncEngine.processPendingWork(account: signedInAccount)
+            guard identity == privateRequestIdentity else { return 0 }
             let elapsed = Date().timeIntervalSince(startedAt)
             if report.includesAuthoritativeAccountState {
                 applyBackendEntitlement(
@@ -5035,6 +5140,7 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshPendingUserContentSyncCount()
             return report.attemptedCount
         } catch {
+            guard identity == privateRequestIdentity else { return 0 }
             if handleBackendSessionFailureIfNeeded(error) {
                 refreshUserContentSyncCheckpoint()
                 refreshPendingUserContentSyncCount()
@@ -5167,6 +5273,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func pullRemoteUserContentIfPossible(skipIfUnchanged: Bool = false) async {
         guard !isAccountBusy else { return }
+        let identity = privateRequestIdentity
         isAccountBusy = true
         defer { isAccountBusy = false }
 
@@ -5176,6 +5283,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 applySafeChanges: true,
                 skipIfUnchanged: skipIfUnchanged
             )
+            guard identity == privateRequestIdentity else { return }
             if report.includesAuthoritativeAccountState {
                 applyBackendEntitlement(
                     report.entitlement,
@@ -5201,10 +5309,12 @@ final class CodeLibraryViewModel: ObservableObject {
                 statusMessage = "\(report.conflictCount) remote changes need review."
             }
         } catch {
+            guard identity == privateRequestIdentity else { return }
             if handleBackendSessionFailureIfNeeded(error) {
                 refreshUserContentSyncCheckpoint()
                 return
             }
+            finishUnconfirmedEntitlementCheck(for: identity)
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
         }
@@ -5215,6 +5325,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard signedInAccount != nil else { return }
         guard !didRunStartupAccountSync else { return }
         didRunStartupAccountSync = true
+        let identity = privateRequestIdentity
         lastForegroundAccountSyncAt = Date()
         // A cold launch must refresh the authoritative account state even when
         // the content checkpoint is unchanged. This repairs missing local
@@ -5224,6 +5335,7 @@ final class CodeLibraryViewModel: ObservableObject {
         if pushedCount > 0 {
             await pullRemoteUserContentIfPossible(skipIfUnchanged: false)
         }
+        finishUnconfirmedEntitlementCheck(for: identity)
     }
 
     func performForegroundAccountSyncIfNeeded() async {
@@ -5836,23 +5948,31 @@ final class CodeLibraryViewModel: ObservableObject {
         _ entitlement: AppEntitlement?,
         capabilityContract: PermitextCapabilityContract? = nil
     ) {
+        initialBackendEntitlementResolved = true
         if let capabilityContract {
             currentCapabilityContract = capabilityContract
         }
         let activeBackendEntitlement = entitlement.flatMap { $0.grantsPro() ? $0 : nil }
         hasActiveBackendProEntitlement = activeBackendEntitlement != nil
         if let entitlement {
-            LocalEntitlementService.setEntitlement(entitlement)
+            LocalEntitlementService.setEntitlement(entitlement, defaults: preferencesDefaults)
         } else {
-            LocalEntitlementService.clearEntitlement()
+            LocalEntitlementService.clearEntitlement(defaults: preferencesDefaults)
         }
         refreshCurrentEntitlement()
+        // An already-running Apple check may still authorize a locally bound
+        // test subscription. A backend Free response alone must not flash an
+        // upsell before that check completes; neither state grants access.
+        initialEntitlementPresentation = initialEntitlementPresentation.confirmingBackendAccess(
+            hasPro: currentPlan == .pro, storeKitPending: initialStoreKitPresentationRequestID != nil)
     }
 
     private func applyStoreKitSnapshot(
         _ snapshot: StoreKitSubscriptionSnapshot,
         authorizedForCurrentAccount: Bool
     ) {
+        initialEntitlementPresentation = initialEntitlementPresentation.confirmingStoreKitAccess(
+            authorizedPro: authorizedForCurrentAccount && snapshot.plan == .pro)
         let authorizedPlan: AppPlan = authorizedForCurrentAccount ? snapshot.plan : .free
         accountAuthorizedStoreKitPlan = authorizedPlan
         activeStoreKitResearch = authorizedForCurrentAccount

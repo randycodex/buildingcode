@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { webcrypto } from "node:crypto";
 import vm from "node:vm";
+import { normalizeNotebookQuestions, notebookQuestionsText } from "../public/notebook-questions.js";
 
 const appSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const offlineSource = await readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8");
@@ -41,7 +42,7 @@ function harness() {
   let confirmed = false;
   const identity = { userID: "synthetic-a", generation: 1 };
   const sandbox = {
-    structuredClone, crypto: webcrypto, console, Date, Promise, Map, Set, Blob,
+    structuredClone, crypto: webcrypto, console, Date, Promise, Map, Set, Blob, normalizeNotebookQuestions, notebookQuestionsText,
     accountUserID: identity.userID, requestIdentity: identity, projectID: "project",
     accountRuntimeGeneration: 1, activeWorkspaceID: "workspace",
     notebookDraftsStoreName: "drafts", requestResult: async (value) => clone(value),

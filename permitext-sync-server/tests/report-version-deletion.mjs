@@ -11,9 +11,9 @@ function harness({confirmed=true,fail=false}={}) {
  const c=vm.createContext({disposed:false,generatingReport:false,deletingReport:false,deletingVersionID:null,historyMutationGeneration:0,
   requestIdentity:'account',requestWorkspaceID:'workspace',activeWorkspaceID:'workspace',current:true,projectID:'project',
   version,history:[version,{id:'version-b'}],activeDraft:{title:'Unsaved title',blocks:[{text:'Unsaved text'}]},dirty:true,
-  shell:{inert:false},panel:{querySelector:selector=>selector==='.report-history'?historyBody:null},
+  shell:{inert:false},panel:{querySelector:selector=>selector==='.report-history'?historyBody:null,_updateReportColumns(){c.availabilityUpdates++;}},
   trigger:{disabled:false,isConnected:true,closest:()=>versionsScope,focus(){c.focused++}},
-  focused:0,cleared:0,renders:0,calls:[],confirmations:[],closed:[],message:'',
+  focused:0,cleared:0,renders:0,availabilityUpdates:0,calls:[],confirmations:[],closed:[],message:'',
   isCurrentAccountRequest:()=>c.current,
   confirmWebWarning:async(...args)=>{c.confirmations.push(args);return confirmed},
   reportRequest:async(path,body)=>{c.calls.push({path,body});if(fail)throw Error('Offline');return{}},
@@ -29,6 +29,7 @@ for(const mode of ['success','cancel','failure']) {
  assert.equal(c.confirmations[0][2].scope,versionsScope,'Confirmation stays in Versions');
  assert.equal(c.history.length,mode==='success'?1:2);
  assert.equal(c.renders,mode==='success'?1:0,'Only the version list is rebuilt');
+ assert.equal(c.availabilityUpdates,mode==='success'?1:0,'Only confirmed deletion updates comparison availability');
  assert.equal(c.activeDraft,draft);assert.equal(c.activeDraft.blocks,blocks);assert.equal(c.dirty,true);
  assert.equal(historyBody.scrollTop,127);assert.equal(c.shell.inert,false);assert.equal(c.trigger.disabled,false);
  assert.equal(c.deletingVersionID,null);

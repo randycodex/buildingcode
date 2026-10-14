@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { emptyWorkspaceLayout, captureWorkspaceLayout, applyWorkspaceLayout, canGroupColumn } from "../public/workspace-state.js";
+import { showProjectFact } from "../public/minimal-workflow.js";
 
 const app = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const shell = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
@@ -20,7 +21,9 @@ const copy = value => JSON.parse(JSON.stringify(value));
 const alpha = { id: "alpha", name: "Alpha", description: "Original context", address: "Original address", structuredFacts: [] };
 assert.match(shell, /id="toggle-saved"[^>]*aria-label="Evidence"/);
 assert.doesNotMatch(actual("renderSavedFolderContext"), /appendSavedProjectFactEditor|saved-project-summary/);
-assert.match(actual("openWorkspaceContextMenu"), /label: "Project details"/);
+assert.match(shell, /id="open-project-details"/);
+assert.doesNotMatch(actual("openWorkspaceContextMenu"), /label: "Project details"/,
+  "Project Details stays in its dedicated top-level control rather than being repeated in the Project menu");
 
 // Visibility is scoped to each Project layout; legacy layouts start closed.
 assert.equal(emptyWorkspaceLayout().projectContextOpen, false);
@@ -41,12 +44,18 @@ for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${
 
 // Context and Facts now share a retained screen; the same editors and save guards remain.
 let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen;
-const mounts = new Map(), issues = [];
+const mounts = new Map(), issues = [], renderedInformation = [];
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
 const body = element('body');
+const workspaceShell = element('main'), workflowToolbar = element('nav'), track = element('section');
+workspaceShell.className = 'workspace-shell'; workflowToolbar.className = 'workflow-toolbar';
+body.append(workspaceShell); workspaceShell.append(workflowToolbar, track);
+track.inert = false; workflowToolbar.inert = false;
 const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
-  currentWorkflowView:()=>"research", track: element("section"), closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {},
-  document: { createElement: element, body, querySelector: () => body }, setInterval: fn => { tickScreen = fn; return 1; }, clearInterval() {},
+  currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
+  document: { createElement: element, body, querySelector: selector => selector === '.workspace-shell' ? workspaceShell : selector === '.workflow-toolbar' ? workflowToolbar : null },
+  setInterval: fn => { tickScreen = fn; return 1; }, clearInterval() {},
+  createReaderToolbarButton: () => { const button = element('button'); button.textContent = 'Reader'; return button; },
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
   workspaceProject: () => current, projectIdentity: value => ({ ...value }), projectDetailKey: value => value.id,
   projectDetailMatches: (a, b) => a?.id === b?.id,
@@ -55,6 +64,11 @@ const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projec
   presentWorkspaceIssue: value => issues.push(value),
   renderProjectInformation: async (identity, kind) => {
     const panel = element('article'); panel.draft = `Draft ${kind}`;
+    const content = element('div'); content.className = 'project-information-content'; panel.append(content);
+    if (kind === 'context') {
+      const records = element('section'); records.className = 'project-records-checklist'; content.append(records);
+    }
+    renderedInformation.push({ identity, kind, panel });
     mounts.set(`project:${kind}:${identity.id}`, {panel, flush: async () => {}});
     return panel;
   }
@@ -65,17 +79,43 @@ vm.runInContext('let projectDetailsScreen=null, reportScreen=null;\n'+
 await c.toggleProjectInformation('context');
 const contextPanel = mounts.get('project:context:alpha').panel;
 const factsPanel = mounts.get('project:facts:alpha').panel;
+const screenElement = find(workspaceShell, node => node.className.includes('project-details-screen'));
+assert.ok(screenElement, 'Project details mounts in the workspace screen wrapper');
+assert.equal(find(screenElement, node => node.attributes.role === 'alert'), undefined, 'Screen hydration must finish without a hidden harness error');
+assert.equal(screenElement.open, true); assert.equal(screenElement.hidden, false);
+assert.equal(track.inert, true); assert.equal(workflowToolbar.inert, true);
+assert.equal(workspaceShell.inert, undefined, 'Cover the underlying controls, not the active details screen');
 assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden,true);
+const overviewTab = find(screenElement, node => node.tag === 'button' && node.textContent === 'Overview');
+const factsTab = find(screenElement, node => node.tag === 'button' && node.textContent === 'Facts');
+const recordsTab = find(screenElement, node => node.tag === 'button' && node.textContent === 'Records');
+assert.equal(overviewTab.attributes['aria-pressed'], 'true');
+assert.equal(factsTab.attributes['aria-pressed'], 'false');
+const recordsPanel = find(screenElement, node => node.className.includes('project-records-panel'));
+assert.ok(find(recordsPanel, node => node.className === 'project-records-checklist'), 'Records retains the existing checklist in its dedicated section');
+assert.equal(find(contextPanel, node => node.className === 'project-records-checklist'), undefined, 'The checklist is moved rather than duplicated');
+recordsTab.handlers.click();
+assert.equal(recordsPanel.hidden, false); assert.equal(contextPanel.hidden, true); assert.equal(factsPanel.hidden, true);
+assert.equal(recordsTab.attributes['aria-pressed'], 'true');
+overviewTab.handlers.click();
 contextPanel.draft='Retained edit'; contextPanel.scrollTop=320;
 vm.runInContext('projectDetailsScreen.close()',c);
+assert.equal(screenElement.hidden, true); assert.equal(screenElement.open, false);
+assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
+assert.equal(mounts.size, 2, 'Closing retains both mounted editors and their drafts');
 await c.toggleProjectInformation('facts');
 assert.equal(mounts.get('project:context:alpha').panel,contextPanel);
 assert.equal(contextPanel.draft,'Retained edit'); assert.equal(contextPanel.scrollTop,320);
 assert.equal(contextPanel.hidden,true); assert.equal(factsPanel.hidden,false);
+assert.equal(renderedInformation.length, 2, 'Switching sections must reuse both original editors');
+assert.equal(factsTab.attributes['aria-pressed'], 'true');
 vm.runInContext('projectDetailsScreen.close()',c);
 await c.openProjectDetailsScreen();
 assert.equal(factsPanel.hidden,false,'Reopening keeps the last section');
 allowed=false; tickScreen(); assert.equal(mounts.size,0,'Revoked access releases retained editor mounts');
+assert.equal(screenElement.isConnected, false, 'Revoking access removes the whole private screen');
+assert.equal(contextPanel.isConnected, false); assert.equal(factsPanel.isConnected, false);
+assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
 assert.equal(await c.toggleProjectInformation('facts'),false);
 allowed=true; privateAllowed=false; assert.equal(await c.toggleProjectInformation('facts'),false);
 privateAllowed=true; current=null; assert.equal(await c.toggleProjectInformation('facts'),false);
@@ -101,7 +141,7 @@ const widthContext = vm.createContext({
   detachedProjectWindow: false
 });
 vm.runInContext([
-  ...app.matchAll(/const (?:legacy|default)\w*PaneWidth = [^;]+;/g)
+  ...app.matchAll(/const (?:(?:legacy|default)\w*PaneWidth|assistantHistoryWidth) = [^;]+;/g)
 ].map(match => match[0]).join("\n") + "\n" + ["defaultPaneWidthForID", "minimumPaneWidthForID", "migrateLegacyPaneWidth",
   "normalizePaneWeights", "isFlexibleReaderPaneID", "applyPaneWeight"].map(actual).join("\n"), widthContext);
 assert.equal(widthContext.defaultPaneWidthForID(factsID), 600);
@@ -129,18 +169,19 @@ assert.match(styles, /\.project-facts-panel\s*\{\s*--pane-min-width: 600px;/);
 
 // Execute the actual split editors: Context patches only description; Facts patches only fact fields.
 function element(tag) {
-  const e = { tag, children: [], attributes: {}, handlers: {}, value: "", isConnected: true,
+  const e = { tag, children: [], attributes: {}, handlers: {}, dataset: {}, value: "", isConnected: true,
     className: "", classList: { add() {}, remove() {} },
-    append(...values) { values.forEach(value => { value.parent = this; this.children.push(value); }); },
+    append(...values) { values.forEach(value => { if (value.parent) value.parent.children = value.parent.children.filter(child => child !== value); value.parent = this; this.children.push(value); }); },
     prepend(value) { value.parent = this; this.children.unshift(value); },
     replaceChildren(...values) { this.children=[]; this.append(...values); },
     querySelectorAll() { return []; },
     showModal() { this.open=true; },
     close() { if (!this.open) return; this.open=false; this.handlers.close?.(); },
-    remove() { this.isConnected=false; if (this.parent) this.parent.children = this.parent.children.filter(value => value !== this); },
+    remove() { const disconnect = node => { node.isConnected=false; node.children.forEach(disconnect); }; disconnect(this); if (this.parent) this.parent.children = this.parent.children.filter(value => value !== this); },
     setAttribute(key, value) { this.attributes[key] = value; },
     addEventListener(type, callback) { this.handlers[type] = callback; },
-    querySelector(selector) { return this.children.find(value => selector === `.${value.className}`) || null; }
+    closest(selector) { for (let current = this; current; current = current.parent) { if (selector.startsWith('.') && current.className.split(/\s+/).includes(selector.slice(1))) return current; } return null; },
+    querySelector(selector) { for (const child of this.children) { const match = find(child, value => selector.startsWith('.') && value.className.split(/\s+/).includes(selector.slice(1))); if (match) return match; } return null; }
   };
   return e;
 }
@@ -151,7 +192,7 @@ function find(root, predicate) {
 let editorCurrent = true, failWrite = false;
 const factMotionCalls = [];
 const patches = [];
-const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { createElement: element },
+const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { createElement: element }, showProjectFact,
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => editorCurrent,
   projectStructuredFacts: project => copy(project.structuredFacts || []), migratedProjectStructuredFacts: project => copy(project.structuredFacts),
   normalizeProjectStructuredFact: value => value.value ? value : null,
@@ -160,24 +201,33 @@ const e = vm.createContext({ activeWorkspaceID: "alpha-workspace", document: { c
   wireProjectSectionMotion(...args) { factMotionCalls.push(args); }, persistProjectSectionExpansion() {}, clear: node => { node.children = []; },
   window: { clearTimeout() {} }, showWebNotice() {},
   projectStructuredFactGroups: [
-    { key: "building", label: "Building & code", fields: [{ key: "occupancy", label: "Occupancy" }] },
-    { key: "zoning", label: "Zoning", fields: [{ key: "address", label: "Address", projectAddress: true }] }
+    { key: "buildingCode", label: "Building & code", fields: [{ key: "occupancy", label: "Occupancy" }] },
+    { key: "zoning", label: "Zoning", fields: [{ key: "address", label: "Address", projectAddress: true }, { key: "zoning-districts", label: "Zoning Districts" }] }
   ],
+  nycMappedFactFields: [],
   async updateProjectFolder(_project, patch) { if (failWrite) throw Error("Write failed"); patches.push(copy(patch)); return true; }
 });
-vm.runInContext(actual("appendSavedProjectFactEditor"), e);
+vm.runInContext(actual("projectFactPresentationGroups") + '\n' + actual("appendSavedProjectFactEditor"), e);
 const contextRoot = element("section"), factsRoot = element("section");
 const contextEditor = e.appendSavedProjectFactEditor(contextRoot, alpha, alpha, { section: "context" });
 const factsEditor = e.appendSavedProjectFactEditor(factsRoot, alpha, alpha, { section: "facts" });
 assert.equal(factMotionCalls.length, 0, "Standalone Facts ignores stored collapsed state and has no accordions.");
-for (const label of ["Building & code", "Zoning"]) {
+for (const label of ["Property", "Building", "Work & code basis", "Zoning", "Special designations"]) {
   assert.ok(find(factsRoot, node => node.tag === "h3" && node.textContent === label));
 }
 const narrative = find(contextRoot, node => node.tag === "textarea");
 const occupancy = find(factsRoot, node => node.attributes["aria-label"] === "Occupancy");
+const zoningRow = find(factsRoot, node => node.dataset.factKey === "zoning-districts");
+const allFacts = find(factsRoot, node => node.className === "ghost-button project-facts-filter");
+assert.equal(zoningRow.hidden, true, 'Unrecorded optional facts start hidden');
+allFacts.handlers.click();
+assert.equal(zoningRow.hidden, false); assert.equal(allFacts.attributes['aria-pressed'], 'true');
 narrative.value = "Changed context";
 await contextEditor.flush();
 occupancy.value = "R-2"; occupancy.handlers.input();
+allFacts.handlers.click();
+assert.equal(occupancy.value, 'R-2', 'Changing the fact presentation cannot rebuild away typed values');
+assert.equal(zoningRow.hidden, true);
 await factsEditor.flush();
 assert.deepEqual(patches[0], { description: "Changed context" });
 assert.deepEqual(Object.keys(patches[1]).sort(), ["address", "structuredFacts"]);

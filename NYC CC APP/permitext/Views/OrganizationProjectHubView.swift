@@ -73,7 +73,8 @@ struct OrganizationProjectHubView: View {
                 kind: "researchAnswer",
                 referenceID: answer.id,
                 label: answer.question,
-                detail: "Permitext Research"
+                detail: "Permitext Research",
+                conversationID: answer.conversationID
             )
         }
     }

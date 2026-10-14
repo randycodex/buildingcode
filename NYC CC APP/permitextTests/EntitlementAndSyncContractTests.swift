@@ -222,6 +222,34 @@ private actor SyncPullRecorder {
     }
 }
 
+private actor InitialEntitlementPullGate {
+    private var started = 0
+    private var waitingForStart: [(Int, CheckedContinuation<Void, Never>)] = []
+    private var pending: [CheckedContinuation<Void, Error>] = []
+
+    func hold() async throws {
+        started += 1
+        let ready = waitingForStart.filter { $0.0 <= started }
+        waitingForStart.removeAll { $0.0 <= started }
+        ready.forEach { $0.1.resume() }
+        try await withCheckedThrowingContinuation { pending.append($0) }
+    }
+
+    func waitUntilStarted(_ count: Int = 1) async {
+        if started >= count { return }
+        await withCheckedContinuation { waitingForStart.append((count, $0)) }
+    }
+
+    func release(failing: Bool = false) {
+        let requests = pending
+        pending.removeAll()
+        for request in requests {
+            if failing { request.resume(throwing: URLError(.notConnectedToInternet)) }
+            else { request.resume() }
+        }
+    }
+}
+
 private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
     let name = "recording-sync"
     let recorder: SyncPullRecorder
@@ -232,6 +260,8 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
     let pullError: Error?
     let simulatesRestoredServer: Bool
     let fullPullError: Error?
+    let returnedEntitlement: AppEntitlement?
+    let pullGate: InitialEntitlementPullGate?
 
     init(
         recorder: SyncPullRecorder,
@@ -241,7 +271,9 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
         mutations: [ServerUserContentMutation] = [],
         pullError: Error? = nil,
         simulatesRestoredServer: Bool = false,
-        fullPullError: Error? = nil
+        fullPullError: Error? = nil,
+        returnedEntitlement: AppEntitlement? = nil,
+        pullGate: InitialEntitlementPullGate? = nil
     ) {
         self.recorder = recorder
         self.returnedContentMapVersion = returnedContentMapVersion
@@ -251,6 +283,8 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
         self.pullError = pullError
         self.simulatesRestoredServer = simulatesRestoredServer
         self.fullPullError = fullPullError
+        self.returnedEntitlement = returnedEntitlement
+        self.pullGate = pullGate
     }
 
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
@@ -311,12 +345,14 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
             sinceEventID: sinceEventID
         )
         if let pullError { throw pullError }
+        try await pullGate?.hold()
         if sinceEventID == nil, let fullPullError { throw fullPullError }
         return ServerUserContentPullResult(
             userID: account.appUserID,
             pulledAt: Date(),
             latestEventID: returnedLatestEventID,
             contentMapVersion: returnedContentMapVersion,
+            entitlement: returnedEntitlement,
             entitlementFingerprint: returnedEntitlementFingerprint,
             mutations: simulatesRestoredServer && sinceEventID != nil ? [] : mutations
         )
@@ -4337,6 +4373,166 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(contract.enables(.projects))
         XCTAssertTrue(contract.enables(.offlineAccess))
         XCTAssertFalse(contract.enables(.research))
+    }
+
+    @MainActor
+    private func entitlementPresentationModel(
+        accountID: String? = "entitlement-owner", cached: AppEntitlement? = nil,
+        response: AppEntitlement? = nil, gate: InitialEntitlementPullGate? = nil
+    ) throws -> CodeLibraryViewModel {
+        let defaults = isolatedEntitlementDefaults()
+        if let cached { LocalEntitlementService.setEntitlement(cached, defaults: defaults) }
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        addTeardownBlock { try? FileManager.default.removeItem(at: directory) }
+        let account = accountID.map { SignedInAccount(appUserID: $0, appleUserID: $0, displayName: "Test", signedInAt: Date()) }
+        return CodeLibraryViewModel(
+            userContentRepository: try UserDataStore(databaseURL: directory.appendingPathComponent("data.sqlite")),
+            continuityStore: ContinuityStore(defaults: defaults), readerThemeStore: ReaderThemeStore(defaults: defaults),
+            preferencesDefaults: defaults, entitlementService: LocalEntitlementService(defaults: defaults),
+            syncBackend: RecordingUserContentSyncBackend(recorder: SyncPullRecorder(), returnedContentMapVersion: 7,
+                returnedEntitlement: response, pullGate: gate),
+            loadsInitialContent: false, loadsPersistedAccount: false, initialSignedInAccount: account,
+            ownsAccountSync: false, privateCacheDirectoryURL: directory.appendingPathComponent("cache"))
+    }
+
+    @MainActor
+    func testInitialEntitlementPresentationKeepsValidProAndDefersUnknownAccount() throws {
+        let pro = AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: "entitlement-owner")
+        let known = try entitlementPresentationModel(cached: pro)
+        XCTAssertEqual(known.initialEntitlementPresentation, .resolved)
+        XCTAssertFalse(known.defersEntitlementPresentation)
+        XCTAssertTrue(known.hasCapability(.savedWork))
+        let unknown = try entitlementPresentationModel()
+        XCTAssertEqual(unknown.initialEntitlementPresentation, .checking)
+        XCTAssertTrue(unknown.defersEntitlementPresentation)
+        XCTAssertFalse(unknown.hasCapability(.savedWork))
+        XCTAssertFalse(unknown.requireSavedWorkAccess())
+        XCTAssertFalse(unknown.requireProjectAccess())
+        unknown.showUpgradePlaceholder()
+        XCTAssertNil(unknown.entitlementPrompt, "Unknown is not an established Free plan")
+        let guest = try entitlementPresentationModel(accountID: nil)
+        XCTAssertFalse(guest.defersEntitlementPresentation)
+        XCTAssertFalse(guest.requireSavedWorkAccess())
+        XCTAssertNotNil(guest.entitlementPrompt)
+        let expired = try entitlementPresentationModel(cached: AppEntitlement(plan: .pro, source: .webSubscription,
+            grantedUserID: "entitlement-owner", expiresAt: Date(timeIntervalSince1970: 1)))
+        XCTAssertTrue(expired.defersEntitlementPresentation)
+        XCTAssertFalse(expired.hasCapability(.savedWork), "Checking never extends an expired grant")
+    }
+
+    @MainActor
+    func testInitialEntitlementPresentationWaitsForAuthoritativeFreeOrPro() async throws {
+        for plan in [AppPlan.free, .pro] {
+            let gate = InitialEntitlementPullGate()
+            let response = AppEntitlement(plan: plan, source: plan == .pro ? .webSubscription : .none, grantedUserID: "entitlement-owner")
+            let model = try entitlementPresentationModel(response: response, gate: gate)
+            let check = Task { await model.retryInitialEntitlementCheck() }
+            await gate.waitUntilStarted()
+            XCTAssertEqual(model.initialEntitlementPresentation, .checking)
+            XCTAssertTrue(model.defersEntitlementPresentation)
+            XCTAssertFalse(model.hasCapability(.savedWork))
+            await gate.release()
+            await check.value
+            XCTAssertEqual(model.initialEntitlementPresentation, .resolved)
+            XCTAssertFalse(model.defersEntitlementPresentation)
+            XCTAssertEqual(model.currentPlan, plan)
+            XCTAssertEqual(model.requireSavedWorkAccess(), plan == .pro)
+            XCTAssertEqual(model.entitlementPrompt == nil, plan == .pro)
+        }
+    }
+
+    @MainActor
+    func testInitialEntitlementPresentationFailureCanRetryWithoutFreeUpsell() async throws {
+        let gate = InitialEntitlementPullGate()
+        let model = try entitlementPresentationModel(response: .free, gate: gate)
+        let first = Task { await model.retryInitialEntitlementCheck() }
+        await gate.waitUntilStarted()
+        await gate.release(failing: true)
+        await first.value
+        XCTAssertEqual(model.initialEntitlementPresentation, .unavailable)
+        XCTAssertTrue(model.defersEntitlementPresentation)
+        XCTAssertFalse(model.requireSavedWorkAccess())
+        XCTAssertNil(model.entitlementPrompt)
+        let retry = Task { await model.retryInitialEntitlementCheck() }
+        await gate.waitUntilStarted(2)
+        XCTAssertEqual(model.initialEntitlementPresentation, .checking)
+        await gate.release()
+        await retry.value
+        XCTAssertEqual(model.initialEntitlementPresentation, .resolved)
+        XCTAssertFalse(model.hasCapability(.savedWork))
+    }
+
+    @MainActor
+    func testInitialEntitlementPresentationIgnoresOldAccountCompletion() async throws {
+        for nextAccount in [String?.none, "another-owner"] {
+            let gate = InitialEntitlementPullGate()
+            let oldResponse = AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: "entitlement-owner")
+            let model = try entitlementPresentationModel(response: oldResponse, gate: gate)
+            let next = try entitlementPresentationModel(accountID: nextAccount)
+            let check = Task { await model.retryInitialEntitlementCheck() }
+            await gate.waitUntilStarted()
+            // Use the real independent-reader account transition. This rotates
+            // the private session without touching the device's signed-in keychain.
+            model.synchronizeIndependentReaderSession(from: next)
+            await gate.release()
+            await check.value
+            XCTAssertEqual(model.signedInAccount?.appUserID, nextAccount)
+            XCTAssertEqual(model.currentPlan, .free)
+            XCTAssertEqual(model.initialEntitlementPresentation, next.initialEntitlementPresentation)
+            XCTAssertFalse(model.hasCapability(.savedWork), "Account A's delayed Pro cannot authorize account B or a guest")
+        }
+    }
+
+    @MainActor
+    func testSignInBackendFreeWaitsForReservedAppleCheckWithoutGrantingAccess() throws {
+        let model = try entitlementPresentationModel()
+        let requestID = model.prepareSignInEntitlementForStoreKitCheck(.free)
+        XCTAssertNotNil(requestID)
+        XCTAssertEqual(model.initialEntitlementPresentation, .checking,
+            "The backend sign-in response precedes StoreKit and must not establish Free yet")
+        XCTAssertTrue(model.defersEntitlementPresentation)
+        XCTAssertFalse(model.hasCapability(.savedWork))
+        XCTAssertFalse(model.requireSavedWorkAccess())
+        XCTAssertNil(model.entitlementPrompt, "Reserving Apple verification suppresses upsell, never grants access")
+
+        let pro = AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: "entitlement-owner")
+        let rechecking = try entitlementPresentationModel(cached: pro)
+        XCTAssertNotNil(rechecking.prepareSignInEntitlementForStoreKitCheck(.free))
+        XCTAssertTrue(rechecking.defersEntitlementPresentation,
+            "A newly returned Free result still waits for Apple after replacing a cached backend grant")
+        XCTAssertFalse(rechecking.hasCapability(.savedWork))
+        let verified = try entitlementPresentationModel()
+        XCTAssertNotNil(verified.prepareSignInEntitlementForStoreKitCheck(pro))
+        XCTAssertEqual(verified.initialEntitlementPresentation, .resolved)
+        XCTAssertTrue(verified.hasCapability(.savedWork), "Authoritative backend Pro need not wait for Apple")
+
+
+    }
+
+    func testInactiveStoreKitDoesNotDeclareWebAccountFree() {
+        XCTAssertEqual(InitialEntitlementPresentation.checking.confirmingStoreKitAccess(authorizedPro: false), .checking)
+        XCTAssertEqual(InitialEntitlementPresentation.unavailable.confirmingStoreKitAccess(authorizedPro: false), .unavailable)
+        XCTAssertEqual(InitialEntitlementPresentation.checking.confirmingStoreKitAccess(authorizedPro: true), .resolved)
+        XCTAssertEqual(InitialEntitlementPresentation.checking.confirmingBackendAccess(hasPro: false, storeKitPending: true), .checking)
+        XCTAssertEqual(InitialEntitlementPresentation.unavailable.confirmingBackendAccess(hasPro: false, storeKitPending: true), .unavailable)
+        XCTAssertEqual(InitialEntitlementPresentation.checking.confirmingBackendAccess(hasPro: true, storeKitPending: true), .resolved)
+        XCTAssertEqual(InitialEntitlementPresentation.checking.confirmingBackendAccess(hasPro: false, storeKitPending: false), .resolved)
+    }
+
+    func testTimedOutStoreKitPresentationAllowsRetryAndIgnoresStaleTimeout() {
+        let request = UUID()
+        var pending: UUID? = request
+        let timedOut = InitialEntitlementPresentation.checking.afterStoreKitTimeout(requestID: request, currentRequestID: &pending)
+        XCTAssertEqual(timedOut, .unavailable)
+        XCTAssertNil(pending, "A stalled Apple check cannot keep blocking authoritative account retries")
+        XCTAssertEqual(timedOut.confirmingBackendAccess(hasPro: false, storeKitPending: pending != nil), .resolved)
+        let newerRequest = UUID()
+        pending = newerRequest
+        XCTAssertEqual(InitialEntitlementPresentation.checking.afterStoreKitTimeout(requestID: request, currentRequestID: &pending), .checking)
+        XCTAssertEqual(pending, newerRequest, "An old timeout cannot clear a newer check")
+        XCTAssertEqual(InitialEntitlementPresentation.resolved.afterStoreKitTimeout(requestID: newerRequest, currentRequestID: &pending), .resolved)
+        XCTAssertNil(pending, "A timeout releases its wait without hiding already verified Pro")
     }
 
     func testPackagedProLegacyAndLifetimePlansIncludeResearch() {

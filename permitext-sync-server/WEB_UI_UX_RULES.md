@@ -28,7 +28,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Keep toolbar actions in workflow order: Research uses `Reader`, `Search`, `Assistant`; Notebook uses `Reader`, `Notes`, `Evidence`; Report uses `Reader`, `Sources & versions`, autosave status, `Export PDF version`. Use `Assistant` for the AI conversation column title too.
 - Reader is available in Research, Notebook, Report, and Project details. Open new Readers beside the current work without switching views. Each view retains its own Reader columns, source selections, widths, and scroll positions. Report and Project details use reference columns to the right and regain their full width when those columns close.
 - Research history's Project filter and Search's matching options share the Layout menu's surface, padding, corners, shadow, and option styling. Keep keyboard selection, Escape, and outside-click dismissal available.
-- Keep Project selection, `Project details`, `Layout`, and `Account` available across working views, including Project details and Account. Open one working view at a time and keep inactive columns mounted.
+- Keep Project selection, `Project details`, and `Account` available across working views, including Project details and Account. Put occasional layout controls in `View options` within the Project/Workspace menu. Open one working view at a time and keep inactive columns mounted.
 - Center the Permitext brand and plan on the screen in the main navigation across all working views. Keep the navigation and current-view toolbar at 42px, with 12px uppercase button labels: light (300) when inactive and bold (700) when active. Do not add vertical dividers between buttons. The Account footer is also 42px, with its disclaimer centered on one line.
 - Assistant has a fixed 400px conversation-history rail immediately to its left and a conversation body at least 600px wide. Keep its title and actions aligned with Search.
 - Report's Sources & versions panel opens on the left. Let users expand or resize its width while keeping the document visible and retaining the chosen width when switching views.
@@ -37,7 +37,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Retain mounted editors, drafts, selected sources, column order, and scroll positions when switching views or returning from Report/Project details.
 - Open linked columns beside their origin. Preserve unrelated Readers, including Readers in another working view.
 - Delayed navigation must not focus or scroll a destination after the user switches views or Projects.
-- Without a Project, column actions show a short-lived message below the centered Create Project action; they do not open columns.
+- Without a Project, public reading and Search remain available. Project-dependent Notes, Evidence, Assistant, and Report actions explain when a Project is required.
 
 ## Readers
 
@@ -80,7 +80,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 ## Report
 
 - Keep the Report document and Reader columns at least 600px wide. Sources & versions reserves its selected width; hide the optional outline before squeezing the document. Overflow belongs to whole workspace columns, never individual tables. Keep the Report text centered at a maximum 850px reading width.
-- Report is a working view below the shared top menu, with an outline, editor, and optional source/version panel. Research, Notebook, Project selection, Layout, and Account stay accessible. Switching views preserves column positions and drafts; reopening Report retains its editor and scroll position.
+- Report is a working view below the shared top menu, with an outline, editor, and optional source/version panel. Research, Notebook, Project selection, View options, and Account stay accessible. Switching views preserves column positions and drafts; reopening Report retains its editor and scroll position.
 - Use clear section hierarchy and compact text/icon actions, without pills for headings and metadata. Use Sources and Versions tabs, an optional Outline, and one Add content menu.
 - Allow review of full passages, tables, notes, and facts before export. Snippets are never the export source.
 - Let users choose which section and passage comments to include.

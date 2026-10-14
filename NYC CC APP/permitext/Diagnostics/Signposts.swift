@@ -633,7 +633,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         title: String,
         document: NotebookDocument,
         evidenceLinks: [NotebookEvidenceLink],
-        clientMutationID: String? = nil
+        clientMutationID: String? = nil,
+        openQuestions: [NotebookQuestion]? = nil
     ) async throws -> NotebookCard {
         try await transport.notebookCardSave(
             NotebookCardSaveRequest(
@@ -645,7 +646,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 title: title,
                 document: document,
                 evidenceLinks: evidenceLinks,
-                clientMutationID: clientMutationID
+                clientMutationID: clientMutationID,
+                openQuestions: openQuestions
             )
         ).card
     }

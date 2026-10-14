@@ -1,0 +1,19 @@
+:root { color-scheme: light dark; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; background: transparent; }
+body { -webkit-text-size-adjust: 100%; }
+#notebook { width: var(--native-note-width, 100%); max-width: 100%; box-sizing: border-box; min-height: 260px; padding-bottom: 20px; }
+.permitext-notebook-editor { background: transparent; }
+.permitext-notebook-editor .bn-editor { background: transparent; padding-inline: 0; min-height: 220px; font-size: var(--native-note-body-size, 17px); line-height: 1.55; }
+.permitext-notebook-editor .bn-block-content { padding-inline: 0; }
+.permitext-notebook-editor .bn-side-menu, .permitext-notebook-editor [data-test="dragHandle"] { display: none !important; }
+.permitext-notebook-editor .notebook-reference-chip { max-width: 100%; border: 0; border-radius: 4px; color: LinkText; background: transparent; text-align: left; padding: 0 2px; font: inherit; }
+.notebook-reference-meta, .notebook-reference-preview { display: none; }
+.notebook-reference-title { font-weight: 500; }
+.permitext-notebook-editor img { max-width: 100%; }
+html[data-read-only="true"] .notebook-format-toolbar { display: none; }
+
+/* BlockNote uses flex rows for list markers and editable text. Let the text
+   consume the remaining width, including long URLs and source labels. */
+.permitext-notebook-editor :is(.bn-editor, .bn-block, .bn-block-content) { min-width: 0; max-width: 100%; }
+.permitext-notebook-editor .bn-block-content > .bn-inline-content { flex: 1 1 0%; overflow-wrap: anywhere; }
+.permitext-notebook-editor .notebook-reference-chip { white-space: normal; overflow-wrap: anywhere; }

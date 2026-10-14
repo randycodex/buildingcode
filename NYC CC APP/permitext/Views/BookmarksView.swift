@@ -1,6 +1,26 @@
 import SwiftUI
 import UIKit
 
+struct NativeEntitlementStatusView: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if library.initialEntitlementPresentation == .checking {
+                ProgressView("Checking your plan…")
+            } else {
+                Text("Your plan could not be checked").font(.headline)
+                Text("Connect and try again. Your saved work is preserved.")
+                    .font(.subheadline).foregroundStyle(.secondary)
+                Button("Try again") { Task { await library.retryInitialEntitlementCheck() } }
+                    .disabled(library.isAccountBusy)
+                    .accessibilityIdentifier("native-entitlement-retry")
+            }
+        }
+        .accessibilityIdentifier("native-entitlement-status")
+    }
+}
+
 struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -131,7 +151,16 @@ struct BookmarksView: View {
     }
 
     var body: some View {
-        if !library.hasCapability(.savedWork) {
+        if library.defersEntitlementPresentation {
+            NativeEntitlementStatusView()
+                .padding(24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .topLeading) {
+                    CodeScreenTitleRow(title: "Saved", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
+                        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                        .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
+                }
+        } else if !library.hasCapability(.savedWork) {
             VStack(spacing: 14) {
                 Image(systemName: "lock")
                     .font(.largeTitle)
@@ -1044,9 +1073,11 @@ struct ProjectView: View {
         let evidence = projectBookmarks.map { bookmark in
             NativeNotebookReferenceCandidate(
                 kind: "canonicalSection",
-                referenceID: bookmark.clientID ?? String(bookmark.id),
+                referenceID: String(bookmark.id),
                 label: "\(bookmark.codeSectionName) · \(NativeReaderEditionLabel.label(for: bookmark.codeVersion)) · § \(bookmark.sectionNumber) · \(bookmark.displayTitle)",
-                detail: "Saved Evidence"
+                detail: "Saved Evidence",
+                sectionID: String(bookmark.id),
+                codeVersion: bookmark.codeVersion
             )
         }
         let research = (projectHubSnapshot?.researchAnswers ?? []).map { answer in
@@ -1054,7 +1085,8 @@ struct ProjectView: View {
                 kind: "researchAnswer",
                 referenceID: answer.id,
                 label: answer.question,
-                detail: "Permitext Research"
+                detail: "Permitext Research",
+                conversationID: answer.conversationID
             )
         }
         return evidence + research

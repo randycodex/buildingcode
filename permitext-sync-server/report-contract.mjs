@@ -393,7 +393,7 @@ function normalizeNotebookManifestItem(item, base) {
     cardID: requiredText(item.cardID || item.sourceID, "Report Notebook card ID", 256),
     cardType: requiredText(item.cardType, "Report Notebook card type", 64),
     title: requiredText(item.title, "Report Notebook title", 500),
-    plainText: optionalText(item.plainText, maximumAuthoredTextLength),
+    plainText: optionalText(item.plainText, 350_000),
     references: Array.isArray(item.references) ? structuredClone(item.references).slice(0, 100) : []
   };
 }

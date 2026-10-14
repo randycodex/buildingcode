@@ -287,7 +287,9 @@ struct PermitextApp: App {
                         }.navigationTitle("Project facts fixture")
                     }
                 } else if let phase3ResearchConfiguration {
-                    if ProcessInfo.processInfo.arguments.contains("--native-access-flow-fixture") {
+                    if ProcessInfo.processInfo.arguments.contains("--native-entitlement-delayed-fixture") {
+                        NativeDelayedEntitlementHarness()
+                    } else if ProcessInfo.processInfo.arguments.contains("--native-access-flow-fixture") {
                         if library.isInitialContentLoaded {
                             PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
                         } else {
@@ -298,7 +300,9 @@ struct PermitextApp: App {
                     } else if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") {
                         NavigationStack {
                             ProjectNotebookView(projectID: "native-notebook-fixture", projectName: "Notebook fixture", accentColor: .blue, referenceCandidates: [],
-                                initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") ? "native-reference-card" : ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") ? "native-conflict-card" : nil,
+                                // Conflict/deletion acceptance must open its seeded draft
+                                // from the real list so dismiss returns to that list.
+                                initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") ? "native-reference-card" : nil,
                                 startNewNote: ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") || (ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") && !ProcessInfo.processInfo.arguments.contains("--native-notebook-http-list-fixture")),
                                 cacheDirectoryURL: phase3ResearchConfiguration.cacheDirectoryURL)
                                 .safeAreaInset(edge: .top) {
@@ -458,6 +462,71 @@ struct PermitextApp: App {
 }
 
 #if DEBUG
+// Only the isolated Phase3 launch route uses this gate and synthetic account.
+private actor NativeDelayedEntitlementGate {
+    static let shared = NativeDelayedEntitlementGate()
+    private var released = false
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    func waitForResponse() async {
+        if released { return }
+        await withCheckedContinuation { waiters.append($0) }
+    }
+
+    func release() {
+        released = true
+        let pending = waiters
+        waiters.removeAll()
+        pending.forEach { $0.resume() }
+    }
+}
+
+private struct NativeDelayedEntitlementBackend: UserContentSyncBackend {
+    let name = "isolated-delayed-entitlement-fixture"
+    private let fallback = NoOpUserContentSyncBackend()
+
+    func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
+        try fallback.preview(items: items)
+    }
+    func push(batch: UserContentSyncBatch, account: SignedInAccount) async throws -> UserContentSyncPushReport {
+        try await fallback.push(batch: batch, account: account)
+    }
+    func checkpoint(account: SignedInAccount, sinceEventID: Int64?, contentMapVersion: Int?, entitlementFingerprint: String?) async throws -> ServerUserContentCheckpointResult {
+        try await fallback.checkpoint(account: account, sinceEventID: sinceEventID, contentMapVersion: contentMapVersion, entitlementFingerprint: entitlementFingerprint)
+    }
+    func pull(account: SignedInAccount, since: Date?, sinceEventID: Int64?, contentMapVersion: Int?, excludedMutationKinds: [String]) async throws -> ServerUserContentPullResult {
+        await NativeDelayedEntitlementGate.shared.waitForResponse()
+        return ServerUserContentPullResult(userID: account.appUserID, pulledAt: Date(),
+            entitlement: AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: account.appUserID), mutations: [])
+    }
+    func previewMerge(incoming: ServerUserContentPullResult, localCandidates: [String: UserContentMergeCandidate]) throws -> UserContentMergePlan {
+        try fallback.previewMerge(incoming: incoming, localCandidates: localCandidates)
+    }
+}
+
+private struct NativeDelayedEntitlementHarness: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var presentsPlan = false
+
+    var body: some View {
+        PermitextRootNavigation(offersFirstUseExperience: false)
+            .safeAreaInset(edge: .top) {
+                HStack {
+                    Button("Fixture plan") { presentsPlan = true }
+                        .accessibilityIdentifier("native-entitlement-fixture-plan")
+                    Button("Confirm fixture Pro") {
+                        Task { await NativeDelayedEntitlementGate.shared.release() }
+                    }
+                    .accessibilityIdentifier("native-entitlement-fixture-release")
+                }.font(.caption).padding(8)
+            }
+            .sheet(isPresented: $presentsPlan) {
+                PermitextAccountEntryView(initialSection: .plan).environmentObject(library)
+            }
+            .task { await library.retryInitialEntitlementCheck() }
+    }
+}
+
 private struct Phase3EntitledResearchConfiguration {
     struct PreparedHarness {
         let configuration: Phase3EntitledResearchConfiguration
@@ -482,6 +551,7 @@ private struct Phase3EntitledResearchConfiguration {
         defaults.removePersistentDomain(forName: defaultsSuiteName)
         let freeAccess = ProcessInfo.processInfo.arguments.contains("--native-access-free")
             || ProcessInfo.processInfo.arguments.contains("--native-access-guest")
+            || ProcessInfo.processInfo.arguments.contains("--native-entitlement-delayed-fixture")
         LocalEntitlementService.setDebugPlan(freeAccess ? .free : .pro, defaults: defaults)
 
         let fileManager = FileManager.default
@@ -553,7 +623,8 @@ private struct Phase3EntitledResearchConfiguration {
                 entitlementService: LocalEntitlementService(defaults: defaults),
                 lifetimeGrantLookupClient: LocalLifetimeGrantLookupClient(defaults: defaults),
                 accountBackendClient: PermitextBackendClient(transport: transport),
-                syncBackend: NoOpUserContentSyncBackend(),
+                syncBackend: ProcessInfo.processInfo.arguments.contains("--native-entitlement-delayed-fixture")
+                    ? NativeDelayedEntitlementBackend() : NoOpUserContentSyncBackend(),
                 loadsPersistedAccount: false,
                 initialSignedInAccount: ProcessInfo.processInfo.arguments.contains("--native-access-guest") ? nil : account,
                 privateCacheDirectoryURL: testDirectory.appendingPathComponent("research-cache", isDirectory: true)

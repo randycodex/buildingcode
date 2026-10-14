@@ -4,3 +4,92 @@
   --mantine-font-family-headings: var(--ui-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", sans-serif);
   font-family: var(--ui-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", sans-serif);
 }
+
+
+/* One writing page; formatting stays above it, never beside individual blocks. */
+.permitext-notebook-editor .notebook-format-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px;
+  min-height: 42px;
+  padding: 5px 12px;
+  border-bottom: 1px solid var(--border, #d7d9dc);
+  background: var(--surface, var(--bn-colors-editor-background));
+  color: var(--text-primary, inherit);
+  font: 13px var(--bn-font-family);
+}
+.permitext-notebook-editor .notebook-format-toolbar > button { width: 30px; flex: 0 0 30px; }
+.permitext-notebook-editor .notebook-format-toolbar > button svg { width: 17px; height: 17px; }
+.permitext-notebook-editor .notebook-format-toolbar :is(button, select, summary) {
+  min-height: 30px;
+  border: 0;
+  border-radius: 4px;
+  padding: 4px 7px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.permitext-notebook-editor .notebook-format-toolbar :is(button, select, summary):hover {
+  background: var(--menu-highlight, #80808018);
+}
+.permitext-notebook-editor .notebook-format-toolbar [aria-pressed="true"] {
+  background: var(--menu-highlight, #80808022);
+}
+.permitext-notebook-editor .notebook-format-toolbar :is(button, select, summary):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+.permitext-notebook-editor .notebook-format-toolbar :disabled { opacity: .45; cursor: default; }
+.permitext-notebook-editor .notebook-format-save-status { margin-inline-start: auto; font-size: 11px; color: var(--text-secondary, #777); }
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { width: auto; flex: 0 0 auto; }
+.permitext-notebook-editor .notebook-format-toolbar .notebook-draft-status {
+  position: static;
+  width: auto;
+  height: auto;
+  min-height: 24px;
+  padding: 0 4px;
+  background: transparent;
+  flex-wrap: wrap;
+}
+.permitext-notebook-editor .notebook-format-toolbar .notebook-draft-status-message {
+  white-space: normal;
+}
+.permitext-notebook-editor .notebook-format-insert { position: relative; }
+.permitext-notebook-editor .notebook-format-insert-menu {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-end: 0;
+  z-index: 20;
+  display: grid;
+  width: max-content;
+  padding: 6px;
+  background: var(--surface, white);
+  border: 1px solid var(--border, #d7d9dc);
+}
+.permitext-notebook-editor .bn-editor { min-height: 360px; padding: 20px 24px 100px; font-size: inherit; }
+.permitext-notebook-editor .bn-editor .bn-block-outer .bn-block .bn-block-content[data-content-type="heading"] { font-size: inherit; }
+.permitext-notebook-editor .bn-editor h1.bn-inline-content { font-size: 1.8em; line-height: 1.3; }
+.permitext-notebook-editor .bn-editor h2.bn-inline-content { font-size: 1.45em; line-height: 1.35; }
+.permitext-notebook-editor .bn-editor h3.bn-inline-content { font-size: 1.2em; line-height: 1.4; }
+.notebook-panel .notebook-editor-surface .permitext-notebook-editor .bn-editor,
+.notebook-editor-surface:not(.project-note-editor-surface) .permitext-notebook-editor .bn-editor {
+  padding-inline: 24px;
+}
+@media (max-width: 600px) {
+  .permitext-notebook-editor .notebook-format-toolbar { padding: 5px 8px; gap: 1px; }
+  .permitext-notebook-editor .notebook-format-toolbar :is(button, select, summary) { min-height: 36px; padding-inline: 6px; }
+  .permitext-notebook-editor .bn-editor { padding: 16px 18px 100px; }
+}
+
+.permitext-notebook-editor .notebook-format-button { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; }
+.permitext-notebook-editor .notebook-format-link { position: relative; display: inline-flex; }
+.permitext-notebook-editor .notebook-format-link-form { position: absolute; inset-block-start: 100%; inset-inline-end: 0; z-index: 30; display: grid; gap: 8px; width: 250px; padding: 12px; border: 1px solid var(--border, #ddd); background: var(--surface, white); color: var(--text-primary, #222); }
+.permitext-notebook-editor .notebook-format-link-form label { display: grid; gap: 4px; }
+.permitext-notebook-editor .notebook-format-link-form input { box-sizing: border-box; width: 100%; min-height: 30px; color: inherit; background: transparent; border: 1px solid var(--border, #ccc); font: inherit; }
+.permitext-notebook-editor .notebook-format-link-form p { margin: 0; font-size: 12px; }

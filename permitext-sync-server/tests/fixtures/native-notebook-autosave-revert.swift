@@ -10,10 +10,14 @@ func nativeNotebookRequestErrorMessage(_ error: Error) -> String { "Synthetic re
 final class DraftCache {
  let url: URL
  var fail = false
+ var recoveryURLs: [URL] = []
  init(_ path: String) { url = URL(fileURLWithPath: path) }
  func store<T: Encodable>(_ value: T, accountID: String, projectID: String, scope: String) throws {
   if fail { throw CocoaError(.fileWriteOutOfSpace) }
-  try JSONEncoder().encode(value).write(to: url, options: .atomic)
+  let target = scope.hasPrefix("native-notebook-legacy-metadata:")
+   ? url.appendingPathExtension(scope.replacingOccurrences(of: ":", with: "-")) : url
+  try JSONEncoder().encode(value).write(to: target, options: .atomic)
+  if target != url && !recoveryURLs.contains(target) { recoveryURLs.append(target) }
  }
  func removeProject(accountID: String, projectID: String) throws {}
  func reopen() throws -> NativeNotebookDraft { try JSONDecoder().decode(NativeNotebookDraft.self, from: Data(contentsOf: url)) }
@@ -22,18 +26,26 @@ final class DraftCache {
  var attempts: [NativeNotebookSaveAttempt] = []
  var suspended: CheckedContinuation<NotebookCard, Error>?
  var hold = false
+ var rejectInvalidQuestions = true
+ var storedQuestions: [NotebookQuestion]? = nil
  func notebookCards(projectID: String) async throws -> ListResponse { ListResponse() }
  func saveNotebookCard(projectID: String, cardID: String?, expectedVersion: Int, title: String,
-  document: NotebookDocument, evidenceLinks: [NotebookEvidenceLink], clientMutationID: String) async throws -> NotebookCard {
+  document: NotebookDocument, evidenceLinks: [NotebookEvidenceLink], clientMutationID: String, openQuestions: [NotebookQuestion]? = nil) async throws -> NotebookCard {
   let attempt = NativeNotebookSaveAttempt(clientMutationID: clientMutationID, cardID: cardID,
-   expectedVersion: expectedVersion, content: .init(title: title, document: document, evidenceLinks: evidenceLinks))
+   expectedVersion: expectedVersion, content: .init(title: title, document: document, evidenceLinks: evidenceLinks, openQuestions: openQuestions))
   attempts.append(attempt)
+  if rejectInvalidQuestions, NotebookQuestion.validationMessage(in: openQuestions ?? []) != nil {
+   throw PermitextBackendHTTPError.serverStatus(400, "Invalid question")
+  }
   if hold { return try await withCheckedThrowingContinuation { suspended = $0 } }
   return response(attempt)
  }
  func response(_ attempt: NativeNotebookSaveAttempt) -> NotebookCard {
-  NotebookCard(id: attempt.cardID ?? "new-note", version: attempt.expectedVersion + 1, createdAt: "", updatedAt: "",
-   title: attempt.content.title, document: attempt.content.document, evidenceLinks: attempt.content.evidenceLinks)
+  // Match the API: omission preserves questions; [] explicitly clears them.
+  if let questions = attempt.content.openQuestions { storedQuestions = questions }
+  return NotebookCard(id: attempt.cardID ?? "new-note", version: attempt.expectedVersion + 1, createdAt: "", updatedAt: "",
+   title: attempt.content.title, document: attempt.content.document, evidenceLinks: attempt.content.evidenceLinks,
+   openQuestions: storedQuestions)
  }
  func acknowledge() { hold = false; suspended?.resume(returning: response(attempts.last!)); suspended = nil }
 }
@@ -45,6 +57,7 @@ final class DraftCache {
  var saveTask: Task<Void, Never>?, lastLocalEditAt: Date?, pendingSave: NativeNotebookSaveAttempt?
  var currentCardID: String? = "note", version = 1, draftMutationID = "original"
  var title = "Saved", document = NotebookDocument.empty, evidenceLinks: [NotebookEvidenceLink] = []
+ var openQuestions: [NotebookQuestion] = []
  var lastSyncedContent: NativeNotebookEditableContent?, mutationContent: NativeNotebookEditableContent?
  var editObservation = NativeNotebookEditObservation(), conflictingCard: NotebookCard?
  let owner: Owner? = Owner(), projectID = "test-project", routeID = "note"
@@ -54,7 +67,9 @@ final class DraftCache {
   lastSyncedContent = editableContent; mutationContent = editableContent; editObservation.reset(to: editableContent)
  }
  func edit(_ value: String) { title = value; scheduleAutosave() }
+ func editQuestions(_ value: [NotebookQuestion]) { openQuestions = value; scheduleAutosave() }
  func retry() async { await saveNow() }
+ func restore(_ draft: NativeNotebookDraft) { apply(draft) }
  func storeServerCard(_ card: NotebookCard) {}
  func onSaved() {}
  func reconcileVersionConflict(_ error: PermitextBackendHTTPError) async { fatalError("Unexpected conflict") }
@@ -116,6 +131,69 @@ func check(_ condition: @autoclosure () -> Bool, _ message: String) {
   conflict.edit("Changed"); conflict.saveTask?.cancel(); conflict.requiresConflictReview = true
   conflict.statusMessage = "Review conflict"; conflict.edit("Saved")
   check(conflict.statusMessage == "Review conflict", "Revert must preserve unresolved conflict")
+
+  let questions = Editor(path)
+  let blank = NotebookQuestion(text: " ")
+  let valid = NotebookQuestion(text: "Saved legacy metadata")
+  questions.library.storedQuestions = [valid]
+  questions.lastSyncedContent?.openQuestions = [valid]
+  questions.openQuestions = [blank]
+  questions.edit("Ordinary note update"); questions.saveTask?.cancel()
+  await questions.retry()
+  check(questions.library.attempts.count == 1 && questions.library.attempts[0].content.openQuestions == nil,
+        "Ordinary note saves must omit hidden question updates")
+  check(questions.statusMessage == "Synced" && questions.errorMessage == nil && !questions.hasLocalDraft,
+        "Invalid hidden metadata must not block note saving or leave an invisible dirty state")
+  check(questions.openQuestions == [valid] && questions.library.storedQuestions == [valid],
+        "Ordinary note updates must preserve saved server metadata")
+  let archived = try questions.cache.recoveryURLs.map { try JSONDecoder().decode(NativeNotebookDraft.self, from: Data(contentsOf: $0)) }
+  check(archived.contains { $0.openQuestions == [blank] && $0.title == "Ordinary note update" },
+        "Unsent legacy metadata must survive acknowledgement in a durable recovery record")
+
+  let pendingQuestion = Editor(path)
+  let oldReceipt = NativeNotebookSaveAttempt(clientMutationID: "old-valid", cardID: "note", expectedVersion: 1,
+   content: .init(title: "Old draft", document: pendingQuestion.document, evidenceLinks: [], openQuestions: [valid]))
+  pendingQuestion.pendingSave = oldReceipt
+  pendingQuestion.openQuestions = [blank]
+  pendingQuestion.title = "Latest ordinary text"
+  await pendingQuestion.retry()
+  try await Task.sleep(for: .milliseconds(50))
+  check(pendingQuestion.library.attempts.first == oldReceipt,
+        "Legacy uncertain requests must replay their exact original body and identity")
+  check(pendingQuestion.library.attempts.count == 2 && pendingQuestion.library.attempts.last?.content.openQuestions == nil,
+        "Compensating ordinary save must omit questions after resolving legacy receipt")
+  check(pendingQuestion.title == "Latest ordinary text" && pendingQuestion.statusMessage == "Synced" && pendingQuestion.openQuestions == [valid],
+        "Legacy acknowledgement must retain newer note text and saved metadata")
+
+  let legacyInvalid = Editor(path)
+  legacyInvalid.openQuestions = [blank]
+  legacyInvalid.title = "New ordinary text"
+  legacyInvalid.pendingSave = NativeNotebookSaveAttempt(clientMutationID: "invalid-old-receipt", cardID: "note", expectedVersion: 1,
+   content: .init(title: "Old text", document: legacyInvalid.document, evidenceLinks: [], openQuestions: [blank]))
+  await legacyInvalid.retry()
+  try await Task.sleep(for: .milliseconds(50))
+  check(legacyInvalid.library.attempts.count == 2 && legacyInvalid.library.attempts[0].clientMutationID == "invalid-old-receipt",
+        "Invalid legacy receipt must first receive definitive rejection before replacement")
+  check(legacyInvalid.library.attempts.last?.clientMutationID != "invalid-old-receipt" && legacyInvalid.library.attempts.last?.content.openQuestions == nil && legacyInvalid.statusMessage == "Synced",
+        "Definitively rejected legacy metadata must not block a fresh ordinary save")
+  let rejectedArchives = try legacyInvalid.cache.recoveryURLs.map { try JSONDecoder().decode(NativeNotebookDraft.self, from: Data(contentsOf: $0)) }
+  check(rejectedArchives.contains { $0.pendingSave?.clientMutationID == "invalid-old-receipt" },
+        "Rejected legacy receipt and metadata must remain durably recoverable")
+
+  for invalid in [NotebookQuestion(text: String(repeating: "😀", count: 501)),
+                  NotebookQuestion(text: "Question", why: String(repeating: "x", count: 2001)),
+                  NotebookQuestion(text: "Question", resolution: String(repeating: "x", count: 4001))] {
+   check(NotebookQuestion.validationMessage(in: [invalid]) != nil, "Native limits must match server UTF-16 limits")
+  }
+  var legacyJSON = try JSONSerialization.jsonObject(with: JSONEncoder().encode(questions.cache.reopen())) as! [String: Any]
+  legacyJSON.removeValue(forKey: "openQuestions")
+  if var base = legacyJSON["baseContent"] as? [String: Any] {
+   base.removeValue(forKey: "openQuestions"); legacyJSON["baseContent"] = base
+  }
+  let legacyDraft = try JSONDecoder().decode(NativeNotebookDraft.self, from: JSONSerialization.data(withJSONObject: legacyJSON))
+  check(legacyDraft.openQuestions == nil && legacyDraft.baseContent?.openQuestions == nil,
+        "Existing drafts and saved baselines without questions must still decode")
   print("PASS: production autosave/save/cache/acknowledgement methods; debounce revert, in-flight compensation, durable pending retry, disk failure and conflict preservation.")
+  print("PASS: hidden legacy metadata remains recoverable without blocking ordinary saves; saved metadata and old receipts preserved, rejected receipts recover, legacy decoding and field limits retained.")
  }
 }
