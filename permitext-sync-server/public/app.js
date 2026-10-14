@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-reader-header-fade-v960";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-project-details-header-v962";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261013-reader-header-fade-v960";
+} from "./offline-storage.js?v=20261013-project-details-header-v962";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261013-reader-header-fade-v960";
+} from "./workspace-state.js?v=20261013-project-details-header-v962";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -3686,6 +3686,19 @@ async function openProjectDetailsScreen(section = null) {
   const workspaceID = activeWorkspaceID;
   const content = document.createElement("div");
   content.className = "project-details-content";
+  const header = document.createElement("header");
+  header.className = "project-details-screen-header";
+  const title = document.createElement("h1");
+  title.className = "eyebrow panel-kind";
+  title.textContent = "Project details";
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "icon-button utility-close project-details-screen-close";
+  close.innerHTML = circleXIconSVG();
+  close.title = "Close Project details";
+  close.setAttribute("aria-label", "Close Project details");
+  close.addEventListener("click", () => screen.close());
+  header.append(title, close);
   const tabs = document.createElement("nav");
   tabs.className = "project-details-tabs";
   tabs.setAttribute("aria-label", "Project details sections");
@@ -3708,7 +3721,7 @@ async function openProjectDetailsScreen(section = null) {
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects"),
     load: async () => {
-      content.replaceChildren(tabs);
+      content.replaceChildren(header, tabs);
       tabs.replaceChildren();
       for (const [kind, label] of [["context", "Overview"], ["facts", "Facts"], ["records", "Records"]]) {
         const button = document.createElement("button");

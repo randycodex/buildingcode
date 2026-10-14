@@ -15808,6 +15808,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 body .account-screen-header h1,
+body .project-details-screen-header h1,
 body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel),
 body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) *:not(.bn-editor, .bn-editor *) {
   font-size: 14px !important;
@@ -17959,7 +17960,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 .account-screen[open] { display: flex; flex-direction: column; }
 .account-screen::backdrop { background: var(--background); }
-.account-screen-header {
+:is(.account-screen-header, .project-details-screen-header) {
   position: relative;
   display: flex;
   flex: 0 0 auto;
@@ -17980,11 +17981,11 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   top: 50%;
   transform: translate(-50%, -50%);
 }
-.account-screen-header h1 {
+:is(.account-screen-header, .project-details-screen-header) h1 {
   margin: 0;
   text-transform: none;
 }
-.account-screen-close {
+:is(.account-screen-close, .project-details-screen-close) {
   --panel-title-control-size: 44px;
   --panel-title-icon-size: 18px;
 }
@@ -19467,6 +19468,7 @@ dialog.report-export-review {
 /* Project details and Account use the same shared navigation and toolbar row. */
 .workspace-shell:has(> .account-workspace-view[open]) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
 .project-details-screen .project-details-content { max-width: none; }
+.project-details-screen .project-details-screen-header { max-width: none; }
 .project-details-screen .project-details-tabs {
   height: 42px; min-height: 42px; flex: 0 0 42px; box-sizing: border-box;
   align-items: center; padding: 0 clamp(22px, 3vw, 46px);
@@ -19478,11 +19480,11 @@ dialog.report-export-review {
   width: 100%; height: auto; min-width: 0; min-height: 0; margin: 0;
   border-radius: 0; display: flex; flex-direction: column; background: var(--bg, #0f0f0f);
 }
-.account-workspace-view .account-screen-header {
+:is(.account-workspace-view .account-screen-header, .project-details-screen-header) {
   height: 42px; min-height: 42px; padding: 0 clamp(22px, 3vw, 46px);
 }
-.account-workspace-view .account-screen-header h1 { font-size: 13px; color: var(--text-secondary); font-weight: 500; letter-spacing: normal; }
-.account-workspace-view .account-screen-close { --panel-title-control-size: 32px; }
+:is(.account-workspace-view .account-screen-header, .project-details-screen-header) h1 { font-size: 13px; color: var(--text-secondary); font-weight: 500; letter-spacing: normal; }
+:is(.account-workspace-view .account-screen-close, .project-details-screen-close) { --panel-title-control-size: 32px; }
 .topbar :is(#open-project-details, #toggle-settings)[aria-pressed="true"] { color: var(--text-primary); font-weight: 700; }
 
 /* Keep menu pills clear of the dividers in each 42px bar. */
@@ -19502,7 +19504,7 @@ dialog.report-export-review {
 }
 .topbar .topbar-actions > .toolbar-button { width: auto; flex: 0 0 auto; padding-inline: 14px; }
 .report-workspace-view .report-draft-shell .report-draft-primary-actions { gap: var(--workspace-menu-gap); }
-.account-workspace-view .account-screen-close {
+:is(.account-workspace-view .account-screen-close, .project-details-screen-close) {
   height: 100%; width: 42px; border-inline: 0; border-radius: 0;
 }
 
