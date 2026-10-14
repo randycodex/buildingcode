@@ -3514,6 +3514,69 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
     }
 
+    func testRealProAccountColdStartKeepsAccess() {
+        let app = XCUIApplication()
+        // Exercise the installed account and normal lifecycle. No synthetic
+        // entitlement, authentication bypass, purchases, or content writes.
+        app.launchArguments = []
+        app.launchEnvironment = [:]
+        let deniedLabels = ["Saved work requires Pro", "Research requires Pro", "View Plans", "Account type: Free"]
+        func assertNoPaywall(_ stage: String) {
+            let denied = app.descendants(matching: .any).matching(NSPredicate(format: "label IN %@", deniedLabels)).firstMatch
+            XCTAssertFalse(denied.exists, "Real Pro account unexpectedly showed a lock or Free plan during \(stage)")
+        }
+
+        for launch in 1...2 {
+            app.terminate()
+            app.launch()
+            let saved = app.buttons["main-tab-saved"]
+            XCTAssertTrue(saved.waitForExistence(timeout: 45), "Normal app navigation must load for cold start \(launch)")
+            saved.tap()
+            // Sample repeatedly as soon as normal Saved navigation is reachable;
+            // don't wait for entitlement resolution before checking for a flash.
+            for sample in 1...12 {
+                assertNoPaywall("cold start \(launch), early Saved sample \(sample)")
+                if sample == 1 { keepScreenshot(named: "Real Pro cold start \(launch) early Saved", from: app) }
+                Thread.sleep(forTimeInterval: 0.2)
+            }
+            let savedContent = element(in: app, identifier: "projects-root")
+            XCTAssertTrue(savedContent.waitForExistence(timeout: 30), "Real Pro Saved content must become available; checking/unavailable is not a pass")
+            XCTAssertFalse(element(in: app, identifier: "native-entitlement-status").exists)
+            assertNoPaywall("cold start \(launch), loaded Saved")
+            keepScreenshot(named: "Real Pro cold start \(launch) Saved access", from: app)
+
+            let research = app.buttons["main-tab-research"]
+            XCTAssertTrue(research.isHittable)
+            research.tap()
+            let researchContent = app.descendants(matching: .any).matching(NSPredicate(
+                format: "identifier IN %@", ["research-history-search", "research-composer"])).firstMatch
+            XCTAssertTrue(researchContent.waitForExistence(timeout: 30), "Real Pro Research history or composer must load without sending a question")
+            XCTAssertFalse(element(in: app, identifier: "native-entitlement-status").exists)
+            assertNoPaywall("cold start \(launch), Research")
+            keepScreenshot(named: "Real Pro cold start \(launch) Research access", from: app)
+
+            saved.tap()
+            let account = app.buttons["Open Account"]
+            XCTAssertTrue(account.waitForExistence(timeout: 10))
+            XCTAssertTrue(account.isHittable)
+            account.tap()
+            let closeAccount = app.buttons["account-close"]
+            XCTAssertTrue(closeAccount.waitForExistence(timeout: 10))
+            let exactPro = app.staticTexts.matching(NSPredicate(format: "label == %@", "Account type: Pro")).firstMatch
+            reveal(exactPro, in: app)
+            XCTAssertTrue(exactPro.exists && exactPro.isHittable, "The real Account plan must explicitly identify Account type: Pro")
+            XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label == %@", "Free")).firstMatch.exists)
+            assertNoPaywall("cold start \(launch), Account plan")
+            keepScreenshot(named: "Real Pro cold start \(launch) Account exact Pro", from: app)
+            closeAccount.tap()
+            XCTAssertTrue(waitForNonexistence(closeAccount))
+            saved.tap()
+            XCTAssertTrue(savedContent.waitForExistence(timeout: 10))
+            assertNoPaywall("cold start \(launch), returned Saved")
+        }
+        keepScreenshot(named: "Real Pro verified twice, normal Saved left open", from: app)
+    }
+
     func testNativeInitialEntitlementPresentationWaitsForPro() {
         let app = XCUIApplication()
         app.launchArguments += ["--permitext-disable-clerk", "--phase3-entitled-research-fixture", "--native-entitlement-delayed-fixture"]

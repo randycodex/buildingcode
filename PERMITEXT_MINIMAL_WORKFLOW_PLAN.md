@@ -2,7 +2,7 @@
 
 Date: October 12, 2026
 
-Status: The revised minimal workflow is implemented and locally verified on the isolated review branch. Notes is continuous writing with basic formatting; Open questions has been removed. The additional Pro startup presentation fix passes controlled device and simulator checks; real-account slow-network acceptance remains listed below. Nothing has been merged or deployed.
+Status: The revised minimal workflow is implemented and locally verified on the isolated review branch. Notes is continuous writing with basic formatting; Open questions has been removed. The Pro startup presentation fix passes controlled tests and real-account physical-device cold launches under normal and 3G-conditioned networking. Nothing has been merged or deployed.
 
 ## Purpose
 
@@ -252,8 +252,8 @@ Keep rendered layout, device interaction, isolated persistence checks, and hoste
 - [x] Implement neutral presentation while an existing account entitlement is restored after cold launch or sign-in.
 - User-reported behavior: locked controls appear for a few seconds before the app recognizes the Pro account.
 - Expected behavior: while account entitlement is being restored or checked, show an appropriate loading state instead of prematurely presenting the account as non-Pro. Preserve account isolation and entitlement validation.
-- [ ] Remaining real-account acceptance: fully close and reopen with a real Pro account under normal and slow connectivity. Controlled tests cover authoritative Free, Pro, failure, timeout, retry, and account switching; actual backend latency has not been measured.
-- Status: implemented locally. Saved, Research, and Plan use a neutral checking state until authoritative resolution; cached valid Pro remains available. The delayed-backend fixture passes on the physical iPhone, and eight state/account-isolation/timeout tests plus the final sign-in ordering regression pass on the existing simulator. The sign-in check reserves Apple verification before applying backend Free, without granting access. Final evidence: `Test-permitext-2026.10.13_21-07-46--0400.xcresult` (1 passed). This fixes premature lock presentation; real-account backend latency under normal and slow connectivity remains a separate acceptance check.
+- [x] Real-account acceptance: two process cold launches under normal networking and two with the iPhone Network Link Conditioner enabled on its 3G preset. All four retained Saved and Research access, showed Account type: Pro / Lifetime Pro, and exposed no Free/lock prompt in sampled UI states. Controlled tests separately cover authoritative Free, Pro, failure, timeout, retry, and account switching. This is interaction acceptance, not a backend-latency benchmark or a frame-by-frame guarantee before XCTest attaches.
+- Status: implemented locally. Saved, Research, and Plan use a neutral checking state until authoritative resolution; cached valid Pro remains available. The delayed-backend fixture passes on the physical iPhone, and eight state/account-isolation/timeout tests plus the final sign-in ordering regression pass on the existing simulator. The sign-in check reserves Apple verification before applying backend Free, without granting access. Final evidence: `Test-permitext-2026.10.13_21-07-46--0400.xcresult` (1 passed). The requested real-account normal/slow-network interaction check is now complete; backend latency was not separately benchmarked.
 
 ## Supporting principle
 
@@ -262,3 +262,12 @@ Expose frequently needed actions clearly and reveal secondary controls when usef
 Reference: [Nielsen Norman Group — Progressive Disclosure](https://www.nngroup.com/articles/progressive-disclosure/).
 
 Local storage checkpoint: reused the existing simulator and shared DerivedData; no simulator downloads or duplicate devices were created. Final audit reported 25 GiB free and 0 B XCTest clone data. The worktree wrapper declined automatic cleanup because its repository validation targets the primary checkout; the separate primary-checkout audit succeeded.
+
+### Real-account Pro cold-start acceptance — October 13, 21:19 ET
+
+- Added `testRealProAccountColdStartKeepsAccess` using normal launch arguments and the phone’s existing account/session; no synthetic entitlement or authentication bypass. Each run terminates and launches twice, samples Saved 12 times after navigation becomes reachable, verifies actual Saved/Research content, then checks the exact Pro account label. No research question, purchase, sign-out, or explicit content edit was performed.
+- Normal connection: **PASS**, `Test-permitextPhysicalStress-2026.10.13_21-13-17--0400.xcresult`.
+- Phone Network Link Conditioner, **3G preset enabled**: **PASS**, `Test-permitextPhysicalStress-2026.10.13_21-17-14--0400.xcresult`. Setting was visually verified before testing and still enabled afterward.
+- Restored Network Link Conditioner to **off**, with its original **Wi-Fi preset** selected, and visually verified restoration. Reopened the normal Permitext app. No simulator runtime/device was added.
+- Screenshots are retained in the corresponding shared-DerivedData test results. Network setup/restoration evidence: `/tmp/permitext-pro-network-3g-enabled.png` and `/tmp/permitext-pro-network-restored.png`. Account evidence confirms the actual Lifetime Pro account, not a fixture.
+- The initial app-launch interval before XCTest can inspect UI is outside the sampled assertions. No full-screen video claim is made: the device reports native screen recording unsupported. Existing delayed-entitlement device coverage and state regression tests cover the unknown-plan transition independently.
