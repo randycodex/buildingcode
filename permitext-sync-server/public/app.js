@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-reader-jumper-hover-v976";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-search-options-menu-v978";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-reader-jumper-hover-v976";
+} from "./offline-storage.js?v=20261014-search-options-menu-v978";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-reader-jumper-hover-v976";
+} from "./workspace-state.js?v=20261014-search-options-menu-v978";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -18447,17 +18447,19 @@ async function renderSearch(instance, options = {}) {
     void renderSearchResults(panel, searchInstance);
   });
   matchControl.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && matchControl.open) {
       event.preventDefault();
       event.stopPropagation();
       matchControl.open = false;
       matchLabel.focus({ preventScroll: true });
     } else if (event.key === "ArrowDown") {
       event.preventDefault();
+      event.stopPropagation();
       matchControl.open = true;
       matchAlternative.focus({ preventScroll: true });
-    } else if (event.key === "ArrowUp") {
+    } else if (event.key === "ArrowUp" && event.target !== matchLabel) {
       event.preventDefault();
+      event.stopPropagation();
       matchLabel.focus({ preventScroll: true });
     }
   });
@@ -38478,8 +38480,7 @@ function openSearchCodeSourceSettings(panel) {
   const existing = panel.querySelector(".search-code-source-menu");
   if (existing) { existing._close(); return; }
   document.querySelector(".column-group-menu")?._close?.();
-  const trigger = panel.querySelector(".search-sources-button");
-  const dock = panel.querySelector(".search-dock");
+  const trigger = panel.querySelector(".column-group-menu-button");
   const menu = document.createElement("section");
   menu.className = "column-group-menu search-code-source-menu";
   menu.id = `search-code-sources-${crypto.randomUUID()}`;
@@ -38526,15 +38527,14 @@ function openSearchCodeSourceSettings(panel) {
   };
   const position = () => {
     const rect = trigger.getBoundingClientRect();
-    const dockRect = dock.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
-    menu.style.top = `${rect.bottom - dockRect.top + 6}px`;
-    menu.style.right = `${Math.max(0, dockRect.right - rect.right)}px`;
+    menu.style.top = `${rect.bottom - panelRect.top + 6}px`;
+    menu.style.right = `${Math.max(8, panelRect.right - rect.right)}px`;
     menu.style.maxHeight = `${Math.max(0, Math.min(560, window.innerHeight - rect.bottom - 14, panelRect.bottom - rect.bottom - 14))}px`;
   };
   menu._close = dismiss;
   menu.append(card);
-  dock.append(menu);
+  panel.append(menu);
   position();
   trigger.setAttribute("aria-expanded", "true");
   trigger.setAttribute("aria-controls", menu.id);
@@ -40839,6 +40839,9 @@ function openColumnGroupMenu(panel, anchor) {
   const controller = new AbortController();
   const trust = panel._readerTrust || panel.querySelector(".reader-trust");
   const trustHome = trust?.parentElement;
+  const searchOptions = panel.classList.contains("search-panel") ? panel.querySelector(".search-options") : null;
+  const searchControls = searchOptions ? [...searchOptions.children] : [];
+  const matchControl = searchOptions?.querySelector(".search-match-control");
   anchor.setAttribute('aria-expanded', 'true');
   const close = () => {
     controller.abort();
@@ -40847,6 +40850,11 @@ function openColumnGroupMenu(panel, anchor) {
       delete trust._positionMenu;
       trust.querySelector("summary").setAttribute("aria-expanded", "false");
       trustHome.append(trust);
+    }
+    if (searchOptions) {
+      matchControl.open = false;
+      matchControl.querySelector("summary").setAttribute("aria-expanded", "false");
+      searchOptions.append(...searchControls);
     }
     menu.remove();
     anchor.setAttribute('aria-expanded', 'false');
@@ -40886,6 +40894,15 @@ function openColumnGroupMenu(panel, anchor) {
   separate();
   add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
   add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
+  if (searchOptions) {
+    separate();
+    matchControl.querySelector("summary").setAttribute("role", "menuitem");
+    matchControl.querySelector("summary").setAttribute("aria-haspopup", "menu");
+    matchControl.querySelector("summary").setAttribute("aria-expanded", String(matchControl.open));
+    matchControl.querySelector("button").setAttribute("role", "menuitem");
+    searchOptions.querySelector(".search-sources-button").setAttribute("role", "menuitem");
+    menu.append(...searchControls);
+  }
   if (panel.classList.contains("reader-panel")) {
     separate();
     add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
@@ -40930,6 +40947,10 @@ function openColumnGroupMenu(panel, anchor) {
     menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
   };
   position();
+  matchControl?.addEventListener("toggle", () => {
+    matchControl.querySelector("summary").setAttribute("aria-expanded", String(matchControl.open));
+    position();
+  }, { signal: controller.signal });
   if (trust) trust._positionMenu = position;
   trust?.addEventListener("toggle", () => {
     trust.querySelector("summary").setAttribute("aria-expanded", String(trust.open));

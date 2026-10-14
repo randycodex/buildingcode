@@ -17629,7 +17629,7 @@ html body .research-compact-composer .research-question-input:focus-visible {
   background: var(--menu-surface);
   box-shadow: 0 8px 32px rgba(0,0,0,.3);
 }
-.column-group-menu :is(button, .reader-trust > summary) {
+.column-group-menu :is(button, .reader-trust > summary, .search-match-mode) {
   display: block;
   width: 100%;
   padding: 10px 12px;
@@ -17641,7 +17641,7 @@ html body .research-compact-composer .research-question-input:focus-visible {
   text-align: left;
   cursor: pointer;
 }
-.column-group-menu :is(button, .reader-trust > summary):is(:hover, :focus-visible) { background: rgba(128,128,128,.16); }
+.column-group-menu :is(button, .reader-trust > summary, .search-match-mode):is(:hover, :focus-visible) { background: rgba(128,128,128,.16); }
 .column-group-menu button:disabled { opacity: .45; cursor: default; }
 .column-group-menu button:disabled:hover { background: transparent; }
 .column-menu-divider {
@@ -19029,7 +19029,7 @@ html body .column-group-menu-button:focus-visible {
 .project-save-dialog > button:last-child { margin-left: auto; }
 
 /* Research and Search: make source context and the next action readable. */
-.search-options { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; color: var(--text-secondary); font-size: 12px; }
+.search-options[hidden] { display: none !important; }
 .search-sources-button { display: inline-flex; align-items: center; box-sizing: border-box; line-height: 1.4; padding: 4px 0; min-height: 30px; border: 0; background: transparent; color: var(--text-secondary); font: inherit; cursor: pointer; }
 .search-sources-button:hover { color: var(--text-primary); }
 .search-panel .result-title { color: var(--text-primary); font-weight: 550; }
@@ -19061,6 +19061,7 @@ html body .column-group-menu-button:focus-visible {
 .search-match-mode::marker { content: ""; }
 .search-match-menu { position: absolute; top: calc(100% + 8px); left: 0; z-index: 100; }
 .search-match-control:not([open]) .search-match-menu { display: none; }
+.column-group-menu .search-match-menu { position: static; margin: 0; padding: 0; background: transparent; box-shadow: none; }
 .search-match-mode:focus, .search-match-alternative:focus { outline: none; box-shadow: none; }
 
 .search-code-source-menu .settings-active-sources-list { gap: 0; }
