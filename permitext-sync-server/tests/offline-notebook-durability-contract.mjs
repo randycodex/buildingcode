@@ -375,13 +375,15 @@ assert.equal((await offline.reportDraftRecoveries(accountB,projectID)).length,1)
 console.log("Report recovery storage passed: editor/account/project isolation, acknowledgement race and account deletion fence.");
 
 {
-// Exercise the actual synchronization boundary against durable IndexedDB state.
-// A partially entered question must not create a poisoned immutable receipt.
+// Execute the actual app save boundary against transactional IndexedDB. Hidden
+// legacy metadata must survive without obstructing ordinary text edits.
 const applicationSource = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const synchronizeSource = applicationSource.slice(applicationSource.indexOf('async function synchronizeNotebookDraft('), applicationSource.indexOf('async function flushPendingNotebookDrafts('));
 const questionOwner = 'web:question-draft-regression';
 const questionIdentity = {userID:questionOwner};
-let submittedQuestions = [];
+const unfinished = {id:'q',text:'Verify condition',why:'',status:'resolved',resolution:''};
+const corrected = {...unfinished,resolution:'Reviewed the supporting source'};
+let submitted = [], failure;
 const syncContext = vm.createContext({
   normalizeNotebookQuestions,
   requireCurrentAccountRequest() {},
@@ -389,75 +391,65 @@ const syncContext = vm.createContext({
   reconcileNotebookDocumentAssets: async value => value,
   notebookDocumentAssetURLs: () => [],
   beginNotebookDraftSave: offline.beginNotebookDraftSave,
+  retireRejectedNotebookQuestionSave: offline.retireRejectedNotebookQuestionSave,
   acknowledgeNotebookDraft: offline.acknowledgeNotebookDraft,
   saveNotebookCardSnapshot: offline.saveNotebookCardSnapshot,
   refreshNotebookPendingStatus: async () => {},
   postResearch: async (_path, body) => {
-    normalizeNotebookQuestions(body.openQuestions);
-    submittedQuestions.push(structuredClone(body.openQuestions));
-    return {card:{...body,id:'question-card',version:body.expectedVersion+1}};
+    submitted.push(structuredClone(body));
+    if (failure) throw Object.assign(new Error('Uncertain request'),{status:failure});
+    try { normalizeNotebookQuestions(body.openQuestions); }
+    catch(error) { throw Object.assign(error,{status:400}); }
+    return {card:{...body,id:'question-card',version:body.expectedVersion+1,openQuestions:body.openQuestions ?? [corrected]}};
   }
 });
 vm.runInContext(synchronizeSource, syncContext);
 const syncQuestions = draft => syncContext.synchronizeNotebookDraft(draft,questionIdentity);
-const unfinished = {id:'q',text:'Verify condition',why:'',status:'resolved',resolution:''};
 let questionDraft = await offline.saveNotebookDraft({...input(questionOwner,'question-card'),baseVersion:1,openQuestions:[unfinished]});
-await assert.rejects(()=>syncQuestions(questionDraft),/resolution/);
-questionDraft = await offline.loadNotebookDraft(questionOwner,projectID,'question-card');
-assert.equal(questionDraft.pendingSave,undefined,'Invalid question must not freeze a retry receipt');
-assert.deepEqual(questionDraft.openQuestions,[unfinished],'Incomplete form stays recoverable locally');
-assert.equal(submittedQuestions.length,0);
-const corrected = {...unfinished,resolution:'Reviewed the supporting source'};
-questionDraft = await offline.saveNotebookDraft({...questionDraft,expectedRevision:questionDraft.revision,openQuestions:[corrected]});
 await syncQuestions(questionDraft);
-assert.deepEqual(submittedQuestions,[[corrected]],'Correcting the form sends the corrected version');
-assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'),null);
-// An uncertain, valid prior receipt must still be retried even when newer local
-// input is incomplete. Its acknowledgement preserves the newer local draft.
+assert.equal(Object.hasOwn(submitted.at(-1),'openQuestions'),false,'Simple note saves omit hidden question edits');
+assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'),null,'Hidden invalid data does not block note sync');
+const retained = (await offline.offlineAccountRecoverySnapshot(questionOwner)).drafts;
+assert.deepEqual(retained.find(record=>record.scope==='notebook-question-recovery').openQuestions,[unfinished]);
+assert.equal((await offline.pendingNotebookDrafts(questionOwner)).length,0,'Retained metadata is not queued as an unsynced note');
+
+// A valid uncertain legacy request keeps its exact payload, then the newer
+// incomplete metadata is retained when the following ordinary save finishes.
 questionDraft = await offline.saveNotebookDraft({...input(questionOwner,'question-card'),baseVersion:1,openQuestions:[corrected]});
 await offline.beginNotebookDraftSave(questionOwner,projectID,'question-card',questionDraft.revision);
 questionDraft = await offline.saveNotebookDraft({...questionDraft,expectedRevision:questionDraft.revision,openQuestions:[unfinished]});
 await syncQuestions(questionDraft);
-assert.deepEqual(submittedQuestions.at(-1),[corrected]);
+assert.deepEqual(submitted.at(-1).openQuestions,[corrected]);
 questionDraft = await offline.loadNotebookDraft(questionOwner,projectID,'question-card');
 assert.deepEqual(questionDraft.openQuestions,[unfinished]);
-assert.equal(questionDraft.pendingSave,undefined);
-await assert.rejects(()=>syncQuestions(questionDraft),/resolution/);
-assert.equal((await offline.loadNotebookDraft(questionOwner,projectID,'question-card')).pendingSave,undefined);
-console.log('Question save correction passed: invalid input stays local, correction syncs, and valid uncertain receipts retain newer edits.');
+await syncQuestions(questionDraft);
+assert.equal(Object.hasOwn(submitted.at(-1),'openQuestions'),false);
+assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'),null);
 
-// Run the real Remove handler, retaining the ordinary durable write and sync
-// boundaries. An accidental blank question must not trap the Note offline.
-class QuestionElement {
-  constructor(tag) { this.tagName = tag; this.children = []; this.events = {}; this.attributes = {}; }
-  append(...children) { this.children.push(...children); }
-  replaceChildren(...children) { this.children = children; }
-  setAttribute(key, value) { this.attributes[key] = value; }
-  addEventListener(name, handler) { this.events[name] = handler; }
-  all() { return this.children.filter(child => typeof child === 'object').flatMap(child => [child, ...child.all()]); }
-}
-const originalDocument = globalThis.document;
-globalThis.document = {createElement: tag => new QuestionElement(tag)};
-try {
-  let write = Promise.resolve();
-  const editor = createNotebookQuestionsEditor({questions:[unfinished], onChange: questions => {
-    write = write.then(async () => {
-      questionDraft = await offline.saveNotebookDraft({...questionDraft, expectedRevision:questionDraft.revision, openQuestions:questions});
-    });
-  }});
-  const remove = editor.all().find(element => element.tagName === 'button' && element.textContent === 'Remove question');
-  assert.ok(remove, 'Existing questions expose a removal action');
-  remove.events.click();
-  await write;
-  assert.deepEqual((await offline.loadNotebookDraft(questionOwner,projectID,'question-card')).openQuestions,[]);
-  await syncQuestions(questionDraft);
-  assert.deepEqual(submittedQuestions.at(-1),[],'Removing an incomplete question restores Note sync');
-  assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'),null);
-  editor.all().find(element => element.textContent === 'Add question').events.click();
-  const form = editor.all().find(element => element.tagName === 'form');
-  assert.ok(form.all().some(element => element.textContent === 'Remove question'),'New question can be discarded before completing its form');
-  const readOnly = createNotebookQuestionsEditor({questions:[corrected],readOnly:true,onChange:()=>assert.fail('Read only must not mutate')});
-  assert.equal(readOnly.all().some(element => element.textContent === 'Remove question'),false);
-} finally { globalThis.document = originalDocument; }
-console.log('Question removal passed: actual handler discards invalid input durably, restores synchronization, and respects read-only access.');
+// An older poisoned receipt may retire only after a definite 400 response.
+questionDraft = await offline.saveNotebookDraft({...input(questionOwner,'question-card'),baseVersion:3,openQuestions:[unfinished]});
+const poisoned = await offline.beginNotebookDraftSave(questionOwner,projectID,'question-card',questionDraft.revision);
+questionDraft = await offline.loadNotebookDraft(questionOwner,projectID,'question-card');
+failure=503;
+await assert.rejects(()=>syncQuestions(questionDraft),/Uncertain/);
+assert.deepEqual((await offline.loadNotebookDraft(questionOwner,projectID,'question-card')).pendingSave,poisoned,'Uncertain outcomes never rewrite a receipt');
+failure=undefined;
+const before=submitted.length;
+await syncQuestions(questionDraft);
+assert.equal(submitted.length,before+2,'Definitive invalid rejection is followed by an ordinary note save');
+assert.deepEqual(submitted[before].openQuestions,[unfinished]);
+assert.equal(Object.hasOwn(submitted[before+1],'openQuestions'),false);
+assert.notEqual(submitted[before].clientMutationID,submitted[before+1].clientMutationID);
+assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'),null);
+assert((await offline.offlineAccountRecoverySnapshot(questionOwner)).drafts.some(record=>record.pendingSave?.revision===poisoned.revision),'Retired receipt is retained in account recovery export');
+// If recovery storage fails, acknowledgement must not delete the only copy.
+questionDraft = await offline.saveNotebookDraft({...input(questionOwner,'question-card'),baseVersion:5,openQuestions:[unfinished]});
+database.failPut = (name,record) => name === 'notebook-drafts' && record.scope === 'notebook-question-recovery';
+await assert.rejects(()=>syncQuestions(questionDraft),/Synthetic IndexedDB write failure/);
+assert.deepEqual((await offline.loadNotebookDraft(questionOwner,projectID,'question-card')).openQuestions,[unfinished]);
+assert((await offline.loadNotebookDraft(questionOwner,projectID,'question-card')).pendingSave,'Receipt remains retryable if recovery storage fails');
+database.failPut = null;
+await syncQuestions(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'));
+assert.equal(await offline.loadNotebookDraft(questionOwner,projectID,'question-card'),null);
+console.log('Simple Notes metadata compatibility passed: hidden drafts retained, question updates omitted, valid receipts replayed, uncertainty preserved, rejected legacy receipt recovered.');
 }

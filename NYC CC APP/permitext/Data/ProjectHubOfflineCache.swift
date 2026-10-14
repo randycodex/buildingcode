@@ -237,7 +237,7 @@ struct ProjectHubOfflineCache: Sendable {
     }
 
     private func cacheURL(accountID: String, projectID: String, scope: String) -> URL {
-        let prefix = scope.hasPrefix("native-notebook-draft:") ? "draft-" : ""
+        let prefix = scope.hasPrefix("native-notebook-draft:") || scope.hasPrefix("native-notebook-legacy-metadata:") ? "draft-" : ""
         return projectDirectoryURL(accountID: accountID, projectID: projectID)
             .appendingPathComponent("\(prefix)\(digest(scope)).json", isDirectory: false)
     }

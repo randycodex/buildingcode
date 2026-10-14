@@ -80,7 +80,7 @@ try {
   const preview=await request("/reports/sources/preview",{projectID:"project-a",kind:"notebookCard",sourceID:id});
   assert.equal(preview.status,200,JSON.stringify(preview));
   const frozenPreview=JSON.stringify(preview.json);
-  assert.match(frozenPreview,/Confirm sprinkler protection/);
+  assert.doesNotMatch(frozenPreview,/Confirm sprinkler protection/, "Retired question metadata is not appended to Report output");
   const resolved=[{...questions[0],status:"resolved",resolution:"Reviewed the approved sprinkler drawings."}];
   const saved=await request("/notebook/cards/save",{...draft,cardID:id,expectedVersion:2,clientMutationID:"resolved",openQuestions:resolved});
   assert.equal(saved.status,200,JSON.stringify(saved));
@@ -88,7 +88,7 @@ try {
   assert.equal((await request("/notebook/cards/save",{...draft,cardID:id,expectedVersion:2,clientMutationID:"stale-open"})).status,409);
   assert.equal(JSON.stringify(preview.json),frozenPreview,"Previously captured report source remains unchanged");
   assert.equal((await request("/notebook/cards/list",{projectID:"project-a"})).json.cards.find(item=>item.id===id).openQuestions[0].status,"resolved");
-  console.log("Questions HTTP passed: durable create/replay, legacy preservation, resolution validation, conflict, Notebook summaries and Report visibility.");
+  console.log("Questions HTTP passed: durable create/replay, legacy preservation, resolution validation, conflict, Notebook metadata compatibility and question-free Report output.");
 } finally {
   globalThis.fetch = originalFetch;
   server.closeAllConnections();

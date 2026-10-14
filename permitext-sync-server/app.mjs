@@ -1,4 +1,3 @@
-import { notebookQuestionsText } from "./public/notebook-questions.js";
 import { planSavedEvidenceDelete, validateSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
@@ -16670,9 +16669,9 @@ async function reportSourcesForProject(userID, projectID, options = {}) {
           cardID: artifact.envelope.id,
           cardType: artifact.payload.cardType,
           title: artifact.payload.title,
-          plainText: [artifact.payload.document
+          plainText: artifact.payload.document
             ? notebookPlainText(artifact.payload.document)
-            : (artifact.payload.plainText || ""), notebookQuestionsText(artifact.payload.openQuestions || [])].filter(Boolean).join("\n\n"),
+            : (artifact.payload.plainText || ""),
           references: artifact.payload.references || []
         }
       });

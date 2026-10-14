@@ -463,7 +463,10 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             CodeEyebrow(text: "Plan", accent: settingsChromeColor)
 
-            VStack(alignment: .leading, spacing: 8) {
+            if library.defersEntitlementPresentation {
+                NativeEntitlementStatusView()
+            } else {
+              VStack(alignment: .leading, spacing: 8) {
                 Label(currentPlanTitle, systemImage: "checkmark.circle.fill")
                     .font(.headline)
                     .foregroundStyle(.primary)
@@ -478,8 +481,9 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
             .accessibilityElement(children: .combine)
+            }
 
-            if library.currentPlan == .free {
+            if library.currentPlan == .free && !library.defersEntitlementPresentation {
                 Button {
                     Task { await library.requestProSubscriptionStore(clerk: clerk) }
                 } label: {
@@ -605,11 +609,13 @@ struct SettingsView: View {
 
             #endif
 
-            Text(library.currentPlan.label)
+            if !library.defersEntitlementPresentation {
+              Text(library.currentPlan.label)
                 .font(.subheadline.weight(.semibold))
                 .frame(maxWidth: .infinity, minHeight: 32)
                 .background(.secondary.opacity(0.12), in: Capsule())
                 .accessibilityLabel("Account type: \(library.currentPlan.label)")
+            }
 
             #if DEBUG
             Button {

@@ -729,6 +729,7 @@ struct NotebookCardSaveRequest: Codable, Hashable, Sendable {
     let document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink] = []
     var clientMutationID: String? = nil
+    var openQuestions: [NotebookQuestion]? = nil
 }
 
 struct NotebookCardDeleteRequest: Codable, Hashable, Sendable {
@@ -785,6 +786,42 @@ struct NotebookImageAsset: Codable, Hashable, Sendable {
     let uploadedAt: String
 }
 
+struct NotebookQuestion: Codable, Hashable, Identifiable, Sendable {
+    var id: String = UUID().uuidString.lowercased()
+    var text: String
+    var why: String = ""
+    var status: String = "open"
+    var resolution: String = ""
+
+    /// Match the server's question contract before an autosave becomes an
+    /// immutable retry attempt. Incomplete text stays in the local draft.
+    static func validationMessage(in questions: [Self]) -> String? {
+        guard questions.count <= 40 else { return "A Note supports up to 40 questions." }
+        var ids = Set<String>()
+        let forbidden = CharacterSet(charactersIn: "\u{0000}"..."\u{0008}")
+            .union(CharacterSet(charactersIn: "\u{000B}"..."\u{000C}"))
+            .union(CharacterSet(charactersIn: "\u{000E}"..."\u{001F}"))
+        for (index, question) in questions.enumerated() {
+            let number = index + 1
+            let id = question.id.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !id.isEmpty, id.utf16.count <= 100, id.rangeOfCharacter(from: forbidden) == nil,
+                  ids.insert(id).inserted else { return "Question \(number) has an invalid or repeated ID." }
+            guard ["open", "resolved"].contains(question.status) else { return "Question \(number) has an invalid status." }
+            for (value, label, maximum, required) in [
+                (question.text, "question text", 1000, true),
+                (question.why, "why it matters", 2000, false),
+                (question.resolution, "resolution explanation or source", 4000, question.status == "resolved")
+            ] {
+                let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+                if required && trimmed.isEmpty { return "Question \(number) needs \(label) before it can sync." }
+                if trimmed.utf16.count > maximum { return "Question \(number): keep \(label) within \(maximum) characters." }
+                if trimmed.rangeOfCharacter(from: forbidden) != nil { return "Question \(number): remove unsupported control characters from \(label)." }
+            }
+        }
+        return nil
+    }
+}
+
 struct NotebookCard: Codable, Hashable, Identifiable, Sendable {
     let id: String
     var version: Int
@@ -799,6 +836,7 @@ struct NotebookCard: Codable, Hashable, Identifiable, Sendable {
     var document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink] = []
     var plainText: String = ""
+    var openQuestions: [NotebookQuestion]? = nil
 }
 
 enum ResearchNotebookHandoffPresentation {
@@ -930,6 +968,7 @@ struct NotebookInlineContent: Codable, Hashable, Sendable {
 }
 
 struct NotebookTextStyles: Codable, Hashable, Sendable {
+    var strike: Bool? = nil
     var bold: Bool? = nil
     var italic: Bool? = nil
 }

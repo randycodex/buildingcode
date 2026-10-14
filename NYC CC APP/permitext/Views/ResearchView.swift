@@ -519,7 +519,11 @@ private struct ResearchSessionView: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 Group {
-                    if library.signedInAccount == nil {
+                    if library.defersEntitlementPresentation {
+                        NativeEntitlementStatusView()
+                            .padding(24)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if library.signedInAccount == nil {
                         researchAccessRecovery(
                             title: "Research requires Pro",
                             description: pendingSelectionRecoveryDescription(

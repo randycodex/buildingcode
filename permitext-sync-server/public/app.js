@@ -1,6 +1,6 @@
-import { createNotebookQuestionsEditor, openNotebookQuestions, notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
+import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261012-minimal-workflow-v950";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-simple-notes-v951";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
@@ -87,6 +87,7 @@ import {
   reportDraftRecoveries,
   deleteReportDraftRecovery,
   beginNotebookDraftSave,
+  retireRejectedNotebookQuestionSave,
   disableOfflineFeature,
   deleteOfflineAccountData,
   deleteNotebookCardSnapshot,
@@ -115,7 +116,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261012-minimal-workflow-v950";
+} from "./offline-storage.js?v=20261013-simple-notes-v951";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -148,7 +149,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261012-minimal-workflow-v950";
+} from "./workspace-state.js?v=20261013-simple-notes-v951";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -11135,20 +11136,18 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
   if (draft.accountUserID !== requestIdentity.userID) throw accountContextChangedError();
   if (draft.recoveryConflict || (draft.scope && draft.scope !== "notebook-card")) return null;
   const pending = draft.pendingSave || draft;
-  // Incomplete question input stays in the device draft. Validate before
-  // freezing a retry receipt: a rejected immutable receipt would otherwise
-  // keep replaying after the user corrected the question. An already pending
-  // valid receipt still completes before newer local edits are synchronized.
-  normalizeNotebookQuestions(pending.openQuestions || []);
+  // Simple Notes leave stored legacy question metadata untouched. An existing
+  // uncertain receipt is replayed byte-for-byte before ordinary saves resume.
   if (!Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0 || !String(pending.title || "").trim()) return null;
   const document = await reconcileNotebookDocumentAssets(pending.document, pending.projectID, requestIdentity);
   requireCurrentAccountRequest(requestIdentity);
   if (notebookDocumentAssetURLs(document, "permitext-notebook-local:").length) return null;
-  const submittedDraft = await beginNotebookDraftSave(requestIdentity.userID, draft.projectID, draft.cardID, draft.revision, { document });
+  const submittedDraft = await beginNotebookDraftSave(requestIdentity.userID, draft.projectID, draft.cardID, draft.revision, { document, omitQuestionUpdates: true });
   requireCurrentAccountRequest(requestIdentity);
   const submittedDocument = submittedDraft.document;
   if (notebookDocumentAssetURLs(submittedDocument, "permitext-notebook-local:").length) return null;
-  const payload = await postResearch("/notebook/cards/save", {
+  let payload;
+  try { payload = await postResearch("/notebook/cards/save", {
     projectID: draft.projectID,
     cardID: submittedDraft.cardID || undefined,
     clientMutationID: submittedDraft.revision,
@@ -11158,7 +11157,20 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
     document: submittedDocument,
     evidenceLinks: submittedDraft.evidenceLinks || [],
     ...(submittedDraft.openQuestions !== undefined ? {openQuestions: submittedDraft.openQuestions} : {})
-  });
+  }); } catch (error) {
+    requireCurrentAccountRequest(requestIdentity);
+    let invalidLegacyQuestions = false;
+    if (!submittedDraft.omitQuestionUpdates) {
+      try { normalizeNotebookQuestions(submittedDraft.openQuestions || []); }
+      catch { invalidLegacyQuestions = true; }
+    }
+    // Only a definitive rejection allows retiring an old invalid receipt.
+    // Timeouts, conflicts and other uncertain outcomes keep the original body.
+    if (error.status !== 400 || !invalidLegacyQuestions) throw error;
+    const retained = await retireRejectedNotebookQuestionSave(requestIdentity.userID, draft.projectID,
+      submittedDraft.cardID, submittedDraft.revision);
+    return synchronizeNotebookDraft(retained, requestIdentity, options);
+  }
   requireCurrentAccountRequest(requestIdentity);
   if (!options.deferAcknowledgement) {
     await acknowledgeNotebookDraft(requestIdentity.userID, draft.projectID, submittedDraft.cardID, submittedDraft.revision, payload.card);
@@ -28143,15 +28155,6 @@ async function renderProjectNotebook(project, options = {}) {
         },
         onOpenReference: null
       });
-      footer.prepend(createNotebookQuestionsEditor({
-        questions: activeCard.openQuestions || [], readOnly: notebookReadOnly,
-        onChange(questions) {
-          if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || notebookCardIdentity(activeCard) !== focusedCardIdentity) throw new Error("Reopen this Note before changing its questions.");
-          activeCard.openQuestions = questions;
-          markNotebookDirty();
-          renderCardList();
-        }
-      }));
       if (!notebookReadOnly && !activeCard.id) {
         noteMenu.editTitle();
       }
@@ -29141,15 +29144,10 @@ async function renderProjectReportDraft(project, resume = null) {
           provenanceLabel.textContent = `Snapshot of Note: ${block.derivedFrom.title}`;
           provenance.append(provenanceLabel);
           let latestSource;
-          const warning = document.createElement("p");
-          provenance.append(warning);
           const updateNote = document.createElement("button");
           updateNote.type = "button";
           row.refreshLinkedNoteState = () => {
             latestSource = sources.find(source => source.kind === "notebookCard" && source.id === block.derivedFrom.id);
-            const questions = openNotebookQuestions(latestSource);
-            warning.hidden = !questions.length;
-            warning.textContent = questions.length ? `${questions.length} open ${questions.length === 1 ? "question" : "questions"} in the linked Note · ${questions.map(question => question.text).join("; ")}` : "";
             updateNote.textContent = latestSource?.version > block.derivedFrom.version ? "Review updated Note" : "Review linked Note";
             updateNote.disabled = !latestSource;
           };
@@ -29161,7 +29159,7 @@ async function renderProjectReportDraft(project, resume = null) {
               const { card } = await postResearch("/notebook/cards/get", { projectID, cardID: block.derivedFrom.id });
               requireCurrentAccountRequest(requestIdentity);
               if (disposed || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
-              const text = [card.plainText, notebookQuestionsText(card.openQuestions || [])].filter(Boolean).join("\n\n");
+              const text = card.plainText || "";
               if (text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note before updating this paragraph.");
               const accepted = await confirmWebWarning("Update this Report paragraph?",
                 `Latest Note: ${card.title} · version ${card.version}\n\n${text}\n\nThis replaces this paragraph’s report-specific text. Saved PDF versions stay unchanged.`,
@@ -29225,17 +29223,6 @@ async function renderProjectReportDraft(project, resume = null) {
         if (!sourceTitle.parentElement) row.append(sourceTitle);
         if (source) {
           if (block.kind === "notebookCard") {
-            const warning = document.createElement("p");
-            row.append(warning);
-            row.refreshLinkedNoteState = () => {
-              const latest = sources.find(item => item.kind === block.kind && item.id === block.sourceID);
-              const questions = openNotebookQuestions(latest);
-              warning.hidden = !questions.length;
-              warning.textContent = questions.length ? `${questions.length} open ${questions.length === 1 ? "question" : "questions"} · ${questions.map(question => question.text).join("; ")}` : "";
-            };
-            row.refreshLinkedNoteState();
-          }
-          if (block.kind === "notebookCard") {
             const explanation = document.createElement("p");
             explanation.className = "report-workflow-help";
             explanation.textContent = "Linked Note uses its latest saved content. Create an editable snapshot to keep report-specific wording.";
@@ -29248,7 +29235,7 @@ async function renderProjectReportDraft(project, resume = null) {
                 const { card } = await postResearch("/notebook/cards/get", {projectID, cardID: block.sourceID});
                 requireCurrentAccountRequest(requestIdentity);
                 if (disposed || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
-                const text = [card.plainText, notebookQuestionsText(card.openQuestions || [])].filter(Boolean).join("\n\n");
+                const text = card.plainText || "";
                 if (text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note first.");
                 Object.assign(block, {kind: "paragraph", text, derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
                   sourceSnapshotAt: new Date().toISOString(), evidenceLinks: structuredClone(card.evidenceLinks || [])});
@@ -29392,13 +29379,6 @@ async function renderProjectReportDraft(project, resume = null) {
       const summary = document.createElement("p");
       summary.textContent = source.summary || "Project source";
       copy.append(heading, summary);
-      const openQuestions = openNotebookQuestions(source);
-      if (openQuestions.length) {
-        const warning = document.createElement("p");
-        warning.className = "report-workflow-help";
-        warning.textContent = `${openQuestions.length} open ${openQuestions.length === 1 ? "question" : "questions"} · Review before export`;
-        copy.append(warning);
-      }
       const add = document.createElement("button");
       add.type = "button";
       add.textContent = "Add";

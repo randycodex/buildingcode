@@ -46,6 +46,8 @@
     "build:account-verification": "vite build --config vite.account-verification.config.js",
     "prebuild:notebook": "npm run test:notebook-security",
     "build:notebook": "vite build --config vite.notebook.config.js",
+    "build:native-notebook": "vite build --config vite.native-notebook.config.js",
+    "test:native-notebook-bridge": "node tests/native-notebook-bridge.mjs",
     "test:notebook-security": "node scripts/verify-notebook-dependencies.mjs",
     "verify:deploy-content": "node scripts/generate-code-asset-manifest.mjs --verify && node scripts/verify-deploy-content.mjs && node scripts/verify-reader-search-index.mjs",
     "test:saved-render-performance": "node tests/saved-annotation-render-performance-contract.mjs && node tests/saved-annotation-consolidation-performance-contract.mjs",

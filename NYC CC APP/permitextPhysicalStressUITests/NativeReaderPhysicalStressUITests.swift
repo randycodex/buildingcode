@@ -624,19 +624,22 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let title = app.textFields["Note title"]
         XCTAssertTrue(title.waitForExistence(timeout: 30))
         XCTAssertTrue(title.isEnabled)
-        XCTAssertFalse(app.buttons["Delete"].exists)
+        XCTAssertFalse(app.buttons["Note actions"].exists, "A cold offline draft cannot expose server deletion before fresh write access.")
         title.tap()
         title.typeText(" cold offline draft")
         let editedTitle = title.value as? String
         let retry = app.buttons["native-notebook-retry-save"]
         XCTAssertTrue(retry.waitForExistence(timeout: 15))
         XCTAssertEqual(title.value as? String, editedTitle)
-        XCTAssertFalse(app.buttons["Image"].isEnabled)
+        let insertImage = app.buttons["Insert image"]
+        XCTAssertTrue(insertImage.waitForExistence(timeout: 10), "The document toolbar must be present; an absent control does not prove access gating.")
+        XCTAssertFalse(insertImage.isEnabled, "Image upload requires fresh server authorization.")
         keepScreenshot(named: "Cold offline cached editor local draft", from: app)
         retry.tap()
         XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
         XCTAssertEqual(title.value as? String, editedTitle)
         XCTAssertFalse(app.buttons["Save"].exists)
+        XCTAssertTrue(insertImage.isEnabled, "Fresh editor authorization must restore image upload.")
         keepScreenshot(named: "Cold offline draft freshly authorized and synced", from: app)
     }
 
@@ -648,44 +651,206 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         verifyNativeLinkedNoteCaret(largeText: true)
     }
 
+    private func nativeNotebookBody(in app: XCUIApplication) -> XCUIElement {
+        app.webViews.textViews.matching(NSPredicate(format: "label == %@", "Note body")).firstMatch
+    }
+
+    private func nativeNotebookBodyValue(_ body: XCUIElement) -> String? {
+        // WebKit exposes nonbreaking spaces for typed spaces beside inline
+        // references. Preserve paragraph boundaries while normalizing that AX
+        // representation for an exact insertion/caret assertion.
+        (body.value as? String)?.replacingOccurrences(of: "\u{00a0}", with: " ")
+    }
+
     private func verifyNativeLinkedNoteCaret(largeText: Bool) {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
         if largeText { app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityM"] }
         app.launch()
-        let original = "Original editing context stays here."
-        let editor = app.textViews.matching(NSPredicate(format: "value == %@", original)).firstMatch
-        XCTAssertTrue(editor.waitForExistence(timeout: 30))
-        editor.tap()
-        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
-        app.typeText(" BEFORE")
-        let edited = app.textViews.matching(NSPredicate(format: "value CONTAINS %@", " BEFORE")).firstMatch
-        keepScreenshot(named: "Source Note initial caret typing", from: app)
-        guard edited.waitForExistence(timeout: 5), let editedValue = edited.value as? String else {
-            XCTFail("Typing must reach the active source editor: \(app.textViews.allElementsBoundByIndex.map { $0.value ?? "missing" })")
+        func captureInputTrace() {
+            let diagnostics = app.descendants(matching: .any).matching(identifier: "native-notebook-input-diagnostics").firstMatch
+            if diagnostics.exists {
+                let trace = diagnostics.value as? String ?? "missing"
+                print("NATIVE NOTE INPUT TRACE \(trace)")
+                let attachment = XCTAttachment(string: trace)
+                attachment.name = "Synthetic native note input trace"
+                attachment.lifetime = .keepAlways
+                add(attachment)
+            }
+        }
+        let editor = nativeNotebookBody(in: app)
+        XCTAssertTrue(editor.waitForExistence(timeout: 30), "The locally bundled continuous editor must load.\n\(app.debugDescription)")
+        XCTAssertEqual(app.webViews.textViews.matching(NSPredicate(format: "label == %@", "Note body")).count, 1,
+                       "All note paragraphs and references must share one editable surface.")
+        guard let original = nativeNotebookBodyValue(editor) else {
+            XCTFail("Note body must expose its text value.\n\(app.debugDescription)")
             return
         }
+        XCTAssertTrue(original.contains("Original editing context stays here."))
+        XCTAssertTrue(original.contains("Text before the reference."))
+        XCTAssertTrue(original.contains("Text after the reference."))
+        // Tap the first visible paragraph, not the source chip farther down.
+        editor.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.04)).tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        // Exercise normal continuous keyboard input without diagnostic delays.
+        app.typeText(" BEFORE")
+        let changed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.nativeNotebookBodyValue(editor)?.contains(" BEFORE") == true
+        }, object: nil)
+        let changedResult = XCTWaiter.wait(for: [changed], timeout: 5)
+        captureInputTrace()
+        XCTAssertEqual(changedResult, .completed, app.debugDescription)
+        guard let editedValue = nativeNotebookBodyValue(editor) else { XCTFail("Missing edited note value"); return }
         XCTAssertEqual(editedValue.replacingOccurrences(of: " BEFORE", with: ""), original)
-        let expectedReturn = editedValue.replacingOccurrences(of: " BEFORE", with: " BEFORE AFTER")
-        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
-        let reference = app.buttons["Open linked Note: Linked sample note"]
-        XCTAssertTrue(reference.exists)
+        let immediatelyEdited = editedValue.replacingOccurrences(of: " BEFORE", with: " BEFORE LAST KEY")
+        let expectedReturn = editedValue.replacingOccurrences(of: " BEFORE", with: " BEFORE LAST KEY AFTER")
+        keepScreenshot(named: "Continuous source Note initial caret typing", from: app)
+        let reference = app.webViews.buttons["Open Linked sample note"]
+        XCTAssertTrue(reference.exists, app.debugDescription)
+        reveal(reference, in: app)
+        XCTAssertTrue(reference.isHittable)
+        // Deliberately do not wait for Synced: pushing a source must retain the
+        // final keystroke even before the autosave debounce completes.
+        app.typeText(" LAST KEY")
         reference.tap()
-        XCTAssertTrue(app.staticTexts["This is the linked note, shown read-only."].waitForExistence(timeout: 10))
-        keepScreenshot(named: "Linked Note read-only sheet during active editing", from: app)
-        guard let done = app.buttons.matching(identifier: "Done").allElementsBoundByIndex.first(where: { $0.isHittable }) else {
-            XCTFail("Linked Note must expose Done"); return
-        }
-        done.tap()
+        XCTAssertTrue(app.staticTexts["This is the linked note, shown read-only."].waitForExistence(timeout: 10), app.debugDescription)
+        keepScreenshot(named: "Linked Note read-only screen during continuous editing", from: app)
+        XCTAssertFalse(app.sheets.firstMatch.exists)
+        let back = app.navigationBars.buttons.element(boundBy: 0)
+        XCTAssertTrue(back.isHittable, "Linked Note must expose Back")
+        back.tap()
         XCTAssertTrue(reference.waitForExistence(timeout: 10))
-        keepScreenshot(named: "Original Note keyboard and caret after linked sheet return", from: app)
+        XCTAssertTrue(editor.waitForExistence(timeout: 10))
+        if nativeNotebookBodyValue(editor) != immediatelyEdited { captureInputTrace() }
+        XCTAssertEqual(nativeNotebookBodyValue(editor), immediatelyEdited, "Pushing a reference must retain the last keystroke.")
+        keepScreenshot(named: "Original continuous Note keyboard and caret after Back", from: app)
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5), "Keyboard must return without tapping the source editor")
+        XCTAssertTrue(app.buttons["Text formatting"].isHittable, "Aa formatting must remain reachable above the keyboard after Back.")
         app.typeText(" AFTER")
-        XCTAssertTrue(app.textViews.matching(NSPredicate(format: "value == %@", expectedReturn)).firstMatch.exists,
-                      "Typing after return must continue at the preserved source caret")
+        let resumed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.nativeNotebookBodyValue(editor) == expectedReturn
+        }, object: nil)
+        let resumedResult = XCTWaiter.wait(for: [resumed], timeout: 5)
+        captureInputTrace()
+        XCTAssertEqual(resumedResult, .completed,
+                       "Typing after Back must continue at the exact source caret; got \(nativeNotebookBodyValue(editor) ?? "missing").")
         XCTAssertEqual(app.textFields["Note title"].value as? String, "Original reference note")
         XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
-        keepScreenshot(named: "Linked Note returns to exact editing caret and syncs", from: app)
+        keepScreenshot(named: "Linked Note returns to exact continuous editing caret and syncs", from: app)
+    }
+
+    func testNativeNotebookContinuousPageSupportsHeadingAndReturn() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
+        app.launch()
+        let body = nativeNotebookBody(in: app)
+        XCTAssertTrue(body.waitForExistence(timeout: 30), app.debugDescription)
+        body.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.04)).tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        app.typeText("Continuous heading")
+        let format = app.buttons["Text formatting"]
+        XCTAssertTrue(format.isHittable)
+        format.tap()
+        let heading = app.buttons["Heading 2"]
+        XCTAssertTrue(heading.waitForExistence(timeout: 5))
+        heading.tap()
+        XCTAssertTrue(waitForValue("heading", on: format), "Aa must apply a heading to the active paragraph.")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        app.typeText("\n")
+        format.tap()
+        app.buttons["Body"].tap()
+        XCTAssertTrue(waitForValue("paragraph", on: format), "Body must restore ordinary paragraph formatting.")
+        app.typeText("Second continuous paragraph")
+        let completeParagraph = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            guard let value = self.nativeNotebookBodyValue(body) else { return false }
+            return value.contains("Continuous heading\nSecond continuous paragraph") || value.contains("Continuous heading\n\nSecond continuous paragraph")
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [completeParagraph], timeout: 5), .completed,
+                       "Return must continue in the same document and retain every typed character: \(nativeNotebookBodyValue(body) ?? "missing")")
+        XCTAssertEqual(app.webViews.textViews.matching(NSPredicate(format: "label == %@", "Note body")).count, 1)
+        XCTAssertFalse(app.staticTexts["Open questions"].exists)
+        XCTAssertFalse(app.buttons["Add question"].exists)
+        XCTAssertFalse(app.textFields["Question"].exists)
+        XCTAssertFalse(app.switches["Open questions only"].exists)
+        XCTAssertFalse(app.buttons["Add text"].exists)
+        XCTAssertFalse(app.buttons["Remove block"].exists)
+        app.buttons["native-notebook-done"].tap()
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        keepScreenshot(named: "Single continuous native page with heading and paragraph", from: app)
+    }
+
+    func testNativeNotebookLayoutFitsInsetWidth() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture", "--native-notebook-layout-diagnostics"]
+        app.launch()
+        let body = nativeNotebookBody(in: app)
+        XCTAssertTrue(body.waitForExistence(timeout: 30))
+        let diagnostics = app.staticTexts["native-notebook-layout-diagnostics"]
+        let measured = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (diagnostics.value as? String ?? "").contains("viewport")
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [measured], timeout: 5), .completed)
+        print("NATIVE NOTE LAYOUT: \(diagnostics.value as? String ?? "missing")")
+        body.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.04)).tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        app.typeText("Width check ")
+        let typed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.nativeNotebookBodyValue(body)?.contains("Width check") == true
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [typed], timeout: 5), .completed)
+        print("NATIVE NOTE FOCUSED LAYOUT: \(diagnostics.value as? String ?? "missing")")
+        let json = (diagnostics.value as? String ?? "").data(using: .utf8)!
+        let metrics = (try? JSONSerialization.jsonObject(with: json)) as? [String: Any]
+        XCTAssertEqual(metrics?["viewportScale"] as? Double ?? 0, 1, accuracy: 0.01,
+                       "Typing must not trigger iOS input auto-zoom and clip the page.")
+        keepScreenshot(named: "Native Note inset width diagnostics", from: app)
+        XCTAssertLessThanOrEqual(body.frame.maxX, app.frame.maxX - 17, "Body must fit the inset writing canvas: \(diagnostics.value as? String ?? "missing")")
+    }
+
+    func testNativeNotebookListsLinksAndUndoRemainInOneDocument() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
+        app.launch()
+        let body = nativeNotebookBody(in: app)
+        XCTAssertTrue(body.waitForExistence(timeout: 30), app.debugDescription)
+        body.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.04)).tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        app.typeText("Tools check ")
+        app.buttons["Lists"].tap()
+        app.buttons["Bulleted list"].tap()
+        XCTAssertTrue(waitForValue("bulletListItem", on: app.buttons["Text formatting"]))
+        app.buttons["Insert link"].tap()
+        app.buttons["Web link"].tap()
+        let label = app.textFields["native-notebook-link-label"]
+        XCTAssertTrue(label.waitForExistence(timeout: 5))
+        label.tap()
+        label.typeText("Reference link")
+        let address = app.textFields["native-notebook-link-url"]
+        address.tap()
+        address.typeText("example.com")
+        app.buttons["native-notebook-confirm-link"].tap()
+        let inserted = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.nativeNotebookBodyValue(body)?.contains("Reference link") == true
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [inserted], timeout: 5), .completed, app.debugDescription)
+        let withLink = nativeNotebookBodyValue(body)
+        XCTAssertTrue(withLink?.contains("Tools check") == true)
+        app.buttons["Undo and redo"].tap()
+        app.buttons["Undo"].tap()
+        let undone = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            let value = self.nativeNotebookBodyValue(body) ?? ""
+            return !value.contains("Reference link") && value.contains("Tools check")
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [undone], timeout: 5), .completed, app.debugDescription)
+        app.buttons["Undo and redo"].tap()
+        app.buttons["Redo"].tap()
+        let restored = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            self.nativeNotebookBodyValue(body) == withLink
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [restored], timeout: 5), .completed, app.debugDescription)
+        app.buttons["native-notebook-done"].tap()
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        keepScreenshot(named: "Native continuous list and link with undo redo", from: app)
     }
 
     func testNativeNotebookCachedRefreshPreservesTypingAndAutosaves() {
@@ -938,9 +1103,26 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-conflict-fixture"]
         app.launch()
+        let cachedDraft = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Local unsynchronized analysis")).firstMatch
+        XCTAssertTrue(cachedDraft.waitForExistence(timeout: 30), app.debugDescription)
+        XCTAssertTrue(app.buttons["New Note"].exists, "Conflict acceptance must begin in the real Notebook list.")
+        XCTAssertTrue(app.staticTexts["Latest saved analysis"].exists, "The list must retain the separately saved server revision.")
+        XCTAssertTrue(cachedDraft.isHittable)
+        keepScreenshot(named: "Notebook list retains local draft and newer saved revision", from: app)
+        cachedDraft.tap()
         let review = app.buttons["native-notebook-review-conflict"]
         XCTAssertTrue(review.waitForExistence(timeout: 30))
-        XCTAssertFalse(app.buttons["Save"].isEnabled, "A reopened stale draft must not silently adopt the latest version.")
+        XCTAssertTrue(nativeNotebookBody(in: app).waitForExistence(timeout: 15))
+        let done = app.buttons["native-notebook-done"]
+        XCTAssertTrue(done.exists && done.isHittable)
+        done.tap()
+        let noUnreviewedSync = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true"), object: app.staticTexts["Synced"])
+        noUnreviewedSync.isInverted = true
+        XCTAssertEqual(XCTWaiter.wait(for: [noUnreviewedSync], timeout: 2), .completed,
+                       "Done must not bypass review and sync a reopened stale draft.")
+        XCTAssertTrue(review.exists && review.isHittable, "Conflict review must remain available after Done.")
+        XCTAssertFalse(app.buttons["native-notebook-retry-save"].exists, "An ordinary retry must not bypass conflict review.")
+        XCTAssertFalse(app.buttons["native-notebook-confirm-conflict"].exists, "Overwrite consent must only be offered inside the review.")
         review.tap()
         XCTAssertTrue(app.staticTexts["Your draft"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["My local draft is still preserved."].exists)
@@ -951,10 +1133,33 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(screenshot)
         app.buttons["native-notebook-confirm-conflict"].tap()
         XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
-        app.buttons["Delete"].tap()
-        app.buttons["Delete Note"].tap()
+        let noteActions = app.buttons["Note actions"]
+        XCTAssertTrue(noteActions.waitForExistence(timeout: 5) && noteActions.isHittable)
+        noteActions.tap()
+        let deleteAction = app.buttons["native-notebook-delete"]
+        XCTAssertTrue(deleteAction.waitForExistence(timeout: 5) && deleteAction.isHittable)
+        deleteAction.tap()
+        let deletionAlert = app.alerts["Delete this Note?"]
+        XCTAssertTrue(deletionAlert.waitForExistence(timeout: 5),
+                      "Delete Note must present a separate explicit confirmation.\n\(app.debugDescription)")
+        let confirmDelete = deletionAlert.buttons["Delete Note"]
+        XCTAssertTrue(confirmDelete.isHittable && deletionAlert.buttons["Cancel"].isHittable, app.debugDescription)
+        XCTAssertFalse(app.staticTexts["No Notes yet"].exists, "Opening confirmation must not delete the note.")
+        keepScreenshot(named: "Native Notebook deletion requires confirmation after reviewed conflict", from: app)
+        confirmDelete.tap()
         XCTAssertTrue(app.staticTexts["No Notes yet"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.staticTexts["Drafts on this iPhone"].exists)
+        XCTAssertFalse(cachedDraft.exists)
+        XCTAssertFalse(app.textFields["Note title"].exists, "Deletion must dismiss the editor to its parent list.")
+        XCTAssertTrue(app.buttons["New Note"].exists)
+        // Foreground refresh rereads both the server list and local draft cache.
+        // Do not relaunch: the isolated harness deliberately reseeds on launch.
+        XCUIDevice.shared.press(.home)
+        app.activate()
+        XCTAssertTrue(app.staticTexts["No Notes yet"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Drafts on this iPhone"].exists, "A cache refresh must not recreate the deleted draft.")
+        XCTAssertFalse(cachedDraft.exists)
+        keepScreenshot(named: "Deleted Notebook stays empty after foreground cache refresh", from: app)
     }
 
     func testResearchLateCompletionCannotReplaceNewConversation() {
@@ -3307,6 +3512,48 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             reveal(text, in: app)
             XCTAssertTrue(text.exists, "Research answer is missing the \(heading) field.")
         }
+    }
+
+    func testNativeInitialEntitlementPresentationWaitsForPro() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--permitext-disable-clerk", "--phase3-entitled-research-fixture", "--native-entitlement-delayed-fixture"]
+        app.launch()
+        let saved = app.buttons["main-tab-saved"]
+        XCTAssertTrue(saved.waitForExistence(timeout: 45))
+        saved.tap()
+        let pending = element(in: app, identifier: "native-entitlement-status")
+        XCTAssertTrue(pending.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Saved work requires Pro"].exists)
+        XCTAssertFalse(app.buttons["View Plans"].exists)
+        keepScreenshot(named: "Entitlement pending Saved", from: app)
+
+        app.buttons["main-tab-research"].tap()
+        XCTAssertTrue(pending.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Research requires Pro"].exists)
+        keepScreenshot(named: "Entitlement pending Research", from: app)
+
+        app.buttons["native-entitlement-fixture-plan"].tap()
+        let close = app.buttons["account-close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        XCTAssertTrue(pending.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Account type: Free"].exists)
+        XCTAssertFalse(app.staticTexts["Free"].exists)
+        keepScreenshot(named: "Entitlement pending Plan", from: app)
+        close.tap()
+        XCTAssertTrue(waitForNonexistence(close))
+
+        app.buttons["native-entitlement-fixture-release"].tap()
+        XCTAssertTrue(waitForNonexistence(pending, timeout: 15))
+        XCTAssertFalse(app.staticTexts["Research requires Pro"].exists)
+        saved.tap()
+        XCTAssertFalse(pending.exists)
+        XCTAssertFalse(app.staticTexts["Saved work requires Pro"].exists)
+        app.buttons["native-entitlement-fixture-plan"].tap()
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Pro"].firstMatch.waitForExistence(timeout: 10))
+        XCTAssertFalse(pending.exists)
+        XCTAssertFalse(app.staticTexts["Free"].exists)
+        keepScreenshot(named: "Entitlement authoritative Pro", from: app)
     }
 
     private func waitForNonexistence(

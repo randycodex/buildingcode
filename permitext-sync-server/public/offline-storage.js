@@ -21,12 +21,14 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1526";
-const shellAssetVersion = "20261012-saved-batch-v936";
+const shellCacheName = "permitext-pro-shell-v1536";
+const shellAssetVersion = "20261013-simple-notes-v951";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/minimal-workflow.js",
+  "/web/notebook-questions.js",
   "/web/project-workflow.js?v=20261011-workflow-v4",
   "/web/search-words.js",
   "/web/nyc-property-facts.js?v=20261004-zola-facts-v1",
@@ -65,20 +67,21 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261012-saved-batch-v936",
+  "/web/styles.css?v=20261013-simple-notes-v951",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261012-saved-batch-v936",
+  "/web/app.js?v=20261013-simple-notes-v951",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261012-saved-batch-v936",
+  "/web/offline-storage.js?v=20261013-simple-notes-v951",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
+  "/web/workspace-state.js?v=20261013-simple-notes-v951",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
   "/web/code-question-client-state.js?v=20260914-question-state-v4",
@@ -97,7 +100,7 @@ const shellURLs = [
   "/web/workflow-views.js?v=7",
   "/web/report-screen.js?v=20261011-shared-shell-v6",
   "/web/report-library.js?v=20261012-sidebar-width-v8",
-  "/web/notebook-note-menu.js?v=20261012-note-menu-v3",
+  "/web/notebook-note-menu.js?v=20261013-simple-notes-v951",
   "/web/report-pdf-preview.js?v=20261012-report-preview-v4",
   "/web/pdf-preview-assets/pdf.min.js",
   "/web/pdf-preview-assets/pdf.worker.min.js"
@@ -426,12 +429,35 @@ export async function beginNotebookDraftSave(accountUserID, projectID, cardID, r
       ...(Object.hasOwn(prepared, "noteID") ? { noteID: prepared.noteID } : {}),
       document: Object.hasOwn(prepared, "document") ? prepared.document : current.document,
       evidenceLinks: current.evidenceLinks || [],
-      ...(current.openQuestions !== undefined ? {openQuestions: current.openQuestions} : {}),
+      ...(prepared.omitQuestionUpdates ? { omitQuestionUpdates: true }
+        : current.openQuestions !== undefined ? {openQuestions: current.openQuestions} : {}),
       updatedAt: current.updatedAt
     };
     store.put({ ...current, pendingSave });
     return pendingSave;
   }, "Could not retain the pending Notebook save.", accountUserID);
+}
+
+// Preserve retired feature data in account recovery exports, outside the sync
+// queue. This shares the caller's transaction with journal/acknowledgement work.
+function retainNotebookQuestionRecovery(store, current) {
+  store.put({ ...current, key: `${current.key}:question-recovery:${current.revision}`,
+    scope: "notebook-question-recovery", recoveredAt: new Date().toISOString() });
+}
+
+export async function retireRejectedNotebookQuestionSave(accountUserID, projectID, cardID, submittedRevision) {
+  return withOfflineStore(notebookDraftsStoreName, "readwrite", async store => {
+    const key = notebookDraftKey(accountUserID, projectID, cardID);
+    const current = await requestResult(store.get(key), "Could not read the rejected Notebook save.");
+    if (!draftMatches(current, accountUserID, projectID, cardID) || current.pendingSave?.revision !== submittedRevision || current.recoveryConflict) {
+      throw new Error("The Notebook draft changed while retaining its rejected save. Retry the current draft.");
+    }
+    retainNotebookQuestionRecovery(store, current);
+    const { pendingSave: _pending, ...content } = current;
+    const next = { ...content, revision: crypto.randomUUID(), updatedAt: new Date().toISOString() };
+    store.put(next);
+    return next;
+  }, "Could not retain the rejected Notebook metadata.", accountUserID);
 }
 
 export async function acknowledgeNotebookDraft(accountUserID, projectID, oldCardID, submittedRevision, savedCard) {
@@ -449,6 +475,10 @@ export async function acknowledgeNotebookDraft(accountUserID, projectID, oldCard
       return { acknowledged: false, stale: true, draft: current };
     }
     if (current.revision === submittedRevision) {
+      if (current.pendingSave?.omitQuestionUpdates && current.openQuestions?.length &&
+          JSON.stringify(current.openQuestions) !== JSON.stringify(savedCard.openQuestions || [])) {
+        retainNotebookQuestionRecovery(store, current);
+      }
       store.delete(key);
       return { acknowledged: true, draft: null };
     }
@@ -515,7 +545,7 @@ export async function rebaseNotebookDraftAfterReview(accountUserID, projectID, c
 export async function pendingNotebookDrafts(accountUserID) {
   return withOfflineStore(notebookDraftsStoreName, "readonly", async (store) =>
     (await requestResult(store.getAll(), "Could not read saved Notebook drafts."))
-      .filter((draft) => draft.accountUserID === accountUserID).map((draft) => ({ ...draft, scope: draftScope(draft) })),
+      .filter((draft) => draft.accountUserID === accountUserID && draft.scope !== "notebook-question-recovery").map((draft) => ({ ...draft, scope: draftScope(draft) })),
   "Could not read saved Notebook drafts.", accountUserID);
 }
 

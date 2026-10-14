@@ -47,18 +47,7 @@ savedReports = [{id:'report',title:'Working Report',blocks:[{kind:'notebookCard'
 await context.refreshProjectReportMembership('project',true);
 assert.equal(hosts[0].textContent,'In Report · Working Report');
 
-const questionStart = app.indexOf('      footer.prepend(createNotebookQuestionsEditor({');
-const questionEnd = app.indexOf('      if (!notebookReadOnly && !activeCard.id)',questionStart);
-context.createNotebookQuestionsEditor = options => options;
-let questions;
-footer.prepend = options => { questions = options; };
-let writes = 0;
-context.markNotebookDirty = () => { writes++; };
-context.renderCardList = () => {};
-vm.runInContext(app.slice(questionStart,questionEnd),context);
-questions.onChange([{id:'q',text:'Question after first save',status:'open'}]);
-assert.equal(writes,1,'Questions remain editable after provisional Note receives its saved ID');
-assert.equal(context.activeCard.openQuestions[0].text,'Question after first save');
-context.activeCard = {id:'other-note',identity:{}};
-assert.throws(()=>questions.onChange([]),/Reopen this Note/,'Old question handlers cannot mutate a different Note');
-console.log('Notebook footer and questions passed: delayed editor mounting, first-save membership identity, continued question editing and stale-note fence.');
+assert(!app.includes('createNotebookQuestionsEditor'), 'The writing page has no question editor');
+assert(!app.includes('openNotebookQuestions'), 'Reports and Notes do not expose question counts or warnings');
+assert(app.includes('openQuestions: structuredClone(activeCard.openQuestions || [])'), 'Existing metadata stays in draft snapshots');
+console.log('Notebook footer passed: delayed editor mounting, first-save membership identity, simple writing surface and metadata preservation.');

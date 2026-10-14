@@ -19658,16 +19658,6 @@ dialog.report-export-review {
 /* Supporting note and project controls use the existing workspace hierarchy. */
 .workspace-view-options { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
 .workspace-view-options > summary { cursor: pointer; padding: 8px 12px; }
-.notebook-questions { border-top: 1px solid var(--border); padding: 12px 0; }
-.notebook-questions > summary { cursor: pointer; }
-.notebook-questions-hint { color: var(--text-secondary); font-size: 12px; }
-.notebook-question { padding: 10px 0; border-bottom: 1px solid var(--border); }
-.notebook-question p { white-space: pre-wrap; overflow-wrap: anywhere; }
-.notebook-question button, .notebook-question-form button { margin-right: 12px; }
-.notebook-question-form { display: grid; gap: 10px; padding-top: 12px; }
-.notebook-question-form label { display: grid; gap: 4px; }
-.notebook-question-form textarea { width: 100%; box-sizing: border-box; resize: vertical; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--border); padding: 8px; }
-.notebook-question-filter[aria-pressed="true"] { font-weight: 700; }
 .project-facts-filter { margin: 0 0 12px; }
 
 /* Legacy layout controls remain mounted for saved layouts and keyboard commands. */
@@ -19705,18 +19695,3 @@ dialog.report-export-review {
   color: var(--text-secondary);
 }
 .notebook-card-footer > div:last-child { margin-inline-start: auto; flex: 0 0 auto; }
-.notebook-card-footer .notebook-questions { flex: 0 0 auto; border: 0; padding: 0; color: var(--text-secondary); font-size: 12px; }
-.notebook-card-footer .notebook-questions > summary { display: flex; align-items: center; height: 42px; list-style: none; }
-.notebook-card-footer .notebook-questions > summary::-webkit-details-marker { display: none; }
-.notebook-card-footer .notebook-questions > div {
-  position: absolute;
-  bottom: 42px;
-  inset-inline: 0;
-  max-height: min(65vh, 560px);
-  overflow-y: auto;
-  z-index: 5;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-primary);
-  padding: 16px;
-}
