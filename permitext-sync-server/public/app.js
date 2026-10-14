@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-source-dropdown-v971";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-assistant-empty-copy-v972";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-source-dropdown-v971";
+} from "./offline-storage.js?v=20261014-assistant-empty-copy-v972";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-source-dropdown-v971";
+} from "./workspace-state.js?v=20261014-assistant-empty-copy-v972";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -23708,9 +23708,7 @@ async function renderResearch(paneID = "utility:analysis") {
     welcome.className = "research-chat-welcome";
     const heading = document.createElement("h3");
     heading.textContent = "New conversation";
-    const context = document.createElement("p");
-    context.textContent = workspaceProject()?.name || "Unassigned Research";
-    welcome.append(heading, context);
+    welcome.append(heading);
     const progress = document.createElement("div");
     progress.className = "analysis-content assistant-start-progress";
     assistantBody.append(welcome, progress);
@@ -24035,10 +24033,12 @@ async function renderResearch(paneID = "utility:analysis") {
 
 
   if (!visibleHistoryConversations().length) {
-    const empty = document.createElement("div");
-    empty.className = "research-conversation-empty";
-    empty.textContent = projectFilter.value !== "*" ? "No conversations in this Project." : "Your previous chats will appear here.";
-    content.append(empty);
+    if (projectFilter.value === "*") {
+      const empty = document.createElement("div");
+      empty.className = "research-conversation-empty";
+      empty.textContent = "Your previous chats will appear here.";
+      content.append(empty);
+    }
     return panel;
   }
 
