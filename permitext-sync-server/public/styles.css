@@ -108,10 +108,10 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --background: #000000;
-    --surface: #000000;
-    --surface-muted: #000000;
-    --surface-raised: #000000;
+    --background: #0f0f0f;
+    --surface: #0f0f0f;
+    --surface-muted: #0f0f0f;
+    --surface-raised: #0f0f0f;
     --menu-surface: #121213;
     --menu-subtle-surface: #121213;
     --reader-notes-input-surface: #3c3e40;
@@ -7630,7 +7630,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 
 .research-conversation-panel {
   --pane-min-width: clamp(360px, 34vw, 560px);
-  --research-conversation-background: #000000;
+  --research-conversation-background: #0f0f0f;
   background: var(--research-conversation-background);
 }
 
@@ -16900,7 +16900,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
     display: grid;
     place-items: center;
     padding: 32px;
-    background: #000;
+    background: #0f0f0f;
     color: #f5f5f7;
     text-align: center;
   }
@@ -19164,10 +19164,10 @@ html body .column-group-menu-button:focus-visible {
 dialog.report-screen {
   position: fixed; inset: 0; width: 100vw; max-width: none; height: 100dvh;
   max-height: none; margin: 0; padding: 0; border: 0; border-radius: 0;
-  background: var(--bg, #000); color: var(--text-primary); overflow: hidden;
+  background: var(--bg, #0f0f0f); color: var(--text-primary); overflow: hidden;
 }
 .report-screen[open] { display: flex; flex-direction: column; }
-.report-screen::backdrop { background: #000; }
+.report-screen::backdrop { background: #0f0f0f; }
 .report-screen-header {
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
   gap: 20px; padding: 16px 24px; border-bottom: 1px solid var(--border); flex: none;
@@ -19179,7 +19179,7 @@ dialog.report-screen {
 .report-screen-loading { padding: 32px; }
 .report-screen .report-draft-panel {
   width: 100%; max-width: none; min-width: 0; height: 100%; margin: 0;
-  border: 0; overflow: hidden; display: block; background: #000;
+  border: 0; overflow: hidden; display: block; background: #0f0f0f;
 }
 .report-screen .report-draft-header { display: none; }
 .report-screen .report-draft-shell {
@@ -19240,7 +19240,7 @@ dialog.report-screen {
 .report-library-divider { display: none; grid-column: 2; grid-row: 2; position: relative; z-index: 1; background: var(--border); cursor: col-resize; touch-action: none; }
 .report-library-divider::before { content: ''; position: absolute; inset: 0 -5px; }
 .report-library-divider:hover, .report-library-divider:focus-visible { background: var(--text-secondary); outline: none; }
-.report-outline-header { position: sticky; top: 0; z-index: 2; background: #000; }
+.report-outline-header { position: sticky; top: 0; z-index: 2; background: #0f0f0f; }
 .report-screen .report-outline-header h2 { display: flex; align-items: center; min-height: 0; margin: 0; }
 .report-outline-divider { grid-column: 2; grid-row: 2; position: relative; z-index: 1; background: var(--border); cursor: col-resize; touch-action: none; }
 .report-outline-divider::before { content: ''; position: absolute; inset: 0 -5px; }
@@ -19404,7 +19404,7 @@ dialog.report-export-review {
 .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text-primary); }
 
 /* Report shares the workspace navigation; retain column geometry underneath. */
-.report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg, #000); }
+.report-workspace-view { grid-column: 1; grid-row: 2 / -1; z-index: 2; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg, #0f0f0f); }
 .report-workspace-view[hidden] { display: none; }
 .workspace-shell:has(> .report-workspace-view:not([hidden])) > :is(.workflow-toolbar, .panel-track, .workspace-issue) { visibility: hidden; }
 .workspace-shell > .workflow-toolbar { grid-row: 2; grid-column: 1; }
@@ -19465,7 +19465,7 @@ dialog.report-export-review {
 .workspace-shell > .account-workspace-view {
   grid-column: 1; grid-row: 2 / -1; z-index: 2;
   width: 100%; height: auto; min-width: 0; min-height: 0; margin: 0;
-  border-radius: 0; display: flex; flex-direction: column; background: var(--bg, #000);
+  border-radius: 0; display: flex; flex-direction: column; background: var(--bg, #0f0f0f);
 }
 .account-workspace-view .account-screen-header {
   height: 42px; min-height: 42px; padding: 0 clamp(22px, 3vw, 46px);
@@ -19657,13 +19657,13 @@ dialog.report-export-review {
 .report-comparison-divider:hover, .report-versions-divider:hover,
 .report-comparison-divider:focus-visible, .report-versions-divider:focus-visible { background: var(--text-secondary); outline: none; }
 .report-versions-divider[aria-disabled="true"] { pointer-events: none; cursor: default; }
-.report-pdf-preview-panel { grid-column: 5; min-width: 600px; overflow: hidden; background: #000; }
+.report-pdf-preview-panel { grid-column: 5; min-width: 600px; overflow: hidden; background: #0f0f0f; }
 .report-pdf-preview-panel .report-pdf-page { max-width: none; }
 .report-pdf-preview-panel > .report-workflow-help { padding: 0 24px; line-height: 1.6; }
 .report-comparison-header { padding: 24px; }
 .report-comparison-header h2 { margin: 0; font-size: 13px; color: var(--text-secondary); }
 .report-pdf-preview-panel.is-previewing-report > [hidden] { display: none !important; }
-.report-pdf-preview-panel .report-export-inline { background: #000; }
+.report-pdf-preview-panel .report-export-inline { background: #0f0f0f; }
 :is(.report-library-header, .report-outline-header, .report-versions-header),
 .report-pdf-preview-panel .report-export-inline > header {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
