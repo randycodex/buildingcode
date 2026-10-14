@@ -17649,6 +17649,11 @@ html body .research-compact-composer .research-question-input:focus-visible {
 .column-group-menu button:hover, .column-group-menu button:focus-visible { background: rgba(128,128,128,.16); }
 .column-group-menu button:disabled { opacity: .45; cursor: default; }
 .column-group-menu button:disabled:hover { background: transparent; }
+.column-menu-divider {
+  height: 1px;
+  margin: 6px;
+  background: var(--border);
+}
 .column-group-dialog {
   width: min(1200px, calc(100vw - 48px));
   max-height: calc(100vh - 48px);

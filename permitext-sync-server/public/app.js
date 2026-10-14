@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-project-details-header-v962";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-column-menu-dividers-v963";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261013-project-details-header-v962";
+} from "./offline-storage.js?v=20261013-column-menu-dividers-v963";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261013-project-details-header-v962";
+} from "./workspace-state.js?v=20261013-column-menu-dividers-v963";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -40782,6 +40782,13 @@ function openColumnGroupMenu(panel, anchor) {
   anchor.setAttribute('aria-expanded', 'true');
   const close = () => { controller.abort(); menu.remove(); anchor.setAttribute('aria-expanded', 'false'); anchor.focus({ preventScroll: true }); };
   menu._close = close;
+  const separate = () => {
+    if (!menu.children.length || menu.lastElementChild.getAttribute("role") === "separator") return;
+    const divider = document.createElement("div");
+    divider.className = "column-menu-divider";
+    divider.setAttribute("role", "separator");
+    menu.append(divider);
+  };
   const add = (label, action, disabled = false) => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -40795,6 +40802,7 @@ function openColumnGroupMenu(panel, anchor) {
   if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
   if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
+  separate();
   if (paneCanCollapse(panel.dataset.paneId) && !columnGroupIsCollapsed(group)) {
     add(paneIsCollapsed(panel.dataset.paneId) ? 'Expand' : 'Collapse', () => {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
@@ -40804,16 +40812,20 @@ function openColumnGroupMenu(panel, anchor) {
     ? savedEvidenceColumnGroup(panel.dataset.paneId, activePaneIDs())[0] || panel.dataset.paneId
     : panel.dataset.paneId;
   if (isProAccount()) add(activePinnedPaneID() === pinTarget ? 'Unpin' : 'Pin', () => togglePinnedPane(panel));
+  separate();
   add('Move Left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
   add('Move Right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
   if (panel.classList.contains("reader-panel")) {
+    separate();
     add("Change Code", () => openReaderCodePicker(anchor, async (code) => {
       const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
       if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
     }));
+    if ((state.readers || []).some(reader => reader.id === panel.dataset.readerId)) separate();
     appendReaderMenuControls(menu, panel);
   }
   if (group) {
+    separate();
     if (columnGroupCanCollapse(group)) add(group.collapsed ? 'Expand group' : 'Collapse group', () => {
       setColumnGroupCollapsed(group, !group.collapsed);
       focusColumnGroupControl(group);

@@ -283,7 +283,8 @@ console.log('Keyboard column moves preserve independent project columns and name
 let focused=null, menu=null, mountedPass=null, menuSaves=0, collapsedCall=null;
 function menuNode(tag='button') {
   return {tag,children:[],attrs:{},listeners:{},style:{},offsetWidth:180,offsetHeight:200,
-    setAttribute(k,v){this.attrs[k]=v;}, addEventListener(k,fn){this.listeners[k]=fn;},
+    get lastElementChild(){return this.children.at(-1);},
+    getAttribute(k){return this.attrs[k];},setAttribute(k,v){this.attrs[k]=v;}, addEventListener(k,fn){this.listeners[k]=fn;},
     append(...nodes){this.children.push(...nodes);}, remove(){this.removed=true;},
     focus(){focused=this;}, getBoundingClientRect(){return {left:0,right:600,bottom:50,width:600};},
     querySelectorAll(){return this.children.filter(x=>x.tag==='button'&&!x.disabled);},
@@ -298,6 +299,7 @@ const menuPanel={dataset:{paneId:'reader:one'},editor:retainedEditor,
 const peerPanel={dataset:{paneId:'reader:two'}};
 let menuOrder=['reader:one','reader:two'], menuPro=false;
 const menuState={paneOrder:menuOrder,columnGroups:[]};
+const menuItems = () => menu.children.filter(item => item.tag === 'button');
 const menuContext=vm.createContext({state:menuState,AbortController,isProAccount:()=>menuPro,currentColumnWorkflowView:()=> 'research',workflowPaneIsVisible:()=>true,
   document:{querySelector:()=>null,createElement:tag=>menuNode(tag),body:{append:n=>{menu=n;}},addEventListener(){},get activeElement(){return focused;}},
   window:{innerWidth:1200,innerHeight:800},
@@ -313,7 +315,7 @@ const menuContext=vm.createContext({state:menuState,AbortController,isProAccount
 vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
 menuState.pinnedPaneID='reader:one';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert.deepEqual(menu.children.map(x=>x.textContent),['Collapse','Move Left','Move Right'],'Free menus omit both Pin and Unpin, even with a stored Pro pin.');
+assert.deepEqual(menuItems().map(x=>x.textContent),['Collapse','Move Left','Move Right'],'Free menus omit both Pin and Unpin, even with a stored Pro pin.');
 assert.equal(menuContext.activePinnedPaneID(),'','A stored Pro pin is inactive on Free.');
 menuContext.togglePinnedPane(menuPanel);
 assert.equal(menuState.pinnedPaneID,'reader:one','Free cannot change a pin through a stale action handler.');
@@ -323,17 +325,17 @@ assert.equal(menuContext.activePinnedPaneID(),'reader:one','The original pin pre
 menuState.pinnedPaneID='';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert.equal(menu.attrs['aria-label'],'Column options');assert.equal(anchor.attrs['aria-expanded'],'true');
-assert.deepEqual(menu.children.map(x=>x.textContent),['Collapse','Pin','Move Left','Move Right']);
-assert.equal(menu.children[2].disabled,true);assert.equal(menu.children[3].disabled,false);
-assert.equal(focused,menu.children[0]);
-menu.children[1].focus();
-menu.listeners.keydown({key:'ArrowDown',preventDefault(){}});assert.equal(focused,menu.children[3],'Arrow keys skip disabled move');
-menu.children[3].listeners.click();
+assert.deepEqual(menuItems().map(x=>x.textContent),['Collapse','Pin','Move Left','Move Right']);
+assert.equal(menuItems()[2].disabled,true);assert.equal(menuItems()[3].disabled,false);
+assert.equal(focused,menuItems()[0]);
+menuItems()[1].focus();
+menu.listeners.keydown({key:'ArrowDown',preventDefault(){}});assert.equal(focused,menuItems()[3],'Arrow keys skip disabled move');
+menuItems()[3].listeners.click();
 assert.equal(anchor.attrs['aria-expanded'],'false');assert.equal(focused,anchor);
 assert.equal(mountedPass[0],menuPanel);assert.equal(mountedPass[1],peerPanel);
 assert.equal(menuPanel.editor,retainedEditor);assert.equal(retainedEditor.value,'Unsent live question');assert.equal(retainedEditor.scrollTop,321);
 assert.equal(menuSaves,1);
-menuContext.openColumnGroupMenu(menuPanel,anchor);menu.children[0].listeners.click();
+menuContext.openColumnGroupMenu(menuPanel,anchor);menuItems()[0].listeners.click();
 assert.equal(collapsedCall[0],menuPanel);assert.equal(collapsedCall[1],true);assert.equal(collapsedCall[2].focus,true);assert.equal(focused,menuRail);
 menuContext.openColumnGroupMenu(menuPanel,anchor);menu.listeners.keydown({key:'Escape',preventDefault(){}});
 assert.equal(focused,anchor);assert.equal(anchor.attrs['aria-expanded'],'false');
