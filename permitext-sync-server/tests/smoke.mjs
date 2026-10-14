@@ -1633,7 +1633,6 @@ async function main() {
         workspaceStyles.text.includes(".reader-code-heading .reader-code-picker .custom-select,\n.reader-code-heading .reader-code-picker .custom-select-trigger {\n  width: max-content;") &&
         workspaceScript.text.includes('menu.classList.toggle("reader-code-select-menu", readerCodeMenu)') &&
         workspaceScript.text.includes('menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu)') &&
-        workspaceScript.text.includes("const menuWidth = readerTopMenu ? boundaryWidth") &&
         workspaceStyles.text.includes(".reader-panel:not(.is-collapsed).has-open-reader-menu::after {") &&
         workspaceScript.text.includes("const menuBottomGap = readerChapterMenu ? menuTop : viewportPadding") &&
         workspaceScript.text.includes('selectPanel?.querySelector(".chapter-select + .custom-select .custom-select-trigger")') &&

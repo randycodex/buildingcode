@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-reader-source-menu-v965";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-chapter-menu-width-v966";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261013-reader-source-menu-v965";
+} from "./offline-storage.js?v=20261013-chapter-menu-width-v966";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261013-reader-source-menu-v965";
+} from "./workspace-state.js?v=20261013-chapter-menu-width-v966";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -7868,6 +7868,7 @@ function enhanceSelect(select) {
       (panelRect?.right ?? window.innerWidth - viewportPadding) - panelInset
     );
     const boundaryWidth = Math.max(rect.width, boundaryRight - boundaryLeft);
+    if (readerChapterMenu) menu.style.setProperty("--select-menu-width", "max-content");
     const menuStyles = getComputedStyle(menu);
     const menuHorizontalPadding = (Number.parseFloat(menuStyles.paddingLeft) || 0) +
       (Number.parseFloat(menuStyles.paddingRight) || 0);
@@ -7883,8 +7884,10 @@ function enhanceSelect(select) {
         (Number.parseFloat(itemStyles.paddingRight) || 0) +
         menuHorizontalPadding;
     });
-    const naturalWidth = Math.ceil(Math.max(rect.width, researchHistoryProjectMenu ? 140 : 0, ...optionWidths));
-    const menuWidth = readerTopMenu ? boundaryWidth : Math.min(naturalWidth, boundaryWidth);
+    const naturalWidth = Math.ceil(readerChapterMenu
+      ? Math.max(rect.width, menu.getBoundingClientRect().width)
+      : Math.max(rect.width, researchHistoryProjectMenu ? 140 : 0, ...optionWidths));
+    const menuWidth = readerCodeMenu ? boundaryWidth : Math.min(naturalWidth, boundaryWidth);
     const left = readerTopMenu
       ? boundaryLeft
       : Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
