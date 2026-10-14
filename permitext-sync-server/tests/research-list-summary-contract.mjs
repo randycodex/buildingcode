@@ -332,7 +332,7 @@ assert.doesNotMatch(stylesSource, /\.research-start-composer \.research-composer
 assert.match(stylesSource, /@media \(prefers-color-scheme: dark\) \{[\s\S]*?\.search-box \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);/, "The dark Search field does not use the annotated warm-white fill.");
 assert.match(stylesSource, /\.reader-internal-search\.search-box \{[\s\S]*?border-radius: var\(--radius-pill\);/, "The Reader search does not use fully rounded ends.");
 assert.doesNotMatch(stylesSource, /\.reader-reading-progress/, "The removed horizontal Reader progress line returned.");
-assert.match(stylesSource, /\.research-conversation-panel \{[\s\S]*?--research-conversation-background: #000000;[\s\S]*?background: var\(--research-conversation-background\);/, "Standalone Research conversations do not use a pure-black surface.");
+assert.match(stylesSource, /\.research-conversation-panel \{[\s\S]*?--research-conversation-background: #0f0f0f;[\s\S]*?background: var\(--research-conversation-background\);/, "Standalone Research conversations must use the shared 0F0F0F workspace surface.");
 assert.match(stylesSource, /\.research-message\.is-user \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?opacity: 1;/, "Research user messages do not use the annotated full-opacity warm-white fill.");
 assert.match(stylesSource, /\.research-compact-composer \.research-composer-box:has\(\.research-question-input:focus-visible\)\s*\{[^}]*outline: none/, "The composer retains the requested borderless focus treatment.");
 assert.match(clientSource, /selectHistoryButton\.innerHTML = selectionModeIconSVG\(\)/, "Research history does not expose its selection icon.");

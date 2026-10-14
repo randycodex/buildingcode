@@ -1307,30 +1307,15 @@ async function main() {
         iosLibraryViewModelSource.includes("func deleteFolders(ids: Set<Int64>) -> Set<Int64>"),
       "iOS Settings omitted project selection, Select All, warning, or bulk deletion."
     );
-    assert(
-      workspaceScript.text.includes("const hasManyColumns = ids.length >= 4") &&
-        workspaceScript.text.includes("Math.max(value, defaultWidth)") &&
-        workspaceScript.text.includes('panel.style.setProperty("--pane-default-min-width"'),
-      "Four-or-more-column workspaces no longer enforce every pane's default width."
-    );
+    // Exercise the actual width functions across main columns and restored
+    // layouts instead of requiring the retired four-column implementation.
+    await import("./reader-width-contract.mjs");
     assert(
       workspaceStyles.text.match(/\.pane-divider \{[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.match(/\.panel-track > \.workspace-panel \{[\s\S]*?border-inline: 0;/) &&
         workspaceStyles.text.match(/\.pane-divider::before \{[\s\S]*?width: 1px;[\s\S]*?background: var\(--border\);/) &&
         workspaceStyles.text.match(/\.pane-divider::after \{[\s\S]*?width: 14px;/),
       "Column dividers should render as hairlines without shrinking their resize target."
-    );
-    assert(
-      workspaceScript.text.includes("function isFlexibleReaderPaneID(paneID)") &&
-        workspaceScript.text.includes('return Boolean(paneID?.startsWith("reader:"))') &&
-        workspaceScript.text.includes("flexibleReader && activePaneIDs().length === 1") &&
-        workspaceScript.text.includes("flexibleReader || hasManyColumns") &&
-        workspaceScript.text.includes("const explicitlyResizedReader = flexibleReader") &&
-        workspaceScript.text.includes("value > defaultWidth + 0.5") &&
-        workspaceScript.text.includes("if (flexibleReader && !explicitlyResizedReader)") &&
-        workspaceScript.text.includes('panel.style.flex = `1 1 ${width}px`') &&
-        workspaceScript.text.includes('panel.style.flex = `0 0 ${width}px`'),
-      "Readers on every plan should share the remaining viewport, preserve divider resizing, and stop shrinking at their default minimum width."
     );
     assert(
       workspaceScript.text.includes("function renderReaderTrust") &&
@@ -1347,10 +1332,10 @@ async function main() {
       "Reader trust, direct passage actions, or exact Project membership context is no longer wired."
     );
     assert(
-      workspaceScript.text.includes("minWidth: defaultPaneWidthForID(pane.dataset.paneId)") &&
+      workspaceScript.text.includes("minWidth: minimumPaneWidthForID(pane.dataset.paneId)") &&
         workspaceScript.text.includes("const pushedScrollDelta = appliedPreviousDelta - delta") &&
         workspaceScript.text.includes("startScrollLeft + pushedScrollDelta"),
-      "Divider resizing no longer preserves default widths while pushing the workspace under the pointer."
+      "Divider resizing no longer preserves minimum widths while pushing the workspace under the pointer."
     );
     const resetColumnWidthsStart = workspaceScript.text.indexOf("async function resetVisibleColumnWidths()");
     const resetColumnWidthsEnd = workspaceScript.text.indexOf("\nasync function closeAllColumns()", resetColumnWidthsStart);
@@ -1401,7 +1386,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("const searchResultPageSize = 25;") &&
         workspaceScript.text.includes("function appendSearchLoadMore") &&
-        workspaceScript.text.includes("&match=${matchMode}&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true") &&
+        workspaceScript.text.includes("&match=${matchMode}&readerSourceMetadata=1&limit=${searchResultPageSize}&offset=0&candidateOffset=0&grouped=true") &&
         workspaceScript.text.includes("offset=${encodeURIComponent(String(options.nextOffset))}"),
       "Search no longer opens with 25 results and supports explicit pagination."
     );
@@ -1652,7 +1637,8 @@ async function main() {
         !workspaceStyles.text.includes(".reader-trust summary::after") &&
         workspaceStyles.text.includes(".reader-panel .panel-header:has(.reader-trust[open]) {\n  z-index: 11;") &&
         workspaceStyles.text.includes("--reader-header-overlay-height: calc(var(--panel-control-row-top) + 40px);") &&
-        !workspaceStyles.text.includes(".reader-trust {\n  display: none;") &&
+        workspaceStyles.text.includes(".reader-panel .reader-trust {\n  display: none;") &&
+        workspaceScript.text.includes("menu.append(trust)") &&
         workspaceScript.text.includes('document.querySelectorAll(".reader-trust[open]")') &&
         workspaceStyles.text.includes("box-shadow: none;") &&
         !workspaceScript.text.includes("function appendProjectStudioOverview") &&
@@ -1684,7 +1670,7 @@ async function main() {
         workspaceStyles.text.includes(".code-filter-menu.is-open .notebook-reference-list {\n  padding-bottom: var(--space-3);") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-container {") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-editor {") &&
-        notebookEditorSource.includes("portalElements: { slashMenu: null },") &&
+        notebookEditorSource.includes("slashMenu: false,") &&
         workspaceStyles.text.includes(".bn-suggestion-menu {\n  background: var(--menu-surface) !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-block-content::after,\n.notebook-editor-surface .bn-side-menu svg {\n  color: var(--text-tertiary) !important;") &&
         workspaceStyles.text.includes('.notebook-editor-surface table :is(th, td) {\n  border-color: #000 !important;') &&
@@ -1815,7 +1801,7 @@ async function main() {
         workspaceScript.text.includes("readerMatchesSource(candidate, detail)") &&
         workspaceScript.text.includes("candidate.sourceAnchorPaneID === anchorPaneID") &&
         workspaceScript.text.includes("placePaneAfter(anchorPaneID, paneID)") &&
-        workspaceScript.text.includes("revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor)"),
+        workspaceScript.text.includes("revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {preferPassage: fromSearch})"),
       "Saved Evidence items should open or reuse an exact-passage Reader beside Saved."
     );
     assert(
@@ -1961,11 +1947,14 @@ async function main() {
     const readerHeaderStyleSource =
       workspaceStyles.text.match(/\.reader-panel:not\(\.is-collapsed\)::before \{[\s\S]*?\n\}/)?.[0] || "";
     assert(
-      readerHeaderStyleSource.includes("background: var(--surface);") &&
+      readerHeaderStyleSource.includes("background: linear-gradient(") &&
+        readerHeaderStyleSource.includes("var(--reader-controls-surface) 0,") &&
+        readerHeaderStyleSource.includes("transparent 100%") &&
+        readerHeaderStyleSource.includes("pointer-events: none;") &&
         readerHeaderStyleSource.includes("-webkit-backdrop-filter: none;") &&
         readerHeaderStyleSource.includes("backdrop-filter: none;") &&
         !readerHeaderStyleSource.includes("color-mix("),
-      "Regular Reader headers should be fully opaque without a backdrop blur."
+      "Reader controls should have an opaque-to-transparent soft fade without blocking input or adding backdrop blur."
     );
     assert(
       workspaceScript.text.includes("function createSavedEvidenceHeading()") &&
@@ -2102,9 +2091,9 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel),") &&
-        workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) * {") &&
+        workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-detail-panel) *:not(.bn-editor, .bn-editor *) {") &&
         workspaceStyles.text.includes("font-size: 14px !important;"),
-      "Workspace tools outside Reader and section detail should use a consistent 14px text size."
+      "Workspace chrome should use 14px text while keeping Reader text and editable Notebook text independent."
     );
     assert(
       !webRoot.text.includes("settings-code-section-select") &&
@@ -2871,7 +2860,8 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".annotated-code-block:hover > .inline-comment") &&
-        workspaceStyles.text.match(/\.reader-content > \*,[\s\S]*?\.section-detail-body > \* \{[\s\S]*?width: 100%;[\s\S]*?max-width: 800px;/),
+        workspaceStyles.text.match(/--workspace-content-max-width: 800px;/) &&
+        workspaceStyles.text.match(/\.reader-content > \*,[\s\S]*?\.section-detail-body > \* \{[\s\S]*?width: 100%;[\s\S]*?max-width: var\(--workspace-content-max-width\);/),
       "Reader passage actions or the responsive 800-pixel reading measure are missing."
     );
     assert(
