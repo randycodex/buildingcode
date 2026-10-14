@@ -28,12 +28,13 @@ function fixture(primary = false) {
       querySelector: () => button, button };
   });
   const pending = [];
-  const panel = { isConnected: true, dataset: {}, classList: classes('is-new-research-chat', 'has-research-composer'),
+  const panel = { isConnected: true, dataset: {}, classList: classes('is-new-research-chat', 'has-research-composer', 'is-history-only'),
     querySelector: () => body, querySelectorAll: () => rows, history };
   const track = { querySelector: () => panel }; panel.parentNode = track;
   const context = vm.createContext({ state, track, CSS: { escape: value => value }, activeWorkspaceID: 'workspace',
     researchDraftPaneIDs: new Set(), researchHistoryShowing: false, researchConversationPaneOpened: true,
     captureAccountRequest: () => identity, isCurrentAccountRequest: value => value === identity, hasCapability: () => true,
+    applyPaneWeight() {}, notifyWorkspaceLayoutChange() {},
     renderResearchConversation: (id, options) => new Promise(resolve => pending.push({ id, options, resolve })) });
   vm.runInContext(actual('researchAssistantContentIdentity') + '\n' + actual('refreshResearchConversationInPlace'), context);
   const paneID = primary ? 'utility:analysis' : 'utility:analysis:one';
@@ -58,6 +59,8 @@ for (const primary of [false, true]) {
   assert.equal(f.rows[1].classList.contains('is-active'), true);
   assert.equal(f.panel.classList.contains('is-new-research-chat'), false);
   assert.equal(f.panel.classList.contains('has-inline-conversation'), true);
+  assert.equal(f.panel.classList.contains('is-history-only'), false);
+  assert.equal(f.body.hidden, false, 'Selecting a conversation reveals its message pane.');
   assert.equal(f.panel.dataset.workspacePaneIdentity, f.context.researchAssistantContentIdentity(primary ? null : f.instance),
     'Workspace reconciliation recognizes the retained Assistant as current.');
 }

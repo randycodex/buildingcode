@@ -19594,15 +19594,15 @@ dialog.report-export-review {
   gap: 0;
   overflow: hidden;
 }
-.assistant-workspace > .panel-header { grid-column: 2; grid-row: 1; padding: var(--panel-padding) var(--panel-padding) 0; }
+.assistant-workspace > .panel-header { grid-column: 1; grid-row: 1; margin: 0; padding: var(--panel-padding) 20px 0; border-right: 1px solid var(--border); }
 .assistant-workspace > .assistant-history-rail {
-  grid-column: 1; grid-row: 1 / -1;
+  grid-column: 1; grid-row: 2;
   display: grid; grid-template-rows: minmax(0, 1fr) auto;
   width: 400px; min-width: 400px; max-width: 400px;
   min-height: 0; box-sizing: border-box; padding: 0;
   border-right: 1px solid var(--border); overflow: hidden;
 }
-.assistant-history-rail > .analysis-content { display: block; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: var(--panel-padding) 20px 0; margin: 0; width: auto; }
+.assistant-history-rail > .analysis-content { display: block; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: var(--space-2) 20px 0; margin: 0; width: auto; }
 .assistant-history-rail .research-history-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 .assistant-history-rail .research-history-filters > * { min-width: 0; width: 100%; max-width: 100%; }
 .assistant-history-rail .research-conversation-list { margin: 0; width: 100%; }
@@ -19625,7 +19625,27 @@ dialog.report-export-review {
   font-size: 12px;
   text-align: center;
 }
-.assistant-workspace > .assistant-body { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; overflow: hidden; display: grid; padding-inline: var(--panel-padding); }
+.assistant-workspace > .assistant-body { grid-column: 2; grid-row: 1 / -1; min-width: 0; min-height: 0; overflow: hidden; display: grid; padding-inline: var(--panel-padding); }
+.assistant-workspace > .assistant-body[hidden] { display: none; }
+.workspace-panel.assistant-workspace.is-history-only {
+  grid-template-columns: 400px;
+  min-width: 400px;
+  max-width: 400px;
+}
+.assistant-workspace .research-conversation-content { padding-top: 0; gap: 0; }
+.assistant-workspace .research-dialogue-pane { position: relative; }
+.assistant-workspace .research-dialogue-pane::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 48px;
+  z-index: 2;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--background), transparent);
+}
+.assistant-workspace .research-message-thread { padding-top: 48px; }
 .assistant-body > *,
 .research-conversation-panel > .research-conversation-content {
   width: 100%;

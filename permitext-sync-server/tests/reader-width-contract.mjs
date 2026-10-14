@@ -4,7 +4,9 @@ import vm from 'node:vm';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const context = vm.createContext({
-  state: { paneWeights: {}, readers: [], paneWidthDefaultsVersion: 5 },
+  state: { paneWeights: {}, readers: [], utilityInstances: [{id:'instance',key:'analysis',conversationID:'selected'}], paneWidthDefaultsVersion: 5 },
+  researchDraftPaneIDs: new Set(), researchConversationPaneIsOpen: () => true,
+  paneIDForUtilityInstance: item => `utility:${item.key}:${item.id}`,
   paneIDs: [],
   activePaneIDs() { return context.paneIDs; },
   detachedProjectWindow: false,
@@ -18,7 +20,7 @@ const context = vm.createContext({
 vm.runInContext([
   ...source.matchAll(/const (?:(?:legacy|default)\w*PaneWidth|assistantHistoryWidth) = [^;]+;/g)
 ].map(match => match[0]).join('\n') + '\n' + [
-  'isProjectNotebookPaneID', 'isProjectReportDraftPaneID', 'defaultPaneWidthForID',
+  'isProjectNotebookPaneID', 'isProjectReportDraftPaneID', 'assistantHistoryOnlyPane', 'defaultPaneWidthForID',
   'minimumPaneWidthForID', 'migrateLegacyPaneWidth', 'normalizePaneWeights',
   'isFixedWidthPaneID', 'isFlexibleReaderPaneID', 'applyPaneWeight'
 ].map(actual).join('\n'), context);
@@ -78,6 +80,19 @@ context.paneIDs = ['utility:archive'];
 context.state.paneWeights = { 'utility:archive': 350 };
 context.normalizePaneWeights(context.paneIDs);
 assert.equal(context.state.paneWeights['utility:archive'], 600, 'Other main columns also enforce the 600px minimum');
+context.researchConversationPaneIsOpen = () => false;
+context.state.utilityInstances = [{id:'instance',key:'analysis',conversationID:''}];
+for (const id of ['utility:analysis', 'utility:analysis:instance']) {
+  assert.equal(context.minimumPaneWidthForID(id),400);
+  assert.equal(context.defaultPaneWidthForID(id),400);
+  assert.equal(layout(id,[id,'reader:a'],1200).flex,'0 0 400px','Unselected Assistant stays compact even with a saved chat width.');
+  context.researchDraftPaneIDs.add(id);
+  assert.equal(context.minimumPaneWidthForID(id),1000,'New chat reserves the message column.');
+  assert.equal(layout(id,[id,'reader:a'],400).flex,'1 1 1000px');
+  context.researchDraftPaneIDs.delete(id);
+}
+context.state.utilityInstances[0].conversationID='selected';
+assert.equal(context.minimumPaneWidthForID('utility:analysis:instance'),1000,'Selected chat retains a 600px message column beside its history.');
 console.log('Main column minimums passed: all main kinds, repeated utilities, saved narrow/wider widths, one through eight columns, and collapse.');
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
 assert.match(css, /--workspace-content-max-width: 800px;/, 'Workspace reading content retains the 800px measure');

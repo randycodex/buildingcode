@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-new-chat-pill-v973";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-assistant-history-first-v975";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-new-chat-pill-v973";
+} from "./offline-storage.js?v=20261014-assistant-history-first-v975";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-new-chat-pill-v973";
+} from "./workspace-state.js?v=20261014-assistant-history-first-v975";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4098,6 +4098,7 @@ async function activateProjectStudio(project, options = {}) {
 }
 
 function defaultPaneWidthForID(paneID) {
+  if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
   if (!paneID) return defaultReaderPaneWidth;
   if (paneID.startsWith("project:context:")) return defaultContextPaneWidth;
   if (paneID.startsWith("project:facts:")) return defaultFactsPaneWidth;
@@ -4127,7 +4128,16 @@ function defaultPaneWidthForID(paneID) {
   return defaultNonReaderPaneWidth;
 }
 
+function assistantHistoryOnlyPane(paneID) {
+  if (paneID !== "utility:analysis" && !paneID?.startsWith("utility:analysis:")) return false;
+  if (researchDraftPaneIDs.has(paneID)) return false;
+  if (paneID === "utility:analysis") return !researchConversationPaneIsOpen();
+  const instance = (state.utilityInstances || []).find(item => paneIDForUtilityInstance(item) === paneID);
+  return !instance?.conversationID;
+}
+
 function minimumPaneWidthForID(paneID) {
+  if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
   if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return assistantHistoryWidth + 600;
   return 600;
 }
@@ -4344,7 +4354,7 @@ function syncReferenceReaderLayout() {
   const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
   const screenOpen = view === "project-details";
   const visibleIDs = screenOpen ? defaultActivePaneIDs().filter(workflowPaneIsVisible) : [];
-  const widths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : Math.max(minimumPaneWidthForID(id), state.paneWeights[id] || defaultPaneWidthForID(id)));
+  const widths = visibleIDs.map(id => paneIsCollapsed(id) ? 48 : assistantHistoryOnlyPane(id) ? assistantHistoryWidth : Math.max(minimumPaneWidthForID(id), state.paneWeights[id] || defaultPaneWidthForID(id)));
   const reportPanel = document.querySelector(".report-workspace-view:not([hidden]) .report-draft-panel");
   const libraryWidth = reportPanel?.dataset.libraryOpen === "true" ? Number(reportPanel.dataset.libraryWidth) || 330 : 0;
   const outlineWidth = reportPanel?.dataset.outlineHidden === "true" ? 0 : Number(reportPanel?.dataset.outlineWidth) || 300;
@@ -5272,6 +5282,12 @@ function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
   if (panel.classList.contains("is-collapsed")) {
     panel.style.flex = "0 0 48px";
+    return;
+  }
+  if (assistantHistoryOnlyPane(paneID)) {
+    panel.style.setProperty("--pane-resized-min-width", `${assistantHistoryWidth}px`);
+    panel.style.setProperty("--pane-default-min-width", `${assistantHistoryWidth}px`);
+    panel.style.flex = `0 0 ${assistantHistoryWidth}px`;
     return;
   }
   const minimumWidth = minimumPaneWidthForID(paneID);
@@ -21613,8 +21629,11 @@ async function refreshResearchConversationInPlace(paneID, conversationID, instan
   if (!current()) return "stale";
   // Publish a complete conversation in one swap; history, filters and focus stay mounted.
   body.replaceChildren(conversation);
-  panel.classList.remove("has-research-composer", "is-new-research-chat");
+  body.hidden = false;
+  panel.classList.remove("has-research-composer", "is-new-research-chat", "is-history-only");
   panel.classList.add("has-inline-conversation");
+  applyPaneWeight(panel, paneID);
+  notifyWorkspaceLayoutChange();
   panel.dataset.workspacePaneIdentity = researchAssistantContentIdentity(instance);
   panel.querySelectorAll(".assistant-history-rail .research-conversation-row").forEach(row => {
     const selected = row.dataset.conversationId === conversationID;
@@ -23638,6 +23657,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
   const draftShowing = researchDraftPaneIDs.has(paneID);
+  const chatVisible = conversationOpen || draftShowing;
   // History is always available beside this Assistant, including while composing.
   const historyShowing = true;
   const panel = renderUtility(analysisTemplate, paneID);
@@ -23685,6 +23705,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const content = panel.querySelector(".analysis-content");
 
   panel.classList.add("assistant-workspace", "research-clean-start", "is-history-open");
+  panel.classList.toggle("is-history-only", !chatVisible);
   const historyRail = document.createElement("aside");
   historyRail.className = "assistant-history-rail";
   historyRail.setAttribute("aria-label", "Assistant conversations");
@@ -23692,6 +23713,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const assistantBody = document.createElement("section");
   assistantBody.className = "assistant-body";
   assistantBody.setAttribute("aria-label", "Assistant conversation");
+  assistantBody.hidden = !chatVisible;
   panel.append(historyRail, assistantBody);
   content.addEventListener("scroll", () => {
     historyState.historyScrollTop = content.scrollTop;
@@ -23702,7 +23724,7 @@ async function renderResearch(paneID = "utility:analysis") {
     assistantBody.append(await renderResearchConversation(instance?.conversationID || state.researchConversationID, {
       embedded: true, supplemental: Boolean(instance), ownerInstance: instance, paneID
     }));
-  } else {
+  } else if (draftShowing) {
     panel.classList.add("has-research-composer", "is-new-research-chat");
     const welcome = document.createElement("div");
     welcome.className = "research-chat-welcome";
