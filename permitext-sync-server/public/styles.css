@@ -19420,7 +19420,7 @@ dialog.report-export-review {
   --header-height: 42px;
   --workspace-menu-height: 30px;
   --workspace-menu-gap: 6px;
-  --workspace-menu-highlight: #242124;
+  --workspace-menu-highlight: #252525;
 }
 .workspace-shell { grid-template-rows: 42px 42px minmax(0, 1fr); }
 .workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: 42px 42px auto minmax(0, 1fr); }
