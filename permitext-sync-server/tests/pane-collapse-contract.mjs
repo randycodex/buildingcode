@@ -287,6 +287,7 @@ function menuNode(tag='button') {
     getAttribute(k){return this.attrs[k];},setAttribute(k,v){this.attrs[k]=v;}, addEventListener(k,fn){this.listeners[k]=fn;},
     append(...nodes){this.children.push(...nodes);}, remove(){this.removed=true;},
     focus(){focused=this;}, getBoundingClientRect(){return {left:0,right:600,bottom:50,width:600};},
+    getClientRects(){return [this.getBoundingClientRect()];},
     querySelectorAll(){return this.children.filter(x=>x.tag==='button'&&!x.disabled);},
     querySelector(){return this.querySelectorAll()[0]||null;}, contains(){return false;}};
 }

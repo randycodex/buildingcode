@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-column-menu-dividers-v963";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-reader-source-menu-v965";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261013-column-menu-dividers-v963";
+} from "./offline-storage.js?v=20261013-reader-source-menu-v965";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261013-column-menu-dividers-v963";
+} from "./workspace-state.js?v=20261013-reader-source-menu-v965";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -5363,9 +5363,10 @@ function codeTrustCurrencyLabel(profile) {
 }
 
 function renderReaderTrust(panel, reader) {
-  const trust = panel.querySelector(".reader-trust");
+  const trust = panel._readerTrust || panel.querySelector(".reader-trust");
   const profile = codeTrustProfile(reader.codePrefix, reader.codeVersion);
   if (!trust) return;
+  panel._readerTrust = trust;
   if (!profile) {
     const metadataUnavailable = codeTrustProfilesStatus !== "loading";
     trust.hidden = false;
@@ -5385,10 +5386,11 @@ function renderReaderTrust(panel, reader) {
       retry.type = "button";
       retry.className = "reader-trust-retry";
       retry.addEventListener("click", () => { void loadStartupCatalogs(); });
-      trust.append(retry);
+      trust.querySelector(".reader-trust-details").append(retry);
     }
     retry.textContent = metadataUnavailable ? "Retry source details" : "Loading source details…";
     retry.disabled = !metadataUnavailable;
+    trust._positionMenu?.();
     return;
   }
   trust.querySelector(".reader-trust-retry")?.remove();
@@ -5420,6 +5422,7 @@ function renderReaderTrust(panel, reader) {
       });
     });
   }
+  trust._positionMenu?.();
 }
 
 function searchCodeFilterPresentation(option = {}) {
@@ -40779,8 +40782,21 @@ function openColumnGroupMenu(panel, anchor) {
   menu.setAttribute('role', 'menu');
   menu.setAttribute('aria-label', group ? `Group options: ${group.name}` : 'Column options');
   const controller = new AbortController();
+  const trust = panel._readerTrust || panel.querySelector(".reader-trust");
+  const trustHome = trust?.parentElement;
   anchor.setAttribute('aria-expanded', 'true');
-  const close = () => { controller.abort(); menu.remove(); anchor.setAttribute('aria-expanded', 'false'); anchor.focus({ preventScroll: true }); };
+  const close = () => {
+    controller.abort();
+    if (trust && trustHome) {
+      trust.open = false;
+      delete trust._positionMenu;
+      trust.querySelector("summary").setAttribute("aria-expanded", "false");
+      trustHome.append(trust);
+    }
+    menu.remove();
+    anchor.setAttribute('aria-expanded', 'false');
+    anchor.focus({ preventScroll: true });
+  };
   menu._close = close;
   const separate = () => {
     if (!menu.children.length || menu.lastElementChild.getAttribute("role") === "separator") return;
@@ -40821,6 +40837,16 @@ function openColumnGroupMenu(panel, anchor) {
       const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
       if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
     }));
+    if (trust) {
+      panel._readerTrust = trust;
+      trust.open = false;
+      trust.hidden = false;
+      trust.querySelector("summary").setAttribute("role", "menuitem");
+      trust.querySelector("summary").setAttribute("aria-expanded", "false");
+      trust.style.setProperty("--code-accent", getComputedStyle(panel).getPropertyValue("--code-accent"));
+      menu.classList.add("has-reader-trust");
+      menu.append(trust);
+    }
     if ((state.readers || []).some(reader => reader.id === panel.dataset.readerId)) separate();
     appendReaderMenuControls(menu, panel);
   }
@@ -40838,17 +40864,26 @@ function openColumnGroupMenu(panel, anchor) {
     });
   }
   document.body.append(menu);
-  const rect = anchor.getBoundingClientRect();
-  const panelRect = panel.getBoundingClientRect();
-  const menuWidth = menu.offsetWidth;
-  const fitsColumn = panelRect.width >= menuWidth + 16;
-  const leftLimit = Math.max(8, fitsColumn ? panelRect.left + 8 : 8);
-  const rightLimit = Math.min(window.innerWidth - 8, fitsColumn ? panelRect.right - 8 : window.innerWidth - 8);
-  menu.style.left = `${Math.max(8, Math.min(Math.max(leftLimit, rect.right - menuWidth), rightLimit - menuWidth))}px`;
-  menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
+  const position = () => {
+    const rect = anchor.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const menuWidth = menu.offsetWidth;
+    const fitsColumn = panelRect.width >= menuWidth + 16;
+    const leftLimit = Math.max(8, fitsColumn ? panelRect.left + 8 : 8);
+    const rightLimit = Math.min(window.innerWidth - 8, fitsColumn ? panelRect.right - 8 : window.innerWidth - 8);
+    menu.style.left = `${Math.max(8, Math.min(Math.max(leftLimit, rect.right - menuWidth), rightLimit - menuWidth))}px`;
+    menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
+  };
+  position();
+  if (trust) trust._positionMenu = position;
+  trust?.addEventListener("toggle", () => {
+    trust.querySelector("summary").setAttribute("aria-expanded", String(trust.open));
+    position();
+  }, { signal: controller.signal });
   menu.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') { event.preventDefault(); close(); }
-    const items = [...menu.querySelectorAll('button:not(:disabled)')];
+    const items = [...menu.querySelectorAll('button:not(:disabled), summary[role="menuitem"], a[href]')]
+      .filter(item => item.getClientRects().length > 0);
     if (items.length && ['ArrowDown', 'ArrowUp'].includes(event.key)) {
       event.preventDefault();
       items[(items.indexOf(document.activeElement) + (event.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();

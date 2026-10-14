@@ -2374,6 +2374,10 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   display: none;
 }
 
+.reader-panel .reader-trust {
+  display: none;
+}
+
 .reader-trust summary {
   position: relative;
   display: grid;
@@ -2492,6 +2496,10 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 .reader-trust-source:focus-visible {
   outline: none;
   box-shadow: none;
+}
+
+.reader-trust-source[hidden] {
+  display: none;
 }
 
 .reader-internal-search.search-box {
@@ -17634,7 +17642,7 @@ html body .research-compact-composer .research-question-input:focus-visible {
   background: var(--menu-surface);
   box-shadow: 0 8px 32px rgba(0,0,0,.3);
 }
-.column-group-menu button {
+.column-group-menu :is(button, .reader-trust > summary) {
   display: block;
   width: 100%;
   padding: 10px 12px;
@@ -17646,13 +17654,31 @@ html body .research-compact-composer .research-question-input:focus-visible {
   text-align: left;
   cursor: pointer;
 }
-.column-group-menu button:hover, .column-group-menu button:focus-visible { background: rgba(128,128,128,.16); }
+.column-group-menu :is(button, .reader-trust > summary):is(:hover, :focus-visible) { background: rgba(128,128,128,.16); }
 .column-group-menu button:disabled { opacity: .45; cursor: default; }
 .column-group-menu button:disabled:hover { background: transparent; }
 .column-menu-divider {
   height: 1px;
   margin: 6px;
   background: var(--border);
+}
+.column-group-menu.has-reader-trust {
+  width: 256px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+}
+.column-group-menu .reader-trust > summary {
+  height: auto;
+  font: inherit;
+}
+.column-group-menu .reader-trust-details {
+  position: static;
+  width: 100%;
+  max-height: none;
+  padding: 12px 6px 6px;
+  border-radius: 0;
+  background: transparent;
 }
 .column-group-dialog {
   width: min(1200px, calc(100vw - 48px));
