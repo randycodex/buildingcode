@@ -16924,9 +16924,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
 /* A collapsed Project section must also leave layout and keyboard navigation. */
 .project-section-motion-body[hidden] { display: none !important; }
 
-/* The find field remains visible before a query has replaced the chapter body. */
-.reader-panel:has(.reader-internal-search:not([hidden])) .reader-content {
+/* An open find field sits above the reading viewport, including while scrolling. */
+.reader-panel:has(.reader-internal-search:not([hidden])) .reader-body {
   padding-top: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
+}
+.reader-panel:has(.reader-internal-search:not([hidden])) .reader-content {
+  padding-top: 0;
+}
+.reader-panel:has(.reader-internal-search:not([hidden])) .reader-content::-webkit-scrollbar-track {
+  margin-top: 0;
 }
 .reader-panel:not(.is-collapsed):has(.reader-internal-search:not([hidden]))::before {
   height: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
