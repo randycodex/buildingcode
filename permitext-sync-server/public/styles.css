@@ -4656,10 +4656,34 @@ select option:checked {
   overflow: hidden;
 }
 
-.search-panel > :is(.search-dock, .search-results) {
+.workspace-panel.search-panel {
+  padding-bottom: 0;
+}
+
+.search-panel > :is(.search-dock, .search-results-viewport) {
   width: 100%;
   max-width: var(--workspace-content-max-width);
   margin-inline: auto;
+}
+
+.search-results-viewport {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.search-results-viewport::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 48px;
+  z-index: 2;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--background), transparent);
 }
 
 .search-panel > .search-dock {
@@ -5007,12 +5031,12 @@ select option:checked {
 }
 
 .search-results {
-  width: calc(100% + (2 * var(--panel-padding)));
+  width: 100%;
   min-width: 0;
-  margin-inline: calc(-1 * var(--panel-padding));
+  margin: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--space-2) 0 var(--space-5);
+  padding: 48px 0 0;
   font-family: var(--ui-font-family);
   font-size: var(--chrome-font-size) !important;
   line-height: 1.45;
@@ -5401,6 +5425,7 @@ select option:checked {
   max-height: none;
   min-height: 0;
   overflow-y: auto;
+  padding-top: 48px;
 }
 
 .search-recent-popover {
@@ -5538,9 +5563,9 @@ body.is-resizing-search-history * {
 }
 
 .search-jump-section {
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-2);
-  padding-bottom: var(--space-2);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0;
+  padding-bottom: 0;
 }
 
 .search-history-list {
@@ -17897,9 +17922,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   box-shadow: var(--shadow-panel);
 }
 
-.search-panel > .search-results.is-history {
-  margin-bottom: var(--space-3);
-  padding-bottom: 0;
+.search-panel .search-results.is-history {
+  padding: 0;
 }
 
 .notebook-panel > .notebook-draft-status { display: none; }
@@ -19041,7 +19065,7 @@ html body .column-group-menu-button:focus-visible {
 .research-entry-context .research-project-context-preview { color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
 .topbar .workspace-actions-button .workspace-current-name { color: var(--text-primary); font-weight: 550; }
 
-.search-panel > .search-results[hidden] { display: none; }
+.search-panel .search-results[hidden] { display: none; }
 .search-code-source-menu {
   position: absolute;
   width: min(360px, calc(100% - 16px));

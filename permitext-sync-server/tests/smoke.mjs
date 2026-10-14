@@ -1477,7 +1477,7 @@ async function main() {
         workspaceScript.text.includes("function outgoingRecentSearchHistory(existingValues, recentSearches)") &&
         workspaceScript.text.includes("recentSearchHistoryJSON: JSON.stringify(recentSearchHistory)") &&
         workspaceScript.text.includes("state.recentSearchHistory = normalizeRecentSearchHistory([") &&
-        workspaceScript.text.includes('label.textContent = "Recently Viewed"') &&
+        !workspaceScript.text.includes('label.textContent = "Recently Viewed"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
         workspaceScript.text.includes("async function openRecentlyViewedInReader(searchInstance, entry)") &&
         workspaceScript.text.includes("await openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(searchInstance), {") &&
@@ -3005,7 +3005,7 @@ async function main() {
         workspaceStyles.text.includes(".project-detail-loading-status") &&
         workspaceStyles.text.match(/\.saved-chapter-header strong,\s*\.saved-chapter-header span \{\s*color: var\(--code-accent\);/) &&
         workspaceStyles.text.includes(".saved-inline-filters") &&
-        workspaceStyles.text.match(/\.search-jump-section \{[\s\S]*?grid-template-rows: auto minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.search-jump-section \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\);/) &&
         workspaceStyles.text.match(/\.search-jump-tile:last-child \{[\s\S]*?border-bottom: 0;/) &&
         workspaceStyles.text.includes(".saved-paragraph-preview") &&
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
