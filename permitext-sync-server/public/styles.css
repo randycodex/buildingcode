@@ -19377,7 +19377,7 @@ dialog.report-export-review {
   --header-height: 42px;
   --workspace-menu-height: 30px;
   --workspace-menu-gap: 6px;
-  --workspace-menu-highlight: color-mix(in srgb, var(--text-primary) 20%, var(--background));
+  --workspace-menu-highlight: #242124;
 }
 .workspace-shell { grid-template-rows: 42px 42px minmax(0, 1fr); }
 .workspace-shell:has(> .workspace-issue:not([hidden])) { grid-template-rows: 42px 42px auto minmax(0, 1fr); }
