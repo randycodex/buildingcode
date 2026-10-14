@@ -189,7 +189,9 @@ function canonicalReferenceInline(node, state) {
     throw new Error("Notebook reference kind is unsupported.");
   }
   const referenceID = requiredText(node?.props?.referenceID, "Notebook reference ID", 256);
-  const label = requiredText(node?.props?.label, "Notebook reference label", 500);
+  // Research references preview the full supported 2,000-character question
+  // plus "Research: ". They still count toward the Note's total text limit.
+  const label = requiredText(node?.props?.label, "Notebook reference label", referenceKind === "researchAnswer" ? 2_010 : 500);
   state.references.push({ referenceKind, referenceID, label });
   addTextLength(state, label);
   return {

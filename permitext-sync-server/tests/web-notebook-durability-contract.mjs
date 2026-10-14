@@ -152,6 +152,67 @@ function harness() {
   assert.equal(recovered.baseVersion, 0);
 }
 
+// Untitled authored work must freeze a valid default title before submission,
+// retain the same receipt after uncertainty, and show the acknowledged title.
+{
+  const test = harness();
+  await test.api.edit("", "Untitled authored bytes");
+  const save = test.api.save();
+  await reached(() => test.requests.length === 1, "untitled foreground Note");
+  assert.equal(test.requests[0].body.title, "Untitled Note");
+  assert.equal(test.requests[0].body.document.text, "Untitled authored bytes");
+  const receipt = test.records()[0].pendingSave;
+  await test.api.edit("Later explicit title", "Newer authored bytes");
+  assert.deepEqual(test.records()[0].pendingSave, receipt, "Newer edits cannot rewrite the frozen creation receipt.");
+  test.respond(0);
+  await save;
+  assert.equal(test.api.state().activeCard.title, "Later explicit title");
+  const next = test.api.save();
+  await reached(() => test.requests.length === 2, "next version after untitled creation");
+  assert.equal(test.requests[1].body.cardID, "saved-card");
+  assert.equal(test.requests[1].body.expectedVersion, 1);
+  assert.equal(test.requests[1].body.title, "Later explicit title");
+  test.respond(1);
+  await next;
+  assert.equal(test.records().length, 0);
+}
+
+// The same repair must work while the Note is not mounted. Preserve reference
+// bytes and the original revision; an empty new editor still sends nothing.
+{
+  const test = harness();
+  const document = { schema: "permitext-notebook-card", schemaVersion: 2, format: "blocknote-json",
+    document: [{ type: "paragraph", content: [{ type: "permitextReference", props: {
+      referenceKind: "researchAnswer", referenceID: "saved-answer", label: `Research: ${"q".repeat(600)}`
+    } }] }] };
+  const draft = await test.api.directSave({ accountUserID: "synthetic-a", projectID: "project", cardID: "",
+    title: "", document, baseVersion: 0 });
+  const save = test.api.sync(draft);
+  await reached(() => test.requests.length === 1, "untitled background reference Note");
+  assert.equal(test.requests[0].body.title, "Untitled Note");
+  assert.equal(test.requests[0].body.clientMutationID, draft.revision);
+  assert.deepEqual(test.requests[0].body.document, document);
+  test.respond(0);
+  await save;
+  assert.equal(test.records().length, 0);
+  const empty = await test.api.directSave({ accountUserID: "synthetic-a", projectID: "project", cardID: "",
+    title: "", document: { document: [{ type: "paragraph", content: [] }] }, baseVersion: 0 });
+  assert.equal(await test.api.sync(empty), null);
+  assert.equal(test.requests.length, 1);
+}
+
+{
+  const test = harness();
+  await test.api.edit("", "Authored without a title");
+  const save = test.api.save();
+  await reached(() => test.requests.length === 1, "default title acknowledgement");
+  test.respond(0);
+  assert.equal(await save, true);
+  assert.equal(test.api.state().activeCard.title, "Untitled Note");
+  assert.equal(test.api.state().draftDocument.text, "Authored without a title");
+  assert.equal(test.records().length, 0);
+}
+
 // A second tab can already own a different draft under the accepted creation
 // ID. Acknowledgement must retain both and leave this editor attached to its
 // original checkpoint, including edits made after the conflict is shown.

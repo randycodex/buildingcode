@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
+import { notebookDraftSaveTitle } from "../public/offline-storage.js";
 
 const app = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 function actual(name) {
@@ -30,7 +31,7 @@ function element(tag) {
   };
 }
 const context = vm.createContext({
-  state, Number, String,
+  state, Number, String, notebookDraftSaveTitle,
   captureAccountRequest: () => identity,
   requireCurrentAccountRequest: value => {
     if (value.generation !== generation) throw new Error("Account context changed");
@@ -58,7 +59,9 @@ assert.equal(notice[2].content.children[1].dataset.pendingDraftScope, "collabora
 assert.equal(notice[2].content.children[1].children[0].textContent, "Project information");
 assert.deepEqual({ drafts, state }, before, "Inspecting pending changes must not alter, delete, or replay saved work.");
 const reason = draft => context.pendingNotebookDraftReason({ scope: "notebook-card", title: "Named Note", baseVersion: 0, ...draft });
-assert.match(reason({ title: " " }), /needs a title/);
+assert.match(reason({ title: " " }), /title or content/);
+assert.match(reason({ title: " ", document: { text: "Authored content" } }), /waiting to save/);
+assert.match(reason({ pendingSave: { baseVersion: 0, title: "" } }), /retained save.*needs review/);
 assert.match(reason({ baseVersion: undefined }), /saved version is missing/);
 assert.match(reason({ document: { localImage: true } }), /image.*upload/);
 assert.match(reason({ recoveryConflict: true }), /versions need review/);

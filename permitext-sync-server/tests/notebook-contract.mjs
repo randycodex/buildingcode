@@ -9,6 +9,7 @@ import {
   validateNotebookDocument
 } from "../notebook-contract.mjs";
 import { blockNoteBlocksFromNotebookDocument } from "../src/notebook-schema.js";
+import { notebookDraftSaveTitle } from "../public/offline-storage.js";
 
 const linkedDocument = {
   schema: "permitext-notebook-card",
@@ -63,6 +64,35 @@ const linkedNoteDocument = {
   }]
 };
 assert.equal(validateNotebookDocument(linkedNoteDocument).references[0].referenceKind, "notebookCard");
+
+// The Insert menu uses the full Research question as its linked preview.
+// Its supported 2,000 characters plus prefix must round-trip without changing
+// the exact answer identity, while total Note and other reference limits remain.
+const researchLabel = `Research: ${"q".repeat(2_000)}`;
+const researchDocument = structuredClone(linkedNoteDocument);
+researchDocument.document[0].content[0].props = {
+  referenceKind: "researchAnswer", referenceID: "saved-answer", label: researchLabel
+};
+const researchValidated = validateNotebookDocument(researchDocument);
+assert.equal(researchValidated.references[0].label, researchLabel);
+assert.equal(researchValidated.references[0].referenceID, "saved-answer");
+assert.equal(notebookPlainText(researchDocument), researchLabel);
+assert.match(renderNotebookDocumentHTML(researchDocument), /data-reference-id="saved-answer"/);
+const oversizedReference = structuredClone(researchDocument);
+oversizedReference.document[0].content[0].props.label += "x";
+assert.throws(() => validateNotebookDocument(oversizedReference), /reference label/);
+oversizedReference.document[0].content[0].props.referenceKind = "canonicalSection";
+assert.throws(() => validateNotebookDocument(oversizedReference), /reference label/);
+const oversizedNote = structuredClone(researchDocument);
+oversizedNote.document[0].content.push({ type: "text", text: "x".repeat(50_000) });
+assert.throws(() => validateNotebookDocument(oversizedNote), /text is too long/);
+
+assert.equal(notebookDraftSaveTitle({ title: " My title ", document: researchDocument }), "My title");
+assert.equal(notebookDraftSaveTitle({ title: "", document: researchDocument }), "Untitled Note");
+assert.equal(notebookDraftSaveTitle({ title: "", document: emptyNotebookDocument() }), "");
+assert.equal(notebookDraftSaveTitle({ cardID: "saved-note", title: "", document: emptyNotebookDocument() }), "Untitled Note");
+assert.equal(notebookDraftSaveTitle({ title: "", document: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Legacy text" }] }] } }), "Untitled Note");
+assert.equal(notebookDraftSaveTitle({ title: "", document: { document: [{ type: "image", props: { url: "permitext-notebook-local:image" } }] } }), "Untitled Note");
 
 assert.throws(
   () => validateNotebookDocument({

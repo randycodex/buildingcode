@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-pending-sync-details-v980";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-notebook-pending-sync-v981";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -89,6 +89,7 @@ import {
   reportDraftRecoveries,
   deleteReportDraftRecovery,
   beginNotebookDraftSave,
+  notebookDraftSaveTitle,
   retireRejectedNotebookQuestionSave,
   disableOfflineFeature,
   deleteOfflineAccountData,
@@ -118,7 +119,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-pending-sync-details-v980";
+} from "./offline-storage.js?v=20261014-notebook-pending-sync-v981";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +152,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-pending-sync-details-v980";
+} from "./workspace-state.js?v=20261014-notebook-pending-sync-v981";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -8294,7 +8295,8 @@ function pendingNotebookDraftReason(draft) {
   if (draft.scope && draft.scope !== "notebook-card") return "This older draft format needs recovery before it can sync.";
   const pending = draft.pendingSave || draft;
   if (!Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0) return "The original saved version is missing.";
-  if (!String(pending.title || "").trim()) return "This Note needs a title before it can sync.";
+  if (draft.pendingSave && !String(pending.title || "").trim()) return "The retained save has no title and needs review before it can sync.";
+  if (!draft.pendingSave && !notebookDraftSaveTitle(draft)) return "Add a title or content to save this empty Note.";
   if (notebookDocumentAssetURLs(pending.document, "permitext-notebook-local:").length) return "An image is still waiting to upload.";
   return pending.lastError || draft.lastError || (draft.pendingSave
     ? "A previous save is waiting for acknowledgement. Its original content is preserved."
@@ -11261,7 +11263,8 @@ async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountR
   const pending = draft.pendingSave || draft;
   // Simple Notes leave stored legacy question metadata untouched. An existing
   // uncertain receipt is replayed byte-for-byte before ordinary saves resume.
-  if (!Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0 || !String(pending.title || "").trim()) return null;
+  if (!Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0 ||
+      !(draft.pendingSave ? String(pending.title || "").trim() : notebookDraftSaveTitle(draft))) return null;
   const document = await reconcileNotebookDocumentAssets(pending.document, pending.projectID, requestIdentity);
   requireCurrentAccountRequest(requestIdentity);
   if (notebookDocumentAssetURLs(document, "permitext-notebook-local:").length) return null;
@@ -26849,7 +26852,7 @@ async function notebookReferenceCandidates(project, foundation, cards) {
     references.push({
       referenceKind: "researchAnswer",
       referenceID: answer.id,
-      label: `Research: ${answer.question || answer.conclusion || "Historical answer"}`
+      label: `Research: ${String(answer.question || answer.conclusion || "Historical answer").slice(0, 2_000)}`
     });
   });
   cards.forEach((card) => {
@@ -27459,7 +27462,7 @@ async function renderProjectNotebook(project, options = {}) {
     function scheduleNotebookAutosave(delay = 700) {
       window.clearTimeout(notebookAutosaveTimer);
       if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || saveConflict || !dirty || !activeCard) return;
-      if (!String(activeCard.title || "").trim()) return;
+      if (!notebookDraftSaveTitle({ cardID: activeCard.id, title: activeCard.title, document: draftDocument })) return;
       notebookAutosaveTimer = window.setTimeout(() => {
         notebookAutosaveTimer = null;
         void saveActiveNotebookCard();

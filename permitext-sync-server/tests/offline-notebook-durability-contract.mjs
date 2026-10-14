@@ -390,6 +390,7 @@ const syncContext = vm.createContext({
   captureAccountRequest: () => questionIdentity,
   reconcileNotebookDocumentAssets: async value => value,
   notebookDocumentAssetURLs: () => [],
+  notebookDraftSaveTitle: offline.notebookDraftSaveTitle,
   beginNotebookDraftSave: offline.beginNotebookDraftSave,
   retireRejectedNotebookQuestionSave: offline.retireRejectedNotebookQuestionSave,
   acknowledgeNotebookDraft: offline.acknowledgeNotebookDraft,

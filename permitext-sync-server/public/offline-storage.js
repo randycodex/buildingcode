@@ -21,8 +21,8 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1565";
-const shellAssetVersion = "20261014-pending-sync-details-v980";
+const shellCacheName = "permitext-pro-shell-v1566";
+const shellAssetVersion = "20261014-notebook-pending-sync-v981";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -67,21 +67,21 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261014-pending-sync-details-v980",
+  "/web/styles.css?v=20261014-notebook-pending-sync-v981",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261014-pending-sync-details-v980",
+  "/web/app.js?v=20261014-notebook-pending-sync-v981",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261014-pending-sync-details-v980",
+  "/web/offline-storage.js?v=20261014-notebook-pending-sync-v981",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
-  "/web/workspace-state.js?v=20261014-pending-sync-details-v980",
+  "/web/workspace-state.js?v=20261014-notebook-pending-sync-v981",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
   "/web/code-question-client-state.js?v=20260914-question-state-v4",
@@ -100,7 +100,7 @@ const shellURLs = [
   "/web/workflow-views.js?v=7",
   "/web/report-screen.js?v=20261011-shared-shell-v6",
   "/web/report-library.js?v=20261012-sidebar-width-v8",
-  "/web/notebook-note-menu.js?v=20261014-pending-sync-details-v980",
+  "/web/notebook-note-menu.js?v=20261014-notebook-pending-sync-v981",
   "/web/reader-render-batches.js?v=20261012-reader-batches-v1",
   "/web/search-query-session.js?v=20261012-search-session-v2",
   "/web/report-pdf-preview.js?v=20261012-report-preview-v4",
@@ -320,6 +320,23 @@ function notebookDraftKey(accountUserID, projectID, cardID) {
   return [accountUserID, projectID, cardID || "new"].join(":");
 }
 
+export function notebookDraftSaveTitle(draft) {
+  const title = String(draft?.title || "").trim();
+  if (title) return title;
+  const hasContent = (node) => {
+    if (!node) return false;
+    if (typeof node === "string") return Boolean(node.trim());
+    if (Array.isArray(node)) return node.some(hasContent);
+    if (String(node.text || node.plainText || "").trim()) return true;
+    if (node.type === "permitextReference" && (node.props?.referenceID || node.attrs?.referenceID)) return true;
+    if (node.type === "image" && (node.props?.url || node.attrs?.src || node.attrs?.url)) return true;
+    return [node.document, node.content, node.children].some(hasContent);
+  };
+  // An untouched empty editor is not a Note. Authored content and linked
+  // references must still save when the user has not supplied a title.
+  return draft?.cardID || hasContent(draft?.document) ? "Untitled Note" : "";
+}
+
 function draftScope(record) {
   return record?.scope || (record?.cardID === "project-information" ? "collaboration-note" : "notebook-card");
 }
@@ -427,7 +444,7 @@ export async function beginNotebookDraftSave(accountUserID, projectID, cardID, r
     const pendingSave = {
       accountUserID, projectID, cardID: current.cardID, revision: current.revision,
       baseVersion: current.baseVersion, cardType: current.cardType || "finding", scope: draftScope(current),
-      title: current.title,
+      title: draftScope(current) === "notebook-card" ? notebookDraftSaveTitle(current) : current.title,
       ...(Object.hasOwn(prepared, "noteID") ? { noteID: prepared.noteID } : {}),
       document: Object.hasOwn(prepared, "document") ? prepared.document : current.document,
       evidenceLinks: current.evidenceLinks || [],
