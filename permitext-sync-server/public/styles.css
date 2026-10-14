@@ -5293,7 +5293,7 @@ select option:checked {
   background: transparent;
   color: var(--text-primary);
   font-size: calc(var(--chrome-font-size) * 0.86);
-  font-weight: 600;
+  font-weight: 400;
   text-align: center;
 }
 
