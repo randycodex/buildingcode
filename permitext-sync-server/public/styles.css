@@ -1740,7 +1740,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   padding-block: 0;
 }
 
-/* Keep the header's navigation offset without masking the reading area. */
+/* Fade scrolling text beneath the fixed controls without shortening the viewport. */
 .reader-panel:not(.is-collapsed)::before {
   position: absolute;
   top: 0;
@@ -1750,7 +1750,12 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   height: calc(var(--reader-header-overlay-height) + var(--panel-padding));
   content: "";
   pointer-events: none;
-  background: transparent;
+  background: linear-gradient(
+    to bottom,
+    var(--reader-controls-surface) 0,
+    var(--reader-controls-surface) calc(var(--reader-header-overlay-height) - var(--space-3)),
+    transparent 100%
+  );
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }

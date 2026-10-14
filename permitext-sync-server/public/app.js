@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-reader-find-layout-v959";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261013-reader-header-fade-v960";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261013-reader-find-layout-v959";
+} from "./offline-storage.js?v=20261013-reader-header-fade-v960";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261013-reader-find-layout-v959";
+} from "./workspace-state.js?v=20261013-reader-header-fade-v960";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17729,6 +17729,14 @@ async function renderReader(reader, options = {}) {
       return;
     }
     await restoreReaderAfterSearch(panel, reader);
+  });
+
+  panel.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented || event.key !== "Escape" || internalSearchBox.hidden) return;
+    event.preventDefault();
+    event.stopPropagation();
+    internalSearchButton.click();
+    internalSearchButton.focus({ preventScroll: true });
   });
 
   internalSearchInput.addEventListener("input", () => {
