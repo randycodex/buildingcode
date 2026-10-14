@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-search-results-fade-v979";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-pending-sync-details-v980";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -118,7 +118,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-search-results-fade-v979";
+} from "./offline-storage.js?v=20261014-pending-sync-details-v980";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -151,7 +151,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-search-results-fade-v979";
+} from "./workspace-state.js?v=20261014-pending-sync-details-v980";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -6342,6 +6342,7 @@ function openWebWarning({
   cancellable = true,
   container = null,
   scope = null,
+  content = null,
   choices = [],
   choiceLabel = "Destination Report"
 }) {
@@ -6390,7 +6391,9 @@ function openWebWarning({
   confirmButton.className = "web-warning-button web-warning-confirm";
   confirmButton.textContent = confirmLabel;
   actions.append(confirmButton);
-  dialog.append(heading, body, actions);
+  dialog.append(heading, body);
+  if (content) dialog.append(content);
+  dialog.append(actions);
   backdrop.append(dialog);
   const warningContainer = mountWebWarningBackdrop(backdrop, container, previousFocus, scope);
 
@@ -8269,13 +8272,14 @@ function updateConnectionStatus() {
           : account ? "Synced" : "Online";
   connectionStatus.style.width = statusKind === "clean" ? "0px" : `${statusLabel.scrollWidth}px`;
   connectionStatus.setAttribute("aria-hidden", String(statusKind === "clean"));
-  const conflictActionAvailable = statusKind === "conflict";
-  connectionStatus.classList.toggle("is-actionable", conflictActionAvailable);
-  connectionStatus.setAttribute("role", conflictActionAvailable ? "button" : "status");
-  if (conflictActionAvailable) {
+  const statusActionAvailable = statusKind === "conflict" || statusKind === "pending";
+  connectionStatus.classList.toggle("is-actionable", statusActionAvailable);
+  connectionStatus.setAttribute("role", statusActionAvailable ? "button" : "status");
+  if (statusActionAvailable) {
+    const action = statusKind === "conflict" ? "Review sync conflicts in Account" : "Review pending changes";
     connectionStatus.tabIndex = 0;
-    connectionStatus.title = "Review sync conflicts in Account";
-    connectionStatus.setAttribute("aria-label", `${connectionStatus.textContent}. Review sync conflicts in Account.`);
+    connectionStatus.title = action;
+    connectionStatus.setAttribute("aria-label", `${connectionStatus.textContent}. ${action}.`);
   } else {
     connectionStatus.removeAttribute("tabindex");
     connectionStatus.removeAttribute("title");
@@ -8284,7 +8288,83 @@ function updateConnectionStatus() {
   updateTopbarPlanBadge();
 }
 
+function pendingNotebookDraftReason(draft) {
+  if (draft.recoveryConflict) return "Different device versions need review before this draft can sync.";
+  if (draft.scope === "collaboration-note") return "Automatic sync is skipping this Project information draft.";
+  if (draft.scope && draft.scope !== "notebook-card") return "This older draft format needs recovery before it can sync.";
+  const pending = draft.pendingSave || draft;
+  if (!Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0) return "The original saved version is missing.";
+  if (!String(pending.title || "").trim()) return "This Note needs a title before it can sync.";
+  if (notebookDocumentAssetURLs(pending.document, "permitext-notebook-local:").length) return "An image is still waiting to upload.";
+  return pending.lastError || draft.lastError || (draft.pendingSave
+    ? "A previous save is waiting for acknowledgement. Its original content is preserved."
+    : "This device draft is waiting to save.");
+}
+
+async function pendingSyncItems(identity = captureAccountRequest()) {
+  requireCurrentAccountRequest(identity);
+  if (!identity.userID) return [];
+  const drafts = await pendingNotebookDrafts(identity.userID);
+  requireCurrentAccountRequest(identity);
+  const projects = currentContentSummary().projects || [];
+  const projectLabel = (projectID) => {
+    const project = projects.find(item => projectRecordID(item) === projectID);
+    return project?.name || project?.title || (projectID ? `Project ${projectID}` : "Workspace");
+  };
+  const kindLabels = { annotation: "Passage note", continuity: "Workspace layout and recent activity",
+    project: "Project", projectSection: "Project evidence", savedItem: "Saved evidence", workboard: "Workboard",
+    codeVersionClear: "Saved evidence removal" };
+  return [
+    ...(state.syncOutbox || []).filter(item => item.accountUserID === identity.userID).map(item => {
+      const { kind, record } = mutationKindAndRecord(item.mutation);
+      return { kind, id: item.recordID, projectID: record?.projectID || "",
+        title: record?.title || record?.name || record?.sectionNumber || kindLabels[kind] || "Saved change",
+        project: projectLabel(record?.projectID), reason: item.lastError || "Waiting to send this saved change." };
+    }),
+    ...drafts.filter(draft => draft.accountUserID === identity.userID).map(draft => ({
+      kind: "draft", id: draft.cardID || "new", projectID: draft.projectID, scope: draft.scope,
+      title: draft.title || (draft.scope === "collaboration-note" ? "Project information" : "Untitled Note"),
+      project: projectLabel(draft.projectID), reason: pendingNotebookDraftReason(draft)
+    }))
+  ];
+}
+
+async function openPendingSyncDetails() {
+  const identity = captureAccountRequest();
+  try {
+    const items = await pendingSyncItems(identity);
+    requireCurrentAccountRequest(identity);
+    const list = document.createElement("div");
+    list.className = "sync-pending-list";
+    list.setAttribute("role", "list");
+    for (const item of items) {
+      const row = document.createElement("article");
+      row.className = "sync-pending-item";
+      row.setAttribute("role", "listitem");
+      row.dataset.pendingKind = item.kind;
+      row.dataset.pendingRecordId = item.id;
+      row.dataset.pendingProjectId = item.projectID;
+      if (item.scope) row.dataset.pendingDraftScope = item.scope;
+      const title = document.createElement("strong");
+      title.textContent = item.title;
+      const project = document.createElement("span");
+      project.className = "sync-pending-project";
+      project.textContent = item.project;
+      const reason = document.createElement("p");
+      reason.textContent = item.reason;
+      row.append(title, project, reason);
+      list.append(row);
+    }
+    await showWebNotice("Pending changes", items.length
+      ? "These changes are preserved on this device."
+      : "No changes remain waiting to sync.", { content: list, confirmLabel: "Close" });
+  } catch (error) {
+    if (isCurrentAccountRequest(identity)) await showWebNotice("Pending changes unavailable", error.message);
+  }
+}
+
 async function openConnectionStatusConflictReview() {
+  if (connectionStatus?.dataset.state === "pending") return openPendingSyncDetails();
   if (connectionStatus?.dataset.state !== "conflict") return;
   collapsedSettingsCardIDs.delete("settings-sync-conflicts-title");
   await focusUtility("settings", ".settings-sync-conflicts-card .settings-card-toggle");
@@ -8298,7 +8378,7 @@ async function openConnectionStatusConflictReview() {
 
 connectionStatus?.addEventListener("click", openConnectionStatusConflictReview);
 connectionStatus?.addEventListener("keydown", (event) => {
-  if (connectionStatus.dataset.state !== "conflict" || !["Enter", " "].includes(event.key)) return;
+  if (!["conflict", "pending"].includes(connectionStatus.dataset.state) || !["Enter", " "].includes(event.key)) return;
   event.preventDefault();
   openConnectionStatusConflictReview();
 });

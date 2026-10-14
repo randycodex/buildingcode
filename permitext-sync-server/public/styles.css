@@ -261,6 +261,12 @@ button {
   line-height: 1.5;
 }
 
+.sync-pending-list { max-height: min(50vh, 420px); overflow-y: auto; }
+.sync-pending-item { display: grid; gap: 6px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.sync-pending-item:last-child { border-bottom: 0; }
+.sync-pending-project { color: var(--text-secondary); font-size: 13px; }
+.sync-pending-item p { margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+
 .web-warning-field {
   display: grid;
   gap: 7px;

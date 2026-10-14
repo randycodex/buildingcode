@@ -2275,13 +2275,15 @@ async function main() {
       workspaceScript.text.includes("connectionStatus.dataset.state = statusKind") &&
         workspaceScript.text.includes('conflicts === 1 ? "1 sync conflict"') &&
         workspaceScript.text.includes('pending === 1 ? "1 pending"') &&
-        workspaceScript.text.includes('connectionStatus.setAttribute("role", conflictActionAvailable ? "button" : "status")') &&
+        workspaceScript.text.includes('connectionStatus.setAttribute("role", statusActionAvailable ? "button" : "status")') &&
+        workspaceScript.text.includes('statusKind === "conflict" || statusKind === "pending"') &&
+        workspaceScript.text.includes('if (connectionStatus?.dataset.state === "pending") return openPendingSyncDetails();') &&
         workspaceScript.text.includes('connectionStatus?.addEventListener("click", openConnectionStatusConflictReview)') &&
         workspaceScript.text.includes('connectionStatus?.addEventListener("keydown"') &&
         workspaceScript.text.includes('if (connectionStatus?.dataset.state !== "conflict") return;') &&
         workspaceScript.text.includes('await focusUtility("settings", ".settings-sync-conflicts-card .settings-card-toggle")') &&
         webRoot.text.includes('id="connection-status" role="status" aria-live="polite"'),
-      "Exceptional sync states no longer provide a clear live signal with conflict-only Settings access."
+      "Exceptional sync states must expose pending-item details while keeping conflict resolution in Account."
     );
     assert(
       workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
