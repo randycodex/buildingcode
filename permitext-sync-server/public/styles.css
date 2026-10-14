@@ -19612,7 +19612,19 @@ dialog.report-export-review {
 .assistant-history-rail .research-conversation-open strong { white-space: normal; overflow-wrap: anywhere; font-size: 12px; font-weight: 400; line-height: 1.5; }
 .assistant-history-rail .research-conversation-open[aria-current="true"] strong { color: var(--text-primary); font-weight: 700; }
 .assistant-history-rail :is(.research-conversation-date, .research-conversation-project-pill, .research-conversation-preview) { display: none; }
-.assistant-history-rail .research-new-chat { width: calc(100% - 40px); margin: 12px 20px; min-height: 32px; height: auto; padding: 8px 0; border-radius: 0; background: transparent; font-size: 12px; text-align: right; }
+.assistant-history-rail .research-new-chat {
+  justify-self: end;
+  width: max-content;
+  max-width: calc(100% - 40px);
+  margin: 12px 20px;
+  min-height: 32px;
+  height: auto;
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--workspace-menu-highlight);
+  font-size: 12px;
+  text-align: center;
+}
 .assistant-workspace > .assistant-body { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; overflow: hidden; display: grid; padding-inline: var(--panel-padding); }
 .assistant-body > *,
 .research-conversation-panel > .research-conversation-content {
