@@ -47154,8 +47154,8 @@ function XW({ options: e, controllerRef: t }) {
 			...hx,
 			placeholders: {
 				...hx.placeholders,
-				default: "Start writing…",
-				emptyDocument: "Start writing…"
+				default: "",
+				emptyDocument: ""
 			}
 		},
 		domAttributes: { editor: {

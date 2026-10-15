@@ -291,7 +291,7 @@ function PermitextNotebookEditor({ options, controllerRef }) {
   );
   const editor = useCreateBlockNote({
     schema: permitextNotebookSchema,
-    dictionary: { ...en, placeholders: { ...en.placeholders, default: "Start writing…", emptyDocument: "Start writing…" } },
+    dictionary: { ...en, placeholders: { ...en.placeholders, default: "", emptyDocument: "" } },
     domAttributes: {
       editor: { "aria-label": options.ariaLabel || "Note body", "aria-multiline": "true" }
     },
