@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-details-menu-v1016";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-account-columns-v1019";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-details-menu-v1016";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-account-columns-v1019";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -11,7 +11,7 @@ import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, 
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
-import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261015-details-resize-v3";
+import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261015-account-columns-v4";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-project-details-menu-v1016";
+} from "./offline-storage.js?v=20261015-account-columns-v1019";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-project-details-menu-v1016";
+} from "./workspace-state.js?v=20261015-account-columns-v1019";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4306,9 +4306,10 @@ function saveWorkspaceResumeForRefresh() {
     view, workflowView: currentWorkflowView(), report,
     details: projectDetailsScreen?.getPresentationState?.(),
     account: {scroll: account?.querySelector(".settings-scroll")?.scrollTop || 0,
-      cards: [...account?.querySelectorAll(".settings-card") || []].map(card => ({
+      cards: [...account?.querySelectorAll(".settings-card, .settings-account-column") || []].map(card => ({
         id: card.getAttribute("aria-labelledby"), scroll: card.scrollTop
-      }))}
+      })),
+      sourceGroups: [...account?.querySelectorAll(".settings-source-group[open]") || []].map(group => group.dataset.sourceGroup)}
   });
   try { saveWorkspaceState(); } catch { /* A presentation snapshot never blocks refresh. */ }
 }
@@ -4357,7 +4358,10 @@ async function restoreWorkspaceAfterRefresh(skip = false) {
         if (!sameContext() || !dialog?.isConnected) return false;
         const scroll = dialog.querySelector(".settings-scroll");
         if (scroll) scroll.scrollTop = account.scroll;
-        dialog.querySelectorAll(".settings-card").forEach(card => {
+        dialog.querySelectorAll(".settings-source-group").forEach(group => {
+          group.open = account.sourceGroups.includes(group.dataset.sourceGroup);
+        });
+        dialog.querySelectorAll(".settings-card, .settings-account-column").forEach(card => {
           card.scrollTop = account.cards.find(item => item.id === card.getAttribute("aria-labelledby"))?.scroll || 0;
         });
         return true;
@@ -38283,8 +38287,11 @@ function settingsPanelScrollTop(panel) {
 
 async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft) {
   const accountScreen = document.querySelector(".account-screen[open]");
-  const categoryScrollTops = new Map(Array.from(accountScreen?.querySelectorAll(".settings-card") || [], card => [
+  const categoryScrollTops = new Map(Array.from(accountScreen?.querySelectorAll(".settings-card, .settings-account-column") || [], card => [
     card.getAttribute("aria-labelledby"), card.scrollTop
+  ]));
+  const sourceGroupStates = new Map(Array.from(accountScreen?.querySelectorAll(".settings-source-group") || [], group => [
+    group.dataset.sourceGroup, group.open
   ]));
   const refreshPaneIDs = activePaneIDs().filter((paneID) => paneID !== "utility:settings");
   await transitionWorkspace("utility", { refreshPaneIDs });
@@ -38306,7 +38313,10 @@ async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceSc
     // Source rows load asynchronously; restore their position after they exist.
     await refreshed.__refreshActiveCodeSources?.();
     if (document.querySelector(".account-screen[open]") !== dialog) return;
-    refreshed.querySelectorAll(".settings-card").forEach(card => {
+    refreshed.querySelectorAll(".settings-source-group").forEach(group => {
+      group.open = sourceGroupStates.get(group.dataset.sourceGroup) || false;
+    });
+    refreshed.querySelectorAll(".settings-card, .settings-account-column").forEach(card => {
       card.scrollTop = categoryScrollTops.get(card.getAttribute("aria-labelledby")) || 0;
     });
     if (refreshed.querySelector(".settings-trash[open]")) {
@@ -38575,13 +38585,56 @@ function renderAccountWelcome(dialog) {
   return panel;
 }
 
+function organizeAccountSettings(panel) {
+  const scroll = panel.querySelector(".settings-scroll");
+  if (!scroll || scroll.querySelector(".settings-account-column")) return;
+  const profile = scroll.querySelector(".account-connector");
+  const plan = scroll.querySelector(".settings-plan-card");
+  const sources = scroll.querySelector(".settings-active-sources-card");
+  const offline = scroll.querySelector(".settings-offline-card");
+  const data = scroll.querySelector(".settings-data-card");
+  const conflicts = scroll.querySelector(".settings-sync-conflicts-card");
+  const column = (key, title, cards) => {
+    const section = document.createElement("section");
+    section.className = `settings-account-column settings-account-column-${key}`;
+    const heading = document.createElement("h2");
+    heading.id = `settings-column-${key}-title`;
+    heading.className = "settings-account-column-title";
+    heading.textContent = title;
+    section.setAttribute("aria-labelledby", heading.id);
+    section.append(heading, ...cards.filter(Boolean));
+    return section;
+  };
+  const account = column("account", "Account", [profile, plan]);
+  const library = column("library", "Library & offline", [sources, offline]);
+  const recovery = column("recovery", "Data & recovery", [conflicts, data]);
+  const actions = document.createElement("div");
+  actions.className = "settings-account-actions";
+  const signOut = profile?.querySelector(".account-clear");
+  if (signOut) actions.append(signOut);
+  const deleteAccount = profile?.querySelector(".account-delete");
+  if (deleteAccount) {
+    const destructive = document.createElement("details");
+    destructive.className = "settings-account-destructive";
+    const summary = document.createElement("summary");
+    summary.textContent = "Delete account…";
+    destructive.append(summary, deleteAccount);
+    actions.append(destructive);
+  }
+  account.append(actions);
+  const trash = data?.querySelector(".settings-trash");
+  const legacy = data?.querySelector(".legacy-workspace-recovery");
+  const searches = data?.querySelector('[data-clear-action="searches"]');
+  const deleteContent = data?.querySelector(".settings-delete-content");
+  data?.append(...[trash, legacy, searches, deleteContent].filter(Boolean));
+  scroll.replaceChildren(account, library, recovery);
+}
+
 function mountAccountScreenContent(dialog, panel) {
   // Reader column widths must not constrain the height of this screen's flex layout.
   panel.style.removeProperty("flex");
   panel.querySelector(".panel-header")?.remove();
-  const scroll = panel.querySelector(".settings-scroll");
-  const profile = scroll?.querySelector(".account-connector");
-  if (profile) scroll.prepend(profile);
+  organizeAccountSettings(panel);
   const header = document.createElement("header");
   header.className = "account-screen-header";
   const title = document.createElement("h1");
@@ -38766,7 +38819,7 @@ function activeCodeSourceMenuRows(catalog) {
 }
 
 // Explicit navigation validates source access before changing Reader or detail state.
-function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = false } = {}) {
+function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = false, collapsibleGroups = false } = {}) {
   const card = panel.querySelector(".settings-active-sources-card");
   if (!card || !enabled) return;
   card.hidden = false;
@@ -38799,9 +38852,21 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
     if (rowCatalog !== catalogKey) {
       list.replaceChildren();
       let currentGroup = "";
-      const items = readerMenu ? activeCodeSourceMenuRows(catalog) : catalog.map(source => ({ source }));
+      let groupContent = list;
+      const items = readerMenu || collapsibleGroups ? activeCodeSourceMenuRows(catalog) : catalog.map(source => ({ source }));
       rows = items.map(({ source, group, label: shortLabel }) => {
-        if (readerMenu && group !== currentGroup) {
+        if (collapsibleGroups && group !== currentGroup) {
+          const details = document.createElement("details");
+          details.className = "settings-source-group";
+          details.dataset.sourceGroup = group;
+          const summary = document.createElement("summary");
+          summary.textContent = group;
+          groupContent = document.createElement("div");
+          groupContent.className = "settings-source-group-content";
+          details.append(summary, groupContent);
+          list.append(details);
+          currentGroup = group;
+        } else if (readerMenu && group !== currentGroup) {
           const heading = document.createElement("h3");
           heading.className = "search-source-group-heading";
           heading.textContent = group;
@@ -38815,9 +38880,9 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
         if (readerMenu) input.setAttribute("role", "menuitemcheckbox");
         const text = document.createElement("span");
         text.textContent = shortLabel || `${source.categoryLabel} — ${source.editionLabel}`;
-        if (readerMenu) label.title = `${source.categoryLabel} — ${source.editionLabel}`;
+        if (readerMenu || collapsibleGroups) label.title = `${source.categoryLabel} — ${source.editionLabel}`;
         label.append(input, text);
-        list.append(label);
+        groupContent.append(label);
         const row = { input, source, token: null };
         input.addEventListener("change", () => {
           if (!currentPanel()) return;
@@ -38874,7 +38939,7 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
 function renderSettings({ upgrade = false } = {}) {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
-  wireSettingsActiveCodeSources(panel, { enabled: true });
+  wireSettingsActiveCodeSources(panel, { enabled: true, collapsibleGroups: true });
   applyPaneWeight(panel, "utility:settings");
 
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));

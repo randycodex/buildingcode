@@ -97,4 +97,21 @@ assert.equal(openedReport.options.resume.draftID,'older-draft',
   'Startup reads the tab snapshot after access verification has supplied the Project identity');
 assert.equal(restoredReport.scrolls.document,950);
 assert.equal(startup.workspaceResumeReady,true);
+
+// Account refresh reopens source groups before restoring the containing column's scroll.
+const accountLayout={cards:[{id:'settings-column-library-title',scroll:425}],sourceGroups:['2022 Construction Codes',null,7],profile:'Private profile data'};
+assert.equal(writeWorkspaceResume(storage,'tab-one',context,{view:'account',account:accountLayout}),true);
+const savedAccount=readWorkspaceResume(storage,'tab-one',context).account;
+assert.deepEqual(savedAccount.sourceGroups,['2022 Construction Codes']);
+assert.ok(![...values.values()].join('').includes('Private profile data'));
+const edition={dataset:{sourceGroup:'2022 Construction Codes'},open:false};
+const libraryColumn={getAttribute:()=> 'settings-column-library-title',set scrollTop(value){assert.equal(edition.open,true);this.restoredScroll=value;}};
+const accountScroll={scrollTop:0};
+const accountPanel={__refreshActiveCodeSources:async()=>{}};
+const accountDialog={isConnected:true,querySelector:selector=>selector==='.settings-panel'?accountPanel:accountScroll,
+  querySelectorAll:selector=>selector==='.settings-source-group'?[edition]:[libraryColumn]};
+startup.toggleAccountDialog=()=>{};
+startup.document={querySelector:()=>accountDialog};
+await startup.restoreWorkspaceAfterRefresh();
+assert.equal(libraryColumn.restoredScroll,425);
 console.log('Workspace resume passed: per-tab/account/project boundaries, selected drafts and PDFs, layout and scroll, all screens, access fences and storage failure.');

@@ -40,7 +40,9 @@ export function normalizeWorkspaceResume(value, context) {
     account: {
       scroll: position(value.account?.scroll),
       cards: (Array.isArray(value.account?.cards) ? value.account.cards : [])
-        .slice(0, 30).map(card => ({id: id(card.id), scroll: position(card.scroll)}))
+        .slice(0, 30).map(card => ({id: id(card.id), scroll: position(card.scroll)})),
+      sourceGroups: (Array.isArray(value.account?.sourceGroups) ? value.account.sourceGroups : [])
+        .filter(group => typeof group === 'string').slice(0, 50).map(id)
     }
   };
 }

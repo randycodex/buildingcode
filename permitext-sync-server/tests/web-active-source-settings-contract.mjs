@@ -5,7 +5,7 @@ import {createActiveCodeSourceController} from '../public/active-code-source-con
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const implementation=app.slice(app.indexOf('function activeCodeSourceMenuRows('),app.indexOf('\nfunction renderSettings('));
 class Element {
-  hidden=true; children=[]; events=new Map(); attributes=new Map(); textContent=''; disabled=false;
+  hidden=true; children=[]; events=new Map(); attributes=new Map(); dataset={}; textContent=''; disabled=false; open=false;
   append(...nodes){this.children.push(...nodes);}
   replaceChildren(...nodes){this.children=[...nodes];}
   addEventListener(name,handler){this.events.set(name,handler);}
@@ -14,7 +14,7 @@ class Element {
   getAttribute(name){return this.attributes.get(name)??null;}
 }
 const sources=[2022,2014].map((year,index)=>({canonicalEdition:`edition:${year}`,jurisdictionID:1,codeID:index+1,categoryID:index+3,categoryLabel:'Building Code',editionLabel:String(year)}));
-function fixture({catalog=async()=>sources,stored=null,readerMenu=false}={}){
+function fixture({catalog=async()=>sources,stored=null,readerMenu=false,collapsibleGroups=false}={}){
  const storage=new Map(stored?[['permitext.active-code-sources.v1.guest',stored]]:[]);
  let writes=0,failWrite=false;
  const controller=createActiveCodeSourceController({storage:{getItem:k=>storage.get(k)??null,setItem(k,v){if(failWrite)throw new Error('Storage full');writes++;storage.set(k,v);}},loadCatalog:catalog});
@@ -24,7 +24,7 @@ function fixture({catalog=async()=>sources,stored=null,readerMenu=false}={}){
  const panel={isConnected:true,querySelector:()=>card};
  const context=vm.createContext({document:{createElement:()=>new Element()},codeOptions:[{prefix:'BC',codeVersion:'edition:2022',group:'2022 Construction Codes',label:'Building Code (2022)'},{prefix:'BC',codeVersion:'edition:2014',group:'2014 Construction Codes (Historical)',label:'Building Code (2014)'}],codeOptionVersion:code=>code.codeVersion,readerCodeOptionLabel:code=>code.label,activeCodeSourcesController:controller,activeWorkspaceID:'w',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true});
  vm.runInContext(implementation,context);
- return {controller,panel,card,nodes,context,storage,get writes(){return writes;},set failWrite(value){failWrite=value;},wire:()=>context.wireSettingsActiveCodeSources(panel,{enabled:true,readerMenu})};
+ return {controller,panel,card,nodes,context,storage,get writes(){return writes;},set failWrite(value){failWrite=value;},wire:()=>context.wireSettingsActiveCodeSources(panel,{enabled:true,readerMenu,collapsibleGroups})};
 }
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 const f=fixture();f.wire();await settle();
@@ -66,3 +66,19 @@ assert.equal(grouped.nodes.get('list').children[1],groupedChildren[1],'Grouped s
 const unknown={...reversed[0],canonicalEdition:'edition:unlisted'};
 assert.equal(grouped.context.activeCodeSourceMenuRows([unknown])[0].group,'Other installed sources','An unknown edition is not mislabeled as an installed Reader edition');
 console.log('Reader-style source organization passed: exact edition mapping, Reader order, compact labels, stable rows and unknown-edition fallback.');
+
+const account=fixture({catalog:async()=>reversed,collapsibleGroups:true});account.wire();await settle();
+const editions=account.nodes.get('list').children;
+assert.equal(editions.length,2);
+assert.deepEqual(editions.map(group=>group.children[0].textContent),['2022 Construction Codes','2014 Construction Codes (Historical)']);
+assert(editions.every(group=>!group.open),'Account edition groups start collapsed.');
+editions[0].open=true;
+const accountRow=editions[0].children[1].children[0],accountInput=accountRow.children[0];
+assert.equal(accountRow.children[1].textContent,'Building Code (2022)');
+accountInput.checked=false;accountInput.fire('change');
+assert.equal(account.controller.state.preferences.isEnabled(reversed[1]),false);
+assert.equal(account.controller.state.preferences.isEnabled(reversed[0]),true);
+assert.equal(account.nodes.get('list').children[0],editions[0]);
+assert.equal(editions[0].open,true,'Toggling a source retains its expanded edition group.');
+assert.equal(editions[0].children[1].children[0],accountRow,'Source toggles keep the focused checkbox.');
+console.log('Account editions passed: collapsed groups, exact source toggles, stable focus and retained expansion.');

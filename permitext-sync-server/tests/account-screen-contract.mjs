@@ -17,31 +17,44 @@ function harness(signedIn) {
       children: [], listeners: {}, attributes: {}, dataset: {}, removedStyles: [], classList: { add() {} },
       style: { removeProperty(name) { this.owner.removedStyles.push(name); } },
       setAttribute(name, value) { this.attributes[name] = value; },
-      append(...children) { this.children.push(...children); },
-      replaceChildren(...children) { this.children = children; },
+      getAttribute(name) { return this.attributes[name] ?? null; },
+      append(...children) { for (const child of children) { child.parent?.removeChild(child); child.parent = this; this.children.push(child); } },
+      removeChild(child) { this.children = this.children.filter(item => item !== child); },
+      replaceChildren(...children) { this.children = []; this.append(...children); },
       addEventListener(name, listener) { this.listeners[name] = listener; },
       showModal() { this.open = true; },
       close() { this.open = false; this.listeners.close(); },
       remove() { currentDialog = null; },
-      querySelector() { return null; },
-      querySelectorAll(selector) { return this.children.flatMap(child => child.querySelectorAll?.(selector) || []); }
+      querySelector(selector) { return this.querySelectorAll(selector)[0] || null; },
+      querySelectorAll(selector) { return this.children.flatMap(child => {
+        const matches = selector.split(", ").some(part => part.startsWith(".")
+          ? child.className?.split(" ").includes(part.slice(1))
+          : part === '[data-clear-action="searches"]' && child.attributes?.["data-clear-action"] === "searches");
+        return [...(matches ? [child] : []), ...(child.querySelectorAll?.(selector) || [])];
+      }); }
     };
   }
   function panel() {
     const result = element();
     result.style.owner = result;
-    const category = id => ({ scrollTop: 0, getAttribute: name => name === "aria-labelledby" ? id : null });
-    const profile = category("profile"), plan = category("plan"), sources = category("sources");
-    const scroll = {
-      children: [plan, profile, sources], scrollTop: 0,
-      querySelector: selector => selector === ".account-connector" ? profile : null,
-      prepend(child) { this.children = [child, ...this.children.filter(item => item !== child)]; }
+    const category = (id, className) => {
+      const card = Object.assign(element(), { scrollTop: 0, className: `settings-card ${className}` });
+      card.setAttribute("aria-labelledby", id);
+      return card;
     };
+    const profile = category("profile", "account-connector"), plan = category("plan", "settings-plan-card"), sources = category("sources", "settings-active-sources-card");
+    const offline = category("offline", "settings-offline-card"), data = category("data", "settings-data-card"), conflicts = category("conflicts", "settings-sync-conflicts-card");
+    const signOut = Object.assign(element(), { className: "account-clear" });
+    const deleteAccount = Object.assign(element(), { className: "account-delete" });
+    profile.append(signOut, deleteAccount);
+    const scroll = Object.assign(element(), { className: "settings-scroll", scrollTop: 0 });
+    scroll.append(plan, profile, sources, conflicts, offline, data);
     const oldHeader = { remove() { result.headerRemoved = true; } };
-    result.querySelector = selector => ({ ".panel-header": oldHeader, ".settings-scroll": signedIn ? scroll : null })[selector] || null;
-    result.querySelectorAll = selector => signedIn && selector === ".settings-card" ? [profile, plan, sources] : [];
+    const find = result.querySelector.bind(result);
+    result.querySelector = selector => selector === ".panel-header" ? oldHeader : find(selector);
+    if (signedIn) result.append(scroll);
     result.__refreshActiveCodeSources = async () => { result.sourcesReady = true; };
-    Object.assign(result, { scroll, profile, plan, sources });
+    Object.assign(result, { scroll, profile, plan, sources, offline, data, conflicts, signOut, deleteAccount });
     panels.push(result);
     return result;
   }
@@ -70,7 +83,7 @@ function harness(signedIn) {
     activePaneIDs: () => ["reader:one", "utility:settings", "utility:saved"],
     transitionWorkspace: async (kind, options) => transitions.push({ kind, options }), track
   });
-  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
+  vm.runInContext(["circleXIconSVG", "settingsPanelScrollTop", "refreshWorkspaceAfterSettingsClear", "organizeAccountSettings", "mountAccountScreenContent", "toggleAccountDialog"].map(extract).join("\n"), context);
   return { context, track, panels, transitions, toggleAttributes,
     toolbar, revokeAccount() { accountCurrent = false; contextCheck(); },
     dialog: () => currentDialog, focusReturns: () => focusReturns, focusTraps: () => focusTraps };
@@ -87,7 +100,17 @@ for (const signedIn of [false, true]) {
   assert.equal(dialog.children[1], panel, "Keep the original wired controls and their account fences.");
   assert.equal(panel.headerRemoved, true);
   assert.deepEqual(panel.removedStyles, ["flex"], "Column size must not become the screen height.");
-  if (signedIn) assert.deepEqual(panel.scroll.children, [panel.profile, panel.plan, panel.sources]);
+  if (signedIn) {
+    const [account, library, recovery] = panel.scroll.children;
+    assert.equal(panel.scroll.children.length, 3);
+    assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
+    assert.deepEqual(library.children.slice(1), [panel.sources, panel.offline]);
+    assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
+    assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
+    const destructive = account.children.at(-1).children[1];
+    assert.equal(destructive.open, undefined, "Account deletion starts collapsed.");
+    assert.equal(destructive.children[1], panel.deleteAccount, "Keep the original deletion confirmation handler.");
+  }
   dialog.listeners.keydown({ defaultPrevented: true, key: "Tab" });
   assert.equal(h.focusTraps(), 0, "Nested dialogs and editors retain handled keyboard events.");
   dialog.children[0].children[1].listeners.click();
@@ -108,12 +131,14 @@ h.context.toggleAccountDialog();
 h.panels[0].scroll.scrollTop = 240;
 h.panels[0].profile.scrollTop = 25;
 h.panels[0].sources.scrollTop = 360;
+h.panels[0].scroll.children[1].scrollTop = 425;
 assert.equal(h.context.settingsPanelScrollTop(h.panels[0]), 240);
 await h.context.refreshWorkspaceAfterSettingsClear(240, 350);
 assert.equal(h.dialog().children[1], h.panels[1]);
 assert.equal(h.panels[1].scroll.scrollTop, 240);
 assert.equal(h.panels[1].profile.scrollTop, 25);
 assert.equal(h.panels[1].sources.scrollTop, 360);
+assert.equal(h.panels[1].scroll.children[1].scrollTop, 425, "Library column position survives a recovery refresh.");
 assert.equal(h.panels[1].sourcesReady, true);
 assert.equal(h.panels[1].plan.scrollTop, 0);
 assert.equal(h.track.scrollLeft, 350);
