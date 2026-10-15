@@ -194,6 +194,7 @@ orderState.paneOrder = [notebookID, 'reader:one', savedID];
 orderContext.placeProjectToolPaneInControlOrder({id:'p'});
 assert.deepEqual(Array.from(orderState.paneOrder).filter(id => id !== reportID), [notebookID, 'reader:one', savedID], 'Opening Report preserves Notebook and other existing column positions');
 
+context.assistantHistoryOnlyPane = () => false;
 vm.runInContext(actual('singleExpandedDividerEdge'), context);
 state.collapsedPaneIDs = ['collapsed'];
 assert.equal(context.singleExpandedDividerEdge('reader', 'collapsed').side, 'right');

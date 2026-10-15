@@ -154,7 +154,7 @@ for (const ids of [[factsID], [factsID, contextID], [factsID, contextID, "utilit
   const style = { setProperty(key, value) { this[key] = value; } };
   widthContext.applyPaneWeight({ dataset: {}, classList: { contains: () => false }, style }, factsID);
   assert.equal(style["--pane-resized-min-width"], "600px");
-  assert.equal(style.flex, "1 1 600px");
+  assert.equal(style.flex, "1 0 600px");
 }
 widthContext.state.paneWeights[factsID] = 850;
 widthContext.normalizePaneWeights([factsID, contextID]);

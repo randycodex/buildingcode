@@ -60,6 +60,7 @@ try {
     function refreshPaneDividerValue(){}
     function defaultPaneWidthForID(){return 300;}
     function minimumPaneWidthForID(){return 300;}
+    function assistantHistoryOnlyPane(){return false;}
     function applyPaneWeight(panel,id){panel.style.flex='0 0 '+(paneIsCollapsed(id)?48:state.paneWeights[id]||360)+'px';}
     function scheduleVisibleReaderScrollIndicatorUpdates(){}
     function captureAccountRequest(){return identity;}
@@ -80,7 +81,7 @@ try {
       if(failEvidence) throw new Error('Offline');
       return {conversation:{...researchConversationList.find(c=>c.id===values.conversationID),sources:values.selections}};
     }
-    ${['activePinnedPaneID','orderPanes','paneIDForUtilityInstance','paneIDForResearchConversation','researchConversationPaneIsOpen','researchConversationTitle','paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','paneIsCollapsed','applyPaneCollapsedState','setPaneCollapsed','preparePaneCollapse','prepareColumnGroupControls','openColumnGroupMenu','focusColumnGroupControl','setColumnGroupCollapsed','refreshColumnGroupPresentation','updateCollapsedPaneDividers','togglePinnedPane','refreshPinnedPaneDivider','appendPaneSequence','scrollPaneIntoView','createDivider','resizeAdjacentPanesBy','updateAdjacentDividerValue','singleExpandedDividerEdge','resizePaneEdgeBy','startPaneEdgeResize','startPaneResize','readerSectionResearchSelection','researchSelectionTextFromRange','normalizedPassageAnchorText','openResearchSelectionDestinations','openResearchDestinationMenu','addResearchSelectionToCurrent'].map(actual).join('\n')}
+    ${['activePinnedPaneID','orderPanes','paneIDForUtilityInstance','paneIDForResearchConversation','researchConversationPaneIsOpen','researchConversationTitle','paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','paneIsCollapsed','applyPaneCollapsedState','setPaneCollapsed','preparePaneCollapse','prepareColumnGroupControls','openColumnGroupMenu','focusColumnGroupControl','setColumnGroupCollapsed','refreshColumnGroupPresentation','updateCollapsedPaneDividers','togglePinnedPane','refreshPinnedPaneDivider','appendPaneSequence','scrollPaneIntoView','createDivider','capturePaneResizeWidths','resizeAdjacentPanesBy','updateAdjacentDividerValue','singleExpandedDividerEdge','resizePaneEdgeBy','startPaneEdgeResize','startPaneResize','readerSectionResearchSelection','researchSelectionTextFromRange','normalizedPassageAnchorText','openResearchSelectionDestinations','openResearchDestinationMenu','addResearchSelectionToCurrent'].map(actual).join('\n')}
     const panes = state.paneOrder.map((id,index)=>{
       const pane=document.createElement('article');pane.className='workspace-panel';pane.dataset.paneId=id;
       pane.innerHTML='<header><h2>Column '+(index+1)+'</h2><div class="panel-actions"></div></header><div class="body" style="overflow:auto"><textarea>Unsent question '+index+'</textarea><div style="height:1400px"></div></div>';

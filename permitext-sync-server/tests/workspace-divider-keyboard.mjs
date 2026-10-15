@@ -9,19 +9,20 @@ function extract(name) {
   return source.slice(start, end + 2);
 }
 const collapsed = new Set();
+const historyOnly = new Set();
 const panes = new Map(['left', 'right'].map(id => [id, {dataset:{paneId:id}, width:600, getBoundingClientRect(){return {width:this.width};}}]));
 const state = {paneWeights:{}};
 let saves=0, layouts=0, indicators=0;
-const track = {scrollLeft:0, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
+const track = {scrollLeft:0, querySelectorAll(){return [...panes.values()];}, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
 const context = vm.createContext({state, track, CSS:{escape:x=>x},isProAccount:()=>false,
-  paneIsCollapsed:id=>collapsed.has(id), defaultPaneWidthForID:()=>600, minimumPaneWidthForID:()=>600,
+  paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600, minimumPaneWidthForID:()=>600,
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,
   document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, classList:{add(){}},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
-vm.runInContext(['activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
+vm.runInContext(['activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
 const divider=context.createDivider('left','right');
 function press(handle,key,shiftKey=false){let prevented=false;handle.handlers.keydown({key,shiftKey,preventDefault(){prevented=true;}});return prevented;}
 function widths(){return [...panes.values()].map(p=>p.width);}
@@ -47,4 +48,28 @@ press(leftEdge,'ArrowRight',true);assert.deepEqual(widths(),[600,704]);
 const rightEdge=context.createDivider('right','');press(rightEdge,'ArrowRight');assert.deepEqual(widths(),[600,728]);
 // Missing DOM panes do not persist phantom widths.
 panes.delete('right');press(divider,'ArrowRight');assert.equal(saves,7);
+// A three-column layout has already shared spare viewport space. Resizing a
+// pair must preserve the unrelated column's visible width, not its old basis.
+panes.set('right',{dataset:{paneId:'right'},width:800,getBoundingClientRect(){return {width:this.width};}});
+panes.set('other',{dataset:{paneId:'other'},width:800,getBoundingClientRect(){return {width:this.width};}});
+panes.get('left').width=800;
+state.paneWeights={left:600,right:600,other:600};
+press(divider,'ArrowRight',true);
+assert.deepEqual(widths(),[880,720,800]);
+assert.deepEqual(state.paneWeights,{left:880,right:720,other:800},'Shared space is retained without redistributing it during a resize.');
+panes.set('hidden',{dataset:{paneId:'hidden'},width:0,getBoundingClientRect(){return {width:0};}});
+state.paneWeights.hidden=950;
+press(divider,'ArrowLeft');
+assert.equal(state.paneWeights.hidden,950,'A retained column in another working view keeps its saved width.');
+historyOnly.add('right');
+const historyWidth=panes.get('right').width;
+const readerWidth=panes.get('left').width;
+press(divider,'ArrowRight');
+assert.equal(panes.get('right').width,historyWidth,'A compact Assistant history is fixed; the adjacent Reader resizes independently.');
+assert.equal(panes.get('left').width,readerWidth+24);
+const historyEdge=context.createDivider('right','');
+historyEdge.handlers.focus();
+assert.equal(historyEdge.tabIndex,-1,'A history-only Assistant has no resizable outer edge.');
+press(historyEdge,'ArrowRight');
+assert.equal(panes.get('right').width,historyWidth);
 console.log('Workspace divider keyboard: expanded pairs, minimums, scroll compensation, Shift steps, collapsed neighbors and outer edges passed.');

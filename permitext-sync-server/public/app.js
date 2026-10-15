@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-toolbar-icons-v986";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-column-resize-v987";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-toolbar-icons-v986";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-column-resize-v987";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-toolbar-icons-v986";
+} from "./offline-storage.js?v=20261014-column-resize-v987";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-toolbar-icons-v986";
+} from "./workspace-state.js?v=20261014-column-resize-v987";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -5305,7 +5305,9 @@ function applyPaneWeight(panel, paneID) {
     : defaultWidth;
   panel.style.setProperty("--pane-resized-min-width", `${width}px`);
   panel.style.setProperty("--pane-default-min-width", `${minimumWidth}px`);
-  panel.style.flex = `1 1 ${width}px`;
+  // A divider's chosen width must survive an overflowing workspace. Allowing
+  // flex shrink here silently pulled resized columns back to their minimum.
+  panel.style.flex = `1 0 ${width}px`;
 }
 
 function setUtilityButtonStates() {
@@ -39888,8 +39890,8 @@ function renderSettings({ upgrade = false } = {}) {
 }
 
 function singleExpandedDividerEdge(previousPaneID, nextPaneID) {
-  const previousOpen = previousPaneID && !paneIsCollapsed(previousPaneID);
-  const nextOpen = nextPaneID && !paneIsCollapsed(nextPaneID);
+  const previousOpen = previousPaneID && !paneIsCollapsed(previousPaneID) && !assistantHistoryOnlyPane(previousPaneID);
+  const nextOpen = nextPaneID && !paneIsCollapsed(nextPaneID) && !assistantHistoryOnlyPane(nextPaneID);
   // The pinned boundary belongs only to the fixed column, not the scrolling
   // neighbor that happens to follow it in the mounted sequence.
   if (previousOpen && previousPaneID === activePinnedPaneID()) return { paneID: previousPaneID, side: "right" };
@@ -39906,14 +39908,32 @@ function updateAdjacentDividerValue(divider, previousWidth, nextWidth) {
   divider.setAttribute("aria-valuetext", `Left column ${Math.round(previousWidth)} pixels; right column ${Math.round(nextWidth)} pixels`);
 }
 
+function capturePaneResizeWidths() {
+  const panes = Array.from(track.querySelectorAll(".workspace-panel")).map((pane) => ({
+    id: pane.dataset.paneId,
+    pane,
+    startWidth: pane.getBoundingClientRect().width,
+    minWidth: minimumPaneWidthForID(pane.dataset.paneId)
+  })).filter(({ startWidth }) => startWidth > 0);
+  // Freeze the currently shared space before changing a pair. Otherwise spare
+  // flex space is redistributed into unrelated columns during the drag.
+  panes.forEach(({ id, pane, startWidth }) => {
+    if (paneIsCollapsed(id)) return;
+    state.paneWeights[id] = startWidth;
+    applyPaneWeight(pane, id);
+  });
+  return panes;
+}
+
 function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
-  if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID)) return;
+  if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID) || assistantHistoryOnlyPane(previousPaneID) || assistantHistoryOnlyPane(nextPaneID)) return;
   const previousPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(previousPaneID)}"]`);
   const nextPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(nextPaneID)}"]`);
   if (!previousPane || !nextPane) return;
   const previousWidth = previousPane.getBoundingClientRect().width;
   const nextWidth = nextPane.getBoundingClientRect().width;
   const scrollLeft = track.scrollLeft;
+  capturePaneResizeWidths();
   const widths = [
     Math.max(minimumPaneWidthForID(previousPaneID), previousWidth + delta),
     Math.max(minimumPaneWidthForID(nextPaneID), nextWidth - delta)
@@ -39937,7 +39957,8 @@ function refreshPaneDividerValue(divider) {
   const paneForID = (id) => id ? track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(id)}"]`) : null;
   const previousPane = paneForID(previousID);
   const nextPane = paneForID(nextID);
-  const pairOpen = previousPane && nextPane && !paneIsCollapsed(previousID) && !paneIsCollapsed(nextID);
+  const pairOpen = previousPane && nextPane && !paneIsCollapsed(previousID) && !paneIsCollapsed(nextID) &&
+    !assistantHistoryOnlyPane(previousID) && !assistantHistoryOnlyPane(nextID);
   divider.tabIndex = edge || pairOpen ? 0 : -1;
   if (edge) {
     const pane = edge.paneID === previousID ? previousPane : nextPane;
@@ -40373,7 +40394,7 @@ function bindPaneDragging(panes) {
 }
 
 function startPaneResize(event, previousPaneID, nextPaneID) {
-  if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID)) return;
+  if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID) || assistantHistoryOnlyPane(previousPaneID) || assistantHistoryOnlyPane(nextPaneID)) return;
   const panes = Array.from(track.querySelectorAll(".workspace-panel"));
   const previousPane = panes.find((pane) => pane.dataset.paneId === previousPaneID);
   const nextPane = panes.find((pane) => pane.dataset.paneId === nextPaneID);
@@ -40385,12 +40406,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   track.classList.add("is-resizing");
   const startX = event.clientX;
   const startScrollLeft = track.scrollLeft;
-  const paneData = panes.map((pane) => ({
-    id: pane.dataset.paneId,
-    pane,
-    startWidth: pane.getBoundingClientRect().width,
-    minWidth: minimumPaneWidthForID(pane.dataset.paneId)
-  }));
+  const paneData = capturePaneResizeWidths();
   const previousIndex = paneData.findIndex((pane) => pane.id === previousPaneID);
   const nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
   if (previousIndex === -1 || nextIndex === -1) {
@@ -40458,11 +40474,12 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
 }
 
 function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
-  if (paneIsCollapsed(paneID)) return;
+  if (paneIsCollapsed(paneID) || assistantHistoryOnlyPane(paneID)) return;
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
   const minWidth = minimumPaneWidthForID(paneID);
   const currentWidth = pane.getBoundingClientRect().width;
+  capturePaneResizeWidths();
   const nextWidth = Math.max(minWidth, currentWidth + delta);
   state.paneWeights[paneID] = nextWidth;
   applyPaneWeight(pane, paneID);
@@ -40473,7 +40490,7 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
 }
 
 function startPaneEdgeResize(event, paneID, edgeSide = "right") {
-  if (paneIsCollapsed(paneID)) return;
+  if (paneIsCollapsed(paneID) || assistantHistoryOnlyPane(paneID)) return;
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
 
@@ -40483,6 +40500,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   track.classList.add("is-resizing");
   const startX = event.clientX;
   const startWidth = pane.getBoundingClientRect().width;
+  capturePaneResizeWidths();
   const minWidth = minimumPaneWidthForID(paneID);
   const isReferenceResize = ["report", "project-details"].includes(currentColumnWorkflowView());
   const edgeAutoResizeThreshold = 32;

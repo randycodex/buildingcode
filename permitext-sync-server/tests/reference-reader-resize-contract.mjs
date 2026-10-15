@@ -43,7 +43,8 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
     state, track, CSS: { escape: value => value }, referenceColumnsWidth, reportColumnsLayout,
     currentColumnWorkflowView: () => view,
     defaultActivePaneIDs: () => panes.map(pane => pane.dataset.paneId), workflowPaneIsVisible: () => true,
-    paneIsCollapsed: () => false, minimumPaneWidthForID: () => 600, defaultPaneWidthForID: () => 600,
+    paneIsCollapsed: () => false, assistantHistoryOnlyPane: () => false,
+    minimumPaneWidthForID: () => 600, defaultPaneWidthForID: () => 600,
     applyPaneWeight: (pane, id) => { pane.width = state.paneWeights[id]; },
     document: { querySelector: selector => selector === '.workspace-shell' ? shell : selector === '.account-screen[open]' ? null : view === 'report' ? reportPanel : null },
     window: {
@@ -57,7 +58,7 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
     updateAdjacentDividerValue() {}, saveWorkspaceState: () => saves++,
     notifyWorkspaceLayoutChange: () => context.syncReferenceReaderLayout()
   });
-  vm.runInContext(['syncReferenceReaderLayout', 'startPaneEdgeResize', 'startPaneResize'].map(actual).join('\n'), context);
+  vm.runInContext(['syncReferenceReaderLayout', 'capturePaneResizeWidths', 'startPaneEdgeResize', 'startPaneResize'].map(actual).join('\n'), context);
   context.syncReferenceReaderLayout();
   return {
     context, handle, panes, state, properties, handlers, frames, dockWidth, reportWidth, trackClasses,
@@ -106,6 +107,14 @@ assert.deepEqual(pair.panes.map(pane => pane.width), [600, 860]);
 assert.equal(pair.dockWidth(), 1320, 'Adjacent resizing updates the dock during the drag when a minimum is reached');
 pair.finish('pointerup', 1140);
 assert.equal(pair.saves, 1); assert.equal(pair.handlers.size, 0);
+
+const shared = fixture('research', [800, 800, 800]);
+shared.state.paneWeights = {'reader:0':600,'reader:1':600,'reader:2':600};
+shared.context.startPaneResize(shared.event(800), 'reader:0', 'reader:1');
+shared.move(900); shared.frame();
+assert.deepEqual(shared.panes.map(pane => pane.width), [900,700,800], 'Pointer resizing changes only the selected pair, preserving previously shared space.');
+shared.finish('pointerup',900);
+assert.equal(shared.state.paneWeights['reader:2'],800,'The untouched rendered width also survives saving.');
 
 // Preserve edge-driven growth for ordinary workspace columns at the viewport edge.
 const ordinary = fixture('research');
