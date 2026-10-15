@@ -11,7 +11,7 @@ const source = { id: 'note-a', kind: 'notebookCard', label: 'Note', sourceClassi
 const evidence = { id: 'passage-a', kind: 'evidence', sectionID: 'section-a', sourceLibraryVersion: '2022', selectionBlockID: 'paragraph-a', label: 'Passage' };
 const project = { id: 'project-a', name: 'Project A' };
 const draft = { id: 'report-a', title: 'Report A', version: 2, introduction: 'Keep this', blocks: [{ id: 'text-a', kind: 'paragraph', text: 'Existing text' }] };
-function fixture({ drafts = [draft], choice = '0', mount, gate } = {}) {
+function fixture({ drafts = [draft], choice = '0', mount, gate, container = null } = {}) {
   let generation = 1;
   const calls = [], dialogs = [], saved = [];
   const c = vm.createContext({ reportsContainingSource, isCurrentAccountRequest:()=>true, track:{querySelectorAll:()=>[]}, structuredClone, crypto: { randomUUID }, Date,
@@ -33,7 +33,7 @@ function fixture({ drafts = [draft], choice = '0', mount, gate } = {}) {
     }
   });
   vm.runInContext(app.slice(start, end), c);
-  return { c, calls, dialogs, saved, switchAccount: () => generation++, run: () => c.promoteNotebookCardToReport(project, note) };
+  return { c, calls, dialogs, saved, switchAccount: () => generation++, run: () => c.promoteNotebookCardToReport(project, note, { container }) };
 }
 const single = fixture();
 assert.equal((await single.run()).title, 'Report A');
@@ -42,14 +42,24 @@ assert.equal(single.saved[0].blocks[0].text, 'Existing text');
 assert.equal(single.saved[0].blocks[1].sourceID, note.id);
 assert.equal(single.saved[0].introduction, 'Keep this');
 assert.equal(single.saved[0].expectedVersion, 2);
-const multiple = fixture({ drafts: [draft, { ...draft, id: 'report-b', title: 'Report B', version: 5 }], choice: '1' });
+const noteColumn = { isConnected: true };
+const multiple = fixture({ drafts: [draft, { ...draft, id: 'report-b', title: 'Report B', version: 5 }], choice: '1', container: noteColumn });
 await multiple.run();
 assert.equal(multiple.dialogs.length, 1);
+assert.equal(multiple.dialogs[0].container, noteColumn, 'The destination prompt keeps its source column across asynchronous loading');
 assert.equal(multiple.saved[0].draftID, 'report-b');
 assert.equal(multiple.saved[0].expectedVersion, 5);
 const cancelled = fixture({ drafts: [draft, { ...draft, id: 'report-b' }], choice: false });
 assert.equal(await cancelled.run(), null);
 assert.equal(cancelled.saved.length, 0);
+let releaseClosedColumn;
+const closedColumn = { isConnected: true };
+const closed = fixture({ drafts: [draft, { ...draft, id: 'report-b' }], container: closedColumn,
+  gate: new Promise(resolve => { releaseClosedColumn = resolve; }) });
+const closing = closed.run(); closedColumn.isConnected = false; releaseClosedColumn();
+assert.equal(await closing, null);
+assert.equal(closed.dialogs.length, 0, 'A removed column cannot strand its destination prompt');
+assert.equal(closed.saved.length, 0);
 const first = fixture({ drafts: [] });
 assert.equal((await first.run()).id, 'new-id');
 assert.equal(first.saved[0].expectedVersion, 0);
@@ -69,11 +79,13 @@ const mounted = fixture({ mount: { getDraftSnapshot: () => draft, hasUnsavedChan
 await mounted.run();
 assert.equal(mountedAdds, 1, 'Open drafts append through their editor to retain unsaved changes.');
 assert.equal(mounted.saved.length, 0, 'Never overwrite a mounted draft with an older server snapshot.');
-const batch = fixture();
+const evidenceColumn = { isConnected: true };
+const batch = fixture({ drafts: [draft, { ...draft, id: 'report-b' }] });
 await batch.c.addSavedEvidenceToReport(project, [
   { sectionID: 'section-a', codeVersion: '2022', blockID: 'paragraph-a' },
   { sectionID: 'section-a', codeVersion: '2014', blockID: 'paragraph-a' }
-]);
+], { container: evidenceColumn });
+assert.equal(batch.dialogs[0].container, evidenceColumn, 'Evidence report selection uses its own source column too');
 assert.deepEqual(batch.saved[0].blocks.slice(1).map(block => block.sourceID), ['passage-a', 'historical']);
 const unavailable = fixture();
 await assert.rejects(unavailable.c.addSavedEvidenceToReport(project, [{ sectionID: 'section-a', codeVersion: '2022', blockID: 'different' }]), /not available/);

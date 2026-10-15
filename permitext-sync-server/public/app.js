@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-note-report-title-action-v1007";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-report-prompt-column-v1008";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-note-report-title-action-v1007";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-report-prompt-column-v1008";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-note-report-title-action-v1007";
+} from "./offline-storage.js?v=20261014-report-prompt-column-v1008";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-note-report-title-action-v1007";
+} from "./workspace-state.js?v=20261014-report-prompt-column-v1008";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -25454,7 +25454,7 @@ function renderResearchNotebookHandoff(conversation, message) {
           const source = sources.find(item => item.kind === "researchAnswer" && item.id === message.id);
           if (!source) throw new Error("Link this Assistant conversation to the selected Project before adding its answer to a Report.");
           return [source];
-        });
+        }, { container: region });
         if (!draft) return;
         if (isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID && reportButton.isConnected) {
           reportButton.textContent = "In Report";
@@ -28334,7 +28334,7 @@ async function renderProjectNotebook(project, options = {}) {
           if (disposed || !isCurrentAccountRequest(requestIdentity) || handoffRenderSequence !== editorRenderSequence) return;
           if (!synchronized || dirty || saveConflict) throw new Error("Finish syncing this Note and resolve any save conflict before adding it to a Report. Your device draft is preserved.");
           if (!activeCard?.id) throw new Error("Save this Note before adding it to a Report.");
-          const addedReport = await promoteNotebookCardToReport(identity, activeCard);
+          const addedReport = await promoteNotebookCardToReport(identity, activeCard, { container: panel });
           reportAdditionFeedback(reportButton, addedReport);
         } catch (error) {
           if (!disposed && isCurrentAccountRequest(requestIdentity)) await showWebNotice("Report handoff not completed", error.message);
@@ -28657,7 +28657,7 @@ function appendUniqueReportSources(draft, sources) {
   }
 }
 
-async function addProjectSourcesToReport(project, selectSources) {
+async function addProjectSourcesToReport(project, selectSources, { container = null } = {}) {
   const identity = projectIdentity(project);
   const projectID = projectDetailKey(identity);
   const requestIdentity = captureAccountRequest();
@@ -28681,8 +28681,9 @@ async function addProjectSourcesToReport(project, selectSources) {
   if (!drafts.length) drafts.push(emptyProjectReportDraft(identity));
   let target = drafts[0];
   if (drafts.length > 1) {
+    if (container && !container.isConnected) return null;
     const selected = await openWebWarning({ title: "Add to Report", message: "Choose the destination Report.",
-      confirmLabel: "Add to Report", choices: drafts.map((draft, index) => ({ value: String(index), label: `${draft.title || "Untitled Report"}${selectedSources.every(source => reportsContainingSource([draft], source.kind, source.id).length) ? " · Already included" : ""}` })) });
+      container, confirmLabel: "Add to Report", choices: drafts.map((draft, index) => ({ value: String(index), label: `${draft.title || "Untitled Report"}${selectedSources.every(source => reportsContainingSource([draft], source.kind, source.id).length) ? " · Already included" : ""}` })) });
     check();
     if (selected === false) return null;
     target = drafts[Number(selected)];
@@ -28815,7 +28816,7 @@ function reportAdditionFeedback(button, draft) {
 
 }
 
-async function addSavedEvidenceToReport(project, items) {
+async function addSavedEvidenceToReport(project, items, options = {}) {
   return addProjectSourcesToReport(project, sources => items.map(item => {
     const blockID = item.scope === "section" ? "" : String(item.blockID || "").trim();
     const source = sources.find(source => source.kind === "evidence" &&
@@ -28824,14 +28825,14 @@ async function addSavedEvidenceToReport(project, items) {
       String(source.selectionBlockID || "") === blockID);
     if (!source) throw new Error("A selected passage is not available for this Project's Report. Sync the evidence and try again.");
     return source;
-  }));
+  }), options);
 }
 
-async function promoteNotebookCardToReport(project, card) {
+async function promoteNotebookCardToReport(project, card, options = {}) {
   if (!String(card.plainText || "").trim() && !(card.references || []).length) {
     throw new Error("Write the Note or link a source before adding it to a Report.");
   }
-  return addProjectSourcesToReport(project, sources => sources.filter(source => source.kind === "notebookCard" && source.id === card.id));
+  return addProjectSourcesToReport(project, sources => sources.filter(source => source.kind === "notebookCard" && source.id === card.id), options);
 }
 
 function reportSourceClassificationLabel(value) {
@@ -36265,7 +36266,7 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     busy = true;
     update();
     try {
-      const draft = await addSavedEvidenceToReport(options.reportProject, [...selectedIDs].map(id => recordByID.get(id)));
+      const draft = await addSavedEvidenceToReport(options.reportProject, [...selectedIDs].map(id => recordByID.get(id)), { container: panel });
       reportAdditionFeedback(reportButton, draft);
     } catch (error) { await showWebNotice("Could not add to Report", error.message); }
     finally { busy = false; update(); }
@@ -36588,7 +36589,7 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
       reportButton.textContent = "Add to Report";
       reportButton.addEventListener("click", async () => {
         reportButton.disabled = true;
-        try { reportAdditionFeedback(reportButton, await addSavedEvidenceToReport(options.reportProject, [item])); }
+        try { reportAdditionFeedback(reportButton, await addSavedEvidenceToReport(options.reportProject, [item], { container: row })); }
         catch (error) { await showWebNotice("Could not add to Report", error.message); }
         finally { if (reportButton.isConnected) reportButton.disabled = false; }
       });
