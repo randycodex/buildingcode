@@ -19761,6 +19761,34 @@ dialog.report-export-review {
 .notebook-insert-group { border-top: 1px solid var(--border); }
 .notebook-toolbar .notebook-insert-action:hover, .notebook-insert-group > summary:hover { background: var(--menu-highlight); }
 
+/* Insert floats beneath its toolbar button without moving the writing area. */
+.notebook-format-insert-slot .notebook-reference-menu {
+  position: relative;
+  overflow: visible;
+  padding: 0;
+  background: transparent;
+}
+.notebook-format-insert-slot .notebook-reference-menu.is-open { padding-bottom: 0; }
+.notebook-format-insert-slot .notebook-reference-menu .notebook-reference-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 180px;
+  max-width: min(320px, calc(100vw - 48px));
+  padding: 0 6px;
+  border-radius: var(--radius-control);
+  background: var(--menu-surface);
+  box-shadow: var(--shadow-panel);
+  transition: opacity 160ms ease;
+}
+.notebook-format-insert-slot .notebook-reference-menu.is-open .notebook-reference-list {
+  max-height: min(360px, 52vh);
+  padding-block: 6px;
+}
+
 .evidence-report-destination { margin: 0; font-size: 12px; font-weight: 400; }
 .saved-row-actions .saved-add-to-report { opacity: 1; color: var(--text-secondary); }
 .saved-row-actions .saved-add-to-report.is-in-report { color: var(--text-primary); }
