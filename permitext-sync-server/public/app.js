@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-notes-close-align-v998";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-sync-issues-v999";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-notes-close-align-v998";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-sync-issues-v999";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-notes-close-align-v998";
+} from "./offline-storage.js?v=20261014-sync-issues-v999";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-notes-close-align-v998";
+} from "./workspace-state.js?v=20261014-sync-issues-v999";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -535,6 +535,8 @@ let activeCodeSourcesController = null;
 let accountLinkWriteFence = null;
 const sessionAccountLinkRecoveries = new Map();
 let notebookPendingDraftCount = 0;
+let notebookPendingDraftAttentionAt = Infinity;
+let connectionStatusAttentionTimer = null;
 let notebookDraftSyncPromise = null;
 let workspaceMigrationError = null;
 let workspaceRestoreError = null;
@@ -8216,6 +8218,9 @@ function replaceActiveAccount(nextAccount, options = {}) {
   foregroundSyncPromise = null;
   notebookDraftSyncPromise = null;
   notebookPendingDraftCount = 0;
+  notebookPendingDraftAttentionAt = Infinity;
+  clearTimeout(connectionStatusAttentionTimer);
+  connectionStatusAttentionTimer = null;
   organizationWorkspace = null;
   organizationLoadPromise = null;
   projectStudioFolderReconcilePromise = null;
@@ -8243,27 +8248,50 @@ function replaceActiveAccount(nextAccount, options = {}) {
   return previous;
 }
 
+function pendingSyncAttentionAt(item, notebookDraft = false) {
+  if (item.lastError || Number(item.attemptCount) > 0) return 0;
+  if (notebookDraft) {
+    const pending = item.pendingSave || item;
+    if (item.recoveryConflict || (item.scope && item.scope !== "notebook-card") ||
+        !Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0 ||
+        (item.pendingSave && !String(pending.title || "").trim()) || pending.lastError) return 0;
+    // A blank new editor has no authored work waiting to save.
+    if (!item.pendingSave && !notebookDraftSaveTitle(item)) return Infinity;
+  }
+  const queuedAt = Date.parse(notebookDraft ? (item.pendingSave?.updatedAt || item.updatedAt) : item.queuedAt);
+  // Normal autosaves stay quiet; a change still waiting after a minute needs attention.
+  return Number.isFinite(queuedAt) ? queuedAt + 60_000 : 0;
+}
+
 function updateConnectionStatus() {
   if (!connectionStatus) return;
   const account = activeAccount();
-  const pending = account
-    ? (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length + notebookPendingDraftCount
-    : 0;
+  const queued = account ? (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID) : [];
+  const pending = account ? queued.length + notebookPendingDraftCount : 0;
   const conflicts = account
     ? (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length
     : 0;
   const offline = navigator.onLine === false || !serverReachable;
   const conflictLabel = conflicts === 1 ? "1 sync conflict" : `${conflicts} sync conflicts`;
   const pendingLabel = pending === 1 ? "1 pending" : `${pending} pending`;
+  const now = Date.now();
+  const attentionAt = queued.reduce((earliest, item) => Math.min(earliest, pendingSyncAttentionAt(item)), notebookPendingDraftAttentionAt);
+  const pendingNeedsAttention = pending > 0 && attentionAt <= now;
+  clearTimeout(connectionStatusAttentionTimer);
+  connectionStatusAttentionTimer = null;
+  if (pending > 0 && !offline && !conflicts && Number.isFinite(attentionAt) && attentionAt > now) {
+    connectionStatusAttentionTimer = window.setTimeout(() => {
+      connectionStatusAttentionTimer = null;
+      updateConnectionStatus();
+    }, Math.min(2_147_483_647, attentionAt - now));
+  }
   const statusKind = conflicts > 0
     ? "conflict"
     : offline
       ? "offline"
-      : pending > 0
+      : pendingNeedsAttention
         ? "pending"
-        : syncFlushPromise || foregroundSyncPromise
-          ? "syncing"
-          : "clean";
+        : "clean";
   connectionStatus.classList.toggle("is-offline", offline);
   connectionStatus.classList.toggle("has-pending", pending > 0 || conflicts > 0);
   connectionStatus.dataset.state = statusKind;
@@ -8274,8 +8302,8 @@ function updateConnectionStatus() {
       : pending > 0 ? `Offline · ${pendingLabel}`
         : "Offline"
     : conflicts > 0 ? conflictLabel
-      : syncFlushPromise || foregroundSyncPromise ? "Syncing"
-        : pending > 0 ? `Changes pending · ${pending}`
+      : pending > 0 ? `Changes pending · ${pending}`
+        : syncFlushPromise || foregroundSyncPromise ? "Syncing"
           : account ? "Synced" : "Online";
   connectionStatus.style.width = statusKind === "clean" ? "0px" : `${statusLabel.scrollWidth}px`;
   connectionStatus.setAttribute("aria-hidden", String(statusKind === "clean"));
@@ -11259,7 +11287,9 @@ async function refreshNotebookPendingStatus(requestIdentity = captureAccountRequ
   if (!requestIdentity.userID) return;
   const drafts = await pendingNotebookDrafts(requestIdentity.userID);
   if (!isCurrentAccountRequest(requestIdentity)) return;
-  notebookPendingDraftCount = drafts.length;
+  const ownedDrafts = drafts.filter(draft => draft.accountUserID === requestIdentity.userID);
+  notebookPendingDraftCount = ownedDrafts.length;
+  notebookPendingDraftAttentionAt = ownedDrafts.reduce((earliest, draft) => Math.min(earliest, pendingSyncAttentionAt(draft, true)), Infinity);
   updateConnectionStatus();
 }
 

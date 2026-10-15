@@ -1709,7 +1709,7 @@ async function main() {
         workspaceStyles.text.includes("padding-inline: var(--space-3);\n  border-radius: var(--radius-control);\n  background-color: var(--menu-surface);") &&
         workspaceStyles.text.includes("background-color: var(--menu-surface);\n  background-image: none;") &&
         workspaceStyles.text.includes(".notebook-note-menu-footer { display: flex;") &&
-        workspaceStyles.text.includes(".notebook-note-menu .notebook-card-tile[aria-current='true'] > span { font-weight: 700;") &&
+        workspaceStyles.text.includes(".notebook-note-menu .notebook-card-tile[aria-current='true'] { background: var(--menu-highlight); font-weight: 600;") &&
         !workspaceScript.text.includes("cardListResizeHandle") &&
         workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;") &&
         workspaceStyles.text.includes(".notebook-reference-menu .notebook-reference-list {\n  background-image: none;") &&
