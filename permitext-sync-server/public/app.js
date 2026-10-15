@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-settings-feedback-v1053";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-settings-project-row-v1054";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-settings-feedback-v1053";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-settings-project-row-v1054";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-settings-feedback-v1053";
+} from "./offline-storage.js?v=20261015-settings-project-row-v1054";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-settings-feedback-v1053";
+} from "./workspace-state.js?v=20261015-settings-project-row-v1054";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -39412,9 +39412,12 @@ function renderSettings({ upgrade = false } = {}) {
     copy.className = "settings-project-copy";
     const name = document.createElement("strong");
     name.textContent = readableProjectName(project);
-    const typeLabel = document.createElement("span");
-    typeLabel.textContent = folderTypeLabel(project);
-    copy.append(name, typeLabel);
+    copy.append(name);
+    if (!folderIsProject(project)) {
+      const typeLabel = document.createElement("span");
+      typeLabel.textContent = folderTypeLabel(project);
+      copy.append(typeLabel);
+    }
     row.append(checkbox, copy);
     if (projectIsArchived(project)) {
       const archivedLabel = document.createElement("span");
