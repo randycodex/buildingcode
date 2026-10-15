@@ -77,7 +77,7 @@ assert.match(clientSource, /folderRecordCountLabel\(selectedProjects\)/);
 assert.match(indexSource, /id="add-reader"[^>]*aria-label="Reader"[^>]*title="Reader"[\s\S]*?<span>Reader<\/span>/);
 assert.match(indexSource, /id="open-column-groups"[^>]*aria-haspopup="menu">Groups<\/button>/);
 assert.match(indexSource, /<summary class="toolbar-button">Layout<\/summary>[\s\S]*?id="fit-columns"[^>]*title="Restore default panel widths">Reset layout<\/button>[\s\S]*?id="collapse-readers"[^>]*title="Close columns in this working view">Close all<\/button>/);
-assert.match(indexSource, /settings-project-clear-all[\s\S]*?Move all projects and saved collections to Trash/);
+assert.match(indexSource, /settings-project-clear-all[\s\S]*?Move all projects to Trash/);
 assert.match(indexSource, /<summary>Trash<\/summary>/);
 assert.match(indexSource, /Restore deleted items for 30 days across synced devices\. Newer work is kept\./);
 assert.match(stylesSource, /\.search-result-summary \{[\s\S]*?color: var\(--text-primary\);/);

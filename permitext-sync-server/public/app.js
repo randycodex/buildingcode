@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-settings-indent-v1051";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-settings-projects-label-v1052";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-settings-indent-v1051";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-settings-projects-label-v1052";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-settings-indent-v1051";
+} from "./offline-storage.js?v=20261015-settings-projects-label-v1052";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-settings-indent-v1051";
+} from "./workspace-state.js?v=20261015-settings-projects-label-v1052";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -39362,6 +39362,13 @@ function renderSettings({ upgrade = false } = {}) {
       left.sourceIndex - right.sourceIndex
     )
     .map(({ project }) => project);
+  const settingsProjectsIncludeCollections = settingsProjects.some((project) => !folderIsProject(project));
+  panel.querySelector("#settings-projects-title").textContent = settingsProjectsIncludeCollections
+    ? "Projects & collections" : "Projects";
+  projectList.setAttribute("aria-label", settingsProjectsIncludeCollections
+    ? "Projects and saved collections" : "Projects");
+  projectClearAll.setAttribute("aria-label", settingsProjectsIncludeCollections
+    ? "Move all projects and saved collections to Trash" : "Move all projects to Trash");
   const selectedProjectIDs = new Set();
   const projectCheckboxes = new Map();
   panel.querySelector('[data-content-count="projects"]').textContent = `${settingsProjects.length} total`;
@@ -39464,7 +39471,7 @@ function renderSettings({ upgrade = false } = {}) {
     if (!count) return;
     const recordLabel = folderRecordCountLabel(settingsProjects);
     const confirmed = await confirmWebWarning(
-      "Move all Projects and saved collections to Trash?",
+      settingsProjectsIncludeCollections ? "Move all Projects and saved collections to Trash?" : "Move all Projects to Trash?",
       `Move ${recordLabel}, including archived records, to Trash across synced devices. Restore within 30 days. Saved passages and notes remain.`,
       { confirmLabel: "Move to Trash" }
     );
