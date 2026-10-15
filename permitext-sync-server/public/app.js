@@ -1,7 +1,8 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-project-details-columns-v1014";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-details-resize-v1015";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-project-details-columns-v1014";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-details-resize-v1015";
+import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -10,7 +11,7 @@ import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, 
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
-import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261014-details-columns-v2";
+import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261015-details-resize-v3";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -120,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-project-details-columns-v1014";
+} from "./offline-storage.js?v=20261015-project-details-resize-v1015";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-project-details-columns-v1014";
+} from "./workspace-state.js?v=20261015-project-details-resize-v1015";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -3708,6 +3709,7 @@ async function openProjectDetailsScreen(section = null) {
   columns.className = "project-details-columns";
   columns.setAttribute("aria-label", "Project details columns");
   const panels = new Map();
+  let resizeControls = null;
   let selectedSection = "context";
   const selectSection = (kind) => {
     if (!panels.has(kind)) return;
@@ -3767,11 +3769,13 @@ async function openProjectDetailsScreen(section = null) {
         panel.replaceChildren(columnHeader, columnBody);
         panels.set(kind, panel); columns.append(panel);
       }
+      resizeControls = createProjectDetailsColumnResizers(columns, [...panels.values()], saveWorkspaceResumeForRefresh);
       selectSection(section || "context");
       return content;
     },
-    onClose: () => { state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
+    onClose: () => { resizeControls?.cancel(); state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
     onDispose: () => {
+      resizeControls?.dispose();
       for (const [kind, panel] of panels) {
         const key = paneIDForProjectInformation(identity, kind);
         if (projectInformationMounts.get(key)?.panel === panel) projectInformationMounts.delete(key);
@@ -3783,9 +3787,11 @@ async function openProjectDetailsScreen(section = null) {
   screen.selectSection = selectSection;
   screen.getPresentationState = () => ({section: selectedSection,
     scrollLeft: columns.scrollLeft || 0,
+    columnWidths: resizeControls?.getWidths() || null,
     columnScrolls: Object.fromEntries([...panels].map(([kind, panel]) =>
       [kind, panel.querySelector(".project-details-column-body")?.scrollTop || 0]))});
   screen.restorePresentation = snapshot => {
+    if (snapshot.columnWidths) resizeControls?.setWidths(snapshot.columnWidths);
     selectSection(snapshot.section);
     if (snapshot.columnScrolls) columns.scrollLeft = snapshot.scrollLeft || 0;
     for (const [kind, panel] of panels) {

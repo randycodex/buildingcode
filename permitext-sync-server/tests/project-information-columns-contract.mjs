@@ -46,6 +46,7 @@ for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${
 let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen;
 const mounts = new Map(), issues = [], renderedInformation = [];
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
+let detailsWidths = [640,640,640], disposedResizers = 0;
 const body = element('body');
 const workspaceShell = element('main'), workflowToolbar = element('nav'), track = element('section');
 workspaceShell.className = 'workspace-shell'; workflowToolbar.className = 'workflow-toolbar';
@@ -53,6 +54,8 @@ body.append(workspaceShell); workspaceShell.append(workflowToolbar, track);
 track.inert = false; workflowToolbar.inert = false;
 const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projectInformationMounts: mounts,
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
+  createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
+  saveWorkspaceResumeForRefresh() {},
   document: { createElement: element, body, querySelector: selector => selector === '.workspace-shell' ? workspaceShell : selector === '.workflow-toolbar' ? workflowToolbar : null },
   setInterval: fn => { tickScreen = fn; return 1; }, clearInterval() {},
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
@@ -103,10 +106,13 @@ factsBody.scrollTop=210; recordsBody.scrollTop=140; columns.scrollLeft=80;
 const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
 assert.deepEqual(copy(presentation.columnScrolls), {context:320,facts:210,records:140});
 assert.equal(presentation.scrollLeft,80);
+assert.deepEqual(copy(presentation.columnWidths),[640,640,640]);
+presentation.columnWidths=[400,700,820];
 contextBody.scrollTop=0; factsBody.scrollTop=0; recordsBody.scrollTop=0; columns.scrollLeft=0;
 c.presentation=presentation; vm.runInContext('projectDetailsScreen.restorePresentation(presentation)',c);
 assert.equal(contextBody.scrollTop,320); assert.equal(factsBody.scrollTop,210); assert.equal(recordsBody.scrollTop,140);
 assert.equal(columns.scrollLeft,80);
+assert.deepEqual(detailsWidths,[400,700,820],'Resized widths are restored alongside the independent scroll positions');
 vm.runInContext('projectDetailsScreen.close()',c);
 assert.equal(screenElement.hidden, true); assert.equal(screenElement.open, false);
 assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
@@ -123,6 +129,7 @@ assert.equal(factsPanel.hidden,false,'Reopening keeps every column visible');
 vm.runInContext('projectDetailsScreen.restorePresentation({section:"records",contentScroll:90})',c);
 assert.equal(recordsBody.scrollTop,90,'A previous tab-based snapshot restores into its matching column');
 allowed=false; tickScreen(); assert.equal(mounts.size,0,'Revoked access releases retained editor mounts');
+assert.equal(disposedResizers,1,'Removing the screen disposes its resize observer');
 assert.equal(screenElement.isConnected, false, 'Revoking access removes the whole private screen');
 assert.equal(contextPanel.isConnected, false); assert.equal(factsPanel.isConnected, false);
 assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);

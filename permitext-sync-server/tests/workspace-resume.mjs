@@ -29,11 +29,13 @@ for (const changed of [{userID:'other'},{workspaceID:'other'},{projectID:'other'
 }
 assert.equal(normalizeWorkspaceResume({...context,view:'unknown'},context),null);
 assert.equal(normalizeWorkspaceResume({...context,view:'report',report:{widths:{pdfComparisonWidth:Infinity}}},context).report.widths.pdfComparisonWidth,0);
-const details = {section:'records',scrollLeft:280,columnScrolls:{context:120,facts:540,records:360},text:'Private checklist content'};
+const details = {section:'records',scrollLeft:280,columnWidths:[400,700,820],columnScrolls:{context:120,facts:540,records:360},text:'Private checklist content'};
 assert.equal(writeWorkspaceResume(storage,'tab-details',context,{view:'project-details',details}),true);
 const resumedDetails = readWorkspaceResume(storage,'tab-details',context).details;
 assert.deepEqual(resumedDetails.columnScrolls,{context:120,facts:540,records:360});
 assert.equal(resumedDetails.scrollLeft,280);
+assert.deepEqual(resumedDetails.columnWidths,[400,700,820]);
+assert.equal(normalizeWorkspaceResume({...context,view:'project-details',details:{columnWidths:[200,700,820]}},context).details.columnWidths,null);
 assert.ok(![...values.values()].join('').includes('Private checklist content'));
 assert.equal(normalizeWorkspaceResume({...context,view:'project-details',details:{section:'facts',contentScroll:180}},context).details.columnScrolls,null,
   'Older section snapshots retain their legacy scroll fallback');

@@ -19600,7 +19600,7 @@ dialog.report-export-review {
 .project-details-screen .project-information-panel { max-width: 1080px; margin-inline: auto; }
 .project-details-screen .project-details-columns {
   display: grid;
-  grid-template-columns: repeat(3, minmax(600px, 1fr));
+  grid-template-columns: minmax(400px, 1fr) 1px minmax(400px, 1fr) 1px minmax(400px, 1fr);
   flex: 1;
   min-height: 0;
   min-width: 0;
@@ -19618,8 +19618,29 @@ dialog.report-export-review {
   padding: 0;
   overflow: hidden;
 }
-.project-details-screen .project-details-columns > .project-information-panel + .project-information-panel {
-  border-left: 1px solid var(--border);
+.project-details-divider {
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+  min-height: 0;
+  background: var(--border);
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+}
+.project-details-divider::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 14px;
+  content: "";
+  transform: translateX(-50%);
+}
+.project-details-columns.is-resizing,
+.project-details-columns.is-resizing * {
+  cursor: col-resize !important;
+  user-select: none;
 }
 .project-details-screen .project-details-columns .project-details-column-header {
   display: flex;

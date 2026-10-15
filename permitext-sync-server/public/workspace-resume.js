@@ -1,3 +1,5 @@
+import { normalizeProjectDetailsWidths } from './project-details-columns.js?v=20261015-project-details-resize-v1';
+
 const views = ['research', 'notebook', 'report', 'project-details', 'account'];
 export const reportResumeFlags = ['libraryOpen', 'outlineHidden', 'comparisonOpen', 'versionsCollapsed'];
 export const reportResumeWidths = ['libraryWidth', 'outlineWidth', 'versionsWidth', 'reportComparisonWidth', 'pdfComparisonWidth'];
@@ -30,6 +32,7 @@ export function normalizeWorkspaceResume(value, context) {
       section: ['context', 'facts', 'records'].includes(value.details?.section) ? value.details.section : 'context',
       scroll: position(value.details?.scroll), contentScroll: position(value.details?.contentScroll),
       scrollLeft: position(value.details?.scrollLeft),
+      columnWidths: normalizeProjectDetailsWidths(value.details?.columnWidths),
       columnScrolls: value.details?.columnScrolls && typeof value.details.columnScrolls === 'object'
         ? Object.fromEntries(['context', 'facts', 'records'].map(kind => [kind, position(value.details.columnScrolls[kind])]))
         : null
