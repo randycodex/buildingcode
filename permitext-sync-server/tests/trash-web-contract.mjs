@@ -57,7 +57,7 @@ const trashValues={document:{createElement:tag=>new Element(tag)},captureAccount
 new Function(...Object.keys(trashValues),'panel',between('function attachSettingsTrash(', 'async function clearSettingsBookmarks(')+';attachSettingsTrash(panel);')(...Object.values(trashValues),panel);
 await nodes['.settings-trash-refresh'].fire('click');
 const list=nodes['.settings-trash-list'],row=list.children[0],actions=row.querySelector('.settings-trash-actions');
-assert.deepEqual(actions.children.map(button=>button.textContent),['Restore / Undo','Delete Permanently']);
+assert.deepEqual(actions.children.map(button=>button.textContent),['Restore','Delete Permanently']);
 assert.match(row.querySelector('p').textContent,/^Expires /);
 assert.equal(nodes['.settings-trash-status'].textContent,'','Routine guidance does not take up a row above populated Trash.');
 actions.children[1].fire('click');

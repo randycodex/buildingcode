@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-trash-action-hover-v1035";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-trash-restore-label-v1036";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-trash-action-hover-v1035";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-trash-restore-label-v1036";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-trash-action-hover-v1035";
+} from "./offline-storage.js?v=20261015-trash-restore-label-v1036";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-trash-action-hover-v1035";
+} from "./workspace-state.js?v=20261015-trash-restore-label-v1036";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -37379,7 +37379,7 @@ function attachSettingsTrash(panel) {
         copy.append(title, date);
         const actions = document.createElement("div");
         actions.className = "settings-trash-actions";
-        actions.append(button("Restore / Undo", () => update("restore", entry.id)), button("Delete Permanently", () => permanent(row, "purge", entry.id), true));
+        actions.append(button("Restore", () => update("restore", entry.id)), button("Delete Permanently", () => permanent(row, "purge", entry.id), true));
         row.append(copy, actions);
         list.append(row);
       }
