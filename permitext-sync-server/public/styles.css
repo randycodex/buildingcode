@@ -13844,6 +13844,15 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   color: color-mix(in srgb, var(--text-primary) 94%, #000);
 }
 
+.notebook-welcome > .notebook-primary-action {
+  min-height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--workspace-menu-highlight);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .notebook-danger-action {
   background: color-mix(in srgb, #d43b32 16%, var(--surface));
   color: color-mix(in srgb, #d43b32 78%, var(--text-primary));
