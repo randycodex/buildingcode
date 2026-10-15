@@ -33,7 +33,7 @@ console.log('Web Trash preflight and all-edition note cleanup passed.');
 // Exercise the rendered row actions with synthetic recovery copies and no backend.
 class Element {
  constructor(tag='div'){this.tagName=tag;this.children=[];this.events={};this.className='';this.value='';this.disabled=false;this.textContent='';}
- classList={add:name=>{this.className+=` ${name}`;}};
+ classList={add:name=>{this.className+=` ${name}`;},contains:name=>this.className.split(' ').includes(name)};
  append(...nodes){for(const node of nodes){node.parent=this;this.children.push(node);}}
  replaceChildren(...nodes){this.children=[];this.append(...nodes);}
  addEventListener(name,handler){this.events[name]=handler;}
@@ -49,15 +49,15 @@ class Element {
 const nodes=Object.fromEntries(['settings-trash','settings-trash-list','settings-trash-status','settings-trash-refresh'].map(name=>[`.${name}`,new Element()]));
 const panel={querySelector:selector=>nodes[selector]};
 const entries=[{id:'copy-one',title:'Synthetic note',expiresAt:'2026-11-01T12:00:00Z'},{id:'copy-two',title:'Synthetic evidence',expiresAt:'2026-11-02T12:00:00Z'}];
-const requests=[];let current=true,preflights=0,refreshes=0;
+const requests=[];let current=true,preflights=0,refreshes=0,failNextRequest=false;
 const trashValues={document:{createElement:tag=>new Element(tag)},captureAccountRequest:()=> 'owner',isCurrentAccountRequest:()=>current,
  prepareRecoverableDeletion:async()=>{preflights++;},requireCurrentAccountRequest(){assert(current);},
- postResearch:async(path,body)=>{requests.push({path,...body});return {entries};},
+ postResearch:async(path,body)=>{requests.push({path,...body});if(failNextRequest){failNextRequest=false;throw Error('Synthetic retry failure');}return {entries};},
  loadSyncedContent:async()=>{},refreshWorkspaceAfterSettingsClear:async()=>{refreshes++;},settingsPanelScrollTop:()=>0,track:{scrollLeft:0},openTrashAfterSettingsDeletion:false};
 new Function(...Object.keys(trashValues),'panel',between('function attachSettingsTrash(', 'async function clearSettingsBookmarks(')+';attachSettingsTrash(panel);')(...Object.values(trashValues),panel);
 await nodes['.settings-trash-refresh'].fire('click');
 const list=nodes['.settings-trash-list'],row=list.children[0],actions=row.querySelector('.settings-trash-actions');
-assert.deepEqual(actions.children.map(button=>button.textContent),['Restore / Undo','Delete Permanently…']);
+assert.deepEqual(actions.children.map(button=>button.textContent),['Restore / Undo','Delete Permanently']);
 assert.match(row.querySelector('p').textContent,/^Expires /);
 assert.equal(nodes['.settings-trash-status'].textContent,'','Routine guidance does not take up a row above populated Trash.');
 actions.children[1].fire('click');
@@ -76,6 +76,11 @@ assert.deepEqual(requests.at(-1),{path:'/content/trash',action:'purge',id:'copy-
 assert.equal(preflights,1);
 await list.children[1].querySelector('.settings-trash-actions').children[0].fire('click');
 assert.equal(requests.at(-1).action,'restore');assert.equal(requests.at(-1).id,'copy-two');assert.equal(refreshes,1);
+list.children[0].querySelector('.settings-trash-actions').children[1].fire('click');
+const pendingConfirmation=list.children[0].querySelector('.settings-trash-confirm').querySelector('button');
+failNextRequest=true;await nodes['.settings-trash-refresh'].fire('click');
+assert.equal(list.children[0].querySelector('.settings-trash-actions').children[1].disabled,false,'A failed refresh restores the row Delete action even when it shares the confirmation label.');
+assert.equal(pendingConfirmation.disabled,true,'Retry does not enable an unconfirmed permanent deletion.');
 current=false;const requestCount=requests.length;
 await list.children[0].querySelector('.settings-trash-actions').children[0].fire('click');
 assert.equal(requests.length,requestCount,'A stale Account view cannot mutate recovery copies.');

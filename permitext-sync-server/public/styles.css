@@ -18226,7 +18226,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   margin: 0;
   padding: 4px 8px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text-primary);
   font-size: 13px !important;
