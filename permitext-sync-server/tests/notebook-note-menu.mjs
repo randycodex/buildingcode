@@ -46,6 +46,7 @@ const menu = createNotebookNoteMenu({ onSelect: card => selected.push(card.id),
 menu.createButton.addEventListener('click',()=>{created++});
 menu.render({cards,activeCard});
 assert.equal(menu.menu.open,false,'Notes starts as a compact closed dropdown');
+assert.equal(menu.menu.hidden,false,'Existing Notes expose the picker');
 assert.equal(menu.list.children.length,2,'Archive entries stay outside the active list');
 const choices = () => menu.list.querySelectorAll('button');
 assert.equal(choices()[0].children[1].textContent,'Revision 1');
@@ -128,13 +129,22 @@ assert.equal(menu.label.textContent,'Archive');
 assert.equal(choices().length,1);
 assert.equal(choices()[0].children[0].textContent,'Archived note');
 assert.deepEqual(questionCards,metadataBefore,'Rendering simple notes preserves stored metadata');
+menu.menu.open=true;
 menu.render({cards:[],activeCard:null,readOnly:true});
+assert.equal(menu.menu.hidden,true,'No Notes means no dropdown trigger');
+assert.equal(menu.element.hidden,true,'An empty picker does not reserve a title row');
+assert.equal(menu.menu.open,false,'Removing the last Note also closes an open picker');
 assert.equal(menu.list.children.length,0);
 assert.equal(menu.createButton.disabled,true);
 menu.createButton.click();
 assert.equal(created,1,'Read-only Notes cannot create a draft');
 menu.editTitle();
 assert.equal(menu.titleEditor.hidden,true);
+menu.render({cards:[],activeCard:{id:'',title:'',version:0}});
+assert.equal(menu.menu.hidden,false,'A new unsaved Note exposes the picker again');
+assert.equal(menu.element.hidden,false);
+menu.render({cards:[cards[2]],activeCard:null});
+assert.equal(menu.menu.hidden,false,'Archived Notes remain reachable even when there are no active Notes');
 console.log('Notebook Notes menu passed: current/revision rows, switching/new action, keyboard/close behavior, live title editing, first-save continuity, archive/selection and read-only access.');
 
 // Run the actual app's control setup and list renderer so integration state,
