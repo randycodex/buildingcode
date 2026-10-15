@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-reader-search-text-hover-v1077";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-divider-reader-picker-v1078";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-reader-search-text-hover-v1077";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-divider-reader-picker-v1078";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-reader-search-text-hover-v1077";
+} from "./offline-storage.js?v=20261015-divider-reader-picker-v1078";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-reader-search-text-hover-v1077";
+} from "./workspace-state.js?v=20261015-divider-reader-picker-v1078";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -8582,8 +8582,14 @@ function syncReaderToolbarButton(button) {
   );
 }
 
+function syncReaderDividerButton(button) {
+  button.disabled = !isProAccount() && (state.readers || []).length >= 2;
+  button.title = button.disabled ? "Two Reader limit reached" : "Add Reader here";
+}
+
 function updateReaderPlanControls() {
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
+  document.querySelectorAll('.pane-divider-add').forEach(syncReaderDividerButton);
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
 }
@@ -8611,7 +8617,7 @@ function bindReaderToolbarButton(button) {
   button.addEventListener("click", () => void openReaderFromToolbar(button));
 }
 
-async function openReaderFromToolbar(button) {
+async function openReaderFromToolbar(button, { previousPaneID = "", nextPaneID = "" } = {}) {
   if (notifyProjectRequiredForColumn()) return false;
   if (!isProAccount() && state.readers.length >= 2) {
     enforceReaderPlanLimit();
@@ -8628,9 +8634,22 @@ async function openReaderFromToolbar(button) {
     if (!isCurrent() || workspaceColumnsRequireProject()) return;
     // Reserve a slot before asynchronous rendering, including late picker clicks.
     if (!isProAccount() && state.readers.length >= 2) return;
+    if (previousPaneID && nextPaneID) {
+      const visibleOrder = activePaneIDs().filter(workflowPaneIsVisible);
+      const previousIndex = visibleOrder.indexOf(previousPaneID);
+      // A picker left open during a column move/close cannot insert elsewhere.
+      if (previousIndex < 0 || visibleOrder[previousIndex + 1] !== nextPaneID) return;
+    }
     const reader = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
     state.readers.push(reader);
     state.workflowMembership = linkPaneToView(state.workflowMembership, paneIDForReader(reader), view);
+    if (previousPaneID && nextPaneID) {
+      const group = columnGroupForPane(previousPaneID);
+      if (group?.paneIDs.includes(nextPaneID)) {
+        group.paneIDs.splice(group.paneIDs.indexOf(previousPaneID) + 1, 0, paneIDForReader(reader));
+      }
+      placePaneAfter(previousPaneID, paneIDForReader(reader));
+    }
     saveWorkspaceState();
     await transitionWorkspace("utility");
     if (isCurrent()) scrollPaneIntoView(paneIDForReader(reader));
@@ -40394,6 +40413,25 @@ function createDivider(previousPaneID, nextPaneID) {
     divider.setAttribute("aria-valuemin", String(Math.round(minimumPaneWidthForID(edgePaneID))));
     const maximumWidth = maximumPaneWidthForID(edgePaneID);
     if (Number.isFinite(maximumWidth)) divider.setAttribute("aria-valuemax", String(maximumWidth));
+  }
+  if (previousPaneID && nextPaneID) {
+    const add = document.createElement("button");
+    add.type = "button";
+    add.className = "pane-divider-add";
+    add.textContent = "+";
+    add.setAttribute("aria-label", "Add Reader here");
+    add.setAttribute("aria-haspopup", "dialog");
+    add.setAttribute("aria-expanded", "false");
+    syncReaderDividerButton(add);
+    // The picker control must never start a resize or reset column widths.
+    ["pointerdown", "dblclick", "keydown"].forEach(type => {
+      add.addEventListener(type, event => event.stopPropagation());
+    });
+    add.addEventListener("click", event => {
+      event.stopPropagation();
+      void openReaderFromToolbar(add, { previousPaneID, nextPaneID });
+    });
+    divider.append(add);
   }
   divider.addEventListener("focus", () => refreshPaneDividerValue(divider));
   divider.addEventListener("keydown", (event) => {

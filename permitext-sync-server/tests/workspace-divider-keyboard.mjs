@@ -13,17 +13,32 @@ const historyOnly = new Set();
 const panes = new Map(['left', 'right'].map(id => [id, {dataset:{paneId:id}, width:600, getBoundingClientRect(){return {width:this.width};}}]));
 const state = {paneWeights:{}};
 let saves=0, layouts=0, indicators=0;
+const readerPickers=[];
 const track = {scrollLeft:0, querySelectorAll(){return [...panes.values()];}, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
 const context = vm.createContext({state, track, CSS:{escape:x=>x},isProAccount:()=>false,
   paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600, minimumPaneWidthForID:id=>id.startsWith('reader:')?400:600,
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,
-  document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, classList:{add(){}},
+  openReaderFromToolbar:(button,location)=>readerPickers.push({button,location}),
+  document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, children:[], classList:{add(){}}, append(child){this.children.push(child);},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
-vm.runInContext(['maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
+vm.runInContext(['syncReaderDividerButton','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
 const divider=context.createDivider('left','right');
+const add=divider.children[0];
+assert.equal(add.textContent,'+');
+assert.equal(add.attrs['aria-label'],'Add Reader here');
+assert.equal(add.attrs['aria-haspopup'],'dialog');
+for(const type of ['pointerdown','dblclick','keydown']) {
+  let stopped=false;add.handlers[type]({stopPropagation(){stopped=true;}});
+  assert.equal(stopped,true,`${type} on + must not resize/reset the divider`);
+}
+add.handlers.click({stopPropagation(){}});
+assert.equal(readerPickers.length,1);
+assert.equal(readerPickers[0].location.previousPaneID,'left');
+assert.equal(readerPickers[0].location.nextPaneID,'right');
+
 function press(handle,key,shiftKey=false){let prevented=false;handle.handlers.keydown({key,shiftKey,preventDefault(){prevented=true;}});return prevented;}
 function widths(){return [...panes.values()].map(p=>p.width);}
 panes.get('left').width=680;
@@ -45,6 +60,7 @@ collapsed.add('right');divider.handlers.focus();assert.equal(divider.tabIndex,-1
 collapsed.clear();divider.handlers.focus();assert.equal(divider.tabIndex,0);assert.equal(divider.attrs['aria-valuemax'],'100');const leftEdge=context.createDivider('', 'left');
 press(leftEdge,'ArrowLeft',true);assert.deepEqual(widths(),[680,704]);
 press(leftEdge,'ArrowRight',true);assert.deepEqual(widths(),[600,704]);
+assert.equal(leftEdge.children.length,0,'Outer resize handles retain their existing behavior');
 const rightEdge=context.createDivider('right','');press(rightEdge,'ArrowRight');assert.deepEqual(widths(),[600,728]);
 // Missing DOM panes do not persist phantom widths.
 panes.delete('right');press(divider,'ArrowRight');assert.equal(saves,7);
@@ -86,3 +102,12 @@ assert.equal(readerEdge.attrs['aria-valuemin'],'400'); assert.equal(readerEdge.a
 context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,900);
 context.resizePaneEdgeBy('reader:left',-10000,readerEdge); assert.equal(panes.get('reader:left').width,400);
 console.log('Reader keyboard limits passed: 400px minimum, 900px maximum, adjacent and outer edges, accessible bounds.');
+
+state.readers=[{id:'one'},{id:'two'}];
+context.syncReaderDividerButton(add);
+assert.equal(add.disabled,true,'Divider insertion observes the existing two-Reader free limit');
+assert.equal(add.title,'Two Reader limit reached');
+state.readers=[];
+context.syncReaderDividerButton(add);
+assert.equal(add.disabled,false);
+assert.equal(add.title,'Add Reader here');
