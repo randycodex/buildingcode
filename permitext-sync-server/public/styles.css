@@ -18049,7 +18049,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 .account-dialog .settings-scroll { flex: 1; min-height: 0; overflow-y: auto; }
 
-/* Account groups related controls into three independently scrolling columns. */
+/* Account and Library each have an independently scrolling column. */
 .account-dialog.account-screen {
   --account-category-gutter: 24px;
   --account-category-top-gutter: 32px;
@@ -18101,7 +18101,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 .account-screen .settings-panel > .settings-scroll {
   display: grid;
-  grid-template-columns: minmax(360px, 1fr) minmax(480px, 1.5fr) minmax(360px, 1fr);
+  grid-template-columns: minmax(400px, 1fr) minmax(480px, 1.3fr);
   grid-template-rows: minmax(0, 1fr);
   align-content: stretch;
   align-items: stretch;
@@ -18163,7 +18163,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   justify-self: start;
   text-align: left;
 }
-.account-screen :is(.account-connector, .settings-active-sources-card, .settings-data-card) > .settings-section-title { display: none; }
+.account-screen :is(.account-connector, .settings-active-sources-card) > .settings-section-title { display: none; }
 .account-screen .settings-account-actions {
   display: grid;
   justify-items: center;

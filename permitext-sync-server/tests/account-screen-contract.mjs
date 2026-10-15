@@ -101,11 +101,10 @@ for (const signedIn of [false, true]) {
   assert.equal(panel.headerRemoved, true);
   assert.deepEqual(panel.removedStyles, ["flex"], "Column size must not become the screen height.");
   if (signedIn) {
-    const [account, library, recovery] = panel.scroll.children;
-    assert.equal(panel.scroll.children.length, 3);
-    assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
+    const [account, library] = panel.scroll.children;
+    assert.equal(panel.scroll.children.length, 2);
+    assert.deepEqual(account.children.slice(1, 5), [panel.profile, panel.plan, panel.conflicts, panel.data]);
     assert.deepEqual(library.children.slice(1), [panel.sources, panel.offline]);
-    assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
     assert.equal(account.children.at(-1).children[1], panel.deleteAccount, "One direct action keeps the original deletion confirmation handler.");
   }

@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-account-delete-action-v1021";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-account-two-columns-v1022";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-account-delete-action-v1021";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-account-two-columns-v1022";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-account-delete-action-v1021";
+} from "./offline-storage.js?v=20261015-account-two-columns-v1022";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-account-delete-action-v1021";
+} from "./workspace-state.js?v=20261015-account-two-columns-v1022";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -38605,9 +38605,8 @@ function organizeAccountSettings(panel) {
     section.append(heading, ...cards.filter(Boolean));
     return section;
   };
-  const account = column("account", "Account", [profile, plan]);
+  const account = column("account", "Account", [profile, plan, conflicts, data]);
   const library = column("library", "Library & offline", [sources, offline]);
-  const recovery = column("recovery", "Data & recovery", [conflicts, data]);
   const actions = document.createElement("div");
   actions.className = "settings-account-actions";
   const signOut = profile?.querySelector(".account-clear");
@@ -38623,7 +38622,7 @@ function organizeAccountSettings(panel) {
   const searches = data?.querySelector('[data-clear-action="searches"]');
   const deleteContent = data?.querySelector(".settings-delete-content");
   data?.append(...[trash, legacy, searches, deleteContent].filter(Boolean));
-  scroll.replaceChildren(account, library, recovery);
+  scroll.replaceChildren(account, library);
 }
 
 function mountAccountScreenContent(dialog, panel) {
