@@ -18030,6 +18030,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   --settings-weight-regular: 400;
   --settings-weight-medium: 500;
   --settings-weight-heading: 600;
+  --settings-disclosure-indent: var(--space-4);
   --account-category-gutter: 24px;
   --account-category-top-gutter: 32px;
   --account-scroll-fade-size: calc(var(--account-category-gutter) + var(--space-3));
@@ -18211,6 +18212,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-account-column > .settings-data-card { gap: 0; }
 .account-screen .settings-data-card > :is(details, .legacy-workspace-recovery) { border-bottom: 1px solid var(--border); }
 .account-screen .settings-data-card > details > summary { padding-block: 12px; }
+.account-screen .settings-data-card > details > :not(summary),
+.account-screen .settings-data-card .legacy-workspace-recovery > div {
+  padding-inline-start: var(--settings-disclosure-indent);
+}
 .account-screen .settings-data-card :is(.settings-secondary-button, .settings-link-button) {
   width: auto;
   min-width: 0;
