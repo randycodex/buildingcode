@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-settings-project-row-v1054";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-overview-inline-v1055";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-settings-project-row-v1054";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-overview-inline-v1055";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-settings-project-row-v1054";
+} from "./offline-storage.js?v=20261015-project-overview-inline-v1055";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-settings-project-row-v1054";
+} from "./workspace-state.js?v=20261015-project-overview-inline-v1055";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -3754,8 +3754,67 @@ async function openProjectDetailsScreen(section = null) {
           address.textContent = workspaceProject()?.address || "No address recorded";
           const edit = document.createElement("button");
           edit.type = "button"; edit.textContent = "Edit project";
-          edit.addEventListener("click", () => showProjectCreateSheet(panel, workspaceProject()));
-          overview.append(name, address, edit);
+          edit.className = "project-overview-edit";
+          edit.setAttribute("aria-expanded", "false");
+          const editorHost = document.createElement("div");
+          editorHost.className = "project-overview-editor";
+          editorHost.id = `project-overview-editor-${safeAnnotationIDPart(projectID)}`;
+          edit.setAttribute("aria-controls", editorHost.id);
+          edit.disabled = Boolean(workspaceProject()?.sharedOnly);
+          let editor = null;
+          let opening = false;
+          edit.addEventListener("click", async () => {
+            if (editor) { editor.close(); return; }
+            if (opening || !screen.isCurrent()) return;
+            opening = true;
+            edit.disabled = true;
+            try {
+              if (!(await flushProjectInformationPanes()) || !screen.isCurrent()) return;
+              const currentProject = workspaceProject();
+              if (!currentProject || currentProject.sharedOnly) return;
+              const coveredColumns = new Map();
+              const releaseColumns = () => {
+                for (const [column, inert] of coveredColumns) column.inert = inert;
+                coveredColumns.clear();
+              };
+              edit.setAttribute("aria-expanded", "true");
+              const description = panel.querySelector(".project-overview-description");
+              if (description) description.hidden = true;
+              editor = showProjectCreateSheet(editorHost, currentProject, {
+                inline: true,
+                onSubmitting: submitting => {
+                  for (const [columnKind, column] of panels) {
+                    if (columnKind === "context") continue;
+                    if (submitting) { coveredColumns.set(column, column.inert); column.inert = true; }
+                  }
+                  if (!submitting) releaseColumns();
+                },
+                beforeSave: () => flushProjectInformationPanes(),
+                onClose: () => {
+                  releaseColumns();
+                  editor = null;
+                  edit.setAttribute("aria-expanded", "false");
+                  if (description) description.hidden = false;
+                },
+                onSaved: async () => {
+                  if (!screen.isCurrent()) return;
+                  const presentation = screen.getPresentationState();
+                  const reopen = screen.isOpen();
+                  screen.dispose();
+                  reconcileProjectWorkspaces();
+                  renderWorkspaceTabs();
+                  if (!reopen) return;
+                  await openProjectDetailsScreen("context");
+                  if (projectDetailsScreen?.isCurrent()) projectDetailsScreen.restorePresentation(presentation);
+                  document.querySelector(".project-overview-edit")?.focus({preventScroll: true});
+                }
+              });
+            } finally {
+              opening = false;
+              edit.disabled = Boolean(workspaceProject()?.sharedOnly);
+            }
+          });
+          overview.append(name, address, edit, editorHost);
           panel.querySelector(".project-information-content")?.prepend(overview);
         }
         panel.querySelectorAll(".saved-project-structured-fact-value").forEach(input => { input.placeholder = "Not recorded"; });
@@ -33261,8 +33320,6 @@ function openProjectManager() {
       }
       copy.append(text);
       row.append(copy);
-      button("Edit", () => showProjectCreateSheet(backdrop, project, { onSaved: render }), row)
-        .setAttribute("aria-label", `Edit ${name}`);
       list.append(row);
     });
     const actions = document.createElement("footer");
@@ -33316,12 +33373,13 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   let submitting = false;
   let mutationStarted = false;
   const isEditing = Boolean(project);
+  const inline = isEditing && options.inline === true;
   const identity = isEditing ? projectIdentity(project) : null;
   const selectedFolderType = isEditing && folderType(project) === "reference" ? "reference" : "project";
   const overlay = document.createElement("section");
-  overlay.className = "project-sheet-overlay";
-  overlay.setAttribute("role", "dialog");
-  overlay.setAttribute("aria-modal", "true");
+  overlay.className = `project-sheet-overlay${inline ? " is-inline" : ""}`;
+  overlay.setAttribute("role", inline ? "region" : "dialog");
+  if (!inline) overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", isEditing ? `Edit ${folderTypeLabel(project)}` : selectedFolderType === "reference" ? "New saved collection" : "New Project");
   const isCurrent = () => !closed && overlay.isConnected &&
     isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
@@ -33501,6 +33559,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     closed = true;
     propertyLookupRequestID += 1;
     overlay.remove();
+    options.onClose?.();
     if (restoreFocus) restoreSheetFocus();
   };
   cancelButton.addEventListener("click", () => { if (!mutationStarted) closeSheet(); });
@@ -33511,7 +33570,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       if (!mutationStarted) closeSheet();
       return;
     }
-    trapWebModalFocus(sheet, event);
+    if (!inline) trapWebModalFocus(sheet, event);
   });
   sheet.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -33521,7 +33580,12 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     saveStatus.hidden = true;
     const fields = [nameInput, addressInput, descriptionInput, ...colorRail.querySelectorAll("button")];
     fields.forEach(field => { field.disabled = true; });
+    options.onSubmitting?.(true);
     try {
+      if (options.beforeSave && !(await options.beforeSave())) {
+        throw new Error("Save the other Project changes before trying again.");
+      }
+      if (!isCurrent()) return;
       const submittedAddress = addressInput.value.trim();
       const addressChanged = isEditing && submittedAddress !== originalProjectAddress;
       const property = selectedFolderType === "project" && submittedAddress && (!isEditing || addressChanged)
@@ -33543,8 +33607,9 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       mutationStarted = true;
       cancelButton.disabled = true;
       if (isEditing) {
-        await updateProjectFolder(project, details);
+        const updated = await updateProjectFolder(project, details);
         if (!isCurrent()) return;
+        if (updated === false) throw new Error("Project edits were not saved. Try again.");
       } else {
         const createdProject = await createProjectFolder(details);
         if (!isCurrent()) return;
@@ -33553,6 +33618,12 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         }
         await options.onCreated?.(createdProject);
         if (closed || !isCurrentAccountRequest(requestIdentity)) return;
+      }
+      if (inline) {
+        closeSheet({ restoreFocus: false });
+        refreshOpenAnnotationProjectEditors();
+        await options.onSaved?.();
+        return;
       }
       closeSheet({ restoreFocus: false });
       await transitionWorkspace("utility", {
@@ -33572,6 +33643,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     } finally {
       submitting = false;
       mutationStarted = false;
+      options.onSubmitting?.(false);
       if (isCurrent()) {
         fields.forEach(field => { field.disabled = false; });
         cancelButton.disabled = false;
@@ -33586,6 +33658,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   syncFolderTypeControls();
   if (options.workspaceProject) overlay.setAttribute("aria-label", "New Project");
   nameInput.focus();
+  return { close: () => { if (!mutationStarted) closeSheet(); } };
 }
 
 function appendProjectEmptyCard(content, title, message) {
@@ -33658,7 +33731,9 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
       }
     });
     lifecycleButton.addEventListener("keydown", (event) => event.stopPropagation());
-    actionGroup.append(countBadge, primaryActionButton, lifecycleButton);
+    actionGroup.append(countBadge);
+    if (mode === "archive" || !folderIsProject(project)) actionGroup.append(primaryActionButton);
+    actionGroup.append(lifecycleButton);
     const body = document.createElement("div");
     body.className = "project-card-body";
     const heading = document.createElement("h3");
@@ -34038,7 +34113,7 @@ async function renderProjectInformation(project, kind) {
   header.append(title, actions);
   const content = document.createElement("section");
   content.className = "saved-project-summary project-information-content";
-  const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind });
+  const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind, readOnly: kind === "context" });
   const checklist = kind === "context" ? appendProjectRecordsChecklist(content, current, identity) : null;
   projectInformationMounts.set(paneID, { panel, flush: async () => { await editor.flush(); await checklist?.flush(); } });
   panel.append(header, content);
@@ -34124,6 +34199,13 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     return saveSequence;
   };
   if (contextOnly) {
+    if (options.readOnly) {
+      const summary = document.createElement("p");
+      summary.className = `project-overview-description${description.value.trim() ? "" : " is-empty"}`;
+      summary.textContent = description.value.trim() || description.placeholder;
+      container.append(summary);
+      return { flush: () => Promise.resolve() };
+    }
     description.addEventListener("blur", () => void save());
     description.addEventListener("keydown", event => {
       if ((event.metaKey || event.ctrlKey) && event.key === "Enter") description.blur();
@@ -34183,6 +34265,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     value.type = "text";
     value.className = "saved-project-structured-fact-value";
     value.value = projectAddress ? address.value : factsByKey.get(key)?.value || "";
+    if (factsOnly && projectAddress) value.readOnly = true;
     value.setAttribute("aria-label", fieldLabel);
     const fact = factsByKey.get(key);
     if (fact?.sourceText) value.title = fact.sourceText;

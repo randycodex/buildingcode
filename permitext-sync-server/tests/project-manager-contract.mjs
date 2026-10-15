@@ -39,6 +39,8 @@ const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8')
 vm.runInContext(app.slice(app.indexOf('function openProjectManager()'), app.indexOf('function showProjectCreateSheet(')), context);
 vm.runInContext('openProjectManager()', context);
 const all = (root = body) => [root, ...root.children.flatMap(child => all(child))];
+assert.equal(all().some(node => node.tag === 'button' && node.textContent === 'Edit'), false,
+  'Project identity editing is available only from Edit project in the Overview column.');
 const click = async text => {
   const target = all().find(x => x.tag === 'button' && x.textContent === text);
   assert.ok(target, `Missing ${text}`);

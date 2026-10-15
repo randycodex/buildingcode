@@ -43,7 +43,7 @@ assert.ok(restored.collapsedPaneIDs.includes("project:facts:alpha"));
 for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${kind}:alpha`), false);
 
 // All three columns share a retained screen; the same editors and save guards remain.
-let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen;
+let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen, inlineOptions;
 const mounts = new Map(), issues = [], renderedInformation = [];
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
 let detailsWidths = [640,640,640], disposedResizers = 0;
@@ -56,6 +56,8 @@ const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projec
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   createProjectDetailsColumnResizers: () => ({getWidths:()=>[...detailsWidths],setWidths:value=>{detailsWidths=[...value];},cancel(){},dispose(){disposedResizers++;}}),
   saveWorkspaceResumeForRefresh() {},
+  safeAnnotationIDPart: value => value,
+  showProjectCreateSheet: (_host, _project, options) => { inlineOptions = options; return {close:()=>options.onClose()}; },
   document: { createElement: element, body, querySelector: selector => selector === '.workspace-shell' ? workspaceShell : selector === '.workflow-toolbar' ? workflowToolbar : null },
   setInterval: fn => { tickScreen = fn; return 1; }, clearInterval() {},
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
@@ -101,6 +103,12 @@ assert.equal(recordsPanel.hidden, false);
 const contextBody = contextPanel.querySelector('.project-details-column-body');
 const factsBody = factsPanel.querySelector('.project-details-column-body');
 const recordsBody = recordsPanel.querySelector('.project-details-column-body');
+const editButton = find(contextPanel, node => node.className === 'project-overview-edit');
+await editButton.handlers.click();
+assert.equal(inlineOptions.inline,true,'Overview expands the existing complete editor in place.');
+assert.equal(editButton.attributes['aria-expanded'],'true');
+await editButton.handlers.click();
+assert.equal(editButton.attributes['aria-expanded'],'false','The same button can collapse the draft without saving.');
 contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
 factsBody.scrollTop=210; recordsBody.scrollTop=140; columns.scrollLeft=80;
 const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
@@ -228,6 +236,12 @@ vm.runInContext(actual("projectFactPresentationGroups") + '\n' + actual("appendS
 const contextRoot = element("section"), factsRoot = element("section");
 const contextEditor = e.appendSavedProjectFactEditor(contextRoot, alpha, alpha, { section: "context" });
 const factsEditor = e.appendSavedProjectFactEditor(factsRoot, alpha, alpha, { section: "facts" });
+const overviewRoot = element('section');
+const overviewEditor = e.appendSavedProjectFactEditor(overviewRoot, alpha, alpha, {section:'context',readOnly:true});
+assert.equal(find(overviewRoot,node=>node.tag==='textarea'),undefined,'Overview context is read-only until Edit project expands.');
+assert.equal(find(overviewRoot,node=>node.className==='project-overview-description').textContent,'Original context');
+await overviewEditor.flush(); assert.equal(patches.length,0);
+assert.equal(find(factsRoot,node=>node.attributes['aria-label']==='Address').readOnly,true,'Address edits belong to the Overview editor.');
 assert.equal(factMotionCalls.length, 0, "Standalone Facts ignores stored collapsed state and has no accordions.");
 for (const label of ["Property", "Building", "Work & code basis", "Zoning", "Special designations"]) {
   assert.ok(find(factsRoot, node => node.tag === "h3" && node.textContent === label));

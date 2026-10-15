@@ -20125,7 +20125,25 @@ dialog.report-export-review {
 .project-overview-identity { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
 .project-overview-identity h2 { margin: 0 0 8px; font-size: 18px; }
 .project-overview-identity p { color: var(--text-secondary); }
-.project-overview-identity button { border: 0; border-radius: 0; background: transparent; padding: 8px 0; font-size: 12px; }
+.project-overview-identity > button { border: 0; border-radius: 0; background: transparent; padding: 8px 0; font-size: 12px; }
+.project-overview-editor:empty { display: none; }
+.project-overview-editor .project-sheet-overlay.is-inline {
+  position: static;
+  display: block;
+  margin-top: var(--space-3);
+  padding: 0;
+  background: transparent;
+}
+.project-overview-editor .project-create-sheet {
+  max-width: none;
+  max-height: none;
+  box-sizing: border-box;
+  overflow: visible;
+  box-shadow: none;
+}
+.project-overview-editor .project-sheet-header { position: static; }
+.project-overview-description { margin: 0; font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.project-overview-description.is-empty { color: var(--text-secondary); }
 .report-draft-blocks.is-open.is-settled,
 .report-draft-blocks.is-open.is-settled > .report-draft-blocks-body { overflow: visible; }
 

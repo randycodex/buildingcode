@@ -497,7 +497,7 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Move all projects and saved collections to Trash", "Clear Recent Searches", "Move all saved passages to Trash", "Move all section notes to Trash"].forEach((label) => {
+    ["Move all projects to Trash", "Clear Recent Searches", "Move all saved passages to Trash", "Move all section notes to Trash"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(!settingsTemplateSource.includes("Clear All Tags"), "Web Settings still exposes tag management.");
@@ -573,6 +573,9 @@ async function main() {
     const workspaceScriptURL = webRoot.text.match(/<script[^>]*src="(\/web\/app\.js\?v=[^"]+)"/)?.[1];
     assert(workspaceScriptURL, "Web HTML must select a versioned workspace script.");
     const workspaceScript = await request(workspaceScriptURL);
+    assert(workspaceScript.text.includes('settingsProjectsIncludeCollections') &&
+      workspaceScript.text.includes('"Move all projects and saved collections to Trash" : "Move all projects to Trash"'),
+      "Settings must retain the legacy collection scope only when those records exist.");
     const workspaceStyles = await request("/web/styles.css");
     const readerFont = await requestBinary("/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0");
     const workspaceStateScript = await request("/web/workspace-state.js");
