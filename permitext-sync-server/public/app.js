@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-evidence-scroll-v1012";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-project-details-tabs-v1013";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-evidence-scroll-v1012";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-project-details-tabs-v1013";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-evidence-scroll-v1012";
+} from "./offline-storage.js?v=20261014-project-details-tabs-v1013";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-evidence-scroll-v1012";
+} from "./workspace-state.js?v=20261014-project-details-tabs-v1013";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -3760,7 +3760,6 @@ async function openProjectDetailsScreen(section = null) {
         panel.querySelectorAll(".saved-project-structured-fact-value").forEach(input => { input.placeholder = "Not recorded"; });
         panels.set(kind, panel); content.append(panel);
       }
-      tabs.append(createReaderToolbarButton());
       selectSection(section || "context");
       return content;
     },
