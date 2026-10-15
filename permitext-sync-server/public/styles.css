@@ -19570,13 +19570,26 @@ dialog.report-screen {
 .report-screen .report-draft-header { display: none; }
 .report-screen .report-draft-shell {
   height: 100%; display: grid; grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr); padding: 0; gap: 0; overflow: clip;
+  grid-template-rows: auto minmax(0, 1fr) auto; padding: 0; gap: 0; overflow: clip;
 }
 .report-screen .report-draft-primary-actions {
   grid-column: 1 / -1; grid-row: 1; display: flex; justify-content: flex-start;
   padding: 12px 24px; gap: 20px; margin: 0; border-bottom: 1px solid var(--border);
 }
-.report-screen .report-draft-status:not([hidden]) { position: absolute; bottom: 16px; left: 24px; z-index: 2; background: var(--surface); padding: 12px; }
+.report-screen .report-draft-shell > .report-draft-status {
+  position: static;
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  margin: 0;
+  padding: 8px var(--space-5);
+  border-top: 1px solid var(--border);
+  background: var(--background);
+  overflow-wrap: anywhere;
+}
+.report-screen .report-draft-shell > .report-draft-status:is([hidden], :empty) { display: none; }
 .report-screen .report-outline { grid-column: 1; grid-row: 2; overflow-y: auto; padding: 0; min-width: 0; }
 .report-screen .report-outline h2 { margin: 0; font-size: 13px; color: var(--text-primary); }
 .report-outline button { border: 0; background: transparent; color: var(--text-secondary); font-size: 12px; line-height: 1.35; box-shadow: none; }
@@ -19850,7 +19863,7 @@ dialog.report-export-review {
 /* Match the shared Research and Notebook toolbar without column spacing. */
 .report-workspace-view .workspace-panel.report-draft-panel { padding: 0; }
 .report-workspace-view .workspace-panel.report-draft-panel .report-draft-shell {
-  width: 100%; margin: 0; gap: 0; grid-template-rows: 42px minmax(0, 1fr);
+  width: 100%; margin: 0; gap: 0; grid-template-rows: 42px minmax(0, 1fr) auto;
 }
 .report-workspace-view .report-draft-shell .report-draft-primary-actions {
   height: 42px; min-height: 0; padding: 0 clamp(22px, 3vw, 46px);
