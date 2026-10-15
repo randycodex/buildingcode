@@ -3568,11 +3568,13 @@ select option:checked {
 }
 .reader-internal-result > :is(strong, p) { grid-column: 2; }
 
-.reader-internal-result:hover,
-.reader-internal-result:focus-visible {
-  background: var(--select-highlight);
+.reader-internal-result:is(:hover, :focus-visible) {
+  background: transparent;
+  color: var(--code-accent);
   outline: 0;
 }
+.reader-internal-result:is(:hover, :focus-visible)::before,
+.reader-internal-result:is(:hover, :focus-visible) > p { color: inherit; }
 
 .reader-internal-result strong {
   display: block;
