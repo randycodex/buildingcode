@@ -5,14 +5,14 @@ import {reportsContainingSource} from '../public/project-workflow.js';
 
 const app = await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const functions = app.slice(app.indexOf('const reportMembershipRequests = new Map();'), app.indexOf('function reportAdditionFeedback('));
-const renderStart = app.indexOf('      footerActions.append(reportButton, researchButton, coordinateButton);');
+const renderStart = app.indexOf('      footerActions.append(researchButton, coordinateButton);');
 const render = app.slice(renderStart, app.indexOf('      let scrollCaptureReady = false;',renderStart));
 assert.ok(renderStart > 0);
 const hosts = [], frames = [];
 let releaseModule;
 const moduleReady = new Promise(resolve => { releaseModule = resolve; });
 const element = () => ({dataset:{},children:[],classList:{toggle(){}},setAttribute(){},append(...children){this.children.push(...children);}});
-const footer = element();
+const footer = element(), titleAction = element();
 const stableNoteIdentity = {};
 let savedReports = [];
 const context = vm.createContext({
@@ -25,7 +25,7 @@ const context = vm.createContext({
   projectID:'project',activeCard:{id:'',identity:stableNoteIdentity},focusedCardID:'',focusedCardIdentity:stableNoteIdentity,
   notebookCardIdentity:card=>card.identity,refreshNotebookReportStatus:async()=>false,
   disposed:false,requestIdentity:{userID:'owner'},renderSequence:1,editorRenderSequence:1,
-  loadNotebookModule:()=>moduleReady,footer,footerActions:element(),
+  loadNotebookModule:()=>moduleReady,footer,footerActions:element(),noteMenu:{titleAction},
   reportButton:element(),researchButton:element(),coordinateButton:element(),
   editorElement:element(),notebookReadOnly:false,
   replaceFocusedContent:()=>hosts.push(...footer.children.filter(child=>child.dataset?.reportMembershipProject))
@@ -39,6 +39,8 @@ releaseModule({});
 await pendingRender;
 while(frames.length) frames.shift()();
 assert.equal(hosts.length,1);
+assert.equal(titleAction.children[0],context.reportButton,'Add to Report is mounted in the title row beside Notes');
+assert(!footer.children.flatMap(child=>child.children || []).includes(context.reportButton),'The footer does not keep a duplicate report action');
 assert.equal(hosts[0].textContent,'Adding creates the first Report','Delayed editor load must not strand a new footer on Checking Report');
 context.activeCard = {id:'accepted-note',identity:stableNoteIdentity};
 await context.refreshNotebookReportStatus();

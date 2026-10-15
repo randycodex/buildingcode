@@ -13,6 +13,8 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
   titleEditor.placeholder = 'Note title';
   titleEditor.setAttribute('aria-label', 'Edit Note title');
   titleEditor.hidden = true;
+  const titleAction = document.createElement('div');
+  titleAction.className = 'notebook-title-action';
   const menu = document.createElement('details');
   menu.className = 'notebook-card-menu notebook-note-menu';
   const toggle = document.createElement('summary');
@@ -39,7 +41,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
   footer.append(createButton, management);
   popup.append(list, footer);
   menu.append(toggle, popup);
-  element.append(title, titleEditor, menu);
+  element.append(title, titleEditor, titleAction, menu);
   let state = { activeCard: null, readOnly: false, selectingCards: false };
   const finishTitleEditing = () => {
     title.textContent = state.activeCard?.title || 'Untitled Note';
@@ -152,5 +154,5 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
       list.append(row);
     }
   };
-  return { element, menu, toggle, label, list, footer, management, createButton, titleEditor, editTitle, render };
+  return { element, menu, toggle, label, list, footer, management, createButton, titleEditor, titleAction, editTitle, render };
 }

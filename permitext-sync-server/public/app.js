@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-notes-no-report-hint-v1006";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-note-report-title-action-v1007";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-notes-no-report-hint-v1006";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-note-report-title-action-v1007";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-notes-no-report-hint-v1006";
+} from "./offline-storage.js?v=20261014-note-report-title-action-v1007";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-notes-no-report-hint-v1006";
+} from "./workspace-state.js?v=20261014-note-report-title-action-v1007";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -28039,6 +28039,7 @@ async function renderProjectNotebook(project, options = {}) {
       const renderSequence = editorRenderSequence;
       refreshNotebookReferenceSources = async () => false;
       refreshNotebookReportStatus = async () => false;
+      noteMenu.titleAction.replaceChildren();
       const replaceFocusedContent = (...children) => {
         editorMount?.destroy?.();
         editorMount = null;
@@ -28322,7 +28323,7 @@ async function renderProjectNotebook(project, options = {}) {
       });
       const reportButton = document.createElement("button");
       reportButton.type = "button";
-      reportButton.className = "notebook-secondary-action workflow-action workflow-action-secondary";
+      reportButton.className = "notebook-add-to-report";
       reportButton.textContent = "Add to Report";
       reportButton.disabled = notebookReadOnly;
       reportButton.addEventListener("click", async () => {
@@ -28340,7 +28341,7 @@ async function renderProjectNotebook(project, options = {}) {
         }
         finally { if (!disposed) reportButton.disabled = notebookReadOnly; }
       });
-      footerActions.append(reportButton, researchButton, coordinateButton);
+      footerActions.append(researchButton, coordinateButton);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
       // The indicator paints connected hosts on the next frame. Schedule it
@@ -28353,6 +28354,7 @@ async function renderProjectNotebook(project, options = {}) {
         await refreshProjectReportMembership(projectID);
         return true;
       };
+      noteMenu.titleAction.append(reportButton);
       footer.append(reportMembership, footerActions);
       const focusedContent = [editorElement];
       if (notebookReadOnly) panel.append(draftStatus);

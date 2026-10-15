@@ -19390,10 +19390,14 @@ dialog.report-screen {
 .report-screen .report-draft-menu-items .report-draft-version-option.is-create { margin-top: 6px; border-top: 1px solid var(--border); border-radius: 0; color: var(--text-primary); }
 .report-screen .report-draft-picker .report-draft-version-list[hidden],
 .report-screen .report-draft-menu-items .report-draft-version-option[hidden] { display: none; }
-.notebook-title-control { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; flex: 0 0 auto; margin: 0 var(--panel-padding) var(--space-3); margin-inline-end: calc(var(--panel-padding) + (var(--panel-title-control-size) - var(--panel-title-icon-size)) / 2); }
+.notebook-title-control { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px; flex: 0 0 auto; margin: 0 var(--panel-padding) var(--space-3); margin-inline-end: calc(var(--panel-padding) + (var(--panel-title-control-size) - var(--panel-title-icon-size)) / 2); }
 .notebook-title-control :is(.notebook-title-text, .notebook-title-editor) { grid-column: 1; grid-row: 1; width: 100%; min-width: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text-primary); font-size: 26px; line-height: 1.3; font-weight: 650; text-align: left; overflow-wrap: anywhere; }
 .notebook-title-control :is(.notebook-title-text, .notebook-title-editor)[hidden] { display: none; }
-.notebook-note-menu { grid-column: 2; grid-row: 1; align-self: center; position: relative; display: block; min-width: 0; margin: 0; padding: 0; background: transparent; border-radius: 0; overflow: visible; }
+.notebook-title-action { grid-column: 2; grid-row: 1; display: flex; align-items: center; }
+.notebook-title-action:empty { display: none; }
+.notebook-title-action .notebook-add-to-report { padding: 8px 0; border: 0; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 12px; font-weight: 400; line-height: 1.5; white-space: nowrap; cursor: pointer; }
+.notebook-title-action .notebook-add-to-report:hover { color: var(--text-primary); }
+.notebook-note-menu { grid-column: 3; grid-row: 1; align-self: center; position: relative; display: block; min-width: 0; margin: 0; padding: 0; background: transparent; border-radius: 0; overflow: visible; }
 .notebook-title-control[hidden], .notebook-note-menu[hidden] { display: none; }
 .notebook-note-menu > summary { display: flex; align-items: center; gap: 8px; list-style: none; padding: 8px 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; cursor: pointer; }
 .notebook-note-menu > summary::-webkit-details-marker { display: none; }
@@ -19411,7 +19415,8 @@ dialog.report-screen {
 .notebook-note-menu-footer .notebook-card-add-action:hover { background: var(--menu-highlight); }
 .notebook-note-menu .notebook-card-rail-actions { position: static; display: flex; margin-left: auto; gap: 6px; transform: none; }
 body .panel-track > article.workspace-panel.notebook-panel .notebook-title-control :is(.notebook-title-text, .notebook-title-editor) { font-size: 26px !important; }
-body .panel-track > article.workspace-panel.notebook-panel .notebook-note-menu > summary { font-size: 12px !important; }
+body .panel-track > article.workspace-panel.notebook-panel .notebook-note-menu > summary,
+body .panel-track > article.workspace-panel.notebook-panel .notebook-add-to-report { font-size: 12px !important; }
 body .panel-track > article.workspace-panel.notebook-panel .notebook-note-menu :is(.notebook-card-tile, .notebook-card-add-action) { font-size: var(--chrome-font-size) !important; }
 body .panel-track > article.workspace-panel.notebook-panel .notebook-note-menu .notebook-card-tile small { font-size: 11px !important; }
 dialog.report-export-review {
