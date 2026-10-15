@@ -4673,6 +4673,21 @@ select option:checked {
   margin-inline: auto;
 }
 
+/* History separators reach the column edges; row content keeps its gutter. */
+.search-panel > .search-results-viewport:has(> .search-results.is-history) {
+  width: calc(100% + (2 * var(--panel-padding)));
+  max-width: none;
+  margin-inline: calc(-1 * var(--panel-padding));
+}
+
+.search-results.is-history .search-jump-open {
+  padding-inline: max(calc(2 * var(--panel-padding)), calc((100% - var(--workspace-content-max-width)) / 2 + var(--panel-padding)));
+}
+
+.search-results.is-history .search-row-actions {
+  padding-inline: max(var(--panel-padding), calc((100% - var(--workspace-content-max-width)) / 2));
+}
+
 .search-results-viewport {
   position: relative;
   display: grid;
@@ -19684,10 +19699,16 @@ dialog.report-export-review {
   border-right: 1px solid var(--border); overflow: hidden;
 }
 .assistant-history-rail > .analysis-content { display: block; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: var(--space-2) 20px 0; margin: 0; width: auto; }
-.assistant-history-rail .research-history-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.assistant-history-rail .research-history-filters {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px;
+  margin-inline: -20px; padding-inline: 20px;
+  border-bottom: 1px solid var(--border);
+}
 .assistant-history-rail .research-history-filters > * { min-width: 0; width: 100%; max-width: 100%; }
-.assistant-history-rail .research-conversation-list { margin: 0; width: 100%; }
-.assistant-history-rail .research-conversation-row { padding: 0; border: 0; }
+.assistant-history-rail .research-history-filters :is(select, .custom-select-trigger) { border-bottom: 0; }
+.assistant-history-rail .research-conversation-list { margin: 0 -20px; width: calc(100% + 40px); }
+.assistant-history-rail .research-history-group-heading { padding-inline: calc(20px + var(--panel-padding)); }
+.assistant-history-rail .research-conversation-row { padding: 0 20px; border: 0; }
 .assistant-history-rail .research-conversation-row + .research-conversation-row { border-top: 1px solid var(--border); }
 .assistant-history-rail .research-conversation-open { display: block; padding: 10px 0; }
 .assistant-history-rail .research-conversation-open strong { white-space: normal; overflow-wrap: anywhere; font-size: 12px; font-weight: 400; line-height: 1.5; }
