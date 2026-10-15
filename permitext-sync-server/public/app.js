@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-report-status-footer-v1068";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-reader-code-search-v1069";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-report-status-footer-v1068";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-reader-code-search-v1069";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-report-status-footer-v1068";
+} from "./offline-storage.js?v=20261015-reader-code-search-v1069";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-report-status-footer-v1068";
+} from "./workspace-state.js?v=20261015-reader-code-search-v1069";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17535,9 +17535,10 @@ async function restoreReaderAfterSearch(panel, reader) {
   if (scrollPosition) restoreReaderScrollPositions(new Map([[paneIDForReader(reader), scrollPosition]]));
 }
 
-async function fetchReaderChapterSearch(reader, query, signal) {
+async function fetchReaderChapterSearch(reader, query, signal, { scope = "chapter" } = {}) {
   const codeVersion = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix));
   const params = new URLSearchParams({ bodyContract: "2", readerSearch: query.trim() });
+  if (scope === "code") params.set("readerScope", "code");
   const path = `/code/chapters/${encodeURIComponent(reader.chapterID)}?${params}`;
   let payload;
   let availabilityFailure = false;
@@ -17570,23 +17571,41 @@ async function fetchReaderChapterSearch(reader, query, signal) {
     const offline = await offlineAPI(path).catch(() => null);
     if (signal.aborted) throw new DOMException("Search cancelled", "AbortError");
     if (!offline?.chapter || String(offline.chapter.id) !== String(reader.chapterID)) throw error;
-    const chapter = offline.chapter;
-    const range = chapter.bodyRange;
-    if (syncCodeVersion(chapter.codeVersion) !== codeVersion || !Array.isArray(chapter.sections) ||
-        !range?.complete || range.start !== 0 || range.end !== chapter.sections.length ||
-        range.total !== chapter.sections.length || chapter.sections.some(section => !Array.isArray(section.blocks))) throw error;
-    const sections = (chapter.sections || []).map(section => ({
-      ...section,
-      displayTitle: sectionDisplayTitle(section.sectionNumber, section.title),
-      blocks: annotatedBlocksForSection(section)
-        .map((block, index) => ({
-          blockID: normalizeAnnotationBlockID(block?.id || block?.tableID || block?.imageID || `block-${index + 1}`),
-          text: plainTextForSearchBlock(block).replace(/\s+/g, " ").trim()
-        }))
-    }));
-    const matches = searchReaderTextSections(sections, query);
-    return /^[a-f0-9]{64}$/.test(chapter.corpusRevision || "")
-      ? matches.map(item => ({ ...item, corpusRevision: chapter.corpusRevision })) : matches;
+    const installed = scope === "code"
+      ? await offlineAPI(`/code/chapters?code=${encodeURIComponent(reader.codePrefix)}`) : null;
+    if (scope === "code" && !Array.isArray(installed?.chapters)) throw error;
+    const others = (installed?.chapters || []).filter(chapter =>
+      chapter.codePrefix === reader.codePrefix && String(chapter.id) !== String(reader.chapterID));
+    const matches = [];
+    for (const entry of [offline.chapter, ...others]) {
+      signal.throwIfAborted();
+      const chapter = entry === offline.chapter ? entry
+        : (await offlineAPI(`/code/chapters/${encodeURIComponent(entry.id)}`))?.chapter;
+      if (!chapter || String(chapter.id) !== String(entry.id)) throw error;
+      // An installed library can contain older editions of the same code.
+      if (entry !== offline.chapter && syncCodeVersion(chapter.codeVersion) !== codeVersion) continue;
+      if (scope === "code" && chapter.codePrefix !== reader.codePrefix) throw error;
+      const range = chapter.bodyRange;
+      if (syncCodeVersion(chapter.codeVersion) !== codeVersion || !Array.isArray(chapter.sections) ||
+          !range?.complete || range.start !== 0 || range.end !== chapter.sections.length ||
+          range.total !== chapter.sections.length || chapter.sections.some(section => !Array.isArray(section.blocks))) throw error;
+      const sections = (chapter.sections || []).map(section => ({
+        ...section,
+        displayTitle: sectionDisplayTitle(section.sectionNumber, section.title),
+        blocks: annotatedBlocksForSection(section)
+          .map((block, index) => ({
+            blockID: normalizeAnnotationBlockID(block?.id || block?.tableID || block?.imageID || `block-${index + 1}`),
+            text: plainTextForSearchBlock(block).replace(/\s+/g, " ").trim()
+          }))
+      }));
+      matches.push(...searchReaderTextSections(sections, query).map(item => ({ ...item,
+        ...(scope === "code" ? { chapterID: chapter.id, chapterNumber: chapter.chapterNumber,
+          chapterTitle: chapter.fullTitle || chapter.displayTitle } : {}),
+        ...(/^[a-f0-9]{64}$/.test(chapter.corpusRevision || "") ? { corpusRevision: chapter.corpusRevision } : {})
+      })));
+    }
+    signal.throwIfAborted();
+    return matches;
   }
   if (signal.aborted) throw new DOMException("Search cancelled", "AbortError");
   const result = payload?.readerSearch;
@@ -17594,6 +17613,31 @@ async function fetchReaderChapterSearch(reader, query, signal) {
       !/^[a-f0-9]{64}$/.test(result.corpusRevision || "") ||
       result.query !== query.trim() || !Array.isArray(result.results) || result.total !== result.results.length) {
     throw new Error("Chapter search identity mismatch");
+  }
+  if (scope === "code") {
+    if (result.scope !== "code" || result.codePrefix !== reader.codePrefix || !Array.isArray(result.chapters)) {
+      throw new Error("Code search identity mismatch");
+    }
+    const chapters = new Map();
+    for (const chapter of result.chapters) {
+      const id = String(chapter.chapterID || "");
+      if (!id || chapters.has(id) || typeof chapter.chapterTitle !== "string" ||
+          !/^[a-f0-9]{64}$/.test(chapter.corpusRevision || "") || !Number.isSafeInteger(chapter.total) || chapter.total < 0) {
+        throw new Error("Code search identity mismatch");
+      }
+      chapters.set(id, chapter);
+    }
+    if (chapters.get(String(reader.chapterID))?.corpusRevision !== result.corpusRevision ||
+        [...chapters.values()].reduce((total, chapter) => total + chapter.total, 0) !== result.total) {
+      throw new Error("Code search identity mismatch");
+    }
+    for (const item of result.results) {
+      const chapter = chapters.get(String(item.chapterID));
+      if (!chapter || item.corpusRevision !== chapter.corpusRevision || item.chapterTitle !== chapter.chapterTitle) {
+        throw new Error("Code search identity mismatch");
+      }
+    }
+    return result.results;
   }
   return result.results.map(item => ({ ...item, corpusRevision: result.corpusRevision }));
 }
@@ -17619,10 +17663,10 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   clear(content);
   content.classList.add("is-searching-reader");
   content.scrollTop = 0;
-  emptyReader(content, "Searching this chapter", "Finding matching sections in the code text.");
+  emptyReader(content, "Searching this code", "Finding matches in this chapter and other chapters.");
   let matches;
   try {
-    matches = await fetchReaderChapterSearch(reader, query, controller.signal);
+    matches = await fetchReaderChapterSearch(reader, query, controller.signal, { scope: "code" });
   } catch {
     if (panel.isConnected && panel.dataset.readerSearchToken === searchToken) {
       emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
@@ -17641,11 +17685,29 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   const results = document.createElement("section");
   results.className = "reader-internal-results";
   if (!matches.length) {
-    emptyReader(content, "No match in this chapter", "Try a shorter phrase, or use Search to look across codes.");
+    emptyReader(content, "No match in this code", "Try a shorter phrase, or use Search to look across codes.");
     return;
   }
 
+  let chapterID = String(reader.chapterID);
+  const chapterHeading = (title) => {
+    const heading = document.createElement("h3");
+    heading.className = "reader-internal-results-heading";
+    heading.textContent = title;
+    results.append(heading);
+  };
+  chapterHeading("Current chapter");
+  if (!matches.some(result => String(result.chapterID) === chapterID)) {
+    const empty = document.createElement("p");
+    empty.className = "reader-internal-results-empty";
+    empty.textContent = "No matches in this chapter.";
+    results.append(empty);
+  }
   matches.forEach((result) => {
+    if (String(result.chapterID) !== chapterID) {
+      chapterID = String(result.chapterID);
+      chapterHeading(result.chapterTitle);
+    }
     const row = document.createElement("button");
     row.className = "reader-internal-result";
     row.type = "button";
@@ -17661,6 +17723,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       const searchBox = panel.querySelector(".reader-internal-search");
       const searchButton = panel.querySelector(".reader-internal-search-toggle");
       panel.dataset.readerSearchToken = `selected:${Date.now()}`;
+      reader.chapterID = result.chapterID;
       reader.sectionID = result.sectionID;
       reader.sectionNumber = result.sectionNumber || "";
       reader.title = result.title || "Reader";
@@ -17675,7 +17738,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
       saveWorkspaceState();
-      await renderSectionContent(panel, reader, { expectedCorpusRevision: result.corpusRevision });
+      await refreshReaderContent(panel, reader, { expectedCorpusRevision: result.corpusRevision });
     });
     results.append(row);
   });

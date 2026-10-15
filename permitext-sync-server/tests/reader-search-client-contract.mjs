@@ -13,7 +13,7 @@ const complete = () => ({ chapter: { id: reader.chapterID, codeVersion: reader.c
   { id: "section-1", sectionNumber: "1", title: "Walls", blocks: [{ id: "paragraph-1", plainText: "Concrete and masonry walls." }] },
   { id: "section-2", sectionNumber: "2", title: "Remote section", blocks: [{ id: "paragraph-2", plainText: "Concrete at the chapter end." }] }
 ] } });
-function harness({ fetchImpl = async () => { throw new Error("network failure"); }, offline = complete(), capable = true } = {}) {
+function harness({ fetchImpl = async () => { throw new Error("network failure"); }, offline = complete(), offlineImpl, capable = true } = {}) {
   let offlineCalls = 0;
   const restored = [], scrollRestored = [], cleared = [], timers = new Map([["reader", 123]]);
   const context = vm.createContext({
@@ -23,7 +23,7 @@ function harness({ fetchImpl = async () => { throw new Error("network failure");
     renderSectionContent: async (...args) => restored.push(args),
     paneIDForReader: () => "reader:pane", restoreReaderScrollPositions: (positions) => { assert.equal(restored.length, 1); scrollRestored.push(positions); },
     fetch: fetchImpl, hasCapability: () => capable,
-    offlineAPI: async () => { offlineCalls++; return offline; },
+    offlineAPI: async path => { offlineCalls++; return offlineImpl ? offlineImpl(path) : offline; },
     sectionDisplayTitle: (number, title) => `${number} ${title}`,
     annotatedBlocksForSection: (section) => section.blocks,
     normalizeAnnotationBlockID: (id) => id.trim(),
@@ -31,7 +31,7 @@ function harness({ fetchImpl = async () => { throw new Error("network failure");
     syncCodeVersion: (value) => value, syncCodeVersionForPrefix: () => "2022"
   });
   vm.runInContext(helpers + "\nglobalThis.search = fetchReaderChapterSearch; globalThis.cancel = cancelReaderInternalSearch; globalThis.restore = restoreReaderAfterSearch;", context);
-  return { context, timers, restored, scrollRestored, cleared, get offlineCalls() { return offlineCalls; }, search: (query = "concrete", signal = new AbortController().signal) => context.search(reader, query, signal) };
+  return { context, timers, restored, scrollRestored, cleared, get offlineCalls() { return offlineCalls; }, search: (query = "concrete", signal = new AbortController().signal, options) => context.search(reader, query, signal, options) };
 }
 {
   const t = harness();
@@ -121,3 +121,41 @@ for (const status of [400,401,403,404,409]) {
  const t=harness({fetchImpl:async()=>({ok:true,json:async()=>{throw new SyntaxError('invalid response');}})});
  await assert.rejects(t.search(),/invalid response/);assert.equal(t.offlineCalls,0,'malformed online representation is not an availability fallback');
 }
+
+function codeResponse(mutate = () => {}) {
+  const chapters = [
+    {chapterID: reader.chapterID, chapterTitle: "Chapter 33", corpusRevision: "a".repeat(64), total: 1},
+    {chapterID: "chapter-34", chapterTitle: "Chapter 34", corpusRevision: "b".repeat(64), total: 1}
+  ];
+  const result = {scope: "code", codePrefix: "BC", chapterID: reader.chapterID, codeVersion: "2022", corpusRevision: "a".repeat(64), query: "concrete", chapters, total: 2,
+    results: chapters.map((chapter, i) => ({...chapter, sectionID: `section-${i+1}`, heading: "Concrete"}))};
+  mutate(result);
+  return {ok: true, json: async () => ({readerSearch: result})};
+}
+{
+  let url;
+  const results = await harness({fetchImpl: async path => {url=path; return codeResponse();}}).search("concrete", undefined, {scope: "code"});
+  assert.equal(new URL(url,"https://test.local").searchParams.get("readerScope"),"code");
+  assert.deepEqual(Array.from(results, item => item.chapterID),[reader.chapterID,"chapter-34"]);
+  assert.equal(results[1].corpusRevision,"b".repeat(64),"each chapter keeps its own opening revision");
+}
+for (const mutate of [
+  x=>{delete x.scope;}, x=>{x.codePrefix="PC";}, x=>{x.chapters[1].corpusRevision="invalid";},
+  x=>{x.results[1].chapterID="unlisted";}, x=>{x.results[1].corpusRevision=x.corpusRevision;},
+  x=>{x.chapters[1].total=3;}, x=>{x.chapters.push(x.chapters[0]);}
+]) {
+  await assert.rejects(harness({fetchImpl: async()=>codeResponse(mutate)}).search("concrete",undefined,{scope:"code"}),/identity mismatch/);
+}
+{
+  const current=complete().chapter;
+  Object.assign(current,{fullTitle:"Chapter 33"});
+  const other={...complete().chapter,id:"chapter-34",fullTitle:"Chapter 34",corpusRevision:"b".repeat(64)};
+  const historical={...other,id:"historical-34",codeVersion:"2014"};
+  const chapters=[current,other,historical];
+  const t=harness({offlineImpl: path=>path.startsWith("/code/chapters?") ? {chapters} : {chapter: chapters.find(x=>path.startsWith(`/code/chapters/${x.id}`))}});
+  const results=await t.search("concrete",undefined,{scope:"code"});
+  assert.deepEqual([...new Set(Array.from(results,x=>x.chapterID))],[reader.chapterID,"chapter-34"]);
+  other.bodyRange={...other.bodyRange,complete:false};
+  await assert.rejects(t.search("concrete",undefined,{scope:"code"}),/network failure/,"an incomplete sibling cannot masquerade as a full code search");
+}
+console.log("Reader code search client passed: chapter grouping identities, exact revisions, and complete offline code scope.");

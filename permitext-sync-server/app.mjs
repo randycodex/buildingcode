@@ -22874,12 +22874,8 @@ export function canonicalConstructionNavigationChapters(chapters = []) {
   return remaining;
 }
 
-async function handleCodeChapters(request, response) {
-  const url = requestURL(request);
-  const codePrefix = url.searchParams.get("code")?.trim().toUpperCase();
-  const requestedVersion = canonicalCodeVersion(url.searchParams.get("version") || "");
+async function codeNavigationChapters(codePrefix, requestedVersion) {
   const historical2014Requested = requestedVersion === historicalConstructionSyncCodeVersion;
-  const startupView = url.searchParams.get("view") === "startup";
   const chapters = historical2014Requested
     ? (await historicalConstructionChapterIndex()).map(withNavigationHierarchy)
     : [
@@ -22892,9 +22888,16 @@ async function handleCodeChapters(request, response) {
   const selectedChapters = codePrefix
     ? chapters.filter((chapter) => chapter.codePrefix === codePrefix)
     : chapters;
-  const navigationChapters = canonicalConstructionNavigationChapters(selectedChapters);
+  return canonicalConstructionNavigationChapters(selectedChapters);
+}
+
+async function handleCodeChapters(request, response) {
+  const url = requestURL(request);
+  const codePrefix = url.searchParams.get("code")?.trim().toUpperCase();
+  const requestedVersion = canonicalCodeVersion(url.searchParams.get("version") || "");
+  const navigationChapters = await codeNavigationChapters(codePrefix, requestedVersion);
   sendPublicCodeJSON(request, response, {
-    chapters: startupView ? navigationChapters.map(startupChapterSummary) : navigationChapters
+    chapters: url.searchParams.get("view") === "startup" ? navigationChapters.map(startupChapterSummary) : navigationChapters
   });
 }
 
@@ -23005,7 +23008,13 @@ async function sendCodeChapter(request, response, payload) {
   }
   if (searchQuery !== null) {
     try {
-      const readerSearch = await searchIndexedReaderChapter(chapter, searchQuery);
+      if (requestURL(request).searchParams.get("readerScope") === "code" && searchQuery.length > 200) {
+        sendError(response, 400, "Search queries are limited to 200 characters.");
+        return;
+      }
+      const readerSearch = requestURL(request).searchParams.get("readerScope") === "code"
+        ? await searchReaderCode(request, chapter, searchQuery)
+        : await searchIndexedReaderChapter(chapter, searchQuery);
       sendPublicCodeJSON(request, response, { readerSearch });
     } catch (error) {
       if (!(error instanceof ReaderSearchIndexError)) throw error;
@@ -23016,17 +23025,46 @@ async function sendCodeChapter(request, response, payload) {
   sendPublicCodeJSON(request, response, { chapter });
 }
 
+async function searchReaderCode(request, currentChapter, query) {
+  const catalog = await codeNavigationChapters(currentChapter.codePrefix, currentChapter.codeVersion);
+  const chapters = [], results = [];
+  // Search manifests and compact indexes only; never hydrate every chapter body.
+  const ordered = [currentChapter, ...catalog.filter(item => String(item.id) !== String(currentChapter.id))];
+  for (const entry of ordered) {
+    const payload = entry === currentChapter ? null : await codeChapterPayload(request, String(entry.id));
+    const chapter = entry === currentChapter ? currentChapter : payload?.chapter && await chapterBodyContractResponse(payload.chapter, {
+      enabled: true, defaultCodeVersion: defaultSyncCodeVersion, authoredRoot: authoredNYCCodeContentPath
+    });
+    if (!chapter || chapter.codePrefix !== currentChapter.codePrefix || chapter.codeVersion !== currentChapter.codeVersion) {
+      throw new ReaderSearchIndexError("READER_SEARCH_INDEX_INVALID", "Reader search chapter source mismatch");
+    }
+    const match = await searchIndexedReaderChapter(chapter, query);
+    const identity = { chapterID: chapter.id, chapterNumber: chapter.chapterNumber,
+      chapterTitle: chapter.fullTitle || chapter.displayTitle, corpusRevision: chapter.corpusRevision };
+    chapters.push({ ...identity, total: match.total });
+    results.push(...match.results.map(item => ({ ...item, ...identity })));
+  }
+  return { scope: "code", chapterID: currentChapter.id, codePrefix: currentChapter.codePrefix,
+    codeVersion: currentChapter.codeVersion, corpusRevision: currentChapter.corpusRevision,
+    query: query.trim(), chapters, total: results.length, results };
+}
+
 async function handleCodeChapter(request, path, response) {
   const chapterID = path.split("/").at(-1);
   if (!/^[a-zA-Z0-9_-]+$/.test(chapterID || "")) {
     sendError(response, 400, "Invalid chapter ID.");
     return;
   }
+  const payload = await codeChapterPayload(request, chapterID);
+  if (!payload) { sendNotFound(response); return; }
+  await sendCodeChapter(request, response, payload);
+}
+
+async function codeChapterPayload(request, chapterID) {
   if (isEnactedCodeChapterID(chapterID) || isEnactedNavigationChapterID(chapterID)) {
     const resolved = await enactedChapterByAnyID(chapterID);
     if (!resolved?.chapter || !resolved.summary) {
-      sendNotFound(response);
-      return;
+      return null;
     }
     const { chapter, summary, sourceSummary } = resolved;
     const sections = flattenChapterSections(chapter).map((section) => ({
@@ -23042,7 +23080,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => enactedSection(section.id)
     );
-    await sendCodeChapter(request, response, {
+    return {
       chapter: {
         id: summary.id,
         sourceChapterID: summary.sourceChapterID || chapter.chapterID,
@@ -23060,8 +23098,7 @@ async function handleCodeChapter(request, path, response) {
         sections: hydrated.sections,
         ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
       }
-    });
-    return;
+    };
   }
   if (isHistoricalConstructionChapterID(chapterID)) {
     const [chapter, chapterSummary] = await Promise.all([
@@ -23071,8 +23108,7 @@ async function handleCodeChapter(request, path, response) {
       )
     ]);
     if (!chapter || !chapterSummary) {
-      sendNotFound(response);
-      return;
+      return null;
     }
     const sections = flattenChapterSections(chapter);
     const hydrated = await chapterSectionsWithRequestedBodies(
@@ -23080,7 +23116,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => historicalConstructionSection(section.id)
     );
-    await sendCodeChapter(request, response, {
+    return {
       chapter: {
         id: chapter.chapterID,
         codePrefix: chapterSummary.codePrefix,
@@ -23094,8 +23130,7 @@ async function handleCodeChapter(request, path, response) {
         sections: hydrated.sections,
         ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
       }
-    });
-    return;
+    };
   }
   if (isExistingBuildingChapterID(chapterID)) {
     const [chapter, chapterSummary] = await Promise.all([
@@ -23105,8 +23140,7 @@ async function handleCodeChapter(request, path, response) {
       )
     ]);
     if (!chapter || !chapterSummary) {
-      sendNotFound(response);
-      return;
+      return null;
     }
     const sections = flattenChapterSections(chapter);
     const hydrated = await chapterSectionsWithRequestedBodies(
@@ -23114,7 +23148,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => existingBuildingSection(section.id)
     );
-    await sendCodeChapter(request, response, {
+    return {
       chapter: {
         id: chapter.chapterID,
         codePrefix: existingBuildingCodePrefix,
@@ -23127,8 +23161,7 @@ async function handleCodeChapter(request, path, response) {
         sections: hydrated.sections,
         ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
       }
-    });
-    return;
+    };
   }
   if (isZoningChapterID(chapterID)) {
     const [chapter, chapterSummary] = await Promise.all([
@@ -23136,8 +23169,7 @@ async function handleCodeChapter(request, path, response) {
       zoningChapterIndex().then((entries) => entries.find((entry) => String(entry.id) === chapterID))
     ]);
     if (!chapter || !chapterSummary) {
-      sendNotFound(response);
-      return;
+      return null;
     }
     const sections = flattenChapterSections(chapter);
     const hydrated = await chapterSectionsWithRequestedBodies(
@@ -23145,7 +23177,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => zoningSection(section.id)
     );
-    await sendCodeChapter(request, response, {
+    return {
       chapter: {
         id: chapter.chapterID,
         codePrefix: zoningCodePrefix,
@@ -23158,8 +23190,7 @@ async function handleCodeChapter(request, path, response) {
         sections: hydrated.sections,
         ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
       }
-    });
-    return;
+    };
   }
   const constructionNavigationSummary = canonicalConstructionNavigationChapters(
     await chapterIndex()
@@ -23167,10 +23198,9 @@ async function handleCodeChapter(request, path, response) {
     String(chapter.id) === chapterID && (chapter.sourceChapterIDs || []).length > 1
   );
   if (constructionNavigationSummary) {
-    await sendCodeChapter(request, response, {
+    return {
       chapter: await assembledConstructionNavigationChapter(request, constructionNavigationSummary)
-    });
-    return;
+    };
   }
   const chapter = await readJSONFile(join(chapterContentPath, `${chapterID}.json`));
   const manifest = await chapterManifest();
@@ -23192,7 +23222,7 @@ async function handleCodeChapter(request, path, response) {
         })
   );
 
-  await sendCodeChapter(request, response, {
+  return {
     chapter: {
       id: chapter.chapterID,
       codePrefix,
@@ -23206,7 +23236,7 @@ async function handleCodeChapter(request, path, response) {
       sections: hydrated.sections,
       ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
     }
-  });
+  };
 }
 
 function normalizedMetadataSectionNumber(value) {

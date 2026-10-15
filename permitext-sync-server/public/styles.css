@@ -3510,6 +3510,21 @@ select option:checked {
   padding-top: 0;
 }
 
+.reader-internal-results-heading {
+  margin: var(--space-5) 0 var(--space-2);
+  color: var(--text-secondary);
+  font-family: var(--ui-font-family);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.reader-internal-results-heading:first-child { margin-top: 0; }
+.reader-internal-results-empty {
+  margin: var(--space-2) 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
 .reader-internal-result {
   display: block;
   width: 100%;

@@ -20,6 +20,7 @@ function harness() {
   content.children = ["Original enacted provision"];
   const panel = { dataset: {}, isConnected: true, querySelector: () => content };
   const reader = { chapterID: "synthetic-chapter" };
+  const opened = [];
   const restore = () => { panel.dataset.readerSearchToken = randomUUID(); content.classList.remove("is-searching-reader"); content.children = ["Original enacted provision"]; };
   const context = vm.createContext({ readerSearchMatch, snippetForMatch, readerSearchResultHeading, crypto: { randomUUID }, document: { createElement: element },
     annotatedBlocksForSection: section => section.blocks || [],
@@ -28,12 +29,14 @@ function harness() {
     emptyReader: (node,title,message) => {node.children = [title,message];},
     renderSectionContent: restore, readerSearchTimers: new Map(), clearTimeout,
     AbortController, captureReaderScrollPositions: () => new Map(),
-    fetchReaderChapterSearch(_reader, _query, signal) { const request = { ...deferred(), signal }; requests.push(request); return request.promise; },
+    refreshReaderContent: async (_panel, target, options) => opened.push({ ...target, options }),
+    updateBrowserSectionURL() {}, scheduleContinuitySync() {}, saveWorkspaceState() {},
+    fetchReaderChapterSearch(_reader, _query, signal, options) { assert.equal(options.scope, "code"); const request = { ...deferred(), signal }; requests.push(request); return request.promise; },
     sectionDisplayTitle: (number,title) => `${number} ${title}`, plainTextForSearchBlock: block => block.plainText,
     appendHighlighted: (node,value) => {node.textContent = value;}, snippetForMatch: value => value
   });
   vm.runInContext(source.slice(source.indexOf("function cancelReaderInternalSearch("), source.indexOf("async function fetchReaderChapterSearch(")) + source.slice(start,end+2)+"\nglobalThis.render = renderReaderInternalSearchResults;",context);
-  return {content,panel,requests,restore,run: query => context.render(panel,reader,query)};
+  return {content,panel,requests,restore,opened,run: query => context.render(panel,reader,query)};
 }
 
 // Opening/clearing find preserves the enacted text; it never presents a blank pane.
@@ -49,10 +52,10 @@ function harness() {
 {
   const t=harness(); const older=t.run("sprinkler"); const newer=t.run("stairs");
   assert.equal(t.requests[0].signal.aborted, true, "new query aborts older fetch");
-  t.requests[1].resolve([{sectionID:"stair",sectionNumber:"1",title:"Stairs",heading:"1 Stairs",snippet:"",blockID:""}]); await newer;
-  assert.equal(t.content.children[0].children[0].children[0].textContent,"1 Stairs");
+  t.requests[1].resolve([{chapterID:"synthetic-chapter",sectionID:"stair",sectionNumber:"1",title:"Stairs",heading:"1 Stairs",snippet:"",blockID:""}]); await newer;
+  assert.equal(t.content.children[0].children.find(item => item.className === "reader-internal-result").children[0].textContent,"1 Stairs");
   t.requests[0].resolve([]); await older;
-  assert.equal(t.content.children[0].children[0].children[0].textContent,"1 Stairs");
+  assert.equal(t.content.children[0].children.find(item => item.className === "reader-internal-result").children[0].textContent,"1 Stairs");
   const closed=t.run("sprinkler"); t.restore(); t.requests[2].resolve([]); await closed;
   assert.deepEqual(t.content.children,["Original enacted provision"]);
 }
@@ -63,7 +66,24 @@ function harness() {
   assert.equal(t.content.children[0],"Search could not load");
   assert.equal(t.content.children[2].textContent,"Try again");
   const retry=t.run("sprinkler"); t.requests[1].resolve([]); await retry;
-  assert.equal(t.content.children[0],"No match in this chapter");
+  assert.equal(t.content.children[0],"No match in this code");
+}
+// Cross-chapter matches retain chapter identity and open in this Reader.
+{
+  const t=harness(), pending=t.run("water");
+  t.requests[0].resolve([{chapterID:"other-chapter",chapterTitle:"Chapter 3: General regulations",sectionID:"other-section",heading:"301 Water",snippet:"Water",corpusRevision:"b".repeat(64),matchText:"Water",blockID:"paragraph-2"}]);
+  await pending;
+  const rows=t.content.children[0].children;
+  assert.equal(rows[0].textContent,"Current chapter");
+  assert.equal(rows[1].textContent,"No matches in this chapter.");
+  assert.equal(rows[2].textContent,"Chapter 3: General regulations");
+  // The actual toggle is a DOM element; this fixture needs only its ARIA setter.
+  t.content.setAttribute=()=>{};
+  await rows[3].callbacks.click();
+  assert.equal(t.opened[0].chapterID,"other-chapter");
+  assert.equal(t.opened[0].sectionID,"other-section");
+  assert.equal(t.opened[0].pendingSearchHighlightBlockID,"paragraph-2");
+  assert.equal(t.opened[0].options.expectedCorpusRevision,"b".repeat(64));
 }
 assert.match(source.slice(source.indexOf("async function renderSectionContent("),source.indexOf("async function renderSectionContent(")+220),/readerSearchToken/);
 
