@@ -18229,6 +18229,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-trash-copy p { margin: 0; padding-inline-end: 8px; color: var(--text-secondary); font-size: 12px; line-height: 1.4; text-align: right; }
 .account-screen .settings-trash-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 .account-screen .settings-trash-actions > .settings-trash-action { margin: 0; }
+.account-screen .settings-trash-entry > .settings-trash-actions > .settings-trash-action { color: var(--text-secondary); }
+.account-screen .settings-trash-entry > .settings-trash-actions > .settings-trash-action:hover { color: var(--text-primary); }
+.account-screen .settings-trash-entry > .settings-trash-actions > .settings-trash-action.is-danger:hover { color: var(--destructive); }
 .account-screen .settings-trash-list > .settings-trash-empty { display: block; margin: 8px 0 12px auto; }
 .account-screen .settings-trash-confirm {
   display: grid;
