@@ -18053,6 +18053,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-dialog.account-screen {
   --account-category-gutter: 24px;
   --account-category-top-gutter: 32px;
+  --account-scroll-fade-size: calc(var(--account-category-gutter) + var(--space-3));
   inset: 0;
   width: 100%;
   height: 100dvh;
@@ -18135,8 +18136,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   z-index: 1;
   flex: 0 0 auto;
   margin: 0;
-  padding: var(--account-category-top-gutter) var(--account-category-gutter) 24px;
-  background: var(--background);
+  padding: var(--account-category-top-gutter) var(--account-category-gutter) var(--account-scroll-fade-size);
+  background: linear-gradient(to bottom, var(--background) 0, var(--background) calc(100% - var(--account-scroll-fade-size)), transparent 100%);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 650;

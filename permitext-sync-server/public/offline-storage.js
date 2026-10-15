@@ -21,14 +21,14 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1613";
-const shellAssetVersion = "20261015-recovery-chevrons-v1028";
+const shellCacheName = "permitext-pro-shell-v1614";
+const shellAssetVersion = "20261015-account-scroll-fade-v1029";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
   "/web/project-details-columns.js?v=20261015-project-details-resize-v1",
-  "/web/workspace-button-icons.js?v=20261015-recovery-chevrons-v1028",
+  "/web/workspace-button-icons.js?v=20261015-account-scroll-fade-v1029",
   "/web/minimal-workflow.js",
   "/web/notebook-questions.js",
   "/web/project-workflow.js?v=20261011-workflow-v4",
@@ -69,21 +69,21 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261015-recovery-chevrons-v1028",
+  "/web/styles.css?v=20261015-account-scroll-fade-v1029",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261015-recovery-chevrons-v1028",
+  "/web/app.js?v=20261015-account-scroll-fade-v1029",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261015-recovery-chevrons-v1028",
+  "/web/offline-storage.js?v=20261015-account-scroll-fade-v1029",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
-  "/web/workspace-state.js?v=20261015-recovery-chevrons-v1028",
+  "/web/workspace-state.js?v=20261015-account-scroll-fade-v1029",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
   "/web/code-question-client-state.js?v=20260914-question-state-v4",
@@ -102,7 +102,7 @@ const shellURLs = [
   "/web/workflow-views.js?v=7",
   "/web/report-screen.js?v=20261011-shared-shell-v6",
   "/web/report-library.js?v=20261012-sidebar-width-v8",
-  "/web/notebook-note-menu.js?v=20261015-recovery-chevrons-v1028",
+  "/web/notebook-note-menu.js?v=20261015-account-scroll-fade-v1029",
   "/web/reader-render-batches.js?v=20261012-reader-batches-v1",
   "/web/search-query-session.js?v=20261012-search-session-v2",
   "/web/report-pdf-preview.js?v=20261012-report-preview-v4",
