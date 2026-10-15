@@ -56,6 +56,24 @@ export function trashSummary(batch) {
   return {...summary, title, count:records.length};
 }
 
+// Only display fields leave storage; recovery records and account identifiers stay private.
+export function trashContents(batch) {
+  const text = (value, limit = 600) => String(value ?? '').replace(/\s+/g, ' ').trim().slice(0, limit);
+  return {...trashSummary(batch), items: batch.records.map(({kind, record}) => ({
+    kind,
+    name: kind === 'project' ? text(record.name || record.title, 200) : '',
+    folderType: record.folderType === 'reference' ? 'reference' : 'project',
+    codeVersion: text(record.codeVersion, 300),
+    codePrefix: text(record.codePrefix, 30),
+    codeEdition: text(record.codeEdition, 80),
+    sectionID: record.sectionID ?? null,
+    sectionNumber: text(record.sectionNumber, 80),
+    title: text(record.title || record.sectionTitle, 200),
+    blockID: text(record.blockID, 200),
+    excerpt: text(kind === 'annotation' ? record.noteBody : record.selectedText || record.previewText || record.excerpt)
+  }))};
+}
+
 export function restoreTrash(batch, current, now = new Date()) {
   if (!batch || Date.parse(batch.expiresAt) <= now.getTime()) throw new Error('This Trash entry has expired.');
   const byID = new Map(current.map(entry).filter(([,r]) => r?.id).map(([k,r])=>[r.id,[k,r]]));

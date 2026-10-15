@@ -1,5 +1,5 @@
 import { planSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
-import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
+import { captureTrash, restoreTrash, trashSummary, trashContents } from "./trash-recovery.mjs";
 import { freePlanMutationDecision } from "./entitlement-contract.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
 
@@ -735,6 +735,11 @@ export function createPostgresSyncRepository(sql) {
   }
 
   async function trashAction(userID, action, id) {
+    if (action === "inspect") {
+      const rows = await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${id} AND expires_at > CURRENT_TIMESTAMP`;
+      if (!rows.length) throw new Error("Trash entry is unavailable or expired.");
+      return {entry: trashContents(safeJSON(rows[0].batch, {}))};
+    }
     let restoredCount = 0, skippedCount = 0;
     if (action === "restore") {
       const rows = await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${id} AND expires_at > CURRENT_TIMESTAMP`;

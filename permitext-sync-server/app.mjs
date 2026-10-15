@@ -28,7 +28,7 @@ import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocume
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
 import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, researchQuestionIsConversationRecall } from "./research-question-intent.mjs";
-import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
+import { captureTrash, restoreTrash, trashSummary, trashContents } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
 import { buildResearchClaimScopeContext, researchClaimScopeVerificationInstruction } from "./research-claim-applicability-review.mjs";
@@ -1130,6 +1130,11 @@ export function createFileStoreAdapter() {
         const store = await readUnlocked();
         store.trashByUserID ||= {};
         let batches = (store.trashByUserID[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
+        if (action === "inspect") {
+          const batch = batches.find(b => b.id === id);
+          if (!batch) throw new Error("Trash entry is unavailable or expired.");
+          return {entry: trashContents(batch)};
+        }
         let restoredCount = 0, skippedCount = 0;
         if (action === "restore") {
           const batch = batches.find(b => b.id === id);
@@ -27971,13 +27976,43 @@ async function handleContentTrash(request, response) {
   if (!userID) return sendError(response,400,"Missing user ID.");
   if (!await authenticatedUserContext(request,response,userID)) return;
   const action = body.action || "list";
-  if (!["list","restore","purge","empty"].includes(action)) return sendError(response,400,"Unknown Trash action.");
+  if (!["list","inspect","restore","purge","empty"].includes(action)) return sendError(response,400,"Unknown Trash action.");
   if (["purge","empty"].includes(action) && body.confirmation !== "DELETE") return sendError(response,400,"Type DELETE to permanently remove content from Trash.");
-  if (["restore","purge"].includes(action) && typeof body.id !== "string") return sendError(response,400,"Choose a Trash entry.");
+  if (["inspect","restore","purge"].includes(action) && typeof body.id !== "string") return sendError(response,400,"Choose a Trash entry.");
   try {
     const result = await (await storeAdapter()).trashAction(userID,action,body.id);
+    if (action === "inspect") await enrichTrashContents(result.entry);
     sendJSON(response,200,result);
   } catch (error) { sendError(response,409,error.message || "Trash could not be updated. Please retry."); }
+}
+
+export async function enrichTrashContents(entry) {
+  const catalog = await allSectionCatalogByID();
+  const bodies = new Map(), sources = new Map();
+  const { findActiveCodeSource } = await import("./active-code-source-catalog.mjs");
+  for (const item of entry.items) {
+    if (item.kind === "project") continue;
+    const candidate = catalog.get(String(item.sectionID));
+    const section = candidate && item.codeVersion &&
+      canonicalCodeVersion(item.codeVersion) === canonicalCodeVersion(codeSearchSectionVersion(candidate)) &&
+      (!item.codePrefix || item.codePrefix === candidate.codePrefix) ? candidate : null;
+    if (section) {
+      item.codePrefix ||= section.codePrefix;
+      item.sectionNumber ||= String(section.sectionNumber || "");
+      if (!item.title || item.title === "Section") item.title = section.title || "";
+    }
+    const sourceKey = `${item.codeVersion}:${item.codePrefix}`;
+    if (!sources.has(sourceKey)) sources.set(sourceKey, findActiveCodeSource({canonicalEdition: canonicalCodeVersion(item.codeVersion), codePrefix: item.codePrefix}).catch(() => null));
+    const source = item.codeVersion ? await sources.get(sourceKey) : null;
+    item.codeLabel = source?.categoryLabel || item.codePrefix || "Code not recorded";
+    item.editionLabel = source?.editionLabel || item.codeEdition || "Edition not recorded";
+    if (!item.excerpt && section && item.kind !== "annotation") {
+      if (!bodies.has(section.id)) bodies.set(section.id, searchableSectionBody(section).catch(() => null));
+      const body = await bodies.get(section.id);
+      const blocks = item.blockID ? (body?.blocks || []).filter(block => String(block.id) === item.blockID) : body?.blocks || [];
+      item.excerpt = blocks.map(block => block.plainText || "").join(" ").replace(/\s+/g, " ").trim().slice(0, 600);
+    }
+  }
 }
 
 async function handlePull(request, response) {

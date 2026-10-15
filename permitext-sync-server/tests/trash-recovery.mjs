@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {captureTrash,restoreTrash,trashSummary} from '../trash-recovery.mjs';
+import {captureTrash,restoreTrash,trashSummary,trashContents} from '../trash-recovery.mjs';
 const now=new Date('2026-09-21T12:00:00Z'), old='2026-09-20T12:00:00Z';
 const base={userID:'owner',codeVersion:'nyc-2022',updatedAt:old};
 const existing=[{savedItem:{...base,id:'save',sectionID:545}},{annotation:{...base,id:'note',sectionID:545,noteBody:'Original',tags:['keep']}},{project:{...base,id:'project',name:'Project'}},{projectSection:{...base,id:'member',folderClientID:'project',sectionID:545}}];
@@ -20,6 +20,12 @@ assert(Date.parse(restored.mutations[0].annotation.updatedAt)>now.getTime());
 assert.equal(restoreTrash(notes,[existing[1]],now).skipped,1,'Keep newer/live notes');
 assert.throws(()=>restoreTrash(notes,current,new Date('2026-11-01')),/expired/);
 assert(!('records' in trashSummary(notes)));
+const contents=trashContents(notes);
+assert.equal(contents.items[0].excerpt,'Original');
+assert.equal(contents.items[0].kind,'annotation');
+assert(!('records' in contents));assert(!('userID' in contents));
+assert(!('userID' in contents.items[0]));assert(!('id' in contents.items[0]));
+assert.equal(trashContents({...notes,records:[{kind:'savedItem',record:{...base,sectionID:545,selectedText:'x'.repeat(2000),secret:'private'}}]}).items[0].excerpt.length,600);
 assert.equal(captureTrash('owner',existing,[{codeVersionClear:{...clear('notes').codeVersionClear,codeVersion:'nyc-2014'}}],now),null);
 console.log('Trash recovery: scopes, expiry, ownership, stale writes, newer content, note/tag preservation passed.');
 

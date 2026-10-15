@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-trash-expiry-footer-v1039";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-trash-contents-v1041";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-trash-expiry-footer-v1039";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-trash-contents-v1041";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-trash-expiry-footer-v1039";
+} from "./offline-storage.js?v=20261015-trash-contents-v1041";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-trash-expiry-footer-v1039";
+} from "./workspace-state.js?v=20261015-trash-contents-v1041";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -37373,14 +37373,72 @@ function attachSettingsTrash(panel) {
         row.className = "settings-trash-entry";
         const copy = document.createElement("div");
         copy.className = "settings-trash-copy";
-        const title = document.createElement("strong"); title.textContent = entry.title;
+        const title = document.createElement("button");
+        title.type = "button";
+        title.className = "settings-trash-title";
+        title.textContent = entry.title;
+        title.setAttribute("aria-expanded", "false");
+        const contents = document.createElement("div");
+        contents.className = "settings-trash-contents";
+        contents.id = `settings-trash-contents-${entry.id}`;
+        contents.hidden = true;
+        contents.setAttribute("role", "region");
+        contents.setAttribute("aria-label", `Deleted contents: ${entry.title}`);
+        title.setAttribute("aria-controls", contents.id);
+        let loaded = false, loading = false;
+        const loadContents = async () => {
+          if (loading || !isCurrentAccountRequest(identity)) return;
+          loading = true;
+          const status = document.createElement("p");
+          status.setAttribute("role", "status");
+          status.textContent = "Loading deleted contents…";
+          contents.replaceChildren(status);
+          try {
+            const detail = await postResearch("/content/trash", {action: "inspect", id: entry.id});
+            if (!isCurrentAccountRequest(identity)) return;
+            if (detail.entry?.id !== entry.id || !Array.isArray(detail.entry.items)) throw new Error("Contents could not be verified. Refresh Trash and try again.");
+            const items = document.createElement("ul");
+            for (const item of detail.entry.items) {
+              const row = document.createElement("li");
+              const kind = item.kind === "project" ? (item.folderType === "reference" ? "Saved collection" : "Project")
+                : item.kind === "annotation" ? "Note" : item.kind === "projectSection" ? "Project evidence" : "Saved passage";
+              const meta = document.createElement("p");
+              meta.className = "settings-trash-item-meta";
+              meta.textContent = [kind, item.codeLabel, item.editionLabel].filter(Boolean).join(" · ");
+              const heading = document.createElement("strong");
+              heading.textContent = item.kind === "project" ? item.name || kind
+                : [item.sectionNumber ? `§ ${item.sectionNumber}` : "", stripLeadingSectionNumber(item.title, item.sectionNumber)].filter(Boolean).join(" · ") || "Section reference unavailable";
+              row.append(meta, heading);
+              if (item.kind !== "project") {
+                const excerpt = document.createElement("p");
+                excerpt.className = "settings-trash-item-excerpt";
+                excerpt.textContent = item.excerpt || (item.kind === "annotation" ? "Note text unavailable for this entry." : "Passage text unavailable for this entry.");
+                row.append(excerpt);
+              }
+              items.append(row);
+            }
+            if (detail.entry.items.length) contents.replaceChildren(items);
+            else { status.textContent = "No item details are available for this entry."; contents.replaceChildren(status); }
+            loaded = true;
+          } catch (error) {
+            if (!isCurrentAccountRequest(identity)) return;
+            status.textContent = error.message || "Contents could not be loaded. Reconnect and try again.";
+            contents.append(button("Retry loading contents", loadContents));
+          } finally { loading = false; }
+        };
+        title.addEventListener("click", () => {
+          if (!isCurrentAccountRequest(identity)) return;
+          contents.hidden = !contents.hidden;
+          title.setAttribute("aria-expanded", String(!contents.hidden));
+          if (!contents.hidden && !loaded) return loadContents();
+        });
         const date = document.createElement("p");
         date.textContent = `Expires ${new Date(entry.expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
         copy.append(title, date);
         const actions = document.createElement("div");
         actions.className = "settings-trash-actions";
         actions.append(button("Restore", () => update("restore", entry.id)), button("Delete Permanently", () => permanent(row, "purge", entry.id), true));
-        row.append(copy, actions);
+        row.append(copy, actions, contents);
         list.append(row);
       }
       if (result.entries.length) {
