@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-notes-no-dividers-v1002";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-notes-insert-dismiss-v1003";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-notes-no-dividers-v1002";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-notes-insert-dismiss-v1003";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-notes-no-dividers-v1002";
+} from "./offline-storage.js?v=20261014-notes-insert-dismiss-v1003";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-notes-no-dividers-v1002";
+} from "./workspace-state.js?v=20261014-notes-insert-dismiss-v1003";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -5597,6 +5597,30 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
   };
   filterRail.addEventListener("transitionend", hideFilterRail);
   window.setTimeout(hideFilterRail, 500);
+}
+
+function dismissNotebookInsertMenus(event) {
+  const escape = event.type === "keydown";
+  if (escape && event.key !== "Escape") return;
+  let closed = false;
+  document.querySelectorAll(".notebook-format-insert-slot .notebook-reference-menu").forEach((menu) => {
+    if (!escape && menu.contains(event.target)) return;
+    const toggle = menu.querySelector(".code-filter-menu-toggle");
+    const binding = toggle?.__filterMenuBinding;
+    const stateKey = binding?.options.stateKey || "codeFilterMenuOpen";
+    if (!binding?.instance[stateKey]) return;
+    binding.instance[stateKey] = false;
+    updateCodeFilterMenu(binding.filterRail, binding.instance, binding.options);
+    binding.filterRail.hidden = true;
+    if (escape && menu.contains(document.activeElement)) toggle.focus({ preventScroll: true });
+    closed = true;
+  });
+  if (!closed) return;
+  saveWorkspaceState();
+  if (escape) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 }
 
 function wireCodeFilterMenu(filterRail, instance, options = {}) {
@@ -46233,6 +46257,8 @@ document.addEventListener("keydown", (event) => {
 });
 
 // Close workspace disclosures when clicking elsewhere.
+document.addEventListener("pointerdown", dismissNotebookInsertMenus, true);
+document.addEventListener("keydown", dismissNotebookInsertMenus, true);
 document.addEventListener("pointerdown", event => {
   document.querySelectorAll(".search-match-control[open], .report-draft-version-list[open], .notebook-note-menu[open]").forEach(control => {
     if (!control.contains(event.target)) control.open = false;

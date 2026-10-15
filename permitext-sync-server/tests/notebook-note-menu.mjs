@@ -187,3 +187,53 @@ c.controls.render();
 assert.equal(c.controls.newButton.disabled,true);
 assert.equal(c.controls.selectButton.disabled,true);
 console.log('Notebook menu app integration passed: actual setup/render state, switching, title autosave, bulk selection, archive and read-only controls.');
+
+// Exercise Insert dismissal through the actual document bindings, including
+// Escape before the menu's opening animation has moved focus off its button.
+const insertStart = source.indexOf('function dismissNotebookInsertMenus(');
+const insertEnd = source.indexOf('\nfunction wireCodeFilterMenu(', insertStart);
+assert(insertStart > 0 && insertEnd > insertStart);
+const insertListeners = {};
+const outside = {}, nestedChoice = {}, insertRail = {hidden:false};
+const insertState = {referenceMenuOpen:true};
+const insertDocument = {activeElement:outside,
+  querySelectorAll:()=>[insertMenu],
+  addEventListener(type,listener,capture) { assert.equal(capture,true); insertListeners[type]=listener; }};
+const insertToggle = {__filterMenuBinding:{filterRail:insertRail,instance:insertState,options:{stateKey:'referenceMenuOpen'}},
+  focus() { insertDocument.activeElement=insertToggle; }};
+const insertMenu = {contains:element=>element===insertToggle || element===nestedChoice,
+  querySelector:()=>insertToggle};
+let insertUpdates=0, insertSaves=0;
+const insertContext=vm.createContext({document:insertDocument,
+  updateCodeFilterMenu:()=>{insertUpdates++;},saveWorkspaceState:()=>{insertSaves++;}});
+vm.runInContext(source.slice(insertStart,insertEnd)+'\n'+source.match(/document\.addEventListener\("pointerdown", dismissNotebookInsertMenus, true\);\ndocument\.addEventListener\("keydown", dismissNotebookInsertMenus, true\);/)[0],insertContext);
+const dismissInsert = (type,target,key) => {
+  const event={type,target,key,prevented:false,stopped:false,
+    preventDefault(){this.prevented=true;},stopPropagation(){this.stopped=true;}};
+  insertListeners[type](event); return event;
+};
+for (const target of [insertToggle,nestedChoice]) {
+  dismissInsert('pointerdown',target);
+  assert.equal(insertState.referenceMenuOpen,true,'Clicks inside Insert keep its nested choices open');
+}
+dismissInsert('pointerdown',outside);
+assert.equal(insertState.referenceMenuOpen,false,'An outside pointer closes Insert');
+assert.equal(insertRail.hidden,true,'Dismissal hides the popup immediately');
+assert.equal(insertDocument.activeElement,outside,'Outside clicks retain their own focus target');
+for (const target of [insertToggle,nestedChoice,outside]) {
+  insertState.referenceMenuOpen=true; insertRail.hidden=false; insertDocument.activeElement=target;
+  const event=dismissInsert('keydown',target,'Escape');
+  assert.equal(insertState.referenceMenuOpen,false,'Escape closes Insert regardless of focus location');
+  assert.equal(insertRail.hidden,true);
+  assert.equal(event.prevented,true); assert.equal(event.stopped,true);
+  assert.equal(insertDocument.activeElement,target===outside?outside:insertToggle,'Escape returns menu focus without stealing outside focus');
+}
+insertState.referenceMenuOpen=true;
+const typing=dismissInsert('keydown',outside,'a');
+assert.equal(insertState.referenceMenuOpen,true,'Typing is not intercepted');
+assert.equal(typing.prevented,false);
+insertState.referenceMenuOpen=false;
+const closedEscape=dismissInsert('keydown',outside,'Escape');
+assert.equal(closedEscape.prevented,false,'A closed Insert does not consume another control\'s Escape');
+assert.equal(insertUpdates,4); assert.equal(insertSaves,4);
+console.log('Notebook Insert dismissal passed: outside clicks, nested choices, immediate Escape from button/menu/editor, focus retention and closed-menu pass-through.');
