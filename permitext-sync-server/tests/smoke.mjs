@@ -1310,6 +1310,7 @@ async function main() {
     // Exercise the actual width functions across main columns and restored
     // layouts instead of requiring the retired four-column implementation.
     await import("./reader-width-contract.mjs");
+    await import("./evidence-scroll-contract.mjs");
     assert(
       workspaceStyles.text.match(/\.pane-divider \{[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.match(/\.panel-track > \.workspace-panel \{[\s\S]*?border-inline: 0;/) &&

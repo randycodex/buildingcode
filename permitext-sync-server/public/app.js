@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-note-style-menu-v1011";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-evidence-scroll-v1012";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-note-style-menu-v1011";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-evidence-scroll-v1012";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-note-style-menu-v1011";
+} from "./offline-storage.js?v=20261014-evidence-scroll-v1012";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-note-style-menu-v1011";
+} from "./workspace-state.js?v=20261014-evidence-scroll-v1012";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -33851,6 +33851,8 @@ function populateSavedEvidenceSection(section, savedInstance, folder, ...childre
   body.id = `saved-evidence-${safeAnnotationIDPart(folderID)}-${safeAnnotationIDPart(savedInstance.id)}`;
   title.setAttribute("aria-controls", body.id);
   if (folderIsProject(folder)) {
+    // This section stays expanded; its open state also constrains the scroll body.
+    section.classList.add("is-open");
     title.remove();
     if (!folder.sharedOnly && hasCapability("professional-exports")) {
       const destination = reportMembershipIndicator(projectDetailKey(projectIdentity(folder)), "destination", {});
