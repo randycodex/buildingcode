@@ -19459,6 +19459,21 @@ dialog.report-export-review {
 .workflow-toolbar > [hidden], .panel-track > .is-workflow-hidden { display: none !important; }
 .workflow-toolbar .toolbar-button { background: transparent; border: 0; border-radius: 0; padding: 4px 0; color: var(--text-secondary); font-size: 13px; }
 .workflow-toolbar .toolbar-button svg { display: none; }
+.workspace-shell button.has-workspace-button-icon {
+  --workspace-button-icon-size: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.workspace-shell button.has-workspace-button-icon > svg.workspace-button-icon {
+  display: block;
+  width: var(--workspace-button-icon-size);
+  height: var(--workspace-button-icon-size);
+  flex: 0 0 var(--workspace-button-icon-size);
+  color: inherit;
+  pointer-events: none;
+}
 .workflow-toolbar .toolbar-button:hover { color: var(--text); }
 .topbar-actions > :is([data-workflow-view], #toggle-report) { color: var(--text-secondary); }
 .topbar-actions > :is([data-workflow-view], #toggle-report)[aria-pressed="true"] { color: var(--text); font-weight: 700; }

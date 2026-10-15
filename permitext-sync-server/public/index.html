@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261010-definition-text-v88">
-    <link rel="stylesheet" href="/web/styles.css?v=20261014-empty-research-v982">
+    <link rel="stylesheet" href="/web/styles.css?v=20261014-toolbar-icons-v985">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -40,9 +40,9 @@
     <main class="workspace-shell">
       <header class="topbar">
         <nav class="topbar-actions" aria-label="Working views">
-<button class="toolbar-button" type="button" data-workflow-view="research" aria-pressed="true">Research</button>
-<button class="toolbar-button" type="button" data-workflow-view="notebook" aria-pressed="false">Notebook</button>
-<button class="toolbar-button" id="toggle-report" type="button" aria-label="Report" title="Choose a Project to open Report" aria-pressed="false" disabled>
+<button class="toolbar-button" type="button" data-workflow-view="research" aria-pressed="true" data-workspace-icon="book-open">Research</button>
+<button class="toolbar-button" type="button" data-workflow-view="notebook" aria-pressed="false" data-workspace-icon="notepad-text">Notebook</button>
+<button class="toolbar-button" id="toggle-report" type="button" aria-label="Report" title="Choose a Project to open Report" aria-pressed="false" disabled data-workspace-icon="summary">
             <span>Report</span>
           </button><button class="mobile-more-button" id="mobile-more" type="button" aria-label="More" title="More" aria-haspopup="dialog" aria-expanded="false" data-mobile-label="More">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
@@ -68,12 +68,12 @@
             </details>
           </div>
           <div class="topbar-workspaces" aria-label="Projects">
-            <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Choose Project" title="Projects" aria-haspopup="menu" aria-expanded="false">
+            <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Choose Project" title="Projects" aria-haspopup="menu" aria-expanded="false" data-workspace-icon="folder">
               <span class="workspace-current-name">Projects</span>
             </button>
           </div>
-          <button class="topbar-settings-button" id="open-project-details" type="button">Project details</button>
-          <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Account" title="Account" aria-pressed="false">Account</button>
+          <button class="topbar-settings-button" id="open-project-details" type="button" data-workspace-icon="layout-list">Project details</button>
+          <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Account" title="Account" aria-pressed="false" data-workspace-icon="user-round">Account</button>
         </div>
         <div class="topbar-account-state">
           <div class="topbar-brand" aria-label="permitext">
@@ -82,37 +82,15 @@
           </div>
         </div>
       </header>
-<nav class="workflow-toolbar" aria-label="Tools for current view"><div data-workflow-tools="research"><button class="toolbar-button" id="add-reader" data-open-reader type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
-              <path d="m9 9.5 2 2 4-4"></path>
-            </svg>
+<nav class="workflow-toolbar" aria-label="Tools for current view"><div data-workflow-tools="research"><button class="toolbar-button" id="add-reader" data-open-reader type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader" data-workspace-icon="library-big">
             <span>Reader</span>
-          </button><button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m21 21-4.34-4.34"></path>
-              <circle cx="11" cy="11" r="8"></circle>
-            </svg>
+          </button><button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search" data-workspace-icon="search">
             <span>Search</span>
-          </button><button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Assistant" title="Assistant" aria-pressed="false" data-mobile-label="Assistant">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 18V5"></path>
-              <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"></path>
-              <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"></path>
-              <path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"></path>
-              <path d="M18 18a4 4 0 0 0 2-7.464"></path>
-              <path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"></path>
-              <path d="M6 18a4 4 0 0 1-2-7.464"></path>
-              <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path>
-            </svg>
+          </button><button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Assistant" title="Assistant" aria-pressed="false" data-mobile-label="Assistant" data-workspace-icon="bot-message-square">
             <span>Assistant</span>
-          </button></div><div data-workflow-tools="notebook" hidden><button class="toolbar-button" id="add-notebook-reader" data-open-reader type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader"><span>Reader</span></button><button class="toolbar-button" id="toggle-saved" type="button" aria-label="Evidence" title="Evidence" aria-pressed="false" data-mobile-label="Evidence">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
-              <circle cx="12" cy="13" r="1"></circle>
-            </svg>
+          </button></div><div data-workflow-tools="notebook" hidden><button class="toolbar-button" id="add-notebook-reader" data-open-reader type="button" aria-label="Reader" title="Reader" data-mobile-label="Reader" data-workspace-icon="library-big"><span>Reader</span></button><button class="toolbar-button" id="toggle-saved" type="button" aria-label="Evidence" title="Evidence" aria-pressed="false" data-mobile-label="Evidence" data-workspace-icon="list-check">
             <span>Evidence</span>
-          </button><button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notes" title="Choose a Project to open Notebook" aria-pressed="false" disabled>
+          </button><button class="toolbar-button" id="toggle-notebook" type="button" aria-label="Notes" title="Choose a Project to open Notebook" aria-pressed="false" disabled data-workspace-icon="sticky-notes">
             <span>Notes</span>
           </button></div><div hidden><button class="toolbar-button" id="toggle-context" type="button" aria-label="Context" title="Choose a Project to open Context" aria-pressed="false" disabled>
             <span>Context</span>
@@ -588,6 +566,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261014-empty-research-v982" type="module"></script>
+    <script src="/web/app.js?v=20261014-toolbar-icons-v985" type="module"></script>
   </body>
 </html>

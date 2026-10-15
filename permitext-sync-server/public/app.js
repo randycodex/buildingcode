@@ -1,6 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-toolbar-icons-v985";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-empty-research-v982";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-toolbar-icons-v985";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -119,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-empty-research-v982";
+} from "./offline-storage.js?v=20261014-toolbar-icons-v985";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -152,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-empty-research-v982";
+} from "./workspace-state.js?v=20261014-toolbar-icons-v985";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -364,6 +365,9 @@ const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
+document.querySelectorAll("[data-workspace-icon]").forEach(button => {
+  prependWorkspaceButtonIcon(button, button.dataset.workspaceIcon);
+});
 const connectionStatus = document.querySelector("#connection-status");
 const workspaceIssue = document.querySelector("#workspace-issue");
 const workspaceIssueCopy = workspaceIssue?.querySelector(".workspace-issue-copy");
@@ -8457,6 +8461,7 @@ function createReaderToolbarButton() {
   button.dataset.openReader = "";
   const label = document.createElement("span");
   button.append(label);
+  prependWorkspaceButtonIcon(button, "library-big");
   syncReaderToolbarButton(button);
   bindReaderToolbarButton(button);
   return button;
@@ -30180,6 +30185,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const tools = document.createElement("button");
     tools.type = "button";
     tools.textContent = "Sources";
+    prependWorkspaceButtonIcon(tools, "form");
     tools.title = "Show Report sources and versions";
     tools.setAttribute("aria-expanded", String(panel.dataset.libraryOpen === "true"));
     tools.addEventListener("click", () => {
@@ -30196,6 +30202,7 @@ async function renderProjectReportDraft(project, resume = null) {
     outlineToggle.type = "button";
     outlineToggle.className = "workflow-action workflow-action-secondary";
     outlineToggle.textContent = "Outline";
+    prependWorkspaceButtonIcon(outlineToggle, "table-of-contents");
     const paintOutlineToggle = () => {
       const shown = panel.dataset.outlineHidden !== "true";
       outlineToggle.setAttribute("aria-pressed", String(shown));
@@ -30212,6 +30219,7 @@ async function renderProjectReportDraft(project, resume = null) {
     const versionsToggle = document.createElement("button");
     versionsToggle.type = "button";
     versionsToggle.textContent = "Versions";
+    prependWorkspaceButtonIcon(versionsToggle, "square-stack");
     versionsToggle.hidden = history.length === 0;
     versionsToggle.title = "Compare saved PDF versions beside the current Report";
     versionsToggle.addEventListener("click", () => comparison.toggle());
