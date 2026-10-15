@@ -20017,8 +20017,8 @@ dialog.report-export-review {
   font-size: 13px;
   line-height: 1.5;
 }
-.project-details-columns .project-records-row > button { grid-area: remove; justify-self: end; align-self: start; min-height: 24px; padding: 0; border-radius: 0; color: var(--text-secondary); font-size: 12px; }
-.project-details-columns .project-records-row > button:hover { background: transparent; color: var(--destructive); }
+.project-details-columns .project-records-row > button { grid-area: remove; justify-self: end; align-self: start; min-height: 28px; padding: 4px 8px; border-radius: var(--radius-pill); color: var(--text-secondary); font-size: 12px; }
+.project-details-columns .project-records-row > button:not(:disabled):hover { background: var(--menu-highlight); color: var(--destructive); }
 .project-details-columns .project-records-checklist > .workflow-action { min-height: 28px; padding: var(--space-1) var(--space-2); color: var(--text-secondary); }
 .workspace-shell > .account-workspace-view {
   grid-column: 1; grid-row: 2 / -1; z-index: 2;
