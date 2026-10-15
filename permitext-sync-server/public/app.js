@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-results-layout-v1084";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-divider-drag-stability-v1086";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-search-results-layout-v1084";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-divider-drag-stability-v1086";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-search-results-layout-v1084";
+} from "./offline-storage.js?v=20261015-divider-drag-stability-v1086";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-search-results-layout-v1084";
+} from "./workspace-state.js?v=20261015-divider-drag-stability-v1086";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4227,7 +4227,10 @@ function minimumPaneWidthForID(paneID) {
 }
 
 function maximumPaneWidthForID(paneID) {
-  return /^(?:reader:|utility:search(?::|$))/.test(paneID || "") ? 900 : Infinity;
+  if (!/^(?:reader:|utility:search(?::|$))/.test(paneID || "")) return Infinity;
+  const layout = typeof track === "undefined" ? null : track._researchColumnLayout;
+  const resizeMaximum = layout && currentColumnWorkflowView() === "research" ? layout.resizeMaximums?.[paneID] : 0;
+  return Math.max(900, resizeMaximum || 0);
 }
 
 function constrainPaneWidth(paneID, width) {
@@ -5434,6 +5437,12 @@ function syncResearchColumnLayout({ reset = false } = {}) {
   const manual = previous?.manual && !resetWidths;
   if (manual) layout = { fits: false, widths: requested };
   else if (!layout.fits && resetWidths) layout.widths.fill(600);
+  // A fitted layout can be wider than the overflow limit. Reserve its shared
+  // space for manual resizing so the first drag starts from the visible width.
+  const resizeMaximums = manual ? previous.resizeMaximums : layout.fits
+    ? Object.fromEntries(balanced.map(panel => [panel.dataset.paneId,
+      Math.max(900, layout.widths.reduce((sum, width) => sum + width, 0) - 600 * (balanced.length - 1))]))
+    : undefined;
   fixed.forEach(panel => {
     applyPaneWeight(panel, panel.dataset.paneId);
     panel.style.flex = `0 0 ${preferredWidth(panel)}px`;
@@ -5443,12 +5452,12 @@ function syncResearchColumnLayout({ reset = false } = {}) {
     const width = layout.widths[index];
     panel.dataset.researchSized = "balanced";
     panel.style.setProperty("--pane-default-min-width", "600px");
-    panel.style.maxWidth = layout.fits ? "none" : "900px";
+    panel.style.maxWidth = layout.fits ? "none" : `${manual ? maximumPaneWidthForID(panel.dataset.paneId) : 900}px`;
     panel.style.flex = `0 0 ${width}px`;
     if (!layout.fits) state.paneWeights[panel.dataset.paneId] = width;
   });
   track.dataset.researchColumnSizing = manual ? "manual" : layout.fits ? "fit" : "overflow";
-  track._researchColumnLayout = { signature, fits: layout.fits, manual };
+  track._researchColumnLayout = { signature, fits: layout.fits, manual, resizeMaximums };
 }
 
 function setUtilityButtonStates() {
@@ -40942,6 +40951,7 @@ function bindPaneDragging(panes) {
 }
 
 function startPaneResize(event, previousPaneID, nextPaneID) {
+  if (event.button > 0) return;
   if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID) || assistantHistoryOnlyPane(previousPaneID) || assistantHistoryOnlyPane(nextPaneID)) return;
   const panes = Array.from(track.querySelectorAll(".workspace-panel"));
   const previousPane = panes.find((pane) => pane.dataset.paneId === previousPaneID);
@@ -40951,17 +40961,12 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   event.preventDefault();
   const resizeHandle = event.currentTarget;
   resizeHandle?.setPointerCapture?.(event.pointerId);
-  track.classList.add("is-resizing");
   const startX = event.clientX;
   const startScrollLeft = track.scrollLeft;
-  const paneData = capturePaneResizeWidths();
-  const previousIndex = paneData.findIndex((pane) => pane.id === previousPaneID);
-  const nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
-  if (previousIndex === -1 || nextIndex === -1) {
-    track.classList.remove("is-resizing");
-    return;
-  }
-  const lastAppliedWidths = paneData.map((pane) => pane.startWidth);
+  let paneData = null;
+  let previousIndex;
+  let nextIndex;
+  let lastAppliedWidths;
   let pendingClientX = startX;
   let resizeFrame = null;
 
@@ -40997,28 +41002,43 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   };
 
   const onMove = (moveEvent) => {
+    if (moveEvent.pointerId !== undefined && moveEvent.pointerId !== event.pointerId) return;
+    if (!paneData) {
+      if (Math.abs(moveEvent.clientX - startX) < 3) return;
+      paneData = capturePaneResizeWidths();
+      previousIndex = paneData.findIndex((pane) => pane.id === previousPaneID);
+      nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
+      lastAppliedWidths = paneData.map((pane) => pane.startWidth);
+      if (previousIndex === -1 || nextIndex === -1) { paneData = null; return; }
+      track.classList.add("is-resizing");
+    }
     pendingClientX = moveEvent.clientX;
     if (resizeFrame === null) resizeFrame = window.requestAnimationFrame(applyPendingResize);
   };
 
   const onUp = (upEvent) => {
+    if (upEvent.pointerId !== undefined && upEvent.pointerId !== event.pointerId) return;
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
     window.removeEventListener("pointercancel", onUp);
     if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
-    pendingClientX = Number.isFinite(upEvent.clientX) ? upEvent.clientX : pendingClientX;
-    applyResizeAt(pendingClientX);
+    if (paneData) {
+      pendingClientX = Number.isFinite(upEvent.clientX) ? upEvent.clientX : pendingClientX;
+      applyResizeAt(pendingClientX);
+    }
     if (resizeHandle?.hasPointerCapture?.(upEvent.pointerId)) {
       resizeHandle.releasePointerCapture(upEvent.pointerId);
     }
     track.classList.remove("is-resizing");
-    notifyWorkspaceLayoutChange();
-    saveWorkspaceState();
+    if (paneData) {
+      notifyWorkspaceLayoutChange();
+      saveWorkspaceState();
+    }
   };
 
   window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", onUp, { once: true });
-  window.addEventListener("pointercancel", onUp, { once: true });
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onUp);
 }
 
 function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
@@ -41037,6 +41057,7 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
 }
 
 function startPaneEdgeResize(event, paneID, edgeSide = "right") {
+  if (event.button > 0) return;
   if (paneIsCollapsed(paneID) || assistantHistoryOnlyPane(paneID)) return;
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
@@ -41044,10 +41065,9 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   event.preventDefault();
   const resizeHandle = event.currentTarget;
   resizeHandle?.setPointerCapture?.(event.pointerId);
-  track.classList.add("is-resizing");
   const startX = event.clientX;
   const startWidth = pane.getBoundingClientRect().width;
-  capturePaneResizeWidths();
+  let resizeStarted = false;
   const isReferenceResize = ["report", "project-details"].includes(currentColumnWorkflowView());
   const edgeAutoResizeThreshold = 32;
   const edgeAutoResizeMaxSpeed = 640;
@@ -41111,6 +41131,13 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   };
 
   const onMove = (moveEvent) => {
+    if (moveEvent.pointerId !== undefined && moveEvent.pointerId !== event.pointerId) return;
+    if (!resizeStarted) {
+      if (Math.abs(moveEvent.clientX - startX) < 3) return;
+      capturePaneResizeWidths();
+      track.classList.add("is-resizing");
+      resizeStarted = true;
+    }
     const nextPointerClientX = moveEvent.clientX;
     virtualClientX += nextPointerClientX - pointerClientX;
     pointerClientX = nextPointerClientX;
@@ -41118,27 +41145,30 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   };
 
   const onUp = (upEvent) => {
+    if (upEvent.pointerId !== undefined && upEvent.pointerId !== event.pointerId) return;
     isDragging = false;
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
     window.removeEventListener("pointercancel", onUp);
     if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
-    if (Number.isFinite(upEvent.clientX)) {
+    if (resizeStarted && Number.isFinite(upEvent.clientX)) {
       virtualClientX += upEvent.clientX - pointerClientX;
       pointerClientX = upEvent.clientX;
     }
-    applyResizeAt(virtualClientX);
+    if (resizeStarted) applyResizeAt(virtualClientX);
     if (resizeHandle?.hasPointerCapture?.(upEvent.pointerId)) {
       resizeHandle.releasePointerCapture(upEvent.pointerId);
     }
     track.classList.remove("is-resizing");
-    notifyWorkspaceLayoutChange();
-    saveWorkspaceState();
+    if (resizeStarted) {
+      notifyWorkspaceLayoutChange();
+      saveWorkspaceState();
+    }
   };
 
   window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", onUp, { once: true });
-  window.addEventListener("pointercancel", onUp, { once: true });
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onUp);
 }
 
 function notifyWorkspaceLayoutChange() {

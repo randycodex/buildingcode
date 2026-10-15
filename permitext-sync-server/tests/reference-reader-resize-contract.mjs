@@ -120,7 +120,7 @@ assert.equal(shared.state.paneWeights['reader:2'],800,'The untouched rendered wi
 
 // Preserve edge-driven growth for ordinary workspace columns at the viewport edge.
 const ordinary = fixture('research');
-ordinary.context.startPaneEdgeResize(ordinary.event(1), 'reader:0', 'left');
+ordinary.context.startPaneEdgeResize(ordinary.event(8), 'reader:0', 'left');
 ordinary.move(0); ordinary.frame(16); ordinary.frame(32);
 assert.ok(ordinary.panes[0].width > 801);
 ordinary.finish('pointerup', 0);
