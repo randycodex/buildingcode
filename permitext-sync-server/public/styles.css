@@ -18217,6 +18217,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-data-card .settings-project-delete { color: var(--text-secondary); }
 .account-screen .settings-data-card .settings-project-delete:not(:disabled):hover { color: var(--destructive); }
 .account-screen .settings-data-card .settings-project-delete:disabled:hover { background: transparent; }
+.account-screen .settings-data-card .settings-content-trash { color: var(--text-secondary); white-space: nowrap; }
+.account-screen .settings-data-card .settings-content-trash:not(:disabled):hover { color: var(--destructive); }
+.account-screen .settings-data-card .settings-content-trash:disabled:hover { background: transparent; }
 .account-screen .settings-data-card .settings-trash-help { margin: 0 0 6px; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
 .account-screen .settings-trash-toolbar { display: flex; justify-content: flex-end; }
 .account-screen .settings-trash-status { margin: 8px 0; color: var(--text-secondary); font-size: 12px; }
@@ -18285,6 +18288,22 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-data-card .settings-project-row { min-height: 32px; padding-block: 6px; }
 .account-screen .settings-data-card .settings-project-copy strong { font-weight: 500; }
 .account-screen .settings-data-card .settings-project-delete:disabled { color: var(--text-secondary); opacity: .5; }
+.account-screen .settings-content-groups { display: grid; }
+.account-screen .settings-content-group { min-width: 0; padding-block: var(--space-3); }
+.account-screen .settings-content-group + .settings-content-group { border-top: 1px solid var(--border); }
+.account-screen .settings-content-copy { min-width: 0; }
+.account-screen .settings-content-group h4 { margin: 0; color: var(--text-primary); font-size: 13px !important; font-weight: 500; line-height: 1.4; }
+.account-screen .settings-content-count, .account-screen .settings-project-selection-status { margin: 4px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.account-screen .settings-content-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.account-screen .settings-projects-card .settings-project-list { margin-top: var(--space-2); }
+.account-screen .settings-projects-card .settings-project-row { min-height: 44px; padding-block: var(--space-2); }
+.account-screen .settings-projects-card .settings-project-copy strong { color: var(--text-primary); }
+.account-screen .settings-projects-card .settings-project-copy span { text-transform: none; letter-spacing: normal; font-size: 12px !important; }
+.account-screen .settings-projects-card .settings-project-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-2); }
+.account-screen .settings-project-actions .settings-project-selection-status { margin: 0 auto 0 0; }
+.account-screen .settings-data-card .settings-project-select-all { color: var(--text-secondary); }
+.account-screen .settings-data-card .settings-project-select-all:hover { color: var(--text-primary); }
+.account-screen .settings-content-groups [hidden] { display: none; }
 .account-screen .settings-data-card .settings-danger-list { margin-inline: 0; border-top: 0; }
 .account-screen .settings-data-card .settings-danger-button {
   grid-template-columns: minmax(0, 1fr);

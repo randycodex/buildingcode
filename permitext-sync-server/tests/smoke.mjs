@@ -493,7 +493,7 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Move All Projects and Saved Collections to Trash", "Clear Recent Searches", "Move All Saved Passages to Trash", "Move All Notes to Trash"].forEach((label) => {
+    ["Move all projects and saved collections to Trash", "Clear Recent Searches", "Move all saved passages to Trash", "Move all section notes to Trash"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(!settingsTemplateSource.includes("Clear All Tags"), "Web Settings still exposes tag management.");
@@ -502,7 +502,7 @@ async function main() {
       settingsTemplateSource.includes('class="settings-project-list"') &&
         settingsTemplateSource.includes('class="settings-link-button settings-project-select-all"') &&
         settingsTemplateSource.includes('class="settings-secondary-button settings-project-delete"') &&
-        settingsTemplateSource.includes('class="settings-danger-button settings-project-clear-all"'),
+        settingsTemplateSource.includes('class="settings-secondary-button settings-content-trash settings-project-clear-all"'),
       "Web Settings omitted project selection or bulk deletion controls."
     );
     assert(

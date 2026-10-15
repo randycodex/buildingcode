@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-delete-selected-hover-v1042";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-saved-content-management-v1043";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-delete-selected-hover-v1042";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-saved-content-management-v1043";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-delete-selected-hover-v1042";
+} from "./offline-storage.js?v=20261015-saved-content-management-v1043";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-delete-selected-hover-v1042";
+} from "./workspace-state.js?v=20261015-saved-content-management-v1043";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -39228,6 +39228,8 @@ function renderSettings({ upgrade = false } = {}) {
   const projectSelectAll = panel.querySelector(".settings-project-select-all");
   const projectDelete = panel.querySelector(".settings-project-delete");
   const projectClearAll = panel.querySelector(".settings-project-clear-all");
+  const projectActions = panel.querySelector(".settings-project-actions");
+  const projectSelectionStatus = panel.querySelector(".settings-project-selection-status");
   const status = panel.querySelector(".settings-status-message");
   wireOperationalSupport(panel);
   const setStatus = (message, isError = false) => {
@@ -39362,13 +39364,27 @@ function renderSettings({ upgrade = false } = {}) {
     .map(({ project }) => project);
   const selectedProjectIDs = new Set();
   const projectCheckboxes = new Map();
+  panel.querySelector('[data-content-count="projects"]').textContent = `${settingsProjects.length} total`;
+  const savedPassageCount = bookmarkRecordsForSettings().length;
+  const savedProjectLinkCount = (currentContentSummary().projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length;
+  const sectionNoteCount = (currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length;
+  panel.querySelector('[data-content-count="bookmarks"]').textContent = `${savedPassageCount} saved · ${savedProjectLinkCount} Project ${savedProjectLinkCount === 1 ? "link" : "links"}`;
+  panel.querySelector('[data-content-count="notes"]').textContent = `${sectionNoteCount} saved · Tags stay`;
+  panel.querySelector('[data-clear-action="bookmarks"]').disabled = savedPassageCount === 0 && savedProjectLinkCount === 0;
+  panel.querySelector('[data-clear-action="notes"]').disabled = sectionNoteCount === 0;
   const updateProjectSelection = () => {
     const count = selectedProjectIDs.size;
-    projectSelectAll.textContent = count === settingsProjects.length && count > 0 ? "Clear All" : "Select All";
+    projectSelectAll.textContent = count === settingsProjects.length && count > 0 ? "Clear selection" : "Select all";
     projectSelectAll.disabled = settingsProjects.length === 0;
+    projectSelectAll.hidden = settingsProjects.length === 0;
     projectDelete.disabled = count === 0;
+    projectDelete.hidden = count === 0;
+    projectDelete.setAttribute("aria-label", `Move ${count} selected ${count === 1 ? "item" : "items"} to Trash`);
     projectClearAll.disabled = settingsProjects.length === 0;
-    projectDelete.textContent = count > 0 ? `Delete ${count} Selected` : "Delete Selected";
+    projectClearAll.hidden = count > 0;
+    projectActions.hidden = settingsProjects.length === 0;
+    projectSelectionStatus.hidden = count === 0;
+    projectSelectionStatus.textContent = count > 0 ? `${count} selected` : "";
     projectCheckboxes.forEach((checkbox, id) => {
       checkbox.checked = selectedProjectIDs.has(id);
     });
@@ -39419,9 +39435,9 @@ function renderSettings({ upgrade = false } = {}) {
     if (!count) return;
     const recordLabel = folderRecordCountLabel(selectedProjects);
     const confirmed = await confirmWebWarning(
-      `Delete ${recordLabel}`,
+      `Move ${recordLabel} to Trash?`,
       `Move ${recordLabel} to Trash across synced devices. Restore within 30 days. Saved passages and notes remain.`,
-      { confirmLabel: "Delete" }
+      { confirmLabel: "Move to Trash" }
     );
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     if (!confirmed) return;
@@ -39448,9 +39464,9 @@ function renderSettings({ upgrade = false } = {}) {
     if (!count) return;
     const recordLabel = folderRecordCountLabel(settingsProjects);
     const confirmed = await confirmWebWarning(
-      "Clear all Projects and saved collections?",
+      "Move all Projects and saved collections to Trash?",
       `Move ${recordLabel}, including archived records, to Trash across synced devices. Restore within 30 days. Saved passages and notes remain.`,
-      { confirmLabel: "Delete All" }
+      { confirmLabel: "Move to Trash" }
     );
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     if (!confirmed) return;
@@ -40074,7 +40090,7 @@ function renderSettings({ upgrade = false } = {}) {
   const clearActionCopy = {
     searches: ["Clear recent searches", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. Are you sure?"],
     bookmarks: ["Move Saved passages to Trash", `${bookmarkRecordsForSettings().length} saved passages and their Project memberships will move to Trash across synced devices. Restore within 30 days. Projects and notes remain.`],
-    notes: ["Move notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages and tags remain.`]
+    notes: ["Move section notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages and tags remain.`]
   };
   panel.querySelectorAll("[data-clear-action]").forEach((button) => {
     button.addEventListener("click", async () => {
