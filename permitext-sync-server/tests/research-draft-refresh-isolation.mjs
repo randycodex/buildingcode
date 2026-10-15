@@ -24,7 +24,10 @@ function harness() {
  context.saveWorkspaceState=()=>{vm.runInContext('captureResearchWorkspaceState()',context);snapshot=JSON.stringify(state.researchViewState);};
  const composerStart=source.indexOf('  const followUpDraftKey = `followup:${conversationID}`;');
  const handlerStart=source.indexOf('  input.addEventListener("input", () => {',composerStart);
- const handler=source.slice(handlerStart,source.indexOf('\n  bindResearchSendShortcut(input, composer);',handlerStart));
+ const blurHandler='  input.addEventListener("blur", flushResearchDraftPersistence);';
+ const handlerEnd=source.indexOf(blurHandler,handlerStart);
+ assert.ok(handlerStart>composerStart&&handlerEnd>handlerStart,'Extract only the actual input/blur persistence handlers');
+ const handler=source.slice(handlerStart,handlerEnd+blurHandler.length);
  function mount(id,conversationID) {
   const callbacks={};const pane={id,conversationID,scrollTop:0,scrollHeight:100,clientHeight:100};
   const input={value:drafts.get(`followup:${conversationID}`)||'',dataset:{researchDraftKey:`followup:${conversationID}`},style:{},selectionStart:2,selectionEnd:4,

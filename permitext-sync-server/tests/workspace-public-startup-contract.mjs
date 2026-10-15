@@ -12,7 +12,8 @@ function pane(id,loading=false){const status={textContent:""},retry={hidden:true
 const sync=deferred(),report=deferred();let account="A",pulls=0,privateLoads=0,removeNotebookOnVerify=false;
 const notebook=pane("notebook"),reader=pane("reader"),search=pane("search");
 let desired=[{id:"reader",publicContent:true,load:()=>reader},{id:"search",publicContent:true,load:()=>search},{id:"notebook",load:()=>{privateLoads++;return notebook;}},{id:"report",load:()=>{privateLoads++;return report.promise;}}];
-let syncResult=null,forceResult=null,forcePulls=0;
+let syncResult=null,forceResult=null,forcePulls=0,summaryReads=0;
+let savedKeys=new Set(["before mutation"]);
 const noop=()=>{};
 const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHydrator,Map,Set,JSON,Promise,console,
  track,activeWorkspaceID:"workspace",accountRuntimeGeneration:1,workspaceRenderGeneration:0,syncedContent:null,syncLoadPromise:null,
@@ -20,6 +21,7 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  captureAccountRequest:()=>({account}),isCurrentAccountRequest:id=>id.account===account,activeAccount:()=>({userID:account}),
  ensureSyncedContentForRender:async()=>{pulls++;if(!syncResult)await sync.promise;return syncResult;},
  loadSyncedContent:async()=>{forcePulls++;return forceResult;},
+ workspaceSavedEvidenceKeys:()=>{summaryReads++;return new Set(savedKeys);},
  reconcileProjectWorkspaces:noop,enforceProjectRequiredWorkspace:noop,workspaceColumnsRequireProject:()=>false,scopeSavedInstanceToWorkspace:noop,enforceReaderPlanLimit:noop,
  closeDeletedProjectDetails:()=>{if(removeNotebookOnVerify)desired=desired.filter(d=>d.id!=="notebook");},
  restoreResearchWorkspaceState:noop,captureReaderScrollPositions:()=>new Map(),updateReaderPlanControls:noop,
@@ -30,7 +32,8 @@ const sandbox=vm.createContext({createWorkspaceAccessGate,createWorkspacePaneHyd
  appendPaneSequence(panes){track.children.forEach(n=>{n.isConnected=false;n.parentNode=null;});track.children=panes;panes.forEach(n=>{n.isConnected=true;n.parentNode=track;});},
  applyPaneWeight:noop,ensureWorkspacePanelAccessibleName:noop,preparePaneCollapse:noop,bindPaneDragging:noop,refreshColumnGroupPresentation:noop,refreshPinnedPaneDivider:noop,
  updateCollapsedPaneDividers:noop,bindReaderScrollIndicator:noop,updateReaderScrollIndicator:noop,enhanceSelect:noop,restoreReaderScrollPositions:noop,
- notifyWorkspaceLayoutChange:noop,disposeUnpublishedWorkspacePane:noop,maskUnverifiedWorkspacePane:noop
+ notifyWorkspaceLayoutChange:noop,disposeUnpublishedWorkspacePane:noop,maskUnverifiedWorkspacePane:noop,
+ workflowPaneIsVisible:()=>true,pendingWorkspacePaneRevealID:""
 });
 const names=["activePinnedPaneID","workspacePrivatePresentationAllowed","finishWorkspacePaneReady","whenWorkspacePaneReady","workspaceAccessGateForRender","workspacePaneRenderContext","workspacePaneContextIsCurrent","getWorkspacePaneHydrator","mountWorkspacePanesIndependently","renderWorkspace","renderUtilityWorkspace"];
 vm.runInContext(`let workspacePaneHydrator=null;let workspaceAccessState=null;const workspacePaneReadyWaiters=new Set();${names.map(actual).join("\n")}`,sandbox);
@@ -65,9 +68,54 @@ sandbox.loadSyncedContent=async()=>{forcePulls++;syncResult=forceResult;sandbox.
 assert.equal(gate.retry(),true);await tick();assert.equal(forcePulls,1);assert.equal(gate.allowed,true);assert.equal(upgrades,2,"Persistent subscriptions upgrade retained controls after recovery.");
 assert.equal(track.children[0],reader);assert.equal(track.children[1],search);
 
+// The production facade shares only the synchronous notification's current
+// snapshot. It must never reuse construction state or retain it across retries.
+assert.equal(summaryReads,0,"Access observers that do not request bookmarks do not build a private summary.");
+let retainedNotification;
+const notifications=[],peerNotifications=[],nestedNotifications=[];
+const stopThrowing=gate.subscribe((_gate,notification)=>{if(notification)throw Error("Observer failed");});
+const stopFirst=gate.subscribe((_gate,notification)=>{
+ if(!notification)return;
+ retainedNotification=notification;
+ notifications.push([...notification.savedEvidenceKeys()]);
+});
+const stopSecond=gate.subscribe((_gate,notification)=>{
+ if(!notification)return;
+ peerNotifications.push([...notification.savedEvidenceKeys()]);
+});
+const stopReentrant=gate.subscribe((_gate,notification)=>{
+ if(!notification)return;
+ const stop=gate.subscribe((_innerGate,nested)=>nestedNotifications.push(nested));
+ stop();
+});
+assert.equal(gate.retry(),true);await tick();
+assert.equal(summaryReads,1,"A failing peer does not prevent two bookmark observers sharing one fresh summary.");
+assert.equal(retainedNotification.savedEvidenceKeys(),null,"The accessor releases its snapshot before an async observer can resume.");
+savedKeys=new Set(["after mutation"]);
+assert.equal(gate.retry(),true);await tick();
+assert.equal(summaryReads,2,"Every notification rebuilds after a mutation.");
+assert.deepEqual(notifications,[["before mutation"],["after mutation"]]);
+assert.deepEqual(peerNotifications,notifications,"Every peer receives the same current snapshot.");
+assert.deepEqual(nestedNotifications,[undefined,undefined],"Reentrant eager subscriptions cannot capture the outer dispatch snapshot.");
+stopThrowing();stopFirst();stopSecond();stopReentrant();
+let stalePeerCalls=0;
+let keysBeforeRevocation,keysAfterRevocation;
+gate.subscribe((_gate,notification)=>{
+ if(!notification)return;
+ keysBeforeRevocation=[...notification.savedEvidenceKeys()];
+ account="B";
+ keysAfterRevocation=notification.savedEvidenceKeys();
+});
+gate.subscribe((_gate,notification)=>{if(notification)stalePeerCalls++;});
+assert.equal(gate.retry(),true);await tick();
+assert.deepEqual(keysBeforeRevocation,["after mutation"]);
+assert.equal(keysAfterRevocation,null,"Revoking the account invalidates even an in-progress notification.");
+assert.equal(stalePeerCalls,0,"An account change stops the remaining old-account observers.");
+
 // Identity changes immediately invalidate the old public-control facade.
 account="B";assert.equal(gate.allowed,false);
 const newGate=sandbox.workspaceAccessGateForRender();assert.notEqual(newGate,gate);await tick();assert.equal(newGate.allowed,false,"An A snapshot cannot authorize B.");
 assert.equal(await sandbox.whenWorkspacePaneReady("missing"),false);
 const descriptors=actual("workspacePaneDescriptors");assert.match(descriptors,/renderUtilityInstance\(instance, \{ accessGate: options\.accessGate,/);assert.match(descriptors,/renderReader\(reader, \{ scrollPosition: options\.readerScrollPositions\?\.get\(id\), accessGate: options\.accessGate, signal \}\)/);
 console.log("Workspace public startup passed: held sync/public publication, shared gate, fresh private reconciliation, shell/target readiness, close cancellation, denial/retry and account isolation.");
+console.log("Workspace notification snapshots passed: lazy summary work, throw isolation, one read per dispatch, fresh mutations, immediate release and mid-dispatch account revocation.");

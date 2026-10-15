@@ -31,7 +31,6 @@ class Node {
 }
 
 let reads = 0, permitted = true, selected = "p1";
-const listeners = [];
 const project = { id: "p1", clientID: "local-p1" };
 const section = { id: "section", sectionNumber: "101", title: "Complete enacted text", readerAliasSectionIDs: [],
   blocks: Array.from({ length: 500 }, (_, index) => ({ id: `paragraph-${index}`, plainText: `Authoritative paragraph ${index}` })) };
@@ -40,11 +39,14 @@ let links = Array.from({ length: 1000 }, (_, index) => ({ sectionID: index < 500
   blockID: `paragraph-${index}`, folderClientID: index % 3 === 0 ? "local-p1" : "other-project" }));
 links.push({ sectionID: "section", codeVersion: "NYC2014", blockID: "paragraph-1", folderID: "p1" });
 links.push({ sectionID: "section", codeVersion: defaultSyncCodeVersion, blockID: "", folderID: "p1" });
-const settledGate = createWorkspaceAccessGate({ isCurrent: () => permitted, verify: async () => "verified" });
-await settledGate.ready;
-const gate = { get allowed() { return settledGate.allowed; }, subscribe(listener) { listeners.push(listener); return settledGate.subscribe(listener); } };
-const panel = new Node("article"); panel.__workspaceAccessGate = gate; panel.connected = true;
+const panel = new Node("article"); panel.connected = true;
 const context = vm.createContext({
+  createWorkspaceAccessGate, workspaceAccessState: null, activeWorkspaceID: "workspace", accountRuntimeGeneration: 1,
+  syncedContent: { userID: "a", workspacePresentationAccess: "verified" }, syncLoadPromise: null,
+  state: { utilityInstances: [] }, captureAccountRequest: () => "a", isCurrentAccountRequest: () => permitted,
+  activeAccount: () => ({ userID: "a" }), ensureSyncedContentForRender: async () => context.syncedContent,
+  loadSyncedContent: async () => context.syncedContent, reconcileProjectWorkspaces() {}, closeDeletedProjectDetails() {}, scopeSavedInstanceToWorkspace() {},
+  enforceReaderPlanLimit() {}, renderUtilityWorkspace: async () => {},
   document: { createElement: tag => new Node(tag) }, syncCodeVersion, defaultSyncCodeVersion, renderReaderBlockBatches,
   currentContentSummary() { reads++; return structuredClone({ projects: [project], projectSections: links }); },
   workspaceProject: projects => projects.find(item => item.id === selected) || null,
@@ -58,8 +60,11 @@ const context = vm.createContext({
   researchActionIconSVG: () => "research", noteAddIconSVG: () => "note",
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
-vm.runInContext(subscriptionLifecycle + ["normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",
+vm.runInContext(subscriptionLifecycle + ["workspaceAccessGateForRender", "normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",
   "readerPrivateContentAllowed", "renderReaderChapterSection", "renderAnnotatedCodeBlock", "renderInlineCommentBox"].map(actual).join("\n"), context);
+const gate = context.workspaceAccessGateForRender();
+await gate.ready;
+panel.__workspaceAccessGate = gate;
 const previousSaved = target => links.some(link => context.savedEvidenceKey(link) === context.savedEvidenceKey(target) && context.projectSectionBelongsToProject(link, selected === "p1" ? project : null));
 function checkRendered(rendered) {
   const bookmarks = [rendered.querySelector(".reader-section-saved-marker"), ...rendered.querySelectorAll(".inline-comment").map(node => node.querySelector(".inline-bookmark-toggle"))];
@@ -76,8 +81,8 @@ checkRendered(rendered);
 assert.equal(reads, 1, "500 block controls plus the whole-section marker share exactly one fresh summary even when the real settled gate eagerly notifies on subscribe");
 const initialReads = reads;
 links = [];
-listeners.forEach(fn => fn());
-assert.equal(reads - initialReads, 501, "Access callbacks retain fresh private reads; they never capture the initial snapshot");
+assert.equal(gate.retry(), true); await gate.ready;
+assert.equal(reads - initialReads, 1, "501 access callbacks share one fresh notification snapshot after writes");
 checkRendered(rendered);
 links = [{ sectionID: "section", codeVersion: defaultSyncCodeVersion, blockID: "paragraph-7", folderID: "p1" }];
 reads = 0;
@@ -93,19 +98,21 @@ rendered = context.renderReaderChapterSection(panel, reader, section, new Map())
 await rendered._readerBlocksReady;
 assert.equal(reads, 0, "Public or pending content never reads private summary state");
 assert.equal(rendered.querySelector(".reader-section-saved-marker").hidden, true);
-console.log(JSON.stringify({ blocks: 500, projectLinks: 1002, currentSummaryReads: 1, currentRenderMS: +afterMS.toFixed(2) }));
+console.log(JSON.stringify({ blocks: 500, projectLinks: 1002, currentSummaryReads: 1, revalidationSummaryReads: 1, pendingUpgradeSummaryReads: 1, currentRenderMS: +afterMS.toFixed(2) }));
 console.log("Reader bookmark rendering passed: exact block/edition/Project membership parity, complete enacted text, pending privacy, fresh access callbacks, workspace changes and fresh subsequent writes.");
 
 permitted = true; selected = "p1";
 let releaseVerification;
-const pendingGate = createWorkspaceAccessGate({ isCurrent: () => permitted, verify: () => new Promise(resolve => { releaseVerification = resolve; }) });
+context.workspaceAccessState = null;
+context.ensureSyncedContentForRender = () => new Promise(resolve => { releaseVerification = () => resolve(context.syncedContent); });
+const pendingGate = context.workspaceAccessGateForRender();
 panel.__workspaceAccessGate = pendingGate; reads = 0;
 rendered = context.renderReaderChapterSection(panel, reader, section, new Map());
 await rendered._readerBlocksReady;
 assert.equal(reads, 0, "The real pending gate does not read private state during construction");
 assert.equal(rendered.querySelector(".reader-section-saved-marker").hidden, true);
-await Promise.resolve(); releaseVerification("verified"); await pendingGate.ready;
+await Promise.resolve(); releaseVerification(); await pendingGate.ready;
 checkRendered(rendered);
 assert.equal(rendered.querySelector(".reader-section-saved-marker").hidden, false);
-assert.ok(reads > 0, "Pending-to-verified access must refresh with fresh state rather than its unresolved initial bookmark");
+assert.equal(reads, 1, "501 pending controls share one current snapshot at verification");
 console.log("Reader access tests use actual subscribeWorkspaceNodeAccess and real settled/pending gates, including eager subscription notification and later private upgrade.");

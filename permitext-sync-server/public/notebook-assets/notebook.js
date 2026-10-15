@@ -13747,7 +13747,7 @@ var Zi = 0, Qi = 1, $i = 2, ea = 3, ta = class {
 				let e = document.createElement("span");
 				e.appendChild(a), a = e;
 			}
-			a.contentEditable = "false", a.classList.add("ProseMirror-widget");
+			a.hasAttribute("contenteditable") || (a.contentEditable = "false"), a.classList.add("ProseMirror-widget");
 		}
 		super(e, [], a, null), this.widget = t, this.widget = t, i = this;
 	}
@@ -14789,7 +14789,14 @@ function _o() {
 var vo = null;
 function yo(e) {
 	let t = window.trustedTypes;
-	return t ? (vo ||= t.defaultPolicy || t.createPolicy("ProseMirrorClipboard", { createHTML: (e) => e }), vo.createHTML(e)) : e;
+	if (!t) return e;
+	if (!vo) {
+		if (vo = t.defaultPolicy) try {
+			return vo.createHTML(e);
+		} catch {}
+		vo = t.createPolicy("ProseMirrorClipboard", { createHTML: (e) => e });
+	}
+	return vo.createHTML(e);
 }
 function bo(e) {
 	let t = /^(\s*<meta [^>]*>)*/.exec(e);
@@ -14827,6 +14834,11 @@ function So(e, t) {
 	for (let e = r.length - 2; e >= 0; e -= 2) {
 		let t = n.nodes[r[e]];
 		if (!t || t.hasRequiredAttrs()) break;
+		try {
+			t.checkAttrs(r[e + 1]);
+		} catch {
+			break;
+		}
 		i = D.from(t.create(r[e + 1], i)), a++, o++;
 	}
 	return new N(i, a, o);

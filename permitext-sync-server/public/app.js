@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-settings-type-hierarchy-v1048";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-performance-audit-v1049";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-settings-type-hierarchy-v1048";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-performance-audit-v1049";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-settings-type-hierarchy-v1048";
+} from "./offline-storage.js?v=20261015-performance-audit-v1049";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-settings-type-hierarchy-v1048";
+} from "./workspace-state.js?v=20261015-performance-audit-v1049";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -327,7 +327,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261014-text-style-menu-v30";
+const notebookClientVersion = "20261015-notebook-security-v31";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -15364,10 +15364,10 @@ function disposeWorkspaceNodeAccess(root) {
 
 function workspaceNodeAccessListener(record) {
   // Separate lexical scope: no control node or update closure can be captured.
-  return () => {
+  return (_gate, notification) => {
     const node = record.owner.deref();
     if (!node) { releaseWorkspaceNodeAccess(record); return; }
-    return workspaceNodeAccessCallbacks.get(node)?.get(record)?.();
+    return workspaceNodeAccessCallbacks.get(node)?.get(record)?.(notification);
   };
 }
 
@@ -16401,7 +16401,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       sectionID: target.sectionID || section.id,
       codeVersion: target.codeVersion,
       blockID: target.blockID || ""
-    })) : Boolean(options.showBookmark);
+    }, "", initialRender?.savedEvidenceKeys?.())) : Boolean(options.showBookmark);
     wrapper.classList.toggle("has-saved-section", saved);
     bookmarkButton.classList.toggle("is-saved", saved);
     bookmarkButton.innerHTML = bookmarkIconSVG(saved);
@@ -18487,12 +18487,12 @@ function createSearchResultSaveButton(panel, detail, options = {}) {
   saveButton.dataset.savedEvidenceKey = savedEvidenceKey(detail);
   let initializing = true;
   let initialized = false;
-  const initialize = () => {
+  const initialize = (notification) => {
     if (initializing && initialized) return;
     if (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed) return;
     saveButton.hidden = false;
     saveButton.disabled = false;
-    const saved = initializing && options.bookmarkStateResolved ? options.showBookmark : isSectionSaved(detail);
+    const saved = initializing && options.bookmarkStateResolved ? options.showBookmark : isSectionSaved(detail, "", notification?.savedEvidenceKeys?.());
     syncImmediateBookmarkButton(saveButton, Boolean(saved));
     initialized = true;
   };
@@ -45166,9 +45166,27 @@ function workspaceAccessGateForRender() {
   workspaceAccessState?.gate.dispose();
   const entry = { key, identity, workspaceID, gate: null, currentGate: null, listeners: new Set(), observedAuthority: authority() };
   const current = () => workspaceAccessState === entry && workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity);
-  const notify = (listener) => {
+  const notify = (listener, notification) => {
     if (!current()) return;
-    try { Promise.resolve(listener(entry.gate)).catch(() => {}); } catch {}
+    try { Promise.resolve(listener(entry.gate, notification)).catch(() => {}); } catch {}
+  };
+  const notifyAll = () => {
+    // Bookmark observers share one fresh Project snapshot during this synchronous
+    // dispatch only. Async observers and later notifications must read again.
+    let active = true;
+    let savedKeys = null;
+    const notification = {
+      savedEvidenceKeys() {
+        if (!active || !current() || !entry.gate.allowed) return null;
+        return savedKeys ||= workspaceSavedEvidenceKeys();
+      }
+    };
+    try {
+      for (const listener of entry.listeners) notify(listener, notification);
+    } finally {
+      active = false;
+      savedKeys = null;
+    }
   };
   // The facade is stable for this workspace/account/session. Reverification
   // never strands public controls with an obsolete gate captured in a closure.
@@ -45223,7 +45241,7 @@ function workspaceAccessGateForRender() {
     entry.currentGate = attempt;
     void attempt.ready.then(() => {
       if (entry.currentGate !== attempt || workspaceAccessState !== entry || !isCurrentAccountRequest(identity)) return;
-      for (const listener of entry.listeners) notify(listener);
+      notifyAll();
       // Recompute desired private descriptors only after completed verification.
       void renderUtilityWorkspace({ skipDeletedProjectCleanup: true, persist: false }).catch((error) => {
         console.warn("Workspace presentation could not refresh.", error);

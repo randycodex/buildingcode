@@ -37,20 +37,22 @@ class Node {
 
 
 let reads = 0, paints = 0, current = true, selected = "p1";
-const listeners = [];
 const project = { id: "p1", clientID: "local-p1" };
 const matches = Array.from({ length: 80 }, (_, index) => ({ id: String(index % 40), sectionNumber: `100.${index}`, codePrefix: "BC",
   codeVersion: index < 40 ? defaultSyncCodeVersion : historicalConstructionSyncCodeVersion,
   blockID: index % 2 ? "paragraph" : "", title: `Heading ${index}`, excerpt: `Complete result ${index}`, citation: `Citation ${index}` }));
 let links = matches.filter((_value, index) => index % 3 === 0).map((item, index) => ({ ...item, sectionID: item.id, folderClientID: index % 2 ? "other-project" : "local-p1" }));
 links.push(...Array.from({ length: 1000 }, (_, index) => ({ sectionID: `unrelated-${index}`, codeVersion: defaultSyncCodeVersion, folderClientID: "local-p1" })));
-const settledGate = createWorkspaceAccessGate({ isCurrent: () => current, verify: async () => "verified" });
-await settledGate.ready;
-const gate = { get allowed() { return settledGate.allowed; }, subscribe(listener) { listeners.push(listener); return settledGate.subscribe(listener); } };
-const panel = new Node("article"); panel.className = "search-panel"; panel.__workspaceAccessGate = gate; panel.connected = true;
+const panel = new Node("article"); panel.className = "search-panel"; panel.connected = true;
 const results = new Node("div"); results.className = "search-results"; panel.append(results);
 const instance = { expandedResultSources: [], defaultExpandedResultSource: "" };
 const c = vm.createContext({
+  createWorkspaceAccessGate, workspaceAccessState: null, activeWorkspaceID: "workspace", accountRuntimeGeneration: 1,
+  syncedContent: { userID: "a", workspacePresentationAccess: "verified" }, syncLoadPromise: null,
+  state: { utilityInstances: [] }, captureAccountRequest: () => "a", isCurrentAccountRequest: () => current,
+  activeAccount: () => ({ userID: "a" }), ensureSyncedContentForRender: async () => c.syncedContent,
+  loadSyncedContent: async () => c.syncedContent, reconcileProjectWorkspaces() {}, closeDeletedProjectDetails() {}, scopeSavedInstanceToWorkspace() {},
+  enforceReaderPlanLimit() {}, renderUtilityWorkspace: async () => {},
   document: { createElement: tag => new Node(tag) }, crypto: { randomUUID }, CSS: { escape: value => value },
   syncCodeVersion, defaultSyncCodeVersion, syncCodeVersionForPrefix: () => defaultSyncCodeVersion,
   currentContentSummary() { reads++; return structuredClone({ projects: [project], projectSections: links }); },
@@ -65,8 +67,11 @@ const c = vm.createContext({
   searchGroupCountText: count => String(count)
 });
 const subscriptionLifecycle = source.slice(source.indexOf("const workspaceNodeAccessRecords"), source.indexOf("function readerPrivateContentAllowed"));
-vm.runInContext(subscriptionLifecycle + ["normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",
+vm.runInContext(subscriptionLifecycle + ["workspaceAccessGateForRender", "normalizeAnnotationBlockID", "savedEvidenceKey", "projectSectionBelongsToProject", "workspaceSavedEvidenceKeys", "isSectionSaved",
   "searchResultDetail", "searchResultPositionKey", "createSearchResultSaveButton", "appendSearchResultGroups", "refreshSearchGroupCounts"].map(actual).join("\n"), c);
+const gate = c.workspaceAccessGateForRender();
+await gate.ready;
+panel.__workspaceAccessGate = gate;
 const expected = item => links.some(link => c.savedEvidenceKey(link) === c.savedEvidenceKey(c.searchResultDetail(item)) && c.projectSectionBelongsToProject(link, selected === "p1" ? project : null));
 const assertRows = (items, resultNode = results) => {
   const buttons = resultNode.querySelectorAll(".search-result-save");
@@ -91,9 +96,9 @@ c.appendSearchResultGroups(results, [...matches, ...next], "means of egress", in
 assertRows([...matches, ...next]);
 assert.equal(reads, 1, "Each new page uses fresh state and skips already-rendered rows");
 assert.equal(paints, 85);
-links = []; reads = 0; listeners.forEach(listener => listener());
+links = []; reads = 0; assert.equal(gate.retry(), true); await gate.ready;
 assertRows([...matches, ...next]);
-assert.equal(reads, 85, "Later access callbacks derive fresh saved status rather than retaining the append snapshot");
+assert.equal(reads, 1, "85 access callbacks share one fresh notification snapshot after writes");
 selected = "other-project";
 const otherResults = new Node("div"); panel.append(otherResults); reads = 0;
 c.appendSearchResultGroups(otherResults, matches.slice(0, 5), "means of egress", instance);
@@ -105,15 +110,17 @@ assert.equal(reads, 0, "Invalid account/workspace authority never reads private 
 assert.ok(revokedResults.querySelectorAll(".search-result-save").every(button => button.hidden && button.disabled));
 current = true; selected = "p1";
 let release;
-const pendingGate = createWorkspaceAccessGate({ isCurrent: () => current, verify: () => new Promise(resolve => { release = resolve; }) });
+c.workspaceAccessState = null;
+c.ensureSyncedContentForRender = () => new Promise(resolve => { release = () => resolve(c.syncedContent); });
+const pendingGate = c.workspaceAccessGateForRender();
 const pendingPanel = new Node("article"); pendingPanel.className = "search-panel"; pendingPanel.__workspaceAccessGate = pendingGate;
 const pendingResults = new Node("div"); pendingPanel.append(pendingResults); reads = 0;
 c.appendSearchResultGroups(pendingResults, matches, "means of egress", instance);
 assert.equal(reads, 0); assert.ok(pendingResults.querySelectorAll(".search-result-save").every(button => button.hidden));
 links.push({ ...matches[0], sectionID: matches[0].id, folderID: "p1" });
-await Promise.resolve(); release("verified"); await pendingGate.ready;
+await Promise.resolve(); release(); await pendingGate.ready;
 assertRows(matches, pendingResults);
 assert.ok(pendingResults.querySelectorAll(".search-result-save").every(button => !button.hidden));
-assert.equal(reads, 80, "A pending-to-verified gate resolves the current private state, including changes after public rendering");
-console.log(JSON.stringify({ results: 80, initialSummaryReads: 1, initialBookmarkPaints: 80, renderMS: +duration.toFixed(2) }));
+assert.equal(reads, 1, "80 pending controls share current private state, including writes after public rendering");
+console.log(JSON.stringify({ results: 80, initialSummaryReads: 1, initialBookmarkPaints: 80, revalidationSummaryReads: 1, pendingUpgradeSummaryReads: 1, renderMS: +duration.toFixed(2) }));
 console.log("Search bookmark render passed: real eager and pending gates, one summary per append, fresh later pages/access updates, exact edition/block/Project identity, duplicate suppression, unchanged citation/title/target output, and revoked account/workspace privacy.");

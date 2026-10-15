@@ -14,6 +14,30 @@ const corePackages = Object.entries(lock.packages)
   .filter(([path]) => /(?:^|\/)node_modules\/@tiptap\/core$/.test(path));
 assert(corePackages.length > 0, "The Notebook Tiptap dependency must be in the lockfile.");
 
+// GHSA-c8x8-7fp4-3x9w: the clipboard context parser must include the upstream
+// validation patch. Check every locked/installed copy and the editor's actual
+// dependency resolution, not just a root-level package declaration.
+const viewPackages = Object.entries(lock.packages)
+  .filter(([path]) => /(?:^|\/)node_modules\/prosemirror-view$/.test(path));
+assert(viewPackages.length > 0, "The Notebook ProseMirror view dependency must be in the lockfile.");
+for (const [path, locked] of viewPackages) {
+  assertPatchedView(locked.version, path);
+  const installed = JSON.parse(readFileSync(resolve(root, path, "package.json"), "utf8"));
+  assert.equal(installed.version, locked.version, `${path}: installed dependency differs from lockfile.`);
+}
+for (const consumer of ["@blocknote/core", "@tiptap/pm/view"]) {
+  const viewEntry = createRequire(require.resolve(consumer)).resolve("prosemirror-view");
+  const installed = JSON.parse(readFileSync(resolve(viewEntry, "../../package.json"), "utf8"));
+  assertPatchedView(installed.version, `${consumer} ProseMirror resolution`);
+}
+
+function assertPatchedView(version, label) {
+  assert.match(version, /^\d+\.\d+\.\d+$/, `${label}: require a stable release.`);
+  const [major, minor, patch] = version.split(".").map(Number);
+  assert(major > 1 || (major === 1 && (minor > 42 || (minor === 42 && patch >= 3))),
+    `${label}: ${version} predates the required patched clipboard release, 1.42.3.`);
+}
+
 function assertPatched(version, label) {
   assert.match(version, /^\d+\.\d+\.\d+$/, `${label}: require a stable release.`);
   const [major, minor, patch] = version.split(".").map(Number);
@@ -96,4 +120,4 @@ for (const entry of entryPoints) {
 }
 assert.equal(Object.prototype["data-inherited-canary"], undefined);
 assert.equal(Object.prototype.onerror, undefined);
-console.log(`Notebook dependency security passed: ${corePackages.length} locked core package(s), ${entryPoints.size} resolved implementation(s); prototype/DOM-attribute and ordinary-merge regressions.`);
+console.log(`Notebook dependency security passed: ${corePackages.length} locked core package(s), ${entryPoints.size} resolved implementation(s), ${viewPackages.length} patched clipboard view package(s); prototype/DOM-attribute and ordinary-merge regressions.`);

@@ -30,6 +30,7 @@ const cachedChapterHTML = new Map();
 const pendingChapterHTML = new Map();
 const cachedChapterHeadings = new Map();
 const cachedAllChapterHeadings = new Map();
+const cachedHeadingWrapperOffsets = new WeakMap();
 const missingChapterHTML = new Set();
 
 function chapterFileNames(chapterNumber) {
@@ -110,10 +111,24 @@ function normalizedHeadingTitle(value) {
     .replace(/[^a-z0-9]+/g, "");
 }
 
-function headingWrapperStart(html, headingStart) {
-  const preceding = html.slice(0, headingStart);
-  const wrapperStart = preceding.toLowerCase().lastIndexOf("<div><span depth=");
-  return wrapperStart >= 0 ? wrapperStart : headingStart;
+function headingWrapperStart(source, headingStart) {
+  let offsets = cachedHeadingWrapperOffsets.get(source);
+  if (!offsets) {
+    offsets = Array.from(source.html.matchAll(/<div><span depth=/gi), match => match.index);
+    cachedHeadingWrapperOffsets.set(source, offsets);
+  }
+  // The old prefix scan copied and lowercased increasingly large HTML strings
+  // for every heading. One index keeps the original source offsets and finds
+  // the same last complete wrapper before the heading with a binary search.
+  const latestStart = headingStart - "<div><span depth=".length;
+  let lower = 0;
+  let upper = offsets.length;
+  while (lower < upper) {
+    const middle = (lower + upper) >>> 1;
+    if (offsets[middle] <= latestStart) lower = middle + 1;
+    else upper = middle;
+  }
+  return lower ? offsets[lower - 1] : headingStart;
 }
 
 function decodedPlainText(html) {
@@ -147,7 +162,7 @@ function parsedHeading(source, match, sectionNumber = "") {
     normalizedHeadingTitle: normalizedHeadingTitle(headingText),
     headingStart,
     contentStart: headingEnd,
-    wrapperStart: headingWrapperStart(source.html, headingStart)
+    wrapperStart: headingWrapperStart(source, headingStart)
   };
 }
 

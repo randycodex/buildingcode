@@ -567,6 +567,7 @@ let cachedCanonicalSectionIDs = null;
 const cachedCanonicalBlockIDsBySectionID = new Map();
 let cachedSectionCatalog = null;
 let cachedSectionCatalogPromise = null;
+const cachedConstructionChapterSections = new Map();
 let cachedAllSectionCatalogByID = null;
 let cachedAllSectionCatalogByIDPromise = null;
 let cachedAppleJWKS = null;
@@ -8164,6 +8165,7 @@ const chapterIndex = createRetryableLazyLoader(async () => {
   const files = await readdir(chapterContentPath);
   const manifest = await chapterManifest();
   const chaptersByKey = new Map();
+  const sectionsByChapter = new Map();
   for (const file of files.filter((name) => name.endsWith(".json"))) {
     const chapter = await readJSONFile(join(chapterContentPath, file));
     const manifestChapter = manifest.get(String(chapter.chapterID));
@@ -8183,6 +8185,16 @@ const chapterIndex = createRetryableLazyLoader(async () => {
       sectionCount: (chapter.groups || []).reduce((count, group) => count + (group.sections?.length || 0), 0),
       manifestSectionCount: manifestChapter?.sectionCount || 0
     };
+    // Keep only the fields used by the section catalog. Retaining the original
+    // chapter would keep full HTML/body text alive just to avoid a second read.
+    sectionsByChapter.set(String(chapter.chapterID), (chapter.groups || []).flatMap(group =>
+      (group.sections || []).map(section => ({
+        id: section.id,
+        sectionNumber: section.sectionNumber,
+        title: section.title,
+        headerLine: normalizedConstructionHeaderLine(group.headerLine, codePrefix),
+        headingLine: group.headingLine
+      }))));
     const canonicalKey = `${codePrefix}:${normalizeChapterNumber(chapterNumber)}`;
     const existing = chaptersByKey.get(canonicalKey);
     if (
@@ -8193,11 +8205,17 @@ const chapterIndex = createRetryableLazyLoader(async () => {
       chaptersByKey.set(canonicalKey, chapterSummary);
     }
   }
-  return Array.from(chaptersByKey.values()).sort((left, right) =>
+  const chapters = Array.from(chaptersByKey.values()).sort((left, right) =>
     String(left.codePrefix).localeCompare(String(right.codePrefix)) ||
     compareChapterNumbers(left.chapterNumber, right.chapterNumber) ||
     Number(left.id) - Number(right.id)
   );
+  // Publish projections only after the entire load succeeds. A transient read
+  // failure can retry without exposing an incomplete or stale catalog.
+  for (const chapter of chapters) {
+    cachedConstructionChapterSections.set(String(chapter.id), sectionsByChapter.get(String(chapter.id)));
+  }
+  return chapters;
 });
 
 function flattenChapterSections(chapter) {
@@ -8236,9 +8254,7 @@ async function buildSectionCatalog() {
       String(chapter.id) === String(chapterSummary.id) ||
       (chapter.sourceChapterIDs || []).map(String).includes(String(chapterSummary.id))
     ) || chapterSummary;
-    const chapter = await readJSONFile(join(chapterContentPath, `${chapterSummary.id}.json`));
-    const groups = normalizedConstructionChapterGroups(chapter.groups, chapterSummary.codePrefix);
-    for (const section of flattenChapterSections({ ...chapter, groups })) {
+    for (const section of cachedConstructionChapterSections.get(String(chapterSummary.id))) {
       const canonicalSection = await canonicalizeSectionPayload(section, {
         codePrefix: chapterSummary.codePrefix,
         chapterNumber: chapterSummary.chapterNumber
@@ -8261,6 +8277,9 @@ async function buildSectionCatalog() {
       });
     }
   }
+  // The completed catalog now owns these fields; discard the intermediate
+  // projection instead of retaining a second copy for the process lifetime.
+  cachedConstructionChapterSections.clear();
   return sectionSummaries;
 }
 

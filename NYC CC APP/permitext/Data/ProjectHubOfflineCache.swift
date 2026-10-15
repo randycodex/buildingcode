@@ -252,6 +252,37 @@ struct ProjectHubOfflineCache: Sendable {
 }
 
 
+/// Serial disk/serialization work for large Project snapshots. The synchronous
+/// cache remains available for small draft writes and shares its deletion lock.
+actor ProjectHubOfflineCacheWorker {
+    static let shared = ProjectHubOfflineCacheWorker()
+
+    func store<Value: Codable & Sendable>(
+        _ value: Value, in cache: ProjectHubOfflineCache,
+        accountID: String, projectID: String, scope: String
+    ) throws {
+        try Task.checkCancellation()
+        try cache.store(value, accountID: accountID, projectID: projectID, scope: scope)
+    }
+
+    func load<Value: Codable & Sendable>(
+        _ type: Value.Type, from cache: ProjectHubOfflineCache,
+        accountID: String, projectID: String, scope: String
+    ) throws -> ProjectHubOfflineCacheLoad<Value>? {
+        try Task.checkCancellation()
+        return try cache.load(type, accountID: accountID, projectID: projectID, scope: scope)
+    }
+
+    func removeProject(
+        from cache: ProjectHubOfflineCache, accountID: String, projectID: String
+    ) throws {
+        // Once a revoked/not-found response authorizes invalidation, navigation
+        // cancellation must not leave that private server copy available offline.
+        try cache.removeProject(accountID: accountID, projectID: projectID)
+    }
+}
+
+
 /// A new session invalidates even responses for the same account after sign-out/sign-in.
 struct NativePrivateRequestIdentity: Equatable, Sendable {
     let accountID: String

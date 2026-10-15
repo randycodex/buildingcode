@@ -7,7 +7,7 @@ const fileName = "construction-html-content.mjs";
 const current = await readFile(new URL(fileName, root), "utf8");
 const token = randomUUID();
 const newPath = new URL(`.heading-parity-new-${token}.mjs`, root);
-const expose = "\nexport { allChapterHeadings, cachedChapterHTML };\n";
+const expose = "\nexport { allChapterHeadings, cachedChapterHTML, headingWrapperStart };\n";
 const hash = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 
 try {
@@ -23,6 +23,14 @@ try {
   assert.equal(newHeadings.length, 934);
   assert.equal(hash(newHeadings), "71210577518dc9746f3fce950ea3ad4667a1337bc867d9eed9ad4cd74b5c34a8");
   assert.equal(after.allChapterHeadings(newSource), newHeadings, "Repeated parsing reuses the heading array");
+  // Wrapper lookup must retain source boundaries with mixed-case wrappers,
+  // missing wrappers, adjacent wrappers and positions inside an incomplete
+  // marker. Compare every offset with the prior prefix-scanning behavior.
+  const wrapperSource = { html: '<h6>First</h6><DIV><SPAN DEPTH="1"><h6>Next</h6><div><span depth="2"><div><span depth="3">Last' };
+  for (let offset = 0; offset <= wrapperSource.html.length; offset += 1) {
+    const previous = wrapperSource.html.slice(0, offset).toLowerCase().lastIndexOf("<div><span depth=");
+    assert.equal(after.headingWrapperStart(wrapperSource, offset), previous < 0 ? offset : previous);
+  }
 
   // These exact source fixtures exercise selection, not just heading parsing.
   const fixture = {

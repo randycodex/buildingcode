@@ -7,12 +7,14 @@ const end = source.indexOf('\n  nameInput.addEventListener', begin);
 assert(begin > 0 && end > begin);
 function lookupHarness() {
   const pending = [];
+  let current = true;
   const c = vm.createContext({ identity: null, selectedFolderType: 'project', isEditing: false,
+    isCurrent: () => current,
     addressInput: { value: 'Sample address' }, propertyLookupStatus: { dataset: {}, textContent: '' },
     activeAccount: () => ({ id: 'isolated' }),
     postResearch: () => new Promise((resolve, reject) => pending.push({resolve, reject})) });
   vm.runInContext(source.slice(begin,end) + '\nglobalThis.lookup = lookupPropertyContext;',c);
-  return { c, pending };
+  return { c, pending, invalidate: () => { current = false; } };
 }
 {
   const {c,pending} = lookupHarness(); const p=c.lookup();
@@ -34,8 +36,18 @@ function lookupHarness() {
   const retry=c.lookup(); pending[2].resolve({property:{structuredFacts:[{}],warnings:[]}}); await retry;
   assert.equal(c.propertyLookupStatus.dataset.state,'success');
 }
+for (const outcome of ['success','failure']) {
+  const {c,pending,invalidate}=lookupHarness(); const request=c.lookup();
+  const before=c.propertyLookupStatus.textContent;
+  invalidate();
+  if(outcome==='success') pending[0].resolve({property:{structuredFacts:[{status:'sourced'}],normalizedAddress:'Stale account address'}});
+  else pending[0].reject(new Error('Stale account failure'));
+  assert.equal(await request,null);
+  assert.equal(c.addressInput.value,'Sample address','A closed or replaced account context cannot publish lookup data');
+  assert.equal(c.propertyLookupStatus.textContent,before,'A stale completion cannot replace current status');
+}
 const noteStart=source.indexOf('  let noteRevision = 0;');
-const noteEnd=source.indexOf('\n  content.append(codeLabelElement',noteStart);
+const noteEnd=source.indexOf('\n  const addNote = document.createElement("button");',noteStart);
 assert(noteStart > 0 && noteEnd > noteStart);
 class Element {
   constructor(){this.textContent='';this.children=[];this.events={};}

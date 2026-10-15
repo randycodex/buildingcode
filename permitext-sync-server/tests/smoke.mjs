@@ -230,6 +230,10 @@ async function main() {
     new URL("../../NYC CC APP/permitext/Info.plist", import.meta.url),
     "utf8"
   );
+  const iosNotebookSource = await readNativeSource(
+    new URL("../../NYC CC APP/permitext/Views/NotebookView.swift", import.meta.url),
+    "utf8"
+  );
   const iosBookmarksSource = await readNativeSource(
     new URL("../../NYC CC APP/permitext/Views/BookmarksView.swift", import.meta.url),
     "utf8"
@@ -1098,10 +1102,14 @@ async function main() {
         iosLibraryViewModelSource.includes("func bookmarks(inFolder folderID: Int64)") &&
         iosLibraryViewModelSource.includes("repository.evidenceReferences(inFolder: folder.id)") &&
         iosUserDataStoreSource.includes("func evidenceReferences(inFolder folderID: Int64)") &&
-        iosBookmarksSource.includes('CodeEyebrow(text: "Project overview"') &&
-        iosBookmarksSource.includes('Label("Notebook", systemImage: "note.text")') &&
-        iosBookmarksSource.includes("projectNotebookDestination(projectID: projectID, cardID: card.id)") &&
-        iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
+        iosBookmarksSource.includes('ProjectContextView(folderID: folderID, accentColor: accentColor)') &&
+        iosBookmarksSource.includes('projectSectionCard("Notes", systemImage: "note.text")') &&
+        iosBookmarksSource.includes("projectNotebookDestination(projectID: projectID)") &&
+        iosBookmarksSource.includes("NavigationLink { projectEvidenceDestination }") &&
+        iosBookmarksSource.includes("library.researchHistoryProjectFilter = projectID") &&
+        iosBookmarksSource.includes("library.researchHistoryIsPresented = true") &&
+        iosBookmarksSource.includes("library.selectedTab = .research") &&
+        !iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
         iosBookmarksSource.includes('projectHubSection(title: "Reports"') &&
         iosExportBuilderSource.includes("struct ProjectReportExportBuilder: Sendable") &&
         iosCodeModelsSource.includes("struct PermitextFirmControls: Codable") &&
@@ -3131,7 +3139,11 @@ async function main() {
         workspaceScript.text.includes("releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)") &&
         (webOnly || (iosLibraryViewModelSource.includes("static let coordination = false") &&
         iosOrganizationProjectHubSource.includes("if PermitextReleaseSurfaceVisibility.coordination {") &&
-        iosBookmarksSource.includes('PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"'))),
+        iosLibraryViewModelSource.includes('coordination || cardType != "coordination-item"') &&
+        iosNotebookSource.includes("PermitextReleaseSurfaceVisibility.visibleNotebookCards(cached.value.cards)") &&
+        iosNotebookSource.includes("PermitextReleaseSurfaceVisibility.visibleNotebookCards(response.cards)") &&
+        iosNotebookSource.includes("guard PermitextReleaseSurfaceVisibility.notebookCardIsVisible(card.cardType) else") &&
+        iosOrganizationProjectHubSource.includes("PermitextReleaseSurfaceVisibility.visibleNotebookCards"))),
       "Deferred Coordination must stay hidden and blocked on web and iOS while its implementation remains preserved."
     );
 

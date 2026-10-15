@@ -16,6 +16,14 @@ extension Notification.Name {
 enum PermitextReleaseSurfaceVisibility {
     static let firmCollaboration = false
     static let coordination = false
+
+    static func notebookCardIsVisible(_ cardType: String) -> Bool {
+        coordination || cardType != "coordination-item"
+    }
+
+    static func visibleNotebookCards(_ cards: [ProjectNotebookCardSummary]) -> [ProjectNotebookCardSummary] {
+        cards.filter { notebookCardIsVisible($0.cardType) }
+    }
 }
 
 /// Presentation only. Checking a plan never grants a capability.
@@ -3890,25 +3898,31 @@ final class CodeLibraryViewModel: ObservableObject {
                 projectID: projectID
             )
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
-            try? projectHubOfflineCache.store(
-                snapshot,
+            try? await ProjectHubOfflineCacheWorker.shared.store(
+                snapshot, in: projectHubOfflineCache,
                 accountID: signedInAccount.appUserID,
                 projectID: projectID,
                 scope: "personal"
             )
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             return snapshot
         } catch {
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
-                try? projectHubOfflineCache.removeProject(accountID: signedInAccount.appUserID, projectID: projectID)
+                try? await ProjectHubOfflineCacheWorker.shared.removeProject(
+                    from: projectHubOfflineCache, accountID: signedInAccount.appUserID, projectID: projectID
+                )
+                guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             }
             guard NativePrivateCachePolicy.permitsOfflineFallback(after: error) else { throw error }
-            if let cached = try? projectHubOfflineCache.load(
-                ProjectHubSnapshot.self,
+            let cached = try? await ProjectHubOfflineCacheWorker.shared.load(
+                ProjectHubSnapshot.self, from: projectHubOfflineCache,
                 accountID: signedInAccount.appUserID,
                 projectID: projectID,
                 scope: "personal"
-            ) {
+            )
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+            if let cached {
                 return cached.value.cachedCopy(at: cached.cachedAt)
             }
             throw error
@@ -3974,25 +3988,31 @@ final class CodeLibraryViewModel: ObservableObject {
                 projectID: projectID
             )
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
-            try? projectHubOfflineCache.store(
-                snapshot,
+            try? await ProjectHubOfflineCacheWorker.shared.store(
+                snapshot, in: projectHubOfflineCache,
                 accountID: signedInAccount.appUserID,
                 projectID: projectID,
                 scope: "organization"
             )
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             return snapshot
         } catch {
             guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
-                try? projectHubOfflineCache.removeProject(accountID: signedInAccount.appUserID, projectID: projectID)
+                try? await ProjectHubOfflineCacheWorker.shared.removeProject(
+                    from: projectHubOfflineCache, accountID: signedInAccount.appUserID, projectID: projectID
+                )
+                guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             }
             guard NativePrivateCachePolicy.permitsOfflineFallback(after: error) else { throw error }
-            if let cached = try? projectHubOfflineCache.load(
-                BackendOrganizationProjectSnapshotResponse.self,
+            let cached = try? await ProjectHubOfflineCacheWorker.shared.load(
+                BackendOrganizationProjectSnapshotResponse.self, from: projectHubOfflineCache,
                 accountID: signedInAccount.appUserID,
                 projectID: projectID,
                 scope: "organization"
-            ) {
+            )
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+            if let cached {
                 var snapshot = cached.value
                 snapshot.cachedAt = cached.cachedAt
                 return snapshot

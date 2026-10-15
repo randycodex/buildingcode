@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {writeSearchQuerySession,withoutPersistentSearchQueries} from '../public/search-query-session.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 function actual(name){const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert.ok(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);}
 let owner='A',now=1000;const pending=[],published=[];
@@ -25,7 +26,7 @@ assert.notEqual(pending.at(-1),mutationPending,'Mutation invalidation causes an 
 pending.at(-1).resolve('after mutation');assert.equal(await beforeMutation,'after mutation');assert.ok(!published.includes('before mutation'));
 
 let clock=0,next=0,epoch=1,writes=0;const timers=new Map(),stored=new Map();
-const d=vm.createContext({activeWorkspaceID:'one',captureAccountRequest:()=>epoch,isCurrentAccountRequest:x=>x===epoch,setTimeout(fn,delay){const id=++next;timers.set(id,{fn,time:clock+delay});return id;},clearTimeout:id=>timers.delete(id),workspaceRestoreError:false,restoreResearchWorkspaceState(){},captureResearchWorkspaceState(){},detachedProjectWindow:false,persistCodeQuestionAccountState(){},captureColumnGroupContents(){},state:{draft:''},track:{scrollLeft:0},captureWorkspaceLayout:s=>({...s}),workspaceSnapshotKey:id=>id,workspaceLayoutWithoutCodeQuestionData:x=>x,localStorage:{setItem(k,v){writes++;stored.set(k,v);}},workspaceRegistry:null,globalWorkspaceStateKeys:[],baseWorkspaceKey:'global',sessionStorage:{removeItem(){}},tabWorkspaceKey:'tab',updateConnectionStatus(){}});
+const d=vm.createContext({activeWorkspaceID:'one',captureAccountRequest:()=>epoch,isCurrentAccountRequest:x=>x===epoch,setTimeout(fn,delay){const id=++next;timers.set(id,{fn,time:clock+delay});return id;},clearTimeout:id=>timers.delete(id),workspaceRestoreError:false,restoreResearchWorkspaceState(){},captureResearchWorkspaceState(){},detachedProjectWindow:false,persistCodeQuestionAccountState(){},captureColumnGroupContents(){},state:{draft:''},track:{scrollLeft:0},captureWorkspaceLayout:s=>({...s}),workspaceSnapshotKey:id=>id,workspaceLayoutWithoutCodeQuestionData:x=>x,localStorage:{setItem(k,v){writes++;stored.set(k,v);}},workspaceRegistry:null,globalWorkspaceStateKeys:[],baseWorkspaceKey:'global',writeSearchQuerySession,withoutPersistentSearchQueries,sessionStorage:{setItem(){},removeItem(){}},tabWorkspaceKey:'tab',updateConnectionStatus(){}});
 vm.runInContext(`let pendingSearchQueryPersistence=null,pendingResearchDraftPersistence=null;${['consumeSearchQueryPersistence','consumeResearchDraftPersistence','scheduleResearchDraftPersistence','flushResearchDraftPersistence','saveWorkspaceState'].map(actual).join('\n')}`,d);
 function advance(ms){clock+=ms;for(const [id,t]of [...timers])if(t.time<=clock){timers.delete(id);t.fn();}}
 for(let i=1;i<=50;i++){d.state.draft='x'.repeat(i);d.scheduleResearchDraftPersistence();advance(10);}

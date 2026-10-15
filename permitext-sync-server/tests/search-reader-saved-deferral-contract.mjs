@@ -97,6 +97,7 @@ final class CodeLibraryViewModel {
  var syncEngine = UserContentSyncEngine(repository: nil, backend: 0, continuityStore: 0)
  var userContentSyncBackend = 0; var continuityStore = 0
  var currentPlan = 0; var currentEntitlementSource = 0; var currentCapabilityContract = 0
+ var initialEntitlementPresentation = 0; var readerSaveDestinationChoice = 0
  var accountAuthorizedStoreKitPlan = 0; var activeStoreKitResearch = 0
  var isStoreKitResearchActive = false; var hasActiveBackendProEntitlement = false
  var activeProjectID: Int64?; var readerTheme = 0
@@ -194,6 +195,7 @@ for transition in ["account-switch", "sign-out", "same-account-rollover"] {
  replacement.tags = [104:["new tag"]]; replacement.annotations = [Annotation(sectionID:105)]
  owner.userContentRepository = replacement
  owner.privateSessionID = UUID()
+ owner.initialEntitlementPresentation = 7; owner.readerSaveDestinationChoice = 9
  if transition == "account-switch" { owner.signedInAccount = Account(appUserID:"b") }
  if transition == "sign-out" { owner.signedInAccount = nil }
  let oldCalls = oldRepository.calls.count
@@ -208,6 +210,7 @@ for transition in ["account-switch", "sign-out", "same-account-rollover"] {
  precondition(card.savedPresentationRefreshTask == nil && card.projectTask == nil)
  precondition(card.userContentRepository === replacement && card.syncEngine.repository === replacement)
  precondition(card.sharedSavedSessionID == owner.privateSessionID)
+ precondition(card.initialEntitlementPresentation == 7 && card.readerSaveDestinationChoice == 9)
  precondition(card.signedInAccount?.appUserID == owner.signedInAccount?.appUserID)
  precondition(card.bookmarkedSectionIDs == [101,102] && card.bookmarks.isEmpty)
  precondition(card.hasDeferredSavedPresentation && card.externallyLoadedBookmarksByCodeVersion.isEmpty)

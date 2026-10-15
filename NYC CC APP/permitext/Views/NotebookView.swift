@@ -190,6 +190,17 @@ struct ProjectNotebookView: View {
     }
 }
 
+func nativeNotebookCachedCardType(
+    cache: ProjectHubOfflineCache, accountID: String, projectID: String, cardID: String
+) -> String? {
+    if let card = try? cache.load(NotebookCard.self, accountID: accountID, projectID: projectID,
+                                  scope: "native-notebook-card:\(cardID)")?.value {
+        return card.cardType
+    }
+    return (try? cache.load(NotebookCardListResponse.self, accountID: accountID, projectID: projectID,
+                            scope: "native-notebook-list"))?.value.cards.first { $0.id == cardID }?.cardType
+}
+
 enum NativeNotebookOfflineDraftPolicy {
     static func permitsDraftEditing(cachedAccess: NotebookAccess?, after error: Error) -> Bool {
         guard let cachedAccess, !cachedAccess.readOnly,
@@ -420,9 +431,15 @@ private struct ProjectNotebookSessionView: View {
             isLoading = false
             return
         }
-        localDrafts = (try? cache.entries(NativeNotebookDraft.self, accountID: owner.accountID, projectID: projectID, scopePrefix: "native-notebook-draft:"))?.filter {
+        let storedDrafts = (try? cache.entries(NativeNotebookDraft.self, accountID: owner.accountID, projectID: projectID, scopePrefix: "native-notebook-draft:"))?.filter {
             $0.value.hasUnsynchronizedChanges
         }.sorted { ($0.value.editedAt ?? .distantPast) > ($1.value.editedAt ?? .distantPast) } ?? []
+        localDrafts = storedDrafts.filter { entry in
+            guard let cardID = entry.value.cardID else { return true }
+            guard let type = nativeNotebookCachedCardType(cache: cache, accountID: owner.accountID, projectID: projectID, cardID: cardID)
+            else { return PermitextReleaseSurfaceVisibility.coordination }
+            return PermitextReleaseSurfaceVisibility.notebookCardIsVisible(type)
+        }
         let cachedAccess = (try? cache.load(NotebookCardListResponse.self, accountID: owner.accountID,
             projectID: projectID, scope: "native-notebook-list"))?.value.access
         let requestID = UUID()
@@ -431,7 +448,7 @@ private struct ProjectNotebookSessionView: View {
             NotebookCardListResponse.self, accountID: owner.accountID,
             projectID: projectID, scope: "native-notebook-list"
         ) {
-            cards = cached.value.cards
+            cards = PermitextReleaseSurfaceVisibility.visibleNotebookCards(cached.value.cards)
             // Cached access is descriptive; an online response authorizes edits.
             access = NotebookAccess(role: "viewer", readOnly: true)
             cachedAt = cached.cachedAt
@@ -441,7 +458,13 @@ private struct ProjectNotebookSessionView: View {
         do {
             let response = try await library.notebookCards(projectID: projectID)
             guard isCurrentOwner, loadID == requestID, !Task.isCancelled else { return }
-            cards = response.cards.sorted { $0.updatedAt > $1.updatedAt }
+            cards = PermitextReleaseSurfaceVisibility.visibleNotebookCards(response.cards).sorted { $0.updatedAt > $1.updatedAt }
+            localDrafts = storedDrafts.filter { entry in
+                guard let cardID = entry.value.cardID else { return true }
+                guard let card = response.cards.first(where: { $0.id == cardID })
+                else { return localDrafts.contains { $0.scope == entry.scope } }
+                return PermitextReleaseSurfaceVisibility.notebookCardIsVisible(card.cardType)
+            }
             access = response.access ?? NotebookAccess(role: "editor", readOnly: false)
             permitsLocalDraftEditing = false
             errorMessage = nil
@@ -1155,6 +1178,7 @@ private struct NotebookCardEditorView: View {
         guard let accountID = owner?.accountID else { return }
         isLoading = true
         var refreshSucceeded = false
+        var deferredDraft: NativeNotebookDraft?
         defer {
             isLoading = false
             // saveNow rejects an active load. Resume only after the load flag is
@@ -1164,21 +1188,41 @@ private struct NotebookCardEditorView: View {
             }
         }
 
-        if !forceNetwork, !hasLoaded {
+        if !hasLoaded {
+            // Unsynchronized drafts must also survive a forced retry after an
+            // offline type-validation failure. Only the server copy is skipped.
             if let cachedDraft = try? cache.load(
                 NativeNotebookDraft.self,
                 accountID: accountID,
                 projectID: projectID,
                 scope: "native-notebook-draft:\(routeID)"
             )?.value, cachedDraft.hasUnsynchronizedChanges {
-                apply(cachedDraft)
-            } else if let cardID,
+                let cachedType = cachedDraft.cardID.flatMap {
+                    nativeNotebookCachedCardType(cache: cache, accountID: accountID, projectID: projectID, cardID: $0)
+                }
+                if let cachedType, !PermitextReleaseSurfaceVisibility.notebookCardIsVisible(cachedType) {
+                    showUnavailableCoordinationCard()
+                    return
+                }
+                if cachedDraft.cardID != nil && cachedType == nil && !PermitextReleaseSurfaceVisibility.coordination {
+                    // An older draft has no type metadata. Keep it on disk and
+                    // validate the saved card before revealing its contents.
+                    deferredDraft = cachedDraft
+                    currentCardID = cachedDraft.cardID
+                } else {
+                    apply(cachedDraft)
+                }
+            } else if !forceNetwork, let cardID,
                       let cachedCard = try? cache.load(
                         NotebookCard.self,
                         accountID: accountID,
                         projectID: projectID,
                         scope: "native-notebook-card:\(cardID)"
                       )?.value {
+                guard PermitextReleaseSurfaceVisibility.notebookCardIsVisible(cachedCard.cardType) else {
+                    showUnavailableCoordinationCard()
+                    return
+                }
                 apply(cachedCard)
             } else {
                 currentCardID = cardID
@@ -1193,6 +1237,11 @@ private struct NotebookCardEditorView: View {
         do {
             let card = try await library.notebookCard(projectID: projectID, cardID: cardID)
             guard isCurrentOwner, !Task.isCancelled else { return }
+            guard PermitextReleaseSurfaceVisibility.notebookCardIsVisible(card.cardType) else {
+                showUnavailableCoordinationCard()
+                return
+            }
+            if let deferredDraft { apply(deferredDraft) }
             let decision = NativeNotebookRefreshDecision.resolve(
                 draft: hasLoaded ? currentDraft : nil, serverVersion: card.version,
                 serverContent: editableContent(for: card))
@@ -1227,6 +1276,15 @@ private struct NotebookCardEditorView: View {
             errorMessage = nativeNotebookRequestErrorMessage(error)
             statusMessage = hasLoaded ? "Saved on this iPhone; could not refresh" : ""
         }
+    }
+
+    private func showUnavailableCoordinationCard() {
+        hasLoaded = false
+        needsSave = false
+        saveTask?.cancel()
+        saveTask = nil
+        errorMessage = "This item is not available in Notebook."
+        statusMessage = ""
     }
 
     private func apply(_ card: NotebookCard) {

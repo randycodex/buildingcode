@@ -62,6 +62,9 @@ try {
   const results = await Promise.all(searches.map(request));
   assert.ok(results.every(result => result.status === 200 && result.body.results.length === 5));
   assert.equal(counts.get(indexPath), 2, "Four concurrent searches must share the successful index retry");
+  const catalogChapterReads = [...counts].filter(([path]) => path.includes("/prepared/chapters/") && path.endsWith(".json"));
+  assert.deepEqual(catalogChapterReads, chapterReads,
+    "Search must reuse the compact section metadata loaded for chapter selectors, without rereading chapter JSON");
   for (const [index, path] of searches.entries()) {
     assert.deepEqual(await request(path), results[index], "Cached response must preserve snippets, ranking and cursor metadata");
     const first = results[index].body;

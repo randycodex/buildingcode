@@ -50,6 +50,7 @@ enum NativePrivateCachePolicy {
 }
 @MainActor final class Library {
  var activeResearchConversationID: String? = "conversation"
+ var researchHistoryProjectFilter = "all"
  var reads: [CheckedContinuation<ResearchConversation, Error>] = []
  var historyReads: [CheckedContinuation<ResearchConversationListResponse, Error>] = []
  var historyRequests: [(limit: Int, cursor: String?, query: String, projectID: String?)] = []
@@ -67,7 +68,8 @@ enum NativePrivateCachePolicy {
  var historyLoadID: UUID?; var summaries: [ResearchConversationSummary] = []; var historyPreviews: [String: String] = [:]
  var conversationLoadID: UUID?; var conversationPublicationID = UUID()
  var historyPreviewRevisions: [String: String] = [:]
- var historyQuery = ""; var historyProjectFilter = "all"; var historyNextCursor: String?
+ var historyQuery = ""; var historyProjectFilter: String { get { library.researchHistoryProjectFilter } set { library.researchHistoryProjectFilter = newValue } }; var historyNextCursor: String?
+ var selectedHistoryIDs: Set<String> = []; var isDeletingHistoryBatch = false
  var historyHasMore = false; var historyLegacySummaries: [ResearchConversationSummary]?
  var isLoadingMoreHistory = false; var historyLoadedFilterKey: String?
  ${property('historyProjectID')}
@@ -218,7 +220,9 @@ enum NativePrivateCachePolicy {
    let h = Harness(); h.cache.history = mixed; h.historyProjectFilter = "unassigned"
    h.historyLegacySummaries = [mixed[1], mixed[2]]; h.summaries = [mixed[1]]
    h.historyLoadID = UUID(); h.historyLoadedFilterKey = h.historyFilterKey; h.historyHasMore = true
+   h.selectedHistoryIDs = ["b", "c"]
    h.removeHistoryConversation(id: "b", accountID: "fixture")
+   precondition(h.selectedHistoryIDs == ["c"], "Deleting a conversation clears only that selection")
    precondition(h.cache.history?.map(\\.id) == ["a", "c"], "A filtered deletion removes its ID from global cache while preserving unrelated Projects")
    precondition(h.historyLegacySummaries?.map(\\.id) == ["c"])
    await h.loadMoreHistory(); precondition(h.summaries.map(\\.id) == ["c"], "Local legacy paging cannot resurrect a deleted conversation")

@@ -28,8 +28,7 @@ struct OrganizationProjectHubView: View {
     }
 
     private var notebookCards: [ProjectNotebookCardSummary] {
-        (foundation?.artifacts ?? [])
-            .compactMap(\.notebookCard)
+        PermitextReleaseSurfaceVisibility.visibleNotebookCards((foundation?.artifacts ?? []).compactMap(\.notebookCard))
             .sorted { $0.updatedAt > $1.updatedAt }
     }
 

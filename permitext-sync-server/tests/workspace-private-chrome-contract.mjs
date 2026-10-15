@@ -24,6 +24,7 @@ const context=vm.createContext({workspaceActionsButton:button,detachedProjectWin
  ensureSyncedContentForRender:async()=>({userID:account?.userID,workspacePresentationAccess:authority}),
  loadSyncedContent:async()=>({userID:account?.userID,workspacePresentationAccess:authority}),showWebNotice:async()=>{},
  activeWorkspaceRecord(){privateReads++;return{id:'project'};},visibleWorkspaceRecords(){privateReads++;return[{id:'project',name:'Private Project'}];},
+ workspaceProject(){privateReads++;return{id:'project'};},hasCapability:()=>true,prependWorkspaceButtonIcon(){},
  reconcileProjectWorkspaces(){privateReads++;},closeWorkspaceContextMenu(){body.children=[];},state,
  document:{createElement:tag=>new Element(tag),body,getElementById:id=>id==='fit-columns'?layoutControl:null},
  window:{innerWidth:1000,innerHeight:800},workspaceContextMenu:null,activeWorkspaceID:'project',updateWorkspaceLayoutControls(){},
@@ -45,7 +46,7 @@ assert.ok(labels().includes('Sign in for Projects'));assert.ok(labels().includes
 account={userID:'owner'};authority='verified';allowed=true;
 context.renderWorkspaceTabs();assert.equal(label.textContent,'Private Project');assert.equal(button.disabled,false);
 await context.openWorkspaceContextMenu('project',button);
-assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(labels().includes('Manage Projects…'));
+assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(labels().includes('Manage Projects…'));assert.ok(labels().includes('Project details'));
 const readsBefore=privateReads;body.children=[];current=false;
 await context.openWorkspaceContextMenu('project',button);
 assert.equal(body.children.length,0,'a stale account request cannot mount its menu');assert.equal(privateReads,readsBefore);

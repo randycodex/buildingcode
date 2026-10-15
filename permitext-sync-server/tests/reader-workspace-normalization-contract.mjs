@@ -26,7 +26,7 @@ for (const initialChapter of ['', 'source-chapter']) {
     applyCodeTheme() {}, renderReaderTrust() {}, populateCodeSelect() {}, resetEnhancedSelects() {},
     renderSectionContent: async () => {}, setTitle() {}, preparePaneCollapse() {}, enhanceSelect() {},
   });
-  vm.runInContext(`const readerResolvedWorkspaceIdentities=new WeakMap();\n${actual('workspaceReaderContentIdentity')}\n${actual('setResolvedReaderChapter')}\n${actual('populateReaderSelectors')}\n${actual('refreshReaderContent')}\nglobalThis.identity=workspaceReaderContentIdentity; globalThis.refresh=refreshReaderContent;`, sandbox);
+  vm.runInContext(`const readerResolvedWorkspaceIdentities=new WeakMap();\nconst resolvedReaderSourceNavigations=new WeakMap();\n${actual('workspaceReaderContentIdentity')}\n${actual('setResolvedReaderChapter')}\n${actual('populateReaderSelectors')}\n${actual('refreshReaderContent')}\nglobalThis.identity=workspaceReaderContentIdentity; globalThis.refresh=refreshReaderContent;`, sandbox);
   const reader = { id: 'reader', codePrefix: 'BC', codeVersion: '2022', chapterID: initialChapter, sectionID: '' };
   const makePanel = () => ({ dataset: {}, querySelector: () => ({ append() {} }), querySelectorAll: () => [] });
   const descriptor = () => ({ id: 'reader', identity: sandbox.identity(reader), load: async () => {
