@@ -17492,9 +17492,6 @@ html body .research-compact-composer .research-question-input:focus-visible {
   color: var(--text-primary);
   text-decoration: underline;
 }
-.settings-footer > .settings-feedback-link {
-  color: var(--text-primary);
-}
 .settings-panel .settings-footer .settings-disclaimer {
   padding: 0;
   text-align: left;
