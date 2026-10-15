@@ -59,18 +59,19 @@ const pane=id=>({dataset:{paneId:id},scrollTop:0,scrollLeft:0,isConnected:true,q
 const reader=pane('reader:one'), notebook=pane('project:notebook:a'); reader.scrollTop=1700; notebook.scrollTop=400;
 const panes=[reader,notebook], state={workflowVisitedViews:['research','notebook'],workflowView:'research',workflowMembership:{},workflowScroll:{notebook:70}};
 const track={scrollLeft:110,querySelectorAll:()=>panes};
-let constructions=0, needProject=false;
+let constructions=0, needProject=false, dividerUpdates=0;
 let reportOpen=false, detailsOpen=false;
 const c=vm.createContext({reportScreen:{isOpen:()=>reportOpen,close(){reportOpen=false;}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){detailsOpen=false;}},toggleSettingsButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
-  syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
+  syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},schedulePaneDividerAddControls(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
   defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
   appendPaneSequence(actualPanes){actualPanes.forEach((p,i)=>assert.equal(p,panes[i]));for(const p of actualPanes){p.hidden=!c.workflowPaneIsVisible(p.dataset.paneId);p.scrollTop=0;}},
   openProjectNotebook(){constructions++;},focusRecentUtilityColumn(){constructions++;}
 });
 vm.runInContext("let presentedColumnWorkflowView='research';\n"+['currentWorkflowView','currentColumnWorkflowView','syncReferenceReaderLayout','syncWorkflowColumnPresentation','workflowPaneAnchors','workflowPaneIsVisible','closeSharedWorkspaceViews','syncWorkflowNavigation','switchWorkflowView'].map(actual).join('\n'),c);
 await c.switchWorkflowView('notebook'); assert.equal(track.scrollLeft,70);
+assert.ok(dividerUpdates > 0, 'Workflow changes refresh divider control visibility even when the column layout stays intact');
 notebook.scrollTop=450; track.scrollLeft=200;
 await c.switchWorkflowView('research');
 assert.equal(reader.scrollTop,1700); assert.equal(track.scrollLeft,110);

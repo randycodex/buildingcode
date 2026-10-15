@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-divider-reader-picker-v1078";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-research-divider-hover-v1081";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-divider-reader-picker-v1078";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-research-divider-hover-v1081";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-divider-reader-picker-v1078";
+} from "./offline-storage.js?v=20261015-research-divider-hover-v1081";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-divider-reader-picker-v1078";
+} from "./workspace-state.js?v=20261015-research-divider-hover-v1081";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4505,6 +4505,7 @@ function syncWorkflowNavigation() {
   syncReferenceReaderLayout();
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   updateWorkspaceLayoutControls();
+  schedulePaneDividerAddControls();
 }
 async function switchWorkflowView(view) {
   closeSharedWorkspaceViews();
@@ -7460,9 +7461,17 @@ function openReaderCodePicker(anchor, onSelect) {
   menu.append(manage);
   document.body.append(menu);
   const bounds = anchor.getBoundingClientRect();
-  menu.style.left = `${Math.max(8, Math.min(bounds.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+  const dividerPicker = anchor.classList.contains("pane-divider-add");
+  const preferredLeft = dividerPicker ? bounds.left + (bounds.width - menu.offsetWidth) / 2 : bounds.left;
+  menu.style.left = `${Math.max(8, Math.min(preferredLeft, window.innerWidth - menu.offsetWidth - 8))}px`;
   menu.style.top = `${bounds.bottom + 8}px`;
   menu.style.maxHeight = `${window.innerHeight - bounds.bottom - 24}px`;
+  if (dividerPicker) {
+    // A moved divider is a new location; do not leave a picker over the old one.
+    track.addEventListener("scroll", close, { passive: true, signal: controller.signal });
+    track.addEventListener("permitext:workspace-layout-change", close, { signal: controller.signal });
+    window.addEventListener("resize", close, { signal: controller.signal });
+  }
   document.addEventListener("pointerdown", (event) => {
     if (!menu.contains(event.target) && !anchor.contains(event.target)) close();
   }, { signal: controller.signal });
@@ -40384,6 +40393,57 @@ function refreshPaneDividerValue(divider) {
   }
 }
 
+let paneDividerAddPointer = null;
+let paneDividerAddFrame = 0;
+let paneDividerAddLayoutDirty = true;
+const paneDividerAddRevealRadius = 40;
+
+function positionPaneDividerAddControls() {
+  const toolbar = document.querySelector(".workflow-toolbar");
+  const toolbarBounds = toolbar?.getBoundingClientRect();
+  const trackBounds = track.getBoundingClientRect();
+  const enabled = currentColumnWorkflowView() === "research" && toolbarBounds?.height > 0 && !track.inert && getComputedStyle(toolbar).visibility !== "hidden";
+  const pinned = track.querySelector(":scope > .workspace-panel.is-pinned:not(.is-workflow-hidden)");
+  const pinnedRight = pinned?.getBoundingClientRect().right || trackBounds.left;
+  track.querySelectorAll(":scope > .pane-divider").forEach(divider => {
+    const button = divider.querySelector(".pane-divider-add");
+    if (!button) return;
+    const bounds = divider.getBoundingClientRect();
+    const x = bounds.left + bounds.width / 2;
+    const left = divider.classList.contains("is-pinned-divider") ? trackBounds.left : pinnedRight;
+    button.hidden = !enabled || !bounds.height || x < left + 14 || x > Math.min(trackBounds.right, window.innerWidth) - 14;
+    if (button.hidden) {
+      button._dividerAddCenter = null;
+      if (button.getAttribute("aria-expanded") === "true") document.querySelector(".reader-open-code-menu")?._close?.();
+      return;
+    }
+    const y = toolbarBounds.top + toolbarBounds.height / 2;
+    button.style.left = `${x}px`;
+    button.style.top = `${y}px`;
+    button._dividerAddCenter = { x, y };
+  });
+}
+
+function revealNearbyPaneDividerAddControls() {
+  track.querySelectorAll(".pane-divider-add").forEach(button => {
+    const center = button._dividerAddCenter;
+    const nearby = Boolean(center && paneDividerAddPointer &&
+      Math.hypot(center.x - paneDividerAddPointer.x, center.y - paneDividerAddPointer.y) <= paneDividerAddRevealRadius);
+    button.classList.toggle("is-near-pointer", nearby);
+  });
+}
+
+function schedulePaneDividerAddControls(reposition = true) {
+  paneDividerAddLayoutDirty ||= reposition;
+  if (paneDividerAddFrame) return;
+  paneDividerAddFrame = requestAnimationFrame(() => {
+    paneDividerAddFrame = 0;
+    if (paneDividerAddLayoutDirty) positionPaneDividerAddControls();
+    paneDividerAddLayoutDirty = false;
+    revealNearbyPaneDividerAddControls();
+  });
+}
+
 function createDivider(previousPaneID, nextPaneID) {
   const isLeftEdge = !previousPaneID && Boolean(nextPaneID);
   const isRightEdge = Boolean(previousPaneID) && !nextPaneID;
@@ -46477,6 +46537,17 @@ async function start() {
   window.addEventListener("beforeunload", saveWorkspaceResumeForRefresh);
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
+  track.addEventListener("scroll", () => schedulePaneDividerAddControls(), { passive: true });
+  track.addEventListener("permitext:workspace-layout-change", () => schedulePaneDividerAddControls());
+  window.addEventListener("resize", () => schedulePaneDividerAddControls(), { passive: true });
+  document.addEventListener("pointermove", event => {
+    paneDividerAddPointer = event.pointerType === "touch" ? null : { x: event.clientX, y: event.clientY };
+    schedulePaneDividerAddControls(false);
+  }, { passive: true });
+  document.addEventListener("pointerleave", () => {
+    paneDividerAddPointer = null;
+    schedulePaneDividerAddControls(false);
+  });
   bindHorizontalWheelScroll(track);
   if (detachedProjectWindow) {
     if (!detachedProject) throw new Error("This detached Workboard no longer has a project session.");

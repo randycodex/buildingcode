@@ -1816,9 +1816,9 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .pane-divider-add {
-  position: absolute;
-  top: var(--space-5);
-  left: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
   z-index: 1;
   display: grid;
   place-items: center;
@@ -1827,10 +1827,10 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   min-height: 0;
   margin: 0;
   padding: 0;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--background);
+  background: transparent;
   color: var(--text-secondary);
   font-family: var(--ui-font-family);
   font-size: 22px;
@@ -1838,13 +1838,21 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   line-height: 1;
   cursor: pointer;
   touch-action: manipulation;
+  opacity: 0;
+  pointer-events: none;
+}
+.pane-divider-add.is-near-pointer,
+.pane-divider-add:is(:focus-visible, [aria-expanded="true"]) {
+  opacity: 1;
   pointer-events: auto;
 }
+.pane-divider-add[hidden] { display: none; }
 .pane-divider-add:is(:hover, :focus-visible, [aria-expanded="true"]) {
   color: var(--text-primary);
   background: var(--menu-surface);
 }
-.pane-divider-add:disabled { opacity: 0.4; cursor: default; }
+.pane-divider-add:disabled { cursor: default; }
+.pane-divider-add:disabled:is(.is-near-pointer, :focus-visible) { opacity: 0.4; }
 .panel-track.is-resizing .pane-divider-add { pointer-events: none; }
 
 .pane-divider::before {
