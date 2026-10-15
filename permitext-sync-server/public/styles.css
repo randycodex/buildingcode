@@ -3517,6 +3517,7 @@ select option:checked {
   gap: 0;
   max-width: none;
   padding-top: 0;
+  counter-reset: reader-search-result;
 }
 
 .reader-internal-results-heading {
@@ -3538,7 +3539,10 @@ select option:checked {
 }
 
 .reader-internal-result {
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(3ch, max-content) minmax(0, 1fr);
+  column-gap: var(--space-2);
+  counter-increment: reader-search-result;
   width: auto;
   margin-inline: var(--reader-search-text-inset);
   padding: var(--space-3) 0;
@@ -3550,6 +3554,19 @@ select option:checked {
   text-align: left;
   cursor: pointer;
 }
+
+.reader-internal-result::before {
+  content: counter(reader-search-result) ".";
+  grid-column: 1;
+  grid-row: 1;
+  color: var(--text-secondary);
+  font-family: var(--ui-font-family);
+  font-size: var(--reader-font-size);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  text-align: end;
+}
+.reader-internal-result > :is(strong, p) { grid-column: 2; }
 
 .reader-internal-result:hover,
 .reader-internal-result:focus-visible {
