@@ -14448,9 +14448,15 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   width: calc(100% + (2 * var(--space-4)));
   margin-inline: calc(-1 * var(--space-4));
   border: 0;
-  border-block: 1px solid var(--border);
   border-radius: 0;
 }
+
+.notebook-panel .notebook-editor-surface .notebook-format-toolbar,
+.notebook-panel .notebook-reference-chapter-title {
+  border-bottom: 0;
+}
+
+.notebook-panel .notebook-insert-group { border-top: 0; }
 
 /* Keep the text and BlockNote controls in their existing gutter while the
  * editor's horizontal edges span the full Notebook column. */
