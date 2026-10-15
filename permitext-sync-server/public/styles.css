@@ -3504,14 +3504,26 @@ select option:checked {
   box-shadow: none;
 }
 
-.reader-internal-results {
+/* Let chapter rules reach the Reader edges while the result text stays inset. */
+.reader-panel:has(.reader-content.is-searching-reader) { padding-inline: 0; }
+.reader-panel .reader-content.is-searching-reader {
+  padding-inline: 0;
+  scrollbar-gutter: auto;
+}
+.reader-content > .reader-internal-results {
+  --reader-search-text-inset: max(calc(var(--panel-padding) + var(--space-4)), calc((100% - var(--workspace-content-max-width)) / 2));
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0;
+  max-width: none;
   padding-top: 0;
 }
 
 .reader-internal-results-heading {
   margin: var(--space-5) 0 var(--space-2);
+  padding-top: var(--space-3);
+  padding-inline: var(--reader-search-text-inset);
+  border-top: 1px solid var(--border);
   color: var(--text-secondary);
   font-family: var(--ui-font-family);
   font-size: 12px;
@@ -3520,14 +3532,15 @@ select option:checked {
 }
 .reader-internal-results-heading:first-child { margin-top: 0; }
 .reader-internal-results-empty {
-  margin: var(--space-2) 0;
+  margin: var(--space-2) var(--reader-search-text-inset);
   color: var(--text-secondary);
   font-size: 12px;
 }
 
 .reader-internal-result {
   display: block;
-  width: 100%;
+  width: auto;
+  margin-inline: var(--reader-search-text-inset);
   padding: var(--space-3) 0;
   border: 0;
   border-bottom: 0;
