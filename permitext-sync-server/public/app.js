@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-context-edit-v1059";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-edit-pencil-v1060";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-context-edit-v1059";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-edit-pencil-v1060";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-project-context-edit-v1059";
+} from "./offline-storage.js?v=20261015-project-edit-pencil-v1060";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-project-context-edit-v1059";
+} from "./workspace-state.js?v=20261015-project-edit-pencil-v1060";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -3753,7 +3753,10 @@ async function openProjectDetailsScreen(section = null) {
           const address = document.createElement("p");
           address.textContent = workspaceProject()?.address || "No address recorded";
           const edit = document.createElement("button");
-          edit.type = "button"; edit.textContent = "Edit project";
+          edit.type = "button";
+          edit.innerHTML = pencilIconSVG();
+          edit.title = "Edit project";
+          edit.setAttribute("aria-label", "Edit project");
           edit.className = "project-overview-edit";
           edit.setAttribute("aria-expanded", "false");
           const editorHost = document.createElement("div");

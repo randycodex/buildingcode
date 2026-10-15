@@ -80,7 +80,7 @@ const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projec
 });
 vm.runInContext('let projectDetailsScreen=null, reportScreen=null;\n'+
   (await readFile(new URL('../public/report-screen.js',import.meta.url),'utf8')).replace('export function','function')+'\n'+
-  ["circleXIconSVG", "projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
+  ["circleXIconSVG", "pencilIconSVG", "projectInformationStateKey", "paneIDForProjectInformation", "flushProjectInformationPanes", "openProjectDetailsScreen", "toggleProjectInformation"].map(actual).join('\n'),c);
 await c.toggleProjectInformation('context');
 const contextPanel = mounts.get('project:context:alpha').panel;
 const factsPanel = mounts.get('project:facts:alpha').panel;

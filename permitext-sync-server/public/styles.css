@@ -20123,7 +20123,9 @@ dialog.report-export-review {
 .project-overview-identity { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
 .project-overview-identity h2 { margin: 0 0 8px; font-size: 18px; }
 .project-overview-identity p { color: var(--text-secondary); }
-.project-overview-identity > button { border: 0; border-radius: 0; background: transparent; padding: 8px 0; font-size: 12px; }
+.project-overview-identity > .project-overview-edit { display: inline-flex; align-items: center; min-width: 30px; min-height: 30px; border: 0; border-radius: 0; background: transparent; padding: 6px 0; color: var(--text-secondary); }
+.project-overview-edit svg { width: var(--panel-title-icon-size); height: var(--panel-title-icon-size); }
+.project-overview-identity > .project-overview-edit:hover { background: transparent; color: var(--text-primary); }
 .project-overview-editor:empty { display: none; }
 .project-overview-editor .project-sheet-overlay.is-inline {
   position: static;
