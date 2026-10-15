@@ -17862,9 +17862,12 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   border-radius: 0;
   background: transparent;
 }
-.saved-panel .saved-project-evidence-body .saved-row::after {
+.saved-panel .saved-folder-context.is-project .saved-project-evidence-body .saved-code-group .saved-row::after {
   right: 0;
   left: 0;
+  height: 0;
+  border-top: 1px solid var(--border);
+  background: transparent;
 }
 .saved-panel .saved-project-evidence-body .saved-selection-check {
   right: calc(var(--saved-evidence-content-gutter) - var(--panel-padding) + var(--space-2));
