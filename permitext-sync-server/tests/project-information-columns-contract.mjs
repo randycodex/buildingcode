@@ -70,6 +70,7 @@ const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projec
     const panel = element('article'); panel.draft = `Draft ${kind}`;
     const content = element('div'); content.className = 'project-information-content'; panel.append(content);
     if (kind === 'context') {
+      const context = element('textarea'); context.className = 'project-overview-context'; content.append(context);
       const records = element('section'); records.className = 'project-records-checklist'; content.append(records);
     }
     renderedInformation.push({ identity, kind, panel });
@@ -107,6 +108,13 @@ const editButton = find(contextPanel, node => node.className === 'project-overvi
 await editButton.handlers.click();
 assert.equal(inlineOptions.inline,true,'Overview expands the existing complete editor in place.');
 assert.equal(editButton.attributes['aria-expanded'],'true');
+const overviewInput = contextPanel.querySelector('.project-overview-context');
+const originalInert = overviewInput.inert;
+inlineOptions.onSubmitting(true);
+assert.equal(overviewInput.inert, true, 'Freeze context while the identity editor flushes and saves.');
+assert.equal(factsPanel.inert, true);
+inlineOptions.onSubmitting(false);
+assert.equal(overviewInput.inert, originalInert, 'Restore context editing after identity submission.');
 await editButton.handlers.click();
 assert.equal(editButton.attributes['aria-expanded'],'false','The same button can collapse the draft without saving.');
 contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
@@ -236,17 +244,19 @@ vm.runInContext(actual("projectFactPresentationGroups") + '\n' + actual("appendS
 const contextRoot = element("section"), factsRoot = element("section");
 const contextEditor = e.appendSavedProjectFactEditor(contextRoot, alpha, alpha, { section: "context" });
 const factsEditor = e.appendSavedProjectFactEditor(factsRoot, alpha, alpha, { section: "facts" });
-const overviewRoot = element('section');
-const overviewEditor = e.appendSavedProjectFactEditor(overviewRoot, alpha, alpha, {section:'context',readOnly:true});
-assert.equal(find(overviewRoot,node=>node.tag==='textarea'),undefined,'Overview context is read-only until Edit project expands.');
-assert.equal(find(overviewRoot,node=>node.className==='project-overview-description').textContent,'Original context');
-await overviewEditor.flush(); assert.equal(patches.length,0);
+await contextEditor.flush(); assert.equal(patches.length,0);
 assert.equal(find(factsRoot,node=>node.attributes['aria-label']==='Address').readOnly,true,'Address edits belong to the Overview editor.');
 assert.equal(factMotionCalls.length, 0, "Standalone Facts ignores stored collapsed state and has no accordions.");
 for (const label of ["Property", "Building", "Work & code basis", "Zoning", "Special designations"]) {
   assert.ok(find(factsRoot, node => node.tag === "h3" && node.textContent === label));
 }
 const narrative = find(contextRoot, node => node.tag === "textarea");
+assert.equal(narrative.attributes['aria-label'], 'Project context');
+assert.equal(narrative.value, 'Original context', 'Existing descriptions remain available as editable Project context.');
+assert.equal(narrative.disabled, false);
+const sharedRoot = element('section');
+e.appendSavedProjectFactEditor(sharedRoot, alpha, {...alpha, sharedOnly:true}, {section:'context'});
+assert.equal(find(sharedRoot,node=>node.tag==='textarea').disabled, true, 'Shared read-only access is preserved.');
 const occupancy = find(factsRoot, node => node.attributes["aria-label"] === "Occupancy");
 const zoningRow = find(factsRoot, node => node.dataset.factKey === "zoning-districts");
 const allFacts = find(factsRoot, node => node.className === "ghost-button project-facts-filter");
@@ -254,6 +264,7 @@ assert.equal(zoningRow.hidden, true, 'Unrecorded optional facts start hidden');
 allFacts.handlers.click();
 assert.equal(zoningRow.hidden, false); assert.equal(allFacts.attributes['aria-pressed'], 'true');
 narrative.value = "Changed context";
+narrative.handlers.blur();
 await contextEditor.flush();
 occupancy.value = "R-2"; occupancy.handlers.input();
 allFacts.handlers.click();

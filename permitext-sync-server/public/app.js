@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-settings-search-row-v1058";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-context-edit-v1059";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-settings-search-row-v1058";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-context-edit-v1059";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-settings-search-row-v1058";
+} from "./offline-storage.js?v=20261015-project-context-edit-v1059";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-settings-search-row-v1058";
+} from "./workspace-state.js?v=20261015-project-context-edit-v1059";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -3778,14 +3778,12 @@ async function openProjectDetailsScreen(section = null) {
                 coveredColumns.clear();
               };
               edit.setAttribute("aria-expanded", "true");
-              const description = panel.querySelector(".project-overview-description");
-              if (description) description.hidden = true;
               editor = showProjectCreateSheet(editorHost, currentProject, {
                 inline: true,
                 onSubmitting: submitting => {
                   for (const [columnKind, column] of panels) {
-                    if (columnKind === "context") continue;
-                    if (submitting) { coveredColumns.set(column, column.inert); column.inert = true; }
+                    const target = columnKind === "context" ? column.querySelector(".project-overview-context") : column;
+                    if (target && submitting) { coveredColumns.set(target, target.inert); target.inert = true; }
                   }
                   if (!submitting) releaseColumns();
                 },
@@ -3794,7 +3792,6 @@ async function openProjectDetailsScreen(section = null) {
                   releaseColumns();
                   editor = null;
                   edit.setAttribute("aria-expanded", "false");
-                  if (description) description.hidden = false;
                 },
                 onSaved: async () => {
                   if (!screen.isCurrent()) return;
@@ -33408,7 +33405,8 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     nameInput.placeholder = isEditing && selectedFolderType === "reference" ? "Name" : "Project Name";
     descriptionInput.placeholder = selectedFolderType === "reference"
       ? "Notes"
-      : inline ? "Add description" : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
+      : "Add existing conditions, proposed work, relevant dates, constraints, assumptions, and other Project context";
+    descriptionInput.setAttribute("aria-label", selectedFolderType === "reference" ? "Notes" : "Project context");
   };
 
   const nameLabel = document.createElement("label");
@@ -33464,14 +33462,13 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   descriptionLabel.className = "project-sheet-field";
   const descriptionInput = document.createElement("textarea");
   descriptionInput.className = "project-description-input";
-  descriptionInput.placeholder = "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
-  descriptionInput.setAttribute("aria-label", "Description");
+  descriptionInput.setAttribute("aria-label", "Project context");
   descriptionInput.autocomplete = "off";
-  descriptionInput.rows = inline ? 2 : 3;
+  descriptionInput.rows = 3;
   if (identity) descriptionInput.value = identity.description;
   descriptionLabel.append(descriptionInput);
   if (inline) {
-    for (const [row, text] of [[nameLabel, "Name"], [addressLabel, "Address"], [descriptionLabel, "Description"], [colorGroup, "Color"]]) {
+    for (const [row, text] of [[nameLabel, "Name"], [addressLabel, "Address"], [colorGroup, "Color"]]) {
       const label = document.createElement("span");
       label.className = "project-editor-label";
       label.textContent = text;
@@ -33586,7 +33583,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     submitting = true;
     saveButton.disabled = true;
     saveStatus.hidden = true;
-    const fields = [nameInput, addressInput, descriptionInput, ...colorRail.querySelectorAll("button")];
+    const fields = [nameInput, addressInput, ...(!inline ? [descriptionInput] : []), ...colorRail.querySelectorAll("button")];
     fields.forEach(field => { field.disabled = true; });
     options.onSubmitting?.(true);
     try {
@@ -33604,9 +33601,10 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         name: nameInput.value,
         address: selectedFolderType === "reference" ? "" : property?.normalizedAddress || addressInput.value,
         color: selectedColor,
-        description: descriptionInput.value,
         folderType: selectedFolderType
       };
+      // The Overview context editor owns this field during inline identity edits.
+      if (!inline) details.description = descriptionInput.value;
       if (selectedFolderType === "reference" || !isEditing || addressChanged) {
         // Facts from the previous address must never survive an address change,
         // while ordinary name/description edits must preserve them.
@@ -33660,7 +33658,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     }
   });
 
-  if (inline) sheet.append(saveStatus, nameLabel, addressLabel, descriptionLabel, colorGroup, header);
+  if (inline) sheet.append(saveStatus, nameLabel, addressLabel, colorGroup, header);
   else sheet.append(header, saveStatus, nameLabel, addressLabel, descriptionLabel, colorGroup);
   overlay.append(sheet);
   panel.append(overlay);
@@ -34122,7 +34120,7 @@ async function renderProjectInformation(project, kind) {
   header.append(title, actions);
   const content = document.createElement("section");
   content.className = "saved-project-summary project-information-content";
-  const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind, readOnly: kind === "context" });
+  const editor = appendSavedProjectFactEditor(content, current, projectIdentity(current), { section: kind });
   const checklist = kind === "context" ? appendProjectRecordsChecklist(content, current, identity) : null;
   projectInformationMounts.set(paneID, { panel, flush: async () => { await editor.flush(); await checklist?.flush(); } });
   panel.append(header, content);
@@ -34208,13 +34206,7 @@ function appendSavedProjectFactEditor(container, folder, identity, options = {})
     return saveSequence;
   };
   if (contextOnly) {
-    if (options.readOnly) {
-      const summary = document.createElement("p");
-      summary.className = `project-overview-description${description.value.trim() ? "" : " is-empty"}`;
-      summary.textContent = description.value.trim() || description.placeholder;
-      container.append(summary);
-      return { flush: () => Promise.resolve() };
-    }
+    description.classList.add("project-overview-context");
     description.addEventListener("blur", () => void save());
     description.addEventListener("keydown", event => {
       if ((event.metaKey || event.ctrlKey) && event.key === "Enter") description.blur();

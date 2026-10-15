@@ -45,7 +45,9 @@ function harness({ editing = false, inline = false, beforeSave } = {}) {
   const name = panel.querySelector(".project-name-input"), address = panel.querySelector(".project-address-input"), description = panel.querySelector(".project-description-input");
   const cancel = form.querySelectorAll("button").find(button => button.textContent === "Cancel");
   const save = form.querySelectorAll("button").find(button => button.textContent === "Save");
-  name.value = "Typed project"; address.value = "Synthetic address"; description.value = "Typed description"; name.events.input();
+  name.value = "Typed project"; address.value = "Synthetic address";
+  if (description) description.value = "Typed description";
+  name.events.input();
   return {c, panel, overlay, form, name, address, description, cancel, save, lookup, write, created, updated, notices, callbacks,
     submit: () => form.events.submit(event()),
     resolveLookup: () => lookup.resolve({property: {normalizedAddress: "Normalized address", structuredFacts: [{status: "sourced"}]}})
@@ -67,12 +69,14 @@ for (const options of [{editing:false},{editing:true},{editing:true,inline:true}
   const h = harness(options), first = h.submit();
   h.name.events.input();
   assert.equal(h.save.disabled, true, "Input events cannot re-enable Save during pending submission");
-  assert.equal(h.name.disabled, true); assert.equal(h.address.disabled, true); assert.equal(h.description.disabled, true);
+  assert.equal(h.name.disabled, true); assert.equal(h.address.disabled, true);
+  if (h.description) assert.equal(h.description.disabled, true);
   const duplicate = h.submit();
   h.resolveLookup(); await Promise.all([first, duplicate]);
   assert.equal(h.created.length + h.updated.length, 1, "Repeated submission writes one Project");
   const details = (options.editing ? h.updated : h.created)[0];
   assert.equal(details.name, "Typed project"); assert.equal(details.address, "Normalized address");
+  assert.equal(Object.hasOwn(details, 'description'), !options.inline, 'Inline identity saves preserve context owned by the separate editor.');
   assert.equal(h.overlay.isConnected, false);
   if (options.inline) assert.deepEqual(h.callbacks, ["saved"], "Inline saving refreshes its own screen without a background workspace transition.");
 }
@@ -81,6 +85,7 @@ for (const options of [{editing:false},{editing:true},{editing:true,inline:true}
   assert.equal(h.overlay.getAttribute("role"), "region");
   assert.equal(h.overlay.getAttribute("aria-modal"), null);
   assert.match(h.overlay.className, /is-inline/);
+  assert.equal(h.description, null, 'Edit project has no duplicate description field.');
   h.overlay.events.keydown(event("Tab"));
   assert.deepEqual(h.callbacks, [], "Inline editing must not trap focus within the form.");
   const pending = h.submit();

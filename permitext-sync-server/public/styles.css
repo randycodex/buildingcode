@@ -20178,7 +20178,6 @@ dialog.report-export-review {
   line-height: 1.5;
   text-align: right;
 }
-.project-overview-editor .project-sheet-field textarea { min-height: 42px; resize: vertical; }
 .project-overview-editor .project-property-lookup-status { grid-column: 1 / -1; text-align: right; }
 .project-overview-editor .project-color-rail {
   --project-swatch-size: 22px;
@@ -20201,8 +20200,7 @@ dialog.report-export-review {
   background: transparent;
 }
 .project-overview-editor .project-sheet-header button { font-size: 13px !important; }
-.project-overview-description { margin: 0; font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
-.project-overview-description.is-empty { color: var(--text-secondary); }
+.project-details-screen .project-overview-context { padding: 0; font-size: 14px; line-height: 1.5; }
 .report-draft-blocks.is-open.is-settled,
 .report-draft-blocks.is-open.is-settled > .report-draft-blocks-body { overflow: visible; }
 
