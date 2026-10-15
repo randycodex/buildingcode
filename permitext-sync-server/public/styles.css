@@ -18211,6 +18211,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-source-group-content { padding: 0 0 12px 18px; }
 .account-screen .settings-active-sources-status:empty { display: none; }
 .account-screen .settings-data-card > :is(.settings-trash, .settings-delete-content) { margin-top: 0; }
+.account-screen .settings-data-card > details > summary {
+  font-size: 13px;
+  font-weight: 400;
+}
 .account-screen .settings-data-card > .settings-danger-button[data-clear-action="searches"] { border-bottom: 0; }
 .account-screen :is(.account-identity, .settings-plan-usage, .settings-danger-list, .settings-trash-entry),
 .account-screen .settings-data-card > .settings-danger-button {
