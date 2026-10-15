@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-overview-inline-v1055";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-editor-rows-v1057";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-overview-inline-v1055";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-editor-rows-v1057";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-project-overview-inline-v1055";
+} from "./offline-storage.js?v=20261015-project-editor-rows-v1057";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-project-overview-inline-v1055";
+} from "./workspace-state.js?v=20261015-project-editor-rows-v1057";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -33408,7 +33408,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     nameInput.placeholder = isEditing && selectedFolderType === "reference" ? "Name" : "Project Name";
     descriptionInput.placeholder = selectedFolderType === "reference"
       ? "Notes"
-      : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
+      : inline ? "Add description" : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
   };
 
   const nameLabel = document.createElement("label");
@@ -33467,9 +33467,17 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   descriptionInput.placeholder = "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
   descriptionInput.setAttribute("aria-label", "Description");
   descriptionInput.autocomplete = "off";
-  descriptionInput.rows = 3;
+  descriptionInput.rows = inline ? 2 : 3;
   if (identity) descriptionInput.value = identity.description;
   descriptionLabel.append(descriptionInput);
+  if (inline) {
+    for (const [row, text] of [[nameLabel, "Name"], [addressLabel, "Address"], [descriptionLabel, "Description"], [colorGroup, "Color"]]) {
+      const label = document.createElement("span");
+      label.className = "project-editor-label";
+      label.textContent = text;
+      row.prepend(label);
+    }
+  }
 
   let propertyLookupAddress = "";
   let propertyLookupResult = null;
@@ -33652,7 +33660,8 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     }
   });
 
-  sheet.append(header, saveStatus, nameLabel, addressLabel, descriptionLabel, colorGroup);
+  if (inline) sheet.append(saveStatus, nameLabel, addressLabel, descriptionLabel, colorGroup, header);
+  else sheet.append(header, saveStatus, nameLabel, addressLabel, descriptionLabel, colorGroup);
   overlay.append(sheet);
   panel.append(overlay);
   syncFolderTypeControls();

@@ -12,6 +12,7 @@ const deferred = () => { let resolve, reject; const promise = new Promise((yes, 
 class Element {
   constructor(tag) { this.tag = tag; this.children = []; this.events = {}; this.attributes = {}; this.style = {setProperty() {}}; this.dataset = {}; this.value = ""; this.disabled = false; this.hidden = false; this.classList = {toggle() {}}; }
   append(...items) { for (const item of items) { item.parent = this; this.children.push(item); } }
+  prepend(item) { item.parent = this; this.children.unshift(item); }
   remove() { if (this.parent) this.parent.children = this.parent.children.filter(item => item !== this); this.parent = null; }
   get isConnected() { return this.tag === "body" || !!this.parent?.isConnected; }
   setAttribute(key, value) { this.attributes[key] = String(value); }
@@ -42,7 +43,8 @@ function harness({ editing = false, inline = false, beforeSave } = {}) {
     {inline, beforeSave, onCreated: async () => callbacks.push("created"), onSaved: () => callbacks.push("saved")});
   const overlay = panel.querySelector(".project-sheet-overlay"), form = panel.querySelector("form");
   const name = panel.querySelector(".project-name-input"), address = panel.querySelector(".project-address-input"), description = panel.querySelector(".project-description-input");
-  const [cancel, save] = form.querySelectorAll("button");
+  const cancel = form.querySelectorAll("button").find(button => button.textContent === "Cancel");
+  const save = form.querySelectorAll("button").find(button => button.textContent === "Save");
   name.value = "Typed project"; address.value = "Synthetic address"; description.value = "Typed description"; name.events.input();
   return {c, panel, overlay, form, name, address, description, cancel, save, lookup, write, created, updated, notices, callbacks,
     submit: () => form.events.submit(event()),
