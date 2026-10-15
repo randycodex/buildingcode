@@ -1,6 +1,6 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-notebook-pending-sync-v981";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-empty-research-v982";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -119,7 +119,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-notebook-pending-sync-v981";
+} from "./offline-storage.js?v=20261014-empty-research-v982";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -152,7 +152,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-notebook-pending-sync-v981";
+} from "./workspace-state.js?v=20261014-empty-research-v982";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -40647,28 +40647,6 @@ function completeFirstUseWelcome() {
   }
 }
 
-function renderEmptyResearchWorkspace() {
-  const welcome = document.createElement("section");
-  welcome.className = "workspace-empty-state workspace-empty-research";
-  welcome.setAttribute("aria-label", "Research tools");
-  const content = document.createElement("div");
-  const actions = document.createElement("div");
-  actions.className = "workspace-empty-actions";
-  const reader = createReaderToolbarButton();
-  const search = document.createElement("button");
-  search.type = "button";
-  search.textContent = "Search";
-  search.addEventListener("click", () => { void focusRecentUtilityColumn("search"); });
-  const assistant = document.createElement("button");
-  assistant.type = "button";
-  assistant.textContent = "Assistant";
-  assistant.addEventListener("click", () => { void focusRecentUtilityColumn("analysis"); });
-  actions.append(reader, search, assistant);
-  content.append(actions);
-  welcome.append(content);
-  return welcome;
-}
-
 function renderProjectRequiredWorkspace() {
   const welcome = document.createElement("section");
   welcome.className = "workspace-empty-state workspace-empty-guidance";
@@ -41476,8 +41454,6 @@ function appendPaneSequence(panes) {
     nodes.push(renderProjectRequiredWorkspace());
   } else if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
     nodes.push(renderFirstUseWelcome());
-  } else if (!visiblePanes.length && !detachedProjectWindow && currentColumnWorkflowView() === "research") {
-    nodes.push(renderEmptyResearchWorkspace());
   }
   nodes.push(...orderedPanes.filter(pane => !visiblePanes.includes(pane)));
   const desiredNodes = new Set(nodes);
