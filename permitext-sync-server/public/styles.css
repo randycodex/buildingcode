@@ -20271,6 +20271,20 @@ dialog.report-export-review {
 .project-overview-editor .project-sheet-header button { padding: 4px 8px; border-radius: var(--radius-pill); font-size: 13px !important; }
 .project-overview-editor .project-sheet-header button:not(:disabled):hover { background: var(--menu-highlight); }
 .project-details-screen .project-overview-context { padding: 0; font-size: 14px; line-height: 1.5; }
+/* Span the column container while keeping the text measure and gutters intact. */
+.project-details-columns :is(.project-overview-identity, .project-records-row, .project-overview-editor .project-sheet-field, .project-overview-editor .project-sheet-colors) { position: relative; border-bottom: 0; }
+.project-details-columns :is(.project-overview-identity, .project-records-row, .project-overview-editor .project-sheet-field, .project-overview-editor .project-sheet-colors)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 100cqw;
+  height: 1px;
+  transform: translateX(-50%);
+  background: var(--border);
+  pointer-events: none;
+}
+.project-details-columns .saved-project-structured-fact + .saved-project-structured-fact::before { right: auto; left: 50%; width: 100cqw; transform: translateX(-50%); }
 .report-draft-blocks.is-open.is-settled,
 .report-draft-blocks.is-open.is-settled > .report-draft-blocks-body { overflow: visible; }
 
