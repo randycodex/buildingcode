@@ -18213,7 +18213,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   justify-self: start;
 }
 .account-screen .settings-data-card :is(.settings-secondary-button, .settings-link-button):not(.legacy-workspace-review):hover { background: var(--menu-highlight); }
-.account-screen .settings-data-card :is(.is-danger, .settings-project-delete) { color: var(--destructive); }
+.account-screen .settings-data-card .is-danger { color: var(--destructive); }
+.account-screen .settings-data-card .settings-project-delete { color: var(--text-secondary); }
+.account-screen .settings-data-card .settings-project-delete:not(:disabled):hover { color: var(--destructive); }
+.account-screen .settings-data-card .settings-project-delete:disabled:hover { background: transparent; }
 .account-screen .settings-data-card .settings-trash-help { margin: 0 0 6px; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
 .account-screen .settings-trash-toolbar { display: flex; justify-content: flex-end; }
 .account-screen .settings-trash-status { margin: 8px 0; color: var(--text-secondary); font-size: 12px; }
