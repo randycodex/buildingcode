@@ -3566,8 +3566,9 @@ select option:checked {
   font-weight: 600;
 }
 
-.reader-internal-result p {
+.reader-internal-result > p {
   margin: 0;
+  padding-inline-start: var(--space-4);
   color: color-mix(in srgb, var(--text-primary) 82%, var(--text-secondary));
   font-family: var(--ui-font-family);
   font-size: var(--reader-font-size) !important;
