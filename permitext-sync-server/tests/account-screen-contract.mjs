@@ -107,9 +107,7 @@ for (const signedIn of [false, true]) {
     assert.deepEqual(library.children.slice(1), [panel.sources, panel.offline]);
     assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
-    const destructive = account.children.at(-1).children[1];
-    assert.equal(destructive.open, undefined, "Account deletion starts collapsed.");
-    assert.equal(destructive.children[1], panel.deleteAccount, "Keep the original deletion confirmation handler.");
+    assert.equal(account.children.at(-1).children[1], panel.deleteAccount, "One direct action keeps the original deletion confirmation handler.");
   }
   dialog.listeners.keydown({ defaultPrevented: true, key: "Tab" });
   assert.equal(h.focusTraps(), 0, "Nested dialogs and editors retain handled keyboard events.");

@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-account-delete-width-v1020";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-account-delete-action-v1021";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-account-delete-width-v1020";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-account-delete-action-v1021";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-account-delete-width-v1020";
+} from "./offline-storage.js?v=20261015-account-delete-action-v1021";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-account-delete-width-v1020";
+} from "./workspace-state.js?v=20261015-account-delete-action-v1021";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -38614,12 +38614,8 @@ function organizeAccountSettings(panel) {
   if (signOut) actions.append(signOut);
   const deleteAccount = profile?.querySelector(".account-delete");
   if (deleteAccount) {
-    const destructive = document.createElement("details");
-    destructive.className = "settings-account-destructive";
-    const summary = document.createElement("summary");
-    summary.textContent = "Delete account…";
-    destructive.append(summary, deleteAccount);
-    actions.append(destructive);
+    deleteAccount.textContent = "Delete account";
+    actions.append(deleteAccount);
   }
   account.append(actions);
   const trash = data?.querySelector(".settings-trash");
