@@ -14,7 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Lucide
 
-Workspace navigation uses the following SVG icons from Lucide, vendored from commit `d672fc43dbf60962d9d829e35bc3b3e5ed89a178`: `book-open`, `library-big`, `search`, `bot-message-square`, `notepad-text`, `list-check`, `sticky-notes`, `form`, `table-of-contents`, `square-stack`, `summary`, `folder`, `layout-list`, `user-round`.
+Workspace navigation uses the following SVG icons from Lucide, vendored from commit `d672fc43dbf60962d9d829e35bc3b3e5ed89a178`: `book-open`, `library-big`, `search`, `astroid`, `notepad-text`, `list-check`, `sticky-notes`, `form`, `table-of-contents`, `square-stack`, `summary`, `folder`, `layout-list`, `user-round`.
 
 Source: https://github.com/lucide-icons/lucide
 
