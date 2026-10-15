@@ -19922,4 +19922,5 @@ dialog.report-export-review {
   font-size: 11px;
   color: var(--text-secondary);
 }
+.notebook-card-footer .report-membership-status:not(.is-in-report) { display: none; }
 .notebook-card-footer > div:last-child { margin-inline-start: auto; flex: 0 0 auto; }

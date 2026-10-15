@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-notes-title-gutter-v1005";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-notes-no-report-hint-v1006";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-notes-title-gutter-v1005";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-notes-no-report-hint-v1006";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-notes-title-gutter-v1005";
+} from "./offline-storage.js?v=20261014-notes-no-report-hint-v1006";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-notes-title-gutter-v1005";
+} from "./workspace-state.js?v=20261014-notes-no-report-hint-v1006";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
