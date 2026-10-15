@@ -445,7 +445,7 @@ async function main() {
     }
     assert(tagWithID(topbarSource, "workspace-actions").includes('aria-haspopup="menu"') &&
       tagWithID(topbarSource, "workspace-actions").includes('aria-expanded="false"') &&
-      tagWithID(topbarSource, "toggle-settings").includes('aria-label="Account"'),
+      tagWithID(topbarSource, "toggle-settings").includes('aria-label="Settings"'),
     "Projects menu or Account navigation lost accessible semantics.");
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),

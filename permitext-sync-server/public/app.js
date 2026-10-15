@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-numbered-trash-contents-v1044";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-settings-label-v1045";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-numbered-trash-contents-v1044";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-settings-label-v1045";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-numbered-trash-contents-v1044";
+} from "./offline-storage.js?v=20261015-settings-label-v1045";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-numbered-trash-contents-v1044";
+} from "./workspace-state.js?v=20261015-settings-label-v1045";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -1660,7 +1660,7 @@ function workspaceTransitionPaneLabel(paneID) {
   if (paneID.startsWith("project:facts:")) return "Facts";
   if (paneID === "utility:archive") return "Evidence archive";
   if (paneID === "utility:analysis") return "Assistant";
-  if (paneID === "utility:settings") return "Account";
+  if (paneID === "utility:settings") return "Settings";
   if (paneID.startsWith("research:conversation:")) return "Assistant conversation";
   if (paneID.startsWith("section:detail:")) return "Code section";
   if (paneID.startsWith("project:notebook:")) return "Notes";
@@ -2178,7 +2178,7 @@ function openMobileMoreSheet() {
   projectSection.append(projectLabel, projectList);
   const accountSection = document.createElement("section");
   accountSection.className = "mobile-more-section";
-  accountSection.append(mobileMoreAction("Account", () => toggleUtilityPane("settings")));
+  accountSection.append(mobileMoreAction("Settings", () => toggleUtilityPane("settings")));
   sheet.append(header, projectSection, accountSection);
   backdrop.append(sheet);
   backdrop.addEventListener("click", (event) => {
@@ -38708,13 +38708,13 @@ function mountAccountScreenContent(dialog, panel) {
   header.className = "account-screen-header";
   const title = document.createElement("h1");
   title.className = "eyebrow panel-kind";
-  title.textContent = "Account";
+  title.textContent = "Settings";
   const close = document.createElement("button");
   close.type = "button";
   close.className = "icon-button utility-close account-screen-close";
   close.innerHTML = circleXIconSVG();
-  close.title = "Close Account";
-  close.setAttribute("aria-label", "Close Account");
+  close.title = "Close Settings";
+  close.setAttribute("aria-label", "Close Settings");
   close.addEventListener("click", () => dialog.close());
   header.append(title, close);
   dialog.replaceChildren(header, panel);
@@ -38753,7 +38753,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     closedWithKeyboard = true;
     dialog.close();
   });
-  dialog.setAttribute("aria-label", "Account workspace");
+  dialog.setAttribute("aria-label", "Settings workspace");
   const panel = activeAccount() ? renderSettings({ upgrade }) : renderAccountWelcome(dialog);
   if (upgrade && !activeAccount()) {
     panel.querySelector("h1").textContent = "Continue to Pro.";
@@ -45865,7 +45865,7 @@ async function toggleProjectsColumns() {
 function workspaceCommandDefinitions() {
   if (workspaceColumnsRequireProject()) return [
     { label: "Create Project", hint: "Start a project workspace", run: () => createNewWorkspace() },
-    { label: "Open Account", hint: "Plan, account, sync, and privacy", run: () => focusUtility("settings") }
+    { label: "Open Settings", hint: "Account, library, offline, and data recovery", run: () => focusUtility("settings") }
   ];
   return [
     { label: "Open Search", hint: "Find sections across all codes", run: () => openNewSearchColumn() },
@@ -45874,7 +45874,7 @@ function workspaceCommandDefinitions() {
       ? [{ label: "New Reader", hint: "Open another code column", run: () => readerToolbarButtonForCurrentView().click() }]
       : []),
     { label: "Open Evidence and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
-    { label: "Open Account", hint: "Plan, account, sync, and privacy", run: () => focusUtility("settings") },
+    { label: "Open Settings", hint: "Account, library, offline, and data recovery", run: () => focusUtility("settings") },
     { label: "Reset Layout", hint: "Restore default panel widths", run: () => resetVisibleColumnWidths() },
     ...(defaultActivePaneIDs().length
       ? [{ label: "Close All", hint: "Close columns in this working view", run: () => closeAllColumns() }]
