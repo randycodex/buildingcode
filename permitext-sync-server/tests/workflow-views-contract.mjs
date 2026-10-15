@@ -114,7 +114,7 @@ const referenceContext=vm.createContext({
   workflowPaneIsVisible:()=>true,paneIsCollapsed:()=>false,minimumPaneWidthForID:()=>600,defaultPaneWidthForID:()=>600,
   referenceColumnsWidth,reportColumnsLayout
 });
-vm.runInContext(actual('syncReferenceReaderLayout'),referenceContext);
+vm.runInContext([actual('maximumPaneWidthForID'),actual('constrainPaneWidth'),actual('syncReferenceReaderLayout')].join('\n'),referenceContext);
 referenceContext.syncReferenceReaderLayout();
 assert.equal(referenceStyles.get('--reference-document-min-width'),'1241px');
 assert.equal(referenceStyles.get('--reference-readers-width'),'0px');

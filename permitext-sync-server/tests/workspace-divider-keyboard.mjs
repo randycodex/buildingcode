@@ -15,14 +15,14 @@ const state = {paneWeights:{}};
 let saves=0, layouts=0, indicators=0;
 const track = {scrollLeft:0, querySelectorAll(){return [...panes.values()];}, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
 const context = vm.createContext({state, track, CSS:{escape:x=>x},isProAccount:()=>false,
-  paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600, minimumPaneWidthForID:()=>600,
+  paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600, minimumPaneWidthForID:id=>id.startsWith('reader:')?400:600,
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,
   document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, classList:{add(){}},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
-vm.runInContext(['activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
+vm.runInContext(['maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);
 const divider=context.createDivider('left','right');
 function press(handle,key,shiftKey=false){let prevented=false;handle.handlers.keydown({key,shiftKey,preventDefault(){prevented=true;}});return prevented;}
 function widths(){return [...panes.values()].map(p=>p.width);}
@@ -73,3 +73,16 @@ assert.equal(historyEdge.tabIndex,-1,'A history-only Assistant has no resizable 
 press(historyEdge,'ArrowRight');
 assert.equal(panes.get('right').width,historyWidth);
 console.log('Workspace divider keyboard: expanded pairs, minimums, scroll compensation, Shift steps, collapsed neighbors and outer edges passed.');
+
+// Reader limits apply equally to keyboard pairs and outer edges.
+for (const id of ['reader:left','reader:right']) panes.set(id,{dataset:{paneId:id},width:600,getBoundingClientRect(){return {width:this.width};}});
+const readerDivider=context.createDivider('reader:left','reader:right');
+context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
+assert.equal(panes.get('reader:left').width,900); assert.equal(panes.get('reader:right').width,400);
+context.resizeAdjacentPanesBy('reader:left','reader:right',-2000,readerDivider);
+assert.equal(panes.get('reader:left').width,400); assert.equal(panes.get('reader:right').width,900);
+const readerEdge=context.createDivider('','reader:left'); readerEdge.handlers.focus();
+assert.equal(readerEdge.attrs['aria-valuemin'],'400'); assert.equal(readerEdge.attrs['aria-valuemax'],'900');
+context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,900);
+context.resizePaneEdgeBy('reader:left',-10000,readerEdge); assert.equal(panes.get('reader:left').width,400);
+console.log('Reader keyboard limits passed: 400px minimum, 900px maximum, adjacent and outer edges, accessible bounds.');

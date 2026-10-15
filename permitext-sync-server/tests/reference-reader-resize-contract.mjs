@@ -44,7 +44,7 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
     currentColumnWorkflowView: () => view,
     defaultActivePaneIDs: () => panes.map(pane => pane.dataset.paneId), workflowPaneIsVisible: () => true,
     paneIsCollapsed: () => false, assistantHistoryOnlyPane: () => false,
-    minimumPaneWidthForID: () => 600, defaultPaneWidthForID: () => 600,
+    minimumPaneWidthForID: () => 400, defaultPaneWidthForID: () => 600,
     applyPaneWeight: (pane, id) => { pane.width = state.paneWeights[id]; },
     document: { querySelector: selector => selector === '.workspace-shell' ? shell : selector === '.account-screen[open]' ? null : view === 'report' ? reportPanel : null },
     window: {
@@ -58,7 +58,7 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
     updateAdjacentDividerValue() {}, saveWorkspaceState: () => saves++,
     notifyWorkspaceLayoutChange: () => context.syncReferenceReaderLayout()
   });
-  vm.runInContext(['syncReferenceReaderLayout', 'capturePaneResizeWidths', 'startPaneEdgeResize', 'startPaneResize'].map(actual).join('\n'), context);
+  vm.runInContext(['maximumPaneWidthForID','constrainPaneWidth','syncReferenceReaderLayout', 'capturePaneResizeWidths', 'startPaneEdgeResize', 'startPaneResize'].map(actual).join('\n'), context);
   context.syncReferenceReaderLayout();
   return {
     context, handle, panes, state, properties, handlers, frames, dockWidth, reportWidth, trackClasses,
@@ -80,32 +80,34 @@ for (const [view, sourcesWidth] of [['project-details', 0]]) {
   const originalReportWidth = f.reportWidth();
   f.context.startPaneEdgeResize(f.event(startX), 'reader:0', 'left');
   f.move(startX - 160); f.frame();
-  assert.equal(f.panes[0].width, 960);
-  assert.equal(f.dockWidth(), 963, `${view}: the reference dock grows while the mouse is held`);
-  assert.equal(f.reportWidth(), originalReportWidth - 160, `${view}: the document gives up the same width immediately`);
+  assert.equal(f.panes[0].width, 900);
+  assert.equal(f.dockWidth(), 903, `${view}: the reference dock grows while the mouse is held`);
+  assert.equal(f.reportWidth(), originalReportWidth - 100, `${view}: the document gives up the same width immediately`);
   assert.equal(f.saves, 0, 'Pointer frames do not persist every intermediate width');
   assert.ok(f.trackClasses.has('is-resizing'));
   assert.equal(f.frames.size, 0, 'Stopping at the moving divider must not trigger automatic growth');
-  f.frame(32); assert.equal(f.panes[0].width, 960);
-  f.move(startX + 260); f.frame(48);
-  assert.equal(f.panes[0].width, 600, 'Dragging right retains the Reader minimum');
-  assert.equal(f.dockWidth(), 603, 'The dock contracts before release too');
-  f.finish('pointercancel', startX + 260);
+  f.frame(32); assert.equal(f.panes[0].width, 900);
+  f.move(startX + 600); f.frame(48);
+  assert.equal(f.panes[0].width, 400, 'Dragging right retains the Reader minimum');
+  assert.equal(f.dockWidth(), 403, 'The dock contracts before release too');
+  f.finish('pointercancel', startX + 600);
   assert.equal(f.saves, 1); assert.equal(f.released, 1);
   assert.equal(f.handlers.size, 0); assert.equal(f.frames.size, 0);
   assert.equal(f.trackClasses.has('is-resizing'), false);
 }
 
-// Minimum-clamped adjacent Readers can enlarge their shared reference dock.
+// Adjacent Readers keep their chosen widths within both bounds.
 const report = fixture('report', [800]);
 assert.equal(report.dockWidth(), 0, 'Report keeps existing Readers hidden while retaining their state');
 assert.equal(report.panes[0].width, 800);
 const pair = fixture('project-details', [600, 700]);
 pair.context.startPaneResize(pair.event(1300), 'reader:0', 'reader:1');
 pair.move(1140); pair.frame();
-assert.deepEqual(pair.panes.map(pane => pane.width), [600, 860]);
-assert.equal(pair.dockWidth(), 1320, 'Adjacent resizing updates the dock during the drag when a minimum is reached');
-pair.finish('pointerup', 1140);
+assert.deepEqual(pair.panes.map(pane => pane.width), [440, 860]);
+assert.equal(pair.dockWidth(), 1304, 'Adjacent resizing updates the dock during the drag when a minimum is reached');
+pair.move(2300); pair.frame();
+assert.deepEqual(pair.panes.map(pane => pane.width), [900,400], 'Pointer resizing respects the Reader maximum and minimum together');
+pair.finish('pointerup', 2300);
 assert.equal(pair.saves, 1); assert.equal(pair.handlers.size, 0);
 
 const shared = fixture('research', [800, 800, 800]);
