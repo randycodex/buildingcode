@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-account-recovery-column-v1024";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-compact-recovery-v1026";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-account-recovery-column-v1024";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-compact-recovery-v1026";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-account-recovery-column-v1024";
+} from "./offline-storage.js?v=20261015-compact-recovery-v1026";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-account-recovery-column-v1024";
+} from "./workspace-state.js?v=20261015-compact-recovery-v1026";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -37333,12 +37333,12 @@ function attachSettingsTrash(panel) {
         await refreshWorkspaceAfterSettingsClear(settingsPanelScrollTop(panel), track.scrollLeft);
         return;
       }
-      status.textContent = result.entries.length ? "Choose a deletion to restore or permanently remove." : "Trash is empty.";
+      status.textContent = result.entries.length ? "" : "Trash is empty.";
       list.replaceChildren();
-      const button = (label, click) => {
+      const button = (label, click, danger = false) => {
         const element = document.createElement("button");
         element.type = "button";
-        element.className = "settings-secondary-button";
+        element.className = `settings-secondary-button settings-trash-action${danger ? " is-danger" : ""}`;
         element.textContent = label;
         element.addEventListener("click", click);
         return element;
@@ -37357,22 +37357,36 @@ function attachSettingsTrash(panel) {
         input.autocomplete = "off";
         input.spellcheck = false;
         label.append(input);
-        const confirm = button("Delete Permanently", () => update(action, id, input.value));
+        const confirm = button("Delete Permanently", () => update(action, id, input.value), true);
         confirm.disabled = true;
         input.addEventListener("input", () => { confirm.disabled = input.value !== "DELETE"; });
-        form.append(copy, label, confirm, button("Cancel", () => form.remove()));
+        const actions = document.createElement("div");
+        actions.className = "settings-trash-actions";
+        actions.append(confirm, button("Cancel", () => form.remove()));
+        form.append(copy, label, actions);
         container.append(form);
         input.focus();
       };
       for (const entry of result.entries) {
         const row = document.createElement("div");
         row.className = "settings-trash-entry";
+        const copy = document.createElement("div");
+        copy.className = "settings-trash-copy";
         const title = document.createElement("strong"); title.textContent = entry.title;
-        const date = document.createElement("p"); date.textContent = `Available until ${new Date(entry.expiresAt).toLocaleDateString()}`;
-        row.append(title, date, button("Restore / Undo", () => update("restore", entry.id)), button("Delete Permanently…", () => permanent(row, "purge", entry.id)));
+        const date = document.createElement("p");
+        date.textContent = `Expires ${new Date(entry.expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+        copy.append(title, date);
+        const actions = document.createElement("div");
+        actions.className = "settings-trash-actions";
+        actions.append(button("Restore / Undo", () => update("restore", entry.id)), button("Delete Permanently…", () => permanent(row, "purge", entry.id), true));
+        row.append(copy, actions);
         list.append(row);
       }
-      if (result.entries.length) list.append(button("Empty Trash…", () => permanent(list, "empty")));
+      if (result.entries.length) {
+        const empty = button("Empty Trash…", () => permanent(list, "empty"), true);
+        empty.classList.add("settings-trash-empty");
+        list.append(empty);
+      }
     } catch (error) {
       if (isCurrentAccountRequest(identity)) status.textContent = error.message || "Trash is unavailable. Please reconnect and retry.";
     } finally {
@@ -38622,7 +38636,7 @@ function organizeAccountSettings(panel) {
   const legacy = data?.querySelector(".legacy-workspace-recovery");
   const searches = data?.querySelector('[data-clear-action="searches"]');
   const deleteContent = data?.querySelector(".settings-delete-content");
-  data?.append(...[trash, legacy, searches, deleteContent].filter(Boolean));
+  data?.append(...[trash, legacy, deleteContent, searches].filter(Boolean));
   scroll.replaceChildren(account, library, recovery);
 }
 

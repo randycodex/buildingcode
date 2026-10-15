@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261010-definition-text-v88">
-    <link rel="stylesheet" href="/web/styles.css?v=20261015-account-recovery-column-v1024">
+    <link rel="stylesheet" href="/web/styles.css?v=20261015-compact-recovery-v1026">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -513,14 +513,16 @@
               Clear Recent Searches
             </button>
           <details class="settings-trash">
-            <summary>Trash / Undo deletion</summary>
-            <p>Restore deleted saved content within 30 days across your synced devices. Newer saved work is kept.</p>
-            <button class="settings-secondary-button settings-trash-refresh" type="button">Refresh Trash</button>
+            <summary>Trash</summary>
+            <p class="settings-trash-help">Restore deleted items for 30 days across synced devices. Newer work is kept.</p>
+            <div class="settings-trash-toolbar">
+              <button class="settings-link-button settings-trash-refresh" type="button" aria-label="Refresh Trash">Refresh</button>
+            </div>
             <p class="settings-trash-status" role="status"></p>
             <div class="settings-trash-list"></div>
           </details>
           <details class="settings-delete-content">
-            <summary>Delete saved content…</summary>
+            <summary>Manage saved content</summary>
           <div class="settings-data-subsection settings-projects-card">
             <div class="settings-projects-heading">
               <h4>Projects and saved collections</h4>
@@ -565,6 +567,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261015-account-recovery-column-v1024" type="module"></script>
+    <script src="/web/app.js?v=20261015-compact-recovery-v1026" type="module"></script>
   </body>
 </html>

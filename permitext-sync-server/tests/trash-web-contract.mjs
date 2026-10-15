@@ -29,3 +29,54 @@ assert.equal(new Set(clears.map(c=>c.operationGroupID)).size,1,'One deletion sta
 assert(state.localAnnotations.every(a=>a.noteBody===''));
 assert(state.localAnnotations.every(a=>a.tags[0]==='Keep'));
 console.log('Web Trash preflight and all-edition note cleanup passed.');
+
+// Exercise the rendered row actions with synthetic recovery copies and no backend.
+class Element {
+ constructor(tag='div'){this.tagName=tag;this.children=[];this.events={};this.className='';this.value='';this.disabled=false;this.textContent='';}
+ classList={add:name=>{this.className+=` ${name}`;}};
+ append(...nodes){for(const node of nodes){node.parent=this;this.children.push(node);}}
+ replaceChildren(...nodes){this.children=[];this.append(...nodes);}
+ addEventListener(name,handler){this.events[name]=handler;}
+ fire(name){if(!this.disabled)return this.events[name]?.();}
+ focus(){}
+ remove(){this.parent.children=this.parent.children.filter(node=>node!==this);}
+ querySelector(selector){return this.querySelectorAll(selector)[0]||null;}
+ querySelectorAll(selector){return this.children.flatMap(node=>[
+  ...(selector.split(',').some(part=>part.trim().startsWith('.')?node.className.split(' ').includes(part.trim().slice(1)):node.tagName===part.trim())?[node]:[]),
+  ...node.querySelectorAll(selector)
+ ]);}
+}
+const nodes=Object.fromEntries(['settings-trash','settings-trash-list','settings-trash-status','settings-trash-refresh'].map(name=>[`.${name}`,new Element()]));
+const panel={querySelector:selector=>nodes[selector]};
+const entries=[{id:'copy-one',title:'Synthetic note',expiresAt:'2026-11-01T12:00:00Z'},{id:'copy-two',title:'Synthetic evidence',expiresAt:'2026-11-02T12:00:00Z'}];
+const requests=[];let current=true,preflights=0,refreshes=0;
+const trashValues={document:{createElement:tag=>new Element(tag)},captureAccountRequest:()=> 'owner',isCurrentAccountRequest:()=>current,
+ prepareRecoverableDeletion:async()=>{preflights++;},requireCurrentAccountRequest(){assert(current);},
+ postResearch:async(path,body)=>{requests.push({path,...body});return {entries};},
+ loadSyncedContent:async()=>{},refreshWorkspaceAfterSettingsClear:async()=>{refreshes++;},settingsPanelScrollTop:()=>0,track:{scrollLeft:0},openTrashAfterSettingsDeletion:false};
+new Function(...Object.keys(trashValues),'panel',between('function attachSettingsTrash(', 'async function clearSettingsBookmarks(')+';attachSettingsTrash(panel);')(...Object.values(trashValues),panel);
+await nodes['.settings-trash-refresh'].fire('click');
+const list=nodes['.settings-trash-list'],row=list.children[0],actions=row.querySelector('.settings-trash-actions');
+assert.deepEqual(actions.children.map(button=>button.textContent),['Restore / Undo','Delete Permanently…']);
+assert.match(row.querySelector('p').textContent,/^Expires /);
+assert.equal(nodes['.settings-trash-status'].textContent,'','Routine guidance does not take up a row above populated Trash.');
+actions.children[1].fire('click');
+let form=row.querySelector('.settings-trash-confirm');
+const input=form.querySelector('input'),confirm=form.querySelector('button');
+assert.equal(confirm.disabled,true);
+input.value='delete';input.fire('input');assert.equal(confirm.disabled,true);
+input.value='DELETE';input.fire('input');assert.equal(confirm.disabled,false);
+form.querySelectorAll('button')[1].fire('click');
+assert.equal(row.querySelector('.settings-trash-confirm'),null);
+assert.equal(requests.length,1,'Opening and canceling permanent deletion only changes presentation.');
+actions.children[1].fire('click');form=row.querySelector('.settings-trash-confirm');
+form.querySelector('input').value='DELETE';form.querySelector('input').fire('input');
+await form.querySelector('button').fire('click');
+assert.deepEqual(requests.at(-1),{path:'/content/trash',action:'purge',id:'copy-one',confirmation:'DELETE'});
+assert.equal(preflights,1);
+await list.children[1].querySelector('.settings-trash-actions').children[0].fire('click');
+assert.equal(requests.at(-1).action,'restore');assert.equal(requests.at(-1).id,'copy-two');assert.equal(refreshes,1);
+current=false;const requestCount=requests.length;
+await list.children[0].querySelector('.settings-trash-actions').children[0].fire('click');
+assert.equal(requests.length,requestCount,'A stale Account view cannot mutate recovery copies.');
+console.log('Compact Trash actions passed: adjacent controls, exact copy identity, typed confirmation, cancel, restore and account fencing.');

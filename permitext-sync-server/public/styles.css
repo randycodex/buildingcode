@@ -18216,8 +18216,88 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   font-weight: 400;
 }
 .account-screen .settings-data-card > .settings-danger-button[data-clear-action="searches"] { border-bottom: 0; }
-.account-screen :is(.account-identity, .settings-plan-usage, .settings-danger-list, .settings-trash-entry),
-.account-screen .settings-data-card > .settings-danger-button {
+.account-screen .settings-account-column > .settings-data-card { gap: 0; }
+.account-screen .settings-data-card > :is(details, .legacy-workspace-recovery) { border-bottom: 1px solid var(--border); }
+.account-screen .settings-data-card > details > summary { padding-block: 12px; }
+.account-screen .settings-data-card :is(.settings-secondary-button, .settings-link-button) {
+  width: auto;
+  min-width: 0;
+  min-height: 28px;
+  margin: 0;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px !important;
+  font-weight: 400;
+  line-height: 1.4;
+  justify-self: start;
+}
+.account-screen .settings-data-card :is(.settings-secondary-button, .settings-link-button):hover { background: var(--menu-highlight); }
+.account-screen .settings-data-card :is(.is-danger, .settings-project-delete) { color: var(--destructive); }
+.account-screen .settings-data-card .settings-trash-help { margin: 0 0 6px; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.account-screen .settings-trash-toolbar { display: flex; justify-content: flex-end; }
+.account-screen .settings-trash-status { margin: 8px 0; color: var(--text-secondary); font-size: 12px; }
+.account-screen .settings-trash-status:empty { display: none; }
+.account-screen .settings-trash-entry {
+  display: grid;
+  gap: 6px;
+  padding: 10px var(--account-category-gutter);
+}
+.account-screen .settings-trash-copy { display: grid; gap: 3px; min-width: 0; }
+.account-screen .settings-trash-copy strong { font-size: 13px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.account-screen .settings-trash-copy p { margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.account-screen .settings-trash-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.account-screen .settings-trash-actions > .settings-trash-action { margin: 0; }
+.account-screen .settings-trash-list > .settings-trash-empty { display: block; margin: 8px 0 12px auto; }
+.account-screen .settings-trash-confirm {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--menu-surface);
+  font-size: 13px;
+}
+.account-screen .settings-trash-confirm p { margin: 0; line-height: 1.4; }
+.account-screen .settings-data-card .legacy-workspace-review {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  padding: 12px 0;
+  text-align: left;
+}
+.account-screen .legacy-workspace-review::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(-45deg);
+}
+.account-screen .legacy-workspace-review[aria-expanded="true"]::before { transform: rotate(45deg); }
+.account-screen .settings-data-card .legacy-workspace-recovery > div:not([hidden]) { padding-bottom: 12px; }
+.account-screen .settings-data-card .settings-projects-heading h4 { font-weight: 500; }
+.account-screen .settings-data-card .settings-project-row { min-height: 32px; padding-block: 6px; }
+.account-screen .settings-data-card .settings-project-copy strong { font-weight: 500; }
+.account-screen .settings-data-card .settings-project-delete:disabled { color: var(--text-secondary); opacity: .5; }
+.account-screen .settings-data-card .settings-danger-list { margin-inline: 0; border-top: 0; }
+.account-screen .settings-data-card .settings-danger-button {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 34px;
+  margin-inline: 0;
+  padding: 8px 0;
+  font-size: 13px !important;
+  font-weight: 400;
+}
+.account-screen .settings-data-card .settings-danger-button > span[aria-hidden="true"] { display: none; }
+.account-screen .settings-data-card > .settings-danger-button[data-clear-action="searches"] { margin-top: 12px; color: var(--text-secondary); }
+.account-screen :is(.account-identity, .settings-plan-usage, .settings-trash-entry) {
   margin-inline: calc(-1 * var(--account-category-gutter));
   border-radius: 0;
 }
