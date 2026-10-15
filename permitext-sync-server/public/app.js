@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-details-resize-v1015";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-project-details-menu-v1016";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-details-resize-v1015";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-project-details-menu-v1016";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-project-details-resize-v1015";
+} from "./offline-storage.js?v=20261015-project-details-menu-v1016";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-project-details-resize-v1015";
+} from "./workspace-state.js?v=20261015-project-details-menu-v1016";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2236,6 +2236,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
       button.classList.add("workspace-context-switch");
     }
     button.textContent = action.label;
+    if (action.icon) prependWorkspaceButtonIcon(button, action.icon);
     button.disabled = Boolean(action.disabled);
     button.classList.toggle("is-danger", Boolean(action.danger));
     button.addEventListener("click", () => {
@@ -2254,6 +2255,9 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   const heading = document.createElement("strong");
   heading.className = "workspace-context-heading";
   heading.textContent = "Projects";
+  if (projectsAvailable && workspaceProject()) {
+    appendMenuAction(projectSection, { label: "Project details", icon: "layout-list", disabled: !hasCapability("projects"), run: () => void openProjectDetailsScreen() });
+  }
   projectSection.append(heading);
   workspaces.forEach((candidate) => {
     const button = document.createElement("button");
@@ -4431,7 +4435,6 @@ function syncWorkflowNavigation() {
   const accountOpen = Boolean(document.querySelector(".account-screen[open]"));
   const view = accountOpen ? "account" : projectDetailsScreen?.isOpen() ? "project-details" : reportScreen?.isOpen() ? "report" : currentWorkflowView();
   toggleSettingsButton?.setAttribute("aria-pressed", String(accountOpen));
-  document.querySelector("#open-project-details")?.setAttribute("aria-pressed", String(view === "project-details"));
   document.querySelectorAll('[data-workflow-view]').forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.workflowView === view));
   });
@@ -45870,11 +45873,6 @@ function bindImmediateUtilityControls() {
     button.dataset.bound = 'true';
     button.addEventListener('click', () => void switchWorkflowView(button.dataset.workflowView));
   });
-  const detailsButton = document.querySelector("#open-project-details");
-  if (detailsButton && !detailsButton.dataset.bound) {
-    detailsButton.dataset.bound = "true";
-    detailsButton.addEventListener("click", () => void openProjectDetailsScreen());
-  }
   [
     [toggleContextButton, "context"],
     [toggleFactsButton, "facts"],

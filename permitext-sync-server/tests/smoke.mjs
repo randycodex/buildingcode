@@ -420,7 +420,6 @@ async function main() {
       'id="collapse-readers"',
       'class="topbar-workspaces"',
       'id="workspace-actions"',
-      'id="open-project-details"',
       'id="toggle-settings"',
       'class="topbar-brand"'
     ].map((marker) => topbarSource.indexOf(marker));

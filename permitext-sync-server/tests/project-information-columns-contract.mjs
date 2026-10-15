@@ -21,9 +21,9 @@ const copy = value => JSON.parse(JSON.stringify(value));
 const alpha = { id: "alpha", name: "Alpha", description: "Original context", address: "Original address", structuredFacts: [] };
 assert.match(shell, /id="toggle-saved"[^>]*aria-label="Evidence"/);
 assert.doesNotMatch(actual("renderSavedFolderContext"), /appendSavedProjectFactEditor|saved-project-summary/);
-assert.match(shell, /id="open-project-details"/);
-assert.doesNotMatch(actual("openWorkspaceContextMenu"), /label: "Project details"/,
-  "Project Details stays in its dedicated top-level control rather than being repeated in the Project menu");
+assert.doesNotMatch(shell, /id="open-project-details"/);
+assert.match(actual("openWorkspaceContextMenu"), /label: "Project details"[\s\S]*?run: \(\) => void openProjectDetailsScreen\(\)/,
+  "Project details opens from the current Project menu");
 
 // Visibility is scoped to each Project layout; legacy layouts start closed.
 assert.equal(emptyWorkspaceLayout().projectContextOpen, false);

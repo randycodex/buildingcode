@@ -1111,6 +1111,17 @@ textarea:focus-visible {
   text-align: left;
 }
 
+.workspace-context-menu button.has-workspace-button-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.workspace-context-menu .workspace-button-icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+}
+
 .workspace-context-menu .workspace-context-switch {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -19691,7 +19702,7 @@ dialog.report-export-review {
 }
 :is(.account-workspace-view .account-screen-header, .project-details-screen-header) h1 { font-size: 13px; color: var(--text-secondary); font-weight: 500; letter-spacing: normal; }
 :is(.account-workspace-view .account-screen-close, .project-details-screen-close) { --panel-title-control-size: 32px; }
-.topbar :is(#open-project-details, #toggle-settings)[aria-pressed="true"] { color: var(--text-primary); font-weight: 700; }
+.topbar #toggle-settings[aria-pressed="true"] { color: var(--text-primary); font-weight: 700; }
 
 /* Keep menu pills clear of the dividers in each 42px bar. */
 .topbar-actions, .topbar-end, .workflow-toolbar > div, .project-details-screen .project-details-tabs { gap: var(--workspace-menu-gap); }
