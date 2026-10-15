@@ -31,7 +31,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
   footer.className = 'notebook-note-menu-footer';
   const createButton = document.createElement('button');
   createButton.type = 'button';
-  createButton.className = 'notebook-card-add-action';
+  createButton.className = 'notebook-card-add-action workspace-menu-option';
   createButton.textContent = '+ New note';
   createButton.setAttribute('aria-label', 'New Note');
   const management = document.createElement('div');
@@ -128,7 +128,7 @@ export function createNotebookNoteMenu({ onSelect, onTitleChange }) {
       row.classList.toggle('is-selected', selectedCardIDs.has(card.id));
       const choice = document.createElement('button');
       choice.type = 'button';
-      choice.className = 'notebook-card-tile';
+      choice.className = 'notebook-card-tile workspace-menu-option';
       choice.setAttribute('aria-label', `${selectingCards ? 'Select' : 'Open'} note: ${card.title || 'Untitled Note'}`);
       if (current) choice.setAttribute('aria-current', 'true');
       if (selectingCards) choice.setAttribute('aria-pressed', String(selectedCardIDs.has(card.id)));
