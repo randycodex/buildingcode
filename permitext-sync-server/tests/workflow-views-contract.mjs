@@ -64,7 +64,7 @@ let reportOpen=false, detailsOpen=false;
 const c=vm.createContext({reportScreen:{isOpen:()=>reportOpen,close(){reportOpen=false;}},projectDetailsScreen:{isOpen:()=>detailsOpen,close(){detailsOpen=false;}},toggleSettingsButton:null,state,track,shouldOpenNotebookByDefault,workspaceProject:()=>({id:"project"}),normalizeWorkflowView,normalizeColumnWorkflowView,paneBelongsToView,workflowScrollStore:createWorkflowScrollStore(),
   detachedProjectWindow:false,sectionDetailAnchorsBySearch:()=>({}),paneIDForSectionDetail:id=>id,
   document:{querySelector:()=>null,querySelectorAll:()=>[]},notifyProjectRequiredForColumn:()=>needProject,
-  syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},schedulePaneDividerAddControls(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
+  syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){},schedulePaneDividerAddControls(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
   defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
   appendPaneSequence(actualPanes){actualPanes.forEach((p,i)=>assert.equal(p,panes[i]));for(const p of actualPanes){p.hidden=!c.workflowPaneIsVisible(p.dataset.paneId);p.scrollTop=0;}},
   openProjectNotebook(){constructions++;},focusRecentUtilityColumn(){constructions++;}

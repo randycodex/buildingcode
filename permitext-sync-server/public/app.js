@@ -1,13 +1,13 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-results-layout-v1084";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-search-word-completion-v1082";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-search-results-layout-v1084";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
 import { createReportAutosave } from "./report-autosave.js?v=1";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=8";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-search-word-completion-v1082";
+} from "./offline-storage.js?v=20261015-search-results-layout-v1084";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-search-word-completion-v1082";
+} from "./workspace-state.js?v=20261015-search-results-layout-v1084";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4220,14 +4220,14 @@ function assistantHistoryOnlyPane(paneID) {
 }
 
 function minimumPaneWidthForID(paneID) {
-  if (paneID?.startsWith("reader:")) return 400;
+  if (paneID?.startsWith("reader:")) return currentColumnWorkflowView() === "research" ? 600 : 400;
   if (assistantHistoryOnlyPane(paneID)) return assistantHistoryWidth;
   if (paneID === "utility:analysis" || paneID?.startsWith("utility:analysis:") || paneID?.startsWith("research:conversation:")) return assistantHistoryWidth + 600;
   return 600;
 }
 
 function maximumPaneWidthForID(paneID) {
-  return paneID?.startsWith("reader:") ? 900 : Infinity;
+  return /^(?:reader:|utility:search(?::|$))/.test(paneID || "") ? 900 : Infinity;
 }
 
 function constrainPaneWidth(paneID, width) {
@@ -4235,8 +4235,8 @@ function constrainPaneWidth(paneID, width) {
 }
 
 function migrateLegacyPaneWidth(paneID, value) {
-  if (paneID?.startsWith("reader:")) {
-    return Number.isFinite(value) && value > 40 ? constrainPaneWidth(paneID, value) : defaultReaderPaneWidth;
+  if (/^(?:reader:|utility:search(?::|$))/.test(paneID || "")) {
+    return Number.isFinite(value) && value > 40 ? constrainPaneWidth(paneID, value) : defaultPaneWidthForID(paneID);
   }
   const minimumWidth = minimumPaneWidthForID(paneID);
   if (minimumWidth > 0 && value < minimumWidth) return minimumWidth;
@@ -4505,6 +4505,7 @@ function syncWorkflowNavigation() {
   syncReferenceReaderLayout();
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
   updateWorkspaceLayoutControls();
+  syncResearchColumnLayout();
   schedulePaneDividerAddControls();
 }
 async function switchWorkflowView(view) {
@@ -5394,7 +5395,60 @@ function applyPaneWeight(panel, paneID) {
   panel.style.setProperty("--pane-default-min-width", `${minimumWidth}px`);
   // A divider's chosen width must survive an overflowing workspace. Allowing
   // flex shrink here silently pulled resized columns back to their minimum.
-  panel.style.flex = `${isFlexibleReaderPaneID(paneID) ? 0 : 1} 0 ${width}px`;
+  panel.style.flex = `${isFlexibleReaderPaneID(paneID) || /^(?:utility:search)(?::|$)/.test(paneID) ? 0 : 1} 0 ${width}px`;
+}
+
+function syncResearchColumnLayout({ reset = false } = {}) {
+  const panels = [...track.querySelectorAll(":scope > .workspace-panel")];
+  const active = currentColumnWorkflowView() === "research" && window.innerWidth > 760 && !track.inert;
+  const visible = active ? panels.filter(panel => !panel.classList.contains("is-workflow-hidden") && !panel.classList.contains("is-group-hidden")) : [];
+  const balanced = visible.filter(panel => /^(?:reader:|utility:search(?::|$))/.test(panel.dataset.paneId) && !paneIsCollapsed(panel.dataset.paneId));
+  const balancedSet = new Set(balanced);
+  const managed = new Set(balanced.length ? visible : []);
+  panels.filter(panel => panel.dataset.researchSized && (!managed.has(panel) || panel.dataset.researchSized === "balanced" && !balancedSet.has(panel))).forEach(panel => {
+    delete panel.dataset.researchSized;
+    panel.style.maxWidth = "";
+    applyPaneWeight(panel, panel.dataset.paneId);
+  });
+  if (!balanced.length) {
+    delete track.dataset.researchColumnSizing;
+    delete track._researchColumnLayout;
+    return;
+  }
+  const preferredWidth = panel => {
+    const id = panel.dataset.paneId;
+    if (paneIsCollapsed(id)) return 48;
+    if (assistantHistoryOnlyPane(id)) return assistantHistoryWidth;
+    return constrainPaneWidth(id, Number(state.paneWeights[id]) || defaultPaneWidthForID(id));
+  };
+  const fixed = visible.filter(panel => !balancedSet.has(panel));
+  const fixedWidth = fixed.reduce((sum, panel) => sum + preferredWidth(panel), 0);
+  const dividerWidth = [...track.querySelectorAll(":scope > .pane-divider")]
+    .reduce((sum, divider) => sum + divider.getBoundingClientRect().width, 0);
+  const signature = [activeWorkspaceID, ...visible.map(panel => `${panel.dataset.paneId}:${paneIsCollapsed(panel.dataset.paneId)}`)].join("|");
+  const previous = track._researchColumnLayout;
+  const changed = previous && previous.signature !== signature;
+  const requested = balanced.map(preferredWidth);
+  let layout = researchColumnsLayout(requested, track.clientWidth, fixedWidth, dividerWidth);
+  const resetWidths = reset || changed || previous?.fits && !layout.fits;
+  const manual = previous?.manual && !resetWidths;
+  if (manual) layout = { fits: false, widths: requested };
+  else if (!layout.fits && resetWidths) layout.widths.fill(600);
+  fixed.forEach(panel => {
+    applyPaneWeight(panel, panel.dataset.paneId);
+    panel.style.flex = `0 0 ${preferredWidth(panel)}px`;
+    panel.dataset.researchSized = "fixed";
+  });
+  balanced.forEach((panel, index) => {
+    const width = layout.widths[index];
+    panel.dataset.researchSized = "balanced";
+    panel.style.setProperty("--pane-default-min-width", "600px");
+    panel.style.maxWidth = layout.fits ? "none" : "900px";
+    panel.style.flex = `0 0 ${width}px`;
+    if (!layout.fits) state.paneWeights[panel.dataset.paneId] = width;
+  });
+  track.dataset.researchColumnSizing = manual ? "manual" : layout.fits ? "fit" : "overflow";
+  track._researchColumnLayout = { signature, fits: layout.fits, manual };
 }
 
 function setUtilityButtonStates() {
@@ -40331,6 +40385,10 @@ function capturePaneResizeWidths() {
     startWidth: pane.getBoundingClientRect().width,
     minWidth: minimumPaneWidthForID(pane.dataset.paneId)
   })).filter(({ startWidth }) => startWidth > 0);
+  if (track._researchColumnLayout) {
+    track._researchColumnLayout.manual = true;
+    track.dataset.researchColumnSizing = "manual";
+  }
   // Freeze the currently shared space before changing a pair. Otherwise spare
   // flex space is redistributed into unrelated columns during the drag.
   panes.forEach(({ id, pane, startWidth }) => {
@@ -46415,6 +46473,7 @@ async function start() {
   window.addEventListener("resize", keepFocusedWorkspacePaneVisible, { passive: true });
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   window.addEventListener("resize", syncReferenceReaderLayout, { passive: true });
+  window.addEventListener("resize", () => syncResearchColumnLayout({ reset: true }), { passive: true });
   track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates);
   bindWorkspaceKeyboardNavigation();
   window.addEventListener("storage", (event) => {
@@ -46539,6 +46598,7 @@ async function start() {
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   track.addEventListener("scroll", () => schedulePaneDividerAddControls(), { passive: true });
   track.addEventListener("permitext:workspace-layout-change", () => schedulePaneDividerAddControls());
+  track.addEventListener("permitext:workspace-layout-change", () => syncResearchColumnLayout());
   window.addEventListener("resize", () => schedulePaneDividerAddControls(), { passive: true });
   document.addEventListener("pointermove", event => {
     paneDividerAddPointer = event.pointerType === "touch" ? null : { x: event.clientX, y: event.clientY };

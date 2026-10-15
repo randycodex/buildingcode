@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+let workflow = 'research';
 const context = vm.createContext({
   state: { paneWeights: {}, readers: [], utilityInstances: [{id:'instance',key:'analysis',conversationID:'selected'}], paneWidthDefaultsVersion: 5 },
   researchDraftPaneIDs: new Set(), researchConversationPaneIsOpen: () => true,
@@ -10,6 +11,7 @@ const context = vm.createContext({
   paneIDs: [],
   activePaneIDs() { return context.paneIDs; },
   detachedProjectWindow: false,
+  currentColumnWorkflowView: () => workflow,
   isProjectWorkboardPaneID: id => id.startsWith('project:workboard:'),
   isCodeQuestionPaneID: () => false,
   isProjectCoordinationThreadPaneID: id => id.startsWith('project:coordination-thread:'),
@@ -38,18 +40,18 @@ function layout(id, ids, storedWidth = 600, linked = false, collapsed = false) {
 }
 for (const storedWidth of [350, 400, 520, 600, 900, 1000]) {
   for (const linked of [false, true]) {
-    assert.equal(layout('reader:a', ['reader:a'], storedWidth, linked).flex, `0 0 ${Math.min(900, Math.max(400, storedWidth))}px`, 'A sole Reader retains its selected width within the limits, including source-linked Readers');
+    assert.equal(layout('reader:a', ['reader:a'], storedWidth, linked).flex, `0 0 ${Math.min(900, Math.max(600, storedWidth))}px`, 'A Reader retains its selected overflow width within the limits, including source-linked Readers');
   }
 }
 for (const ids of [['reader:a','reader:b'], ['reader:a','reader:b','reader:c'], ['reader:a','utility:search']]) {
   const style = layout('reader:a', ids);
   assert.equal(style.flex, '0 0 600px');
-  assert.equal(style['--pane-default-min-width'], '400px', 'Readers may shrink to 400px regardless of the number of columns');
+  assert.equal(style['--pane-default-min-width'], '600px', 'Research Readers stop shrinking at 600px');
 }
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900).flex, '0 0 900px', 'Small layouts retain the chosen Reader width');
 assert.equal(layout('reader:a', ['reader:a','reader:b','utility:search','utility:saved'], 900).flex, '0 0 900px', 'Saved divider widths remain visible when the workspace overflows');
-assert.equal(layout('utility:search', ['utility:search','reader:a']).flex, '1 0 600px', 'Search shares available space in small layouts');
-assert.equal(layout('utility:search', ['utility:search','reader:a','utility:saved','utility:analysis']).flex, '1 0 600px', 'Utilities keep sharing available space beyond three columns');
+assert.equal(layout('utility:search', ['utility:search','reader:a']).flex, '0 0 600px', 'Search uses the same preferred basis as Reader before equal sharing');
+assert.equal(layout('utility:search', ['utility:search','reader:a','utility:saved','utility:analysis']).flex, '0 0 600px', 'Search retains its selected width when the workspace overflows');
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900, false, true).flex, '0 0 48px', 'Collapsed columns retain their compact width');
 const mainPaneIDs = [
   'utility:saved', 'utility:saved:instance', 'reader:a', 'utility:search', 'utility:search:instance',
@@ -60,11 +62,12 @@ const mainPaneIDs = [
 ];
 for (const id of mainPaneIDs) {
   const reader = id.startsWith('reader:');
-  const minimum = reader ? 400 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 1000 : 600;
+  const bounded = reader || /^utility:search(?::|$)/.test(id);
+  const minimum = /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 1000 : 600;
   for (const count of [1, 2, 3, 4, 8]) {
     const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];
     for (const restoredWidth of [350, 400, 520, 550, 600, 850, 900, 1200]) {
-      const expectedWidth = Math.min(reader ? 900 : Infinity, Math.max(minimum, restoredWidth));
+      const expectedWidth = Math.min(bounded ? 900 : Infinity, Math.max(minimum, restoredWidth));
       context.paneIDs = ids;
       context.state.paneWeights = { [id]: restoredWidth };
       context.normalizePaneWeights(ids);
@@ -73,11 +76,16 @@ for (const id of mainPaneIDs) {
       assert.equal(style['--pane-default-min-width'], `${minimum}px`, `${id} enforces its rendered minimum`);
       assert.equal(context.state.paneWeights[id], expectedWidth, `${id} also clamps widths when mounted directly`);
       const basis = expectedWidth;
-      assert.equal(style.flex, `${reader ? 0 : 1} 0 ${basis}px`, `${id} keeps the intended sizing with ${count} columns`);
+      assert.equal(style.flex, `${bounded ? 0 : 1} 0 ${basis}px`, `${id} keeps the intended sizing with ${count} columns`);
     }
   }
   assert.equal(layout(id, [id], 600, false, true).flex, '0 0 48px', `${id} keeps its collapsed width`);
 }
+for (workflow of ['notebook', 'project-details']) {
+  assert.equal(layout('reader:a', ['reader:a'], 400).flex, '0 0 400px', `${workflow} retains the reference Reader minimum`);
+  assert.equal(layout('utility:search:instance', ['utility:search:instance'], 1200).flex, '0 0 900px', 'Repeated Search columns also respect their resize maximum');
+}
+workflow = 'research';
 context.paneIDs = ['utility:archive'];
 context.state.paneWeights = { 'utility:archive': 350 };
 context.normalizePaneWeights(context.paneIDs);

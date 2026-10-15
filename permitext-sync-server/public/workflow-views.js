@@ -33,6 +33,14 @@ export function referenceColumnsWidth(widths, availableWidth, documentWidth = 60
     sum + (minimumWidths[index] ?? (width <= 48 ? width : 600)), dividersAndBorder);
   return Math.max(minimum, Math.min(requested, availableWidth - documentWidth));
 }
+// Reader and Search share the available desk until the 600px reading minimum
+// requires horizontal scrolling. The 900px resize limit applies in overflow;
+// a small number of columns can fill a wider desk equally.
+export function researchColumnsLayout(widths, availableWidth, fixedWidth = 0, dividerWidth = 0) {
+  const equalWidth = widths.length ? (availableWidth - fixedWidth - dividerWidth) / widths.length : 0;
+  const fits = widths.length > 0 && equalWidth >= 600;
+  return { fits, widths: widths.map(width => fits ? equalWidth : Math.max(600, Math.min(900, Number(width) || 600))) };
+}
 // Sources reserve their chosen width beside the Report document.
 // Hide the optional outline before shrinking the document.
 export function reportColumnsLayout(availableWidth, libraryWidth = 0, requestedOutlineWidth = 300) {

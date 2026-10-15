@@ -1755,6 +1755,9 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   grid-template-rows: minmax(0, 1fr);
 }
 
+.panel-track[data-research-column-sizing] > .reader-panel:not(.is-collapsed) { --pane-min-width: 600px; }
+.search-panel { max-width: 900px; }
+
 .workspace-panel.reader-panel:not(.is-collapsed) {
   padding-block: 0;
 }
@@ -19467,6 +19470,24 @@ html body .column-group-menu-button:focus-visible {
 .search-sources-button:hover { color: var(--text-primary); }
 .search-panel .result-title { color: var(--text-primary); font-weight: 550; }
 .search-panel .result-row-main > p { color: var(--text-secondary); line-height: 1.55; }
+.search-panel .search-results:not(.is-history) { counter-reset: search-result; }
+.search-panel .result-row-main {
+  display: grid;
+  grid-template-columns: minmax(3ch, max-content) minmax(0, 1fr);
+  column-gap: var(--space-2);
+  counter-increment: search-result;
+}
+.search-panel .result-row-main::before {
+  content: counter(search-result) ".";
+  grid-column: 1;
+  grid-row: 1;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  text-align: end;
+}
+.search-panel .result-row-main > :is(.result-heading, p) { grid-column: 2; }
+.search-panel .result-row-main > p { padding-inline-start: var(--space-4); }
 .research-origin-edition { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 12px; }
 .research-entry-context { padding: 20px 0; border-top: 1px solid var(--border); }
 .research-entry-project { margin: 0 0 8px; color: var(--text-secondary); font-size: 12px; }
