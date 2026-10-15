@@ -18212,9 +18212,14 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-active-sources-status:empty { display: none; }
 .account-screen .settings-data-card > :is(.settings-trash, .settings-delete-content) { margin-top: 0; }
 .account-screen .settings-data-card > details > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
   font-size: 13px;
   font-weight: 400;
 }
+.account-screen .settings-data-card > details > summary::-webkit-details-marker { display: none; }
 .account-screen .settings-data-card > .settings-danger-button[data-clear-action="searches"] { border-bottom: 0; }
 .account-screen .settings-account-column > .settings-data-card { gap: 0; }
 .account-screen .settings-data-card > :is(details, .legacy-workspace-recovery) { border-bottom: 1px solid var(--border); }
@@ -18271,6 +18276,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding: 12px 0;
   text-align: left;
 }
+.account-screen .settings-data-card > details > summary::before,
 .account-screen .legacy-workspace-review::before {
   content: "";
   width: 5px;
@@ -18280,6 +18286,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   border-bottom: 1px solid currentColor;
   transform: rotate(-45deg);
 }
+.account-screen .settings-data-card > details[open] > summary::before,
 .account-screen .legacy-workspace-review[aria-expanded="true"]::before { transform: rotate(45deg); }
 .account-screen .settings-data-card .legacy-workspace-recovery > div:not([hidden]) { padding-bottom: 12px; }
 .account-screen .settings-data-card .settings-projects-heading h4 { font-weight: 500; }
