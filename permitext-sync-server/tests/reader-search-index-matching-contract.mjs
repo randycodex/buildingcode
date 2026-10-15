@@ -33,7 +33,7 @@ for(const query of ['hazardous materials','harzadous materials','Concrete','conc
   expected.push({sectionID:section.id,sectionNumber:section.sectionNumber,title:section.title,
    heading:readerSearchResultHeading(section.displayTitle,blockMatch),
    headingHighlight:titleMatch?.text||blockMatch?.match?.text||query,
-   snippet:snippetForMatch(blockMatch?.text||section.title,snippetMatch),snippetHighlight:snippetMatch.text,
+   snippet:snippetForMatch(blockMatch?.text||section.title,snippetMatch,readerSearchResultHeading(section.displayTitle,blockMatch)),snippetHighlight:snippetMatch.text,
    matchText:match.text,blockID:blockMatch?.blockID||''});
  }
  assert.deepEqual(actual,expected,query);

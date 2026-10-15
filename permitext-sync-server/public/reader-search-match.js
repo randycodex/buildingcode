@@ -60,8 +60,15 @@ export function readerSearchMatch(value, query) {
   return null;
 }
 
-export function snippetForMatch(value, match) {
-  const text = String(value || "").replace(/\s+/g, " ").trim();
+export function snippetForMatch(value, match, heading = "") {
+  let text = String(value || "").replace(/\s+/g, " ").trim();
+  const label = String(heading || "").replace(/\s+/g, " ").trim().replace(/[.!?:;]+$/, "").trim();
+  if (label && text.slice(0, label.length).toLowerCase() === label.toLowerCase()) {
+    const remainder = text.slice(label.length);
+    // Only omit an exact heading followed by punctuation or the end of the block.
+    // A shared opening phrase in a different sentence remains intact.
+    if (!remainder || /^[.!?:;](?:\s|$)/.test(remainder)) text = remainder.replace(/^[.!?:;\s]+/, "");
+  }
   const normalizedMatch = readerSearchMatch(text, match?.text || "");
   if (!normalizedMatch) return text.slice(0, 220);
   const start = Math.max(0, normalizedMatch.index - 70);
@@ -98,13 +105,14 @@ export function searchReaderTextSections(sections, query) {
     const match = titleMatch || blockMatch?.match;
     if (!match) continue;
     const snippetMatch = blockMatch?.match || match;
+    const heading = readerSearchResultHeading(title, blockMatch);
     results.push({
       sectionID: section.id,
       sectionNumber: section.sectionNumber || "",
       title: section.title || "",
-      heading: readerSearchResultHeading(title, blockMatch),
+      heading,
       headingHighlight: titleMatch?.text || blockMatch?.match?.text || query,
-      snippet: snippetForMatch(blockMatch?.text || section.title, snippetMatch),
+      snippet: snippetForMatch(blockMatch?.text || section.title, snippetMatch, heading),
       snippetHighlight: snippetMatch.text,
       matchText: match.text,
       blockID: blockMatch?.blockID || ""

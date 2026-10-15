@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-reader-search-dividers-v1072";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-reader-search-preview-v1074";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-reader-search-dividers-v1072";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-reader-search-preview-v1074";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -20,7 +20,7 @@ import { createActiveCodeSourceController } from "./active-code-source-controlle
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
-import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-chapter-search-v1";
+import { searchReaderTextSections } from "./reader-search-match.js?v=20261015-reader-search-preview-v3";
 import { buildReaderChapterContents, readerContentsAncestorKeys, readerContentsChapterKey } from "./reader-navigation-tree.js?v=20261010-contents-v1";
 import { createReaderChapterExtent } from "./reader-chapter-extent.js?v=20261010-chapter-extent-v2";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-reader-search-dividers-v1072";
+} from "./offline-storage.js?v=20261015-reader-search-preview-v1074";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-reader-search-dividers-v1072";
+} from "./workspace-state.js?v=20261015-reader-search-preview-v1074";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17718,7 +17718,8 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
     const snippet = document.createElement("p");
     appendHighlighted(snippet, result.snippet, result.snippetHighlight);
 
-    row.append(heading, snippet);
+    row.append(heading);
+    if (result.snippet) row.append(snippet);
     row.addEventListener("click", async () => {
       const searchBox = panel.querySelector(".reader-internal-search");
       const searchButton = panel.querySelector(".reader-internal-search-toggle");
