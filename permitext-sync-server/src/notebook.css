@@ -47,7 +47,32 @@
 }
 .permitext-notebook-editor .notebook-format-toolbar :disabled { opacity: .45; cursor: default; }
 .permitext-notebook-editor .notebook-format-save-status { margin-inline-start: auto; font-size: 11px; color: var(--text-secondary, #777); }
-.permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { width: auto; flex: 0 0 auto; }
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; width: auto; flex: 0 0 auto; }
+.permitext-notebook-editor .notebook-format-toolbar .notebook-format-style svg { width: 14px; height: 14px; }
+.permitext-notebook-editor .notebook-format-style-menu {
+  padding: 6px;
+  border: 0;
+  border-radius: var(--radius-control, 12px);
+  background: var(--menu-surface, var(--surface, white));
+  color: var(--text-primary, inherit);
+  box-shadow: var(--shadow-panel, 0 18px 44px #0003);
+  font: inherit;
+}
+.permitext-notebook-editor .notebook-format-style-menu .notebook-format-style-option {
+  display: block;
+  width: 100%;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+  text-align: left;
+}
+.permitext-notebook-editor .notebook-format-style-menu .notebook-format-style-option:is(:hover, :focus-visible, [data-menu-active], [aria-current="true"]) {
+  background: var(--menu-highlight, #80808018);
+}
 .permitext-notebook-editor .notebook-format-toolbar .notebook-draft-status {
   position: static;
   width: auto;

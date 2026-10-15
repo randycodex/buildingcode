@@ -7,6 +7,7 @@ import {
   defaultStyleSpecs
 } from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
+import { Menu } from "@mantine/core";
 import "@blocknote/mantine/style.css";
 import "./notebook.css";
 import { en } from "@blocknote/core/locales";
@@ -149,6 +150,7 @@ function PermitextFormattingToolbar({ editor, options }) {
   const [linkText, setLinkText] = useState("");
   const [linkError, setLinkError] = useState("");
   const linkSelection = useRef(null);
+  const textStyleButton = useRef(null);
   const captureSelection = () => {
     const state = editor._tiptapEditor.state;
     return {from: state.selection.from, to: state.selection.to, document: state.doc, text: editor.getSelectedText()};
@@ -219,13 +221,23 @@ function PermitextFormattingToolbar({ editor, options }) {
     styleButton("bold", "Bold", React.createElement("strong", null, "B")),
     styleButton("italic", "Italic", React.createElement("em", null, "I")),
     styleButton("strike", "Strikethrough", React.createElement("s", null, "S")),
-    React.createElement("select", {
-      className: "notebook-format-style", "aria-label": "Text style", value: type,
-      disabled: !state.editable || !textBlocks.length,
-      onChange: event => event.target.value.startsWith("heading-")
-        ? setBlockType("heading", {level: Number(event.target.value.slice(-1))}) : setBlockType("paragraph")
-    }, ...[["paragraph", "Body"], ["heading-1", "Heading 1"], ["heading-2", "Heading 2"], ["heading-3", "Heading 3"]]
-      .map(([value, label]) => React.createElement("option", {key:value, value}, label))),
+    React.createElement(Menu, {position: "bottom-start", offset: 8, withinPortal: false, width: 180, loop: true, returnFocus: false},
+      React.createElement(Menu.Target, null,
+        React.createElement("button", {
+          ref: textStyleButton, type: "button", className: "notebook-format-style", "aria-label": "Text style",
+          disabled: !state.editable || !textBlocks.length,
+          onMouseDown: event => event.preventDefault()
+        }, type.startsWith("heading-") ? `Heading ${type.slice(-1)}` : "Body", icon(["M5 8l5 5 5-5"]))),
+      React.createElement(Menu.Dropdown, {
+        className: "notebook-format-style-menu", "aria-label": "Text style",
+        onKeyDown: event => { if (event.key === "Escape") textStyleButton.current?.focus(); }
+      },
+        ...[["paragraph", "Body"], ["heading-1", "Heading 1"], ["heading-2", "Heading 2"], ["heading-3", "Heading 3"]]
+          .map(([value, label]) => React.createElement(Menu.Item, {
+            key: value, className: "notebook-format-style-option", "aria-current": type === value ? "true" : undefined,
+            onClick: () => value.startsWith("heading-")
+              ? setBlockType("heading", {level: Number(value.slice(-1))}) : setBlockType("paragraph")
+          }, label)))),
     listButton("bulletListItem", "Bulleted list", icon(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])),
     listButton("numberedListItem", "Numbered list", icon(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])),
     React.createElement("span", {className:"notebook-format-link"},

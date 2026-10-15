@@ -46959,7 +46959,7 @@ var UW = pF({
 	}
 });
 function KW({ editor: e, options: t }) {
-	let [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(""), [o, s] = (0, _.useState)(""), [c, l] = (0, _.useState)(""), u = (0, _.useRef)(null), d = () => {
+	let [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(""), [o, s] = (0, _.useState)(""), [c, l] = (0, _.useState)(""), u = (0, _.useRef)(null), d = (0, _.useRef)(null), f = () => {
 		let t = e._tiptapEditor.state;
 		return {
 			from: t.selection.from,
@@ -46967,43 +46967,43 @@ function KW({ editor: e, options: t }) {
 			document: t.doc,
 			text: e.getSelectedText()
 		};
-	}, f = (t) => {
+	}, p = (t) => {
 		if (!t || t.document !== e._tiptapEditor.state.doc) return !1;
 		let n = e._tiptapEditor.state.selection;
 		return (n.from !== t.from || n.to !== t.to) && e._tiptapEditor.commands.setTextSelection({
 			from: t.from,
 			to: t.to
 		}), !0;
-	}, p = ZA({
+	}, m = ZA({
 		editor: e,
 		selector: ({ editor: e }) => ({
 			editable: e.isEditable,
 			styles: e.getActiveStyles(),
 			blocks: e.getSelection()?.blocks || [e.getTextCursorPosition().block]
 		})
-	}), m = p.blocks.filter((e) => [
+	}), h = m.blocks.filter((e) => [
 		"paragraph",
 		"heading",
 		"bulletListItem",
 		"numberedListItem"
-	].includes(e.type)), h = m[0], g = h?.type === "heading" ? `heading-${h.props.level}` : "paragraph", v = (t, n = {}) => {
-		e.focus(), e.transact(() => m.forEach((r) => e.updateBlock(r, {
+	].includes(e.type)), g = h[0], v = g?.type === "heading" ? `heading-${g.props.level}` : "paragraph", y = (t, n = {}) => {
+		e.focus(), e.transact(() => h.forEach((r) => e.updateBlock(r, {
 			type: t,
 			props: n
 		})));
-	}, y = (t, n, r) => _.createElement("button", {
+	}, b = (t, n, r) => _.createElement("button", {
 		key: t,
 		type: "button",
 		className: `notebook-format-button notebook-format-${t}`,
 		title: n,
 		"aria-label": n,
-		"aria-pressed": !!p.styles[t],
-		disabled: !p.editable || !m.length,
+		"aria-pressed": !!m.styles[t],
+		disabled: !m.editable || !h.length,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: () => {
 			e.focus(), e.toggleStyles({ [t]: !0 });
 		}
-	}, r), b = (e) => _.createElement("svg", {
+	}, r), x = (e) => _.createElement("svg", {
 		viewBox: "0 0 20 20",
 		width: 18,
 		height: 18,
@@ -47014,9 +47014,9 @@ function KW({ editor: e, options: t }) {
 	}, ...e.map((e, t) => _.createElement("path", {
 		key: t,
 		d: e
-	}))), x = () => {
-		u.current = d(), a(e.getSelectedLinkUrl() || ""), s(e.getSelectedText()), l(""), r(!0);
-	}, S = (t) => {
+	}))), S = () => {
+		u.current = f(), a(e.getSelectedLinkUrl() || ""), s(e.getSelectedText()), l(""), r(!0);
+	}, C = (t) => {
 		t.preventDefault();
 		let n;
 		try {
@@ -47033,23 +47033,23 @@ function KW({ editor: e, options: t }) {
 			l("Use an HTTP, HTTPS, or mailto URL.");
 			return;
 		}
-		if (!f(u.current)) {
+		if (!p(u.current)) {
 			l("The Note changed. Close this form and select the link location again.");
 			return;
 		}
 		let a = u.current, s = o.trim();
 		e.focus(), e.createLink(n.href, a.from === a.to ? s || n.href : s && s !== a.text ? s : void 0), r(!1);
-	}, C = (e, t, n) => _.createElement("button", {
+	}, w = (e, t, n) => _.createElement("button", {
 		key: e,
 		type: "button",
 		className: "notebook-format-button",
 		title: t,
 		"aria-label": t,
-		"aria-pressed": h?.type === e,
-		disabled: !p.editable || !m.length,
+		"aria-pressed": g?.type === e,
+		disabled: !m.editable || !h.length,
 		onMouseDown: (e) => e.preventDefault(),
-		onClick: () => v(h?.type === e ? "paragraph" : e)
-	}, n), w = [
+		onClick: () => y(g?.type === e ? "paragraph" : e)
+	}, n), T = [
 		["evidence", "Evidence"],
 		["research", "Assistant answer"],
 		["image", "Image"],
@@ -47059,34 +47059,50 @@ function KW({ editor: e, options: t }) {
 		className: "notebook-format-toolbar",
 		role: "toolbar",
 		"aria-label": "Note formatting"
-	}, y("bold", "Bold", _.createElement("strong", null, "B")), y("italic", "Italic", _.createElement("em", null, "I")), y("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("select", {
+	}, b("bold", "Bold", _.createElement("strong", null, "B")), b("italic", "Italic", _.createElement("em", null, "I")), b("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement(NH, {
+		position: "bottom-start",
+		offset: 8,
+		withinPortal: !1,
+		width: 180,
+		loop: !0,
+		returnFocus: !1
+	}, _.createElement(NH.Target, null, _.createElement("button", {
+		ref: d,
+		type: "button",
 		className: "notebook-format-style",
 		"aria-label": "Text style",
-		value: g,
-		disabled: !p.editable || !m.length,
-		onChange: (e) => e.target.value.startsWith("heading-") ? v("heading", { level: Number(e.target.value.slice(-1)) }) : v("paragraph")
+		disabled: !m.editable || !h.length,
+		onMouseDown: (e) => e.preventDefault()
+	}, v.startsWith("heading-") ? `Heading ${v.slice(-1)}` : "Body", x(["M5 8l5 5 5-5"]))), _.createElement(NH.Dropdown, {
+		className: "notebook-format-style-menu",
+		"aria-label": "Text style",
+		onKeyDown: (e) => {
+			e.key === "Escape" && d.current?.focus();
+		}
 	}, ...[
 		["paragraph", "Body"],
 		["heading-1", "Heading 1"],
 		["heading-2", "Heading 2"],
 		["heading-3", "Heading 3"]
-	].map(([e, t]) => _.createElement("option", {
+	].map(([e, t]) => _.createElement(NH.Item, {
 		key: e,
-		value: e
-	}, t))), C("bulletListItem", "Bulleted list", b(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])), C("numberedListItem", "Numbered list", b(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])), _.createElement("span", { className: "notebook-format-link" }, _.createElement("button", {
+		className: "notebook-format-style-option",
+		"aria-current": v === e ? "true" : void 0,
+		onClick: () => e.startsWith("heading-") ? y("heading", { level: Number(e.slice(-1)) }) : y("paragraph")
+	}, t)))), w("bulletListItem", "Bulleted list", x(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"])), w("numberedListItem", "Numbered list", x(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"])), _.createElement("span", { className: "notebook-format-link" }, _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button",
 		title: "Link",
 		"aria-label": "Link",
 		"aria-expanded": n,
-		disabled: !p.editable || !m.length,
+		disabled: !m.editable || !h.length,
 		onMouseDown: (e) => e.preventDefault(),
-		onClick: x
-	}, b(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"])), n && _.createElement("form", {
+		onClick: S
+	}, x(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"])), n && _.createElement("form", {
 		className: "notebook-format-link-form",
-		onSubmit: S,
+		onSubmit: C,
 		onKeyDown: (t) => {
-			t.key === "Escape" && (t.preventDefault(), r(!1), f(u.current) && e.focus());
+			t.key === "Escape" && (t.preventDefault(), r(!1), p(u.current) && e.focus());
 		}
 	}, _.createElement("label", null, "URL", _.createElement("input", {
 		autoFocus: !0,
@@ -47103,17 +47119,17 @@ function KW({ editor: e, options: t }) {
 	})), c && _.createElement("p", { role: "alert" }, c), _.createElement("div", null, _.createElement("button", { type: "submit" }, "Apply link"), _.createElement("button", {
 		type: "button",
 		onClick: () => {
-			r(!1), f(u.current) && e.focus();
+			r(!1), p(u.current) && e.focus();
 		}
 	}, "Cancel")))), t.toolbarInsertElement ? _.createElement("span", {
 		className: "notebook-format-insert-slot",
 		ref: (e) => {
 			e && t.toolbarInsertElement.parentElement !== e && e.append(t.toolbarInsertElement);
 		}
-	}) : t.onInsert && _.createElement("details", { className: "notebook-format-insert" }, _.createElement("summary", null, "Insert"), _.createElement("div", { className: "notebook-format-insert-menu" }, ...w.map(([e, n]) => _.createElement("button", {
+	}) : t.onInsert && _.createElement("details", { className: "notebook-format-insert" }, _.createElement("summary", null, "Insert"), _.createElement("div", { className: "notebook-format-insert-menu" }, ...T.map(([e, n]) => _.createElement("button", {
 		type: "button",
 		key: e,
-		disabled: !p.editable,
+		disabled: !m.editable,
 		onMouseDown: (e) => e.preventDefault(),
 		onClick: (n) => {
 			n.currentTarget.closest("details").open = !1, t.onInsert(e);
