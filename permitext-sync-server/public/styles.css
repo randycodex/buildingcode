@@ -19598,6 +19598,68 @@ dialog.report-export-review {
 }
 .project-details-screen .project-details-tabs button { padding: 4px 0; font-size: 13px; }
 .project-details-screen .project-information-panel { max-width: 1080px; margin-inline: auto; }
+.project-details-screen .project-details-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(600px, 1fr));
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.project-details-screen .project-details-columns > .project-information-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.project-details-screen .project-details-columns > .project-information-panel + .project-information-panel {
+  border-left: 1px solid var(--border);
+}
+.project-details-screen .project-details-columns .project-details-column-header {
+  display: flex;
+  flex: 0 0 auto;
+  min-height: 72px;
+  margin: 0;
+  padding: 24px;
+}
+.project-details-column-body {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  padding: 0 24px 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+}
+.project-details-column-body > .project-information-content {
+  width: 100%;
+  max-width: var(--workspace-content-max-width);
+  margin-inline: auto;
+  overflow: visible;
+}
+.project-details-columns .project-facts-panel :is(.saved-project-structured-group-heading, .saved-project-structured-fact) {
+  padding-inline: 0;
+}
+.project-details-screen .project-details-columns .saved-project-structured-fact {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.project-details-screen .project-details-columns .saved-project-structured-fact > :not(label):not(input) {
+  grid-column: 1;
+}
+.project-details-columns .project-records-checklist {
+  max-width: var(--workspace-content-max-width);
+  margin: 0 auto;
+  padding: 0;
+  border-top: 0;
+}
 .workspace-shell > .account-workspace-view {
   grid-column: 1; grid-row: 2 / -1; z-index: 2;
   width: 100%; height: auto; min-width: 0; min-height: 0; margin: 0;

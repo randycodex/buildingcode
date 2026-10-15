@@ -42,7 +42,7 @@ assert.equal(restored.paneWeights["project:context:alpha"], 670);
 assert.ok(restored.collapsedPaneIDs.includes("project:facts:alpha"));
 for (const kind of ["context", "facts"]) assert.equal(canGroupColumn(`project:${kind}:alpha`), false);
 
-// Context and Facts now share a retained screen; the same editors and save guards remain.
+// All three columns share a retained screen; the same editors and save guards remain.
 let current = alpha, allowed = true, privateAllowed = true, accountCurrent = true, tickScreen;
 const mounts = new Map(), issues = [], renderedInformation = [];
 const state = { projectContextOpen: false, projectFactsOpen: false, paneWeights: {}, paneOrder: [] };
@@ -55,7 +55,6 @@ const c = vm.createContext({ state, activeWorkspaceID: "alpha-workspace", projec
   currentWorkflowView:()=>"research", track, closeSharedWorkspaceViews() {}, syncWorkflowNavigation() {}, syncWorkflowColumnPresentation() {},
   document: { createElement: element, body, querySelector: selector => selector === '.workspace-shell' ? workspaceShell : selector === '.workflow-toolbar' ? workflowToolbar : null },
   setInterval: fn => { tickScreen = fn; return 1; }, clearInterval() {},
-  createReaderToolbarButton: () => { const button = element('button'); button.textContent = 'Reader'; return button; },
   captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
   workspaceProject: () => current, projectIdentity: value => ({ ...value }), projectDetailKey: value => value.id,
   projectDetailMatches: (a, b) => a?.id === b?.id,
@@ -85,33 +84,44 @@ assert.equal(find(screenElement, node => node.attributes.role === 'alert'), unde
 assert.equal(screenElement.open, true); assert.equal(screenElement.hidden, false);
 assert.equal(track.inert, true); assert.equal(workflowToolbar.inert, true);
 assert.equal(workspaceShell.inert, undefined, 'Cover the underlying controls, not the active details screen');
-assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden,true);
-const overviewTab = find(screenElement, node => node.tag === 'button' && node.textContent === 'Overview');
-const factsTab = find(screenElement, node => node.tag === 'button' && node.textContent === 'Facts');
-const recordsTab = find(screenElement, node => node.tag === 'button' && node.textContent === 'Records');
-assert.equal(overviewTab.attributes['aria-pressed'], 'true');
-assert.equal(factsTab.attributes['aria-pressed'], 'false');
+assert.equal(contextPanel.hidden, false); assert.equal(factsPanel.hidden, false);
+const columns = find(screenElement, node => node.className === 'project-details-columns');
+assert.equal(columns.children.length, 3, 'Overview, Facts, and Records are mounted side by side');
+for (const label of ['Overview', 'Facts', 'Records']) {
+  assert.ok(find(columns, node => node.tag === 'h2' && node.textContent === label));
+}
+assert.equal(find(screenElement, node => node.className === 'project-details-tabs'), undefined);
 const recordsPanel = find(screenElement, node => node.className.includes('project-records-panel'));
 assert.ok(find(recordsPanel, node => node.className === 'project-records-checklist'), 'Records retains the existing checklist in its dedicated section');
 assert.equal(find(contextPanel, node => node.className === 'project-records-checklist'), undefined, 'The checklist is moved rather than duplicated');
-recordsTab.handlers.click();
-assert.equal(recordsPanel.hidden, false); assert.equal(contextPanel.hidden, true); assert.equal(factsPanel.hidden, true);
-assert.equal(recordsTab.attributes['aria-pressed'], 'true');
-overviewTab.handlers.click();
-contextPanel.draft='Retained edit'; contextPanel.scrollTop=320;
+assert.equal(recordsPanel.hidden, false);
+const contextBody = contextPanel.querySelector('.project-details-column-body');
+const factsBody = factsPanel.querySelector('.project-details-column-body');
+const recordsBody = recordsPanel.querySelector('.project-details-column-body');
+contextPanel.draft='Retained edit'; contextBody.scrollTop=320;
+factsBody.scrollTop=210; recordsBody.scrollTop=140; columns.scrollLeft=80;
+const presentation = vm.runInContext('projectDetailsScreen.getPresentationState()',c);
+assert.deepEqual(copy(presentation.columnScrolls), {context:320,facts:210,records:140});
+assert.equal(presentation.scrollLeft,80);
+contextBody.scrollTop=0; factsBody.scrollTop=0; recordsBody.scrollTop=0; columns.scrollLeft=0;
+c.presentation=presentation; vm.runInContext('projectDetailsScreen.restorePresentation(presentation)',c);
+assert.equal(contextBody.scrollTop,320); assert.equal(factsBody.scrollTop,210); assert.equal(recordsBody.scrollTop,140);
+assert.equal(columns.scrollLeft,80);
 vm.runInContext('projectDetailsScreen.close()',c);
 assert.equal(screenElement.hidden, true); assert.equal(screenElement.open, false);
 assert.equal(track.inert, false); assert.equal(workflowToolbar.inert, false);
 assert.equal(mounts.size, 2, 'Closing retains both mounted editors and their drafts');
 await c.toggleProjectInformation('facts');
 assert.equal(mounts.get('project:context:alpha').panel,contextPanel);
-assert.equal(contextPanel.draft,'Retained edit'); assert.equal(contextPanel.scrollTop,320);
-assert.equal(contextPanel.hidden,true); assert.equal(factsPanel.hidden,false);
+assert.equal(contextPanel.draft,'Retained edit'); assert.equal(contextBody.scrollTop,320);
+assert.equal(contextPanel.hidden,false); assert.equal(factsPanel.hidden,false); assert.equal(recordsPanel.hidden,false);
 assert.equal(renderedInformation.length, 2, 'Switching sections must reuse both original editors');
-assert.equal(factsTab.attributes['aria-pressed'], 'true');
+assert.equal(vm.runInContext('projectDetailsScreen.getPresentationState().section',c),'facts');
 vm.runInContext('projectDetailsScreen.close()',c);
 await c.openProjectDetailsScreen();
-assert.equal(factsPanel.hidden,false,'Reopening keeps the last section');
+assert.equal(factsPanel.hidden,false,'Reopening keeps every column visible');
+vm.runInContext('projectDetailsScreen.restorePresentation({section:"records",contentScroll:90})',c);
+assert.equal(recordsBody.scrollTop,90,'A previous tab-based snapshot restores into its matching column');
 allowed=false; tickScreen(); assert.equal(mounts.size,0,'Revoked access releases retained editor mounts');
 assert.equal(screenElement.isConnected, false, 'Revoking access removes the whole private screen');
 assert.equal(contextPanel.isConnected, false); assert.equal(factsPanel.isConnected, false);

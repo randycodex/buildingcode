@@ -28,7 +28,11 @@ export function normalizeWorkspaceResume(value, context) {
     },
     details: {
       section: ['context', 'facts', 'records'].includes(value.details?.section) ? value.details.section : 'context',
-      scroll: position(value.details?.scroll), contentScroll: position(value.details?.contentScroll)
+      scroll: position(value.details?.scroll), contentScroll: position(value.details?.contentScroll),
+      scrollLeft: position(value.details?.scrollLeft),
+      columnScrolls: value.details?.columnScrolls && typeof value.details.columnScrolls === 'object'
+        ? Object.fromEntries(['context', 'facts', 'records'].map(kind => [kind, position(value.details.columnScrolls[kind])]))
+        : null
     },
     account: {
       scroll: position(value.account?.scroll),

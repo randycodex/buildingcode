@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-project-details-tabs-v1013";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261014-project-details-columns-v1014";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-project-details-tabs-v1013";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261014-project-details-columns-v1014";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
@@ -10,7 +10,7 @@ import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, 
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
-import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261012-refresh-v1";
+import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261014-details-columns-v2";
 import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
@@ -120,7 +120,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261014-project-details-tabs-v1013";
+} from "./offline-storage.js?v=20261014-project-details-columns-v1014";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -153,7 +153,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261014-project-details-tabs-v1013";
+} from "./workspace-state.js?v=20261014-project-details-columns-v1014";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -3704,18 +3704,15 @@ async function openProjectDetailsScreen(section = null) {
   close.setAttribute("aria-label", "Close Project details");
   close.addEventListener("click", () => screen.close());
   header.append(title, close);
-  const tabs = document.createElement("nav");
-  tabs.className = "project-details-tabs";
-  tabs.setAttribute("aria-label", "Project details sections");
+  const columns = document.createElement("section");
+  columns.className = "project-details-columns";
+  columns.setAttribute("aria-label", "Project details columns");
   const panels = new Map();
-  const buttons = new Map();
   let selectedSection = "context";
   const selectSection = (kind) => {
+    if (!panels.has(kind)) return;
     selectedSection = kind;
-    for (const [key, panel] of panels) {
-      panel.hidden = key !== kind;
-      buttons.get(key).setAttribute("aria-pressed", String(key === kind));
-    }
+    panels.get(kind).scrollIntoView?.({block: "nearest", inline: "nearest"});
   };
   const screen = createReportScreen({
     screenTitle: "Project details", screenClass: "project-details-screen", projectName: identity.name,
@@ -3726,18 +3723,16 @@ async function openProjectDetailsScreen(section = null) {
     isCurrent: () => isCurrentAccountRequest(requestIdentity) && workspaceID === activeWorkspaceID &&
       projectDetailMatches(workspaceProject(), identity) && hasCapability("projects"),
     load: async () => {
-      content.replaceChildren(header, tabs);
-      tabs.replaceChildren();
+      content.replaceChildren(header, columns);
+      columns.replaceChildren();
       for (const [kind, label] of [["context", "Overview"], ["facts", "Facts"], ["records", "Records"]]) {
-        const button = document.createElement("button");
-        button.type = "button"; button.textContent = label;
-        button.addEventListener("click", () => selectSection(kind));
-        buttons.set(kind, button); tabs.append(button);
         const panel = kind === "records" ? document.createElement("article") : await renderProjectInformation(identity, kind);
+        const columnBody = document.createElement("div");
+        columnBody.className = "project-details-column-body";
         if (kind === "records") {
           panel.className = "workspace-panel project-information-panel project-records-panel";
           const checklist = panels.get("context")?.querySelector(".project-records-checklist");
-          if (checklist) panel.append(checklist);
+          if (checklist) columnBody.append(checklist);
         }
         if (!screen.isCurrent()) {
           const key = paneIDForProjectInformation(identity, kind);
@@ -3758,7 +3753,19 @@ async function openProjectDetailsScreen(section = null) {
           panel.querySelector(".project-information-content")?.prepend(overview);
         }
         panel.querySelectorAll(".saved-project-structured-fact-value").forEach(input => { input.placeholder = "Not recorded"; });
-        panels.set(kind, panel); content.append(panel);
+        const information = panel.querySelector(".project-information-content");
+        if (information) columnBody.append(information);
+        const columnHeader = document.createElement("header");
+        columnHeader.className = "panel-header project-details-column-header";
+        const columnTitle = document.createElement("h2");
+        columnTitle.className = "eyebrow panel-kind";
+        columnTitle.id = `project-details-${kind}`;
+        columnTitle.textContent = label;
+        columnHeader.append(columnTitle);
+        panel.setAttribute("aria-labelledby", columnTitle.id);
+        panel.hidden = false;
+        panel.replaceChildren(columnHeader, columnBody);
+        panels.set(kind, panel); columns.append(panel);
       }
       selectSection(section || "context");
       return content;
@@ -3775,14 +3782,17 @@ async function openProjectDetailsScreen(section = null) {
   screen.projectID = projectID;
   screen.selectSection = selectSection;
   screen.getPresentationState = () => ({section: selectedSection,
-    scroll: panels.get(selectedSection)?.scrollTop || 0,
-    contentScroll: panels.get(selectedSection)?.querySelector(".project-information-content")?.scrollTop || 0});
+    scrollLeft: columns.scrollLeft || 0,
+    columnScrolls: Object.fromEntries([...panels].map(([kind, panel]) =>
+      [kind, panel.querySelector(".project-details-column-body")?.scrollTop || 0]))});
   screen.restorePresentation = snapshot => {
     selectSection(snapshot.section);
-    const panel = panels.get(snapshot.section);
-    if (panel) panel.scrollTop = snapshot.scroll;
-    const body = panel?.querySelector(".project-information-content");
-    if (body) body.scrollTop = snapshot.contentScroll;
+    if (snapshot.columnScrolls) columns.scrollLeft = snapshot.scrollLeft || 0;
+    for (const [kind, panel] of panels) {
+      const body = panel.querySelector(".project-details-column-body");
+      if (body) body.scrollTop = snapshot.columnScrolls?.[kind] ??
+        (kind === snapshot.section ? snapshot.contentScroll || snapshot.scroll || 0 : 0);
+    }
   };
   projectDetailsScreen = screen;
   await screen.open();
