@@ -20268,7 +20268,8 @@ dialog.report-export-review {
   padding: var(--space-3) 0 0;
   background: transparent;
 }
-.project-overview-editor .project-sheet-header button { font-size: 13px !important; }
+.project-overview-editor .project-sheet-header button { padding: 4px 8px; border-radius: var(--radius-pill); font-size: 13px !important; }
+.project-overview-editor .project-sheet-header button:not(:disabled):hover { background: var(--menu-highlight); }
 .project-details-screen .project-overview-context { padding: 0; font-size: 14px; line-height: 1.5; }
 .report-draft-blocks.is-open.is-settled,
 .report-draft-blocks.is-open.is-settled > .report-draft-blocks-body { overflow: visible; }
