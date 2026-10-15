@@ -18205,7 +18205,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   line-height: 1.4;
 }
 .account-screen .settings-data-card > details > summary::-webkit-details-marker { display: none; }
-.account-screen .settings-data-card > .settings-danger-button[data-clear-action="searches"] { border-bottom: 0; }
 .account-screen .settings-account-column > .settings-data-card { gap: 0; }
 .account-screen .settings-data-card > :is(details, .legacy-workspace-recovery) { border-bottom: 1px solid var(--border); }
 .account-screen .settings-data-card > details > summary { padding-block: 12px; }
@@ -18335,7 +18334,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   font-weight: var(--settings-weight-regular);
 }
 .account-screen .settings-data-card .settings-danger-button > span[aria-hidden="true"] { display: none; }
-.account-screen .settings-data-card > .settings-danger-button[data-clear-action="searches"] { margin-top: 12px; color: var(--text-secondary); }
 .account-screen :is(.account-identity, .settings-plan-usage, .settings-trash-entry) {
   margin-inline: calc(-1 * var(--account-category-gutter));
   border-radius: 0;
