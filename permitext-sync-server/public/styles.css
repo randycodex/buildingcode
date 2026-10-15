@@ -19941,11 +19941,43 @@ dialog.report-export-review {
   padding-inline: 0;
 }
 .project-details-screen .project-details-columns .saved-project-structured-fact {
-  grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
+  grid-template-columns: minmax(100px, .85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: 2px var(--space-2);
+  min-height: 36px;
+  padding-block: var(--space-1);
+}
+.project-details-columns .project-facts-panel .saved-project-structured-fact-label {
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.project-details-screen .project-details-columns input.saved-project-structured-fact-value {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: right;
 }
 .project-details-screen .project-details-columns .saved-project-structured-fact > :not(label):not(input) {
-  grid-column: 1;
+  grid-column: 2;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.project-details-columns .project-facts-panel .saved-project-structured-groups { gap: var(--space-2); }
+.project-details-columns .project-facts-panel .saved-project-structured-group-heading { min-height: 24px; }
+.project-details-columns .project-facts-panel .saved-project-structured-group-label { font-size: 13px; }
+.project-details-columns .project-facts-panel .project-facts-filter {
+  justify-self: end;
+  min-height: 28px;
+  margin: 0 0 var(--space-1);
+  padding: var(--space-1) 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
 }
 .project-details-columns .project-records-checklist {
   max-width: var(--workspace-content-max-width);
