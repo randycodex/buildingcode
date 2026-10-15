@@ -12518,31 +12518,13 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .settings-feature-row {
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: var(--space-2);
 }
 
 .settings-feature-row[hidden] {
   display: none;
-}
-
-.settings-feature-icon {
-  display: grid;
-  width: 20px;
-  height: 20px;
-  place-items: center;
-  border: 1px solid var(--text-tertiary);
-  border-radius: 50%;
-  color: var(--text-secondary);
-  font-size: 9pt !important;
-  font-weight: 700;
-}
-
-.settings-feature-icon.is-pro {
-  border-color: var(--text-primary);
-  background: var(--text-primary);
-  color: var(--surface-raised);
 }
 
 .settings-feature-row p {
@@ -12555,7 +12537,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   font-weight: 600;
 }
 
-.settings-feature-row span:not(.settings-feature-icon) {
+.settings-feature-row p > span {
   color: var(--text-secondary);
   font-size: 10pt !important;
   line-height: 1.35;
@@ -13203,7 +13185,6 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 }
 
 .settings-panel .settings-feature-row {
-  grid-template-columns: 18px minmax(0, 1fr);
   gap: var(--space-2);
   padding: 8px;
   border: 0;
@@ -13215,21 +13196,6 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   background: transparent;
 }
 
-.settings-panel .settings-feature-icon {
-  width: 18px;
-  height: 18px;
-  border-color: var(--text-tertiary);
-  background: transparent;
-  color: transparent;
-  font-size: 8pt !important;
-}
-
-.settings-panel .settings-feature-row.is-active .settings-feature-icon {
-  border-color: var(--text-primary);
-  background: var(--text-primary);
-  color: var(--surface);
-}
-
 .settings-panel .settings-feature-row p {
   gap: 1px;
 }
@@ -13238,7 +13204,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   font-size: 9.75pt !important;
 }
 
-.settings-panel .settings-feature-row span:not(.settings-feature-icon) {
+.settings-panel .settings-feature-row p > span {
   font-size: 9pt !important;
   line-height: 1.3;
 }

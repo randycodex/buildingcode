@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-account-scroll-fade-v1029";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-plan-label-v1030";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-account-scroll-fade-v1029";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-plan-label-v1030";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-account-scroll-fade-v1029";
+} from "./offline-storage.js?v=20261015-plan-label-v1030";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-account-scroll-fade-v1029";
+} from "./workspace-state.js?v=20261015-plan-label-v1030";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -39467,11 +39467,9 @@ function renderSettings({ upgrade = false } = {}) {
       row.hidden = !active;
       row.classList.toggle("is-active", active);
       row.setAttribute("aria-current", active ? "true" : "false");
-      const indicator = row.querySelector(".settings-feature-icon");
-      if (indicator) indicator.textContent = active ? "✓" : "";
       if (active) {
         const title = row.querySelector("strong");
-        const summary = row.querySelector("span:not(.settings-feature-icon)");
+        const summary = row.querySelector("p > span");
         if (title) title.textContent = activePlanCopy.title;
         if (summary) {
           summary.textContent = source === "lifetimeGrant" ? "" : activePlanCopy.summary;
