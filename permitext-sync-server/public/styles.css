@@ -18023,6 +18023,13 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 
 /* Account groups related controls into three independently scrolling columns. */
 .account-dialog.account-screen {
+  --settings-type-caption: 12px;
+  --settings-type-support: 13px;
+  --settings-type-body: 14px;
+  --settings-type-emphasis: 16px;
+  --settings-weight-regular: 400;
+  --settings-weight-medium: 500;
+  --settings-weight-heading: 600;
   --account-category-gutter: 24px;
   --account-category-top-gutter: 32px;
   --account-scroll-fade-size: calc(var(--account-category-gutter) + var(--space-3));
@@ -18111,8 +18118,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding: var(--account-category-top-gutter) var(--account-category-gutter) var(--account-scroll-fade-size);
   background: linear-gradient(to bottom, var(--background) 0, var(--background) calc(100% - var(--account-scroll-fade-size)), transparent 100%);
   color: var(--text-primary);
-  font-size: 12px;
-  font-weight: 650;
+  font-size: var(--settings-type-caption);
+  font-weight: var(--settings-weight-heading);
   line-height: 1.2;
   letter-spacing: .085em;
   text-transform: uppercase;
@@ -18132,8 +18139,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: transparent;
   overflow: visible;
 }
-.account-screen .settings-section-title {
+.account-screen .settings-panel .settings-section-title {
   justify-self: start;
+  font-size: var(--settings-type-caption) !important;
+  font-weight: var(--settings-weight-medium);
   text-align: left;
 }
 .account-screen :is(.account-connector, .settings-active-sources-card, .settings-data-card) > .settings-section-title { display: none; }
@@ -18156,8 +18165,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   border: 0;
   background: transparent;
   color: var(--destructive);
-  font-size: 13px;
-  font-weight: 400;
+  font-size: var(--settings-type-support);
+  font-weight: var(--settings-weight-regular);
 }
 .account-screen .settings-source-group { border-bottom: 1px solid var(--border); }
 .account-screen .settings-source-group > summary {
@@ -18168,8 +18177,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding: 12px 0;
   box-sizing: border-box;
   color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--settings-type-body);
+  font-weight: var(--settings-weight-medium);
   line-height: 1.4;
   list-style: none;
   cursor: pointer;
@@ -18193,8 +18202,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   align-items: center;
   gap: 8px;
   list-style: none;
-  font-size: 13px;
-  font-weight: 400;
+  font-size: var(--settings-type-body);
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.4;
 }
 .account-screen .settings-data-card > details > summary::-webkit-details-marker { display: none; }
 .account-screen .settings-data-card > .settings-danger-button[data-clear-action="searches"] { border-bottom: 0; }
@@ -18211,8 +18221,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text-primary);
-  font-size: 13px !important;
-  font-weight: 400;
+  font-size: var(--settings-type-support) !important;
+  font-weight: var(--settings-weight-regular);
   line-height: 1.4;
   justify-self: start;
 }
@@ -18224,9 +18234,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-data-card .settings-content-trash { color: var(--text-secondary); white-space: nowrap; }
 .account-screen .settings-data-card .settings-content-trash:not(:disabled):hover { color: var(--destructive); }
 .account-screen .settings-data-card .settings-content-trash:disabled:hover { background: transparent; }
-.account-screen .settings-data-card .settings-trash-help { margin: 0 0 6px; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.account-screen .settings-data-card .settings-trash-help { margin: 0 0 6px; color: var(--text-secondary); font-size: var(--settings-type-support); line-height: 1.5; }
 .account-screen .settings-trash-toolbar { display: flex; justify-content: flex-end; }
-.account-screen .settings-trash-status { margin: 8px 0; color: var(--text-secondary); font-size: 12px; }
+.account-screen .settings-trash-status { margin: 8px 0; color: var(--text-secondary); font-size: var(--settings-type-support); line-height: 1.5; }
 .account-screen .settings-trash-status:empty { display: none; }
 .account-screen .settings-trash-entry {
   display: grid;
@@ -18236,19 +18246,19 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding: 10px var(--account-category-gutter);
 }
 .account-screen .settings-trash-copy { display: contents; }
-.account-screen .settings-trash-title { grid-column: 1 / -1; justify-self: start; max-width: calc(50% - 6px); margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text-primary); font-size: 13px; font-weight: 500; line-height: 1.4; text-align: left; overflow-wrap: anywhere; }
+.account-screen .settings-trash-title { grid-column: 1 / -1; justify-self: start; max-width: calc(50% - 6px); margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text-primary); font-size: var(--settings-type-support); font-weight: var(--settings-weight-medium); line-height: 1.4; text-align: left; overflow-wrap: anywhere; }
 .account-screen .settings-trash-title::before, .account-screen .settings-trash-title::after { content: none; }
 .account-screen .settings-trash-contents { grid-column: 1 / -1; min-width: 0; padding-top: 8px; }
 .account-screen .settings-trash-contents[hidden] { display: none; }
 .account-screen .settings-trash-contents ol { margin: 0; padding-inline-start: 24px; list-style: decimal; }
 .account-screen .settings-trash-contents li { display: list-item; min-width: 0; padding-inline-start: 4px; }
 .account-screen .settings-trash-contents li + li { margin-top: var(--space-3); }
-.account-screen .settings-trash-contents li::marker { color: var(--text-secondary); font-size: 12px; }
-.account-screen .settings-trash-contents strong { display: block; font-size: 13px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
-.account-screen .settings-trash-contents p { margin: 0; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.account-screen .settings-trash-contents li::marker { color: var(--text-secondary); font-size: var(--settings-type-caption); }
+.account-screen .settings-trash-contents strong { display: block; font-size: var(--settings-type-support); font-weight: var(--settings-weight-medium); line-height: 1.4; overflow-wrap: anywhere; }
+.account-screen .settings-trash-contents p { margin: 0; font-size: var(--settings-type-support); line-height: 1.5; overflow-wrap: anywhere; }
 .account-screen .settings-trash-contents li > * + * { margin-top: 4px; }
 .account-screen .settings-trash-item-meta, .account-screen .settings-trash-item-excerpt { color: var(--text-secondary); }
-.account-screen .settings-trash-copy p { grid-column: 1; grid-row: 2; margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.account-screen .settings-trash-copy p { grid-column: 1; grid-row: 2; margin: 0; color: var(--text-secondary); font-size: var(--settings-type-caption); line-height: 1.4; }
 .account-screen .settings-trash-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 .account-screen .settings-trash-entry > .settings-trash-actions { grid-column: 2; grid-row: 2; }
 .account-screen .settings-trash-actions > .settings-trash-action { margin: 0; }
@@ -18264,7 +18274,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   border: 1px solid var(--border);
   border-radius: var(--radius-control);
   background: var(--menu-surface);
-  font-size: 13px;
+  font-size: var(--settings-type-support);
 }
 .account-screen .settings-trash-confirm p { margin: 0; line-height: 1.4; }
 .account-screen .settings-trash-entry > .settings-trash-confirm { grid-column: 1 / -1; }
@@ -18276,6 +18286,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   min-height: 42px;
   padding: 12px 0;
   border-radius: 0;
+  font-size: var(--settings-type-body) !important;
+  font-weight: var(--settings-weight-medium);
   text-align: left;
 }
 .account-screen .settings-data-card > details > summary::before,
@@ -18291,21 +18303,21 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .account-screen .settings-data-card > details[open] > summary::before,
 .account-screen .legacy-workspace-review[aria-expanded="true"]::before { transform: rotate(45deg); }
 .account-screen .settings-data-card .legacy-workspace-recovery > div:not([hidden]) { padding-bottom: 12px; }
-.account-screen .settings-data-card .settings-projects-heading h4 { font-weight: 500; }
+.account-screen .settings-data-card .settings-projects-heading h4 { font-weight: var(--settings-weight-medium); }
 .account-screen .settings-data-card .settings-project-row { min-height: 32px; padding-block: 6px; }
-.account-screen .settings-data-card .settings-project-copy strong { font-weight: 500; }
+.account-screen .settings-data-card .settings-project-copy strong { font-size: var(--settings-type-body) !important; font-weight: var(--settings-weight-regular); line-height: 1.4; }
 .account-screen .settings-data-card .settings-project-delete:disabled { color: var(--text-secondary); opacity: .5; }
 .account-screen .settings-content-groups { display: grid; }
 .account-screen .settings-content-group { min-width: 0; padding-block: var(--space-3); }
 .account-screen .settings-content-group + .settings-content-group { border-top: 1px solid var(--border); }
 .account-screen .settings-content-copy { min-width: 0; }
-.account-screen .settings-content-group h4 { margin: 0; color: var(--text-primary); font-size: 13px !important; font-weight: 500; line-height: 1.4; }
-.account-screen .settings-content-count, .account-screen .settings-project-selection-status { margin: 4px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.account-screen .settings-content-group h4 { margin: 0; color: var(--text-primary); font-size: var(--settings-type-body) !important; font-weight: var(--settings-weight-medium); line-height: 1.4; }
+.account-screen .settings-content-count, .account-screen .settings-project-selection-status { margin: 4px 0 0; color: var(--text-secondary); font-size: var(--settings-type-caption); line-height: 1.4; }
 .account-screen .settings-content-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
 .account-screen .settings-projects-card .settings-project-list { margin-top: var(--space-2); }
 .account-screen .settings-projects-card .settings-project-row { min-height: 44px; padding-block: var(--space-2); }
 .account-screen .settings-projects-card .settings-project-copy strong { color: var(--text-primary); }
-.account-screen .settings-projects-card .settings-project-copy span { text-transform: none; letter-spacing: normal; font-size: 12px !important; }
+.account-screen .settings-projects-card .settings-project-copy span { text-transform: none; letter-spacing: normal; font-size: var(--settings-type-caption) !important; font-weight: var(--settings-weight-regular); line-height: 1.4; }
 .account-screen .settings-projects-card .settings-project-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-2); }
 .account-screen .settings-project-actions .settings-project-selection-status { margin: 0 auto 0 0; }
 .account-screen .settings-data-card .settings-project-select-all { color: var(--text-secondary); }
@@ -18317,8 +18329,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   min-height: 34px;
   margin-inline: 0;
   padding: 8px 0;
-  font-size: 13px !important;
-  font-weight: 400;
+  font-size: var(--settings-type-support) !important;
+  font-weight: var(--settings-weight-regular);
 }
 .account-screen .settings-data-card .settings-danger-button > span[aria-hidden="true"] { display: none; }
 .account-screen .settings-data-card > .settings-danger-button[data-clear-action="searches"] { margin-top: 12px; color: var(--text-secondary); }
@@ -18360,6 +18372,97 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   min-height: 0;
   height: auto;
   overflow-y: auto;
+}
+/* Apply the same text roles to profile, plan, library, and recovery states.
+   Explicit sizes override the older shared Settings column styles. */
+.account-screen .account-screen-header h1 {
+  font-size: var(--settings-type-body) !important;
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.4;
+}
+.account-screen .settings-panel :is(.account-identity dt, .settings-plan-usage p,
+  .settings-card-copy, .account-profile-helper, .connector-status,
+  .settings-offline-status, .settings-status-message, .settings-projects-empty,
+  .settings-feature-row p > span, .settings-purchase-consent) {
+  font-size: var(--settings-type-support) !important;
+  font-weight: var(--settings-weight-regular);
+  line-height: 1.5;
+}
+.account-screen .settings-panel .account-identity dd {
+  font-size: var(--settings-type-body) !important;
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.4;
+}
+.account-screen .settings-plan-usage strong {
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.5;
+}
+.account-screen .settings-feature-row p > strong {
+  font-size: var(--settings-type-emphasis) !important;
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.3;
+}
+.account-screen .settings-active-source-row > span {
+  font-size: var(--settings-type-body);
+  font-weight: var(--settings-weight-regular);
+  line-height: 1.5;
+}
+.account-screen .settings-panel :is(.settings-primary-button, .account-clear, .account-profile-save) {
+  font-size: var(--settings-type-support) !important;
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.4;
+}
+.account-screen .settings-panel .settings-link-button {
+  font-size: var(--settings-type-support) !important;
+  font-weight: var(--settings-weight-regular);
+  line-height: 1.4;
+}
+.account-screen .settings-trash-contents .settings-trash-item-meta {
+  font-size: var(--settings-type-caption);
+  font-weight: var(--settings-weight-regular);
+}
+.account-screen .settings-trash-confirm label {
+  font-size: var(--settings-type-support);
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.4;
+}
+.account-screen .settings-panel :is(.account-identity-inline-input, .account-identity-inline-select,
+  .account-profile-editor input), .account-screen .settings-trash-confirm input {
+  font-size: var(--settings-type-body) !important;
+  font-weight: var(--settings-weight-regular);
+  line-height: 1.4;
+}
+.account-screen .settings-panel :is(.settings-footer a, .settings-footer .settings-disclaimer) {
+  font-size: var(--settings-type-caption) !important;
+  font-weight: var(--settings-weight-regular);
+  line-height: 1.4;
+}
+.account-screen .web-warning-title {
+  font-size: var(--settings-type-emphasis);
+  font-weight: var(--settings-weight-heading);
+  line-height: 1.3;
+}
+.account-screen :is(.account-deletion-disclosure h3, .settings-conflict-row > strong) {
+  font-size: var(--settings-type-body);
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.4;
+}
+.account-screen :is(.web-warning-message, .account-deletion-disclosure p,
+  .account-deletion-disclosure ul, .account-deletion-acknowledgment,
+  .settings-conflict-row > span) {
+  font-size: var(--settings-type-support) !important;
+  font-weight: var(--settings-weight-regular);
+  line-height: 1.5;
+}
+.account-screen :is(.account-deletion-permanent-warning, .web-warning-field,
+  .web-warning-button, .account-deletion-manage-link) {
+  font-size: var(--settings-type-support);
+  font-weight: var(--settings-weight-medium);
+  line-height: 1.4;
+}
+.account-screen .web-warning-field input {
+  font-size: var(--settings-type-body);
+  font-weight: var(--settings-weight-regular);
 }
 @media (max-width: 1200px) {
   .account-screen .settings-panel > .settings-scroll {
