@@ -1,6 +1,7 @@
 // Shared by online and offline Search. These are lexical matches, not AI relevance.
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const hyphenPostings = new WeakMap();
+const wordIndexes = new WeakMap();
+const completesWord = word => /^\p{L}{3,}$/u.test(word);
 
 export function searchWords(query) {
   return [...new Set((String(query || "").toLowerCase()
@@ -15,7 +16,9 @@ export function searchWordForms(word) {
 }
 
 export function searchWordPattern(word) {
-  return new RegExp(`(?<![\\p{L}\\p{N}_])(?:${searchWordForms(word).map(escape).join("|")})(?![\\p{L}\\p{N}_])`, "iu");
+  const forms = searchWordForms(word).map(escape);
+  if (completesWord(word)) forms.push(`${escape(word)}[\\p{L}]*`);
+  return new RegExp(`(?<![\\p{L}\\p{N}_])(?:${forms.join("|")})(?![\\p{L}\\p{N}_])`, "iu");
 }
 
 export function matchesSearchWords(values, query) {
@@ -25,8 +28,9 @@ export function matchesSearchWords(values, query) {
 }
 
 export function searchWordPosting(index, word) {
-  // Build only the hyphen aliases once per loaded index; keep original postings intact.
-  if (!hyphenPostings.has(index)) {
+  // Reuse one sorted vocabulary per loaded index. Prefix searches inspect only
+  // the matching range instead of scanning every token on each keystroke.
+  if (!wordIndexes.has(index)) {
     const aliases = new Map();
     for (const [token, ids] of index) {
       if (!/\p{L}[-‐‑–]\p{L}/u.test(token)) continue;
@@ -35,11 +39,25 @@ export function searchWordPosting(index, word) {
         for (const id of ids) aliases.get(part).add(id);
       }
     }
-    hyphenPostings.set(index, aliases);
+    wordIndexes.set(index, { aliases, vocabulary: [...new Set([...index.keys(), ...aliases.keys()])].sort() });
   }
-  return [...new Set(searchWordForms(word).flatMap(form => [
-    ...index.get(form) || [], ...hyphenPostings.get(index).get(form) || []
-  ]))].sort((a, b) => a - b);
+  const { aliases, vocabulary } = wordIndexes.get(index);
+  const sectionIDs = new Set();
+  const collect = token => {
+    for (const id of index.get(token) || []) sectionIDs.add(id);
+    for (const id of aliases.get(token) || []) sectionIDs.add(id);
+  };
+  searchWordForms(word).forEach(collect);
+  if (completesWord(word)) {
+    let left = 0, right = vocabulary.length;
+    while (left < right) {
+      const middle = (left + right) >>> 1;
+      if (vocabulary[middle] < word) left = middle + 1;
+      else right = middle;
+    }
+    for (let position = left; position < vocabulary.length && vocabulary[position].startsWith(word); position++) collect(vocabulary[position]);
+  }
+  return [...sectionIDs].sort((a, b) => a - b);
 }
 
 export function searchWordsSnippet(value, query) {
