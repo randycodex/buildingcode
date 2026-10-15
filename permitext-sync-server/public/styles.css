@@ -17037,6 +17037,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
   align-items: center;
   min-height: 44px;
   color: var(--text-primary);
+  text-decoration: none;
 }
 .legacy-workspace-recovery [role="status"]:empty {
   display: none;
