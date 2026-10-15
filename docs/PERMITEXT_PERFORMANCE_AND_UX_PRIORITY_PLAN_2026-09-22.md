@@ -1088,3 +1088,9 @@ Mixed-use inspection found a false Chapter O / Reserved link under Saved102.3. N
 ### September30 current remaining gate
 
 Build41.36 physical reference correction and five-minute mixed-use functional acceptance pass; offline unacknowledged-write recovery and independent web delivery also pass. The current distribution/TestFlight artifact still needs preparation and acceptance; Cloud393 predates the reference fix. Speed/resource profiling and accessibility remain owner-deferred. App Store submission/release remains prohibited. Full backlog is preserved, not declared complete.
+
+### September30 TestFlight-only authorization
+
+Owner explicitly authorized private TestFlight testing ("do that, testflight only"). App Store review submission and public release remain prohibited. Main is pushed at f3b77c5867bed4bfdc0e9ce91e118f3f89259b83. Default Xcode Cloud distribution preparation was changed from None to TestFlight (Internal Testing Only), with no distribution post-actions added. Manual build396 (519fc5f1-d4e8-4fa9-90f0-7c425cfd29c8) was queued from main at14:47. Build395 was started before that setting change and is not the internal-distribution candidate. Verify396 source, success, TestFlight processing and actual installation before closing distribution acceptance.
+
+September30 processing checkpoint: Apple lists version1.0 build396 as Processing (uploaded14:58). Cloud396 independently shows source f3b77c5867bed4bfdc0e9ce91e118f3f89259b83 and Archive - iOS In Progress. Owner chose to keep396 for this test after discussing sequential numbering; the cancellation dialog was dismissed without cancelling. Internal-group availability, TestFlight installation and the bounded distribution smoke check are still unverified. Do not rebuild or claim distribution acceptance merely because upload succeeded.
