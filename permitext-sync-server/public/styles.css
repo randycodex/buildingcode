@@ -18144,6 +18144,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   margin-top: auto;
   padding: 24px var(--account-category-gutter) 0;
 }
+.account-screen .settings-offline-download,
+.account-screen .settings-account-actions .account-clear {
+  width: min(250px, 100%);
+}
 .account-screen .settings-account-actions .account-delete {
   width: auto;
   min-width: 0;
