@@ -18030,7 +18030,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   --settings-weight-regular: 400;
   --settings-weight-medium: 500;
   --settings-weight-heading: 600;
-  --settings-disclosure-indent: var(--space-4);
+  --settings-disclosure-indent: calc(var(--space-4) + 25px);
   --account-category-gutter: 24px;
   --account-category-top-gutter: 32px;
   --account-scroll-fade-size: calc(var(--account-category-gutter) + var(--space-3));
