@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1099";
+} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1100";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1099";
+} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1100";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
