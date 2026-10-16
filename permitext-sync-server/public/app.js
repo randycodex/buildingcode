@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1089";
+} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1090";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1089";
+} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1090";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -24003,10 +24003,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const action = (host, label, callback) => { const button = element("button", "ghost-button assistant-context-action", label); button.type = "button"; button.addEventListener("click", callback); host.append(button); return button; };
   const icon = paths => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
   const toolbar = element("div", "assistant-context-toolbar"); toolbar.setAttribute("aria-label", "Assistant context controls");
-  const summary = element("div", "assistant-context-summary");
-  const projectName = element("strong", "assistant-context-project", project?.name || information.name || "No project attached");
-  const workSummary = element("button", "assistant-context-work-summary"); workSummary.type = "button";
-  summary.append(projectName, workSummary);
+  const projectName = project?.name || information.name || "No project attached";
   const details = element("section", "assistant-context-details");
   const tabs = [
     ["project", "Project", '<path d="M3 7h7l2-3h9v16H3z"/>'],
@@ -24031,7 +24028,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
     buttons.set(key, button); bodies.set(key, body); toolbar.append(button); details.append(body);
   }
   const projectBody = bodies.get("project");
-  field(projectBody, "Attached project", projectName.textContent);
+  field(projectBody, "Attached project", projectName);
   const address = information.address || project?.address || projectStructuredFacts(information).find(fact => fact.key === "address")?.value;
   if (address) field(projectBody, "Property", address);
   copy(projectBody, "Saved site records describe existing conditions. Set the proposed design under Work.");
@@ -24042,9 +24039,6 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const workBody = bodies.get("work");
   const initialWork = conversation ? assistantWorkContext(conversation.projectContext?.facts || [])
     : view.draft.projectID === projectID ? view.draft : { workType: "Unspecified", uses: "", additionalFacts: "" };
-  const updateSummary = work => { workSummary.textContent = conversation?.projectContextReviewRequired ? "Proposed work: Review required" : `Proposed work: ${work.workType || "Unspecified"}`; workSummary.classList.toggle("is-unspecified", !work.workType || work.workType === "Unspecified"); };
-  updateSummary(initialWork);
-  workSummary.addEventListener("click", () => { selectTab("work"); });
   const form = element("form", "assistant-work-form");
   const typeLabel = element("label", "", "Proposed work");
   const workType = document.createElement("select"); workType.setAttribute("aria-label", "Proposed work");
@@ -24058,7 +24052,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const status = element("p", "assistant-context-status"); status.setAttribute("role", "status"); status.setAttribute("aria-live", "polite");
   const save = element("button", "ghost-button assistant-work-save", conversation ? "Save work context" : "Use for new conversation"); save.type = "submit";
   const readWork = () => ({ projectID, workType: workType.value, uses: uses.value, additionalFacts: facts.value });
-  const draftChanged = () => { if (!conversation) { view.draft = readWork(); persist(); updateSummary(view.draft); status.textContent = "Ready for your first question."; } else status.textContent = "Unsaved changes"; };
+  const draftChanged = () => { if (!conversation) { view.draft = readWork(); persist(); status.textContent = "Ready for your first question."; } else status.textContent = "Unsaved changes"; };
   [workType, uses, facts].forEach(control => control.addEventListener("input", draftChanged));
   form.addEventListener("submit", async event => {
     event.preventDefault(); if (!current() || save.disabled) return;
@@ -24066,14 +24060,14 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
     if (activeProgress && !activeProgress.endedAt) { status.textContent = "Wait for the current answer before changing context."; return; }
     try {
       const next = readWork(); const nextFacts = assistantWorkFacts(next);
-      if (!conversation) { view.draft = next; persist(); updateSummary(next); status.textContent = "Ready for your first question."; return; }
+      if (!conversation) { view.draft = next; persist(); status.textContent = "Ready for your first question."; return; }
       save.disabled = true; status.textContent = "Saving…";
       const payload = await postResearch("/research/conversations/project-context", { conversationID: conversation.id, projectID, facts: nextFacts });
       if (!current()) return;
       conversation = payload.conversation;
       if (instance) supplementalResearchConversations.set(conversation.id, conversation); else activeResearchConversation = conversation;
       researchConversationList = researchConversationList.map(item => item.id === conversation.id ? { ...item, ...conversation } : item);
-      updateSummary(next); status.textContent = "Work context saved";
+      status.textContent = "Work context saved";
     } catch (error) { if (current()) status.textContent = error.message; }
     finally { if (current()) save.disabled = false; }
   });
@@ -24124,9 +24118,9 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
 
   const historyHeading = element("h3", "assistant-history-heading", "Conversations");
   content.prepend(historyHeading);
-  historyRail.prepend(toolbar, summary, details);
+  historyRail.prepend(toolbar, details);
   return { toolbar, settings, disposeContext() {
-    toolbar.remove(); summary.remove(); details.remove(); historyHeading.remove();
+    toolbar.remove(); details.remove(); historyHeading.remove();
   }, startNewConversation() {
     const latest = instance ? supplementalResearchConversations.get(instance.conversationID) : activeResearchConversation;
     if (latest) view.draft = assistantDraftForConversation(latest, projectID);
