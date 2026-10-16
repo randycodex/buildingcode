@@ -21,6 +21,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "utilities",
   "paneWidthDefaultsVersion",
   "paneWeights",
+  "workflowPaneWeights",
   "paneOrder",
   "collapsedPaneIDs",
   "pinnedPaneID",
@@ -253,6 +254,7 @@ export function emptyWorkspaceLayout() {
     utilities: utilityState(),
     paneWidthDefaultsVersion: 4,
     paneWeights: {},
+    workflowPaneWeights: {},
     paneOrder: [],
     collapsedPaneIDs: [],
     pinnedPaneID: "",
@@ -385,6 +387,12 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.workflowView = normalizeWorkflowView(source.workflowView);
   layout.workflowVisitedViews = normalizeVisitedWorkflowViews(source);
   layout.workflowMembership = normalizeWorkflowMembership(source.workflowMembership);
+  layout.workflowPaneWeights = Object.fromEntries(
+    ['research', 'notebook', 'report', 'project-details'].map(view => [view,
+      Object.fromEntries(Object.entries(source.workflowPaneWeights?.[view] || {})
+        .filter(([id, width]) => typeof id === 'string' && Number.isFinite(width) && width > 0))
+    ])
+  );
   layout.workflowScroll = Object.fromEntries(columnWorkflowViews.map(view =>
     [view, Math.max(0, Number(source.workflowScroll?.[view]) || 0)]));
   layout.trackScrollLeft = Number.isFinite(Number(source.trackScrollLeft))

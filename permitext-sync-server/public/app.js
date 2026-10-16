@@ -1,3 +1,4 @@
+import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=3";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
@@ -122,7 +123,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261016-assistant-composer-fade-v1106";
+} from "./offline-storage.js?v=20261016-column-expansion-v1110";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +156,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261016-assistant-composer-fade-v1106";
+} from "./workspace-state.js?v=20261016-column-expansion-v1110";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -882,6 +883,7 @@ function loadWorkspaceState(accountOverride) {
       },
       account: accountOverride === undefined ? loadPersistedAccount(saved.account) : accountOverride,
       browserCredentialID: typeof saved.browserCredentialID === "string" ? saved.browserCredentialID : "",
+      workflowPaneWeights: saved.workflowPaneWeights || {},
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
       pinnedPaneID: typeof saved.pinnedPaneID === "string" ? saved.pinnedPaneID : "",
       columnGroups: normalizeColumnGroups(saved.columnGroups),
@@ -3722,6 +3724,8 @@ async function openProjectDetailsScreen(section = null) {
   columns.setAttribute("aria-label", "Project details columns");
   const panels = new Map();
   let resizeControls = null;
+  let expansionControls = null;
+  let unexpandedWidths = null;
   let selectedSection = "context";
   const selectSection = (kind) => {
     if (!panels.has(kind)) return;
@@ -3841,12 +3845,19 @@ async function openProjectDetailsScreen(section = null) {
         panels.set(kind, panel); columns.append(panel);
       }
       resizeControls = createProjectDetailsColumnResizers(columns, [...panels.values()], saveWorkspaceResumeForRefresh);
+      expansionControls = createColumnExpansion({
+        host: columns, columns: () => [...panels.values()], minimumWidth: () => 400,
+        label: node => node.querySelector(':scope > header h2')?.textContent || 'Column',
+        key: node => node.getAttribute('aria-labelledby'),
+        capturePosition: () => { if (!columns.classList.contains('has-expanded-column')) unexpandedWidths = resizeControls.getWidths(); }
+      });
       selectSection(section || "context");
       return content;
     },
     onClose: () => { resizeControls?.cancel(); state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1; syncWorkflowColumnPresentation(); },
     onDispose: () => {
       resizeControls?.dispose();
+      expansionControls?.dispose();
       for (const [kind, panel] of panels) {
         const key = paneIDForProjectInformation(identity, kind);
         if (projectInformationMounts.get(key)?.panel === panel) projectInformationMounts.delete(key);
@@ -3858,7 +3869,7 @@ async function openProjectDetailsScreen(section = null) {
   screen.selectSection = selectSection;
   screen.getPresentationState = () => ({section: selectedSection,
     scrollLeft: columns.scrollLeft || 0,
-    columnWidths: resizeControls?.getWidths() || null,
+    columnWidths: columns.classList.contains("has-expanded-column") ? unexpandedWidths : resizeControls?.getWidths() || null,
     columnScrolls: Object.fromEntries([...panels].map(([kind, panel]) =>
       [kind, panel.querySelector(".project-details-column-body")?.scrollTop || 0]))});
   screen.restorePresentation = snapshot => {
@@ -4471,6 +4482,9 @@ function syncWorkflowColumnPresentation() {
   const view = currentColumnWorkflowView();
   const panes = [...track.querySelectorAll(':scope > .workspace-panel')];
   if (view !== presentedColumnWorkflowView) {
+    state.workflowPaneWeights ||= {};
+    state.workflowPaneWeights[presentedColumnWorkflowView] = { ...state.paneWeights };
+    state.paneWeights = { ...(state.workflowPaneWeights[view] || state.paneWeights) };
     const shell = document.querySelector(".workspace-shell");
     if (shell) referenceWorkspaceScroll.set(`${activeWorkspaceID}:${presentedColumnWorkflowView}`, shell.scrollLeft);
     const readerPositions = captureReaderScrollPositions();
@@ -4493,6 +4507,7 @@ function syncWorkflowColumnPresentation() {
     track.scrollLeft = state.workflowScroll[view] || 0;
     if (shell) shell.scrollLeft = referenceWorkspaceScroll.get(`${activeWorkspaceID}:${view}`) || 0;
   }
+  columnExpansionController().refresh();
   syncWorkflowNavigation();
 }
 function closeSharedWorkspaceViews(except = "") {
@@ -29344,6 +29359,7 @@ async function renderProjectReportDraft(project, resume = null) {
     },
     dispose() {
       disposed = true;
+      panel._columnExpansion?.dispose();
       outlineController?.dispose();
       comparisonController?.dispose();
       autosave?.dispose();
@@ -30680,8 +30696,14 @@ async function renderProjectReportDraft(project, resume = null) {
       paintOutlineToggle();
       libraryControls.update(); versionsControls.update();
     };
+    panel._columnExpansion?.dispose();
     shell.append(primaryActions, columns);
     panel._updateReportColumns();
+    panel._columnExpansion = createColumnExpansion({
+      host: columns, columns: () => [library, outline, documentBody, comparison.preview, comparison.versions],
+      label: node => node === library ? 'Sources' : node === outline ? 'Outline' : node === documentBody ? 'Report' : node === comparison.preview ? 'PDF' : 'Versions',
+      key: node => node.className.split(' ')[0], minimumWidth: () => 300
+    });
     documents.scrollLeft = keepPosition ? columnsScroll : 0;
     sourcePicker.scrollTop = reportLibraryScroll.sources;
     comparison.restorePosition(comparisonScroll);
@@ -40473,6 +40495,16 @@ function renderSettings({ upgrade = false } = {}) {
   return panel;
 }
 
+let workspaceColumnExpansion;
+function columnExpansionController() {
+  return workspaceColumnExpansion ||= createColumnExpansion({
+    host: track, columns: () => [...track.querySelectorAll(':scope > .workspace-panel')],
+    label: columnPaneLabel, context: () => `${activeWorkspaceID}:${currentColumnWorkflowView()}`,
+    minimumWidth: node => minimumPaneWidthForID(node.dataset.paneId), menu: false,
+    capturePosition: captureReaderScrollPositions, restorePosition: position => { if (position) restoreReaderScrollPositions(position); }
+  });
+}
+
 function singleExpandedDividerEdge(previousPaneID, nextPaneID) {
   const previousOpen = previousPaneID && !paneIsCollapsed(previousPaneID) && !assistantHistoryOnlyPane(previousPaneID);
   const nextOpen = nextPaneID && !paneIsCollapsed(nextPaneID) && !assistantHistoryOnlyPane(nextPaneID);
@@ -40493,6 +40525,7 @@ function updateAdjacentDividerValue(divider, previousWidth, nextWidth) {
 }
 
 function capturePaneResizeWidths() {
+  workspaceColumnExpansion?.restore();
   const panes = Array.from(track.querySelectorAll(".workspace-panel")).map((pane) => ({
     id: pane.dataset.paneId,
     pane,
@@ -40518,16 +40551,15 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   const nextWidth = nextPane.getBoundingClientRect().width;
   const scrollLeft = track.scrollLeft;
   capturePaneResizeWidths();
-  const widths = [
-    constrainPaneWidth(previousPaneID, previousWidth + delta),
-    constrainPaneWidth(nextPaneID, nextWidth - delta)
-  ];
+  const widths = adjacentColumnWidths(previousWidth, nextWidth, delta,
+    minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
+    maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID));
   state.paneWeights[previousPaneID] = widths[0];
   state.paneWeights[nextPaneID] = widths[1];
   applyPaneWeight(previousPane, previousPaneID);
   applyPaneWeight(nextPane, nextPaneID);
   // Match pointer resizing when one column reaches its minimum width.
-  track.scrollLeft = Math.max(0, scrollLeft + widths[0] - previousWidth - delta);
+  track.scrollLeft = scrollLeft;
   updateAdjacentDividerValue(divider, ...widths);
   scheduleVisibleReaderScrollIndicatorUpdates();
   notifyWorkspaceLayoutChange();
@@ -40690,6 +40722,7 @@ function createDivider(previousPaneID, nextPaneID) {
 }
 
 function resetDividerPanes(previousPaneID, nextPaneID) {
+  workspaceColumnExpansion?.restore();
   const currentLeft = track.scrollLeft;
   [previousPaneID, nextPaneID].forEach((paneID) => {
     if (!paneID || paneIsCollapsed(paneID)) return;
@@ -41078,14 +41111,10 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   const applyResizeAt = (clientX) => {
     const delta = clientX - startX;
     const widths = paneData.map((pane) => pane.startWidth);
-    widths[previousIndex] = constrainPaneWidth(
-      previousPaneID,
-      paneData[previousIndex].startWidth + delta
-    );
-    widths[nextIndex] = constrainPaneWidth(
-      nextPaneID,
-      paneData[nextIndex].startWidth - delta
-    );
+    [widths[previousIndex], widths[nextIndex]] = adjacentColumnWidths(
+      paneData[previousIndex].startWidth, paneData[nextIndex].startWidth, delta,
+      minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
+      maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID));
     [previousIndex, nextIndex].forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
       const pane = paneData[index];
@@ -41095,9 +41124,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     });
     syncReferenceReaderLayout();
     updateAdjacentDividerValue(resizeHandle, widths[previousIndex], widths[nextIndex]);
-    const appliedPreviousDelta = widths[previousIndex] - paneData[previousIndex].startWidth;
-    const pushedScrollDelta = appliedPreviousDelta - delta;
-    track.scrollLeft = Math.max(0, startScrollLeft + pushedScrollDelta);
+    track.scrollLeft = startScrollLeft;
     scheduleVisibleReaderScrollIndicatorUpdates();
   };
 
@@ -41617,13 +41644,18 @@ function openColumnGroupMenu(panel, anchor) {
     button.addEventListener('click', () => { close(); action(); });
     menu.append(button);
   };
+  const expansion = columnExpansionController();
+  add(expansion.isExpanded(panel) ? 'Restore width' : 'Expand', () => {
+    if (expansion.isExpanded(panel)) expansion.restore();
+    else expansion.expand(panel);
+  });
   const factEditor = panel.classList.contains("project-facts-panel") ? projectInformationMounts.get(panel.dataset.paneId) : null;
   if (factEditor?.refreshZoLa) add("Refresh ZoLa data", factEditor.refreshZoLa, factEditor.isRefreshing());
   if (panel.classList.contains("search-panel")) add("New search column", () => void openNewSearchColumn());
   if (panel.classList.contains("research-list-panel")) add("New research column", () => void openNewResearchColumn());
   separate();
   if (paneCanCollapse(panel.dataset.paneId) && !columnGroupIsCollapsed(group)) {
-    add(paneIsCollapsed(panel.dataset.paneId) ? 'Expand' : 'Collapse', () => {
+    add(paneIsCollapsed(panel.dataset.paneId) ? 'Reopen column' : 'Collapse', () => {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
     });
   }
@@ -41864,6 +41896,7 @@ function applyPaneCollapsedState(panel) {
 }
 
 function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
+  workspaceColumnExpansion?.restore();
   const paneID = panel.dataset.paneId;
   if (!paneCanCollapse(paneID)) return;
   const group = columnGroupForPane(paneID);

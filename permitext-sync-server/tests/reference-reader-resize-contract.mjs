@@ -1,3 +1,4 @@
+import { adjacentColumnWidths } from "../public/column-expansion.js";
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
@@ -40,6 +41,7 @@ function fixture(view, widths = [800], sourcesWidth = 0) {
     getBoundingClientRect: () => ({ left: reportWidth() + 1, right: reportWidth() + 2 })
   };
   const context = vm.createContext({
+    workspaceColumnExpansion: null, adjacentColumnWidths,
     state, track, CSS: { escape: value => value }, referenceColumnsWidth, reportColumnsLayout,
     currentColumnWorkflowView: () => view,
     defaultActivePaneIDs: () => panes.map(pane => pane.dataset.paneId), workflowPaneIsVisible: () => true,
