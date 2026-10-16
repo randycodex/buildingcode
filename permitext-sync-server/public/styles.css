@@ -20244,6 +20244,7 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .assistant-context-section[hidden] { display: none; }
 .assistant-context-heading, .assistant-history-heading { margin: 0 0 16px; color: var(--text-secondary); font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
 .assistant-context-details :is(.assistant-context-heading, .assistant-context-label, label) { text-transform: none; letter-spacing: normal; }
+.assistant-context-section[aria-label="Settings"] > .assistant-context-heading { padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 .assistant-context-field { display: grid; gap: 4px; margin-bottom: 16px; font-size: 13px; overflow-wrap: anywhere; }
 .assistant-context-label { font-size: 11px; color: var(--text-secondary); }
 .assistant-context-field strong { font-weight: 500; line-height: 1.5; }
