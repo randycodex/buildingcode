@@ -1,3 +1,5 @@
+import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs";
+import { loadPreparedPassages } from "./research-prepared-passages.mjs";
 import { isAmbiguousResearchProjectCorrection } from "./research-project-scope.mjs";
 import { planSavedEvidenceDelete, validateSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
@@ -8477,7 +8479,8 @@ export async function researchCorpusResources(corpusPlan) {
             invertedIndex = await zoningSearchIndex();
           }
           return { catalog, invertedIndex,
-            passageIndex: passageSearch ? await buildResearchPassageIndex(catalog, researchBodyForCatalogSection) : null };
+            passageIndex: passageSearch ? (await loadPreparedPassages(corpus, catalog) ||
+              await buildResearchPassageIndex(catalog, researchBodyForCatalogSection)) : null };
         })().catch(error => {
           if (cachedResearchCorpusPartitions.get(partitionKey) === partition) cachedResearchCorpusPartitions.delete(partitionKey);
           throw error;
@@ -8505,6 +8508,8 @@ export async function researchCorpusResources(corpusPlan) {
   while (cachedResearchCorpusResources.size > 8) cachedResearchCorpusResources.delete(cachedResearchCorpusResources.keys().next().value);
   return resourcePromise;
 }
+
+const cachedResearchSourceBody = createResearchSourceBodyReader(researchBodyForCatalogSection);
 
 export async function researchBodyForCatalogSection(section) {
   const withReservedCatalogTitle = (body) => {
@@ -8789,7 +8794,7 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
       }
       summary = researchCatalogEntry(summary, corpus);
       canonicalID = String(summary.id || summary.sectionID || requestedID);
-      body = await researchBodyForCatalogSection(summary);
+      body = await (options.readSectionBody || researchBodyForCatalogSection)(summary);
       const rawText = (body.blocks || []).map((block) => block.plainText || "").join("\n\n");
       enactedBodyText = String(rawText || "").replace(/\s+/g, " ").trim();
       sourceBodyState = researchSourceBodyState(summary, body);
@@ -12520,7 +12525,7 @@ export function researchAssemblyCrossReferences(evidence, catalog) {
   return references;
 }
 
-export async function resolveResearchAssemblySection(request, catalog) {
+export async function resolveResearchAssemblySection(request, catalog, readSectionBody = researchBodyForCatalogSection) {
   const requestedID = String(request?.sectionID || "").trim();
   const requestedPrefix = String(request?.codePrefix || "").trim().toUpperCase();
   const requestedNumber = String(request?.sectionNumber || "").trim().replace(/\.$/, "").toUpperCase();
@@ -12544,6 +12549,7 @@ export async function resolveResearchAssemblySection(request, catalog) {
     [summary?.id || directPinnedSectionID],
     {
       skipUnavailable: false,
+      readSectionBody,
       allowOptInCorpora: Boolean(directPinnedSectionID) ||
         ["nyc-1968-building-code", "nyc-existing-building-code-2027"].includes(summary?.corpusID)
     }
@@ -12555,7 +12561,7 @@ export async function resolveResearchAssemblySection(request, catalog) {
     // Preserve that structure for selecting complete entries; flattened text
     // cannot distinguish those labels from mentions inside other definitions.
     ...((process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1" || /\bdefinitions?\b/i.test(evidence.title) || String(evidence.text || "").length > 4_000) ? {
-      body: await researchBodyForCatalogSection({ ...evidence, id: evidence.sectionID })
+      body: await readSectionBody({ ...evidence, id: evidence.sectionID })
     } : {}),
     crossReferences: researchAssemblyCrossReferences(evidence, catalog)
   };
@@ -12572,23 +12578,30 @@ export async function assembledResearchEvidenceForTurn({
   zoningPlan = null,
   beforeSemanticRequest = null,
   semanticBatchKey = null,
-  onStage
+  onStage,
+  onTiming = null
 }) {
+  const timing = {};
+  const measure = async (name, run) => {
+    const started = performance.now();
+    try { return await run(); } finally { timing[name] = (timing[name] || 0) + performance.now() - started; }
+  };
   const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({
     question,
     messages,
     topicContext,
     projectFacts
   });
-  const { catalog, invertedIndex, passageIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
-  const semanticResource = passageIndex ? await researchSemanticSearchResource() : null;
-  const semanticSearch = semanticResource && beforeSemanticRequest ? {
-    search: (index, query, options = {}) => semanticResource.search(index, query, { ...options, batchKey: semanticBatchKey,
-      beforeRequest: async ({ body }) => {
-        await beforeSemanticRequest();
-        return reserveResearchEmbeddingSpend(body);
-      } })
-  } : semanticResource;
+  const { catalog, invertedIndex, passageIndex, availableCodePrefixes } = await measure("corpusResourcesMilliseconds", () => researchCorpusResources(appliedCorpusPlan));
+  const semanticResource = passageIndex ? await measure("semanticResourceMilliseconds", () => researchSemanticSearchResource()) : null;
+  const semanticSearch = semanticResource ? {
+    search: (index, query, options = {}) => measure("semanticSearchMilliseconds", () => semanticResource.search(index, query,
+      beforeSemanticRequest ? { ...options, batchKey: semanticBatchKey,
+        beforeRequest: async ({ body }) => {
+          await beforeSemanticRequest();
+          return reserveResearchEmbeddingSpend(body);
+        } } : options))
+  } : null;
   const strategy = researchEvidenceStrategyForTurn({
     question,
     pinnedEvidence,
@@ -12616,6 +12629,7 @@ export async function assembledResearchEvidenceForTurn({
         maximumSupplementalCharacters: testSupplementalCharacterBudget
       }
     : baseAssemblyLimits;
+  const assemblyStarted = performance.now();
   const assembled = await assembleResearchEvidence({
     question,
     previousMessages: messages,
@@ -12627,20 +12641,22 @@ export async function assembledResearchEvidenceForTurn({
     onStage,
     limits: assemblyLimits,
     reserveRepairCapacity: !zoningPlan && !pinnedEvidence?.length && strategy.mode === researchEvidenceStrategies.broad,
-    discover: ({ question: retrievalQuestion, limit, retrievalContext }) => discoverRelevantEvidence({
+    discover: ({ question: retrievalQuestion, limit, retrievalContext }) => measure("discoveryMilliseconds", () => discoverRelevantEvidence({
       question: retrievalQuestion,
       retrievalContext,
       catalog,
       invertedIndex,
       passageIndex,
       semanticSearch,
-      readSectionBody: researchBodyForCatalogSection,
+      readSectionBody: cachedResearchSourceBody,
       resolveVisualSource: constructionVisualSourceMetadata,
       availableCodePrefixes,
       limit
-    }),
-    resolveSection: (request) => resolveResearchAssemblySection(request, catalog)
+    })),
+    resolveSection: (request) => measure("sourceResolutionMilliseconds", () => resolveResearchAssemblySection(request, catalog, cachedResearchSourceBody))
   });
+  timing.assemblyMilliseconds = performance.now() - assemblyStarted;
+  onTiming?.(Object.fromEntries(Object.entries(timing).map(([key, value]) => [key, Math.round(value)])));
   const zoningSelection = zoningPlan
     ? selectZoningResearchEvidence({ question, evidence: assembled.sources, plan: zoningPlan })
     : null;
@@ -20362,6 +20378,8 @@ async function handleResearchConversationMessage(request, response) {
     researchOperation.preparationMilliseconds = Math.round(performance.now() - preparationStartedAt);
     progressResponse.progress("preparing_question", "completed");
     const retrievalStartedAt = performance.now();
+    researchOperation.retrievalTimings = [];
+    const recordRetrievalTiming = timing => researchOperation.retrievalTimings.push(timing);
     const assembleForZoningPlan = (questionPlan) => assembledResearchEvidenceForTurn({
       question,
       messages: activeMessages,
@@ -20381,7 +20399,8 @@ async function handleResearchConversationMessage(request, response) {
           throw error;
         }
       },
-      onStage: progressResponse.progress
+      onStage: progressResponse.progress,
+      onTiming: recordRetrievalTiming
     });
     let evidencePackage = await assembleForZoningPlan(initialZoningPlan);
     const openInvestigation = !mockMode && openInvestigationEnabled({ pinnedEvidence, decisionLink,
@@ -20455,7 +20474,7 @@ async function handleResearchConversationMessage(request, response) {
             beforeSemanticRequest:async () => {
               if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Research request was already handled."), {code:"RESEARCH_REQUEST_HANDLED"});
             },
-            onStage:progressResponse.progress});
+            onStage:progressResponse.progress, onTiming:recordRetrievalTiming});
           return { ...found, investigationCorpusPlan: searchPlan };
         },
         onSearchResults: results => {
@@ -22379,6 +22398,7 @@ async function handleResearchConversationMessage(request, response) {
           durationMilliseconds: researchOperation.durationMilliseconds,
           preparationMilliseconds: researchOperation.preparationMilliseconds ?? null,
           retrievalMilliseconds: researchOperation.retrievalMilliseconds ?? null,
+          retrievalTimings: researchOperation.retrievalTimings || [],
           investigationMilliseconds: researchOperation.investigationMilliseconds ?? null,
           generationMilliseconds: researchOperation.generationMilliseconds ?? null,
           reviewMilliseconds: researchOperation.reviewMilliseconds ?? null,

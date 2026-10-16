@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { createResearchSourceBodyReader } from '../research-source-body-cache.mjs';
+let calls = 0;
+const read = createResearchSourceBodyReader(async section => { calls++; return { blocks: [{ plainText: section.codeVersion }] }; }, { maximumEntries: 2 });
+const source = { id: '1', corpusID: 'construction', codeVersion: '2022', title: 'Test' };
+const [first, second] = await Promise.all([read(source), read({ ...source })]);
+assert.equal(calls, 1); assert.deepEqual(first, second); first.blocks[0].plainText = 'caller mutation';
+assert.equal((await read(source)).blocks[0].plainText, '2022');
+await read({ ...source, codeVersion: '2014' }); assert.equal(calls, 2);
+await read({ ...source, corpusID: 'fire' }); assert.equal(calls, 3);
+await read(source); assert.equal(calls, 4);
+let failures = 0;
+const retry = createResearchSourceBodyReader(async () => { if (++failures === 1) throw Error('read failure'); return { blocks: [] }; });
+await assert.rejects(retry(source)); await retry(source); assert.equal(failures, 2);
+console.log('Version/corpus isolation, concurrent reuse, mutation isolation, eviction and failure retry passed');

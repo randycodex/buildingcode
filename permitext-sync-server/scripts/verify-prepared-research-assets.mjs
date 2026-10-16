@@ -16,11 +16,12 @@ import {
 } from "../research-semantic-artifact.mjs";
 
 export async function currentPreparedResearchIndexes() {
-  const flags = ["PERMITEXT_RESEARCH_PASSAGE_SEARCH", "PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL", "PERMITEXT_RESEARCH_SEMANTIC_SEARCH"];
+  const flags = ["PERMITEXT_RESEARCH_BUILD_PASSAGES", "PERMITEXT_RESEARCH_PASSAGE_SEARCH", "PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL", "PERMITEXT_RESEARCH_SEMANTIC_SEARCH"];
   const previous = flags.map(name => process.env[name]);
   const previousFetch = globalThis.fetch;
   let networkAttempts = 0;
   globalThis.fetch = async () => { networkAttempts++; throw new Error("Prepared Research asset verification is offline"); };
+  process.env.PERMITEXT_RESEARCH_BUILD_PASSAGES = "1";
   process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH = "1";
   process.env.PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL = "1";
   process.env.PERMITEXT_RESEARCH_SEMANTIC_SEARCH = "0";
