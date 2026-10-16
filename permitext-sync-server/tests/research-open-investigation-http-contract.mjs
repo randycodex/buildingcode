@@ -32,7 +32,7 @@ globalThis.fetch=async(url,options)=>{
   assert.equal(body.model,'gpt-6-luna');assert.equal(body.store,false);
   let value;
   if(phase==='permitext_research_investigation') {
-   assert.equal(body.service_tier,'default');
+   assert.equal(body.service_tier,'priority');
    value={ready:calls.length>1,queries:calls.length===1?['MC 304.12 identification of equipment']:[],retainSourceIDs:[],reason:'Find the actual requirement'};
   } else if(phase==='permitext_code_interpretation') {
    const isRepair=Boolean(draft);assert.equal(body.service_tier,isRepair?'default':'priority');
@@ -40,7 +40,7 @@ globalThis.fetch=async(url,options)=>{
    const text=isRepair?'The identification must identify the area served.':'The identification rule concerns the area served.';
    draft={answerText:text,supportedPoints:[{heading:'Identification',explanation:text,sectionID:match[2],sourceIDs:[match[1]]}],citations:[{sectionID:match[2],sourceIDs:[match[1]],relevance:text}],assumptions:[],missingFacts:[],followUpQuestions:[],evidenceLimitations:[],additionalEvidenceNeeded:[],supportingSourceUses:[]};value=draft;
   } else {
-   assert.equal(phase,'permitext_research_open_review');assert.equal(body.service_tier,'default');
+   assert.equal(phase,'permitext_research_open_review');assert.equal(body.service_tier,'priority');
    const reviews=calls.filter(x=>x===phase).length;
    const answer=JSON.parse(body.input).answer;
    if(reviews===2)assert.equal(answer.answerText,'The identification must identify the area served.');

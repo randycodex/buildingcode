@@ -280,7 +280,7 @@ import {
   researchEconomicsReport
 } from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
-import { openInvestigationEnabled, investigateResearchEvidence, mergeInvestigationEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion, validateOpenInvestigationValue, openReviewRevisionFeedback, openCitationOnlyRepairAllowed, assertOpenCitationOnlyRepair } from "./research-open-investigation.mjs";
+import { openInvestigationEnabled, openInvestigationServiceTier, investigateResearchEvidence, mergeInvestigationEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion, validateOpenInvestigationValue, openReviewRevisionFeedback, openCitationOnlyRepairAllowed, assertOpenCitationOnlyRepair } from "./research-open-investigation.mjs";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 import { researchDecisionFactRepair } from "./research-decision-fact-repair.mjs";
 import {
@@ -8682,11 +8682,20 @@ async function sectionBody(sectionID, options = {}) {
   throw error;
 }
 
+const sectionSummaryIndexes = new WeakMap();
 async function sectionSummaryByID(sectionID) {
-  const normalizedID = String(sectionID || "").trim();
-  return (await sectionCatalog()).find((section) =>
-    String(section.id) === normalizedID || String(section.webSectionID || "") === normalizedID
-  ) || null;
+  const catalog = await sectionCatalog();
+  let byID = sectionSummaryIndexes.get(catalog);
+  if (!byID) {
+    byID = new Map();
+    // Match Array.find's first-record precedence, including alias collisions.
+    // The catalog is immutable; a replacement array gets a fresh index.
+    for (const section of catalog) for (const id of [String(section.id), String(section.webSectionID || "")]) {
+      if (!byID.has(id)) byID.set(id, section);
+    }
+    sectionSummaryIndexes.set(catalog, byID);
+  }
+  return byID.get(String(sectionID || "").trim()) || null;
 }
 
 function normalizedResearchText(value, maxLength) {
@@ -10763,6 +10772,7 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
 }
 
 async function openAIResearchInvestigationDecision(name, instructions, schema, input, userID, signal) {
+  const startedAt = performance.now();
   const model = "gpt-6-luna";
   let usage = combinedResearchUsage();
   let retryAfterTruncation = false;
@@ -10772,7 +10782,7 @@ async function openAIResearchInvestigationDecision(name, instructions, schema, i
       ({ payload } = await requestResearchProvider({
         apiKey: process.env.OPENAI_API_KEY,
         requestBody: {
-          model, store: false, service_tier: "default", reasoning: { effort: "medium" },
+          model, store: false, service_tier: openInvestigationServiceTier(), reasoning: { effort: "medium" },
           max_output_tokens: retryAfterTruncation ? 12000 : 6000,
           safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
           instructions: instructions + (attempt
@@ -10802,7 +10812,7 @@ async function openAIResearchInvestigationDecision(name, instructions, schema, i
         code: "INVALID_RESEARCH_RESPONSE", failureStage: "provider_incomplete"
       });
       const value = validateOpenInvestigationValue(JSON.parse(outputTextFromResponse(payload)), name);
-      return { value, model, usage, structuredResponseRetryCount:attempt };
+      return { value, model, usage, structuredResponseRetryCount:attempt, milliseconds: Math.round(performance.now() - startedAt) };
     } catch (error) {
       // Refusals, cancellation, transport failures and spending limits do not
       // authorize another format attempt. Every dispatched result stays billed.
@@ -20430,7 +20440,9 @@ async function handleResearchConversationMessage(request, response) {
         decide: async input => {
           const response = await openAIResearchInvestigationDecision("permitext_research_investigation", investigationInstructions,
             investigationSchema, {...input, codeBasis:answerCodeBasis, corpusPlan}, context.userID, progressResponse.signal);
-          investigationUsage.push(response.usage); return response.value;
+          investigationUsage.push(response.usage);
+          researchOperation.investigationMilliseconds = (researchOperation.investigationMilliseconds || 0) + response.milliseconds;
+          return response.value;
         },
         search: async query => {
           const searchPlan = constrainSpecialtySearchPlan(await researchCorpusPlanForTurn({question:query,
@@ -20857,6 +20869,7 @@ async function handleResearchConversationMessage(request, response) {
             context.userID,
             { ...options, model }
           );
+    const generationStartedAt = performance.now();
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(
@@ -20902,6 +20915,7 @@ async function handleResearchConversationMessage(request, response) {
           });
           return requestInterpretation(accurateModel, interpretationOptions);
         });
+    researchOperation.generationMilliseconds = Math.round(performance.now() - generationStartedAt);
     if (result.structuredResponseRetryCount) {
       modelEscalationStages.push({
         stage: "structured_response_retry",
@@ -21185,6 +21199,7 @@ async function handleResearchConversationMessage(request, response) {
               Array.isArray(result.interpretation[key]) && result.interpretation[key].length === 0),
             facts:validUserFacts, propertyResearch, codeBasis:answerCodeBasis, corpusPlan,
             supportingSources:webSupport.sources }, context.userID, progressResponse.signal);
+        researchOperation.reviewMilliseconds = (researchOperation.reviewMilliseconds || 0) + review.milliseconds;
         verifierUsage = combinedResearchUsage(verifierUsage, review.usage);
         if (typeof review.value.pass !== "boolean" || !Array.isArray(review.value.issues) ||
             review.value.pass !== (review.value.issues.length === 0)) {
@@ -21196,9 +21211,11 @@ async function handleResearchConversationMessage(request, response) {
         const citationOnlyRepair = openCitationOnlyRepairAllowed(attempt, review.value.issues);
         if (attempt > 1 && !citationOnlyRepair) throw Object.assign(new Error("The investigated answer still has a substantive accuracy issue."),
           {code:"RESEARCH_VERIFICATION_FAILED",verificationAttempts});
+        const repairStartedAt = performance.now();
         const repaired = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID,
           {...interpretationOptions, model:"gpt-6-luna", revisionFeedback:openReviewRevisionFeedback(review.value.issues),
             previousInterpretation:result.interpretation, disableTargetedRevision:true, citationOnlyRepair});
+        researchOperation.repairMilliseconds = (researchOperation.repairMilliseconds || 0) + Math.round(performance.now() - repairStartedAt);
         answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, repaired.usage);
         if (citationOnlyRepair) assertOpenCitationOnlyRepair(result.interpretation, repaired.interpretation);
         result = repaired; answerRegenerated = true;
@@ -22362,6 +22379,10 @@ async function handleResearchConversationMessage(request, response) {
           durationMilliseconds: researchOperation.durationMilliseconds,
           preparationMilliseconds: researchOperation.preparationMilliseconds ?? null,
           retrievalMilliseconds: researchOperation.retrievalMilliseconds ?? null,
+          investigationMilliseconds: researchOperation.investigationMilliseconds ?? null,
+          generationMilliseconds: researchOperation.generationMilliseconds ?? null,
+          reviewMilliseconds: researchOperation.reviewMilliseconds ?? null,
+          repairMilliseconds: researchOperation.repairMilliseconds ?? null,
           projectLinked: researchOperation.projectLinked ?? null,
           projectFactCount: researchOperation.projectFactCount ?? null,
           establishedConversationFactCount: researchOperation.establishedConversationFactCount ?? null,

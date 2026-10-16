@@ -111,3 +111,10 @@ export async function investigateResearchEvidence({question, facts, messages, ev
   return {...evidencePackage, sources, investigation:{version:openInvestigationVersion,trace},
     usage:{...evidencePackage.usage, investigationSearchCount:seen.size}};
 }
+
+// Inherit the interactive Research tier; never change model or reasoning effort.
+export function openInvestigationServiceTier(environment = process.env) {
+  const tier = environment.PERMITEXT_RESEARCH_OPEN_SERVICE_TIER || environment.PERMITEXT_RESEARCH_SERVICE_TIER || 'default';
+  if (!['default', 'priority', 'fast'].includes(tier)) throw new Error('Unsupported open Research service tier.');
+  return tier;
+}

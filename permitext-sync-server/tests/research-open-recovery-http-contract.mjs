@@ -26,7 +26,7 @@ globalThis.fetch=async(url,options)=>{
   calls.push(phase);const count=counts[phase]=(counts[phase]||0)+1;
   let value,status='completed';
   if(phase==='permitext_research_investigation'){
-   assert.equal(body.service_tier,'default');
+   assert.equal(body.service_tier,'priority');
    if(scenario==='empty-gap') {
     const input=JSON.parse(body.input);assert.deepEqual(input.sources,[]);
     assert(input.corpusPlan.unavailable.some(corpus=>corpus.id==='nyc-2016-energy-code'));
@@ -80,7 +80,7 @@ globalThis.fetch=async(url,options)=>{
     }
    }
   }else{
-   assert.equal(phase,'permitext_research_open_review');assert.equal(body.service_tier,'default');
+   assert.equal(phase,'permitext_research_open_review');assert.equal(body.service_tier,'priority');
    assert.equal(JSON.parse(body.input).evidenceGapOnly,['gap','empty-gap','rejected-gap'].includes(scenario)||['energy-local-lookup','energy-thermal-referral'].includes(scenario)&&count===1);
    if(scenario==='energy-local-lookup')assert(JSON.parse(body.input).evidence.some(source=>source.sourceID.endsWith('-gap-R403.7')&&source.text.includes('ACCA Manual S')));
    if(scenario==='energy-thermal-referral')assert(JSON.parse(body.input).evidence.some(source=>source.sourceID.endsWith('-gap-C402.1.2')&&
