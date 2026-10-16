@@ -12,15 +12,22 @@ function actual(name) {
 function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
   const collapsed = new Set(collapsedIDs), handlers = new Map(), frames = new Map(), classes = new Set();
   const state = { paneWeights: Object.fromEntries(ids.map(id => [id, 600])) };
-  const makePane = id => ({
-    dataset: { paneId: id },
-    style: { setProperty(name, value) { this[name] = value; } },
-    classList: { contains: name => name === 'is-collapsed' && collapsed.has(id) },
-    getBoundingClientRect() {
-      const width = Number.parseFloat(this.style.flex?.split(' ').at(-1)) || 600;
-      return { width: Math.min(width, Number.parseFloat(this.style.maxWidth) || Infinity) };
-    }
-  });
+  const paneWidth = pane => Math.min(Number.parseFloat(pane.style.flex?.split(' ').at(-1)) || 600,
+    Number.parseFloat(pane.style.maxWidth) || Infinity);
+  const makePane = id => {
+    const flags = new Set();
+    return {
+      dataset: { paneId: id },
+      style: { setProperty(name, value) { this[name] = value; } },
+      classList: { contains: name => name === 'is-collapsed' && collapsed.has(id) || flags.has(name), add: name => flags.add(name) },
+      getBoundingClientRect() {
+        const before = panes.slice(0, panes.indexOf(this));
+        const naturalLeft = 1 + before.reduce((sum, pane) => sum + paneWidth(pane) + 1, 0) - track.scrollLeft;
+        const left = flags.has('is-pinned') ? Math.max(0, naturalLeft) : naturalLeft;
+        return { width: paneWidth(this), left, right: left + paneWidth(this) };
+      }
+    };
+  };
   const panes = ids.map(makePane);
   const track = {
     dataset: {}, clientWidth: availableWidth, scrollWidth: availableWidth, scrollLeft: 0,
@@ -40,6 +47,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
     assistantHistoryOnlyPane: id => id === 'utility:analysis', paneIsCollapsed: id => collapsed.has(id),
     defaultPaneWidthForID: () => 600, isFlexibleReaderPaneID: id => id.startsWith('reader:'),
+    activePinnedPaneID: () => '',
     isProjectCoordinationPaneID: () => false,
     window: {
       innerWidth: availableWidth,
@@ -51,7 +59,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     notifyWorkspaceLayoutChange() { layouts++; context.syncResearchColumnLayout(); }, saveWorkspaceState() { saves++; }
   });
   vm.runInContext(['minimumPaneWidthForID', 'maximumPaneWidthForID', 'constrainPaneWidth', 'migrateLegacyPaneWidth',
-    'applyPaneWeight', 'syncResearchColumnLayout', 'capturePaneResizeWidths', 'startPaneResize', 'startPaneEdgeResize'].map(actual).join('\n'), context);
+    'applyPaneWeight', 'syncResearchColumnLayout', 'capturePaneResizeWidths', 'singleExpandedDividerEdge', 'startPaneResize', 'startPaneEdgeResize'].map(actual).join('\n'), context);
   context.syncResearchColumnLayout();
   return {
     context, state, track, panes, handlers, frames, classes, makePane,
@@ -116,4 +124,17 @@ assert.deepEqual(unrelated.widths(), [860, 740, 800], 'Resizing a pair preserves
 assert.equal(unrelated.handlers.size, 0); assert.equal(unrelated.frames.size, 0);
 unrelated.context.startPaneResize(unrelated.event(801, 2), 'reader:one', 'reader:two');
 assert.equal(unrelated.handlers.size, 0, 'Secondary clicks cannot start a drag');
+
+// Outside workspace grips target the column at the visible edge, even if the
+// logical first/last column is off-screen. A pinned column remains on top.
+const overflow = fixture(['reader:one', 'reader:two', 'reader:three', 'reader:four'], 1605);
+const leftTarget = () => overflow.context.singleExpandedDividerEdge('', 'reader:one', {});
+const rightTarget = () => overflow.context.singleExpandedDividerEdge('reader:four', '', {});
+assert.equal(leftTarget().paneID, 'reader:one');
+assert.equal(rightTarget().paneID, 'reader:three', 'The right grip must not resize an off-screen trailing column');
+overflow.track.scrollLeft = 805;
+assert.equal(leftTarget().paneID, 'reader:two', 'The left grip follows the leading visible column after horizontal scrolling');
+assert.equal(rightTarget().paneID, 'reader:four');
+overflow.panes[0].classList.add('is-pinned');
+assert.equal(leftTarget().paneID, 'reader:one', 'A pinned surface owns the outside left grip above scrolling columns');
 console.log('Research divider pointer behavior passed: click/jitter stability, collapsed neighbors, wider fitted drags, adjacent pairs, cancellation, unrelated panes and overflow bounds.');

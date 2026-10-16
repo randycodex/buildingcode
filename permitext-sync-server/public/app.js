@@ -1,7 +1,7 @@
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-divider-drag-stability-v1086";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-workspace-outer-edges-v1087";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-divider-drag-stability-v1086";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-workspace-outer-edges-v1087";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -121,7 +121,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-divider-drag-stability-v1086";
+} from "./offline-storage.js?v=20261015-workspace-outer-edges-v1087";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-divider-drag-stability-v1086";
+} from "./workspace-state.js?v=20261015-workspace-outer-edges-v1087";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -40368,7 +40368,22 @@ function renderSettings({ upgrade = false } = {}) {
   return panel;
 }
 
-function singleExpandedDividerEdge(previousPaneID, nextPaneID) {
+function singleExpandedDividerEdge(previousPaneID, nextPaneID, divider = null) {
+  if (divider && (!previousPaneID || !nextPaneID) && track.clientWidth > 0 && window.innerWidth > 760) {
+    const bounds = track.getBoundingClientRect();
+    const left = Math.max(0, bounds.left);
+    const right = Math.min(window.innerWidth, bounds.right);
+    const visible = [...track.querySelectorAll(":scope > .workspace-panel")]
+      .map(pane => ({ pane, bounds: pane.getBoundingClientRect() }))
+      .filter(item => item.bounds.width > 0 && item.bounds.right > left + 1 && item.bounds.left < right - 1);
+    // Outer grips stay on screen. Resize the column visible beside that edge,
+    // rather than an off-screen first/last column in the scrolling sequence.
+    const pinned = visible.find(item => item.pane.classList.contains("is-pinned"));
+    const first = pinned?.bounds.left <= left + 1 ? pinned : visible.reduce((first, item) => !first || item.bounds.left < first.bounds.left ? item : first, null);
+    const last = pinned?.bounds.right >= right - 1 ? pinned : visible.reduce((last, item) => !last || item.bounds.right > last.bounds.right ? item : last, null);
+    if (!previousPaneID) nextPaneID = first?.pane.dataset.paneId;
+    else previousPaneID = last?.pane.dataset.paneId;
+  }
   const previousOpen = previousPaneID && !paneIsCollapsed(previousPaneID) && !assistantHistoryOnlyPane(previousPaneID);
   const nextOpen = nextPaneID && !paneIsCollapsed(nextPaneID) && !assistantHistoryOnlyPane(nextPaneID);
   // The pinned boundary belongs only to the fixed column, not the scrolling
@@ -40436,15 +40451,19 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
 function refreshPaneDividerValue(divider) {
   const previousID = divider.dataset.previousPaneId;
   const nextID = divider.dataset.nextPaneId;
-  const edge = singleExpandedDividerEdge(previousID, nextID);
+  const edge = singleExpandedDividerEdge(previousID, nextID, divider);
   const paneForID = (id) => id ? track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(id)}"]`) : null;
   const previousPane = paneForID(previousID);
   const nextPane = paneForID(nextID);
   const pairOpen = previousPane && nextPane && !paneIsCollapsed(previousID) && !paneIsCollapsed(nextID) &&
     !assistantHistoryOnlyPane(previousID) && !assistantHistoryOnlyPane(nextID);
+  if (!previousID || !nextID) {
+    divider.classList.toggle("is-collapse-disabled", !edge);
+    divider.setAttribute("aria-disabled", String(!edge));
+  }
   divider.tabIndex = edge || pairOpen ? 0 : -1;
   if (edge) {
-    const pane = edge.paneID === previousID ? previousPane : nextPane;
+    const pane = paneForID(edge.paneID);
     if (!pane) return;
     const width = Math.round(pane.getBoundingClientRect().width);
     divider.setAttribute("aria-valuemin", String(Math.round(minimumPaneWidthForID(edge.paneID))));
@@ -40474,7 +40493,7 @@ function positionPaneDividerAddControls() {
   const pinnedRight = pinned?.getBoundingClientRect().right || trackBounds.left;
   track.querySelectorAll(":scope > .pane-divider").forEach(divider => {
     const button = divider.querySelector(".pane-divider-add");
-    if (!button) return;
+    if (!button) { refreshPaneDividerValue(divider); return; }
     const bounds = divider.getBoundingClientRect();
     const x = bounds.left + bounds.width / 2;
     const left = divider.classList.contains("is-pinned-divider") ? trackBounds.left : pinnedRight;
@@ -40563,7 +40582,7 @@ function createDivider(previousPaneID, nextPaneID) {
   divider.addEventListener("focus", () => refreshPaneDividerValue(divider));
   divider.addEventListener("keydown", (event) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID);
+    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID, divider);
     if (!edge && (!previousPaneID || !nextPaneID || paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID))) return;
     event.preventDefault();
     const step = event.shiftKey ? 80 : 24;
@@ -40575,12 +40594,12 @@ function createDivider(previousPaneID, nextPaneID) {
     }
   });
   divider.addEventListener("pointerdown", (event) => {
-    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID);
+    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID, divider);
     if (edge) startPaneEdgeResize(event, edge.paneID, edge.side);
     else if (previousPaneID && nextPaneID) startPaneResize(event, previousPaneID, nextPaneID);
   });
   divider.addEventListener("dblclick", () => {
-    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID);
+    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID, divider);
     if (edge) resetDividerPanes(edge.paneID, null);
     else if (isLeftEdge || isRightEdge) resetDividerPanes(edgePaneID, null);
     else resetDividerPanes(previousPaneID, nextPaneID);

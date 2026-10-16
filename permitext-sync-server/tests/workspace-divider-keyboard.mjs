@@ -21,7 +21,7 @@ const context = vm.createContext({state, track, CSS:{escape:x=>x},isProAccount:(
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
   scheduleVisibleReaderScrollIndicatorUpdates:()=>indicators++,
   openReaderFromToolbar:(button,location)=>readerPickers.push({button,location}),
-  document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, children:[], classList:{add(){}}, append(child){this.children.push(child);},
+  document:{createElement(){return {dataset:{}, attrs:{}, handlers:{}, children:[], classList:{add(){},toggle(){}}, append(child){this.children.push(child);},
     setAttribute(k,v){this.attrs[k]=v;}, removeAttribute(k){delete this.attrs[k];}, addEventListener(k,v){this.handlers[k]=v;}};}}
 });
 vm.runInContext(['syncReaderDividerButton','maximumPaneWidthForID','constrainPaneWidth','activePinnedPaneID','singleExpandedDividerEdge','updateAdjacentDividerValue','capturePaneResizeWidths','resizeAdjacentPanesBy','resizePaneEdgeBy','refreshPaneDividerValue','createDivider'].map(extract).join('\n'),context);

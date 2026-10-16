@@ -1905,6 +1905,16 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   transform: none;
 }
 
+@media (min-width: 761px) {
+  .panel-track > .pane-edge-resizer {
+    position: sticky;
+    z-index: 42;
+  }
+  .panel-track > .pane-left-edge-resizer { left: 0; }
+  .panel-track > .pane-right-edge-resizer { right: 0; margin-left: auto; }
+  .panel-track > .pane-edge-resizer::after { width: 24px; }
+}
+
 .panel-header {
   display: flex;
   align-items: start;
