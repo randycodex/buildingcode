@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1095";
+} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1097";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1095";
+} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1097";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -7883,6 +7883,7 @@ function enhanceSelect(select) {
   const researchProjectMenu = select.classList.contains("research-conversation-header-project");
   const researchHistoryProjectMenu = select.classList.contains("research-history-project-select");
   const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select") || select.classList.contains("research-feedback-rating-select");
+  const assistantWorkMenu = select.classList.contains("assistant-work-type-select");
   const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
@@ -7890,6 +7891,7 @@ function enhanceSelect(select) {
   menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu);
   menu.classList.toggle("research-project-select-menu", researchProjectMenu);
   menu.classList.toggle("research-feedback-role-select-menu", researchFeedbackRoleMenu);
+  menu.classList.toggle("column-style-select-menu", assistantWorkMenu);
   custom.classList.toggle("research-project-custom-select", researchProjectMenu);
   menu.classList.toggle("workspace-menu", researchHistoryProjectMenu);
   custom.classList.toggle("research-history-custom-select", researchHistoryProjectMenu);
@@ -8008,7 +8010,7 @@ function enhanceSelect(select) {
   const positionMenu = () => {
     const rect = trigger.getBoundingClientRect();
     const viewportPadding = 8;
-    const panel = trigger.closest(".workspace-panel");
+    const panel = trigger.closest(assistantWorkMenu ? ".assistant-history-rail" : ".workspace-panel");
     const panelRect = panel?.getBoundingClientRect();
     const panelInset = panel?.classList.contains("reader-panel") || researchProjectMenu || researchHistoryProjectMenu
       ? Number.parseFloat(getComputedStyle(panel).paddingLeft) || 0
@@ -8038,11 +8040,11 @@ function enhanceSelect(select) {
     const naturalWidth = Math.ceil(readerChapterMenu
       ? Math.max(rect.width, menu.getBoundingClientRect().width)
       : Math.max(rect.width, researchHistoryProjectMenu ? 140 : 0, ...optionWidths));
-    const menuWidth = readerCodeMenu ? boundaryWidth : Math.min(naturalWidth, boundaryWidth);
+    const menuWidth = readerCodeMenu ? boundaryWidth : assistantWorkMenu ? Math.min(rect.width, boundaryWidth) : Math.min(naturalWidth, boundaryWidth);
     const left = readerTopMenu
       ? boundaryLeft
       : Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
-    const menuOffset = readerTopMenu ? 12 : researchHistoryProjectMenu ? 8 : 2;
+    const menuOffset = readerTopMenu ? 12 : researchHistoryProjectMenu ? 8 : assistantWorkMenu ? 6 : 2;
     const chapterTrigger = readerCodeMenu
       ? selectPanel?.querySelector(".chapter-select + .custom-select .custom-select-trigger")
       : null;
@@ -24113,6 +24115,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const form = element("form", "assistant-work-form");
   const typeLabel = element("label", "", "Proposed work");
   const workType = document.createElement("select"); workType.setAttribute("aria-label", "Proposed work");
+  workType.className = "assistant-work-type-select";
   const typeChoices = assistantWorkTypes.includes(initialWork.workType) ? assistantWorkTypes : [...assistantWorkTypes, initialWork.workType];
   typeChoices.forEach(type => { const option = element("option", "", type); option.value = type; workType.append(option); }); workType.value = initialWork.workType;
   typeLabel.append(workType);
@@ -24125,6 +24128,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const readWork = () => ({ projectID, workType: workType.value, uses: uses.value, additionalFacts: facts.value });
   const draftChanged = () => { if (!conversation) { view.draft = readWork(); persist(); status.textContent = "Ready for your first question."; } else status.textContent = "Unsaved changes"; };
   [workType, uses, facts].forEach(control => control.addEventListener("input", draftChanged));
+  workType.addEventListener("change", draftChanged);
   form.addEventListener("submit", async event => {
     event.preventDefault(); if (!current() || save.disabled) return;
     const activeProgress = conversation && activeResearchProgress.get(conversation.id);
@@ -24190,8 +24194,11 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const historyHeading = element("h3", "assistant-history-heading", "Conversations");
   content.prepend(historyHeading);
   historyRail.prepend(toolbar, details, divider);
+  enhanceSelect(workType);
   const disposeDivider = bindAssistantContextDivider({ historyRail, details, content, divider, view, persist, current });
   return { toolbar, settings, disposeContext() {
+    if (activeCustomSelect?.menu === workType._customSelectMenu) closeActiveCustomSelect();
+    resetEnhancedSelects(details);
     disposeDivider(); toolbar.remove(); details.remove(); divider.remove(); historyHeading.remove();
   }, startNewConversation() {
     const latest = instance ? supplementalResearchConversations.get(instance.conversationID) : activeResearchConversation;

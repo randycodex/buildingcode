@@ -17750,7 +17750,7 @@ html body .research-compact-composer .research-question-input:focus-visible {
   width: 36px;
 }
 .workspace-panel.is-collapsed .pane-collapsed-tab { padding-bottom: 56px; }
-.column-group-menu {
+.column-group-menu, .column-style-select-menu {
   border: 0;
   position: fixed;
   z-index: 2000;
@@ -17760,7 +17760,8 @@ html body .research-compact-composer .research-question-input:focus-visible {
   background: var(--menu-surface);
   box-shadow: 0 8px 32px rgba(0,0,0,.3);
 }
-.column-group-menu :is(button, .reader-trust > summary, .search-match-mode) {
+.column-group-menu :is(button, .reader-trust > summary, .search-match-mode),
+.column-style-select-menu .custom-select-option {
   display: block;
   width: 100%;
   padding: 10px 12px;
@@ -17772,7 +17773,8 @@ html body .research-compact-composer .research-question-input:focus-visible {
   text-align: left;
   cursor: pointer;
 }
-.column-group-menu :is(button, .reader-trust > summary, .search-match-mode):is(:hover, :focus-visible) { background: rgba(128,128,128,.16); }
+.column-group-menu :is(button, .reader-trust > summary, .search-match-mode):is(:hover, :focus-visible),
+.column-style-select-menu .custom-select-option:is(:hover, :focus-visible) { background: rgba(128,128,128,.16); }
 .column-group-menu button:disabled { opacity: .45; cursor: default; }
 .column-group-menu button:disabled:hover { background: transparent; }
 .column-menu-divider {
@@ -20261,7 +20263,9 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .assistant-context-editions { padding-left: 16px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
 .assistant-work-form { display: grid; gap: 14px; }
 .assistant-work-form label { display: grid; gap: 7px; font-size: 11px; color: var(--text-secondary); }
-.assistant-work-form :is(select, textarea) { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 9px; background: var(--surface-muted); color: var(--text-primary); font: inherit; font-size: 12px; line-height: 1.5; }
+.assistant-work-form :is(select, textarea, .custom-select-trigger) { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 9px; background: var(--surface-muted); color: var(--text-primary); font: inherit; font-size: 12px; line-height: 1.5; }
+.assistant-work-form .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; }
+.assistant-work-form .custom-select-trigger::after { content: "⌄"; margin-left: 8px; color: var(--text-secondary); }
 .assistant-work-form textarea { resize: vertical; min-height: 60px; }
 .assistant-work-form .assistant-work-save { justify-self: start; font-size: 12px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; height: auto; min-height: 32px; }
 .assistant-work-form .assistant-context-status { margin: 0; }
