@@ -12,6 +12,8 @@ Work edits use the existing `/research/conversations/project-context` endpoint a
 
 The Proposed work picker uses the existing custom dropdown with shared column-menu styling and stays within the left sidebar. Browser checks confirmed matching menu/item appearance, pointer and keyboard selection, Escape dismissal, draft persistence after reload, and cleanup when returning through history.
 
+The work choices now follow the [NYC DOB source review and Permitext scope mapping](ASSISTANT_WORK_CATEGORIES_2026-10-15.md). The UI links to DOB project guidance and distinguishes a research scope from its eventual filing type.
+
 Code and Sources expose actual project defaults, searched editions, selected passages, and exact answer source links. They preserve the current automatic retrieval and citation mechanisms; this implementation does not introduce new codebook restrictions or jurisdiction overrides. Settings exposes the existing safeguards, allowance, and account settings. No new answer-style or model-routing preference is represented as functional.
 
 Draft context and selected panel persist in the existing account/workspace-scoped Research view state. They are cleared/restored with the owning workspace and account. The web shell versions include the new context module.

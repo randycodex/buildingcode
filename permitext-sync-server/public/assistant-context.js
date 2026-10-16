@@ -1,5 +1,15 @@
 // User-provided design context stays separate from saved existing-site records.
-export const assistantWorkTypes = ['Unspecified', 'New construction', 'Alteration', 'Change of use', 'Addition', 'Other'];
+// Research scopes adapted from NYC DOB Project Guidelines, reviewed 2026-10-15.
+// These labels do not determine DOB NOW job type, CO requirements, or code applicability.
+export const assistantWorkTypes = ['Unspecified', 'New building', 'Alteration', 'Renovation / repair',
+  'Enlargement / addition', 'Change of use or occupancy', 'Building systems work',
+  'Construction equipment', 'Full demolition', 'Other'];
+const workTypeAliases = new Map([
+  ['New construction', 'New building'], ['Addition', 'Enlargement / addition'],
+  ['Change of use', 'Change of use or occupancy']
+]);
+// Display equivalent legacy wording without rewriting saved conversation facts.
+export function assistantWorkTypeForMenu(value) { return workTypeAliases.get(value) || value; }
 const compact = value => String(value || '').replace(/\s+/g, ' ').trim();
 export function assistantWorkContext(facts = []) {
   const workIndex = facts.findIndex(fact => /^Proposed work:\s*/i.test(fact));

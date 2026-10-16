@@ -1,4 +1,4 @@
-import { assistantWorkTypes, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=4";
+import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=5";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1097";
+} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1098";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1097";
+} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1098";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -24116,8 +24116,9 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const typeLabel = element("label", "", "Proposed work");
   const workType = document.createElement("select"); workType.setAttribute("aria-label", "Proposed work");
   workType.className = "assistant-work-type-select";
-  const typeChoices = assistantWorkTypes.includes(initialWork.workType) ? assistantWorkTypes : [...assistantWorkTypes, initialWork.workType];
-  typeChoices.forEach(type => { const option = element("option", "", type); option.value = type; workType.append(option); }); workType.value = initialWork.workType;
+  const selectedWorkType = assistantWorkTypeForMenu(initialWork.workType);
+  const typeChoices = assistantWorkTypes.includes(selectedWorkType) ? assistantWorkTypes : [...assistantWorkTypes, selectedWorkType];
+  typeChoices.forEach(type => { const option = element("option", "", type); option.value = type; workType.append(option); }); workType.value = selectedWorkType;
   typeLabel.append(workType);
   const usesLabel = element("label", "", "Proposed uses");
   const uses = document.createElement("textarea"); uses.rows = 2; uses.maxLength = 480; uses.placeholder = "e.g. Apartments above ground-floor retail"; uses.value = initialWork.uses; uses.setAttribute("aria-label", "Proposed uses"); usesLabel.append(uses);
@@ -24153,7 +24154,11 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   if (!projectID) status.textContent = "Choose a project to save proposed work.";
   else if (progress && !progress.endedAt) status.textContent = "Wait for the current answer before changing context.";
   form.append(typeLabel, usesLabel, factsLabel, save, status); workBody.append(form);
-  copy(workBody, "Applies to this conversation. Your proposed design is kept separate from existing site records.");
+  const scopeNote = element("p", "assistant-context-copy", "Research scope for this conversation, separate from existing site records. DOB filing type is confirmed separately. ");
+  const scopeSource = element("a", "", "NYC DOB project guidance");
+  scopeSource.href = "https://www.nyc.gov/site/buildings/dob/project-categories.page";
+  scopeSource.target = "_blank"; scopeSource.rel = "noopener noreferrer";
+  scopeNote.append(scopeSource); workBody.append(scopeNote);
 
   const basisBody = bodies.get("basis");
   const basis = conversation?.codeBasis || {};

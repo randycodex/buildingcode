@@ -1,11 +1,21 @@
 import assert from 'node:assert/strict';
-import {assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews} from '../public/assistant-context.js';
+import {assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews} from '../public/assistant-context.js';
 import {normalizeWorkspaceLayout} from '../public/workspace-state.js';
 const facts=['Existing building has 37 apartments.', 'Proposed work: New construction', 'Proposed uses: Apartments and retail', 'Applicant has not confirmed construction type.'];
 const copy=structuredClone(facts), scope=assistantWorkContext(facts);
 assert.equal(scope.workType,'New construction');assert.equal(scope.uses,'Apartments and retail');
 assert.deepEqual(assistantWorkFacts(scope),[facts[1],facts[2],facts[0],facts[3]]);
 assert.deepEqual(facts,copy,'Reading context cannot change stored facts');
+assert.equal(assistantWorkTypeForMenu(scope.workType),'New building');
+assert.equal(assistantWorkTypeForMenu('Addition'),'Enlargement / addition');
+assert.equal(assistantWorkTypeForMenu('Change of use'),'Change of use or occupancy');
+assert.equal(assistantWorkTypeForMenu('Demolition'),'Demolition','An ambiguous saved demolition scope must not be upgraded to full demolition');
+assert.equal(assistantWorkTypeForMenu('constructor'),'constructor','Custom work descriptions remain plain strings');
+for (const workType of assistantWorkTypes.filter(type=>type!=='Unspecified')) {
+  const workFacts = assistantWorkFacts({workType});
+  assert.deepEqual(workFacts,[`Proposed work: ${workType}`],'A scope selection cannot assert a filing type, CO requirement, or governing edition');
+  assert.equal(assistantWorkContext(workFacts).workType,workType);
+}
 assert.equal(assistantWorkContext(['Existing residential building']).workType,'Unspecified','Existing inventory does not establish proposed work');
 assert.deepEqual(assistantWorkFacts({workType:'Unspecified',uses:'',additionalFacts:''}),[]);
 const conflicting=['Proposed work: New construction','Proposed work: Alteration'];
