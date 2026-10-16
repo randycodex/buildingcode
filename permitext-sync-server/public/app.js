@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1092";
+} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1093";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1092";
+} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1093";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -24021,7 +24021,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   for (const [key, label, paths] of tabs) {
     const button = element("button", "assistant-context-tab"); button.type = "button"; button.title = label === "Code" ? "Code basis" : label;
     button.setAttribute("aria-label", button.title); button.setAttribute("aria-pressed", String(view.tab === key));
-    button.innerHTML = icon(paths); button.append(element("span", "", label));
+    button.innerHTML = icon(paths);
     const body = element("section", "assistant-context-section"); body.setAttribute("aria-label", button.title); body.hidden = view.tab !== key;
     body.append(element("h3", "assistant-context-heading", button.title));
     button.addEventListener("click", () => { selectTab(key); });

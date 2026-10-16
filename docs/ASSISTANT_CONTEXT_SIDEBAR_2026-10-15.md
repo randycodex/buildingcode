@@ -4,7 +4,7 @@ Implements the user's sketch on `codex/research-context-speed`, following `37d3d
 
 ## Layout and behavior
 
-The Assistant has a 320px context/history sidebar and a conversation area with a 600px minimum. Five compact, labelled controls keep the original proposal's related entries together: Project, Work (building use and proposed work), Code (jurisdiction, project default, searched editions), Sources (selected passages and answer citations), and Settings. The user left this grouping to implementation judgment after noting the earlier seven-entry proposal. The original **+ New chat** pill remains anchored at the bottom, as explicitly requested.
+The Assistant has a 320px context/history sidebar and a conversation area with a 600px minimum. Five compact icon controls with hover tooltips and accessible names keep the original proposal's related entries together: Project, Work (building use and proposed work), Code (jurisdiction, project default, searched editions), Sources (selected passages and answer citations), and Settings. The user left this grouping to implementation judgment after noting the earlier seven-entry proposal. The original **+ New chat** pill remains anchored at the bottom, as explicitly requested.
 
 The attached Project appears under Project, and proposed work appears under Work. The duplicate summary block above the detail panel was removed at the user's request. Context details and conversation history scroll independently. The user requested removal of the added sidebar-collapse arrow; the sidebar stays open, and the original menu/close actions align at the right edge of its header. Legacy collapse state is discarded. Empty Assistants show a new-conversation composer rather than history alone.
 
