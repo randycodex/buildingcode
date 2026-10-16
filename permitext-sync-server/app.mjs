@@ -1,3 +1,4 @@
+import { isAmbiguousResearchProjectCorrection } from "./research-project-scope.mjs";
 import { planSavedEvidenceDelete, validateSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
@@ -12560,6 +12561,7 @@ export async function assembledResearchEvidenceForTurn({
   corpusPlan,
   zoningPlan = null,
   beforeSemanticRequest = null,
+  semanticBatchKey = null,
   onStage
 }) {
   const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({
@@ -12571,7 +12573,7 @@ export async function assembledResearchEvidenceForTurn({
   const { catalog, invertedIndex, passageIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
   const semanticResource = passageIndex ? await researchSemanticSearchResource() : null;
   const semanticSearch = semanticResource && beforeSemanticRequest ? {
-    search: (index, query, options = {}) => semanticResource.search(index, query, { ...options,
+    search: (index, query, options = {}) => semanticResource.search(index, query, { ...options, batchKey: semanticBatchKey,
       beforeRequest: async ({ body }) => {
         await beforeSemanticRequest();
         return reserveResearchEmbeddingSpend(body);
@@ -20286,6 +20288,14 @@ async function handleResearchConversationMessage(request, response) {
       context.userID,
       conversation.primaryProjectID
     );
+    if (projectInformation?.projectID && isAmbiguousResearchProjectCorrection(question)) {
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "project_scope" });
+      Object.assign(researchOperation, { status: "completed", mode: "clarification",
+        model: "permitext-conversation-clarification", routingMode: "project_scope", charged: false,
+        projectLinked: true, preparationMilliseconds: Math.round(performance.now() - preparationStartedAt) });
+      return;
+    }
     const manualProjectFacts = conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
     if (researchProjectContextOnlyEligibility({ question, projectInformation })) {
@@ -20370,6 +20380,7 @@ async function handleResearchConversationMessage(request, response) {
       practicalNextStep: isResearchPracticalNextStep(question, activeMessages)
     }) && !researchQuestionIsBoundedCitationLookup(question);
     const investigationUsage = [];
+    const investigationSemanticBatchKey = {};
 
     const conversationFactState = resolveResearchConversationFacts({
       question,
@@ -20426,20 +20437,26 @@ async function handleResearchConversationMessage(request, response) {
             messages: [...activeMessages, { role:"user", question }],
             projectCodeVersion:projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null}),
             investigationCorpusBoundary);
-          // Discovery may cross into a relevant historical or other available
-          // code book. Searching it is not a finding that it governs this site.
-          for (const field of ["selected", "unavailable", "requestedCorpusIDs"]) {
-            const records = [...(corpusPlan[field] || []), ...(searchPlan[field] || [])];
-            corpusPlan[field] = [...new Map(records.map(item => [typeof item === "string" ? item : item.id, item])).values()];
-          }
-          corpusPlan.excluded = (corpusPlan.excluded || []).filter(item => !corpusPlan.selected.some(selected => selected.id === item.id));
           const found = await assembledResearchEvidenceForTurn({question:query, messages:[], pinnedEvidence:[],
             originSurface:conversation.origin?.surface || "", projectFacts:[], topicContext:null, corpusPlan:searchPlan,
-            zoningPlan:null, beforeSemanticRequest:async () => { await ensureResearchTurnReservation(); },
+            zoningPlan:null, semanticBatchKey:investigationSemanticBatchKey,
+            beforeSemanticRequest:async () => {
+              if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Research request was already handled."), {code:"RESEARCH_REQUEST_HANDLED"});
+            },
             onStage:progressResponse.progress});
+          return { ...found, investigationCorpusPlan: searchPlan };
+        },
+        onSearchResults: results => {
+          // Merge in requested query order, never asynchronous completion order.
+          for (const { investigationCorpusPlan: searchPlan } of results) {
+            for (const field of ["selected", "unavailable", "requestedCorpusIDs"]) {
+              const records = [...(corpusPlan[field] || []), ...(searchPlan[field] || [])];
+              corpusPlan[field] = [...new Map(records.map(item => [typeof item === "string" ? item : item.id, item])).values()];
+            }
+          }
+          corpusPlan.excluded = (corpusPlan.excluded || []).filter(item => !corpusPlan.selected.some(selected => selected.id === item.id));
           Object.assign(answerCodeBasis, researchCodeBasis(conversation.primaryProjectID, projectInformation,
             new Date().toISOString(), corpusPlan));
-          return found;
         }
       });
       // The experimental model performs applicability reasoning from the actual

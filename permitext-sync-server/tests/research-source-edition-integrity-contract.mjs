@@ -90,6 +90,7 @@ function clientHarness(overrides = {}) {
     captureAccountRequest: () => "fixture", isCurrentAccountRequest: token => token === "fixture", activeWorkspaceID: "fixture",
     whenWorkspacePaneReady: async () => true,
     URLSearchParams, syncCodeVersion, syncCodeVersionForPrefix, state,
+    resolvedReaderSourceNavigations: new WeakMap(),
     currentContentSummary: () => ({ savedItems: [] }),
     currentColumnWorkflowView: () => "research", workspaceColumnsRequireProject: () => false,
     workflowPaneIsVisible: () => true, linkPaneToView,

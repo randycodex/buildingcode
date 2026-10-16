@@ -762,7 +762,8 @@ export function immutableResearchAnswer({
     emptyStructuredGuidanceAnalysis &&
     emptyGuidanceFactUsage;
   const clarificationAnswer = model === "permitext-conversation-clarification" &&
-    researchCitations.length === 0 && isCanonicalResearchClarification(question, answer);
+    researchCitations.length === 0 && isCanonicalResearchClarification(question, answer) &&
+    (answer?.verification?.reason !== "project_scope" || Boolean(projectID));
   if (researchEvidence.length < 1 && !investigatedEvidenceGapAnswer && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer) {
     throw new Error("Research answers require evidence.");
   }

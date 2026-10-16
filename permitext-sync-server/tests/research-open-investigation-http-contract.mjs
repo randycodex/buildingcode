@@ -69,7 +69,7 @@ try {
   assert.deepEqual(calls,expected);
   const answer=response.body.conversation.messages.at(-1).answer;
   assert.equal(answer.mode,scenario==='accepted'?'openai':'clarification');
-  if(scenario==='accepted'){assert.equal(answer.researchEngine,'20261007-open-investigation-recovery-v6');assert.equal(answer.investigation.trace[0].queries.length,1);assert(answer.citations.length);}
+  if(scenario==='accepted'){assert.equal(answer.researchEngine,'20261015-project-scope-batched-investigation-v7');assert.equal(answer.investigation.trace[0].queries.length,1);assert(answer.citations.length);}
   else assert.deepEqual(answer.citations,[]);
   const reopened=await request('/research/conversations/get',{auth,conversationID},token);
   assert.equal(reopened.body.conversation.messages.at(-1).answer.answerText,answer.answerText);

@@ -41,13 +41,22 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
     });
     vm.runInContext(code,c);
     c.renderResearchNotebookHandoff({primaryProjectID:'p'},{id:'answer',answer:{}});
-    const pending = nodes.find(e=>e.tag==='button').click();
+    const saveButton = nodes.find(e=>e.tag==='button');
+    if (['ready','refresh'].includes(delay)) {
+      await saveButton.click();
+      assert.deepEqual(calls,['saved']);
+      assert.equal(saveButton.textContent,'Open note in Research');
+    }
+    const pending = saveButton.click();
     await tick();
     if(change==='view') c.state.workflowNavigationGeneration=2;
     if(change==='project') c.activeWorkspaceID='other';
     finish(delay==='save'?{card:{id:'note'}}:true);
     await pending;
     if(change==='none') {
+      assert.deepEqual(calls,['saved'],'Saving a note must not open or link Notes into Research');
+      assert.equal(saveButton.textContent,'Open note in Research');
+      await saveButton.click();
       assert.deepEqual(calls,['saved',['placed','research:one','notebook:p'],'opened','focused']);
       assert.equal(c.pendingNotebookCardByProject.size,0);
     } else {
@@ -58,4 +67,4 @@ for (const delay of ['confirmation','save','ready','refresh','none']) {
     }
   }
 }
-console.log('Research → Notebook navigation passed: current destination opens beside Research; delayed confirmation/save/hydration/refresh cannot pull the user into a different view or Project.');
+console.log('Research → Notebook navigation passed: save stays in Notebook; explicit open reveals Notes beside Research; delayed confirmation/save/hydration/refresh cannot pull the user into a different view or Project.');

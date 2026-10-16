@@ -7,7 +7,7 @@ import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
 import { createReportAutosave } from "./report-autosave.js?v=1";
-import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=7";
+import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout } from "./workflow-views.js?v=8";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
@@ -154,7 +154,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-search-word-completion-v1082";
+} from "./workspace-state.js?v=20261015-research-context-speed-v1083";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2707,6 +2707,8 @@ async function openProjectCodeDecisions(project) {
 async function closeProjectNotebook(project) {
   if (!(await confirmNotebookDiscard(project))) return false;
   const notebookID = paneIDForProjectNotebook(project);
+  // Closing ends the explicit Research opt-in; Notebook can reopen at home.
+  if (state.workflowMembership) delete state.workflowMembership[notebookID];
   state.notebooks = openNotebooks().filter((item) => !projectDetailMatches(project, item));
   delete state.paneWeights[notebookID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== notebookID);
@@ -25567,6 +25569,10 @@ function renderResearchNotebookHandoff(conversation, message) {
         requireCurrentAccountRequest(requestIdentity);
         savedCard = payload.card;
         await saveNotebookCardSnapshot(requestIdentity.userID, researchProjectID(project), savedCard);
+        // Saving a reference does not change the current view or pane membership.
+        // A second, explicitly labelled action opens it beside Research.
+        if (originIsCurrent()) button.textContent = "Open note in Research";
+        return;
       }
       requireCurrentAccountRequest(requestIdentity);
       if (!originIsCurrent()) return;
@@ -25590,7 +25596,7 @@ function renderResearchNotebookHandoff(conversation, message) {
       if (!destinationIsCurrent()) return;
       if (mount?.activeCardID?.() !== savedCard.id) await mount?.focusCard?.(savedCard.id);
       if (mount?.activeCardID?.() === savedCard.id) pendingNotebookCardByProject.delete(researchProjectID(project));
-      button.textContent = "Open reference Note";
+      button.textContent = "Open note in Research";
     } catch (error) {
       if (originIsCurrent()) await showWebNotice("Notebook handoff not completed", error.message);
     } finally {

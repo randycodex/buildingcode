@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
-export const researchSemanticPassagesVersion = "20261002-semantic-passage-search-v1";
+export const researchSemanticPassagesVersion = "20261015-turn-batched-semantic-v2";
 export const researchSemanticEmbeddingModel = "text-embedding-3-small";
 export const researchSemanticEmbeddingDimensions = 256;
 export const researchSemanticEmbeddingMaximumCharacters = 6200;
@@ -260,6 +260,43 @@ export function createResearchSemanticSearch({
   const cache = new Map();
   const maximum = Math.max(1, Math.min(2048, Number(cacheLimit) || 128));
   let providerQueue = Promise.resolve();
+  const batches = new Map();
+  const requestVector = (queryText, options, metadata) => {
+    const before = options.beforeRequest || beforeRequest;
+    const after = options.afterRequest || afterRequest;
+    // The opaque key belongs to one HTTP turn, never a user/global cache key.
+    // Without it retain the original serialized provider boundary.
+    const key = options.batchKey;
+    if (!key) {
+      const task = providerQueue.catch(() => {}).then(async () => {
+        const result = await requestResearchEmbeddings([queryText], { enabled, apiKey, fetchImpl, timeoutMS,
+          beforeRequest: before, afterRequest: after });
+        metadata.costUSD = result.costUSD; metadata.usage = result.usage;
+        return result.vectors[0];
+      });
+      providerQueue = task;
+      return task;
+    }
+    let batch = batches.get(key);
+    if (!batch) {
+      batch = { items: [], before, after };
+      batches.set(key, batch);
+      setImmediate(() => {
+        batches.delete(key);
+        const task = providerQueue.catch(() => {}).then(async () => {
+          const result = await requestResearchEmbeddings(batch.items.map(item => item.text), {
+            enabled, apiKey, fetchImpl, timeoutMS, beforeRequest: batch.before, afterRequest: batch.after });
+          // Charge a batch once; each query still receives its own exact vector.
+          batch.items[0].metadata.costUSD = result.costUSD;
+          batch.items[0].metadata.usage = result.usage;
+          batch.items.forEach((item, index) => item.resolve(result.vectors[index]));
+        });
+        providerQueue = task;
+        task.catch(error => batch.items.forEach(item => item.reject(error)));
+      });
+    }
+    return new Promise((resolve, reject) => batch.items.push({ text: queryText, metadata, resolve, reject }));
+  };
   return {
     get cacheSize() { return cache.size; },
     async search(index, question, options = {}) {
@@ -285,16 +322,9 @@ export function createResearchSemanticSearch({
           metadata.queryCached = true;
           queryVector = await cached;
         } else {
-          // Serialize provider queries even when callers arrive concurrently.
-          // Evaluation-ledger hooks can block spending on an unknown outcome.
-          const task = providerQueue.catch(() => {}).then(async () => {
-            const result = await requestResearchEmbeddings([queryText], { enabled, apiKey, fetchImpl, timeoutMS,
-              beforeRequest: options.beforeRequest || beforeRequest, afterRequest: options.afterRequest || afterRequest });
-            metadata.costUSD = result.costUSD;
-            metadata.usage = result.usage;
-            return result.vectors[0];
-          });
-          providerQueue = task;
+          // Concurrent siblings share one batch, still behind the provider
+          // queue and the same pre-dispatch reservation/unknown-outcome hooks.
+          const task = requestVector(queryText, options, metadata);
           cache.set(hash, task);
           while (cache.size > maximum) cache.delete(cache.keys().next().value);
           try { queryVector = await task; } catch (error) { if (cache.get(hash) === task) cache.delete(hash); throw error; }

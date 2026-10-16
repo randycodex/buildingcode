@@ -1,3 +1,4 @@
+import { isAmbiguousResearchProjectCorrection, projectScopeClarification } from "./research-project-scope.mjs";
 import { researchFailureReason, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason,
   researchPriorQuestionRecoveryTextForReason, researchRecoveryPresentation } from "./public/research-failure-recovery.js";
 
@@ -147,6 +148,7 @@ function clarificationAnswer(question = "", reason = "verification", legacy = fa
 }
 
 export function researchClarificationAnswer(question = "", reason = "verification", options = {}) {
+  if (reason === "project_scope" && isAmbiguousResearchProjectCorrection(question)) return projectScopeClarification();
   const presentation = researchSystemRecoveryReasons.includes(reason)
     ? researchRecoveryPresentation(question, options.requestID, options.requestDescription, options.humanContext) : null;
   return clarificationAnswer(question, reason, false, false, false, false, presentation);
@@ -154,6 +156,11 @@ export function researchClarificationAnswer(question = "", reason = "verificatio
 
 export function isCanonicalResearchClarification(question, answer) {
   const reason = answer?.verification?.reason;
+  if (reason === "project_scope") {
+    const expected = projectScopeClarification();
+    return isAmbiguousResearchProjectCorrection(question) &&
+      Object.keys(expected).every(key => JSON.stringify(answer?.[key]) === JSON.stringify(expected[key]));
+  }
   if (!["verification", "evidence", ...researchSystemRecoveryReasons].includes(reason)) return false;
   if (Object.hasOwn(answer, "recoveryPresentation")) {
     if (!researchSystemRecoveryReasons.includes(reason)) return false;

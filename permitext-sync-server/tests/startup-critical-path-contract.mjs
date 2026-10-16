@@ -88,7 +88,7 @@ assert.deepEqual(failedProfile.events, expectedEvents, "Profile setup failure mu
 // Verify actual neutral Reader trust rendering, including the retry affordance.
 const trustFunction = between("function renderReaderTrust(", "function searchCodeFilterPresentation(");
 const pieces = new Map();
-const trust = { dataset: {}, hidden: true, append(element) { pieces.set(`.${element.className}`, element); }, querySelector(selector) { if (selector === ".reader-trust-retry") return pieces.get(selector) || null; if (!pieces.has(selector)) pieces.set(selector, { textContent: "", hidden: false }); return pieces.get(selector); } };
+const trust = { dataset: {}, hidden: true, append(element) { pieces.set(`.${element.className}`, element); }, querySelector(selector) { if (selector === ".reader-trust-retry") return pieces.get(selector) || null; if (!pieces.has(selector)) pieces.set(selector, { textContent: "", hidden: false, append(element) { pieces.set(`.${element.className}`, element); } }); return pieces.get(selector); } };
 const trustContext = vm.createContext({
   document: { createElement: () => ({ addEventListener() {} }) },
   codeTrustProfile: () => null, codeDisplayLabel: () => "2022 Building Code",

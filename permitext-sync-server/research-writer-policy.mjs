@@ -1,13 +1,15 @@
+import { researchProjectScopeInstruction } from "./research-project-scope.mjs";
 import { researchQuestionIsConversationRecall, researchConversationRecallInstruction } from "./research-question-intent.mjs";
 import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchPracticalNextStepPrompt } from "./research-practical-next-step.mjs";
 
-export const researchWriterPolicyVersion = "20261007-direct-writer-recovery-v5";
+export const researchWriterPolicyVersion = "20261015-project-scope-writer-v6";
 
 // The writer has one general policy. Retrieval, citation validation, factual
 // qualification, semantic review and freshly verified repairs remain in code.
 const core = [
   "Answer the user's current NYC code question directly, leading with the strongest conclusion supported by the evidence. A yes/no opening must answer the proposition actually asked, including requests to remove or waive a requirement. Explain enough to make the answer useful; choose paragraphs, lists or a table to suit the question without a fixed template or intake sequence.",
+  researchProjectScopeInstruction,
   "Treat supplied user facts as discussion premises, preserving qualifications, corrections and the scope of hypotheticals. Apply the supplied definitions yourself when those facts suffice. Give useful conditional conclusions when a material fact remains unknown; ask only for facts that could change this answer, without re-asking established facts or blocking a rule explanation on a complete project intake.",
   "Use only the authorized enacted passages for legal requirements. Preserve their jurisdiction, edition, dates, applicability, exact selection boundaries and governing ancestor conditions. Historical and future text are not automatically current law. Source completeness, empty bodies, catalog labels, importer placeholders and amendment metadata describe records rather than supplying operative rules or legal history.",
   "Preserve the actual subject, thresholds, units, measurement datums, calculation order, table headers and footnotes, cumulative or alternative conditions, and every exception material to the conclusion. Match the actual component or installation to the rule and distinguish it from a similar component covered by a different supplied rule or exception. When the component is ambiguous, state the two supported branches instead of applying the broader rule to both. State important qualifications at the affected claim. Clearly label deductions and calculations from the supplied rules and premises; never expand a partial finding into overall compliance.",

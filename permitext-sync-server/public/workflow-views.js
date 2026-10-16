@@ -3,10 +3,15 @@
 export function normalizeWorkflowView(value) { return value === 'notebook' ? 'notebook' : 'research'; }
 export const columnWorkflowViews = ['research', 'notebook', 'report', 'project-details'];
 export function normalizeColumnWorkflowView(value) { return columnWorkflowViews.includes(value) ? value : 'research'; }
+// Older releases automatically linked Notes to Research when saving an answer.
+// Only an explicit open under this policy opts Notes into Research again.
+const explicitNotesResearch = 'notes-research-explicit';
+const isNotesPane = id => /^project:notebook:/.test(id);
 export function normalizeWorkflowMembership(value) {
   return Object.fromEntries(Object.entries(value && typeof value === 'object' ? value : {})
     .filter(([id, views]) => id && Array.isArray(views))
-    .map(([id, views]) => [id, [...new Set(views.filter(view => columnWorkflowViews.includes(view)))]]));
+    .map(([id, views]) => [id, [...new Set(views.filter(view => (columnWorkflowViews.includes(view) || view === explicitNotesResearch) &&
+      !(isNotesPane(id) && view === 'research' && !views.includes(explicitNotesResearch))))]]));
 }
 export function workflowHome(paneID, anchors = {}) {
   if (/^(?:project:notebook:|utility:saved(?::|$))/.test(paneID)) return 'notebook';
@@ -17,13 +22,15 @@ export function workflowHome(paneID, anchors = {}) {
 export function paneBelongsToView(paneID, view, membership, anchors) {
   if (view === 'report') return false;
   const views = membership?.[paneID] || [];
+  if (isNotesPane(paneID) && view === 'research' && !views.includes(explicitNotesResearch)) return false;
   // Retained Readers from older Report layouts remain available in Research.
   if (view === 'research' && /^reader:/.test(paneID) && views.includes('report')) return true;
   return views.length ? views.includes(view) : workflowHome(paneID, anchors) === view;
 }
 export function linkPaneToView(membership, paneID, view) {
   const home = /^(?:project:notebook:|utility:saved(?::|$))/.test(paneID) ? ['notebook'] : [];
-  return {...membership, [paneID]: [...new Set([...home, ...(membership?.[paneID] || []), normalizeColumnWorkflowView(view)])]};
+  return {...membership, [paneID]: [...new Set([...home, ...(membership?.[paneID] || []), normalizeColumnWorkflowView(view),
+    ...(isNotesPane(paneID) && view === 'research' ? [explicitNotesResearch] : [])])]};
 }
 export function referenceColumnsWidth(widths, availableWidth, documentWidth = 600, minimumWidths = []) {
   if (!widths.length) return 0;

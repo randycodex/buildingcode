@@ -1,5 +1,5 @@
 import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
-import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=7";
+import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=8";
 const workspaceRegistryVersion = 3;
 const defaultWorkspaceName = "General";
 const maximumWorkspaceNameLength = 40;

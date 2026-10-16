@@ -171,3 +171,13 @@ assert.equal(layoutState.paneWeights['project:notebook:a'], 730, 'The other view
 assert.equal(savedLayouts, 1); assert.equal(workspaceTransitions, 1);
 assert.equal(layoutTrack.scrollLeft, 220);
 console.log('Layout reset passed: Report-aware controls and reset, loading guard, retained working views and existing Research/Notebook behavior.');
+
+// Restoring a legacy automatic link must not reopen Notes in Research.
+const notesID = 'project:notebook:legacy';
+assert.equal(paneBelongsToView(notesID,'research',{[notesID]:['notebook','research']}),false);
+assert.equal(paneBelongsToView(notesID,'notebook',{[notesID]:['notebook','research']}),true);
+const explicitNotes = linkPaneToView({},notesID,'research');
+const notesLayout = {};
+applyWorkspaceLayout(notesLayout,captureWorkspaceLayout({workflowMembership:explicitNotes}));
+assert.equal(paneBelongsToView(notesID,'research',notesLayout.workflowMembership),true);
+assert.equal(paneBelongsToView(notesID,'notebook',notesLayout.workflowMembership),true);
