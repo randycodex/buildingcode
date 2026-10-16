@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1101";
+} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1103";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1101";
+} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1103";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -21173,7 +21173,7 @@ function renderResearchInterpretation(container, result, options = {}) {
         citation.evidenceRole === "contextual"
           ? "Context"
           : citation.evidenceRole === "supporting"
-            ? "Supporting"
+            ? ""
             : "Governing",
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
