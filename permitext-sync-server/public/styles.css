@@ -20259,7 +20259,7 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .assistant-context-copy, .assistant-context-status { margin: 8px 0 16px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
 .assistant-context-status:empty { display: none; }
 .assistant-context-section .assistant-context-action { display: block; padding: 7px 0; margin: 4px 0; text-align: left; font-size: 12px; min-height: 32px; height: auto; white-space: normal; }
-.assistant-source-link { border-bottom: 1px solid var(--border); width: 100%; }
+.assistant-context-section .assistant-source-link { width: 100%; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .assistant-context-editions { padding-left: 16px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
 .assistant-work-form { display: grid; gap: 14px; }
 .assistant-work-form label { display: grid; gap: 7px; font-size: 11px; color: var(--text-secondary); }
