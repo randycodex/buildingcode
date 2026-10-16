@@ -20225,7 +20225,7 @@ dialog.report-export-review {
   width: var(--assistant-sidebar-width); min-width: 0; min-height: 0;
   box-sizing: border-box; padding: 0; border-right: 1px solid var(--border); overflow: hidden;
 }
-.assistant-context-toolbar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; padding: 2px 10px 12px; }
+.assistant-context-toolbar { display: grid; grid-template-columns: 48px; gap: 2px; padding: 2px 10px 12px; }
 .assistant-history-rail.is-context-closed { grid-template-rows: auto minmax(0, 1fr) auto; }
 .assistant-context-details[hidden], .assistant-context-divider[hidden] { display: none; }
 .assistant-context-divider { position: relative; min-height: 1px; background: var(--border); cursor: row-resize; touch-action: none; }
@@ -20252,15 +20252,12 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .assistant-context-section[hidden] { display: none; }
 .assistant-context-heading, .assistant-history-heading { margin: 0 0 16px; color: var(--text-secondary); font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
 .assistant-context-details :is(.assistant-context-heading, .assistant-context-label, label) { text-transform: none; letter-spacing: normal; }
-.assistant-context-section[aria-label="Settings"] > .assistant-context-heading { padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 .assistant-context-field { display: grid; gap: 4px; margin-bottom: 16px; font-size: 13px; overflow-wrap: anywhere; }
 .assistant-context-label { font-size: 11px; color: var(--text-secondary); }
 .assistant-context-field strong { font-weight: 500; line-height: 1.5; }
 .assistant-context-copy, .assistant-context-status { margin: 8px 0 16px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
 .assistant-context-status:empty { display: none; }
 .assistant-context-section .assistant-context-action { display: block; padding: 7px 0; margin: 4px 0; text-align: left; font-size: 12px; min-height: 32px; height: auto; white-space: normal; }
-.assistant-context-section .assistant-source-link { width: 100%; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.assistant-context-editions { padding-left: 16px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
 .assistant-work-form { display: grid; gap: 14px; }
 .assistant-work-form label { display: grid; gap: 7px; font-size: 11px; color: var(--text-secondary); }
 .assistant-work-form :is(select, textarea, .custom-select-trigger) { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; border: 0; border-radius: 6px; padding: 9px; background: var(--surface-muted); color: var(--text-primary); font: inherit; font-size: 12px; line-height: 1.5; }

@@ -35,6 +35,11 @@ assert.equal(normalizeAssistantViews({pane:{splitRatio:-2}}).pane.splitRatio,0.2
 assert.equal(normalizeAssistantViews({pane:{splitRatio:NaN}}).pane.splitRatio,0.45);
 assert.equal(normalizeAssistantViews({pane:{tab:'unknown',collapsed:'true',draft:{workType:null}}}).pane.draft.workType,'Unspecified');
 assert.equal(normalizeAssistantViews({pane:{draft:{workType:'Demolition'}}}).pane.draft.workType,'Demolition','Existing user-provided work labels survive a draft reload');
+for (const tab of ['project','basis','sources','settings']) {
+  const migrated = normalizeAssistantViews({pane:{tab,draft:normalized['utility:analysis'].draft}}).pane;
+  assert.equal(migrated.tab,'work','Removed informational panels restore to Work');
+  assert.deepEqual(migrated.draft,normalized['utility:analysis'].draft,'Migrating a removed panel preserves work drafts');
+}
 assert.deepEqual(normalizeAssistantViews(null),{});
 console.log('Assistant context passed: scope stays explicit, existing facts survive, limits enforced, drafts and sidebar state reload.');
 

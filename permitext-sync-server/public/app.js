@@ -1,4 +1,4 @@
-import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=5";
+import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1103";
+} from "./offline-storage.js?v=20261015-assistant-work-sidebar-v1105";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1103";
+} from "./workspace-state.js?v=20261015-assistant-work-sidebar-v1105";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -24043,23 +24043,18 @@ function bindAssistantContextDivider({ historyRail, details, content, divider, v
 
 function renderAssistantContextSidebar({ panel, historyRail, content, paneID, conversation: initialConversation, instance }) {
   let conversation = initialConversation;
-  const view = researchAssistantViews.get(paneID) || normalizeAssistantViews({ [paneID]: {} })[paneID];
+  const view = normalizeAssistantViews({ [paneID]: researchAssistantViews.get(paneID) || {} })[paneID];
   researchAssistantViews.set(paneID, view);
   const projectID = String(conversation ? conversation.primaryProjectID || "" : researchProjectID(workspaceProject() || {}) || "");
   const project = researchProjects().find(item => researchProjectID(item) === projectID) || (conversation ? null : workspaceProject());
-  const information = conversation?.projectInformation || project || {};
   const requestIdentity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const current = () => panel.isConnected && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
     (!conversation || (instance ? instance.conversationID : state.researchConversationID) === conversation.id);
   const persist = () => { captureResearchWorkspaceState(); scheduleResearchDraftPersistence(); };
   const element = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text) node.textContent = text; return node; };
-  const copy = (host, text) => host.append(element("p", "assistant-context-copy", text));
-  const field = (host, label, value) => { const row = element("div", "assistant-context-field"); row.append(element("span", "assistant-context-label", label), element("strong", "", value)); host.append(row); return row; };
-  const action = (host, label, callback) => { const button = element("button", "ghost-button assistant-context-action", label); button.type = "button"; button.addEventListener("click", callback); host.append(button); return button; };
   const icon = paths => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
   const toolbar = element("div", "assistant-context-toolbar"); toolbar.setAttribute("aria-label", "Assistant context controls");
-  const projectName = project?.name || information.name || "No project attached";
   const details = element("section", "assistant-context-details");
   details.hidden = !view.tab;
   const divider = element("div", "assistant-context-divider");
@@ -24070,11 +24065,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   divider.hidden = !view.tab;
   historyRail.classList.toggle("is-context-closed", !view.tab);
   const tabs = [
-    ["project", "Project", '<path d="M3 7h7l2-3h9v16H3z"/>'],
-    ["work", "Work", '<path d="m4 20 8-8m-2-5 7-4 4 4-4 7-3-3-4-4z"/>'],
-    ["basis", "Code", '<path d="M12 5v16m0-16C8 2 3 3 3 3v16s5-1 9 2c4-3 9-2 9-2V3s-5-1-9 2z"/>'],
-    ["sources", "Sources", '<path d="M7 3h10v14H7zM4 7H3v14h10v-1m-3-13h4m-4 4h4"/>'],
-    ["settings", "Settings", '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/>']
+    ["work", "Work", '<path d="m4 20 8-8m-2-5 7-4 4 4-4 7-3-3-4-4z"/>']
   ];
   const bodies = new Map(), buttons = new Map();
   const selectTab = key => {
@@ -24091,7 +24082,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
     persist();
   };
   for (const [key, label, paths] of tabs) {
-    const button = element("button", "assistant-context-tab"); button.type = "button"; button.title = label === "Code" ? "Code basis" : label;
+    const button = element("button", "assistant-context-tab"); button.type = "button"; button.title = label;
     button.setAttribute("aria-label", button.title); button.setAttribute("aria-pressed", String(view.tab === key));
     button.setAttribute("aria-expanded", String(view.tab === key));
     button.innerHTML = icon(paths);
@@ -24100,15 +24091,6 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
     button.addEventListener("click", () => { selectTab(key); });
     buttons.set(key, button); bodies.set(key, body); toolbar.append(button); details.append(body);
   }
-  const projectBody = bodies.get("project");
-  field(projectBody, "Attached project", projectName);
-  const address = information.address || project?.address || projectStructuredFacts(information).find(fact => fact.key === "address")?.value;
-  if (address) field(projectBody, "Property", address);
-  copy(projectBody, "Saved site records describe existing conditions. Set the proposed design under Work.");
-  if (projectID) action(projectBody, "Open project details", () => void openProjectDetailsScreen());
-  action(projectBody, "Switch project", () => workspaceActionsButton.click());
-  if (!projectID) copy(projectBody, "Choose a project to include its saved site facts.");
-
   const workBody = bodies.get("work");
   const initialWork = conversation ? assistantWorkContext(conversation.projectContext?.facts || [])
     : view.draft.projectID === projectID ? view.draft : { workType: "Unspecified", uses: "", additionalFacts: "" };
@@ -24160,48 +24142,12 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   scopeSource.target = "_blank"; scopeSource.rel = "noopener noreferrer";
   scopeNote.append(scopeSource); workBody.append(scopeNote);
 
-  const basisBody = bodies.get("basis");
-  const basis = conversation?.codeBasis || {};
-  const projectVersion = information.codeVersion || project?.codeVersion || basis.projectCodeVersion || "";
-  field(basisBody, "Jurisdiction", basis.jurisdiction || (/new-york-city/.test(projectVersion) ? "New York City" : "From project"));
-  field(basisBody, "Project code default", /(?:19|20)\d{2}/.exec(projectVersion)?.[0] || "Current library");
-  copy(basisBody, "Research follows the question and selected passages. A project default does not establish which edition legally governs the work.");
-  const corpora = [...(basis.searchedCorpora || []), ...(basis.pinnedCorpora || [])];
-  const editions = [...new Set(corpora.map(item => item.codeEdition || item.label).filter(Boolean))];
-  if (editions.length) { const list = element("ul", "assistant-context-editions"); editions.forEach(edition => list.append(element("li", "", edition))); basisBody.append(list); }
-  if (projectID) action(basisBody, "Review project code basis", () => void openProjectDetailsScreen());
-
-  const sourceBody = bodies.get("sources");
-  const selected = (conversation?.sources || []).filter(source => source.kind === "selection");
-  field(sourceBody, "Selected passages", String(selected.length));
-  copy(sourceBody, "Relevant codes are discovered automatically, including governing definitions, exceptions, and cross-references.");
-  const latest = conversation?.messages?.findLast(message => message.answer)?.answer;
-  const sourceLinks = [...selected, ...(latest?.citations || [])];
-  const seen = new Set();
-  for (const source of sourceLinks) {
-    const key = `${source.codeVersion || ""}:${source.sectionID || source.id}`; if (seen.has(key)) continue; seen.add(key);
-    const button = action(sourceBody, `${source.codePrefix || "Code"} ${source.sectionNumber || source.title || "Selected passage"}`, async () => {
-      button.disabled = true;
-      try { await openSourceInReader(source, paneID, { projectID }); }
-      catch (error) { if (current()) await showWebNotice("Source not opened", error.message); }
-      finally { button.disabled = false; }
-    });
-    button.classList.add("assistant-source-link"); button.title = source.title || source.codeEdition || "Open exact source in Reader";
-  }
-  if (!sourceLinks.length) copy(sourceBody, "Passages and answer citations will appear here.");
-  action(sourceBody, "Open Reader to select passages", () => addReaderButton.click());
-  const settings = bodies.get("settings");
-  field(settings, "Citation review", "Always on");
-  field(settings, "Source dependencies", "Included");
-  copy(settings, "Answers include their source links and material qualifications. Open account settings to review your plan and allowance.");
-  action(settings, "Account settings", () => focusUtility("settings"));
-
   const historyHeading = element("h3", "assistant-history-heading", "Conversations");
   content.prepend(historyHeading);
   historyRail.prepend(toolbar, details, divider);
   enhanceSelect(workType);
   const disposeDivider = bindAssistantContextDivider({ historyRail, details, content, divider, view, persist, current });
-  return { toolbar, settings, disposeContext() {
+  return { toolbar, disposeContext() {
     if (activeCustomSelect?.menu === workType._customSelectMenu) closeActiveCustomSelect();
     resetEnhancedSelects(details);
     disposeDivider(); toolbar.remove(); details.remove(); divider.remove(); historyHeading.remove();
@@ -24303,11 +24249,9 @@ async function renderResearch(paneID = "utility:analysis") {
     ? supplementalResearchConversations.get(instance.conversationID) : activeResearchConversation) : null;
   const sidebar = renderAssistantContextSidebar({ panel, historyRail, content, paneID, conversation: sidebarConversation, instance });
   panel._assistantSidebarUpdate = nextConversation => {
-    const usage = sidebar.settings.querySelector(".assistant-usage-host");
     sidebar.disposeContext();
     const next = renderAssistantContextSidebar({ panel, historyRail, content, paneID, conversation: nextConversation, instance });
     Object.assign(sidebar, next);
-    if (usage) sidebar.settings.append(usage);
   };
 
   const updateConversationSelection = () => {
@@ -24431,8 +24375,6 @@ async function renderResearch(paneID = "utility:analysis") {
   const renderingWorkspaceID = activeWorkspaceID;
   const isCurrent = () => panel.isConnected && isCurrentAccountRequest(renderingIdentity) &&
     activeWorkspaceID === renderingWorkspaceID;
-  const usageHost = document.createElement("div");
-  usageHost.className = "assistant-usage-host";
   const historyHost = document.createElement("div");
   const filters = document.createElement("div");
   filters.className = "research-history-filters";
@@ -24459,7 +24401,6 @@ async function renderResearch(paneID = "utility:analysis") {
   };
   projectFilter.addEventListener("change", refreshFilters);
   filters.append(projectFilter);
-  sidebar.settings.append(usageHost);
   content.append(filters, historyHost);
   enhanceSelect(projectFilter);
   const loading = document.createElement("p");
@@ -24468,42 +24409,6 @@ async function renderResearch(paneID = "utility:analysis") {
   loading.textContent = "Loading history…";
   historyHost.append(loading);
 
-  const loadUsage = async (reuseRecent = true) => {
-    try {
-      await refreshResearchUsage({ reuseRecent });
-      if (!isCurrent()) return;
-      clear(usageHost);
-
-  if (researchEnabled && researchUsage) {
-    const usage = document.createElement("section");
-    usage.className = "research-usage";
-    usage.setAttribute("role", "status");
-    const heading = document.createElement("strong");
-    heading.textContent = "Research turns";
-    const copy = document.createElement("p");
-    copy.textContent = researchUsageCopy(researchUsage);
-    usage.append(heading, copy);
-    if (hasAvailableWebResearchTurnPack(researchUsage)) {
-      const buyMore = document.createElement("button");
-      buyMore.type = "button";
-      buyMore.className = "ghost-button";
-      buyMore.textContent = "Buy more turns";
-      buyMore.addEventListener("click", () => focusUtility("settings"));
-      usage.append(buyMore);
-    }
-    usageHost.append(usage);
-  }
-    } catch {
-      if (!isCurrent()) return;
-      clear(usageHost);
-      const retry = document.createElement("button");
-      retry.type = "button";
-      retry.className = "ghost-button";
-      retry.textContent = "Retry allowance";
-      retry.addEventListener("click", () => { retry.disabled = true; void loadUsage(false); });
-      usageHost.append(retry);
-    }
-  };
   const loadHistory = async (reuseRecent = true, append = false) => {
     const content = historyHost;
     const generation = ++historyGeneration;
@@ -25038,7 +24943,7 @@ async function renderResearch(paneID = "utility:analysis") {
   requestAnimationFrame(() => {
     if (!isCurrent()) return;
     void loadHistory();
-    void loadUsage();
+    void refreshResearchUsage({ reuseRecent: true }).catch(() => {});
   });
   return panel;
 }
