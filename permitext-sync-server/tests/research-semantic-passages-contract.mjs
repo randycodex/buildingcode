@@ -200,3 +200,20 @@ const deniedKey={};
 const deniedResults=await Promise.allSettled([denied.search(index,'one',{batchKey:deniedKey}),denied.search(index,'two',{batchKey:deniedKey})]);
 assert(deniedResults.every(r=>r.status==='rejected'&&r.reason.code==='RESEARCH_REQUEST_HANDLED'));
 assert.equal(denied.cacheSize,0);
+
+// Lazy materialization must preserve ties, offset deduplication and nested hits.
+const tiedPassages = [
+  { id: 'b', sectionID: 'one', blockID: 'same', sourceOffsets: {start:0,end:4}, text:'same' },
+  { id: 'a', sectionID: 'one', blockID: 'same', sourceOffsets: {start:0,end:4}, text:'same' },
+  { id: 'c', sectionID: 'one', blockID: 'other', sourceOffsets: {start:0,end:4}, text:'same' },
+  { id: 'd', sectionID: 'two', blockID: 'same', sourceOffsets: {start:0,end:4}, text:'same' }
+];
+const tiedIndex = { passages: tiedPassages };
+const tiedVectors = new Map(tiedPassages.map(p => [researchSemanticInputHash(researchPassageEmbeddingText(p)), Float32Array.from(basis(0))]));
+const tiedHits = searchResearchSemanticPassages(tiedIndex, tiedVectors, basis(0), {limit:2, passagesPerSection:2});
+assert.deepEqual(tiedHits.map(hit => hit.id), ['a', 'd']);
+assert.deepEqual(tiedHits[0].passages.map(hit => hit.id), ['a', 'c']);
+assert(tiedHits.every(hit => hit.similarity === 1 && hit.score === 1 && hit.retrievalMethod === 'semantic_passage'));
+assert.equal(searchResearchSemanticPassages(tiedIndex, tiedVectors, basis(0), {minimumSimilarity:1}).length, 0);
+assert.deepEqual(tiedPassages.map(p => p.id), ['b', 'a', 'c', 'd'], 'Search must not reorder or annotate source records.');
+console.log('Semantic materialization preserves exact ties, duplicate offsets, threshold and source immutability.');

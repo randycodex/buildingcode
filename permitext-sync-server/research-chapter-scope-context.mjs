@@ -26,6 +26,9 @@ const chapterKey = value => [...fields.map(field => field === "jurisdiction"
   ? compact(value[field]).toLowerCase() : text(value[field])), chapter(value)].join("\u0000");
 const inherited = value => value?.inheritedAuthorityReference === true || value?.signals?.inheritedAuthorityReference === true;
 const scopeTitle = value => {
+  // Necessary literal prefilter avoids constructing a regex for every catalog
+  // title. The exact scope-title and authority checks still run below.
+  if (!/\b(?:scope|applicability)\b/i.test(text(value?.title))) return false;
   const number = text(value?.sectionNumber).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const title = number ? text(value?.title).replace(new RegExp(`^(?:[A-Z]+\\s+)?${number}\\.?\\s+`, "i"), "") : text(value?.title);
   return /^(?:scope|applicability)\b/i.test(title);

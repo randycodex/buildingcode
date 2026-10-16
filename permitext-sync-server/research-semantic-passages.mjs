@@ -190,23 +190,29 @@ export function searchResearchSemanticPassages(index, vectors, queryVector, opti
     let similarity = 0;
     for (let position = 0; position < query.length; position += 1) similarity += query[position] * vector[position];
     if (!Number.isFinite(similarity) || similarity <= minimum) continue;
-    const hit = { ...passage, similarity, score: similarity, semanticInputHash: inputHash,
-      exactReference: false, matchedTerms: [], retrievalMethod: "semantic_passage" };
+    const hit = { passage, similarity, inputHash };
     if (!grouped.has(passage.sectionID)) grouped.set(passage.sectionID, []);
     grouped.get(passage.sectionID).push(hit);
   }
   return [...grouped.values()].map(hits => {
-    hits.sort((left, right) => right.similarity - left.similarity || left.id.localeCompare(right.id));
+    hits.sort((left, right) => right.similarity - left.similarity || left.passage.id.localeCompare(right.passage.id));
     const passages = [];
     const seen = new Set();
     for (const hit of hits) {
-      const key = `${hit.blockID}:${hit.sourceOffsets?.start}:${hit.sourceOffsets?.end}`;
+      const key = `${hit.passage.blockID}:${hit.passage.sourceOffsets?.start}:${hit.passage.sourceOffsets?.end}`;
       if (seen.has(key)) continue;
       seen.add(key); passages.push(hit);
       if (passages.length >= perSection) break;
     }
     return { ...hits[0], passages };
-  }).sort((left, right) => right.similarity - left.similarity || left.id.localeCompare(right.id)).slice(0, limit);
+  }).sort((left, right) => right.similarity - left.similarity || left.passage.id.localeCompare(right.passage.id)).slice(0, limit)
+    .map(hit => {
+      // Only materialize winners; score every authorized vector with the same
+      // arithmetic, ordering, deduplication and limits as before.
+      const materialize = item => ({ ...item.passage, similarity: item.similarity, score: item.similarity,
+        semanticInputHash: item.inputHash, exactReference: false, matchedTerms: [], retrievalMethod: "semantic_passage" });
+      return { ...materialize(hit), passages: hit.passages.map(materialize) };
+    });
 }
 
 /** Explicitly gated embeddings request; caller owns paid-request accounting. */

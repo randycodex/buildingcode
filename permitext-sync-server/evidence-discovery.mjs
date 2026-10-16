@@ -1775,6 +1775,18 @@ function strongActionSubjectReservation({ probeHits, detailed, selected, current
     .map(({ hit, item }) => ({ hit, item, rank: hit.probeRank, strength: hit.probeStrength, actionSubject: true }))[0] || null;
 }
 
+const headingTokenCache = new WeakMap();
+const genericHeadingWords = new Set(["general", "requirements", "requirement", "provisions", "minimum", "maximum", "reserved", "definitions", "scope", "section", "code"]);
+function headingTokens(section) {
+  const title = section.title || "";
+  const cached = headingTokenCache.get(section);
+  if (cached?.title === title) return cached.tokens;
+  const tokens = [...new Set(rawTokens(title).filter(token =>
+    /[a-z]/i.test(token) && !stopWords.has(token) && !genericHeadingWords.has(token) && token.length > 2))];
+  headingTokenCache.set(section, { title, tokens });
+  return tokens;
+}
+
 export async function discoverRelevantEvidence({
   question,
   retrievalContext = null,
@@ -1794,8 +1806,16 @@ export async function discoverRelevantEvidence({
   const sourceQuestion = retrievalContext?.sourceQuery
     ? validateEvidenceDiscoveryQuestion(retrievalContext.sourceQuery) : normalizedQuestion;
   const sections = Array.isArray(catalog) ? catalog : [];
-  const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
   const currentQuestion = retrievalContext?.currentQuestion || sourceQuestion;
+  // Start the same reserved semantic query before CPU-only lexical work. Let
+  // sibling queries join their existing turn batch before beginning the scan.
+  // Observe rejection immediately even if the lexical path itself fails.
+  const semanticPending = passageIndex && semanticSearch
+    ? Promise.resolve().then(() => semanticSearch.search(passageIndex,
+      retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }))
+      .then(value => ({ value }), error => ({ error })) : null;
+  if (semanticPending) await new Promise(resolve => setImmediate(resolve));
+  const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
   const gasVocabulary = researchGasEquipmentVocabulary(currentQuestion, {
     contextDependentFollowUp: retrievalContext?.contextDependentFollowUp === true,
     humanTopics: [retrievalContext?.conversationTopic, retrievalContext?.immediateContext]
@@ -1978,8 +1998,9 @@ export async function discoverRelevantEvidence({
       probeStrength: complete.score / measurementHits[0].score }] : [];
   });
   const passageHitsByID = new Map(lexicalHitsByID);
-  const semanticResult = passageIndex && semanticSearch
-    ? await semanticSearch.search(passageIndex, retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }) : null;
+  const semanticOutcome = semanticPending ? await semanticPending : null;
+  if (semanticOutcome?.error) throw semanticOutcome.error;
+  const semanticResult = semanticOutcome?.value || null;
   const semanticHits = (semanticResult?.hits || [])
     .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean);
   const fusedScores = new Map();
@@ -2041,10 +2062,8 @@ export async function discoverRelevantEvidence({
   // Use heading coverage as a bounded recall signal, never as applicability.
   const headingScores = new Map();
   const literalQuestionTerms = new Set(rawTokens(currentQuestion).flatMap(token => [...singularForms(token)]));
-  const genericHeadingWords = new Set(["general", "requirements", "requirement", "provisions", "minimum", "maximum", "reserved", "definitions", "scope", "section", "code"]);
   for (const section of sections) {
-    const tokens = [...new Set(rawTokens(section.title || "").filter(token =>
-      /[a-z]/i.test(token) && !stopWords.has(token) && !genericHeadingWords.has(token) && token.length > 2))];
+    const tokens = headingTokens(section);
     if (tokens.length >= 2 && tokens.every(token => [...singularForms(token)].some(form => literalQuestionTerms.has(form)))) {
       headingScores.set(comparableSectionID(section.id), 45);
     }

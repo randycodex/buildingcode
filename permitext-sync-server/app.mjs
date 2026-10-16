@@ -8446,7 +8446,7 @@ export async function researchCorpusResources(corpusPlan) {
     const catalogs = [];
     const indexes = [];
     const passageIndexes = [];
-    for (const corpus of selected) {
+    const partitions = await Promise.allSettled(selected.map(async corpus => {
       const partitionKey = `${corpus.id}:${corpus.codeVersion}:passages=${passageSearch}`;
       let partition = cachedResearchCorpusPartitions.get(partitionKey);
       if (!partition) {
@@ -8488,7 +8488,12 @@ export async function researchCorpusResources(corpusPlan) {
         cachedResearchCorpusPartitions.set(partitionKey, partition);
         while (cachedResearchCorpusPartitions.size > 16) cachedResearchCorpusPartitions.delete(cachedResearchCorpusPartitions.keys().next().value);
       }
-      const resource = await partition;
+      return partition;
+    }));
+    const failure = partitions.find(result => result.status === "rejected");
+    if (failure) throw failure.reason;
+    // I/O overlaps, while merge order remains the authorized corpus order.
+    for (const { value: resource } of partitions) {
       catalogs.push(resource.catalog);
       indexes.push(resource.invertedIndex);
       if (resource.passageIndex) passageIndexes.push(resource.passageIndex);
