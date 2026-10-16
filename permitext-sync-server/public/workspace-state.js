@@ -1,4 +1,4 @@
-import { normalizeAssistantViews } from "./assistant-context.js?v=2";
+import { normalizeAssistantViews } from "./assistant-context.js?v=3";
 import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
 import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=8";
 const workspaceRegistryVersion = 3;

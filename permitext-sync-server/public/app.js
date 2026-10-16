@@ -1,4 +1,4 @@
-import { assistantWorkTypes, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=2";
+import { assistantWorkTypes, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=3";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1093";
+} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1094";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1093";
+} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1094";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -24005,6 +24005,8 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const toolbar = element("div", "assistant-context-toolbar"); toolbar.setAttribute("aria-label", "Assistant context controls");
   const projectName = project?.name || information.name || "No project attached";
   const details = element("section", "assistant-context-details");
+  details.hidden = !view.tab;
+  historyRail.classList.toggle("is-context-closed", !view.tab);
   const tabs = [
     ["project", "Project", '<path d="M3 7h7l2-3h9v16H3z"/>'],
     ["work", "Work", '<path d="m4 20 8-8m-2-5 7-4 4 4-4 7-3-3-4-4z"/>'],
@@ -24014,13 +24016,21 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   ];
   const bodies = new Map(), buttons = new Map();
   const selectTab = key => {
-    view.tab = key;
-    for (const [id, body] of bodies) { body.hidden = id !== key; buttons.get(id).setAttribute("aria-pressed", String(id === key)); }
+    view.tab = view.tab === key ? "" : key;
+    details.hidden = !view.tab;
+    historyRail.classList.toggle("is-context-closed", !view.tab);
+    for (const [id, body] of bodies) {
+      const selected = id === view.tab;
+      body.hidden = !selected;
+      buttons.get(id).setAttribute("aria-pressed", String(selected));
+      buttons.get(id).setAttribute("aria-expanded", String(selected));
+    }
     persist();
   };
   for (const [key, label, paths] of tabs) {
     const button = element("button", "assistant-context-tab"); button.type = "button"; button.title = label === "Code" ? "Code basis" : label;
     button.setAttribute("aria-label", button.title); button.setAttribute("aria-pressed", String(view.tab === key));
+    button.setAttribute("aria-expanded", String(view.tab === key));
     button.innerHTML = icon(paths);
     const body = element("section", "assistant-context-section"); body.setAttribute("aria-label", button.title); body.hidden = view.tab !== key;
     body.append(element("h3", "assistant-context-heading", button.title));

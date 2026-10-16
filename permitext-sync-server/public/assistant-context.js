@@ -22,7 +22,7 @@ export function assistantWorkFacts(value = {}) {
 }
 export function normalizeAssistantViews(value) {
   return Object.fromEntries(Object.entries(value && typeof value === 'object' ? value : {}).filter(([id]) => id).slice(0, 100).map(([id, view]) => [id, {
-    tab: ['project', 'work', 'basis', 'sources', 'settings'].includes(view?.tab) ? view.tab : 'project',
+    tab: ['', 'project', 'work', 'basis', 'sources', 'settings'].includes(view?.tab) ? view.tab : 'project',
     draft: { projectID: String(view?.draft?.projectID || '').slice(0, 200),
       workType: typeof view?.draft?.workType === 'string' && compact(view.draft.workType) ? compact(view.draft.workType).slice(0, 480) : 'Unspecified',
       uses: String(view?.draft?.uses || '').slice(0, 480), additionalFacts: String(view?.draft?.additionalFacts || '').slice(0, 10_000) }

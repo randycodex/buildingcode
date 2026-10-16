@@ -20224,6 +20224,8 @@ dialog.report-export-review {
   box-sizing: border-box; padding: 0; border-right: 1px solid var(--border); overflow: hidden;
 }
 .assistant-context-toolbar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; padding: 2px 10px 12px; }
+.assistant-history-rail.is-context-closed { grid-template-rows: auto minmax(0, 1fr) auto; }
+.assistant-context-details[hidden] { display: none; }
 .assistant-context-toolbar :is(.assistant-context-tab, .research-new-chat) {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
   width: 100%; min-width: 0; min-height: 48px; margin: 0; padding: 6px 1px;
