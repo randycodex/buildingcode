@@ -1,4 +1,4 @@
-import { assistantWorkTypes, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=3";
+import { assistantWorkTypes, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=4";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1094";
+} from "./offline-storage.js?v=20261015-assistant-context-sidebar-v1095";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1094";
+} from "./workspace-state.js?v=20261015-assistant-context-sidebar-v1095";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -23985,6 +23985,60 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   requestAnimationFrame(resizeComposer);
 }
 
+function bindAssistantContextDivider({ historyRail, details, content, divider, view, persist, current }) {
+  let drag = null;
+  const limits = () => {
+    if (details.hidden) return { height: 0, minimum: 0.2, maximum: 0.8 };
+    const height = details.getBoundingClientRect().height + content.getBoundingClientRect().height;
+    const minimum = height ? Math.min(0.8, Math.max(0.2, 140 / height)) : 0.2;
+    return { height, minimum, maximum: height ? Math.max(minimum, Math.min(0.8, 1 - 180 / height)) : 0.8 };
+  };
+  const applyRatio = value => {
+    const { minimum, maximum } = limits();
+    const ratio = clampNumber(value, minimum, maximum, 0.45);
+    view.splitRatio = ratio;
+    historyRail.style.setProperty("--assistant-context-share", `${ratio}fr`);
+    historyRail.style.setProperty("--assistant-history-share", `${1 - ratio}fr`);
+    divider.setAttribute("aria-valuemin", String(Math.round(minimum * 100)));
+    divider.setAttribute("aria-valuemax", String(Math.round(maximum * 100)));
+    divider.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
+  };
+  applyRatio(view.splitRatio);
+  const finish = event => {
+    if (!drag || (event && event.pointerId !== drag.pointerID)) return;
+    const pointerID = drag.pointerID;
+    drag = null;
+    historyRail.classList.remove("is-resizing-context");
+    if (divider.hasPointerCapture?.(pointerID)) divider.releasePointerCapture(pointerID);
+    if (current()) persist();
+  };
+  divider.addEventListener("pointerdown", event => {
+    if (event.button !== 0 || event.isPrimary === false || !current()) return;
+    const { height } = limits();
+    if (!height) return;
+    event.preventDefault();
+    event.stopPropagation();
+    drag = { pointerID: event.pointerId, y: event.clientY, upperHeight: details.getBoundingClientRect().height, height };
+    divider.setPointerCapture?.(event.pointerId);
+    historyRail.classList.add("is-resizing-context");
+  });
+  divider.addEventListener("pointermove", event => {
+    if (!drag || event.pointerId !== drag.pointerID) return;
+    if (!current()) { finish(event); return; }
+    applyRatio((drag.upperHeight + event.clientY - drag.y) / drag.height);
+  });
+  for (const name of ["pointerup", "pointercancel", "lostpointercapture"]) divider.addEventListener(name, finish);
+  divider.addEventListener("keydown", event => {
+    const direction = event.key === "ArrowUp" ? -1 : event.key === "ArrowDown" ? 1 : 0;
+    if ((!direction && event.key !== "Home" && event.key !== "End") || !current()) return;
+    event.preventDefault();
+    const { minimum, maximum } = limits();
+    applyRatio(event.key === "Home" ? minimum : event.key === "End" ? maximum : view.splitRatio + direction * 0.04);
+    persist();
+  });
+  return () => finish();
+}
+
 function renderAssistantContextSidebar({ panel, historyRail, content, paneID, conversation: initialConversation, instance }) {
   let conversation = initialConversation;
   const view = researchAssistantViews.get(paneID) || normalizeAssistantViews({ [paneID]: {} })[paneID];
@@ -24006,6 +24060,12 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const projectName = project?.name || information.name || "No project attached";
   const details = element("section", "assistant-context-details");
   details.hidden = !view.tab;
+  const divider = element("div", "assistant-context-divider");
+  divider.setAttribute("role", "separator");
+  divider.setAttribute("aria-label", "Resize Assistant context and conversations");
+  divider.setAttribute("aria-orientation", "horizontal");
+  divider.tabIndex = 0;
+  divider.hidden = !view.tab;
   historyRail.classList.toggle("is-context-closed", !view.tab);
   const tabs = [
     ["project", "Project", '<path d="M3 7h7l2-3h9v16H3z"/>'],
@@ -24018,6 +24078,7 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
   const selectTab = key => {
     view.tab = view.tab === key ? "" : key;
     details.hidden = !view.tab;
+    divider.hidden = !view.tab;
     historyRail.classList.toggle("is-context-closed", !view.tab);
     for (const [id, body] of bodies) {
       const selected = id === view.tab;
@@ -24128,9 +24189,10 @@ function renderAssistantContextSidebar({ panel, historyRail, content, paneID, co
 
   const historyHeading = element("h3", "assistant-history-heading", "Conversations");
   content.prepend(historyHeading);
-  historyRail.prepend(toolbar, details);
+  historyRail.prepend(toolbar, details, divider);
+  const disposeDivider = bindAssistantContextDivider({ historyRail, details, content, divider, view, persist, current });
   return { toolbar, settings, disposeContext() {
-    toolbar.remove(); details.remove(); historyHeading.remove();
+    disposeDivider(); toolbar.remove(); details.remove(); divider.remove(); historyHeading.remove();
   }, startNewConversation() {
     const latest = instance ? supplementalResearchConversations.get(instance.conversationID) : activeResearchConversation;
     if (latest) view.draft = assistantDraftForConversation(latest, projectID);

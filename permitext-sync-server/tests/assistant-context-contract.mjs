@@ -13,12 +13,16 @@ assert.deepEqual(assistantWorkFacts(assistantWorkContext(conflicting)),conflicti
 assert.throws(()=>assistantWorkFacts({additionalFacts:Array.from({length:21},(_,i)=>`Fact ${i}`).join('\n')}));
 assert.throws(()=>assistantWorkFacts({uses:'a'.repeat(500)}));
 assert.throws(()=>assistantWorkFacts({additionalFacts:'Same\nSame'}));
-const view={tab:'work',collapsed:true,draft:{projectID:'project-a',...scope}};
+const view={tab:'work',collapsed:true,splitRatio:0.62,draft:{projectID:'project-a',...scope}};
 const normalized=normalizeAssistantViews({'utility:analysis':view});
 assert.deepEqual(normalizeWorkspaceLayout({researchViewState:{assistantViews:normalized}}).researchViewState.assistantViews,normalized,'Work drafts and selected-panel state must survive a workspace reload');
 const closed = normalizeAssistantViews({'utility:analysis':{...view,tab:''}});
 assert.equal(normalizeWorkspaceLayout({researchViewState:{assistantViews:closed}}).researchViewState.assistantViews['utility:analysis'].tab,'','A closed context panel stays closed after workspace reload');
 assert.deepEqual(closed['utility:analysis'].draft,normalized['utility:analysis'].draft,'Closing a context panel preserves its work draft');
+assert.equal(closed['utility:analysis'].splitRatio,0.62,'The divider position survives closing and restoring a context panel');
+assert.equal(normalizeAssistantViews({pane:{splitRatio:2}}).pane.splitRatio,0.8);
+assert.equal(normalizeAssistantViews({pane:{splitRatio:-2}}).pane.splitRatio,0.2);
+assert.equal(normalizeAssistantViews({pane:{splitRatio:NaN}}).pane.splitRatio,0.45);
 assert.equal(normalizeAssistantViews({pane:{tab:'unknown',collapsed:'true',draft:{workType:null}}}).pane.draft.workType,'Unspecified');
 assert.equal(normalizeAssistantViews({pane:{draft:{workType:'Demolition'}}}).pane.draft.workType,'Demolition','Existing user-provided work labels survive a draft reload');
 assert.deepEqual(normalizeAssistantViews(null),{});
