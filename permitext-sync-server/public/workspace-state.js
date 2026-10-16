@@ -1,3 +1,4 @@
+import { normalizeAssistantViews } from "./assistant-context.js?v=2";
 import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
 import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=8";
 const workspaceRegistryVersion = 3;
@@ -347,6 +348,7 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.researchConversationID = typeof source.researchConversationID === "string" ? source.researchConversationID : "";
   const research = source.researchViewState || {};
   layout.researchViewState = {
+    assistantViews: normalizeAssistantViews(research.assistantViews),
     conversationOpen: research.conversationOpen === true,
     historyShowing: research.historyShowing === true,
     draftPaneIDs: Array.isArray(research.draftPaneIDs) ? research.draftPaneIDs.filter(id => typeof id === "string") : [],

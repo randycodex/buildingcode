@@ -1,3 +1,4 @@
+import { normalizeAssistantViews } from '../public/assistant-context.js';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
@@ -10,6 +11,7 @@ const extract = name => {
   return source.slice(start, source.indexOf('\n}', start) + 2);
 };
 const context = vm.createContext({
+  normalizeAssistantViews, researchAssistantViews: new Map(),
   state: {}, restoredResearchViewState: undefined,
   researchDraftPaneIDs: new Set(), researchNewChatDrafts: new Map(),
   researchConversationPaneOpened: false, researchHistoryShowing: false,
@@ -40,9 +42,11 @@ context.researchDraftPaneIDs.add('utility:analysis:second');
 context.researchNewChatDrafts.set('utility:analysis:second', 'Unsent new question');
 context.researchNewChatDrafts.set('followup:conversation-a', 'Unsent follow-up');
 context.supplementalResearchConversationIDs.push('conversation-b', 'conversation-c');
+context.researchAssistantViews.set('utility:analysis', {tab:'work',collapsed:true,draft:{projectID:'project-a',workType:'New construction',uses:'Apartments',additionalFacts:''}});
 const a = save();
 open({ projectDetails: [{ id: 'project-b', name: 'B' }] });
 assert.equal(context.researchNewChatDrafts.size, 0);
+assert.equal(context.researchAssistantViews.size,0);
 assert.equal(context.researchConversationPaneOpened, false);
 assert.equal(context.supplementalResearchConversationIDs.length, 0);
 context.researchNewChatDrafts.set('utility:analysis', 'B only');
@@ -50,6 +54,8 @@ context.researchHistoryShowing = true;
 const b = save();
 open(a);
 assert.equal(context.state.projectDetails[0].id, 'project-a');
+assert.equal(context.researchAssistantViews.get('utility:analysis').draft.uses,'Apartments');
+assert.equal(context.researchAssistantViews.get('utility:analysis').collapsed,undefined,'The removed sidebar-collapse state cannot hide context on reload');
 assert.equal(context.researchNewChatDrafts.get('utility:analysis:second'), 'Unsent new question');
 assert.equal(context.researchNewChatDrafts.get('followup:conversation-a'), 'Unsent follow-up');
 assert.equal(context.researchNewChatDrafts.has('utility:analysis'), false);

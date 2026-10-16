@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import {assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews} from '../public/assistant-context.js';
+import {normalizeWorkspaceLayout} from '../public/workspace-state.js';
+const facts=['Existing building has 37 apartments.', 'Proposed work: New construction', 'Proposed uses: Apartments and retail', 'Applicant has not confirmed construction type.'];
+const copy=structuredClone(facts), scope=assistantWorkContext(facts);
+assert.equal(scope.workType,'New construction');assert.equal(scope.uses,'Apartments and retail');
+assert.deepEqual(assistantWorkFacts(scope),[facts[1],facts[2],facts[0],facts[3]]);
+assert.deepEqual(facts,copy,'Reading context cannot change stored facts');
+assert.equal(assistantWorkContext(['Existing residential building']).workType,'Unspecified','Existing inventory does not establish proposed work');
+assert.deepEqual(assistantWorkFacts({workType:'Unspecified',uses:'',additionalFacts:''}),[]);
+const conflicting=['Proposed work: New construction','Proposed work: Alteration'];
+assert.deepEqual(assistantWorkFacts(assistantWorkContext(conflicting)),conflicting,'Do not silently discard additional facts with similar labels');
+assert.throws(()=>assistantWorkFacts({additionalFacts:Array.from({length:21},(_,i)=>`Fact ${i}`).join('\n')}));
+assert.throws(()=>assistantWorkFacts({uses:'a'.repeat(500)}));
+assert.throws(()=>assistantWorkFacts({additionalFacts:'Same\nSame'}));
+const view={tab:'work',collapsed:true,draft:{projectID:'project-a',...scope}};
+const normalized=normalizeAssistantViews({'utility:analysis':view});
+assert.deepEqual(normalizeWorkspaceLayout({researchViewState:{assistantViews:normalized}}).researchViewState.assistantViews,normalized,'Work drafts and selected-panel state must survive a workspace reload');
+assert.equal(normalizeAssistantViews({pane:{tab:'unknown',collapsed:'true',draft:{workType:null}}}).pane.draft.workType,'Unspecified');
+assert.equal(normalizeAssistantViews({pane:{draft:{workType:'Demolition'}}}).pane.draft.workType,'Demolition','Existing user-provided work labels survive a draft reload');
+assert.deepEqual(normalizeAssistantViews(null),{});
+console.log('Assistant context passed: scope stays explicit, existing facts survive, limits enforced, drafts and sidebar state reload.');
+
+const linked = {primaryProjectID:'a',projectContext:{projectID:'a',facts:['Proposed work: New construction']}};
+assert.equal(assistantDraftForConversation(linked,'a').workType,'New construction');
+assert.equal(assistantDraftForConversation(linked,'b').workType,'Unspecified','New chat cannot inherit another property');
+assert.equal(assistantDraftForConversation({...linked,projectContextReviewRequired:true},'a').workType,'Unspecified','New chat cannot bypass required context review');
+assert.equal(assistantDraftForConversation({...linked,projectContext:{projectID:'old',facts:linked.projectContext.facts}},'a').workType,'Unspecified');

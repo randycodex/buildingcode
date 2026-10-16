@@ -5,6 +5,7 @@ import vm from 'node:vm';
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const context = vm.createContext({
   state: { paneWeights: {}, readers: [], utilityInstances: [{id:'instance',key:'analysis',conversationID:'selected'}], paneWidthDefaultsVersion: 5 },
+  researchAssistantViews: new Map(),
   researchDraftPaneIDs: new Set(), researchConversationPaneIsOpen: () => true,
   paneIDForUtilityInstance: item => `utility:${item.key}:${item.id}`,
   paneIDs: [],
@@ -60,7 +61,7 @@ const mainPaneIDs = [
 ];
 for (const id of mainPaneIDs) {
   const reader = id.startsWith('reader:');
-  const minimum = reader ? 400 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 1000 : 600;
+  const minimum = reader ? 400 : /^(?:utility:analysis(?:$|:)|research:conversation:)/.test(id) ? 920 : 600;
   for (const count of [1, 2, 3, 4, 8]) {
     const ids = [id, ...Array.from({ length: count - 1 }, (_, index) => `reader:other-${index}`)];
     for (const restoredWidth of [350, 400, 520, 550, 600, 850, 900, 1200]) {
@@ -85,16 +86,18 @@ assert.equal(context.state.paneWeights['utility:archive'], 600, 'Other main colu
 context.researchConversationPaneIsOpen = () => false;
 context.state.utilityInstances = [{id:'instance',key:'analysis',conversationID:''}];
 for (const id of ['utility:analysis', 'utility:analysis:instance']) {
-  assert.equal(context.minimumPaneWidthForID(id),400);
-  assert.equal(context.defaultPaneWidthForID(id),400);
-  assert.equal(layout(id,[id,'reader:a'],1200).flex,'0 0 400px','Unselected Assistant stays compact even with a saved chat width.');
+  assert.equal(context.minimumPaneWidthForID(id),920);
+  assert.equal(context.defaultPaneWidthForID(id),920);
+  assert.equal(layout(id,[id,'reader:a'],1200).flex,'1 0 1200px','An empty Assistant retains its conversation composer.');
   context.researchDraftPaneIDs.add(id);
-  assert.equal(context.minimumPaneWidthForID(id),1000,'New chat reserves the message column.');
-  assert.equal(layout(id,[id,'reader:a'],400).flex,'1 0 1000px');
+  assert.equal(context.minimumPaneWidthForID(id),920,'New chat reserves the message column.');
+  context.researchAssistantViews.set(id,{collapsed:true});
+  assert.equal(context.minimumPaneWidthForID(id),920,'Legacy sidebar-collapse state cannot hide the fixed context panel.');
+  context.researchAssistantViews.delete(id);
   context.researchDraftPaneIDs.delete(id);
 }
 context.state.utilityInstances[0].conversationID='selected';
-assert.equal(context.minimumPaneWidthForID('utility:analysis:instance'),1000,'Selected chat retains a 600px message column beside its history.');
+assert.equal(context.minimumPaneWidthForID('utility:analysis:instance'),920,'Selected chat retains a 600px message column beside context.');
 console.log('Main column minimums passed: all main kinds, repeated utilities, saved narrow/wider widths, one through eight columns, and collapse.');
 for (const invalidWidth of [NaN, 0, -1]) {
   assert.equal(layout('reader:a', ['reader:a'], invalidWidth).flex, '0 0 600px', 'A missing or invalid Reader width uses the 600px default');
@@ -102,7 +105,7 @@ for (const invalidWidth of [NaN, 0, -1]) {
 assert.equal(context.defaultPaneWidthForID('reader:a'),600);
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
 assert.match(css, /\.reader-panel\s*\{\s*--pane-min-width: 400px;\s*max-width: 900px;/, 'CSS enforces the Reader limits before and after mounting');
-assert.match(css, /grid-template-columns: 400px minmax\(600px, 1fr\);/, 'Only the Assistant chat expands; its conversation history stays fixed at 400px');
+assert.match(css, /--assistant-sidebar-width: 320px;[\s\S]*?grid-template-columns: var\(--assistant-sidebar-width\) minmax\(600px, 1fr\);/, 'The Assistant keeps its 320px context sidebar beside a flexible 600px-minimum conversation');
 assert.match(css, /--workspace-content-max-width: 800px;/, 'Workspace reading content retains the 800px measure');
 assert.match(css, /\.reader-content > \*[^{}]*\{[^}]*max-width: var\(--workspace-content-max-width\);[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the shared centered text measure');
 console.log('Reader width contract passed: sole/restored/linked Readers, sharing, minimums, manual resizing, and text measure.');

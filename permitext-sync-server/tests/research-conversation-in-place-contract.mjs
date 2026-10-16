@@ -27,18 +27,20 @@ function fixture(primary = false) {
     return { dataset: { conversationId: id }, classList: classes(...(id === 'old' ? ['is-active'] : [])),
       querySelector: () => button, button };
   });
-  const pending = [];
+  const pending = [], sidebarContexts = [];
   const panel = { isConnected: true, dataset: {}, classList: classes('is-new-research-chat', 'has-research-composer', 'is-history-only'),
-    querySelector: () => body, querySelectorAll: () => rows, history };
+    querySelector: () => body, querySelectorAll: () => rows, history, _assistantSidebarUpdate: value => sidebarContexts.push(value) };
   const track = { querySelector: () => panel }; panel.parentNode = track;
   const context = vm.createContext({ state, track, CSS: { escape: value => value }, activeWorkspaceID: 'workspace',
+    activeResearchConversation: {id:"next",projectContext:{facts:["Proposed work: New construction"]}},
+    supplementalResearchConversations:new Map([["next",{id:"next",projectContext:{facts:["Proposed work: New construction"]}}],["newest",{id:"newest"}]]),
     researchDraftPaneIDs: new Set(), researchHistoryShowing: false, researchConversationPaneOpened: true,
     captureAccountRequest: () => identity, isCurrentAccountRequest: value => value === identity, hasCapability: () => true,
     applyPaneWeight() {}, notifyWorkspaceLayoutChange() {},
     renderResearchConversation: (id, options) => new Promise(resolve => pending.push({ id, options, resolve })) });
   vm.runInContext(actual('researchAssistantContentIdentity') + '\n' + actual('refreshResearchConversationInPlace'), context);
   const paneID = primary ? 'utility:analysis' : 'utility:analysis:one';
-  return { context, state, instance, panel, body, rows, pending, previous, history, paneID,
+  return { context, state, instance, panel, body, rows, pending, previous, history, paneID, sidebarContexts,
     changeAccount() { identity = 'account-b'; },
     refresh(id = 'next') { return context.refreshResearchConversationInPlace(paneID, id, primary ? null : instance); } };
 }
@@ -52,6 +54,8 @@ for (const primary of [false, true]) {
   const next = { conversationID: 'next' }; f.pending[0].resolve(next);
   assert.equal(await opening, 'updated');
   assert.equal(f.body.children[0], next); assert.equal(f.body.swaps, 1);
+  assert.equal(f.sidebarContexts[0].id,'next');
+  assert.equal(f.sidebarContexts[0].projectContext.facts[0],'Proposed work: New construction','Context must update with the visible conversation');
   assert.equal(f.panel.history, f.history, 'The history rail retains its original DOM and state.');
   assert.deepEqual(f.history, { scrollTop: 160, filter: 'project', cursor: 'older-page' });
   assert.equal(f.rows[0].button.attributes.has('aria-current'), false);
@@ -71,7 +75,7 @@ for (const invalidate of [
   f => { f.context.hasCapability = () => false; }
 ]) {
   const f = fixture(), opening = f.refresh(); invalidate(f); f.pending[0].resolve({ conversationID: 'next' });
-  assert.equal(await opening, 'stale'); assert.equal(f.body.children[0], f.previous);
+  assert.equal(await opening, 'stale'); assert.equal(f.body.children[0], f.previous); assert.equal(f.sidebarContexts.length,0);
 }
 const f = fixture(), first = f.refresh();
 f.instance.conversationID = 'newest'; const second = f.refresh('newest');
