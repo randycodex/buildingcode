@@ -116,7 +116,9 @@ export function createColumnExpansion({ host, columns, label, key = node => node
   observer.observe(host, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'class'] });
   const resize = new ResizeObserver(schedule);
   resize.observe(host);
-  const api = { refresh: schedule, restore, isExpanded: node => expanded === node,
+  const api = { refresh: schedule, restore,
+    reveal(node) { if (!node) return; expanded = null; active = node; render(); },
+    isExpanded: node => expanded === node,
     expand(node) { if (!expanded) savedScrollLeft = host.scrollLeft; active = expanded = node; render(true); host.scrollLeft = 0; },
     dispose() { disposed = true; observer.disconnect(); resize.disconnect(); tabs.remove(); } };
   // Nested report columns have their own header menus; ordinary workspace panes

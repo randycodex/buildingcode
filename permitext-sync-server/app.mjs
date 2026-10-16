@@ -1,3 +1,4 @@
+import { searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
 import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs";
 import { loadPreparedPassages } from "./research-prepared-passages.mjs";
 import { isAmbiguousResearchProjectCorrection } from "./research-project-scope.mjs";
@@ -23761,6 +23762,7 @@ async function codeSearchResults(hits, query, matchMode = "exact") {
       title: section.title,
       headerLine: section.headerLine,
       headingLine: section.headingLine,
+      definitionTerm: matchingSearchDefinition(section, query, plainText) || undefined,
       matchKind: searchTextMatchesExactQuery([section.sectionNumber, section.title, plainText], query) ? "exact" : "words",
       snippet: (matchMode === "words" ? searchWordsSnippet : searchSnippet)(plainText || section.title || "", query)
     };
@@ -23785,7 +23787,7 @@ async function groupedCodeSearchPage(hits, query, resultLimit, matchMode = "exac
     while (next < entries.length) {
       const index = next++;
       const source = entries[index];
-      const page = await exactSearchPage(source.hits, query, 0, Math.min(5, resultLimit), matchMode);
+      const page = await exactSearchPage(source.hits, query, 0, initialSearchGroupLimit(entries.length, resultLimit), matchMode);
       pages[index] = { codePrefix: source.codePrefix, codeVersion: source.codeVersion, ...page };
     }
   }));
@@ -23913,8 +23915,16 @@ async function handleCodeSearch(request, response) {
   const includeEnacted = !historical2014Requested && (codeFilter.size === 0 ||
     [...codeFilter].some((prefix) => enactedCodePrefixes.has(prefix)));
   const candidates = [];
+  const spellingSections = [];
+  const rememberSpellingSections = (catalog, family) => {
+    const permitted = allowedIDs(catalog, family);
+    spellingSections.push(...catalog.filter(section => (!permitted || permitted.has(section.id)) &&
+      (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
+      (!resultSource || section.codePrefix === resultSource.codePrefix && codeSearchSectionVersion(section) === resultSource.codeVersion)));
+  };
   if (includeConstruction && familyEnabled("construction")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => sectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => sectionCatalog());
+    rememberSpellingSections(scopedCatalog, "construction");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "construction");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => shippedSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
@@ -23924,7 +23934,8 @@ async function handleCodeSearch(request, response) {
     ));
   }
   if (includeHistorical2014 && familyEnabled("historical2014")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
+    rememberSpellingSections(scopedCatalog, "historical2014");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "historical2014");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
@@ -23934,14 +23945,16 @@ async function handleCodeSearch(request, response) {
     ));
   }
   if (includeZoning && familyEnabled("zoning")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
+    rememberSpellingSections(scopedCatalog, "zoning");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "zoning");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => zoningSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
     candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
   }
   if (includeExistingBuilding && familyEnabled("existingBuilding")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
+    rememberSpellingSections(scopedCatalog, "existingBuilding");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "existingBuilding");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
@@ -23952,7 +23965,8 @@ async function handleCodeSearch(request, response) {
     );
   }
   if (includeEnacted && familyEnabled("enacted")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
+    rememberSpellingSections(scopedCatalog, "enacted");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "enacted");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => enactedSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
@@ -23963,22 +23977,23 @@ async function handleCodeSearch(request, response) {
       )
     );
   }
+  const definitionBodies = new Map();
+  const definitionCandidates = candidates.filter(section => isSearchDefinitionSection(section) &&
+    (!resultSource || section.codePrefix === resultSource.codePrefix && codeSearchSectionVersion(section) === resultSource.codeVersion));
+  for (let index = 0; index < definitionCandidates.length; index += exactSearchConcurrency) {
+    await Promise.all(definitionCandidates.slice(index, index + exactSearchConcurrency).map(async section => {
+      const body = await searchableSectionPlainText(section).catch(() => null);
+      if (body !== null) definitionBodies.set(section, body);
+    }));
+  }
+  const spellingSuggestions = () => searchSpellingSuggestions(query, searchVocabulary(spellingSections));
   const hits = timePublicCodePhase("ranking", () => {
     const hits = candidates.filter(section => !resultSource ||
       (section.codePrefix === resultSource.codePrefix &&
         codeSearchSectionVersion(section) === resultSource.codeVersion)).map((section) => {
-      const sectionNumber = String(section.sectionNumber || "").toLowerCase();
-      const title = String(section.title || "").toLowerCase();
-      const rank = sectionNumber === normalizedQuery
-        ? 0
-        : sectionNumber.startsWith(normalizedQuery)
-          ? 1
-          : title.includes(normalizedQuery)
-            ? 2
-            : matchMode === "words"
-              ? 3 - queryTokens.filter(word => matchesSearchWords(title, word)).length / Math.max(1, queryTokens.length)
-              : 3;
-      return { section, rank };
+      const plainText = definitionBodies.get(section);
+      const rank = searchRelevanceRank(section, query, matchMode, plainText);
+      return { section, rank, ...(plainText === undefined ? {} : {plainText}) };
     });
     hits.sort((left, right) =>
       left.rank - right.rank ||
@@ -23995,6 +24010,7 @@ async function handleCodeSearch(request, response) {
 
   if (exactMatch && url.searchParams.get("grouped") === "true" && !resultSource) {
     const page = await timePublicCodePhase("exact_match", () => groupedCodeSearchPage(hits, query, resultLimit, matchMode));
+    if (!page.results.length && !page.hasMore) page.suggestions = spellingSuggestions();
     sendPublicCodeJSON(request, response, page);
     return;
   }
@@ -24024,6 +24040,7 @@ async function handleCodeSearch(request, response) {
     nextOffset,
     ...(exactPage ? { nextCandidateOffset: exactPage.nextCandidateOffset } : {}),
     cursorKind: exactPage ? "candidate" : "offset",
+    ...(!results.length && !hasMore ? {suggestions: spellingSuggestions()} : {}),
     hasMore,
     limited: hasMore
   });

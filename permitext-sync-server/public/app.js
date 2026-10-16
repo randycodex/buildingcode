@@ -1,4 +1,4 @@
-import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=3";
+import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
@@ -123,7 +123,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261016-column-expansion-v1110";
+} from "./offline-storage.js?v=20261016-search-relevance-v1113";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -156,7 +156,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261016-column-expansion-v1110";
+} from "./workspace-state.js?v=20261016-search-relevance-v1113";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -7253,7 +7253,7 @@ function searchResultPresentation(result, query = "") {
   const parentTitle = clean(result.headingLine);
   // Numbered list items sometimes contain an entire paragraph as their title.
   // Keep the supplied parent citation; never manufacture a subsection number.
-  const heading = title && title.length <= 110 ? title : parentTitle || "Code passage";
+  const heading = result.definitionTerm ? `Definition: ${result.definitionTerm.toLocaleLowerCase()}` : title && title.length <= 110 ? title : parentTitle || "Code passage";
   const citation = [result.codePrefix || "BC", researchCodeEdition(result),
     parent && parent !== number && parent !== `${result.codePrefix || "BC"} ${number}` ? `Section ${parent}` : "",
     number ? `${parent && !number.startsWith(parent.replace(/^[A-Z]+\s+/, "")) ? "Item " : "§ "}${number}` : ""
@@ -18305,7 +18305,22 @@ function refreshSearchGroupCounts(results) {
   });
 }
 
+function updateSearchScopeSummary(panel, instance) {
+  const button = panel.querySelector(".search-scope-summary");
+  if (!button) return;
+  const {catalog, preferences, error} = activeCodeSourcesController.state;
+  const sources = catalog?.filter(source => preferences?.isEnabled(source));
+  const labels = sources ? activeCodeSourceMenuRows(sources).map(row => row.label) : [];
+  button.textContent = error ? 'Source selection unavailable' : !catalog ? 'NYC · All codebooks & editions'
+    : !sources.length ? 'NYC · No code sources enabled' : sources.length === catalog.length ? `NYC · All ${sources.length} codebooks & editions`
+    : labels.length > 2 ? `NYC · ${labels.length} selected codebooks & editions` : `NYC · ${labels.join(' · ')}`;
+  button.title = labels.join('\n') || 'Choose code sources and editions';
+  const mode = panel.querySelector('.search-visible-match-mode');
+  if (mode) mode.textContent = instance?.matchMode === 'exact' ? 'Exact phrase' : 'All words';
+}
+
 function updateSearchDock(panel, instance, resultCount = null, options = {}) {
+  updateSearchScopeSummary(panel, instance);
   const query = String(instance?.query || "").trim();
   const summary = panel.querySelector(".search-result-summary");
   const summaryCopy = panel.querySelector(".search-result-summary-copy");
@@ -18811,6 +18826,11 @@ async function renderSearch(instance, options = {}) {
   sourcesButton.setAttribute("aria-expanded", "false");
   sourcesButton.setAttribute("aria-haspopup", "menu");
   sourcesButton.addEventListener("click", () => openSearchCodeSourceSettings(panel));
+  panel.querySelector('.search-scope-summary')?.addEventListener('click', () => openSearchCodeSourceSettings(panel));
+  const scopeToken = activeCodeSourcesController.captureContext();
+  void activeCodeSourcesController.ensureCatalog().then(() => {
+    if (panel.isConnected && activeCodeSourcesController.isCurrent(scopeToken)) updateSearchScopeSummary(panel, searchInstance);
+  }).catch(() => { if (panel.isConnected) updateSearchScopeSummary(panel, searchInstance); });
   const clearButton = panel.querySelector(".search-clear-button");
   applyPaneWeight(panel, paneID);
   input.value = searchInstance.query || "";
@@ -19106,6 +19126,19 @@ async function renderSearchResults(panel, instance) {
       title: matchMode === "words" ? "No matches for all words" : "No exact match",
       body: matchMode === "words" ? `No section containing all these words was found in ${scope}. Try fewer words or a section number.` : `Search looks for this phrase together in section titles or code text. It was not found in ${scope}. Try a shorter phrase or a section number${terms.length ? ", or search one term below." : "."}`
     });
+    for (const suggestion of payload.suggestions || []) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'ghost-button search-spelling-suggestion';
+      button.textContent = `Search “${suggestion}” instead`;
+      button.addEventListener('click', () => {
+        if (!isCurrent()) return;
+        searchInstance.query = suggestion;
+        panel.querySelector('.search-input').value = suggestion;
+        saveWorkspaceState();
+        void renderSearchResults(panel, searchInstance);
+      });
+      results.querySelector('.reader-empty')?.append(button);
+    }
     for (const term of terms) {
       const termButton = document.createElement("button");
       termButton.type = "button";
@@ -19228,7 +19261,7 @@ function applyInitialSearchGroupExpansion(instance, matches, sourceScope, { hasM
   if (!matches.some((result) => expanded.has(sourceKey(result)))) {
     const explicitlyScopedEdition = instance.searchEdition && instance.searchEdition !== "all";
     const completeSingleSource = !hasMore && new Set(matches.map(sourceKey)).size === 1;
-    if (explicitlyScopedEdition || completeSingleSource) instance.defaultExpandedResultSource = sourceKey(matches[0]);
+    if (explicitlyScopedEdition || sourceScope?.enabledSourceCount === 1 || completeSingleSource) instance.defaultExpandedResultSource = sourceKey(matches[0]);
   }
   return true;
 }
@@ -37499,6 +37532,9 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   }
   await transitionWorkspace("utility", { refreshPaneIDs: retainedPanel ? [] : [paneID] });
   if (!navigationIsCurrent() || !await whenWorkspacePaneReady(paneID) || !navigationIsCurrent()) return null;
+  const destinationPanel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (destinationPanel && paneIsCollapsed(paneID)) setPaneCollapsed(destinationPanel, false);
+  columnExpansionController().reveal(destinationPanel);
   revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor, {preferPassage: fromSearch});
   scrollPaneIntoView(paneID);
   return reader;
@@ -39140,7 +39176,7 @@ function openSearchCodeSourceSettings(panel) {
   const existing = panel.querySelector(".search-code-source-menu");
   if (existing) { existing._close(); return; }
   document.querySelector(".column-group-menu")?._close?.();
-  const trigger = panel.querySelector(".column-group-menu-button");
+  const trigger = panel.querySelector(".search-scope-summary") || panel.querySelector(".column-group-menu-button");
   const menu = document.createElement("section");
   menu.className = "column-group-menu search-code-source-menu";
   menu.id = `search-code-sources-${crypto.randomUUID()}`;
@@ -39188,8 +39224,10 @@ function openSearchCodeSourceSettings(panel) {
   const position = () => {
     const rect = trigger.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
+    const menuWidth = Math.min(360, panelRect.width - 16);
     menu.style.top = `${rect.bottom - panelRect.top + 6}px`;
-    menu.style.right = `${Math.max(8, panelRect.right - rect.right)}px`;
+    menu.style.left = `${Math.max(8, Math.min(rect.left - panelRect.left, panelRect.width - menuWidth - 8))}px`;
+    menu.style.right = 'auto';
     menu.style.maxHeight = `${Math.max(0, Math.min(560, window.innerHeight - rect.bottom - 14, panelRect.bottom - rect.bottom - 14))}px`;
   };
   menu._close = dismiss;

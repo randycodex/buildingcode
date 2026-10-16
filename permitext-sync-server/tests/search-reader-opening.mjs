@@ -1,3 +1,4 @@
+const visibleReaderReveals = [];
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -8,7 +9,7 @@ const existing={id:'reader',codePrefix:'BC',codeVersion:'edition',chapterID:'2',
 const untouched={id:'other',codePrefix:'PC',chapterID:'10',sectionID:'100'};
 const content={classList:{contains:()=>false},querySelectorAll:()=>[{dataset:{sectionId:'113',sectionAliases:'114 115'}}]};
 const panel={dataset:{readerPublicCorpusGeneration:'1'},querySelector:name=>name==='.reader-content'?content:{value:''}};
-const c=vm.createContext({state:{readers:[existing,untouched],paneWeights:{}},activeWorkspaceID:'workspace',
+const c=vm.createContext({columnExpansionController:()=>({reveal:node=>visibleReaderReveals.push(node)}),paneIsCollapsed:()=>false,state:{readers:[existing,untouched],paneWeights:{}},activeWorkspaceID:'workspace',
   workspaceColumnsRequireProject:()=>false,currentColumnWorkflowView:()=> 'research',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,
   workflowPaneIsVisible:()=>true,resolveReaderSource:item=>new Promise(resolve=>requests.push(()=>resolve(item))),
   searchResultDetail:item=>item,readerFieldsForSectionDetail:item=>item,normalizeAnnotationBlockID:id=>id||'',
@@ -39,3 +40,5 @@ assert.equal(c.retainReaderForSource(existing,target('999')),null,'Unloaded pass
 c.publicCodeRevision.generation=2;
 assert.equal(c.retainReaderForSource(existing,target('115')),null,'Invalidated corpus forces fresh manifest and body validation');
 console.log('Actual result-opening flow reuses loaded text, keeps latest click and rejects mismatched sources.');
+
+assert(visibleReaderReveals.length > 0, 'Explicit source navigation reveals its destination through the shared column layout.');

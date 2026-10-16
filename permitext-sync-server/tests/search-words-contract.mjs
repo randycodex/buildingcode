@@ -1,3 +1,4 @@
+import { searchRelevanceRank, matchingSearchDefinition } from "../public/search-relevance.js";
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from '../public/search-words.js';
@@ -35,7 +36,7 @@ try {
   const page=await get({q});
   assert.equal(page.results.find(r=>r.codeVersion.includes('/2022-')).sectionNumber, '1020.4', q+' must rank BC 2022 Dead ends first');
   assert(page.results.every(r=>r.codePrefix==='BC'));
-  assert(page.groups.every(g=>page.results.filter(r=>r.codeVersion===g.codeVersion).length<=5));
+  assert(page.groups.every(g=>page.results.filter(r=>r.codeVersion===g.codeVersion).length<=(page.groups.length===1?12:8)));
  }
  const exact=await get({q:'dead end corridor',match:'exact'});
  assert(!exact.results.some(r=>r.sectionNumber==='1020.4' && r.codeVersion.includes('/2022-')));
@@ -79,7 +80,7 @@ const db={close(){},transaction(){return {objectStore(){return {index(){return {
  const advance=()=>{request.result=i<records.length?{value:records[i++],continue:()=>queueMicrotask(advance)}:null;request.onsuccess();};
  queueMicrotask(advance);return request;
 }};}};}};}};
-const context=vm.createContext({openDatabase:async()=>db,sectionsStoreName:'sections',IDBKeyRange:{only:x=>x},matchesSearchWords,searchWords,searchWordsSnippet,searchSnippet:searchWordsSnippet});
+const context=vm.createContext({searchRelevanceRank, matchingSearchDefinition,openDatabase:async()=>db,sectionsStoreName:'sections',IDBKeyRange:{only:x=>x},matchesSearchWords,searchWords,searchWordsSnippet,searchSnippet:searchWordsSnippet});
 vm.runInContext(actual,context);
 const offlineMatches=await context.matchingOfflineSearchResults('test',{codeFilter:new Set(['BC']),normalizedQuery:'dead-end corridor',query:'dead-end corridor',tokens:searchWords('dead-end corridor'),matchMode:'words',sourceScope:{permits:section=>section.codeVersion==='2022'}});
 assert.deepEqual(Array.from(offlineMatches,x=>x.result.id),[1]);

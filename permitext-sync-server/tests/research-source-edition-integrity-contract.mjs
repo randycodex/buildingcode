@@ -1,3 +1,4 @@
+import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "../public/search-relevance.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -86,6 +87,7 @@ function clientHarness(overrides = {}) {
   const controller = createActiveCodeSourceController({storage: {getItem: () => null, setItem() {}}, loadCatalog: async () => sourceCatalog});
   controller.setContext({accountID: "fixture", sessionID: "1"});
   const context = vm.createContext({
+    track:{querySelector:()=>null}, CSS:{escape:value=>value}, columnExpansionController:()=>({reveal(){}}),
     createActiveCodeSourceNavigationGuard, activeCodeSourcesController: controller,
     captureAccountRequest: () => "fixture", isCurrentAccountRequest: token => token === "fixture", activeWorkspaceID: "fixture",
     whenWorkspacePaneReady: async () => true,
@@ -265,6 +267,7 @@ const installMetadata = {
 };
 function offlineHarness(records, chapters, metadata = installMetadata) {
   const context = vm.createContext({
+    searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions,
     codeSourceIdentity, codeSourceKey, parseActiveCodeSearchScope,
     URL, defaultCodeVersion: defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
     syncCodeVersion, syncCodeVersionForPrefix, chaptersStoreName: "chapters", sectionsStoreName: "sections",

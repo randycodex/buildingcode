@@ -20633,3 +20633,9 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
   .has-column-tabs > .assistant-workspace.is-column-expanded { --assistant-sidebar-width: min(240px, 32vw); grid-template-columns: var(--assistant-sidebar-width) minmax(0, 1fr); }
   .has-column-tabs .assistant-body .research-dialogue-pane { min-width: 0; }
 }
+
+.search-visible-context { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-width: 0; margin-top: 8px; color: var(--text-secondary); font-size: 12px; }
+.search-scope-summary { padding: 0; min-width: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-scope-summary:hover { color: var(--text-primary); }
+.search-visible-match-mode { flex: 0 0 auto; }
+.search-spelling-suggestion { margin-top: 8px; }
