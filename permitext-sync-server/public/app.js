@@ -122,7 +122,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261015-assistant-work-sidebar-v1105";
+} from "./offline-storage.js?v=20261016-assistant-composer-fade-v1106";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -155,7 +155,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261015-assistant-work-sidebar-v1105";
+} from "./workspace-state.js?v=20261016-assistant-composer-fade-v1106";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,

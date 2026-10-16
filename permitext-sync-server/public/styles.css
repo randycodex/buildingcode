@@ -20286,6 +20286,20 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .assistant-workspace .research-conversation-content { padding-top: 0; gap: 0; }
 .assistant-workspace .research-dialogue-pane { position: relative; }
 .assistant-workspace .research-message-thread { padding-top: 24px; }
+/* Match the Reader's soft edge where messages meet the fixed composer. */
+.assistant-workspace .research-dialogue-pane > .research-compact-composer { position: relative; }
+.assistant-workspace .research-dialogue-pane > .research-compact-composer::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: var(--panel-padding);
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to top, var(--surface), transparent);
+}
+
 .assistant-body > *, .research-conversation-panel > .research-conversation-content { width: 100%; max-width: var(--workspace-content-max-width); min-width: 0; margin-inline: auto; }
 .assistant-body > .research-conversation-embedded { min-height: 0; display: grid; overflow: hidden; }
 .assistant-workspace.is-new-research-chat > .assistant-body { grid-template-rows: minmax(0, 1fr) auto auto; }
