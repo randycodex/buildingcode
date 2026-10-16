@@ -21,8 +21,8 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1675";
-const shellAssetVersion = "20261015-assistant-context-sidebar-v1090";
+const shellCacheName = "permitext-pro-shell-v1676";
+const shellAssetVersion = "20261015-assistant-context-sidebar-v1091";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -69,21 +69,21 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261015-assistant-context-sidebar-v1090",
+  "/web/styles.css?v=20261015-assistant-context-sidebar-v1091",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261015-assistant-context-sidebar-v1090",
+  "/web/app.js?v=20261015-assistant-context-sidebar-v1091",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261015-assistant-context-sidebar-v1090",
+  "/web/offline-storage.js?v=20261015-assistant-context-sidebar-v1091",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
-  "/web/workspace-state.js?v=20261015-assistant-context-sidebar-v1090",
+  "/web/workspace-state.js?v=20261015-assistant-context-sidebar-v1091",
   "/web/assistant-context.js?v=2",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
