@@ -4,7 +4,7 @@ import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "./r
 import { researchPracticalNextStepPrompt } from "./research-practical-next-step.mjs";
 import { occupantLoadDraftInstruction } from "./research-occupant-load-draft.mjs";
 
-export const researchWriterPolicyVersion = "20261017-calculator-draft-writer-v7";
+export const researchWriterPolicyVersion = "20261017-calculator-footnotes-writer-v8";
 
 // The writer has one general policy. Retrieval, citation validation, factual
 // qualification, semantic review and freshly verified repairs remain in code.
@@ -47,6 +47,7 @@ export function researchWriterContext({ question, sources, options = {}, earlier
   const context = {
     codeBasis: options.codeBasis,
     projectFacts: options.projectContextFacts,
+    calculatorWorkFacts: options.calculatorWorkFacts,
     conversationFacts: options.conversationFactContext,
     earlierUserStatements,
     conversation: (options.messages || []).slice(-8).map(message => ({

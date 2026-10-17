@@ -164,6 +164,34 @@ export function occupantLoadPrefill(answer, source) {
   return suggestions.length ? {...values, reviewed: false, suggestions} : {};
 }
 
+export function occupantLoadFootnoteAssessment(answer, source) {
+  if (answer?.verification?.pass !== true || !Array.isArray(answer.occupantLoadDraft?.footnoteChecks)) return null;
+  const selection=occupantLoadPrefill(answer,source);
+  if (!selection.factor) return null;
+  return {selection,sourceID:answer.occupantLoadDraft.sourceID,checks:answer.occupantLoadDraft.footnoteChecks.slice(0,5),
+    workFacts:answer.occupantLoadDraft.footnoteWorkFacts||[]};
+}
+
+export function occupantLoadFootnoteState(assessment, table, row, input) {
+  if (!assessment || !row || occupantLoadSuggestedRow(assessment.selection,table)?.id!==row.id ||
+    ['area','seating'].some(key=>String(assessment.selection[key]||'')!==String(input[key]||'')) ||
+    String(assessment.selection.areaBasis||'')!==String(input.userMeasurementBasis||'')) return null;
+  return row.footnotes.map(note=>{
+    const check=assessment.checks.find(check=>check.sourceID===assessment.sourceID && check.marker===note.marker && compact(check.footnoteText)===compact(note.text) &&
+      ['applies','not_applicable','needs_information'].includes(check.status));
+    return {...note,check:check||null};
+  });
+}
+
+export function occupantLoadFootnoteQuestion(input) {
+  return ['Check which footnotes of 2022 NYC BC Table 1004.1.3 apply to this selected calculation.',
+    `Function of space: ${input.spaceFunction}.`,
+    input.area?`The calculator floor area is ${input.area} square feet${input.userMeasurementBasis?` of ${input.userMeasurementBasis} area`:''}.`:'The calculator area is blank; reuse earlier stated values only if their measurement basis is established.',
+    input.seating==='without-fixed-seating'?'This space has no fixed seating.':input.seating==='fixed-seating'?'This space has fixed seating.':'The seating condition has not been entered.',
+    'Use the existing conversation and current Work facts, respecting later corrections and the specific space. The selected code row does not establish how the area was measured. Ask only for genuinely missing information that could affect the calculation or its applicability. Do not infer approvals, deduct area automatically or declare overall compliance.'
+  ].join('\n');
+}
+
 export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '') {
   if (!calculation?.valid || !evidenceLinks?.length) throw new Error('Complete the calculation and link its governing source first.');
   const c = calculation.input;
@@ -184,9 +212,10 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '')
   return blocks;
 }
 
-export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote}) {
+export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes}) {
   const initialDraft = {...draft};
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
+  let userMeasurementBasis = draft.userMeasurementBasis ?? draft.areaBasis ?? '';
   let table = null, loading = false;
   const root = document.createElement('details');
   root.className = 'occupant-load-card';
@@ -225,12 +254,23 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
   });
   const result = document.createElement('output'); result.className = 'calculation-result'; result.setAttribute('aria-live', 'polite');
   const formula = document.createElement('p'); formula.className = 'calculation-formula';
+  const footnotes = document.createElement('section'); footnotes.className='calculation-footnote-checks';
+  const checkNotes = document.createElement('button'); checkNotes.type='button';checkNotes.className='ghost-button';
+  checkNotes.textContent='Check footnotes in Assistant';
+  checkNotes.addEventListener('click',async()=>{
+    checkNotes.disabled=true;
+    try {await onCheckFootnotes?.({...draft});} catch(error){status.textContent=error.message;}
+    finally {update();}
+  });
+  let invalidatedAnswerID='';
+  root.addEventListener('calculation-context-changed',()=>{invalidatedAnswerID=(getAssessment?.()||assessment)?.answerID||'';assessment=null;update();});
+  root.addEventListener('calculation-assessment-refreshed',()=>update());
   const actions = document.createElement('div'); actions.className = 'calculation-actions';
   const save = document.createElement('button'); save.type = 'submit'; save.className = 'ghost-button'; save.textContent = 'Save calculation to Notebook';
   const open = document.createElement('button'); open.type = 'button'; open.className = 'ghost-button'; open.textContent = 'Open in Notebook'; open.hidden = true;
   open.addEventListener('click', async () => {try {await onOpenNote?.(savedCard);} catch (error) {status.textContent = error.message;}});
   let busy = false, savedCard = null, savedFingerprint = '';
-  const values = () => occupantLoadTableInput({area: fields.area.value, seating: fields.seating.value, areaMeasurementBasis}, table, fields.spaceFunction.value);
+  const values = () => occupantLoadTableInput({area: fields.area.value, seating: fields.seating.value, areaMeasurementBasis,userMeasurementBasis}, table, fields.spaceFunction.value);
   const update = () => {
     Object.assign(draft, values());
     const row = table?.rows.find(row => row.id === draft.tableRowID);
@@ -243,6 +283,37 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     const hasResult = calculation.previewPeople !== null;
     const fixedSeating = draft.seating === 'fixed-seating';
     const special = row && row.method !== 'area';
+    footnotes.replaceChildren();
+    const currentAssessment=getAssessment?.()||assessment;
+    const checks=occupantLoadFootnoteState(currentAssessment?.answerID && currentAssessment.answerID===invalidatedAnswerID?null:currentAssessment,table,row,draft);
+    if(checks) {
+      const heading=document.createElement('p');heading.className='calculation-footnote-heading';heading.textContent='Footnote checks';footnotes.append(heading);
+      const questions=new Set();
+      for(const note of checks) {
+        const item=document.createElement('div');item.className='calculation-footnote-item';
+        const link=document.createElement('button');link.type='button';link.className='calculation-source';
+        link.textContent=`Footnote ${note.marker}`;
+        link.addEventListener('click',()=>void Promise.resolve(onOpenSource({exact:note.text})).catch(error=>{status.textContent=error.message;}));
+        const state=document.createElement('span');state.textContent=note.check?({applies:'Applies',not_applicable:'Not applicable',needs_information:'Needs information'}[note.check.status]):'Not checked';
+        item.append(link,state);
+        if(note.check) {
+          const why=document.createElement('p');why.textContent=note.check.reason;item.append(why);
+          for(const fact of note.check.factQuotes||[]) {const quote=document.createElement('blockquote');quote.textContent=fact.quote;item.append(quote);}
+          if(note.check.status==='needs_information' && note.check.question && !questions.has(note.check.question)) {
+            questions.add(note.check.question);const question=document.createElement('p');question.className='calculation-footnote-question';question.textContent=note.check.question;item.append(question);
+          }
+        }
+        footnotes.append(item);
+      }
+      if(questions.size && onReplyFootnotes) {
+        const reply=document.createElement('button');reply.type='button';reply.className='ghost-button';reply.textContent='Reply in Assistant';
+        reply.addEventListener('click',()=>void Promise.resolve(onReplyFootnotes()).catch(error=>{status.textContent=error.message;}));footnotes.append(reply);
+      }
+    }
+    checkNotes.hidden=!onCheckFootnotes || !row || special;
+    checkNotes.disabled=busy || !table;
+    checkNotes.textContent=checks?'Recheck footnotes in Assistant':'Check footnotes in Assistant';
+    if(!checkNotes.hidden) footnotes.append(checkNotes);
     result.classList.toggle('is-pending', !hasResult);
     result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} people`
       : fixedSeating || special ? 'Separate method required' : 'Complete calculation inputs';
@@ -264,7 +335,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
         fields.seating.value = 'fixed-seating'; fields.seating.dispatchEvent(new Event('change', {bubbles: true}));
       }
     }
-    if (event.target === fields.area) areaMeasurementBasis = table?.rows.find(row => row.id === fields.spaceFunction.value)?.areaBasis || '';
+    if (event.target === fields.area) {areaMeasurementBasis = table?.rows.find(row => row.id === fields.spaceFunction.value)?.areaBasis || '';userMeasurementBasis=areaMeasurementBasis;}
     status.textContent = ''; update();
   };
   form.addEventListener('input', handleInput);
@@ -303,7 +374,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     } catch (error) {table = null; status.textContent = error.message;}
     finally {loading = false;}
   });
-  actions.append(save, open); form.append(result, formula, actions);
+  actions.append(save, open); form.append(result, formula, footnotes, actions);
   if (!draft.suggestions?.length) body.append(scope);
   body.append(source);
   body.append(form, status); root.append(summary, body); update();

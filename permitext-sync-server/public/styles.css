@@ -20653,6 +20653,15 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .occupant-load-form input[readonly], .occupant-load-form textarea[readonly] { cursor: default; }
 .calculation-function-search { position: sticky; top: 0; width: 100%; margin: 0 0 6px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface-muted); color: var(--text-primary); font: inherit; }
 .calculation-function-menu .custom-select-option[hidden] { display: none; }
+.calculation-footnote-checks { grid-column: 1 / -1; font-size: 12px; }
+.calculation-footnote-checks:empty { display: none; }
+.calculation-footnote-heading { margin: 0 0 8px; color: var(--text-secondary); }
+.calculation-footnote-item { padding: 10px 0; border-top: 1px solid var(--border); }
+.calculation-footnote-item > span { margin-left: 12px; color: var(--text-secondary); }
+.calculation-footnote-item p { margin: 6px 0; }
+.calculation-footnote-item blockquote { margin: 6px 0; padding-left: 10px; border-left: 1px solid var(--border); color: var(--text-secondary); }
+.calculation-footnote-question { font-weight: 500; }
+.calculation-footnote-checks > button { font-size: 12px; }
 .calculation-result { grid-column: 1 / -1; font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .calculation-result.is-pending { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
 .calculation-status:empty { display: none; }

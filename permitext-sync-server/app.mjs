@@ -10948,7 +10948,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
         normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
         passageEvidence,
         supportingSources,
-        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, allowEvidenceGapOnly: options.allowEvidenceGapOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText, question, messages: options.messages }
+        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, allowEvidenceGapOnly: options.allowEvidenceGapOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText, question, messages: options.messages, calculatorWorkFacts: options.calculatorWorkFacts }
       ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
@@ -11158,6 +11158,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
   interpretation = structuredClone(interpretation);
   options = { ...options, mappedScopeReview: structuredClone(options.mappedScopeReview),
     messages: structuredClone(options.messages), projectContextFacts: structuredClone(options.projectContextFacts),
+    calculatorWorkFacts: structuredClone(options.calculatorWorkFacts),
     conversationFactContext: structuredClone(options.conversationFactContext),
     applicabilityFactContext: structuredClone(options.applicabilityFactContext),
     sourceAvailability: structuredClone(options.sourceAvailability) };
@@ -11321,6 +11322,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
         ? `UNTRUSTED CONVERSATION CONTEXT — resolve follow-ups and supplied facts; prior assistant claims are not authority.\n${JSON.stringify(options.messages.slice(-8).map(message => ({ role: message.role, question: message.question, answerText: message.answer?.answerText }))).slice(0, 20_000)}`
         : "",
       researchPropertyInvestigationInstruction(options.propertyResearch),
+      options.calculatorWorkFacts?.length
+        ? `CURRENT WORK FACTS FOR CALCULATOR — USER-SUPPLIED PROPOSED WORK; SEPARATE FROM EXISTING-SITE RECORDS\n${options.calculatorWorkFacts.join("\n")}`
+        : "",
       options.projectContextFacts?.length
         ? `PROJECT FACTS\n${options.projectContextFacts.join("\n")}`
         : "",
@@ -20860,6 +20864,7 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_conclusion", "active");
     let answerEscalated = false;
     const interpretationOptions = {
+      calculatorWorkFacts: [...manualProjectFacts],
       allowEvidenceGapOnly: openInvestigation,
       corpusPlan,
       sourceAvailability: evidencePackage.sourceAvailability,
@@ -21000,7 +21005,7 @@ async function handleResearchConversationMessage(request, response) {
         // Use the ordinary citation validator to retain complete source metadata
         // and passages. Keep existing prose, points and citations byte-for-byte;
         // the independent verifier below must review every newly bound rule.
-        const normalized = validateResearchInterpretation(boundAnswer, assembledEvidence, webSupport.sources, {question, messages: activeMessages});
+        const normalized = validateResearchInterpretation(boundAnswer, assembledEvidence, webSupport.sources, {question, messages: activeMessages, calculatorWorkFacts: [...manualProjectFacts]});
         boundAnswer = { ...boundAnswer, citations: normalized.citations };
       }
       return {
@@ -21322,7 +21327,7 @@ async function handleResearchConversationMessage(request, response) {
             applicabilityFactContext,
             propertyResearch,
             messages: activeMessages,
-            projectContextFacts: combinedProjectFacts, conversationFactContext,
+            projectContextFacts: combinedProjectFacts, calculatorWorkFacts: [...manualProjectFacts], conversationFactContext,
             webSupport, allowOfficialGuidanceOnly, codeBasis: answerCodeBasis,
             requiredClaims, structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             zoningPlan, zoningDeterministicContext,
@@ -21444,6 +21449,7 @@ async function handleResearchConversationMessage(request, response) {
             propertyResearch,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
+            calculatorWorkFacts: [...manualProjectFacts],
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
@@ -21702,6 +21708,7 @@ async function handleResearchConversationMessage(request, response) {
             propertyResearch,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
+            calculatorWorkFacts: [...manualProjectFacts],
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,

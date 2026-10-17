@@ -1,5 +1,5 @@
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
-import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, calculationNoteBlocks } from "./occupant-load-calculation.js?v=16";
+import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=19";
 import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-calculation-table-v1137";
+} from "./offline-storage.js?v=20261017-calculator-footnotes-v1142";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-calculation-table-v1137";
+} from "./workspace-state.js?v=20261017-calculator-footnotes-v1142";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -15796,7 +15796,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   sectionWrapper.append(headingRow);
 
   if (privateContentAllowed) {
-    const calculation = renderOccupantLoadCalculation(readerPassagePayload(section, reader, annotationTargetForSection(section, reader)));
+    const calculation = renderOccupantLoadCalculation(readerPassagePayload(section, reader, annotationTargetForSection(section, reader)), {getConversation:()=>calculatorConversationForPane(reader.sourceAnchorPaneID)});
     if (calculation) sectionWrapper.append(calculation);
   }
 
@@ -16468,7 +16468,53 @@ function showNotebookSavedLink(anchor, project, card) {
   message.append(status, open); container.append(message);
 }
 
-function renderOccupantLoadCalculation(source, {anchor, conversationID = "", answerID = "", answer = null} = {}) {
+function calculatorConversationForPane(paneID = "") {
+  const conversations=[activeResearchConversation,...supplementalResearchConversations.values()].filter(Boolean);
+  if(paneID) return conversations.find(item=>paneIDForResearchConversation(item.id)===paneID) || null;
+  const visible=conversations.filter(item=>researchConversationInWorkspace(item) &&
+    track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneIDForResearchConversation(item.id))}"]`));
+  const unique=[...new Map(visible.map(item=>[item.id,item])).values()];
+  return unique.length===1?unique[0]:null;
+}
+
+function calculatorFootnoteAssessmentFor(source, conversation, answerID = "") {
+  if (!conversation || conversation.projectContextReviewRequired || !researchConversationInWorkspace(conversation)) return null;
+  const latest=conversation.messages?.at(-1);
+  if (latest?.role!=="assistant" || (answerID && latest.id!==answerID) ||
+    Number(latest.contextRevision||0)!==Number(conversation.contextRevision||0)) return null;
+  const pending=reconciledResearchProgressSession(conversation);
+  if (pending && ["active","retrying"].includes(pending.status)) return null;
+  const citation=latest.answer?.citations?.find(item=>occupantLoadSource(item) &&
+    String(item.sectionID)===String(source.sectionID||source.id) &&
+    String(item.codeVersion||item.sourceLibraryVersion)===String(source.codeVersion||source.sourceLibraryVersion));
+  if(!citation) return null;
+  const assessment=occupantLoadFootnoteAssessment(latest.answer,citation);
+  return assessment && JSON.stringify(assessment.workFacts)===JSON.stringify(conversation.projectContext?.facts||[]) ? {...assessment,answerID:latest.id} : null;
+}
+
+async function askCalculatorFootnotes(source, draft, {conversationID="", anchorPaneID="", reply=false}={}) {
+  const identity=captureAccountRequest(),workspaceID=activeWorkspaceID,project=workspaceProject();
+  const current=()=>isCurrentAccountRequest(identity) && activeWorkspaceID===workspaceID;
+  if(!project) throw new Error("Open a Project before checking footnotes.");
+  let conversation=conversationID ? (activeResearchConversation?.id===conversationID?activeResearchConversation:supplementalResearchConversations.get(conversationID)) : calculatorConversationForPane();
+  if(!conversation || conversation.primaryProjectID!==researchProjectID(project) || conversation.codeVersion!==(source.codeVersion||source.sourceLibraryVersion)) {
+    conversation=await startNewResearchFromSelection({sectionID:source.sectionID||source.id,
+      selectedText:"",projectID:researchProjectID(project),originSurface:"reader",originPaneID:anchorPaneID});
+  } else if(!track.querySelector(`.assistant-workspace[data-pane-id="${CSS.escape(paneIDForResearchConversation(conversation.id))}"] .research-question-input`)) await openResearchConversation(conversation.id,{anchorPaneID,instance:(state.utilityInstances||[]).find(item=>item.key==="analysis" && item.conversationID===conversation.id)});
+  if(!current() || !conversation) return;
+  const paneID=paneIDForResearchConversation(conversation.id);
+  if(!await whenWorkspacePaneReady(paneID) || !current()) return;
+  const pane=track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  const input=pane?.querySelector(".research-question-input"),composer=input?.closest("form"),send=composer?.querySelector('button[type="submit"]');
+  if(!input || input.disabled) throw new Error("Wait for the current Research request before continuing.");
+  if(reply) {input.focus();return;}
+  if(input.value.trim()) throw new Error("Send or clear your current Assistant draft before checking footnotes.");
+  input.value=occupantLoadFootnoteQuestion(draft);input.dispatchEvent(new Event("input",{bubbles:true}));
+  if(!send || send.disabled) throw new Error(composer.querySelector(".research-composer-status")?.textContent || "Review the conversation context before continuing.");
+  composer.requestSubmit();
+}
+
+function renderOccupantLoadCalculation(source, {anchor, conversationID = "", answerID = "", answer = null, conversation = null, getConversation = null} = {}) {
   if (!occupantLoadSource(source) || !hasCapability("notebook")) return null;
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
@@ -16493,13 +16539,17 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
     if (!payload.section?.codeVersion || String(payload.section.sectionID || payload.section.id) !== String(resolved.sectionID) || payload.section.codePrefix !== resolved.codePrefix || !sectionRecordMatchesRequestedEdition(resolved, payload.section)) throw new Error("The calculation source does not match its exact code edition.");
     return {resolved, section: payload.section};
   };
+  const currentConversation=()=>getConversation ? getConversation() : (conversationID ? [activeResearchConversation,...supplementalResearchConversations.values()].find(item=>item?.id===conversationID) : conversation || calculatorConversationForPane());
   card = createOccupantLoadCard({draft: occupantLoadDrafts.get(key), sourceLabel, canSave: Boolean(project),
+    getAssessment: () => calculatorFootnoteAssessmentFor(source,currentConversation(),answerID),
+    onCheckFootnotes: draft => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId}),
+    onReplyFootnotes: () => askCalculatorFootnotes(source,occupantLoadDrafts.get(key),{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId,reply:true}),
     onLoadTable: async () => {const {resolved, section} = await loadSource(); return occupantLoadTable(section.blocks, resolved);},
     onControlsReady: form => form.querySelectorAll("select").forEach(enhanceSelect),
-    onOpenSource: async () => {
+    onOpenSource: async ({exact}={}) => {
       assertCurrent();
       await openSourceInReader({...source, codePrefix: source.codePrefix || source.codeBook},
-        card.closest(".workspace-panel")?.dataset.paneId, {projectID: project ? researchProjectID(project) : ""});
+        card.closest(".workspace-panel")?.dataset.paneId, {projectID: project ? researchProjectID(project) : "",...(exact?{evidenceAnchor:{passages:[{exact}]}}:{})});
     },
     onSave: async calculation => {
       assertCurrent();
@@ -22144,6 +22194,7 @@ async function refreshResearchConversationInPlace(paneID, conversationID, instan
   if (!current()) return "stale";
   // Publish a complete conversation in one swap; history, filters and focus stay mounted.
   body.replaceChildren(conversation);
+  track.querySelectorAll(".occupant-load-card").forEach(card=>card.dispatchEvent(new Event("calculation-assessment-refreshed")));
   panel._assistantSidebarUpdate?.(instance ? supplementalResearchConversations.get(conversationID) : activeResearchConversation);
   body.hidden = false;
   panel.classList.remove("has-research-composer", "is-new-research-chat", "is-history-only");
@@ -26489,7 +26540,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
     const calculationSource = occupantLoadAnswerSource(researchSourcesForAnswer(conversation, message), message.answer);
     if (calculationSource) {
-      const calculation = renderOccupantLoadCalculation(calculationSource, {conversationID, answerID: message.id, answer: message.answer});
+      const calculation = renderOccupantLoadCalculation(calculationSource, {conversationID, answerID: message.id, answer: message.answer, conversation});
       if (calculation) bubble.append(calculation);
     }
     const notebookHandoff = renderResearchNotebookHandoff(conversation, message);
@@ -26608,6 +26659,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     event.preventDefault();
     const question = input.value.trim() || starterAnalysisQuestion;
     if (question.length < 3 || sendButton.disabled) return;
+    track.querySelectorAll(".occupant-load-card").forEach(card=>card.dispatchEvent(new Event("calculation-context-changed")));
     input.disabled = true;
     sendButton.disabled = true;
     status.textContent = "";

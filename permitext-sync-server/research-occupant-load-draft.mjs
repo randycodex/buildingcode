@@ -1,4 +1,5 @@
 import { occupantLoadSource } from './public/occupant-load-calculation.js';
+import {calculatorFootnoteSchema,normalizeCalculatorFootnotes,calculatorFootnoteInstruction,calculatorFootnoteReviewInstruction} from './research-calculator-footnotes.mjs';
 
 const humanFields = ['spaceFunction', 'area', 'areaBasis', 'seating'];
 const valuesFor = {areaBasis: ['gross', 'net'], seating: ['without-fixed-seating', 'fixed-seating']};
@@ -19,13 +20,13 @@ export function occupantLoadDraftSchema(evidence = []) {
     required: ['value', 'quote']}]});
   return {anyOf: [{type: 'null'}, {type: 'object', additionalProperties: false,
     properties: {sourceID: {type: 'string', enum: sourceIDs},
-      ...Object.fromEntries([...humanFields, 'factor'].map(key => [key, field(key)]))},
-    required: ['sourceID', ...humanFields, 'factor']}]};
+      ...Object.fromEntries([...humanFields, 'factor'].map(key => [key, field(key)])),footnoteChecks:calculatorFootnoteSchema},
+    required: ['sourceID', ...humanFields, 'factor','footnoteChecks']}]};
 }
 
-export const occupantLoadDraftInstruction = 'When the schema includes occupantLoadDraft, return null unless this answer actually discusses an occupant-load calculation under supplied 2022 BC 1004.1.3. Otherwise propose one space only. Copy spaceFunction, area in square feet, areaBasis and seating ONLY from explicit user statements in this conversation, each with a short verbatim user quote. Respect later corrections, negations, hypotheticals and which space each fact describes; do not fill ambiguous, conflicting, example-only, unknown or unstated inputs. Do not infer that a user area is gross or net from a code table. A factor is a suggestion from an exact cited enacted row: supply its exact sourceID and a verbatim row quote containing the function, factor and gross/net basis; preserve all applicable footnotes in the answer. A user-supplied factor or a prior assistant claim cannot substitute for this code evidence. Use null for each missing field. Never propose a reviewed/confirmed state, a computed result or compliance in the draft. The draft supplements, and never replaces, the fully cited and qualified answer.';
+export const occupantLoadDraftInstruction = 'When the schema includes occupantLoadDraft, return null unless this answer actually discusses an occupant-load calculation under supplied 2022 BC 1004.1.3. Otherwise propose one space only. Copy spaceFunction, area in square feet, areaBasis and seating ONLY from explicit user statements in this conversation or the current calculatorWorkFacts, each with a short verbatim quote. Respect later corrections, negations, hypotheticals and which space each fact describes; do not fill ambiguous, conflicting, example-only, unknown or unstated inputs. Do not infer that a user area is gross or net from a code table. A factor is a suggestion from an exact cited enacted row: supply its exact sourceID and a verbatim row quote containing the function, factor and gross/net basis; preserve all applicable footnotes in the answer. A user-supplied factor or a prior assistant claim cannot substitute for this code evidence. Use null for each missing field. Never propose a reviewed/confirmed state, a computed result or compliance in the draft. The draft supplements, and never replaces, the fully cited and qualified answer. '+calculatorFootnoteInstruction;
 
-export const occupantLoadDraftReviewInstruction = 'Also review occupantLoadDraft as proposed inputs, not confirmed facts. Check every human quote against the stated space and actual user conversation, including later corrections, unknowns, negations and hypothetical scope. Check the factor quote against the exact bound enacted row, its function, units, gross/net basis and material footnotes. Reject an unsupported, stale, ambiguous or mismatched input using the existing unsupported_requirement or misstated_provision issue types. A review checkbox is never inferred. Apply all ordinary answer and citation checks unchanged.';
+export const occupantLoadDraftReviewInstruction = 'Also review occupantLoadDraft as proposed inputs, not confirmed facts. Check every human quote against the stated space and actual user conversation or separately supplied current Work facts, including later corrections, unknowns, negations and hypothetical scope. Check the factor quote against the exact bound enacted row, its function, units, gross/net basis and material footnotes. Reject an unsupported, stale, ambiguous or mismatched input using the existing unsupported_requirement or misstated_provision issue types. A review checkbox is never inferred. Apply all ordinary answer and citation checks unchanged. '+calculatorFootnoteReviewInstruction;
 
 // Optional suggestions fail closed field by field. A bad suggestion cannot
 // manufacture a project fact, source confirmation, or a calculator result.
@@ -35,7 +36,7 @@ export function normalizeOccupantLoadDraft(value, evidence, citations, context =
     String(item.sourceID || `section-${item.sectionID}`) === value.sourceID);
   if (!source || !citations.some(citation => String(citation.sectionID) === String(source.sectionID) &&
     citation.sourceIDs?.includes(value.sourceID))) return null;
-  const statements = [...(context.messages || []).filter(message => message.role === 'user').map(message => message.question), context.question]
+  const statements = [...(context.calculatorWorkFacts || []), ...(context.messages || []).filter(message => message.role === 'user').map(message => message.question), context.question]
     .filter(item => typeof item === 'string').map(text);
   const result = {sourceID: value.sourceID, ...Object.fromEntries([...humanFields, 'factor'].map(key => [key, null]))};
   for (const key of humanFields) {
@@ -64,5 +65,7 @@ export function normalizeOccupantLoadDraft(value, evidence, citations, context =
     if (result.spaceFunction && result.seating?.value !== 'fixed-seating' && decimal(input) && quote && quote.length <= 500 && text(source.text).includes(quote) &&
       containsNumber(quote, input) && /\b(?:gross|net)\b/i.test(quote) && (!result.areaBasis || new RegExp(`\\b${result.areaBasis.value}\\b`, 'i').test(quote))) result.factor = {value: input, quote};
   }
+  const footnotes=normalizeCalculatorFootnotes(value.footnoteChecks,source,result.factor,context);
+  if(footnotes.length) {result.footnoteChecks=footnotes;result.footnoteWorkFacts=[...(context.calculatorWorkFacts||[])];}
   return [...humanFields, 'factor'].some(key => result[key]) ? result : null;
 }
