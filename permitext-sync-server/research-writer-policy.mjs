@@ -2,8 +2,9 @@ import { researchProjectScopeInstruction } from "./research-project-scope.mjs";
 import { researchQuestionIsConversationRecall, researchConversationRecallInstruction } from "./research-question-intent.mjs";
 import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchPracticalNextStepPrompt } from "./research-practical-next-step.mjs";
+import { occupantLoadDraftInstruction } from "./research-occupant-load-draft.mjs";
 
-export const researchWriterPolicyVersion = "20261015-project-scope-writer-v6";
+export const researchWriterPolicyVersion = "20261017-calculator-draft-writer-v7";
 
 // The writer has one general policy. Retrieval, citation validation, factual
 // qualification, semantic review and freshly verified repairs remain in code.
@@ -23,6 +24,7 @@ const core = [
 export function researchWriterInstructions({ question, options = {} } = {}) {
   return [
     core,
+    options.occupantLoadDraft ? occupantLoadDraftInstruction : "",
     options.conversationRecall || researchQuestionIsConversationRecall(question)
       ? researchConversationRecallInstruction : "",
     researchSuppliedTextPrompt(options.suppliedText),

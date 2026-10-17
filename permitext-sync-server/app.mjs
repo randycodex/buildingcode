@@ -7,6 +7,7 @@ import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
+import { occupantLoadDraftSchema, normalizeOccupantLoadDraft, occupantLoadDraftReviewInstruction } from "./research-occupant-load-draft.mjs";
 import { researchHistoryOptions, researchHistoryCursor, researchHistoryFileRows, researchHistoryPageQuery } from "./research-history-pagination.mjs";
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
 import { researchSourceBodyState, researchSourceBodyStatePrompt, researchSourceAvailabilityPrompt,
@@ -735,6 +736,11 @@ const researchInterpretationSchema = {
 
 export function researchInterpretationSchemaForEvidence(evidence, supportingSources = [], options = {}) {
   const schema = structuredClone(researchInterpretationSchema);
+  const calculationSchema = occupantLoadDraftSchema(evidence);
+  if (calculationSchema && !options.practicalNextStep && !options.conversationRecall && !options.suppliedText) {
+    schema.properties.occupantLoadDraft = calculationSchema;
+    schema.required.push("occupantLoadDraft");
+  }
   if (options.allowEvidenceGapOnly === true) {
     // Open investigation may exhaust the available law. A truthful gap must
     // not manufacture an unrelated positive rule to satisfy a JSON minimum.
@@ -10566,7 +10572,8 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       ...allowedSupportingSources.get(use.sourceID),
       claim: use.claim
     })),
-    citations: cleanedCitations
+    citations: cleanedCitations,
+    ...(value.occupantLoadDraft ? {occupantLoadDraft: normalizeOccupantLoadDraft(value.occupantLoadDraft, evidence, cleanedCitations, options)} : {})
   };
 }
 
@@ -10882,7 +10889,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
           ? (conversational ? 6_000 : 3_000)
           : (conversational ? 3_000 : 1_500),
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
-      instructions: researchWriterInstructions({ question, options }),
+      instructions: researchWriterInstructions({ question, options: {...options, occupantLoadDraft: Boolean(occupantLoadDraftSchema(passageEvidence))} }),
       input: researchInputForEvidence(question, passageEvidence, { ...options, compactWriterPolicy: true }),
       text: {
         format: {
@@ -10941,7 +10948,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
         normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
         passageEvidence,
         supportingSources,
-        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, allowEvidenceGapOnly: options.allowEvidenceGapOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText }
+        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, allowEvidenceGapOnly: options.allowEvidenceGapOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText, question, messages: options.messages }
       ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
@@ -11233,6 +11240,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
         ? "For a conditional source explanation, evaluate answerText and supportedPoints together: answerText supplies the direct unresolved finding and concise application; supportedPoints may supply the distinct cited rules and historical alternatives. Do not require the same rules twice. Any conclusion or explanation fields are compatibility summaries, not additional required paragraphs."
         : "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
       "Presentation must fit the question: accept a concise direct paragraph for a simple or expressly short request, a compact checklist for parallel requirements, and a Markdown table only for a real side-by-side comparison. Fail with missed_material_conclusion if formatting hides the governing result or material qualification. Fail with unsupported_requirement if a bold statement, practical note, calculation, drawing note, or human-readable inline code reference is not supported by the supplied enacted evidence and structured citation map.",
+      ...(interpretation.occupantLoadDraft ? [occupantLoadDraftReviewInstruction] : []),
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
       options.allowOfficialGuidanceOnly
         ? "Because the user expressly requested official guidance, an official-guidance-only answer may correctly have no supportedPoints or enacted citations when the assembled enacted evidence does not establish a responsive rule, provided the server-rendered answer is visibly noncontrolling and supportingSourceUses contain the exact supplied web source and claim bindings. Do not demand an enacted citation for a guidance-only claim."
@@ -20992,7 +21000,7 @@ async function handleResearchConversationMessage(request, response) {
         // Use the ordinary citation validator to retain complete source metadata
         // and passages. Keep existing prose, points and citations byte-for-byte;
         // the independent verifier below must review every newly bound rule.
-        const normalized = validateResearchInterpretation(boundAnswer, assembledEvidence, webSupport.sources);
+        const normalized = validateResearchInterpretation(boundAnswer, assembledEvidence, webSupport.sources, {question, messages: activeMessages});
         boundAnswer = { ...boundAnswer, citations: normalized.citations };
       }
       return {

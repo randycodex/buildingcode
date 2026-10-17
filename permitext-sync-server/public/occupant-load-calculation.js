@@ -1,5 +1,5 @@
 // Arithmetic assistance, kept separate from the immutable Research answer.
-// Factors and applicability are explicitly supplied and reviewed by the author.
+// Suggested factors and applicability still require the author's source review.
 const decimal = value => {
   const text = String(value ?? '').trim();
   if (!/^\d{1,10}(?:\.\d{1,6})?$/.test(text)) return null;
@@ -43,7 +43,25 @@ export function occupantLoadSource(source = {}) {
 // Automatically discovered evidence is carried on answer citations even when
 // the conversation has no manually selected sources.
 export function occupantLoadAnswerSource(sources = [], answer = {}) {
-  return [...(Array.isArray(answer.citations) ? answer.citations : []), ...sources].find(occupantLoadSource) || null;
+  return [...(Array.isArray(answer?.citations) ? answer.citations : []), ...sources].find(occupantLoadSource) || null;
+}
+
+export function occupantLoadPrefill(answer, source) {
+  const proposal = answer?.occupantLoadDraft;
+  const sourceIDs = [...(source?.sourceIDs || []), source?.sourceID].filter(Boolean);
+  if (!occupantLoadSource(source) || !proposal || !sourceIDs.includes(proposal.sourceID)) return {};
+  const values = {}, suggestions = [];
+  for (const [key, label] of [['spaceFunction', 'Function of space'], ['area', 'Floor area'], ['areaBasis', 'Area basis'], ['seating', 'Seating'], ['factor', 'Occupant-load factor']]) {
+    const field = proposal[key];
+    if (!field || typeof field.value !== 'string' || !field.value.trim() || field.value.length > 300 || typeof field.quote !== 'string' || !field.quote.trim() || field.quote.length > 500) continue;
+    if (['area', 'factor'].includes(key) && !decimal(field.value)) continue;
+    if (key === 'areaBasis' && !['gross', 'net'].includes(field.value)) continue;
+    if (key === 'seating' && !['without-fixed-seating', 'fixed-seating'].includes(field.value)) continue;
+    values[key] = field.value;
+    suggestions.push({label, value: field.value, quote: field.quote, origin: key === 'factor' ? 'Cited table row' : 'Your conversation'});
+  }
+  if (values.factor) values.factorBasis = `${proposal.factor.quote} · Review applicable footnotes.`.slice(0, 500);
+  return suggestions.length ? {...values, reviewed: false, suggestions} : {};
 }
 
 export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '') {
@@ -73,7 +91,17 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   const summary = document.createElement('summary'); summary.textContent = 'Occupant load calculation';
   const body = document.createElement('div'); body.className = 'occupant-load-body';
   const scope = document.createElement('p'); scope.className = 'calculation-scope';
-  scope.textContent = 'One space without fixed seating · author-supplied inputs';
+  scope.textContent = draft.suggestions?.length ? 'Suggested inputs from this conversation · review required' : 'One space without fixed seating · author-supplied inputs';
+  const suggestions = document.createElement('details'); suggestions.className = 'calculation-suggestions';
+  if (draft.suggestions?.length) {
+    const title = document.createElement('summary'); title.textContent = 'Where the suggested inputs came from'; suggestions.append(title);
+    for (const item of draft.suggestions) {
+      const row = document.createElement('div'); const label = document.createElement('strong');
+      label.textContent = `${item.label}: ${item.value} · ${item.origin}`;
+      const quote = document.createElement('blockquote'); quote.textContent = item.quote;
+      row.append(label, quote); suggestions.append(row);
+    }
+  }
   const form = document.createElement('form'); form.className = 'occupant-load-form';
   const fields = {};
   for (const [key, label, options] of [
@@ -113,7 +141,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
     Object.assign(draft, values());
     const calculation = calculateOccupantLoad(draft);
     result.classList.toggle('is-pending', !calculation.valid);
-    result.textContent = calculation.valid ? `${calculation.people.toLocaleString()} people` : 'Complete inputs and source review';
+    result.textContent = calculation.valid ? `${calculation.people.toLocaleString()} people`
+      : calculation.errors.length === 1 && !draft.reviewed ? 'Ready for source review' : 'Complete inputs and source review';
     formula.textContent = calculation.valid ? `${calculation.input.area} ÷ ${calculation.input.factor} · rounded up to a whole person` : calculation.errors[0];
     const changed = savedCard && JSON.stringify(calculation.input) !== savedFingerprint;
     save.disabled = busy || !calculation.valid || !canSave;
@@ -138,6 +167,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
     finally {busy = false; Object.values(fields).forEach(field => field.disabled = false); reviewed.disabled = false; update();}
   });
   actions.append(save, open); form.append(reviewLabel, result, formula, actions);
-  body.append(scope, source, form, status); root.append(summary, body); update();
+  body.append(scope, source);
+  if (draft.suggestions?.length) body.append(suggestions);
+  body.append(form, status); root.append(summary, body); update();
   return root;
 }

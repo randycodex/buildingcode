@@ -1,5 +1,5 @@
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
-import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, calculationNoteBlocks } from "./occupant-load-calculation.js?v=4";
+import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, calculationNoteBlocks } from "./occupant-load-calculation.js?v=6";
 import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-assistant-calculation-v1123";
+} from "./offline-storage.js?v=20261017-calculation-prefill-v1125";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-assistant-calculation-v1123";
+} from "./workspace-state.js?v=20261017-calculation-prefill-v1125";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -16452,14 +16452,14 @@ function showNotebookSavedLink(anchor, project, card) {
   message.append(status, open); container.append(message);
 }
 
-function renderOccupantLoadCalculation(source, {anchor, conversationID = "", answerID = ""} = {}) {
+function renderOccupantLoadCalculation(source, {anchor, conversationID = "", answerID = "", answer = null} = {}) {
   if (!occupantLoadSource(source) || !hasCapability("notebook")) return null;
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const project = workspaceProject();
   const sourceLabel = `${source.codePrefix || source.codeBook} § ${source.sectionNumber} · ${researchCodeEdition(source)}`;
   const key = `${identity.userID}:${workspaceID}:${conversationID}:${answerID}:${source.sectionID || source.id}:${source.codeVersion || source.sourceLibraryVersion}`;
-  if (!occupantLoadDrafts.has(key)) occupantLoadDrafts.set(key, {});
+  if (!occupantLoadDrafts.has(key)) occupantLoadDrafts.set(key, occupantLoadPrefill(answer, source));
   // Drafts live only in memory; saved Notes use the durable Notebook contract.
   if (occupantLoadDrafts.size > 60) occupantLoadDrafts.delete(occupantLoadDrafts.keys().next().value);
   let card;
@@ -26462,7 +26462,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
     const calculationSource = occupantLoadAnswerSource(researchSourcesForAnswer(conversation, message), message.answer);
     if (calculationSource) {
-      const calculation = renderOccupantLoadCalculation(calculationSource, {conversationID, answerID: message.id});
+      const calculation = renderOccupantLoadCalculation(calculationSource, {conversationID, answerID: message.id, answer: message.answer});
       if (calculation) bubble.append(calculation);
     }
     const notebookHandoff = renderResearchNotebookHandoff(conversation, message);

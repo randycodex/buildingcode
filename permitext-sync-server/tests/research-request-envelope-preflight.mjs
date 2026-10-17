@@ -85,6 +85,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     defaultSyncCodeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
     researchZoningWriterInstructions, researchZoningVerificationInstructions,
     researchWriterInstructions, researchWriterPolicyVersion, researchPropertyInvestigationInstruction, researchSourceBodyStateInstruction,
+    occupantLoadDraftSchema, occupantLoadDraftReviewInstruction,
     createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction, researchQualifiedFactInstruction, researchClaimScopeInstruction, researchZoningExplanationScopeInstruction,
     researchInputForEvidence, researchInterpretationSchemaForEvidence,
     researchQuestionIntentInstruction, researchPriorSuppliedTextPrompt, researchSuppliedTextPrompt, researchPracticalNextStepPrompt, researchGuidedNextStepInstruction
@@ -247,3 +248,4 @@ export async function preflightRampRequestEnvelopes(evidence) {
     scope: "Actual request builders with deterministic analysis, required claims and routed code basis; separate synthetic 29-fact, settled-web and answer/verifier cases. No prior chat, returned web claims or revision. Not live or full-turn acceptance."
   }));
 }
+import { occupantLoadDraftSchema, occupantLoadDraftReviewInstruction } from '../research-occupant-load-draft.mjs';
