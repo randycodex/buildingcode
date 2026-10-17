@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-calculator-column-v1144";
+} from "./offline-storage.js?v=20261017-calculator-centered-v1146";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-calculator-column-v1144";
+} from "./workspace-state.js?v=20261017-calculator-centered-v1146";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,

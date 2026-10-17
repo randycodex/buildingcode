@@ -20653,7 +20653,7 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .occupant-load-form input[readonly], .occupant-load-form textarea[readonly] { cursor: default; }
 .calculation-function-search { position: sticky; top: 0; width: 100%; margin: 0 0 6px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface-muted); color: var(--text-primary); font: inherit; }
 .calculation-function-menu .custom-select-option[hidden] { display: none; }
-.calculator-column-content { min-height: 0; overflow: auto; padding: 20px 0; }
+.calculator-column-content { width: 100%; max-width: 600px; justify-self: center; min-width: 0; min-height: 0; box-sizing: border-box; overflow: auto; padding: 20px 0; }
 .calculator-column-content .occupant-load-card { margin: 0; }
 .calculation-footnote-checks { grid-column: 1 / -1; font-size: 12px; }
 .calculation-footnote-checks:empty { display: none; }
