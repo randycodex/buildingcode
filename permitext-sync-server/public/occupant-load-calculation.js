@@ -137,11 +137,11 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
     save.disabled = busy || !calculation.valid || !canSave;
     save.textContent = savedCard ? (changed ? 'Save revised calculation as new Note' : 'Saved to Notebook') : 'Save calculation to Notebook';
     if (savedCard && !changed) save.disabled = true;
-    if (changed) status.textContent = 'Inputs changed. The saved Note keeps its original snapshot and needs review.';
     return calculation;
   };
-  form.addEventListener('input', update);
-  form.addEventListener('change', update);
+  const handleInput = () => {status.textContent = ''; update();};
+  form.addEventListener('input', handleInput);
+  form.addEventListener('change', handleInput);
   form.addEventListener('submit', async event => {
     event.preventDefault(); const calculation = update(); if (!calculation.valid || save.disabled) return;
     busy = true; update(); status.textContent = 'Saving calculation and source snapshot…';
