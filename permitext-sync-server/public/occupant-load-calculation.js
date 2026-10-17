@@ -130,7 +130,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
     result.classList.toggle('is-pending', !hasResult);
     result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} people`
       : fixedSeating ? 'Separate method required' : 'Complete calculation inputs';
-    formula.textContent = hasResult ? `${calculation.input.area} ÷ ${calculation.input.factor} · rounded up to a whole person`
+    formula.hidden = hasResult;
+    formula.textContent = hasResult ? ''
       : fixedSeating ? 'Fixed seating uses a separate calculation method.' : calculation.errors[0];
     const changed = savedCard && JSON.stringify(calculation.input) !== savedFingerprint;
     save.disabled = busy || !calculation.valid || !canSave;

@@ -1,5 +1,5 @@
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
-import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, calculationNoteBlocks } from "./occupant-load-calculation.js?v=10";
+import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, calculationNoteBlocks } from "./occupant-load-calculation.js?v=11";
 import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-calculation-live-v1129";
+} from "./offline-storage.js?v=20261017-calculation-cleanup-v1130";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-calculation-live-v1129";
+} from "./workspace-state.js?v=20261017-calculation-cleanup-v1130";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,

@@ -22,8 +22,8 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1706";
-const shellAssetVersion = "20261017-calculation-live-v1129";
+const shellCacheName = "permitext-pro-shell-v1707";
+const shellAssetVersion = "20261017-calculation-cleanup-v1130";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -34,7 +34,7 @@ const shellURLs = [
   "/web/notebook-questions.js",
   "/web/project-workflow.js?v=20261011-workflow-v4",
   "/web/search-relevance.js?v=1",
-  "/web/occupant-load-calculation.js?v=10",
+  "/web/occupant-load-calculation.js?v=11",
   "/web/notebook-reader-evidence.js?v=2",
   "/web/search-words.js?v=20261015-search-word-completion-v1082",
   "/web/nyc-property-facts.js?v=20261004-zola-facts-v1",
@@ -73,22 +73,22 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261017-calculation-live-v1129",
+  "/web/styles.css?v=20261017-calculation-cleanup-v1130",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261017-calculation-live-v1129",
+  "/web/app.js?v=20261017-calculation-cleanup-v1130",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261017-calculation-live-v1129",
+  "/web/offline-storage.js?v=20261017-calculation-cleanup-v1130",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/column-expansion.js?v=4",
-  "/web/workspace-state.js?v=20261017-calculation-live-v1129",
+  "/web/workspace-state.js?v=20261017-calculation-cleanup-v1130",
   "/web/assistant-context.js?v=7",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
