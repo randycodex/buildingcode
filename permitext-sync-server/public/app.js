@@ -1,6 +1,8 @@
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
+import { createOccupantLoadCard, occupantLoadSource, calculationNoteBlocks } from "./occupant-load-calculation.js?v=2";
+import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
-import { notebookQuestionsText, normalizeNotebookQuestions } from "./notebook-questions.js";
+import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-search-word-completion-v1082";
@@ -123,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261016-search-relevance-v1113";
+} from "./offline-storage.js?v=20261016-calculation-evidence-v1121";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -156,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261016-search-relevance-v1113";
+} from "./workspace-state.js?v=20261016-calculation-evidence-v1121";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -15777,6 +15779,11 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.append(sectionHeading, savedMarker);
   sectionWrapper.append(headingRow);
 
+  if (privateContentAllowed) {
+    const calculation = renderOccupantLoadCalculation(readerPassagePayload(section, reader, annotationTargetForSection(section, reader)));
+    if (calculation) sectionWrapper.append(calculation);
+  }
+
   const appendBlock = (block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
     const savedBlockRecord = privateContentAllowed && isSectionSaved({
@@ -16410,6 +16417,103 @@ async function saveReaderPassage(panel, section, reader, target, options = {}) {
   return true;
 }
 
+const occupantLoadDrafts = new Map();
+
+async function openCalculationNotebook(project, card) {
+  if (!card?.id) return;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const currentAccountWorkspace = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
+  if (!currentAccountWorkspace() || !await switchWorkflowView("notebook") || !currentAccountWorkspace() || currentWorkflowView() !== "notebook") return;
+  const generation = state.workflowNavigationGeneration || 0;
+  const current = () => currentAccountWorkspace() && currentWorkflowView() === "notebook" && generation === (state.workflowNavigationGeneration || 0);
+  const projectID = researchProjectID(project);
+  pendingNotebookCardByProject.set(projectID, card.id);
+  try {
+    if (!await openProjectNotebook(project) || !current()) return;
+    const paneID = paneIDForProjectNotebook(project);
+    if (!await whenWorkspacePaneReady(paneID) || !current()) return;
+    const mount = notebookMounts.get(projectID);
+    await mount?.refreshCards?.();
+    if (!current()) return;
+    await mount?.focusCard?.(card.id);
+  } finally {
+    if (pendingNotebookCardByProject.get(projectID) === card.id) pendingNotebookCardByProject.delete(projectID);
+  }
+}
+
+function showNotebookSavedLink(anchor, project, card) {
+  const container = anchor.closest(".inline-comment, .occupant-load-body") || anchor.parentElement;
+  container.querySelector(".passage-notebook-saved")?.remove();
+  const message = document.createElement("div"); message.className = "passage-notebook-saved";
+  const status = document.createElement("span"); status.setAttribute("role", "status"); status.textContent = "Saved to Notebook";
+  const open = document.createElement("button"); open.type = "button"; open.className = "ghost-button"; open.textContent = "Open in Notebook";
+  open.addEventListener("click", () => void openCalculationNotebook(project, card).catch(error => showWebNotice("Note not opened", error.message)));
+  message.append(status, open); container.append(message);
+}
+
+function renderOccupantLoadCalculation(source, {anchor, conversationID = "", answerID = ""} = {}) {
+  if (!occupantLoadSource(source) || !hasCapability("notebook")) return null;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const project = workspaceProject();
+  const sourceLabel = `${source.codePrefix || source.codeBook} § ${source.sectionNumber} · ${researchCodeEdition(source)}`;
+  const key = `${identity.userID}:${workspaceID}:${conversationID}:${answerID}:${source.sectionID || source.id}:${source.codeVersion || source.sourceLibraryVersion}`;
+  if (!occupantLoadDrafts.has(key)) occupantLoadDrafts.set(key, {});
+  // Drafts live only in memory; saved Notes use the durable Notebook contract.
+  if (occupantLoadDrafts.size > 60) occupantLoadDrafts.delete(occupantLoadDrafts.keys().next().value);
+  let card;
+  const savePayloads = new Map();
+  const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID &&
+    card.isConnected;
+  const assertCurrent = () => {if (!current()) throw new Error("Return to this Project and reopen the calculation before continuing.");};
+  card = createOccupantLoadCard({draft: occupantLoadDrafts.get(key), sourceLabel, canSave: Boolean(project),
+    onOpenSource: async () => {
+      assertCurrent();
+      await openSourceInReader({...source, codePrefix: source.codePrefix || source.codeBook},
+        card.closest(".workspace-panel")?.dataset.paneId, {projectID: project ? researchProjectID(project) : ""});
+    },
+    onSave: async calculation => {
+      assertCurrent();
+      const generation = state.workflowNavigationGeneration || 0;
+      const actionCurrent = () => current() && generation === (state.workflowNavigationGeneration || 0);
+      const requireAction = () => {if (!actionCurrent()) throw new Error("The view changed. Reopen this calculation before saving.");};
+      if (!project) throw new Error("Create a Project before saving a calculation.");
+      const resolved = await resolveReaderSource({...source, codePrefix: source.codePrefix || source.codeBook}, {isCurrent: actionCurrent});
+      requireAction();
+      if (!resolved) return null;
+      const payload = await api(`/code/sections/${encodeURIComponent(resolved.sectionID)}`);
+      requireAction();
+      if (!payload.section?.codeVersion || String(payload.section.sectionID || payload.section.id) !== String(resolved.sectionID) || payload.section.codePrefix !== resolved.codePrefix || !sectionRecordMatchesRequestedEdition(resolved, payload.section)) throw new Error("The calculation source does not match its exact code edition.");
+      const capture = document.createElement("div");
+      (payload.section.blocks || []).forEach(block => capture.append(renderCodeBlock(block)));
+      const exact = notebookEvidenceTextMap(capture, {literalInline: true}).text;
+      if (!exact || exact.length > 50000) throw new Error("The complete source passage could not be captured safely. Save the relevant passage from Reader instead.");
+      const link = {id: crypto.randomUUID(), label: sourceLabel, relationshipRole: "context", projectID: researchProjectID(project),
+        source: {...resolved, sourceID: String(resolved.sectionID), sectionID: String(resolved.sectionID),
+          sectionTitle: resolved.title, codeEdition: researchCodeEdition(resolved), sourceLibraryVersion: resolved.codeVersion},
+        passages: [{exact}], createdAt: new Date().toISOString()};
+      const notebookDocument = emptyNotebookDocument();
+      notebookDocument.document = calculationNoteBlocks(calculation, [link], answerID);
+      const fingerprint = JSON.stringify(calculation.input);
+      const submission = savePayloads.get(fingerprint) || {projectID: researchProjectID(project), expectedVersion: 0,
+        clientMutationID: `occupant-load:${crypto.randomUUID()}`, cardType: "finding",
+        title: `Occupant load · ${calculation.input.spaceFunction}`.slice(0, 300), document: notebookDocument, evidenceLinks: [link],
+        openQuestions: [{id: crypto.randomUUID(), text: "Review cumulative occupant loads and any applicable exceptions before using this result for egress design.",
+          why: "This snapshot calculates one space only; it does not determine exit count or establish compliance.", status: "open", resolution: ""}]};
+      savePayloads.set(fingerprint, submission);
+      const saved = await postResearch("/notebook/cards/save", submission);
+      requireCurrentAccountRequest(identity);
+      await saveNotebookCardSnapshot(identity.userID, researchProjectID(project), saved.card);
+      if (!actionCurrent()) return null;
+      // Saving never opens Notes in Research or overwrites an existing author-edited Note.
+      return saved.card;
+    },
+    onOpenNote: async saved => {assertCurrent(); await openCalculationNotebook(project, saved);}
+  });
+  return card;
+}
+
 async function addPassageToNotebook(anchor, source, exact) {
   const project = workspaceProject();
   if (!project) throw new Error("Create a Project before adding a passage to a Note.");
@@ -16444,13 +16548,7 @@ async function addPassageToNotebook(anchor, source, exact) {
   requireCurrentAccountRequest(identity);
   await saveNotebookCardSnapshot(identity.userID, projectID, payload.card);
   if (!current()) return;
-  const paneID = paneIDForProjectNotebook(project);
-  requestLinkedPanePlacement(anchor.closest(".workspace-panel")?.dataset.paneId, paneID);
-  if (!await openProjectNotebook(project) || !current()) return;
-  if (!await whenWorkspacePaneReady(paneID) || !current()) return;
-  const destinationMount = notebookMounts.get(projectID);
-  await destinationMount?.refreshCards?.();
-  if (current()) await destinationMount?.focusCard?.(payload.card.id);
+  showNotebookSavedLink(anchor, project, payload.card);
 }
 
 function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
@@ -19920,26 +20018,33 @@ function makeSectionPayloadFromDetail(detail, section) {
   };
 }
 
-function notebookEvidenceTextMap(root) {
+function notebookEvidenceTextMap(root, {literalInline = false} = {}) {
   const chars = [];
   const map = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
-      if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      if (!node.nodeValue || (!literalInline && !node.nodeValue.trim())) return NodeFilter.FILTER_REJECT;
       if (node.parentElement?.closest(
-        "button:not(.inline-code-reference), input, textarea, script, style, [data-research-selection-exclude='true']"
+        "button:not(.inline-code-reference):not(.reader-definition-term), input, textarea, script, style, [data-research-selection-exclude='true']"
       )) {
         return NodeFilter.FILTER_REJECT;
       }
       return NodeFilter.FILTER_ACCEPT;
     }
   });
-  let node;
+  let node, previousBlock = null;
   while ((node = walker.nextNode())) {
-    if (chars.length && chars.at(-1) !== " ") {
+    // Inline links and definition buttons must not invent spaces inside the
+    // enacted sentence. Keep a second exact map for their decorated DOM form.
+    const block = literalInline ? node.parentElement?.closest("p, li, td, th, div") : null;
+    if (chars.length && chars.at(-1) !== " " && (!literalInline || (previousBlock && block !== previousBlock))) {
       chars.push(" ");
       map.push({ node, offset: 0 });
     }
+    if (literalInline && chars.length && /\s$/.test(map.at(-1)?.node?.nodeValue || "") && chars.at(-1) !== " ") {
+      chars.push(" "); map.push({node, offset: 0});
+    }
+    previousBlock = block;
     let pendingSpace = false;
     for (let offset = 0; offset < node.nodeValue.length; offset += 1) {
       const character = node.nodeValue[offset];
@@ -19954,6 +20059,9 @@ function notebookEvidenceTextMap(root) {
       }
       chars.push(character);
       map.push({ node, offset });
+    }
+    if (literalInline && pendingSpace) {
+      chars.push(" "); map.push({node, offset: node.nodeValue.length - 1});
     }
   }
   while (chars.at(-1) === " ") {
@@ -19989,9 +20097,13 @@ function notebookEvidenceMatchIndex(text, selector) {
 }
 
 function markNotebookEvidenceRange(root, selector) {
-  const { text, map } = notebookEvidenceTextMap(root);
+  let { text, map } = notebookEvidenceTextMap(root);
   const exact = normalizedPassageAnchorText(selector?.normalizedExact || selector?.exact);
-  const start = notebookEvidenceMatchIndex(text, selector);
+  let start = notebookEvidenceMatchIndex(text, selector);
+  if (start < 0) {
+    ({text, map} = notebookEvidenceTextMap(root, {literalInline: true}));
+    start = notebookEvidenceMatchIndex(text, selector);
+  }
   if (start < 0 || !exact) return [];
   const selectedMap = map.slice(start, start + exact.length);
   const byNode = new Map();
@@ -26348,6 +26460,11 @@ async function renderResearchConversation(conversationID, options = {}) {
       const evidenceReviewedBody = bubble.querySelector(".research-evidence-reviewed-body");
       (evidenceReviewedBody || bubble).append(answerSources);
     }
+    const calculationSource = researchSourcesForAnswer(conversation, message).find(occupantLoadSource);
+    if (calculationSource) {
+      const calculation = renderOccupantLoadCalculation(calculationSource, {conversationID, answerID: message.id});
+      if (calculation) bubble.append(calculation);
+    }
     const notebookHandoff = renderResearchNotebookHandoff(conversation, message);
     if (notebookHandoff) bubble.append(notebookHandoff);
     thread.append(bubble);
@@ -28745,7 +28862,20 @@ async function renderProjectNotebook(project, options = {}) {
       };
       noteMenu.titleAction.append(reportButton);
       footer.append(reportMembership, footerActions);
-      const focusedContent = [editorElement];
+      const readerEvidence = createNotebookReaderEvidence(activeCard, async link => {
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+        await openNotebookReference(identity, foundation, {referenceKind: "selectedPassage", referenceID: link.id,
+          label: link.label, evidenceLink: link}, loadCard, paneID, projectID);
+      });
+      const focusedContent = [...(readerEvidence ? [readerEvidence] : []), editorElement];
+      if (activeCard.openQuestions?.length) {
+        focusedContent.push(createNotebookQuestionsEditor({questions: activeCard.openQuestions, readOnly: notebookReadOnly,
+          onChange(questions) {
+            if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+            activeCard.openQuestions = questions;
+            markNotebookDirty();
+          }}));
+      }
       if (notebookReadOnly) panel.append(draftStatus);
       focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
