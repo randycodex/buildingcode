@@ -91,7 +91,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   const summary = document.createElement('summary'); summary.textContent = 'Occupant load calculation';
   const body = document.createElement('div'); body.className = 'occupant-load-body';
   const scope = document.createElement('p'); scope.className = 'calculation-scope';
-  scope.textContent = draft.suggestions?.length ? 'Suggested inputs from this conversation · review required' : 'One space without fixed seating · author-supplied inputs';
+  scope.textContent = 'One space without fixed seating · author-supplied inputs';
   const form = document.createElement('form'); form.className = 'occupant-load-form';
   const fields = {};
   for (const [key, label, options] of [
@@ -159,7 +159,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
     finally {busy = false; Object.values(fields).forEach(field => field.disabled = false); reviewed.disabled = false; update();}
   });
   actions.append(save, open); form.append(reviewLabel, result, formula, actions);
-  body.append(scope, source);
+  if (!draft.suggestions?.length) body.append(scope);
+  body.append(source);
   body.append(form, status); root.append(summary, body); update();
   return root;
 }
