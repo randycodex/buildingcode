@@ -10,6 +10,8 @@ import { researchWriterInstructions, researchWriterContext, researchWriterPolicy
 import { occupantLoadDraftSchema, normalizeOccupantLoadDraft, occupantLoadDraftReviewInstruction } from "./research-occupant-load-draft.mjs";
 import { researchHistoryOptions, researchHistoryCursor, researchHistoryFileRows, researchHistoryPageQuery } from "./research-history-pagination.mjs";
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
+import { researchCitationBindingTargets, researchCitationBindingRepairSchema, applyResearchCitationBindingRepair,
+  researchCitationBindingRepairEligible, researchCitationBindingRepairInstruction } from "./research-citation-binding-repair.mjs";
 import { researchSourceBodyState, researchSourceBodyStatePrompt, researchSourceAvailabilityPrompt,
   researchSourceBodyStateInstruction } from "./research-source-body-state.mjs";
 import { applyVerifiedProjectFollowups, researchResponseFollowupQuestions } from "./research-verification-followups.mjs";
@@ -10904,8 +10906,19 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
         }
       }
   };
-  const targetedRevision = researchTargetedRevisionEligible(options);
-  if (targetedRevision) {
+  const bindingRepair = options.citationBindingRepair === true;
+  const targetedRevision = !bindingRepair && researchTargetedRevisionEligible(options);
+  if (bindingRepair) {
+    if (!researchCitationBindingRepairEligible(options.previousInterpretation, passageEvidence, options.revisionFeedback)) {
+      throw Object.assign(new Error('Citation binding repair is unavailable for this finding.'), { code: 'RESEARCH_CITATION_REPAIR_UNAVAILABLE' });
+    }
+    requestBody.instructions = researchCitationBindingRepairInstruction;
+    const targets = `BINDING REPAIR TARGETS\n${JSON.stringify(researchCitationBindingTargets(options.previousInterpretation, passageEvidence))}`;
+    if (typeof requestBody.input === 'string') requestBody.input += `\n\n${targets}`;
+    else requestBody.input.push({ role: 'user', content: [{ type: 'input_text', text: targets }] });
+    requestBody.text.format = { type: 'json_schema', name: 'permitext_research_citation_binding_repair', strict: true,
+      schema: researchCitationBindingRepairSchema(options.previousInterpretation, passageEvidence) };
+  } else if (targetedRevision) {
     requestBody.instructions = `${researchWriterInstructions({ question, options })} ${researchTargetedRevisionInstruction}`;
     const input = `EDITABLE TEXT TARGETS\n${JSON.stringify(researchRevisionTargets(options.previousInterpretation).map(({ id, path, text, removable }) => ({ id, path, text, removable })))}`;
     if (typeof requestBody.input === "string") requestBody.input += `\n\n${input}`;
@@ -10942,6 +10955,10 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
   }
   let interpretation;
   try {
+    if (bindingRepair) {
+      value = applyResearchCitationBindingRepair(options.previousInterpretation, value, passageEvidence);
+      if (!value) throw Object.assign(new Error('The citation defect needs full answer revision.'), { code: 'RESEARCH_CITATION_REPAIR_UNAVAILABLE' });
+    }
     if (targetedRevision) value = applyResearchTargetedRevision(options.previousInterpretation, value, passageEvidence);
     interpretation = finalizeResearchGuidanceOnlyInterpretation(
       validateResearchInterpretation(
@@ -10952,6 +10969,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
       ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
+    if (bindingRepair) assertOpenCitationOnlyRepair(options.previousInterpretation, interpretation);
   } catch (error) {
     if (!error.failureStage) {
       error.failureStage = ["INVALID_RESEARCH_CITATION", "INVALID_RESEARCH_WEB_CITATION"]
@@ -10970,6 +10988,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
   }
   return {
     interpretation,
+    ...(bindingRepair ? { citationBindingRepairApplied: true } : {}),
     requestedModel: model,
     model: payload.model || model,
     configuration,
@@ -21024,6 +21043,7 @@ async function handleResearchConversationMessage(request, response) {
     let verifierUsage = combinedResearchUsage();
     let answerGenerationUsage = result.usage;
     let answerRegenerated = false;
+    let citationBindingRepairApplied = false;
     let decisionFactRepairApplied = false;
     const applyDecisionFactCandidate = () => {
       const previous = result;
@@ -21230,6 +21250,7 @@ async function handleResearchConversationMessage(request, response) {
       }
       // Two bounded substantive repairs, then one citation-only correction if
       // all remaining issues are binding errors. Every result gets fresh review.
+      let citationBindingRepairAttempted = false;
       for (let attempt=0; attempt<4; attempt++) {
         const review = await openAIResearchInvestigationDecision("permitext_research_open_review", reviewInstructions,
           reviewSchema, { question, evidence:assembledEvidence, answer:result.interpretation,
@@ -21250,13 +21271,30 @@ async function handleResearchConversationMessage(request, response) {
         if (attempt > 1 && !citationOnlyRepair) throw Object.assign(new Error("The investigated answer still has a substantive accuracy issue."),
           {code:"RESEARCH_VERIFICATION_FAILED",verificationAttempts});
         const repairStartedAt = performance.now();
-        const repaired = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID,
-          {...interpretationOptions, model:"gpt-6-luna", revisionFeedback:openReviewRevisionFeedback(review.value.issues),
-            previousInterpretation:result.interpretation, disableTargetedRevision:true, citationOnlyRepair});
+        const repairOptions = { ...interpretationOptions, model: 'gpt-6-luna',
+          revisionFeedback: openReviewRevisionFeedback(review.value.issues), previousInterpretation: result.interpretation,
+          disableTargetedRevision: true, citationOnlyRepair };
+        let repaired;
+        if (!citationBindingRepairAttempted && researchCitationBindingRepairEligible(result.interpretation, assembledEvidence, review.value.issues)) {
+          citationBindingRepairAttempted = true;
+          try {
+            repaired = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID,
+              { ...repairOptions, citationBindingRepair: true });
+          } catch (error) {
+            if (error.code !== 'RESEARCH_CITATION_REPAIR_UNAVAILABLE') {
+              error.verificationAttempts = [...verificationAttempts, ...(error.verificationAttempts || [])];
+              throw error;
+            }
+            answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, error.providerUsage);
+          }
+        }
+        repaired ||= await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID, repairOptions);
         researchOperation.repairMilliseconds = (researchOperation.repairMilliseconds || 0) + Math.round(performance.now() - repairStartedAt);
         answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, repaired.usage);
         if (citationOnlyRepair) assertOpenCitationOnlyRepair(result.interpretation, repaired.interpretation);
-        result = repaired; answerRegenerated = true;
+        result = repaired;
+        citationBindingRepairApplied ||= repaired.citationBindingRepairApplied === true;
+        answerRegenerated ||= repaired.citationBindingRepairApplied !== true;
       }
       requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({requiredClaims,evidence:assembledEvidence,answer:result.interpretation});
       claimMateriality = evaluateResearchClaimMateriality({claims:materialityClaims,evidence:assembledEvidence,answer:result.interpretation});
@@ -21963,6 +22001,7 @@ async function handleResearchConversationMessage(request, response) {
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
           regenerated: answerRegenerated,
+          ...(citationBindingRepairApplied ? { citationBindingRepairApplied: true } : {}),
           ...(decisionFactRepairApplied ? { decisionFactRepairApplied: true } : {}),
           sourceBoundedRepairApplied: zoningRepairApplied,
           history: verificationAttempts
