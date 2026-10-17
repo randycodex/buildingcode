@@ -20649,7 +20649,10 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .occupant-load-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
 .occupant-load-form > label { text-transform: none; letter-spacing: normal; display: grid; align-content: start; gap: 6px; min-width: 0; font-size: 12px; color: var(--text-secondary); }
 .occupant-load-form input:not([type="checkbox"]), .occupant-load-form textarea, .occupant-load-form select, .occupant-load-form .custom-select-trigger { width: 100%; min-width: 0; min-height: 36px; padding: 8px 10px; border: 0; border-radius: 5px; background: var(--toolbar-active); color: var(--text-primary); font: inherit; font-size: 14px !important; line-height: 1.5; }
-.occupant-load-form textarea { resize: vertical; max-height: 240px; }
+.calculation-table-notes { grid-column: 1 / -1; min-width: 0; }
+.calculation-table-notes[hidden] { display: none; }
+.calculation-table-notes > h3 { margin: 0 0 6px; color: var(--text-secondary); font-size: 12px; font-weight: 400; }
+.calculation-table-notes-content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
 .occupant-load-form input[readonly], .occupant-load-form textarea[readonly] { cursor: default; }
 .calculation-function-search { position: sticky; top: 0; width: 100%; margin: 0 0 6px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface-muted); color: var(--text-primary); font: inherit; }
 .calculation-function-menu .custom-select-option[hidden] { display: none; }

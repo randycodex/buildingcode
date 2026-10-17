@@ -228,22 +228,24 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     ['spaceFunction', 'Function of space', [['', 'Select a BC table function']]], ['area', 'Floor area · ft²', null],
     ['areaBasis', 'Area basis', null],
     ['factor', 'Occupant-load factor · ft²/person', null],
-    ['factorBasis', 'Table row and footnotes', null],
     ['seating', 'Seating', [['', 'Confirm seating'], ['without-fixed-seating', 'Without fixed seating'], ['fixed-seating', 'Fixed seating — separate method required']]]
   ]) {
     const wrapper = document.createElement('label'); wrapper.textContent = label;
-    const field = document.createElement(options ? 'select' : key === 'factorBasis' ? 'textarea' : 'input');
+    const field = document.createElement(options ? 'select' : 'input');
     field.setAttribute('aria-label', label);
     if (options) options.forEach(([value, text]) => {const option = document.createElement('option'); option.value = value; option.textContent = text; field.append(option);});
-    else {if (key !== 'factorBasis') field.type = 'text'; field.maxLength = key === 'factorBasis' ? 4000 : 300; if (['area', 'factor'].includes(key)) field.inputMode = 'decimal';}
-    const derived = ['areaBasis', 'factor', 'factorBasis'].includes(key);
+    else {field.type = 'text'; field.maxLength = 300; if (['area', 'factor'].includes(key)) field.inputMode = 'decimal';}
+    const derived = ['areaBasis', 'factor'].includes(key);
     field.readOnly = derived;
     field.value = derived || key === 'spaceFunction' ? '' : draft[key] || '';
     if (key === 'spaceFunction') field.disabled = true;
     if (key === 'spaceFunction') field.className = 'occupant-load-function-select';
-    if (key === 'factorBasis') field.rows = 4;
     fields[key] = field; wrapper.append(field); form.append(wrapper);
   }
+  const notesSection = document.createElement('section'); notesSection.className = 'calculation-table-notes';
+  const notesHeading = document.createElement('h3'); notesHeading.textContent = 'Table row and footnotes';
+  const tableNotes = document.createElement('div'); tableNotes.className = 'calculation-table-notes-content';
+  notesSection.append(notesHeading, tableNotes); form.append(notesSection);
   const source = document.createElement('button'); source.type = 'button'; source.className = 'calculation-source';
   source.textContent = `Open in Reader · ${sourceLabel}`;
   const status = document.createElement('p'); status.className = 'calculation-status'; status.setAttribute('role', 'status');
@@ -274,7 +276,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     const row = table?.rows.find(row => row.id === draft.tableRowID);
     fields.factor.value = draft.factor;
     fields.areaBasis.value = draft.areaBasis ? draft.areaBasis[0].toUpperCase() + draft.areaBasis.slice(1) : '';
-    fields.factorBasis.value = draft.factorBasis;
+    tableNotes.textContent = draft.factorBasis;
+    notesSection.hidden = !draft.factorBasis;
     const areaLabel = fields.area.parentElement.firstChild;
     areaLabel.textContent = draft.areaBasis ? `Floor area · ${draft.areaBasis} ft²` : 'Floor area · ft²';
     const calculation = calculateOccupantLoad(draft);
