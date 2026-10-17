@@ -40,6 +40,12 @@ export function occupantLoadSource(source = {}) {
     /^\d+$/.test(String(source.sectionID || source.id || ''));
 }
 
+// Automatically discovered evidence is carried on answer citations even when
+// the conversation has no manually selected sources.
+export function occupantLoadAnswerSource(sources = [], answer = {}) {
+  return [...(Array.isArray(answer.citations) ? answer.citations : []), ...sources].find(occupantLoadSource) || null;
+}
+
 export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '') {
   if (!calculation?.valid || !evidenceLinks?.length) throw new Error('Complete the calculation and link its governing source first.');
   const c = calculation.input;

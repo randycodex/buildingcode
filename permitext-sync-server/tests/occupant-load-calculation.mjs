@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {calculateOccupantLoad, occupantLoadSource, calculationNoteBlocks} from '../public/occupant-load-calculation.js';
+import {calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, calculationNoteBlocks} from '../public/occupant-load-calculation.js';
 import {emptyNotebookDocument, normalizeNotebookCardPayload} from '../notebook-contract.mjs';
 const input={spaceFunction:'Synthetic office test',area:'1200',factor:'100',areaBasis:'gross',factorBasis:'Author-selected table row; footnotes reviewed',seating:'without-fixed-seating',reviewed:true};
 assert.equal(calculateOccupantLoad(input).people,12);
@@ -11,6 +11,12 @@ for(const patch of [{area:'0'},{factor:'0'},{factor:'-1'},{area:'Infinity'},{are
 const source={sectionID:'2152',codePrefix:'BC',sectionNumber:'1004.1.3',codeVersion:'CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1'};
 assert(occupantLoadSource(source));
 for(const patch of [{codeVersion:''},{codeVersion:source.codeVersion.replace('2022','2014')},{codePrefix:'FC'},{sectionID:'word'},{sectionNumber:'1004.3'}])assert(!occupantLoadSource({...source,...patch}));
+assert.equal(occupantLoadAnswerSource([], {citations:[source]}), source, 'Automatically retrieved citations expose the calculator without manually pinned sources.');
+assert.equal(occupantLoadAnswerSource([source], {}), source);
+assert.equal(occupantLoadAnswerSource([], {}), null);
+for (const patch of [{codeVersion:''},{codeVersion:source.codeVersion.replace('2022','2014')},{sectionNumber:'1004.3'},{codePrefix:'FC'}]) {
+ assert.equal(occupantLoadAnswerSource([], {citations:[{...source,...patch}]}), null, 'Answer citations must pass the same exact source and edition gate.');
+}
 const link={id:'synthetic-link',label:'BC 2022 § 1004.1.3',source:{...source,sourceID:'2152',sectionTitle:'Areas without fixed seating',codeEdition:'2022',sourceLibraryVersion:source.codeVersion},passages:[{exact:'Synthetic captured passage for a persistence contract.'}],relationshipRole:'context',createdAt:new Date().toISOString()};
 const document=emptyNotebookDocument();document.document=calculationNoteBlocks(calculateOccupantLoad(input),[link]);
 const normalized=normalizeNotebookCardPayload({cardType:'finding',title:'Synthetic calculation',document,evidenceLinks:[link],createdBy:'synthetic',updatedBy:'synthetic'});
