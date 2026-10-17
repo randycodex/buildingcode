@@ -33,6 +33,14 @@ for(const stale of [false,true]) {
  options.draft.area='1400';
  context.renderOccupantLoadCalculation(prefilledSource,{answerID:'prefill-answer',answer});
  assert.equal(options.draft.area,'1400','Rendering an answer again must preserve the author edit instead of reapplying Luna suggestions.');
+ const originalOptions=options;
+ context.renderOccupantLoadCalculation(prefilledSource,{calculatorID:'utility:calculator'});
+ assert.equal(options.draft.area,undefined,'Standalone inputs do not borrow a Reader or Assistant draft.');
+ options.draft.area='1700';
+ assert.equal(options.savedMessage,'Saved to Notebook · needs review.');
+ context.renderOccupantLoadCalculation(prefilledSource,{calculatorID:'utility:calculator'});
+ assert.equal(options.draft.area,'1700','Reopening the standalone calculator retains its own session draft.');
+ options=originalOptions;
  const save=options.onSave(calculation);await new Promise(r=>setImmediate(r));
  if(stale)context.state.workflowNavigationGeneration++;
  resolve();

@@ -212,7 +212,7 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '')
   return blocks;
 }
 
-export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes}) {
+export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote, assessment = null, getAssessment, onCheckFootnotes, onReplyFootnotes, savedMessage = 'Saved to Notebook · needs review. The Assistant answer is unchanged.'}) {
   const initialDraft = {...draft};
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
   let userMeasurementBasis = draft.userMeasurementBasis ?? draft.areaBasis ?? '';
@@ -349,7 +349,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
       const card = await onSave(calculation);
       if (!card) return;
       savedCard = card; savedFingerprint = JSON.stringify(calculation.input); open.hidden = false;
-      status.textContent = 'Saved to Notebook · needs review. The Assistant answer is unchanged.';
+      status.textContent = savedMessage;
     } catch (error) {status.textContent = error.message;}
     finally {busy = false; Object.values(fields).forEach(field => field.disabled = false); fields.spaceFunction.disabled = !table; update();}
   });

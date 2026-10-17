@@ -31,7 +31,7 @@ const state = { collapsedPaneIDs: [], paneWeights: { 'utility:search:1': 720 }, 
 let reducedMotion = false;
 let saves = 0;
 const context = vm.createContext({
-  state, Set, Map, Array, Object, isProAccount:()=>false,
+  state, Set, Map, Array, Object, workspaceColumnExpansion: null, isProAccount:()=>false,
   currentColumnWorkflowView:()=> 'research', workflowPaneIsVisible:()=>true,
   columnGroupForPane: id => state.columnGroups?.find(group => group.paneIDs.includes(id)),
   track: { querySelectorAll: () => [] },
@@ -281,7 +281,7 @@ assert.deepEqual(orderState.collapsedPaneIDs,[notebookID]);
 console.log('Keyboard column moves preserve independent project columns and named groups, boundaries and pinned Settings.');
 
 // Menu activation invokes real movement/collapse helpers without rerendering editors.
-let focused=null, menu=null, mountedPass=null, menuSaves=0, collapsedCall=null;
+let focused=null, menu=null, mountedPass=null, menuSaves=0, collapsedCall=null, expandedPanel=null;
 function menuNode(tag='button') {
   return {tag,children:[],attrs:{},listeners:{},style:{},offsetWidth:180,offsetHeight:200,
     get lastElementChild(){return this.children.at(-1);},
@@ -311,13 +311,14 @@ const menuContext=vm.createContext({state:menuState,AbortController,isProAccount
   appendPaneSequence:nodes=>{mountedPass=nodes;menuOrder=Array.from(menuState.paneOrder);},
   saveWorkspaceState:()=>menuSaves++,workspacePrivatePresentationAllowed:()=>false,
   canGroupColumn:()=>false,columnGroupForPane:()=>{throw Error('Private group lookup for guest');},
+  columnExpansionController:()=>({isExpanded:panel=>expandedPanel===panel,expand:panel=>{expandedPanel=panel;},restore:()=>{expandedPanel=null;}}),
   appendReaderMenuControls(){},paneIsCollapsed:()=>false,
   setPaneCollapsed:(...args)=>{collapsedCall=args;menuRail.focus();}
 });
 vm.runInContext(['paneCanCollapse','columnGroupCanCollapse','columnGroupIsCollapsed','canGroupWorkspaceColumn','activePinnedPaneID','togglePinnedPane','orderWithPaneStepped','movePaneOneStep','openColumnGroupMenu'].map(actual).join('\n'),menuContext);
 menuState.pinnedPaneID='reader:one';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert.deepEqual(menuItems().map(x=>x.textContent),['Collapse','Move Left','Move Right'],'Free menus omit both Pin and Unpin, even with a stored Pro pin.');
+assert.deepEqual(menuItems().map(x=>x.textContent),['Expand','Collapse','Move Left','Move Right'],'Free menus omit both Pin and Unpin, even with a stored Pro pin.');
 assert.equal(menuContext.activePinnedPaneID(),'','A stored Pro pin is inactive on Free.');
 menuContext.togglePinnedPane(menuPanel);
 assert.equal(menuState.pinnedPaneID,'reader:one','Free cannot change a pin through a stale action handler.');
@@ -327,23 +328,28 @@ assert.equal(menuContext.activePinnedPaneID(),'reader:one','The original pin pre
 menuState.pinnedPaneID='';
 menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert.equal(menu.attrs['aria-label'],'Column options');assert.equal(anchor.attrs['aria-expanded'],'true');
-assert.deepEqual(menuItems().map(x=>x.textContent),['Collapse','Pin','Move Left','Move Right']);
-assert.equal(menuItems()[2].disabled,true);assert.equal(menuItems()[3].disabled,false);
+assert.deepEqual(menuItems().map(x=>x.textContent),['Expand','Collapse','Pin','Move Left','Move Right']);
+assert.equal(menuItems()[3].disabled,true);assert.equal(menuItems()[4].disabled,false);
 assert.equal(focused,menuItems()[0]);
-menuItems()[1].focus();
-menu.listeners.keydown({key:'ArrowDown',preventDefault(){}});assert.equal(focused,menuItems()[3],'Arrow keys skip disabled move');
-menuItems()[3].listeners.click();
+menuItems()[2].focus();
+menu.listeners.keydown({key:'ArrowDown',preventDefault(){}});assert.equal(focused,menuItems()[4],'Arrow keys skip disabled move');
+menuItems()[4].listeners.click();
 assert.equal(anchor.attrs['aria-expanded'],'false');assert.equal(focused,anchor);
 assert.equal(mountedPass[0],menuPanel);assert.equal(mountedPass[1],peerPanel);
 assert.equal(menuPanel.editor,retainedEditor);assert.equal(retainedEditor.value,'Unsent live question');assert.equal(retainedEditor.scrollTop,321);
 assert.equal(menuSaves,1);
-menuContext.openColumnGroupMenu(menuPanel,anchor);menuItems()[0].listeners.click();
+menuContext.openColumnGroupMenu(menuPanel,anchor);menuItems()[1].listeners.click();
 assert.equal(collapsedCall[0],menuPanel);assert.equal(collapsedCall[1],true);assert.equal(collapsedCall[2].focus,true);assert.equal(focused,menuRail);
 menuContext.openColumnGroupMenu(menuPanel,anchor);menu.listeners.keydown({key:'Escape',preventDefault(){}});
 assert.equal(focused,anchor);assert.equal(anchor.attrs['aria-expanded'],'false');
+// Expansion is offered by the shared column menu, including Calculator.
+menuContext.openColumnGroupMenu(menuPanel,anchor);menuItems()[0].listeners.click();
+assert.equal(expandedPanel,menuPanel);assert.equal(menuPanel.editor,retainedEditor);
+menuContext.openColumnGroupMenu(menuPanel,anchor);assert.equal(menuItems()[0].textContent,'Restore width');menuItems()[0].listeners.click();assert.equal(expandedPanel,null);
 menuContext.currentColumnWorkflowView=()=> 'notebook';
 menuPanel.dataset.paneId='utility:saved:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
-assert(!menu.children.some(item=>['Collapse','Expand'].includes(item.textContent)), 'Notebook Evidence menus do not offer collapse or expansion.');
+assert(!menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Evidence menus do not offer collapse.');
+assert(menu.children.some(item=>item.textContent==='Expand'), 'Notebook Evidence retains the shared expansion control.');
 menuPanel.dataset.paneId='reader:one'; menuContext.openColumnGroupMenu(menuPanel,anchor);
 assert(menu.children.some(item=>item.textContent==='Collapse'), 'Notebook Reader menus retain collapse.');
 menuContext.currentColumnWorkflowView=()=> 'research';

@@ -124,6 +124,7 @@ function utilityState(value = {}) {
     search: Boolean(value.search),
     saved: Boolean(value.saved),
     analysis: Boolean(value.analysis),
+    calculator: Boolean(value.calculator),
     settings: Boolean(value.settings)
   };
 }

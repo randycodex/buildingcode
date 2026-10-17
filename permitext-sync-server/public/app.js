@@ -1,9 +1,9 @@
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
-import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=19";
+import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=20";
 import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
-import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261015-search-word-completion-v1082";
+import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
 import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261015-search-word-completion-v1082";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-calculator-footnotes-v1142";
+} from "./offline-storage.js?v=20261017-calculator-column-v1144";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-calculator-footnotes-v1142";
+} from "./workspace-state.js?v=20261017-calculator-column-v1144";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -345,6 +345,7 @@ const topbarActions = document.querySelector(".topbar-actions");
 const addReaderButton = document.querySelector("#add-reader");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
+const toggleCalculatorButton = document.querySelector("#toggle-calculator");
 const toggleSavedButton = document.querySelector("#toggle-saved");
 const toggleContextButton = document.querySelector("#toggle-context");
 const toggleFactsButton = document.querySelector("#toggle-facts");
@@ -881,6 +882,7 @@ function loadWorkspaceState(accountOverride) {
         search: false,
         saved: false,
         analysis: Boolean(saved.utilities?.analysis),
+        calculator: Boolean(saved.utilities?.calculator),
         settings: Boolean(saved.utilities?.settings)
       },
       account: accountOverride === undefined ? loadPersistedAccount(saved.account) : accountOverride,
@@ -994,7 +996,7 @@ function loadWorkspaceState(accountOverride) {
       sectionNotes: {},
       localSavedSectionIDs: [],
       utilityInstances: [],
-      utilities: { projects: false, archive: false, search: false, saved: false, analysis: false, settings: false },
+      utilities: { projects: false, archive: false, search: false, saved: false, analysis: false, calculator: false, settings: false },
       account: accountOverride === undefined ? loadPersistedAccount() : accountOverride,
       browserCredentialID: "",
       paneWeights: {},
@@ -1671,6 +1673,7 @@ function workspaceTransitionPaneLabel(paneID) {
   if (paneID === "utility:archive") return "Evidence archive";
   if (paneID === "utility:analysis") return "Assistant";
   if (paneID === "utility:settings") return "Settings";
+  if (paneID === "utility:calculator") return "Calculator";
   if (paneID.startsWith("research:conversation:")) return "Assistant conversation";
   if (paneID.startsWith("section:detail:")) return "Code section";
   if (paneID.startsWith("project:notebook:")) return "Notes";
@@ -2469,7 +2472,7 @@ function initializeDetachedProjectState(project) {
   state.coordinationThreads = [];
   state.detachedWorkboards = [];
   state.utilityInstances = [];
-  state.utilities = { projects: false, archive: false, search: false, saved: false, analysis: false, settings: false };
+  state.utilities = { projects: false, archive: false, search: false, saved: false, analysis: false, calculator: false, settings: false };
   state.readers = [];
   const workboardID = paneIDForProjectWorkboard(identity);
   const savedWorkboardWidth = Number(state.paneWeights?.[workboardID]);
@@ -4578,6 +4581,7 @@ function defaultActivePaneIDs() {
     ids.push("utility:analysis");
   }
   ids.push(...openResearchConversationPaneIDs());
+  if (state.utilities.calculator) ids.push("utility:calculator");
   if (state.utilities.settings) ids.push("utility:settings");
   state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
   openCodeQuestionPaneIDs().forEach((id) => ids.push(id));
@@ -5421,7 +5425,7 @@ function applyPaneWeight(panel, paneID) {
 }
 
 function setUtilityButtonStates() {
-  [toggleArchiveButton, toggleSearchButton, toggleSavedButton, toggleAnalysisButton, toggleWorkboardButton]
+  [toggleArchiveButton, toggleSearchButton, toggleSavedButton, toggleAnalysisButton, toggleCalculatorButton, toggleWorkboardButton]
     .forEach((button) => { if (button) button.disabled = false; });
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   document.querySelectorAll('[data-open-reader]').forEach(syncReaderToolbarButton);
@@ -5429,6 +5433,7 @@ function setUtilityButtonStates() {
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
   toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis || activeRepeatableKeys.has("analysis")));
+  toggleCalculatorButton?.setAttribute("aria-pressed", String(Boolean(state.utilities.calculator)));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(Boolean(document.querySelector(".account-screen[open]"))));
   syncTopbarProjectToolStates();
@@ -16468,6 +16473,55 @@ function showNotebookSavedLink(anchor, project, card) {
   message.append(status, open); container.append(message);
 }
 
+async function closeCalculatorColumn() {
+  if (!state.utilities.calculator) return;
+  state.utilities.calculator = false;
+  state.paneOrder = (state.paneOrder || []).filter(id => id !== "utility:calculator");
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+}
+
+async function openCalculatorColumn() {
+  if (notifyProjectRequiredForColumn()) return;
+  const paneID = "utility:calculator";
+  if (!state.utilities.calculator) await toggleUtilityPane("calculator");
+  if (!await whenWorkspacePaneReady(paneID)) return;
+  const panel = track.querySelector('.workspace-panel[data-pane-id="utility:calculator"]');
+  if (!panel) return;
+  const group = columnGroupForPane(paneID);
+  if (group?.collapsed) setColumnGroupCollapsed(group, false);
+  if (paneIsCollapsed(paneID)) setPaneCollapsed(panel, false);
+  scrollPaneIntoView(paneID);
+}
+
+function renderCalculatorColumn() {
+  const paneID = "utility:calculator";
+  const panel = document.createElement("article");
+  panel.className = "workspace-panel utility-panel calculator-panel";
+  panel.dataset.paneId = paneID;
+  const header = document.createElement("header"); header.className = "panel-header";
+  const heading = document.createElement("h2"); heading.className = "eyebrow panel-kind"; heading.textContent = "Calculator";
+  const actions = document.createElement("div"); actions.className = "panel-actions";
+  const close = document.createElement("button"); close.type = "button"; close.className = "icon-button utility-close";
+  close.setAttribute("aria-label", "Close Calculator"); close.title = "Close Calculator"; close.innerHTML = circleXIconSVG();
+  close.addEventListener("click", () => void closeCalculatorColumn());
+  actions.append(close); header.append(heading, actions);
+  const content = document.createElement("section"); content.className = "calculator-column-content";
+  // Navigation identity only. Factors, area bases and footnotes still load from
+  // the exact canonical section through the shared calculator's source checks.
+  const source = {sectionID: "2152", sectionNumber: "1004.1.3", codePrefix: "BC",
+    codeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"};
+  const calculator = renderOccupantLoadCalculation(source, {calculatorID: paneID});
+  if (calculator) {calculator.open = true; content.append(calculator);}
+  else {
+    const message = document.createElement("p"); message.className = "empty-state";
+    message.textContent = "Calculator is available with Pro.";
+    const account = document.createElement("button"); account.type = "button"; account.className = "ghost-button"; account.textContent = "Open account";
+    account.addEventListener("click", () => void focusUtility("settings")); content.append(message, account);
+  }
+  panel.append(header, content); applyPaneWeight(panel, paneID); return panel;
+}
+
 function calculatorConversationForPane(paneID = "") {
   const conversations=[activeResearchConversation,...supplementalResearchConversations.values()].filter(Boolean);
   if(paneID) return conversations.find(item=>paneIDForResearchConversation(item.id)===paneID) || null;
@@ -16514,13 +16568,13 @@ async function askCalculatorFootnotes(source, draft, {conversationID="", anchorP
   composer.requestSubmit();
 }
 
-function renderOccupantLoadCalculation(source, {anchor, conversationID = "", answerID = "", answer = null, conversation = null, getConversation = null} = {}) {
+function renderOccupantLoadCalculation(source, {anchor, conversationID = "", answerID = "", answer = null, conversation = null, getConversation = null, calculatorID = ""} = {}) {
   if (!occupantLoadSource(source) || !hasCapability("notebook")) return null;
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
   const project = workspaceProject();
   const sourceLabel = `${source.codePrefix || source.codeBook} § ${source.sectionNumber} · ${researchCodeEdition(source)}`;
-  const key = `${identity.userID}:${workspaceID}:${conversationID}:${answerID}:${source.sectionID || source.id}:${source.codeVersion || source.sourceLibraryVersion}`;
+  const key = `${identity.userID}:${workspaceID}:${conversationID}:${answerID}:${source.sectionID || source.id}:${source.codeVersion || source.sourceLibraryVersion}${calculatorID ? `:${calculatorID}` : ""}`;
   if (!occupantLoadDrafts.has(key)) occupantLoadDrafts.set(key, occupantLoadPrefill(answer, source));
   // Drafts live only in memory; saved Notes use the durable Notebook contract.
   if (occupantLoadDrafts.size > 60) occupantLoadDrafts.delete(occupantLoadDrafts.keys().next().value);
@@ -16541,6 +16595,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
   };
   const currentConversation=()=>getConversation ? getConversation() : (conversationID ? [activeResearchConversation,...supplementalResearchConversations.values()].find(item=>item?.id===conversationID) : conversation || calculatorConversationForPane());
   card = createOccupantLoadCard({draft: occupantLoadDrafts.get(key), sourceLabel, canSave: Boolean(project),
+    ...(calculatorID ? {savedMessage: "Saved to Notebook · needs review."} : {}),
     getAssessment: () => calculatorFootnoteAssessmentFor(source,currentConversation(),answerID),
     onCheckFootnotes: draft => askCalculatorFootnotes(source,draft,{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId}),
     onReplyFootnotes: () => askCalculatorFootnotes(source,occupantLoadDrafts.get(key),{conversationID:currentConversation()?.id||conversationID,anchorPaneID:card.closest(".workspace-panel")?.dataset.paneId,reply:true}),
@@ -41006,7 +41061,7 @@ function captureColumnGroupContents() {
           const detail = openProjectDetails().find((item) => paneID(item) === id);
           if (detail) column = { kind: 'project', key, value: detail, host: state.projectHostPaneID };
         }
-        if (!column && ['utility:settings', 'utility:archive'].includes(id)) column = { kind: 'singleton', key: id.slice(8) };
+        if (!column && ['utility:settings', 'utility:archive', 'utility:calculator'].includes(id)) column = { kind: 'singleton', key: id.slice(8) };
       }
       if (!column) continue;
       group.columns[id] = JSON.parse(JSON.stringify({ ...column, width: state.paneWeights[id] || defaultPaneWidthForID(id), collapsed: (state.collapsedPaneIDs || []).includes(id) }));
@@ -46226,6 +46281,7 @@ function workspacePaneDescriptors(options = {}) {
     if ((state.utilityInstances || []).some((item) => item.conversationID === id)) continue;
     add(paneIDForResearchConversation(id), "Assistant", () => renderResearchConversation(id, { supplemental: true }), () => closeResearchConversation(id));
   }
+  if (state.utilities.calculator) add("utility:calculator", "Calculator", renderCalculatorColumn, closeCalculatorColumn, { ownerClass: "calculator-panel", accessCapabilities: ["notebook", "research"] });
   if (state.utilities.settings) add("utility:settings", "Settings", renderSettings, closeAndRender(() => { state.utilities.settings = false; }));
   for (const reader of state.readers) {
     const id = paneIDForReader(reader);
@@ -46594,6 +46650,7 @@ function workspaceCommandDefinitions() {
   return [
     { label: "Open Search", hint: "Find sections across all codes", run: () => openNewSearchColumn() },
     { label: "Open Research", hint: "Ask a cited building-code question", run: () => focusUtility("analysis", ".research-question-input") },
+    { label: "Open Calculator", hint: "Calculate occupant load from the BC table", run: () => openCalculatorColumn() },
     ...(isProAccount() || state.readers.length < 2
       ? [{ label: "New Reader", hint: "Open another code column", run: () => readerToolbarButtonForCurrentView().click() }]
       : []),
@@ -46786,6 +46843,10 @@ function bindImmediateUtilityControls() {
       if (notifyProjectRequiredForColumn()) return;
       void focusRecentUtilityColumn("analysis");
     });
+  }
+  if (toggleCalculatorButton && toggleCalculatorButton.dataset.coldStartBound !== "true") {
+    toggleCalculatorButton.dataset.coldStartBound = "true";
+    toggleCalculatorButton.addEventListener("click", () => void openCalculatorColumn());
   }
   if (toggleSavedButton.dataset.coldStartBound === "true") return;
   toggleSavedButton.dataset.coldStartBound = "true";
