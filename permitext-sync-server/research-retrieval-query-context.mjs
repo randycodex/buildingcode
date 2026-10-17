@@ -309,7 +309,7 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
   const currentTerms = contextTerms(question);
   const questionTerms = currentTerms.size >= 3 ? currentTerms : contextTerms(subject);
   const relevant = new Set();
-  const zoning = /\b(?:zoning|district|floor area ratio|parking|setback|yards?|lot coverage|lot|permitted use|use permitted|development rights?|frontage|transparency|streetscape|street[- ]wall|glazing)\b/i.test(subject) || researchFloorAreaRatioRequested(subject);
+  const zoning = /\b(?:zoning|district|use groups?|floor area ratio|parking|setback|yards?|lot coverage|lot|permitted use|use permitted|development rights?|frontage|transparency|streetscape|street[- ]wall|glazing)\b/i.test(subject) || researchFloorAreaRatioRequested(subject);
   if (intent.roomDimensions) relevant.add("use");
   if (zoning) for (const name of ["district", "use", "work", "lot"]) relevant.add(name);
   if (/\b(?:occupancy|group\s+(?:A-[1-5]|B|E|F-[12]|H-[1-5]|I-[1-4]|M|R-[1-3]|S-[12]|U)|occupant load|egress|stairs?|exit|travel distance|accessible|fire|sprinkler|ventilation|plumbing fixtures?|water closets?)\b/i.test(subject)) relevant.add("use");
@@ -353,12 +353,16 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
           !researchQuestionSubject(fact.assertion).roomDimensions) return { ...fact, index, score: 0 };
       const overlap = [...contextTerms(fact.assertion)].filter(term => questionTerms.has(term)).length;
       const facetMatches = fact.facets.filter(name => relevant.has(name)).length;
+      // Mapped district/subdistrict context chooses which published zoning
+      // chapter to search. Existing unit counts and tax-lot dimensions must
+      // not consume the five search-hint slots before that scope is included.
+      const districtScope = zoning && fact.facets.includes("district") ? 25 : 0;
       const lexicalIdentity = queryMode === "lexical" && zoning && /\b(?:address|borough|BBL|ZIP code|community district|zoning map)\s*:/i.test(fact.payload);
       // A description's broad use/fire facet alone cannot nominate unrelated
       // prose. Within a requested scope, the first statement carries premises
       // (and remains attached to every selected subordinate statement).
       const substantive = overlap > 0 || hypothetical && fact.scopeIntroduction;
-      return { ...fact, index, score: fact.descriptionStatement && !substantive ? 0 : facetMatches * 10 + overlap * 4 + (lexicalIdentity ? 1 : 0) };
+      return { ...fact, index, score: fact.descriptionStatement && !substantive ? 0 : districtScope + facetMatches * 10 + overlap * 4 + (lexicalIdentity ? 1 : 0) };
     }).filter(fact => fact.score > 0 && (queryMode === "lexical" && zoning ||
       !/\b(?:address|borough|BBL|ZIP code|community district|zoning map)\s*:/i.test(fact.payload)))
     .sort((left, right) => right.score - left.score || left.index - right.index);

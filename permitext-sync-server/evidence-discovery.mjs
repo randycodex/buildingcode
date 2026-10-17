@@ -11,8 +11,9 @@ import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch,
 import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup, researchImmediateChildDetailGain } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 import { researchCurrentPurposeTerms, researchCurrentPurposeMatches, researchCurrentEditionContext } from "./research-current-purpose.mjs";
+import { nominateZoningDistrictScope } from "./research-zoning-district-scope.mjs";
 
-export const evidenceDiscoveryVersion = "20261017-construction-topic-recall-v69";
+export const evidenceDiscoveryVersion = "20261017-mapped-zoning-scope-v70";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1918,6 +1919,11 @@ export async function discoverRelevantEvidence({
   const directReferenceKeys = new Set(codeReferences(currentQuestion).map(reference =>
     `${reference.codePrefix}:${reference.sectionNumber}`));
   const relevanceComparison = retrievalContext?.relevanceComparison === true;
+  const districtScopeNominations = nominateZoningDistrictScope({ question: sourceQuestion,
+    scopeText: normalizedQuestion, catalog: sections,
+    restricted: relevanceComparison || retrievalContext?.sourceSelectionRestricted === true ||
+      (explicitDisciplinePrefixes.size > 0 && !explicitDisciplinePrefixes.has('ZR')) });
+  const districtScopeByID = new Map(districtScopeNominations.map(item => [comparableSectionID(item.section.id), item]));
   const comparisonReferenceKeys = new Set(
     relevanceComparison
       ? codeReferences([
@@ -2217,6 +2223,9 @@ export async function discoverRelevantEvidence({
     const id = comparableSectionID(section.id);
     if (!preliminaryIDs.has(id)) preliminary.push({ id, score: scores.get(id) || 0 });
   }
+  for (const id of districtScopeByID.keys()) {
+    if (!preliminaryIDs.has(id)) preliminary.push({ id, score: scores.get(id) || 0 });
+  }
   const detailed = [];
   const unavailableSourceCandidates = [];
   for (const entry of preliminary) {
@@ -2249,7 +2258,12 @@ export async function discoverRelevantEvidence({
     const coverage = originalTerms.length
       ? originalMatches.size / new Set(originalTerms).size
       : 0;
-    const indexedPassage = passageHitsByID.get(entry.id);
+    let indexedPassage = passageHitsByID.get(entry.id);
+    const mappedDistrictScope = districtScopeByID.get(entry.id);
+    // Preserve the entire short qualification, including its conditions and
+    // closing paragraphs. Ordinary canonical resolution still binds it later.
+    const completeDistrictScope = mappedDistrictScope && bodyPlainText.length <= 12_000;
+    if (completeDistrictScope) indexedPassage = null;
     // A monolithic source can contain the exact subsection the user named.
     // Keep that passage-level identity through fusion and final sorting; its
     // containing catalog section need not have the same section number.
@@ -2272,7 +2286,7 @@ export async function discoverRelevantEvidence({
         ))
       )
     );
-    let passage = indexedPassage ? { text: indexedPassage.text, score: indexedPassage.score,
+    let passage = completeDistrictScope ? { text: bodyPlainText, score: 0, blockID: null } : indexedPassage ? { text: indexedPassage.text, score: indexedPassage.score,
       blockID: indexedPassage.blockID } : bestPassage(body, passageTerms, bigrams);
     if (!passage) continue;
     if (routeMatch?.useSelectedPassageOnly && routeMatch.selectedExcerptPatterns.length) {
@@ -2328,6 +2342,7 @@ export async function discoverRelevantEvidence({
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
       definitionCarrier: researchEmbeddedDefinitionCarrier({ ...section, body }),
+      ...(completeDistrictScope ? { mappedDistrictScope: { district: mappedDistrictScope.district, kind: mappedDistrictScope.kind } } : {}),
     });
   }
 
@@ -2519,6 +2534,15 @@ export async function discoverRelevantEvidence({
       break;
     }
   }
+  // Keep these qualifications in the existing shortlist, preserving explicit
+  // references, the lead, and the already protected technical reservations.
+  const districtScopes = districtScopeNominations.flatMap(({ section }) =>
+    detailed.filter(item => item.mappedDistrictScope && comparableSectionID(item.section.id) === comparableSectionID(section.id)));
+  if (districtScopes.length) {
+    const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference ||
+      item.completeSiblingCompanionOf || item.currentQuestionLexicalReservation || item.currentQuestionForeground || item.currentDetailChildParent);
+    selectedCandidates = [...new Set([...protectedItems, ...districtScopes, ...selectedCandidates])].slice(0, candidateLimit);
+  }
   const selectedIDs = new Set(selectedCandidates.map((item) => item.section.id));
   const selectedPrefixCounts = new Map();
   for (const item of selectedCandidates) {
@@ -2677,6 +2701,7 @@ export async function discoverRelevantEvidence({
       whyRelevant: candidateExplanation(item),
       signals: {
         matchedTerms: item.matchedTerms.slice(0, 12),
+        ...(item.mappedDistrictScope ? { mappedDistrictScope: item.mappedDistrictScope } : {}),
         ...(item.completeSiblingCompanionOf ? { completeSiblingCompanionOf: item.completeSiblingCompanionOf } : {}),
         ...(item.currentDetailChildParent ? { currentDetailChildParent: item.currentDetailChildParent } : {}),
         ...(item.currentQuestionLexicalReservation ? { currentQuestionLexicalReservation: item.currentQuestionLexicalReservation } : {}),

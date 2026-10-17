@@ -146,4 +146,17 @@ const foreignReferenceText = "315.1 General.\n\nThis section contains rules.\n\n
 const foreignReferences = researchPassagesForSection(catalog[0], { blocks: [{ id: "foreign-references", plainText: foreignReferenceText }] });
 assert.equal(foreignReferences.find(passage => passage.subsectionNumber === "315.2").sameSectionReferences.length, 0, "Do not bind explicitly different-code references to a coincidentally numbered internal rule.");
 
-console.log(`Research passage index contract passed: exact numbered source slices, parent conditions, exceptions, complete table sources, source invalidation and actual FC 315 recall (${realIndex.passageCount} passages).`);
+// Large source metadata is needed only for returned passages. A broad lexical
+// match must still score every record, without copying every dependency packet.
+const broadCatalog = Array.from({ length: 300 }, (_, i) => ({ ...catalog[0], id: `lazy-${i}`, sectionNumber: `315.${i + 1}` }));
+const broadIndex = await buildResearchPassageIndex(broadCatalog, async s => ({ blocks: [{ id: 'rule', plainText: `${s.sectionNumber} Storage.\nCombustible storage requires protection.` }] }));
+let materialized = 0;
+for (const { passage } of broadIndex.records) Object.defineProperty(passage, 'expensiveSourceMetadata', {
+  enumerable: true, get() { materialized++; return { canonical: true }; }
+});
+const broadHits = searchResearchPassages(broadIndex, 'combustible storage protection', { limit: 5 });
+assert.equal(broadHits.length, 5);
+assert(materialized <= 20, `Only returned source metadata should be copied, saw ${materialized} copies.`);
+assert(broadHits.every(hit => hit.expensiveSourceMetadata.canonical && hit.passages.every(p => p.expensiveSourceMetadata.canonical)));
+assert.deepEqual(broadHits.map(hit => hit.sectionID), ['lazy-0', 'lazy-1', 'lazy-2', 'lazy-3', 'lazy-4'], 'Equal-score ordering remains stable.');
+console.log(`Research passage index contract passed: exact numbered source slices, parent conditions, exceptions, complete table sources, source invalidation, lazy copies and actual FC 315 recall (${realIndex.passageCount} passages).`);
