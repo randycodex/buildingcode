@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-calculator-centered-v1146";
+} from "./offline-storage.js?v=20261017-calculator-menus-v1147";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-calculator-centered-v1146";
+} from "./workspace-state.js?v=20261017-calculator-menus-v1147";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -7907,6 +7907,7 @@ function enhanceSelect(select) {
   const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select") || select.classList.contains("research-feedback-rating-select");
   const assistantWorkMenu = select.classList.contains("assistant-work-type-select");
   const calculationFunctionMenu = select.classList.contains("occupant-load-function-select");
+  const calculationMenu = Boolean(select.closest(".occupant-load-card"));
   menu.classList.toggle("calculation-function-menu", calculationFunctionMenu);
   const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
@@ -8047,9 +8048,9 @@ function enhanceSelect(select) {
   const positionMenu = () => {
     const rect = trigger.getBoundingClientRect();
     const viewportPadding = 8;
-    const panel = trigger.closest(assistantWorkMenu ? ".assistant-history-rail" : ".workspace-panel");
+    const panel = trigger.closest(calculationMenu ? ".occupant-load-body" : assistantWorkMenu ? ".assistant-history-rail" : ".workspace-panel");
     const panelRect = panel?.getBoundingClientRect();
-    const panelInset = panel?.classList.contains("reader-panel") || researchProjectMenu || researchHistoryProjectMenu
+    const panelInset = calculationMenu || panel?.classList.contains("reader-panel") || researchProjectMenu || researchHistoryProjectMenu
       ? Number.parseFloat(getComputedStyle(panel).paddingLeft) || 0
       : 0;
     const boundaryLeft = Math.max(viewportPadding, (panelRect?.left ?? viewportPadding) + panelInset);
@@ -8057,7 +8058,9 @@ function enhanceSelect(select) {
       window.innerWidth - viewportPadding,
       (panelRect?.right ?? window.innerWidth - viewportPadding) - panelInset
     );
-    const boundaryWidth = Math.max(rect.width, boundaryRight - boundaryLeft);
+    const boundaryWidth = calculationMenu
+      ? Math.max(0, Math.min(600, boundaryRight - boundaryLeft))
+      : Math.max(rect.width, boundaryRight - boundaryLeft);
     if (readerChapterMenu) menu.style.setProperty("--select-menu-width", "max-content");
     const menuStyles = getComputedStyle(menu);
     const menuHorizontalPadding = (Number.parseFloat(menuStyles.paddingLeft) || 0) +
