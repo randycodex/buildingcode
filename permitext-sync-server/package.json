@@ -249,7 +249,7 @@
     "test:research-prepared-retrieval": "node tests/research-prepared-passages-contract.mjs && node tests/research-source-body-cache-contract.mjs && node scripts/build-prepared-research-passages.mjs && node scripts/benchmark-research-prepared-passages.mjs"
   },
   "dependencies": {
-    "@blocknote/core": "^0.54.0",
+    "@blocknote/core": "^0.55.0",
     "@blocknote/mantine": "^0.54.0",
     "@blocknote/react": "^0.54.0",
     "@clerk/backend": "^3.17.0",
