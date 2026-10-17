@@ -92,7 +92,9 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   });
   const reviewLabel = document.createElement('label'); reviewLabel.className = 'calculation-confirm';
   const reviewed = document.createElement('input'); reviewed.type = 'checkbox'; reviewed.checked = draft.reviewed === true;
-  reviewLabel.append(reviewed, 'I confirmed the factor, gross/net basis, and applicable footnotes in Reader.');
+  const reviewText = document.createElement('span');
+  reviewText.textContent = 'I confirmed the factor, gross/net basis, and applicable footnotes in Reader.';
+  reviewLabel.append(reviewed, reviewText);
   const result = document.createElement('output'); result.className = 'calculation-result'; result.setAttribute('aria-live', 'polite');
   const formula = document.createElement('p'); formula.className = 'calculation-formula';
   const actions = document.createElement('div'); actions.className = 'calculation-actions';
@@ -104,6 +106,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   const update = () => {
     Object.assign(draft, values());
     const calculation = calculateOccupantLoad(draft);
+    result.classList.toggle('is-pending', !calculation.valid);
     result.textContent = calculation.valid ? `${calculation.people.toLocaleString()} people` : 'Complete inputs and source review';
     formula.textContent = calculation.valid ? `${calculation.input.area} ÷ ${calculation.input.factor} · rounded up to a whole person` : calculation.errors[0];
     const changed = savedCard && JSON.stringify(calculation.input) !== savedFingerprint;
