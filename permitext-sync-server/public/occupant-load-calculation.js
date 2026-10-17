@@ -222,8 +222,6 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
   root.dataset.researchSelectionExclude = 'true';
   const summary = document.createElement('summary'); summary.textContent = 'Occupant load calculation';
   const body = document.createElement('div'); body.className = 'occupant-load-body';
-  const scope = document.createElement('p'); scope.className = 'calculation-scope';
-  scope.textContent = 'One space without fixed seating · author-supplied inputs';
   const form = document.createElement('form'); form.className = 'occupant-load-form';
   const fields = {};
   for (const [key, label, options] of [
@@ -375,7 +373,6 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     finally {loading = false;}
   });
   actions.append(save, open); form.append(result, formula, footnotes, actions);
-  if (!draft.suggestions?.length) body.append(scope);
   body.append(source);
   body.append(form, status); root.append(summary, body); update();
   return root;
