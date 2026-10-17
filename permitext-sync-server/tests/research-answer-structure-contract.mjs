@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateResearchInterpretation } from "../app.mjs";
 import { researchWriterInstructions } from "../research-writer-policy.mjs";
+import { buildResearchRequestEnvelopeBuilders } from "./research-request-envelope-preflight.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const [serverSource, clientSource] = await Promise.all([
@@ -73,8 +74,17 @@ assert.doesNotMatch(serverSource, /write conclusion and explanation so they read
 // The general writer policy replaced the old inline answer-template prompt.
 // Exercise the actual policy used by the request builder, retaining its scope,
 // formatting, qualification and source-boundary obligations.
-const writerPolicy = researchWriterInstructions({ question: "What are the requirements?" });
-assert.match(serverSource, /instructions: researchWriterInstructions\(\{ question, options \}\)/);
+const writerQuestion = "What are the requirements?";
+const writerOptions = {responseStyle: "conversational"};
+const writerPolicy = researchWriterInstructions({question: writerQuestion, options: {...writerOptions, occupantLoadDraft: false}});
+const {buildAnswerRequest} = await buildResearchRequestEnvelopeBuilders();
+assert.equal(buildAnswerRequest(writerQuestion, evidence, "offline-answer-structure", writerOptions).instructions, writerPolicy,
+  "The actual request builder must preserve the complete general writer policy when no calculator source is present.");
+const calculatorEvidence = [{...evidence[0], sectionID:"2152", sectionNumber:"1004.1.3",
+  codeVersion:"CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"}];
+assert.equal(buildAnswerRequest(writerQuestion, calculatorEvidence, "offline-calculator-structure", writerOptions).instructions,
+  researchWriterInstructions({question:writerQuestion,options:{...writerOptions,occupantLoadDraft:true}}),
+  "Calculator instructions must extend the same general policy when its governing source is supplied.");
 assert.match(writerPolicy, /leading with the strongest conclusion supported by the evidence/);
 assert.match(writerPolicy, /choose paragraphs, lists or a table to suit the question without a fixed template/);
 assert.match(writerPolicy, /every exception material to the conclusion/);

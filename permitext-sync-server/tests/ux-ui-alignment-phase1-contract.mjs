@@ -134,14 +134,18 @@ try {
       result.headingLine,
       result.snippet
     ], "systems required by this")),
-    false,
-    "The exact-search regression fixture unexpectedly moved into the first broad page."
+    true,
+    "Broad search should surface literal phrase matches after the search-ranking improvements."
   );
   const exact = await getJSON(`/code/search?q=${query}&code=BC&match=exact&limit=25&offset=0`);
   assert.equal(exact.totalResults, 5);
   assert.equal(exact.results.length, 5);
   assert(exact.results.some((result) => String(result.id) === "1840"));
   assert.equal(exact.hasMore, false);
+  for (const result of exact.results) {
+    assert(searchTextMatchesExactQuery([result.sectionNumber, result.title, result.headingLine, result.snippet],
+      "systems required by this"), "Exact mode must return only literal phrase matches.");
+  }
 
   const commonQuery = encodeURIComponent("of");
   const commonPageOne = await getJSON(

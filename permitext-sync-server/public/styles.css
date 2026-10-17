@@ -1973,11 +1973,6 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   height: 20px;
 }
 
-.reader-to-top:hover {
-  background: color-mix(in srgb, var(--surface-raised) 86%, var(--code-accent) 14%);
-  box-shadow: 0 8px 24px color-mix(in srgb, #000 22%, transparent);
-}
-
 .reader-to-top:focus-visible {
   outline: none;
   box-shadow: none;
@@ -3610,7 +3605,6 @@ select option:checked {
 
 .reader-internal-result:is(:hover, :focus-visible) {
   background: transparent;
-  color: var(--code-accent);
   outline: 0;
 }
 .reader-internal-result:is(:hover, :focus-visible)::before,

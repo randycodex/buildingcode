@@ -312,7 +312,7 @@ export function relevantResearchRetrievalFactContext({ question, contextualTopic
   const zoning = /\b(?:zoning|district|floor area ratio|parking|setback|yards?|lot coverage|lot|permitted use|use permitted|development rights?|frontage|transparency|streetscape|street[- ]wall|glazing)\b/i.test(subject) || researchFloorAreaRatioRequested(subject);
   if (intent.roomDimensions) relevant.add("use");
   if (zoning) for (const name of ["district", "use", "work", "lot"]) relevant.add(name);
-  if (/\b(?:occupancy|occupant load|egress|stairs?|exit|travel distance|accessible|fire|sprinkler|ventilation|plumbing fixtures?|water closets?)\b/i.test(subject)) relevant.add("use");
+  if (/\b(?:occupancy|group\s+(?:A-[1-5]|B|E|F-[12]|H-[1-5]|I-[1-4]|M|R-[1-3]|S-[12]|U)|occupant load|egress|stairs?|exit|travel distance|accessible|fire|sprinkler|ventilation|plumbing fixtures?|water closets?)\b/i.test(subject)) relevant.add("use");
   if (/\b(?:new|development|enlargement|alteration|existing|change of use|construction)\b/i.test(subject)) relevant.add("work");
   if ((!intent.roomDimensions || /\b(?:sprinkler|fire|storage|egress|travel distance)\b/i.test(subject)) && /\b(?:sprinkler|fire|storage|egress|travel distance|height|area)\b/i.test(subject)) relevant.add("sprinklers");
   if (/\b(?:height|stories|storeys|high[- ]rise|floors?|vertical|elevator)\b/i.test(subject.replace(/\bfloor\s+drains?\b/gi, "drain"))) relevant.add("height");

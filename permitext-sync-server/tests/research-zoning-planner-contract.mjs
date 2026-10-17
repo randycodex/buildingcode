@@ -223,10 +223,18 @@ const projection = zoningResearchPlanCostProjection({
   evidenceCharacters: zoningResearchEvidenceLimits(tablePlan).maximumCharacters
 });
 assert.equal(projection.production.requestCount, 2);
-assert.equal(projection.production.adverseRequestCount, 3);
+assert.equal(projection.production.adverseRequestCount, 4);
+assert.equal(projection.adverseCalls.at(-1).stage, "post_repair_verification",
+  "A repaired answer must include a fresh verification call in the cost projection.");
+assert.equal(projection.production.adverseRequestCount, tablePlan.callPolicy.maximumProviderCalls);
 assert.equal(projection.judge.requestCount, 0);
 assert.ok(projection.production.adverseUSD >= projection.production.nominalUSD);
-assert.ok(projection.production.adverseUSD * 100 < 6);
+assert.ok(projection.production.nominalUSD * 100 < 6);
+// This stress case fills the entire character ceiling, then revises and reviews.
+// Report its actual worst-case cost rather than silently omitting the review.
+// The frozen cohort's $6/100 nominal AND adverse gates remain in the preflight.
+assert.ok(projection.production.adverseUSD * 100 > 6,
+  "A maximum-size four-call stress case must expose that it exceeds the cohort cost target.");
 
 const missingSpecialParkingRule = evaluateZoningEvidenceReadiness({
   question: "The broker says this R6 site is close to a subway. What parking applies?",

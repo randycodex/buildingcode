@@ -22532,9 +22532,10 @@ async function handleResearchEvidenceDiscover(request, response) {
     if (!access) return;
   }
   try {
+    const corpus = (await currentResearchCorpusRegistry()).find(item => item.id === "nyc-2022-construction-codes");
     const discovery = await discoverRelevantEvidence({
       question: context.body.question,
-      catalog: await sectionCatalog(),
+      catalog: (await sectionCatalog()).map(section => researchCatalogEntry(section, corpus)),
       invertedIndex: await shippedSearchIndex(),
       readSectionBody: (section) => sectionBody(section.webSectionID || section.id, {
         allowMissing: true,

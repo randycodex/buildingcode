@@ -4,6 +4,10 @@ import { discoverRelevantEvidence } from "../evidence-discovery.mjs";
 
 const index = JSON.parse(await readFile(new URL("../config/canonical-section-ids.json", import.meta.url), "utf8"));
 const checks = [
+  ["What exceptions permit omitting parapets?", ["705.11"]],
+  ["Check emergency escape and rescue windows for a dwelling.", ["1030.1"]],
+  ["How does flame-spread classification affect interior finishes?", ["803.11"]],
+  ["How do frontage and sprinkler increases affect allowable building area?", ["506.1", "506.2", "506.3"]],
   ["An exterior wall is 3 feet from an interior lot line. What rating is required and are unprotected window openings permitted?", ["602.1", "705.8", "705.8.1"]],
   ["Can a four-story open volume be treated as an atrium and what separation and smoke control protections apply?", ["712.1.7", "404.3", "404.5", "404.6"]],
   ["Can a plumbing pipe penetrate a 2-hour shaft enclosure wall?", ["713.8", "713.8.1", "714.3", "714.3.1"]],
@@ -21,7 +25,7 @@ const catalog = [];
 for (const [key, id] of Object.entries(index.byCodeChapterSection)) {
   const [codePrefix, chapterNumber, sectionNumber] = key.split(":");
   if (codePrefix === "BC" && wanted.has(sectionNumber)) {
-    catalog.push({ id: String(id), codePrefix, chapterNumber, sectionNumber, title: `BC ${sectionNumber}` });
+    catalog.push({ id: String(id), codePrefix, codeEdition: "2022", chapterNumber, sectionNumber, title: `BC ${sectionNumber}` });
   }
 }
 assert.deepEqual(new Set(catalog.map((item) => item.sectionNumber)), wanted, "Every route target must exist in the canonical corpus.");
@@ -58,5 +62,11 @@ for (const [question, expected] of checks) {
     }
   }
 }
+
+const otherEdition = await discoverRelevantEvidence({
+  question: "Parapet exceptions", catalog: [{ id: "historical-parapet", codePrefix: "BC", codeEdition: "2014", sectionNumber: "705.11", title: "General" }],
+  invertedIndex: new Map(), readSectionBody: async () => ({ blocks: [{ plainText: "Different edition." }] }), limit: 12
+});
+assert.equal(otherEdition.candidates.length, 0, "A 2022 topic nomination cannot manufacture a same-numbered 2014 hit.");
 
 console.log("permitext distinct evidence-discovery routes contract passed");

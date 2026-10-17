@@ -44,7 +44,7 @@ export async function withOfflineResearchHTTPHarness(namespace, evaluate) {
 
   let server;
   try {
-    const { handleRequest } = await import(`../app.mjs?${safeNamespace}=${Date.now()}`);
+    const { handleRequest, researchCorpusPlanForTurn, researchCorpusResources, resolveResearchAssemblySection } = await import(`../app.mjs?${safeNamespace}=${Date.now()}`);
     server = createServer(handleRequest);
     await new Promise((resolve, reject) => {
       server.once("error", reject);
@@ -67,6 +67,8 @@ export async function withOfflineResearchHTTPHarness(namespace, evaluate) {
       body: { credential }
     })).account;
 
+    const corpusPlan = await researchCorpusPlanForTurn({ question: "2022 NYC Construction Codes", messages: [], projectFacts: [] });
+    const { catalog } = await researchCorpusResources(corpusPlan);
     const sectionCache = new Map();
     const resolveSection = async (requested) => {
       const cacheKey = requested.sectionID
@@ -89,15 +91,16 @@ export async function withOfflineResearchHTTPHarness(namespace, evaluate) {
         sectionID = String(match.id);
       }
       const section = (await jsonRequest(baseURL, `/code/sections/${sectionID}`)).section;
-      const resolved = {
-        sectionID: String(section.sectionID || sectionID),
-        codePrefix: section.codePrefix,
-        sectionNumber: section.sectionNumber,
-        title: section.title,
-        codeVersion: section.codeVersion,
-        body: { blocks: section.blocks || [] },
-        crossReferences: []
-      };
+      // Use the production resolver after the HTTP identity check. Its edition
+      // metadata and complete reference lists are part of the evidence contract.
+      const resolved = await resolveResearchAssemblySection({ ...requested, sectionID }, catalog);
+      assert.ok(resolved, `No canonical evidence for ${sectionID}.`);
+      assert.equal(resolved.sectionNumber, section.sectionNumber);
+      assert.equal(resolved.codePrefix, section.codePrefix);
+      // Some content contracts also inspect exact block/table structure. The
+      // production resolver omits small bodies for speed; retain this already
+      // fetched canonical HTTP body alongside its production evidence fields.
+      resolved.body ||= { blocks: section.blocks || [] };
       sectionCache.set(cacheKey, resolved);
       sectionCache.set(`id:${resolved.sectionID}`, resolved);
       sectionCache.set(`${resolved.codePrefix}:${resolved.sectionNumber}`, resolved);

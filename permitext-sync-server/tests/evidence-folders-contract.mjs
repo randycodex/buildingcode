@@ -883,15 +883,24 @@ assert.match(appSource, /instance\.projectsMenuOpen = overrides\.projectsMenuOpe
 assert.match(appSource, /archiveButton\.innerHTML = showingArchived \? activeProjectsIconSVG\(\) : archiveIconSVG\(\)/);
 assert.match(appSource, /const defaultNonReaderPaneWidth = 400;/);
 assert.match(appSource, /const legacyCoordinationPaneWidth = 430;[\s\S]*?const defaultCoordinationPaneWidth = 600;/);
-assert.match(appSource, /const legacyReaderPaneWidth = 520;[\s\S]*?const defaultReaderPaneWidth = 600;/);
-assert.match(appSource, /const legacySourceLinkedReaderPaneWidth = 400;[\s\S]*?const defaultSourceLinkedReaderPaneWidth = 600;/);
+assert.match(appSource, /const defaultReaderPaneWidth = 600;/);
+assert.match(appSource, /const defaultSourceLinkedReaderPaneWidth = 600;/);
 assert.match(appSource, /const defaultResearchPaneWidth = assistantHistoryWidth \+ 600;/);
 assert.match(appSource, /const defaultCodeDecisionPaneWidth = 600;/);
 assert.match(appSource, /const defaultSearchPaneWidth = 600;/);
 assert.match(appSource, /paneID === "utility:search" \|\| paneID\.startsWith\("utility:search:"\)\) return defaultSearchPaneWidth;/);
 assert.match(appSource, /return Math\.max\(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole\(parsed\?\.paneRole\) \|\| 0\);/);
 assert.match(appSource, /paneID === "utility:analysis" \|\| paneID\.startsWith\("utility:analysis:"\) \|\| paneID\.startsWith\("research:conversation:"\)\) return defaultResearchPaneWidth;/);
-assert.match(appSource, /paneID\?\.startsWith\("reader:"\)[\s\S]*?value === legacyReaderPaneWidth \|\| value === legacySourceLinkedReaderPaneWidth[\s\S]*?defaultPaneWidthForID\(paneID\) === defaultReaderPaneWidth[\s\S]*?return defaultReaderPaneWidth;/);
+const migrateReaderWidth = new Function([
+  appSource.match(/const defaultReaderPaneWidth = [^;]+;/)[0],
+  ...["minimumPaneWidthForID", "maximumPaneWidthForID", "constrainPaneWidth", "migrateLegacyPaneWidth"]
+    .map(name => functionSource(appSource, name)),
+  "return migrateLegacyPaneWidth;"
+].join("\n"))();
+for (const [stored, expected] of [[350,400], [400,400], [520,520], [600,600], [900,900], [1000,900], [40,600], [0,600], [NaN,600]]) {
+  assert.equal(migrateReaderWidth("reader:fixture", stored), expected,
+    "Restored Reader widths must preserve the user's choice within 400–900px and default invalid/strip widths to 600px.");
+}
 assert.match(appSource, /if \(isProjectCoordinationPaneID\(paneID\) && value === legacyCoordinationPaneWidth\) \{[\s\S]*?return defaultCoordinationPaneWidth;/);
 assert.match(appSource, /projectsMenuToggle\.onclick = \(\) => \{[\s\S]*?if \(instance\.projectsMenuOpen \|\| !showingArchived\) return;[\s\S]*?instance\.projectsArchiveMode = false;/);
 assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);
@@ -906,7 +915,27 @@ assert.match(
 );
 assert.match(appSource, /typeLabel\.textContent = folderTypeLabel\(project\)/, "Settings must identify each record as a Project or saved collection.");
 assert.match(appSource, /folderRecordCountLabel\(selectedProjects\)/, "Selected-record deletion must name the exact Project and saved-collection mix.");
-assert.match(indexSource, /Move All Projects and Saved Collections to Trash/, "Settings must not describe mixed folder deletion as Projects only.");
+assert.match(indexSource, /<button[^>]*class="[^"]*settings-project-clear-all[^"]*"[^>]*>Move all to Trash<\/button>/,
+  "Settings keeps its compact visible bulk-action label.");
+const settingsFolderSetupStart = appSource.indexOf("  const settingsProjects = visibleProjectRecords(");
+const settingsFolderSetupEnd = appSource.indexOf("  const selectedProjectIDs = new Set();", settingsFolderSetupStart);
+assert(settingsFolderSetupStart >= 0 && settingsFolderSetupEnd > settingsFolderSetupStart);
+const renderSettingsFolderLabels = new Function("currentContentSummary", "visibleProjectRecords", "projectIsArchived", "panel", "projectList", "projectClearAll", [
+  functionSource(appSource, "folderType"), functionSource(appSource, "folderIsProject"),
+  appSource.slice(settingsFolderSetupStart, settingsFolderSetupEnd)
+].join("\n"));
+for (const mixed of [false, true]) {
+  const title = {}, list = {}, action = {};
+  const projects = [{folderType:"project"}, ...(mixed ? [{folderType:"reference"}] : [])];
+  renderSettingsFolderLabels(() => ({projects}), records => records, () => false,
+    {querySelector: selector => {assert.equal(selector,"#settings-projects-title");return title;}},
+    {setAttribute: (name,value) => {list[name]=value;}},
+    {setAttribute: (name,value) => {action[name]=value;}});
+  assert.equal(title.textContent, mixed ? "Projects & collections" : "Projects");
+  assert.equal(list["aria-label"], mixed ? "Projects and saved collections" : "Projects");
+  assert.equal(action["aria-label"], mixed ? "Move all projects and saved collections to Trash" : "Move all projects to Trash",
+    "The rendered bulk action must identify whether saved collections are included.");
+}
 assert.match(
   appSource,
   /function projectOverviewRefreshPaneIDs\([\s\S]*?state\.utilities\.settings \? "utility:settings" : ""/,

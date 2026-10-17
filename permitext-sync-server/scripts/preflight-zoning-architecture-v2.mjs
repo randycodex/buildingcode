@@ -246,8 +246,15 @@ async function compileCase(caseRecord, catalogByID, retainedCase = null) {
     pathSpecificInitialRoute: expectedZeroModelBoundary ||
       (plan.callPolicy.initialTier === route.tier),
     atMostOneRepair: plan.callPolicy.maximumRepairAttempts <= 1,
-    noFullAnswerRewrite: plan.callPolicy.allowFullAnswerRewrite === false,
-    disabledTwentyFourKCandidate: plan.evidenceLimits.maximumCharacters < 24_000
+    boundedVerifiedRevision: plan.disposition === zoningResearchDispositions.ready
+      ? plan.callPolicy.allowFullAnswerRewrite === true && plan.callPolicy.repairMode === "verified_answer_revision" && plan.callPolicy.maximumRepairAttempts === 1
+      : plan.callPolicy.allowFullAnswerRewrite === false && plan.callPolicy.maximumRepairAttempts === 0,
+    projectedCallsWithinPlan: cost.production.adverseRequestCount <= plan.callPolicy.maximumProviderCalls,
+    freshReviewAfterRevision: !plan.callPolicy.subjectiveVerification || !plan.callPolicy.repairEligible ||
+      cost.adverseCalls.at(-1)?.stage === "post_repair_verification",
+    boundedExplanationEvidence: plan.questionSignals.streetscapeExplanation || plan.questionSignals.explicitSectionExplanation
+      ? plan.evidenceLimits.maximumCharacters === 24_000 && plan.evidenceLimits.maximumDiscovered === 4
+      : plan.evidenceLimits.maximumCharacters < 24_000
   };
   return {
     id: caseRecord.id,
@@ -325,9 +332,10 @@ async function replayRetainedAnswers(retained) {
   return {
     deliveredCount: answers.length,
     preservedFullScoreIDs: answers.filter((item) => item.pass).map((item) => item.id),
-    rejectedKnownJudgeFailureIDs: answers.filter((item) => !item.pass && !(architectureV21 && ["zr-rules-of-construction", "zr-new-divided-zoning-lot"].includes(item.id))).map((item) => item.id),
+    rejectedKnownJudgeFailureIDs: answers.filter((item) => !item.pass && !(architectureV21 && ["zr-rules-of-construction", "zr-new-divided-zoning-lot", "zr-zoning-lot-contiguity-definition"].includes(item.id))).map((item) => item.id),
     ...(architectureV21 ? { rejectedRequiredCoverageIDs: answers.filter((item) => !item.pass && item.id === "zr-rules-of-construction").map((item) => item.id) } : {}),
     ...(architectureV21 ? { rejectedTemporalApplicationIDs: answers.filter((item) => !item.pass && item.id === "zr-new-divided-zoning-lot").map((item) => item.id) } : {}),
+    ...(architectureV21 ? { rejectedHistoricalPremiseIDs: answers.filter((item) => !item.pass && item.id === "zr-zoning-lot-contiguity-definition").map((item) => item.id) } : {}),
     answers
   };
 }
@@ -520,13 +528,17 @@ async function buildResult() {
       item.evidenceReadiness.pass === false
     ),
     oneRepairMaximum: cases.every((item) => item.plan.callPolicy.maximumRepairAttempts <= 1),
-    maximumAdverseLogicalCallsAtMostThree: Math.max(...adverseCalls) <= 3,
+    maximumAdverseLogicalCallsWithinVerifiedRevisionPolicy: cases.every(item =>
+      item.cost.production.adverseRequestCount <= item.plan.callPolicy.maximumProviderCalls) && Math.max(...adverseCalls) <= 4,
     productionNominalCostAtMostSixPerHundred:
       readyCases.length > 0 && (nominalUSD / readyCases.length) * 100 <= 6,
     productionAdverseCostAtMostSixPerHundred:
       readyCases.length > 0 && (adverseUSD / readyCases.length) * 100 <= 6,
     ...(architectureV21 ? {
-      fourteenAcceptedRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 14,
+      thirteenAcceptedRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 13,
+      unsupportedHistoricalPremiseReopeningExposed: JSON.stringify(answerReplay.rejectedHistoricalPremiseIDs) === JSON.stringify(["zr-zoning-lot-contiguity-definition"]) &&
+        answerReplay.answers.find(item => item.id === "zr-zoning-lot-contiguity-definition").issues.every(issue =>
+          ["HISTORICAL_LOT_PREMISE_NOT_APPLIED", "HISTORICAL_LOT_PREMISE_REOPENED"].includes(issue.code)),
       unsupportedTemporalApplicationExposed: JSON.stringify(answerReplay.rejectedTemporalApplicationIDs) === JSON.stringify(["zr-new-divided-zoning-lot"]) &&
         answerReplay.answers.find((item) => item.id === "zr-new-divided-zoning-lot").issues.every((issue) =>
           issue.obligationID === "divided_lot_effective_date_application" && issue.code === "TEMPORAL_APPLICATION_NOT_ESTABLISHED"),
@@ -554,7 +566,7 @@ async function buildResult() {
     artifact: architectureV21
       ? "Permitext Zoning Research Architecture V2.1 no-cost preflight"
       : "Permitext Zoning Research Architecture V2 no-cost preflight",
-    artifactDate: sourceSelection ? "2026-09-08" : "2026-09-01",
+    artifactDate: snapshotName?.match(/(\d{4}-\d{2}-\d{2})\.json$/)?.[1] || (sourceSelection ? "2026-09-08" : "2026-09-01"),
     plannerVersion: zoningResearchPlannerVersion,
     compilerVersion: zoningResearchCompilerVersion,
     cohort: {

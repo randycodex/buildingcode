@@ -6,7 +6,7 @@ const start=source.indexOf('function bookmarkActionLabel(');
 assert.ok(start>=0);
 const context=vm.createContext({project:null,workspaceProject:()=>context.project});
 vm.runInContext(source.slice(start,source.indexOf('\nfunction showBookmarkUndo',start)),context);
-assert.equal(context.bookmarkActionLabel(true),'Remove from Saved');
+assert.equal(context.bookmarkActionLabel(true),'Remove from Evidence');
 context.project={name:'House'};
 assert.equal(context.bookmarkActionLabel(true),'Remove from project: House');
 assert.equal(context.bookmarkActionLabel(false),'Save passage');

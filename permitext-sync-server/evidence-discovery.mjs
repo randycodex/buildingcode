@@ -12,7 +12,7 @@ import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearest
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 import { researchCurrentPurposeTerms, researchCurrentPurposeMatches, researchCurrentEditionContext } from "./research-current-purpose.mjs";
 
-export const evidenceDiscoveryVersion = "20261005-exact-empty-source-nomination-v68";
+export const evidenceDiscoveryVersion = "20261017-construction-topic-recall-v69";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -111,6 +111,29 @@ export function stipulatedFountainSubstitutionQuestion(question) {
 }
 
 const topicRoutes = [
+  // These nominate the governing subject alongside lexical hits. They do not
+  // establish that a row, exception, occupancy branch or increase applies.
+  {
+    pattern: /\bparapets?\b/i,
+    label: "exterior-wall parapet requirements and exceptions",
+    targets: [{ codePrefix: "BC", codeEdition: "2022", sectionPrefix: "705.11", rootClaimCoverage: false }]
+  },
+  {
+    pattern: /\bemergency\s+escape\s+and\s+rescue\s+(?:openings?|windows?)\b/i,
+    label: "emergency escape and rescue opening applicability",
+    targets: [{ codePrefix: "BC", codeEdition: "2022", sectionPrefix: "1030.1", rootClaimCoverage: false }]
+  },
+  {
+    pattern: /\b(?:wall|ceiling|interior)\s+finish(?:es)?\b[\s\S]*\b(?:class(?:ification)?|flame[- ]spread|stairway|egress)\b|\b(?:class(?:ification)?|flame[- ]spread)\b[\s\S]*\b(?:wall|ceiling|interior)\s+finish(?:es)?\b/i,
+    label: "interior wall and ceiling finish classification requirements",
+    targets: [{ codePrefix: "BC", codeEdition: "2022", sectionPrefix: "803.11", rootClaimCoverage: false }]
+  },
+  {
+    pattern: /\ballowable\s+(?:building\s+)?area\b[\s\S]*\b(?:frontage|sprinkler|increases?)\b|\b(?:frontage|sprinkler)\b[\s\S]*\ballowable\s+(?:building\s+)?area\b/i,
+    label: "allowable building area and increase calculation provisions",
+    targets: ["506.1", "506.2", "506.3"].map(sectionPrefix =>
+      ({ codePrefix: "BC", codeEdition: "2022", sectionPrefix, rootClaimCoverage: false }))
+  },
   {
     pattern: /^(?=[\s\S]*\bsprinklers?\b)(?=[\s\S]*\b(?:required?|requires?|needs?|triggers?)\b)/i,
     label: "sprinkler applicability and occupancy-based triggers",
@@ -305,6 +328,10 @@ const topicRoutes = [
     label: "high-rise emergency and standby power provisions",
     targets: [
       { codePrefix: "BC", sectionPrefix: "403.4.8", includeDescendants: true },
+      // Keep the separately cataloged residential load lists in the fixed
+      // shortlist; broad high-rise title hits can otherwise displace them.
+      ...["403.4.8.3.2", "403.4.8.4.2", "403.4.8.4.3"].map(sectionPrefix =>
+        ({ codePrefix: "BC", codeEdition: "2022", sectionPrefix, rootClaimCoverage: false })),
       { codePrefix: "BC", sectionPrefix: "2702.1" }
     ]
   },

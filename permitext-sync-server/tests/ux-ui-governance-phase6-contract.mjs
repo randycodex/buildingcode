@@ -90,7 +90,7 @@ assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
 assert.match(webClient, /title\.textContent = "Reports"/);
 assert.doesNotMatch(webClient, /title\.textContent = "Report exports"/);
 // Web bulk deletion is recoverable Trash; native labels remain a separate contract.
-assert.match(webIndex, /data-clear-action="bookmarks"[\s\S]*?Move All Saved Passages to Trash/);
+assert.match(webIndex, /data-clear-action="bookmarks"[^>]*aria-label="Move all saved passages to Trash"[^>]*>Move all to Trash/);
 assert.match(webIndex, /<summary>Trash<\/summary>/);
 assert.match(webIndex, /Restore deleted items for 30 days across synced devices\. Newer work is kept\./);
 assert.doesNotMatch(webIndex, /Clear All Bookmarks/);
@@ -101,7 +101,7 @@ const library = await readFile(new URL("NYC CC APP/permitext/ViewModels/CodeLibr
 assert.match(chapterReader, /library\.readerSaveActionLabel\(sectionID:/);
 assert.match(chapterReader, /displayedIsBookmarked = library\.toggleReaderDestinationSave\(sectionID: sectionID\)/);
 assert.match(library, /saved \? "Remove from Project: /);
-assert.match(library, /saved \? "Remove from Saved" : "Save passage"/);
+assert.match(library, /return "Choose a Project to save passage"/);
 assert.match(chapterReader, /Image\(systemName: displayedIsBookmarked \? "bookmark.fill" : "bookmark"\)/);
 assert.match(chapterReader, /\.foregroundStyle\(displayedIsBookmarked \? accentColor : Color\.secondary\)/);
 assert.match(chapterReader, /\.accessibilityValue\([^\n]*displayedIsBookmarked[^\n]*readerSaveDestinationName/);
@@ -153,7 +153,7 @@ const allowedAudit = auditAddedLines([
 assert.equal(allowedAudit.failures.length, 0);
 
 const packageJSON = JSON.parse(packageSource);
-assert.equal(packageJSON.scripts.postcheck, "npm run test:notebook-security && npm run test:ux-alignment");
+assert.equal(packageJSON.scripts.postcheck, "npm run test:notebook-security && npm run test:ux-alignment && npm run test:calculation-evidence");
 assert.equal(packageJSON.scripts["prebuild:notebook"], "npm run test:notebook-security");
 assert.match(packageJSON.scripts["test:ux-alignment"], /ux-ui-governance-phase6-contract\.mjs/);
 assert.equal(packageJSON.scripts["audit:ux-ui"], "node scripts/audit-ux-ui.mjs");

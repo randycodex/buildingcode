@@ -40,15 +40,15 @@ assert(
   "Every production and acceptance tab shell must retain Saved as the top-level label."
 );
 assert.doesNotMatch(iosApp, /\.accessibilityLabel\("Projects"\)/);
-assert.match(iosSaved, /private var screenTitle: String \{ collectionOnly \? "Unassigned saves" : "Saved" \}/);
+assert.match(iosSaved, /private let screenTitle = "Saved"/);
 assert.match(iosSaved, /CodeTopContentFade\(title: screenTitle/);
 assert.match(iosSaved, /private var pinnedSavedHeader[\s\S]*?CodeScreenTitleRow\(title: screenTitle/);
 assert.match(iosSaved, /CodeScreenTitleRow\(title: "Saved"/);
 assert.match(iosSaved, /private var projectTilesSection[\s\S]*?folderGrid\(projectFolders\)/);
-assert.match(iosSaved, /private var allSavedLink[\s\S]*?NavigationLink \{[\s\S]*?BookmarksView\(filterDefaults: filterDefaults, collectionOnly: true\)[\s\S]*?Text\("Unassigned saves"\)/);
+assert.match(iosSaved, /NavigationLink \{\s*ProjectView\(folderID: folder\.id\)\s*\.id\(library\.privateSessionID\)/);
 assert.match(iosSaved, /CodeScreenSectionEyebrow\(text: "References"/);
 assert.match(iosSaved, /private var savedBookmarkList[\s\S]*?NavigationLink \{[\s\S]*?bookmarkDestination\(for: bookmark\)/);
-assert.match(iosSaved, /library\.folders\.filter \{ \$0\.folderType == \.project \}/);
+assert.match(iosSaved, /library\.folders\.filter \{ \$0\.folderType == \.project && \$0\.deletedAt == nil \}/);
 assert.match(iosSaved, /library\.folders\.filter \{ \$0\.folderType == \.reference \}/);
 assert.match(iosSaved, /if isProjectFolder \{[\s\S]*?projectHub/);
 assert.match(iosSettings, /CodeEyebrow\(text: "Data & Storage"/);
@@ -104,8 +104,8 @@ assert.match(webClient, /const exactSource = answerSources\.find[\s\S]*?openSour
 assert.match(webClient, /if \(citation\.sectionID \|\| citation\.sectionNumber\)[\s\S]*?openSourceInReader\(citation/);
 assert.match(webClient, /: "Governing"/);
 assert.doesNotMatch(webClient, /projectOwnership\.textContent = `Project: \$\{identity\.name\}`/);
-assert.match(webClient, /function renderProjectNotebook[\s\S]*?headingTitle\.textContent = "Notebook"[\s\S]*?heading\.append\(headingTitle\)/);
-assert.match(webClient, /function renderProjectReportDraft[\s\S]*?headingTitle\.textContent = "Report"[\s\S]*?heading\.append\(headingTitle\)/);
+assert.match(webClient, /function renderProjectNotebook[\s\S]*?headingTitle\.textContent = "Notes"[\s\S]*?heading\.append\(headingTitle\)/);
+assert.match(webClient, /function createReportPaneHeader[\s\S]*?title\.textContent = "Report"[\s\S]*?heading\.append\(title\)/);
 assert.doesNotMatch(webClient, /Project Report Manifest as PDF/);
 assert.match(webIndex, /\/web\/app\.js\?v=[^"']+/);
 

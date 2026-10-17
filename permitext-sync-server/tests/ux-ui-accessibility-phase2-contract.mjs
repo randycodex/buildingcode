@@ -48,11 +48,12 @@ assert(
   (clientSource.match(/trapWebModalFocus\(/g) || []).length >= 7,
   "The shared modal focus trap must cover warnings, prompts, Stripe, Mobile More, Project sheets, and commands."
 );
-assert.match(clientSource, /overlay\.setAttribute\("role", "dialog"\)[\s\S]*?overlay\.setAttribute\("aria-modal", "true"\)/);
+assert.match(clientSource, /overlay\.setAttribute\("role", inline \? "region" : "dialog"\)/);
+assert.match(clientSource, /if \(!inline\) overlay\.setAttribute\("aria-modal", "true"\)/);
 
 assert.match(stylesSource, /--panel-title-row-height:\s*max\([^;]+, 28px\)/);
-assert.match(stylesSource, /\.inline-comment\s*\{[^}]*min-width:\s*68px;[^}]*width:\s*68px;/s);
-assert.match(stylesSource, /\.inline-bookmark-toggle,\s*\.inline-research-toggle\s*\{\s*flex:\s*0 0 28px;/s);
+assert.match(stylesSource, /\.inline-comment\s*\{[^}]*min-width:\s*0;[^}]*width:\s*max-content;/s);
+assert.match(stylesSource, /\.inline-bookmark-toggle,\s*\.inline-research-toggle,\s*\.inline-note-toggle\s*\{\s*flex:\s*0 0 28px;/s);
 const globalKeyboardFocus = stylesSource.match(/html body :is\([^{}]+\):focus-visible\s*\{([^}]+)\}/);
 assert.ok(globalKeyboardFocus, "Supported controls must share the no-highlight product preference.");
 assert.match(globalKeyboardFocus[1], /outline:\s*none !important/);

@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-calculator-custom-factor-v1150";
+} from "./offline-storage.js?v=20261017-current-ui-contracts-v1152";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-calculator-custom-factor-v1150";
+} from "./workspace-state.js?v=20261017-current-ui-contracts-v1152";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -40856,10 +40856,12 @@ function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
   const previousPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(previousPaneID)}"]`);
   const nextPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(nextPaneID)}"]`);
   if (!previousPane || !nextPane) return;
+  // Expansion must be restored before measuring the pair, just as it is for
+  // pointer resizing. Expanded/strip widths are presentation, not resize bases.
+  capturePaneResizeWidths();
   const previousWidth = previousPane.getBoundingClientRect().width;
   const nextWidth = nextPane.getBoundingClientRect().width;
   const scrollLeft = track.scrollLeft;
-  capturePaneResizeWidths();
   const widths = adjacentColumnWidths(previousWidth, nextWidth, delta,
     minimumPaneWidthForID(previousPaneID), minimumPaneWidthForID(nextPaneID),
     maximumPaneWidthForID(previousPaneID), maximumPaneWidthForID(nextPaneID));

@@ -5,7 +5,8 @@ import {
   evaluateZoningEvidenceReadiness,
   planZoningResearchQuestion,
   zoningResearchDeterministicContext,
-  zoningResearchDispositions
+  zoningResearchDispositions,
+  zoningResearchPlanCostProjection
 } from "../research-zoning-planner.mjs";
 import { structuredRichSources } from "../evidence-discovery.mjs";
 import { zoningSection } from "../zoning-content.mjs";
@@ -126,7 +127,19 @@ for (const result of failedV1) {
   assert.equal(plan.disposition, zoningResearchDispositions.ready);
   assert.equal(plan.callPolicy.repairEligible, true, `${result.testCase.id} needs one bounded repair path.`);
   assert.equal(plan.callPolicy.maximumRepairAttempts, 1);
-  assert.equal(plan.callPolicy.allowFullAnswerRewrite, false);
+  assert.equal(plan.callPolicy.allowFullAnswerRewrite, true);
+  assert.equal(plan.callPolicy.repairMode, "verified_answer_revision");
+  assert.equal(plan.callPolicy.maximumProviderCalls, plan.callPolicy.subjectiveVerification ? 4 : 3);
+  const projection = zoningResearchPlanCostProjection({plan,evidenceCharacters:12000});
+  assert(projection.production.adverseRequestCount <= plan.callPolicy.maximumProviderCalls);
+  const revision = projection.adverseCalls.find(call => call.stage === "source_bounded_repair");
+  assert(revision.inputTokens >= projection.nominalCalls[0].inputTokens,
+    "A full answer revision must not be estimated as the former small targeted patch.");
+  if (plan.callPolicy.subjectiveVerification) {
+    assert.equal(projection.adverseCalls.at(-1).stage, "post_repair_verification",
+      "The diagnostic projection must include fresh verification after the bounded revision.");
+    assert.equal(projection.production.adverseRequestCount,4);
+  }
 }
 
 const missingMap = planZoningResearchQuestion({
