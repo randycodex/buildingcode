@@ -15,7 +15,7 @@ export function calculateOccupantLoad(input = {}) {
   if (!area) errors.push('Enter a positive floor area, with up to six decimal places.');
   if (!factor) errors.push('Enter the applicable positive factor in ft² per person.');
   if (!['gross', 'net'].includes(input.areaBasis)) errors.push('Select gross or net area from the governing table.');
-  if (!String(input.factorBasis || '').trim() || String(input.factorBasis).length > 500) errors.push('Identify the table row and applicable footnotes.');
+  if (!String(input.factorBasis || '').trim() || String(input.factorBasis).length > 4000) errors.push('Identify the table row and applicable footnotes.');
   if (input.seating !== 'without-fixed-seating') errors.push('This calculation supports one space without fixed seating only.');
   let people = null;
   if (area && factor) {
@@ -29,7 +29,8 @@ export function calculateOccupantLoad(input = {}) {
     previewPeople: input.seating === 'fixed-seating' ? null : people,
     input: {spaceFunction: String(input.spaceFunction || '').trim(), area: area?.text || '',
       factor: factor?.text || '', areaBasis: input.areaBasis, seating: input.seating,
-      factorBasis: String(input.factorBasis || '').trim()}};
+      factorBasis: String(input.factorBasis || '').trim(),
+      ...(input.tableRowID ? {tableRowID: input.tableRowID} : {})}};
 }
 
 export function occupantLoadSource(source = {}) {
@@ -44,6 +45,105 @@ export function occupantLoadSource(source = {}) {
 // the conversation has no manually selected sources.
 export function occupantLoadAnswerSource(sources = [], answer = {}) {
   return [...(Array.isArray(answer?.citations) ? answer.citations : []), ...sources].find(occupantLoadSource) || null;
+}
+
+const compact = text => String(text || '').replace(/\s+/g, ' ').trim();
+const tag = node => String(node.nodeName || '').toLowerCase();
+const attribute = (node, name) => node.getAttribute?.(name) ?? node.attrs?.find(a => a.name === name)?.value ?? '';
+const descendants = (node, predicate) => {
+  const found = [];
+  for (const child of node.childNodes || []) {
+    if (predicate(child)) found.push(child);
+    found.push(...descendants(child, predicate));
+  }
+  return found;
+};
+const textOf = node => tag(node) === '#text' ? (node.nodeValue ?? node.value ?? '')
+  : Array.from(node.childNodes || [], textOf).join('');
+
+// Read the actual section payload, including its subrows and superscript notes.
+// The optional parser lets offline tests use parse5 against the same corpus HTML.
+export function occupantLoadTable(blocks, source, parseHTML = html => new DOMParser().parseFromString(html, 'text/html')) {
+  if (!occupantLoadSource(source)) throw new Error('The calculator requires its exact 2022 BC table source.');
+  const parse = html => parseHTML(String(html).replace(/<\/br\s*>/gi, ''));
+  const notesRoot = parse((blocks || []).map(b => b.html || '').join(''));
+  const tables = descendants(notesRoot, n => tag(n) === 'table').filter(table => {
+    const trs = descendants(table, n => tag(n) === 'tr');
+    const header = trs[0] && descendants(trs[0], n => ['td','th'].includes(tag(n)));
+    return header?.length === 2 && /^Function of Space$/i.test(compact(textOf(header[0]))) &&
+      /Occupant Load Factor/i.test(compact(textOf(header[1]))) && trs.length > 1;
+  });
+  if (tables.length !== 1) throw new Error('The complete BC table could not be loaded.');
+  const notes = {};
+  for (const node of descendants(notesRoot, n => attribute(n, 'class').split(/\s+/).includes('Small'))) {
+    const text = compact(textOf(node));
+    const match = text.match(/^([a-z])\.\s*(.+)$/) || text.match(/^(C\*)\s*-\s*(.+)$/);
+    if (match) notes[match[1]] = match[2];
+  }
+  const cellLines = node => {
+    const walk = n => {
+      if (tag(n) === 'br') return '\n';
+      if (tag(n) === '#text') return String(n.nodeValue ?? n.value ?? '').replace(/\s+/g, ' ');
+      if (tag(n) === 'sup' || /vertical-align\s*:\s*super/i.test(attribute(n, 'style'))) {
+        return `[[${compact(textOf(n))}]]` + '\n'.repeat(descendants(n, child => tag(child) === 'br').length);
+      }
+      return Array.from(n.childNodes || [], walk).join('');
+    };
+    const lines = walk(node).split('\n').map(line => {
+      const markers = [];
+      const text = compact(line.replace(/\[\[([^\]]+)\]\]/g, (_, letters) => {
+        markers.push(...letters.split(',').map(compact)); return '';
+      }));
+      return {text, markers};
+    });
+    while (lines.length && !lines.at(-1).text && !lines.at(-1).markers.length) lines.pop();
+    return lines;
+  };
+  const rows = [];
+  for (const tr of descendants(tables[0], n => tag(n) === 'tr')) {
+    const cells = Array.from(tr.childNodes || []).filter(n => ['td', 'th'].includes(tag(n)));
+    if (cells.length !== 2) throw new Error('The BC table row structure has changed.');
+    if (!compact(textOf(cells[0])) && !compact(textOf(cells[1]))) continue;
+    if (/^Function of Space$/i.test(compact(textOf(cells[0])))) continue;
+    const functions = cellLines(cells[0]), factors = cellLines(cells[1]);
+    let group = '';
+    if (functions.length > 1 && !factors[0]?.text) {group = functions.shift().text; factors.shift();}
+    if (!functions.length || functions.length !== factors.length) throw new Error('The BC table subrows could not be aligned.');
+    functions.forEach((fn, i) => {
+      const factorText = factors[i].text;
+      const label = group ? `${group} — ${fn.text}` : fn.text;
+      const markers = [...new Set(['a', ...fn.markers, ...factors[i].markers, ...(factorText.includes('C*') ? ['C*'] : [])])];
+      if (!fn.text || markers.some(marker => !notes[marker])) throw new Error('A BC row or its footnotes are missing.');
+      const numeric = factorText.match(/^(\d+(?:\.\d+)?)\s+(gross|net)$/i);
+      const fixed = /See Section 1004\.3\b/i.test(factorText);
+      // Bowling includes people per lane in addition to its area-based part.
+      const method = numeric && !/persons for each lane/i.test(label) ? 'area' : fixed ? 'fixed' : 'special';
+      rows.push({id: `bc-1004.1.3:${label}`, label, sourceFunction: fn.text, factorText, method,
+        factor: method === 'area' ? numeric[1] : '', areaBasis: method === 'area' ? numeric[2].toLowerCase() : '',
+        footnotes: markers.map(marker => ({marker, text: notes[marker]})),
+        description: `${label} · ${factorText}\n${markers.map(marker => `${marker}. ${notes[marker]}`).join('\n')}`});
+    });
+  }
+  if (!rows.length) throw new Error('The BC table has no available functions.');
+  return {rows, codeVersion: source.codeVersion || source.sourceLibraryVersion, sectionID: String(source.sectionID || source.id)};
+}
+
+export function occupantLoadTableInput(input, table, rowID = input.tableRowID) {
+  const row = table?.rows.find(row => row.id === rowID);
+  return {...input, tableRowID: row?.id || '', spaceFunction: row?.label || '',
+    factor: row?.factor || '', areaBasis: row?.areaBasis || '', factorBasis: row?.description || '',
+    ...(row?.method === 'fixed' ? {seating: 'fixed-seating'} : {})};
+}
+
+export function occupantLoadSuggestedRow(draft, table) {
+  if (draft.tableRowID) return table.rows.find(row => row.id === draft.tableRowID) || null;
+  const exact = table.rows.find(row => compact(row.label) === compact(draft.spaceFunction));
+  if (exact) return exact;
+  const quote = compact(draft.suggestions?.find(s => s.label === 'Occupant-load factor')?.quote);
+  const matches = table.rows.filter(row => row.method === 'area' && quote.includes(compact(row.sourceFunction)) &&
+    (!draft.factor || draft.factor === row.factor) &&
+    new RegExp(`\\b${row.factor}\\s+${row.areaBasis}\\b`, 'i').test(quote));
+  return matches.length === 1 ? matches[0] : null;
 }
 
 export function occupantLoadPrefill(answer, source) {
@@ -84,7 +184,10 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '')
   return blocks;
 }
 
-export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, sourceLabel, canSave = true, onOpenNote}) {
+export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoadTable, onControlsReady, sourceLabel, canSave = true, onOpenNote}) {
+  const initialDraft = {...draft};
+  let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
+  let table = null, loading = false;
   const root = document.createElement('details');
   root.className = 'occupant-load-card';
   root.dataset.researchSelectionExclude = 'true';
@@ -95,18 +198,24 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   const form = document.createElement('form'); form.className = 'occupant-load-form';
   const fields = {};
   for (const [key, label, options] of [
-    ['spaceFunction', 'Function of space', null], ['area', 'Floor area · ft²', null],
-    ['areaBasis', 'Area basis', [['', 'Choose gross or net'], ['gross', 'Gross'], ['net', 'Net']]],
+    ['spaceFunction', 'Function of space', [['', 'Select a BC table function']]], ['area', 'Floor area · ft²', null],
+    ['areaBasis', 'Area basis', null],
     ['factor', 'Occupant-load factor · ft²/person', null],
     ['factorBasis', 'Table row and footnotes', null],
     ['seating', 'Seating', [['', 'Confirm seating'], ['without-fixed-seating', 'Without fixed seating'], ['fixed-seating', 'Fixed seating — separate method required']]]
   ]) {
     const wrapper = document.createElement('label'); wrapper.textContent = label;
-    const field = document.createElement(options ? 'select' : 'input');
+    const field = document.createElement(options ? 'select' : key === 'factorBasis' ? 'textarea' : 'input');
     field.setAttribute('aria-label', label);
     if (options) options.forEach(([value, text]) => {const option = document.createElement('option'); option.value = value; option.textContent = text; field.append(option);});
-    else {field.type = 'text'; field.maxLength = key === 'factorBasis' ? 500 : 300; if (['area', 'factor'].includes(key)) field.inputMode = 'decimal';}
-    field.value = draft[key] || ''; fields[key] = field; wrapper.append(field); form.append(wrapper);
+    else {if (key !== 'factorBasis') field.type = 'text'; field.maxLength = key === 'factorBasis' ? 4000 : 300; if (['area', 'factor'].includes(key)) field.inputMode = 'decimal';}
+    const derived = ['areaBasis', 'factor', 'factorBasis'].includes(key);
+    field.readOnly = derived;
+    field.value = derived || key === 'spaceFunction' ? '' : draft[key] || '';
+    if (key === 'spaceFunction') field.disabled = true;
+    if (key === 'spaceFunction') field.className = 'occupant-load-function-select';
+    if (key === 'factorBasis') field.rows = 4;
+    fields[key] = field; wrapper.append(field); form.append(wrapper);
   }
   const source = document.createElement('button'); source.type = 'button'; source.className = 'calculation-source';
   source.textContent = `Open in Reader · ${sourceLabel}`;
@@ -121,25 +230,43 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   const open = document.createElement('button'); open.type = 'button'; open.className = 'ghost-button'; open.textContent = 'Open in Notebook'; open.hidden = true;
   open.addEventListener('click', async () => {try {await onOpenNote?.(savedCard);} catch (error) {status.textContent = error.message;}});
   let busy = false, savedCard = null, savedFingerprint = '';
-  const values = () => Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value]));
+  const values = () => occupantLoadTableInput({area: fields.area.value, seating: fields.seating.value, areaMeasurementBasis}, table, fields.spaceFunction.value);
   const update = () => {
     Object.assign(draft, values());
+    const row = table?.rows.find(row => row.id === draft.tableRowID);
+    fields.factor.value = draft.factor;
+    fields.areaBasis.value = draft.areaBasis ? draft.areaBasis[0].toUpperCase() + draft.areaBasis.slice(1) : '';
+    fields.factorBasis.value = draft.factorBasis;
+    const areaLabel = fields.area.parentElement.firstChild;
+    areaLabel.textContent = draft.areaBasis ? `Floor area · ${draft.areaBasis} ft²` : 'Floor area · ft²';
     const calculation = calculateOccupantLoad(draft);
     const hasResult = calculation.previewPeople !== null;
     const fixedSeating = draft.seating === 'fixed-seating';
+    const special = row && row.method !== 'area';
     result.classList.toggle('is-pending', !hasResult);
     result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} people`
-      : fixedSeating ? 'Separate method required' : 'Complete calculation inputs';
+      : fixedSeating || special ? 'Separate method required' : 'Complete calculation inputs';
     formula.hidden = hasResult;
     formula.textContent = hasResult ? ''
-      : fixedSeating ? 'Fixed seating uses a separate calculation method.' : calculation.errors[0];
+      : special ? row.factorText : fixedSeating ? 'Fixed seating uses a separate calculation method.' : calculation.errors[0];
     const changed = savedCard && JSON.stringify(calculation.input) !== savedFingerprint;
     save.disabled = busy || !calculation.valid || !canSave;
     save.textContent = savedCard ? (changed ? 'Save revised calculation as new Note' : 'Saved to Notebook') : 'Save calculation to Notebook';
     if (savedCard && !changed) save.disabled = true;
     return calculation;
   };
-  const handleInput = () => {status.textContent = ''; update();};
+  const handleInput = event => {
+    if (event.target === fields.spaceFunction) {
+      const next = table?.rows.find(row => row.id === fields.spaceFunction.value);
+      if (areaMeasurementBasis && next?.areaBasis && areaMeasurementBasis !== next.areaBasis) fields.area.value = '';
+      if (next?.areaBasis) areaMeasurementBasis = next.areaBasis;
+      if (next?.method === 'fixed' && fields.seating.value !== 'fixed-seating') {
+        fields.seating.value = 'fixed-seating'; fields.seating.dispatchEvent(new Event('change', {bubbles: true}));
+      }
+    }
+    if (event.target === fields.area) areaMeasurementBasis = table?.rows.find(row => row.id === fields.spaceFunction.value)?.areaBasis || '';
+    status.textContent = ''; update();
+  };
   form.addEventListener('input', handleInput);
   form.addEventListener('change', handleInput);
   form.addEventListener('submit', async event => {
@@ -153,7 +280,28 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
       savedCard = card; savedFingerprint = JSON.stringify(calculation.input); open.hidden = false;
       status.textContent = 'Saved to Notebook · needs review. The Assistant answer is unchanged.';
     } catch (error) {status.textContent = error.message;}
-    finally {busy = false; Object.values(fields).forEach(field => field.disabled = false); update();}
+    finally {busy = false; Object.values(fields).forEach(field => field.disabled = false); fields.spaceFunction.disabled = !table; update();}
+  });
+  root.addEventListener('toggle', async () => {
+    if (!root.open || table || loading) return;
+    loading = true;
+    try {
+      table = await onLoadTable();
+      const selected = occupantLoadSuggestedRow(initialDraft, table);
+      for (const row of table.rows) {
+        const option = document.createElement('option'); option.value = row.id; option.textContent = row.label;
+        fields.spaceFunction.append(option);
+      }
+      fields.spaceFunction.disabled = false;
+      fields.spaceFunction.value = selected?.id || '';
+      if (selected?.areaBasis && areaMeasurementBasis && selected.areaBasis !== areaMeasurementBasis) fields.area.value = '';
+      if (selected?.areaBasis) areaMeasurementBasis = selected.areaBasis;
+      if (selected?.method === 'fixed') fields.seating.value = 'fixed-seating';
+      update(); onControlsReady?.(form);
+      fields.spaceFunction.dispatchEvent(new Event('change', {bubbles: true}));
+      fields.seating.dispatchEvent(new Event('change', {bubbles: true}));
+    } catch (error) {table = null; status.textContent = error.message;}
+    finally {loading = false;}
   });
   actions.append(save, open); form.append(result, formula, actions);
   if (!draft.suggestions?.length) body.append(scope);

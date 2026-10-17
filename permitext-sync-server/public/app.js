@@ -1,5 +1,5 @@
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
-import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, calculationNoteBlocks } from "./occupant-load-calculation.js?v=12";
+import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, calculationNoteBlocks } from "./occupant-load-calculation.js?v=16";
 import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-calculation-cleanup-v1131";
+} from "./offline-storage.js?v=20261017-calculation-table-v1137";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-calculation-cleanup-v1131";
+} from "./workspace-state.js?v=20261017-calculation-table-v1137";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -7901,6 +7901,8 @@ function enhanceSelect(select) {
   const researchHistoryProjectMenu = select.classList.contains("research-history-project-select");
   const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select") || select.classList.contains("research-feedback-rating-select");
   const assistantWorkMenu = select.classList.contains("assistant-work-type-select");
+  const calculationFunctionMenu = select.classList.contains("occupant-load-function-select");
+  menu.classList.toggle("calculation-function-menu", calculationFunctionMenu);
   const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
@@ -7978,6 +7980,19 @@ function enhanceSelect(select) {
       }
     }
     clear(menu);
+    if (calculationFunctionMenu) {
+      const search = document.createElement("input");
+      search.type = "search"; search.placeholder = "Find a function…";
+      search.setAttribute("aria-label", "Find a BC table function");
+      search.className = "calculation-function-search";
+      search.addEventListener("input", () => {
+        const query = search.value.trim().toLocaleLowerCase();
+        menu.querySelectorAll('[role="option"]').forEach(option => {
+          option.hidden = !option.textContent.toLocaleLowerCase().includes(query);
+        });
+      });
+      menu.append(search);
+    }
     const appendOption = (option, { indented = false } = {}) => {
       if (enabledValues && !enabledValues.has(option.value)) return;
       const item = document.createElement("button");
@@ -8098,6 +8113,7 @@ function enhanceSelect(select) {
       } else {
         renderOptions();
         requestAnimationFrame(() => {
+          if (calculationFunctionMenu) {menu.querySelector("input")?.focus({preventScroll:true}); return;}
           const target = menu.querySelector('[role="option"][aria-selected="true"]:not(:disabled)') ||
             menu.querySelector('[role="option"]:not(:disabled)');
           target?.focus({ preventScroll: true });
@@ -8111,7 +8127,7 @@ function enhanceSelect(select) {
   });
 
   if (!readerChapterMenu) {
-    const menuOptions = () => Array.from(menu.querySelectorAll('[role="option"]:not(:disabled)'));
+    const menuOptions = () => Array.from(menu.querySelectorAll('[role="option"]:not(:disabled):not([hidden])'));
     const moveMenuFocus = (event, boundary = "") => {
       const options = menuOptions();
       if (!options.length) return;
@@ -16467,7 +16483,19 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
   const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID &&
     card.isConnected;
   const assertCurrent = () => {if (!current()) throw new Error("Return to this Project and reopen the calculation before continuing.");};
+  const loadSource = async (isCurrent = current) => {
+    assertCurrent();
+    const resolved = await resolveReaderSource({...source, codePrefix: source.codePrefix || source.codeBook}, {isCurrent});
+    if (!isCurrent()) throw new Error("The view changed. Reopen this calculation before continuing.");
+    if (!resolved) throw new Error("The calculation source could not be opened.");
+    const payload = await api(`/code/sections/${encodeURIComponent(resolved.sectionID)}`);
+    if (!isCurrent()) throw new Error("The view changed. Reopen this calculation before continuing.");
+    if (!payload.section?.codeVersion || String(payload.section.sectionID || payload.section.id) !== String(resolved.sectionID) || payload.section.codePrefix !== resolved.codePrefix || !sectionRecordMatchesRequestedEdition(resolved, payload.section)) throw new Error("The calculation source does not match its exact code edition.");
+    return {resolved, section: payload.section};
+  };
   card = createOccupantLoadCard({draft: occupantLoadDrafts.get(key), sourceLabel, canSave: Boolean(project),
+    onLoadTable: async () => {const {resolved, section} = await loadSource(); return occupantLoadTable(section.blocks, resolved);},
+    onControlsReady: form => form.querySelectorAll("select").forEach(enhanceSelect),
     onOpenSource: async () => {
       assertCurrent();
       await openSourceInReader({...source, codePrefix: source.codePrefix || source.codeBook},
@@ -16479,14 +16507,13 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       const actionCurrent = () => current() && generation === (state.workflowNavigationGeneration || 0);
       const requireAction = () => {if (!actionCurrent()) throw new Error("The view changed. Reopen this calculation before saving.");};
       if (!project) throw new Error("Create a Project before saving a calculation.");
-      const resolved = await resolveReaderSource({...source, codePrefix: source.codePrefix || source.codeBook}, {isCurrent: actionCurrent});
+      const {resolved, section} = await loadSource(actionCurrent);
       requireAction();
-      if (!resolved) return null;
-      const payload = await api(`/code/sections/${encodeURIComponent(resolved.sectionID)}`);
-      requireAction();
-      if (!payload.section?.codeVersion || String(payload.section.sectionID || payload.section.id) !== String(resolved.sectionID) || payload.section.codePrefix !== resolved.codePrefix || !sectionRecordMatchesRequestedEdition(resolved, payload.section)) throw new Error("The calculation source does not match its exact code edition.");
+      const table = occupantLoadTable(section.blocks, resolved);
+      const rebound = occupantLoadTableInput(calculation.input, table);
+      if (!rebound.tableRowID || !rebound.factor || ['spaceFunction','factor','areaBasis','factorBasis','seating'].some(key => rebound[key] !== calculation.input[key])) throw new Error("The BC table changed. Reopen the calculator before saving.");
       const capture = document.createElement("div");
-      (payload.section.blocks || []).forEach(block => capture.append(renderCodeBlock(block)));
+      (section.blocks || []).forEach(block => capture.append(renderCodeBlock(block)));
       const exact = notebookEvidenceTextMap(capture, {literalInline: true}).text;
       if (!exact || exact.length > 50000) throw new Error("The complete source passage could not be captured safely. Save the relevant passage from Reader instead.");
       const link = {id: crypto.randomUUID(), label: sourceLabel, relationshipRole: "context", projectID: researchProjectID(project),

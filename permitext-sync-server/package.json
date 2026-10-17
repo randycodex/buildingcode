@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:calculation-evidence": "node tests/occupant-load-calculation.mjs && node tests/research-occupant-load-draft.mjs && node tests/calculation-handoff-client.mjs && node tests/notebook-evidence-text-map.mjs && node tests/calculation-notebook-http.mjs",
+    "test:calculation-evidence": "node tests/occupant-load-calculation.mjs && node tests/occupant-load-table.mjs && node tests/research-occupant-load-draft.mjs && node tests/calculation-handoff-client.mjs && node tests/notebook-evidence-text-map.mjs && node tests/calculation-notebook-http.mjs",
     "test:search-words": "node tests/search-words-contract.mjs",
     "test:smooth-performance": "node tests/workspace-bundle-contract.mjs && node tests/scoped-sync-research-reads.mjs && node tests/research-refresh-performance.mjs && node tests/workspace-pane-orchestration-contract.mjs && node tests/native-research-refresh-freshness.mjs && node tests/native-research-history-preview.mjs && node tests/native-notebook-image-preparation.mjs && node tests/native-chapter-search-background.mjs && node tests/completed-search-coordinator-contract.mjs && node tests/native-search-text-store-contract.mjs && node tests/chapter-opening-fast-path-contract.mjs && npm run test:native-project-cache",
     "test:smooth-performance:browser": "node tests/research-progressive-history-browser.mjs",

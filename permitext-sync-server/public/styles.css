@@ -20647,8 +20647,12 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .calculation-scope, .calculation-status, .calculation-formula { font-size: 12px; color: var(--text-secondary); }
 .calculation-source { padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text-primary); font: inherit; font-size: 12px; text-align: left; }
 .occupant-load-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
-.occupant-load-form > label { text-transform: none; letter-spacing: normal; display: grid; gap: 6px; min-width: 0; font-size: 12px; color: var(--text-secondary); }
-.occupant-load-form input:not([type="checkbox"]), .occupant-load-form select, .occupant-load-form .custom-select-trigger { width: 100%; min-width: 0; min-height: 36px; padding: 8px 10px; border: 0; border-radius: 5px; background: var(--toolbar-active); color: var(--text-primary); font: inherit; font-size: 14px !important; line-height: 1.5; }
+.occupant-load-form > label { text-transform: none; letter-spacing: normal; display: grid; align-content: start; gap: 6px; min-width: 0; font-size: 12px; color: var(--text-secondary); }
+.occupant-load-form input:not([type="checkbox"]), .occupant-load-form textarea, .occupant-load-form select, .occupant-load-form .custom-select-trigger { width: 100%; min-width: 0; min-height: 36px; padding: 8px 10px; border: 0; border-radius: 5px; background: var(--toolbar-active); color: var(--text-primary); font: inherit; font-size: 14px !important; line-height: 1.5; }
+.occupant-load-form textarea { resize: vertical; max-height: 240px; }
+.occupant-load-form input[readonly], .occupant-load-form textarea[readonly] { cursor: default; }
+.calculation-function-search { position: sticky; top: 0; width: 100%; margin: 0 0 6px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface-muted); color: var(--text-primary); font: inherit; }
+.calculation-function-menu .custom-select-option[hidden] { display: none; }
 .calculation-result { grid-column: 1 / -1; font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .calculation-result.is-pending { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
 .calculation-status:empty { display: none; }
