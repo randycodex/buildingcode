@@ -92,16 +92,6 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   const body = document.createElement('div'); body.className = 'occupant-load-body';
   const scope = document.createElement('p'); scope.className = 'calculation-scope';
   scope.textContent = draft.suggestions?.length ? 'Suggested inputs from this conversation · review required' : 'One space without fixed seating · author-supplied inputs';
-  const suggestions = document.createElement('details'); suggestions.className = 'calculation-suggestions';
-  if (draft.suggestions?.length) {
-    const title = document.createElement('summary'); title.textContent = 'Where the suggested inputs came from'; suggestions.append(title);
-    for (const item of draft.suggestions) {
-      const row = document.createElement('div'); const label = document.createElement('strong');
-      label.textContent = `${item.label}: ${item.value} · ${item.origin}`;
-      const quote = document.createElement('blockquote'); quote.textContent = item.quote;
-      row.append(label, quote); suggestions.append(row);
-    }
-  }
   const form = document.createElement('form'); form.className = 'occupant-load-form';
   const fields = {};
   for (const [key, label, options] of [
@@ -168,7 +158,6 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   });
   actions.append(save, open); form.append(reviewLabel, result, formula, actions);
   body.append(scope, source);
-  if (draft.suggestions?.length) body.append(suggestions);
   body.append(form, status); root.append(summary, body); update();
   return root;
 }

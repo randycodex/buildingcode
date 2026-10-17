@@ -20655,10 +20655,6 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 .calculation-result { grid-column: 1 / -1; font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .calculation-result.is-pending { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
 .calculation-status:empty { display: none; }
-.calculation-suggestions { margin-top: 12px; font-size: 12px; color: var(--text-secondary); }
-.calculation-suggestions > summary { cursor: pointer; }
-.calculation-suggestions > div { margin: 12px 0; }
-.calculation-suggestions blockquote { margin: 4px 0; padding-left: 10px; border-left: 1px solid var(--border); overflow-wrap: anywhere; }
 .calculation-formula, .calculation-actions { grid-column: 1 / -1; margin: 0; }
 .calculation-actions, .passage-notebook-saved { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .calculation-actions button { font-size: 12px; }
