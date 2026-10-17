@@ -44,7 +44,7 @@ try {
   token=signIn.json.account.backendSessionToken;
   const codeVersion="CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
   assert.equal((await request("/sync/push",{batch:{user:{id:userID},mutations:[{project:{id:"calc-project",userID,codeVersion,clientID:"calculation-project",name:"Synthetic calculation acceptance",colorHex:"#334455",sortOrder:0,updatedAt:new Date().toISOString()}}]}})).status,200);
-  const calculation=calculateOccupantLoad({spaceFunction:"Synthetic test space",area:"1201",factor:"100",areaBasis:"gross",factorBasis:"Author-confirmed synthetic inputs",seating:"without-fixed-seating",reviewed:true});
+  const calculation=calculateOccupantLoad({spaceFunction:"Synthetic test space",area:"1201",factor:"100",areaBasis:"gross",factorBasis:"Synthetic inputs",seating:"without-fixed-seating"});
   const link={id:"calculation-source",label:"BC 2022 § 1004.1.3",relationshipRole:"context",projectID:"calculation-project",source:{codePrefix:"BC",codeVersion,codeEdition:"2022",sourceID:"2152",sectionID:"2152",sectionNumber:"1004.1.3",sectionTitle:"Areas without fixed seating",sourceLibraryVersion:codeVersion},passages:[{exact:"The number of occupants shall be computed at the rate of one occupant per unit of area as prescribed in Table 1004.1.3."}],createdAt:new Date().toISOString()};
   const document=emptyNotebookDocument();document.document=calculationNoteBlocks(calculation,[link]);
   const saveBody={projectID:"calculation-project",clientMutationID:"calculation-acceptance",expectedVersion:0,cardType:"finding",title:"Synthetic calculation",document,evidenceLinks:[link],openQuestions:[{id:"review",text:"Review cumulative loads and exceptions",status:"open",why:"Single-space calculation",resolution:""}]};
@@ -52,6 +52,7 @@ try {
   const replay=await request("/notebook/cards/save",saveBody);assert.equal(replay.status,200);assert.equal(replay.json.card.id,saved.json.card.id);
   const get=await request("/notebook/cards/get",{projectID:"calculation-project",cardID:saved.json.card.id});
   assert.equal(get.status,200);assert.match(get.json.card.plainText,/13 people/);assert.match(get.json.card.plainText,/Needs review/);
+  assert.doesNotMatch(get.json.card.plainText,/author confirmed/i);
   assert.equal(get.json.card.evidenceLinks[0].source.codeVersion,codeVersion);assert.equal(get.json.card.openQuestions[0].status,"open");
   assert.equal(get.json.card.sourceClassification,"user-authored");
   assert.equal((await request("/sync/push",{batch:{user:{id:userID},mutations:[{project:{id:"other-project-record",userID,codeVersion,clientID:"other-project",name:"Separate synthetic project",colorHex:"#334455",sortOrder:1,updatedAt:new Date().toISOString()}}]}})).status,200);

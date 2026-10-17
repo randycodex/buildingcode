@@ -17,7 +17,6 @@ export function calculateOccupantLoad(input = {}) {
   if (!['gross', 'net'].includes(input.areaBasis)) errors.push('Select gross or net area from the governing table.');
   if (!String(input.factorBasis || '').trim() || String(input.factorBasis).length > 500) errors.push('Identify the table row and applicable footnotes.');
   if (input.seating !== 'without-fixed-seating') errors.push('This calculation supports one space without fixed seating only.');
-  if (input.reviewed !== true) errors.push('Review the factor, area basis, and applicable footnotes in Reader.');
   let people = null;
   if (area && factor) {
     const numerator = area.numerator * factor.scale;
@@ -27,9 +26,10 @@ export function calculateOccupantLoad(input = {}) {
     else people = Number(rounded);
   }
   return {valid: errors.length === 0, errors, people: errors.length ? null : people,
+    previewPeople: input.seating === 'fixed-seating' ? null : people,
     input: {spaceFunction: String(input.spaceFunction || '').trim(), area: area?.text || '',
       factor: factor?.text || '', areaBasis: input.areaBasis, seating: input.seating,
-      factorBasis: String(input.factorBasis || '').trim(), reviewed: input.reviewed === true}};
+      factorBasis: String(input.factorBasis || '').trim()}};
 }
 
 export function occupantLoadSource(source = {}) {
@@ -72,8 +72,8 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '')
     {type: 'heading', props: {level: 2}, content: [{type: 'text', text: 'Occupant load calculation', styles: {}}]},
     paragraph(`Needs review · calculation snapshot · ${c.spaceFunction}`),
     paragraph(`${c.area} ft² (${c.areaBasis}) ÷ ${c.factor} ft²/person = ${calculation.people} people (rounded up to a whole person).`),
-    paragraph(`Factor basis supplied by author: ${c.factorBasis}`),
-    paragraph('One space without fixed seating. The author confirmed the factor, area basis, and applicable footnotes. This arithmetic does not establish cumulative loads, exit count, or compliance.'),
+    paragraph(`Factor basis: ${c.factorBasis}`),
+    paragraph('One space without fixed seating. Source applicability and footnotes need review. This arithmetic does not establish cumulative loads, exit count, or compliance.'),
     ...evidenceLinks.map(link => ({type: 'paragraph', content: [{type: 'permitextReference', props: {
       referenceKind: 'selectedPassage', referenceID: link.id, label: link.label
     }}]}))
@@ -114,11 +114,6 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   source.addEventListener('click', async () => {
     try {await onOpenSource();} catch (error) {status.textContent = error.message;}
   });
-  const reviewLabel = document.createElement('label'); reviewLabel.className = 'calculation-confirm';
-  const reviewed = document.createElement('input'); reviewed.type = 'checkbox'; reviewed.checked = draft.reviewed === true;
-  const reviewText = document.createElement('span');
-  reviewText.textContent = 'I confirmed the factor, gross/net basis, and applicable footnotes in Reader.';
-  reviewLabel.append(reviewed, reviewText);
   const result = document.createElement('output'); result.className = 'calculation-result'; result.setAttribute('aria-live', 'polite');
   const formula = document.createElement('p'); formula.className = 'calculation-formula';
   const actions = document.createElement('div'); actions.className = 'calculation-actions';
@@ -126,16 +121,17 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   const open = document.createElement('button'); open.type = 'button'; open.className = 'ghost-button'; open.textContent = 'Open in Notebook'; open.hidden = true;
   open.addEventListener('click', async () => {try {await onOpenNote?.(savedCard);} catch (error) {status.textContent = error.message;}});
   let busy = false, savedCard = null, savedFingerprint = '';
-  const values = () => ({...Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value])), reviewed: reviewed.checked});
+  const values = () => Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value]));
   const update = () => {
     Object.assign(draft, values());
     const calculation = calculateOccupantLoad(draft);
-    const awaitingReview = !calculation.valid && calculation.errors.length === 1 && !draft.reviewed;
-    result.classList.toggle('is-pending', !calculation.valid);
-    result.hidden = awaitingReview;
-    result.textContent = calculation.valid ? `${calculation.people.toLocaleString()} people`
-      : awaitingReview ? '' : 'Complete inputs and source review';
-    formula.textContent = calculation.valid ? `${calculation.input.area} ÷ ${calculation.input.factor} · rounded up to a whole person` : calculation.errors[0];
+    const hasResult = calculation.previewPeople !== null;
+    const fixedSeating = draft.seating === 'fixed-seating';
+    result.classList.toggle('is-pending', !hasResult);
+    result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} people`
+      : fixedSeating ? 'Separate method required' : 'Complete calculation inputs';
+    formula.textContent = hasResult ? `${calculation.input.area} ÷ ${calculation.input.factor} · rounded up to a whole person`
+      : fixedSeating ? 'Fixed seating uses a separate calculation method.' : calculation.errors[0];
     const changed = savedCard && JSON.stringify(calculation.input) !== savedFingerprint;
     save.disabled = busy || !calculation.valid || !canSave;
     save.textContent = savedCard ? (changed ? 'Save revised calculation as new Note' : 'Saved to Notebook') : 'Save calculation to Notebook';
@@ -143,22 +139,22 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
     if (changed) status.textContent = 'Inputs changed. The saved Note keeps its original snapshot and needs review.';
     return calculation;
   };
-  form.addEventListener('input', event => {if (event.target !== reviewed) reviewed.checked = false; update();});
-  form.addEventListener('change', event => {if (event.target !== reviewed) reviewed.checked = false; update();});
+  form.addEventListener('input', update);
+  form.addEventListener('change', update);
   form.addEventListener('submit', async event => {
     event.preventDefault(); const calculation = update(); if (!calculation.valid || save.disabled) return;
     busy = true; update(); status.textContent = 'Saving calculation and source snapshot…';
     // Lock inputs during the save so a delayed response cannot label newer inputs saved.
-    Object.values(fields).forEach(field => field.disabled = true); reviewed.disabled = true;
+    Object.values(fields).forEach(field => field.disabled = true);
     try {
       const card = await onSave(calculation);
       if (!card) return;
       savedCard = card; savedFingerprint = JSON.stringify(calculation.input); open.hidden = false;
       status.textContent = 'Saved to Notebook · needs review. The Assistant answer is unchanged.';
     } catch (error) {status.textContent = error.message;}
-    finally {busy = false; Object.values(fields).forEach(field => field.disabled = false); reviewed.disabled = false; update();}
+    finally {busy = false; Object.values(fields).forEach(field => field.disabled = false); update();}
   });
-  actions.append(save, open); form.append(reviewLabel, result, formula, actions);
+  actions.append(save, open); form.append(result, formula, actions);
   if (!draft.suggestions?.length) body.append(scope);
   body.append(source);
   body.append(form, status); root.append(summary, body); update();

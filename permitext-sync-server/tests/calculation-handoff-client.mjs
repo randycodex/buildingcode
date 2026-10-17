@@ -5,7 +5,7 @@ import {calculateOccupantLoad,calculationNoteBlocks,occupantLoadSource,occupantL
 const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const a=app.indexOf('function renderOccupantLoadCalculation('),b=app.indexOf('\nasync function addPassageToNotebook',a);
 const source={sectionID:'2152',sectionNumber:'1004.1.3',codePrefix:'BC',codeVersion:'CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1'};
-const calculation=calculateOccupantLoad({spaceFunction:'Synthetic',area:'1200',factor:'100',factorBasis:'Synthetic row',areaBasis:'gross',seating:'without-fixed-seating',reviewed:true});
+const calculation=calculateOccupantLoad({spaceFunction:'Synthetic',area:'1200',factor:'100',factorBasis:'Synthetic row',areaBasis:'gross',seating:'without-fixed-seating'});
 for(const stale of [false,true]) {
  let options,resolve; const gate=new Promise(r=>resolve=r); const calls=[];
  const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,calculationNoteBlocks,occupantLoadDrafts:new Map(),
