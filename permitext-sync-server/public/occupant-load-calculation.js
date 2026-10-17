@@ -130,9 +130,11 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, source
   const update = () => {
     Object.assign(draft, values());
     const calculation = calculateOccupantLoad(draft);
+    const awaitingReview = !calculation.valid && calculation.errors.length === 1 && !draft.reviewed;
     result.classList.toggle('is-pending', !calculation.valid);
+    result.hidden = awaitingReview;
     result.textContent = calculation.valid ? `${calculation.people.toLocaleString()} people`
-      : calculation.errors.length === 1 && !draft.reviewed ? 'Ready for source review' : 'Complete inputs and source review';
+      : awaitingReview ? '' : 'Complete inputs and source review';
     formula.textContent = calculation.valid ? `${calculation.input.area} ÷ ${calculation.input.factor} · rounded up to a whole person` : calculation.errors[0];
     const changed = savedCard && JSON.stringify(calculation.input) !== savedFingerprint;
     save.disabled = busy || !calculation.valid || !canSave;
