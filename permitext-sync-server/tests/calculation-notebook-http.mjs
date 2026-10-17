@@ -55,11 +55,23 @@ try {
   assert.doesNotMatch(get.json.card.plainText,/author confirmed/i);
   assert.equal(get.json.card.evidenceLinks[0].source.codeVersion,codeVersion);assert.equal(get.json.card.openQuestions[0].status,"open");
   assert.equal(get.json.card.sourceClassification,"user-authored");
+  const customCalculation=calculateOccupantLoad({...calculation.input,factorMode:"custom",factor:"50",tableFactor:"100",tableRowID:"synthetic-row",customReason:"Synthetic design reference CALC-7"});
+  const customDocument=emptyNotebookDocument();customDocument.document=calculationNoteBlocks(customCalculation,[link]);
+  const customBody={...saveBody,clientMutationID:"custom-calculation-acceptance",title:"Custom factor calculation",document:customDocument};
+  const customSaved=await request("/notebook/cards/save",customBody);assert.equal(customSaved.status,201);
+  const customReplay=await request("/notebook/cards/save",customBody);assert.equal(customReplay.json.card.id,customSaved.json.card.id);
+  const customGet=await request("/notebook/cards/get",{projectID:"calculation-project",cardID:customSaved.json.card.id});
+  assert.equal(customGet.status,200);assert.match(customGet.json.card.plainText,/25 people/);
+  assert.match(customGet.json.card.plainText,/Custom factor \(user-defined\): 50/);
+  assert.match(customGet.json.card.plainText,/BC table factor: 100/);
+  assert.match(customGet.json.card.plainText,/Synthetic design reference CALC-7/);
+  assert.equal(customGet.json.card.sourceClassification,"user-authored");assert.equal(customGet.json.card.evidenceLinks[0].source.codeVersion,codeVersion);
   assert.equal((await request("/sync/push",{batch:{user:{id:userID},mutations:[{project:{id:"other-project-record",userID,codeVersion,clientID:"other-project",name:"Separate synthetic project",colorHex:"#334455",sortOrder:1,updatedAt:new Date().toISOString()}}]}})).status,200);
   assert.equal((await request("/notebook/cards/get",{projectID:"other-project",cardID:saved.json.card.id})).status,404);
   const sources=await request("/reports/sources/list",{projectID:"calculation-project"});assert.equal(sources.status,200);
   const note=sources.json.sources.find(s=>s.kind==="notebookCard"&&s.id===saved.json.card.id);assert(note,JSON.stringify(sources));
   assert.match(note.plainText || note.text || JSON.stringify(note),/13 people/);
+  assert(sources.json.sources.some(s=>s.kind==="notebookCard"&&s.id===customSaved.json.card.id));
   console.log("Calculation → Notebook durable round trip, retry identity, cross-Project denial and Report source availability passed; zero external/provider calls.");
 } finally {
   server.closeAllConnections();await new Promise(resolve=>server.close(resolve));

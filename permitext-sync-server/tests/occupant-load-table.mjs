@@ -30,11 +30,19 @@ for(const row of table.rows.filter(r=>/Bowling|Stages and platforms|Mall buildin
  const input=occupantLoadTableInput({area:'1500',factor:'1000',areaBasis:'gross',seating:'without-fixed-seating'},table,row.id);
  assert.notEqual(row.method,'area');assert.equal(input.factor,'');
  assert.equal(calculateOccupantLoad(input).previewPeople,null,'A special method must never reuse the previous numeric factor.');
+ const override=occupantLoadTableInput({...input,factorMode:'custom',customFactor:'50',customReason:'Synthetic reference'},table,row.id);
+ assert.equal(override.factor,'');assert.equal(calculateOccupantLoad(override).previewPeople,null,'Custom mode cannot bypass a special method.');
 }
 assert.match(find('Passenger terminal — Passenger terminal or platform').description,/capacity of all passenger vehicles/);
 const bound=occupantLoadTableInput({area:'1500',factor:'1000',factorBasis:'Manual override',seating:'without-fixed-seating'},table,business.id);
 assert.equal(bound.factor,'100');assert.equal(bound.areaBasis,'gross');
 assert.equal(calculateOccupantLoad(bound).people,15);
+const custom=occupantLoadTableInput({...bound,factorMode:'custom',customFactor:'50',customReason:'Synthetic design reference'},table);
+assert.equal(custom.factor,'50');assert.equal(custom.tableFactor,'100');assert.equal(custom.factorBasis,business.description);
+assert.equal(calculateOccupantLoad(custom).people,30);
+const restored=occupantLoadTableInput({...custom,factorMode:'table'},table);
+assert.equal(restored.factor,'100');assert.equal(restored.factorMode,undefined);assert.equal(restored.customReason,undefined);assert.equal(restored.tableFactor,undefined);
+assert.equal(calculateOccupantLoad(restored).people,15);
 assert.equal(occupantLoadTableInput(bound,table,'not-a-row').factor,'');
 assert.equal(occupantLoadSuggestedRow({spaceFunction:'office'},table),null,'An informal name alone cannot choose a code row.');
 assert.equal(occupantLoadSuggestedRow({suggestions:[{label:'Occupant-load factor',quote:`${business.label} 100 gross b, d`}]},table)?.id,business.id);
@@ -53,6 +61,7 @@ assert.throws(()=>readTable(blocks.filter(b=>b.kind!=='table')));
 assert.throws(()=>readTable(blocks.map(b=>b.kind==='table'?{...b,html:b.html.replace('>b, d<','>z<')}:b)),'A missing footnote cannot be silently discarded.');
 const changed=readTable(blocks.map(b=>b.kind==='table'?{...b,html:b.html.replace('100 gross \n','101 gross \n')}:b));
 assert.equal(changed.rows.find(r=>r.id===business.id).factor,'101','Factors come from the loaded source rather than a copied catalogue.');
+assert.equal(occupantLoadTableInput(custom,changed).tableFactor,'101','A custom calculation retains the current canonical baseline so the save handler can detect source drift.');
 const note=JSON.stringify(calculationNoteBlocks(calculateOccupantLoad(bound),[{id:'source',label:'BC 1004.1.3'}]));
 assert.match(note,/permanent fixtures and amenities/);assert.match(note,/100 ft²\/person/);
 console.log('Actual BC table: 52 functions, exact factors/bases/footnotes, special methods, source drift and quoted prefill passed.');

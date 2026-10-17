@@ -1,5 +1,5 @@
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
-import { createOccupantLoadCard, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=22";
+import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
 import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-calculator-notes-layout-v1149";
+} from "./offline-storage.js?v=20261017-calculator-custom-factor-v1150";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-calculator-notes-layout-v1149";
+} from "./workspace-state.js?v=20261017-calculator-custom-factor-v1150";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -16619,7 +16619,11 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       requireAction();
       const table = occupantLoadTable(section.blocks, resolved);
       const rebound = occupantLoadTableInput(calculation.input, table);
-      if (!rebound.tableRowID || !rebound.factor || ['spaceFunction','factor','areaBasis','factorBasis','seating'].some(key => rebound[key] !== calculation.input[key])) throw new Error("The BC table changed. Reopen the calculator before saving.");
+      if (!rebound.tableRowID || !rebound.factor || ['spaceFunction','factor','areaBasis','factorBasis','seating','factorMode','tableFactor','customReason'].some(key => rebound[key] !== calculation.input[key])) throw new Error("The BC table changed. Reopen the calculator before saving.");
+      const checked = calculateOccupantLoad(rebound);
+      if (!checked.valid) throw new Error(checked.errors[0]);
+      // Recompute from the current source and explicit user override before saving.
+      calculation = checked;
       const capture = document.createElement("div");
       (section.blocks || []).forEach(block => capture.append(renderCodeBlock(block)));
       const exact = notebookEvidenceTextMap(capture, {literalInline: true}).text;
@@ -16633,7 +16637,7 @@ function renderOccupantLoadCalculation(source, {anchor, conversationID = "", ans
       const fingerprint = JSON.stringify(calculation.input);
       const submission = savePayloads.get(fingerprint) || {projectID: researchProjectID(project), expectedVersion: 0,
         clientMutationID: `occupant-load:${crypto.randomUUID()}`, cardType: "finding",
-        title: `Occupant load · ${calculation.input.spaceFunction}`.slice(0, 300), document: notebookDocument, evidenceLinks: [link],
+        title: `Occupant load${calculation.input.factorMode === 'custom' ? ' · Custom factor' : ''} · ${calculation.input.spaceFunction}`.slice(0, 300), document: notebookDocument, evidenceLinks: [link],
         openQuestions: [{id: crypto.randomUUID(), text: "Review cumulative occupant loads and any applicable exceptions before using this result for egress design.",
           why: "This snapshot calculates one space only; it does not determine exit count or establish compliance.", status: "open", resolution: ""}]};
       savePayloads.set(fingerprint, submission);

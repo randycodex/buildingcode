@@ -13,7 +13,7 @@ const row=table.rows.find(r=>r.label.startsWith('Business areas'));
 const calculation=calculateOccupantLoad(occupantLoadTableInput({area:'1200',seating:'without-fixed-seating'},table,row.id));
 for(const stale of [false,true]) {
  let options,resolve; const gate=new Promise(r=>resolve=r); const calls=[];
- const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,occupantLoadTable:readTable,occupantLoadTableInput,calculationNoteBlocks,occupantLoadDrafts:new Map(),
+ const context=vm.createContext({occupantLoadSource,occupantLoadPrefill,occupantLoadTable:readTable,occupantLoadTableInput,calculateOccupantLoad,calculationNoteBlocks,occupantLoadDrafts:new Map(),
   calculatorFootnoteAssessmentFor:()=>null,calculatorConversationForPane:()=>null,supplementalResearchConversations:new Map(),activeResearchConversation:null,
   state:{workflowNavigationGeneration:0},activeWorkspaceID:'workspace',captureAccountRequest:()=>({userID:'owner'}),
   isCurrentAccountRequest:()=>true,hasCapability:()=>true,workspaceProject:()=>({id:'project'}),researchProjectID:()=> 'project',researchCodeEdition:()=> '2022',
@@ -46,6 +46,17 @@ for(const stale of [false,true]) {
  resolve();
  if(stale){await assert.rejects(save,/view changed/);assert.equal(calls.length,0);}
  else {assert.equal((await save).id,'note');assert.equal(calls.length,1);assert.match(calls[0].evidenceLinks[0].passages[0].exact,/Exact canonical text/);assert.equal(calls[0].document.document[2].content[0].text.includes('12 people'),true);
-  await assert.rejects(options.onSave({...calculation,input:{...calculation.input,factor:'1000'}}),/BC table changed/);assert.equal(calls.length,1,'A modified table factor cannot be saved.');}
+  await assert.rejects(options.onSave({...calculation,input:{...calculation.input,factor:'1000'}}),/BC table changed/);assert.equal(calls.length,1,'A modified default table factor cannot be saved.');
+  const custom=calculateOccupantLoad(occupantLoadTableInput({...calculation.input,factorMode:'custom',customFactor:'50',customReason:'Synthetic reference CALC-7'},table));
+  await options.onSave({...custom,people:999});
+  const savedText=JSON.stringify(calls[1]);
+  assert.match(savedText,/Custom factor/);assert.match(savedText,/24 people/);assert.doesNotMatch(savedText,/999 people/,'Save recomputes custom arithmetic rather than trusting a submitted result.');
+  assert.match(savedText,/BC table factor: 100/);assert.match(savedText,/Synthetic reference CALC-7/);
+  await assert.rejects(options.onSave({...custom,input:{...custom.input,tableFactor:'101'}}),/BC table changed/);
+  await assert.rejects(options.onSave({...custom,input:{...custom.input,customReason:''}}),/reason\/reference/);
+  await assert.rejects(options.onSave({...custom,input:{...custom.input,factor:'0'}}),/positive factor/);
+  await assert.rejects(options.onSave({...custom,input:{...custom.input,factorBasis:'Changed notes'}}),/BC table changed/);
+  assert.equal(calls.length,2,'Invalid overrides cannot write a Note.');
+ }
 }
 console.log('Actual client save handler captures canonical evidence, saves the arithmetic snapshot, and cancels after a view change.');

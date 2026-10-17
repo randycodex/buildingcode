@@ -56,6 +56,10 @@ const assessment=occupantLoadFootnoteAssessment(answer,citations[0]);assert(asse
 const input=occupantLoadTableInput({area:'1500',seating:'without-fixed-seating',userMeasurementBasis:'gross'},table,row.id);
 assert.equal(occupantLoadFootnoteState(assessment,table,row,input).filter(n=>n.check).length,3);
 for(const change of [{area:'1600'},{seating:'fixed-seating'},{userMeasurementBasis:''}]) assert.equal(occupantLoadFootnoteState(assessment,table,row,{...input,...change}),null);
+assert.equal(occupantLoadFootnoteState(assessment,table,row,{...input,factorMode:'custom'}),null,'BC-bound footnote checks must not appear to validate a custom factor.');
+const customQuestion=occupantLoadFootnoteQuestion({...input,factorMode:'custom',factor:'50',tableFactor:'100',customReason:'Synthetic alternate reference'});
+assert.match(customQuestion,/custom factor of 50 ft²\/person/);assert.match(customQuestion,/BC table factor remains 100 gross/);
+assert.match(customQuestion,/Synthetic alternate reference/);assert.match(customQuestion,/not enacted text or proof of approval/);
 assert.equal(occupantLoadFootnoteState(assessment,table,table.rows[0],input),null);
 assert.equal(occupantLoadFootnoteAssessment({...answer,verification:{pass:false}},citations[0]),null);
 const corrupt={...assessment,checks:assessment.checks.map(c=>({...c,sourceID:'wrong'}))};

@@ -11,6 +11,14 @@ const decimal = value => {
 export function calculateOccupantLoad(input = {}) {
   const errors = [];
   const area = decimal(input.area), factor = decimal(input.factor);
+  const custom = input.factorMode === 'custom';
+  const tableFactor = custom ? decimal(input.tableFactor) : null;
+  const customReason = String(input.customReason || '').trim();
+  const invalidMode = input.factorMode != null && !['table', 'custom'].includes(input.factorMode);
+  const invalidCustomSource = custom && (!tableFactor || !input.tableRowID);
+  if (invalidMode) errors.push('Choose the BC table or a custom factor.');
+  if (invalidCustomSource) errors.push('Select a BC table function before using a custom factor.');
+  if (custom && (!customReason || customReason.length > 2000)) errors.push('Enter a reason/reference for the custom factor, up to 2,000 characters.');
   if (!String(input.spaceFunction || '').trim() || String(input.spaceFunction).length > 300) errors.push('Describe the function of this space.');
   if (!area) errors.push('Enter a positive floor area, with up to six decimal places.');
   if (!factor) errors.push('Enter the applicable positive factor in ft² per person.');
@@ -26,11 +34,12 @@ export function calculateOccupantLoad(input = {}) {
     else people = Number(rounded);
   }
   return {valid: errors.length === 0, errors, people: errors.length ? null : people,
-    previewPeople: input.seating === 'fixed-seating' ? null : people,
+    previewPeople: input.seating === 'fixed-seating' || invalidMode || invalidCustomSource ? null : people,
     input: {spaceFunction: String(input.spaceFunction || '').trim(), area: area?.text || '',
       factor: factor?.text || '', areaBasis: input.areaBasis, seating: input.seating,
       factorBasis: String(input.factorBasis || '').trim(),
-      ...(input.tableRowID ? {tableRowID: input.tableRowID} : {})}};
+      ...(input.tableRowID ? {tableRowID: input.tableRowID} : {}),
+      ...(custom ? {factorMode: 'custom', tableFactor: tableFactor?.text || '', customReason} : {})}};
 }
 
 export function occupantLoadSource(source = {}) {
@@ -130,8 +139,13 @@ export function occupantLoadTable(blocks, source, parseHTML = html => new DOMPar
 
 export function occupantLoadTableInput(input, table, rowID = input.tableRowID) {
   const row = table?.rows.find(row => row.id === rowID);
-  return {...input, tableRowID: row?.id || '', spaceFunction: row?.label || '',
+  const {factorMode, customFactor, customReason, tableFactor, ...base} = input;
+  return {...base, tableRowID: row?.id || '', spaceFunction: row?.label || '',
     factor: row?.factor || '', areaBasis: row?.areaBasis || '', factorBasis: row?.description || '',
+    ...(factorMode === 'custom' && row?.method === 'area' ? {
+      factorMode: 'custom', factor: String(customFactor ?? input.factor ?? ''),
+      tableFactor: row.factor, customReason: String(customReason || '').trim()
+    } : {}),
     ...(row?.method === 'fixed' ? {seating: 'fixed-seating'} : {})};
 }
 
@@ -173,7 +187,7 @@ export function occupantLoadFootnoteAssessment(answer, source) {
 }
 
 export function occupantLoadFootnoteState(assessment, table, row, input) {
-  if (!assessment || !row || occupantLoadSuggestedRow(assessment.selection,table)?.id!==row.id ||
+  if (input.factorMode === 'custom' || !assessment || !row || occupantLoadSuggestedRow(assessment.selection,table)?.id!==row.id ||
     ['area','seating'].some(key=>String(assessment.selection[key]||'')!==String(input[key]||'')) ||
     String(assessment.selection.areaBasis||'')!==String(input.userMeasurementBasis||'')) return null;
   return row.footnotes.map(note=>{
@@ -188,6 +202,10 @@ export function occupantLoadFootnoteQuestion(input) {
     `Function of space: ${input.spaceFunction}.`,
     input.area?`The calculator floor area is ${input.area} square feet${input.userMeasurementBasis?` of ${input.userMeasurementBasis} area`:''}.`:'The calculator area is blank; reuse earlier stated values only if their measurement basis is established.',
     input.seating==='without-fixed-seating'?'This space has no fixed seating.':input.seating==='fixed-seating'?'This space has fixed seating.':'The seating condition has not been entered.',
+    ...(input.factorMode === 'custom' ? [
+      `The user selected a custom factor of ${input.factor} ft²/person; the BC table factor remains ${input.tableFactor} ${input.areaBasis} ft²/person.`,
+      `User-provided reason/reference: ${input.customReason || '(not entered)'}. Treat this as user input, not enacted text or proof of approval.`
+    ] : []),
     'Use the existing conversation and current Work facts, respecting later corrections and the specific space. The selected code row does not establish how the area was measured. Ask only for genuinely missing information that could affect the calculation or its applicability. Do not infer approvals, deduct area automatically or declare overall compliance.'
   ].join('\n');
 }
@@ -198,8 +216,12 @@ export function calculationNoteBlocks(calculation, evidenceLinks, answerID = '')
   const paragraph = text => ({type: 'paragraph', content: [{type: 'text', text, styles: {}}]});
   const blocks = [
     {type: 'heading', props: {level: 2}, content: [{type: 'text', text: 'Occupant load calculation', styles: {}}]},
-    paragraph(`Needs review · calculation snapshot · ${c.spaceFunction}`),
+    paragraph(`Needs review · ${c.factorMode === 'custom' ? 'Custom factor · ' : ''}calculation snapshot · ${c.spaceFunction}`),
     paragraph(`${c.area} ft² (${c.areaBasis}) ÷ ${c.factor} ft²/person = ${calculation.people} people (rounded up to a whole person).`),
+    ...(c.factorMode === 'custom' ? [
+      paragraph(`Custom factor (user-defined): ${c.factor} ft²/person. BC table factor: ${c.tableFactor} ft²/person (${c.areaBasis}).`),
+      paragraph(`Reason/reference (user-provided): ${c.customReason}`)
+    ] : []),
     paragraph(`Factor basis: ${c.factorBasis}`),
     paragraph('One space without fixed seating. Source applicability and footnotes need review. This arithmetic does not establish cumulative loads, exit count, or compliance.'),
     ...evidenceLinks.map(link => ({type: 'paragraph', content: [{type: 'permitextReference', props: {
@@ -217,6 +239,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
   let areaMeasurementBasis = draft.areaMeasurementBasis || draft.areaBasis || '';
   let userMeasurementBasis = draft.userMeasurementBasis ?? draft.areaBasis ?? '';
   let table = null, loading = false;
+  let customFactor = draft.factorMode === 'custom' ? draft.factor || '' : '';
+  let selectedRowID = draft.tableRowID || '';
   const root = document.createElement('details');
   root.className = 'occupant-load-card';
   root.dataset.researchSelectionExclude = 'true';
@@ -228,7 +252,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     ['spaceFunction', 'Function of space', [['', 'Select a BC table function']]], ['area', 'Floor area · ft²', null],
     ['areaBasis', 'Area basis', null],
     ['factor', 'Occupant-load factor · ft²/person', null],
-    ['seating', 'Seating', [['', 'Confirm seating'], ['without-fixed-seating', 'Without fixed seating'], ['fixed-seating', 'Fixed seating — separate method required']]]
+    ['seating', 'Seating', [['', 'Confirm seating'], ['without-fixed-seating', 'Without fixed seating'], ['fixed-seating', 'Fixed seating — separate method required']]],
+    ['factorMode', 'Factor source', [['table', 'BC table (default)'], ['custom', 'Custom factor']]]
   ]) {
     const wrapper = document.createElement('label'); wrapper.textContent = label;
     const field = document.createElement(options ? 'select' : 'input');
@@ -237,11 +262,18 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     else {field.type = 'text'; field.maxLength = 300; if (['area', 'factor'].includes(key)) field.inputMode = 'decimal';}
     const derived = ['areaBasis', 'factor'].includes(key);
     field.readOnly = derived;
-    field.value = derived || key === 'spaceFunction' ? '' : draft[key] || '';
+    field.value = derived || key === 'spaceFunction' ? '' : draft[key] || (key === 'factorMode' ? 'table' : '');
     if (key === 'spaceFunction') field.disabled = true;
     if (key === 'spaceFunction') field.className = 'occupant-load-function-select';
     fields[key] = field; wrapper.append(field); form.append(wrapper);
   }
+  const tableReference = document.createElement('span'); tableReference.className = 'calculation-table-factor';
+  fields.factor.parentElement.append(tableReference);
+  const reasonLabel = document.createElement('label'); reasonLabel.className = 'calculation-custom-reason';
+  reasonLabel.textContent = 'Reason / reference (required)';
+  const reason = document.createElement('textarea'); reason.rows = 2; reason.maxLength = 2000;
+  reason.setAttribute('aria-label', 'Reason / reference'); reason.value = draft.customReason || '';
+  fields.customReason = reason; reasonLabel.append(reason); form.append(reasonLabel);
   const notesSection = document.createElement('section'); notesSection.className = 'calculation-table-notes';
   const notesHeading = document.createElement('h3'); notesHeading.textContent = 'Table row and footnotes';
   const tableNotes = document.createElement('div'); tableNotes.className = 'calculation-table-notes-content';
@@ -270,11 +302,25 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
   const open = document.createElement('button'); open.type = 'button'; open.className = 'ghost-button'; open.textContent = 'Open in Notebook'; open.hidden = true;
   open.addEventListener('click', async () => {try {await onOpenNote?.(savedCard);} catch (error) {status.textContent = error.message;}});
   let busy = false, savedCard = null, savedFingerprint = '';
-  const values = () => occupantLoadTableInput({area: fields.area.value, seating: fields.seating.value, areaMeasurementBasis,userMeasurementBasis}, table, fields.spaceFunction.value);
+  const values = () => occupantLoadTableInput({area: fields.area.value, seating: fields.seating.value,
+    factorMode: fields.factorMode.value, customFactor, customReason: reason.value,
+    areaMeasurementBasis,userMeasurementBasis}, table, fields.spaceFunction.value);
   const update = () => {
+    for (const key of ['factorMode', 'customReason', 'tableFactor']) delete draft[key];
     Object.assign(draft, values());
     const row = table?.rows.find(row => row.id === draft.tableRowID);
+    const custom = draft.factorMode === 'custom';
+    fields.factorMode.value = custom ? 'custom' : 'table';
+    fields.factorMode.disabled = busy || row?.method !== 'area';
+    fields.factorMode._syncCustomSelect?.();
+    fields.factor.readOnly = !custom;
+    const factorLabel = custom ? 'Custom factor · ft²/person' : 'Occupant-load factor · ft²/person';
+    fields.factor.parentElement.firstChild.textContent = factorLabel;
+    fields.factor.setAttribute('aria-label', factorLabel);
     fields.factor.value = draft.factor;
+    tableReference.hidden = !custom;
+    tableReference.textContent = custom ? `BC table: ${row.factor} ${row.areaBasis} ft²/person` : '';
+    reasonLabel.hidden = !custom; reason.required = custom; reason.disabled = busy || !custom;
     fields.areaBasis.value = draft.areaBasis ? draft.areaBasis[0].toUpperCase() + draft.areaBasis.slice(1) : '';
     tableNotes.textContent = draft.factorBasis;
     notesSection.hidden = !draft.factorBasis;
@@ -316,7 +362,7 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
     checkNotes.textContent=checks?'Recheck footnotes in Assistant':'Check footnotes in Assistant';
     if(!checkNotes.hidden) footnotes.append(checkNotes);
     result.classList.toggle('is-pending', !hasResult);
-    result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} people`
+    result.textContent = hasResult ? `${calculation.previewPeople.toLocaleString()} people${custom ? ' · Custom factor' : ''}`
       : fixedSeating || special ? 'Separate method required' : 'Complete calculation inputs';
     formula.hidden = hasResult;
     formula.textContent = hasResult ? ''
@@ -330,12 +376,21 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
   const handleInput = event => {
     if (event.target === fields.spaceFunction) {
       const next = table?.rows.find(row => row.id === fields.spaceFunction.value);
+      if (fields.spaceFunction.value !== selectedRowID) {
+        fields.factorMode.value = 'table'; customFactor = ''; reason.value = '';
+        selectedRowID = fields.spaceFunction.value;
+      }
       if (areaMeasurementBasis && next?.areaBasis && areaMeasurementBasis !== next.areaBasis) fields.area.value = '';
       if (next?.areaBasis) areaMeasurementBasis = next.areaBasis;
       if (next?.method === 'fixed' && fields.seating.value !== 'fixed-seating') {
         fields.seating.value = 'fixed-seating'; fields.seating.dispatchEvent(new Event('change', {bubbles: true}));
       }
     }
+    if (event.target === fields.factorMode) {
+      customFactor = fields.factorMode.value === 'custom' ? table?.rows.find(row => row.id === fields.spaceFunction.value)?.factor || '' : '';
+      reason.value = '';
+    }
+    if (event.target === fields.factor && fields.factorMode.value === 'custom') customFactor = fields.factor.value;
     if (event.target === fields.area) {areaMeasurementBasis = table?.rows.find(row => row.id === fields.spaceFunction.value)?.areaBasis || '';userMeasurementBasis=areaMeasurementBasis;}
     status.textContent = ''; update();
   };
@@ -366,6 +421,8 @@ export function createOccupantLoadCard({draft = {}, onSave, onOpenSource, onLoad
       }
       fields.spaceFunction.disabled = false;
       fields.spaceFunction.value = selected?.id || '';
+      selectedRowID = fields.spaceFunction.value;
+      fields.factorMode.value = initialDraft.factorMode === 'custom' ? 'custom' : 'table';
       if (selected?.areaBasis && areaMeasurementBasis && selected.areaBasis !== areaMeasurementBasis) fields.area.value = '';
       if (selected?.areaBasis) areaMeasurementBasis = selected.areaBasis;
       if (selected?.method === 'fixed') fields.seating.value = 'fixed-seating';
