@@ -4,8 +4,8 @@ import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2"
 import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
-import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-closed-view-retention-v1156";
+import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-notebook-evidence-left-v1157";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-closed-view-retention-v1156";
+} from "./offline-storage.js?v=20261017-notebook-evidence-left-v1157";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-closed-view-retention-v1156";
+} from "./workspace-state.js?v=20261017-notebook-evidence-left-v1157";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2743,6 +2743,7 @@ async function openProjectNotebook(project) {
   const notebookID = paneIDForProjectNotebook(identity);
   state.paneWeights[notebookID] ||= defaultNotebookPaneWidth;
   if (!wasOpen) placeProjectToolPaneInControlOrder(identity);
+  savedPaneIDs().forEach((paneID) => placeEvidenceBeforeNotebook(paneID, identity));
   syncProjectToolButtonStates(identity);
   saveWorkspaceState();
   await transitionWorkspace("utility");
@@ -4540,11 +4541,12 @@ async function switchWorkflowView(view) {
   if (notifyProjectRequiredForColumn()) return false;
   view = normalizeWorkflowView(view);
   const visitedViews = state.workflowVisitedViews || [];
-  const initializeNotebook = shouldOpenNotebookByDefault(view, visitedViews);
+  const initializeNotebook = view === "notebook" && !projectHasOpenNotebook(workspaceProject());
   if (view !== currentWorkflowView()) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     state.workflowView = view;
   }
+  if (view === "notebook") savedPaneIDs().forEach((paneID) => placeEvidenceBeforeNotebook(paneID));
   syncWorkflowColumnPresentation();
   saveWorkspaceState();
   if (initializeNotebook || (!visitedViews.includes(view) && !defaultActivePaneIDs().some(workflowPaneIsVisible))) {
@@ -4895,6 +4897,15 @@ function placePaneBefore(anchorPaneID, paneID) {
   const anchorIndex = ordered.indexOf(anchorPaneID);
   ordered.splice(anchorIndex === -1 ? 0 : anchorIndex, 0, paneID);
   state.paneOrder = ordered;
+}
+
+function placeEvidenceBeforeNotebook(paneID, project = workspaceProject()) {
+  if (!project || !projectHasOpenNotebook(project)) return false;
+  const notebookID = paneIDForProjectNotebook(project);
+  const order = state.paneOrder || [];
+  if (order.indexOf(paneID) >= 0 && order.indexOf(paneID) < order.indexOf(notebookID)) return false;
+  placePaneBefore(notebookID, paneID);
+  return true;
 }
 
 function updateLinkedReaderForSearch(searchID, detail, overrides = {}) {
@@ -46562,6 +46573,7 @@ async function toggleUtilityPane(key) {
     state.utilities[key] = false;
     state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
     appendPaneIfMissing(paneID);
+    if (key === "saved") placeEvidenceBeforeNotebook(paneID);
     if (key === "search") {
       await transitionWorkspace("utility", { deferStateSave: true });
     } else {
@@ -46735,6 +46747,10 @@ async function focusRecentUtilityColumn(key) {
     return key === "saved" ? focusUtility("saved") : key === "search" ? openNewSearchColumn() : openNewResearchColumn();
   }
   const paneID = paneIDForUtilityInstance(instance);
+  if (key === "saved" && placeEvidenceBeforeNotebook(paneID)) {
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+  }
   rememberUtilityColumn(paneID);
   if (!await whenWorkspacePaneReady(paneID)) return;
   const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);

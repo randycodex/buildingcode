@@ -435,14 +435,15 @@ async function main() {
     const workflowStart = webRoot.text.indexOf('<nav class="workflow-toolbar"');
     const workflowSource = webRoot.text.slice(workflowStart, webRoot.text.indexOf("</nav>", workflowStart));
     const workflowOrder = ['data-workflow-tools="research"', 'id="add-reader"', 'id="toggle-search"',
-      'id="toggle-analysis"', 'data-workflow-tools="notebook"', 'id="add-notebook-reader"', 'id="toggle-saved"', 'id="toggle-notebook"']
+      'id="toggle-analysis"', 'data-workflow-tools="notebook"', 'id="toggle-saved"', 'id="toggle-notebook"']
       .map(marker => workflowSource.indexOf(marker));
     assert(
       workflowStart >= 0 && workflowOrder.every((index, position) => index >= 0 && (position === 0 || index > workflowOrder[position - 1])),
-      "Research tools must remain Reader, Search, Assistant; Notebook tools must remain Reader, Evidence, Notes."
+      "Research tools must remain Reader, Search, Assistant; Notebook tools must remain Evidence, Notes."
     );
+    assert(!workflowSource.includes('id="add-notebook-reader"'), "Notebook must not expose a Reader toolbar button.");
     for (const [id, label] of [["add-reader", "Reader"], ["toggle-search", "Search"], ["toggle-analysis", "Assistant"],
-      ["add-notebook-reader", "Reader"], ["toggle-saved", "Evidence"], ["toggle-notebook", "Notes"]]) {
+      ["toggle-saved", "Evidence"], ["toggle-notebook", "Notes"]]) {
       const tag = tagWithID(workflowSource, id);
       assert(tag.includes('type="button"') && tag.includes(`aria-label="${label}"`), `${label} tool lost button semantics or its accessible label.`);
       if (id.startsWith("toggle-")) assert(tag.includes('aria-pressed="false"'), `${label} tool lost its initial toggle state.`);

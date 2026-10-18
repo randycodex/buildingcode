@@ -67,7 +67,8 @@ const c=vm.createContext({columnExpansionController:()=>({refresh(){}}),reportSc
   syncReaderToolbarButton(){},updateWorkspaceLayoutControls(){},syncResearchColumnLayout(){},schedulePaneDividerAddControls(){dividerUpdates++;},captureReaderScrollPositions:()=>new Map(),restoreReaderScrollPositions(){},saveWorkspaceState(){},
   defaultActivePaneIDs:()=>panes.map(p=>p.dataset.paneId),
   appendPaneSequence(actualPanes){actualPanes.forEach((p,i)=>assert.equal(p,panes[i]));for(const p of actualPanes){p.hidden=!c.workflowPaneIsVisible(p.dataset.paneId);p.scrollTop=0;}},
-  openProjectNotebook(){constructions++;},focusRecentUtilityColumn(){constructions++;}
+  projectHasOpenNotebook:()=>panes.includes(notebook),savedPaneIDs:()=>[],placeEvidenceBeforeNotebook(){},
+  openProjectNotebook(){constructions++;if(!panes.includes(notebook))panes.push(notebook);},focusRecentUtilityColumn(){constructions++;}
 });
 vm.runInContext("let presentedColumnWorkflowView='research';\n"+['currentWorkflowView','currentColumnWorkflowView','syncReferenceReaderLayout','syncWorkflowColumnPresentation','workflowPaneAnchors','workflowPaneIsVisible','closeSharedWorkspaceViews','syncWorkflowNavigation','switchWorkflowView'].map(actual).join('\n'),c);
 await c.switchWorkflowView('notebook'); assert.equal(track.scrollLeft,70);
@@ -103,7 +104,7 @@ vm.runInContext(actual('closeAllColumns'),c);
 await c.closeAllColumns();
 assert.deepEqual(closed,['project:notebook:a'],'Close all only closes this view');
 
-// Closing a view is an intentional layout, including before its first navigation.
+// Research stays empty; Notebook keeps Notes available on entry.
 needProject=false;
 c.workspacePaneDescriptors=()=>panes.map(p=>({id:p.dataset.paneId,close:async()=>{
   panes.splice(panes.indexOf(p),1);
@@ -125,16 +126,28 @@ for (const view of ['research','notebook']) {
   const afterOther=constructions;
   await c.switchWorkflowView(view);
   await c.switchWorkflowView(view);
-  assert.equal(constructions,afterOther,'Returning to an empty view must not reopen Search or Notes');
-  assert.equal(panes.length,1,'Screen switching preserves the closed layout');
-  if(other==='notebook') assert.equal(afterOther,before+1,'First Notebook visit still initializes Notes');
+  assert.equal(afterOther,before,'Switching to a retained screen keeps its existing columns');
+  assert.equal(constructions,afterOther+(view==='notebook'?1:0),'Only Notes reopens when returning to an empty screen');
+  assert.equal(panes.length,view==='notebook'?2:1,'Research remains empty while Notebook restores Notes');
 }
 panes.length=0;
 state.workflowVisitedViews=[];
 const beforeFresh=constructions;
 await c.switchWorkflowView('research');
 assert.equal(constructions,beforeFresh+1,'First empty Research visit still opens Search');
-console.log('Closed view regression passed: first-use defaults, other-view retention and empty Research/Notebook persistence after layout restore.');
+console.log('Closed view regression passed: Research stays empty, Notes returns in Notebook, retained editors and saved layouts survive.');
+
+const evidenceState={paneOrder:['reader:research','project:notebook:a','utility:saved:one','utility:saved:two']};
+const evidenceContext=vm.createContext({state:evidenceState,workspaceProject:()=>({id:'a'}),
+  projectHasOpenNotebook:()=>true,paneIDForProjectNotebook:()=> 'project:notebook:a',
+  defaultActivePaneIDs:()=>['reader:research','project:notebook:a','utility:saved:one','utility:saved:two']});
+vm.runInContext(actual('placePaneBefore')+'\n'+actual('placeEvidenceBeforeNotebook'),evidenceContext);
+for (const id of ['utility:saved:one','utility:saved:two']) {
+  assert.equal(evidenceContext.placeEvidenceBeforeNotebook(id),true);
+  assert.equal(evidenceContext.placeEvidenceBeforeNotebook(id),false,'Already positioned Evidence keeps its position');
+}
+assert.deepEqual(evidenceState.paneOrder,['reader:research','utility:saved:one','utility:saved:two','project:notebook:a']);
+console.log('Notebook order passed: Evidence opens to the left of Notes without moving retained Research columns.');
 
 // Exercise the application wiring, including the Sources disclosure/resize path.
 const referenceClasses=new Set(), referenceStyles=new Map();
