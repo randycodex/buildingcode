@@ -1164,6 +1164,10 @@ textarea:focus-visible {
   color: #d94a4a;
 }
 
+.workspace-context-menu button.is-danger-on-hover:hover {
+  color: var(--destructive);
+}
+
 .workspace-context-menu button:disabled {
   opacity: 0.35;
 }

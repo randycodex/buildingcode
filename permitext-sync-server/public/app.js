@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-project-menu-actions-v1154";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-close-all-hover-v1155";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-project-menu-actions-v1154";
+} from "./offline-storage.js?v=20261017-close-all-hover-v1155";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-project-menu-actions-v1154";
+} from "./workspace-state.js?v=20261017-close-all-hover-v1155";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2252,6 +2252,7 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     if (action.icon) prependWorkspaceButtonIcon(button, action.icon);
     button.disabled = Boolean(action.disabled);
     button.classList.toggle("is-danger", Boolean(action.danger));
+    button.classList.toggle("is-danger-on-hover", Boolean(action.dangerOnHover));
     button.addEventListener("click", () => {
       closeWorkspaceContextMenu();
       // Dialogs must capture a durable return target, not the removed menu item.
@@ -2306,7 +2307,8 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   for (const id of ["fit-columns", "collapse-all-columns", "expand-all-columns", "collapse-readers"]) {
     const control = document.getElementById(id);
     if (control && !control.hidden) appendMenuAction(layoutActions, {
-      label: control.textContent, disabled: control.disabled, run: () => control.click()
+      label: control.textContent, disabled: control.disabled,
+      dangerOnHover: id === "collapse-readers", run: () => control.click()
     });
   }
   if (projectsAvailable && state.columnGroups?.length) appendMenuAction(layoutActions, {
