@@ -3,11 +3,10 @@ import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSear
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
-import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2";
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-existing-note-passages-v1180";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-note-body-only-v1181";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -127,7 +126,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-existing-note-passages-v1180";
+} from "./offline-storage.js?v=20261018-note-body-only-v1181";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -160,7 +159,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-existing-note-passages-v1180";
+} from "./workspace-state.js?v=20261018-note-body-only-v1181";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -28898,12 +28897,7 @@ async function renderProjectNotebook(project, options = {}) {
       };
       noteMenu.titleAction.append(reportButton);
       footer.append(reportMembership, footerActions);
-      const readerEvidence = createNotebookReaderEvidence(activeCard, async link => {
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-        await openNotebookReference(identity, foundation, {referenceKind: "selectedPassage", referenceID: link.id,
-          label: link.label, evidenceLink: link}, loadCard, paneID, projectID);
-      });
-      const focusedContent = [...(readerEvidence ? [readerEvidence] : []), editorElement];
+      const focusedContent = [editorElement];
       if (activeCard.openQuestions?.length) {
         focusedContent.push(createNotebookQuestionsEditor({questions: activeCard.openQuestions, readOnly: notebookReadOnly,
           onChange(questions) {
