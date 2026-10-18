@@ -20701,3 +20701,51 @@ body .permitext-notebook-editor :is(.notebook-format-style-menu, .notebook-forma
 body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu-dropdown, .bn-suggestion-menu, .bn-grid-suggestion-menu, .bn-form-popover) {
   border: 1px solid var(--border);
 }
+
+/* Report authoring shares the Note toolbar's quiet, compact controls. */
+.report-screen .report-format-toolbar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 3px;
+  min-height: 42px; padding: 5px 0;
+  background: var(--surface); color: var(--text-primary);
+  border-bottom: 1px solid var(--border); font: 13px var(--ui-font-family);
+}
+.report-screen .report-format-toolbar :is(button, select, summary) {
+  min-height: 30px; padding: 4px 7px; border: 0; border-radius: 4px;
+  background: transparent; color: inherit; font: inherit; cursor: pointer;
+}
+.report-screen .report-format-toolbar > button { width: 30px; flex: 0 0 30px; }
+.report-screen .report-draft-shell .report-format-toolbar > select { width: auto; min-width: 100px; flex: 0 0 auto; margin: 0; }
+.report-screen .report-format-toolbar svg { display: block; width: 17px; height: 17px; }
+.report-screen .report-format-toolbar :is(button, select, summary):hover,
+.report-screen .report-format-toolbar [aria-pressed="true"] { background: var(--menu-highlight, #80808022); }
+.report-screen .report-format-toolbar :disabled { opacity: .45; cursor: default; }
+.report-screen .report-format-toolbar :focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+.report-screen .report-format-toolbar .report-format-highlight { color: #d7b74c; }
+.report-screen .report-format-link, .report-screen .report-format-insert { position: relative; }
+.report-screen .report-format-insert summary { list-style: none; }
+.report-screen .report-format-insert summary::-webkit-details-marker { display: none; }
+.report-screen .report-format-insert summary::after { content: '⌄'; margin-left: 10px; }
+.report-screen .report-format-link-form, .report-screen .report-format-insert-menu {
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 10;
+  width: 260px; padding: 10px; border: 1px solid var(--border); border-radius: 12px;
+  background: var(--menu-surface, var(--surface)); color: var(--text-primary); box-shadow: none;
+}
+.report-screen .report-format-link-form[hidden] { display: none; }
+.report-screen .report-format-link-form label { display: block; margin-bottom: 8px; color: var(--text-secondary); }
+.report-screen .report-format-link-form input { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 7px; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; }
+.report-screen .report-format-link-form [role="alert"] { font-size: 12px; }
+.report-screen .report-format-insert-menu { width: 180px; }
+.report-screen .report-format-insert-menu button { display: block; width: 100%; text-align: left; }
+.report-screen .report-rich-editor .tiptap { min-height: 44px; outline: none; font: 17px/1.65 var(--ui-font-family); color: var(--text-primary); overflow-wrap: anywhere; white-space: pre-wrap; }
+.report-screen .report-rich-editor .tiptap p { display: block; overflow: visible; -webkit-line-clamp: unset; margin: 0; color: inherit; font: inherit; white-space: pre-wrap; }
+.report-screen .report-rich-editor[data-kind="heading"] .tiptap { font-size: 25px; font-weight: 700; }
+.report-screen .report-rich-editor[data-kind="heading"][data-heading-level="2"] .tiptap { font-size: 21px; }
+.report-screen .report-rich-editor[data-kind="heading"][data-heading-level="3"] .tiptap { font-size: 18px; }
+.report-screen .report-rich-editor[data-kind="list"] .tiptap { padding-left: 24px; }
+.report-screen .report-rich-editor[data-kind="list"] .tiptap p { display: list-item; list-style-type: disc; }
+.report-screen .report-rich-editor[data-kind="list"][data-list-style="ordered"] .tiptap p { list-style-type: decimal; }
+.report-screen .report-rich-editor :is(strong,b) { font-weight: 700; }
+.report-screen .report-rich-editor :is(em,i) { font-style: italic; }
+.report-screen .report-rich-editor mark { background: #f4d35e55; color: inherit; }
+.report-screen .report-rich-editor a { color: var(--link, #8ac8ff); text-decoration: underline; }

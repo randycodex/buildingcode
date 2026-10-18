@@ -1,6 +1,7 @@
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "node:url";
 import { reportEvidenceDisplayText, reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation } from "./report-presentation.mjs";
+import { reportBlockRuns, reportRunsLines } from "./public/report-rich-text.js";
 
 const colors = Object.freeze({
   ink: "#171717",
@@ -368,6 +369,52 @@ function drawCover(document, manifest) {
     });
 }
 
+// Lay out authored runs explicitly so marks, links and printed highlights stay
+// attached to their text across wrapping and page breaks.
+export function drawReportRichText(document, runs, {size = 10, bold = false, paragraphGap = 10, indent = 0, prefix = ""} = {}) {
+  const lineHeight = size * 1.5;
+  const left = document.page.margins.left + indent;
+  const width = document.page.width - document.page.margins.right - left;
+  let line = [], used = 0;
+  const measure = run => document.font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(size).widthOfString(run.text);
+  const flush = () => {
+    ensureVerticalSpace(document, lineHeight + 2);
+    const top = document.y;
+    let x = left;
+    for (const run of line) {
+      const runWidth = measure(run);
+      if (run.highlight) document.save().fillColor("#f4d35e").fillOpacity(0.5).rect(x, top + 1, runWidth, size * 1.25).fill().restore();
+      document.fillColor(colors.ink).font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(size)
+        .text(run.text, x, top, {lineBreak:false, oblique:run.italic || false, strike:run.strike || false,
+          ...(run.href ? {link:run.href, underline:true} : {})});
+      x += runWidth;
+    }
+    document.x = document.page.margins.left;
+    document.y = top + lineHeight;
+    line = []; used = 0;
+  };
+  const append = run => {
+    const runWidth = measure(run);
+    if (used && used + runWidth > width) flush();
+    if (runWidth > width) {
+      for (const char of run.text) {
+        const fragment = {...run,text:char}, charWidth = measure(fragment);
+        if (used && used + charWidth > width) flush();
+        line.push(fragment); used += charWidth;
+      }
+    } else {line.push(run); used += runWidth;}
+  };
+  if (prefix) append({text:prefix});
+  for (const run of runs) {
+    const tokens = run.text.split(/(\n|[^\S\n]+)/u).filter(Boolean);
+    for (const token of tokens) {
+      if (token === "\n") flush(); else append({...run,text:token});
+    }
+  }
+  if (line.length) flush();
+  document.y += paragraphGap;
+}
+
 function drawBody(document, manifest, projectMaterialBySourceID) {
   const presentation = reportPresentation(manifest);
   document.addPage();
@@ -375,6 +422,10 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
   (manifest.items || []).forEach((item) => {
     if (item.kind === "heading") {
       ensureVerticalSpace(document, 70);
+      if (item.richText) {
+        drawReportRichText(document, item.richText, {bold:true, size:item.presentationRole === "comment" ? 9 : ({1:17,2:14,3:12}[item.headingLevel] || 17), paragraphGap:item.presentationRole === "comment" ? 4 : 10});
+        return;
+      }
       document
         .fillColor(colors.ink)
         .font("Report-Bold")
@@ -384,7 +435,8 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     }
     if (item.kind === "paragraph") {
       ensureVerticalSpace(document, 55);
-      document
+      if (item.richText) drawReportRichText(document, item.richText);
+      else document
         .fillColor(colors.ink)
         .font("Report-Regular")
         .fontSize(10)
@@ -413,12 +465,15 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     }
     if (item.kind === "list") {
       ensureVerticalSpace(document, 55);
-      stringList(item.items).forEach((value) => {
+      const richLines = item.richText ? reportRunsLines(reportBlockRuns(item)) : null;
+      stringList(item.items).forEach((value, index) => {
+        const prefix = item.listStyle === "ordered" ? `${index + 1}. ` : "- ";
+        if (richLines) {drawReportRichText(document, richLines[index] || [{text:value}], {indent:8,prefix,paragraphGap:4}); return;}
         document
           .fillColor(colors.ink)
           .font("Report-Regular")
           .fontSize(10)
-          .text(`- ${value}`, { indent: 8, paragraphGap: 4 });
+          .text(`${prefix}${value}`, { indent: 8, paragraphGap: 4 });
       });
       document.moveDown(0.6);
       return;

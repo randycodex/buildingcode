@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-evidence-row-actions-v1183";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-report-format-highlight-v1187";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -127,7 +127,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-evidence-row-actions-v1183";
+} from "./offline-storage.js?v=20261018-report-format-highlight-v1187";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -160,7 +160,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-evidence-row-actions-v1183";
+} from "./workspace-state.js?v=20261018-report-format-highlight-v1187";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -333,7 +333,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261018-fold-note-passages-v34";
+const notebookClientVersion = "20261018-report-format-highlight-v37";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -29488,6 +29488,8 @@ async function renderProjectReportDraft(project, resume = null) {
   let refreshReportSources = async () => false;
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
+  let reportFormatting = null;
+  let reportFormattingModule = null;
   let outlineController = null;
   let comparisonController = null;
   const outlineSectionExpansion = new Map();
@@ -29570,6 +29572,7 @@ async function renderProjectReportDraft(project, resume = null) {
     },
     dispose() {
       disposed = true;
+      reportFormatting?.dispose();
       panel._columnExpansion?.dispose();
       outlineController?.dispose();
       comparisonController?.dispose();
@@ -29944,27 +29947,8 @@ async function renderProjectReportDraft(project, resume = null) {
       top.append(label, actions);
       row.append(top);
 
-      if (block.kind === "heading") {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.value = block.text || "";
-        input.placeholder = "Report heading";
-        input.setAttribute("aria-label", "Report heading");
-        input.addEventListener("input", () => {
-          block.text = input.value;
-          setDirty();
-        });
-        row.append(input);
-      } else if (block.kind === "paragraph") {
-        const textarea = document.createElement("textarea");
-        textarea.value = block.text || "";
-        textarea.placeholder = "Professional narrative paragraph";
-        textarea.setAttribute("aria-label", "Report paragraph");
-        textarea.addEventListener("input", () => {
-          block.text = textarea.value;
-          setDirty();
-        });
-        row.append(textarea);
+      if (["heading", "paragraph", "list"].includes(block.kind)) {
+        row.append(reportFormatting.mount(block));
         if (block.derivedFrom?.kind === "notebookCard") {
           const provenance = document.createElement("section");
           provenance.className = "report-note-provenance";
@@ -29994,6 +29978,11 @@ async function renderProjectReportDraft(project, resume = null) {
                 { confirmLabel: "Replace with reviewed Note" });
               if (!accepted || disposed || !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
               block.text = text;
+              delete block.richText;
+              block.kind = "paragraph";
+              delete block.items;
+              delete block.headingLevel;
+              delete block.listStyle;
               block.derivedFrom = {kind: "notebookCard", id: card.id, title: card.title, version: card.version};
               block.sourceSnapshotAt = new Date().toISOString();
               block.evidenceLinks = structuredClone(card.evidenceLinks || []);
@@ -30020,16 +30009,6 @@ async function renderProjectReportDraft(project, resume = null) {
           });
           row.append(provenance);
         }
-      } else if (block.kind === "list") {
-        const textarea = document.createElement("textarea");
-        textarea.value = (block.items || []).join("\n");
-        textarea.placeholder = "One list item per line";
-        textarea.setAttribute("aria-label", "Report list items");
-        textarea.addEventListener("input", () => {
-          block.items = textarea.value.split("\n").map((value) => value.trim()).filter(Boolean);
-          setDirty();
-        });
-        row.append(textarea);
       } else {
         let source = sources.find((item) => item.kind === block.kind && item.id === block.sourceID);
         if (block.kind === "evidence" && source) {
@@ -30421,6 +30400,7 @@ async function renderProjectReportDraft(project, resume = null) {
       if (keepPosition && body && !body.hidden) reportLibraryScroll[key] = body.scrollTop;
     }
     renderedDraftKey = draftKey;
+    reportFormatting?.dispose();
     outlineController?.dispose();
     resetEnhancedSelects(shell);
     shell.querySelectorAll(":scope > :not(.report-draft-status)").forEach((element) => element.remove());
@@ -30618,46 +30598,48 @@ async function renderProjectReportDraft(project, resume = null) {
       { onChange(expanded) { persistReportSectionExpanded("Report introduction", expanded); } });
     metadata.append(introductionSection);
 
+    const addReportContent = kind => {
+      if (kind === "source") {
+        panel.dataset.libraryOpen = "true";
+        renderWorkspaceContent();
+        panel.querySelector('.report-source-group-toggle')?.focus({preventScroll: true});
+        return;
+      }
+      const block = {id:crypto.randomUUID(), kind:kind === "ordered" ? "list" : kind, sourceClassification:"user-authored"};
+      if (block.kind === "list") {block.items = [""]; if (kind === "ordered") block.listStyle = "ordered";}
+      else block.text = kind === "heading" ? "Report section" : "";
+      activeDraft.blocks.push(block);
+      setDirty(); renderWorkspaceContent(); reportFormatting.focus(block);
+    };
+    reportFormatting = reportFormattingModule.createReportFormatting({
+      isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
+      onInsert: addReportContent,
+      onError: showStatusError,
+      onChange: block => {
+        const row = [...shell.querySelectorAll(".report-draft-block")].find(row => row._reportBlock === block);
+        if (row) {
+          row.className = `report-draft-block report-draft-block-${block.kind}`;
+          const label = row.querySelector(".report-draft-classification");
+          if (label) label.textContent = `${block.kind === "list" ? "List" : block.kind === "heading" ? "Heading" : block.derivedFrom ? "Notebook note" : "Paragraph"} · User-authored`;
+        }
+        setDirty(); outlineController?.refreshLabels();
+      }
+    });
     const addControls = document.createElement("div");
     addControls.className = "report-draft-add-controls";
     addControls.setAttribute("role", "group");
     addControls.setAttribute("aria-label", "Add report content");
-    [
-      { kind: "heading", label: "Add heading", value: { text: "Report section" } },
-      { kind: "paragraph", label: "Add paragraph", value: { text: "" } },
-      { kind: "list", label: "Add list", value: { items: [""] } }
-    ].forEach((control) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = control.label;
-      button.addEventListener("click", () => {
-        activeDraft.blocks.push({
-          id: crypto.randomUUID(),
-          kind: control.kind,
-          sourceClassification: "user-authored",
-          ...structuredClone(control.value)
-        });
-        setDirty();
-        renderWorkspaceContent();
-      });
-      addControls.append(button);
-    });
-    const addSource = document.createElement("button");
-    addSource.type = "button";
-    addSource.textContent = "Add source";
-    addSource.addEventListener("click", () => {
-      panel.dataset.libraryOpen = "true";
-      renderWorkspaceContent();
-      panel.querySelector('.report-source-group-toggle')?.focus({preventScroll: true});
-    });
-    addControls.append(addSource);
+    for (const [kind,label] of [["heading","Add heading"],["paragraph","Add paragraph"],["list","Add list"],["source","Add source"]]) {
+      const button = document.createElement("button"); button.type = "button"; button.textContent = label;
+      button.addEventListener("click", () => addReportContent(kind)); addControls.append(button);
+    }
 
     const blocks = document.createElement("section");
     blocks.className = "report-draft-blocks";
     blocks.setAttribute("aria-label", "Report content");
     const blocksBody = document.createElement("div");
     blocksBody.className = "report-draft-blocks-body";
-    blocksBody.append(addControls);
+    blocksBody.append(reportFormatting.element, addControls);
     if (!activeDraft.blocks.length) {
       const empty = document.createElement("p");
       empty.className = "report-workflow-help";
@@ -30994,14 +30976,16 @@ async function renderProjectReportDraft(project, resume = null) {
   try {
     const historyPayloadPromise = projectTransitionHubPayload(projectID)
       .then((hubPayload) => hubPayload?.reports || reportRequest("/reports/history/list", { projectID }));
-    const [draftPayload, sourcePayload, historyPayload, optionsPayload, recoveries] = await Promise.all([
+    const [draftPayload, sourcePayload, historyPayload, optionsPayload, recoveries, editorModule] = await Promise.all([
       reportRequest("/reports/drafts/list", { projectID }),
       reportRequest("/reports/sources/list", { projectID }),
       historyPayloadPromise,
       reportRequest("/reports/options", { projectID }),
-      reportDraftRecoveries(accountUserID, projectID).catch(() => [])
+      reportDraftRecoveries(accountUserID, projectID).catch(() => []),
+      loadNotebookModule()
     ]);
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return panel;
+    reportFormattingModule = editorModule;
     drafts = draftPayload.drafts || [];
     const contentIdentity = draft => JSON.stringify([draft.title, draft.reportDate, draft.introduction, draft.blocks]);
     recoveredDrafts = [];

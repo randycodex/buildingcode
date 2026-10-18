@@ -11,6 +11,7 @@ import { Menu } from "@mantine/core";
 import "@blocknote/mantine/style.css";
 import "./notebook.css";
 import { notebookReferenceBlocks } from "../public/notebook-passage-blocks.js";
+export { createReportFormatting } from "./report-text-editor.js";
 import { en } from "@blocknote/core/locales";
 import {
   createReactInlineContentSpec,
@@ -158,7 +159,8 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
   styleSpecs: {
     bold: defaultStyleSpecs.bold,
     italic: defaultStyleSpecs.italic,
-    strike: defaultStyleSpecs.strike
+    strike: defaultStyleSpecs.strike,
+    backgroundColor: defaultStyleSpecs.backgroundColor
   }
 });
 
@@ -239,6 +241,17 @@ function PermitextFormattingToolbar({ editor, options }) {
     styleButton("bold", "Bold", React.createElement("strong", null, "B")),
     styleButton("italic", "Italic", React.createElement("em", null, "I")),
     styleButton("strike", "Strikethrough", React.createElement("s", null, "S")),
+    React.createElement("button", {
+      type: "button", className: "notebook-format-button notebook-format-highlight",
+      title: "Highlight", "aria-label": "Highlight", "aria-pressed": state.styles.backgroundColor === "yellow",
+      disabled: !state.editable || !textBlocks.length,
+      onMouseDown: event => event.preventDefault(),
+      onClick: () => {
+        editor.focus();
+        if (state.styles.backgroundColor === "yellow") editor.removeStyles({backgroundColor: "yellow"});
+        else editor.addStyles({backgroundColor: "yellow"});
+      }
+    }, icon(["M5 12l6-8 5 4-6 8-5-4Z", "M5 12l-2 5h6", "M2 19h15"])),
     React.createElement(Menu, {position: "bottom-start", offset: 8, withinPortal: false, width: 180, loop: true, returnFocus: false},
       React.createElement(Menu.Target, null,
         React.createElement("button", {

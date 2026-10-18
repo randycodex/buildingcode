@@ -159,6 +159,10 @@ function canonicalStyles(styles) {
   }
   const canonical = {};
   for (const [name, value] of Object.entries(styles)) {
+    if (name === "backgroundColor" && (value === "yellow" || value === "default")) {
+      if (value === "yellow") canonical.backgroundColor = "yellow";
+      continue;
+    }
     if (!permittedStyleNames.has(name)) {
       throw new Error("Notebook text uses an unsupported style.");
     }
@@ -427,6 +431,7 @@ function renderInlineHTML(content) {
     if (node.styles.bold) html = `<strong>${html}</strong>`;
     if (node.styles.italic) html = `<em>${html}</em>`;
     if (node.styles.strike) html = `<s>${html}</s>`;
+    if (node.styles.backgroundColor === "yellow") html = `<mark>${html}</mark>`;
     return html;
   }).join("");
 }

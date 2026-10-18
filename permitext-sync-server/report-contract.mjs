@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { normalizeNotebookEvidenceLinks } from "./notebook-contract.mjs";
 import { normalizedResearchProjectStructuredFacts, projectFactProjectionVersion } from "./project-fact-projection.mjs";
+import { normalizeReportRuns } from "./public/report-rich-text.js";
 
 export const reportDraftSchemaVersion = 1;
 export const reportDraftSchemaVersionV2 = 2;
@@ -148,12 +149,19 @@ export function stableReportJSON(value) {
 }
 
 function normalizeAuthoredBlock(block, kind) {
+  if (kind === "heading" && block.headingLevel !== undefined && ![1, 2, 3].includes(block.headingLevel)) {
+    throw new Error("Invalid Report heading level.");
+  }
   if (kind === "list") {
     const items = (Array.isArray(block.items) ? block.items : [])
       .map((item) => optionalText(item, 2_000))
       .filter(Boolean);
     if (!items.length || items.length > 100) throw new Error("Report lists require 1 to 100 items.");
-    return { items };
+    return { items,
+      ...(block.listStyle === "ordered" ? {listStyle: "ordered"} : {}),
+      ...(block.richText ? {richText: normalizeReportRuns(block.richText, items.join("\n"), true)} : {}),
+      ...normalizePromotedNoteProvenance(block)
+    };
   }
   return {
     text: requiredText(
@@ -161,7 +169,11 @@ function normalizeAuthoredBlock(block, kind) {
       kind === "heading" ? "Report heading" : "Report paragraph",
       kind === "heading" ? 500 : maximumAuthoredTextLength
     ),
-    ...(kind === "paragraph" ? normalizePromotedNoteProvenance(block) : {})
+    ...(kind === "heading" && block.headingLevel !== undefined ? {
+      headingLevel: block.headingLevel
+    } : {}),
+    ...(block.richText ? {richText: normalizeReportRuns(block.richText, String(block.text || "").trim())} : {}),
+    ...normalizePromotedNoteProvenance(block)
   };
 }
 
