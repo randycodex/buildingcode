@@ -18188,6 +18188,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding: 0;
 }
 .account-screen .settings-panel > .settings-scroll {
+  position: relative;
   display: grid;
   grid-template-columns: var(--settings-account-width, minmax(360px, 1fr)) var(--settings-library-width, minmax(480px, 1.5fr)) var(--settings-recovery-width, minmax(360px, 1fr));
   grid-template-rows: minmax(0, 1fr);
@@ -18215,6 +18216,29 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   scrollbar-width: thin;
 }
 .account-screen .settings-account-column:last-child { border-inline-end: 0; }
+.account-screen .settings-account-column-recovery { border-inline-end: 0; }
+.settings-column-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 1px;
+  background: var(--border);
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+}
+.settings-column-divider::after {
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 14px;
+  content: "";
+  transform: translateX(-50%);
+}
+.settings-column-divider[aria-disabled="true"] { pointer-events: none; }
+.account-screen .settings-scroll.is-resizing,
+.account-screen .settings-scroll.is-resizing * { cursor: col-resize !important; user-select: none; }
 .account-screen .settings-account-column.is-collapsed { padding: 0; overflow: hidden; }
 .account-screen .settings-account-column.is-collapsed > :not(.settings-column-restore) { display: none !important; }
 .account-screen .settings-column-restore { flex: 1; min-height: 0; padding-top: var(--account-category-top-gutter); }
@@ -18579,6 +18603,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   font-weight: var(--settings-weight-regular);
 }
 @media (max-width: 1200px) {
+  .account-screen .settings-column-divider { display: none; }
   .account-screen .settings-panel > .settings-scroll {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: none;

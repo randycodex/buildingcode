@@ -7,8 +7,9 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-light-scroll-fades-v1203";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-settings-column-widths-v1204";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
+import { createSettingsColumnResizers, normalizeSettingsColumnWidths } from "./settings-columns.js?v=1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
@@ -129,7 +130,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-light-scroll-fades-v1203";
+} from "./offline-storage.js?v=20261018-settings-column-widths-v1204";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -162,7 +163,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-light-scroll-fades-v1203";
+} from "./workspace-state.js?v=20261018-settings-column-widths-v1204";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -515,6 +516,7 @@ const globalWorkspaceStateKeys = [
   "readerSettings",
   "savedTextSize",
   "settingsCollapsedColumnIDs",
+  "settingsColumnWidths",
   "researchHistoryGroupExpansion",
   "projectSectionExpansion",
   "researchEvidenceSplitRatios",
@@ -901,6 +903,7 @@ function loadWorkspaceState(accountOverride) {
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
       settingsCollapsedColumnIDs: Array.isArray(saved.settingsCollapsedColumnIDs)
         ? [...new Set(saved.settingsCollapsedColumnIDs.filter((key) => ["account", "library", "recovery"].includes(key)))] : [],
+      settingsColumnWidths: normalizeSettingsColumnWidths(saved.settingsColumnWidths),
       researchViewState: saved.researchViewState || null,
       researchConversationID: typeof saved.researchConversationID === "string" ? saved.researchConversationID : "",
       researchHistoryGroupExpansion: saved.researchHistoryGroupExpansion && typeof saved.researchHistoryGroupExpansion === "object"
@@ -1008,6 +1011,7 @@ function loadWorkspaceState(accountOverride) {
       pinnedPaneID: "",
       collapsedPaneIDs: [],
       settingsCollapsedColumnIDs: [],
+      settingsColumnWidths: null,
       columnGroups: [],
       recentChaptersByCode: {},
       continuityAppliedAt: null,
@@ -39313,6 +39317,7 @@ function organizeAccountSettings(panel) {
   const offline = scroll.querySelector(".settings-offline-card");
   const data = scroll.querySelector(".settings-data-card");
   const conflicts = scroll.querySelector(".settings-sync-conflicts-card");
+  let columnResizers;
   const column = (key, title, cards) => {
     const section = document.createElement("section");
     section.className = `settings-account-column settings-account-column-${key}`;
@@ -39335,6 +39340,7 @@ function organizeAccountSettings(panel) {
       rail.hidden = !collapsed;
       heading.setAttribute("aria-expanded", String(!collapsed));
       scroll.style.setProperty(`--settings-${key}-width`, collapsed ? "48px" : key === "library" ? "minmax(480px, 1.5fr)" : "minmax(360px, 1fr)");
+      columnResizers?.refresh();
     };
     let scrollPositions = [];
     const setCollapsed = (collapsed) => {
@@ -39385,13 +39391,19 @@ function organizeAccountSettings(panel) {
   const deleteContent = data?.querySelector(".settings-delete-content");
   data?.append(...[projects, deleteContent, trash].filter(Boolean));
   scroll.replaceChildren(account, library, recovery);
+  columnResizers = createSettingsColumnResizers(scroll, [account, library, recovery], state.settingsColumnWidths, (widths) => {
+    state.settingsColumnWidths = widths;
+    saveWorkspaceState();
+  });
+  return columnResizers.dispose;
 }
 
 function mountAccountScreenContent(dialog, panel) {
   // Reader column widths must not constrain the height of this screen's flex layout.
   panel.style.removeProperty("flex");
   panel.querySelector(".panel-header")?.remove();
-  organizeAccountSettings(panel);
+  dialog._disposeSettingsColumns?.();
+  dialog._disposeSettingsColumns = organizeAccountSettings(panel);
   const header = document.createElement("header");
   header.className = "account-screen-header";
   const title = document.createElement("h1");
@@ -39428,6 +39440,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     clearInterval(contextCheck);
     if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
     dialog.open = false;
+    dialog._disposeSettingsColumns?.();
     dialog.remove();
     coveredState.forEach((inert, element) => { element.inert = inert; });
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
