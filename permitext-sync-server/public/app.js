@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-close-all-hover-v1155";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-closed-view-retention-v1156";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-close-all-hover-v1155";
+} from "./offline-storage.js?v=20261017-closed-view-retention-v1156";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-close-all-hover-v1155";
+} from "./workspace-state.js?v=20261017-closed-view-retention-v1156";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -4539,14 +4539,15 @@ async function switchWorkflowView(view) {
   closeSharedWorkspaceViews();
   if (notifyProjectRequiredForColumn()) return false;
   view = normalizeWorkflowView(view);
-  const initializeNotebook = shouldOpenNotebookByDefault(view, state.workflowVisitedViews || []);
+  const visitedViews = state.workflowVisitedViews || [];
+  const initializeNotebook = shouldOpenNotebookByDefault(view, visitedViews);
   if (view !== currentWorkflowView()) {
     state.workflowNavigationGeneration = (state.workflowNavigationGeneration || 0) + 1;
     state.workflowView = view;
   }
   syncWorkflowColumnPresentation();
   saveWorkspaceState();
-  if (initializeNotebook || !defaultActivePaneIDs().some(workflowPaneIsVisible)) {
+  if (initializeNotebook || (!visitedViews.includes(view) && !defaultActivePaneIDs().some(workflowPaneIsVisible))) {
     if (view === 'notebook') await openProjectNotebook(workspaceProject());
     else await focusRecentUtilityColumn('search');
   }
@@ -46652,12 +46653,18 @@ async function closeAllColumns() {
   // column in the other working view as a side effect of this view's action.
   const workspaceID = activeWorkspaceID;
   const identity = captureAccountRequest();
+  const view = currentColumnWorkflowView();
   const allDescriptors = workspacePaneDescriptors();
   allDescriptors.forEach(item => item.foundationScope?.release(item.id));
   const descriptors = allDescriptors.filter(item => workflowPaneIsVisible(item.id)).reverse();
   for (const descriptor of descriptors) {
     if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return false;
     if (await descriptor.close() === false) return false;
+  }
+  if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return false;
+  if (view === "research" || view === "notebook") {
+    state.workflowVisitedViews = [...new Set([...(state.workflowVisitedViews || []), view])];
+    saveWorkspaceState();
   }
   return true;
 }

@@ -103,6 +103,39 @@ vm.runInContext(actual('closeAllColumns'),c);
 await c.closeAllColumns();
 assert.deepEqual(closed,['project:notebook:a'],'Close all only closes this view');
 
+// Closing a view is an intentional layout, including before its first navigation.
+needProject=false;
+c.workspacePaneDescriptors=()=>panes.map(p=>({id:p.dataset.paneId,close:async()=>{
+  panes.splice(panes.indexOf(p),1);
+}}));
+for (const view of ['research','notebook']) {
+  const other=view==='research'?'notebook':'research';
+  state.workflowView=view;
+  state.workflowVisitedViews=[];
+  panes.splice(0,panes.length,reader,notebook);
+  await c.closeAllColumns();
+  assert.equal(panes.length,1,'Close all retains the other view column');
+  assert.equal(panes[0],view==='research'?notebook:reader);
+  assert.ok(state.workflowVisitedViews.includes(view),'Remember a deliberately empty view');
+  // Exercise the same layout serialization used by reload and Project switches.
+  const saved=captureWorkspaceLayout(state);
+  applyWorkspaceLayout(state,saved);
+  const before=constructions;
+  await c.switchWorkflowView(other);
+  const afterOther=constructions;
+  await c.switchWorkflowView(view);
+  await c.switchWorkflowView(view);
+  assert.equal(constructions,afterOther,'Returning to an empty view must not reopen Search or Notes');
+  assert.equal(panes.length,1,'Screen switching preserves the closed layout');
+  if(other==='notebook') assert.equal(afterOther,before+1,'First Notebook visit still initializes Notes');
+}
+panes.length=0;
+state.workflowVisitedViews=[];
+const beforeFresh=constructions;
+await c.switchWorkflowView('research');
+assert.equal(constructions,beforeFresh+1,'First empty Research visit still opens Search');
+console.log('Closed view regression passed: first-use defaults, other-view retention and empty Research/Notebook persistence after layout restore.');
+
 // Exercise the application wiring, including the Sources disclosure/resize path.
 const referenceClasses=new Set(), referenceStyles=new Map();
 const referenceShell={clientWidth:1920,classList:{toggle(name,on){on?referenceClasses.add(name):referenceClasses.delete(name);}},style:{setProperty:(name,value)=>referenceStyles.set(name,value)}};
