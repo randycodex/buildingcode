@@ -22,10 +22,13 @@ records.push({ id: 'collection', collection: true }, { id: 'shared', sharedOnly:
 const calls = [];
 let allowDelete = false;
 let restored = 0;
+let current = true;
+const contentUpdates = [];
 const context = vm.createContext({
   container,
   document: { body, createElement: tag => new Element(tag), querySelector: () => null },
-  captureAccountRequest: () => 1, isCurrentAccountRequest: () => true, requireCurrentAccountRequest() {},
+  captureAccountRequest: () => 1, isCurrentAccountRequest: () => current, requireCurrentAccountRequest() {},
+  onChange: () => contentUpdates.push(records.filter(p => !p.deleted && !p.collection && !p.sharedOnly).map(p => ({id:p.id,archived:p.archived}))),
   currentContentSummary: () => ({ projects: records }), visibleProjectRecords: x => x.filter(p => !p.deleted),
   folderIsProject: p => !p.collection, projectIsArchived: p => !!p.archived, projectRecordID: p => p.id,
   activeWorkspaceRecord: () => null, trapWebModalFocus() {},
@@ -40,7 +43,7 @@ const context = vm.createContext({
 });
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 vm.runInContext(app.slice(app.indexOf('function renderProjectManager('), app.indexOf('function showProjectCreateSheet(')), context);
-vm.runInContext('renderProjectManager(container)', context);
+vm.runInContext('renderProjectManager(container, { onChange })', context);
 const all = (root = body) => [root, ...root.children.flatMap(child => all(child))];
 assert.equal(container.children[0].role, 'region', 'Project management renders in its supplied Settings container');
 assert.equal(all().some(node => node.role === 'dialog'), false, 'Project management does not open a popup');
@@ -55,14 +58,18 @@ const click = async text => {
 };
 await click('Select');
 await click('Select All');
-vm.runInContext('renderProjectManager(container)', context);
+vm.runInContext('renderProjectManager(container, { onChange })', context);
 await click('Archive Selected');
 assert.deepEqual(calls[0], ['archive', 30], 'bulk archive includes projects beyond the old 24-row limit');
 assert.ok(!records.at(-1).archived, 'shared-only projects are excluded');
+assert.equal(contentUpdates.length,1);
+assert.ok(contentUpdates.at(-1).every(p=>p.archived),'The Settings callback sees committed archive state.');
 await click('Archived');
 await click('Select All');
 await click('Restore Selected');
 assert.equal(restored, 30);
+assert.equal(contentUpdates.length,2);
+assert.ok(contentUpdates.at(-1).every(p=>!p.archived));
 await click('Active');
 await click('Select All');
 await click('Delete Selected');
@@ -71,5 +78,7 @@ assert.deepEqual(calls.at(-1), ['delete', 30, true], 'confirmation includes the 
 allowDelete = true;
 await click('Delete Selected');
 assert.equal(records.filter(p => p.deleted).length, 30);
+assert.equal(contentUpdates.at(-1).length,0,'Deleted projects cannot linger in dependent Settings lists.');
+assert.equal(contentUpdates.length,4);
 assert.ok(!records.at(-2).deleted, 'collections are excluded from project management');
 console.log('Project manager bulk archive, restore, delete cancellation, and scope checks passed.');

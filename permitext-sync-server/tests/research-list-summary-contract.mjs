@@ -62,6 +62,17 @@ function functionSource(source, name) {
       else if (character === quote) quote = "";
       continue;
     }
+    if (character === "/" && source[index + 1] === "/") {
+      index = source.indexOf("\n", index);
+      if (index < 0) break;
+      continue;
+    }
+    if (character === "/" && source[index + 1] === "*") {
+      index = source.indexOf("*/", index + 2);
+      if (index < 0) break;
+      index += 1;
+      continue;
+    }
     if (character === '"' || character === "'" || character === "`") {
       quote = character;
       continue;
@@ -714,7 +725,8 @@ await import("./reader-public-presentation-contract.mjs");
 assert.doesNotMatch(clientSource, /newResearchButton|inline-new-research-toggle|Start new Research with this passage|createNew: true/, "The Reader still exposes a duplicate new-Research icon.");
 assert.match(clientSource, /function researchActionIconSVG\(\)[\s\S]*?M12\.983 21\.186a1 1 0 0 1-1\.966 0/, "The Reader Research action does not use Lucide's Astroid icon.");
 assert.doesNotMatch(clientSource, /className = "inline-comment-toggle"|Link passage to Note|openReaderPassageNoteLinker/, "The removed Reader comment-card action is still exposed.");
-assert.doesNotMatch(clientSource, /wrapper\.tabIndex = 0|Passage actions for|is-actions-active/, "Reader paragraph text is still exposed as a clickable or keyboard-activated action target.");
+assert.doesNotMatch(functionSource(clientSource, "renderAnnotatedCodeBlock"), /wrapper\.tabIndex = 0/, "Reader paragraphs must not become keyboard-activated action targets; table scroll regions remain keyboard accessible.");
+assert.doesNotMatch(clientSource, /Passage actions for|is-actions-active/, "Reader paragraph text is still exposed as a clickable action target.");
 assert.doesNotMatch(stylesSource, /\.annotated-code-block[^\{]*\{[^}]*cursor: pointer;|\.annotated-code-block\.is-actions-active/, "Reader paragraph styling still implies clickability.");
 assert.match(stylesSource, /\.annotated-code-block\.is-source-target,[\s\S]*?\.chapter-section\.is-source-target \{[\s\S]*?background: transparent;[\s\S]*?\.annotated-code-block\.is-source-target :where\([\s\S]*?color: var\(--reader-notes-active-text\) !important;/, "Linked Reader destinations must use text color instead of a section-wide highlight.");
 assert.match(stylesSource, /\.annotated-code-block \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?align-items: end;/, "Reader action icons must reserve a bottom-aligned column beside their passage.");

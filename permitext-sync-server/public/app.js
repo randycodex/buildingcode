@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-settings-projects-label-v1170";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-settings-content-refresh-v1171";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-settings-projects-label-v1170";
+} from "./offline-storage.js?v=20261018-settings-content-refresh-v1171";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-settings-projects-label-v1170";
+} from "./workspace-state.js?v=20261018-settings-content-refresh-v1171";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -33881,7 +33881,7 @@ function openWorkspaceManager() {
   dialog.querySelector("header button")?.focus();
 }
 
-function renderProjectManager(container) {
+function renderProjectManager(container, { onChange = () => {} } = {}) {
   if (container._refreshProjectManager) {
     container._refreshProjectManager();
     return;
@@ -34002,6 +34002,7 @@ function renderProjectManager(container) {
         if (isCurrentAccountRequest(requestIdentity)) await showWebNotice("Could not update projects", error.message);
       } finally {
         busy = false; render();
+        if (isCurrentAccountRequest(requestIdentity)) onChange();
         dialog.querySelector(".project-manager-toolbar button")?.focus();
       }
     };
@@ -38077,6 +38078,7 @@ function attachSettingsTrash(panel) {
         await refreshWorkspaceAfterSettingsClear(settingsPanelScrollTop(panel), track.scrollLeft);
         return;
       }
+      panel.__refreshSettingsContent?.();
       status.textContent = result.entries.length ? "" : "Trash is empty.";
       list.replaceChildren();
       const button = (label, click, danger = false) => {
@@ -38199,7 +38201,8 @@ function attachSettingsTrash(panel) {
       list.querySelectorAll("button, input").forEach(control => { if (!control.classList.contains("settings-trash-confirm-button")) control.disabled = false; });
     }
   };
-  details.addEventListener("toggle", () => { if (details.open) update(); });
+  panel.__refreshSettingsTrash = () => { if (details.open) return update(); };
+  details.addEventListener("toggle", panel.__refreshSettingsTrash);
   refresh.addEventListener("click", () => update());
 }
 
@@ -39802,7 +39805,12 @@ function renderSettings({ upgrade = false } = {}) {
       manageProjects.open = false;
       return;
     }
-    renderProjectManager(manageProjects.querySelector(".settings-project-manager-content"));
+    renderProjectManager(manageProjects.querySelector(".settings-project-manager-content"), {
+      onChange: () => {
+        refreshSettingsContent();
+        panel.__refreshSettingsTrash?.();
+      }
+    });
   });
 
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
@@ -40149,30 +40157,10 @@ function renderSettings({ upgrade = false } = {}) {
     });
   };
 
-  const settingsProjects = visibleProjectRecords(currentContentSummary().projects || [])
-    .map((project, sourceIndex) => ({ project, sourceIndex }))
-    .sort((left, right) =>
-      Number(projectIsArchived(left.project)) - Number(projectIsArchived(right.project)) ||
-      left.sourceIndex - right.sourceIndex
-    )
-    .map(({ project }) => project);
-  const settingsProjectsIncludeCollections = settingsProjects.some((project) => !folderIsProject(project));
-  panel.querySelector("#settings-projects-title").textContent = settingsProjectsIncludeCollections
-    ? "Projects & collections" : "Projects";
-  projectList.setAttribute("aria-label", settingsProjectsIncludeCollections
-    ? "Projects and saved collections" : "Projects");
-  projectClearAll.setAttribute("aria-label", settingsProjectsIncludeCollections
-    ? "Move all projects and saved collections to Trash" : "Move all projects to Trash");
+  let settingsProjects = [];
+  let settingsProjectsIncludeCollections = false;
   const selectedProjectIDs = new Set();
   const projectCheckboxes = new Map();
-  panel.querySelector('[data-content-count="projects"]').textContent = `${settingsProjects.length} total`;
-  const savedPassageCount = bookmarkRecordsForSettings().length;
-  const savedProjectLinkCount = (currentContentSummary().projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length;
-  const sectionNoteCount = (currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length;
-  panel.querySelector('[data-content-count="bookmarks"]').textContent = `${savedPassageCount} saved · ${savedProjectLinkCount} Project ${savedProjectLinkCount === 1 ? "link" : "links"}`;
-  panel.querySelector('[data-content-count="notes"]').textContent = `${sectionNoteCount} saved · Tags stay`;
-  panel.querySelector('[data-clear-action="bookmarks"]').disabled = savedPassageCount === 0 && savedProjectLinkCount === 0;
-  panel.querySelector('[data-clear-action="notes"]').disabled = sectionNoteCount === 0;
   const updateProjectSelection = () => {
     const count = selectedProjectIDs.size;
     projectSelectAll.textContent = count === settingsProjects.length && count > 0 ? "Clear selection" : "Select all";
@@ -40190,43 +40178,76 @@ function renderSettings({ upgrade = false } = {}) {
       checkbox.checked = selectedProjectIDs.has(id);
     });
   };
-  projectEmpty.hidden = settingsProjects.length > 0;
-  settingsProjects.forEach((project) => {
-    const id = projectRecordID(project);
-    const row = document.createElement("label");
-    row.className = "settings-project-row";
-    row.style.setProperty("--project-color", projectColor(project));
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.setAttribute(
-      "aria-label",
-      `Select ${folderTypeLabel(project)} ${project.name || project.title || "record"}`
-    );
-    const copy = document.createElement("span");
-    copy.className = "settings-project-copy";
-    const name = document.createElement("strong");
-    name.textContent = readableProjectName(project);
-    copy.append(name);
-    if (!folderIsProject(project)) {
-      const typeLabel = document.createElement("span");
-      typeLabel.textContent = folderTypeLabel(project);
-      copy.append(typeLabel);
-    }
-    row.append(checkbox, copy);
-    if (projectIsArchived(project)) {
-      const archivedLabel = document.createElement("span");
-      archivedLabel.className = "settings-project-archive-label";
-      archivedLabel.textContent = "Archived";
-      row.append(archivedLabel);
-    }
-    checkbox.addEventListener("change", () => {
-      if (checkbox.checked) selectedProjectIDs.add(id);
-      else selectedProjectIDs.delete(id);
-      updateProjectSelection();
+  const refreshSettingsContent = () => {
+    if (!isCurrentAccountRequest(settingsIdentity)) return;
+    const summary = currentContentSummary();
+    settingsProjects = visibleProjectRecords(summary.projects || [])
+      .map((project, sourceIndex) => ({ project, sourceIndex }))
+      .sort((left, right) =>
+        Number(projectIsArchived(left.project)) - Number(projectIsArchived(right.project)) ||
+        left.sourceIndex - right.sourceIndex
+      )
+      .map(({ project }) => project);
+    const projectIDs = new Set(settingsProjects.map(projectRecordID));
+    selectedProjectIDs.forEach(id => { if (!projectIDs.has(id)) selectedProjectIDs.delete(id); });
+    settingsProjectsIncludeCollections = settingsProjects.some((project) => !folderIsProject(project));
+    panel.querySelector("#settings-projects-title").textContent = settingsProjectsIncludeCollections
+      ? "Projects & collections" : "Projects";
+    projectList.setAttribute("aria-label", settingsProjectsIncludeCollections
+      ? "Projects and saved collections" : "Projects");
+    projectClearAll.setAttribute("aria-label", settingsProjectsIncludeCollections
+      ? "Move all projects and saved collections to Trash" : "Move all projects to Trash");
+    panel.querySelector('[data-content-count="projects"]').textContent = `${settingsProjects.length} total`;
+    const savedPassageCount = bookmarkRecordsForSettings().length;
+    const savedProjectLinkCount = (summary.projectSections || []).filter(item => item?.sectionID && !item.deletedAt).length;
+    const sectionNoteCount = (summary.annotations || []).filter(item => String(item.noteBody || "").trim()).length;
+    panel.querySelector('[data-content-count="bookmarks"]').textContent = `${savedPassageCount} saved · ${savedProjectLinkCount} Project ${savedProjectLinkCount === 1 ? "link" : "links"}`;
+    panel.querySelector('[data-content-count="notes"]').textContent = `${sectionNoteCount} saved · Tags stay`;
+    panel.querySelector('[data-clear-action="bookmarks"]').disabled = savedPassageCount === 0 && savedProjectLinkCount === 0;
+    panel.querySelector('[data-clear-action="notes"]').disabled = sectionNoteCount === 0;
+    projectList.replaceChildren();
+    projectCheckboxes.clear();
+    projectEmpty.hidden = settingsProjects.length > 0;
+    settingsProjects.forEach((project) => {
+      const id = projectRecordID(project);
+      const row = document.createElement("label");
+      row.className = "settings-project-row";
+      row.style.setProperty("--project-color", projectColor(project));
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.setAttribute(
+        "aria-label",
+        `Select ${folderTypeLabel(project)} ${project.name || project.title || "record"}`
+      );
+      const copy = document.createElement("span");
+      copy.className = "settings-project-copy";
+      const name = document.createElement("strong");
+      name.textContent = readableProjectName(project);
+      copy.append(name);
+      if (!folderIsProject(project)) {
+        const typeLabel = document.createElement("span");
+        typeLabel.textContent = folderTypeLabel(project);
+        copy.append(typeLabel);
+      }
+      row.append(checkbox, copy);
+      if (projectIsArchived(project)) {
+        const archivedLabel = document.createElement("span");
+        archivedLabel.className = "settings-project-archive-label";
+        archivedLabel.textContent = "Archived";
+        row.append(archivedLabel);
+      }
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) selectedProjectIDs.add(id);
+        else selectedProjectIDs.delete(id);
+        updateProjectSelection();
+      });
+      projectCheckboxes.set(id, checkbox);
+      projectList.append(row);
     });
-    projectCheckboxes.set(id, checkbox);
-    projectList.append(row);
-  });
+    updateProjectSelection();
+  };
+  panel.__refreshSettingsContent = refreshSettingsContent;
+  refreshSettingsContent();
   projectSelectAll.addEventListener("click", () => {
     if (selectedProjectIDs.size === settingsProjects.length) selectedProjectIDs.clear();
     else settingsProjects.forEach((project) => selectedProjectIDs.add(projectRecordID(project)));
@@ -40291,7 +40312,6 @@ function renderSettings({ upgrade = false } = {}) {
       projectClearAll.disabled = false;
     }
   });
-  updateProjectSelection();
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
     const library = await offlineLibraryStatus().catch(() => ({ available: false, supported: false }));
@@ -40892,14 +40912,15 @@ function renderSettings({ upgrade = false } = {}) {
   });
 
   attachSettingsTrash(panel);
-  const clearActionCopy = {
-    searches: ["Clear recent searches", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. Are you sure?"],
-    bookmarks: ["Move Saved passages to Trash", `${bookmarkRecordsForSettings().length} saved passages and their Project memberships will move to Trash across synced devices. Restore within 30 days. Projects and notes remain.`],
-    notes: ["Move section notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages and tags remain.`]
-  };
   panel.querySelectorAll("[data-clear-action]").forEach((button) => {
     button.addEventListener("click", async () => {
+      if (!isCurrentAccountRequest(settingsIdentity)) return;
       const action = button.dataset.clearAction;
+      const clearActionCopy = {
+        searches: ["Clear recent searches", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. Are you sure?"],
+        bookmarks: ["Move Saved passages to Trash", `${bookmarkRecordsForSettings().length} saved passages and their Project memberships will move to Trash across synced devices. Restore within 30 days. Projects and notes remain.`],
+        notes: ["Move section notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} section notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages and tags remain.`]
+      };
       const [title, message] = clearActionCopy[action];
       const confirmed = await confirmWebWarning(title, message, { confirmLabel: "Confirm" });
       if (!confirmed) return;
