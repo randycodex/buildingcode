@@ -46,7 +46,7 @@ assert.ok(labels().includes('Sign in for Projects'));assert.ok(labels().includes
 account={userID:'owner'};authority='verified';allowed=true;
 context.renderWorkspaceTabs();assert.equal(label.textContent,'Private Project');assert.equal(button.disabled,false);
 await context.openWorkspaceContextMenu('project',button);
-assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(labels().includes('Manage Projects…'));assert.ok(labels().includes('Project details'));
+assert.ok(labels().includes('Private Project'));assert.ok(labels().includes('Saved groups…'));assert.ok(!labels().includes('Manage Projects…'));assert.ok(labels().includes('Project details'));
 const readsBefore=privateReads;body.children=[];current=false;
 await context.openWorkspaceContextMenu('project',button);
 assert.equal(body.children.length,0,'a stale account request cannot mount its menu');assert.equal(privateReads,readsBefore);

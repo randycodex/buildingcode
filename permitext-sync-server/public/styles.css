@@ -18244,7 +18244,25 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   font-weight: var(--settings-weight-medium);
   text-align: left;
 }
-.account-screen :is(.account-connector, .settings-active-sources-card, .settings-data-card) > .settings-section-title { display: none; }
+.account-screen :is(.account-connector, .settings-active-sources-card, .settings-project-management-card, .settings-data-card) > .settings-section-title { display: none; }
+.account-screen .settings-account-column > .settings-project-management-card { padding: 0 0 20px; }
+.account-screen .settings-project-management-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 12px var(--account-category-gutter);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--settings-type-body);
+  font-weight: var(--settings-weight-medium);
+  text-align: left;
+}
+.account-screen .settings-project-management-action:not(:disabled):hover { background: var(--menu-highlight); }
 .account-screen .settings-account-actions {
   display: grid;
   justify-items: center;
@@ -18395,7 +18413,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   text-align: left;
 }
 .account-screen .settings-data-card > details > summary::before,
-.account-screen .legacy-workspace-review::before {
+.account-screen .legacy-workspace-review::before,
+.account-screen .settings-project-management-action::before {
   content: "";
   width: 5px;
   height: 5px;

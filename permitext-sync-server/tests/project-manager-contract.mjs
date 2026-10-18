@@ -21,6 +21,7 @@ const calls = [];
 let allowDelete = false;
 let restored = 0;
 const context = vm.createContext({
+  HTMLElement: Element,
   document: { body, createElement: tag => new Element(tag), querySelector: () => null },
   captureAccountRequest: () => 1, isCurrentAccountRequest: () => true, requireCurrentAccountRequest() {},
   currentContentSummary: () => ({ projects: records }), visibleProjectRecords: x => x.filter(p => !p.deleted),

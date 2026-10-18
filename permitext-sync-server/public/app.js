@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-research-layout-menu-v1158";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-settings-project-management-v1159";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-research-layout-menu-v1158";
+} from "./offline-storage.js?v=20261017-settings-project-management-v1159";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-research-layout-menu-v1158";
+} from "./workspace-state.js?v=20261017-settings-project-management-v1159";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2168,7 +2168,6 @@ function openMobileMoreSheet() {
       { current: workspace.id === activeWorkspaceID }));
   });
   projectList.append(mobileMoreAction("New Project", () => void createNewWorkspace()));
-  projectList.append(mobileMoreAction("Manage Projects…", () => openProjectManager()));
   if (activeWorkspaceRecord()?.projectID) projectList.append(mobileMoreAction("Close Project", () => void closeActiveProject()));
   const project = workspaceProject();
   const identity = project ? projectIdentity(project) : null;
@@ -2293,7 +2292,6 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
   });
   if (projectsAvailable) {
     appendMenuAction(projectSection, { label: "New Project", run: () => void createNewWorkspace() });
-    appendMenuAction(projectSection, { label: "Manage Projects…", separated: true, run: () => openProjectManager() });
   } else {
     appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
   }
@@ -33872,6 +33870,7 @@ function openWorkspaceManager() {
 
 function openProjectManager() {
   document.querySelector(".project-manager-backdrop")?.remove();
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const requestIdentity = captureAccountRequest();
   const backdrop = document.createElement("div");
   backdrop.className = "project-manager-backdrop";
@@ -33889,7 +33888,8 @@ function openProjectManager() {
   const close = () => {
     if (busy) return;
     backdrop.remove();
-    document.querySelector("#workspace-actions")?.focus();
+    const returnTarget = previousFocus?.isConnected ? previousFocus : document.querySelector("#workspace-actions");
+    returnTarget?.focus({ preventScroll: true });
   };
   backdrop.addEventListener("keydown", (event) => {
     if (backdrop.querySelector(".project-sheet-overlay")) return;
@@ -39414,6 +39414,7 @@ function organizeAccountSettings(panel) {
   const plan = scroll.querySelector(".settings-plan-card");
   const sources = scroll.querySelector(".settings-active-sources-card");
   const offline = scroll.querySelector(".settings-offline-card");
+  const projects = scroll.querySelector(".settings-project-management-card");
   const data = scroll.querySelector(".settings-data-card");
   const conflicts = scroll.querySelector(".settings-sync-conflicts-card");
   const column = (key, title, cards) => {
@@ -39429,7 +39430,13 @@ function organizeAccountSettings(panel) {
   };
   const account = column("account", "Account", [profile, plan]);
   const library = column("library", "Library & offline", [sources, offline]);
-  const recovery = column("recovery", "Data & recovery", [conflicts, data]);
+  const recovery = column("recovery", "Projects", [projects]);
+  const recoveryHeading = document.createElement("h2");
+  recoveryHeading.id = "settings-data-recovery-heading";
+  recoveryHeading.className = "settings-account-column-title";
+  recoveryHeading.textContent = "Data & recovery";
+  recovery.append(recoveryHeading, ...[conflicts, data].filter(Boolean));
+  recovery.setAttribute("aria-labelledby", `settings-column-recovery-title ${recoveryHeading.id}`);
   const actions = document.createElement("div");
   actions.className = "settings-account-actions";
   const signOut = profile?.querySelector(".account-clear");
@@ -39760,6 +39767,11 @@ function renderSettings({ upgrade = false } = {}) {
   const panel = renderTemplate(settingsTemplate);
   wireSettingsActiveCodeSources(panel, { enabled: true, collapsibleGroups: true });
   applyPaneWeight(panel, "utility:settings");
+  const manageProjectsButton = panel.querySelector(".settings-project-management-action");
+  manageProjectsButton?.addEventListener("click", () => {
+    if (!isCurrentAccountRequest(settingsIdentity) || !workspacePrivatePresentationAllowed()) return;
+    openProjectManager();
+  });
 
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
@@ -40292,6 +40304,7 @@ function renderSettings({ upgrade = false } = {}) {
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
+    if (manageProjectsButton) manageProjectsButton.disabled = !workspacePrivatePresentationAllowed();
     const source = currentEntitlement()?.source;
     const activePlanCopy = settingsPlanCopy({ pro, source });
     planRows.forEach((row) => {

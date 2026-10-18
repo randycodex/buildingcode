@@ -760,7 +760,7 @@ assert.match(functionSource(clientSource, "renderResearchConversation"), /pendin
 // three duplicated source implementations of the same callback.
 await import("./research-client-context-recovery-contract.mjs");
 assert.match(clientSource, /async function clearResearchConversationHistory\(button,[\s\S]*?"Remove selected Research history\?"[\s\S]*?container: button\.closest\("\.workspace-panel"\)/, "Bulk Research-history removal must keep its confirmation inside the Research column.");
-assert.match(clientSource, /label: "Manage Projects…", separated: true, run: \(\) => openProjectManager\(\)/, "The Project menu has one management destination.");
+assert.match(functionSource(clientSource, "renderSettings"), /manageProjectsButton\?\.addEventListener\("click"[\s\S]*?openProjectManager\(\)/, "Settings provides the Project management destination.");
 assert.match(clientSource, /Saved passages and notes that are not assigned to a Project appear here\./, "Unassigned saves explains that the collection is saved evidence outside a Project.");
 assert.match(clientSource, /No unassigned saves match[\s\S]*?Clear the search to see every unassigned save\./, "A search that hides Unassigned saves must say the collection is unchanged.");
 assert.match(functionSource(clientSource, "applyProjectSelectionIntent"), /liveInstance\.organizeUnassigned = intent\.kind === "unassigned";[\s\S]*?transitionProjectSelection\(controller\.paneID\)/, "The serialized Project-selection controller does not open the filtered Unassigned Saved evidence view.");

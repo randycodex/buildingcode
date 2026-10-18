@@ -8,7 +8,7 @@ const mobileChooser = app.slice(app.indexOf('function openMobileMoreSheet('), ap
 for (const source of [chooser, mobileChooser]) {
   assert.doesNotMatch(source, /New workspace|Manage workspaces|Rename workspace|Duplicate workspace|Delete workspace|Workspaces share/);
   assert.match(source, /New Project/);
-  assert.match(source, /Manage Projects/);
+  assert.doesNotMatch(source, /Manage Projects/, 'Project management belongs in Settings');
 }
 assert.match(app, /function visibleWorkspaceRecords\(\)[\s\S]*?workspace\.projectID && availableProjectIDs\.has\(workspace\.projectID\)/);
 assert.doesNotMatch(chooser, /Unassigned saves/);
