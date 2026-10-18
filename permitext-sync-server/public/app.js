@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-reader-table-scroll-v1168";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-settings-recovery-order-v1169";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-reader-table-scroll-v1168";
+} from "./offline-storage.js?v=20261018-settings-recovery-order-v1169";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-reader-table-scroll-v1168";
+} from "./workspace-state.js?v=20261018-settings-recovery-order-v1169";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -10627,7 +10627,7 @@ function appendLegacyWorkspaceRecoveryControls(container, identity = captureAcco
   const reviewButton = document.createElement("button");
   reviewButton.type = "button";
   reviewButton.className = "settings-secondary-button legacy-workspace-review";
-  reviewButton.textContent = "Review older workspace data";
+  reviewButton.textContent = "Older Workspace";
   reviewButton.setAttribute("aria-expanded", "false");
   const details = document.createElement("div");
   details.id = "legacy-workspace-recovery-details";
@@ -39482,7 +39482,7 @@ function organizeAccountSettings(panel) {
   const projects = data?.querySelector(".settings-project-management");
   const legacy = data?.querySelector(".legacy-workspace-recovery");
   const deleteContent = data?.querySelector(".settings-delete-content");
-  data?.append(...[projects, trash, legacy, deleteContent].filter(Boolean));
+  data?.append(...[projects, deleteContent, legacy, trash].filter(Boolean));
   scroll.replaceChildren(account, library, recovery);
 }
 
