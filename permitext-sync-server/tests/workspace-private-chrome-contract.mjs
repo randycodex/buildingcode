@@ -28,7 +28,7 @@ const context=vm.createContext({workspaceActionsButton:button,detachedProjectWin
  reconcileProjectWorkspaces(){privateReads++;},closeWorkspaceContextMenu(){body.children=[];},state,
  document:{createElement:tag=>new Element(tag),body,getElementById:id=>id==='fit-columns'?layoutControl:null},
  window:{innerWidth:1000,innerHeight:800},workspaceContextMenu:null,activeWorkspaceID:'project',updateWorkspaceLayoutControls(){},
- toggleAccountDialog(){},createNewWorkspace(){},openProjectManager(){},switchWorkspace(){}
+ toggleAccountDialog(){},createNewWorkspace(){},openProjectManager(){},switchWorkspace(){},currentColumnWorkflowView:()=> 'research'
 });
 const privateMenus=['openMobileMoreSheet','openWorkspaceManager','openSavedColumnGroupsMenu','openColumnGroupEditor'];
 vm.runInContext(['renderWorkspaceTabs','openWorkspaceContextMenu',...privateMenus].map(actual).join('\n'),context);
@@ -39,7 +39,7 @@ assert.equal(privateReads,0,'unverified private-only menus may not read saved pr
 await context.openWorkspaceContextMenu('project',button);
 const labels=()=>{const visit=node=>[node.textContent,...node.children.flatMap(visit)];return visit(body).filter(Boolean);};
 assert.equal(privateReads,0,'public menu must not inspect private project names or saved groups');
-assert.ok(labels().includes('View options'));assert.ok(labels().includes('Reset layout'));
+assert.ok(!labels().includes('View options'));assert.ok(labels().includes('Reset layout'));
 assert.ok(labels().includes('Account & project access'));assert.ok(!labels().includes('Saved groups…'));
 account=null;await context.openWorkspaceContextMenu('project',button);
 assert.ok(labels().includes('Sign in for Projects'));assert.ok(labels().includes('Reset layout'));assert.equal(privateReads,0);
