@@ -7,11 +7,11 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-report-format-highlight-v1187";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-pin-report-controls-v1190";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
-import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261011-outline-v11";
+import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=9";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
@@ -127,7 +127,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-report-format-highlight-v1187";
+} from "./offline-storage.js?v=20261018-pin-report-controls-v1190";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -160,7 +160,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-report-format-highlight-v1187";
+} from "./workspace-state.js?v=20261018-pin-report-controls-v1190";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -30639,7 +30639,10 @@ async function renderProjectReportDraft(project, resume = null) {
     blocks.setAttribute("aria-label", "Report content");
     const blocksBody = document.createElement("div");
     blocksBody.className = "report-draft-blocks-body";
-    blocksBody.append(reportFormatting.element, addControls);
+    const editorControls = document.createElement("div");
+    editorControls.className = "report-editor-controls";
+    editorControls.append(reportFormatting.element, addControls);
+    blocksBody.append(editorControls);
     if (!activeDraft.blocks.length) {
       const empty = document.createElement("p");
       empty.className = "report-workflow-help";

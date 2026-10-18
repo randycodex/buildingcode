@@ -32,6 +32,12 @@ assert.equal(reportOutlineDropIndex(orderedSources, 0, 2, true, false), 2, 'An e
 assert.equal(reportOutlineDropIndex(orderedSources, 2, 2, true, true), 2, 'Dropping a folded heading onto itself does not move it past its own children');
 const navigationScrolls = [];
 const scrollContainer = {scrollTop: 100, getBoundingClientRect: () => ({top: 84, bottom: 1080}), scrollTo: value => navigationScrolls.push(value)};
+const pinnedNavigation = [];
+scrollReportTarget({...scrollContainer,
+  querySelector: () => ({getBoundingClientRect: () => ({height: 84})}),
+  scrollTo: value => pinnedNavigation.push(value)
+}, {getBoundingClientRect: () => ({top: 316})});
+assert.equal(pinnedNavigation[0].top, 232, 'Outline destinations remain below both pinned control rows');
 scrollReportTarget(scrollContainer, {getBoundingClientRect: () => ({top: 316})});
 assert.deepEqual(navigationScrolls, [{top: 300, behavior: 'smooth'}], 'Navigation scrolls only the document, preserving outer toolbars');
 revealOutlineHandle(scrollContainer, {getBoundingClientRect: () => ({top: 1060, bottom: 1090})});

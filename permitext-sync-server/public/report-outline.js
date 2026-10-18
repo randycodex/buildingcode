@@ -14,8 +14,10 @@ export function moveReportBlock(blocks, sourceIndex, targetIndex) {
 }
 
 export function scrollReportTarget(container, target) {
+  const controlsHeight = container.querySelector?.('.report-editor-controls')?.getBoundingClientRect().height || 0;
+  const topInset = Math.max(32, controlsHeight + 16);
   container.scrollTo({
-    top: Math.max(0, container.scrollTop + target.getBoundingClientRect().top - container.getBoundingClientRect().top - 32),
+    top: Math.max(0, container.scrollTop + target.getBoundingClientRect().top - container.getBoundingClientRect().top - topInset),
     behavior: "smooth"
   });
 }

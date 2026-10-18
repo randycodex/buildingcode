@@ -19749,7 +19749,7 @@ dialog.report-screen {
 .report-outline-item.is-drop-after::after { bottom: -1px; }
 .report-outline-drag-image { position: fixed; top: 0; left: 0; width: 1px; height: 1px; pointer-events: none; }
 .report-outline .report-outline-drag:active { cursor: grabbing; }
-.report-screen .report-document { min-width: 600px; grid-column: 3; grid-row: 2; overflow-y: auto; padding: 40px max(28px, calc((100% - var(--workspace-content-max-width)) / 2)); scroll-padding-top: 32px; }
+.report-screen .report-document { --report-document-padding-top: 40px; min-width: 600px; grid-column: 3; grid-row: 2; overflow-y: auto; padding: var(--report-document-padding-top) max(28px, calc((100% - var(--workspace-content-max-width)) / 2)); scroll-padding-top: 32px; }
 .report-screen .report-title-control { align-items: start; }
 .report-screen .report-title-text, .report-screen .report-title-editor { font-size: 26px; line-height: 1.3; font-weight: 650; white-space: normal; }
 .report-screen .report-title-revision { display: none; }
@@ -19787,7 +19787,7 @@ dialog.report-screen {
   .report-screen-header { padding: 10px 16px; grid-template-columns: 1fr auto; }
   .report-screen-header > span { display: none; }
   .report-screen .report-draft-shell { grid-template-columns: minmax(0, 1fr); }
-  .report-screen .report-document { grid-column: 1; padding: 24px 20px; }
+  .report-screen .report-document { --report-document-padding-top: 24px; grid-column: 1; padding: var(--report-document-padding-top) 20px; }
   .report-screen .report-draft-primary-actions { padding: 12px 16px; gap: 12px; flex-wrap: wrap; }
 }
 /* Typography is sized for reading a document, rather than a compact column. */
@@ -20703,8 +20703,11 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 }
 
 /* Report authoring shares the Note toolbar's quiet, compact controls. */
+.report-screen .report-editor-controls {
+  position: sticky; top: calc(-1 * var(--report-document-padding-top)); z-index: 5; align-self: start;
+  background: var(--surface);
+}
 .report-screen .report-format-toolbar {
-  position: sticky; top: 0; z-index: 5;
   display: flex; align-items: center; flex-wrap: wrap; gap: 3px;
   min-height: 42px; padding: 5px 0;
   background: var(--surface); color: var(--text-primary);
