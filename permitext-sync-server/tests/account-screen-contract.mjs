@@ -14,8 +14,10 @@ function harness(signedIn) {
   const panels = [], transitions = [], toggleAttributes = {};
   function element() {
     return {
-      children: [], listeners: {}, attributes: {}, dataset: {}, removedStyles: [], classList: { add() {} },
-      style: { removeProperty(name) { this.owner.removedStyles.push(name); } },
+      children: [], listeners: {}, attributes: {}, dataset: {}, removedStyles: [],
+      classList: { add() {}, toggle(name, on) { this[name] = on; }, contains(name) { return this[name] === true; } },
+      style: { removeProperty(name) { this.owner.removedStyles.push(name); }, setProperty(name, value) { this[name] = value; } },
+      focus() {},
       setAttribute(name, value) { this.attributes[name] = value; },
       getAttribute(name) { return this.attributes[name] ?? null; },
       append(...children) { for (const child of children) { child.parent?.removeChild(child); child.parent = this; this.children.push(child); } },
@@ -29,7 +31,7 @@ function harness(signedIn) {
       querySelectorAll(selector) { return this.children.flatMap(child => {
         const matches = selector.split(", ").some(part => part.startsWith(".")
           ? child.className?.split(" ").includes(part.slice(1))
-          : part === '[data-clear-action="searches"]' && child.attributes?.["data-clear-action"] === "searches");
+          : part === '*' || part === '[data-clear-action="searches"]' && child.attributes?.["data-clear-action"] === "searches");
         return [...(matches ? [child] : []), ...(child.querySelectorAll?.(selector) || [])];
       }); }
     };
@@ -76,7 +78,7 @@ function harness(signedIn) {
     activeAccount: () => signedIn ? { userID: "synthetic-account" } : null,
     renderSettings: panel, renderAccountWelcome: panel,
     trapWebModalFocus: () => { focusTraps++; }, clearProUpgradeIntent() {},
-    state: {}, closeSharedWorkspaceViews() {},
+    state: {}, saveWorkspaceState() {}, closeSharedWorkspaceViews() {},
     captureAccountRequest: () => ({}), isCurrentAccountRequest: () => accountCurrent,
     setInterval: cb => { contextCheck = cb; return 1; }, clearInterval() {},
     syncWorkflowNavigation() { toggleAttributes["aria-pressed"] = String(Boolean(currentDialog?.open)); },
@@ -104,9 +106,9 @@ for (const signedIn of [false, true]) {
     const [account, library, recovery] = panel.scroll.children;
     assert.equal(panel.scroll.children.length, 3);
     assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
-    assert.deepEqual(library.children.slice(1), [panel.sources, panel.offline]);
+    assert.deepEqual(library.children.slice(1, -1), [panel.sources, panel.offline]);
     assert.equal(recovery.children[0].textContent, "Data & recovery");
-    assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
+    assert.deepEqual(recovery.children.slice(1, -1), [panel.conflicts, panel.data]);
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
     assert.equal(account.children.at(-1).children[1], panel.deleteAccount, "One direct action keeps the original deletion confirmation handler.");
   }
@@ -145,3 +147,32 @@ assert.equal(h.transitions[0].options.refreshPaneIDs.join(","), "reader:one,util
 h.dialog().children[0].children[1].listeners.click();
 assert.equal(h.dialog(), null);
 console.log("Account screen passed: signed-in/guest lifecycle, original controls, close/Escape, nested keyboard handling, and independent category scroll restoration.");
+
+const collapse = harness(true);
+collapse.context.toggleAccountDialog();
+const keys = ["account", "library", "recovery"];
+for (const [index, column] of collapse.panels[0].scroll.children.entries()) {
+  const heading = column.children[0];
+  const rail = column.children.find(node => node.className?.includes("settings-column-restore"));
+  const originalChildren = [...column.children];
+  column.scrollTop = 160 + index;
+  column.children[1].draft = "Retained editable content";
+  let prevented = false;
+  heading.listeners.keydown({key: index % 2 ? " " : "Enter", preventDefault() { prevented = true; }});
+  assert.equal(prevented, true);
+  assert.equal(column.classList.contains("is-collapsed"), true);
+  assert.equal(rail.hidden, false);
+  assert.equal(collapse.panels[0].scroll.style[`--settings-${keys[index]}-width`], "48px");
+  assert.deepEqual(column.children, originalChildren, "Collapsing preserves the original controls and inputs");
+  column.scrollTop = 0;
+  rail.listeners.click();
+  assert.equal(column.scrollTop, 160 + index, "Restoring a column returns to its scroll position");
+  assert.equal(column.children[1].draft, "Retained editable content");
+  assert.equal(heading.getAttribute("aria-expanded"), "true");
+  heading.listeners.click();
+}
+assert.deepEqual(Array.from(collapse.context.state.settingsCollapsedColumnIDs), keys);
+collapse.dialog().children[0].children[1].listeners.click();
+collapse.context.toggleAccountDialog();
+assert.ok(collapse.panels[1].scroll.children.every(column => column.classList.contains("is-collapsed")), "Reopening Settings retains all three collapsed columns");
+console.log("Settings collapse passed: all columns, keyboard controls, mounted content, restored scroll, and reopening state.");

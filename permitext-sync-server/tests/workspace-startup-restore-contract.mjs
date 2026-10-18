@@ -35,10 +35,10 @@ const layout = { ...workspace.emptyWorkspaceLayout(), workflowView:"notebook", w
   paneOrder: ["saved:saved-pane", "notebook:project", "search:search-pane"] };
 const registry = { version: 1, activeWorkspaceID: "workspace", workspaces: [{ id: "workspace", name: "Synthetic workspace", createdAt: "2026-09-04T00:00:00Z", updatedAt: "2026-09-04T00:00:00Z" }] };
 
-function restore({ layoutJSON = JSON.stringify(layout), regressOrder = false, storedColor = false } = {}) {
+function restore({ layoutJSON = JSON.stringify(layout), regressOrder = false, storedColor = false, settingsCollapsedColumnIDs = [] } = {}) {
   const logs = [];
   const storedLayout = storedColor ? JSON.stringify({ ...layout, notebooks: layout.notebooks.map((p) => ({ ...p, structuredFacts: [], color: "#6674c8" })), projectDetails: layout.projectDetails.map((p) => ({ ...p, structuredFacts: [] })) }) : layoutJSON;
-  const records = new Map([["shared", JSON.stringify({ localProjects: [{ id: "project" }], syncOutbox: [{ accountUserID: "account", mutation: { id: "pending" } }] })], ["registry", JSON.stringify(registry)], ["layout:workspace", storedLayout]]);
+  const records = new Map([["shared", JSON.stringify({ localProjects: [{ id: "project" }], syncOutbox: [{ accountUserID: "account", mutation: { id: "pending" } }], settingsCollapsedColumnIDs })], ["registry", JSON.stringify(registry)], ["layout:workspace", storedLayout]]);
   const initialRecords = JSON.stringify([...records]);
   const storage = { getItem: (key) => records.get(key) ?? null, setItem: (key, value) => records.set(key, value), removeItem: (key) => records.delete(key) };
   const context = vm.createContext({ ...workspace, ...searchSession, normalizeVisitedWorkflowViews, normalizeWorkflowView, normalizeWorkflowMembership, crypto: webcrypto,
@@ -76,6 +76,8 @@ assert.equal(after.context.restored.notebooks[0].structuredFacts[0].status, "con
 assert.deepEqual(Array.from(after.context.restored.paneOrder), layout.paneOrder);
 assert.equal(after.context.restored.syncOutbox.length, 1);
 assert.equal(after.logs.length, 0);
+const settings = restore({ settingsCollapsedColumnIDs: ["library", "unknown", "library"] });
+assert.deepEqual(Array.from(settings.context.restored.settingsCollapsedColumnIDs), ["library"]);
 
 // Corrupt persisted JSON must be visible and protected from later automatic saves.
 const corrupt = restore({ layoutJSON: '{"privateSyntheticMarker":' });

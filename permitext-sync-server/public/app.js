@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-flat-dropdown-menus-v1162";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-settings-column-collapse-v1163";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-flat-dropdown-menus-v1162";
+} from "./offline-storage.js?v=20261017-settings-column-collapse-v1163";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-flat-dropdown-menus-v1162";
+} from "./workspace-state.js?v=20261017-settings-column-collapse-v1163";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -508,6 +508,7 @@ const globalWorkspaceStateKeys = [
   "recentChaptersByCode",
   "readerSettings",
   "savedTextSize",
+  "settingsCollapsedColumnIDs",
   "researchHistoryGroupExpansion",
   "projectSectionExpansion",
   "researchEvidenceSplitRatios",
@@ -897,6 +898,8 @@ function loadWorkspaceState(accountOverride) {
       continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings),
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
+      settingsCollapsedColumnIDs: Array.isArray(saved.settingsCollapsedColumnIDs)
+        ? [...new Set(saved.settingsCollapsedColumnIDs.filter((key) => ["account", "library", "recovery"].includes(key)))] : [],
       researchViewState: saved.researchViewState || null,
       researchConversationID: typeof saved.researchConversationID === "string" ? saved.researchConversationID : "",
       researchHistoryGroupExpansion: saved.researchHistoryGroupExpansion && typeof saved.researchHistoryGroupExpansion === "object"
@@ -1003,6 +1006,7 @@ function loadWorkspaceState(accountOverride) {
       paneOrder: [],
       pinnedPaneID: "",
       collapsedPaneIDs: [],
+      settingsCollapsedColumnIDs: [],
       columnGroups: [],
       recentChaptersByCode: {},
       continuityAppliedAt: null,
@@ -39407,6 +39411,49 @@ function organizeAccountSettings(panel) {
     heading.textContent = title;
     section.setAttribute("aria-labelledby", heading.id);
     section.append(heading, ...cards.filter(Boolean));
+    const rail = document.createElement("button");
+    rail.type = "button";
+    rail.className = "pane-collapsed-tab settings-column-restore";
+    rail.setAttribute("aria-label", `Expand ${title}`);
+    rail.setAttribute("aria-expanded", "false");
+    const railLabel = document.createElement("span");
+    railLabel.textContent = title;
+    rail.append(railLabel);
+    const paintCollapsed = (collapsed) => {
+      section.classList.toggle("is-collapsed", collapsed);
+      rail.hidden = !collapsed;
+      heading.setAttribute("aria-expanded", String(!collapsed));
+      scroll.style.setProperty(`--settings-${key}-width`, collapsed ? "48px" : key === "library" ? "minmax(480px, 1.5fr)" : "minmax(360px, 1fr)");
+    };
+    let scrollPositions = [];
+    const setCollapsed = (collapsed) => {
+      if (collapsed) scrollPositions = [section, ...section.querySelectorAll("*")]
+        .filter((node) => node.scrollTop || node.scrollLeft)
+        .map((node) => ({ node, top: node.scrollTop, left: node.scrollLeft }));
+      const ids = new Set(state.settingsCollapsedColumnIDs || []);
+      if (collapsed) ids.add(key);
+      else ids.delete(key);
+      state.settingsCollapsedColumnIDs = [...ids];
+      paintCollapsed(collapsed);
+      if (!collapsed) for (const { node, top, left } of scrollPositions) {
+        node.scrollTop = top; node.scrollLeft = left;
+      }
+      (collapsed ? rail : heading).focus({ preventScroll: true });
+      saveWorkspaceState();
+    };
+    heading.tabIndex = 0;
+    heading.setAttribute("role", "button");
+    heading.setAttribute("aria-label", `Collapse ${title}`);
+    heading.title = `Collapse ${title}`;
+    heading.addEventListener("click", () => setCollapsed(true));
+    heading.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      setCollapsed(true);
+    });
+    rail.addEventListener("click", () => setCollapsed(false));
+    section.append(rail);
+    paintCollapsed((state.settingsCollapsedColumnIDs || []).includes(key));
     return section;
   };
   const account = column("account", "Account", [profile, plan]);
