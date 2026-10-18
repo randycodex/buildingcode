@@ -3,7 +3,8 @@ import {reportItemPreview} from '../report-presentation.mjs';
 const rows=[['Use','Value'],['R','1']];
 const tableText=rows.map(row=>row.join(' | ')).join('\n');
 const evidence=reportItemPreview({kind:'evidence',passageText:`Before\n${tableText}\nFinal exception`,tables:[{text:tableText,rows}]});
-assert.deepEqual(evidence,[{kind:'text',label:'',text:'Before'},{kind:'table',rows},{kind:'text',label:'',text:'Final exception'}]);
+assert.deepEqual(evidence.map(({key,headerRowCount,...part})=>part),[{kind:'text',label:'',text:'Before'},{kind:'table',rows},{kind:'text',label:'',text:'Final exception'}]);
+assert.equal(new Set(evidence.map(part=>part.key)).size,evidence.length,'Every source part has a distinct highlight anchor');
 const research=reportItemPreview({kind:'researchAnswer',question:'A complete question',conclusion:'Conditional conclusion',
   assumptions:['Unverified assumption'],missingFacts:['Missing fact'],limitations:['Evidence limit'],
   additionalEvidenceNeeded:['Obtain records'],codeEdition:'2022',

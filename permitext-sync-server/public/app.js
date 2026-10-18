@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-pin-report-controls-v1190";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-source-formatting-v1193";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -18,7 +18,7 @@ import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
 import { createReportComparison, reportComparisonLayout, preserveReportReadingPosition, resetReportColumnWidths } from "./report-comparison.js?v=20261012-comparison-v20";
 import { readWorkspaceResume, writeWorkspaceResume, restoreWorkspaceResume, captureReportResume, applyReportResumeLayout, restoreReportResumeScroll } from "./workspace-resume.js?v=20261015-account-columns-v4";
-import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261011-workflow-v4";
+import { appendFindingTemplate, normalizeRecordsChecklist, suggestedRecords, recordStatuses, reportCommentKey, reportsContainingSource, reportEvidenceCoverage, reportCommentPresentation } from "./project-workflow.js?v=20261018-source-formatting-v7";
 import { nycMappedFactFields, previewNYCPropertyRefresh, applyNYCPropertyRefresh } from "./nyc-property-facts.js?v=20261004-zola-facts-v1";
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { researchFailureRecovery, researchSystemRecoveryReasons, researchVerificationRecoveryTextForReason } from "./research-failure-recovery.js?v=20261005-natural-recovery-v4";
@@ -127,7 +127,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-pin-report-controls-v1190";
+} from "./offline-storage.js?v=20261018-source-formatting-v1193";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -160,7 +160,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-pin-report-controls-v1190";
+} from "./workspace-state.js?v=20261018-source-formatting-v1193";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -333,7 +333,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261018-report-format-highlight-v37";
+const notebookClientVersion = "20261018-source-formatting-v40";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -29979,6 +29979,7 @@ async function renderProjectReportDraft(project, resume = null) {
               if (!accepted || disposed || !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
               block.text = text;
               delete block.richText;
+              delete block.sourceFormatting;
               block.kind = "paragraph";
               delete block.items;
               delete block.headingLevel;
@@ -30044,9 +30045,11 @@ async function renderProjectReportDraft(project, resume = null) {
                 if (disposed || activeWorkspaceID !== requestWorkspaceID || activeDraft.id !== draftID || !activeDraft.blocks.includes(block)) return;
                 const text = card.plainText || "";
                 if (text.length > 20000) throw new Error("This Note is too long for one Report paragraph. Keep the linked source or split the Note first.");
-                Object.assign(block, {kind: "paragraph", text, derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
+                const richText = reportFormatting.sourceSnapshotRuns(block,text);
+                Object.assign(block, {kind: "paragraph", text, richText, derivedFrom: {kind: "notebookCard", id: card.id, title: card.title, version: card.version},
                   sourceSnapshotAt: new Date().toISOString(), evidenceLinks: structuredClone(card.evidenceLinks || [])});
                 delete block.sourceID;
+                delete block.sourceFormatting;
                 setDirty(); renderWorkspaceContent();
               } catch (error) { if (isCurrentAccountRequest(requestIdentity)) showStatusError(error.message); }
               finally { snapshot.disabled = false; }
@@ -30068,7 +30071,7 @@ async function renderProjectReportDraft(project, resume = null) {
           const loadPreview = async () => {
             if (!preview.open || loaded || loading) return;
             const revision = previewRevision;
-            loading = true; body.textContent = "Loading complete source…";
+            loading = true; reportFormatting.unregisterSource(body); body.textContent = "Loading complete source…";
             const identity = captureAccountRequest();
             try {
               const key = JSON.stringify([block.kind, block.sourceID, source]);
@@ -30086,10 +30089,11 @@ async function renderProjectReportDraft(project, resume = null) {
                 if (part.kind === "table") {
                   const scroll = document.createElement("div"); scroll.className = "report-preview-table";
                   const table = document.createElement("table");
-                  for (const cells of part.rows || []) {
+                  for (const [rowIndex,cells] of (part.rows || []).entries()) {
                     const row = document.createElement("tr");
-                    for (const value of cells) {
+                    for (const [columnIndex,value] of cells.entries()) {
                       const cell = document.createElement("td"); cell.textContent = value; row.append(cell);
+                      if (String(value)) reportFormatting.registerSource(block,cell,{key:`${part.key}:${rowIndex}:${columnIndex}`,text:String(value)});
                     }
                     table.append(row);
                   }
@@ -30099,6 +30103,7 @@ async function renderProjectReportDraft(project, resume = null) {
                     const heading = document.createElement("strong"); heading.textContent = part.label; body.append(heading);
                   }
                   const text = document.createElement("p"); text.textContent = part.text; body.append(text);
+                  if (part.text) reportFormatting.registerSource(block,text,part);
                 }
               }
               loaded = true;
@@ -30617,7 +30622,7 @@ async function renderProjectReportDraft(project, resume = null) {
       onError: showStatusError,
       onChange: block => {
         const row = [...shell.querySelectorAll(".report-draft-block")].find(row => row._reportBlock === block);
-        if (row) {
+        if (row && ["heading", "paragraph", "list"].includes(block.kind)) {
           row.className = `report-draft-block report-draft-block-${block.kind}`;
           const label = row.querySelector(".report-draft-classification");
           if (label) label.textContent = `${block.kind === "list" ? "List" : block.kind === "heading" ? "Heading" : block.derivedFrom ? "Notebook note" : "Paragraph"} · User-authored`;

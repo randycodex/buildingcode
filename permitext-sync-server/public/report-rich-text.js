@@ -8,7 +8,7 @@ export function reportLinkURL(value) {
 }
 
 export const reportRunsText = runs => (runs || []).map(run => run.text).join('');
-const sameStyle = (a, b) => ['bold', 'italic', 'strike', 'highlight', 'href'].every(key => a[key] === b[key]);
+const sameStyle = (a, b) => ['bold', 'italic', 'underline', 'strike', 'highlight', 'href'].every(key => a[key] === b[key]);
 function compact(runs) {
   const result = [];
   for (const run of runs) {
@@ -47,7 +47,7 @@ export function canonicalReportRuns(value, {list = false} = {}) {
     total += run.text.length;
     if (total > 210000) throw new Error('Report formatted text is too long.');
     const result = {text: run.text};
-    for (const key of ['bold', 'italic', 'strike', 'highlight']) {
+    for (const key of ['bold', 'italic', 'underline', 'strike', 'highlight']) {
       if (run[key] !== undefined && typeof run[key] !== 'boolean') throw new Error('Invalid Report text style.');
       if (run[key]) result[key] = true;
     }
@@ -75,7 +75,7 @@ export function reportBlockRuns(block) {
 export function reportRunsDocument(runs) {
   return {type:'doc', content:reportRunsLines(runs).map(line => ({type:'paragraph', content:line.map(run => ({
     type:'text', text:run.text,
-    marks:[...['bold','italic','strike','highlight'].filter(key => run[key]).map(type => ({type})),
+    marks:[...['bold','italic','underline','strike','highlight'].filter(key => run[key]).map(type => ({type})),
       ...(run.href ? [{type:'link', attrs:{href:run.href}}] : [])]
   }))}))};
 }
@@ -85,7 +85,7 @@ export function reportDocumentRuns(doc) {
     ...(paragraph.content || []).map(node => {
       const run = {text:node.type === 'hardBreak' ? '\n' : node.text || ''};
       for (const mark of node.marks || []) {
-        if (['bold','italic','strike','highlight'].includes(mark.type)) run[mark.type] = true;
+        if (['bold','italic','underline','strike','highlight'].includes(mark.type)) run[mark.type] = true;
         if (mark.type === 'link' && reportLinkURL(mark.attrs?.href)) run.href = reportLinkURL(mark.attrs.href);
       }
       return run;

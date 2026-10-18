@@ -1,7 +1,8 @@
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "node:url";
-import { reportEvidenceDisplayText, reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation } from "./report-presentation.mjs";
+import { reportEvidenceDisplayText, reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition, reportFactPresentation, reportItemPreview, reportResearchDisplayText } from "./report-presentation.mjs";
 import { reportBlockRuns, reportRunsLines } from "./public/report-rich-text.js";
+import { sourceFormattingRuns, sourceTextStyles } from "./public/report-source-formatting.js";
 
 const colors = Object.freeze({
   ink: "#171717",
@@ -50,12 +51,7 @@ function stringList(value) {
 }
 
 function researchDisplayText(value) {
-  return reportResearchPlainText(value)
-    .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
-    .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
-    .replace(/\s+([,.;:!?])/g, "$1")
-    .replace(/[;,]\s*$/, "")
-    .trim();
+  return reportResearchDisplayText(value);
 }
 
 function researchDisplayList(value) {
@@ -172,7 +168,27 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation,
   document.restore();
   if (showClassification) drawClassification(document, item.sourceClassification);
 
-  if (item.kind === "evidence") {
+  const formatted = annotatedSourceParts(item);
+  if (hasSourceMarks(formatted)) {
+    const question = formatted.find(part=>part.label === 'Question');
+    const title = item.kind === 'evidence' ? `${item.codeBook} ${item.sectionNumber}: ${item.title}` : item.question || item.title || 'Project facts';
+    drawReportRichText(document,question?.runs || [{text:title}],{size:12,bold:true,paragraphGap:7});
+    if (item.kind === 'evidence') document.font('Report-Regular').fontSize(9).fillColor(colors.muted)
+      .text(`Edition: ${reportEvidenceEdition(item)}`,{paragraphGap:8});
+    for (const part of formatted) {
+      if (part === question) continue;
+      if (part.kind === 'table') {
+        drawFormattedSourceTable(document,part,item.sourceFormatting,startX,contentWidth);
+        document.moveDown(0.7);
+      } else {
+        if (part.label) {
+          ensureVerticalSpace(document,45);
+          document.fillColor(colors.ink).font('Report-Bold').fontSize(9).text(part.label,{paragraphGap:4});
+        }
+        drawReportRichText(document,part.runs,{size:9.5,paragraphGap:8});
+      }
+    }
+  } else if (item.kind === "evidence") {
     document
       .fillColor(colors.ink)
       .font("Report-Bold")
@@ -371,14 +387,15 @@ function drawCover(document, manifest) {
 
 // Lay out authored runs explicitly so marks, links and printed highlights stay
 // attached to their text across wrapping and page breaks.
-export function drawReportRichText(document, runs, {size = 10, bold = false, paragraphGap = 10, indent = 0, prefix = ""} = {}) {
-  const lineHeight = size * 1.5;
-  const left = document.page.margins.left + indent;
-  const width = document.page.width - document.page.margins.right - left;
-  let line = [], used = 0;
+export function drawReportRichText(document, runs, {size = 10, bold = false, paragraphGap = 10, indent = 0, prefix = "",
+  left = document.page.margins.left + indent, width = document.page.width - document.page.margins.right - left,
+  lineHeight = size * 1.5, paginate = true, measureOnly = false} = {}) {
+  let line = [], used = 0, measuredHeight = 0;
   const measure = run => document.font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(size).widthOfString(run.text);
   const flush = () => {
-    ensureVerticalSpace(document, lineHeight + 2);
+    measuredHeight += lineHeight;
+    if (measureOnly) {line = []; used = 0; return;}
+    if (paginate) ensureVerticalSpace(document, lineHeight + 2);
     const top = document.y;
     let x = left;
     for (const run of line) {
@@ -386,7 +403,7 @@ export function drawReportRichText(document, runs, {size = 10, bold = false, par
       if (run.highlight) document.save().fillColor("#f4d35e").fillOpacity(0.5).rect(x, top + 1, runWidth, size * 1.25).fill().restore();
       document.fillColor(colors.ink).font(run.bold || bold ? "Report-Bold" : "Report-Regular").fontSize(size)
         .text(run.text, x, top, {lineBreak:false, oblique:run.italic || false, strike:run.strike || false,
-          ...(run.href ? {link:run.href, underline:true} : {})});
+          underline:run.underline || Boolean(run.href), ...(run.href ? {link:run.href} : {})});
       x += runWidth;
     }
     document.x = document.page.margins.left;
@@ -412,7 +429,48 @@ export function drawReportRichText(document, runs, {size = 10, bold = false, par
     }
   }
   if (line.length) flush();
-  document.y += paragraphGap;
+  if (!measureOnly) document.y += paragraphGap;
+  return measuredHeight + paragraphGap;
+}
+
+function annotatedSourceParts(item) {
+  if (!item.sourceFormatting?.length) return [];
+  return reportItemPreview(item).map(part => part.kind === 'text' ? {...part,runs:sourceFormattingRuns(part,item.sourceFormatting)} : {...part,formatting:item.sourceFormatting});
+}
+const hasInlineStyle = run => sourceTextStyles.some(style=>run[style]);
+function hasSourceMarks(parts) {
+  return parts.some(part=>part.kind === 'text' ? part.runs.some(hasInlineStyle) : part.rows.some((row,r)=>row.some((text,c)=>
+    sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},part.formatting || []).some(hasInlineStyle))));
+}
+function drawFormattedSourceTable(document,part,formatting,startX,contentWidth) {
+  const columns = Math.max(...part.rows.map(row=>row.length)), width = contentWidth / columns;
+  const size = 8, lineHeight = 10.4;
+  const runs = part.rows.map((row,r)=>row.map((text,c)=>sourceFormattingRuns({key:`${part.key}:${r}:${c}`,text},formatting)));
+  const heights = runs.map(row=>Math.max(10.4,...row.map(cell=>drawReportRichText(document,cell,{size,width:width-10,lineHeight,paragraphGap:0,measureOnly:true})))+12);
+  const headers = part.headerRowCount || 0;
+  let position = headers;
+  while (position < part.rows.length || position === headers && position === part.rows.length) {
+    const bottom = document.page.height-document.page.margins.bottom-2;
+    const headerHeight = heights.slice(0,headers).reduce((a,b)=>a+b,0);
+    if (document.y+headerHeight+(heights[position] || 0)>bottom) document.addPage();
+    const indices = Array.from({length:headers},(_,i)=>i); let height = headerHeight;
+    while (position < part.rows.length && document.y+height+heights[position]<=bottom) {indices.push(position); height+=heights[position++];}
+    if (indices.length === headers && position < part.rows.length) throw new Error('A Report table row is too tall for a PDF page. Narrow the selection before exporting.');
+    for (const r of indices) {
+      const top = document.y;
+      for (let c=0;c<columns;c++) {
+        const x = startX+c*width;
+        document.save().lineWidth(0.5).strokeColor(colors.rule);
+        if (r < headers) document.rect(x,top,width,heights[r]).fillAndStroke('#f0f0f0',colors.rule);
+        else document.rect(x,top,width,heights[r]).stroke();
+        document.restore(); document.y=top+5;
+        drawReportRichText(document,runs[r][c] || [],{size,left:x+5,width:width-10,lineHeight,paragraphGap:0,paginate:false});
+      }
+      document.x=startX; document.y=top+heights[r];
+    }
+    if (position>=part.rows.length) break;
+    document.addPage();
+  }
 }
 
 function drawBody(document, manifest, projectMaterialBySourceID) {
@@ -420,10 +478,17 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
   document.addPage();
   let previousSourceClassification = null;
   (manifest.items || []).forEach((item) => {
+    const sourceParts = annotatedSourceParts(item);
+    const markedText = sourceParts.find(part=>part.kind === 'text' && part.runs.some(hasInlineStyle))?.runs;
+    if (!["heading","paragraph","list"].includes(item.kind) && hasSourceMarks(sourceParts)) {
+      drawSourceItem(document,item,projectMaterialBySourceID,presentation,previousSourceClassification !== item.sourceClassification);
+      previousSourceClassification = item.sourceClassification;
+      return;
+    }
     if (item.kind === "heading") {
       ensureVerticalSpace(document, 70);
-      if (item.richText) {
-        drawReportRichText(document, item.richText, {bold:true, size:item.presentationRole === "comment" ? 9 : ({1:17,2:14,3:12}[item.headingLevel] || 17), paragraphGap:item.presentationRole === "comment" ? 4 : 10});
+      if (item.richText || markedText) {
+        drawReportRichText(document, item.richText || markedText, {bold:true, size:item.presentationRole === "comment" ? 9 : ({1:17,2:14,3:12}[item.headingLevel] || 17), paragraphGap:item.presentationRole === "comment" ? 4 : 10});
         return;
       }
       document
@@ -435,7 +500,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     }
     if (item.kind === "paragraph") {
       ensureVerticalSpace(document, 55);
-      if (item.richText) drawReportRichText(document, item.richText);
+      if (item.richText || markedText) drawReportRichText(document, item.richText || markedText);
       else document
         .fillColor(colors.ink)
         .font("Report-Regular")

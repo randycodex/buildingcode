@@ -36,7 +36,7 @@ const maximumNotebookTextLength = 50_000;
 const maximumNotebookJSONLength = 500_000;
 const maximumNotebookBlocks = 500;
 const maximumNotebookDepth = 8;
-const permittedStyleNames = new Set(["bold", "italic", "strike"]);
+const permittedStyleNames = new Set(["bold", "italic", "underline", "strike"]);
 const notebookEvidenceRoles = new Set(["context", "supports", "conflicts", "unresolved"]);
 const maximumNotebookEvidenceLinks = 100;
 const maximumNotebookEvidencePassages = 24;
@@ -431,6 +431,7 @@ function renderInlineHTML(content) {
     if (node.styles.bold) html = `<strong>${html}</strong>`;
     if (node.styles.italic) html = `<em>${html}</em>`;
     if (node.styles.strike) html = `<s>${html}</s>`;
+    if (node.styles.underline) html = `<u>${html}</u>`;
     if (node.styles.backgroundColor === "yellow") html = `<mark>${html}</mark>`;
     return html;
   }).join("");

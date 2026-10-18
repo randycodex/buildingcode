@@ -160,6 +160,7 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
     bold: defaultStyleSpecs.bold,
     italic: defaultStyleSpecs.italic,
     strike: defaultStyleSpecs.strike,
+    underline: defaultStyleSpecs.underline,
     backgroundColor: defaultStyleSpecs.backgroundColor
   }
 });
@@ -240,6 +241,7 @@ function PermitextFormattingToolbar({ editor, options }) {
   return React.createElement("div", {className: "notebook-format-toolbar", role: "toolbar", "aria-label": "Note formatting"},
     styleButton("bold", "Bold", React.createElement("strong", null, "B")),
     styleButton("italic", "Italic", React.createElement("em", null, "I")),
+    styleButton("underline", "Underline", React.createElement("u", null, "U")),
     styleButton("strike", "Strikethrough", React.createElement("s", null, "S")),
     React.createElement("button", {
       type: "button", className: "notebook-format-button notebook-format-highlight",

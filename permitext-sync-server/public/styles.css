@@ -20751,4 +20751,6 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .report-screen .report-rich-editor :is(strong,b) { font-weight: 700; }
 .report-screen .report-rich-editor :is(em,i) { font-style: italic; }
 .report-screen .report-rich-editor mark { background: #f4d35e55; color: inherit; }
+.report-screen .report-highlight-target mark { background: #f4d35e55; color: inherit; }
+.report-screen .report-highlight-target { cursor: text; }
 .report-screen .report-rich-editor a { color: var(--link, #8ac8ff); text-decoration: underline; }

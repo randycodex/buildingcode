@@ -8,7 +8,7 @@ import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const runs = [{text:'A '},{text:'bold',bold:true},{text:' and '},{text:'highlighted',highlight:true},
   {text:' passage '},{text:'with italics',italic:true},{text:' and '},{text:'removed',strike:true},{text:' text. '},
-  {text:'Source link',href:'https://example.com/source'}];
+  {text:'underlined',underline:true},{text:' '},{text:'Source link',href:'https://example.com/source'}];
 const text = reportRunsText(runs);
 assert.deepEqual(reportDocumentRuns(reportRunsDocument(runs)),runs);
 const block = normalizeReportDraftBlock({id:'rich',kind:'paragraph',text,richText:runs});
@@ -30,6 +30,8 @@ const note = emptyNotebookDocument();
 note.document[0].content = [{type:'text',text:'Highlighted note',styles:{backgroundColor:'yellow',bold:true}}];
 const validated = validateNotebookDocument(note).document;
 assert.equal(validated.document[0].content[0].styles.backgroundColor,'yellow');
+note.document[0].content[0].styles.underline=true;
+assert.match(renderNotebookDocumentHTML(validateNotebookDocument(note).document), /<u>/);
 assert.match(renderNotebookDocumentHTML(validated),/<mark><strong>Highlighted note<\/strong><\/mark>/);
 note.document[0].content[0].styles.backgroundColor='url(evil)';
 assert.throws(()=>validateNotebookDocument(note),/unsupported style/);

@@ -77,23 +77,30 @@ export function uniqueReportItems(blocks, sources, renderBlock) {
   }
   // Resolve every block, including covered passages, so unavailable sources
   // still fail explicitly and each independently selected comment is retained.
-  const rendered = new Map(blocks.map(block => [block.id, renderBlock(block)]));
+  const rendered = new Map(blocks.map(block => [block.id, renderBlock(block).map(item =>
+    block.sourceFormatting?.length ? {...item,sourceFormatting:structuredClone(block.sourceFormatting)} : item)]));
   const groupsByOwner = new Map([...groups.values()].map(group => [owners.get(group[0].id).id, group]));
   return blocks.flatMap(block => {
     const owner = owners.get(block.id);
     if (!owner) return rendered.get(block.id);
     if (owner.id !== block.id) return [];
-    const seen = new Set();
+    const seen = new Map();
     const group = groupsByOwner.get(block.id);
     const comments = group.flatMap(member => rendered.get(member.id).filter(item => {
       if (!item.reportCommentKey) return false;
       const key = JSON.stringify([item.reportCommentKey, item.kind, item.text]);
-      if (seen.has(key)) return false;
-      seen.add(key); return true;
+      if (seen.has(key)) {
+        const kept = seen.get(key);
+        if (item.sourceFormatting?.length) kept.sourceFormatting = [...(kept.sourceFormatting || []),...item.sourceFormatting];
+        return false;
+      }
+      seen.set(key,item); return true;
     }));
     // Keep comments beside their source even if a selected passage appeared
     // earlier in the draft than the whole section that now contains it.
-    return [...rendered.get(block.id).filter(item => !item.reportCommentKey), ...comments];
+    const formatting = group.flatMap(member=>member.sourceFormatting || []);
+    return [...rendered.get(block.id).filter(item => !item.reportCommentKey).map(item =>
+      formatting.length ? {...item,sourceFormatting:structuredClone(formatting)} : item), ...comments];
   });
 }
 

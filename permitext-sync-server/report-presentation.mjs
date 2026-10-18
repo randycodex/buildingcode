@@ -1,4 +1,5 @@
 // Render only from the immutable manifest. No live source lookup or snapshot rewrite.
+import {createHash} from 'node:crypto';
 const text = (value) => String(value || '').trim();
 
 // Correct a known whitespace defect in the imported BC 1020.6 display only.
@@ -16,6 +17,15 @@ export function reportResearchPlainText(value) {
     .replace(/(?<![\\\w])([*_])(?=\S)([^\n]*?\S)\1(?!\w)/g, '$2')
     .replace(/`([^`\n]+)`/g, '$1')
     .replace(/^ {0,3}#{1,6}[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$/gm, '$1')
+    .trim();
+}
+
+export function reportResearchDisplayText(value) {
+  return reportResearchPlainText(value)
+    .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
+    .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/[;,]\s*$/, "")
     .trim();
 }
 
@@ -70,7 +80,7 @@ export function reportItemPreview(item) {
   const parts = [];
   const add = (label, content) => {
     const value = Array.isArray(content) ? content.filter(Boolean).join('\n\n') : String(content || '');
-    if (value.trim()) parts.push({kind:'text',label,text:item.kind === 'researchAnswer' ? reportResearchPlainText(value) : item.kind === 'evidence' ? reportEvidenceDisplayText(value.trim()) : value.trim()});
+    if (value.trim()) parts.push({kind:'text',label,text:item.kind === 'researchAnswer' ? reportResearchDisplayText(value) : item.kind === 'evidence' ? reportEvidenceDisplayText(value.trim()) : value.trim()});
   };
   if (item.kind === 'evidence') {
     let remaining = item.passageText || '';
@@ -78,7 +88,7 @@ export function reportItemPreview(item) {
       const position = remaining.indexOf(table.text);
       if (position < 0) continue;
       add('',remaining.slice(0,position));
-      parts.push({kind:'table',rows:table.rows});
+      parts.push({kind:'table',rows:table.rows,headerRowCount:table.headerRowCount || 0});
       remaining = remaining.slice(position + table.text.length);
     }
     add('',remaining);
@@ -86,6 +96,11 @@ export function reportItemPreview(item) {
     add('Question',item.question);
     add('Research basis',[item.authorityLabel || item.authorityStatus,item.codeEdition,item.sourceAsOf,
       item.codeBasis?.disclosure,item.codeBasis?.limitation]);
+    add('Corpus basis', [...(item.codeBasis?.searchedCorpora || []).map(corpus=>({kind:'Searched',corpus})),
+      ...(item.codeBasis?.pinnedCorpora || []).map(corpus=>({kind:'Explicit evidence',corpus}))]
+      .map(({kind,corpus})=>[kind,corpus.label || corpus.id || 'Research corpus',
+        corpus.codeEdition ? `Edition: ${corpus.codeEdition}` : 'Edition not provided',
+        corpus.applicabilityStatus ? `Applicability: ${String(corpus.applicabilityStatus).replace(/[-_]+/g,' ')}` : 'Applicability status not provided'].join(' · ')));
     add('Conclusion',item.conclusion);
     add('What the selected evidence establishes',(item.supportedPoints || []).map(point=>[point.heading,point.explanation].filter(Boolean).join(': ')));
     add('Explanation',item.explanation);
@@ -104,7 +119,9 @@ export function reportItemPreview(item) {
   } else {
     add('',item.plainText || item.text);
   }
-  return parts;
+  return parts.map((part,index)=>({...part,key:part.kind === 'table'
+    ? `${item.kind}:table:${index}:${createHash('sha256').update(JSON.stringify(part.rows)).digest('hex')}`
+    : `${item.kind}:text:${item.reportCommentKey || ''}:${index}`}));
 }
 
 // Compact only the known fact-projection envelope. Unrecognized/legacy prose

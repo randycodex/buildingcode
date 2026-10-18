@@ -7,6 +7,7 @@ import { defaultSyncCodeVersion } from "../public/sync-identity.js";
 import { historicalConstructionSyncCodeVersion } from "../historical-construction-content.mjs";
 import { parseFragment } from "parse5";
 import { reportSavedSourceID, savedExportSourceText } from "../report-evidence.mjs";
+import {sourceFormattingRuns, sourceTextStyles} from '../public/report-source-formatting.js';
 
 const directory = await mkdtemp(join(tmpdir(), "permitext-report-evidence-"));
 Object.assign(process.env, { NODE_ENV: "test", VERCEL: "", VERCEL_ENV: "",
@@ -83,7 +84,15 @@ try {
       index === 1 ? ["Historical note stays with 2014."] : []);
   }
   const blocks = savedRecords.map((record, index) => ({ id: `evidence-${index}`, kind: "evidence", sourceID: reportSavedSourceID(record), label: "Selected saved code" }));
+  const initialPreview = await post('/reports/sources/preview',{projectID,kind:'evidence',sourceID:blocks[0].sourceID});
+  const anchor = initialPreview.preview.find(part=>part.kind==='text');
+  const sourceFormatting = [{key:anchor.key,text:anchor.text,formats:Object.fromEntries(sourceTextStyles.map(style=>[style,[[0,8]]]))}];
+  blocks[0].sourceFormatting=sourceFormatting;
   const { draft } = await post("/reports/drafts/save", { projectID, expectedVersion: 0, title: "Complete evidence report", reportDate: "2026-10-10", blocks }, 201);
+  assert.deepEqual((await post('/reports/drafts/get',{projectID,draftID:draft.id})).draft.blocks[0].sourceFormatting,sourceFormatting,
+    'Report-owned source styles persist through the actual save/get endpoints');
+  await post('/reports/drafts/save',{projectID,expectedVersion:0,title:'Invalid formatting',reportDate:'2026-10-10',blocks:[{...blocks[0],
+    sourceFormatting:[{...sourceFormatting[0],formats:{bold:[[-1,8]]}}]}]},400);
   const creation = {projectID, clientDraftID:'5c39bfca-c126-4b29-9c74-1e46c2be910d', expectedVersion:0,
     title:'Autosave retry', reportDate:'2026-10-10', introduction:'Retained edit', blocks:[]};
   const created = (await post('/reports/drafts/save',creation,201)).draft;
@@ -101,6 +110,11 @@ try {
   assert.deepEqual(concurrent.map(response=>response.status).sort(),[200,409],'Only one concurrent writer may replace the same revision');
   const issued = await post("/reports/generate", { projectID, draftID: draft.id, expectedVersion: draft.version }, 201);
   const evidence = issued.manifest.items.filter(item => item.kind === "evidence");
+  const styledEvidence=evidence.find(item=>item.sectionID === String(current.id));
+  assert.deepEqual(styledEvidence.sourceFormatting,sourceFormatting,'Frozen exports retain the source styles');
+  assert(sourceTextStyles.every(style=>sourceFormattingRuns(anchor,styledEvidence.sourceFormatting)[0][style]));
+  assert.equal(styledEvidence.passageText,initialPreview.items.find(item=>item.kind==='evidence').passageText);
+  assert.equal(styledEvidence.passageTextHash,initialPreview.items.find(item=>item.kind==='evidence').passageTextHash);
   assert(evidence.find(item => item.sectionID === String(current.id)).passageText.length > 240);
   assert(issued.manifest.items.some(item => item.text === "Original scope note."));
   assert(issued.manifest.items.some(item => item.text === "Historical note stays with 2014."));

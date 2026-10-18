@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { normalizeNotebookEvidenceLinks } from "./notebook-contract.mjs";
 import { normalizedResearchProjectStructuredFacts, projectFactProjectionVersion } from "./project-fact-projection.mjs";
 import { normalizeReportRuns } from "./public/report-rich-text.js";
+import { normalizeSourceFormatting } from "./public/report-source-formatting.js";
 
 export const reportDraftSchemaVersion = 1;
 export const reportDraftSchemaVersionV2 = 2;
@@ -183,7 +184,8 @@ export function normalizeReportDraftBlock(block, index = 0) {
   const normalized = {
     id: requiredText(block?.id || randomUUID(), "Report block ID", 256),
     kind,
-    order: index
+    order: index,
+    ...(block.sourceFormatting !== undefined ? {sourceFormatting: normalizeSourceFormatting(block.sourceFormatting)} : {})
   };
   if (authoredBlockKinds.has(kind)) {
     return {
@@ -474,7 +476,9 @@ export function normalizeReportManifestItem(item, index = 0) {
     id: requiredText(item?.id || randomUUID(), "Report item ID", 256),
     kind,
     order: index,
-    sourceClassification: manifestSourceClassification(kind)
+    sourceClassification: manifestSourceClassification(kind),
+    ...(item.sourceFormatting !== undefined ? {sourceFormatting: normalizeSourceFormatting(item.sourceFormatting)} : {}),
+    ...(item.reportCommentKey ? {reportCommentKey: requiredText(item.reportCommentKey,"Report comment key",256)} : {})
   };
   if (authoredBlockKinds.has(kind)) return { ...base, ...normalizeAuthoredBlock(item, kind), ...(kind === "heading" && item.presentationRole === "comment" ? {presentationRole: "comment"} : {}) };
   if (kind === "evidence") return normalizeEvidenceManifestItem(item, base);

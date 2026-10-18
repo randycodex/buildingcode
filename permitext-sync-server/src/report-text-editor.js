@@ -2,9 +2,11 @@ import {Editor, Node, Mark, mergeAttributes} from '@tiptap/core';
 import Bold from '@tiptap/extension-bold';
 import Italic from '@tiptap/extension-italic';
 import Strike from '@tiptap/extension-strike';
+import Underline from '@tiptap/extension-underline';
 import Text from '@tiptap/extension-text';
 import {UndoRedo} from '@tiptap/extensions';
 import {canonicalReportRuns, reportRunsText, reportBlockRuns, reportRunsDocument, reportDocumentRuns, reportLinkURL} from '../public/report-rich-text.js';
+import {createReportSourceFormatting} from '../public/report-source-formatting.js';
 
 const Document = Node.create({name:'doc', topNode:true, content:'paragraph+'});
 const Paragraph = Node.create({name:'paragraph', group:'block', content:'inline*', parseHTML:() => [{tag:'p'}, {tag:'div'}, {tag:'h1'}, {tag:'h2'}, {tag:'h3'}, {tag:'li'}], renderHTML:() => ['p',0]});
@@ -25,11 +27,18 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
   toolbar.setAttribute('role','toolbar'); toolbar.setAttribute('aria-label','Report formatting');
   let current = null, stopped = false, linkSession = null;
   const editors = new Set(), controls = [];
+  const sourceFormatting = createReportSourceFormatting({onChange,isCurrent});
   const valid = () => !stopped && isCurrent() && current && !current.editor.isDestroyed && current.element.isConnected;
   const refresh = () => {
     const enabled = Boolean(valid());
     controls.forEach(control => {control.disabled = !enabled;});
     for (const [name, button] of marks) button.setAttribute('aria-pressed', String(enabled && current.editor.isActive(name)));
+    if (sourceFormatting.hasSelection()) {
+      for (const [name,button] of marks) {
+        button.disabled = false;
+        button.setAttribute('aria-pressed',String(sourceFormatting.isActive(name)));
+      }
+    }
     if (enabled) {
       style.value = current.block.kind === 'heading' ? `heading-${current.block.headingLevel || 1}` : 'paragraph';
       bullets.setAttribute('aria-pressed',String(current.block.kind === 'list' && current.block.listStyle !== 'ordered'));
@@ -45,8 +54,15 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
     return element;
   };
   const marks = new Map();
-  for (const [mark,label,html] of [['bold','Bold','<strong>B</strong>'],['italic','Italic','<em>I</em>'],['strike','Strikethrough','<s>S</s>'],['highlight','Highlight',reportHighlightIcon]]) {
-    const control = button(label,html,() => {current.editor.chain().focus().toggleMark(mark).run(); refresh();});
+  for (const [mark,label,html] of [['bold','Bold','<strong>B</strong>'],['italic','Italic','<em>I</em>'],['underline','Underline','<u>U</u>'],['strike','Strikethrough','<s>S</s>'],['highlight','Highlight',reportHighlightIcon]]) {
+    const control = button(label,html,() => {
+      try {
+        if (sourceFormatting.hasSelection()) sourceFormatting.toggle(mark);
+        else if (valid()) current.editor.chain().focus().toggleMark(mark).run();
+        refresh();
+      } catch (error) {onError(error.message);}
+    },false);
+    controls.push(control);
     control.className = `report-format-${mark}`; marks.set(mark,control); toolbar.append(control);
   }
   const style = document.createElement('select'); style.setAttribute('aria-label','Text style'); style.title = 'Text style';
@@ -127,6 +143,7 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
   const focusOut = event => {if (!toolbar.contains(event.relatedTarget)) {insert.open = false; if (linkSession) closeLink();}};
   toolbar.addEventListener('focusout',focusOut);
   const selectionChanged = () => {
+    sourceFormatting.capture();
     if (valid()) {
       const selection = window.getSelection();
       if (selection?.anchorNode && !current.element.contains(selection.anchorNode) && !toolbar.contains(document.activeElement)) {
@@ -138,10 +155,13 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
   document.addEventListener('selectionchange',selectionChanged);
   const api = {
     element:toolbar,
+    registerSource:(block,element,part) => sourceFormatting.register(block,element,part),
+    unregisterSource:container => sourceFormatting.unregister(container),
+    sourceSnapshotRuns:(block,text) => sourceFormatting.snapshotRuns(block,text),
     mount(block) {
       const element = document.createElement('div'); element.className = 'report-rich-editor';
       const entry = {block,element,editor:null};
-      entry.editor = new Editor({element, extensions:[Document,Paragraph,Text,HardBreak,Bold,Italic,Strike,Highlight,Link,UndoRedo],
+      entry.editor = new Editor({element, extensions:[Document,Paragraph,Text,HardBreak,Bold,Italic,Underline,Strike,Highlight,Link,UndoRedo],
         content:reportRunsDocument(reportBlockRuns(block)),
         editorProps:{attributes:{role:'textbox','aria-multiline':'true','aria-label':`Report ${block.kind === 'list' ? 'list items' : block.kind}`},
           handleClick:(_view,_pos,event) => {if (event.target.closest('a')) {event.preventDefault(); return true;} return false;}},
@@ -153,7 +173,7 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
       return element;
     },
     focus(block) {const entry = [...editors].find(entry => entry.block === block); if (entry) {current = entry; entry.editor.commands.focus('end'); refresh();}},
-    dispose() {stopped = true; document.removeEventListener('selectionchange',selectionChanged); editors.forEach(entry=>entry.editor.destroy()); editors.clear(); current = null;}
+    dispose() {stopped = true; sourceFormatting.dispose(); document.removeEventListener('selectionchange',selectionChanged); editors.forEach(entry=>entry.editor.destroy()); editors.clear(); current = null;}
   };
   refresh(); return api;
 }
