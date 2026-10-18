@@ -44,18 +44,17 @@ function harness(signedIn) {
     };
     const profile = category("profile", "account-connector"), plan = category("plan", "settings-plan-card"), sources = category("sources", "settings-active-sources-card");
     const offline = category("offline", "settings-offline-card"), data = category("data", "settings-data-card"), conflicts = category("conflicts", "settings-sync-conflicts-card");
-    const projects = category("projects", "settings-project-management-card");
     const signOut = Object.assign(element(), { className: "account-clear" });
     const deleteAccount = Object.assign(element(), { className: "account-delete" });
     profile.append(signOut, deleteAccount);
     const scroll = Object.assign(element(), { className: "settings-scroll", scrollTop: 0 });
-    scroll.append(plan, profile, sources, conflicts, offline, projects, data);
+    scroll.append(plan, profile, sources, conflicts, offline, data);
     const oldHeader = { remove() { result.headerRemoved = true; } };
     const find = result.querySelector.bind(result);
     result.querySelector = selector => selector === ".panel-header" ? oldHeader : find(selector);
     if (signedIn) result.append(scroll);
     result.__refreshActiveCodeSources = async () => { result.sourcesReady = true; };
-    Object.assign(result, { scroll, profile, plan, sources, offline, projects, data, conflicts, signOut, deleteAccount });
+    Object.assign(result, { scroll, profile, plan, sources, offline, data, conflicts, signOut, deleteAccount });
     panels.push(result);
     return result;
   }
@@ -106,10 +105,8 @@ for (const signedIn of [false, true]) {
     assert.equal(panel.scroll.children.length, 3);
     assert.deepEqual(account.children.slice(1, 3), [panel.profile, panel.plan]);
     assert.deepEqual(library.children.slice(1), [panel.sources, panel.offline]);
-    assert.equal(recovery.children[0].textContent, "Projects");
-    assert.equal(recovery.children[1], panel.projects);
-    assert.equal(recovery.children[2].textContent, "Data & recovery");
-    assert.deepEqual(recovery.children.slice(3), [panel.conflicts, panel.data]);
+    assert.equal(recovery.children[0].textContent, "Data & recovery");
+    assert.deepEqual(recovery.children.slice(1), [panel.conflicts, panel.data]);
     assert.equal(account.children.at(-1).children[0], panel.signOut, "Keep the wired sign-out control below Plan.");
     assert.equal(account.children.at(-1).children[1], panel.deleteAccount, "One direct action keeps the original deletion confirmation handler.");
   }

@@ -11459,29 +11459,14 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   overflow: hidden;
 }
 
-.project-manager-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 3000;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.54);
-}
-
 .project-manager {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: min(560px, 100%);
-  max-height: calc(100dvh - 40px);
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  background: var(--surface);
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
 }
 
-.project-manager header,
 .project-manager nav,
 .project-manager-toolbar,
 .project-manager footer,
@@ -11491,20 +11476,20 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
   gap: 12px;
 }
 
-.project-manager header { justify-content: space-between; }
-.project-manager h2 { margin: 0; font-size: 18px; }
+.project-manager-toolbar { flex-wrap: wrap; }
 .project-manager button {
   padding: 8px 12px;
   border: 0;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--surface) 86%, var(--text-primary));
+  background: transparent;
   color: var(--text-primary);
   cursor: pointer;
 }
 .project-manager button:disabled { opacity: 0.4; cursor: default; }
-.project-manager button[aria-pressed="true"] { background: #414141; }
+.project-manager button:not(:disabled):hover,
+.project-manager button[aria-pressed="true"] { background: var(--menu-highlight); }
 .project-manager button.is-danger { color: #f16e72; }
-.project-manager-list { overflow-y: auto; min-height: 80px; }
+.project-manager-list { min-height: 0; }
 .project-manager-row { padding: 12px 0; border-bottom: 1px solid var(--border); }
 .project-manager-row label { display: flex; flex: 1; min-width: 0; gap: 12px; align-items: center; font-size: 14px; text-transform: none; color: var(--text-primary); }
 .project-manager-row input[type="checkbox"] { width: 16px; height: 16px; flex: 0 0 16px; }
@@ -18244,25 +18229,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   font-weight: var(--settings-weight-medium);
   text-align: left;
 }
-.account-screen :is(.account-connector, .settings-active-sources-card, .settings-project-management-card, .settings-data-card) > .settings-section-title { display: none; }
-.account-screen .settings-account-column > .settings-project-management-card { padding: 0 0 20px; }
-.account-screen .settings-project-management-action {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-height: 44px;
-  margin: 0;
-  padding: 12px var(--account-category-gutter);
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--text-primary);
-  font-size: var(--settings-type-body);
-  font-weight: var(--settings-weight-medium);
-  text-align: left;
-}
-.account-screen .settings-project-management-action:not(:disabled):hover { background: var(--menu-highlight); }
+.account-screen :is(.account-connector, .settings-active-sources-card, .settings-data-card) > .settings-section-title { display: none; }
 .account-screen .settings-account-actions {
   display: grid;
   justify-items: center;
@@ -18413,8 +18380,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   text-align: left;
 }
 .account-screen .settings-data-card > details > summary::before,
-.account-screen .legacy-workspace-review::before,
-.account-screen .settings-project-management-action::before {
+.account-screen .legacy-workspace-review::before {
   content: "";
   width: 5px;
   height: 5px;

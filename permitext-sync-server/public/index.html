@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20261010-definition-text-v88">
-    <link rel="stylesheet" href="/web/styles.css?v=20261017-settings-project-management-v1159">
+    <link rel="stylesheet" href="/web/styles.css?v=20261017-inline-project-management-v1160">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -510,12 +510,12 @@
             <button class="settings-link-button settings-offline-remove" type="button" hidden>Remove Download</button>
           </div>
         </section>
-        <section class="settings-card settings-project-management-card" aria-labelledby="settings-project-management-title">
-          <h3 id="settings-project-management-title" class="section-label settings-section-title">Projects</h3>
-          <button class="settings-project-management-action" type="button" aria-haspopup="dialog" disabled>Manage Projects</button>
-        </section>
         <section class="settings-card settings-data-card" aria-labelledby="settings-data-title">
           <h3 id="settings-data-title" class="section-label settings-section-title">Data recovery</h3>
+          <details class="settings-project-management">
+            <summary>Manage Projects</summary>
+            <div class="settings-project-manager-content"></div>
+          </details>
           <details class="settings-trash">
             <summary>Trash</summary>
             <p class="settings-trash-help">Restore deleted items for 30 days across synced devices. Newer work is kept.</p>
@@ -583,6 +583,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20261017-settings-project-management-v1159" type="module"></script>
+    <script src="/web/app.js?v=20261017-inline-project-management-v1160" type="module"></script>
   </body>
 </html>

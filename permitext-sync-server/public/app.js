@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-settings-project-management-v1159";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-inline-project-management-v1160";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-settings-project-management-v1159";
+} from "./offline-storage.js?v=20261017-inline-project-management-v1160";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-settings-project-management-v1159";
+} from "./workspace-state.js?v=20261017-inline-project-management-v1160";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -33868,36 +33868,23 @@ function openWorkspaceManager() {
   dialog.querySelector("header button")?.focus();
 }
 
-function openProjectManager() {
-  document.querySelector(".project-manager-backdrop")?.remove();
-  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+function renderProjectManager(container) {
+  if (container._refreshProjectManager) {
+    container._refreshProjectManager();
+    return;
+  }
   const requestIdentity = captureAccountRequest();
-  const backdrop = document.createElement("div");
-  backdrop.className = "project-manager-backdrop";
   const dialog = document.createElement("section");
   dialog.className = "project-manager";
-  dialog.setAttribute("role", "dialog");
-  dialog.setAttribute("aria-modal", "true");
-  dialog.setAttribute("aria-label", "Manage Projects");
-  backdrop.append(dialog);
-  document.body.append(backdrop);
+  dialog.setAttribute("role", "region");
+  dialog.setAttribute("aria-label", "Project management");
+  container.replaceChildren(dialog);
   let archived = false;
   let selecting = false;
   let busy = false;
   const selected = new Set();
-  const close = () => {
-    if (busy) return;
-    backdrop.remove();
-    const returnTarget = previousFocus?.isConnected ? previousFocus : document.querySelector("#workspace-actions");
-    returnTarget?.focus({ preventScroll: true });
-  };
-  backdrop.addEventListener("keydown", (event) => {
-    if (backdrop.querySelector(".project-sheet-overlay")) return;
-    if (event.key === "Escape") { event.preventDefault(); close(); }
-    else trapWebModalFocus(dialog, event);
-  });
   const render = () => {
-    if (!isCurrentAccountRequest(requestIdentity)) { backdrop.remove(); return; }
+    if (!isCurrentAccountRequest(requestIdentity)) { dialog.remove(); return; }
     const records = visibleProjectRecords(currentContentSummary().projects || [])
       .filter((project) => folderIsProject(project) && !project.sharedOnly && projectIsArchived(project) === archived);
     const ids = new Set(records.map(projectRecordID));
@@ -33912,11 +33899,6 @@ function openProjectManager() {
       parent.append(control);
       return control;
     };
-    const header = document.createElement("header");
-    const title = document.createElement("h2");
-    title.textContent = "Manage Projects";
-    header.append(title);
-    button("Close", close, header);
     const tabs = document.createElement("nav");
     tabs.setAttribute("aria-label", "Project status");
     [false, true].forEach((value) => {
@@ -34007,20 +33989,20 @@ function openProjectManager() {
         if (isCurrentAccountRequest(requestIdentity)) await showWebNotice("Could not update projects", error.message);
       } finally {
         busy = false; render();
-        dialog.querySelector("header button")?.focus();
+        dialog.querySelector(".project-manager-toolbar button")?.focus();
       }
     };
     if (selecting) {
       button(archived ? "Restore Selected" : "Archive Selected", () => void run("archive"), actions, !selected.size);
       button("Delete Selected", () => void run("delete"), actions, !selected.size).className = "is-danger";
     }
-    dialog.append(header, tabs, toolbar, list, actions);
+    dialog.append(tabs, toolbar, list, actions);
   };
   const listFocus = (id) => {
     [...dialog.querySelectorAll("input[data-project-id]")].find((input) => input.dataset.projectId === id)?.focus();
   };
+  container._refreshProjectManager = render;
   render();
-  dialog.querySelector("header button")?.focus();
 }
 
 function showProjectCreateSheet(panel, project = null, options = {}) {
@@ -39414,7 +39396,6 @@ function organizeAccountSettings(panel) {
   const plan = scroll.querySelector(".settings-plan-card");
   const sources = scroll.querySelector(".settings-active-sources-card");
   const offline = scroll.querySelector(".settings-offline-card");
-  const projects = scroll.querySelector(".settings-project-management-card");
   const data = scroll.querySelector(".settings-data-card");
   const conflicts = scroll.querySelector(".settings-sync-conflicts-card");
   const column = (key, title, cards) => {
@@ -39430,13 +39411,7 @@ function organizeAccountSettings(panel) {
   };
   const account = column("account", "Account", [profile, plan]);
   const library = column("library", "Library & offline", [sources, offline]);
-  const recovery = column("recovery", "Projects", [projects]);
-  const recoveryHeading = document.createElement("h2");
-  recoveryHeading.id = "settings-data-recovery-heading";
-  recoveryHeading.className = "settings-account-column-title";
-  recoveryHeading.textContent = "Data & recovery";
-  recovery.append(recoveryHeading, ...[conflicts, data].filter(Boolean));
-  recovery.setAttribute("aria-labelledby", `settings-column-recovery-title ${recoveryHeading.id}`);
+  const recovery = column("recovery", "Data & recovery", [conflicts, data]);
   const actions = document.createElement("div");
   actions.className = "settings-account-actions";
   const signOut = profile?.querySelector(".account-clear");
@@ -39448,9 +39423,10 @@ function organizeAccountSettings(panel) {
   }
   account.append(actions);
   const trash = data?.querySelector(".settings-trash");
+  const projects = data?.querySelector(".settings-project-management");
   const legacy = data?.querySelector(".legacy-workspace-recovery");
   const deleteContent = data?.querySelector(".settings-delete-content");
-  data?.append(...[trash, legacy, deleteContent].filter(Boolean));
+  data?.append(...[projects, trash, legacy, deleteContent].filter(Boolean));
   scroll.replaceChildren(account, library, recovery);
 }
 
@@ -39767,10 +39743,14 @@ function renderSettings({ upgrade = false } = {}) {
   const panel = renderTemplate(settingsTemplate);
   wireSettingsActiveCodeSources(panel, { enabled: true, collapsibleGroups: true });
   applyPaneWeight(panel, "utility:settings");
-  const manageProjectsButton = panel.querySelector(".settings-project-management-action");
-  manageProjectsButton?.addEventListener("click", () => {
-    if (!isCurrentAccountRequest(settingsIdentity) || !workspacePrivatePresentationAllowed()) return;
-    openProjectManager();
+  const manageProjects = panel.querySelector(".settings-project-management");
+  manageProjects?.addEventListener("toggle", () => {
+    if (!manageProjects.open) return;
+    if (!isCurrentAccountRequest(settingsIdentity) || !workspacePrivatePresentationAllowed()) {
+      manageProjects.open = false;
+      return;
+    }
+    renderProjectManager(manageProjects.querySelector(".settings-project-manager-content"));
   });
 
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
@@ -40304,7 +40284,7 @@ function renderSettings({ upgrade = false } = {}) {
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
-    if (manageProjectsButton) manageProjectsButton.disabled = !workspacePrivatePresentationAllowed();
+    manageProjects?.querySelector("summary")?.setAttribute("aria-disabled", String(!workspacePrivatePresentationAllowed()));
     const source = currentEntitlement()?.source;
     const activePlanCopy = settingsPlanCopy({ pro, source });
     planRows.forEach((row) => {

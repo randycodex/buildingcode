@@ -6,7 +6,7 @@ import vm from 'node:vm';
 class Element {
   constructor(tag) { this.tag = tag; this.children = []; this.events = {}; this.dataset = {}; }
   append(...items) { items.forEach(item => { item.parent = this; this.children.push(item); }); }
-  replaceChildren() { this.children = []; }
+  replaceChildren(...items) { this.children = []; this.append(...items); }
   setAttribute(key, value) { this[key] = value; }
   addEventListener(key, handler) { this.events[key] = handler; }
   remove() { if (this.parent) this.parent.children = this.parent.children.filter(x => x !== this); }
@@ -15,13 +15,15 @@ class Element {
   querySelectorAll() { return []; }
 }
 const body = new Element('body');
+const container = new Element('div');
+body.append(container);
 const records = Array.from({ length: 30 }, (_, i) => ({ id: String(i), name: `Project ${i}`, archived: false }));
 records.push({ id: 'collection', collection: true }, { id: 'shared', sharedOnly: true });
 const calls = [];
 let allowDelete = false;
 let restored = 0;
 const context = vm.createContext({
-  HTMLElement: Element,
+  container,
   document: { body, createElement: tag => new Element(tag), querySelector: () => null },
   captureAccountRequest: () => 1, isCurrentAccountRequest: () => true, requireCurrentAccountRequest() {},
   currentContentSummary: () => ({ projects: records }), visibleProjectRecords: x => x.filter(p => !p.deleted),
@@ -37,9 +39,11 @@ const context = vm.createContext({
   showProjectCreateSheet: () => {}, showWebNotice: async () => {},
 });
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
-vm.runInContext(app.slice(app.indexOf('function openProjectManager()'), app.indexOf('function showProjectCreateSheet(')), context);
-vm.runInContext('openProjectManager()', context);
+vm.runInContext(app.slice(app.indexOf('function renderProjectManager('), app.indexOf('function showProjectCreateSheet(')), context);
+vm.runInContext('renderProjectManager(container)', context);
 const all = (root = body) => [root, ...root.children.flatMap(child => all(child))];
+assert.equal(container.children[0].role, 'region', 'Project management renders in its supplied Settings container');
+assert.equal(all().some(node => node.role === 'dialog'), false, 'Project management does not open a popup');
 assert.equal(all().some(node => node.tag === 'button' && node.textContent === 'Edit'), false,
   'Project identity editing is available only from Edit project in the Overview column.');
 const click = async text => {
@@ -51,6 +55,7 @@ const click = async text => {
 };
 await click('Select');
 await click('Select All');
+vm.runInContext('renderProjectManager(container)', context);
 await click('Archive Selected');
 assert.deepEqual(calls[0], ['archive', 30], 'bulk archive includes projects beyond the old 24-row limit');
 assert.ok(!records.at(-1).archived, 'shared-only projects are excluded');
