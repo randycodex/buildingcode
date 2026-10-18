@@ -1,6 +1,6 @@
 .reader-definition-term {
   display: inline; padding: 0; margin: 0; border: 0; border-radius: 0;
-  background: transparent; color: color-mix(in srgb, currentColor 55%, var(--text-secondary, #bfc2c6)); font: inherit; line-height: inherit;
+  background: transparent; color: light-dark(#2473ad, #8fc7ff); font: inherit; line-height: inherit;
   text-align: inherit; cursor: pointer; text-decoration: none;
 }
 .reader-definition-popover {

@@ -3774,10 +3774,9 @@ select option:checked {
 
 .reader-save-confirmation {
   position: absolute;
-  left: 50%;
+  right: calc(var(--panel-padding) + 38px + var(--space-3));
   width: max-content;
-  max-width: calc(100% - var(--panel-padding) - var(--panel-padding));
-  translate: -50% 0;
+  max-width: calc(100% - var(--panel-padding) - var(--panel-padding) - 38px - var(--space-3));
   bottom: calc(var(--panel-padding) + var(--space-3));
   z-index: 19;
   display: flex;
