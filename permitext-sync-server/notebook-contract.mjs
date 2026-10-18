@@ -131,6 +131,7 @@ export function normalizeNotebookEvidenceLinks(input) {
         sourceLibraryVersion: optionalText(source.sourceLibraryVersion || source.codeVersion, "Notebook evidence source-library version", 1_024)
       },
       passages,
+      ...(link?.noteTextVersion === 1 ? { noteTextVersion: 1 } : {}),
       createdAt: requiredText(link?.createdAt, "Notebook evidence creation date", 64),
       noteTarget: link?.noteTarget && typeof link.noteTarget === "object" && !Array.isArray(link.noteTarget)
         ? {

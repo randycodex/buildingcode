@@ -1,4 +1,4 @@
-import { notebookReferenceBlocks } from "./notebook-passage-blocks.js?v=1";
+import { notebookReferenceBlocks, restoreNotebookPassageText } from "./notebook-passage-blocks.js?v=2";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
@@ -7,7 +7,7 @@ import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2"
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-note-passage-text-v1179";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-existing-note-passages-v1180";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -127,7 +127,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-note-passage-text-v1179";
+} from "./offline-storage.js?v=20261018-existing-note-passages-v1180";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -160,7 +160,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-note-passage-text-v1179";
+} from "./workspace-state.js?v=20261018-existing-note-passages-v1180";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -16732,7 +16732,7 @@ async function addPassageToNotebook(anchor, source, exact) {
     choices: [{ value: "new", label: "New Note" }] });
   if (!destination || !current()) return;
   const label = `${source.codePrefix} · ${researchCodeEdition(source)} · § ${source.sectionNumber} · ${source.title}`;
-  const link = { id: crypto.randomUUID(), label, relationshipRole: "context", projectID,
+  const link = { id: crypto.randomUUID(), label, relationshipRole: "context", projectID, noteTextVersion: 1,
     source: { ...source, sourceID: String(source.sectionID), sectionID: String(source.sectionID),
       sectionTitle: source.title, codeEdition: researchCodeEdition(source), sourceLibraryVersion: source.codeVersion },
     passages: [{ exact: String(exact).trim() }], createdAt: new Date().toISOString() };
@@ -28316,16 +28316,19 @@ async function renderProjectNotebook(project, options = {}) {
         candidateCard.evidenceLinks = localDraft.evidenceLinks || candidateCard.evidenceLinks || [];
         candidateCard.openQuestions = localDraft.openQuestions ?? candidateCard.openQuestions ?? [];
       }
+      const restoredPassages = restoreNotebookPassageText(currentCardLabels.document, candidateCard.evidenceLinks);
+      candidateCard.evidenceLinks = restoredPassages.evidenceLinks;
+      const restoredWritable = restoredPassages.changed && !notebookReadOnly;
       activeCard = candidateCard;
-      draftDocument = currentCardLabels.document;
+      draftDocument = restoredPassages.document;
       saveConflict = false;
-      dirty = useLocalDraft || currentCardLabels.changed;
+      dirty = useLocalDraft || currentCardLabels.changed || restoredWritable;
       persistedDraft = localDraft || null;
       persistedCardID = candidateCard.id || "";
       persistedRevision = localDraft ? notebookRevision : -1;
-      if (currentCardLabels.changed) notebookRevision += 1;
+      if (currentCardLabels.changed || restoredWritable) notebookRevision += 1;
       if (!showNotebookRecoveryConflict(localDraft)) {
-        showDraftStatus(currentCardLabels.changed
+        showDraftStatus(restoredWritable ? "Added saved passage text · waiting to sync" : currentCardLabels.changed
           ? "Updated linked reference · waiting to sync"
           : useLocalDraft ? "Recovered device draft · waiting to sync" : "Synced");
       }

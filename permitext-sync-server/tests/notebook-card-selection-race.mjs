@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import {restoreNotebookPassageText} from '../public/notebook-passage-blocks.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const start = source.indexOf('    async function loadCard(cardID) {');
@@ -54,7 +55,7 @@ function harness() {
     saveNotebookCardSnapshot: (account, project, card) => waitAt('snapshot', card.id, undefined),
     loadNotebookDraft: (account, project, id) => waitAt('draft', id, drafts.get(id) || null),
     reconcileNotebookDocumentAssets: document => waitAt('assets', document.cardID, structuredClone(document)),
-    notebookDocumentWithCurrentCardLabels: document => ({document, changed: false}),
+    notebookDocumentWithCurrentCardLabels: document => ({document, changed: false}), restoreNotebookPassageText,
     privateCacheFallbackAllowed: () => false,
     loadNotebookProjectSnapshot: async () => null,
     showNotebookRecoveryConflict: () => false,
@@ -297,3 +298,19 @@ for (const invalidation of ['account', 'workspace', 'dispose', 'selection']) {
   assert.equal(h.c.activeCard.id, invalidation === 'selection' ? 'B' : 'original');
 }
 console.log('New Note storage recovery passed: current failures preserve the editor and show recovery guidance; stale failures stay silent.');
+
+for(const readOnly of [false,true]) {
+  const h=harness(); h.c.notebookReadOnly=readOnly;
+  const reference={referenceKind:'selectedPassage',referenceID:'old',label:'Historical source'};
+  const original={id:'old-note',version:1,title:'Existing note',evidenceLinks:[{id:'old',passages:[{exact:'Complete saved passage.'}]}],
+    document:{cardID:'old-note',document:[{type:'paragraph',content:[{type:'permitextReference',props:reference}]}]}};
+  h.c.notebookRequest=async()=>({card:original});
+  await h.c.load('old-note');
+  assert.equal(h.c.draftDocument.document[1].content[0].text,'Complete saved passage.');
+  assert.equal(h.c.activeCard.evidenceLinks[0].noteTextVersion,1);
+  assert.equal(h.c.dirty,!readOnly);
+  assert.equal(h.scheduled.length,readOnly?0:1,'Writable restoration uses normal guarded autosave; read-only display never writes.');
+  assert.equal(original.document.document.length,1,'The fetched response remains intact.');
+  assert.equal(original.evidenceLinks[0].noteTextVersion,undefined);
+}
+console.log('Existing Note passage loading passed: restored snapshots, guarded autosave and read-only display without mutation.');
