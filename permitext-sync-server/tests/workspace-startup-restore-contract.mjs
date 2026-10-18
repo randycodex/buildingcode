@@ -1,3 +1,4 @@
+import * as recentSearchScope from "../public/recent-search-scope.js";
 import * as recentViewScope from "../public/recent-view-scope.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -42,7 +43,7 @@ function restore({ layoutJSON = JSON.stringify(layout), regressOrder = false, st
   const records = new Map([["shared", JSON.stringify({ localProjects: [{ id: "project" }], syncOutbox: [{ accountUserID: "account", mutation: { id: "pending" } }], settingsCollapsedColumnIDs })], ["registry", JSON.stringify(registry)], ["layout:workspace", storedLayout]]);
   const initialRecords = JSON.stringify([...records]);
   const storage = { getItem: (key) => records.get(key) ?? null, setItem: (key, value) => records.set(key, value), removeItem: (key) => records.delete(key) };
-  const context = vm.createContext({ ...recentViewScope, ...workspace, ...searchSession, normalizeVisitedWorkflowViews, normalizeWorkflowView, normalizeWorkflowMembership, crypto: webcrypto,
+  const context = vm.createContext({ ...recentSearchScope, ...recentViewScope, ...workspace, ...searchSession, normalizeVisitedWorkflowViews, normalizeWorkflowView, normalizeWorkflowMembership, crypto: webcrypto,
     console: { error: (...values) => logs.push(values) }, localStorage: storage,
     sessionStorage: { getItem: () => null, setItem() {}, removeItem() {} },
     initialPersistedAccount: { userID: "account" }, detachedProjectWindow: false,

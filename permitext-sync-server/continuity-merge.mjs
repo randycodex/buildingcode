@@ -1,3 +1,4 @@
+import { migrateProjectSearchHistory, normalizeProjectSearchHistory, projectRecentSearchQueries } from "./public/recent-search-scope.js";
 import { recentViewProjectID, limitRecentViewsByProject } from "./public/recent-view-scope.js";
 import { syncCodeVersion } from "./public/sync-identity.js";
 import { mergeGroupCatalogs } from "./public/group-catalog.js";
@@ -99,7 +100,8 @@ function explicitClearTimestamp(record, historyKey) {
   const rawHistory = record?.values?.[
     historyKey === "views" ? "recentlyViewedSectionsJSON" : "recentSearchesJSON"
   ];
-  return rawHistory !== undefined && safeArray(rawHistory).length === 0
+  const hasProjectSearchHistory = historyKey === "searches" && safeArray(record?.values?.[recentSearchHistoryKey]).length > 0;
+  return rawHistory !== undefined && safeArray(rawHistory).length === 0 && !hasProjectSearchHistory
     ? Math.max(storedTimestamp, recordTimestamp(record))
     : storedTimestamp;
 }
@@ -127,54 +129,14 @@ function mergedRecentViews(records, clearedAt) {
     }), recentViewLimit);
 }
 
-function searchIdentity(query) {
-  return String(query || "").trim().normalize("NFKC").toLocaleLowerCase("en-US");
-}
-
 function searchHistory(record) {
-  const explicitHistory = safeArray(record?.values?.[recentSearchHistoryKey])
-    .map((entry) => ({
-      query: String(entry?.query || "").trim(),
-      searchedAt: Number(entry?.searchedAt)
-    }))
-    .filter((entry) => entry.query && Number.isFinite(entry.searchedAt));
-  if (explicitHistory.length) return explicitHistory;
-
-  const snapshotTimestamp = recordTimestamp(record);
-  return safeArray(record?.values?.recentSearchesJSON)
-    .map((query, index) => ({
-      query: String(query || "").trim(),
-      // Preserve the snapshot's order without requiring older clients to
-      // understand the per-entry clock added by this merge policy.
-      searchedAt: snapshotTimestamp - index
-    }))
-    .filter((entry) => entry.query);
-}
-
-function preferredSearch(left, right) {
-  if (right.searchedAt !== left.searchedAt) {
-    return right.searchedAt > left.searchedAt ? right : left;
-  }
-  return right.query.localeCompare(left.query) > 0 ? right : left;
+  return migrateProjectSearchHistory(safeArray(record?.values?.[recentSearchHistoryKey]),
+    safeArray(record?.values?.recentSearchesJSON), recordTimestamp(record), recentSearchLimit);
 }
 
 function mergedSearchHistory(records, clearedAt) {
-  const byQuery = new Map();
-  records.forEach((record) => {
-    searchHistory(record).forEach((entry) => {
-      const identity = searchIdentity(entry.query);
-      if (!identity) return;
-      const existing = byQuery.get(identity);
-      byQuery.set(identity, existing ? preferredSearch(existing, entry) : entry);
-    });
-  });
-  return [...byQuery.values()]
-    .filter((entry) => entry.searchedAt > clearedAt)
-    .sort((left, right) => {
-      if (right.searchedAt !== left.searchedAt) return right.searchedAt - left.searchedAt;
-      return searchIdentity(left.query).localeCompare(searchIdentity(right.query));
-    })
-    .slice(0, recentSearchLimit);
+  return normalizeProjectSearchHistory(records.flatMap(searchHistory)
+    .filter(entry => entry.searchedAt > clearedAt), recentSearchLimit);
 }
 
 function preferredSnapshot(left, right) {
@@ -195,8 +157,7 @@ export function mergeContinuityRecords(left, right, { mergedAt } = {}) {
   const searches = mergedSearchHistory(records, searchesClearedAt);
   const historiesChanged =
     canonicalJSONString(views) !== canonicalJSONString(safeArray(preferred.values?.recentlyViewedSectionsJSON)) ||
-    canonicalJSONString(searches.map((entry) => entry.query)) !==
-      canonicalJSONString(safeArray(preferred.values?.recentSearchesJSON));
+    canonicalJSONString(searches) !== canonicalJSONString(safeArray(preferred.values?.[recentSearchHistoryKey]));
   const newestTimestamp = Math.max(recordTimestamp(left), recordTimestamp(right));
   const mergeTimestamp = Date.parse(mergedAt || "");
   const updatedAt = historiesChanged && Number.isFinite(mergeTimestamp) && mergeTimestamp > newestTimestamp
@@ -210,7 +171,7 @@ export function mergeContinuityRecords(left, right, { mergedAt } = {}) {
       workspaceGroupsJSON: JSON.stringify(mergeGroupCatalogs(left.values?.workspaceGroupsJSON, right.values?.workspaceGroupsJSON)),
       workspaceCatalogJSON: JSON.stringify(mergeWorkspaceCatalogs(left.values?.workspaceCatalogJSON, right.values?.workspaceCatalogJSON)),
       recentlyViewedSectionsJSON: JSON.stringify(views),
-      recentSearchesJSON: JSON.stringify(searches.map((entry) => entry.query)),
+      recentSearchesJSON: JSON.stringify(projectRecentSearchQueries(searches, "", recentSearchLimit)),
       [recentSearchHistoryKey]: JSON.stringify(searches),
       [historyClearsKey]: JSON.stringify({
         views: viewsClearedAt,

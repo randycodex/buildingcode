@@ -22,7 +22,8 @@ try {
  const userID=account.appUserID,token=account.backendSessionToken;
  const now=Date.now(),viewedAt=now/1000-978307200;
  const record=(projectID,age)=>({continuity:{userID,codeVersion:defaultSyncCodeVersion,updatedAt:new Date(now+age).toISOString(),values:{
-  recentlyViewedSectionsJSON:JSON.stringify([{projectID,sectionID:2738,codeVersion:defaultSyncCodeVersion,title:projectID,viewedAt:viewedAt+age/1000}])}}});
+  recentlyViewedSectionsJSON:JSON.stringify([{projectID,sectionID:2738,codeVersion:defaultSyncCodeVersion,title:projectID,viewedAt:viewedAt+age/1000}]),
+  recentSearchesJSON:'[]',recentSearchHistoryJSON:JSON.stringify([{projectID,query:'stairs',searchedAt:now+age}])}}});
  for(const mutation of [record('project-a',0),record('project-b',1)]){
   const pushed=await post('/sync/push',{auth:{accountUserID:userID},batch:{user:{id:userID},mutations:[mutation]}},token);
   assert.equal(pushed.rejectedMutationIDs.length,0,JSON.stringify(pushed));
@@ -33,12 +34,20 @@ try {
  const views=JSON.parse(continuity.values.recentlyViewedSectionsJSON);
  assert.deepEqual(views.map(entry=>entry.projectID).sort(),['project-a','project-b'],'The sync API persists separate visits to the same section for both Projects.');
  assert.ok(views.every(entry=>entry.sectionID===2738));
+ assert.deepEqual(JSON.parse(continuity.values.recentSearchHistoryJSON).map(entry=>entry.projectID).sort(),['project-a','project-b'],'Identical queries in two Projects remain independent through the real sync API.');
  // Replay an older device snapshot: neither Project history is dropped or reassigned.
  await post('/sync/push',{auth:{accountUserID:userID},batch:{user:{id:userID},mutations:[record('project-a',0)]}},token);
  const replay=await post('/sync/pull',{auth:{accountUserID:userID}},token);
  const replayed=JSON.parse(replay.mutations.find(item=>item.continuity).continuity.values.recentlyViewedSectionsJSON);
  assert.deepEqual(replayed.map(entry=>entry.projectID).sort(),['project-a','project-b']);
- console.log('Project Recently Viewed HTTP passed: isolated sign-in, real sync push/pull, same-section Project identity, persisted merge and stale-device replay.');
+ const removed=record('project-a',10);
+ removed.continuity.values.recentSearchHistoryJSON=JSON.stringify([{projectID:'project-a',query:'stairs',searchedAt:now+10,deleted:true}]);
+ await post('/sync/push',{auth:{accountUserID:userID},batch:{user:{id:userID},mutations:[removed]}},token);
+ await post('/sync/push',{auth:{accountUserID:userID},batch:{user:{id:userID},mutations:[record('project-a',0)]}},token);
+ const afterRemove=await post('/sync/pull',{auth:{accountUserID:userID}},token);
+ const queries=JSON.parse(afterRemove.mutations.find(item=>item.continuity).continuity.values.recentSearchHistoryJSON);
+ assert.deepEqual(queries.filter(entry=>!entry.deleted).map(entry=>entry.projectID),['project-b'],'A scoped query removal survives stale replay and preserves the other Project.');
+ console.log('Project recent activity HTTP passed: real push/pull, independent viewed sections and queries, scoped removal and stale-device replay.');
 } finally {
  globalThis.fetch=originalFetch;
  await new Promise(resolve=>server.close(resolve));

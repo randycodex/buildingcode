@@ -1,3 +1,4 @@
+import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
 import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occupantLoadAnswerSource, occupantLoadPrefill, occupantLoadTable, occupantLoadTableInput, occupantLoadFootnoteAssessment, occupantLoadFootnoteQuestion, calculationNoteBlocks } from "./occupant-load-calculation.js?v=23";
@@ -5,7 +6,7 @@ import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2"
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-project-recent-views-v1175";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-project-recent-searches-v1176";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +126,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-project-recent-views-v1175";
+} from "./offline-storage.js?v=20261018-project-recent-searches-v1176";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +159,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-project-recent-views-v1175";
+} from "./workspace-state.js?v=20261018-project-recent-searches-v1176";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -843,7 +844,7 @@ function loadWorkspaceState(accountOverride) {
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
       recentSearches: normalizeSearchHistory(saved.recentSearches, recentSearchLimit),
-      recentSearchHistory: normalizeRecentSearchHistory(saved.recentSearchHistory, recentSearchLimit),
+      recentSearchHistory: migrateProjectSearchHistory(saved.recentSearchHistory, saved.recentSearches, Date.parse(saved.recentActivityUpdatedAt || "") || Date.now(), recentSearchLimit),
       recentActivityUpdatedAt: saved.recentActivityUpdatedAt || null,
       pinnedSearches: normalizeSearchHistory(saved.pinnedSearches),
       recentlyViewedSections: limitRecentViewsByProject(saved.recentlyViewedSections, recentViewLimit),
@@ -3199,18 +3200,7 @@ function normalizeSearchHistory(value, limit = Number.POSITIVE_INFINITY) {
 }
 
 function normalizeRecentSearchHistory(value, limit = Number.POSITIVE_INFINITY) {
-  if (!Array.isArray(value)) return [];
-  const seen = new Set();
-  const normalized = [];
-  value.forEach((item) => {
-    const query = String(item?.query || "").trim();
-    const searchedAt = Number(item?.searchedAt);
-    const key = query.normalize("NFKC").toLocaleLowerCase("en-US");
-    if (!query || !Number.isFinite(searchedAt) || seen.has(key)) return;
-    seen.add(key);
-    normalized.push({ query, searchedAt });
-  });
-  return normalized.slice(0, limit);
+  return normalizeProjectSearchHistory(value, limit);
 }
 
 function normalizeSavedSortMode(value) {
@@ -11996,33 +11986,28 @@ function continuityRecentSearches(values = {}) {
 function continuityRecentSearchHistory(values = {}, fallbackTimestamp = 0) {
   try {
     const parsed = JSON.parse(values.recentSearchHistoryJSON || "[]");
-    const explicit = normalizeRecentSearchHistory(parsed, recentSearchLimit);
-    if (explicit.length) return explicit;
+    if (Array.isArray(parsed) && parsed.length) return normalizeRecentSearchHistory(parsed, recentSearchLimit);
   } catch {
-    // Fall through to the ordered legacy search list.
+    // Fall through to the ordered legacy search list, outside Projects.
   }
-  return continuityRecentSearches(values).map((query, index) => ({
-    query,
-    searchedAt: Math.max(0, fallbackTimestamp - index)
-  }));
+  return migrateProjectSearchHistory([], continuityRecentSearches(values), fallbackTimestamp, recentSearchLimit);
+}
+
+function localRecentSearchHistory() {
+  return migrateProjectSearchHistory(state.recentSearchHistory, state.recentSearches,
+    Date.parse(state.recentActivityUpdatedAt || "") || Date.now(), recentSearchLimit);
+}
+
+function searchRecentQueries(limit = recentSearchPopoverLimit) {
+  return projectRecentSearchQueries(localRecentSearchHistory(), activeRecentViewProjectID(), limit);
 }
 
 function outgoingRecentSearchHistory(existingValues, recentSearches) {
-  const candidates = [
-    ...normalizeRecentSearchHistory(state.recentSearchHistory, recentSearchLimit),
+  return normalizeRecentSearchHistory([
+    ...migrateProjectSearchHistory(state.recentSearchHistory, recentSearches,
+      Date.parse(state.recentActivityUpdatedAt || "") || Date.now(), recentSearchLimit),
     ...continuityRecentSearchHistory(existingValues)
-  ];
-  const byQuery = new Map();
-  candidates.forEach((entry) => {
-    const key = entry.query.normalize("NFKC").toLocaleLowerCase("en-US");
-    const current = byQuery.get(key);
-    if (!current || entry.searchedAt > current.searchedAt) byQuery.set(key, entry);
-  });
-  const fallbackTimestamp = Date.now();
-  return recentSearches.map((query, index) => {
-    const key = query.normalize("NFKC").toLocaleLowerCase("en-US");
-    return byQuery.get(key) || { query, searchedAt: fallbackTimestamp - index };
-  });
+  ], recentSearchLimit);
 }
 
 function recordRecentlyViewedReader(reader) {
@@ -12062,8 +12047,8 @@ function continuityValuesForReader(reader, options = {}) {
       ...recentEntries.filter((item) => recentViewIdentity(item) !== identity)
     );
   }
-  const recentSearches = normalizeSearchHistory(state.recentSearches, recentSearchLimit);
-  const recentSearchHistory = outgoingRecentSearchHistory(existing, recentSearches);
+  const recentSearchHistory = outgoingRecentSearchHistory(existing, state.recentSearches);
+  const recentSearches = projectRecentSearchQueries(recentSearchHistory, "", recentSearchLimit);
   return {
     ...existing,
     selectedJurisdictionKey: "jurisdiction-1",
@@ -12151,9 +12136,9 @@ async function applyRemoteContinuityIfNewer() {
         ? { ...entry, previewText: local.previewText }
         : entry;
     });
-    if (record.values?.recentSearchesJSON !== undefined) {
-      state.recentSearches = continuityRecentSearches(record.values);
+    if (record.values?.recentSearchesJSON !== undefined || record.values?.recentSearchHistoryJSON !== undefined) {
       state.recentSearchHistory = continuityRecentSearchHistory(record.values, remoteTimestamp);
+      state.recentSearches = projectRecentSearchQueries(state.recentSearchHistory, "", recentSearchLimit);
     }
     state.recentActivityUpdatedAt = record.updatedAt;
   }
@@ -18518,17 +18503,12 @@ function renderSearchPlaceholder(results, message) {
 function recordRecentSearch(query) {
   const trimmed = String(query || "").trim();
   if (!trimmed) return;
-  const searchedAt = Date.now();
-  state.recentSearches = normalizeSearchHistory([
-    trimmed,
-    ...(state.recentSearches || []).filter((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0)
-  ], recentSearchLimit);
+  const entry = { query: trimmed, searchedAt: Date.now(), projectID: activeRecentViewProjectID() };
+  const identity = recentSearchIdentity(entry);
   state.recentSearchHistory = normalizeRecentSearchHistory([
-    { query: trimmed, searchedAt },
-    ...(state.recentSearchHistory || []).filter((item) =>
-      item.query.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0
-    )
+    entry, ...localRecentSearchHistory().filter(item => recentSearchIdentity(item) !== identity)
   ], recentSearchLimit);
+  state.recentSearches = projectRecentSearchQueries(state.recentSearchHistory, "", recentSearchLimit);
   state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
   scheduleRecentSearchContinuitySync();
@@ -18547,10 +18527,13 @@ function unpinSearch(query) {
 
 function removeRecentSearch(query) {
   const trimmed = String(query || "").trim();
-  state.recentSearches = (state.recentSearches || []).filter((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0);
-  state.recentSearchHistory = (state.recentSearchHistory || []).filter((item) =>
-    item.query.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0
-  );
+  if (!trimmed) return;
+  const entry = { query: trimmed, searchedAt: Date.now(), projectID: activeRecentViewProjectID(), deleted: true };
+  const identity = recentSearchIdentity(entry);
+  state.recentSearchHistory = normalizeRecentSearchHistory([
+    entry, ...localRecentSearchHistory().filter(item => recentSearchIdentity(item) !== identity)
+  ], recentSearchLimit);
+  state.recentSearches = projectRecentSearchQueries(state.recentSearchHistory, "", recentSearchLimit);
   state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
   scheduleRecentSearchContinuitySync();
@@ -18765,7 +18748,12 @@ function renderSearchRecentPopover(panel, instance) {
     setSearchRecentPopoverOpen(panel, false);
     return;
   }
-  const queries = normalizeSearchHistory(state.recentSearches, recentSearchPopoverLimit);
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const projectID = activeRecentViewProjectID();
+  const current = () => panel.isConnected && isCurrentAccountRequest(identity) &&
+    activeWorkspaceID === workspaceID && activeRecentViewProjectID() === projectID;
+  const queries = searchRecentQueries(recentSearchPopoverLimit);
   clear(popover);
   popover.dataset.hasItems = String(queries.length > 0);
   popover.id = `search-recent-popover-${instance.id}`;
@@ -18787,6 +18775,7 @@ function renderSearchRecentPopover(panel, instance) {
     applyButton.innerHTML = "<span></span>";
     applyButton.querySelector("span").textContent = query;
     applyButton.addEventListener("click", () => {
+      if (!current()) return;
       instance.query = query;
       input.value = query;
       recordRecentSearch(query);
@@ -18800,6 +18789,7 @@ function renderSearchRecentPopover(panel, instance) {
     removeButton.setAttribute("aria-label", `Remove ${query} from recent searches`);
     removeButton.innerHTML = circleXIconSVG();
     removeButton.addEventListener("click", () => {
+      if (!current()) return;
       removeRecentSearch(query);
       renderSearchRecentPopover(panel, instance);
       input.focus({ preventScroll: true });

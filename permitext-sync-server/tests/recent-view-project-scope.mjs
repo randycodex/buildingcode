@@ -1,3 +1,4 @@
+import * as recentSearchScope from "../public/recent-search-scope.js";
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -8,7 +9,7 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const actual=name=>{const start=source.search(new RegExp(`(?:async )?function ${name}\\(`));assert.ok(start>=0,name);return source.slice(start,source.indexOf('\n}',start)+2);};
 let projectID='',accountID='owner',clock=800_000_001;
 const timers=[],queued=[];
-const context=vm.createContext({...scope,syncCodeVersion,defaultSyncCodeVersion,
+const context=vm.createContext({...recentSearchScope,...scope,syncCodeVersion,defaultSyncCodeVersion,
   activeWorkspaceID:'general',activeWorkspaceRecord:()=>({projectID}),
   captureAccountRequest:()=>accountID,isCurrentAccountRequest:id=>id===accountID,
   activeAccount:()=>({userID:accountID}),state:{recentlyViewedSections:[],syncOutbox:[],readers:[]},
