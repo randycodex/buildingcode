@@ -20575,7 +20575,6 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
 
 /* Supporting note and project controls use the existing workspace hierarchy. */
 .workspace-view-options { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
-.workspace-view-options > summary { cursor: pointer; padding: 8px 12px; }
 .project-facts-filter { margin: 0 0 12px; }
 
 /* Legacy layout controls remain mounted for saved layouts and keyboard commands. */

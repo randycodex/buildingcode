@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, shouldOpenNotebookByDefault, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-column-layout-merge-v1153";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-project-menu-actions-v1154";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-column-layout-merge-v1153";
+} from "./offline-storage.js?v=20261017-project-menu-actions-v1154";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-column-layout-merge-v1153";
+} from "./workspace-state.js?v=20261017-project-menu-actions-v1154";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -2297,12 +2297,8 @@ async function openWorkspaceContextMenu(workspaceID, anchor) {
     appendMenuAction(projectSection, { label: activeAccount() ? "Account & project access" : "Sign in for Projects", run: () => toggleAccountDialog() });
   }
   menu.append(projectSection);
-  const viewOptions = document.createElement("details");
+  const viewOptions = document.createElement("div");
   viewOptions.className = "workspace-view-options";
-  viewOptions.open = !projectsAvailable;
-  const viewSummary = document.createElement("summary");
-  viewSummary.textContent = "View options";
-  viewOptions.append(viewSummary);
   const layoutActions = document.createElement("div");
   layoutActions.setAttribute("role", "group");
   layoutActions.setAttribute("aria-label", "View options");
