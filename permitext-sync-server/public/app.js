@@ -6,7 +6,7 @@ import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2"
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-open-note-insertion-v1177";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-note-append-bottom-v1178";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -126,7 +126,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-open-note-insertion-v1177";
+} from "./offline-storage.js?v=20261018-note-append-bottom-v1178";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -159,7 +159,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-open-note-insertion-v1177";
+} from "./workspace-state.js?v=20261018-note-append-bottom-v1178";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -332,7 +332,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261015-notebook-security-v31";
+const notebookClientVersion = "20261018-append-note-reference-v32";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -28343,7 +28343,7 @@ async function renderProjectNotebook(project, options = {}) {
       const previousLinks = activeCard.evidenceLinks || [];
       if (evidenceLink) activeCard.evidenceLinks = [...previousLinks, evidenceLink];
       try {
-        if (editorMount.insertReference(reference) === false) throw new Error("The Note editor is still loading. Try again.");
+        if (editorMount.appendReference(reference) === false) throw new Error("The Note editor is still loading. Try again.");
       } catch (error) {
         activeCard.evidenceLinks = previousLinks;
         throw error;

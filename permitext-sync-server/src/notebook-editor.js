@@ -427,6 +427,21 @@ export function mountPermitextNotebookEditor(element, options = {}) {
       ]);
       return true;
     },
+    appendReference(reference) {
+      const editor = controllerRef.current;
+      const lastBlock = editor?.document.at(-1);
+      if (!editor || !lastBlock) return false;
+      const [added] = editor.insertBlocks([{
+        type: "paragraph",
+        content: [
+          { type: "permitextReference", props: normalizedReference(reference) },
+          " "
+        ]
+      }], lastBlock, "after");
+      editor.setTextCursorPosition(added, "end");
+      editor.focus();
+      return true;
+    },
     replaceAssetURL(fromURL, toURL) {
       const editor = controllerRef.current;
       if (!editor || !fromURL || !toURL || fromURL === toURL) return false;

@@ -47281,6 +47281,18 @@ function ZW(e, t = {}) {
 				props: qW(e)
 			}, " "]), !0) : !1;
 		},
+		appendReference(e) {
+			let t = r.current, n = t?.document.at(-1);
+			if (!t || !n) return !1;
+			let [i] = t.insertBlocks([{
+				type: "paragraph",
+				content: [{
+					type: "permitextReference",
+					props: qW(e)
+				}, " "]
+			}], n, "after");
+			return t.setTextCursorPosition(i, "end"), t.focus(), !0;
+		},
 		replaceAssetURL(e, t) {
 			let n = r.current;
 			if (!n || !e || !t || e === t) return !1;

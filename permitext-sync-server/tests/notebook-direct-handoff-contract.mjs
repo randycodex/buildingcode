@@ -38,7 +38,7 @@ for(const changed of ['none','card','disposed','readonly','conflict','loading'])
  const oldLinks=[];const card={id:'note',evidenceLinks:oldLinks};let inserts=0,writes=0;
  const c=vm.createContext({mountState:{},requestIdentity:{},requireCurrentAccountRequest(){},disposed:changed==='disposed',
  notebookReadOnly:changed==='readonly',saveConflict:changed==='conflict',activeCard:card,draftDocument:null,
- editorMount:{insertReference:()=>{inserts++;return changed!=='loading';},getDocument:()=>({retained:'Existing text plus reference'})},
+ editorMount:{appendReference:()=>{inserts++;return changed!=='loading';},insertReference:()=>assert.fail('External passages must append instead of using the caret'),getDocument:()=>({retained:'Existing text plus reference'})},
  markNotebookDirty(){},persistFocusedDraft:async()=>{writes++;}});
  vm.runInContext(mountCode,c);
  const action=c.mountState.insertLinkedReference(changed==='card'?'other':'note',{referenceID:'answer'},{id:'evidence'});
