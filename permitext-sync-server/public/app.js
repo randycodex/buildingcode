@@ -1,3 +1,4 @@
+import { notebookReferenceBlocks } from "./notebook-passage-blocks.js?v=1";
 import { recentSearchIdentity, normalizeProjectSearchHistory, migrateProjectSearchHistory, projectRecentSearchQueries } from "./recent-search-scope.js?v=1";
 import { recentViewProjectID, recentViewBelongsToProject, limitRecentViewsByProject } from "./recent-view-scope.js?v=1";
 import { createColumnExpansion, adjacentColumnWidths } from "./column-expansion.js?v=4";
@@ -6,7 +7,7 @@ import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2"
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-note-append-bottom-v1178";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-note-passage-text-v1179";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -126,7 +127,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-note-append-bottom-v1178";
+} from "./offline-storage.js?v=20261018-note-passage-text-v1179";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -159,7 +160,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-note-append-bottom-v1178";
+} from "./workspace-state.js?v=20261018-note-passage-text-v1179";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -332,7 +333,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261018-append-note-reference-v32";
+const notebookClientVersion = "20261018-note-passage-text-v33";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -16742,7 +16743,7 @@ async function addPassageToNotebook(anchor, source, exact) {
   }
   if (navigator.onLine === false) throw new Error("Reconnect to create a Note.");
   const document = emptyNotebookDocument();
-  document.document = [{ type: "paragraph", content: [{ type: "permitextReference", props: reference }] }];
+  document.document = notebookReferenceBlocks(reference, link.passages);
   const payload = await postResearch("/notebook/cards/save", { projectID, clientMutationID: `passage-note:${link.id}`,
     expectedVersion: 0, cardType: "finding", title: source.title.slice(0, 300), document, evidenceLinks: [link] });
   requireCurrentAccountRequest(identity);
@@ -28343,7 +28344,7 @@ async function renderProjectNotebook(project, options = {}) {
       const previousLinks = activeCard.evidenceLinks || [];
       if (evidenceLink) activeCard.evidenceLinks = [...previousLinks, evidenceLink];
       try {
-        if (editorMount.appendReference(reference) === false) throw new Error("The Note editor is still loading. Try again.");
+        if (editorMount.appendReference(reference, evidenceLink?.passages) === false) throw new Error("The Note editor is still loading. Try again.");
       } catch (error) {
         activeCard.evidenceLinks = previousLinks;
         throw error;

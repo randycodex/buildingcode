@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
 import {normalizeNotebookEvidenceLinks} from '../notebook-contract.mjs';
+import {notebookReferenceBlocks} from '../public/notebook-passage-blocks.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const start=source.indexOf('async function addPassageToNotebook(');
 const code=source.slice(start,source.indexOf('\nfunction renderInlineCommentBox(',start));
@@ -15,7 +16,7 @@ for(const mode of ['current','unsaved','new','cancel','changed','account','detac
  researchProjectID:p=>p.id,notebookMounts:new Map(hasOpenNote?[['p',mount]]:mode==='other-project'?[['other',mount]]:[]),
  openWebWarning:options=>{calls.push(['choose',options]);return pending;},
  crypto:{randomUUID:()=> 'link'},Date,researchCodeEdition:()=> '2014',navigator:{onLine:true},
- emptyNotebookDocument:()=>({document:[]}),postResearch:async(path,payload)=>{calls.push(['save',payload]);return {card:{id:'created'}};},
+ notebookReferenceBlocks,emptyNotebookDocument:()=>({document:[]}),postResearch:async(path,payload)=>{calls.push(['save',payload]);return {card:{id:'created'}};},
  saveNotebookCardSnapshot:async()=>{},showNotebookSavedLink:(...args)=>calls.push(['saved',...args])});
  vm.runInContext(code,context);
  const action=context.addPassageToNotebook({isConnected:mode!=='detached',closest:()=>({dataset:{paneId:'reader'}})},
@@ -30,7 +31,7 @@ for(const mode of ['current','unsaved','new','cancel','changed','account','detac
  assert.equal(normalized.source.codeVersion,'historical/2014');assert.equal(normalized.source.codeEdition,'2014');
  assert.equal(normalized.source.sectionID,'123');
  if(hasOpenNote){assert.equal(calls.length,1,'An open Note inserts directly without a dialog or new Note.');assert.equal(calls[0][1],mode==='unsaved'?'':'note');assert.equal(calls[0][2].referenceKind,'selectedPassage');}
- else {assert.equal(calls[0][0],'choose');assert.equal(mutations[0][0],'save');assert.equal(mutations[0][1].projectID,'p');assert.equal(mutations[1][0],'saved');assert.equal(mutations[0][1].document.document[0].content[0].props.referenceID,link.id);}
+ else {assert.equal(calls[0][0],'choose');assert.equal(mutations[0][0],'save');assert.equal(mutations[0][1].projectID,'p');assert.equal(mutations[1][0],'saved');assert.equal(mutations[0][1].document.document[0].content[0].props.referenceID,link.id);assert.equal(mutations[0][1].document.document[1].content[0].text,link.passages[0].exact);}
 }
 const mountStart=source.indexOf('    mountState.insertLinkedReference = async');
 const mountCode=source.slice(mountStart,source.indexOf('\n    };',mountStart)+7);
@@ -38,10 +39,10 @@ for(const changed of ['none','card','disposed','readonly','conflict','loading'])
  const oldLinks=[];const card={id:'note',evidenceLinks:oldLinks};let inserts=0,writes=0;
  const c=vm.createContext({mountState:{},requestIdentity:{},requireCurrentAccountRequest(){},disposed:changed==='disposed',
  notebookReadOnly:changed==='readonly',saveConflict:changed==='conflict',activeCard:card,draftDocument:null,
- editorMount:{appendReference:()=>{inserts++;return changed!=='loading';},insertReference:()=>assert.fail('External passages must append instead of using the caret'),getDocument:()=>({retained:'Existing text plus reference'})},
+ editorMount:{appendReference:(_reference,passages)=>{inserts++;assert.equal(passages[0].exact,'Full captured passage.');return changed!=='loading';},insertReference:()=>assert.fail('External passages must append instead of using the caret'),getDocument:()=>({retained:'Existing text plus reference'})},
  markNotebookDirty(){},persistFocusedDraft:async()=>{writes++;}});
  vm.runInContext(mountCode,c);
- const action=c.mountState.insertLinkedReference(changed==='card'?'other':'note',{referenceID:'answer'},{id:'evidence'});
+ const action=c.mountState.insertLinkedReference(changed==='card'?'other':'note',{referenceID:'answer'},{id:'evidence',passages:[{exact:'Full captured passage.'}]});
  if(changed==='none'){await action;assert.equal(writes,1);assert.equal(c.draftDocument.retained,'Existing text plus reference');}
  else {await assert.rejects(action);assert.equal(writes,0);assert.equal(card.evidenceLinks,oldLinks);if(changed!=='loading')assert.equal(inserts,0);}
 }

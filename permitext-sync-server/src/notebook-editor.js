@@ -10,6 +10,7 @@ import { BlockNoteView } from "@blocknote/mantine";
 import { Menu } from "@mantine/core";
 import "@blocknote/mantine/style.css";
 import "./notebook.css";
+import { notebookReferenceBlocks } from "../public/notebook-passage-blocks.js";
 import { en } from "@blocknote/core/locales";
 import {
   createReactInlineContentSpec,
@@ -427,18 +428,12 @@ export function mountPermitextNotebookEditor(element, options = {}) {
       ]);
       return true;
     },
-    appendReference(reference) {
+    appendReference(reference, passages = []) {
       const editor = controllerRef.current;
       const lastBlock = editor?.document.at(-1);
       if (!editor || !lastBlock) return false;
-      const [added] = editor.insertBlocks([{
-        type: "paragraph",
-        content: [
-          { type: "permitextReference", props: normalizedReference(reference) },
-          " "
-        ]
-      }], lastBlock, "after");
-      editor.setTextCursorPosition(added, "end");
+      const added = editor.insertBlocks(notebookReferenceBlocks(normalizedReference(reference), passages), lastBlock, "after");
+      editor.setTextCursorPosition(added.at(-1), "end");
       editor.focus();
       return true;
     },

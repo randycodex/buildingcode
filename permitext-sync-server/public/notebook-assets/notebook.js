@@ -46813,37 +46813,58 @@ var xW = (0, _.forwardRef)((e, t) => {
 };
 EW[2], EW[6], EW[2], EW[6], EW[2], EW[7], EW[2], EW[7], EW[2], EW[8], EW[5], EW[7], EW[8], EW[7], EW[4], DW.borderRadius, DW.fontFamily;
 //#endregion
+//#region public/notebook-passage-blocks.js
+function OW(e, t = []) {
+	return [{
+		type: "paragraph",
+		content: [{
+			type: "permitextReference",
+			props: { ...e }
+		}]
+	}, ...(Array.isArray(t) ? t : []).flatMap((e) => {
+		let t = String(e?.exact || "").trim();
+		return t ? [{
+			type: "paragraph",
+			content: [{
+				type: "text",
+				text: t,
+				styles: {}
+			}]
+		}] : [];
+	})];
+}
+//#endregion
 //#region src/notebook-schema.js
-var OW = "permitext-notebook-card", kW = "blocknote-json", AW = Object.freeze([
+var kW = "permitext-notebook-card", AW = "blocknote-json", jW = Object.freeze([
 	"canonicalSection",
 	"selectedPassage",
 	"researchAnswer",
 	"notebookCard",
 	"attachment"
-]), jW = Object.freeze([
+]), MW = Object.freeze([
 	"paragraph",
 	"heading",
 	"bulletListItem",
 	"numberedListItem",
 	"image"
 ]);
-function MW() {
+function NW() {
 	return [{
 		type: "paragraph",
 		content: []
 	}];
 }
-function NW(e) {
+function PW(e) {
 	let t = {};
 	return (Array.isArray(e) ? e : []).forEach((e) => {
 		(e?.type === "bold" || e?.type === "italic") && (t[e.type] = !0);
 	}), t;
 }
-function PW(e) {
+function FW(e) {
 	return e?.type === "text" && typeof e.text == "string" ? {
 		type: "text",
 		text: e.text,
-		styles: NW(e.marks)
+		styles: PW(e.marks)
 	} : e?.type === "permitextReference" ? {
 		type: "permitextReference",
 		props: {
@@ -46853,17 +46874,17 @@ function PW(e) {
 		}
 	} : null;
 }
-function FW(e) {
+function IW(e) {
 	let t = (Array.isArray(e?.content) ? e.content : []).filter((e) => e?.type === "paragraph").map((e) => ({
 		type: "paragraph",
-		content: (Array.isArray(e.content) ? e.content : []).map(PW).filter(Boolean)
+		content: (Array.isArray(e.content) ? e.content : []).map(FW).filter(Boolean)
 	}));
-	return t.length ? t : MW();
-}
-function IW(e) {
-	return Array.isArray(e) ? e.length ? e : MW() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : MW() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? FW(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? LW(e.plainText) : MW();
+	return t.length ? t : NW();
 }
 function LW(e) {
+	return Array.isArray(e) ? e.length ? e : NW() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : NW() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? IW(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? RW(e.plainText) : NW();
+}
+function RW(e) {
 	let t = String(e || "").split(/\n{2,}/).map((e) => e.replace(/\s*\n\s*/g, " ").trim()).filter(Boolean).map((e) => ({
 		type: "paragraph",
 		content: [{
@@ -46872,11 +46893,11 @@ function LW(e) {
 			styles: {}
 		}]
 	}));
-	return t.length ? t : MW();
+	return t.length ? t : NW();
 }
 //#endregion
 //#region src/notebook-editor.js
-var RW = new Set(jW), zW = {
+var zW = new Set(MW), BW = {
 	BC: "Building Code",
 	EBC: "Existing Building Code",
 	BC68: "1968 Building Code",
@@ -46887,11 +46908,11 @@ var RW = new Set(jW), zW = {
 	AC: "Administrative Code",
 	ZR: "Zoning Resolution"
 };
-function BW(e) {
-	return String(e || "Linked item").trim().replace(/^([A-Z][A-Z0-9]{0,4})\s+(§\s*)/, (e, t, n) => `${zW[t] || t} · ${n}`);
+function VW(e) {
+	return String(e || "Linked item").trim().replace(/^([A-Z][A-Z0-9]{0,4})\s+(§\s*)/, (e, t, n) => `${BW[t] || t} · ${n}`);
 }
-function VW(e, t) {
-	let n = BW(t);
+function HW(e, t) {
+	let n = VW(t);
 	if (e === "researchAnswer") return {
 		meta: "Research",
 		title: "Research answer",
@@ -46913,8 +46934,8 @@ function VW(e, t) {
 		preview: ""
 	};
 }
-function HW(e, t) {
-	let n = VW(e, t);
+function UW(e, t) {
+	let n = HW(e, t);
 	return [
 		_.createElement("span", {
 			className: "notebook-reference-meta",
@@ -46930,12 +46951,12 @@ function HW(e, t) {
 		}, n.preview) : null
 	].filter(Boolean);
 }
-var UW = pF({
+var WW = pF({
 	type: "permitextReference",
 	propSchema: {
 		referenceKind: {
 			default: "canonicalSection",
-			values: [...AW]
+			values: [...jW]
 		},
 		referenceID: { default: "" },
 		label: { default: "Linked Permitext item" }
@@ -46950,19 +46971,19 @@ var UW = pF({
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label,
 		"aria-label": `Open ${e.props.label}`
-	}, ...HW(e.props.referenceKind, e.props.label)),
+	}, ...UW(e.props.referenceKind, e.props.label)),
 	toExternalHTML: ({ inlineContent: e }) => _.createElement("span", {
 		className: "notebook-reference-chip",
 		"data-permitext-reference": "true",
 		"data-reference-kind": e.props.referenceKind,
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label
-	}, ...HW(e.props.referenceKind, e.props.label))
-}), WW = Object.fromEntries(Object.entries(Sv).filter(([e]) => RW.has(e))), GW = Ov.create({
-	blockSpecs: WW,
+	}, ...UW(e.props.referenceKind, e.props.label))
+}), GW = Object.fromEntries(Object.entries(Sv).filter(([e]) => zW.has(e))), KW = Ov.create({
+	blockSpecs: GW,
 	inlineContentSpecs: {
 		...Ev,
-		permitextReference: UW
+		permitextReference: WW
 	},
 	styleSpecs: {
 		bold: Tv.bold,
@@ -46970,7 +46991,7 @@ var UW = pF({
 		strike: Tv.strike
 	}
 });
-function KW({ editor: e, options: t }) {
+function qW({ editor: e, options: t }) {
 	let [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(""), [o, s] = (0, _.useState)(""), [c, l] = (0, _.useState)(""), u = (0, _.useRef)(null), d = (0, _.useRef)(null), f = () => {
 		let t = e._tiptapEditor.state;
 		return {
@@ -47154,30 +47175,30 @@ function KW({ editor: e, options: t }) {
 		}
 	}, t.toolbarStatusElement ? null : t.status || ""));
 }
-function qW(e) {
+function JW(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();
-	if (!AW.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
+	if (!jW.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
 	return {
 		referenceKind: t,
 		referenceID: n,
 		label: r
 	};
 }
-function JW(e) {
+function YW(e) {
 	return {
-		schema: OW,
+		schema: kW,
 		schemaVersion: 2,
-		format: kW,
+		format: AW,
 		document: e
 	};
 }
-function YW() {
+function XW() {
 	let e = document.documentElement.dataset.theme;
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function XW({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(YW), i = (0, _.useMemo)(() => IW(e.document), []), a = ej({
-		schema: GW,
+function ZW({ options: e, controllerRef: t }) {
+	let [n, r] = (0, _.useState)(XW), i = (0, _.useMemo)(() => LW(e.document), []), a = ej({
+		schema: KW,
 		dictionary: {
 			...hx,
 			placeholders: {
@@ -47195,7 +47216,7 @@ function XW({ options: e, controllerRef: t }) {
 		resolveFileUrl: e.resolveFileUrl
 	}), o = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
-		let e = () => r(YW()), t = new MutationObserver(e);
+		let e = () => r(XW()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
 			attributes: !0,
 			attributeFilter: ["class", "data-theme"]
@@ -47208,7 +47229,7 @@ function XW({ options: e, controllerRef: t }) {
 		t.current === a && (t.current = null);
 	}), [a]), (0, _.useEffect)(() => {
 		let t = e.document;
-		t && t !== o.current && (o.current = t, a.replaceBlocks(a.document, IW(t)));
+		t && t !== o.current && (o.current = t, a.replaceBlocks(a.document, LW(t)));
 	}, [a, e.document]), _.createElement(TW, {
 		editor: a,
 		className: "permitext-notebook-editor",
@@ -47218,14 +47239,14 @@ function XW({ options: e, controllerRef: t }) {
 		sideMenu: !1,
 		slashMenu: !1,
 		renderEditor: !1,
-		onChange: () => e.onChange?.(JW(a.document)),
+		onChange: () => e.onChange?.(YW(a.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
-	}, e.toolbar !== !1 && e.editable !== !1 && _.createElement(KW, {
+	}, e.toolbar !== !1 && e.editable !== !1 && _.createElement(qW, {
 		editor: a,
 		options: e
 	}), _.createElement(WP));
 }
-function ZW(e, t = {}) {
+function QW(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
 	let n = (e) => JSON.stringify(e.state.doc.toJSON(), (e, t) => e === "id" ? void 0 : t), r = { current: null }, i = (0, y.createRoot)(e), a = null, o = {
 		...t,
@@ -47233,7 +47254,7 @@ function ZW(e, t = {}) {
 			a = e;
 		}
 	};
-	return i.render(_.createElement(XW, {
+	return i.render(_.createElement(ZW, {
 		options: o,
 		controllerRef: r
 	})), {
@@ -47241,13 +47262,13 @@ function ZW(e, t = {}) {
 			o.status = String(e || ""), a && !t.toolbarStatusElement && (a.textContent = o.status);
 		},
 		setEditable(e) {
-			o.editable = !!e, r.current && (r.current.isEditable = o.editable), i.render(_.createElement(XW, {
+			o.editable = !!e, r.current && (r.current.isEditable = o.editable), i.render(_.createElement(ZW, {
 				options: { ...o },
 				controllerRef: r
 			}));
 		},
 		getDocument() {
-			return JW(r.current?.document || t.document?.document || []);
+			return YW(r.current?.document || t.document?.document || []);
 		},
 		getEditingPosition() {
 			let e = r.current?._tiptapEditor, t = e?.state.selection;
@@ -47268,7 +47289,7 @@ function ZW(e, t = {}) {
 		},
 		setDocument(e) {
 			let t = r.current;
-			t && t.replaceBlocks(t.document, IW(e));
+			t && t.replaceBlocks(t.document, LW(e));
 		},
 		insertImage() {
 			let e = r.current;
@@ -47278,20 +47299,14 @@ function ZW(e, t = {}) {
 			let t = r.current;
 			return t ? (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
-				props: qW(e)
+				props: JW(e)
 			}, " "]), !0) : !1;
 		},
-		appendReference(e) {
-			let t = r.current, n = t?.document.at(-1);
-			if (!t || !n) return !1;
-			let [i] = t.insertBlocks([{
-				type: "paragraph",
-				content: [{
-					type: "permitextReference",
-					props: qW(e)
-				}, " "]
-			}], n, "after");
-			return t.setTextCursorPosition(i, "end"), t.focus(), !0;
+		appendReference(e, t = []) {
+			let n = r.current, i = n?.document.at(-1);
+			if (!n || !i) return !1;
+			let a = n.insertBlocks(OW(JW(e), t), i, "after");
+			return n.setTextCursorPosition(a.at(-1), "end"), n.focus(), !0;
 		},
 		replaceAssetURL(e, t) {
 			let n = r.current;
@@ -47325,4 +47340,4 @@ function ZW(e, t = {}) {
 	};
 }
 //#endregion
-export { ZW as mountPermitextNotebookEditor, GW as permitextNotebookSchema };
+export { QW as mountPermitextNotebookEditor, KW as permitextNotebookSchema };
