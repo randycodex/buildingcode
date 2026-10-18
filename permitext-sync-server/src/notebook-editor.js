@@ -186,11 +186,16 @@ function PermitextFormattingToolbar({ editor, options }) {
   };
   const state = useEditorState({
     editor,
-    selector: ({ editor }) => ({
-      editable: editor.isEditable,
-      styles: editor.getActiveStyles(),
-      blocks: editor.getSelection()?.blocks || [editor.getTextCursorPosition().block]
-    })
+    selector: ({ editor }) => {
+      const history = editor.getExtension('yUndo') || editor.getExtension('history');
+      return {
+        editable: editor.isEditable,
+        canUndo: Boolean(history && editor.canExec(history.undoCommand)),
+        canRedo: Boolean(history && editor.canExec(history.redoCommand)),
+        styles: editor.getActiveStyles(),
+        blocks: editor.getSelection()?.blocks || [editor.getTextCursorPosition().block]
+      };
+    }
   });
   const textBlocks = state.blocks.filter(block => ["paragraph", "heading", "bulletListItem", "numberedListItem"].includes(block.type));
   const first = textBlocks[0];
@@ -239,6 +244,18 @@ function PermitextFormattingToolbar({ editor, options }) {
   const insertActions = [["evidence", "Evidence"], ["research", "Assistant answer"], ["image", "Image"], ["template", "Finding template"]]
     .filter(([kind]) => !options.insertItems || options.insertItems.includes(kind));
   return React.createElement("div", {className: "notebook-format-toolbar", role: "toolbar", "aria-label": "Note formatting"},
+    React.createElement("button", {
+      type: "button", className: "notebook-format-button notebook-format-undo",
+      title: "Undo (⌘Z / Ctrl+Z)", "aria-label": "Undo", disabled: !state.editable || !state.canUndo,
+      onMouseDown: event => event.preventDefault(),
+      onClick: () => {editor.focus(); editor.undo();}
+    }, icon(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"])),
+    React.createElement("button", {
+      type: "button", className: "notebook-format-button notebook-format-redo",
+      title: "Redo (⌘⇧Z / Ctrl+Shift+Z)", "aria-label": "Redo", disabled: !state.editable || !state.canRedo,
+      onMouseDown: event => event.preventDefault(),
+      onClick: () => {editor.focus(); editor.redo();}
+    }, icon(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"])),
     styleButton("bold", "Bold", React.createElement("strong", null, "B")),
     styleButton("italic", "Italic", React.createElement("em", null, "I")),
     styleButton("underline", "Underline", React.createElement("u", null, "U")),

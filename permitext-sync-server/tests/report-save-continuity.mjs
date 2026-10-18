@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import {createReportAutosave} from '../public/report-autosave.js';
+import {createReportUndo,reportContentBlocks} from '../public/report-undo.js';
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const start = source.indexOf('  const paintReportSaveState = () => {');
 assert.ok(start > 0);
@@ -15,6 +16,7 @@ function harness() {
     drafts: [], dirty:false, disposed:false, deletingReport:false, projectID:'p', requestIdentity:'a', current:true,
     requestWorkspaceID:'w',activeWorkspaceID:'w',accountUserID:'a',recoveryEditorID:'editor',restoredRecovery:null,recoveredDrafts:[],
     autosave:null,savePresentation:{state:'saved'},shell:{querySelector:()=>null},
+    reportUndo:createReportUndo(),reportContentBlocks,reportFormatting:null,panel:{addEventListener:()=>{}},
     createReportAutosave:options=>createReportAutosave({...options,setTimer:()=>1,clearTimer:()=>{}}),
     saveReportDraftRecovery:async record=>record,deleteReportDraftRecovery:async()=>true,
     isCurrentAccountRequest:()=>context.current, calls:[], renders:0, message:'',
@@ -25,6 +27,14 @@ function harness() {
   vm.runInContext(implementation+'\nglobalThis.save = saveDraft; globalThis.change = setDirty;', context);
   context.change();
   return {c:context, complete:()=>resolve({draft:{...context.calls.at(-1), id:'saved',version:context.calls.at(-1).expectedVersion+1}}), fail:()=>reject(new Error('Offline'))};
+}
+{
+ const h=harness();
+ h.c.activeDraft.blocks.push({id:'blank',kind:'paragraph',text:''});h.c.change();
+ const p=h.c.save();await tick();
+ assert.equal(h.c.calls[0].blocks.length,0,'An empty editing placeholder must not prevent Undo from saving');
+ assert.equal(h.c.activeDraft.blocks.length,1,'Saving does not replace the live editing placeholder');
+ h.complete();assert.equal(await p,true);
 }
 {
  const h=harness(), p=h.c.save(); assert.equal(h.c.save(),p); await tick(); assert.equal(h.c.calls.length,1);

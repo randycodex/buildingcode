@@ -7,12 +7,13 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-report-bold-size-v1194";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-editor-history-v1200";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
 import { createReportAutosave } from "./report-autosave.js?v=1";
+import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=2";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=9";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
@@ -127,7 +128,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-report-bold-size-v1194";
+} from "./offline-storage.js?v=20261018-editor-history-v1200";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -160,7 +161,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-report-bold-size-v1194";
+} from "./workspace-state.js?v=20261018-editor-history-v1200";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -333,7 +334,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261018-source-formatting-v40";
+const notebookClientVersion = "20261018-editor-history-v42";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -29483,6 +29484,7 @@ async function renderProjectReportDraft(project, resume = null) {
   };
   let selectedReportTemplateID = "permitext-standard";
   let activeDraft = emptyProjectReportDraft(identity);
+  const reportUndo = createReportUndo();
   let dirty = false;
   let disposed = false;
   let refreshReportSources = async () => false;
@@ -29572,6 +29574,7 @@ async function renderProjectReportDraft(project, resume = null) {
     },
     dispose() {
       disposed = true;
+      reportUndo.clear();
       reportFormatting?.dispose();
       panel._columnExpansion?.dispose();
       outlineController?.dispose();
@@ -29625,7 +29628,7 @@ async function renderProjectReportDraft(project, resume = null) {
       const payload = await reportRequest("/reports/drafts/save", {
         projectID, draftID: snapshot.id, clientDraftID: snapshot.clientDraftID, expectedVersion: snapshot.version || 0,
         title: snapshot.title, reportDate: snapshot.reportDate,
-        introduction: snapshot.introduction, blocks: snapshot.blocks
+        introduction: snapshot.introduction, blocks: reportContentBlocks(snapshot.blocks)
       });
       return payload.draft;
     },
@@ -29649,13 +29652,47 @@ async function renderProjectReportDraft(project, resume = null) {
       paintReportSaveState();
     }
   });
-  const setDirty = () => {
+  const setDirty = (editGroup = null) => {
+    reportUndo.record(activeDraft, editGroup);
     dirty = true;
     activeDraft.clientDraftID ||= crypto.randomUUID();
     autosave.change();
+    reportFormatting?.refreshHistory();
     void refreshProjectReportMembership(projectID);
   };
   const saveDraft = () => { activeDraft.clientDraftID ||= crypto.randomUUID(); return autosave.flush({ force: !activeDraft.id }); };
+
+  const changeReportHistory = (redo = false) => {
+    if (disposed || deletingReport || generatingReport || !isCurrentAccountRequest(requestIdentity) || requestWorkspaceID !== activeWorkspaceID) return;
+    const introductionFocused = document.activeElement?.getAttribute('aria-label') === 'Report introduction';
+    const introductionPosition = introductionFocused ? document.activeElement.selectionStart : 0;
+    const pickerOpen = shell.querySelector('.report-draft-version-list')?.open;
+    const blockID = document.activeElement?.closest('.report-draft-block')?.dataset.blockId;
+    const restored = redo ? reportUndo.redo(activeDraft) : reportUndo.undo(activeDraft);
+    if (!restored) return;
+    Object.assign(activeDraft, restored);
+    setDirty(); renderWorkspaceContent();
+    const picker = shell.querySelector('.report-draft-version-list');
+    if (picker && pickerOpen !== undefined) picker.open = pickerOpen;
+    const block = activeDraft.blocks.find(block=>block.id === blockID);
+    if (introductionFocused) {
+      const field = shell.querySelector('[aria-label="Report introduction"]');
+      field.focus({preventScroll:true});
+      field.setSelectionRange(Math.min(introductionPosition,field.value.length),Math.min(introductionPosition,field.value.length));
+    } else if (block && ['heading','paragraph','list'].includes(block.kind)) reportFormatting.focus(block);
+    else {
+      const preferred = shell.querySelector(redo ? '.report-format-redo' : '.report-format-undo');
+      const fallback = shell.querySelector(redo ? '.report-format-undo' : '.report-format-redo');
+      (preferred?.disabled ? fallback : preferred)?.focus({preventScroll:true});
+    }
+  };
+  panel.addEventListener('keydown', event => {
+    const key = event.key.toLowerCase();
+    const redo = event.ctrlKey && key === 'y';
+    if (!(event.ctrlKey || event.metaKey) || event.altKey || (key !== 'z' && !redo) ||
+        event.target.closest('.report-format-link-form, .report-title-editor')) return;
+    event.preventDefault(); event.stopPropagation(); changeReportHistory(redo || event.shiftKey);
+  }, {capture:true});
 
   const ensureComparison = () => comparisonController ||= createReportComparison({
     panel, columns: () => shell.querySelector(".report-document-columns"),
@@ -29684,6 +29721,7 @@ async function renderProjectReportDraft(project, resume = null) {
   let deletingVersionID = null;
   let historyMutationGeneration = 0;
   const paintExportState = () => {
+    reportFormatting?.refreshHistory();
     panel.querySelectorAll(".report-history-delete").forEach((button) => { button.disabled = generatingReport; });
     const button = panel.querySelector('[data-report-export]');
     if (!button) return;
@@ -30389,6 +30427,7 @@ async function renderProjectReportDraft(project, resume = null) {
 
   function renderWorkspaceContent() {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+    reportUndo.bind(activeDraft);
     outlineNavigationGeneration += 1;
     const draftKey = activeDraft.id || activeDraft.clientDraftID;
     const keepPosition = renderedDraftKey === draftKey;
@@ -30591,7 +30630,7 @@ async function renderProjectReportDraft(project, resume = null) {
     introduction.setAttribute("aria-label", "Report introduction");
     introduction.addEventListener("input", () => {
       activeDraft.introduction = introduction.value;
-      setDirty();
+      setDirty('introduction');
     });
     const introductionBody = document.createElement("div");
     introductionBody.append(introduction);
@@ -30619,15 +30658,19 @@ async function renderProjectReportDraft(project, resume = null) {
     reportFormatting = reportFormattingModule.createReportFormatting({
       isCurrent: () => !disposed && isCurrentAccountRequest(requestIdentity) && requestWorkspaceID === activeWorkspaceID,
       onInsert: addReportContent,
+      onUndo: () => changeReportHistory(),
+      onRedo: () => changeReportHistory(true),
+      canUndo: () => !deletingReport && !generatingReport && reportUndo.canUndo(activeDraft),
+      canRedo: () => !deletingReport && !generatingReport && reportUndo.canRedo(activeDraft),
       onError: showStatusError,
-      onChange: block => {
+      onChange: (block, edit = {}) => {
         const row = [...shell.querySelectorAll(".report-draft-block")].find(row => row._reportBlock === block);
         if (row && ["heading", "paragraph", "list"].includes(block.kind)) {
           row.className = `report-draft-block report-draft-block-${block.kind}`;
           const label = row.querySelector(".report-draft-classification");
           if (label) label.textContent = `${block.kind === "list" ? "List" : block.kind === "heading" ? "Heading" : block.derivedFrom ? "Notebook note" : "Paragraph"} · User-authored`;
         }
-        setDirty(); outlineController?.refreshLabels();
+        setDirty(edit.group); outlineController?.refreshLabels();
       }
     });
     const addControls = document.createElement("div");

@@ -21,7 +21,7 @@ const Link = Mark.create({name:'link', inclusive:false,
 const icon = paths => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">${paths.map(d=>`<path d="${d}"/>`).join('')}</svg>`;
 export const reportHighlightIcon = icon(['M5 12l6-8 5 4-6 8-5-4Z','M5 12l-2 5h6','M2 19h15']);
 
-export function createReportFormatting({onChange, onInsert, onError = () => {}, isCurrent = () => true}) {
+export function createReportFormatting({onChange, onInsert, onUndo, onRedo, canUndo = () => false, canRedo = () => false, onError = () => {}, isCurrent = () => true}) {
   const toolbar = document.createElement('div');
   toolbar.className = 'report-format-toolbar';
   toolbar.setAttribute('role','toolbar'); toolbar.setAttribute('aria-label','Report formatting');
@@ -30,6 +30,8 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
   const sourceFormatting = createReportSourceFormatting({onChange,isCurrent});
   const valid = () => !stopped && isCurrent() && current && !current.editor.isDestroyed && current.element.isConnected;
   const refresh = () => {
+    undo.disabled = stopped || !isCurrent() || !canUndo();
+    redo.disabled = stopped || !isCurrent() || !canRedo();
     const enabled = Boolean(valid());
     controls.forEach(control => {control.disabled = !enabled;});
     for (const [name, button] of marks) button.setAttribute('aria-pressed', String(enabled && current.editor.isActive(name)));
@@ -54,6 +56,10 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
     return element;
   };
   const marks = new Map();
+  const undo = button('Undo',icon(['M7 4 3 8l4 4','M3 8h8a5 5 0 0 1 0 10H8']),() => onUndo?.(),false);
+  undo.className = 'report-format-undo'; undo.title = 'Undo (⌘Z / Ctrl+Z)'; toolbar.append(undo);
+  const redo = button('Redo',icon(['M13 4l4 4-4 4','M17 8H9a5 5 0 0 0 0 10h3']),() => onRedo?.(),false);
+  redo.className = 'report-format-redo'; redo.title = 'Redo (⌘⇧Z / Ctrl+Shift+Z)'; toolbar.append(redo);
   for (const [mark,label,html] of [['bold','Bold','<strong>B</strong>'],['italic','Italic','<em>I</em>'],['underline','Underline','<u>U</u>'],['strike','Strikethrough','<s>S</s>'],['highlight','Highlight',reportHighlightIcon]]) {
     const control = button(label,html,() => {
       try {
@@ -75,12 +81,12 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
     entry.element.dataset.listStyle = entry.block.listStyle || 'bullet';
     entry.element.querySelector('[contenteditable]')?.setAttribute('aria-label',`Report ${entry.block.kind === 'list' ? 'list items' : entry.block.kind}`);
   };
-  const store = entry => {
+  const store = (entry, typing = false) => {
     const runs = canonicalReportRuns(reportDocumentRuns(entry.editor.getJSON()),{list:entry.block.kind === 'list'});
     if (entry.block.kind === 'list') {entry.block.items = reportRunsText(runs).split('\n'); delete entry.block.text;}
     else {entry.block.text = reportRunsText(runs); delete entry.block.items;}
     entry.block.richText = runs;
-    onChange(entry.block); refresh();
+    onChange(entry.block,{group:typing ? `text:${entry.block.id}` : null}); refresh();
   };
   const changeKind = (kind, props = {}) => {
     if (!valid()) return;
@@ -155,6 +161,10 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
   document.addEventListener('selectionchange',selectionChanged);
   const api = {
     element:toolbar,
+    refreshHistory:() => {
+      undo.disabled = stopped || !isCurrent() || !canUndo();
+      redo.disabled = stopped || !isCurrent() || !canRedo();
+    },
     registerSource:(block,element,part) => sourceFormatting.register(block,element,part),
     unregisterSource:container => sourceFormatting.unregister(container),
     sourceSnapshotRuns:(block,text) => sourceFormatting.snapshotRuns(block,text),
@@ -167,7 +177,11 @@ export function createReportFormatting({onChange, onInsert, onError = () => {}, 
           handleClick:(_view,_pos,event) => {if (event.target.closest('a')) {event.preventDefault(); return true;} return false;}},
         onFocus:() => {if (!stopped && isCurrent()) {current = entry; refresh();}},
         onSelectionUpdate:() => {if (!stopped && isCurrent()) {current = entry; refresh();}},
-        onUpdate:() => {if (!stopped && isCurrent()) {try {store(entry);} catch (error) {onError(error.message);}}}
+        onUpdate:({transaction}) => {if (!stopped && isCurrent()) {try {
+          const typing = !transaction.getMeta('paste') && transaction.steps.length > 0 &&
+            transaction.steps.every(step=>['replace','replaceAround'].includes(step.toJSON().stepType));
+          store(entry,typing);
+        } catch (error) {onError(error.message);}}}
       });
       paintBlock(entry); editors.add(entry);
       return element;

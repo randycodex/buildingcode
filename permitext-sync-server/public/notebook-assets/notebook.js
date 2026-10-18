@@ -47716,27 +47716,31 @@ var yG = _f.create({
 	"M5 12l-2 5h6",
 	"M2 19h15"
 ]);
-function EG({ onChange: e, onInsert: t, onError: n = () => {}, isCurrent: r = () => !0 }) {
-	let i = document.createElement("div");
-	i.className = "report-format-toolbar", i.setAttribute("role", "toolbar"), i.setAttribute("aria-label", "Report formatting");
-	let a = null, o = !1, s = null, c = /* @__PURE__ */ new Set(), l = [], u = vG({
+function EG({ onChange: e, onInsert: t, onUndo: n, onRedo: r, canUndo: i = () => !1, canRedo: a = () => !1, onError: o = () => {}, isCurrent: s = () => !0 }) {
+	let c = document.createElement("div");
+	c.className = "report-format-toolbar", c.setAttribute("role", "toolbar"), c.setAttribute("aria-label", "Report formatting");
+	let l = null, u = !1, d = null, f = /* @__PURE__ */ new Set(), p = [], m = vG({
 		onChange: e,
-		isCurrent: r
-	}), d = () => !o && r() && a && !a.editor.isDestroyed && a.element.isConnected, f = () => {
-		let e = !!d();
-		l.forEach((t) => {
+		isCurrent: s
+	}), h = () => !u && s() && l && !l.editor.isDestroyed && l.element.isConnected, g = () => {
+		y.disabled = u || !s() || !i(), b.disabled = u || !s() || !a();
+		let e = !!h();
+		p.forEach((t) => {
 			t.disabled = !e;
 		});
-		for (let [t, n] of m) n.setAttribute("aria-pressed", String(e && a.editor.isActive(t)));
-		if (u.hasSelection()) for (let [e, t] of m) t.disabled = !1, t.setAttribute("aria-pressed", String(u.isActive(e)));
-		e && (h.value = a.block.kind === "heading" ? `heading-${a.block.headingLevel || 1}` : "paragraph", y.setAttribute("aria-pressed", String(a.block.kind === "list" && a.block.listStyle !== "ordered")), b.setAttribute("aria-pressed", String(a.block.kind === "list" && a.block.listStyle === "ordered")));
-	}, p = (e, t, n, i = !0) => {
-		let a = document.createElement("button");
-		return a.type = "button", a.title = e, a.setAttribute("aria-label", e), a.innerHTML = t, a.addEventListener("mousedown", (e) => e.preventDefault()), a.addEventListener("click", () => {
-			!o && r() && (!i || d()) && n();
-		}), i && l.push(a), a;
-	}, m = /* @__PURE__ */ new Map();
-	for (let [e, t, r] of [
+		for (let [t, n] of v) n.setAttribute("aria-pressed", String(e && l.editor.isActive(t)));
+		if (m.hasSelection()) for (let [e, t] of v) t.disabled = !1, t.setAttribute("aria-pressed", String(m.isActive(e)));
+		e && (x.value = l.block.kind === "heading" ? `heading-${l.block.headingLevel || 1}` : "paragraph", T.setAttribute("aria-pressed", String(l.block.kind === "list" && l.block.listStyle !== "ordered")), E.setAttribute("aria-pressed", String(l.block.kind === "list" && l.block.listStyle === "ordered")));
+	}, _ = (e, t, n, r = !0) => {
+		let i = document.createElement("button");
+		return i.type = "button", i.title = e, i.setAttribute("aria-label", e), i.innerHTML = t, i.addEventListener("mousedown", (e) => e.preventDefault()), i.addEventListener("click", () => {
+			!u && s() && (!r || h()) && n();
+		}), r && p.push(i), i;
+	}, v = /* @__PURE__ */ new Map(), y = _("Undo", wG(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"]), () => n?.(), !1);
+	y.className = "report-format-undo", y.title = "Undo (⌘Z / Ctrl+Z)", c.append(y);
+	let b = _("Redo", wG(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"]), () => r?.(), !1);
+	b.className = "report-format-redo", b.title = "Redo (⌘⇧Z / Ctrl+Shift+Z)", c.append(b);
+	for (let [e, t, n] of [
 		[
 			"bold",
 			"Bold",
@@ -47763,17 +47767,17 @@ function EG({ onChange: e, onInsert: t, onError: n = () => {}, isCurrent: r = ()
 			TG
 		]
 	]) {
-		let o = p(t, r, () => {
+		let r = _(t, n, () => {
 			try {
-				u.hasSelection() ? u.toggle(e) : d() && a.editor.chain().focus().toggleMark(e).run(), f();
+				m.hasSelection() ? m.toggle(e) : h() && l.editor.chain().focus().toggleMark(e).run(), g();
 			} catch (e) {
-				n(e.message);
+				o(e.message);
 			}
 		}, !1);
-		l.push(o), o.className = `report-format-${e}`, m.set(e, o), i.append(o);
+		p.push(r), r.className = `report-format-${e}`, v.set(e, r), c.append(r);
 	}
-	let h = document.createElement("select");
-	h.setAttribute("aria-label", "Text style"), h.title = "Text style";
+	let x = document.createElement("select");
+	x.setAttribute("aria-label", "Text style"), x.title = "Text style";
 	for (let [e, t] of [
 		["paragraph", "Body"],
 		["heading-1", "Heading 1"],
@@ -47781,122 +47785,125 @@ function EG({ onChange: e, onInsert: t, onError: n = () => {}, isCurrent: r = ()
 		["heading-3", "Heading 3"]
 	]) {
 		let n = document.createElement("option");
-		n.value = e, n.textContent = t, h.append(n);
+		n.value = e, n.textContent = t, x.append(n);
 	}
-	let g = (e) => {
+	let S = (e) => {
 		e.element.dataset.kind = e.block.kind, e.element.dataset.headingLevel = String(e.block.headingLevel || 1), e.element.dataset.listStyle = e.block.listStyle || "bullet", e.element.querySelector("[contenteditable]")?.setAttribute("aria-label", `Report ${e.block.kind === "list" ? "list items" : e.block.kind}`);
-	}, _ = (t) => {
-		let n = cG(dG(t.editor.getJSON()), { list: t.block.kind === "list" });
-		t.block.kind === "list" ? (t.block.items = nG(n).split("\n"), delete t.block.text) : (t.block.text = nG(n), delete t.block.items), t.block.richText = n, e(t.block), f();
-	}, v = (e, t = {}) => {
-		d() && (a.block.kind = e, delete a.block.headingLevel, delete a.block.listStyle, Object.assign(a.block, t), g(a), _(a), a.editor.commands.focus());
+	}, C = (t, n = !1) => {
+		let r = cG(dG(t.editor.getJSON()), { list: t.block.kind === "list" });
+		t.block.kind === "list" ? (t.block.items = nG(r).split("\n"), delete t.block.text) : (t.block.text = nG(r), delete t.block.items), t.block.richText = r, e(t.block, { group: n ? `text:${t.block.id}` : null }), g();
+	}, w = (e, t = {}) => {
+		h() && (l.block.kind = e, delete l.block.headingLevel, delete l.block.listStyle, Object.assign(l.block, t), S(l), C(l), l.editor.commands.focus());
 	};
-	h.addEventListener("change", () => v(h.value.startsWith("heading") ? "heading" : "paragraph", h.value.startsWith("heading") ? { headingLevel: Number(h.value.slice(-1)) } : {})), l.push(h), i.append(h);
-	let y = p("Bulleted list", wG(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"]), () => v(a.block.kind === "list" && a.block.listStyle !== "ordered" ? "paragraph" : "list", { listStyle: "bullet" })), b = p("Numbered list", wG(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"]), () => v(a.block.kind === "list" && a.block.listStyle === "ordered" ? "paragraph" : "list", { listStyle: "ordered" }));
-	i.append(y, b);
-	let x = document.createElement("span");
-	x.className = "report-format-link";
-	let S = p("Link", wG(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"]), () => {
-		if (s) {
-			D();
+	x.addEventListener("change", () => w(x.value.startsWith("heading") ? "heading" : "paragraph", x.value.startsWith("heading") ? { headingLevel: Number(x.value.slice(-1)) } : {})), p.push(x), c.append(x);
+	let T = _("Bulleted list", wG(["M7 5h10M7 10h10M7 15h10", "M3 4.5h.5v.5H3zM3 9.5h.5v.5H3zM3 14.5h.5v.5H3z"]), () => w(l.block.kind === "list" && l.block.listStyle !== "ordered" ? "paragraph" : "list", { listStyle: "bullet" })), E = _("Numbered list", wG(["M8 5h9M8 10h9M8 15h9", "M2 3h1v4M2 9c3-2 3 1 0 3h3M2 15h2l-1 1c3 0 2 3-1 2"]), () => w(l.block.kind === "list" && l.block.listStyle === "ordered" ? "paragraph" : "list", { listStyle: "ordered" }));
+	c.append(T, E);
+	let D = document.createElement("span");
+	D.className = "report-format-link";
+	let O = _("Link", wG(["M8 6l2-2a4 4 0 0 1 6 6l-2 2M12 14l-2 2a4 4 0 0 1-6-6l2-2M7 13l6-6"]), () => {
+		if (d) {
+			N();
 			return;
 		}
-		let { from: e, to: t } = a.editor.state.selection, n = a.editor.state.doc.textBetween(e, t, "\n");
-		s = {
-			entry: a,
-			doc: a.editor.state.doc,
+		let { from: e, to: t } = l.editor.state.selection, n = l.editor.state.doc.textBetween(e, t, "\n");
+		d = {
+			entry: l,
+			doc: l.editor.state.doc,
 			from: e,
 			to: t,
 			label: n.replace(/\n/g, " ")
-		}, w.value = a.editor.getAttributes("link").href || "", T.value = s.label, E.textContent = "", C.hidden = !1, S.setAttribute("aria-expanded", "true"), w.focus();
+		}, A.value = l.editor.getAttributes("link").href || "", j.value = d.label, M.textContent = "", k.hidden = !1, O.setAttribute("aria-expanded", "true"), A.focus();
 	});
-	S.setAttribute("aria-expanded", "false");
-	let C = document.createElement("form");
-	C.className = "report-format-link-form", C.hidden = !0;
-	let w = document.createElement("input");
-	w.type = "text", w.placeholder = "https://", w.setAttribute("aria-label", "Link URL");
-	let T = document.createElement("input");
-	T.type = "text", T.setAttribute("aria-label", "Link text");
-	let E = document.createElement("p");
-	E.setAttribute("role", "alert");
-	for (let [e, t] of [["URL", w], ["Text", T]]) {
+	O.setAttribute("aria-expanded", "false");
+	let k = document.createElement("form");
+	k.className = "report-format-link-form", k.hidden = !0;
+	let A = document.createElement("input");
+	A.type = "text", A.placeholder = "https://", A.setAttribute("aria-label", "Link URL");
+	let j = document.createElement("input");
+	j.type = "text", j.setAttribute("aria-label", "Link text");
+	let M = document.createElement("p");
+	M.setAttribute("role", "alert");
+	for (let [e, t] of [["URL", A], ["Text", j]]) {
 		let n = document.createElement("label");
-		n.textContent = e, n.append(t), C.append(n);
+		n.textContent = e, n.append(t), k.append(n);
 	}
-	let D = () => {
-		C.hidden = !0, s = null, S.setAttribute("aria-expanded", "false");
-	}, O = () => !d() || !s || s.entry !== a || a.editor.state.doc !== s.doc ? (E.textContent = "The Report changed. Select the link location again.", !1) : (a.editor.commands.setTextSelection({
-		from: s.from,
-		to: s.to
+	let N = () => {
+		k.hidden = !0, d = null, O.setAttribute("aria-expanded", "false");
+	}, ee = () => !h() || !d || d.entry !== l || l.editor.state.doc !== d.doc ? (M.textContent = "The Report changed. Select the link location again.", !1) : (l.editor.commands.setTextSelection({
+		from: d.from,
+		to: d.to
 	}), !0);
-	C.addEventListener("submit", (e) => {
+	k.addEventListener("submit", (e) => {
 		e.preventDefault();
-		let t = tG(w.value);
+		let t = tG(A.value);
 		if (!t) {
-			E.textContent = "Use an HTTP, HTTPS, or mailto URL.";
+			M.textContent = "Use an HTTP, HTTPS, or mailto URL.";
 			return;
 		}
-		if (!O()) return;
-		let { from: n, to: r } = s, i = a.editor.chain().focus();
-		n === r || T.value !== s.label ? i.insertContent({
+		if (!ee()) return;
+		let { from: n, to: r } = d, i = l.editor.chain().focus();
+		n === r || j.value !== d.label ? i.insertContent({
 			type: "text",
-			text: T.value || t,
+			text: j.value || t,
 			marks: [{
 				type: "link",
 				attrs: { href: t }
 			}]
-		}) : i.setMark("link", { href: t }), i.run(), D();
-	}), C.addEventListener("keydown", (e) => {
-		e.key === "Escape" && (e.preventDefault(), D(), d() && a.editor.commands.focus());
+		}) : i.setMark("link", { href: t }), i.run(), N();
+	}), k.addEventListener("keydown", (e) => {
+		e.key === "Escape" && (e.preventDefault(), N(), h() && l.editor.commands.focus());
 	});
-	let k = document.createElement("button");
-	k.type = "submit", k.textContent = "Apply link";
-	let A = p("Remove link", "Remove link", () => {
-		O() && (a.editor.chain().focus().extendMarkRange("link").unsetMark("link").run(), D());
-	}), j = p("Cancel", "Cancel", () => {
-		D(), d() && a.editor.commands.focus();
+	let P = document.createElement("button");
+	P.type = "submit", P.textContent = "Apply link";
+	let te = _("Remove link", "Remove link", () => {
+		ee() && (l.editor.chain().focus().extendMarkRange("link").unsetMark("link").run(), N());
+	}), ne = _("Cancel", "Cancel", () => {
+		N(), h() && l.editor.commands.focus();
 	}, !1);
-	C.append(E, k, A, j), x.append(S, C), i.append(x);
-	let M = document.createElement("details");
-	M.className = "report-format-insert";
-	let N = document.createElement("summary");
-	N.textContent = "Insert", N.setAttribute("aria-label", "Insert report content");
-	let ee = document.createElement("div");
-	ee.className = "report-format-insert-menu";
+	k.append(M, P, te, ne), D.append(O, k), c.append(D);
+	let re = document.createElement("details");
+	re.className = "report-format-insert";
+	let ie = document.createElement("summary");
+	ie.textContent = "Insert", ie.setAttribute("aria-label", "Insert report content");
+	let F = document.createElement("div");
+	F.className = "report-format-insert-menu";
 	for (let [e, n] of [
 		["heading", "Heading"],
 		["paragraph", "Paragraph"],
 		["list", "Bulleted list"],
 		["ordered", "Numbered list"],
 		["source", "Source"]
-	]) ee.append(p(n, n, () => {
-		M.open = !1, t(e);
+	]) F.append(_(n, n, () => {
+		re.open = !1, t(e);
 	}, !1));
-	M.append(N, ee), i.append(M), i.addEventListener("focusout", (e) => {
-		i.contains(e.relatedTarget) || (M.open = !1, s && D());
+	re.append(ie, F), c.append(re), c.addEventListener("focusout", (e) => {
+		c.contains(e.relatedTarget) || (re.open = !1, d && N());
 	});
-	let P = () => {
-		if (u.capture(), d()) {
+	let ae = () => {
+		if (m.capture(), h()) {
 			let e = window.getSelection();
-			e?.anchorNode && !a.element.contains(e.anchorNode) && !i.contains(document.activeElement) && (a = null);
+			e?.anchorNode && !l.element.contains(e.anchorNode) && !c.contains(document.activeElement) && (l = null);
 		}
-		f();
+		g();
 	};
-	document.addEventListener("selectionchange", P);
-	let te = {
-		element: i,
-		registerSource: (e, t, n) => u.register(e, t, n),
-		unregisterSource: (e) => u.unregister(e),
-		sourceSnapshotRuns: (e, t) => u.snapshotRuns(e, t),
+	document.addEventListener("selectionchange", ae);
+	let oe = {
+		element: c,
+		refreshHistory: () => {
+			y.disabled = u || !s() || !i(), b.disabled = u || !s() || !a();
+		},
+		registerSource: (e, t, n) => m.register(e, t, n),
+		unregisterSource: (e) => m.unregister(e),
+		sourceSnapshotRuns: (e, t) => m.snapshotRuns(e, t),
 		mount(e) {
 			let t = document.createElement("div");
 			t.className = "report-rich-editor";
-			let i = {
+			let n = {
 				block: e,
 				element: t,
 				editor: null
 			};
-			return i.editor = new hf({
+			return n.editor = new hf({
 				element: t,
 				extensions: [
 					yG,
@@ -47921,29 +47928,30 @@ function EG({ onChange: e, onInsert: t, onError: n = () => {}, isCurrent: r = ()
 					handleClick: (e, t, n) => n.target.closest("a") ? (n.preventDefault(), !0) : !1
 				},
 				onFocus: () => {
-					!o && r() && (a = i, f());
+					!u && s() && (l = n, g());
 				},
 				onSelectionUpdate: () => {
-					!o && r() && (a = i, f());
+					!u && s() && (l = n, g());
 				},
-				onUpdate: () => {
-					if (!o && r()) try {
-						_(i);
+				onUpdate: ({ transaction: e }) => {
+					if (!u && s()) try {
+						let t = !e.getMeta("paste") && e.steps.length > 0 && e.steps.every((e) => ["replace", "replaceAround"].includes(e.toJSON().stepType));
+						C(n, t);
 					} catch (e) {
-						n(e.message);
+						o(e.message);
 					}
 				}
-			}), g(i), c.add(i), t;
+			}), S(n), f.add(n), t;
 		},
 		focus(e) {
-			let t = [...c].find((t) => t.block === e);
-			t && (a = t, t.editor.commands.focus("end"), f());
+			let t = [...f].find((t) => t.block === e);
+			t && (l = t, t.editor.commands.focus("end"), g());
 		},
 		dispose() {
-			o = !0, u.dispose(), document.removeEventListener("selectionchange", P), c.forEach((e) => e.editor.destroy()), c.clear(), a = null;
+			u = !0, m.dispose(), document.removeEventListener("selectionchange", ae), f.forEach((e) => e.editor.destroy()), f.clear(), l = null;
 		}
 	};
-	return f(), te;
+	return g(), oe;
 }
 //#endregion
 //#region src/notebook-schema.js
@@ -48151,11 +48159,16 @@ function GG({ editor: e, options: t }) {
 		}), !0;
 	}, m = QA({
 		editor: e,
-		selector: ({ editor: e }) => ({
-			editable: e.isEditable,
-			styles: e.getActiveStyles(),
-			blocks: e.getSelection()?.blocks || [e.getTextCursorPosition().block]
-		})
+		selector: ({ editor: e }) => {
+			let t = e.getExtension("yUndo") || e.getExtension("history");
+			return {
+				editable: e.isEditable,
+				canUndo: !!(t && e.canExec(t.undoCommand)),
+				canRedo: !!(t && e.canExec(t.redoCommand)),
+				styles: e.getActiveStyles(),
+				blocks: e.getSelection()?.blocks || [e.getTextCursorPosition().block]
+			};
+		}
 	}), h = m.blocks.filter((e) => [
 		"paragraph",
 		"heading",
@@ -48234,7 +48247,27 @@ function GG({ editor: e, options: t }) {
 		className: "notebook-format-toolbar",
 		role: "toolbar",
 		"aria-label": "Note formatting"
-	}, b("bold", "Bold", _.createElement("strong", null, "B")), b("italic", "Italic", _.createElement("em", null, "I")), b("underline", "Underline", _.createElement("u", null, "U")), b("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("button", {
+	}, _.createElement("button", {
+		type: "button",
+		className: "notebook-format-button notebook-format-undo",
+		title: "Undo (⌘Z / Ctrl+Z)",
+		"aria-label": "Undo",
+		disabled: !m.editable || !m.canUndo,
+		onMouseDown: (e) => e.preventDefault(),
+		onClick: () => {
+			e.focus(), e.undo();
+		}
+	}, x(["M7 4 3 8l4 4", "M3 8h8a5 5 0 0 1 0 10H8"])), _.createElement("button", {
+		type: "button",
+		className: "notebook-format-button notebook-format-redo",
+		title: "Redo (⌘⇧Z / Ctrl+Shift+Z)",
+		"aria-label": "Redo",
+		disabled: !m.editable || !m.canRedo,
+		onMouseDown: (e) => e.preventDefault(),
+		onClick: () => {
+			e.focus(), e.redo();
+		}
+	}, x(["M13 4l4 4-4 4", "M17 8H9a5 5 0 0 0 0 10h3"])), b("bold", "Bold", _.createElement("strong", null, "B")), b("italic", "Italic", _.createElement("em", null, "I")), b("underline", "Underline", _.createElement("u", null, "U")), b("strike", "Strikethrough", _.createElement("s", null, "S")), _.createElement("button", {
 		type: "button",
 		className: "notebook-format-button notebook-format-highlight",
 		title: "Highlight",
