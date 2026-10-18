@@ -28,7 +28,7 @@ const state = { paneWeights: { 'utility:search:one': 1400, 'reader:one': 400 } }
 const track = { dataset: {}, clientWidth: 2403, inert: false,
   querySelectorAll: selector => selector.includes('.pane-divider') ? Array.from({length: panels.filter(p=>!p.classList.contains('is-workflow-hidden')).length+1},()=>({getBoundingClientRect:()=>({width:1})})) : panels };
 const collapsed = new Set();
-const context = vm.createContext({ state, track, activeWorkspaceID: 'test', window: { innerWidth: 2403 }, researchColumnsLayout,
+const context = vm.createContext({ workspaceColumnExpansion: undefined, state, track, activeWorkspaceID: 'test', window: { innerWidth: 2403 }, researchColumnsLayout,
   currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
   assistantHistoryOnlyPane: id => id === 'utility:analysis:history', paneIsCollapsed: id => collapsed.has(id), defaultPaneWidthForID: () => 600,
   applyPaneWeight(panel, id) { panel.style.flex = `1 0 ${state.paneWeights[id] || 600}px`; } });

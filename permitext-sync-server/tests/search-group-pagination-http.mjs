@@ -19,7 +19,7 @@ try {
   assert(initial.groups.length > 1);
   for (const group of initial.groups) {
     const rows = initial.results.filter(row => row.codePrefix === group.codePrefix && row.codeVersion === group.codeVersion);
-    assert(rows.length > 0 && rows.length <= 5, "Initial results stay bounded in each source.");
+    assert(rows.length > 0 && rows.length <= 8, "Initial results stay bounded in each source.");
     assert.equal(rows.length, group.nextOffset);
     assert.equal(group.cursorKind, "candidate");
   }

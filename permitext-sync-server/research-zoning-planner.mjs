@@ -2148,11 +2148,24 @@ export function zoningResearchPlanCostProjection({
         stage: "source_bounded_repair",
         ledger: "production",
         tier: "accurate",
-        inputTokens: estimatedTokens(3_000 + Math.min(8_000, evidenceCharacters)),
-        outputTokens: 900
+        inputTokens: plan.callPolicy.repairMode === "verified_answer_revision"
+          ? requestInputTokens + answerOutputTokens
+          : estimatedTokens(3_000 + Math.min(8_000, evidenceCharacters)),
+        outputTokens: answerOutputTokens
       }
     : null;
-  const adverseCalls = repairCall ? [...nominalCalls, repairCall] : nominalCalls;
+  const postRepairVerification = repairCall && plan?.callPolicy?.subjectiveVerification
+    ? {
+        stage: "post_repair_verification",
+        ledger: "production",
+        tier: "fast",
+        inputTokens: requestInputTokens + answerOutputTokens,
+        outputTokens: verifierOutputTokens
+      }
+    : null;
+  const adverseCalls = repairCall
+    ? [...nominalCalls, repairCall, ...(postRepairVerification ? [postRepairVerification] : [])]
+    : nominalCalls;
   const cost = (call, adverse = false) => {
     const rate = rates[call.tier];
     const input = Math.ceil(call.inputTokens * (adverse ? adverseInputMultiplier : 1));
@@ -2163,6 +2176,7 @@ export function zoningResearchPlanCostProjection({
   const productionAdverseUSD = adverseCalls.reduce((sum, call) => sum + cost(call, true), 0);
   return {
     schemaVersion: 2,
+    projectionVersion: "20261017-verified-revision-cost-v3",
     pricing: rates,
     tokenEstimator: "ceil(bytes/4*1.25)",
     calls: adverseCalls,

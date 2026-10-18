@@ -113,14 +113,25 @@ const body = await researchBodyForCatalogSection(section);
 const source = { ...section, sectionID: String(section.id), body,
   corpusID: corpus.id, codeVersion: corpus.codeVersion, codeEdition: corpus.codeEdition, jurisdiction: corpus.jurisdiction };
 const carrier = researchEmbeddedDefinitionCarrier(source);
-assert.equal(carrier?.sectionNumber, '202',
-  'The fresh canonical app body must retain the existing official FGC202 embedded definitions.');
-const definition = targetedDefinitionExcerpt(source, 'direct-vent appliance', {
+assert.equal(carrier, null, 'Current FGC201.4 ends before the separately published FGC202 banner.');
+assert.equal(targetedDefinitionExcerpt(source, 'direct-vent appliance'), null,
+  'An ordinary canonical leaf cannot acquire definitions from the following section.');
+// Retain positive real-text coverage of the legacy layout independently of
+// today's leaf boundaries. No runtime resolver receives this combined fixture.
+const heading = 'Section FGC 202: General Definitions';
+const definitions = await constructionHTMLBodyForSection({ ...section, sectionNumber: '202', title: heading });
+assert(definitions?.blocks?.length);
+const legacyText = [body.blocks[0].plainText, heading, ...definitions.blocks.map(b => b.plainText)].join('\n\n');
+const legacySource = { ...source, text: legacyText, body: { ...body, blocks: [{
+  id: 'legacy-FGC-definition-carrier', kind: 'html', plainText: legacyText,
+  html: body.blocks[0].html + `<h6>${heading}</h6>` + definitions.blocks.map(b => b.html).join('\n')
+}] } };
+const definition = targetedDefinitionExcerpt(legacySource, 'direct-vent appliance', {
   completeDefinitionLabels: ['DIRECT-VENT APPLIANCES'], maximumCharacters: 12000
 });
 assert.match(definition?.text || '', /all air for combustion is derived directly from the outdoor atmosphere/);
 assert.match(definition.text, /all flue gases are discharged directly to the outdoor atmosphere/);
-const published = researchBoundDefinitionPublishedReference(source, definition, definition.text);
+const published = researchBoundDefinitionPublishedReference(legacySource, definition, definition.text);
 assert.equal(published?.codePrefix, 'FGC');
 assert.equal(published?.sectionNumber, '202');
 assert.equal(published?.carrierSectionID, String(section.id));
@@ -129,9 +140,12 @@ const officialBody = await constructionHTMLBodyForSection(section, { includeOffi
 assert.equal((await constructionHTMLBodyForSection(section)).officialSourceBinding, undefined,
   'The default existing loader/Reader body shape does not acquire recovery metadata.');
 const officialSource = await constructionChapterHTMLSource(section.codePrefix, section.chapterNumber);
-assert.equal(body.officialSourceBinding.sourceHTMLHash, hash(officialSource.html));
-assert.equal(body.officialSourceBinding.bodyTextHash, hash(body.blocks[0].plainText));
-assert.deepEqual(body, officialBody, 'The app restores the existing same-source official body rather than synthesizing legal text.');
+assert.equal(officialBody.officialSourceBinding.sourceHTMLHash, hash(officialSource.html));
+assert.equal(officialBody.officialSourceBinding.bodyTextHash, hash(officialBody.blocks[0].plainText));
+assert.equal(officialBody.blocks[0].plainText, body.blocks[0].plainText,
+  'The prepared leaf and fresh official leaf retain the same ordinary provision.');
+assert.equal(enrichResearchConstructionDefinitionBody(body, officialBody, section, officialSource), body,
+  'A complete ordinary leaf is not widened merely because definitions follow it in the chapter file.');
 for (const prefix of ['PC', 'MC']) {
   const completeSection = [...catalog.values()].find(s => s.codePrefix === prefix && s.sectionNumber === '201.4' &&
     !s.codeVersion?.includes('2014-construction-codes'));
@@ -145,7 +159,7 @@ for (const prefix of ['PC', 'MC']) {
 // The canonical source becoming complete must not widen a selected passage.
 // Its opening retains the carrier identity; only exact bound entries may use
 // the separately published dictionary reference.
-const selectedText = body.blocks[0].plainText.slice(0, carrier.sourceOffsets.start).trim();
+const selectedText = body.blocks[0].plainText;
 assert.equal(researchBoundDefinitionPublishedReference(source, definition, selectedText), null);
 const input = { question: 'Using only the selected passage, explain its stated rule.',
   messages: [], projectFacts: [], originSurface: 'reader',

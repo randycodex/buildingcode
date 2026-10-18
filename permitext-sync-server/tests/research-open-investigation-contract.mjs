@@ -44,3 +44,22 @@ for(const value of [{pass:false,issues:[]},{pass:true,issues:review.issues},{pas
   assert.throws(()=>validateOpenInvestigationValue(value,'permitext_research_open_review'),{code:'INVALID_RESEARCH_VERIFICATION'});
 assert.throws(()=>validateOpenInvestigationValue({ready:true,queries:[],reason:'Missing retained IDs'},'permitext_research_investigation'),{code:'INVALID_RESEARCH_RESPONSE'});
 console.log('Open investigation discovery, scope, cancellation, and budget contracts passed.');
+
+// Independent searches overlap, but source priority follows query order.
+let releaseFirst, releaseSecond;
+const startedQueries=[];
+const firstGate=new Promise(r=>releaseFirst=r), secondGate=new Promise(r=>releaseSecond=r);
+const concurrent=investigateResearchEvidence({evidencePackage:{sources:[a]},maximumRounds:1,
+ decide:async()=>({ready:false,queries:['first','second'],retainSourceIDs:['a']}),
+ search:async query=>{startedQueries.push(query);await(query==='first'?firstGate:secondGate);return {sources:[{sourceID:query,text:query}]};}});
+await new Promise(r=>setImmediate(r));
+assert.deepEqual(startedQueries,['first','second']);
+releaseSecond();releaseFirst();
+assert.deepEqual((await concurrent).sources.map(s=>s.sourceID),['a','first','second']);
+let settledSibling=false;
+await assert.rejects(investigateResearchEvidence({evidencePackage:{sources:[]},maximumRounds:1,
+ decide:async()=>({queries:['fail','finish']}),search:async query=>{
+  if(query==='fail')throw new Error('source unavailable');
+  await new Promise(r=>setImmediate(r));settledSibling=true;return {sources:[b]};
+ }}),/source unavailable/);
+assert(settledSibling,'Do not return while sibling work is still pending');

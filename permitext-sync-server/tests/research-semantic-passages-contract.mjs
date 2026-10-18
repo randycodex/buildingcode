@@ -175,3 +175,45 @@ assert.throws(() => semanticIndexBuilderArguments(["--live", "--budget-ledger=te
 assert.throws(() => semanticIndexBuilderArguments(["--live", "--budget-ledger=test.json", "--campaign-cap-usd=15.73"]), /13.97/);
 assert.equal(semanticIndexBuilderArguments(["--live", "--budget-ledger=test.json", "--campaign-cap-usd=13.97"]).capUSD, 13.97);
 console.log("Semantic passage contracts passed: source hashes and corpus boundaries, complete source hits, opt-in provider use, bounded cache, timeout fallback, atomic resumable indexing and shared-budget unknown-outcome stops.");
+
+const batches=[];
+const batchAccounting=[];
+const batched=createResearchSemanticSearch({enabled:true,vectors:loaded,apiKey:'offline',
+ fetchImpl:async(url,options)=>{const body=JSON.parse(options.body);batches.push(body.input);
+  return Response.json({model:body.model,usage:{prompt_tokens:body.input.length*10,total_tokens:body.input.length*10},
+   data:body.input.map((text,i)=>({index:i,embedding:basis(text.includes('plumbing')?1:0)})).reverse()});},
+ beforeRequest:({body})=>{batchAccounting.push(['reserve',body.input.length]);return 'reservation';},
+ afterRequest:result=>batchAccounting.push(['settle',result.reservation])});
+const batchKey={};
+const paired=await Promise.all([batched.search(index,'storage question',{batchKey}),batched.search(index,'plumbing question',{batchKey})]);
+assert.deepEqual(batches,[['storage question','plumbing question']]);
+assert.equal(paired[0].hits[0].sectionID,'current');
+assert.equal(paired[1].hits[0].sectionID,'plumbing','Provider response order cannot swap query vectors');
+assert.deepEqual(batchAccounting,[['reserve',2],['settle','reservation']]);
+assert.equal(paired.reduce((sum,item)=>sum+item.metadata.costUSD,0),20*.02/1e6);
+await Promise.all([batched.search(index,'turn A',{batchKey:{}}),batched.search(index,'turn B',{batchKey:{}})]);
+assert.deepEqual(batches.slice(1),[['turn A'],['turn B']],'Never batch across HTTP turns');
+console.log('Turn-scoped embedding batching passed: exact vector mapping, one reservation and settlement, separate turns.');
+const denied=createResearchSemanticSearch({enabled:true,vectors:loaded,apiKey:'offline',fetchImpl:()=>{throw Error('must not dispatch');},
+ beforeRequest:()=>{throw Object.assign(Error('reservation denied'),{code:'RESEARCH_REQUEST_HANDLED'});}});
+const deniedKey={};
+const deniedResults=await Promise.allSettled([denied.search(index,'one',{batchKey:deniedKey}),denied.search(index,'two',{batchKey:deniedKey})]);
+assert(deniedResults.every(r=>r.status==='rejected'&&r.reason.code==='RESEARCH_REQUEST_HANDLED'));
+assert.equal(denied.cacheSize,0);
+
+// Lazy materialization must preserve ties, offset deduplication and nested hits.
+const tiedPassages = [
+  { id: 'b', sectionID: 'one', blockID: 'same', sourceOffsets: {start:0,end:4}, text:'same' },
+  { id: 'a', sectionID: 'one', blockID: 'same', sourceOffsets: {start:0,end:4}, text:'same' },
+  { id: 'c', sectionID: 'one', blockID: 'other', sourceOffsets: {start:0,end:4}, text:'same' },
+  { id: 'd', sectionID: 'two', blockID: 'same', sourceOffsets: {start:0,end:4}, text:'same' }
+];
+const tiedIndex = { passages: tiedPassages };
+const tiedVectors = new Map(tiedPassages.map(p => [researchSemanticInputHash(researchPassageEmbeddingText(p)), Float32Array.from(basis(0))]));
+const tiedHits = searchResearchSemanticPassages(tiedIndex, tiedVectors, basis(0), {limit:2, passagesPerSection:2});
+assert.deepEqual(tiedHits.map(hit => hit.id), ['a', 'd']);
+assert.deepEqual(tiedHits[0].passages.map(hit => hit.id), ['a', 'c']);
+assert(tiedHits.every(hit => hit.similarity === 1 && hit.score === 1 && hit.retrievalMethod === 'semantic_passage'));
+assert.equal(searchResearchSemanticPassages(tiedIndex, tiedVectors, basis(0), {minimumSimilarity:1}).length, 0);
+assert.deepEqual(tiedPassages.map(p => p.id), ['b', 'a', 'c', 'd'], 'Search must not reorder or annotate source records.');
+console.log('Semantic materialization preserves exact ties, duplicate offsets, threshold and source immutability.');

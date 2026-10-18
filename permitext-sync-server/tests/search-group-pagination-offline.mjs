@@ -1,3 +1,4 @@
+import { initialSearchGroupLimit, searchSpellingSuggestions, searchVocabulary } from "../public/search-relevance.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -8,14 +9,14 @@ const matches = [ ["BC", "2022", 8], ["BC", "2014", 6], ["MC", "2022", 3] ].flat
   Array.from({ length: count }, (_, n) => ({ rank: 2, record: { codePrefix, codeVersion },
     result: { id: n + 1, codePrefix, sectionNumber: String(n + 1), title: "Concrete", chapterNumber: "1" } })));
 let exactPattern;
-const context = vm.createContext({ offlineSourceScope: () => null, tokenizeSearchText: value => value.split(" "), syncCodeVersion: value => value,
+const context = vm.createContext({initialSearchGroupLimit, searchSpellingSuggestions, searchVocabulary, offlineSourceScope: () => null, tokenizeSearchText: value => value.split(" "), syncCodeVersion: value => value,
   compareChapterNumbers: (left, right) => Number(left) - Number(right),
   matchingOfflineSearchResults: async (_install, options) => { exactPattern = options.exactPattern; return matches; },
   offlineSectionWithEdition: async record => record });
 vm.runInContext(fn, context);
 const get = params => context.offlineSearch({ installID: "offline" }, new URL(`https://local/code/search?${new URLSearchParams({ q: "concrete", version: "all", match: "exact", limit: "25", ...params })}`));
 const initial = await get({ grouped: "true" });
-assert.equal(initial.groups.length, 3); assert.equal(initial.results.length, 13);
+assert.equal(initial.groups.length, 3); assert.equal(initial.results.length, 17);
 assert.equal(exactPattern.test("Concrete structural walls"), true); assert.equal(exactPattern.test("concreted"), false);
 for (const group of initial.groups) assert.equal(group.cursorKind, "offset");
 const current = await get({ resultSource: JSON.stringify({ codePrefix: "BC", codeVersion: "2022" }), offset: "5", candidateOffset: "8" });

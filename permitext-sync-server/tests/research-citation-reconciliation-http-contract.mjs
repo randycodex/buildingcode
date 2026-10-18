@@ -36,7 +36,7 @@ globalThis.fetch = async (url, options) => {
     if (phase === "permitext_code_interpretation") {
       if (!proposed) {
         const sources = [...body.input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)\nCODE: [^\n]+\nSECTION: ([^\n]+)/g)];
-        const rule = sources.find(s => s[3] === "304.12"), extra = sources.find(s => s[3] === "201.4");
+        const rule = sources.find(s => s[3] === "304.12"), extra = sources.find(s => s[3] === "201.3");
         assert(rule && extra);
         const explanation = "MC 304.12 requires identification of the area served, with the exception for equipment serving only its own room or space.";
         proposed = { answerText: explanation, supportedPoints: [{ heading: "Identification", explanation,

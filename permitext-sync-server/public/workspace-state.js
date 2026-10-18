@@ -1,5 +1,6 @@
+import { normalizeAssistantViews } from "./assistant-context.js?v=7";
 import { normalizeVisitedWorkflowViews } from "./minimal-workflow.js";
-import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=8";
+import { normalizeWorkflowView, normalizeWorkflowMembership, columnWorkflowViews } from "./workflow-views.js?v=9";
 const workspaceRegistryVersion = 3;
 const defaultWorkspaceName = "General";
 const maximumWorkspaceNameLength = 40;
@@ -20,6 +21,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "utilities",
   "paneWidthDefaultsVersion",
   "paneWeights",
+  "workflowPaneWeights",
   "paneOrder",
   "collapsedPaneIDs",
   "pinnedPaneID",
@@ -122,6 +124,7 @@ function utilityState(value = {}) {
     search: Boolean(value.search),
     saved: Boolean(value.saved),
     analysis: Boolean(value.analysis),
+    calculator: Boolean(value.calculator),
     settings: Boolean(value.settings)
   };
 }
@@ -252,6 +255,7 @@ export function emptyWorkspaceLayout() {
     utilities: utilityState(),
     paneWidthDefaultsVersion: 4,
     paneWeights: {},
+    workflowPaneWeights: {},
     paneOrder: [],
     collapsedPaneIDs: [],
     pinnedPaneID: "",
@@ -347,6 +351,7 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.researchConversationID = typeof source.researchConversationID === "string" ? source.researchConversationID : "";
   const research = source.researchViewState || {};
   layout.researchViewState = {
+    assistantViews: normalizeAssistantViews(research.assistantViews),
     conversationOpen: research.conversationOpen === true,
     historyShowing: research.historyShowing === true,
     draftPaneIDs: Array.isArray(research.draftPaneIDs) ? research.draftPaneIDs.filter(id => typeof id === "string") : [],
@@ -383,6 +388,12 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.workflowView = normalizeWorkflowView(source.workflowView);
   layout.workflowVisitedViews = normalizeVisitedWorkflowViews(source);
   layout.workflowMembership = normalizeWorkflowMembership(source.workflowMembership);
+  layout.workflowPaneWeights = Object.fromEntries(
+    ['research', 'notebook', 'report', 'project-details'].map(view => [view,
+      Object.fromEntries(Object.entries(source.workflowPaneWeights?.[view] || {})
+        .filter(([id, width]) => typeof id === 'string' && Number.isFinite(width) && width > 0))
+    ])
+  );
   layout.workflowScroll = Object.fromEntries(columnWorkflowViews.map(view =>
     [view, Math.max(0, Number(source.workflowScroll?.[view]) || 0)]));
   layout.trackScrollLeft = Number.isFinite(Number(source.trackScrollLeft))

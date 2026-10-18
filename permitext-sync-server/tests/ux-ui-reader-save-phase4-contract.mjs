@@ -56,7 +56,7 @@ assert.match(sectionDetailSave, /persistSectionBookmark\(sectionPayload, true/);
 assert.doesNotMatch(sectionDetailSave, /showReaderSaveConfirmation\(panel, sectionPayload/);
 assert.doesNotMatch(sectionDetailSave, /removeSectionDetail/,
   "Unbookmarking in Source Detail must leave the passage open for saving again.");
-assert.match(sectionDetail, /actions\.append\(projectButton, backButton\)/,
+assert.match(sectionDetail, /actions\.append\(saveButton, projectButton, backButton\)/,
   "Source Detail keeps project assignment in its header before the menu and close controls.");
 assert.match(sectionDetail, /showSectionProjectAssignment\(panel, sectionPayload, projectButton, \{ chooseDestination: true \}\)/,
   "The Source Detail header opens a destination picker for its exact passage.");
@@ -71,7 +71,10 @@ assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
 let confirmationProject = { id: "p1", name: "Test Project" };
 let confirmationLinks = [{ projectID: "p1", key: "BC2022:1020.4" }];
 const confirmationPanel = { querySelector: () => null, append(node) { this.current = node; } };
+const confirmationState = { syncOutbox: [] };
 const confirmationContext = vm.createContext({
+  state: confirmationState,
+  mutationKindAndRecord: mutation => mutation,
   document: { createElement: () => ({ children: [], setAttribute() {}, addEventListener() {}, append(...nodes) { this.children.push(...nodes); } }) },
   window: { setTimeout() {} },
   workspaceProject: () => confirmationProject,
@@ -89,6 +92,13 @@ assert.equal(confirmationPanel.current.children[0].textContent, "Saved", "A diff
 confirmationProject = null;
 confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
 assert.equal(confirmationPanel.current.children[1].textContent, "Add to Project");
+
+confirmationState.syncOutbox = [{ mutation: { kind: "savedItem", record: { key: "BC2022:1020.4" } } }];
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
+assert.equal(confirmationPanel.current.children[0].textContent, "Saved on this device · waiting to sync");
+confirmationState.syncOutbox = [{ mutation: { kind: "savedItem", record: { key: "BC2014:1020.4" } } }];
+confirmationContext.showReaderSaveConfirmation(confirmationPanel, { key: "BC2022:1020.4" });
+assert.equal(confirmationPanel.current.children[0].textContent, "Saved");
 
 assert.match(webClient, /confirmation\.classList\.add\("is-leaving"\)/);
 assert.match(cssRule(".reader-save-confirmation"), /animation: reader-save-confirmation-enter/);

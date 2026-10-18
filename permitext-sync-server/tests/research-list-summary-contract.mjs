@@ -395,7 +395,7 @@ assert.match(clientSource, /function openResearchConversationPaneIDs\(\)[\s\S]*?
 // Exercise the actual descriptor loop: constructing the desired pane list must
 // not eagerly await Research; each unique conversation owns its load and close.
 const supplementalDescriptorStart = clientSource.indexOf("  for (const id of supplementalResearchConversationIDs) {");
-const supplementalDescriptorEnd = clientSource.indexOf("\n  if (state.utilities.settings)", supplementalDescriptorStart);
+const supplementalDescriptorEnd = clientSource.indexOf("\n  }", supplementalDescriptorStart) + 4;
 assert.ok(supplementalDescriptorStart >= 0 && supplementalDescriptorEnd > supplementalDescriptorStart);
 const supplementalDescriptors = [];
 const supplementalLoads = [];
@@ -664,7 +664,12 @@ assert.match(functionSource(clientSource, "renderInlineCommentBox"), /wrapper\.a
 assert.doesNotMatch(functionSource(clientSource, "renderInlineCommentBox"), /commentButton|Link to Note|showResearchSelectionMenu/, "Reader passage actions must not restore the retired comment or selection card.");
 assert.match(clientSource, /function notebookEvidenceMatchIndex\(text, selector\)[\s\S]*?if \(scored\.length > 1 && scored\[0\]\.score === scored\[1\]\.score\) return -1;/, "Passage reopening does not fail closed when exact-text recovery is ambiguous.");
 assert.match(clientSource, /The linked passage could not be relocated safely\. The enacted section is shown without a passage highlight\./, "Passage reopening does not disclose when a safe exact match cannot be recovered.");
-assert.doesNotMatch(clientSource, /notebook-add-to-report|reportButton\.textContent = reportBlock \? "Update in Report" : "Add to Report"/, "Notebook Notes should be added from the Report column.");
+const notebookReportHandoff = clientSource.slice(clientSource.indexOf('reportButton.className = "notebook-add-to-report"'), clientSource.indexOf("noteMenu.titleAction.append(reportButton)") + "noteMenu.titleAction.append(reportButton)".length);
+assert.match(notebookReportHandoff, /await saveActiveNotebookCard\(\)/);
+assert.match(notebookReportHandoff, /!synchronized \|\| dirty \|\| saveConflict/);
+assert.match(notebookReportHandoff, /isCurrentAccountRequest\(requestIdentity\)/);
+assert.match(notebookReportHandoff, /await promoteNotebookCardToReport\(identity, activeCard, \{ container: panel \}\)/);
+assert.match(notebookReportHandoff, /noteMenu\.titleAction\.append\(reportButton\)/);
 assert.match(clientSource, /headingTitle\.textContent = "Notes"[\s\S]*?heading\.append\(headingTitle\)/, "Notebook does not render its title.");
 assert.doesNotMatch(clientSource, /projectOwnership/, "Notebook or Report still repeats its owning Project beneath the tool title.");
 assert.doesNotMatch(clientSource, /Professional analysis/, "Notebook still repeats Project context beneath its title.");

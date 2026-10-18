@@ -11,8 +11,9 @@ import { researchEmbeddedDefinitionCarrier, researchRequestedDefinitionMatch,
 import { boundCanonicalRulePassage, nominateDelegatedRuleGroups, nominateNearestCompleteIndexedRuleGroup, researchImmediateChildDetailGain } from "./research-rule-groups.mjs";
 import { nominateResearchChapterScopeCandidates } from "./research-chapter-scope-context.mjs";
 import { researchCurrentPurposeTerms, researchCurrentPurposeMatches, researchCurrentEditionContext } from "./research-current-purpose.mjs";
+import { nominateZoningDistrictScope } from "./research-zoning-district-scope.mjs";
 
-export const evidenceDiscoveryVersion = "20261005-exact-empty-source-nomination-v68";
+export const evidenceDiscoveryVersion = "20261017-mapped-zoning-scope-v70";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -111,6 +112,29 @@ export function stipulatedFountainSubstitutionQuestion(question) {
 }
 
 const topicRoutes = [
+  // These nominate the governing subject alongside lexical hits. They do not
+  // establish that a row, exception, occupancy branch or increase applies.
+  {
+    pattern: /\bparapets?\b/i,
+    label: "exterior-wall parapet requirements and exceptions",
+    targets: [{ codePrefix: "BC", codeEdition: "2022", sectionPrefix: "705.11", rootClaimCoverage: false }]
+  },
+  {
+    pattern: /\bemergency\s+escape\s+and\s+rescue\s+(?:openings?|windows?)\b/i,
+    label: "emergency escape and rescue opening applicability",
+    targets: [{ codePrefix: "BC", codeEdition: "2022", sectionPrefix: "1030.1", rootClaimCoverage: false }]
+  },
+  {
+    pattern: /\b(?:wall|ceiling|interior)\s+finish(?:es)?\b[\s\S]*\b(?:class(?:ification)?|flame[- ]spread|stairway|egress)\b|\b(?:class(?:ification)?|flame[- ]spread)\b[\s\S]*\b(?:wall|ceiling|interior)\s+finish(?:es)?\b/i,
+    label: "interior wall and ceiling finish classification requirements",
+    targets: [{ codePrefix: "BC", codeEdition: "2022", sectionPrefix: "803.11", rootClaimCoverage: false }]
+  },
+  {
+    pattern: /\ballowable\s+(?:building\s+)?area\b[\s\S]*\b(?:frontage|sprinkler|increases?)\b|\b(?:frontage|sprinkler)\b[\s\S]*\ballowable\s+(?:building\s+)?area\b/i,
+    label: "allowable building area and increase calculation provisions",
+    targets: ["506.1", "506.2", "506.3"].map(sectionPrefix =>
+      ({ codePrefix: "BC", codeEdition: "2022", sectionPrefix, rootClaimCoverage: false }))
+  },
   {
     pattern: /^(?=[\s\S]*\bsprinklers?\b)(?=[\s\S]*\b(?:required?|requires?|needs?|triggers?)\b)/i,
     label: "sprinkler applicability and occupancy-based triggers",
@@ -305,6 +329,10 @@ const topicRoutes = [
     label: "high-rise emergency and standby power provisions",
     targets: [
       { codePrefix: "BC", sectionPrefix: "403.4.8", includeDescendants: true },
+      // Keep the separately cataloged residential load lists in the fixed
+      // shortlist; broad high-rise title hits can otherwise displace them.
+      ...["403.4.8.3.2", "403.4.8.4.2", "403.4.8.4.3"].map(sectionPrefix =>
+        ({ codePrefix: "BC", codeEdition: "2022", sectionPrefix, rootClaimCoverage: false })),
       { codePrefix: "BC", sectionPrefix: "2702.1" }
     ]
   },
@@ -1775,6 +1803,18 @@ function strongActionSubjectReservation({ probeHits, detailed, selected, current
     .map(({ hit, item }) => ({ hit, item, rank: hit.probeRank, strength: hit.probeStrength, actionSubject: true }))[0] || null;
 }
 
+const headingTokenCache = new WeakMap();
+const genericHeadingWords = new Set(["general", "requirements", "requirement", "provisions", "minimum", "maximum", "reserved", "definitions", "scope", "section", "code"]);
+function headingTokens(section) {
+  const title = section.title || "";
+  const cached = headingTokenCache.get(section);
+  if (cached?.title === title) return cached.tokens;
+  const tokens = [...new Set(rawTokens(title).filter(token =>
+    /[a-z]/i.test(token) && !stopWords.has(token) && !genericHeadingWords.has(token) && token.length > 2))];
+  headingTokenCache.set(section, { title, tokens });
+  return tokens;
+}
+
 export async function discoverRelevantEvidence({
   question,
   retrievalContext = null,
@@ -1794,8 +1834,16 @@ export async function discoverRelevantEvidence({
   const sourceQuestion = retrievalContext?.sourceQuery
     ? validateEvidenceDiscoveryQuestion(retrievalContext.sourceQuery) : normalizedQuestion;
   const sections = Array.isArray(catalog) ? catalog : [];
-  const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
   const currentQuestion = retrievalContext?.currentQuestion || sourceQuestion;
+  // Start the same reserved semantic query before CPU-only lexical work. Let
+  // sibling queries join their existing turn batch before beginning the scan.
+  // Observe rejection immediately even if the lexical path itself fails.
+  const semanticPending = passageIndex && semanticSearch
+    ? Promise.resolve().then(() => semanticSearch.search(passageIndex,
+      retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }))
+      .then(value => ({ value }), error => ({ error })) : null;
+  if (semanticPending) await new Promise(resolve => setImmediate(resolve));
+  const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
   const gasVocabulary = researchGasEquipmentVocabulary(currentQuestion, {
     contextDependentFollowUp: retrievalContext?.contextDependentFollowUp === true,
     humanTopics: [retrievalContext?.conversationTopic, retrievalContext?.immediateContext]
@@ -1871,6 +1919,11 @@ export async function discoverRelevantEvidence({
   const directReferenceKeys = new Set(codeReferences(currentQuestion).map(reference =>
     `${reference.codePrefix}:${reference.sectionNumber}`));
   const relevanceComparison = retrievalContext?.relevanceComparison === true;
+  const districtScopeNominations = nominateZoningDistrictScope({ question: sourceQuestion,
+    scopeText: normalizedQuestion, catalog: sections,
+    restricted: relevanceComparison || retrievalContext?.sourceSelectionRestricted === true ||
+      (explicitDisciplinePrefixes.size > 0 && !explicitDisciplinePrefixes.has('ZR')) });
+  const districtScopeByID = new Map(districtScopeNominations.map(item => [comparableSectionID(item.section.id), item]));
   const comparisonReferenceKeys = new Set(
     relevanceComparison
       ? codeReferences([
@@ -1978,8 +2031,9 @@ export async function discoverRelevantEvidence({
       probeStrength: complete.score / measurementHits[0].score }] : [];
   });
   const passageHitsByID = new Map(lexicalHitsByID);
-  const semanticResult = passageIndex && semanticSearch
-    ? await semanticSearch.search(passageIndex, retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }) : null;
+  const semanticOutcome = semanticPending ? await semanticPending : null;
+  if (semanticOutcome?.error) throw semanticOutcome.error;
+  const semanticResult = semanticOutcome?.value || null;
   const semanticHits = (semanticResult?.hits || [])
     .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean);
   const fusedScores = new Map();
@@ -2041,10 +2095,8 @@ export async function discoverRelevantEvidence({
   // Use heading coverage as a bounded recall signal, never as applicability.
   const headingScores = new Map();
   const literalQuestionTerms = new Set(rawTokens(currentQuestion).flatMap(token => [...singularForms(token)]));
-  const genericHeadingWords = new Set(["general", "requirements", "requirement", "provisions", "minimum", "maximum", "reserved", "definitions", "scope", "section", "code"]);
   for (const section of sections) {
-    const tokens = [...new Set(rawTokens(section.title || "").filter(token =>
-      /[a-z]/i.test(token) && !stopWords.has(token) && !genericHeadingWords.has(token) && token.length > 2))];
+    const tokens = headingTokens(section);
     if (tokens.length >= 2 && tokens.every(token => [...singularForms(token)].some(form => literalQuestionTerms.has(form)))) {
       headingScores.set(comparableSectionID(section.id), 45);
     }
@@ -2171,6 +2223,9 @@ export async function discoverRelevantEvidence({
     const id = comparableSectionID(section.id);
     if (!preliminaryIDs.has(id)) preliminary.push({ id, score: scores.get(id) || 0 });
   }
+  for (const id of districtScopeByID.keys()) {
+    if (!preliminaryIDs.has(id)) preliminary.push({ id, score: scores.get(id) || 0 });
+  }
   const detailed = [];
   const unavailableSourceCandidates = [];
   for (const entry of preliminary) {
@@ -2203,7 +2258,12 @@ export async function discoverRelevantEvidence({
     const coverage = originalTerms.length
       ? originalMatches.size / new Set(originalTerms).size
       : 0;
-    const indexedPassage = passageHitsByID.get(entry.id);
+    let indexedPassage = passageHitsByID.get(entry.id);
+    const mappedDistrictScope = districtScopeByID.get(entry.id);
+    // Preserve the entire short qualification, including its conditions and
+    // closing paragraphs. Ordinary canonical resolution still binds it later.
+    const completeDistrictScope = mappedDistrictScope && bodyPlainText.length <= 12_000;
+    if (completeDistrictScope) indexedPassage = null;
     // A monolithic source can contain the exact subsection the user named.
     // Keep that passage-level identity through fusion and final sorting; its
     // containing catalog section need not have the same section number.
@@ -2226,7 +2286,7 @@ export async function discoverRelevantEvidence({
         ))
       )
     );
-    let passage = indexedPassage ? { text: indexedPassage.text, score: indexedPassage.score,
+    let passage = completeDistrictScope ? { text: bodyPlainText, score: 0, blockID: null } : indexedPassage ? { text: indexedPassage.text, score: indexedPassage.score,
       blockID: indexedPassage.blockID } : bestPassage(body, passageTerms, bigrams);
     if (!passage) continue;
     if (routeMatch?.useSelectedPassageOnly && routeMatch.selectedExcerptPatterns.length) {
@@ -2282,6 +2342,7 @@ export async function discoverRelevantEvidence({
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
       definitionCarrier: researchEmbeddedDefinitionCarrier({ ...section, body }),
+      ...(completeDistrictScope ? { mappedDistrictScope: { district: mappedDistrictScope.district, kind: mappedDistrictScope.kind } } : {}),
     });
   }
 
@@ -2473,6 +2534,15 @@ export async function discoverRelevantEvidence({
       break;
     }
   }
+  // Keep these qualifications in the existing shortlist, preserving explicit
+  // references, the lead, and the already protected technical reservations.
+  const districtScopes = districtScopeNominations.flatMap(({ section }) =>
+    detailed.filter(item => item.mappedDistrictScope && comparableSectionID(item.section.id) === comparableSectionID(section.id)));
+  if (districtScopes.length) {
+    const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference ||
+      item.completeSiblingCompanionOf || item.currentQuestionLexicalReservation || item.currentQuestionForeground || item.currentDetailChildParent);
+    selectedCandidates = [...new Set([...protectedItems, ...districtScopes, ...selectedCandidates])].slice(0, candidateLimit);
+  }
   const selectedIDs = new Set(selectedCandidates.map((item) => item.section.id));
   const selectedPrefixCounts = new Map();
   for (const item of selectedCandidates) {
@@ -2631,6 +2701,7 @@ export async function discoverRelevantEvidence({
       whyRelevant: candidateExplanation(item),
       signals: {
         matchedTerms: item.matchedTerms.slice(0, 12),
+        ...(item.mappedDistrictScope ? { mappedDistrictScope: item.mappedDistrictScope } : {}),
         ...(item.completeSiblingCompanionOf ? { completeSiblingCompanionOf: item.completeSiblingCompanionOf } : {}),
         ...(item.currentDetailChildParent ? { currentDetailChildParent: item.currentDetailChildParent } : {}),
         ...(item.currentQuestionLexicalReservation ? { currentQuestionLexicalReservation: item.currentQuestionLexicalReservation } : {}),

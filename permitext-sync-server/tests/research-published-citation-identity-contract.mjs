@@ -9,6 +9,7 @@ import { targetedDefinitionExcerpt, researchEmbeddedDefinitionCarrier,
   researchCommonPublishedCitationReference } from "../research-definition-excerpts.mjs";
 import { researchSourceApplicabilityPrompt } from "../research-rule-packets.mjs";
 import { buildResearchRequestEnvelopeBuilders } from "./research-request-envelope-preflight.mjs";
+import { constructionHTMLBodyForSection } from "../construction-html-content.mjs";
 
 globalThis.fetch = () => { throw Error("Network/provider calls forbidden in published citation contract."); };
 process.env.NODE_ENV = "test";
@@ -25,7 +26,25 @@ const canonical = async (number, prefix = "PC") => {
   return { ...summary, sectionID: String(summary.id), body,
     text: body.blocks.map(block => block.plainText || "").join("\n\n") };
 };
-const [carrier, operative] = await Promise.all([canonical("201.4"), canonical("416.5")]);
+// Current PC/MC bodies end at the next section banner. Explicitly reconstruct
+// the legacy monolithic carrier layout this contract exercises, using complete
+// definitions from the same shipped chapter rather than assuming today's leaf
+// body still includes them. Only this test resolver sees the combined fixture.
+const legacyDefinitionCarrier = async (prefix) => {
+  const section = await canonical("201.4", prefix);
+  assert.equal(researchEmbeddedDefinitionCarrier(section), null,
+    `Current ${prefix} 201.4 remains an ordinary provision, not a dictionary.`);
+  const heading = `Section ${prefix} 202: General Definitions`;
+  const definitions = await constructionHTMLBodyForSection({ ...section,
+    sectionNumber: "202", title: heading });
+  assert(definitions?.blocks?.length, `Shipped ${prefix} 202 definitions must exist.`);
+  const html = section.body.blocks.map(block => block.html).join("\n") +
+    `<h6>${heading}</h6>` + definitions.blocks.map(block => block.html).join("\n");
+  const text = [section.text, heading, ...definitions.blocks.map(block => block.plainText)].join("\n\n");
+  return { ...section, text, body: { ...section.body,
+    blocks: [{ id: `legacy-${prefix}-definition-carrier`, kind: "html", html, plainText: text }] } };
+};
+const [carrier, operative] = await Promise.all([legacyDefinitionCarrier("PC"), canonical("416.5")]);
 const beforeCarrier = structuredClone(carrier);
 const excerpt = targetedDefinitionExcerpt(carrier, "TEMPERED WATER", {
   maximumCharacters: 1000, completeDefinitionLabels: ["TEMPERED WATER"] });
@@ -79,7 +98,7 @@ assert.equal(researchBoundDefinitionPublishedReference(carrier, excerpt, carrier
 assert.equal(researchBoundDefinitionPublishedReference(carrier, excerpt, excerpt.text.slice(0, -1)), null);
 assert.deepEqual(carrier, beforeCarrier, "Derivation does not mutate canonical or historical records.");
 
-const mechanicalCarrier = await canonical("201.4", "MC");
+const mechanicalCarrier = await legacyDefinitionCarrier("MC");
 const mechanicalExcerpt = targetedDefinitionExcerpt(mechanicalCarrier, "APPLIANCE", {
   maximumCharacters: 3000, completeDefinitionLabels: ["APPLIANCE"] });
 assert(mechanicalExcerpt);
@@ -211,16 +230,22 @@ assert.throws(() => validateResearchInterpretation(input(), [irrelevant]), error
 // Both real prompt builders receive the same server-owned distinction; normal
 // source/semantic review remains responsible for all legal claims and numbers.
 const { buildAnswerRequest, buildVerifierRequest } = await buildResearchRequestEnvelopeBuilders();
-for (const request of [buildAnswerRequest(question, packet.sources, "offline-citation"),
-  buildVerifierRequest(question, packet.sources, normalized, "offline-citation")]) {
+const answerRequest = buildAnswerRequest(question, packet.sources, "offline-citation");
+const verifierRequest = buildVerifierRequest(question, packet.sources, normalized, "offline-citation");
+for (const request of [answerRequest, verifierRequest]) {
   const line = request.input.split("\n").find(line => line.startsWith("PUBLISHED_CITATION_REFERENCE: "));
   assert.deepEqual(JSON.parse(line.slice("PUBLISHED_CITATION_REFERENCE: ".length)), definitionSource.publishedCitationReference);
   assert(request.input.includes(`SECTION_ID: ${carrier.sectionID}`));
   assert(request.input.includes("SECTION: PC 201.4") || request.input.includes("SECTION: 201.4"));
-  assert.match(request.instructions, /carrier SECTION\/TITLE remain immutable storage identifiers/);
-  assert.match(request.instructions, /does not establish rule applicability or excuse a wrong scope/);
   assert(request.input.includes(definitionSource.text));
 }
+// The compact writer policy binds supplied IDs and preserves applicability;
+// detailed published-reference review remains in the full verifier policy.
+assert.match(answerRequest.instructions, /exact supplied SECTION_ID and PASSAGE_ID values/);
+assert.match(answerRequest.instructions, /Preserve their jurisdiction, edition, dates, applicability, exact selection boundaries/);
+assert.match(answerRequest.instructions, /Do not invent facts, requirements, citations or source contents/);
+assert.match(verifierRequest.instructions, /carrier SECTION\/TITLE remain immutable storage identifiers/);
+assert.match(verifierRequest.instructions, /does not establish rule applicability or excuse a wrong scope/);
 assert(!researchSourceApplicabilityPrompt(ordinary).includes("PUBLISHED_CITATION_REFERENCE"));
 const badClaim = input();
 badClaim.answerText = "All public restroom lavatories may deliver tempered water up to 210°F without the stated device.";

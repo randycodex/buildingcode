@@ -139,10 +139,15 @@ const expectedSemanticFailureIDs = retained.results
   .sort();
 assert.deepEqual(
   deliveredReplay.filter((item) => !item.pass).map((item) => item.id).sort(),
-  [...expectedSemanticFailureIDs, "zr-rules-of-construction", "zr-new-divided-zoning-lot"].sort(),
-  "Preserve the other accepted answers, reject the five known failures, and expose the construction and date-application gaps without changing historical grading."
+  [...expectedSemanticFailureIDs, "zr-rules-of-construction", "zr-new-divided-zoning-lot", "zr-zoning-lot-contiguity-definition"].sort(),
+  "Preserve the other accepted answers, reject the five known failures, and expose construction, date-application and stated-history gaps without changing historical grading."
 );
-assert.equal(deliveredReplay.filter((item) => item.pass).length, 14);
+assert.equal(deliveredReplay.filter((item) => item.pass).length, 13);
+const historicalGap = deliveredReplay.find(item => item.id === "zr-zoning-lot-contiguity-definition");
+assert.deepEqual(historicalGap.issues.map(issue => issue.code).sort(),
+  ["HISTORICAL_LOT_PREMISE_NOT_APPLIED", "HISTORICAL_LOT_PREMISE_REOPENED"]);
+assert.equal(retained.results.find(item => item.testCase.id === historicalGap.id).scoring.passed,true,
+  "Keep the historical grade immutable while exposing the gap under the current stated-history guard.");
 assert.deepEqual(deliveredReplay.find((item) => item.id === "zr-rules-of-construction").issues.map((issue) => issue.obligationID),
   ["construction_particular_controls_general"]);
 const temporalGap = deliveredReplay.find((item) => item.id === "zr-new-divided-zoning-lot");
@@ -153,7 +158,21 @@ const temporalCorrection = structuredClone(temporalResult.answer);
 for (const field of ["answerText", "explanation"]) temporalCorrection[field] = temporalCorrection[field].replace(
   "On the supplied evidence, the stated 2026 assembly therefore does not qualify for the Section 77-11 majority-district use-regulation option.",
   "The formation year alone does not establish whether the lot existed on an applicable amendment date; that condition needs confirmation before applying either existence-date branch here.");
+const temporalEvidence = await evidenceFor(temporalResult);
+for (const point of temporalCorrection.supportedPoints) {
+  // Handwritten fixture objects use sectionNumbers; retain the original
+  // source bindings when converting a copy of a retained answer to that format.
+  point.sectionNumbers = (point.sourceIDs || []).map(id => {
+    const source = temporalEvidence.find(item => item.sourceID === id);
+    assert(source, "The corrected fixture must retain its actual supplied source.");
+    return source.sectionNumber;
+  });
+}
 assert((await controlsFor(temporalResult, temporalCorrection)).controls.pass, "Correcting the unsupported temporal inference restores acceptance while retaining the original rule and other qualifications.");
+const unboundTemporalCorrection = structuredClone(temporalCorrection);
+unboundTemporalCorrection.supportedPoints[1].sectionNumbers = [];
+assert((await controlsFor(temporalResult, unboundTemporalCorrection)).controls.issues.some(issue => issue.code === "EXPLICIT_ZONING_RULE_SOURCE_NOT_BOUND"),
+  "Corrected prose must still fail when the supporting provision is unbound.");
 assert.equal(deliveredReplay.find((item) => item.id === "zr-residential-building-spacing").pass, true,
   "Preserve the qualified spacing explanation and main-text calculation.");
 
@@ -467,6 +486,7 @@ console.log(JSON.stringify({
   retainedSemanticFailuresRejected: deliveredReplay.filter((item) => !item.pass && expectedSemanticFailureIDs.includes(item.id)).length,
   newlyDetectedRequiredCoverageGaps: ["zr-rules-of-construction"],
   newlyDetectedTemporalApplicationGaps: ["zr-new-divided-zoning-lot"],
+  newlyDetectedHistoricalPremiseGaps: ["zr-zoning-lot-contiguity-definition"],
   focusedAdversarialSuitePassed: true,
   ownerApprovedRubricsModified: false,
   paidModelCalls: 0

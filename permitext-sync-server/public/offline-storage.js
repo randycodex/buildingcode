@@ -1,4 +1,5 @@
-import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js?v=20261015-workspace-outer-edges-v1087";
+import { searchRelevanceRank, matchingSearchDefinition, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./search-relevance.js?v=1";
+import { searchWords, matchesSearchWords, searchWordsSnippet } from "./search-words.js?v=20261015-search-word-completion-v1082";
 import { parseActiveCodeSearchScope } from "./active-code-search-scope.js";
 import { codeSourceIdentity, codeSourceKey } from "./active-code-sources.js";
 import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
@@ -21,18 +22,21 @@ const reportDraftsStoreName = "report-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1672";
-const shellAssetVersion = "20261015-workspace-outer-edges-v1087";
+const shellCacheName = "permitext-pro-shell-v1730";
+const shellAssetVersion = "20261017-column-layout-merge-v1153";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
   "/web/project-details-columns.js?v=20261015-project-details-resize-v1",
-  "/web/workspace-button-icons.js?v=20261015-workspace-outer-edges-v1087",
+  "/web/workspace-button-icons.js?v=20261017-calculator-column-v1",
   "/web/minimal-workflow.js",
   "/web/notebook-questions.js",
   "/web/project-workflow.js?v=20261011-workflow-v4",
-  "/web/search-words.js?v=20261015-workspace-outer-edges-v1087",
+  "/web/search-relevance.js?v=1",
+  "/web/occupant-load-calculation.js?v=23",
+  "/web/notebook-reader-evidence.js?v=2",
+  "/web/search-words.js?v=20261015-search-word-completion-v1082",
   "/web/nyc-property-facts.js?v=20261004-zola-facts-v1",
   "/web/active-code-sources.js",
   "/web/active-code-search-scope.js",
@@ -69,21 +73,23 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20261015-workspace-outer-edges-v1087",
+  "/web/styles.css?v=20261017-column-layout-merge-v1153",
   "/web/fonts/ibm-plex-sans-variable-roman.woff2?v=1da12f0",
   "/web/fonts/ibm-plex-sans-variable-italic.woff2?v=1da12f0",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20261015-workspace-outer-edges-v1087",
+  "/web/app.js?v=20261017-column-layout-merge-v1153",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20261005-natural-recovery-v127",
   "/web/research-failure-recovery.js?v=20261005-natural-recovery-v4",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20261015-workspace-outer-edges-v1087",
+  "/web/offline-storage.js?v=20261017-column-layout-merge-v1153",
   "/web/research-intent-state.js?v=20261010-project-message-timeout-v780",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
-  "/web/workspace-state.js?v=20261015-workspace-outer-edges-v1087",
+  "/web/column-expansion.js?v=4",
+  "/web/workspace-state.js?v=20261017-column-layout-merge-v1153",
+  "/web/assistant-context.js?v=7",
   "/web/workspace-state.js?v=20261012-workflow-views-v18",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
   "/web/code-question-client-state.js?v=20260914-question-state-v4",
@@ -99,10 +105,10 @@ const shellURLs = [
   "/web/private-workspace-state.js?v=20260912-account-recovery-v8",
   "/web/legacy-workspace-restore.js?v=20261012-workflow-cache-v5",
   "/web/sync-state.js?v=20260924-empty-clears-v3",
-  "/web/workflow-views.js?v=8",
+  "/web/workflow-views.js?v=9",
   "/web/report-screen.js?v=20261011-shared-shell-v6",
   "/web/report-library.js?v=20261012-sidebar-width-v8",
-  "/web/notebook-note-menu.js?v=20261015-workspace-outer-edges-v1087",
+  "/web/notebook-note-menu.js?v=20261017-column-layout-merge-v1153",
   "/web/reader-render-batches.js?v=20261012-reader-batches-v1",
   "/web/search-query-session.js?v=20261012-search-session-v2",
   "/web/report-pdf-preview.js?v=20261012-report-preview-v4",
@@ -1393,7 +1399,7 @@ async function offlineSectionMetadataRecords(installID) {
   } finally { database.close(); }
 }
 
-async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens, sourceScope = null, exactPattern = null, phrasePattern = null, matchMode = "exact" }) {
+async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens, sourceScope = null, exactPattern = null, phrasePattern = null, matchMode = "exact", spellingSections = [], spellingPermits = () => true }) {
   const database = await openDatabase();
   try {
     const transaction = database.transaction(sectionsStoreName, "readonly");
@@ -1412,20 +1418,16 @@ async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQ
         let permitted;
         try { permitted = sourceScope === null || sourceScope.permits(section); }
         catch (error) { reject(error); return; }
+        if (permitted && (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) && spellingPermits(section)) {
+          spellingSections.push({title: section.title, headingLine: section.headingLine});
+        }
         if (
           permitted &&
           (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
           (matchMode === "words" ? matchesSearchWords([section.sectionNumber, section.title, section.headingLine, section.plainText], query) : tokens.every((token) => section.searchText.includes(token))) &&
           (!exactPattern || exactPattern.test([section.sectionNumber, section.title, section.headingLine, section.plainText].filter(Boolean).join(" ").replace(/\s+/g, " ")))
         ) {
-          const number = String(section.sectionNumber || "").toLowerCase();
-          const title = String(section.title || "").toLowerCase();
-          const rank = number === normalizedQuery
-            ? 0
-            : number.startsWith(normalizedQuery)
-              ? 1
-              : title.includes(normalizedQuery) ? 2 : matchMode === "words"
-                ? 3 - searchWords(query).filter(word => matchesSearchWords(title, word)).length / Math.max(1, searchWords(query).length) : 3;
+          const rank = searchRelevanceRank(section, query, matchMode);
           matches.push({
             rank,
             record: {
@@ -1444,6 +1446,7 @@ async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQ
               title: section.title,
               headerLine: section.headerLine,
               headingLine: section.headingLine,
+              definitionTerm: matchingSearchDefinition(section, query) || undefined,
               matchKind: phrasePattern?.test([section.sectionNumber, section.title, section.plainText].join(" ")) ? "exact" : "words",
               snippet: (matchMode === "words" ? searchWordsSnippet : searchSnippet)(section.plainText || section.title, query)
             }
@@ -1610,13 +1613,16 @@ async function offlineSearch(metadata, url) {
     `${/^[\p{L}\p{N}_]/u.test(needle) ? "(?<![\\p{L}\\p{N}_])" : ""}${escaped}${/[\p{L}\p{N}_]$/u.test(needle) ? "(?![\\p{L}\\p{N}_])" : ""}`, "iu");
   const exactPattern = url.searchParams.get("match") === "exact" ? phrasePattern : null;
   const chapters = new Map();
+  const spellingSections = [];
   const matches = (await Promise.all((await matchingOfflineSearchResults(metadata.installID, {
     codeFilter,
     normalizedQuery,
     query,
     tokens,
     sourceScope,
-    exactPattern, phrasePattern,
+    exactPattern, phrasePattern, spellingSections,
+    spellingPermits: section => (!requestedVersion || requestedVersion === "all" || section.codeVersion === syncCodeVersion(requestedVersion)) &&
+      (!resultSource || section.codePrefix === resultSource.codePrefix && section.codeVersion === resultSource.codeVersion),
     matchMode: url.searchParams.get("match") === "words" ? "words" : "exact"
   })).map(async (match) => {
     const record = await offlineSectionWithEdition(match.record, metadata, chapters);
@@ -1633,6 +1639,7 @@ async function offlineSearch(metadata, url) {
       }) ||
       Number(left.result.id) - Number(right.result.id)
     );
+  const suggestions = matches.length ? [] : searchSpellingSuggestions(query, searchVocabulary(spellingSections));
   if (url.searchParams.get("grouped") === "true" && !resultSource) {
     const grouped = new Map();
     for (const match of matches) {
@@ -1642,14 +1649,14 @@ async function offlineSearch(metadata, url) {
     }
     const groups = [], results = [];
     for (const group of grouped.values()) {
-      const page = group.slice(0, Math.min(limit || 25, 5));
+      const page = group.slice(0, initialSearchGroupLimit(grouped.size, limit || 25));
       results.push(...page);
       groups.push({ codePrefix: group[0].codePrefix, codeVersion: group[0].codeVersion,
         nextOffset: page.length, nextCandidateOffset: page.length, cursorKind: "offset",
         hasMore: page.length < group.length, totalResults: group.length });
     }
     const hasMore = groups.some(group => group.hasMore);
-    return { query, groups, results, hasMore, limited: hasMore, totalResults: matches.length };
+    return { query, groups, results, hasMore, limited: hasMore, totalResults: matches.length, suggestions };
   }
   const totalResults = matches.length;
   const selected = limit ? matches.slice(offset, offset + limit) : matches.slice(offset);
@@ -1660,7 +1667,7 @@ async function offlineSearch(metadata, url) {
     totalResults,
     offset, nextOffset, nextCandidateOffset: nextOffset, cursorKind: "offset", hasMore,
     limited: hasMore,
-    results: selected.map(({ result }) => result)
+    results: selected.map(({ result }) => result), suggestions
   };
 }
 

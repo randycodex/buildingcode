@@ -644,7 +644,7 @@ export function searchResearchPassages(index, query, options = {}) {
     }
   }
   const exact = new Set();
-  for (const [ordinal, record] of index.records.entries()) {
+  for (const [ordinal, record] of references.length ? index.records.entries() : []) {
     if (!eligible(ordinal)) continue;
     if (references.some(reference => reference.codePrefix === record.passage.codePrefix && reference.number === record.passage.subsectionNumber)) {
       exact.add(ordinal);
@@ -656,7 +656,9 @@ export function searchResearchPassages(index, query, options = {}) {
     if (score <= 0) continue;
     const record = index.records[ordinal];
     const passage = record.passage;
-    const hit = { ...passage, score, exactReference: exact.has(ordinal), matchedTerms: [...(matches.get(ordinal) || [])], ordinal };
+    // Rank lightweight records. Full passages can contain tables, parent
+    // scopes and dependency packets; copy only the final returned winners.
+    const hit = { passage, score, exactReference: exact.has(ordinal), ordinal };
     if (!grouped.has(passage.sectionID)) grouped.set(passage.sectionID, []);
     grouped.get(passage.sectionID).push(hit);
   }
@@ -669,12 +671,16 @@ export function searchResearchPassages(index, query, options = {}) {
     const selected = [];
     const seen = new Set();
     for (const hit of hits) {
-      const key = `${hit.blockID}:${hit.sourceOffsets.start}:${hit.sourceOffsets.end}`;
+      const key = `${hit.passage.blockID}:${hit.passage.sourceOffsets.start}:${hit.passage.sourceOffsets.end}`;
       if (seen.has(key)) continue;
       seen.add(key);
       selected.push(hit);
       if (selected.length >= perSection) break;
     }
     return { ...best, passages: selected };
-  }).sort(hitOrder).slice(0, limit);
+  }).sort(hitOrder).slice(0, limit).map(hit => {
+    const materialize = item => ({ ...item.passage, score: item.score,
+      exactReference: item.exactReference, matchedTerms: [...(matches.get(item.ordinal) || [])], ordinal: item.ordinal });
+    return { ...materialize(hit), passages: hit.passages.map(materialize) };
+  });
 }

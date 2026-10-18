@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
-export const researchSemanticPassagesVersion = "20261002-semantic-passage-search-v1";
+export const researchSemanticPassagesVersion = "20261015-turn-batched-semantic-v2";
 export const researchSemanticEmbeddingModel = "text-embedding-3-small";
 export const researchSemanticEmbeddingDimensions = 256;
 export const researchSemanticEmbeddingMaximumCharacters = 6200;
@@ -190,23 +190,29 @@ export function searchResearchSemanticPassages(index, vectors, queryVector, opti
     let similarity = 0;
     for (let position = 0; position < query.length; position += 1) similarity += query[position] * vector[position];
     if (!Number.isFinite(similarity) || similarity <= minimum) continue;
-    const hit = { ...passage, similarity, score: similarity, semanticInputHash: inputHash,
-      exactReference: false, matchedTerms: [], retrievalMethod: "semantic_passage" };
+    const hit = { passage, similarity, inputHash };
     if (!grouped.has(passage.sectionID)) grouped.set(passage.sectionID, []);
     grouped.get(passage.sectionID).push(hit);
   }
   return [...grouped.values()].map(hits => {
-    hits.sort((left, right) => right.similarity - left.similarity || left.id.localeCompare(right.id));
+    hits.sort((left, right) => right.similarity - left.similarity || left.passage.id.localeCompare(right.passage.id));
     const passages = [];
     const seen = new Set();
     for (const hit of hits) {
-      const key = `${hit.blockID}:${hit.sourceOffsets?.start}:${hit.sourceOffsets?.end}`;
+      const key = `${hit.passage.blockID}:${hit.passage.sourceOffsets?.start}:${hit.passage.sourceOffsets?.end}`;
       if (seen.has(key)) continue;
       seen.add(key); passages.push(hit);
       if (passages.length >= perSection) break;
     }
     return { ...hits[0], passages };
-  }).sort((left, right) => right.similarity - left.similarity || left.id.localeCompare(right.id)).slice(0, limit);
+  }).sort((left, right) => right.similarity - left.similarity || left.passage.id.localeCompare(right.passage.id)).slice(0, limit)
+    .map(hit => {
+      // Only materialize winners; score every authorized vector with the same
+      // arithmetic, ordering, deduplication and limits as before.
+      const materialize = item => ({ ...item.passage, similarity: item.similarity, score: item.similarity,
+        semanticInputHash: item.inputHash, exactReference: false, matchedTerms: [], retrievalMethod: "semantic_passage" });
+      return { ...materialize(hit), passages: hit.passages.map(materialize) };
+    });
 }
 
 /** Explicitly gated embeddings request; caller owns paid-request accounting. */
@@ -260,6 +266,43 @@ export function createResearchSemanticSearch({
   const cache = new Map();
   const maximum = Math.max(1, Math.min(2048, Number(cacheLimit) || 128));
   let providerQueue = Promise.resolve();
+  const batches = new Map();
+  const requestVector = (queryText, options, metadata) => {
+    const before = options.beforeRequest || beforeRequest;
+    const after = options.afterRequest || afterRequest;
+    // The opaque key belongs to one HTTP turn, never a user/global cache key.
+    // Without it retain the original serialized provider boundary.
+    const key = options.batchKey;
+    if (!key) {
+      const task = providerQueue.catch(() => {}).then(async () => {
+        const result = await requestResearchEmbeddings([queryText], { enabled, apiKey, fetchImpl, timeoutMS,
+          beforeRequest: before, afterRequest: after });
+        metadata.costUSD = result.costUSD; metadata.usage = result.usage;
+        return result.vectors[0];
+      });
+      providerQueue = task;
+      return task;
+    }
+    let batch = batches.get(key);
+    if (!batch) {
+      batch = { items: [], before, after };
+      batches.set(key, batch);
+      setImmediate(() => {
+        batches.delete(key);
+        const task = providerQueue.catch(() => {}).then(async () => {
+          const result = await requestResearchEmbeddings(batch.items.map(item => item.text), {
+            enabled, apiKey, fetchImpl, timeoutMS, beforeRequest: batch.before, afterRequest: batch.after });
+          // Charge a batch once; each query still receives its own exact vector.
+          batch.items[0].metadata.costUSD = result.costUSD;
+          batch.items[0].metadata.usage = result.usage;
+          batch.items.forEach((item, index) => item.resolve(result.vectors[index]));
+        });
+        providerQueue = task;
+        task.catch(error => batch.items.forEach(item => item.reject(error)));
+      });
+    }
+    return new Promise((resolve, reject) => batch.items.push({ text: queryText, metadata, resolve, reject }));
+  };
   return {
     get cacheSize() { return cache.size; },
     async search(index, question, options = {}) {
@@ -285,16 +328,9 @@ export function createResearchSemanticSearch({
           metadata.queryCached = true;
           queryVector = await cached;
         } else {
-          // Serialize provider queries even when callers arrive concurrently.
-          // Evaluation-ledger hooks can block spending on an unknown outcome.
-          const task = providerQueue.catch(() => {}).then(async () => {
-            const result = await requestResearchEmbeddings([queryText], { enabled, apiKey, fetchImpl, timeoutMS,
-              beforeRequest: options.beforeRequest || beforeRequest, afterRequest: options.afterRequest || afterRequest });
-            metadata.costUSD = result.costUSD;
-            metadata.usage = result.usage;
-            return result.vectors[0];
-          });
-          providerQueue = task;
+          // Concurrent siblings share one batch, still behind the provider
+          // queue and the same pre-dispatch reservation/unknown-outcome hooks.
+          const task = requestVector(queryText, options, metadata);
           cache.set(hash, task);
           while (cache.size > maximum) cache.delete(cache.keys().next().value);
           try { queryVector = await task; } catch (error) { if (cache.get(hash) === task) cache.delete(hash); throw error; }

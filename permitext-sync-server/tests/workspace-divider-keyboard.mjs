@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import { adjacentColumnWidths } from '../public/column-expansion.js';
 import { readFile } from 'node:fs/promises';
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 function extract(name) {
@@ -12,10 +13,11 @@ const collapsed = new Set();
 const historyOnly = new Set();
 const panes = new Map(['left', 'right'].map(id => [id, {dataset:{paneId:id}, width:600, getBoundingClientRect(){return {width:this.width};}}]));
 const state = {paneWeights:{}};
-let saves=0, layouts=0, indicators=0;
+let saves=0, layouts=0, indicators=0, expansionRestores=0;
+let restoreWidths=null;
 const readerPickers=[];
 const track = {scrollLeft:0, querySelectorAll(){return [...panes.values()];}, querySelector(selector){return panes.get(selector.match(/data-pane-id="([^"]+)"/)?.[1]);}};
-const context = vm.createContext({state, track, CSS:{escape:x=>x},isProAccount:()=>false,
+const context = vm.createContext({state, track, adjacentColumnWidths, workspaceColumnExpansion:{restore(){expansionRestores++;restoreWidths?.();}}, CSS:{escape:x=>x},isProAccount:()=>false,
   paneIsCollapsed:id=>collapsed.has(id), assistantHistoryOnlyPane:id=>historyOnly.has(id), defaultPaneWidthForID:()=>600, minimumPaneWidthForID:id=>id.startsWith('reader:')?400:600,
   applyPaneWeight:(pane,id)=>{pane.width=state.paneWeights[id];},
   notifyWorkspaceLayoutChange:()=>layouts++, saveWorkspaceState:()=>saves++,
@@ -44,24 +46,25 @@ function widths(){return [...panes.values()].map(p=>p.width);}
 panes.get('left').width=680;
 assert.equal(press(divider,'ArrowLeft'),true);
 assert.deepEqual(widths(),[656,624]);
+assert.equal(expansionRestores,1,'Resizing restores an expanded column before capturing visible widths.');
 assert.equal(divider.attrs['aria-valuenow'],'51');
 assert.equal(divider.attrs['aria-valuetext'],'Left column 656 pixels; right column 624 pixels');
 assert.equal(press(divider,'ArrowRight',true),true);
-assert.deepEqual(widths(),[736,600]); // Independent minimums match pointer behavior; total can grow.
+assert.deepEqual(widths(),[680,600]); // Shared helper preserves the pair total when either minimum is reached.
 assert.equal(saves,2);assert.equal(layouts,2);assert.equal(indicators,2);
-// Minimum-clamped left side compensates scrolling just as the pointer handler does.
+// At a pair minimum, keyboard resizing preserves both the total and scroll position.
 panes.get('left').width=600;panes.get('right').width=600;track.scrollLeft=40;
-press(divider,'ArrowLeft',true);assert.deepEqual(widths(),[600,680]);assert.equal(track.scrollLeft,120);
+press(divider,'ArrowLeft',true);assert.deepEqual(widths(),[600,600]);assert.equal(track.scrollLeft,40);
 assert.equal(press(divider,'Escape'),false);assert.equal(saves,3);
 // A collapsed neighbor delegates to the existing edge handler, in the right direction.
-collapsed.add('left');divider.handlers.focus();assert.equal(divider.attrs['aria-valuemax'],undefined);press(divider,'ArrowLeft');assert.deepEqual(widths(),[600,704]);
-assert.equal(divider.attrs['aria-valuetext'],'Column width 704 pixels');
+collapsed.add('left');divider.handlers.focus();assert.equal(divider.attrs['aria-valuemax'],undefined);press(divider,'ArrowLeft');assert.deepEqual(widths(),[600,624]);
+assert.equal(divider.attrs['aria-valuetext'],'Column width 624 pixels');
 collapsed.add('right');divider.handlers.focus();assert.equal(divider.tabIndex,-1);assert.equal(divider.attrs['aria-valuenow'],undefined);assert.equal(press(divider,'ArrowRight'),false);assert.equal(saves,4);
 collapsed.clear();divider.handlers.focus();assert.equal(divider.tabIndex,0);assert.equal(divider.attrs['aria-valuemax'],'100');const leftEdge=context.createDivider('', 'left');
-press(leftEdge,'ArrowLeft',true);assert.deepEqual(widths(),[680,704]);
-press(leftEdge,'ArrowRight',true);assert.deepEqual(widths(),[600,704]);
+press(leftEdge,'ArrowLeft',true);assert.deepEqual(widths(),[680,624]);
+press(leftEdge,'ArrowRight',true);assert.deepEqual(widths(),[600,624]);
 assert.equal(leftEdge.children.length,0,'Outer resize handles retain their existing behavior');
-const rightEdge=context.createDivider('right','');press(rightEdge,'ArrowRight');assert.deepEqual(widths(),[600,728]);
+const rightEdge=context.createDivider('right','');press(rightEdge,'ArrowRight');assert.deepEqual(widths(),[600,648]);
 // Missing DOM panes do not persist phantom widths.
 panes.delete('right');press(divider,'ArrowRight');assert.equal(saves,7);
 // A three-column layout has already shared spare viewport space. Resizing a
@@ -94,9 +97,9 @@ console.log('Workspace divider keyboard: expanded pairs, minimums, scroll compen
 for (const id of ['reader:left','reader:right']) panes.set(id,{dataset:{paneId:id},width:600,getBoundingClientRect(){return {width:this.width};}});
 const readerDivider=context.createDivider('reader:left','reader:right');
 context.resizeAdjacentPanesBy('reader:left','reader:right',1000,readerDivider);
-assert.equal(panes.get('reader:left').width,900); assert.equal(panes.get('reader:right').width,400);
+assert.equal(panes.get('reader:left').width,800); assert.equal(panes.get('reader:right').width,400);
 context.resizeAdjacentPanesBy('reader:left','reader:right',-2000,readerDivider);
-assert.equal(panes.get('reader:left').width,400); assert.equal(panes.get('reader:right').width,900);
+assert.equal(panes.get('reader:left').width,400); assert.equal(panes.get('reader:right').width,800);
 const readerEdge=context.createDivider('','reader:left'); readerEdge.handlers.focus();
 assert.equal(readerEdge.attrs['aria-valuemin'],'400'); assert.equal(readerEdge.attrs['aria-valuemax'],'900');
 context.resizePaneEdgeBy('reader:left',10000,readerEdge); assert.equal(panes.get('reader:left').width,900);
@@ -111,3 +114,12 @@ state.readers=[];
 context.syncReaderDividerButton(add);
 assert.equal(add.disabled,false);
 assert.equal(add.title,'Add Reader here');
+
+// Expanded and strip presentation sizes cannot become the resize bases.
+const restoredLeft=panes.get('left'), restoredRight=panes.get('right');
+historyOnly.clear();
+restoredLeft.width=1200;restoredRight.width=48;
+restoreWidths=()=>{restoredLeft.width=680;restoredRight.width=640;restoreWidths=null;};
+context.resizeAdjacentPanesBy('left','right',24,divider);
+assert.deepEqual([restoredLeft.width,restoredRight.width],[704,616]);
+console.log('Expanded-column keyboard resizing measures restored widths before applying the delta.');

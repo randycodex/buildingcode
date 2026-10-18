@@ -1,10 +1,17 @@
+import { searchRelevanceRank, matchingSearchDefinition, isSearchDefinitionSection, initialSearchGroupLimit, searchVocabulary, searchSpellingSuggestions } from "./public/search-relevance.js";
+import { createResearchSourceBodyReader } from "./research-source-body-cache.mjs";
+import { loadPreparedPassages } from "./research-prepared-passages.mjs";
+import { isAmbiguousResearchProjectCorrection } from "./research-project-scope.mjs";
 import { planSavedEvidenceDelete, validateSavedEvidenceDelete } from "./saved-evidence-delete.mjs";
 import { createRetryableLazyLoader } from "./retryable-lazy-loader.mjs";
 import { normalizeRecordsChecklist, selectedReportEvidenceItems, uniqueReportItems } from "./public/project-workflow.js";
 import { searchWords, matchesSearchWords, searchWordPosting, searchWordsSnippet } from "./public/search-words.js";
 import { researchWriterInstructions, researchWriterContext, researchWriterPolicyVersion } from "./research-writer-policy.mjs";
+import { occupantLoadDraftSchema, normalizeOccupantLoadDraft, occupantLoadDraftReviewInstruction } from "./research-occupant-load-draft.mjs";
 import { researchHistoryOptions, researchHistoryCursor, researchHistoryFileRows, researchHistoryPageQuery } from "./research-history-pagination.mjs";
 import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
+import { researchCitationBindingTargets, researchCitationBindingRepairSchema, applyResearchCitationBindingRepair,
+  researchCitationBindingRepairEligible, researchCitationBindingRepairInstruction } from "./research-citation-binding-repair.mjs";
 import { researchSourceBodyState, researchSourceBodyStatePrompt, researchSourceAvailabilityPrompt,
   researchSourceBodyStateInstruction } from "./research-source-body-state.mjs";
 import { applyVerifiedProjectFollowups, researchResponseFollowupQuestions } from "./research-verification-followups.mjs";
@@ -279,7 +286,7 @@ import {
   researchEconomicsReport
 } from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
-import { openInvestigationEnabled, investigateResearchEvidence, mergeInvestigationEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion, validateOpenInvestigationValue, openReviewRevisionFeedback, openCitationOnlyRepairAllowed, assertOpenCitationOnlyRepair } from "./research-open-investigation.mjs";
+import { openInvestigationEnabled, openInvestigationServiceTier, investigateResearchEvidence, mergeInvestigationEvidence, investigationInstructions, investigationSchema, reviewInstructions, reviewSchema, openInvestigationVersion, validateOpenInvestigationValue, openReviewRevisionFeedback, openCitationOnlyRepairAllowed, assertOpenCitationOnlyRepair } from "./research-open-investigation.mjs";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 import { researchDecisionFactRepair } from "./research-decision-fact-repair.mjs";
 import {
@@ -731,6 +738,11 @@ const researchInterpretationSchema = {
 
 export function researchInterpretationSchemaForEvidence(evidence, supportingSources = [], options = {}) {
   const schema = structuredClone(researchInterpretationSchema);
+  const calculationSchema = occupantLoadDraftSchema(evidence);
+  if (calculationSchema && !options.practicalNextStep && !options.conversationRecall && !options.suppliedText) {
+    schema.properties.occupantLoadDraft = calculationSchema;
+    schema.required.push("occupantLoadDraft");
+  }
   if (options.allowEvidenceGapOnly === true) {
     // Open investigation may exhaust the available law. A truthful gap must
     // not manufacture an unrelated positive rule to satisfy a JSON minimum.
@@ -8443,7 +8455,7 @@ export async function researchCorpusResources(corpusPlan) {
     const catalogs = [];
     const indexes = [];
     const passageIndexes = [];
-    for (const corpus of selected) {
+    const partitions = await Promise.allSettled(selected.map(async corpus => {
       const partitionKey = `${corpus.id}:${corpus.codeVersion}:passages=${passageSearch}`;
       let partition = cachedResearchCorpusPartitions.get(partitionKey);
       if (!partition) {
@@ -8476,7 +8488,8 @@ export async function researchCorpusResources(corpusPlan) {
             invertedIndex = await zoningSearchIndex();
           }
           return { catalog, invertedIndex,
-            passageIndex: passageSearch ? await buildResearchPassageIndex(catalog, researchBodyForCatalogSection) : null };
+            passageIndex: passageSearch ? (await loadPreparedPassages(corpus, catalog) ||
+              await buildResearchPassageIndex(catalog, researchBodyForCatalogSection)) : null };
         })().catch(error => {
           if (cachedResearchCorpusPartitions.get(partitionKey) === partition) cachedResearchCorpusPartitions.delete(partitionKey);
           throw error;
@@ -8484,7 +8497,12 @@ export async function researchCorpusResources(corpusPlan) {
         cachedResearchCorpusPartitions.set(partitionKey, partition);
         while (cachedResearchCorpusPartitions.size > 16) cachedResearchCorpusPartitions.delete(cachedResearchCorpusPartitions.keys().next().value);
       }
-      const resource = await partition;
+      return partition;
+    }));
+    const failure = partitions.find(result => result.status === "rejected");
+    if (failure) throw failure.reason;
+    // I/O overlaps, while merge order remains the authorized corpus order.
+    for (const { value: resource } of partitions) {
       catalogs.push(resource.catalog);
       indexes.push(resource.invertedIndex);
       if (resource.passageIndex) passageIndexes.push(resource.passageIndex);
@@ -8504,6 +8522,8 @@ export async function researchCorpusResources(corpusPlan) {
   while (cachedResearchCorpusResources.size > 8) cachedResearchCorpusResources.delete(cachedResearchCorpusResources.keys().next().value);
   return resourcePromise;
 }
+
+const cachedResearchSourceBody = createResearchSourceBodyReader(researchBodyForCatalogSection);
 
 export async function researchBodyForCatalogSection(section) {
   const withReservedCatalogTitle = (body) => {
@@ -8681,11 +8701,20 @@ async function sectionBody(sectionID, options = {}) {
   throw error;
 }
 
+const sectionSummaryIndexes = new WeakMap();
 async function sectionSummaryByID(sectionID) {
-  const normalizedID = String(sectionID || "").trim();
-  return (await sectionCatalog()).find((section) =>
-    String(section.id) === normalizedID || String(section.webSectionID || "") === normalizedID
-  ) || null;
+  const catalog = await sectionCatalog();
+  let byID = sectionSummaryIndexes.get(catalog);
+  if (!byID) {
+    byID = new Map();
+    // Match Array.find's first-record precedence, including alias collisions.
+    // The catalog is immutable; a replacement array gets a fresh index.
+    for (const section of catalog) for (const id of [String(section.id), String(section.webSectionID || "")]) {
+      if (!byID.has(id)) byID.set(id, section);
+    }
+    sectionSummaryIndexes.set(catalog, byID);
+  }
+  return byID.get(String(sectionID || "").trim()) || null;
 }
 
 function normalizedResearchText(value, maxLength) {
@@ -8779,7 +8808,7 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
       }
       summary = researchCatalogEntry(summary, corpus);
       canonicalID = String(summary.id || summary.sectionID || requestedID);
-      body = await researchBodyForCatalogSection(summary);
+      body = await (options.readSectionBody || researchBodyForCatalogSection)(summary);
       const rawText = (body.blocks || []).map((block) => block.plainText || "").join("\n\n");
       enactedBodyText = String(rawText || "").replace(/\s+/g, " ").trim();
       sourceBodyState = researchSourceBodyState(summary, body);
@@ -10545,7 +10574,8 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       ...allowedSupportingSources.get(use.sourceID),
       claim: use.claim
     })),
-    citations: cleanedCitations
+    citations: cleanedCitations,
+    ...(value.occupantLoadDraft ? {occupantLoadDraft: normalizeOccupantLoadDraft(value.occupantLoadDraft, evidence, cleanedCitations, options)} : {})
   };
 }
 
@@ -10762,6 +10792,7 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
 }
 
 async function openAIResearchInvestigationDecision(name, instructions, schema, input, userID, signal) {
+  const startedAt = performance.now();
   const model = "gpt-6-luna";
   let usage = combinedResearchUsage();
   let retryAfterTruncation = false;
@@ -10771,7 +10802,7 @@ async function openAIResearchInvestigationDecision(name, instructions, schema, i
       ({ payload } = await requestResearchProvider({
         apiKey: process.env.OPENAI_API_KEY,
         requestBody: {
-          model, store: false, service_tier: "default", reasoning: { effort: "medium" },
+          model, store: false, service_tier: openInvestigationServiceTier(), reasoning: { effort: "medium" },
           max_output_tokens: retryAfterTruncation ? 12000 : 6000,
           safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
           instructions: instructions + (attempt
@@ -10801,7 +10832,7 @@ async function openAIResearchInvestigationDecision(name, instructions, schema, i
         code: "INVALID_RESEARCH_RESPONSE", failureStage: "provider_incomplete"
       });
       const value = validateOpenInvestigationValue(JSON.parse(outputTextFromResponse(payload)), name);
-      return { value, model, usage, structuredResponseRetryCount:attempt };
+      return { value, model, usage, structuredResponseRetryCount:attempt, milliseconds: Math.round(performance.now() - startedAt) };
     } catch (error) {
       // Refusals, cancellation, transport failures and spending limits do not
       // authorize another format attempt. Every dispatched result stays billed.
@@ -10860,7 +10891,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
           ? (conversational ? 6_000 : 3_000)
           : (conversational ? 3_000 : 1_500),
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
-      instructions: researchWriterInstructions({ question, options }),
+      instructions: researchWriterInstructions({ question, options: {...options, occupantLoadDraft: Boolean(occupantLoadDraftSchema(passageEvidence))} }),
       input: researchInputForEvidence(question, passageEvidence, { ...options, compactWriterPolicy: true }),
       text: {
         format: {
@@ -10875,8 +10906,19 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
         }
       }
   };
-  const targetedRevision = researchTargetedRevisionEligible(options);
-  if (targetedRevision) {
+  const bindingRepair = options.citationBindingRepair === true;
+  const targetedRevision = !bindingRepair && researchTargetedRevisionEligible(options);
+  if (bindingRepair) {
+    if (!researchCitationBindingRepairEligible(options.previousInterpretation, passageEvidence, options.revisionFeedback)) {
+      throw Object.assign(new Error('Citation binding repair is unavailable for this finding.'), { code: 'RESEARCH_CITATION_REPAIR_UNAVAILABLE' });
+    }
+    requestBody.instructions = researchCitationBindingRepairInstruction;
+    const targets = `BINDING REPAIR TARGETS\n${JSON.stringify(researchCitationBindingTargets(options.previousInterpretation, passageEvidence))}`;
+    if (typeof requestBody.input === 'string') requestBody.input += `\n\n${targets}`;
+    else requestBody.input.push({ role: 'user', content: [{ type: 'input_text', text: targets }] });
+    requestBody.text.format = { type: 'json_schema', name: 'permitext_research_citation_binding_repair', strict: true,
+      schema: researchCitationBindingRepairSchema(options.previousInterpretation, passageEvidence) };
+  } else if (targetedRevision) {
     requestBody.instructions = `${researchWriterInstructions({ question, options })} ${researchTargetedRevisionInstruction}`;
     const input = `EDITABLE TEXT TARGETS\n${JSON.stringify(researchRevisionTargets(options.previousInterpretation).map(({ id, path, text, removable }) => ({ id, path, text, removable })))}`;
     if (typeof requestBody.input === "string") requestBody.input += `\n\n${input}`;
@@ -10913,16 +10955,21 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
   }
   let interpretation;
   try {
+    if (bindingRepair) {
+      value = applyResearchCitationBindingRepair(options.previousInterpretation, value, passageEvidence);
+      if (!value) throw Object.assign(new Error('The citation defect needs full answer revision.'), { code: 'RESEARCH_CITATION_REPAIR_UNAVAILABLE' });
+    }
     if (targetedRevision) value = applyResearchTargetedRevision(options.previousInterpretation, value, passageEvidence);
     interpretation = finalizeResearchGuidanceOnlyInterpretation(
       validateResearchInterpretation(
         normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
         passageEvidence,
         supportingSources,
-        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, allowEvidenceGapOnly: options.allowEvidenceGapOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText }
+        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, allowEvidenceGapOnly: options.allowEvidenceGapOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText, question, messages: options.messages, calculatorWorkFacts: options.calculatorWorkFacts }
       ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
+    if (bindingRepair) assertOpenCitationOnlyRepair(options.previousInterpretation, interpretation);
   } catch (error) {
     if (!error.failureStage) {
       error.failureStage = ["INVALID_RESEARCH_CITATION", "INVALID_RESEARCH_WEB_CITATION"]
@@ -10941,6 +10988,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
   }
   return {
     interpretation,
+    ...(bindingRepair ? { citationBindingRepairApplied: true } : {}),
     requestedModel: model,
     model: payload.model || model,
     configuration,
@@ -11129,6 +11177,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
   interpretation = structuredClone(interpretation);
   options = { ...options, mappedScopeReview: structuredClone(options.mappedScopeReview),
     messages: structuredClone(options.messages), projectContextFacts: structuredClone(options.projectContextFacts),
+    calculatorWorkFacts: structuredClone(options.calculatorWorkFacts),
     conversationFactContext: structuredClone(options.conversationFactContext),
     applicabilityFactContext: structuredClone(options.applicabilityFactContext),
     sourceAvailability: structuredClone(options.sourceAvailability) };
@@ -11211,6 +11260,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
         ? "For a conditional source explanation, evaluate answerText and supportedPoints together: answerText supplies the direct unresolved finding and concise application; supportedPoints may supply the distinct cited rules and historical alternatives. Do not require the same rules twice. Any conclusion or explanation fields are compatibility summaries, not additional required paragraphs."
         : "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
       "Presentation must fit the question: accept a concise direct paragraph for a simple or expressly short request, a compact checklist for parallel requirements, and a Markdown table only for a real side-by-side comparison. Fail with missed_material_conclusion if formatting hides the governing result or material qualification. Fail with unsupported_requirement if a bold statement, practical note, calculation, drawing note, or human-readable inline code reference is not supported by the supplied enacted evidence and structured citation map.",
+      ...(interpretation.occupantLoadDraft ? [occupantLoadDraftReviewInstruction] : []),
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
       options.allowOfficialGuidanceOnly
         ? "Because the user expressly requested official guidance, an official-guidance-only answer may correctly have no supportedPoints or enacted citations when the assembled enacted evidence does not establish a responsive rule, provided the server-rendered answer is visibly noncontrolling and supportingSourceUses contain the exact supplied web source and claim bindings. Do not demand an enacted citation for a guidance-only claim."
@@ -11291,6 +11341,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
         ? `UNTRUSTED CONVERSATION CONTEXT — resolve follow-ups and supplied facts; prior assistant claims are not authority.\n${JSON.stringify(options.messages.slice(-8).map(message => ({ role: message.role, question: message.question, answerText: message.answer?.answerText }))).slice(0, 20_000)}`
         : "",
       researchPropertyInvestigationInstruction(options.propertyResearch),
+      options.calculatorWorkFacts?.length
+        ? `CURRENT WORK FACTS FOR CALCULATOR — USER-SUPPLIED PROPOSED WORK; SEPARATE FROM EXISTING-SITE RECORDS\n${options.calculatorWorkFacts.join("\n")}`
+        : "",
       options.projectContextFacts?.length
         ? `PROJECT FACTS\n${options.projectContextFacts.join("\n")}`
         : "",
@@ -12509,7 +12562,7 @@ export function researchAssemblyCrossReferences(evidence, catalog) {
   return references;
 }
 
-export async function resolveResearchAssemblySection(request, catalog) {
+export async function resolveResearchAssemblySection(request, catalog, readSectionBody = researchBodyForCatalogSection) {
   const requestedID = String(request?.sectionID || "").trim();
   const requestedPrefix = String(request?.codePrefix || "").trim().toUpperCase();
   const requestedNumber = String(request?.sectionNumber || "").trim().replace(/\.$/, "").toUpperCase();
@@ -12533,6 +12586,7 @@ export async function resolveResearchAssemblySection(request, catalog) {
     [summary?.id || directPinnedSectionID],
     {
       skipUnavailable: false,
+      readSectionBody,
       allowOptInCorpora: Boolean(directPinnedSectionID) ||
         ["nyc-1968-building-code", "nyc-existing-building-code-2027"].includes(summary?.corpusID)
     }
@@ -12544,7 +12598,7 @@ export async function resolveResearchAssemblySection(request, catalog) {
     // Preserve that structure for selecting complete entries; flattened text
     // cannot distinguish those labels from mentions inside other definitions.
     ...((process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1" || /\bdefinitions?\b/i.test(evidence.title) || String(evidence.text || "").length > 4_000) ? {
-      body: await researchBodyForCatalogSection({ ...evidence, id: evidence.sectionID })
+      body: await readSectionBody({ ...evidence, id: evidence.sectionID })
     } : {}),
     crossReferences: researchAssemblyCrossReferences(evidence, catalog)
   };
@@ -12560,23 +12614,31 @@ export async function assembledResearchEvidenceForTurn({
   corpusPlan,
   zoningPlan = null,
   beforeSemanticRequest = null,
-  onStage
+  semanticBatchKey = null,
+  onStage,
+  onTiming = null
 }) {
+  const timing = {};
+  const measure = async (name, run) => {
+    const started = performance.now();
+    try { return await run(); } finally { timing[name] = (timing[name] || 0) + performance.now() - started; }
+  };
   const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({
     question,
     messages,
     topicContext,
     projectFacts
   });
-  const { catalog, invertedIndex, passageIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
-  const semanticResource = passageIndex ? await researchSemanticSearchResource() : null;
-  const semanticSearch = semanticResource && beforeSemanticRequest ? {
-    search: (index, query, options = {}) => semanticResource.search(index, query, { ...options,
-      beforeRequest: async ({ body }) => {
-        await beforeSemanticRequest();
-        return reserveResearchEmbeddingSpend(body);
-      } })
-  } : semanticResource;
+  const { catalog, invertedIndex, passageIndex, availableCodePrefixes } = await measure("corpusResourcesMilliseconds", () => researchCorpusResources(appliedCorpusPlan));
+  const semanticResource = passageIndex ? await measure("semanticResourceMilliseconds", () => researchSemanticSearchResource()) : null;
+  const semanticSearch = semanticResource ? {
+    search: (index, query, options = {}) => measure("semanticSearchMilliseconds", () => semanticResource.search(index, query,
+      beforeSemanticRequest ? { ...options, batchKey: semanticBatchKey,
+        beforeRequest: async ({ body }) => {
+          await beforeSemanticRequest();
+          return reserveResearchEmbeddingSpend(body);
+        } } : options))
+  } : null;
   const strategy = researchEvidenceStrategyForTurn({
     question,
     pinnedEvidence,
@@ -12604,6 +12666,7 @@ export async function assembledResearchEvidenceForTurn({
         maximumSupplementalCharacters: testSupplementalCharacterBudget
       }
     : baseAssemblyLimits;
+  const assemblyStarted = performance.now();
   const assembled = await assembleResearchEvidence({
     question,
     previousMessages: messages,
@@ -12615,20 +12678,22 @@ export async function assembledResearchEvidenceForTurn({
     onStage,
     limits: assemblyLimits,
     reserveRepairCapacity: !zoningPlan && !pinnedEvidence?.length && strategy.mode === researchEvidenceStrategies.broad,
-    discover: ({ question: retrievalQuestion, limit, retrievalContext }) => discoverRelevantEvidence({
+    discover: ({ question: retrievalQuestion, limit, retrievalContext }) => measure("discoveryMilliseconds", () => discoverRelevantEvidence({
       question: retrievalQuestion,
       retrievalContext,
       catalog,
       invertedIndex,
       passageIndex,
       semanticSearch,
-      readSectionBody: researchBodyForCatalogSection,
+      readSectionBody: cachedResearchSourceBody,
       resolveVisualSource: constructionVisualSourceMetadata,
       availableCodePrefixes,
       limit
-    }),
-    resolveSection: (request) => resolveResearchAssemblySection(request, catalog)
+    })),
+    resolveSection: (request) => measure("sourceResolutionMilliseconds", () => resolveResearchAssemblySection(request, catalog, cachedResearchSourceBody))
   });
+  timing.assemblyMilliseconds = performance.now() - assemblyStarted;
+  onTiming?.(Object.fromEntries(Object.entries(timing).map(([key, value]) => [key, Math.round(value)])));
   const zoningSelection = zoningPlan
     ? selectZoningResearchEvidence({ question, evidence: assembled.sources, plan: zoningPlan })
     : null;
@@ -20286,6 +20351,14 @@ async function handleResearchConversationMessage(request, response) {
       context.userID,
       conversation.primaryProjectID
     );
+    if (projectInformation?.projectID && isAmbiguousResearchProjectCorrection(question)) {
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "project_scope" });
+      Object.assign(researchOperation, { status: "completed", mode: "clarification",
+        model: "permitext-conversation-clarification", routingMode: "project_scope", charged: false,
+        projectLinked: true, preparationMilliseconds: Math.round(performance.now() - preparationStartedAt) });
+      return;
+    }
     const manualProjectFacts = conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
     if (researchProjectContextOnlyEligibility({ question, projectInformation })) {
@@ -20342,6 +20415,8 @@ async function handleResearchConversationMessage(request, response) {
     researchOperation.preparationMilliseconds = Math.round(performance.now() - preparationStartedAt);
     progressResponse.progress("preparing_question", "completed");
     const retrievalStartedAt = performance.now();
+    researchOperation.retrievalTimings = [];
+    const recordRetrievalTiming = timing => researchOperation.retrievalTimings.push(timing);
     const assembleForZoningPlan = (questionPlan) => assembledResearchEvidenceForTurn({
       question,
       messages: activeMessages,
@@ -20361,7 +20436,8 @@ async function handleResearchConversationMessage(request, response) {
           throw error;
         }
       },
-      onStage: progressResponse.progress
+      onStage: progressResponse.progress,
+      onTiming: recordRetrievalTiming
     });
     let evidencePackage = await assembleForZoningPlan(initialZoningPlan);
     const openInvestigation = !mockMode && openInvestigationEnabled({ pinnedEvidence, decisionLink,
@@ -20370,6 +20446,7 @@ async function handleResearchConversationMessage(request, response) {
       practicalNextStep: isResearchPracticalNextStep(question, activeMessages)
     }) && !researchQuestionIsBoundedCitationLookup(question);
     const investigationUsage = [];
+    const investigationSemanticBatchKey = {};
 
     const conversationFactState = resolveResearchConversationFacts({
       question,
@@ -20419,27 +20496,35 @@ async function handleResearchConversationMessage(request, response) {
         decide: async input => {
           const response = await openAIResearchInvestigationDecision("permitext_research_investigation", investigationInstructions,
             investigationSchema, {...input, codeBasis:answerCodeBasis, corpusPlan}, context.userID, progressResponse.signal);
-          investigationUsage.push(response.usage); return response.value;
+          investigationUsage.push(response.usage);
+          researchOperation.investigationMilliseconds = (researchOperation.investigationMilliseconds || 0) + response.milliseconds;
+          return response.value;
         },
         search: async query => {
           const searchPlan = constrainSpecialtySearchPlan(await researchCorpusPlanForTurn({question:query,
             messages: [...activeMessages, { role:"user", question }],
             projectCodeVersion:projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null}),
             investigationCorpusBoundary);
-          // Discovery may cross into a relevant historical or other available
-          // code book. Searching it is not a finding that it governs this site.
-          for (const field of ["selected", "unavailable", "requestedCorpusIDs"]) {
-            const records = [...(corpusPlan[field] || []), ...(searchPlan[field] || [])];
-            corpusPlan[field] = [...new Map(records.map(item => [typeof item === "string" ? item : item.id, item])).values()];
-          }
-          corpusPlan.excluded = (corpusPlan.excluded || []).filter(item => !corpusPlan.selected.some(selected => selected.id === item.id));
           const found = await assembledResearchEvidenceForTurn({question:query, messages:[], pinnedEvidence:[],
             originSurface:conversation.origin?.surface || "", projectFacts:[], topicContext:null, corpusPlan:searchPlan,
-            zoningPlan:null, beforeSemanticRequest:async () => { await ensureResearchTurnReservation(); },
-            onStage:progressResponse.progress});
+            zoningPlan:null, semanticBatchKey:investigationSemanticBatchKey,
+            beforeSemanticRequest:async () => {
+              if (!(await ensureResearchTurnReservation())) throw Object.assign(new Error("Research request was already handled."), {code:"RESEARCH_REQUEST_HANDLED"});
+            },
+            onStage:progressResponse.progress, onTiming:recordRetrievalTiming});
+          return { ...found, investigationCorpusPlan: searchPlan };
+        },
+        onSearchResults: results => {
+          // Merge in requested query order, never asynchronous completion order.
+          for (const { investigationCorpusPlan: searchPlan } of results) {
+            for (const field of ["selected", "unavailable", "requestedCorpusIDs"]) {
+              const records = [...(corpusPlan[field] || []), ...(searchPlan[field] || [])];
+              corpusPlan[field] = [...new Map(records.map(item => [typeof item === "string" ? item : item.id, item])).values()];
+            }
+          }
+          corpusPlan.excluded = (corpusPlan.excluded || []).filter(item => !corpusPlan.selected.some(selected => selected.id === item.id));
           Object.assign(answerCodeBasis, researchCodeBasis(conversation.primaryProjectID, projectInformation,
             new Date().toISOString(), corpusPlan));
-          return found;
         }
       });
       // The experimental model performs applicability reasoning from the actual
@@ -20798,6 +20883,7 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_conclusion", "active");
     let answerEscalated = false;
     const interpretationOptions = {
+      calculatorWorkFacts: [...manualProjectFacts],
       allowEvidenceGapOnly: openInvestigation,
       corpusPlan,
       sourceAvailability: evidencePackage.sourceAvailability,
@@ -20840,6 +20926,7 @@ async function handleResearchConversationMessage(request, response) {
             context.userID,
             { ...options, model }
           );
+    const generationStartedAt = performance.now();
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(
@@ -20885,6 +20972,7 @@ async function handleResearchConversationMessage(request, response) {
           });
           return requestInterpretation(accurateModel, interpretationOptions);
         });
+    researchOperation.generationMilliseconds = Math.round(performance.now() - generationStartedAt);
     if (result.structuredResponseRetryCount) {
       modelEscalationStages.push({
         stage: "structured_response_retry",
@@ -20936,7 +21024,7 @@ async function handleResearchConversationMessage(request, response) {
         // Use the ordinary citation validator to retain complete source metadata
         // and passages. Keep existing prose, points and citations byte-for-byte;
         // the independent verifier below must review every newly bound rule.
-        const normalized = validateResearchInterpretation(boundAnswer, assembledEvidence, webSupport.sources);
+        const normalized = validateResearchInterpretation(boundAnswer, assembledEvidence, webSupport.sources, {question, messages: activeMessages, calculatorWorkFacts: [...manualProjectFacts]});
         boundAnswer = { ...boundAnswer, citations: normalized.citations };
       }
       return {
@@ -20955,6 +21043,7 @@ async function handleResearchConversationMessage(request, response) {
     let verifierUsage = combinedResearchUsage();
     let answerGenerationUsage = result.usage;
     let answerRegenerated = false;
+    let citationBindingRepairApplied = false;
     let decisionFactRepairApplied = false;
     const applyDecisionFactCandidate = () => {
       const previous = result;
@@ -21161,6 +21250,7 @@ async function handleResearchConversationMessage(request, response) {
       }
       // Two bounded substantive repairs, then one citation-only correction if
       // all remaining issues are binding errors. Every result gets fresh review.
+      let citationBindingRepairAttempted = false;
       for (let attempt=0; attempt<4; attempt++) {
         const review = await openAIResearchInvestigationDecision("permitext_research_open_review", reviewInstructions,
           reviewSchema, { question, evidence:assembledEvidence, answer:result.interpretation,
@@ -21168,6 +21258,7 @@ async function handleResearchConversationMessage(request, response) {
               Array.isArray(result.interpretation[key]) && result.interpretation[key].length === 0),
             facts:validUserFacts, propertyResearch, codeBasis:answerCodeBasis, corpusPlan,
             supportingSources:webSupport.sources }, context.userID, progressResponse.signal);
+        researchOperation.reviewMilliseconds = (researchOperation.reviewMilliseconds || 0) + review.milliseconds;
         verifierUsage = combinedResearchUsage(verifierUsage, review.usage);
         if (typeof review.value.pass !== "boolean" || !Array.isArray(review.value.issues) ||
             review.value.pass !== (review.value.issues.length === 0)) {
@@ -21179,12 +21270,31 @@ async function handleResearchConversationMessage(request, response) {
         const citationOnlyRepair = openCitationOnlyRepairAllowed(attempt, review.value.issues);
         if (attempt > 1 && !citationOnlyRepair) throw Object.assign(new Error("The investigated answer still has a substantive accuracy issue."),
           {code:"RESEARCH_VERIFICATION_FAILED",verificationAttempts});
-        const repaired = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID,
-          {...interpretationOptions, model:"gpt-6-luna", revisionFeedback:openReviewRevisionFeedback(review.value.issues),
-            previousInterpretation:result.interpretation, disableTargetedRevision:true, citationOnlyRepair});
+        const repairStartedAt = performance.now();
+        const repairOptions = { ...interpretationOptions, model: 'gpt-6-luna',
+          revisionFeedback: openReviewRevisionFeedback(review.value.issues), previousInterpretation: result.interpretation,
+          disableTargetedRevision: true, citationOnlyRepair };
+        let repaired;
+        if (!citationBindingRepairAttempted && researchCitationBindingRepairEligible(result.interpretation, assembledEvidence, review.value.issues)) {
+          citationBindingRepairAttempted = true;
+          try {
+            repaired = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID,
+              { ...repairOptions, citationBindingRepair: true });
+          } catch (error) {
+            if (error.code !== 'RESEARCH_CITATION_REPAIR_UNAVAILABLE') {
+              error.verificationAttempts = [...verificationAttempts, ...(error.verificationAttempts || [])];
+              throw error;
+            }
+            answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, error.providerUsage);
+          }
+        }
+        repaired ||= await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID, repairOptions);
+        researchOperation.repairMilliseconds = (researchOperation.repairMilliseconds || 0) + Math.round(performance.now() - repairStartedAt);
         answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, repaired.usage);
         if (citationOnlyRepair) assertOpenCitationOnlyRepair(result.interpretation, repaired.interpretation);
-        result = repaired; answerRegenerated = true;
+        result = repaired;
+        citationBindingRepairApplied ||= repaired.citationBindingRepairApplied === true;
+        answerRegenerated ||= repaired.citationBindingRepairApplied !== true;
       }
       requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({requiredClaims,evidence:assembledEvidence,answer:result.interpretation});
       claimMateriality = evaluateResearchClaimMateriality({claims:materialityClaims,evidence:assembledEvidence,answer:result.interpretation});
@@ -21255,7 +21365,7 @@ async function handleResearchConversationMessage(request, response) {
             applicabilityFactContext,
             propertyResearch,
             messages: activeMessages,
-            projectContextFacts: combinedProjectFacts, conversationFactContext,
+            projectContextFacts: combinedProjectFacts, calculatorWorkFacts: [...manualProjectFacts], conversationFactContext,
             webSupport, allowOfficialGuidanceOnly, codeBasis: answerCodeBasis,
             requiredClaims, structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             zoningPlan, zoningDeterministicContext,
@@ -21377,6 +21487,7 @@ async function handleResearchConversationMessage(request, response) {
             propertyResearch,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
+            calculatorWorkFacts: [...manualProjectFacts],
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
@@ -21635,6 +21746,7 @@ async function handleResearchConversationMessage(request, response) {
             propertyResearch,
             messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
+            calculatorWorkFacts: [...manualProjectFacts],
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
@@ -21889,6 +22001,7 @@ async function handleResearchConversationMessage(request, response) {
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
           regenerated: answerRegenerated,
+          ...(citationBindingRepairApplied ? { citationBindingRepairApplied: true } : {}),
           ...(decisionFactRepairApplied ? { decisionFactRepairApplied: true } : {}),
           sourceBoundedRepairApplied: zoningRepairApplied,
           history: verificationAttempts
@@ -22345,6 +22458,11 @@ async function handleResearchConversationMessage(request, response) {
           durationMilliseconds: researchOperation.durationMilliseconds,
           preparationMilliseconds: researchOperation.preparationMilliseconds ?? null,
           retrievalMilliseconds: researchOperation.retrievalMilliseconds ?? null,
+          retrievalTimings: researchOperation.retrievalTimings || [],
+          investigationMilliseconds: researchOperation.investigationMilliseconds ?? null,
+          generationMilliseconds: researchOperation.generationMilliseconds ?? null,
+          reviewMilliseconds: researchOperation.reviewMilliseconds ?? null,
+          repairMilliseconds: researchOperation.repairMilliseconds ?? null,
           projectLinked: researchOperation.projectLinked ?? null,
           projectFactCount: researchOperation.projectFactCount ?? null,
           establishedConversationFactCount: researchOperation.establishedConversationFactCount ?? null,
@@ -22453,9 +22571,10 @@ async function handleResearchEvidenceDiscover(request, response) {
     if (!access) return;
   }
   try {
+    const corpus = (await currentResearchCorpusRegistry()).find(item => item.id === "nyc-2022-construction-codes");
     const discovery = await discoverRelevantEvidence({
       question: context.body.question,
-      catalog: await sectionCatalog(),
+      catalog: (await sectionCatalog()).map(section => researchCatalogEntry(section, corpus)),
       invertedIndex: await shippedSearchIndex(),
       readSectionBody: (section) => sectionBody(section.webSectionID || section.id, {
         allowMissing: true,
@@ -23698,6 +23817,7 @@ async function codeSearchResults(hits, query, matchMode = "exact") {
       title: section.title,
       headerLine: section.headerLine,
       headingLine: section.headingLine,
+      definitionTerm: matchingSearchDefinition(section, query, plainText) || undefined,
       matchKind: searchTextMatchesExactQuery([section.sectionNumber, section.title, plainText], query) ? "exact" : "words",
       snippet: (matchMode === "words" ? searchWordsSnippet : searchSnippet)(plainText || section.title || "", query)
     };
@@ -23722,7 +23842,7 @@ async function groupedCodeSearchPage(hits, query, resultLimit, matchMode = "exac
     while (next < entries.length) {
       const index = next++;
       const source = entries[index];
-      const page = await exactSearchPage(source.hits, query, 0, Math.min(5, resultLimit), matchMode);
+      const page = await exactSearchPage(source.hits, query, 0, initialSearchGroupLimit(entries.length, resultLimit), matchMode);
       pages[index] = { codePrefix: source.codePrefix, codeVersion: source.codeVersion, ...page };
     }
   }));
@@ -23850,8 +23970,16 @@ async function handleCodeSearch(request, response) {
   const includeEnacted = !historical2014Requested && (codeFilter.size === 0 ||
     [...codeFilter].some((prefix) => enactedCodePrefixes.has(prefix)));
   const candidates = [];
+  const spellingSections = [];
+  const rememberSpellingSections = (catalog, family) => {
+    const permitted = allowedIDs(catalog, family);
+    spellingSections.push(...catalog.filter(section => (!permitted || permitted.has(section.id)) &&
+      (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
+      (!resultSource || section.codePrefix === resultSource.codePrefix && codeSearchSectionVersion(section) === resultSource.codeVersion)));
+  };
   if (includeConstruction && familyEnabled("construction")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => sectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => sectionCatalog());
+    rememberSpellingSections(scopedCatalog, "construction");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "construction");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => shippedSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
@@ -23861,7 +23989,8 @@ async function handleCodeSearch(request, response) {
     ));
   }
   if (includeHistorical2014 && familyEnabled("historical2014")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
+    rememberSpellingSections(scopedCatalog, "historical2014");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "historical2014");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
@@ -23871,14 +24000,16 @@ async function handleCodeSearch(request, response) {
     ));
   }
   if (includeZoning && familyEnabled("zoning")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
+    rememberSpellingSections(scopedCatalog, "zoning");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "zoning");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => zoningSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
     candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
   }
   if (includeExistingBuilding && familyEnabled("existingBuilding")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
+    rememberSpellingSections(scopedCatalog, "existingBuilding");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "existingBuilding");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
@@ -23889,7 +24020,8 @@ async function handleCodeSearch(request, response) {
     );
   }
   if (includeEnacted && familyEnabled("enacted")) {
-    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
+    const scopedCatalog = await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
+    rememberSpellingSections(scopedCatalog, "enacted");
     const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "enacted");
     const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => enactedSearchIndex());
     const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs, matchMode));
@@ -23900,22 +24032,23 @@ async function handleCodeSearch(request, response) {
       )
     );
   }
+  const definitionBodies = new Map();
+  const definitionCandidates = candidates.filter(section => isSearchDefinitionSection(section) &&
+    (!resultSource || section.codePrefix === resultSource.codePrefix && codeSearchSectionVersion(section) === resultSource.codeVersion));
+  for (let index = 0; index < definitionCandidates.length; index += exactSearchConcurrency) {
+    await Promise.all(definitionCandidates.slice(index, index + exactSearchConcurrency).map(async section => {
+      const body = await searchableSectionPlainText(section).catch(() => null);
+      if (body !== null) definitionBodies.set(section, body);
+    }));
+  }
+  const spellingSuggestions = () => searchSpellingSuggestions(query, searchVocabulary(spellingSections));
   const hits = timePublicCodePhase("ranking", () => {
     const hits = candidates.filter(section => !resultSource ||
       (section.codePrefix === resultSource.codePrefix &&
         codeSearchSectionVersion(section) === resultSource.codeVersion)).map((section) => {
-      const sectionNumber = String(section.sectionNumber || "").toLowerCase();
-      const title = String(section.title || "").toLowerCase();
-      const rank = sectionNumber === normalizedQuery
-        ? 0
-        : sectionNumber.startsWith(normalizedQuery)
-          ? 1
-          : title.includes(normalizedQuery)
-            ? 2
-            : matchMode === "words"
-              ? 3 - queryTokens.filter(word => matchesSearchWords(title, word)).length / Math.max(1, queryTokens.length)
-              : 3;
-      return { section, rank };
+      const plainText = definitionBodies.get(section);
+      const rank = searchRelevanceRank(section, query, matchMode, plainText);
+      return { section, rank, ...(plainText === undefined ? {} : {plainText}) };
     });
     hits.sort((left, right) =>
       left.rank - right.rank ||
@@ -23932,6 +24065,7 @@ async function handleCodeSearch(request, response) {
 
   if (exactMatch && url.searchParams.get("grouped") === "true" && !resultSource) {
     const page = await timePublicCodePhase("exact_match", () => groupedCodeSearchPage(hits, query, resultLimit, matchMode));
+    if (!page.results.length && !page.hasMore) page.suggestions = spellingSuggestions();
     sendPublicCodeJSON(request, response, page);
     return;
   }
@@ -23961,6 +24095,7 @@ async function handleCodeSearch(request, response) {
     nextOffset,
     ...(exactPage ? { nextCandidateOffset: exactPage.nextCandidateOffset } : {}),
     cursorKind: exactPage ? "candidate" : "offset",
+    ...(!results.length && !hasMore ? {suggestions: spellingSuggestions()} : {}),
     hasMore,
     limited: hasMore
   });

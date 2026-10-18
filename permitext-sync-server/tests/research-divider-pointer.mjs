@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 import { researchColumnsLayout } from '../public/workflow-views.js';
+import { adjacentColumnWidths } from '../public/column-expansion.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 function actual(name) {
@@ -42,7 +43,7 @@ function fixture(ids, availableWidth = 2403, collapsedIDs = []) {
     setPointerCapture() {}, hasPointerCapture: () => true, releasePointerCapture() {}, setAttribute() {},
     getBoundingClientRect: () => ({ left: 800, right: 801 })
   };
-  const context = vm.createContext({
+  const context = vm.createContext({ workspaceColumnExpansion: undefined, adjacentColumnWidths,
     state, track, activeWorkspaceID: 'test', CSS: { escape: value => value }, researchColumnsLayout,
     currentColumnWorkflowView: () => workflow, assistantHistoryWidth: 400,
     assistantHistoryOnlyPane: id => id === 'utility:analysis', paneIsCollapsed: id => collapsed.has(id),

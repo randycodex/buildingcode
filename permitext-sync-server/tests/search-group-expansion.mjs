@@ -44,6 +44,9 @@ const partial = make();
 apply(partial, [current], all, {hasMore: true});
 assert.deepEqual(keys(partial), [], 'A truncated first page cannot establish a single edition');
 assert.equal(apply(partial, [historical], all, {hasMore: true}), false);
+const enabledSource = make();
+apply(enabledSource, [current], {querySuffix:'&sourceScope=current-only',enabledSourceCount:1}, {hasMore:true});
+assert.deepEqual(keys(enabledSource), ['BC|2022'], 'An explicit single enabled source opens even when its results are paginated.');
 // Remembered represented choices take precedence, including multiple explicit expansions.
 const remembered = make('concrete', ['BC|2014', 'MC|2022']);
 apply(remembered, [current, historical, mechanical], all);

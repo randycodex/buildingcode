@@ -9,7 +9,10 @@ for (const name of ["openSourceInReader", "openDeepLinkedSectionInReader"]) {
     let resolve;
     const gate = new Promise(done => { resolve=done; });
     const calls=[];
+    let layoutReveals = 0;
     const c=vm.createContext({
+      track:{querySelector:()=>null}, CSS:{escape:value=>value}, paneIsCollapsed:()=>false,
+      columnExpansionController:()=>({reveal(){layoutReveals++;}}),
       workspaceColumnsRequireProject: () => false, workflowPaneIsVisible: () => true, currentColumnWorkflowView: () => "research", resolvedReaderSourceNavigations: new WeakMap(), searchReaderOpeningAttempts: new Map(),
       activeWorkspaceID: "workspace-a", captureAccountRequest: () => 1, isCurrentAccountRequest: () => true,
       state:{readers:[],paneWeights:{}}, resolveReaderSource:async item=>item,
@@ -29,6 +32,7 @@ for (const name of ["openSourceInReader", "openDeepLinkedSectionInReader"]) {
     assert.deepEqual(calls,["shell",["wait","reader:reader-a"]],"Only the requested Reader is awaited before DOM-dependent work");
     resolve(ready);
     await pending;
+    assert.equal(layoutReveals, ready && name === 'openSourceInReader' ? 1 : 0, 'Layout reveal waits for the same ready/current target gate.');
     assert.deepEqual(calls,ready ? ["shell",["wait","reader:reader-a"],name==="openSourceInReader"?"reveal":"align","scroll"] : ["shell",["wait","reader:reader-a"]]);
   }
 }

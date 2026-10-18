@@ -1,7 +1,7 @@
 import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
 
 export const researchBenchmarkRetrievalEvaluationVersion =
-  "20260811-required-enacted-code-recall-v2";
+  "20261017-required-enacted-code-recall-v3";
 
 function normalizedReference(value) {
   return String(value || "").trim().replace(/\.$/, "");
@@ -225,17 +225,21 @@ export async function evaluateResearchBenchmarkRetrieval({
       { allConcrete: allConcreteRequiredCitations }
     );
     if (!expectations.references.length) continue;
-    let discoveryResult = null;
+    const discoveryResults = [];
     const evidence = await assembleResearchEvidence({
       question: testCase.question,
       discover: async (options) => {
-        discoveryResult = await discover(options);
-        paidModelCall ||= discoveryResult?.paidModelCall === true;
-        return discoveryResult;
+        const result = await discover(options);
+        discoveryResults.push(result);
+        paidModelCall ||= result?.paidModelCall === true;
+        return result;
       },
       resolveSection
     });
-    const candidateRanks = rankMap(discoveryResult?.candidates);
+    const candidateRanks = new Map();
+    for (const result of discoveryResults) for (const [id, rank] of rankMap(result?.candidates)) {
+      if (!candidateRanks.has(id) || rank < candidateRanks.get(id)) candidateRanks.set(id, rank);
+    }
     const evidenceIdentities = new Set(evidence.sources.map(sourceIdentity));
     const required = expectations.references.map((reference) => {
       const candidateRank = candidateRanks.get(reference.sectionID) || null;
@@ -260,7 +264,10 @@ export async function evaluateResearchBenchmarkRetrieval({
       question: testCase.question,
       required,
       skipped: expectations.skipped,
-      candidateCount: discoveryResult?.candidates?.length || 0,
+      // Keep the per-request cap testable while reporting all nominations.
+      candidateCount: Math.max(0, ...discoveryResults.map(result => result?.candidates?.length || 0)),
+      nominatedCandidateCount: candidateRanks.size,
+      discoveryRequestCount: discoveryResults.length,
       evidenceSourceCount: evidence.sources.length,
       candidateRecall: candidateHits / required.length,
       evidenceRecall: evidenceHits / required.length,
@@ -333,7 +340,7 @@ export function formatResearchBenchmarkRetrievalReport(report) {
   }
   lines.push(
     `Summary: ${report.summary.caseCount} cases, ${report.summary.requiredCitationCount} concrete required citations, ` +
-    `${(report.summary.candidateRecall * 100).toFixed(1)}% candidate recall@12, ` +
+    `${(report.summary.candidateRecall * 100).toFixed(1)}% candidate recall (at most 12 per discovery request), ` +
     `${(report.summary.evidenceRecall * 100).toFixed(1)}% assembled-evidence recall, ` +
     `${report.summary.fullEvidenceRecallCases}/${report.summary.caseCount} cases with full evidence recall, ` +
     `paid model calls: ${report.paidModelCall ? "yes" : "no"}.`
