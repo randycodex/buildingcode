@@ -20725,3 +20725,11 @@ body .permitext-notebook-editor .notebook-format-style-menu,
 body .bn-mantine :is(.mantine-Menu-dropdown, .bn-menu-dropdown, .bn-suggestion-menu, .bn-grid-suggestion-menu, .bn-form-popover) {
   box-shadow: none;
 }
+
+/* Dropdown edges use the same thin line as workspace column dividers. */
+body :is(.workspace-context-menu, .custom-select-menu, .search-recent-popover, .saved-action-menu, .column-group-menu, .column-style-select-menu, .workspace-menu, .reader-open-code-menu),
+body .notebook-format-insert-slot .notebook-reference-menu .notebook-reference-list,
+body .permitext-notebook-editor :is(.notebook-format-style-menu, .notebook-format-insert-menu),
+body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu-dropdown, .bn-suggestion-menu, .bn-grid-suggestion-menu, .bn-form-popover) {
+  border: 1px solid var(--border);
+}
