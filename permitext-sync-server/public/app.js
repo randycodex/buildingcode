@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-inline-project-management-v1160";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-library-settings-copy-v1161";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-inline-project-management-v1160";
+} from "./offline-storage.js?v=20261017-library-settings-copy-v1161";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-inline-project-management-v1160";
+} from "./workspace-state.js?v=20261017-library-settings-copy-v1161";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -39631,7 +39631,6 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
   const status = card.querySelector(".settings-active-sources-status");
   const list = card.querySelector(".settings-active-sources-list");
   const retry = card.querySelector(".settings-active-sources-retry");
-  const scope = card.querySelector(".settings-active-sources-scope");
   let attempt = 0;
   let rowCatalog = null;
   let rows = [];
@@ -39642,9 +39641,6 @@ function wireSettingsActiveCodeSources(panel, { enabled = false, readerMenu = fa
   };
   const render = () => {
     const snapshot = activeCodeSourcesController.state;
-    if (scope) scope.textContent = snapshot.accountID === null
-      ? "Guest choices stay in this browser on this device."
-      : "These choices apply to this account in this browser on this device.";
     if (snapshot.error || !snapshot.preferences) {
       showFailure(snapshot.error || new Error("Code source preferences are unavailable."));
       return;
