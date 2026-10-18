@@ -139,9 +139,9 @@ vm.runInContext(['bindHorizontalWheelScroll', 'renderCodeBlock'].map(actual).joi
 const html = '<table><tr><td rowspan="2">Roof slope</td><td>Attachment</td></tr></table>';
 const table = tableContext.renderCodeBlock({ kind: 'table', html });
 assert.equal(table.innerHTML, html, 'Column resizing preserves authored table cells, spans and text.');
-assert.equal(table.tabIndex, undefined, 'Tables do not add a keyboard scrolling stop.');
+assert.equal(table.tabIndex, 0, 'Tables support native keyboard scrolling.');
 assert.equal(table.attributes['aria-label'], 'Code table');
-assert.equal(table.listeners.length, 0, 'Tables do not intercept wheel gestures.');
+assert.equal(table.listeners.length, 1, 'Tables handle horizontal gestures before the workspace.');
 for (const selector of [
   '.code-table', '.research-answer-table-scroll',
   '.report-full-preview .report-preview-table'
@@ -150,36 +150,49 @@ for (const selector of [
     .find(match => /overflow-x:/.test(match[2]) &&
       match[1].replace(/\/\*[\s\S]*?\*\//g, '').split(',').some(value => value.trim() === selector));
   assert.ok(rule, `Missing table overflow rule: ${selector}`);
-  assert.match(rule[2], /overflow-x:\s*clip;/, `${selector} must not create a horizontal scroll container`);
-  assert.match(rule[2], /overflow-y:\s*visible;/, `${selector} must not turn horizontal clipping into scrollable overflow`);
+  if (selector === '.code-table') {
+    assert.match(rule[2], /overflow-x:\s*auto;/, 'Wide source tables scroll within their Reader');
+    assert.match(rule[2], /overflow-y:\s*hidden;/, 'Source tables do not create a vertical scroll area');
+    assert.match(rule[2], /overscroll-behavior-x:\s*contain;/, 'Native table scrolling stays within the table');
+  } else {
+    assert.match(rule[2], /overflow-x:\s*clip;/, `${selector} keeps its current overflow behavior`);
+    assert.match(rule[2], /overflow-y:\s*visible;/, `${selector} keeps its current vertical behavior`);
+  }
 }
-assert.match(css, /\.code-table table\s*\{[^}]*width: max-content;/, 'Wide source tables retain their authored measure until the column expands.');
+assert.match(css, /\.code-table table\s*\{[^}]*width: max-content;/, 'Wide source tables retain their authored measure while scrolling.');
 const workspace = scrollElement(1000, 3000);
 tableContext.bindHorizontalWheelScroll(workspace);
 tableContext.bindHorizontalWheelScroll(workspace);
 assert.equal(workspace.listeners.length, 1, 'Rebinding the workspace does not duplicate its wheel handler.');
-function wheel(values = {}) {
+function wheel(values = {}, overTable = true) {
   const event = { deltaX: 0, deltaY: 0, deltaMode: 0, defaultPrevented: false,
     preventDefault() { this.defaultPrevented = true; }, ...values };
-  table.listeners.forEach(listener => listener.callback(event));
+  if (overTable) table.listeners.forEach(listener => listener.callback(event));
   workspace.listeners[0].callback(event);
   return event;
 }
-assert.equal(wheel({ shiftKey: true, deltaY: 80 }).defaultPrevented, false, 'Tables leave native Shift wheel gestures available.');
-assert.equal(table.scrollLeft, 0);
+assert.equal(wheel({ shiftKey: true, deltaY: 80 }).defaultPrevented, true, 'Shift wheel scrolls the table horizontally.');
+assert.equal(table.scrollLeft, 80);
 wheel({ deltaX: 120, deltaY: 2 });
-assert.equal(table.scrollLeft, 0, 'Horizontal trackpad gestures never scroll the table.');
-assert.equal(workspace.scrollLeft, 120, 'Horizontal gestures over a table can move the workspace.');
+assert.equal(table.scrollLeft, 200, 'Horizontal trackpad gestures reveal the table columns.');
+assert.equal(workspace.scrollLeft, 0, 'Table gestures leave the workspace in place.');
 assert.equal(wheel({ deltaY: 120 }).defaultPrevented, false, 'Ordinary vertical scrolling stays available.');
-assert.equal(workspace.scrollLeft, 120);
-wheel({ deltaX: -120 });
-assert.equal(workspace.scrollLeft, 0, 'Tables do not trap gestures at their left edge.');
+assert.equal(table.scrollLeft, 200);
+wheel({ deltaX: -200 });
+assert.equal(table.scrollLeft, 0);
+assert.equal(wheel({ deltaX: -80 }).defaultPrevented, true, 'A table edge does not shift neighboring columns.');
 wheel({ deltaX: 2, deltaMode: 1 });
-assert.equal(workspace.scrollLeft, 32, 'Line-based wheels retain workspace pixel conversion.');
+assert.equal(table.scrollLeft, 32, 'Line-based wheels retain table pixel conversion.');
 wheel({ deltaX: 1, deltaMode: 2 });
-assert.equal(workspace.scrollLeft, 1032, 'Page-based wheels use the workspace viewport.');
+assert.equal(table.scrollLeft, 432, 'Page-based wheels use the table viewport.');
+wheel({ deltaX: 200 });
+assert.equal(table.scrollLeft, 500, 'The final table column can be reached.');
+wheel({ deltaX: 120 });
+assert.equal(workspace.scrollLeft, 0, 'The table right edge also keeps the workspace in place.');
 for (const modifier of ['ctrlKey', 'metaKey']) {
   assert.equal(wheel({ [modifier]: true, deltaX: 40 }).defaultPrevented, false, 'Zoom gestures remain native.');
 }
-assert.equal(table.scrollLeft, 0);
-console.log('Column table contract passed: intact content, no inner scroll/focus handlers, clipped web wrappers, preserved workspace gestures, vertical scrolling and zoom.');
+wheel({ deltaX: 120 }, false);
+assert.equal(workspace.scrollLeft, 120, 'Horizontal gestures outside tables still move the workspace.');
+assert.equal(table.scrollLeft, 500);
+console.log('Reader tables passed: intact content, keyboard access, trackpad and Shift wheel scrolling, both edges, workspace isolation, vertical scrolling and zoom.');

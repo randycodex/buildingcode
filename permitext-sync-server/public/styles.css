@@ -4588,9 +4588,10 @@ select option:checked {
   font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
   line-height: var(--reader-line-height);
-  /* Widen the column to reveal more; the table is not a scroll container. */
-  overflow-x: clip;
-  overflow-y: visible;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
 }
 
 .code-table table {

@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-reader-menu-toggle-v1167";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-reader-table-scroll-v1168";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-reader-menu-toggle-v1167";
+} from "./offline-storage.js?v=20261018-reader-table-scroll-v1168";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-reader-menu-toggle-v1167";
+} from "./workspace-state.js?v=20261018-reader-table-scroll-v1168";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17590,6 +17590,8 @@ function renderCodeBlock(block) {
     decorateCodeHTML(wrapper);
     wrapper.setAttribute("role", "region");
     wrapper.setAttribute("aria-label", "Code table");
+    wrapper.tabIndex = 0;
+    bindHorizontalWheelScroll(wrapper, { shiftWheel: true, contain: true });
     return wrapper;
   }
 
