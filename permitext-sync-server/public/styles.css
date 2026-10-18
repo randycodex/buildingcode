@@ -20748,7 +20748,8 @@ body .bn-mantine :is(.mantine-Menu-dropdown, .mantine-Popover-dropdown, .bn-menu
 .report-screen .report-rich-editor[data-kind="list"] .tiptap { padding-left: 24px; }
 .report-screen .report-rich-editor[data-kind="list"] .tiptap p { display: list-item; list-style-type: disc; }
 .report-screen .report-rich-editor[data-kind="list"][data-list-style="ordered"] .tiptap p { list-style-type: decimal; }
-.report-screen .report-rich-editor :is(strong,b) { font-weight: 700; }
+.report-screen .report-rich-editor :is(strong,b),
+.report-screen .report-highlight-target :is(strong,b) { font-size: inherit; line-height: inherit; font-weight: 700; }
 .report-screen .report-rich-editor :is(em,i) { font-style: italic; }
 .report-screen .report-rich-editor mark { background: #f4d35e55; color: inherit; }
 .report-screen .report-highlight-target mark { background: #f4d35e55; color: inherit; }
