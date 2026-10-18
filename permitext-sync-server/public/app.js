@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-reader-navigation-width-v1166";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-reader-menu-toggle-v1167";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-reader-navigation-width-v1166";
+} from "./offline-storage.js?v=20261018-reader-menu-toggle-v1167";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-reader-navigation-width-v1166";
+} from "./workspace-state.js?v=20261018-reader-menu-toggle-v1167";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -7523,9 +7523,13 @@ function populateCodeSelect(panel, reader) {
 }
 
 function openReaderCodePicker(anchor, onSelect) {
-  document.querySelector(".reader-open-code-menu")?._close?.();
+  const existing = document.querySelector(".reader-open-code-menu");
+  const sameAnchor = existing?._anchor === anchor;
+  existing?._close?.();
+  if (sameAnchor) return;
   const menu = document.createElement("div");
   menu.className = "reader-open-code-menu";
+  menu._anchor = anchor;
   menu.setAttribute("role", "dialog");
   menu.setAttribute("aria-label", "Choose a code for Reader");
   const controller = new AbortController();
