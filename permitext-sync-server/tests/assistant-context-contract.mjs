@@ -1,50 +1,82 @@
 import assert from 'node:assert/strict';
-import {assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, assistantWorkFacts, assistantDraftForConversation, normalizeAssistantViews} from '../public/assistant-context.js';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
 import {normalizeWorkspaceLayout} from '../public/workspace-state.js';
-const facts=['Existing building has 37 apartments.', 'Proposed work: New construction', 'Proposed uses: Apartments and retail', 'Applicant has not confirmed construction type.'];
-const copy=structuredClone(facts), scope=assistantWorkContext(facts);
-assert.equal(scope.workType,'New construction');assert.equal(scope.uses,'Apartments and retail');
-assert.deepEqual(assistantWorkFacts(scope),[facts[1],facts[2],facts[0],facts[3]]);
-assert.deepEqual(facts,copy,'Reading context cannot change stored facts');
-assert.equal(assistantWorkTypeForMenu(scope.workType),'New building');
-assert.equal(assistantWorkTypeForMenu('Addition'),'Enlargement / addition');
-assert.equal(assistantWorkTypeForMenu('Change of use'),'Change of use or occupancy');
-assert.equal(assistantWorkTypeForMenu('Demolition'),'Demolition','An ambiguous saved demolition scope must not be upgraded to full demolition');
-assert.equal(assistantWorkTypeForMenu('constructor'),'constructor','Custom work descriptions remain plain strings');
-for (const workType of assistantWorkTypes.filter(type=>type!=='Unspecified')) {
-  const workFacts = assistantWorkFacts({workType});
-  assert.deepEqual(workFacts,[`Proposed work: ${workType}`],'A scope selection cannot assert a filing type, CO requirement, or governing edition');
-  assert.equal(assistantWorkContext(workFacts).workType,workType);
-}
-assert.equal(assistantWorkContext(['Existing residential building']).workType,'Unspecified','Existing inventory does not establish proposed work');
-assert.deepEqual(assistantWorkFacts({workType:'Unspecified',uses:'',additionalFacts:''}),[]);
-const conflicting=['Proposed work: New construction','Proposed work: Alteration'];
-assert.deepEqual(assistantWorkFacts(assistantWorkContext(conflicting)),conflicting,'Do not silently discard additional facts with similar labels');
-assert.throws(()=>assistantWorkFacts({additionalFacts:Array.from({length:21},(_,i)=>`Fact ${i}`).join('\n')}));
-assert.throws(()=>assistantWorkFacts({uses:'a'.repeat(500)}));
-assert.throws(()=>assistantWorkFacts({additionalFacts:'Same\nSame'}));
-const view={tab:'work',collapsed:true,splitRatio:0.62,draft:{projectID:'project-a',...scope}};
-const normalized=normalizeAssistantViews({'utility:analysis':view});
-assert.deepEqual(normalizeWorkspaceLayout({researchViewState:{assistantViews:normalized}}).researchViewState.assistantViews,normalized,'Work drafts and selected-panel state must survive a workspace reload');
-const closed = normalizeAssistantViews({'utility:analysis':{...view,tab:''}});
-assert.equal(normalizeWorkspaceLayout({researchViewState:{assistantViews:closed}}).researchViewState.assistantViews['utility:analysis'].tab,'','A closed context panel stays closed after workspace reload');
-assert.deepEqual(closed['utility:analysis'].draft,normalized['utility:analysis'].draft,'Closing a context panel preserves its work draft');
-assert.equal(closed['utility:analysis'].splitRatio,0.62,'The divider position survives closing and restoring a context panel');
-assert.equal(normalizeAssistantViews({pane:{splitRatio:2}}).pane.splitRatio,0.8);
-assert.equal(normalizeAssistantViews({pane:{splitRatio:-2}}).pane.splitRatio,0.2);
-assert.equal(normalizeAssistantViews({pane:{splitRatio:NaN}}).pane.splitRatio,0.45);
-assert.equal(normalizeAssistantViews({pane:{tab:'unknown',collapsed:'true',draft:{workType:null}}}).pane.draft.workType,'Unspecified');
-assert.equal(normalizeAssistantViews({pane:{draft:{workType:'Demolition'}}}).pane.draft.workType,'Demolition','Existing user-provided work labels survive a draft reload');
-for (const tab of ['project','basis','sources','settings']) {
-  const migrated = normalizeAssistantViews({pane:{tab,draft:normalized['utility:analysis'].draft}}).pane;
-  assert.equal(migrated.tab,'work','Removed informational panels restore to Work');
-  assert.deepEqual(migrated.draft,normalized['utility:analysis'].draft,'Migrating a removed panel preserves work drafts');
-}
-assert.deepEqual(normalizeAssistantViews(null),{});
-console.log('Assistant context passed: scope stays explicit, existing facts survive, limits enforced, drafts and sidebar state reload.');
+import {researchProjectInformation} from '../app.mjs';
 
-const linked = {primaryProjectID:'a',projectContext:{projectID:'a',facts:['Proposed work: New construction']}};
-assert.equal(assistantDraftForConversation(linked,'a').workType,'New construction');
-assert.equal(assistantDraftForConversation(linked,'b').workType,'Unspecified','New chat cannot inherit another property');
-assert.equal(assistantDraftForConversation({...linked,projectContextReviewRequired:true},'a').workType,'Unspecified','New chat cannot bypass required context review');
-assert.equal(assistantDraftForConversation({...linked,projectContext:{projectID:'old',facts:linked.projectContext.facts}},'a').workType,'Unspecified');
+const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+const server = await readFile(new URL('../app.mjs', import.meta.url), 'utf8');
+const styles = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
+const extract = (text, name, async = false) => {
+  const start = text.indexOf(`${async ? 'async ' : ''}function ${name}(`);
+  assert.ok(start >= 0, name);
+  return text.slice(start, text.indexOf('\n}', start) + 2);
+};
+
+const retiredViews = {'utility:analysis': {tab:'work', splitRatio:0.8,
+  draft:{projectID:'project-a', workType:'New building', uses:'Outdated use', additionalFacts:'Outdated fact'}}};
+const normalized = normalizeWorkspaceLayout({researchViewState:{assistantViews:retiredViews,
+  drafts:{'utility:analysis':'Keep my question'},draftPaneIDs:['utility:analysis']}});
+assert.equal(Object.hasOwn(normalized.researchViewState, 'assistantViews'), false,
+  'Retired Work editor state cannot return after a workspace reload.');
+assert.equal(normalized.researchViewState.drafts['utility:analysis'], 'Keep my question');
+assert.doesNotMatch(source, /renderAssistantContextSidebar|bindAssistantContextDivider|researchAssistantViews|assistantWorkFacts|assistant-work-type-select/);
+assert.doesNotMatch(styles, /assistant-context-toolbar|assistant-context-details|assistant-context-divider|assistant-work-form/);
+assert.match(styles, /\.assistant-workspace > \.assistant-history-rail \{[^}]*grid-template-rows: minmax\(0, 1fr\) auto;/,
+  'History fills the space vacated by the Work editor.');
+
+// Start actual main and supplemental composers with a retained legacy draft.
+// Only Project identity is submitted; the server owns current Context and Facts.
+for (const supplemental of [false, true]) {
+  const elements = [], requests = [], turns = [];
+  const element = tag => {
+    const node = {tag, children:[], listeners:{}, dataset:{}, style:{}, value:'', scrollHeight:48,
+      classList:{add(){}}, setAttribute(){}, addEventListener(name,handler){this.listeners[name]=handler;},
+      append(...children){this.children.push(...children);}, querySelector(){return null;}};
+    elements.push(node); return node;
+  };
+  const instance = supplemental ? {id:'second',key:'analysis'} : null;
+  const paneID = supplemental ? 'utility:analysis:second' : 'utility:analysis';
+  const context = vm.createContext({
+    document:{createElement:element},state:{researchViewState:{assistantViews:retiredViews}},
+    workspaceProject:()=>({id:'project-a',name:'Current project'}),projectDetailKey:project=>project.id,
+    paneIDForUtilityInstance:()=>paneID,researchNewChatDrafts:new Map(),
+    researchProjectContextPreview:()=>element('preview'), researchComposerDisclosure:()=>element('disclosure'),
+    researchChatPlaceholder:'Ask a question', bindResearchSendShortcut(){}, requestAnimationFrame:fn=>fn(),
+    scheduleResearchDraftPersistence(){},flushResearchDraftPersistence(){},
+    createResearchProgressSession:()=>({stages:new Map()}),renderResearchProgressCard:()=>element('progress'),
+    startResearchProgressTimer(){},activeResearchProgress:new Map(),
+    refreshResearchConversationList:async()=>{}, openResearchConversation:async()=>{},
+    recoveredResearchProgressCallbacks:()=>({}),
+    runResearchProgressSession:async progress=>turns.push(progress.conversationID),
+    postResearch:async(path,body)=>{requests.push({path,body});return {conversation:{id:'new-chat',primaryProjectID:body.projectID}};},
+    refreshResearchProgressCard(){throw Error('Conversation submission failed');},clearInterval(){},Date,Map,
+  });
+  vm.runInContext(extract(source,'renderNewResearchComposer'),context);
+  context.renderNewResearchComposer(element('container'),true,instance);
+  const input = elements.find(node=>node.tag==='textarea');
+  input.value='What applies to the project?';input.listeners.input();
+  await elements.find(node=>node.tag==='form').listeners.submit({preventDefault(){}});
+  assert.equal(requests.length,1,'New chat does not send an extra per-conversation Work context request.');
+  assert.equal(requests[0].path,'/research/conversations/create');
+  assert.equal(requests[0].body.projectID,'project-a');
+  assert.equal(Object.hasOwn(requests[0].body,'facts'),false);
+  assert.deepEqual(turns,['new-chat']);
+}
+
+// Saved Project Context and Facts remain live; no editor draft is needed.
+let project = {id:'project-a',address:'123 Example Street',description:'Renovate the ground floor',
+  structuredFacts:[{id:'use',key:'proposed-use',label:'Proposed use',value:'Retail',status:'stated'}]};
+const serverContext=vm.createContext({String,researchProjectInformation,
+  projectAccessForUser:async(userID,projectID)=>userID==='owner'&&projectID===project.id ? {projectID,project}:null});
+vm.runInContext(extract(server,'currentResearchProjectInformation',true),serverContext);
+const first=await serverContext.currentResearchProjectInformation('owner','project-a');
+assert.equal(first.address,'123 Example Street');assert.equal(first.description,'Renovate the ground floor');
+assert.ok(first.facts.some(fact=>fact.includes('Retail')));
+project={...project,description:'Renovate the second floor',structuredFacts:[{...project.structuredFacts[0],value:'Office'}]};
+const next=await serverContext.currentResearchProjectInformation('owner','project-a');
+assert.equal(next.description,'Renovate the second floor');
+assert.ok(next.facts.some(fact=>fact.includes('Office')),'Later turns read updated saved Project facts.');
+assert.ok(first.facts.some(fact=>fact.includes('Retail')),'Previous context snapshots remain intact.');
+assert.equal(await serverContext.currentResearchProjectInformation('other','project-a'),null,'Project access remains enforced.');
+console.log('Assistant Project context passed: Work UI and draft injection removed, chat creation preserved, live Project facts and access retained.');

@@ -1,4 +1,3 @@
-import { normalizeAssistantViews } from '../public/assistant-context.js';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
@@ -8,7 +7,7 @@ function harness() {
  const drafts=new Map(), panes=new Map();let snapshot;let owner={userID:'owner',sessionToken:'session'};let focused=null;let afterTransition=()=>{};
  const state={researchConversationID:'named',utilityInstances:[],researchViewState:null};
  const find=selector=>{const id=selector.match(/data-pane-id="([^"]+)"/)?.[1];const pane=panes.get(id);if(!pane)return null;if(selector.includes('.research-question-input'))return pane.input;if(selector.includes('.research-conversation-panel')&&!pane.input)return null;return pane;};
- const context=vm.createContext({normalizeAssistantViews,researchAssistantViews:new Map(),state,Map,Set,Object,String,Event:class{},CSS:{escape:x=>x},
+ const context=vm.createContext({state,Map,Set,Object,String,Event:class{},CSS:{escape:x=>x},
   researchNewChatDrafts:drafts,researchDraftPaneIDs:new Set(),supplementalResearchConversationIDs:[],supplementalResearchConversations:new Map(),
   researchQuestionDraft:'',activeResearchConversation:null,researchHistoryShowing:false,researchConversationPaneOpened:true,restoredResearchViewState:null,
   activeWorkspaceID:'workspace',activeAccount:()=>owner,researchArtifactConsumersVisible:()=>true,

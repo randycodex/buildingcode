@@ -17257,7 +17257,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel):not(.section-deta
 .workspace-panel {
   --column-content-top-gap: calc(var(--space-2) + var(--space-3));
 }
-.workspace-panel:not(.reader-panel):not(.saved-panel):not(.notebook-panel):not(.report-draft-panel):not(.settings-panel) > header + :not([hidden]) {
+.workspace-panel:not(.reader-panel):not(.saved-panel):not(.notebook-panel):not(.report-draft-panel):not(.settings-panel):not(.assistant-workspace) > header + :not([hidden]) {
   padding-top: var(--column-content-top-gap);
 }
 .notebook-panel > .notebook-shell,
@@ -20227,7 +20227,7 @@ dialog.report-export-review {
   padding: 8px 12px; background: var(--surface); border: 1px solid var(--border);
 }
 
-/* Assistant context and conversations share a persistent sidebar. */
+/* Assistant conversation history stays beside the active chat. */
 .workspace-panel.assistant-workspace {
   --assistant-sidebar-width: 320px;
   display: grid;
@@ -20242,25 +20242,10 @@ dialog.report-export-review {
 .assistant-workspace > .panel-header > .panel-actions { margin-left: auto; }
 .assistant-workspace > .assistant-history-rail {
   grid-column: 1; grid-row: 2; display: grid;
-  grid-template-rows: auto minmax(140px, var(--assistant-context-share, .45fr)) 1px minmax(180px, var(--assistant-history-share, .55fr)) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   width: var(--assistant-sidebar-width); min-width: 0; min-height: 0;
   box-sizing: border-box; padding: 0; border-right: 1px solid var(--border); overflow: hidden;
 }
-.assistant-context-toolbar { display: grid; grid-template-columns: 48px; gap: 2px; padding: 2px 10px 12px; }
-.assistant-history-rail.is-context-closed { grid-template-rows: auto minmax(0, 1fr) auto; }
-.assistant-context-details[hidden], .assistant-context-divider[hidden] { display: none; }
-.assistant-context-divider { position: relative; min-height: 1px; background: var(--border); cursor: row-resize; touch-action: none; }
-.assistant-context-divider::before { content: ""; position: absolute; inset: -6px 0; }
-.assistant-context-divider:focus-visible { outline: 1px solid var(--text-secondary); outline-offset: 2px; }
-.assistant-history-rail.is-resizing-context, .assistant-history-rail.is-resizing-context * { cursor: row-resize !important; user-select: none; }
-.assistant-context-toolbar :is(.assistant-context-tab, .research-new-chat) {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-  width: 100%; min-width: 0; min-height: 48px; margin: 0; padding: 6px 1px;
-  border: 0; border-radius: 7px; background: transparent; color: var(--text-secondary);
-  font: inherit; font-size: 10px; line-height: 1.2; cursor: pointer;
-}
-.assistant-context-tab svg { width: 18px; height: 18px; }
-body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button, button > span) { font-size: 12px !important; }
 /* Keep the established New chat pill anchored below conversation history. */
 .assistant-history-rail > .research-new-chat {
   justify-self: end; width: max-content; max-width: calc(100% - 40px);
@@ -20268,27 +20253,8 @@ body .workspace-panel.assistant-workspace .assistant-context-toolbar :is(button,
   border-radius: var(--radius-pill); background: var(--workspace-menu-highlight);
   font-size: 12px; text-align: center;
 }
-.assistant-context-tab[aria-pressed="true"], .assistant-context-toolbar button:hover { color: var(--text-primary); background: var(--toolbar-active); }
-.assistant-context-details { min-height: 0; overflow-y: auto; padding: 18px; scrollbar-gutter: stable; }
-.assistant-context-section[hidden] { display: none; }
-.assistant-context-heading, .assistant-history-heading { margin: 0 0 16px; color: var(--text-secondary); font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
-.assistant-context-details :is(.assistant-context-heading, .assistant-context-label, label) { text-transform: none; letter-spacing: normal; }
-.assistant-context-field { display: grid; gap: 4px; margin-bottom: 16px; font-size: 13px; overflow-wrap: anywhere; }
-.assistant-context-label { font-size: 11px; color: var(--text-secondary); }
-.assistant-context-field strong { font-weight: 500; line-height: 1.5; }
-.assistant-context-copy, .assistant-context-status { margin: 8px 0 16px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
-.assistant-context-status:empty { display: none; }
-.assistant-context-section .assistant-context-action { display: block; padding: 7px 0; margin: 4px 0; text-align: left; font-size: 12px; min-height: 32px; height: auto; white-space: normal; }
-.assistant-work-form { display: grid; gap: 14px; }
-.assistant-work-form label { display: grid; gap: 7px; font-size: 11px; color: var(--text-secondary); }
-.assistant-work-form :is(select, textarea, .custom-select-trigger) { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; border: 0; border-radius: 6px; padding: 9px; background: var(--surface-muted); color: var(--text-primary); font: inherit; font-size: 12px; line-height: 1.5; }
-.assistant-work-form .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; }
-.assistant-work-form textarea { resize: vertical; min-height: 60px; }
-.assistant-work-form textarea[aria-label="Proposed uses"] { background: var(--menu-surface); }
-.assistant-work-form .assistant-work-save { justify-self: start; font-size: 12px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; height: auto; min-height: 32px; }
-.assistant-work-form .assistant-context-status { margin: 0; }
+.assistant-history-heading { margin: 0 0 16px; color: var(--text-secondary); font-size: 11px; font-weight: 500; }
 .assistant-history-rail > .analysis-content { display: block; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 18px 18px 12px; margin: 0; width: auto; }
-.assistant-history-rail.is-context-closed > .analysis-content { border-top: 1px solid var(--border); }
 .assistant-history-rail :is(.assistant-history-heading, .research-history-group-label) { text-transform: none; letter-spacing: normal; }
 .assistant-history-rail .research-history-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin: 0 0 12px; padding: 0; }
 .assistant-history-rail .research-history-filters[hidden] { display: none; }
