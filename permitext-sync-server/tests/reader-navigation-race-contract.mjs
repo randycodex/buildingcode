@@ -42,6 +42,7 @@ function harness({ delayChapters = false } = {}) {
     blankReader: element => { element.children = ["Select a chapter"]; },
     stopReaderProgressiveHydration() {}, applyCodeTheme() {}, renderReaderTrust() {},
     populateCodeSelect() {}, resetEnhancedSelects() {}, enhanceSelect() {}, preparePaneCollapse() { panel.headerTitle = panel.title; },
+    syncResearchColumnLayout() {},
     setReaderDefinitionContext() {}, syncCodeVersion: value => value,
     codeOptionVersion: option => option.version,
     fetchChapterList(prefix, version) { const r = deferred(`${prefix}-${version}`); lists.push(r); return r.promise; },

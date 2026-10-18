@@ -12,7 +12,7 @@ assert.deepEqual(researchColumnsLayout([900, 600], 2203, 1000, 3), { fits: true,
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 function actual(name) {
-  const start = source.indexOf(`function ${name}(`);
+  const start = source.search(new RegExp(`(?:async )?function ${name}\\(`));
   assert.ok(start >= 0, name);
   return source.slice(start, source.indexOf('\n}', start) + 2);
 }
@@ -76,3 +76,37 @@ assert.equal(context.maximumPaneWidthForID('utility:search:one'), 900);
 workflow = 'project-details';
 assert.equal(context.minimumPaneWidthForID('reader:one'), 400, 'Project reference Reader bounds stay intact');
 console.log('Research columns passed: equal one/two/three-column fit, 600px overflow, 900px resize limit, manual persistence, collapse, hidden views and phone isolation.');
+
+// Chapter/code refreshes prepare the live header again. That reapplies the
+// stored width, so the Research layout must be restored before publishing.
+Object.assign(context, {
+  resolvedReaderSourceNavigations: new WeakMap(),
+  workspaceReaderContentIdentity: () => 'reader-navigation',
+  beginReaderNavigation: panel => panel.dataset.readerNavigationToken = 'current',
+  applyCodeTheme() {}, renderReaderTrust() {}, populateCodeSelect() {}, resetEnhancedSelects() {},
+  populateReaderSelectors: async () => true, renderSectionContent: async () => {},
+  setTitle() {}, enhanceSelect() {},
+  preparePaneCollapse: panel => context.applyPaneWeight(panel, panel.dataset.paneId)
+});
+vm.runInContext(actual('refreshReaderContent'), context);
+workflow = 'research';
+context.window.innerWidth = track.clientWidth = 2403;
+collapsed.clear();
+for (const count of [1, 2]) {
+  panels = ['reader:one', ...(count === 2 ? ['utility:search:one'] : [])].map(makePane);
+  state.paneWeights = Object.fromEntries(panels.map(panel => [panel.dataset.paneId, 600]));
+  delete track._researchColumnLayout;
+  const readerPanel = panels[0];
+  Object.assign(readerPanel, { isConnected: true, querySelector: () => null, querySelectorAll: () => [] });
+  context.syncResearchColumnLayout();
+  const before = sizes();
+  await context.refreshReaderContent(readerPanel, {chapterID: 'any-chapter'});
+  assert.deepEqual(sizes(), before, `Changing chapters keeps the fitted width with ${count} columns`);
+  context.capturePaneResizeWidths();
+  state.paneWeights['reader:one'] = 900;
+  context.syncResearchColumnLayout();
+  const resized = sizes();
+  await context.refreshReaderContent(readerPanel, {chapterID: 'another-code-chapter'});
+  assert.deepEqual(sizes(), resized, 'Changing chapters also preserves manual widths');
+}
+console.log('Reader navigation preserves fitted and manually resized widths for one and multiple columns.');

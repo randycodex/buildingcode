@@ -5,7 +5,7 @@ import { assistantWorkTypes, assistantWorkTypeForMenu, assistantWorkContext, ass
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261017-reader-blue-save-position-v1165";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-reader-navigation-width-v1166";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -125,7 +125,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261017-reader-blue-save-position-v1165";
+} from "./offline-storage.js?v=20261018-reader-navigation-width-v1166";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -158,7 +158,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261017-reader-blue-save-position-v1165";
+} from "./workspace-state.js?v=20261018-reader-navigation-width-v1166";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -17470,6 +17470,9 @@ async function refreshReaderContent(panel, reader, options = {}) {
   if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   setTitle(panel, reader);
   preparePaneCollapse(panel);
+  // Header preparation reapplies the stored width; live Readers must keep
+  // their fitted or manually resized Research layout after navigation.
+  if (panel.isConnected) syncResearchColumnLayout();
   panel.querySelectorAll("select").forEach(enhanceSelect);
   if (saveButton) {
     saveButton.hidden = !reader.sectionID;
