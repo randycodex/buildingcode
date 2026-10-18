@@ -50,7 +50,7 @@
   background-color: #f4d35e55;
   color: inherit;
 }
-.permitext-notebook-editor .notebook-format-highlight { color: #d7b74c; }
+.permitext-notebook-editor .notebook-format-highlight { color: var(--highlight-tool-color, #826700); }
 .permitext-notebook-editor .notebook-format-save-status { margin-inline-start: auto; font-size: 11px; color: var(--text-secondary, #777); }
 .permitext-notebook-editor .notebook-format-toolbar .notebook-format-style { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; width: auto; flex: 0 0 auto; }
 .permitext-notebook-editor .notebook-format-toolbar .notebook-format-style svg { width: 14px; height: 14px; }

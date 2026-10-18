@@ -7,13 +7,14 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-editor-history-v1200";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-light-scroll-fades-v1203";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
 import { createReportOutline, moveReportBlock, reportDropIndex, scrollReportTarget, revealOutlineHandle, navigateReportOutline } from "./report-outline.js?v=20261018-pinned-outline-v12";
 import { createReportAutosave } from "./report-autosave.js?v=1";
 import { createReportUndo, reportContentBlocks } from "./report-undo.js?v=2";
+import { installScrollEdgeFades } from "./scroll-edge-fades.js?v=4";
 import { normalizeWorkflowView, normalizeWorkflowMembership, paneBelongsToView, linkPaneToView, createWorkflowScrollStore, referenceColumnsWidth, reportColumnsLayout, researchColumnsLayout } from "./workflow-views.js?v=9";
 import { createReportScreen } from "./report-screen.js?v=20261011-shared-shell-v6";
 import { createReportLibraryControls, createReportOutlineControls, createReportVersionsControls } from "./report-library.js?v=20261012-sidebar-width-v8";
@@ -128,7 +129,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-editor-history-v1200";
+} from "./offline-storage.js?v=20261018-light-scroll-fades-v1203";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -161,7 +162,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-editor-history-v1200";
+} from "./workspace-state.js?v=20261018-light-scroll-fades-v1203";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -292,6 +293,8 @@ import {
 } from "./code-question-legacy.js?v=20260806-code-question-legacy-v1";
 
 const permitextSyncSchemaVersion = 2;
+installScrollEdgeFades();
+
 let releaseIdentityPromise = null;
 const releaseSurfaceVisibility = Object.freeze({
   // Preserved for data, report, and restoration compatibility. See
@@ -334,7 +337,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20261018-editor-history-v42";
+const notebookClientVersion = "20261018-light-scroll-fades-v43";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
