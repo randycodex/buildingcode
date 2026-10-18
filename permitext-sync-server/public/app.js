@@ -6,7 +6,7 @@ import { createNotebookReaderEvidence } from "./notebook-reader-evidence.js?v=2"
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-project-recent-searches-v1176";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-open-note-insertion-v1177";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -126,7 +126,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-project-recent-searches-v1176";
+} from "./offline-storage.js?v=20261018-open-note-insertion-v1177";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -159,7 +159,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-project-recent-searches-v1176";
+} from "./workspace-state.js?v=20261018-open-note-insertion-v1177";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -16726,9 +16726,9 @@ async function addPassageToNotebook(anchor, source, exact) {
   const projectID = researchProjectID(project);
   const mount = notebookMounts.get(projectID);
   const target = mount?.insertionTarget?.();
-  const destination = await openWebWarning({ title: "Add to note", message: "Keep a link to this exact passage and its code edition.",
+  const destination = target ? "current" : await openWebWarning({ title: "Add to note", message: "Keep a link to this exact passage and its code edition.",
     confirmLabel: "Add to note", choiceLabel: "Destination Note", container: anchor.closest(".workspace-panel"),
-    choices: [...(target ? [{ value: "current", label: target.title || "Untitled Note" }] : []), { value: "new", label: "New Note" }] });
+    choices: [{ value: "new", label: "New Note" }] });
   if (!destination || !current()) return;
   const label = `${source.codePrefix} · ${researchCodeEdition(source)} · § ${source.sectionNumber} · ${source.title}`;
   const link = { id: crypto.randomUUID(), label, relationshipRole: "context", projectID,
@@ -25890,24 +25890,19 @@ function renderResearchNotebookHandoff(conversation, message) {
     const currentMount = notebookMounts.get(researchProjectID(project));
     const currentNote = currentMount?.insertionTarget?.();
     if (!savedCard && currentNote) {
-      const destination = await openWebWarning({ title: "Add to note", message: "Choose where to keep this Assistant answer.",
-        confirmLabel: "Add to note", choiceLabel: "Destination Note", container: region,
-        choices: [{ value: "current", label: currentNote.title || "Untitled Note" }, { value: "new", label: "New Note" }] });
-      if (!destination || !originIsCurrent()) return;
-      if (destination === "current") {
-        button.disabled = true;
-        try {
-          await currentMount.insertLinkedReference(currentNote.id, {
-            referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${title}`
-          });
-          if (originIsCurrent()) button.textContent = "Added to note";
-        } catch (error) {
-          if (originIsCurrent()) await showWebNotice("Note not updated", error.message);
-        } finally {
-          if (originIsCurrent()) button.disabled = false;
-        }
-        return;
+      if (!originIsCurrent()) return;
+      button.disabled = true;
+      try {
+        await currentMount.insertLinkedReference(currentNote.id, {
+          referenceKind: "researchAnswer", referenceID: message.id, label: `Research: ${title}`
+        });
+        if (originIsCurrent()) button.textContent = "Added to note";
+      } catch (error) {
+        if (originIsCurrent()) await showWebNotice("Note not updated", error.message);
+      } finally {
+        if (originIsCurrent()) button.disabled = false;
       }
+      return;
     }
     if (!savedCard && !currentNote && !await confirmWebWarning("Keep this Research reference in Notebook?",
       `Project: ${readableProjectName(project)}\n\n${title}\n\nThe new Note links to the exact saved answer and its cited sources. Review the answer before writing your own conclusion.`,
