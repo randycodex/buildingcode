@@ -12037,6 +12037,7 @@ html body .saved-project-summary textarea.saved-project-fact-input.saved-project
 
 .saved-row-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-1);
   min-height: 26px;
@@ -20462,12 +20463,8 @@ dialog.report-export-review {
 }
 
 .evidence-report-destination { margin: 0; font-size: 12px; font-weight: 400; }
-.saved-row-actions .saved-add-to-report { opacity: 1; color: var(--text-secondary); }
+.saved-row-actions .saved-add-to-report { color: var(--text-secondary); }
 .saved-row-actions .saved-add-to-report.is-in-report { color: var(--text-primary); }
-.saved-row-more { position: relative; }
-.saved-row-more > summary { list-style: none; cursor: pointer; padding: 3px 7px; color: var(--text-secondary); }
-.saved-row-more > summary::-webkit-details-marker { display: none; }
-.saved-row-more[open] > button { position: absolute; right: 0; z-index: 5; min-width: 100px; opacity: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); }
 
 .saved-row-actions button { color: var(--text-secondary); }
 

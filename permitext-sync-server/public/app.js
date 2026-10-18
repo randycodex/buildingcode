@@ -7,7 +7,7 @@ import { createOccupantLoadCard, calculateOccupantLoad, occupantLoadSource, occu
 import { notebookQuestionsText, normalizeNotebookQuestions, createNotebookQuestionsEditor } from "./notebook-questions.js";
 import { prependWorkspaceButtonIcon } from "./workspace-button-icons.js?v=20261017-calculator-column-v1";
 import { normalizeVisitedWorkflowViews, initialReportOutlineHidden, showProjectFact } from "./minimal-workflow.js";
-import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-fold-note-passages-v1182";
+import { createNotebookNoteMenu } from "./notebook-note-menu.js?v=20261018-evidence-row-actions-v1183";
 import { createProjectDetailsColumnResizers } from "./project-details-columns.js?v=20261015-project-details-resize-v1";
 import { renderReaderBlockBatches } from "./reader-render-batches.js?v=20261012-reader-batches-v1";
 import { withoutPersistentSearchQueries, writeSearchQuerySession, restoreSearchQuerySession, startSearchQuerySession } from "./search-query-session.js?v=20261012-search-session-v2";
@@ -127,7 +127,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261018-fold-note-passages-v1182";
+} from "./offline-storage.js?v=20261018-evidence-row-actions-v1183";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -160,7 +160,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20261018-fold-note-passages-v1182";
+} from "./workspace-state.js?v=20261018-evidence-row-actions-v1183";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -28341,7 +28341,7 @@ async function renderProjectNotebook(project, options = {}) {
     }
     mountState.focusCard = loadCard;
     mountState.insertionTarget = () => !disposed && !notebookReadOnly && !saveConflict && activeCard && editorMount
-      ? { id: activeCard.id, title: activeCard.title } : null;
+      ? { id: activeCard.id, title: activeCard.title, identity: notebookCardIdentity(activeCard) } : null;
     mountState.insertLinkedReference = async (cardID, reference, evidenceLink = null) => {
       requireCurrentAccountRequest(requestIdentity);
       if (disposed || notebookReadOnly || saveConflict || activeCard?.id !== cardID || !editorMount) {
@@ -37059,6 +37059,41 @@ function folderAddIconSVG() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V4h6l2 3h10v13H3Z"/><path d="M12 10v7m-3.5-3.5h7"/></svg>';
 }
 
+async function addSavedEvidenceToNotebook(anchor, item, projectID = "") {
+  const project = workspaceProject();
+  if (!project || (projectID && researchProjectID(project) !== projectID)) throw new Error("Open this Project before adding its evidence to a Note.");
+  projectID = researchProjectID(project);
+  const identity = captureAccountRequest(), workspaceID = activeWorkspaceID;
+  const generation = state.workflowNavigationGeneration || 0;
+  const mount = notebookMounts.get(projectID), target = mount?.insertionTarget?.();
+  const current = () => {
+    const next = mount?.insertionTarget?.();
+    const sameNote = target?.identity ? next?.identity === target.identity : target?.id === next?.id;
+    return anchor.isConnected && isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+      generation === (state.workflowNavigationGeneration || 0) && researchProjectID(workspaceProject() || {}) === projectID &&
+      notebookMounts.get(projectID) === mount && sameNote;
+  };
+  const blockID = item.scope === "section" || item.projectSavedScope === "section" ? "" : normalizeAnnotationBlockID(item.blockID || item.anchorID || item.contentBlockID);
+  const detail = { ...item, sectionID: String(item.sectionID), codeVersion: syncCodeVersion(item.codeVersion), blockID };
+  const { chapter, section } = await resolveSavedSectionDetail(detail);
+  if (!current()) return;
+  if (!section || !sectionRecordMatchesRequestedEdition(detail, section)) throw new Error("This saved passage's exact code edition is unavailable.");
+  const blocks = blockID
+    ? annotatedBlocksForSection(section).filter(block => normalizeAnnotationBlockID(block.id || block.tableID || block.imageID) === blockID)
+    : section.blocks || [];
+  if (!blocks.length) throw new Error("This saved passage is unavailable. Open its source and try again.");
+  const capture = document.createElement("div");
+  blocks.forEach(block => capture.append(renderCodeBlock(block)));
+  const exact = notebookEvidenceTextMap(capture, { literalInline: true }).text;
+  if (!String(exact || "").trim()) throw new Error("This saved passage has no text to add to a Note.");
+  await addPassageToNotebook(anchor, {
+    codeVersion: detail.codeVersion, codePrefix: detail.codePrefix || section.codePrefix || "BC",
+    sectionID: section.sectionID || section.id, sectionNumber: section.sectionNumber || detail.sectionNumber,
+    title: section.title || detail.title, chapterID: chapter?.id || detail.chapterID || "",
+    chapterNumber: chapter?.chapterNumber || detail.chapterNumber || "", blockID
+  }, exact);
+}
+
 function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnapshot) {
   const row = document.createElement("article");
   row.className = `saved-row saved-section-row code-theme-${codeTheme(item.codePrefix || item.code || "BC")}`;
@@ -37184,9 +37219,24 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
       });
       actions.append(reportButton);
     }
+    if (options.reportProject && !options.reportProject.sharedOnly && hasCapability("notebook")) {
+      const noteButton = document.createElement("button");
+      noteButton.type = "button";
+      noteButton.className = "saved-add-to-note";
+      noteButton.textContent = "Add to note";
+      noteButton.addEventListener("click", async () => {
+        if (noteButton.disabled) return;
+        noteButton.disabled = true;
+        try { await addSavedEvidenceToNotebook(noteButton, item, options.researchProjectID || ""); }
+        catch (error) { if (noteButton.isConnected) await showWebNotice("Passage not added", error.message); }
+        finally { if (noteButton.isConnected) noteButton.disabled = false; }
+      });
+      actions.append(noteButton);
+    }
     if (item.savedColumnKind === "bookmark") {
       const removeItemButton = document.createElement("button");
       removeItemButton.type = "button";
+      removeItemButton.className = "saved-remove-evidence";
       removeItemButton.textContent = "Remove";
       removeItemButton.addEventListener("click", async () => {
         removeItemButton.disabled = true;
@@ -37208,19 +37258,7 @@ function appendSavedEvidenceRow(codeBody, item, paneID, options, annotationSnaps
           await options.onSavedItemRemoved(item);
         }
       });
-      const more = document.createElement("details");
-      more.className = "saved-row-more";
-      const summary = document.createElement("summary");
-      summary.textContent = "⋯";
-      summary.setAttribute("aria-label", "Evidence actions");
-      more.append(summary, removeItemButton);
-      more.addEventListener("keydown", event => {
-        if (event.key === "Escape") { more.open = false; summary.focus(); }
-      });
-      more.addEventListener("focusout", () => requestAnimationFrame(() => {
-        if (!more.contains(document.activeElement)) more.open = false;
-      }));
-      actions.append(more);
+      actions.append(removeItemButton);
     }
     row.append(actions);
   }
